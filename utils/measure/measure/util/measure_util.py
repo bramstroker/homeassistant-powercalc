@@ -9,7 +9,7 @@ from statistics import mean
 import numpy as np
 
 from measure.config import MeasureConfig
-from measure.const import PROJECT_DIR, RETRY_COUNT_LIMIT, Trend, dummy_load_measurement_count, dummy_load_measurements_duration
+from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION, PROJECT_DIR, RETRY_COUNT_LIMIT, Trend
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
@@ -250,7 +250,7 @@ class MeasureUtil:
 
         print(
             "Measuring and checking dummy load... this will take at least %.0f minutes."
-            % (dummy_load_measurement_count / 60 * dummy_load_measurements_duration),
+            % (DUMMY_LOAD_MEASUREMENT_COUNT / 60 * DUMMY_LOAD_MEASUREMENTS_DURATION),
         )
 
         # Validate power meter is capable of measuring voltage
@@ -258,7 +258,7 @@ class MeasureUtil:
 
         while True:
             averages = [
-                self.take_average_measurement(dummy_load_measurements_duration, measure_resistance=True) for _ in range(dummy_load_measurement_count)
+                self.take_average_measurement(DUMMY_LOAD_MEASUREMENTS_DURATION, measure_resistance=True) for _ in range(DUMMY_LOAD_MEASUREMENT_COUNT)
             ]
 
             trend = self._check_trend(averages)

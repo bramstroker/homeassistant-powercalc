@@ -29,6 +29,6 @@ class Trend(StrEnum):
     STEADY = "steady"
 
 
-dummy_load_measurement_count = 20
-dummy_load_measurements_duration = 30
+DUMMY_LOAD_MEASUREMENT_COUNT = 20
+DUMMY_LOAD_MEASUREMENTS_DURATION = 30
 RETRY_COUNT_LIMIT = 100
