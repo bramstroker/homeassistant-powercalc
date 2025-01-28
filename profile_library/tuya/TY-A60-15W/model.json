@@ -9,6 +9,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.2:docker"
   },
-  "name": "TY-A60-15W E27",
+  "name": "Tuya Zigbee 3.0 Bulb E27 RGB+CW+WW 15W",
   "standby_power": 0.52
 }
