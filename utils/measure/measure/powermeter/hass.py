@@ -34,7 +34,7 @@ class HassPowerMeter(PowerMeter):
             time.sleep(1)
 
         state = self.client.get_state(entity_id=self._entity_id)
-        if state == "unavailable":
+        if state.state == "unavailable":
             raise PowerMeterError(f"Power sensor {self._entity_id} unavailable")
         last_updated = state.last_updated.timestamp()
         power_value = float(state.state)
@@ -44,7 +44,7 @@ class HassPowerMeter(PowerMeter):
 
         if include_voltage:
             voltage_state = self.client.get_state(entity_id=self._voltage_entity_id)
-            if voltage_state == "unavailable":
+            if voltage_state.state == "unavailable":
                 raise PowerMeterError(f"Voltage sensor {self._voltage_entity_id} unavailable")
 
             voltage_value = float(voltage_state.state)
@@ -61,7 +61,7 @@ class HassPowerMeter(PowerMeter):
             return False
 
         voltage_state = self.client.get_state(entity_id=self._voltage_entity_id)
-        if voltage_state == "unavailable":
+        if voltage_state.state == "unavailable":
             raise PowerMeterError(f"Voltage sensor {self._voltage_entity_id} unavailable")
         return True
 
