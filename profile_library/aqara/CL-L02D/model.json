@@ -8,7 +8,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.1:docker"
   },
-  "name": "Ceiling light T1M (CL-L02D)",
+  "name": "Ceiling light T1M",
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
