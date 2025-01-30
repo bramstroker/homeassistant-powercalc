@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-01-29T23:49:52.221176",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.3:docker"
+  },
+  "name": "HB-10521-HS",
+  "standby_power": 1.5,
+  "author": "Chris Hallgren <challgren@gmail.com>"
+}
