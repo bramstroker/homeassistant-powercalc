@@ -16,7 +16,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import get_test_config_dir
+from tests.common import get_test_config_dir, run_powercalc_setup
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
@@ -137,6 +137,8 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
             },
         },
     )
+
+    await run_powercalc_setup(hass, {})
 
     hass.states.async_set("media_player.test", STATE_IDLE)
     await hass.async_block_till_done()
