@@ -86,7 +86,7 @@ class HassLightController(LightController):
             "entity_id": self._entity_id,
             "transition": self._transition_time,
             "brightness": bri,
-            "color_temp": ct,
+            "color_temp_kelvin": self.mired_to_kelvin(ct),
         }
 
     def build_bri_json_body(self, bri: int) -> dict:
@@ -96,3 +96,8 @@ class HassLightController(LightController):
     def kelvin_to_mired(kelvin_temperature: float) -> int:
         """Convert degrees kelvin to mired shift."""
         return math.floor(1000000 / kelvin_temperature)
+
+    @staticmethod
+    def mired_to_kelvin(mired_temperature: float) -> int:
+        """Convert absolute mired shift to degrees kelvin."""
+        return math.floor(1000000 / mired_temperature)
