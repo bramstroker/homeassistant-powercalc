@@ -274,7 +274,7 @@ class Measure:
         answers = inquirer.prompt(questions_to_ask, answers=predefined_answers, render=self.console_render)
         answers.update(predefined_answers)
 
-        if not isinstance(answers[QUESTION_MODE], set):
+        if QUESTION_MODE in answers and not isinstance(answers[QUESTION_MODE], set):
             answers[QUESTION_MODE] = {LutMode(answers[QUESTION_MODE])}
 
         _LOGGER.debug("Answers: %s", answers)
