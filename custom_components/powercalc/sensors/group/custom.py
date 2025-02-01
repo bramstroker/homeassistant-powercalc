@@ -741,7 +741,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             state,
         )
 
-        start_at_zero = bool(self._sensor_config.get(CONF_GROUP_ENERGY_START_AT_ZERO, False))
+        start_at_zero = bool(self._sensor_config.get(CONF_GROUP_ENERGY_START_AT_ZERO, True))
         delta = Decimal(0) if not prev_state and start_at_zero else cur_state_value - prev_state_value
 
         if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
