@@ -71,8 +71,7 @@ class LutRegistry:
         cache_key = f"{power_profile.manufacturer}_{power_profile.model}_{lookup_mode}_{power_profile.sub_profile}"
         lookup_dict = self._lookup_dictionaries.get(cache_key)
         if lookup_dict is None:
-            defaultdict_of_dict = partial(defaultdict, dict)  # type: ignore[var-annotated]
-            lookup_dict = defaultdict(defaultdict_of_dict)
+            lookup_dict = defaultdict(partial(defaultdict, dict))
 
             csv_file = await self._hass.async_add_executor_job(partial(self.get_lut_file, power_profile, lookup_mode))
             with csv_file:
@@ -102,6 +101,7 @@ class LutRegistry:
 
     @staticmethod
     def get_lut_file(power_profile: PowerProfile, lookup_mode: LookupMode) -> TextIO:
+        """Open the LUT file for the given power profile and color mode. When the file is gzipped, it will be extracted with gzip."""
         path = os.path.join(power_profile.get_model_directory(), f"{lookup_mode}.csv")
 
         gzip_path = f"{path}.gz"
