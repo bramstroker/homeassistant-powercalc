@@ -35,8 +35,6 @@ from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
-LUT_COLOR_MODES = {ColorMode.BRIGHTNESS, ColorMode.COLOR_TEMP, ColorMode.HS}
-
 _LOGGER = logging.getLogger(__name__)
 
 BrightnessLutValue = float
