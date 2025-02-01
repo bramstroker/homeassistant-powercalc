@@ -7,6 +7,7 @@ import inquirer
 from phue import Bridge, PhueRegistrationException
 
 from measure.const import PROJECT_DIR
+from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
 from measure.controller.light.errors import LightControllerError, ModelNotDiscoveredError
 
@@ -24,9 +25,9 @@ class HueLightController(LightController):
 
     def change_light_state(
         self,
-        color_mode: str,
+        lut_mode: LutMode,
         on: bool = True,
-        **kwargs,  # noqa: ANN003
+        **kwargs: Any,  # noqa: ANN401
     ) -> None:
         kwargs["on"] = on
         if self.is_group:
@@ -104,3 +105,9 @@ class HueLightController(LightController):
         light_type, light_id = answers["light"].split(":")
         self.is_group = light_type == TYPE_GROUP
         self.light_id = int(light_id)
+
+    def has_effect_support(self) -> bool:
+        return False
+
+    def get_effect_list(self) -> list[str]:
+        return []
