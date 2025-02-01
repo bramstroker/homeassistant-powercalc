@@ -10,7 +10,7 @@ from homeassistant_api import Client, HomeassistantAPIError
 from measure.const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightController, LightInfo
-from measure.controller.light.errors import LightControllerError
+from measure.controller.light.errors import ApiConnectionError, LightControllerError
 
 
 class HassLightController(LightController):
@@ -41,7 +41,10 @@ class HassLightController(LightController):
             LutMode.EFFECT: self.build_effect_json_body,
         }.get(lut_mode, self.build_bri_json_body)(**kwargs)
 
-        self.client.trigger_service("light", "turn_on", **json)
+        try:
+            self.client.trigger_service("light", "turn_on", **json)
+        except HomeassistantAPIError as e:
+            raise ApiConnectionError(f"Failed to change light state: {e}") from e
         time.sleep(self._transition_time)
 
     def get_light_info(self) -> LightInfo:

@@ -17,6 +17,7 @@ import inquirer
 from measure.config import MeasureConfig
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightInfo
+from measure.controller.light.errors import ApiConnectionError
 from measure.controller.light.factory import LightControllerFactory
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
@@ -162,11 +163,19 @@ class LightRunner(MeasurementRunner):
                     )
                 _LOGGER.info("Changing light to: %s", variation)
                 variation_start_time = time.time()
-                self.light_controller.change_light_state(
-                    mode,
-                    on=True,
-                    **asdict(variation),
-                )
+                for _ in range(5):
+                    try:
+                        self.light_controller.change_light_state(
+                            mode,
+                            on=True,
+                            **asdict(variation),
+                        )
+                        break
+                    except ApiConnectionError as e:
+                        _LOGGER.warning("Failed to change light state: %s. Retrying...", e)
+                        time.sleep(5)
+                else:
+                    raise RunnerError("Failed to change light state after 5 retries")
 
                 self.wait(variation, previous_variation)
 
