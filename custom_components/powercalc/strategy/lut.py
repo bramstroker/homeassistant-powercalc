@@ -44,7 +44,7 @@ ColorTempLutValue = dict[int, float]
 SatLutValue = dict[int, float]
 HsLutValue = dict[int, SatLutValue]
 EffectLutValue = dict[str, float]
-LookupDictValue = BrightnessLutValue | ColorTempLutValue | HsLutValue | EffectLutValue
+LookupDictValue = BrightnessLutValue | ColorTempLutValue | HsLutValue
 LookupDictType = dict[int, LookupDictValue]
 
 
@@ -89,6 +89,8 @@ class LutRegistry:
                         )
                     elif lookup_mode == LookupMode.COLOR_TEMP:
                         lookup_dict[int(row[0])][int(row[1])] = float(row[2])
+                    elif lookup_mode == LookupMode.EFFECT:
+                        lookup_dict[row[0]][int(row[1])] = float(row[2])
                     else:
                         lookup_dict[int(row[0])] = float(row[1])
                     line_count += 1
@@ -156,7 +158,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if brightness > 255:
             brightness = 255
 
-        color_mode = await self.get_selected_color_mode(attrs)
+        supported_lut_modes = await self._lut_registry.get_supported_modes(self._profile)
+        color_mode = await self.get_selected_color_mode(attrs, supported_lut_modes)
         if color_mode == ColorMode.UNKNOWN:
             _LOGGER.warning(
                 "%s: Could not calculate power. color mode unknown",
@@ -165,11 +168,11 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return None
 
         effect = attrs.get(ATTR_EFFECT)
-        lut_mode = LookupMode.EFFECT if effect else LookupMode.from_color_mode(color_mode)
+        active_mode = LookupMode.EFFECT if effect and LookupMode.EFFECT in supported_lut_modes else LookupMode.from_color_mode(color_mode)
         try:
             lookup_table = await self._lut_registry.get_lookup_dictionary(
                 self._profile,
-                lut_mode,
+                active_mode,
             )
         except LutFileNotFoundError:
             _LOGGER.error(
@@ -180,7 +183,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             )
             return None
 
-        light_setting = self.create_light_setting(entity_state, color_mode, brightness, effect)
+        light_setting = self.create_light_setting(entity_state, color_mode, brightness)
         if not light_setting:
             return None
 
@@ -189,6 +192,12 @@ class LutStrategy(PowerCalculationStrategyInterface):
             entity_state.entity_id,
             {attr: getattr(light_setting, attr) for attr in vars(light_setting)},
         )
+
+        if active_mode == LookupMode.EFFECT:
+            lookup_table = lookup_table.get(effect)  # type: ignore
+            if not lookup_table:
+                _LOGGER.warning('%s: Effect "%s" not found in LUT', entity_state.entity_id, effect)
+                return None
 
         power = Decimal(self.lookup_power(lookup_table, light_setting))
 
@@ -200,10 +209,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
         entity_state: State,
         color_mode: ColorMode,
         brightness: int,
-        effect: str | None = None,
     ) -> LightSetting | None:
         """Create a LightSetting object based on the entity state."""
-        light_setting = LightSetting(color_mode=color_mode, brightness=brightness, effect=effect)
+        light_setting = LightSetting(color_mode=color_mode, brightness=brightness)
 
         attrs = entity_state.attributes
         original_color_mode = attrs.get(ATTR_COLOR_MODE)
@@ -223,17 +231,18 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         return light_setting
 
-    async def get_selected_color_mode(self, attrs: Mapping[str, Any]) -> ColorMode:
+    async def get_selected_color_mode(self, attrs: Mapping[str, Any], supported_modes: set[LookupMode]) -> ColorMode:
         """Get the selected color mode for the entity."""
         try:
             color_mode = ColorMode(str(attrs.get(ATTR_COLOR_MODE, ColorMode.UNKNOWN)))
         except ValueError:
             color_mode = ColorMode.UNKNOWN
+        if color_mode == ColorMode.UNKNOWN:
+            return color_mode
         if color_mode in COLOR_MODES_COLOR:
             color_mode = ColorMode.HS
         lookup_mode = LookupMode.from_color_mode(color_mode)
-        profile_modes = await self._lut_registry.get_supported_modes(self._profile)
-        if lookup_mode not in profile_modes and color_mode == ColorMode.COLOR_TEMP:
+        if lookup_mode not in supported_modes and color_mode == ColorMode.COLOR_TEMP:
             _LOGGER.debug("Color mode not natively supported, falling back to HS")
             color_mode = ColorMode.HS
         return color_mode
@@ -272,22 +281,13 @@ class LutStrategy(PowerCalculationStrategyInterface):
         lut_value: LookupDictValue,
         light_setting: LightSetting,
     ) -> float:
-        if light_setting.effect:
-            return lut_value.get(light_setting.effect)  # type: ignore
-
-        if light_setting.color_mode == ColorMode.BRIGHTNESS:
-            return lut_value  # type: ignore
-
-        if not isinstance(lut_value, dict):  # pragma: no cover
-            _LOGGER.warning(
-                "Cannot calculate power for LutStrategy, expecting a dictionary",
-            )
-            return 0
+        if isinstance(lut_value, float):
+            return lut_value
 
         if light_setting.color_mode == ColorMode.COLOR_TEMP:
             return self.get_nearest(lut_value, light_setting.color_temp or 0)  # type: ignore
 
-        sat_values = self.get_nearest(lut_value, light_setting.hue or 0)  # type: ignore
+        sat_values = self.get_nearest(lut_value, light_setting.hue or 0)
         return self.get_nearest(sat_values, light_setting.saturation or 0)  # type: ignore
 
     @staticmethod
