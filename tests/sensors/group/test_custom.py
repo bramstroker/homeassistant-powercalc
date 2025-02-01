@@ -289,6 +289,7 @@ async def test_reset_service(hass: HomeAssistant) -> None:
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
+            CONF_GROUP_ENERGY_START_AT_ZERO: False,
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1"),
                 get_simple_fixed_config("input_boolean.test2"),
@@ -478,6 +479,7 @@ async def test_energy_group_available_when_members_temporarily_unavailable(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
+            CONF_GROUP_ENERGY_START_AT_ZERO: False,
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1", 50),
                 get_simple_fixed_config("input_boolean.test2", 50),
@@ -957,6 +959,7 @@ async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_ENERGY_START_AT_ZERO: False,
             CONF_NAME: "TestGroup",
             CONF_GROUP_ENERGY_ENTITIES: [
                 "sensor.energy_Wh",
@@ -1782,6 +1785,7 @@ async def _create_energy_group(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_ENERGY_START_AT_ZERO: False,
             CONF_NAME: name,
             CONF_GROUP_ENERGY_ENTITIES: member_entities,
         },
