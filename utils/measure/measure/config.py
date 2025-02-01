@@ -94,7 +94,7 @@ class MeasureConfig:
 
     @property
     def effect_bri_steps(self) -> int:
-        return config("EFFECT_BRI_STEPS", default=15, cast=int)
+        return config("EFFECT_BRI_STEPS", default=40, cast=int)
 
     @property
     def selected_light_controller(self) -> LightControllerType:
@@ -160,12 +160,12 @@ class MeasureConfig:
         return config("SLEEP_TIME_CT", default=10, cast=int)
 
     @property
-    def sleep_time_effect(self) -> int:
-        return config("SLEEP_TIME_EFFECT", default=2, cast=int)
+    def measure_time_effect(self) -> int:
+        return config("MEASURE_TIME_EFFECT", default=10, cast=int)
 
     @property
     def sleep_time_effect_change(self) -> int:
-        return config("SLEEP_TIME_EFFECT_CHANGE", default=2, cast=int)
+        return config("SLEEP_TIME_EFFECT_CHANGE", default=5, cast=int)
 
     @property
     def sleep_time_nudge(self) -> float:

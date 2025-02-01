@@ -25,7 +25,7 @@ from measure.powermeter.factory import PowerMeterFactory
 from measure.powermeter.powermeter import PowerMeter
 from measure.runner.average import AverageRunner
 from measure.runner.charging import ChargingRunner
-from measure.runner.const import QUESTION_COLOR_MODE
+from measure.runner.const import QUESTION_MODE
 from measure.runner.light import LightRunner
 from measure.runner.recorder import RecorderRunner
 from measure.runner.runner import MeasurementRunner
@@ -274,8 +274,8 @@ class Measure:
         answers = inquirer.prompt(questions_to_ask, answers=predefined_answers, render=self.console_render)
         answers.update(predefined_answers)
 
-        if not isinstance(answers[QUESTION_COLOR_MODE], set):
-            answers[QUESTION_COLOR_MODE] = {LutMode(answers[QUESTION_COLOR_MODE])}
+        if not isinstance(answers[QUESTION_MODE], set):
+            answers[QUESTION_MODE] = {LutMode(answers[QUESTION_MODE])}
 
         _LOGGER.debug("Answers: %s", answers)
 

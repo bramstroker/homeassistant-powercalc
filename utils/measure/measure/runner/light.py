@@ -23,7 +23,7 @@ from measure.powermeter.errors import (
     PowerMeterError,
     ZeroReadingError,
 )
-from measure.runner.const import QUESTION_COLOR_MODE, QUESTION_GZIP, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
+from measure.runner.const import QUESTION_GZIP, QUESTION_MODE, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
 from measure.runner.errors import RunnerError
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasureUtil
@@ -68,7 +68,7 @@ class LightRunner(MeasurementRunner):
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.light_controller.process_answers(answers)
-        self.lut_modes = set(answers[QUESTION_COLOR_MODE])
+        self.lut_modes = set(answers[QUESTION_MODE])
         self.num_lights = int(answers.get(QUESTION_NUM_LIGHTS) or 1)
         self.light_info = self.light_controller.get_light_info()
         self.effect_list = self.light_controller.get_effect_list()
@@ -129,7 +129,7 @@ class LightRunner(MeasurementRunner):
 
         _LOGGER.info(
             "Starting measurements. Estimated duration: %s",
-            self.calculate_time_left(all_variations, left_variations),
+            self.calculate_time_left(mode, all_variations, left_variations),
         )
 
         with open(measurement_info.csv_file, file_write_mode, newline="") as csv_file:
@@ -137,7 +137,7 @@ class LightRunner(MeasurementRunner):
 
             # To avoid bugs in some lights, when set to low brightness initially
             # where they turn off again. And also bugs where lights will turn off
-            # again, after they recevied two turn-off commands, followed by a single
+            # again, after they received two turn-off commands, followed by a single
             # turn on command, we set them to maximum brightness, twice here.
             # See issue #2598
             self.set_light_to_maximum_brightness(mode)
@@ -153,7 +153,7 @@ class LightRunner(MeasurementRunner):
             previous_variation = None
             for count, variation in enumerate(variations):
                 if count % 10 == 0:
-                    time_left = self.calculate_time_left(all_variations, left_variations, variation)
+                    time_left = self.calculate_time_left(mode, all_variations, left_variations, variation)
                     progress_percentage = ((len(all_variations) - len(left_variations)) / len(all_variations)) * 100
                     _LOGGER.info(
                         "Progress: %d%%, Estimated time left: %s",
@@ -171,8 +171,9 @@ class LightRunner(MeasurementRunner):
                 self.wait(variation, previous_variation)
 
                 previous_variation = variation
+
                 try:
-                    power = self.take_power_measurement(variation_start_time)
+                    power = self.take_power_measurement(mode, variation_start_time)
                 except OutdatedMeasurementError:
                     power = self.nudge_and_remeasure(mode, variation)
                 except ZeroReadingError as error:
@@ -222,10 +223,8 @@ class LightRunner(MeasurementRunner):
                 _LOGGER.info("Extra waiting for effect change...")
                 time.sleep(self.config.sleep_time_effect_change)
 
-        if variation.mode == LutMode.EFFECT:
-            time.sleep(self.config.sleep_time_effect)
-
-        time.sleep(self.config.sleep_time)
+        if variation.mode != LutMode.EFFECT:
+            time.sleep(self.config.sleep_time)
 
     def set_light_to_maximum_brightness(self, mode: LutMode) -> None:
         """
@@ -356,6 +355,7 @@ class LightRunner(MeasurementRunner):
 
     def calculate_time_left(
         self,
+        current_mode: LutMode,
         all_variations: list[Variation],
         left_variations: list[Variation],
         current_variation: Variation | None = None,
@@ -364,17 +364,21 @@ class LightRunner(MeasurementRunner):
         num_variations_left = len(left_variations)
         num_variations = len(all_variations)
         progress = num_variations - num_variations_left
-        current_mode = current_variation.mode if current_variation else None
 
         # Account estimated seconds for the light_controller and power_meter to process
         estimated_step_delay = 0.15
 
+        if current_mode == LutMode.EFFECT:
+            step_time = self.config.measure_time_effect + estimated_step_delay
+        else:
+            step_time = self.config.sleep_time + estimated_step_delay
+            if self.config.sample_count > 1:
+                step_time += self.config.sample_count * (self.config.sleep_time_sample + estimated_step_delay)
+
         time_left = 0
         if progress == 0:
             time_left += self.config.sleep_standby + self.config.sleep_initial
-        time_left += num_variations_left * (self.config.sleep_time + estimated_step_delay)
-        if self.config.sample_count > 1:
-            time_left += num_variations_left * self.config.sample_count * (self.config.sleep_time_sample + estimated_step_delay)
+        time_left += num_variations_left * step_time
 
         mode_time_calculation = {
             LutMode.HS: self.calculate_hs_time_left,
@@ -383,13 +387,12 @@ class LightRunner(MeasurementRunner):
             LutMode.EFFECT: self.calculate_effect_time_left,
         }
 
-        if current_mode:
-            time_left += mode_time_calculation[current_mode](current_variation)
+        time_left += mode_time_calculation[current_mode](current_variation)
 
         # Add timings for color modes which needs to be fully measured
-        left_color_modes = {variation.mode for variation in left_variations}
+        left_modes = {variation.mode for variation in left_variations}
 
-        time_left += sum(mode_time_calculation[mode](None) for mode in left_color_modes if mode != current_mode)
+        time_left += sum(mode_time_calculation[mode](None) for mode in left_modes if mode != current_mode)
 
         return self.format_time_left(time_left)
 
@@ -424,7 +427,7 @@ class LightRunner(MeasurementRunner):
         """Calculate the time left for the HS color mode."""
         effect_progress = self.effect_list.index(current_variation.effect) if current_variation else 0
         effect_steps_left = len(self.effect_list) - effect_progress - 1
-        return effect_steps_left * self.config.sleep_time_effect
+        return effect_steps_left * self.config.sleep_time_effect_change
 
     @staticmethod
     def format_time_left(time_left: float) -> str:
@@ -442,7 +445,7 @@ class LightRunner(MeasurementRunner):
 
     def nudge_and_remeasure(
         self,
-        color_mode: str,
+        mode: LutMode,
         variation: Variation,
     ) -> float | None:
         nudge_count = 0
@@ -459,13 +462,13 @@ class LightRunner(MeasurementRunner):
                 time.sleep(self.config.pulse_time_nudge)
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
-                    color_mode,
+                    mode,
                     on=True,
                     **asdict(variation),
                 )
                 # Wait a longer amount of time for the PM to settle
                 time.sleep(self.config.sleep_time_nudge)
-                return self.take_power_measurement(variation_start_time)
+                return self.take_power_measurement(mode, variation_start_time)
             except OutdatedMeasurementError:
                 continue
             except ZeroReadingError as error:
@@ -528,7 +531,7 @@ class LightRunner(MeasurementRunner):
             )
         return should_resume
 
-    def get_resume_variation(self, csv_file_path: str, color_mode: LutMode) -> Variation | None:
+    def get_resume_variation(self, csv_file_path: str, mode: LutMode) -> Variation | None:
         """This method returns the variation to resume at.
 
         It reads the last row from the CSV file and converts it into a Variation object.
@@ -565,28 +568,32 @@ class LightRunner(MeasurementRunner):
             rows = csv.reader(csv_file)
             last_row = list(rows)[-1]
 
-        if color_mode == LutMode.BRIGHTNESS:
+        if mode == LutMode.BRIGHTNESS:
             return Variation(bri=int(last_row[0]))
 
-        if color_mode == LutMode.COLOR_TEMP:
+        if mode == LutMode.COLOR_TEMP:
             return ColorTempVariation(bri=int(last_row[0]), ct=int(last_row[1]))
 
-        if color_mode == LutMode.HS:
+        if mode == LutMode.HS:
             return HsVariation(
                 bri=int(last_row[0]),
                 hue=int(last_row[1]),
                 sat=int(last_row[2]),
             )
 
-        raise RunnerError(f"Color mode {color_mode} not supported")
+        raise RunnerError(f"Mode {mode} not supported")
 
     def take_power_measurement(
         self,
+        mode: LutMode,
         start_timestamp: float,
         retry_count: int = 0,
     ) -> float:
-        """Request a power reading from the self.config.red power meter"""
-        value = self.measure_util.take_measurement(start_timestamp, retry_count)
+        """Request a power reading from the configured power_meter"""
+        if mode == LutMode.EFFECT:
+            value = self.measure_util.take_average_measurement(self.config.measure_time_effect)
+        else:
+            value = self.measure_util.take_measurement(start_timestamp, retry_count)
 
         # Determine per load power consumption
         value /= self.num_lights
@@ -615,7 +622,7 @@ class LightRunner(MeasurementRunner):
         )
         time.sleep(self.config.sleep_standby)
         try:
-            return self.take_power_measurement(start_time)
+            return self.take_power_measurement(LutMode.BRIGHTNESS, start_time)
         except OutdatedMeasurementError:
             self.nudge_and_remeasure(LutMode.BRIGHTNESS, Variation(0))
         except ZeroReadingError:
@@ -639,8 +646,8 @@ class LightRunner(MeasurementRunner):
 
         questions = [
             inquirer.List(
-                name=QUESTION_COLOR_MODE,
-                message="Select the color mode",
+                name=QUESTION_MODE,
+                message="Select the mode",
                 choices=modes,
                 default=LutMode.HS,
             ),
@@ -739,7 +746,7 @@ class CsvWriter:
     def __init__(
         self,
         csv_file: TextIO,
-        color_mode: LutMode,
+        mode: LutMode,
         add_header: bool,
         config: MeasureConfig,
     ) -> None:
@@ -748,7 +755,7 @@ class CsvWriter:
         self.writer = csv.writer(csv_file)
         self.rows_written = 0
         if add_header:
-            header_row = CSV_HEADERS[color_mode]
+            header_row = CSV_HEADERS[mode]
             if self.config.csv_add_datetime_column:
                 header_row.append("time")
             self.writer.writerow(header_row)
