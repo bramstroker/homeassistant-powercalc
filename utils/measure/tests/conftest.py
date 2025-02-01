@@ -56,7 +56,7 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
                 "multiple_lights": False,
                 "num_lights": 1,
                 "selected_measure_type": "Light bulb(s)",
-                "color_mode": {LutMode.BRIGHTNESS},
+                "mode": {LutMode.BRIGHTNESS},
                 **(question_defaults or {}),
                 **config_values,
             }
