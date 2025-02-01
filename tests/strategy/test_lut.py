@@ -131,6 +131,27 @@ async def test_effect_lut(hass: HomeAssistant, effect: str, brightness: int, exp
     )
 
 
+async def test_effect_mode_unsupported(hass: HomeAssistant) -> None:
+    """
+    Test light is set in effect mode, but effect is not supported by the profile.
+    In this case normal LUT for color mode should be used.
+    """
+    strategy = await _create_lut_strategy(hass, "signify", "LWB010", "light.test")
+    await _calculate_and_assert_power(
+        strategy,
+        state=State(
+            "light.test",
+            STATE_ON,
+            {
+                ATTR_COLOR_MODE: ColorMode.BRIGHTNESS,
+                ATTR_BRIGHTNESS: 255,
+                ATTR_EFFECT: "Test",
+            },
+        ),
+        expected_power=9.65,
+    )
+
+
 async def test_hs_lut_attribute_none(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """Test error is logged when hs_color attribute is None"""
 
