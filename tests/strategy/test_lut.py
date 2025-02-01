@@ -6,6 +6,7 @@ from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
+    ATTR_EFFECT,
     ATTR_HS_COLOR,
     ColorMode,
 )
@@ -26,7 +27,7 @@ from tests.common import get_test_profile_dir, run_powercalc_setup
 from tests.strategy.common import create_source_entity
 
 
-async def test_colortemp_lut(hass: HomeAssistant) -> None:
+async def test_color_temp_lut(hass: HomeAssistant) -> None:
     """Test LUT lookup in color_temp mode"""
 
     source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.COLOR_TEMP])
@@ -93,6 +94,61 @@ async def test_hs_lut(hass: HomeAssistant) -> None:
         strategy,
         state=_create_light_hs_state(100, 200, 300),
         expected_power=1.53,
+    )
+
+
+@pytest.mark.parametrize(
+    "effect,brightness,expected_power",
+    [
+        ("Android", 20, 2.08),
+        ("Android", 100, 2.73),
+        ("Android", 255, 4.00),
+        ("Wipe Random", 20, 1.98),
+        ("Non existing effect", 100, None),
+    ],
+)
+async def test_effect_lut(hass: HomeAssistant, effect: str, brightness: int, expected_power: float) -> None:
+    """Test LUT lookup in effect mode"""
+    strategy = await _create_lut_strategy(
+        hass,
+        "test",
+        "test",
+        custom_profile_dir=get_test_profile_dir("lut_effect"),
+    )
+    await _calculate_and_assert_power(
+        strategy,
+        state=State(
+            "light.test",
+            STATE_ON,
+            {
+                ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
+                ATTR_COLOR_TEMP_KELVIN: 153,
+                ATTR_BRIGHTNESS: brightness,
+                ATTR_EFFECT: effect,
+            },
+        ),
+        expected_power=expected_power,
+    )
+
+
+async def test_effect_mode_unsupported(hass: HomeAssistant) -> None:
+    """
+    Test light is set in effect mode, but effect is not supported by the profile.
+    In this case normal LUT for color mode should be used.
+    """
+    strategy = await _create_lut_strategy(hass, "signify", "LWB010", "light.test")
+    await _calculate_and_assert_power(
+        strategy,
+        state=State(
+            "light.test",
+            STATE_ON,
+            {
+                ATTR_COLOR_MODE: ColorMode.BRIGHTNESS,
+                ATTR_BRIGHTNESS: 255,
+                ATTR_EFFECT: "Test",
+            },
+        ),
+        expected_power=9.65,
     )
 
 
@@ -356,7 +412,11 @@ def _create_light_hs_state(brightness: int, hue: int, sat: int) -> State:
 async def _calculate_and_assert_power(
     strategy: PowerCalculationStrategyInterface,
     state: State,
-    expected_power: float,
+    expected_power: float | None,
 ) -> None:
     power = await strategy.calculate(state)
-    assert round(Decimal(expected_power), 2) == round(power, 2)
+    if expected_power is None:
+        assert power is None
+        return
+
+    assert round(power, 2) == round(Decimal(expected_power), 2)

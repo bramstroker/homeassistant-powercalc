@@ -18,12 +18,15 @@ from inquirer.render import ConsoleRender
 
 from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME, MeasureType
+from measure.controller.light.const import LutMode
 from measure.controller.light.errors import LightControllerError
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.factory import PowerMeterFactory
 from measure.powermeter.powermeter import PowerMeter
 from measure.runner.average import AverageRunner
 from measure.runner.charging import ChargingRunner
+from measure.runner.const import QUESTION_MODE
+from measure.runner.errors import RunnerError
 from measure.runner.light import LightRunner
 from measure.runner.recorder import RecorderRunner
 from measure.runner.runner import MeasurementRunner
@@ -150,9 +153,14 @@ class Measure:
 
         if answers.get(QUESTION_DUMMY_LOAD, False):
             input("Please connect the appliance you want to measure in parallel to the dummy load and press enter to start measurement session...")
-        runner_result = self.runner.run(answers, export_directory)
+        try:
+            runner_result = self.runner.run(answers, export_directory)
+        except RunnerError as error:
+            _LOGGER.error("Aborting: %s", error)
+            exit(1)
         if not runner_result:
             _LOGGER.error("Some error occurred during the measurement session")
+            exit(1)
 
         generate_model_json: bool = answers.get(QUESTION_GENERATE_MODEL_JSON, False) and export_directory
 
@@ -161,7 +169,7 @@ class Measure:
                 standby_power = self.runner.measure_standby_power()
             except PowerMeterError as error:
                 _LOGGER.error("Aborting: %s", error)
-                return
+                exit(1)
 
             self.write_model_json(
                 directory=export_directory,
@@ -271,6 +279,9 @@ class Measure:
 
         answers = inquirer.prompt(questions_to_ask, answers=predefined_answers, render=self.console_render)
         answers.update(predefined_answers)
+
+        if QUESTION_MODE in answers and not isinstance(answers[QUESTION_MODE], set):
+            answers[QUESTION_MODE] = {LutMode(answers[QUESTION_MODE])}
 
         _LOGGER.debug("Answers: %s", answers)
 

@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR
-from measure.controller.light.const import ColorMode
+from measure.controller.light.const import LutMode
 
 
 @pytest.fixture(autouse=True)
@@ -56,7 +56,7 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
                 "multiple_lights": False,
                 "num_lights": 1,
                 "selected_measure_type": "Light bulb(s)",
-                "color_mode": {ColorMode.BRIGHTNESS},
+                "mode": {LutMode.BRIGHTNESS},
                 **(question_defaults or {}),
                 **config_values,
             }
