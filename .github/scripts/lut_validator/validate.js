@@ -23,7 +23,7 @@ const validColorModeCombinations = [
     'brightness,color_temp'
 ]
 
-const pattern = /(\/|^)(hs|color_temp|brightness)\.csv\.gz$/;
+const pattern = /(\/|^)(hs|color_temp|brightness|effect)\.csv\.gz$/;
 const main = async () => {
     const dataDirectory = path.join(__dirname, '../../../profile_library')
     let errors = []

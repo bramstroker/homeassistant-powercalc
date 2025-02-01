@@ -1,0 +1,21 @@
+{
+  "properties": {
+    "effect": {
+      "type": "string"
+    },
+    "bri": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "watt": {
+      "type": "number",
+      "minimum": 0.01
+    }
+  },
+  "required": [
+    "effect",
+    "bri",
+    "watt"
+  ]
+}
