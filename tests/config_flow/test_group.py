@@ -523,7 +523,14 @@ async def test_subgroup_selector(hass: HomeAssistant) -> None:
         {
             CONF_NAME: "Group2",
             CONF_SENSOR_TYPE: SensorType.GROUP,
-            CONF_GROUP_TYPE: GroupType.CUSTOM,
+        },
+    )
+    create_mock_entry(
+        hass,
+        {
+            CONF_NAME: "Group3",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_TYPE: GroupType.DOMAIN,
         },
     )
 

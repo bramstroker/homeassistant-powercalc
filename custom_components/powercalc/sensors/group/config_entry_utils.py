@@ -153,5 +153,6 @@ def get_group_entries(hass: HomeAssistant, group_type: GroupType | None = None) 
     return [
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and (group_type is None or entry.data.get(CONF_GROUP_TYPE) == group_type)
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
+        and (group_type is None or entry.data.get(CONF_GROUP_TYPE, GroupType.CUSTOM) == group_type)
     ]
