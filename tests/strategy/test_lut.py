@@ -26,7 +26,7 @@ from tests.common import get_test_profile_dir, run_powercalc_setup
 from tests.strategy.common import create_source_entity
 
 
-async def test_colortemp_lut(hass: HomeAssistant) -> None:
+async def test_color_temp_lut(hass: HomeAssistant) -> None:
     """Test LUT lookup in color_temp mode"""
 
     source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.COLOR_TEMP])
