@@ -24,6 +24,8 @@ pytz = "2022.7"
 scipy = "^1.12"
 six = "^1.16"
 typing-extensions = "^4.5"
+seaborn = "^0.13.2"
+plotly = "^6.0.0"
 
 
 [build-system]

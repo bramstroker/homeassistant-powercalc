@@ -15,20 +15,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas
 import pandas as pd
+import seaborn as sns
 
 
-class ColorMode(StrEnum):
+class LutMode(StrEnum):
     BRIGHTNESS = "brightness"
     COLOR_TEMP = "color_temp"
+    EFFECT = "effect"
     HS = "hs"
 
 
-def create_scatter_plot(df: pandas.DataFrame, color_mode: ColorMode) -> None:
+def create_color_mode_plot(df: pandas.DataFrame, color_mode: LutMode) -> None:
     bri = df["bri"]
     watt = df["watt"]
-    if color_mode == ColorMode.BRIGHTNESS:
+    if color_mode == LutMode.BRIGHTNESS:
         df["color"] = "#1f77b4"
-    elif color_mode == ColorMode.COLOR_TEMP:
+    elif color_mode == LutMode.COLOR_TEMP:
         df["color"] = df["mired"].apply(convert_mired_to_rgb)
     else:
         df["color"] = df.apply(
@@ -42,6 +44,11 @@ def create_scatter_plot(df: pandas.DataFrame, color_mode: ColorMode) -> None:
 
     plt.scatter(bri, watt, color=df["color"], marker=".", s=10)
 
+
+def create_effect_plot(df: pandas.DataFrame) -> None:
+    sns.lineplot(data=df, x="bri", y="watt", hue="effect", marker="o")
+    plt.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+    plt.tight_layout()
 
 def mired_to_rgb(mired):
     kelvin = 1000000 / mired
@@ -119,7 +126,7 @@ def convert_mired_to_rgb(mired):
 
 def create_plot_for_csv_file(file_path: str, output: str) -> None:
     """Create a scatter plot from a CSV file."""
-    color_mode = ColorMode(Path(file_path).stem.removesuffix(".csv"))
+    color_mode = LutMode(Path(file_path).stem.removesuffix(".csv"))
 
     if file_path.endswith(".gz"):
         csv_file = gzip.open(file_path, "rt")
@@ -129,7 +136,10 @@ def create_plot_for_csv_file(file_path: str, output: str) -> None:
     dataframe = pd.read_csv(csv_file)
 
     plt.figure(figsize=(10, 6))
-    create_scatter_plot(dataframe, color_mode)
+    if color_mode == LutMode.EFFECT:
+        create_effect_plot(dataframe)
+    else:
+        create_color_mode_plot(dataframe, color_mode)
     plt.xlabel("brightness")
     plt.ylabel("watt")
     if output:
