@@ -39,12 +39,8 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
                 "sleep_time": 0,
                 "sleep_initial": 0,
                 "sleep_standby": 0,
-                "resume": False,
-                "min_brightness": 0,
-                "max_brightness": 255,
-                "bri_bri_steps": 1,
-                "sample_count": 1,
                 "sleep_time_sample": 0,
+                "resume": False,
             }
         if set_question_defaults:
             config_values = {
@@ -61,13 +57,14 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
                 **config_values,
             }
 
+        real_config = MeasureConfig()
         mock_instance = mock.return_value
         mock_instance.get_conf_value = MagicMock()
-        mock_instance.get_conf_value.side_effect = lambda k: config_values.get(k.lower(), None)
+        mock_instance.get_conf_value.side_effect = lambda k: config_values.get(k.lower(), real_config.get_conf_value(k))
 
         properties = {prop for prop in dir(MeasureConfig) if isinstance(getattr(MeasureConfig, prop, None), property)}
         for prop in properties:
-            setattr(mock_instance, prop, config_values.get(prop, None))
+            setattr(mock_instance, prop, config_values.get(prop, getattr(real_config, prop)))
 
         return mock_instance
 
@@ -104,3 +101,10 @@ def mock_requests_get_factory() -> MockRequestsGetFactory:
         return mock_request
 
     return factory
+
+
+@pytest.fixture()
+def export_path(tmp_path: str) -> str:
+    export_dir = tmp_path / "export"
+    export_dir.mkdir(parents=True, exist_ok=True)
+    return str(export_dir)
