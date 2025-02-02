@@ -125,6 +125,7 @@ class MeasureConfig:
         return config(
             "POWER_METER",
             cast=Choices([t.value for t in PowerMeterType]),
+            default=PowerMeterType.HASS.value,
         )
 
     @property
@@ -133,7 +134,7 @@ class MeasureConfig:
 
     @property
     def sleep_initial(self) -> int:
-        return 10
+        return config("SLEEP_INITIAL", default=10, cast=int)
 
     @property
     def sleep_standby(self) -> int:
