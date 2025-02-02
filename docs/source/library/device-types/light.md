@@ -36,8 +36,6 @@ Some lights support two color modes (both `hs` and `color_temp`), so there must 
 When your light supports `xy` color mode, you just need to provide the `hs` CSV file. When your light supports
 predefined `effect` mode, you should also include the `effect` CSV file.
 
-Additionally, you can provide a `effects.csv.gz` file for lights that support different effects.
-
 The files must be gzipped to keep the repository footprint small.
 
 Example directory structure:
