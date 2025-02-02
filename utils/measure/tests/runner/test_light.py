@@ -21,7 +21,7 @@ from measure.util.measure_util import MeasureUtil
         ),
         (
             LutMode.HS,
-            585,
+            2025,
         ),
         (
             LutMode.EFFECT,
