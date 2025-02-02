@@ -11,7 +11,7 @@
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "only_self_usage": true,
+  "only_self_usage": false,
   "created_at": "2022-11-23T08:42:12",
   "author": "Bram Gerritsen <bgerritsen@emico.nl>"
 }
