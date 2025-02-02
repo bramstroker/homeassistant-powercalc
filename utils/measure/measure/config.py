@@ -125,6 +125,7 @@ class MeasureConfig:
         return config(
             "POWER_METER",
             cast=Choices([t.value for t in PowerMeterType]),
+            default=PowerMeterType.HASS.value,
         )
 
     @property
