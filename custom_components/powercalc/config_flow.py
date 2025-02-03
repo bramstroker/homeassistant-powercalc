@@ -830,7 +830,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         options = [
             selector.SelectOptionDict(
                 value=config_entry.entry_id,
-                label=str(config_entry.data.get(CONF_NAME)),
+                label=config_entry.title,
             )
             for config_entry in (group_entries or get_group_entries(self.hass, GroupType.CUSTOM))
             if current_entry is None or config_entry.entry_id != current_entry.entry_id

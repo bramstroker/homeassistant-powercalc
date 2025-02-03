@@ -262,7 +262,8 @@ def create_mock_entry(
     source: str = config_entries.SOURCE_USER,
     unique_id: str | None = None,
 ) -> MockConfigEntry:
-    entry = MockConfigEntry(domain=DOMAIN, data=entry_data, source=source, unique_id=unique_id or str(uuid.uuid4()))
+    title = entry_data.get(CONF_NAME, "test")
+    entry = MockConfigEntry(domain=DOMAIN, title=title, data=entry_data, source=source, unique_id=unique_id or str(uuid.uuid4()))
     entry.add_to_hass(hass)
 
     assert not entry.options
