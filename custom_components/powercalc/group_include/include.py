@@ -72,8 +72,8 @@ def _build_filter(entity_filter: EntityFilter | None) -> EntityFilter:
         [
             DomainFilter(SUPPORTED_DOMAINS),
             LambdaFilter(lambda entity: entity.platform != "utility_meter"),
-            LambdaFilter(lambda entity: not entity.unique_id.startswith("powercalc_standby_group")),
-            LambdaFilter(lambda entity: "tracked_" not in entity.unique_id),
+            LambdaFilter(lambda entity: not str(entity.unique_id).startswith("powercalc_standby_group")),
+            LambdaFilter(lambda entity: "tracked_" not in str(entity.unique_id)),
         ],
     )
     if not entity_filter:
