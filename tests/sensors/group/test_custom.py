@@ -1740,14 +1740,14 @@ async def test_area_group(hass: HomeAssistant, area_registry: AreaRegistry) -> N
         {
             "sensor.test_power": RegistryEntry(
                 entity_id="sensor.test_power",
-                unique_id="1111",
+                unique_id=1111,
                 platform="powercalc",
                 device_class=SensorDeviceClass.POWER,
                 area_id=area.id,
             ),
             "sensor.test_energy": RegistryEntry(
                 entity_id="sensor.test_energy",
-                unique_id="2222",
+                unique_id=2222,
                 platform="powercalc",
                 device_class=SensorDeviceClass.ENERGY,
                 area_id=area.id,
