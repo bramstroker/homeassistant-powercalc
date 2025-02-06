@@ -4,7 +4,7 @@
   "measure_method": "script",
   "measure_settings": {
     "VERSION": "v1.17.1:docker"
-   },
+  },
   "name": "HM-LC-Sw1-DR",
   "standby_power": 0.32,
   "standby_power_on": 0.52,
