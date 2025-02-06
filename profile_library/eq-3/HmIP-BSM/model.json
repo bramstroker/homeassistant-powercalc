@@ -4,7 +4,7 @@
   "measure_method": "script",
   "measure_settings": {
     "VERSION": "v1.17.1:docker"
-   },
+  },
   "name": "HmIP-BSM",
   "standby_power": 0.2,
   "standby_power_on": 0.2,
