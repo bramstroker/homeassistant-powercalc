@@ -1,7 +1,10 @@
 {
-  "measure_description": "Manually measured",
-  "measure_method": "manual",
-  "measure_device": "From manufacturer specifications",
+  "measure_description": "Manually measured with dummy load attached at 7.7W (average over 300s) multiple times, than calculated average of that. There is no difference in standby power on/off.",
+  "measure_device": "Shelly PM Mini Gen3 (S3PM-001PCEU16)",
+  "measure_method": "script",
+  "measure_settings": {
+    "VERSION": "v1.17.1:docker"
+  },
   "name": "HmIP-BSM",
   "standby_power": 0.2,
   "standby_power_on": 0.2,
@@ -12,7 +15,7 @@
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
   "only_self_usage": true,
-  "created_at": "2024-09-06T18:37:40",
+  "created_at": "2025-02-04T18:37:40",
   "author": "CV",
   "description": "HomematicIP smart switch with power measurement integrated for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device."
 }
