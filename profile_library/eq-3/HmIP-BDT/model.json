@@ -1,17 +1,21 @@
 {
-  "measure_description": "Manually measured",
-  "measure_method": "manual",
-  "measure_device": "From manufacturer specifications",
+  "measure_description": "Manually measured with dummy load attached at 7.61W (average over 300s).",
+  "measure_device": "Shelly PM Mini Gen3 (S3PM-001PCEU16)",
+  "measure_method": "script",
+  "measure_settings": {
+    "VERSION": "v1.17.1:docker"
+  },
   "name": "HmIP-BDT",
-  "standby_power": 0.4,
-  "standby_power_on": 0.4,
+  "standby_power": 0.36,
+  "standby_power_on": 0.41,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
   "device_type": "smart_dimmer",
   "calculation_strategy": "linear",
-  "created_at": "2024-09-06T18:37:40",
+  "config_flow_discovery_remarks": "This device controls a non-smart device, hence it only tracks standby power by default. You need to configure the power draw of the controlled device yourself while or after the configuring process.",
+  "created_at": "2025-02-04T18:37:40",
   "author": "CV",
   "description": "HomematicIP smart trailing edge dimmer for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage must be configured by the user since it is possible to connect anything to it."
 }
