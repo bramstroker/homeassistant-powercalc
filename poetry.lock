@@ -50,13 +50,13 @@ files = [
 
 [[package]]
 name = "aiohasupervisor"
-version = "0.2.2b6"
+version = "0.3.0"
 description = "Asynchronous python client for Home Assistant Supervisor."
 optional = false
 python-versions = ">=3.12.0"
 files = [
-    {file = "aiohasupervisor-0.2.2b6-py3-none-any.whl", hash = "sha256:d222698fcf3f16601844adc07ab73601d6eceec02d0131ac600ec10dc8810708"},
-    {file = "aiohasupervisor-0.2.2b6.tar.gz", hash = "sha256:0e19e92410ed73459e91f85510e7933cfac6aa31bf35e58f296560e2dbc03bc5"},
+    {file = "aiohasupervisor-0.3.0-py3-none-any.whl", hash = "sha256:f85b45c80ee24b381523e5a84a39f962f25e72c90026a3dcef2becea1d7f5501"},
+    {file = "aiohasupervisor-0.3.0.tar.gz", hash = "sha256:91bf0b051f28582196f900a31c9bcbebec6de9e3ed1a32a2947a892c04748ce2"},
 ]
 
 [package.dependencies]
@@ -1584,18 +1584,18 @@ habluetooth = ">=3.0"
 
 [[package]]
 name = "homeassistant"
-version = "2025.2.0b9"
+version = "2025.2.0"
 description = "Open-source home automation platform running on Python 3."
 optional = false
 python-versions = ">=3.13.0"
 files = [
-    {file = "homeassistant-2025.2.0b9-py3-none-any.whl", hash = "sha256:ec800063ebbcfd8de4e00337ca85fb1748cc3af06befa71964b34f08aedf44ef"},
-    {file = "homeassistant-2025.2.0b9.tar.gz", hash = "sha256:44a4f9877d723031258416b780dcb1f8f5752d48702939baf288c552ef881807"},
+    {file = "homeassistant-2025.2.0-py3-none-any.whl", hash = "sha256:615421323e103e195a2d65ba8f792d5b44deb9b7836a924cc54e7220c2f7624e"},
+    {file = "homeassistant-2025.2.0.tar.gz", hash = "sha256:f9d912e80baacb3bc2d8d886086903006c45fe44bf2ee2a43055d65e30b723c6"},
 ]
 
 [package.dependencies]
 aiodns = "3.2.0"
-aiohasupervisor = "0.2.2b6"
+aiohasupervisor = "0.3.0"
 aiohttp = "3.11.11"
 aiohttp-asyncmdnsresolver = "0.0.3"
 aiohttp-cors = "0.7.0"
@@ -1646,17 +1646,17 @@ zeroconf = "0.143.0"
 
 [[package]]
 name = "homeassistant-stubs"
-version = "2025.2.0b9"
+version = "2025.2.0"
 description = "PEP 484 typing stubs for Home Assistant Core"
 optional = false
 python-versions = "<3.14,>=3.13"
 files = [
-    {file = "homeassistant_stubs-2025.2.0b9-py3-none-any.whl", hash = "sha256:7314f1da1d27193d7dd9231bb60a213e073d5b67fdbd688f0c64e47b46814112"},
-    {file = "homeassistant_stubs-2025.2.0b9.tar.gz", hash = "sha256:ca913a8c6cff7245d627cc8155520fe87f3f93a06ffedb28cdf5a9a511d0e982"},
+    {file = "homeassistant_stubs-2025.2.0-py3-none-any.whl", hash = "sha256:ab3f33ce37346cdd9d73ebb6c91bb92d285916cc999c1ac4d9ff1aad5486ab90"},
+    {file = "homeassistant_stubs-2025.2.0.tar.gz", hash = "sha256:0c63029937600e6ef9250485971b36e4ee1374972fca61b8538a9bd7caed4656"},
 ]
 
 [package.dependencies]
-homeassistant = "2025.2.0b9"
+homeassistant = "2025.2.0"
 
 [[package]]
 name = "httpcore"
@@ -3353,19 +3353,19 @@ pytest = ">=4.0.0"
 
 [[package]]
 name = "pytest-homeassistant-custom-component"
-version = "0.13.209"
+version = "0.13.210"
 description = "Experimental package to automatically extract test plugins for Home Assistant custom components"
 optional = false
 python-versions = ">=3.13"
 files = [
-    {file = "pytest_homeassistant_custom_component-0.13.209-py3-none-any.whl", hash = "sha256:2c31d5d6ad458491a33128c3e1eba49936c3987288af722b7fa4395f87ca7e89"},
-    {file = "pytest_homeassistant_custom_component-0.13.209.tar.gz", hash = "sha256:ea7d24617c8b1fa09baa773ec72b52019512f299318cb01b6e5ad8d1884bf58e"},
+    {file = "pytest_homeassistant_custom_component-0.13.210-py3-none-any.whl", hash = "sha256:33ebf961b05bca5fb5fab2aa8a378706e69709f4e05d88b15911de7afa2ed6bd"},
+    {file = "pytest_homeassistant_custom_component-0.13.210.tar.gz", hash = "sha256:000e9edd8faad774c284bf313da9b349e065a9ca8fe1790f95f19d55652a0a42"},
 ]
 
 [package.dependencies]
 coverage = "7.6.8"
 freezegun = "1.5.1"
-homeassistant = "2025.2.0b9"
+homeassistant = "2025.2.0"
 license-expression = "30.4.0"
 mock-open = "1.4.0"
 numpy = "2.2.2"
@@ -4750,4 +4750,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.13,<3.14"
-content-hash = "5df6b7ea846973b6b49fb72f6010b5bfd920f81d6b459725c34109bc9db3182a"
+content-hash = "575710a0afd17aba9b892674d5236cedfa255d62dc0a0f107e201f5b6d015b82"
