@@ -4,7 +4,7 @@
   "measure_method": "script",
   "measure_settings": {
     "VERSION": "v1.17.1:docker"
-   },
+  },
   "name": "HmIP-FROLL",
   "standby_power": 0.12,
   "standby_power_on": 0.2,
