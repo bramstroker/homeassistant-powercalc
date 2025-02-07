@@ -12,6 +12,7 @@ import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.components.command_line import async_load_platforms
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
@@ -25,6 +26,8 @@ from homeassistant.const import (
 from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers.discovery import async_load_platform
+from homeassistant.helpers.entity_platform import async_get_platforms
+from homeassistant.helpers.reload import async_integration_yaml_config
 from homeassistant.helpers.typing import ConfigType
 
 from .common import validate_name_pattern
@@ -87,6 +90,7 @@ from .const import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     MIN_HA_VERSION,
     SERVICE_CHANGE_GUI_CONFIGURATION,
+    SERVICE_RELOAD,
     SERVICE_UPDATE_LIBRARY,
     PowercalcDiscoveryType,
     SensorType,
@@ -312,6 +316,7 @@ def register_services(hass: HomeAssistant) -> None:
     )
 
     async def _handle_update_library_service(_: ServiceCall) -> None:
+        _LOGGER.info("Updating library and rediscovering devices")
         discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
         await discovery_manager.update_library_and_rediscover()
 
@@ -319,6 +324,27 @@ def register_services(hass: HomeAssistant) -> None:
         DOMAIN,
         SERVICE_UPDATE_LIBRARY,
         _handle_update_library_service,
+    )
+
+    async def _reload_config(_: ServiceCall) -> None:
+        """Reload powercalc."""
+        reload_config = await async_integration_yaml_config(hass, DOMAIN)
+        reset_platforms = async_get_platforms(hass, DOMAIN)
+        for reset_platform in reset_platforms:
+            _LOGGER.debug("Reload resetting platform: %s", reset_platform.domain)
+            await reset_platform.async_reset()
+        if not reload_config:
+            return
+        await async_load_platforms(hass, reload_config.get(DOMAIN, []), reload_config)
+
+        for entry in hass.config_entries.async_entries(DOMAIN):
+            _LOGGER.debug("Reloading config entry %s", entry.entry_id)
+            await hass.config_entries.async_reload(entry.entry_id)
+
+    hass.services.register(
+        DOMAIN,
+        SERVICE_RELOAD,
+        _reload_config,
     )
 
 

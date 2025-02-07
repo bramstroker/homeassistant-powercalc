@@ -7,6 +7,7 @@
     "get_active_playbook": "mdi:book-open-variant-outline",
     "get_group_entities": "mdi:format-list-group",
     "increase_daily_energy": "mdi:numeric",
+    "reload": "mdi:reload",
     "reset_energy": "mdi:restore",
     "stop_playbook": "mdi:stop",
     "switch_sub_profile": "mdi:toggle-switch",

@@ -749,6 +749,10 @@
       },
       "name": "Verhoog dagelijkste energiesensor"
     },
+    "reload": {
+      "description": "Powercalc configuratie en entiteiten herladen",
+      "name": "Herladen"
+    },
     "reset_energy": {
       "description": "Herstel een energiesensor naar 0 kWh.",
       "name": "Herstel energiesensor"
