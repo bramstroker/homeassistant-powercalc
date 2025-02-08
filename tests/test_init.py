@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from homeassistant.components import input_boolean, light
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntryState
@@ -6,13 +8,13 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
-    STATE_UNAVAILABLE,
+    STATE_ON, STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import async_migrate_entry, repair_none_config_entries_issue
+from custom_components.powercalc import SERVICE_RELOAD, async_migrate_entry, repair_none_config_entries_issue
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
@@ -26,7 +28,7 @@ from custom_components.powercalc.const import (
     CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
-    CONF_SENSOR_TYPE,
+    CONF_SENSORS, CONF_SENSOR_TYPE,
     CONF_STATE_TRIGGER,
     CONF_STATES_TRIGGER,
     CONF_UTILITY_METER_TYPES,
@@ -249,3 +251,32 @@ async def test_migrate_config_entry_version_4(hass: HomeAssistant) -> None:
             },
         },
     }
+
+async def test_reload_service(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(hass,{ CONF_ENTITY_ID: "light.test", CONF_FIXED: {CONF_POWER: 50}})
+
+    new_config = {
+        DOMAIN: {
+            CONF_SENSORS: [
+                {
+                    CONF_ENTITY_ID: "light.test",
+                    CONF_FIXED: {CONF_POWER: 100}
+                }
+            ]
+        }
+    }
+
+    hass.states.async_set("light.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    with patch("homeassistant.config.load_yaml_config_file", return_value=new_config):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_RELOAD,
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+
+        power_state = hass.states.get("sensor.test_power")
+        assert power_state
+        assert power_state.state == "100.00"
