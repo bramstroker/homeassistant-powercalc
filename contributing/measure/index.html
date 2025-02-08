@@ -2485,7 +2485,7 @@ When the <code>xy</code> is in the supported modes you'll need to choose <code>h
 <p>Make sure you temporarily pause possible automations you have in HA for your lights, so the light won't be switched in the middle of measuring session.</p>
 </div>
 <p>Now start the script to begin the measurement session:</p>
-<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--name<span class="o">=</span>measure<span class="w"> </span>--env-file<span class="o">=</span>.env<span class="w"> </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/export:/app/export<span class="w"> </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.persistent:/app/.persistent<span class="w"> </span>-it<span class="w"> </span>bramgerritsen/powercalc-measure:latest
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--pull<span class="o">=</span>always<span class="w"> </span>--rm<span class="w"> </span>--name<span class="o">=</span>measure<span class="w"> </span>--env-file<span class="o">=</span>.env<span class="w"> </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/export:/app/export<span class="w"> </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.persistent:/app/.persistent<span class="w"> </span>-it<span class="w"> </span>bramgerritsen/powercalc-measure:latest
 </code></pre></div>
 <p>The script will ask you a few questions and will start switching your light to all kind of different settings.
 Depending on the selected color mode and sleep settings this will take a while. This will take 1 hour to a few hours to complete.
@@ -2537,7 +2537,7 @@ When everything looks fine you can safely remove the CSV file (only keep the .cs
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 22, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">February 8, 2025</span>
   </span>
 
     
