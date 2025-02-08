@@ -345,7 +345,7 @@ def register_services(hass: HomeAssistant) -> None:
                 hass,
                 Platform.SENSOR,
                 DOMAIN,
-                sensor_config, # need to do for each sensor entry
+                sensor_config,  # need to do for each sensor entry
                 reload_config,
             )
 

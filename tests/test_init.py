@@ -8,7 +8,8 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
-    STATE_ON, STATE_UNAVAILABLE,
+    STATE_ON,
+    STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
@@ -28,7 +29,8 @@ from custom_components.powercalc.const import (
     CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
-    CONF_SENSORS, CONF_SENSOR_TYPE,
+    CONF_SENSOR_TYPE,
+    CONF_SENSORS,
     CONF_STATE_TRIGGER,
     CONF_STATES_TRIGGER,
     CONF_UTILITY_METER_TYPES,
@@ -252,18 +254,19 @@ async def test_migrate_config_entry_version_4(hass: HomeAssistant) -> None:
         },
     }
 
+
 async def test_reload_service(hass: HomeAssistant) -> None:
-    await run_powercalc_setup(hass,{ CONF_ENTITY_ID: "light.test", CONF_FIXED: {CONF_POWER: 50}})
+    await run_powercalc_setup(hass, {CONF_ENTITY_ID: "light.test", CONF_FIXED: {CONF_POWER: 50}})
 
     new_config = {
         DOMAIN: {
             CONF_SENSORS: [
                 {
                     CONF_ENTITY_ID: "light.test",
-                    CONF_FIXED: {CONF_POWER: 100}
-                }
-            ]
-        }
+                    CONF_FIXED: {CONF_POWER: 100},
+                },
+            ],
+        },
     }
 
     hass.states.async_set("light.test", STATE_ON)
