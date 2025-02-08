@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 from copy import copy
 from datetime import timedelta
@@ -159,7 +160,7 @@ async def create_virtual_power_sensor(
         strategy = detect_calculation_strategy(sensor_config, power_profile)
         calculation_strategy_factory = PowerCalculatorStrategyFactory.get_instance(hass)
 
-        standby_power, standby_power_on = _get_standby_power(sensor_config, strategy, power_profile)
+        standby_power, standby_power_on = _get_standby_power(sensor_config, power_profile)
 
         _LOGGER.debug(
             "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s unique_id=%s)",
@@ -251,7 +252,6 @@ async def _select_sub_profile(
 
 def _get_standby_power(
     sensor_config: ConfigType,
-    strategy: CalculationStrategy,
     power_profile: PowerProfile | None,
 ) -> tuple[Template | Decimal, Decimal]:
     """Retrieve standby power settings from sensor config or power profile."""
@@ -418,6 +418,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def initial_update(hass: HomeAssistant) -> None:
+            """Calculate initial value and push state"""
+
+            # When using reload service energy sensor became unavailable
+            # This is caused because state change listener of energy sensor is registered before power sensor pushes initial update
+            # Adding sleep 0 fixes this issue.
+            await asyncio.sleep(0)
             if self._strategy_instance:
                 await self._strategy_instance.on_start(hass)
 

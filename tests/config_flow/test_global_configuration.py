@@ -1,3 +1,4 @@
+import asyncio
 from datetime import timedelta
 from typing import Any
 
@@ -340,6 +341,7 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
         result["flow_id"],
         user_input=user_input,
     )
+    await asyncio.sleep(0.1)
 
     assert hass.states.get("sensor.test_power").state == "50.0000"
 

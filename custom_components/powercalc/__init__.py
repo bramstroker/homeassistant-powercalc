@@ -330,7 +330,6 @@ async def register_services(hass: HomeAssistant) -> None:
         reload_config = await async_integration_yaml_config(hass, DOMAIN)
         reset_platforms = async_get_platforms(hass, DOMAIN)
         for reset_platform in reset_platforms:
-            _LOGGER.debug("Reload resetting platform: %s", reset_platform.domain)
             await reset_platform.async_reset()
         if not reload_config:
             return
