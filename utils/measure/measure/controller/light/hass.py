@@ -10,7 +10,7 @@ from homeassistant_api import Client, HomeassistantAPIError
 from measure.const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightController, LightInfo
-from measure.controller.light.errors import ApiConnectionError, LightControllerError
+from measure.controller.light.errors import ApiConnectionError
 
 
 class HassLightController(LightController):
@@ -22,7 +22,7 @@ class HassLightController(LightController):
             self.client = Client(api_url, token, cache_session=False)
             self.client.get_config()
         except HomeassistantAPIError as e:
-            raise LightControllerError(f"Failed to connect to HA API: {e}") from e
+            raise ApiConnectionError(f"Failed to connect to HA API: {e}") from e
 
     def change_light_state(
         self,
