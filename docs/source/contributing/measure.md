@@ -34,7 +34,7 @@ When the `xy` is in the supported modes you'll need to choose `hs` in the measur
 Now start the script to begin the measurement session:
 
 ```bash
-docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
+docker run --pull=always --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
 ```
 
 The script will ask you a few questions and will start switching your light to all kind of different settings.
