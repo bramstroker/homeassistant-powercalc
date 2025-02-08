@@ -233,7 +233,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DATA_STANDBY_POWER_SENSORS: {},
     }
 
-    await hass.async_add_executor_job(register_services, hass)
+    await register_services(hass)
     await setup_yaml_sensors(hass, config, global_config)
 
     setup_domain_groups(hass, global_config)
@@ -301,13 +301,13 @@ def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
     return global_config
 
 
-def register_services(hass: HomeAssistant) -> None:
+async def register_services(hass: HomeAssistant) -> None:
     """Register generic services"""
 
     async def _handle_change_gui_service(call: ServiceCall) -> None:
         await change_gui_configuration(hass, call)
 
-    hass.services.register(
+    hass.services.async_register(
         DOMAIN,
         SERVICE_CHANGE_GUI_CONFIGURATION,
         _handle_change_gui_service,
@@ -319,7 +319,7 @@ def register_services(hass: HomeAssistant) -> None:
         discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
         await discovery_manager.update_library_and_rediscover()
 
-    hass.services.register(
+    hass.services.async_register(
         DOMAIN,
         SERVICE_UPDATE_LIBRARY,
         _handle_update_library_service,
@@ -353,7 +353,7 @@ def register_services(hass: HomeAssistant) -> None:
             _LOGGER.debug("Reloading config entry %s", entry.entry_id)
             await hass.config_entries.async_reload(entry.entry_id)
 
-    hass.services.register(
+    hass.services.async_register(
         DOMAIN,
         SERVICE_RELOAD,
         _reload_config,
