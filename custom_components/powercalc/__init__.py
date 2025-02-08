@@ -12,7 +12,6 @@ import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
-from homeassistant.components.command_line import async_load_platforms
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
@@ -338,6 +337,7 @@ def register_services(hass: HomeAssistant) -> None:
 
         hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []
         hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES] = {}
+        hass.data[DOMAIN][DOMAIN_CONFIG] = get_global_configuration(hass, reload_config)
 
         for sensor_config in reload_config[DOMAIN].get(CONF_SENSORS, []):
             sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
@@ -345,7 +345,7 @@ def register_services(hass: HomeAssistant) -> None:
                 hass,
                 Platform.SENSOR,
                 DOMAIN,
-                sensor_config, # need to do for each sensor entry
+                sensor_config,
                 reload_config,
             )
 
