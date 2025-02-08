@@ -329,13 +329,15 @@ def register_services(hass: HomeAssistant) -> None:
     async def _reload_config(_: ServiceCall) -> None:
         """Reload powercalc."""
         reload_config = await async_integration_yaml_config(hass, DOMAIN)
-        reset_platforms = async_get_platforms(hass, DOMAIN)
-        for reset_platform in reset_platforms:
-            _LOGGER.debug("Reload resetting platform: %s", reset_platform.domain)
-            await reset_platform.async_reset()
         if not reload_config:
             return
-        await async_load_platforms(hass, reload_config.get(DOMAIN, []), reload_config)
+        # await async_load_platform(
+        #     hass,
+        #     DOMAIN,
+        #     DOMAIN,
+        #     {},
+        #     reload_config,
+        # )
 
         for entry in hass.config_entries.async_entries(DOMAIN):
             _LOGGER.debug("Reloading config entry %s", entry.entry_id)
