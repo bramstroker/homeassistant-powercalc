@@ -22,22 +22,17 @@ Go to the directory you created in a command line.
 
 ##### Linux and MacOS
 ```
-docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
+docker run --pull=always --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
 ```
 ##### Windows
 ```
-docker run --rm --name=measure --env-file=.env -v %CD%/export:/app/export -v %CD%/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
+docker run --pull=always --rm --name=measure --env-file=.env -v %CD%/export:/app/export -v %CD%/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
 ```
 Note: if you use PowerShell instead of the Windows command line tool, you must use the full paths instead of relative paths.
 
 The script will ask you a few questions, than proceed taking measurements.
 
 After the measurements are finished you will find the files in `export` directory.
-
-To update the Docker container to the latest version of the script:
-```
-docker pull bramgerritsen/powercalc-measure
-```
 
 ### Native
 
