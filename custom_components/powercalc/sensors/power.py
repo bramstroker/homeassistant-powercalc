@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from copy import copy
 from datetime import timedelta
 from decimal import Decimal
@@ -30,7 +31,7 @@ from homeassistant.core import (
     State,
     callback,
 )
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import HomeAssistantError, TemplateError
 from homeassistant.helpers import start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
@@ -441,8 +442,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Add listeners and get initial state."""
         entities_to_track = self._get_tracking_entities()
 
-        self._track_entities = set({entity for entity in entities_to_track if isinstance(entity, str)})
         track_templates = [template for template in entities_to_track if isinstance(template, TrackTemplate)]
+        template_entities = self.find_entities_in_track_template(track_templates)
+        self._track_entities = set({entity for entity in entities_to_track if isinstance(entity, str) and entity not in template_entities})
 
         self.async_on_remove(
             async_track_state_change_event(
@@ -471,6 +473,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if hasattr(self._strategy_instance, "set_update_callback"):
             self._strategy_instance.set_update_callback(self._update_power_sensor)
+
+    @staticmethod
+    def find_entities_in_track_template(track_templates: list[TrackTemplate]) -> set[str]:
+        """Find all entity id's used in `states()` template functions."""
+        return {match for template in track_templates for match in re.findall(r"states\('([\w\d_]+\.[\w\d_]+)'\)", template.template.template)}
 
     def _get_tracking_entities(self) -> list[str | TrackTemplate]:
         """Return entities and templates that should be tracked."""
@@ -667,7 +674,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if not template:
             return True
 
-        return bool(template.async_render())
+        try:
+            return bool(template.async_render())
+        except TemplateError as ex:
+            _LOGGER.error("Could not render calculation enabled condition template: %s", ex)
+            return False
 
     @property
     def source_entity(self) -> str:
