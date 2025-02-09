@@ -60,14 +60,4 @@ powercalc:
       model: LIFX Z/length_9
 ```
 
-Powercalc also provides an action which you can call to switch to another sub profile while HA is running.
-The action is called `powercalc.switch_sub_profile`.
-You can call this action from the GUI (`Developer tools` -> `Actions`) or from automations.
-
-```yaml
-action: powercalc.switch_sub_profile
-data:
-  profile: length_5
-target:
-  entity_id: sensor.my_light_power
-```
+Powercalc also provides an action [`powercalc.switch_sub_profile`](../actions/switch-sub-profile.md) which you can call to switch to another sub profile while HA is running.

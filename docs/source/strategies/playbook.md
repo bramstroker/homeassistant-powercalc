@@ -91,7 +91,7 @@ powercalc:
 ## Manually executing the playbook
 
 To start executing a playbook you'll have to utilize HA automations.
-Powercalc provides two actions which let's you control the playbook execution. `activate_playbook` and `stop_playbook`.
+Powercalc provides two actions which let's you control the playbook execution. [`activate_playbook`](../actions/activate-playbook.md) and [`stop_playbook`](../actions/stop-playbook.md).
 For example to start the playbook when your washing machine enters a specific program use an automation similar as below.
 
 ```yaml
@@ -114,8 +114,8 @@ action:
 ## Playbook structure
 
 A playbook file must be a CSV file with 2 columns.
-\- elapsed time in seconds
-\- power value in W
+ - elapsed time in seconds
+ - power value in W
 
 ```
 0.5,70

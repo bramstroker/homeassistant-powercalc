@@ -1,15 +1,40 @@
 {
   "services": {
-    "activate_playbook": "mdi:play",
-    "calibrate_utility_meter": "mdi:wrench",
-    "calibrate_energy": "mdi:wrench",
-    "change_gui_config": "mdi:cogs",
-    "get_active_playbook": "mdi:book-open-variant-outline",
-    "get_group_entities": "mdi:format-list-group",
-    "increase_daily_energy": "mdi:numeric",
-    "reset_energy": "mdi:restore",
-    "stop_playbook": "mdi:stop",
-    "switch_sub_profile": "mdi:toggle-switch",
-    "update_library": "mdi:cloud-download"
+    "activate_playbook": {
+      "service": "mdi:play"
+    },
+    "calibrate_utility_meter": {
+      "service": "mdi:wrench"
+    },
+    "calibrate_energy": {
+      "service": "mdi:wrench"
+    },
+    "change_gui_config": {
+      "service": "mdi:cogs"
+    },
+    "get_active_playbook": {
+      "service": "mdi:book-open-variant-outline"
+    },
+    "get_group_entities": {
+      "service": "mdi:format-list-group"
+    },
+    "increase_daily_energy": {
+      "service": "mdi:numeric"
+    },
+    "reload": {
+      "service": "mdi:reload"
+    },
+    "reset_energy": {
+      "service": "mdi:restore"
+    },
+    "stop_playbook": {
+      "service": "mdi:stop"
+    },
+    "switch_sub_profile": {
+      "service": "mdi:toggle-switch"
+    },
+    "update_library": {
+      "service": "mdi:cloud-download"
+    }
   }
 }

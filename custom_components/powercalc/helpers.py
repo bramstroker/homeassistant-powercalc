@@ -9,6 +9,7 @@ from functools import wraps
 from typing import Any, TypeVar
 
 from homeassistant.const import CONF_UNIQUE_ID
+from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
@@ -27,7 +28,11 @@ async def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
 
     try:
         if isinstance(power, Template):
-            power = power.async_render()
+            try:
+                power = power.async_render()
+            except TemplateError as ex:
+                _LOGGER.error("Could not render power template %s: %s", power, ex)
+                return None
             if power == "unknown":
                 return None
 

@@ -68,6 +68,6 @@ Once the update process is complete, a discovery routine will be initiated to po
 
 - *At Each Startup*: The library checks for updates whenever the system is started.
 - *Every Two Hours*: Updates are scheduled to run automatically every two hours.
-- *Manual Trigger*: Updates can also be initiated manually by invoking the action Powercalc: update library.
+- *Manual Trigger*: Updates can also be initiated manually by invoking the action [`powecalc.update_library`](../actions/update-library.md).
 
 This ensures that you always have the latest power profiles available, without the need to restart HA.

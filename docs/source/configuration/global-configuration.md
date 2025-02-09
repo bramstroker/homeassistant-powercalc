@@ -65,22 +65,7 @@ All the possible options are listed below.
 ## Change GUI configuration action
 
 To change the configuration options for all Powercalc GUI config entries at once you can utilize the action `powercalc.change_gui_config`.
-You can use it to change the configuration for the following options
-
-- create_energy_sensor
-- create_utility_meters
-- ignore_unavailable_state
-- energy_integration_method
-
-You can call this action from the GUI (`Developer tools` -> `Actions`).
-For example to set `create_utility_meters` to yes for all powercalc GUI configurations:
-
-```yaml
-action: powercalc.change_gui_config
-data:
-  field: create_utility_meters
-  value: 1
-```
+See [Change GUI Configuration](../actions/change-gui-configuration.md) for more information.
 
 [utility_cycle]: https://www.home-assistant.io/integrations/utility_meter/#cycle
 [utility_net_consumption]: https://www.home-assistant.io/integrations/utility_meter/#net_consumption
