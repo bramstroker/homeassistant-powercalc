@@ -749,6 +749,10 @@
       },
       "name": "Creșteți senzorul de energie zilnic"
     },
+    "reload": {
+      "description": "Reload Powercalc configuration and entities",
+      "name": "Reload"
+    },
     "reset_energy": {
       "description": "Resetați un senzor de energie la zero kWh.",
       "name": "Resetați senzorul de energie"

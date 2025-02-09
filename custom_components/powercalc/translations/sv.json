@@ -749,6 +749,10 @@
       },
       "name": "Öka daglig energisensor"
     },
+    "reload": {
+      "description": "Reload Powercalc configuration and entities",
+      "name": "Reload"
+    },
     "reset_energy": {
       "description": "Återställ en energisensor till 0 kWh.",
       "name": "Återställ energisensor"

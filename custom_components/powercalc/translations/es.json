@@ -749,6 +749,10 @@
       },
       "name": "Aumentar el sensor de energía diario"
     },
+    "reload": {
+      "description": "Reload Powercalc configuration and entities",
+      "name": "Reload"
+    },
     "reset_energy": {
       "description": "Restablecer un sensor de energía a cero kWh.",
       "name": "Restablecer sensor de energía"
