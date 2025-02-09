@@ -10,7 +10,7 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES, DeviceType
+from custom_components.powercalc import CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES, CONF_GROUP_UPDATE_INTERVAL, DEFAULT_GROUP_UPDATE_INTERVAL, DeviceType
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_DOMAIN_GROUPS,
@@ -115,6 +115,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_ENERGY_SENSOR_PRECISION: 4,
         CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
         CONF_FORCE_UPDATE_FREQUENCY: 300,
+        CONF_GROUP_UPDATE_INTERVAL: DEFAULT_GROUP_UPDATE_INTERVAL,
         CONF_IGNORE_UNAVAILABLE_STATE: False,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_POWER_SENSOR_CATEGORY: None,

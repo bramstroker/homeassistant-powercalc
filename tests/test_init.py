@@ -339,3 +339,21 @@ async def test_reload_service_config_entries(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
         assert hass.states.get("sensor.test_power").state == "100.00"
+
+
+async def test_reload_service_powercalc_removed(hass: HomeAssistant) -> None:
+    """
+    Test reload when powercalc is removed from configuration.
+    Reload service should not give an error and entities must be removed
+    """
+    await run_powercalc_setup(hass, {CONF_ENTITY_ID: "light.test", CONF_FIXED: {CONF_POWER: 50}})
+
+    with patch("homeassistant.config.load_yaml_config_file", return_value={}):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_RELOAD,
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+
+        assert not hass.states.get("sensor.test_power")

@@ -31,7 +31,7 @@ from homeassistant.core import (
     State,
     callback,
 )
-from homeassistant.exceptions import HomeAssistantError, TemplateError
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
@@ -674,11 +674,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if not template:
             return True
 
-        try:
-            return bool(template.async_render())
-        except TemplateError as ex:
-            _LOGGER.error("Could not render calculation enabled condition template: %s", ex)
-            return False
+        return bool(template.async_render())
 
     @property
     def source_entity(self) -> str:
