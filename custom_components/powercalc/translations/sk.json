@@ -749,6 +749,10 @@
       },
       "name": "Zvýšenie denného energetického snímača"
     },
+    "reload": {
+      "description": "Reload Powercalc configuration and entities",
+      "name": "Reload"
+    },
     "reset_energy": {
       "description": "Resetovanie snímača energie na nulovú hodnotu kWh.",
       "name": "Resetovanie snímača energie"

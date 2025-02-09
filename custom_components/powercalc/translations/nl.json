@@ -750,7 +750,7 @@
       "name": "Verhoog dagelijkste energiesensor"
     },
     "reload": {
-      "description": "Powercalc configuratie en entiteiten herladen",
+      "description": "Herlaad Powercalc configuratie en entiteiten",
       "name": "Herladen"
     },
     "reset_energy": {
