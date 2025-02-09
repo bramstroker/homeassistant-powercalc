@@ -54,6 +54,16 @@ powercalc:
           - 255 -> 15.3
 ```
 
+When setting up with the GUI you'll need to supply following format:
+
+```
+1: 0.3
+10: 1.25
+50: 3.50
+100: 6.8
+255: 15.3
+```
+
 !!! note
 
     For lights the supplied values must be in brightness range 1-255, when you select 1 in lovelace UI slider this is actually brightness level 3.
