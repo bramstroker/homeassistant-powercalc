@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 import pytest
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -13,6 +14,7 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant, State
+from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
@@ -557,6 +559,22 @@ async def test_create_daily_energy_sensor_using_config_entry(
     assert hass.states.get("sensor.test_energy")
 
     assert hass.states.get("sensor.test_energy_daily")
+
+
+async def test_template_error_catched(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    with patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception())):
+        await run_powercalc_setup(
+            hass,
+            {
+                CONF_ENERGY_SENSOR_NAMING: "{} Energy",
+                CONF_NAME: "My sensor",
+                CONF_DAILY_FIXED_ENERGY: {
+                    CONF_VALUE: "{{ 1 + 3 }}",
+                },
+            },
+        )
+        await _trigger_periodic_update(hass, 10)
+        assert "Could not render value template" in caplog.text
 
 
 async def _trigger_periodic_update(

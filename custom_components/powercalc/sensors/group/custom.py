@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from abc import abstractmethod
 from collections.abc import Callable
 from datetime import timedelta
@@ -53,6 +54,7 @@ from homeassistant.util.unit_conversion import (
     PowerConverter,
 )
 
+from custom_components.powercalc import CONF_GROUP_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -405,6 +407,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
     _attr_should_poll = False
     _unrecorded_attributes = frozenset({ATTR_ENTITIES, ATTR_IS_GROUP})
+    _is_energy_sensor = False
 
     def __init__(
         self,
@@ -421,7 +424,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         # Remove own entity from entities, when it happens to be there. To prevent recursion
         entities.discard(entity_id)
         self._entities = entities
-        if isinstance(self, GroupedEnergySensor):
+        if self._is_energy_sensor:
             self._rounding_digits = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
         else:
             self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
@@ -434,7 +437,10 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._native_value_exact = Decimal(0)
         self._states: dict[str, Decimal] = {}
         self._ignore_unavailable_state = bool(self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE))
-        self.group_type = group_type
+        self._group_type = group_type
+        self._start_time: float = time.time()
+        self._last_update_time: float = 0
+        self._update_interval: int = int(self._sensor_config.get(CONF_GROUP_UPDATE_INTERVAL, 60))
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -483,7 +489,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self.set_new_state(calculated_new_state)
 
     async def init_domain_group(self) -> None:
-        if self.group_type != GroupType.DOMAIN:
+        if self._group_type != GroupType.DOMAIN:
             return
         domain = self._sensor_config.get(CONF_DOMAIN)
         if domain == "all":
@@ -493,7 +499,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             entities = self.hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES).get(domain, [])
             entities = filter_entity_list_by_class(
                 entities,
-                EnergySensor if isinstance(self, GroupedEnergySensor) else PowerSensor,
+                EnergySensor if self._is_energy_sensor else PowerSensor,
             )
         excluded_entities = self._sensor_config.get(CONF_EXCLUDE_ENTITIES) or []
         self._entities = set({entity for entity in entities if entity not in excluded_entities})
@@ -543,9 +549,25 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             self.async_write_ha_state()
             return
 
-        self._set_native_value(state, write_state=False)
+        current_time = time.time()
+        should_throttle = self._should_throttle(current_time)
+
+        write_state = True
+        if should_throttle and current_time - self._last_update_time < self._update_interval:
+            write_state = False
         self._attr_available = True
-        self.async_write_ha_state()
+        self._set_native_value(state, write_state=write_state)
+        if should_throttle and write_state:
+            self._last_update_time = current_time
+
+    def _should_throttle(self, current_time: float) -> bool:
+        if self._update_interval == 0:
+            return False
+
+        if not self._is_energy_sensor:
+            return False
+
+        return not current_time - self._start_time < 5
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
         """Convert value of member entity state to match the unit of measurement of the group sensor."""
@@ -601,6 +623,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfPower.WATT
+    _is_energy_sensor = False
 
     def calculate_initial_state(
         self,
@@ -632,6 +655,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_state_class = SensorStateClass.TOTAL
+    _is_energy_sensor = True
 
     def __init__(
         self,

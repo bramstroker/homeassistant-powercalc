@@ -134,7 +134,7 @@ async def create_daily_fixed_energy_power_sensor(
         return None
 
     power_value: float = mode_config.get(CONF_VALUE)  # type: ignore
-    if mode_config.get(CONF_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR:
+    if mode_config.get(CONF_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR and not isinstance(power_value, Template):
         power_value = power_value * 1000 / 24
 
     power_sensor_config = sensor_config.copy()

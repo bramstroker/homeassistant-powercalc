@@ -42,6 +42,7 @@ from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.selector import TextSelector
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
+from . import CONF_GROUP_UPDATE_INTERVAL
 from .common import SourceEntity, create_source_entity
 from .const import (
     CONF_AREA,
@@ -534,6 +535,9 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         ),
         vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
             selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
+        ),
+        vol.Optional(CONF_GROUP_UPDATE_INTERVAL): selector.NumberSelector(
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
         vol.Optional(CONF_FORCE_UPDATE_FREQUENCY): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
