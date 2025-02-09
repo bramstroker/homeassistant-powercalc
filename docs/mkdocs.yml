@@ -97,6 +97,18 @@ nav:
           - 'library/device-types/smart-speaker.md'
           - 'library/device-types/network.md'
           #- 'library/device-types/vacuum-robot.md'
+  - 'Actions':
+      - 'actions/activate-playbook.md'
+      - 'actions/calibrate-energy.md'
+      - 'actions/calibrate-utility-meter.md'
+      - 'actions/change-gui-configuration.md'
+      - 'actions/get-group-entities.md'
+      - 'actions/increase-daily-energy.md'
+      - 'actions/reload.md'
+      - 'actions/reset-energy.md'
+      - 'actions/stop-playbook.md'
+      - 'actions/switch-sub-profile.md'
+      - 'actions/update-library.md'
   - 'Troubleshooting':
       - 'troubleshooting/faq.md'
       - 'troubleshooting/data-correction.md'

@@ -4,6 +4,7 @@ from unittest.mock import PropertyMock, patch
 import pytest
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.template import Template
 
@@ -31,6 +32,14 @@ async def test_evaluate_power(
     if isinstance(power, Template):
         power.hass = hass
     assert await evaluate_power(power) == output
+
+
+@patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception()))
+async def test_evaluate_power_template_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    power = Template("{{ 1 + 3 }}")
+    power.hass = hass
+    await evaluate_power(power)
+    assert "Could not render power template" in caplog.text
 
 
 async def test_get_unique_id_from_config() -> None:

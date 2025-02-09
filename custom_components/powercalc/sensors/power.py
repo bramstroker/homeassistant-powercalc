@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import logging
+import re
 from copy import copy
 from datetime import timedelta
 from decimal import Decimal
@@ -159,7 +161,7 @@ async def create_virtual_power_sensor(
         strategy = detect_calculation_strategy(sensor_config, power_profile)
         calculation_strategy_factory = PowerCalculatorStrategyFactory.get_instance(hass)
 
-        standby_power, standby_power_on = _get_standby_power(sensor_config, strategy, power_profile)
+        standby_power, standby_power_on = _get_standby_power(sensor_config, power_profile)
 
         _LOGGER.debug(
             "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s unique_id=%s)",
@@ -251,7 +253,6 @@ async def _select_sub_profile(
 
 def _get_standby_power(
     sensor_config: ConfigType,
-    strategy: CalculationStrategy,
     power_profile: PowerProfile | None,
 ) -> tuple[Template | Decimal, Decimal]:
     """Retrieve standby power settings from sensor config or power profile."""
@@ -418,6 +419,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def initial_update(hass: HomeAssistant) -> None:
+            """Calculate initial value and push state"""
+
+            # When using reload service energy sensor became unavailable
+            # This is caused because state change listener of energy sensor is registered before power sensor pushes initial update
+            # Adding sleep 0 fixes this issue.
+            await asyncio.sleep(0)
             if self._strategy_instance:
                 await self._strategy_instance.on_start(hass)
 
@@ -435,8 +442,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Add listeners and get initial state."""
         entities_to_track = self._get_tracking_entities()
 
-        self._track_entities = set({entity for entity in entities_to_track if isinstance(entity, str)})
         track_templates = [template for template in entities_to_track if isinstance(template, TrackTemplate)]
+        template_entities = self.find_entities_in_track_template(track_templates)
+        self._track_entities = set({entity for entity in entities_to_track if isinstance(entity, str) and entity not in template_entities})
 
         self.async_on_remove(
             async_track_state_change_event(
@@ -465,6 +473,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if hasattr(self._strategy_instance, "set_update_callback"):
             self._strategy_instance.set_update_callback(self._update_power_sensor)
+
+    @staticmethod
+    def find_entities_in_track_template(track_templates: list[TrackTemplate]) -> set[str]:
+        """Find all entity id's used in `states()` template functions."""
+        return {match for template in track_templates for match in re.findall(r"states\('([\w\d_]+\.[\w\d_]+)'\)", template.template.template)}
 
     def _get_tracking_entities(self) -> list[str | TrackTemplate]:
         """Return entities and templates that should be tracked."""

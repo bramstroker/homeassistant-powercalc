@@ -350,6 +350,25 @@ async def test_template_entity_tracking(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == "15.00"
 
 
+async def test_template_entity_not_double_tracked(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """When the source entity is also used in the template, it should not be double tracked"""
+    caplog.set_level(logging.ERROR)
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Dynamic input number",
+            CONF_ENTITY_ID: "input_number.my_entity",
+            CONF_FIXED: {
+                CONF_POWER: "{{ states('input_number.my_entity') | float(0) }}",
+            },
+        },
+    )
+
+    assert hass.states.get("sensor.dynamic_input_number_power")
+    assert len(caplog.records) == 0
+
+
 async def test_unknown_source_entity_state(hass: HomeAssistant) -> None:
     """Power sensor should be unavailable when source entity state is unknown"""
     await create_input_boolean(hass)

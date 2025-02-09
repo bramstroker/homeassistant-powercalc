@@ -749,6 +749,10 @@
       },
       "name": "Augmenter le capteur d'énergie quotidien"
     },
+    "reload": {
+      "description": "Reload Powercalc configuration and entities",
+      "name": "Reload"
+    },
     "reset_energy": {
       "description": "Réinitialiser un capteur d'énergie à zéro kWh.",
       "name": "Réinitialiser le capteur d'énergie"

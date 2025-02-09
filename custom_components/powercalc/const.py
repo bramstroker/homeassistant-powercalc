@@ -80,6 +80,7 @@ CONF_GROUP_POWER_ENTITIES = "group_power_entities"
 CONF_GROUP_TRACKED_AUTO = "group_tracked_auto"
 CONF_GROUP_TRACKED_POWER_ENTITIES = "group_tracked_entities"
 CONF_GROUP_TYPE = "group_type"
+CONF_GROUP_UPDATE_INTERVAL = "group_update_interval"
 CONF_HIDE_MEMBERS = "hide_members"
 CONF_IGNORE_UNAVAILABLE_STATE = "ignore_unavailable_state"
 CONF_INCLUDE = "include"
@@ -170,6 +171,7 @@ ENTITY_CATEGORIES = [
     ENTITY_CATEGORY_SYSTEM,
 ]
 
+DEFAULT_GROUP_UPDATE_INTERVAL = 60
 DEFAULT_UPDATE_FREQUENCY = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
 DEFAULT_POWER_SENSOR_PRECISION = 2
@@ -205,6 +207,7 @@ SERVICE_RESET_ENERGY = "reset_energy"
 SERVICE_STOP_PLAYBOOK = "stop_playbook"
 SERVICE_SWITCH_SUB_PROFILE = "switch_sub_profile"
 SERVICE_UPDATE_LIBRARY = "update_library"
+SERVICE_RELOAD = "reload"
 
 SIGNAL_POWER_SENSOR_STATE_CHANGE = "powercalc_power_sensor_state_change"
 

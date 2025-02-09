@@ -4,6 +4,7 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from freezegun import freeze_time
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.sensor import (
     SensorDeviceClass,
@@ -37,6 +38,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_restore_cache_with_extra_data,
 )
 
+from custom_components.powercalc import CONF_GROUP_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -1773,6 +1775,66 @@ async def test_area_group(hass: HomeAssistant, area_registry: AreaRegistry) -> N
 
     power_state = hass.states.get("sensor.testarea123_power")
     assert power_state
+
+
+async def test_energy_throttle(hass: HomeAssistant) -> None:
+    """Test that energy sensor is not updated more than once per minute"""
+
+    hass.states.async_set("sensor.a_energy", "2.00")
+    hass.states.async_set("sensor.b_energy", "3.00")
+    await hass.async_block_till_done()
+    await _create_energy_group(
+        hass,
+        "TestGroup",
+        ["sensor.a_energy", "sensor.b_energy"],
+    )
+
+    assert hass.states.get("sensor.testgroup_energy").state == "5.0000"
+
+    # Do a state change directly after group energy sensor is created
+    # These state changes should not be throttled
+    hass.states.async_set("sensor.a_energy", "2.50")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "5.5000"
+
+    now = dt.utcnow()
+    with freeze_time(now + timedelta(seconds=15)):
+        # Do 3 state changes after startup period has expired and throttling is activated
+        # Only the first state change should be processed and written to state machine
+        # Which means 3.50 - 3.00 = 0.50 should be added to the group energy total
+        hass.states.async_set("sensor.b_energy", "3.50")
+        hass.states.async_set("sensor.a_energy", "2.75")
+        hass.states.async_set("sensor.b_energy", "4.00")
+        await hass.async_block_till_done()
+        assert hass.states.get("sensor.testgroup_energy").state == "6.0000"
+
+    with freeze_time(now + timedelta(seconds=120)):
+        # Do another state change after the throttle period has expired
+        # This state change should be processed and written to state machine, in addition to previously collected state changes
+        hass.states.async_set("sensor.b_energy", "4.25")
+        await hass.async_block_till_done()
+        assert hass.states.get("sensor.testgroup_energy").state == "7.0000"
+
+
+async def test_energy_throttle_disabled(hass: HomeAssistant) -> None:
+    """Test that energy sensor throttling can be disabled"""
+
+    await run_powercalc_setup(hass, {}, {CONF_GROUP_UPDATE_INTERVAL: 0})
+    await _create_energy_group(
+        hass,
+        "TestGroup",
+        ["sensor.a_energy", "sensor.b_energy"],
+    )
+
+    with freeze_time(dt.utcnow() + timedelta(seconds=15)):
+        hass.states.async_set("sensor.a_energy", "2.00")
+        hass.states.async_set("sensor.a_energy", "3.00")
+        hass.states.async_set("sensor.a_energy", "4.00")
+        hass.states.async_set("sensor.b_energy", "4.00")
+        hass.states.async_set("sensor.b_energy", "5.00")
+        await hass.async_block_till_done()
+        assert hass.states.get("sensor.testgroup_energy").state == "9.0000"
 
 
 async def _create_energy_group(
