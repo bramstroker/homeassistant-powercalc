@@ -28,5 +28,7 @@
   },
   "name": "JBL Link Music",
   "standby_power": 1.7,
-  "aliases": ["JBL Link Music"]
+  "aliases": [
+    "JBL Link Music"
+  ]
 }
