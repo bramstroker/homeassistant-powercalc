@@ -5,7 +5,7 @@
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
-	  "0 -> 2.71",
+      "0 -> 2.71",
       "10 -> 2.72",
       "20 -> 2.76",
       "30 -> 2.76",
