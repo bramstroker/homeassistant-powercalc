@@ -5,17 +5,17 @@
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
-      "10 -> 2.76",
-      "20 -> 2.7",
-      "30 -> 2.73",
+	  "0 -> 2.71",
+      "10 -> 2.72",
+      "20 -> 2.76",
+      "30 -> 2.76",
       "40 -> 2.76",
-      "50 -> 2.7",
+      "50 -> 2.76",
       "60 -> 2.83",
       "70 -> 3.47",
       "80 -> 5.49",
       "90 -> 7.44",
-      "100 -> 8.56",
-      "0 -> 5.61"
+      "100 -> 8.56"
     ]
   },
   "measure_description": "Measured with utils/measure script",
@@ -27,5 +27,5 @@
     "VERSION": "v1.17.6:docker"
   },
   "name": "JBL Link Music",
-  "standby_power": 2.7
+  "standby_power": 1.7
 }
