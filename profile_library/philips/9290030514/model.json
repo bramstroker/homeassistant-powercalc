@@ -10,5 +10,5 @@
     "VERSION": "v1.17.6:docker"
   },
   "name": "Hue Filament Standard A60/E27 bluetooth",
-  "standby_power": 0.06
+  "standby_power": 0.14
 }
