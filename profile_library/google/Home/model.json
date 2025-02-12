@@ -27,5 +27,6 @@
     "VERSION": "v1.17.6:docker"
   },
   "name": "Google Home",
-  "standby_power": 2.0
+  "standby_power": 2.0,
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
 }
