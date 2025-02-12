@@ -5,7 +5,7 @@
   "measure_method": "manual",
   "calculation_strategy": "linear",
   "device_type": "smart_dimmer",
-  "name": "TRADFRI LED driver",
+  "name": "TRADFRI LED driver, 30 w",
   "aliases": [
     "TRADFRI LED driver, 30 w (ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2"
   ],
