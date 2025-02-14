@@ -81,6 +81,10 @@
       "type": "string",
       "description": "Some remarks to show in the GUI config flow on first step of discovery"
     },
+    "config_flow_sub_profile_remarks": {
+      "type": "string",
+      "description": "Some remarks to show in the GUI config flow on sub profile selection step"
+    },
     "created_at": {
       "type": "string",
       "format": "date-time",

@@ -1154,11 +1154,9 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             return {CONF_MODEL: f"{self.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"}
 
         async def _create_schema(
-            model_info: ModelInfo,
+            profile: PowerProfile,
         ) -> vol.Schema:
             """Create sub profile schema."""
-            library = await ProfileLibrary.factory(self.hass)
-            profile = await library.get_profile(model_info, process_variables=False)
             sub_profiles = [
                 selector.SelectOptionDict(
                     value=sub_profile[0],
@@ -1177,18 +1175,30 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 },
             )
 
+        library = await ProfileLibrary.factory(self.hass)
+        profile = await library.get_profile(
+            ModelInfo(
+                str(self.sensor_config.get(CONF_MANUFACTURER)),
+                str(self.sensor_config.get(CONF_MODEL)),
+            ),
+            process_variables=False,
+        )
+        remarks = profile.config_flow_sub_profile_remarks
+        if remarks:
+            remarks = "\n\n" + remarks
+
         return await self.handle_form_step(
             PowercalcFormStep(
                 step=Step.SUB_PROFILE,
-                schema=await _create_schema(
-                    ModelInfo(
-                        str(self.sensor_config.get(CONF_MANUFACTURER)),
-                        str(self.sensor_config.get(CONF_MODEL)),
-                    ),
-                ),
+                schema=await _create_schema(profile),
                 next_step=Step.POWER_ADVANCED,
                 validate_user_input=_validate,
-                form_kwarg={"description_placeholders": {"entity_id": self.source_entity_id}},
+                form_kwarg={
+                    "description_placeholders": {
+                        "entity_id": self.source_entity_id,
+                        "remarks": remarks,
+                    },
+                },
             ),
             user_input,
         )
