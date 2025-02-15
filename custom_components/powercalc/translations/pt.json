@@ -325,7 +325,7 @@
         "data": {
           "sub_profile": "Sub-perfil"
         },
-        "description": "Este modelo tem vários sub-perfis. Selecione um adequado ao seu dispositivo\n\n\"{entity_id}\"",
+        "description": "Este modelo tem vários sub-perfis. Selecione um adequado ao seu dispositivo\n\n\"{entity_id}\"{remarks}",
         "title": "Sub-perfil config"
       },
       "smart_switch": {

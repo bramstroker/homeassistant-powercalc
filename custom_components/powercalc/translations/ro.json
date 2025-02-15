@@ -325,7 +325,7 @@
         "data": {
           "sub_profile": "Subprofil"
         },
-        "description": "Acest model are mai multe subprofiluri. Selectați unul care se potrivește dispozitivului dvs\n\n\"{entity_id}\"",
+        "description": "Acest model are mai multe subprofiluri. Selectați unul care se potrivește dispozitivului dvs\n\n\"{entity_id}\"{remarks}",
         "title": "Configurare subprofil"
       },
       "smart_switch": {
