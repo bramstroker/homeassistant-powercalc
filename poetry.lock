@@ -1553,13 +1553,13 @@ bluetooth-data-tools = ">=1.16.0"
 
 [[package]]
 name = "hass-nabucasa"
-version = "0.90.0"
+version = "0.92.0"
 description = "Home Assistant cloud integration by Nabu Casa, Inc."
 optional = false
 python-versions = ">=3.13"
 files = [
-    {file = "hass_nabucasa-0.90.0-py3-none-any.whl", hash = "sha256:efd747d7881ff4239130665d86865677358cc25cc389ea80bdd1fdc5139eaa29"},
-    {file = "hass_nabucasa-0.90.0.tar.gz", hash = "sha256:c27842a64059bc143ad4955e758ba36a616cfadc13b686ff053f4e9579ee1e2a"},
+    {file = "hass_nabucasa-0.92.0-py3-none-any.whl", hash = "sha256:1ddf9ebcbdbd789870fce6347b2cdc444872212d7972a3eb548bbf9f3679aa9d"},
+    {file = "hass_nabucasa-0.92.0.tar.gz", hash = "sha256:ea926736f79319b086efb5ee247ad32c855c206958d881331b0591de82cf07a3"},
 ]
 
 [package.dependencies]
@@ -1593,13 +1593,13 @@ habluetooth = ">=3.0"
 
 [[package]]
 name = "homeassistant"
-version = "2025.2.3"
+version = "2025.2.4"
 description = "Open-source home automation platform running on Python 3."
 optional = false
 python-versions = ">=3.13.0"
 files = [
-    {file = "homeassistant-2025.2.3-py3-none-any.whl", hash = "sha256:6d391c7a21732c6f46156a221fb9443aefbeb1c8d15223dbf1fca5202bbc8435"},
-    {file = "homeassistant-2025.2.3.tar.gz", hash = "sha256:e0ba23ada9d9f712d1de4a41befcd9fd725c85b82bf59558c9d9ed3680640951"},
+    {file = "homeassistant-2025.2.4-py3-none-any.whl", hash = "sha256:143df0def44fadceef45997afa8055a4d2f13edc8b49852217d98e13c48bacf0"},
+    {file = "homeassistant-2025.2.4.tar.gz", hash = "sha256:db800e2320b4d14e89d406e0d738f805b48bb118a4dad4194856a802eef0f393"},
 ]
 
 [package.dependencies]
@@ -1622,7 +1622,7 @@ ciso8601 = "2.3.2"
 cronsim = "2.6"
 cryptography = "44.0.1"
 fnv-hash-fast = "1.2.2"
-hass-nabucasa = "0.90.0"
+hass-nabucasa = "0.92.0"
 home-assistant-bluetooth = "1.13.0"
 httpx = "0.28.1"
 ifaddr = "0.2.0"
@@ -1655,17 +1655,17 @@ zeroconf = "0.144.1"
 
 [[package]]
 name = "homeassistant-stubs"
-version = "2025.2.3"
+version = "2025.2.4"
 description = "PEP 484 typing stubs for Home Assistant Core"
 optional = false
 python-versions = "<3.14,>=3.13"
 files = [
-    {file = "homeassistant_stubs-2025.2.3-py3-none-any.whl", hash = "sha256:bfbcd323ad2076356bbc9556aaa7d79e78d08432af7ea464f742a136219d93df"},
-    {file = "homeassistant_stubs-2025.2.3.tar.gz", hash = "sha256:e06312e94f364864db93170b23edda7256289207f30fee4fd20552f613e1faac"},
+    {file = "homeassistant_stubs-2025.2.4-py3-none-any.whl", hash = "sha256:a5f10982ffd702ed949c4269eea3fd377d2ae94f66137a3884b4fa726126a29b"},
+    {file = "homeassistant_stubs-2025.2.4.tar.gz", hash = "sha256:cca7cb70daa9bbad208f5241c7f165e0cde8f78c78617fa530f842250f144a9b"},
 ]
 
 [package.dependencies]
-homeassistant = "2025.2.3"
+homeassistant = "2025.2.4"
 
 [[package]]
 name = "httpcore"
@@ -3362,19 +3362,19 @@ pytest = ">=4.0.0"
 
 [[package]]
 name = "pytest-homeassistant-custom-component"
-version = "0.13.213"
+version = "0.13.214"
 description = "Experimental package to automatically extract test plugins for Home Assistant custom components"
 optional = false
 python-versions = ">=3.13"
 files = [
-    {file = "pytest_homeassistant_custom_component-0.13.213-py3-none-any.whl", hash = "sha256:edc0de637f24e7c5111552a69de59592ee677283d36f4486e91d2c96febf9df4"},
-    {file = "pytest_homeassistant_custom_component-0.13.213.tar.gz", hash = "sha256:4cf3fe19d59df15fa5f81162cf6fd29207d5efb9bfdae5b400e3863737af66cb"},
+    {file = "pytest_homeassistant_custom_component-0.13.214-py3-none-any.whl", hash = "sha256:abca56b7816706a7e48b6373ae378ced3a66facef6f4fcf2607323c370b74c36"},
+    {file = "pytest_homeassistant_custom_component-0.13.214.tar.gz", hash = "sha256:bf15327c5df97f0a10138980d3ec91096b965e66fc67a13a4a27b866fc08f285"},
 ]
 
 [package.dependencies]
 coverage = "7.6.8"
 freezegun = "1.5.1"
-homeassistant = "2025.2.3"
+homeassistant = "2025.2.4"
 license-expression = "30.4.0"
 mock-open = "1.4.0"
 numpy = "2.2.2"
@@ -4775,4 +4775,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.13,<3.14"
-content-hash = "26b587a605a34861679d67ebe8f5aad991708e94f2b7d34fdeae5d51171483ae"
+content-hash = "03ec0466a80a86a47061b826e7ca3e0c1c96586652be3e220d77fc3d1a16375d"
