@@ -39,19 +39,24 @@ def generate_library_json(model_listing: list[dict]) -> None:
         if device_type not in manufacturer["device_types"]:
             manufacturer["device_types"].append(device_type)
 
-        key_mapping = {
+        mapped_fields = {
             "model": "id",
-            "name": "name",
-            "device_type": "device_type",
-            "discovery_by": "discovery_by",
-            "aliases": "aliases",
-            "updated_at": "updated_at",
-            "color_modes": "color_modes",
         }
-
-        # Create a new dictionary with updated keys
-        mapped_dict = {key_mapping.get(key, key): value for key, value in model.items()}
-        manufacturer["models"].append({key: mapped_dict[key] for key in key_mapping.values() if key in mapped_dict})
+        skipped_fields = [
+            "calculation_enabled_condition",
+            "config_flow_discovery_remarks",
+            "config_flow_sub_profile_remarks",
+            "composite_config",
+            "fixed_config",
+            "linear_config",
+            "playbook_config",
+            "sensor_config",
+            "sub_profile_select",
+        ]
+        mapped_dict = {
+            mapped_fields.get(key, key): value for key, value in model.items() if key not in skipped_fields
+        }
+        manufacturer["models"].append(mapped_dict)
 
     json_data = {
         "manufacturers": list(manufacturers.values()),
