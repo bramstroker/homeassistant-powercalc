@@ -325,7 +325,7 @@
         "data": {
           "sub_profile": "Unterprofil"
         },
-        "description": "Dieses Gerät besitzt ein Modell mit mehreren Unterprofilen. Wählen Sie das Unterprofil aus, welches zu der folgenden Entität gehört:\n\n\"{entity_id}\"",
+        "description": "Dieses Gerät besitzt ein Modell mit mehreren Unterprofilen. Wählen Sie das Unterprofil aus, welches zu der folgenden Entität gehört:\n\n\"{entity_id}\"{remarks}",
         "title": "Unterprofil Konfiguration"
       },
       "smart_switch": {

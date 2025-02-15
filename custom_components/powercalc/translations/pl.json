@@ -325,7 +325,7 @@
         "data": {
           "sub_profile": "Podprofile"
         },
-        "description": "Ten model ma wiele podprofili. Wybierz taki, który pasuje do Twojego urządzenia\n\n\"{entity_id}\"",
+        "description": "Ten model ma wiele podprofili. Wybierz taki, który pasuje do Twojego urządzenia\n\n\"{entity_id}\"{remarks}",
         "title": "Konfiguracja podprofili"
       },
       "smart_switch": {
