@@ -1,7 +1,7 @@
 {
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
   "measure_method": "manual",
-  "measure_device": "Zhurui PR10",
+  "measure_device": "Zhurui PR10-D",
   "name": "TRADFRI control outlet",
   "standby_power": 0.23,
   "standby_power_on": 0.98,
