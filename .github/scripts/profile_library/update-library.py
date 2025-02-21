@@ -49,6 +49,7 @@ def generate_library_json(model_listing: list[dict]) -> None:
             "composite_config",
             "directory",
             "fixed_config",
+            "full_path",
             "linear_config",
             "playbook_config",
             "sensor_config",
