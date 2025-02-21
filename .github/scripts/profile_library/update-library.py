@@ -47,6 +47,7 @@ def generate_library_json(model_listing: list[dict]) -> None:
             "config_flow_discovery_remarks",
             "config_flow_sub_profile_remarks",
             "composite_config",
+            "directory",
             "fixed_config",
             "linear_config",
             "playbook_config",
