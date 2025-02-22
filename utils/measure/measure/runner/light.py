@@ -232,8 +232,7 @@ class LightRunner(MeasurementRunner):
                 _LOGGER.info("Extra waiting for effect change...")
                 time.sleep(self.config.sleep_time_effect_change)
 
-        if variation.mode != LutMode.EFFECT:
-            time.sleep(self.config.sleep_time)
+        time.sleep(self.config.sleep_time)
 
     def set_light_to_maximum_brightness(self, mode: LutMode) -> None:
         """
@@ -347,7 +346,7 @@ class LightRunner(MeasurementRunner):
 
         for effect in effects:
             for bri in self.inclusive_range(
-                5,
+                max(self.config.min_brightness, 5),
                 self.config.max_brightness,
                 self.config.effect_bri_steps,
             ):
