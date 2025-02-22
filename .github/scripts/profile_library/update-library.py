@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import hashlib
 import json
 import os
 import subprocess
@@ -59,6 +60,7 @@ def generate_library_json(model_listing: list[dict]) -> None:
         mapped_dict = {
             mapped_fields.get(key, key): value for key, value in model.items() if key not in skipped_fields
         }
+        mapped_dict["hash"] = hashlib.md5(json.dumps(mapped_dict, sort_keys=True).encode()).hexdigest()
         manufacturer["models"].append(mapped_dict)
 
     json_data = {
@@ -79,7 +81,6 @@ def update_authors(model_listing: list[dict]) -> None:
         author = model.get("author")
         model_json_path = model.get("full_path")
         if author:
-            #print(f"Skipping {model_json_path}, author already set to {author}")
             continue
 
         author = find_first_commit_author(model_json_path)
@@ -96,7 +97,6 @@ def update_translations(model_listing: list[dict]) -> None:
     for model in model_listing:
         custom_fields = model.get("fields")
         if not custom_fields:
-            #print(f"Skipping {model_json_path}, no custom fields found")
             continue
 
         for key, field_data in custom_fields.items():

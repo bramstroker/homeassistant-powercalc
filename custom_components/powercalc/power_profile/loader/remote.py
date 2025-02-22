@@ -1,10 +1,8 @@
 import asyncio
-import datetime
 import json
 import logging
 import os
 import shutil
-import time
 from collections.abc import Callable, Coroutine
 from functools import partial
 from json import JSONDecodeError
@@ -36,12 +34,12 @@ class RemoteLoader(Loader):
         self.model_infos: dict[str, dict] = {}
         self.manufacturer_models: dict[str, list[dict]] = {}
         self.manufacturer_aliases: dict[str, set[str]] = {}
-        self.last_update_time: float | None = None
+        self.profile_hashes: dict[str, str] = {}
 
     async def initialize(self) -> None:
         """Initialize the loader."""
         self.library_contents = await self.load_library_json()
-        self.last_update_time = await self.hass.async_add_executor_job(self.get_last_update_time)
+        self.profile_hashes = await self.hass.async_add_executor_job(self.load_profile_hashes)
 
         self.model_infos.clear()
         self.manufacturer_models.clear()
@@ -154,7 +152,7 @@ class RemoteLoader(Loader):
         storage_path = self.get_storage_path(manufacturer, model)
         model_path = os.path.join(storage_path, "model.json")
 
-        if await self._needs_update(model_info, model_path, force_update):
+        if await self._needs_update(model_info, manufacturer, model, model_path, force_update):
             await self._download_profile_with_retry(manufacturer, model, storage_path, model_path)
 
         try:
@@ -171,25 +169,27 @@ class RemoteLoader(Loader):
             raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
         return model_info
 
-    async def _needs_update(self, model_info: dict, model_path: str, force_update: bool) -> bool:
+    async def _needs_update(self, model_info: dict, manufacturer: str, model: str, model_path: str, force_update: bool) -> bool:
         """Check if the model needs to be updated."""
+        if force_update:
+            return True
+
         path_exists = os.path.exists(model_path)
         if not path_exists:
             return True
 
-        remote_modification_time = self._get_remote_modification_time(model_info)
-        if self.last_update_time and remote_modification_time > self.last_update_time:
-            _LOGGER.debug("Remote profile is newer than local profile")
-            return True
-
-        return force_update
+        existing_hash = self.profile_hashes.get(f"{manufacturer}/{model}")
+        new_hash = model_info.get("hash")
+        return existing_hash != new_hash
 
     async def _download_profile_with_retry(self, manufacturer: str, model: str, storage_path: str, model_path: str) -> None:
         """Attempt to download the profile, with retry logic and error handling."""
         try:
             callback = partial(self.download_profile, manufacturer, model, storage_path)
             await self.download_with_retry(callback)
-            await self.set_last_update_time(time.time())
+            model_info = self._get_model_info(manufacturer, model)
+            self.profile_hashes[f"{manufacturer}/{model}"] = str(model_info.get("hash"))
+            await self.hass.async_add_executor_job(self.write_profile_hashes, self.profile_hashes)
         except ProfileDownloadError as e:
             if not os.path.exists(model_path):
                 await self.hass.async_add_executor_job(shutil.rmtree, storage_path)
@@ -222,35 +222,6 @@ class RemoteLoader(Loader):
     def get_storage_path(self, manufacturer: str, model: str) -> str:
         """Retrieve the storage path for a given manufacturer and model."""
         return str(self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model))
-
-    def get_last_update_time(self) -> float | None:
-        """Get the last update time of the local library"""
-        path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".last_update")
-        if not os.path.exists(path):
-            return None
-
-        with open(path) as f:
-            return float(f.read())
-
-    async def set_last_update_time(self, time: float) -> None:
-        """Set the last update time of the local library"""
-        self.last_update_time = time
-        path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".last_update")
-
-        def _write() -> None:
-            """Write last update time to file"""
-            with open(path, "w") as f:
-                f.write(str(time))
-
-        return await self.hass.async_add_executor_job(_write)
-
-    @staticmethod
-    def _get_remote_modification_time(model_info: dict) -> float:
-        """Get the remote modification time of the model"""
-        remote_modification_time = model_info.get("updated_at", time.time())
-        if isinstance(remote_modification_time, str):
-            remote_modification_time = datetime.datetime.fromisoformat(remote_modification_time).timestamp()
-        return remote_modification_time  # type: ignore
 
     async def download_with_retry(self, callback: Callable[[], Coroutine[Any, Any, None | dict[str, Any]]]) -> None | dict[str, Any]:
         """Download a file from a remote endpoint with retries"""
@@ -307,3 +278,20 @@ class RemoteLoader(Loader):
                         await self.hass.async_add_executor_job(_save_file, contents, resource.get("path"))
             except aiohttp.ClientError as e:
                 raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
+
+    def load_profile_hashes(self) -> dict[str, str]:
+        """Load profile hashes from local storage"""
+
+        path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
+        if not os.path.exists(path):
+            return {}
+
+        with open(path) as f:
+            return json.load(f)  # type: ignore
+
+    def write_profile_hashes(self, hashes: dict[str, str]) -> None:
+        """Write profile hashes to local storage"""
+
+        path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
+        with open(path, "w") as json_file:
+            json.dump(hashes, json_file, indent=4)
