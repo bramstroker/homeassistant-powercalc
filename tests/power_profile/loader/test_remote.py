@@ -1,10 +1,8 @@
 import contextlib
-import datetime
 import json
 import logging
 import os
 import shutil
-import time
 from functools import partial
 from unittest.mock import patch
 
@@ -220,18 +218,20 @@ async def test_eventual_success_after_download_retry(mock_aioresponse: aiorespon
 
 
 @pytest.mark.parametrize(
-    "remote_modification_time_delta,exists_locally,expected_download",
+    "profile_hash,local_hash,exists_locally,expected_download",
     [
-        (-5000, False, True),
-        (+400, True, True),
-        (-4000, True, False),
+        ("018de85593a1b22b906f863677bb4891", None, True, True),
+        ("018de85593a1b22b906f863677bb4891", "b3e12b2e89ca7db698abeb39e2d7d2d3", True, True),
+        ("018de85593a1b22b906f863677bb4891", "018de85593a1b22b906f863677bb4891", True, False),
+        ("018de85593a1b22b906f863677bb4891", "018de85593a1b22b906f863677bb4891", False, True),
     ],
 )
 async def test_profile_redownloaded_when_newer_version_available(
     hass: HomeAssistant,
     mock_aioresponse: aioresponses,
     mock_download_profile_endpoints: None,
-    remote_modification_time_delta: int,
+    profile_hash: str | None,
+    local_hash: str | None,
     exists_locally: bool,
     expected_download: bool,
 ) -> None:
@@ -241,7 +241,7 @@ async def test_profile_redownloaded_when_newer_version_available(
                 return len(calls)
         return 0
 
-    def _mock_library_json(profile_updated_at: str) -> None:
+    def _mock_library_json() -> None:
         mock_aioresponse.get(
             ENDPOINT_LIBRARY,
             status=200,
@@ -253,7 +253,7 @@ async def test_profile_redownloaded_when_newer_version_available(
                             {
                                 "id": "LCA001",
                                 "device_type": "light",
-                                "updated_at": profile_updated_at,
+                                "hash": profile_hash,
                             },
                         ],
                     },
@@ -262,27 +262,34 @@ async def test_profile_redownloaded_when_newer_version_available(
             repeat=True,
         )
 
-    remote_date = datetime.datetime.fromtimestamp(time.time() + remote_modification_time_delta).isoformat()
-    _mock_library_json(remote_date)
+    _mock_library_json()
 
     loader = RemoteLoader(hass)
-    await loader.initialize()
 
     # Clean local directory first so we have consistent test results
     # When scenario exists_locally=True, we download the profile first, to fake the local existence
     local_storage_path = loader.get_storage_path("signify", "LCA001")
     clear_storage_dir(local_storage_path)
+    hash_file = hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
+    if os.path.exists(hash_file):
+        os.remove(hash_file)
+
+    if local_hash:
+        loader.write_profile_hashes({"signify/LCA001": local_hash})
+
+    await loader.initialize()
 
     if exists_locally:
-        await loader.set_last_update_time(time.time())
         await loader.download_profile("signify", "LCA001", local_storage_path)
 
     await loader.load_model("signify", "LCA001")
 
-    expected_call_count = 1 if expected_download else 0
+    actual_call_count = _count_download_requests()
     if exists_locally:
-        expected_call_count += 1
-    assert _count_download_requests() == expected_call_count
+        actual_call_count -= 1
+
+    expected_call_count = 1 if expected_download else 0
+    assert actual_call_count == expected_call_count
 
 
 async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: aioresponses, caplog: pytest.LogCaptureFixture) -> None:
