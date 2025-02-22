@@ -223,6 +223,7 @@ async def test_eventual_success_after_download_retry(mock_aioresponse: aiorespon
         ("018de85593a1b22b906f863677bb4891", None, True, True),
         ("018de85593a1b22b906f863677bb4891", "b3e12b2e89ca7db698abeb39e2d7d2d3", True, True),
         ("018de85593a1b22b906f863677bb4891", "018de85593a1b22b906f863677bb4891", True, False),
+        ("018de85593a1b22b906f863677bb4891", "018de85593a1b22b906f863677bb4891", False, True),
     ],
 )
 async def test_profile_redownloaded_when_newer_version_available(
