@@ -208,7 +208,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Se si sceglie di non confermare, è possibile immettere il produttore e modellare da soli"
         },
-        "description": "Source entity: {source_entity}\n\nProduttore \"{manufacturer}\" e modello \"{model}\" sono stati rilevati automaticamente per il tuo dispositivo.{remarks}",
+        "description": "Source entity: {source}\n\nProduttore \"{manufacturer}\" e modello \"{model}\" sono stati rilevati automaticamente per il tuo dispositivo.{remarks}",
         "title": "Libreria"
       },
       "library_multi_profile": {
