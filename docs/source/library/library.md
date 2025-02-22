@@ -71,3 +71,10 @@ Once the update process is complete, a discovery routine will be initiated to po
 - *Manual Trigger*: Updates can also be initiated manually by invoking the action [`powecalc.update_library`](../actions/update-library.md).
 
 This ensures that you always have the latest power profiles available, without the need to restart HA.
+
+## Force redownload
+
+Powercalc keeps track of hashes per profile to determine if a profile has changed.
+The file which contains the hashes is located at `config/.storage/powercalc_profiles/.profile_hashes`
+
+To force a redownload of all profiles, you can delete this file and restart HA or call the [`powecalc.update_library`](../actions/update-library.md) action.
