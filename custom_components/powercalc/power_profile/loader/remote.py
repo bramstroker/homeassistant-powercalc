@@ -1,10 +1,8 @@
 import asyncio
-import datetime
 import json
 import logging
 import os
 import shutil
-import time
 from collections.abc import Callable, Coroutine
 from functools import partial
 from json import JSONDecodeError
@@ -224,14 +222,6 @@ class RemoteLoader(Loader):
     def get_storage_path(self, manufacturer: str, model: str) -> str:
         """Retrieve the storage path for a given manufacturer and model."""
         return str(self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model))
-
-    @staticmethod
-    def _get_remote_modification_time(model_info: dict) -> float:
-        """Get the remote modification time of the model"""
-        remote_modification_time = model_info.get("updated_at", time.time())
-        if isinstance(remote_modification_time, str):
-            remote_modification_time = datetime.datetime.fromisoformat(remote_modification_time).timestamp()
-        return remote_modification_time  # type: ignore
 
     async def download_with_retry(self, callback: Callable[[], Coroutine[Any, Any, None | dict[str, Any]]]) -> None | dict[str, Any]:
         """Download a file from a remote endpoint with retries"""
