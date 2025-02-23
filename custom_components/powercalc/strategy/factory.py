@@ -221,9 +221,7 @@ class PowerCalculatorStrategyFactory:
         Otherwise, return the original value.
         """
         if isinstance(value, str) and value.startswith("{{"):
-            template = Template(value)
-            template.hass = self._hass
-            return template
+            return Template(value, self._hass)
         if isinstance(value, Template):
             value.hass = self._hass
             return value
