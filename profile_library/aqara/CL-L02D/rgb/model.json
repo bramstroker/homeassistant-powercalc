@@ -1,3 +1,4 @@
 {
+  "name": "RGB ring light of the Lamp",
   "calculation_strategy": "lut"
 }
