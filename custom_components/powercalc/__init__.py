@@ -345,16 +345,19 @@ async def register_services(hass: HomeAssistant) -> None:
         hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES] = {}
         hass.data[DOMAIN][DOMAIN_CONFIG] = get_global_configuration(hass, reload_config)
 
-        for sensor_config in reload_config[DOMAIN].get(CONF_SENSORS, []):
-            sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
-            await async_load_platform(
-                hass,
-                Platform.SENSOR,
-                DOMAIN,
-                sensor_config,
-                reload_config,
-            )
+        # Reload YAML sensors if any
+        if DOMAIN in reload_config:
+            for sensor_config in reload_config[DOMAIN].get(CONF_SENSORS, []):
+                sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
+                await async_load_platform(
+                    hass,
+                    Platform.SENSOR,
+                    DOMAIN,
+                    sensor_config,
+                    reload_config,
+                )
 
+        # Reload all config entries
         for entry in hass.config_entries.async_entries(DOMAIN):
             _LOGGER.debug("Reloading config entry %s", entry.entry_id)
             await hass.config_entries.async_reload(entry.entry_id)
