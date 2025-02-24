@@ -334,12 +334,12 @@ async def test_template_entity_tracking(hass: HomeAssistant) -> None:
     await run_powercalc_setup(
         hass,
         {
-            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_ENTITY_ID: "input_number.test",
             CONF_FIXED: {CONF_POWER: "{{ states('input_number.test') }}"},
         },
     )
 
-    hass.states.async_set("input_boolean.test", STATE_ON)
+    hass.states.async_set("input_number.test", 0)
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "0.00"

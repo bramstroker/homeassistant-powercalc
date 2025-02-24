@@ -462,7 +462,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 TrackTemplate(self._calculation_enabled_condition, None, None),
             )
         if track_templates:
-            self.remove_source_entity_from_track_templates(track_templates)
             async_track_template_result(
                 self.hass,
                 track_templates=track_templates,
@@ -753,20 +752,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 self._config_entry,
                 data={**self._config_entry.data, CONF_MODEL: new_model},
             )
-
-    def remove_source_entity_from_track_templates(self, track_templates: list[TrackTemplate]) -> None:
-        """
-        Remove the source entity from the track templates, to prevent duplicate tracking.
-        This would cause duplicate updates at the same time, which causes issues.
-        """
-        for index, track_template in enumerate(track_templates):
-            if self._source_entity.entity_id in track_template.template.template:
-                orig_template = track_template.template.template
-                orig_template = orig_template.replace(
-                    self._source_entity.entity_id,
-                    DUMMY_ENTITY_ID,
-                )
-                track_templates[index] = TrackTemplate(Template(orig_template, self.hass), None, None)
 
 
 class RealPowerSensor(PowerSensor):
