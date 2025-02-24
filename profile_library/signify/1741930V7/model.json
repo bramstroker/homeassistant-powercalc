@@ -10,5 +10,6 @@
     "VERSION": "v1.17.7:docker"
   },
   "name": "Hue Calla outdoor bollard",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author": "dewbot6 <drewsnodgrass@comcast.net>"
 }
