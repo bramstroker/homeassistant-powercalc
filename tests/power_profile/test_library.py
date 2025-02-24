@@ -43,6 +43,7 @@ async def test_model_listing(hass: HomeAssistant, manufacturer: str, expected_mo
     [
         (ModelInfo("signify", "LCT010"), {"LCT010"}),
         (ModelInfo("lidl", "HG06106A/HG06104A"), {"HG06104A", "HG06106A"}),
+        (ModelInfo("Philips", "LTA009"), {"LTA009"}),
     ],
 )
 async def test_find_models(hass: HomeAssistant, model_info: ModelInfo, expected_models: set[str]) -> None:
