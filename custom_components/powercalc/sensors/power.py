@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import re
 from copy import copy
 from datetime import timedelta
 from decimal import Decimal
