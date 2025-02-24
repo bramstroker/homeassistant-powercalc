@@ -16,6 +16,6 @@
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN + BT + ECO\": All three turned on, repeater turned off!\n\"WLAN + ECO\": Both turned on, repeater turned off.\n\"Other combinations\": For all other combinations. Maximum device power draw.",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN + BT + ECO\": All three turned on, repeater turned off.\n\"WLAN + ECO\": Both turned on, repeater turned off.\n\"Other combinations\": For all other combinations. Maximum device power draw.",
   "author": "CV"
 }
