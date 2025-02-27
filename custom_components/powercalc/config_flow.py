@@ -1,4 +1,4 @@
-"""Config flow for Adaptive Lighting integration."""
+"""Config flow for Powercalc integration."""
 
 from __future__ import annotations
 
