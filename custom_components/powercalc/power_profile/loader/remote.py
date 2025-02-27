@@ -6,7 +6,7 @@ import shutil
 from collections.abc import Callable, Coroutine
 from functools import partial
 from json import JSONDecodeError
-from typing import Any, cast
+from typing import Any, NotRequired, TypedDict, cast
 
 import aiohttp
 from aiohttp import ClientError
@@ -25,15 +25,28 @@ ENDPOINT_LIBRARY = f"{DOWNLOAD_PROXY}/library"
 ENDPOINT_DOWNLOAD = f"{DOWNLOAD_PROXY}/download"
 
 
+class LibraryModel(TypedDict):
+    id: str
+    aliases: NotRequired[list[str]]
+    hash: str
+    device_type: NotRequired[DeviceType]
+
+
+class LibraryManufacturer(TypedDict):
+    name: str
+    aliases: NotRequired[list[str]]
+    models: list[LibraryModel]
+
+
 class RemoteLoader(Loader):
     retry_timeout = 3
 
     def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
         self.library_contents: dict = {}
-        self.model_infos: dict[str, dict] = {}
-        self.manufacturer_models: dict[str, dict] = {}
-        self.model_lookup: dict[str, dict[str, list[dict]]] = {}
+        self.model_infos: dict[str, LibraryModel] = {}
+        self.manufacturer_models: dict[str, list[LibraryModel]] = {}
+        self.model_lookup: dict[str, dict[str, list[LibraryModel]]] = {}
         self.manufacturer_lookup: dict[str, set[str]] = {}
         self.profile_hashes: dict[str, str] = {}
 
@@ -48,7 +61,7 @@ class RemoteLoader(Loader):
         self.manufacturer_lookup.clear()
 
         # Load contents of library JSON into several dictionaries for easy access
-        manufacturers = self.library_contents.get("manufacturers", [])
+        manufacturers: list[LibraryManufacturer] = self.library_contents.get("manufacturers", [])
 
         for manufacturer in manufacturers:
             manufacturer_name = str(manufacturer.get("name"))
@@ -58,7 +71,7 @@ class RemoteLoader(Loader):
             self.model_infos.update({f"{manufacturer_name}/{model.get('id')!s}": model for model in models})
             self.manufacturer_models[manufacturer_name] = models
 
-            model_lookup: dict[str, list[dict]] = {}
+            model_lookup: dict[str, list[LibraryModel]] = {}
             for model in models:
                 model_id = str(model.get("id")).lower()
                 model_lookup.setdefault(model_id, []).append(model)
@@ -131,6 +144,10 @@ class RemoteLoader(Loader):
     async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
 
+        models = self.manufacturer_models.get(manufacturer)
+        if not models:
+            return set()
+
         return {
             model["id"]
             for model in self.manufacturer_models.get(manufacturer, [])
@@ -153,7 +170,7 @@ class RemoteLoader(Loader):
         retry_count: int = 0,
     ) -> tuple[dict, str] | None:
         """Load a model, downloading it if necessary, with retry logic."""
-        model_info = self._get_model_info(manufacturer, model)
+        model_info = self._get_library_model(manufacturer, model)
         storage_path = self.get_storage_path(manufacturer, model)
         model_path = os.path.join(storage_path, "model.json")
 
@@ -167,14 +184,14 @@ class RemoteLoader(Loader):
 
         return json_data, storage_path
 
-    def _get_model_info(self, manufacturer: str, model: str) -> dict:
+    def _get_library_model(self, manufacturer: str, model: str) -> LibraryModel:
         """Retrieve model info, or raise an error if not found."""
         model_info = self.model_infos.get(f"{manufacturer}/{model}")
         if not model_info:
             raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
         return model_info
 
-    async def _needs_update(self, model_info: dict, manufacturer: str, model: str, model_path: str, force_update: bool) -> bool:
+    async def _needs_update(self, model_info: LibraryModel, manufacturer: str, model: str, model_path: str, force_update: bool) -> bool:
         """Check if the model needs to be updated."""
         if force_update:
             return True
@@ -192,7 +209,7 @@ class RemoteLoader(Loader):
         try:
             callback = partial(self.download_profile, manufacturer, model, storage_path)
             await self.download_with_retry(callback)
-            model_info = self._get_model_info(manufacturer, model)
+            model_info = self._get_library_model(manufacturer, model)
             self.profile_hashes[f"{manufacturer}/{model}"] = str(model_info.get("hash"))
             await self.hass.async_add_executor_job(self.write_profile_hashes, self.profile_hashes)
         except ProfileDownloadError as e:
