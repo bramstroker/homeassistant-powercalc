@@ -311,7 +311,7 @@ async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: 
     loader.retry_timeout = 0
     await loader.initialize()
 
-    assert "signify" in loader.manufacturer_models
+    assert "signify" in loader.model_lookup
     assert len(caplog.records) == 2
 
 
@@ -338,7 +338,7 @@ async def test_fallback_to_local_library_on_client_connection_error(
     loader.retry_timeout = 0
     await loader.initialize()
 
-    assert "signify" in loader.manufacturer_models
+    assert "signify" in loader.model_lookup
     assert len(caplog.records) == 2
 
 
@@ -486,6 +486,7 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
         ("apple", {"HomePod (gen 2)"}, {"MQJ83"}, None),
         ("apple", {"Non existing model"}, set(), None),
         ("signify", {"LCA001", "LCT010"}, {"LCT010", "LCA001"}, None),
+        ("signify", {"lca001"}, {"LCA001"}, None),
         ("test_manu", {"CCT Light"}, {"model1", "model2"}, "multi_profile"),
     ],
 )

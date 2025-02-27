@@ -32,8 +32,9 @@ class RemoteLoader(Loader):
         self.hass = hass
         self.library_contents: dict = {}
         self.model_infos: dict[str, dict] = {}
-        self.manufacturer_models: dict[str, list[dict]] = {}
-        self.manufacturer_aliases: dict[str, set[str]] = {}
+        self.manufacturer_models: dict[str, dict] = {}
+        self.model_lookup: dict[str, dict[str, list[dict]]] = {}
+        self.manufacturer_lookup: dict[str, set[str]] = {}
         self.profile_hashes: dict[str, str] = {}
 
     async def initialize(self) -> None:
@@ -42,8 +43,9 @@ class RemoteLoader(Loader):
         self.profile_hashes = await self.hass.async_add_executor_job(self.load_profile_hashes)
 
         self.model_infos.clear()
+        self.model_lookup.clear()
         self.manufacturer_models.clear()
-        self.manufacturer_aliases.clear()
+        self.manufacturer_lookup.clear()
 
         # Load contents of library JSON into several dictionaries for easy access
         manufacturers = self.library_contents.get("manufacturers", [])
@@ -54,12 +56,21 @@ class RemoteLoader(Loader):
 
             # Store model info and group models by manufacturer
             self.model_infos.update({f"{manufacturer_name}/{model.get('id')!s}": model for model in models})
-            self.manufacturer_models.setdefault(manufacturer_name, []).extend(models)
+            self.manufacturer_models[manufacturer_name] = models
+
+            model_lookup: dict[str, list[dict]] = {}
+            for model in models:
+                model_id = str(model.get("id")).lower()
+                model_lookup.setdefault(model_id, []).append(model)
+                for alias in model.get("aliases", []):
+                    model_lookup.setdefault(alias.lower(), []).append(model)
+
+            self.model_lookup[manufacturer_name] = model_lookup
 
             # Map manufacturer aliases
-            self.manufacturer_aliases[manufacturer_name.lower()] = {manufacturer_name}
+            self.manufacturer_lookup[manufacturer_name.lower()] = {manufacturer_name}
             for alias in manufacturer.get("aliases", []):
-                self.manufacturer_aliases.setdefault(alias.lower(), set()).add(manufacturer_name)
+                self.manufacturer_lookup.setdefault(alias.lower(), set()).add(manufacturer_name)
 
     async def load_library_json(self) -> dict[str, Any]:
         """Load library.json file"""
@@ -114,7 +125,7 @@ class RemoteLoader(Loader):
     @async_cache
     async def find_manufacturers(self, search: str) -> set[str]:
         """Find the manufacturer in the library."""
-        return self.manufacturer_aliases.get(search, set())
+        return self.manufacturer_lookup.get(search, set())
 
     @async_cache
     async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
@@ -130,14 +141,8 @@ class RemoteLoader(Loader):
     async def find_model(self, manufacturer: str, search: set[str]) -> set[str]:
         """Find the model in the library."""
 
-        models = self.manufacturer_models.get(manufacturer, [])
-        result = set()
-        for model in models:
-            model_id = model.get("id")
-            if model_id and (model_id in search or any(alias in search for alias in model.get("aliases", []))):
-                result.add(model_id)
-
-        return result
+        models = self.model_lookup.get(manufacturer, {})
+        return {model["id"] for phrase in search if (phrase_lower := phrase.lower()) in models for model in models[phrase_lower]}
 
     @async_cache
     async def load_model(
