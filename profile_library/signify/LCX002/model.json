@@ -9,6 +9,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.7:docker"
   },
-  "name": "Hue play gradient lightstrip",
-  "standby_power": 0.39
+  "name": "Play Gradient Lightstrip 65 Inch",
+  "standby_power": 0.07
 }
