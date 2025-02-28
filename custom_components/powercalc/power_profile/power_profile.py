@@ -347,6 +347,17 @@ class PowerProfile:
         return len(await self.get_sub_profiles()) > 0
 
     @property
+    async def requires_manual_sub_profile_selection(self) -> bool:
+        """Check whether this profile requires manual sub profile selection."""
+        if not await self.has_sub_profiles:
+            return False
+
+        if not self.sub_profile_select:
+            return True
+
+        return not self.sub_profile_select.matchers
+
+    @property
     def sub_profile_select(self) -> SubProfileSelectConfig | None:
         """Get the configuration for automatic sub profile switching."""
         select_dict = self._json_data.get("sub_profile_select")
@@ -424,7 +435,7 @@ class SubProfileSelector:
 
     def _build_matchers(self) -> list[SubProfileMatcher]:
         """Create matchers from json config."""
-        return [self._create_matcher(matcher_config) for matcher_config in self._config.matchers]
+        return [self._create_matcher(matcher_config) for matcher_config in self._config.matchers or []]
 
     def select_sub_profile(self, entity_state: State) -> str:
         """Dynamically tries to select a sub profile depending on the entity state.
@@ -465,7 +476,7 @@ class SubProfileSelector:
 
 class SubProfileSelectConfig(NamedTuple):
     default: str
-    matchers: list[dict]
+    matchers: list[dict] | None = None
 
 
 class SubProfileMatcher(Protocol):

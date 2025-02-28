@@ -361,6 +361,39 @@ async def test_sub_profiles_select_options(hass: HomeAssistant) -> None:
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
+async def test_sub_profile_selection_available_default_sub_profile(hass: HomeAssistant) -> None:
+    """
+    Test the sub profile selection is still provided to the user, even when a default sub profile is defined.
+    We only want to omit the sub profile step when matchers are defined.
+    """
+    hass.config.config_dir = get_test_config_dir()
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "switch.test"},
+    )
+    result = await select_manufacturer_and_model(hass, result, "test", "sub_profile_default")
+
+    data_schema: vol.Schema = result["data_schema"]
+    sub_profile_selector: SelectSelector = data_schema.schema["sub_profile"]
+    options = sub_profile_selector.config["options"]
+    assert options == [{"label": "Name A", "value": "a"}, {"label": "Name B", "value": "b"}]
+
+
+async def test_sub_profile_selection_omitted(hass: HomeAssistant) -> None:
+    """
+    Test the sub profile selection is omitted when matchers are defined.
+    """
+    hass.config.config_dir = get_test_config_dir()
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "switch.test"},
+    )
+    result = await select_manufacturer_and_model(hass, result, "test", "sub_profile_matchers")
+    assert result["step_id"] != Step.SUB_PROFILE
+
+
 async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
     mock_device_registry(

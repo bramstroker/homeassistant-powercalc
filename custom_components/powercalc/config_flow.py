@@ -1078,11 +1078,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             if result:
                 return result
 
-        if (
-            Step.SUB_PROFILE not in self.handled_steps
-            and await self.selected_profile.has_sub_profiles
-            and not self.selected_profile.sub_profile_select
-        ):
+        if Step.SUB_PROFILE not in self.handled_steps and await self.selected_profile.requires_manual_sub_profile_selection:
             return await self.async_step_sub_profile()
 
         if (

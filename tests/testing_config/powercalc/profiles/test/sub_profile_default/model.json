@@ -1,5 +1,5 @@
 {
-  "name": "Some profile with sub profiles",
+  "name": "Some profile with sub profiles, default selected, but no matchers",
   "discovery_by": "entity",
   "device_type": "smart_switch",
   "sensor_config": {
@@ -7,5 +7,7 @@
     "energy_sensor_naming": "{} Device Energy"
   },
   "calculation_strategy": "fixed",
-  "config_flow_sub_profile_remarks": "More info\n\nBla bla\n*Bla bla*"
+  "sub_profile_select": {
+    "default": "a"
+  }
 }
