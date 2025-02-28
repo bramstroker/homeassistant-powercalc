@@ -217,6 +217,44 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
     assert entry.data[CONF_MODEL] == "LWB010"
 
 
+async def test_change_sub_profile_options_flow(hass: HomeAssistant) -> None:
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.spots_kitchen",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "yeelight",
+            CONF_MODEL: "YLDD04YL/standard_length",
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={},
+    )
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MANUFACTURER: "yeelight"},
+    )
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MODEL: "YLDD04YL"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.SUB_PROFILE
+
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_SUB_PROFILE: "extension_5x1meter"},
+    )
+
+    assert entry.data[CONF_MANUFACTURER] == "yeelight"
+    assert entry.data[CONF_MODEL] == "YLDD04YL/extension_5x1meter"
+
+
 async def test_configured_model_populated_in_options_flow(hass: HomeAssistant) -> None:
     entry = create_mock_entry(
         hass,
