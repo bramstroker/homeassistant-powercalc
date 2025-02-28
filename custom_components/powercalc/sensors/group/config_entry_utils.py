@@ -96,6 +96,9 @@ async def add_to_associated_group(
             if "discovery_keys" in signature.parameters:
                 additional_args["discovery_keys"] = {}
 
+            if "subentries_data" in signature.parameters:
+                additional_args["subentries_data"] = None
+
             group_entry = ConfigEntry(
                 version=ConfigFlow.VERSION,
                 minor_version=ConfigFlow.MINOR_VERSION,
