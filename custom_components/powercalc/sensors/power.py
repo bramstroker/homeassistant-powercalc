@@ -31,6 +31,7 @@ from homeassistant.core import (
     callback,
 )
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers import start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
@@ -143,6 +144,18 @@ async def create_virtual_power_sensor(
                 sensor_config.update(power_profile.sensor_config)
             if CONF_CALCULATION_ENABLED_CONDITION not in sensor_config and power_profile.calculation_enabled_condition:
                 sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = power_profile.calculation_enabled_condition
+
+            if config_entry and await power_profile.has_sub_profiles and "/" not in sensor_config.get(CONF_MODEL, ""):
+                ir.async_create_issue(
+                    hass,
+                    DOMAIN,
+                    f"sub_profile_{config_entry.entry_id}",
+                    is_fixable=True,
+                    severity=ir.IssueSeverity.WARNING,
+                    translation_key="sub_profile",
+                    translation_placeholders={"entry": config_entry.title},
+                    data={"config_entry_id": config_entry.entry_id},
+                )
 
         name = generate_power_sensor_name(
             sensor_config,

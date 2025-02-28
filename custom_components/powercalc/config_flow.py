@@ -134,6 +134,7 @@ from .const import (
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .flow_helper.dynamic_field_builder import build_dynamic_field_schema
+from .flow_helper.schema import build_sub_profile_schema
 from .group_include.include import find_entities
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
@@ -1151,33 +1152,6 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         async def _validate(user_input: dict[str, Any]) -> dict[str, str]:
             return {CONF_MODEL: f"{self.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"}
 
-        async def _create_schema(
-            profile: PowerProfile,
-        ) -> vol.Schema:
-            """Create sub profile schema."""
-            sub_profiles = [
-                selector.SelectOptionDict(
-                    value=sub_profile[0],
-                    label=sub_profile[1]["name"] if "name" in sub_profile[1] else sub_profile[0],
-                )
-                for sub_profile in await profile.get_sub_profiles()
-            ]
-            sub_profile = self.selected_sub_profile
-            return vol.Schema(
-                {
-                    vol.Required(
-                        CONF_SUB_PROFILE,
-                        description={"suggested_value": sub_profile},
-                        default=sub_profile,
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            options=sub_profiles,
-                            mode=selector.SelectSelectorMode.DROPDOWN,
-                        ),
-                    ),
-                },
-            )
-
         library = await ProfileLibrary.factory(self.hass)
         profile = await library.get_profile(
             ModelInfo(
@@ -1193,7 +1167,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         return await self.handle_form_step(
             PowercalcFormStep(
                 step=Step.SUB_PROFILE,
-                schema=await _create_schema(profile),
+                schema=await build_sub_profile_schema(profile, self.selected_sub_profile),
                 next_step=Step.POWER_ADVANCED,
                 validate_user_input=_validate,
                 form_kwarg={
