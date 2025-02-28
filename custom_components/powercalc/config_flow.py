@@ -615,6 +615,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self.source_entity: SourceEntity | None = None
         self.source_entity_id: str | None = None
         self.selected_profile: PowerProfile | None = None
+        self.selected_sub_profile: str | None = None
         self.is_library_flow: bool = False
         self.skip_advanced_step: bool = False
         self.selected_sensor_type: str | None = None
@@ -889,7 +890,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             if key in options and isinstance(key, vol.Marker):
                 if isinstance(key, vol.Optional) and callable(key.default) and key.default():
                     new_key = vol.Optional(key.schema, default=options.get(key))  # type: ignore
-                else:
+                elif "suggested_value" not in (new_key.description or {}):
                     new_key = copy.copy(key)
                     new_key.description = {"suggested_value": options.get(key)}  # type: ignore
             schema[new_key] = val
@@ -1037,9 +1038,10 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             library = await ProfileLibrary.factory(self.hass)
             device_types = DOMAIN_DEVICE_TYPE_MAPPING.get(self.source_entity.domain, set()) if self.source_entity else None
             models = [selector.SelectOptionDict(value=model, label=model) for model in await library.get_model_listing(manufacturer, device_types)]
+            model = self.selected_profile.model if self.selected_profile else self.sensor_config.get(CONF_MODEL)
             return vol.Schema(
                 {
-                    vol.Required(CONF_MODEL, default=self.sensor_config.get(CONF_MODEL)): selector.SelectSelector(
+                    vol.Required(CONF_MODEL, description={"suggested_value": model}, default=model): selector.SelectSelector(
                         selector.SelectSelectorConfig(
                             options=models,
                             mode=selector.SelectSelectorMode.DROPDOWN,
@@ -1078,11 +1080,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             if result:
                 return result
 
-        if (
-            Step.SUB_PROFILE not in self.handled_steps
-            and await self.selected_profile.has_sub_profiles
-            and not self.selected_profile.sub_profile_select
-        ):
+        if Step.SUB_PROFILE not in self.handled_steps and await self.selected_profile.requires_manual_sub_profile_selection:
             return await self.async_step_sub_profile()
 
         if (
@@ -1164,9 +1162,14 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 )
                 for sub_profile in await profile.get_sub_profiles()
             ]
+            sub_profile = self.selected_sub_profile
             return vol.Schema(
                 {
-                    vol.Required(CONF_SUB_PROFILE): selector.SelectSelector(
+                    vol.Required(
+                        CONF_SUB_PROFILE,
+                        description={"suggested_value": sub_profile},
+                        default=sub_profile,
+                    ): selector.SelectSelector(
                         selector.SelectSelectorConfig(
                             options=sub_profiles,
                             mode=selector.SelectSelectorMode.DROPDOWN,
@@ -2051,6 +2054,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     async def async_step_library_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the basic options flow."""
         self.is_library_flow = True
+        self.selected_sub_profile = self.selected_profile.sub_profile  # type: ignore
         if user_input is not None:
             return await self.async_step_manufacturer()
 

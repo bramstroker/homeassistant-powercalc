@@ -77,6 +77,7 @@ from tests.common import (
     create_input_boolean,
     create_input_number,
     get_simple_fixed_config,
+    get_test_config_dir,
     get_test_profile_dir,
     run_powercalc_setup,
     setup_config_entry,
@@ -667,6 +668,23 @@ async def test_entity_category(hass: HomeAssistant) -> None:
     power_entry = entity_registry.async_get("sensor.test_power")
     assert power_entry
     assert power_entry.entity_category == EntityCategory.DIAGNOSTIC
+
+
+async def test_sub_profile_default_select(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "sub_profile_default",
+        },
+    )
+
+    hass.states.async_set("switch.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_device_power").state == "0.80"
 
 
 async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
