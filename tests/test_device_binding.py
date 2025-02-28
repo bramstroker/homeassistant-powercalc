@@ -19,7 +19,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SensorType,
 )
-from tests.common import get_test_config_dir, run_powercalc_setup
+from tests.common import get_test_config_dir, run_powercalc_setup, setup_config_entry
 from tests.config_flow.common import create_mock_entry
 
 
@@ -216,3 +216,68 @@ async def test_entities_are_bound_to_source_device3(
     power_entity_entry = entity_reg.async_get("sensor.test_device_power")
     assert power_entity_entry
     assert power_entity_entry.device_id == device_id
+
+
+async def test_change_device(hass: HomeAssistant) -> None:
+    """
+    Test that changing the device in the configuration updates the device registry
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/3123
+    """
+    device_registry = mock_device_registry(
+        hass,
+        {
+            "device1": DeviceEntry(
+                id="device1",
+                manufacturer="shelly",
+                model="PlugS",
+            ),
+            "device2": DeviceEntry(
+                id="device2",
+                manufacturer="shelly",
+                model="PlugS",
+            ),
+        },
+    )
+
+    mock_registry(
+        hass,
+        {
+            "entity1": er.RegistryEntry(
+                entity_id="sensor.entity1",
+                unique_id="1111",
+                platform="shelly",
+                device_id="device1",
+            ),
+            "entity2": er.RegistryEntry(
+                entity_id="sensor.entity2",
+                unique_id="2222",
+                platform="shelly",
+                device_id="device2",
+            ),
+        },
+    )
+
+    entry_data = {
+        CONF_SENSOR_TYPE: SensorType.REAL_POWER,
+        CONF_NAME: "Test",
+        CONF_ENTITY_ID: "sensor.entity1",
+    }
+    config_entry = await setup_config_entry(
+        hass,
+        {
+            **entry_data,
+            CONF_DEVICE: "device1",
+        },
+    )
+
+    device1 = device_registry.async_get("device1")
+    assert device1.config_entries == {config_entry.entry_id}
+
+    hass.config_entries.async_update_entry(config_entry, data={**entry_data, CONF_DEVICE: "device2"})
+    await hass.async_block_till_done()
+
+    device1 = device_registry.async_get("device1")
+    assert not device1
+
+    device2 = device_registry.async_get("device2")
+    assert device2.config_entries == {config_entry.entry_id}
