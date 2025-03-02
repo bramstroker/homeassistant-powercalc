@@ -402,6 +402,24 @@
     "deprecated_platform_yaml": {
       "description": "Konfigurowanie czujników przy użyciu `sensor->platform` zostało uznane za przestarzałe. Musisz zmienić konfigurację na `powercalc->sensors`. Aby uzyskać dalsze instrukcje, kliknij 'Dowiedz się więcej'.",
       "title": "Konfiguracja Powercalc w trybie YAML została zmieniona (breaking change)"
+    },
+    "sub_profile": {
+      "fix_flow": {
+        "step": {
+          "sub_profile": {
+            "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"{remarks}",
+            "title": "Select correct sub profile",
+            "data": {
+              "sub_profile": "Sub profile"
+            }
+          }
+        }
+      },
+      "title": "Sub profile selection required for {entry}"
+    },
+    "legacy_webrtc_provider": {
+      "description": "The {legacy_integration} integration has registered a legacy WebRTC provider. Home Assistant prefers using the built-in modern WebRTC provider registered by the {builtin_integration} integration.\n\nBenefits of the built-in integration are:\n\n- The camera stream is started faster.\n- More camera devices are supported.\n\nTo fix this issue, you can either keep using the built-in modern WebRTC provider and remove the {legacy_integration} integration or remove the {builtin_integration} integration to use the legacy provider, and then restart Home Assistant.",
+      "title": "Detected use of legacy WebRTC provider registered by {legacy_integration}"
     }
   },
   "options": {
