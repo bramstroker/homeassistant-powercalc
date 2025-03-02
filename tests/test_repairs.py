@@ -37,3 +37,19 @@ async def test_sub_profile_repair(hass: HomeAssistant, issue_registry: ir.IssueR
     assert result["type"] == "create_entry"
 
     assert config_entry.data[CONF_MODEL] == "sub_profile/a"
+
+
+async def test_no_sub_profile_repair_raised(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    config_entry = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "sub_profile_matchers",
+        },
+    )
+
+    issue = issue_registry.async_get_issue("powercalc", f"sub_profile_{config_entry.entry_id}")
+    assert not issue

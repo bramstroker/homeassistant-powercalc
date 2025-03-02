@@ -145,7 +145,7 @@ async def create_virtual_power_sensor(
             if CONF_CALCULATION_ENABLED_CONDITION not in sensor_config and power_profile.calculation_enabled_condition:
                 sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = power_profile.calculation_enabled_condition
 
-            if config_entry and await power_profile.has_sub_profiles and "/" not in sensor_config.get(CONF_MODEL, ""):
+            if config_entry and await power_profile.requires_manual_sub_profile_selection and "/" not in sensor_config.get(CONF_MODEL, ""):
                 ir.async_create_issue(
                     hass,
                     DOMAIN,
