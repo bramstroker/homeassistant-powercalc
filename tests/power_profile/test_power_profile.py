@@ -2,15 +2,20 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
-from homeassistant.const import STATE_OFF, STATE_ON
+from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_PAUSED, STATE_PLAYING
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.entity_registry import RegistryEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_MODEL,
     CONF_POWER,
+    DOMAIN,
     CalculationStrategy,
 )
 from custom_components.powercalc.errors import (
@@ -24,7 +29,7 @@ from custom_components.powercalc.power_profile.power_profile import (
     PowerProfile,
     SubProfileSelector,
 )
-from tests.common import get_test_profile_dir
+from tests.common import get_test_profile_dir, run_powercalc_setup
 
 
 async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> None:
@@ -502,3 +507,37 @@ async def test_discovery_flow_remarks(hass: HomeAssistant, test_profile: str, ex
         return_value={key: key for key in translations_keys},
     ):
         assert power_profile.config_flow_discovery_remarks == expected_translation_key
+
+
+async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) -> None:
+    """
+    JSON data is cached for the same model. This caused the replaced `calculation_enabled_condition` to be replaced with the first entity.
+    On consequent retrievals of the same model the same condition was used, because it did not contain [[entity]] placeholder anymore.
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/3118
+    """
+    entry_a = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_ENTITY_ID: "media_player.a",
+            CONF_MANUFACTURER: "sonos",
+            CONF_MODEL: "playbar",
+        },
+    )
+    entry_b = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_ENTITY_ID: "media_player.b",
+            CONF_MANUFACTURER: "sonos",
+            CONF_MODEL: "playbar",
+        },
+    )
+    await hass.config_entries.async_add(entry_a)
+    await hass.config_entries.async_add(entry_b)
+    await run_powercalc_setup(hass)
+
+    hass.states.async_set("media_player.a", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 1})
+    hass.states.async_set("media_player.b", STATE_PAUSED)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.a_power").state == "26.90"
+    assert hass.states.get("sensor.b_power").state == "5.20"
