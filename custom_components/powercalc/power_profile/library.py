@@ -127,6 +127,9 @@ class ProfileLibrary:
             model_info = next(iter(models))
 
         json_data, directory = await self._load_model_data(model_info.manufacturer, model_info.model, custom_directory)
+
+        # json_data is potentially retrieved from cache, so we need to copy it to avoid modifying the cache
+        json_data = json_data.copy()
         if process_variables:
             if json_data.get("fields"):  # When custom fields in profile are defined, make sure all variables are passed
                 self.validate_variables(json_data, variables or {})
