@@ -232,6 +232,25 @@ async def test_color_mode_unknown_is_handled_gracefully(
     assert "color mode unknown" in caplog.text
 
 
+async def test_error_is_logged_when_color_temp_unavailable(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Test error is logged when color_temp attribute is not available"""
+
+    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
+
+    state = State(
+        "light.test",
+        STATE_ON,
+        {
+            ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
+            ATTR_BRIGHTNESS: 100,
+            ATTR_COLOR_TEMP_KELVIN: None,
+        },
+    )
+    assert not await strategy.calculate(state)
+
+    assert "Could not calculate power. no color temp set" in caplog.text
+
+
 async def test_unsupported_color_mode(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,

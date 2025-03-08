@@ -212,9 +212,20 @@ class LutStrategy(PowerCalculationStrategyInterface):
         light_setting = LightSetting(color_mode=color_mode, brightness=brightness)
 
         attrs = entity_state.attributes
-        original_color_mode = attrs.get(ATTR_COLOR_MODE)
+        if color_mode == ColorMode.COLOR_TEMP:
+            color_temp = attrs.get(ATTR_COLOR_TEMP_KELVIN)
+            if color_temp is None:
+                _LOGGER.error(
+                    "%s: Could not calculate power. no color temp set. Please check the attributes of your light in the developer tools.",
+                    entity_state.entity_id,
+                )
+                return None
+            light_setting.color_temp = color_temperature_kelvin_to_mired(color_temp)
+            return light_setting
+
         if color_mode == ColorMode.HS:
             try:
+                original_color_mode = attrs.get(ATTR_COLOR_MODE)
                 hs = color_temperature_to_hs(attrs[ATTR_COLOR_TEMP_KELVIN]) if original_color_mode == ColorMode.COLOR_TEMP else attrs[ATTR_HS_COLOR]
                 light_setting.hue = int(hs[0] / 360 * 65535)
                 light_setting.saturation = int(hs[1] / 100 * 255)
@@ -224,8 +235,6 @@ class LutStrategy(PowerCalculationStrategyInterface):
                     entity_state.entity_id,
                 )
                 return None
-        elif color_mode == ColorMode.COLOR_TEMP:
-            light_setting.color_temp = color_temperature_kelvin_to_mired(attrs[ATTR_COLOR_TEMP_KELVIN])
 
         return light_setting
 
