@@ -3,6 +3,7 @@ import os.path
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_DISABLE_LIBRARY_DOWNLOAD
@@ -12,6 +13,7 @@ from custom_components.powercalc.power_profile.loader.composite import Composite
 from custom_components.powercalc.power_profile.loader.local import LocalLoader
 from custom_components.powercalc.power_profile.loader.remote import RemoteLoader
 from tests.common import get_test_config_dir, get_test_profile_dir, run_powercalc_setup
+from tests.conftest import MockEntityWithModel
 
 
 async def test_manufacturer_listing(hass: HomeAssistant) -> None:
@@ -210,3 +212,20 @@ async def test_linked_profile_loading_failed(hass: HomeAssistant) -> None:
 
         with pytest.raises(LibraryError):
             await library.get_profile(ModelInfo("signify", "LCA001"))
+
+
+async def test_autodiscover_model_with_default_sub_profile(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """Test autodiscover model with default sub profile."""
+    mock_entity_with_model_information(
+        "switch.test",
+        "shelly",
+        "Shelly Plus 1PM",
+    )
+
+    hass.states.async_set("switch.test", STATE_ON)
+    await run_powercalc_setup(hass, {CONF_ENTITY_ID: "switch.test"})
+
+    assert hass.states.get("sensor.test_device_power").state == "1.00"
