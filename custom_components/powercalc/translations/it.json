@@ -70,7 +70,7 @@
           "domain": "Dominio dell'entità",
           "exclude_entities": "Escludi entità"
         },
-        "title": "Create a domain based group sensor"
+        "title": "Crea un sensore di gruppo basato sul dominio"
       },
       "fixed": {
         "data": {
@@ -97,14 +97,14 @@
           "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Forza frequenza di aggiornamento",
           "ignore_unavailable_state": "Ignora stato non disponibile",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "include_non_powercalc_sensors": "Includi sensori non powercalc",
           "power_sensor_category": "Categoria sensore di potenza",
           "power_sensor_friendly_naming": "Power sensor friendly name pattern",
           "power_sensor_naming": "Power sensor name pattern"
         },
         "data_description": {
           "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "create_utility_meters": "",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
           "discovery_exclude_device_types": "Exclude device types from the discovery process",
@@ -170,13 +170,13 @@
           "create_utility_meters": "Crea contatori (utility meters)",
           "entity_id": "Entità di base",
           "name": "Nome",
-          "subtract_entities": "Subtract entities"
+          "subtract_entities": "Sottrai entità"
         },
         "data_description": {
           "entity_id": "The base entity to subtract the power from",
           "subtract_entities": "Select all the entities you want to subtract from the base entity"
         },
-        "title": "Subtract group sensor"
+        "title": "Sottrai sensore di gruppo"
       },
       "group_tracked_untracked": {
         "data": {
