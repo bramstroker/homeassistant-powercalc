@@ -1614,13 +1614,13 @@ habluetooth = ">=3.0"
 
 [[package]]
 name = "homeassistant"
-version = "2025.3.1"
+version = "2025.3.2"
 description = "Open-source home automation platform running on Python 3."
 optional = false
 python-versions = ">=3.13.0"
 files = [
-    {file = "homeassistant-2025.3.1-py3-none-any.whl", hash = "sha256:50c6aaa152f8636a4de76c15b425d8609acb5f1b5ea345d56064c3944ec7e988"},
-    {file = "homeassistant-2025.3.1.tar.gz", hash = "sha256:b3ee25f45650e40d1cbcf5d7ca9c73c73a4c82b127ae0a20cc7fd2ed5c1465ee"},
+    {file = "homeassistant-2025.3.2-py3-none-any.whl", hash = "sha256:5a7385335324f632dec53eb8d57a09689709a14fff75348fea5e8d21075b7355"},
+    {file = "homeassistant-2025.3.2.tar.gz", hash = "sha256:db55ad51baa1b31bf60c4cbadf367b74f18ff9413eb27967df02c66ed2021834"},
 ]
 
 [package.dependencies]
@@ -1647,7 +1647,7 @@ hass-nabucasa = "0.92.0"
 home-assistant-bluetooth = "1.13.1"
 httpx = "0.28.1"
 ifaddr = "0.2.0"
-Jinja2 = "3.1.5"
+Jinja2 = "3.1.6"
 lru-dict = "1.3.0"
 orjson = "3.10.12"
 packaging = ">=23.1"
@@ -1676,17 +1676,17 @@ zeroconf = "0.145.1"
 
 [[package]]
 name = "homeassistant-stubs"
-version = "2025.3.1"
+version = "2025.3.2"
 description = "PEP 484 typing stubs for Home Assistant Core"
 optional = false
 python-versions = "<3.14,>=3.13"
 files = [
-    {file = "homeassistant_stubs-2025.3.1-py3-none-any.whl", hash = "sha256:c05a4f8b7cc48793baab96dbd4e12e79f816afa0406da02f96c183016d8eb443"},
-    {file = "homeassistant_stubs-2025.3.1.tar.gz", hash = "sha256:840790d709144a6af3396e12dc659c2ed4411e94dc6f83309543f0691050308d"},
+    {file = "homeassistant_stubs-2025.3.2-py3-none-any.whl", hash = "sha256:d4a59225de9994378d20326a278d1e0ed35210f5755ab399cd0de0daa315430c"},
+    {file = "homeassistant_stubs-2025.3.2.tar.gz", hash = "sha256:cbaeaa28b69f60b1720ff3356ffba37e6367c47cacac25eb5202a6af0a69cb32"},
 ]
 
 [package.dependencies]
-homeassistant = "2025.3.1"
+homeassistant = "2025.3.2"
 
 [[package]]
 name = "httpcore"
@@ -1785,13 +1785,13 @@ files = [
 
 [[package]]
 name = "jinja2"
-version = "3.1.5"
+version = "3.1.6"
 description = "A very fast and expressive template engine."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "jinja2-3.1.5-py3-none-any.whl", hash = "sha256:aba0f4dc9ed8013c424088f68a5c226f7d6097ed89b246d7749c2ec4175c6adb"},
-    {file = "jinja2-3.1.5.tar.gz", hash = "sha256:8fefff8dc3034e27bb80d67c671eb8a9bc424c0ef4c0826edbff304cceff43bb"},
+    {file = "jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67"},
+    {file = "jinja2-3.1.6.tar.gz", hash = "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d"},
 ]
 
 [package.dependencies]
@@ -3395,19 +3395,19 @@ pytest = ">=6.0.0"
 
 [[package]]
 name = "pytest-homeassistant-custom-component"
-version = "0.13.222"
+version = "0.13.223"
 description = "Experimental package to automatically extract test plugins for Home Assistant custom components"
 optional = false
 python-versions = ">=3.13"
 files = [
-    {file = "pytest_homeassistant_custom_component-0.13.222-py3-none-any.whl", hash = "sha256:7b94f333f098207cf6778711f6e8c149e24ede4b10dfce37836e12b1c7b657a3"},
-    {file = "pytest_homeassistant_custom_component-0.13.222.tar.gz", hash = "sha256:6898043291e57acdfdc742f2286c85cee370986f2c44048923b8622f6e3d970a"},
+    {file = "pytest_homeassistant_custom_component-0.13.223-py3-none-any.whl", hash = "sha256:4e71eaffff7bd70fde477f66ff03c35bccb8a3481023c7daf13cd9fc7017b8bc"},
+    {file = "pytest_homeassistant_custom_component-0.13.223.tar.gz", hash = "sha256:019b950ba1bb3d210bb1c838917e489dfff3add5a46e46349236138f162e97eb"},
 ]
 
 [package.dependencies]
 coverage = "7.6.10"
 freezegun = "1.5.1"
-homeassistant = "2025.3.1"
+homeassistant = "2025.3.2"
 license-expression = "30.4.1"
 mock-open = "1.4.0"
 numpy = "2.2.2"
@@ -4707,4 +4707,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.13,<3.14"
-content-hash = "af9435e846e4037c88b28396ac1bf3d8a6cb79b4c1d1afd9813231491d95d98d"
+content-hash = "4f4887caf81214e37454470a4729c98c267918d1707a62cd061f6c4d927bf1de"
