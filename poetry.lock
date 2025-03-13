@@ -1131,6 +1131,7 @@ optional = false
 python-versions = ">=3.8"
 groups = ["main", "dev"]
 files = [
+    {file = "cronsim-2.6-py3-none-any.whl", hash = "sha256:5e153ff8ed64da7ee8d5caac470dbeda8024ab052c3010b1be149772b4801835"},
     {file = "cronsim-2.6.tar.gz", hash = "sha256:5aab98716ef90ab5ac6be294b2c3965dbf76dc869f048846a0af74ebb506c10d"},
 ]
 
