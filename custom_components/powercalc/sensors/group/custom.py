@@ -119,8 +119,8 @@ ENERGY_UNIT_PREFIX_MAPPING = {
 }
 
 UNIT_CONVERTERS: dict[str | None, type[BaseUnitConverter]] = {
-    **{unit: EnergyConverter for unit in EnergyConverter.VALID_UNITS},
-    **{unit: PowerConverter for unit in PowerConverter.VALID_UNITS},
+    **dict.fromkeys(EnergyConverter.VALID_UNITS, EnergyConverter),
+    **dict.fromkeys(PowerConverter.VALID_UNITS, PowerConverter),
 }
 
 
