@@ -99,7 +99,7 @@ mkdocs-git-revision-date-localized-plugin = "*"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.0.0"
-ruff = "^0.9.0"
+ruff = "^0.10.0"
 mypy = "1.15.0"
 numpy = "*"
 voluptuous-stubs = "^0.1"
@@ -113,10 +113,10 @@ pytest-cov = "^6.0"
 psutil_home_assistant = "*"
 fnv_hash_fast = "*"
 cronsim = "*"
+aioresponses = "^0.7.6"
 
 [tool.poetry.dependencies]
 python = ">=3.13,<3.14"
-aioresponses = "^0.7.6"
 
 [build-system]
 requires = ["poetry-core"]
