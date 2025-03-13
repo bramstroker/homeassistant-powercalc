@@ -9,6 +9,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.9:docker"
   },
-  "name": "Phillips Hue Garnea Downlight",
+  "name": "Hue Garnea Downlight",
   "standby_power": 0.19
 }
