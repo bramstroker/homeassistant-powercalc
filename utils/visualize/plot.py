@@ -124,9 +124,12 @@ def convert_mired_to_rgb(mired):
     return [*[div / 255.0 for div in rgb], 1]
 
 
-def create_plot_for_csv_file(file_path: str, output: str) -> None:
+def create_plot_for_csv_file(file_path: str, output: str, color_mode: str | None) -> None:
     """Create a scatter plot from a CSV file."""
-    color_mode = LutMode(Path(file_path).stem.removesuffix(".csv"))
+
+    file_name_without_suffix = Path(file_path).stem.removesuffix(".csv")
+    if not color_mode:
+        color_mode = LutMode(file_name_without_suffix)
 
     if file_path.endswith(".gz"):
         csv_file = gzip.open(file_path, "rt")
@@ -144,7 +147,7 @@ def create_plot_for_csv_file(file_path: str, output: str) -> None:
     plt.ylabel("watt")
     if output:
         if output == "auto":
-            output = f"{color_mode}.png"
+            output = f"{file_name_without_suffix}.png"
         output_path = Path(output)
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(output_path)
@@ -160,10 +163,11 @@ def main() -> None:
     )
     parser.add_argument("file")
     parser.add_argument("--output", required=False)
+    parser.add_argument("--colormode", required=False)
     args = parser.parse_args()
 
     file_path = resolve_absolute_file_path(args.file)
-    create_plot_for_csv_file(file_path, args.output)
+    create_plot_for_csv_file(file_path, args.output, args.colormode)
 
 
 def resolve_absolute_file_path(file_path: str) -> str:
