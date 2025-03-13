@@ -113,10 +113,10 @@ pytest-cov = "^6.0"
 psutil_home_assistant = "*"
 fnv_hash_fast = "*"
 cronsim = "*"
+aioresponses = "^0.7.6"
 
 [tool.poetry.dependencies]
 python = ">=3.13,<3.14"
-aioresponses = "^0.7.6"
 
 [build-system]
 requires = ["poetry-core"]
