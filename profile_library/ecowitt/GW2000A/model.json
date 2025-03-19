@@ -9,8 +9,5 @@
   "measure_device": "Shelly PM mini 3Gen",
   "measure_method": "script",
   "name": "Ecowitt GW2000 Gateway",
-  "alias": [
-    "GW2000A"
-  ],
   "author": "Franck Nijhof <opensource@frenck.dev>"
 }
