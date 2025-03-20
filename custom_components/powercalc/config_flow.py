@@ -991,7 +991,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             library = await ProfileLibrary.factory(self.hass)
             device_types = DOMAIN_DEVICE_TYPE_MAPPING.get(self.source_entity.domain, set()) if self.source_entity else None
             manufacturers = [
-                selector.SelectOptionDict(value=manufacturer, label=manufacturer)
+                selector.SelectOptionDict(value=manufacturer[0], label=manufacturer[1])
                 for manufacturer in await library.get_manufacturer_listing(device_types)
             ]
             return vol.Schema(

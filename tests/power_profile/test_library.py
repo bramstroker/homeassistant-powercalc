@@ -19,9 +19,9 @@ from tests.conftest import MockEntityWithModel
 async def test_manufacturer_listing(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     manufacturers = await library.get_manufacturer_listing()
-    assert "signify" in manufacturers
-    assert "ikea" in manufacturers
-    assert "bladiebla" not in manufacturers
+    assert ("signify", "Signify") in manufacturers
+    assert ("ikea", "IKEA") in manufacturers
+    assert ("bladiebla", "foo") not in manufacturers
 
 
 @pytest.mark.parametrize(

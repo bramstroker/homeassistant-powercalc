@@ -64,7 +64,7 @@ class RemoteLoader(Loader):
         manufacturers: list[LibraryManufacturer] = self.library_contents.get("manufacturers", [])
 
         for manufacturer in manufacturers:
-            manufacturer_name = str(manufacturer.get("name"))
+            manufacturer_name = str(manufacturer.get("dir_name"))
             models = manufacturer.get("models", [])
 
             # Store model info and group models by manufacturer
@@ -126,11 +126,11 @@ class RemoteLoader(Loader):
             return await self.hass.async_add_executor_job(_load_local_library_json)
 
     @async_cache
-    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[tuple[str, str]]:
         """Get listing of available manufacturers."""
 
         return {
-            manufacturer["name"]
+            (manufacturer["dir_name"], manufacturer["full_name"])
             for manufacturer in self.library_contents.get("manufacturers", [])
             if not device_types or any(device_type in manufacturer.get("device_types", []) for device_type in device_types)
         }
