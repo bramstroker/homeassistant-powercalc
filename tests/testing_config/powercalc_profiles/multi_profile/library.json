@@ -2,6 +2,8 @@
     "manufacturers": [
         {
             "name": "test_manu",
+            "full_name": "Test manufacturer",
+            "dir_name": "test_manu",
             "aliases": [],
             "models": [
                 {

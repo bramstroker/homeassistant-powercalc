@@ -66,7 +66,7 @@ class ProfileLibrary:
 
         return CompositeLoader(loaders)
 
-    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None = None) -> list[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None = None) -> list[tuple[str, str]]:
         """Get listing of available manufacturers."""
         manufacturers = await self._loader.get_manufacturer_listing(device_types)
         return sorted(manufacturers)

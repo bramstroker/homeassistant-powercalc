@@ -42,8 +42,8 @@ async def test_lut_manual_flow(hass: HomeAssistant) -> None:
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
-    assert {"value": "belkin", "label": "belkin"} in manufacturer_options
-    assert {"value": "signify", "label": "signify"} in manufacturer_options
+    assert {"value": "belkin", "label": "Belkin"} in manufacturer_options
+    assert {"value": "signify", "label": "Signify"} in manufacturer_options
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],

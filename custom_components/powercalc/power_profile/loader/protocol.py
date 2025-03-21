@@ -7,7 +7,7 @@ class Loader(Protocol):
     async def initialize(self) -> None:
         """Initialize the loader."""
 
-    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[tuple[str, str]]:
         """Get listing of possible manufacturers."""
 
     async def find_manufacturers(self, search: str) -> set[str]:

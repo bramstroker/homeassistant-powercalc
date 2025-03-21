@@ -120,8 +120,8 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain(
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
-    assert {"value": "sonos", "label": "sonos"} not in manufacturer_options
-    assert {"value": "signify", "label": "signify"} in manufacturer_options
+    assert {"value": "sonos", "label": "Sonos"} not in manufacturer_options
+    assert {"value": "signify", "label": "Signify"} in manufacturer_options
 
 
 async def test_manufacturer_listing_is_filtered_by_entity_domain2(
@@ -141,8 +141,8 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain2(
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
-    assert {"value": "sonos", "label": "sonos"} not in manufacturer_options
-    assert {"value": "shelly", "label": "shelly"} in manufacturer_options
+    assert {"value": "sonos", "label": "Sonos"} not in manufacturer_options
+    assert {"value": "shelly", "label": "Shelly"} in manufacturer_options
 
 
 async def test_fixed_power_is_skipped_when_only_self_usage_true(hass: HomeAssistant) -> None:

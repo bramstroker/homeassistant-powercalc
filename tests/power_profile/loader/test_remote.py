@@ -128,7 +128,7 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
 
 async def test_get_manufacturer_listing(remote_loader: RemoteLoader) -> None:
     manufacturers = await remote_loader.get_manufacturer_listing({DeviceType.LIGHT})
-    assert "signify" in manufacturers
+    assert ("signify", "Signify") in manufacturers
     assert len(manufacturers) > 40
 
 
@@ -249,6 +249,7 @@ async def test_profile_redownloaded_when_newer_version_available(
                 "manufacturers": [
                     {
                         "name": "signify",
+                        "dir_name": "signify",
                         "models": [
                             {
                                 "id": "LCA001",
@@ -529,6 +530,7 @@ async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aiorespon
             "manufacturers": [
                 {
                     "name": "manufacturer1",
+                    "dir_name": "manufacturer1",
                     "aliases": ["my-alias"],
                     "models": [
                         {
@@ -540,6 +542,7 @@ async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aiorespon
                 },
                 {
                     "name": "manufacturer2",
+                    "dir_name": "manufacturer2",
                     "aliases": ["my-alias"],
                     "models": [
                         {

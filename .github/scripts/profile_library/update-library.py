@@ -139,9 +139,20 @@ def get_manufacturer_json(manufacturer: str) -> dict:
     json_path = os.path.join(DATA_DIR, manufacturer, "manufacturer.json")
     try:
         with open(json_path) as json_file:
-            return json.load(json_file)
+            manufacturer_data =  json.load(json_file)
+            return {
+                "aliases": manufacturer_data.get("aliases", []),
+                "name": manufacturer,
+                "full_name": manufacturer_data.get("name"),
+                "dir_name": manufacturer
+            }
     except FileNotFoundError:
-        default_json = {"name": manufacturer, "aliases": []}
+        default_json = {
+            "name": manufacturer,
+            "full_name": manufacturer,
+            "dir_name": manufacturer,
+            "aliases": []
+        }
         with open(json_path, "w", encoding="utf-8") as json_file:
             json.dump(default_json, json_file, ensure_ascii=False, indent=4)
         git.Repo(PROJECT_ROOT).git.add(json_path)

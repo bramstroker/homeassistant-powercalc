@@ -25,17 +25,17 @@ class LocalLoader(Loader):
         if not self._is_custom_directory:
             await self._hass.async_add_executor_job(self._load_custom_library)
 
-    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[tuple[str, str]]:
         """Get listing of all available manufacturers or filtered by model device_type."""
         if device_types is None:
-            return set(self._manufacturer_model_listing.keys())
+            return {(manufacturer, manufacturer) for manufacturer in self._manufacturer_model_listing}
 
-        manufacturers: set[str] = set()
+        manufacturers: set[tuple[str, str]] = set()
         for manufacturer in self._manufacturer_model_listing:
             models = await self.get_model_listing(manufacturer, device_types)
             if not models:
                 continue
-            manufacturers.add(manufacturer)
+            manufacturers.add((manufacturer, manufacturer))
 
         return manufacturers
 
