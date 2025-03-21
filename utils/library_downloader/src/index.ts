@@ -156,7 +156,7 @@ app.get(
                 const modifiedPath = item.path.substring(path.length + 1);
                 return [{path: modifiedPath, url: item.download_url ?? ""}];
               } else if (item.type === "symlink") {
-                const target = item.target
+                const target = (item as any).target
                 return await fetchContents(target.replace("../", repository.path + "/"))
               } else if (item.type === "dir") {
                 const newPath = `${path}/${item.name}`;
