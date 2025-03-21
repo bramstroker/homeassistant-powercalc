@@ -244,6 +244,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
             color_mode = ColorMode(str(attrs.get(ATTR_COLOR_MODE, ColorMode.UNKNOWN)))
         except ValueError:
             color_mode = ColorMode.UNKNOWN
+        if color_mode == ColorMode.WHITE:
+            return ColorMode.BRIGHTNESS
         if color_mode == ColorMode.UNKNOWN:
             return color_mode
         if color_mode in COLOR_MODES_COLOR:
