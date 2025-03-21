@@ -10,5 +10,6 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "ikuu 92mm Walter 9W Smart LED Downlight RGB+CCT Zigbee",
-  "standby_power": 0.43
+  "standby_power": 0.43,
+  "author": "hemiceni <ivansiegmann@live.com>"
 }

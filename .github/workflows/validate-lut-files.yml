@@ -1,13 +1,9 @@
 name: LUT file validation
 
 on:
-  pull_request_target:
+  pull_request:
     paths:
        - '**/*.csv.gz'
-       - '.github/scripts/lut_validator/**'
-
-permissions:
-   pull-requests: write
 
 jobs:
   validate-lut:
@@ -22,61 +18,3 @@ jobs:
         npm install
     - name: Validate LUT CSV files
       run: node .github/scripts/lut_validator/validate.js
-  visualize:
-    name: Add plot to PR
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-      - uses: ./.github/workflows/poetry-composite-action
-        with:
-          directory: './utils/visualize'
-          python_version: '3.13'
-          cache_dependencies: 'false'
-      - uses: actions/github-script@v7
-        name: List changed files from the PR
-        id: list-files
-        with:
-          script: |
-            const { execSync } = require('child_process')
-            const { commits } = context.payload.pull_request
-            const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits} | grep -E '(brightness|color_temp|hs)\\.csv\\.gz$'`).toString()
-            const files = rawFiles.split('\n').filter(Boolean)
-            core.setOutput('changedFiles', "\"" + files.join("\" \"") + "\"")
-      - name: Run visualization tool
-        run: |
-          cd ./utils/visualize
-          for file in ${{ steps.list-files.outputs.changedFiles }}; do
-            echo "Generating plot for - ${file}."
-            if [ -f "${{ github.workspace }}/${file}" ]; then
-              poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
-            fi
-          done
-      - name: Upload the plots to Imgur
-        uses: devicons/public-upload-to-imgur@v2
-        id: imgur_step
-        with:
-          path: ./utils/visualize/*.png
-          client_id: ${{secrets.IMGUR_CLIENT_ID}}
-      - name: Build PR message
-        id: build-pr-message
-        run: |
-          echo 'PR_MESSAGE<<EOF' >> $GITHUB_OUTPUT
-          echo "Thank you for submitting light measurements!" >> $GITHUB_OUTPUT
-          echo -e "Here are some visualizations for the CSV files.\n" >> $GITHUB_OUTPUT
-          for url in ${{ join(fromJSON(steps.imgur_step.outputs.imgur_urls), ' ') }}
-          do
-            echo "![Image](${url})" >> $GITHUB_OUTPUT
-          done
-          echo 'EOF' >> $GITHUB_OUTPUT
-      - name: Add comment to PR
-        uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
-      - name: add label
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          labels: lightmodel

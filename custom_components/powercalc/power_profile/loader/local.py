@@ -23,31 +23,31 @@ class LocalLoader(Loader):
     async def initialize(self) -> None:
         """Initialize the loader."""
         if not self._is_custom_directory:
-            await self._hass.async_add_executor_job(self._load_custom_library)  # type: ignore
+            await self._hass.async_add_executor_job(self._load_custom_library)
 
-    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[tuple[str, str]]:
         """Get listing of all available manufacturers or filtered by model device_type."""
         if device_types is None:
-            return set(self._manufacturer_model_listing.keys())
+            return {(manufacturer, manufacturer) for manufacturer in self._manufacturer_model_listing}
 
-        manufacturers: set[str] = set()
+        manufacturers: set[tuple[str, str]] = set()
         for manufacturer in self._manufacturer_model_listing:
             models = await self.get_model_listing(manufacturer, device_types)
             if not models:
                 continue
-            manufacturers.add(manufacturer)
+            manufacturers.add((manufacturer, manufacturer))
 
         return manufacturers
 
-    async def find_manufacturer(self, search: str) -> str | None:
+    async def find_manufacturers(self, search: str) -> set[str]:
         """Check if a manufacturer is available."""
 
         _search = search.lower()
         manufacturer_list = self._manufacturer_model_listing.keys()
         if _search in manufacturer_list:
-            return _search
+            return {_search}
 
-        return None
+        return set()
 
     async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available models for a given manufacturer.
@@ -104,19 +104,18 @@ class LocalLoader(Loader):
         model_json = lib_model.json_data
         return model_json, model_path
 
-    async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
+    async def find_model(self, manufacturer: str, search: set[str]) -> set[str]:
         """Find a model for a given manufacturer. Also must check aliases."""
         _manufacturer = manufacturer.lower()
 
         models = self._manufacturer_model_listing.get(_manufacturer)
         if not models:
-            _LOGGER.info("Manufacturer does not exist in custom library: %s", _manufacturer)
-            return []
+            return set()
 
         search_lower = {phrase.lower() for phrase in search}
 
         profile = next((models[model] for model in models if model.lower() in search_lower), None)
-        return [profile.model] if profile else []
+        return {profile.model} if profile else set()
 
     def _load_custom_library(self) -> None:
         """Loading custom models and aliases from file system.
@@ -130,6 +129,7 @@ class LocalLoader(Loader):
             _LOGGER.error("Custom library directory does not exist: %s", base_path)
             return
 
+        self._manufacturer_model_listing.clear()
         for manufacturer_dir in next(os.walk(base_path))[1]:
             manufacturer_path = os.path.join(base_path, manufacturer_dir)
 

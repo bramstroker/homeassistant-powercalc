@@ -5,13 +5,15 @@ import pytest
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
-    ATTR_COLOR_TEMP,
+    ATTR_COLOR_TEMP_KELVIN,
+    ATTR_EFFECT,
     ATTR_HS_COLOR,
     ColorMode,
 )
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
+from homeassistant.util import color as color_util
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, CalculationStrategy
@@ -21,11 +23,11 @@ from custom_components.powercalc.strategy.factory import PowerCalculatorStrategy
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
-from tests.common import get_test_config_dir, run_powercalc_setup
+from tests.common import get_test_profile_dir, run_powercalc_setup
 from tests.strategy.common import create_source_entity
 
 
-async def test_colortemp_lut(hass: HomeAssistant) -> None:
+async def test_color_temp_lut(hass: HomeAssistant) -> None:
     """Test LUT lookup in color_temp mode"""
 
     source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.COLOR_TEMP])
@@ -92,6 +94,61 @@ async def test_hs_lut(hass: HomeAssistant) -> None:
         strategy,
         state=_create_light_hs_state(100, 200, 300),
         expected_power=1.53,
+    )
+
+
+@pytest.mark.parametrize(
+    "effect,brightness,expected_power",
+    [
+        ("Android", 20, 2.08),
+        ("Android", 100, 2.73),
+        ("Android", 255, 4.00),
+        ("Wipe Random", 20, 1.98),
+        ("Non existing effect", 100, None),
+    ],
+)
+async def test_effect_lut(hass: HomeAssistant, effect: str, brightness: int, expected_power: float) -> None:
+    """Test LUT lookup in effect mode"""
+    strategy = await _create_lut_strategy(
+        hass,
+        "test",
+        "test",
+        custom_profile_dir=get_test_profile_dir("lut_effect"),
+    )
+    await _calculate_and_assert_power(
+        strategy,
+        state=State(
+            "light.test",
+            STATE_ON,
+            {
+                ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
+                ATTR_COLOR_TEMP_KELVIN: 153,
+                ATTR_BRIGHTNESS: brightness,
+                ATTR_EFFECT: effect,
+            },
+        ),
+        expected_power=expected_power,
+    )
+
+
+async def test_effect_mode_unsupported(hass: HomeAssistant) -> None:
+    """
+    Test light is set in effect mode, but effect is not supported by the profile.
+    In this case normal LUT for color mode should be used.
+    """
+    strategy = await _create_lut_strategy(hass, "signify", "LWB010", "light.test")
+    await _calculate_and_assert_power(
+        strategy,
+        state=State(
+            "light.test",
+            STATE_ON,
+            {
+                ATTR_COLOR_MODE: ColorMode.BRIGHTNESS,
+                ATTR_BRIGHTNESS: 255,
+                ATTR_EFFECT: "Test",
+            },
+        ),
+        expected_power=9.65,
     )
 
 
@@ -175,6 +232,25 @@ async def test_color_mode_unknown_is_handled_gracefully(
     assert "color mode unknown" in caplog.text
 
 
+async def test_error_is_logged_when_color_temp_unavailable(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Test error is logged when color_temp attribute is not available"""
+
+    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
+
+    state = State(
+        "light.test",
+        STATE_ON,
+        {
+            ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
+            ATTR_BRIGHTNESS: 100,
+            ATTR_COLOR_TEMP_KELVIN: None,
+        },
+    )
+    assert not await strategy.calculate(state)
+
+    assert "Could not calculate power. no color temp set" in caplog.text
+
+
 async def test_unsupported_color_mode(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
@@ -227,7 +303,7 @@ async def test_sensor_unavailable_for_unsupported_color_mode(hass: HomeAssistant
 async def test_fallback_color_temp_to_hs(hass: HomeAssistant) -> None:
     """
     Test fallback is done when no color_temp.csv is available, but a hs.csv is.
-    Fixes issue where HUE bridge is falsly reporting color_temp as color_mode.
+    Fixes issue where HUE bridge is falsy reporting color_temp as color_mode.
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2247
     """
 
@@ -243,7 +319,7 @@ async def test_fallback_color_temp_to_hs(hass: HomeAssistant) -> None:
     hass.states.async_set(
         "light.test",
         STATE_ON,
-        {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100, ATTR_COLOR_TEMP: 500},
+        {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100, ATTR_COLOR_TEMP_KELVIN: 500},
     )
     await hass.async_block_till_done()
 
@@ -285,7 +361,7 @@ async def test_fallback_to_non_gzipped_file(hass: HomeAssistant) -> None:
         hass,
         "test",
         "test",
-        custom_profile_dir=get_test_config_dir("powercalc_profiles/lut-non-gzipped"),
+        custom_profile_dir=get_test_profile_dir("lut_non_gzipped"),
     )
     await _calculate_and_assert_power(
         strategy,
@@ -335,7 +411,7 @@ def _create_light_color_temp_state(brightness: int, color_temp: int) -> State:
         {
             ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
             ATTR_BRIGHTNESS: brightness,
-            ATTR_COLOR_TEMP: color_temp,
+            ATTR_COLOR_TEMP_KELVIN: color_util.color_temperature_mired_to_kelvin(color_temp),
         },
     )
 
@@ -355,7 +431,11 @@ def _create_light_hs_state(brightness: int, hue: int, sat: int) -> State:
 async def _calculate_and_assert_power(
     strategy: PowerCalculationStrategyInterface,
     state: State,
-    expected_power: float,
+    expected_power: float | None,
 ) -> None:
     power = await strategy.calculate(state)
-    assert round(Decimal(expected_power), 2) == round(power, 2)
+    if expected_power is None:
+        assert power is None
+        return
+
+    assert round(power, 2) == round(Decimal(expected_power), 2)

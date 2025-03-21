@@ -16,7 +16,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import get_test_config_dir
+from tests.common import get_test_config_dir, run_powercalc_setup
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
@@ -104,14 +104,14 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
 async def test_playbooks_mandatory(hass: HomeAssistant) -> None:
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.PLAYBOOK)
-    result = await set_virtual_power_configuration(
-        hass,
-        result,
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
         {
             CONF_REPEAT: True,
             CONF_AUTOSTART: "playbook1",
         },
     )
+
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"] == {"base": "playbook_mandatory"}
 
@@ -137,6 +137,8 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
             },
         },
     )
+
+    await run_powercalc_setup(hass, {})
 
     hass.states.async_set("media_player.test", STATE_IDLE)
     await hass.async_block_till_done()

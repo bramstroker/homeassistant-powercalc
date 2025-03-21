@@ -4,6 +4,8 @@ import os
 
 from jsonschema import ValidationError, validate
 
+from utils.library.common import PROFILE_DIRECTORY
+
 
 def load_json(file_path: str) -> dict:
     """Load a JSON file from the given file path."""
@@ -32,7 +34,6 @@ def validate_models_with_glob(directory: str, schema_path: str) -> None:
 
 
 if __name__ == "__main__":
-    directory = os.path.join(os.path.dirname(__file__), "../../profile_library")
     schema_file_path = os.path.join(os.path.dirname(__file__), "../../profile_library/model_schema.json")
 
-    validate_models_with_glob(directory, schema_file_path)
+    validate_models_with_glob(PROFILE_DIRECTORY, schema_file_path)

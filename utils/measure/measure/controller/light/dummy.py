@@ -24,3 +24,9 @@ class DummyLightController(LightController):
 
     def process_answers(self, answers: dict[str, Any]) -> None:
         pass
+
+    def has_effect_support(self) -> bool:
+        return True
+
+    def get_effect_list(self) -> list[str]:
+        return ["A", "B", "C"]

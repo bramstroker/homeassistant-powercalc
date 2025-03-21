@@ -1,22 +1,17 @@
-reset_energy:
-  name: Reset energy sensor
-  description: Reset an energy sensor to zero kWh
+activate_playbook:
+  name: Activate playbook
+  description: Activate playbook
   target:
     entity:
       domain: sensor
-      device_class: energy
-calibrate_utility_meter:
-  name: Calibrate utility meter
-  description: Calibrates a utility meter sensor.
-  target:
-    entity:
-      domain: sensor
+      integration: powercalc
+      device_class: power
   fields:
-    value:
-      name: Value
-      description: Value to which set the meter
-      example: "100"
+    playbook_id:
+      name: Playbook
+      description: Playbook identifier
       required: true
+      example: program1
       selector:
         text:
 calibrate_energy:
@@ -34,6 +29,47 @@ calibrate_energy:
       required: true
       selector:
         text:
+calibrate_utility_meter:
+  name: Calibrate utility meter
+  description: Calibrates a utility meter sensor.
+  target:
+    entity:
+      domain: sensor
+  fields:
+    value:
+      name: Value
+      description: Value to which set the meter
+      example: "100"
+      required: true
+      selector:
+        text:
+change_gui_config:
+  name: Change GUI config
+  description: Batch change configuration of all Powercalc config entries
+  fields:
+    field:
+      name: Field
+      required: true
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - "create_energy_sensor"
+            - "create_utility_meters"
+            - "ignore_unavailable_state"
+            - "energy_integration_method"
+    value:
+      name: Value
+      required: true
+      selector:
+        text:
+get_group_entities:
+  name: Get group entities
+  description: Get child entities of a Powercalc power or energy group
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
 increase_daily_energy:
   name: Increase daily energy sensor
   description: Increases the sensor with a given amount
@@ -50,22 +86,16 @@ increase_daily_energy:
       required: true
       selector:
         text:
-activate_playbook:
-  name: Activate playbook
-  description: Activate playbook
+reload:
+  name: Reload config entries
+  description: Reload all Powercalc config entries
+reset_energy:
+  name: Reset energy sensor
+  description: Reset an energy sensor to zero kWh
   target:
     entity:
       domain: sensor
-      integration: powercalc
-      device_class: power
-  fields:
-    playbook_id:
-      name: Playbook
-      description: Playbook identifier
-      required: true
-      example: program1
-      selector:
-        text:
+      device_class: energy
 stop_playbook:
   name: Stop playbook
   description: Stop active playbook
@@ -90,23 +120,6 @@ switch_sub_profile:
       required: true
       selector:
         text:
-change_gui_config:
-  name: Change GUI config
-  description: Batch change configuration of all Powercalc config entries
-  fields:
-    field:
-      name: Field
-      required: true
-      selector:
-        select:
-          mode: dropdown
-          options:
-            - "create_energy_sensor"
-            - "create_utility_meters"
-            - "ignore_unavailable_state"
-            - "energy_integration_method"
-    value:
-      name: Value
-      required: true
-      selector:
-        text:
+update_library:
+  name: Update profile library
+  description: Update the profile library and reinitialize discovery

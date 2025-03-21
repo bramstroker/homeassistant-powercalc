@@ -1,7 +1,7 @@
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
-    ATTR_COLOR_TEMP,
+    ATTR_COLOR_TEMP_KELVIN,
     ATTR_SUPPORTED_COLOR_MODES,
     ColorMode,
 )
@@ -59,7 +59,7 @@ async def test_infrared_light(
         {
             ATTR_BRIGHTNESS: 11,
             ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
-            ATTR_COLOR_TEMP: 601,
+            ATTR_COLOR_TEMP_KELVIN: 1663,
         },
     )
     hass.states.async_set(infrared_brightness_select_id, "50%")

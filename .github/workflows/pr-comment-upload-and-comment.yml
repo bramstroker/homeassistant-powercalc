@@ -1,0 +1,75 @@
+name: PR comment - Upload and comment
+
+on:
+  workflow_run:
+    workflows: [PR comment - Generate plots]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+  contents: read
+  actions: read
+
+jobs:
+  upload:
+    name: Upload plots to Imgur
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: plots
+          path: artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+      - name: Upload the plots to Imgur
+        uses: devicons/public-upload-to-imgur@v2
+        id: imgur_step
+        with:
+          path: ./artifacts/**/*.png
+          client_id: ${{secrets.IMGUR_CLIENT_ID}}
+      - name: Build PR message
+        id: build-pr-message
+        run: |
+          echo 'PR_MESSAGE<<EOF' >> $GITHUB_OUTPUT
+          echo "Thank you for submitting light measurements!" >> $GITHUB_OUTPUT
+          echo -e "Here are some visualizations for the CSV files.\n" >> $GITHUB_OUTPUT
+          for url in ${{ join(fromJSON(steps.imgur_step.outputs.imgur_urls), ' ') }}
+          do
+            echo "![Image](${url})" >> $GITHUB_OUTPUT
+          done
+          echo 'EOF' >> $GITHUB_OUTPUT
+      - name: Post Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const prNumber = Number(fs.readFileSync('artifacts/pr_number.txt'));
+            const repo = context.repo;
+            const prMessage = process.env.PR_MESSAGE;
+
+            const comments = await github.rest.issues.listComments({
+              owner: repo.owner,
+              repo: repo.repo,
+              issue_number: prNumber
+            });
+
+            const existingComment = comments.data.find(comment => comment.body.includes('Thank you for submitting'));
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: repo.owner,
+                repo: repo.repo,
+                comment_id: existingComment.id,
+                body: prMessage
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: repo.owner,
+                repo: repo.repo,
+                issue_number: prNumber,
+                body: prMessage
+              });
+            }
+        env:
+          PR_MESSAGE: ${{ steps.build-pr-message.outputs.PR_MESSAGE }}

@@ -10,5 +10,6 @@
     "VERSION": "master"
   },
   "name": "Cree Lighting Connected Max 60-Watt EQ A19 Tunable White E26 Dimmable Smart Light Bulb",
-  "standby_power": 0.55
+  "standby_power": 0.55,
+  "author": "Benjamin Pearce <gitlab@bcpearce.com>"
 }

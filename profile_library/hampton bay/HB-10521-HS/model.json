@@ -1,0 +1,16 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-01-30T12:14:50.534799",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.3:docker"
+  },
+  "name": "Smart 24ft LED Color Changing Plug-In String Lights",
+  "standby_power": 1.45,
+  "author": "Chris Hallgren <challgren@gmail.com>",
+  "config_flow_discovery_remarks": "***Warning** Supoort to provide measurements during an effect is running is not currently implemented."
+}

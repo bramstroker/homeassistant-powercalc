@@ -6,7 +6,7 @@ from decimal import Decimal
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import CONF_ENTITIES, STATE_ON, STATE_UNAVAILABLE
+from homeassistant.const import CONF_ENTITIES, STATE_CLOSING, STATE_ON, STATE_OPENING, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 
@@ -24,6 +24,8 @@ CONFIG_SCHEMA = vol.Schema(
 
 _LOGGER = logging.getLogger(__name__)
 
+ON_STATES = [STATE_ON, STATE_OPENING, STATE_CLOSING]
+
 
 class MultiSwitchStrategy(PowerCalculationStrategyInterface):
     def __init__(
@@ -31,7 +33,7 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
         hass: HomeAssistant,
         switch_entities: list[str],
         on_power: Decimal,
-        off_power: Decimal,
+        off_power: Decimal | None = None,
     ) -> None:
         self.hass = hass
         self.switch_entities = switch_entities
@@ -51,9 +53,9 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
         def _get_power(state: str) -> Decimal:
             if state == STATE_UNAVAILABLE:
                 return Decimal(0)
-            if state == STATE_ON:
+            if state in ON_STATES:
                 return self.on_power
-            return self.off_power
+            return self.off_power or Decimal(0)
 
         return Decimal(sum(_get_power(state) for state in self.known_states.values()))
 
@@ -61,4 +63,4 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
         return self.switch_entities  # type: ignore
 
     def can_calculate_standby(self) -> bool:
-        return True
+        return self.off_power is not None

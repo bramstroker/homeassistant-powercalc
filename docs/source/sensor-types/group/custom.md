@@ -152,3 +152,7 @@ When you are not interested in the individual energy sensors of each light this 
 
     Beware that if your group also consists of [daily energy](../daily-energy.md) sensors the Riemann sum sensor will not be accurate, as it's could be missing the data of this sensor, because it does not always have a power sensor.
     So you only must use this option when the group power sensor contains all the power data from individual entities.
+
+## Action get_group_entities
+
+Powercalc provides an action [`Powercalc: get group entities`](../../actions/get-group-entities.md) to get all entity_id's of group members.

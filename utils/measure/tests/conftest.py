@@ -7,9 +7,10 @@ from typing import Any, Protocol
 from unittest.mock import MagicMock, patch
 
 import pytest
+from decouple import UndefinedValueError
 from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR
-from measure.controller.light.const import ColorMode
+from measure.controller.light.const import LutMode
 
 
 @pytest.fixture(autouse=True)
@@ -30,44 +31,47 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
         set_question_defaults: bool = True,
         question_defaults: dict | None = None,
     ) -> MagicMock:
-        if config_values is None:
-            config_values = {
-                "selected_light_controller": "dummy",
-                "selected_power_meter": "dummy",
-                "selected_media_controller": "dummy",
-                "selected_charging_controller": "dummy",
-                "sleep_time": 0,
-                "sleep_initial": 0,
-                "sleep_standby": 0,
-                "resume": False,
-                "min_brightness": 0,
-                "max_brightness": 255,
-                "bri_bri_steps": 1,
-                "sample_count": 1,
-                "sleep_time_sample": 0,
-            }
+        default_config_values = {
+            "selected_light_controller": "dummy",
+            "selected_power_meter": "dummy",
+            "selected_media_controller": "dummy",
+            "selected_charging_controller": "dummy",
+            "sleep_time": 0,
+            "sleep_initial": 0,
+            "sleep_standby": 0,
+            "sleep_time_sample": 0,
+            "resume": False,
+        }
+        if config_values is not None:
+            default_config_values.update(config_values)
         if set_question_defaults:
-            config_values = {
-                "generate_model_json": True,
-                "dummy_load": False,
-                "model_name": "Test model",
-                "measure_device": "Shelly Plug S",
-                "gzip": True,
-                "multiple_lights": False,
-                "num_lights": 1,
-                "selected_measure_type": "Light bulb(s)",
-                "color_mode": {ColorMode.BRIGHTNESS},
-                **(question_defaults or {}),
-                **config_values,
-            }
+            default_config_values.update(
+                {
+                    "generate_model_json": True,
+                    "dummy_load": False,
+                    "model_name": "Test model",
+                    "measure_device": "Shelly Plug S",
+                    "gzip": True,
+                    "multiple_lights": False,
+                    "num_lights": 1,
+                    "selected_measure_type": "Light bulb(s)",
+                    "mode": {LutMode.BRIGHTNESS},
+                    **(question_defaults or {}),
+                },
+            )
 
+        real_config = MeasureConfig()
         mock_instance = mock.return_value
         mock_instance.get_conf_value = MagicMock()
-        mock_instance.get_conf_value.side_effect = lambda k: config_values.get(k.lower(), None)
+        mock_instance.get_conf_value.side_effect = lambda k: default_config_values.get(k.lower(), real_config.get_conf_value(k))
 
         properties = {prop for prop in dir(MeasureConfig) if isinstance(getattr(MeasureConfig, prop, None), property)}
         for prop in properties:
-            setattr(mock_instance, prop, config_values.get(prop, None))
+            try:
+                default_val = getattr(real_config, prop)
+            except UndefinedValueError:
+                default_val = None
+            setattr(mock_instance, prop, default_config_values.get(prop, default_val))
 
         return mock_instance
 
@@ -104,3 +108,10 @@ def mock_requests_get_factory() -> MockRequestsGetFactory:
         return mock_request
 
     return factory
+
+
+@pytest.fixture()
+def export_path(tmp_path: str) -> str:
+    export_dir = tmp_path / "export"
+    export_dir.mkdir(parents=True, exist_ok=True)
+    return str(export_dir)

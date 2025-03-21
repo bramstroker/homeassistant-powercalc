@@ -1,0 +1,21 @@
+{
+  "created_at": "2025-02-23T11:56:26",
+  "measure_description": "Measured with 7.5W (average over 300s) dummy load over 300s and calculated average. Multiple combinations of settings were tested. Firmware version 1.44",
+  "measure_device": "Shelly PM Mini Gen3 (S3PM-001PCEU16)",
+  "measure_method": "script",
+  "measure_settings": {
+    "VERSION": "v1.17.1:docker"
+  },
+  "name": "Shelly 1 Mini Gen3",
+  "alias": [
+    "S3SW-001X8EU"
+  ],
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN + BT + ECO\": All three turned on, repeater turned off.\n\"WLAN + ECO\": Both turned on, repeater turned off.\n\"Other combinations\": For all other combinations. Maximum device power draw.",
+  "author": "CV"
+}

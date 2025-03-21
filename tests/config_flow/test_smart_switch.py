@@ -7,7 +7,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_POWER
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -20,8 +20,10 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
+    confirm_auto_discovered_model,
     create_mock_entry,
     initialize_options_flow,
     select_menu_item,
@@ -32,10 +34,10 @@ from tests.conftest import MockEntityWithModel
 @pytest.mark.parametrize(
     "user_input,expected_fixed_power",
     [
-        ({CONF_POWER: 20, CONF_SELF_USAGE_INCLUDED: True}, 20.89),
-        ({CONF_POWER: 20, CONF_SELF_USAGE_INCLUDED: False}, 20),
-        ({CONF_POWER: 20}, 20.89),
-        ({}, 0.89),
+        ({CONF_POWER: 20, CONF_SELF_USAGE_INCLUDED: True}, 20),
+        ({CONF_POWER: 20, CONF_SELF_USAGE_INCLUDED: False}, 20.70),
+        ({CONF_POWER: 20}, 20.70),
+        ({}, 0.70),
     ],
 )
 async def test_smart_switch_flow(
@@ -44,10 +46,11 @@ async def test_smart_switch_flow(
     user_input: dict[str, Any],
     expected_fixed_power: float,
 ) -> None:
+    hass.config.config_dir = get_test_config_dir()
     mock_entity_with_model_information(
         "switch.test",
-        "shelly",
-        "Shelly Plug S",
+        "test",
+        "smart_switch_without_pm",
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
@@ -65,10 +68,7 @@ async def test_smart_switch_flow(
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.LIBRARY
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    result = await confirm_auto_discovered_model(hass, result)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.SMART_SWITCH
@@ -87,17 +87,17 @@ async def test_smart_switch_flow(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert result["data"][CONF_FIXED][CONF_POWER] == expected_fixed_power
     assert result["data"][CONF_MODE] == CalculationStrategy.FIXED
 
     hass.states.async_set("switch.test", STATE_ON)
     await hass.async_block_till_done()
 
-    power_state = hass.states.get("sensor.test_device_power")
+    power_state = hass.states.get("sensor.test_power")
     assert power_state.state == f"{expected_fixed_power:.2f}"
 
 
 async def test_smart_switch_options(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
     entry = create_mock_entry(
         hass,
         {
@@ -106,14 +106,14 @@ async def test_smart_switch_options(hass: HomeAssistant) -> None:
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_SELF_USAGE_INCLUDED: False,
             CONF_FIXED: {CONF_POWER: 40},
-            CONF_MANUFACTURER: "shelly",
-            CONF_MODEL: "Shelly Plug S",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "smart_switch_without_pm",
         },
     )
 
     result = await initialize_options_flow(hass, entry, Step.FIXED)
 
-    user_input = {CONF_POWER: 50, CONF_SELF_USAGE_INCLUDED: True}
+    user_input = {CONF_SELF_USAGE_INCLUDED: True}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -121,11 +121,10 @@ async def test_smart_switch_options(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_SELF_USAGE_INCLUDED] is True
-    assert entry.data[CONF_POWER] == 50
-    assert entry.data[CONF_FIXED][CONF_POWER] == 50.89
 
 
 async def test_smart_switch_options_correctly_loaded(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
     entry = create_mock_entry(
         hass,
         {
@@ -135,8 +134,8 @@ async def test_smart_switch_options_correctly_loaded(hass: HomeAssistant) -> Non
             CONF_POWER: 40,
             CONF_FIXED: {CONF_POWER: 40.85},
             CONF_SELF_USAGE_INCLUDED: True,
-            CONF_MANUFACTURER: "shelly",
-            CONF_MODEL: "Shelly Plug S",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "smart_switch_without_pm",
         },
     )
 

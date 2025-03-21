@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-01-23T01:54:09.746937",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "TP-Link HS110",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.2:docker"
+  },
+  "name": "Tuya Zigbee 3.0 Bulb E27 RGB+CW+WW 15W",
+  "standby_power": 0.52,
+  "author": "Dr-Seltsam <46630992+Dr-Seltsam@users.noreply.github.com>"
+}

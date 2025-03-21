@@ -21,17 +21,20 @@ async def attach_entities_to_source_device(
     source_entity: SourceEntity,
 ) -> None:
     """Set the entity to same device as the source entity, if any available."""
-    if not source_entity.entity_entry or not source_entity.device_entry:
+    if config_entry:
+        bind_config_entry_to_device(hass, config_entry)
+
+    device_id = source_entity.device_entry.id if source_entity.device_entry else None
+    if not device_id and config_entry:
+        device_id = config_entry.data.get(CONF_DEVICE)
+    if not device_id:
         return
 
     for entity in (entity for entity in entities_to_add if isinstance(entity, BaseEntity)):
         try:
-            entity.source_device_id = source_entity.device_entry.id  # type: ignore
+            entity.source_device_id = device_id  # type: ignore
         except AttributeError:  # pragma: no cover
             _LOGGER.error("%s: Cannot set device id on entity", entity.entity_id)
-
-    if config_entry:
-        bind_config_entry_to_device(hass, config_entry)
 
 
 def bind_config_entry_to_device(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
@@ -49,6 +52,29 @@ def bind_config_entry_to_device(hass: HomeAssistant, config_entry: ConfigEntry) 
         device_reg.async_update_device(
             device_id,
             add_config_entry_id=config_entry.entry_id,
+        )
+
+    remove_stale_devices(hass, config_entry, device_id)
+
+
+def remove_stale_devices(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    device_id: str,
+) -> None:
+    """Remove stale devices from device registry."""
+    device_reg = device_registry.async_get(hass)
+    device_entries = device_registry.async_entries_for_config_entry(
+        device_reg,
+        config_entry.entry_id,
+    )
+
+    stale_devices = [device_entry for device_entry in device_entries if device_entry.id != device_id]
+
+    for device_entry in stale_devices:
+        device_reg.async_update_device(
+            device_entry.id,
+            remove_config_entry_id=config_entry.entry_id,
         )
 
 

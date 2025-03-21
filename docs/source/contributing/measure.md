@@ -34,7 +34,7 @@ When the `xy` is in the supported modes you'll need to choose `hs` in the measur
 Now start the script to begin the measurement session:
 
 ```bash
-docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
+docker run --pull=always --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
 ```
 
 The script will ask you a few questions and will start switching your light to all kind of different settings.
@@ -77,6 +77,17 @@ To do this, use the [group integration](https://www.home-assistant.io/integratio
 
 When this is also not working use one of the recommended smart plugs
 
+You could also use a dummy load. This is a device that consumes a fixed amount of power. This can be used to increase the power consumption of the light, so the power meter can measure it more accurately.
+
 ### Tuya power plug will not connect
 
 For Tuya measuring devices, disable or delete the plug from local tuya and reboot the plug as they only support 1 connection at a time.
+
+### KeyError: 'apower' on shelly powermeter
+
+Some smart plugs / power meters do not provide the expected endpoint for Powercalc measure util to retrieve the power consumption.
+
+Known devices which have this issues are:
+- Shelly EM Gen3 (S3EM-002CXCEU)
+
+For this device you can simply use the `hass` powermeter to do the measurements through Home Assistant.

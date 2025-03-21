@@ -1,10 +1,8 @@
 import contextlib
-import datetime
 import json
 import logging
 import os
 import shutil
-import time
 from functools import partial
 from unittest.mock import patch
 
@@ -16,6 +14,7 @@ from homeassistant.helpers.storage import STORAGE_DIR
 
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
+from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.loader.remote import ENDPOINT_DOWNLOAD, ENDPOINT_LIBRARY, RemoteLoader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 from tests.common import get_test_config_dir, get_test_profile_dir
@@ -75,7 +74,7 @@ async def mock_download_profile_endpoints(mock_aioresponse: aioresponses) -> lis
     )
 
     for remote_file in remote_files:
-        with open(get_test_profile_dir("signify-LCA001") + f"/{remote_file['path']}", "rb") as f:
+        with open(get_test_profile_dir("signify_LCA001") + f"/{remote_file['path']}", "rb") as f:
             mock_aioresponse.get(
                 remote_file["url"],
                 status=200,
@@ -129,7 +128,7 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
 
 async def test_get_manufacturer_listing(remote_loader: RemoteLoader) -> None:
     manufacturers = await remote_loader.get_manufacturer_listing({DeviceType.LIGHT})
-    assert "signify" in manufacturers
+    assert ("signify", "Signify") in manufacturers
     assert len(manufacturers) > 40
 
 
@@ -219,18 +218,20 @@ async def test_eventual_success_after_download_retry(mock_aioresponse: aiorespon
 
 
 @pytest.mark.parametrize(
-    "remote_modification_time_delta,exists_locally,expected_download",
+    "profile_hash,local_hash,exists_locally,expected_download",
     [
-        (-5000, False, True),
-        (+400, True, True),
-        (-4000, True, False),
+        ("018de85593a1b22b906f863677bb4891", None, True, True),
+        ("018de85593a1b22b906f863677bb4891", "b3e12b2e89ca7db698abeb39e2d7d2d3", True, True),
+        ("018de85593a1b22b906f863677bb4891", "018de85593a1b22b906f863677bb4891", True, False),
+        ("018de85593a1b22b906f863677bb4891", "018de85593a1b22b906f863677bb4891", False, True),
     ],
 )
 async def test_profile_redownloaded_when_newer_version_available(
     hass: HomeAssistant,
     mock_aioresponse: aioresponses,
     mock_download_profile_endpoints: None,
-    remote_modification_time_delta: int,
+    profile_hash: str | None,
+    local_hash: str | None,
     exists_locally: bool,
     expected_download: bool,
 ) -> None:
@@ -240,7 +241,7 @@ async def test_profile_redownloaded_when_newer_version_available(
                 return len(calls)
         return 0
 
-    def _mock_library_json(profile_updated_at: str) -> None:
+    def _mock_library_json() -> None:
         mock_aioresponse.get(
             ENDPOINT_LIBRARY,
             status=200,
@@ -248,11 +249,12 @@ async def test_profile_redownloaded_when_newer_version_available(
                 "manufacturers": [
                     {
                         "name": "signify",
+                        "dir_name": "signify",
                         "models": [
                             {
                                 "id": "LCA001",
                                 "device_type": "light",
-                                "updated_at": profile_updated_at,
+                                "hash": profile_hash,
                             },
                         ],
                     },
@@ -261,27 +263,34 @@ async def test_profile_redownloaded_when_newer_version_available(
             repeat=True,
         )
 
-    remote_date = datetime.datetime.fromtimestamp(time.time() + remote_modification_time_delta).isoformat()
-    _mock_library_json(remote_date)
+    _mock_library_json()
 
     loader = RemoteLoader(hass)
-    await loader.initialize()
 
     # Clean local directory first so we have consistent test results
     # When scenario exists_locally=True, we download the profile first, to fake the local existence
     local_storage_path = loader.get_storage_path("signify", "LCA001")
     clear_storage_dir(local_storage_path)
+    hash_file = hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
+    if os.path.exists(hash_file):
+        os.remove(hash_file)
+
+    if local_hash:
+        loader.write_profile_hashes({"signify/LCA001": local_hash})
+
+    await loader.initialize()
 
     if exists_locally:
-        await loader.set_last_update_time(time.time())
         await loader.download_profile("signify", "LCA001", local_storage_path)
 
     await loader.load_model("signify", "LCA001")
 
-    expected_call_count = 1 if expected_download else 0
+    actual_call_count = _count_download_requests()
     if exists_locally:
-        expected_call_count += 1
-    assert _count_download_requests() == expected_call_count
+        actual_call_count -= 1
+
+    expected_call_count = 1 if expected_download else 0
+    assert actual_call_count == expected_call_count
 
 
 async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: aioresponses, caplog: pytest.LogCaptureFixture) -> None:
@@ -303,7 +312,7 @@ async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: 
     loader.retry_timeout = 0
     await loader.initialize()
 
-    assert "signify" in loader.manufacturer_models
+    assert "signify" in loader.model_lookup
     assert len(caplog.records) == 2
 
 
@@ -330,7 +339,7 @@ async def test_fallback_to_local_library_on_client_connection_error(
     loader.retry_timeout = 0
     await loader.initialize()
 
-    assert "signify" in loader.manufacturer_models
+    assert "signify" in loader.model_lookup
     assert len(caplog.records) == 2
 
 
@@ -475,10 +484,13 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
 @pytest.mark.parametrize(
     "manufacturer,phrases,expected_models,library_dir",
     [
-        ("apple", {"HomePod (gen 2)"}, ["MQJ83"], None),
-        ("apple", {"Non existing model"}, [], None),
-        ("signify", {"LCA001", "LCT010"}, ["LCT010", "LCA001"], None),
-        ("test_manu", {"CCT Light"}, ["model1", "model2"], "multi-profile"),
+        ("apple", {"HomePod (gen 2)"}, {"MQJ83"}, None),
+        ("apple", {"Non existing model"}, set(), None),
+        ("signify", {"LCA001", "LCT010"}, {"LCT010", "LCA001"}, None),
+        ("signify", {"lca001"}, {"LCA001"}, None),
+        ("test_manu", {"CCT Light"}, {"model1", "model2"}, "multi_profile"),
+        ("eq-3", {"HMIP-PSM"}, {"HmIP-PSM"}, None),
+        ("shelly", {"Shelly 1PM mini gen3"}, {"Shelly 1PM Mini Gen3"}, None),
     ],
 )
 @pytest.mark.skip_remote_loader_mocking
@@ -508,3 +520,49 @@ def clear_storage_dir(storage_path: str) -> None:
     if not os.path.exists(storage_path):
         return
     shutil.rmtree(storage_path, ignore_errors=True)
+
+
+async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aioresponse: aioresponses) -> None:
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=200,
+        payload={
+            "manufacturers": [
+                {
+                    "name": "manufacturer1",
+                    "dir_name": "manufacturer1",
+                    "aliases": ["my-alias"],
+                    "models": [
+                        {
+                            "id": "model1",
+                            "device_type": "light",
+                            "updated_at": "2021-01-01T00:00:00",
+                        },
+                    ],
+                },
+                {
+                    "name": "manufacturer2",
+                    "dir_name": "manufacturer2",
+                    "aliases": ["my-alias"],
+                    "models": [
+                        {
+                            "id": "model1",
+                            "device_type": "light",
+                            "updated_at": "2021-01-01T00:00:00",
+                        },
+                    ],
+                },
+            ],
+        },
+    )
+
+    library = await ProfileLibrary.factory(hass)
+
+    manufacturers = await library.find_manufacturers("my-alias")
+    assert manufacturers == {"manufacturer1", "manufacturer2"}
+
+    model_listing = await library.get_model_listing("my-alias", {DeviceType.LIGHT})
+    assert len(model_listing) == 2
+
+    models = await library.find_models(ModelInfo("my-alias", "model1"))
+    assert models == {ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")}

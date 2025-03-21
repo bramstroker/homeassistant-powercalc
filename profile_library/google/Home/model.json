@@ -1,16 +1,32 @@
 {
-  "measure_description": "Manually sampled at 10% volume increases, radio, listening to EDM. Max power is from manufacturer specs",
-  "measure_method": "manual",
-  "measure_device": "TP-Link Tapo P110",
-  "name": "Google Home",
-  "standby_power": 2.4,
-  "device_type": "smart_speaker",
-  "calculation_strategy": "linear",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2025-02-10T17:04:27.179723",
+  "device_type": "smart_speaker",
   "linear_config": {
-    "min_power": 2.4,
-    "max_power": 3.87
+    "calibrate": [
+      "10 -> 2.56",
+      "20 -> 2.56",
+      "30 -> 2.59",
+      "40 -> 2.69",
+      "50 -> 2.71",
+      "60 -> 3.06",
+      "70 -> 3.37",
+      "80 -> 3.57",
+      "90 -> 3.59",
+      "100 -> 3.69",
+      "0 -> 2.56"
+    ]
   },
-  "created_at": "2022-10-05T10:14:54",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Nous A8T (esphome)",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.6:docker"
+  },
+  "name": "Google Home",
+  "standby_power": 2.0,
   "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
 }

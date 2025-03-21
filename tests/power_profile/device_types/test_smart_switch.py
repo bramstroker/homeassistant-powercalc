@@ -3,10 +3,10 @@ from unittest.mock import AsyncMock
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.data_entry_flow import FlowResult, FlowResultType
 
 from custom_components.powercalc import async_setup_entry
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_FIXED,
@@ -15,12 +15,12 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     DOMAIN,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup
-from tests.config_flow.common import initialize_options_flow
+from tests.common import get_test_config_dir, get_test_profile_dir, run_powercalc_setup
+from tests.config_flow.common import confirm_auto_discovered_model, initialize_options_flow
 from tests.conftest import MockEntityWithModel
 
 
-async def test_smart_switch(
+async def test_smart_switch_with_yaml(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
@@ -37,7 +37,7 @@ async def test_smart_switch(
         model=model,
     )
 
-    power_sensor_id = "sensor.oven_device_power"
+    power_sensor_id = "sensor.oven_power"
 
     await run_powercalc_setup(
         hass,
@@ -83,7 +83,7 @@ async def test_smart_switch_power_input_yaml(
         model=model,
     )
 
-    power_sensor_id = "sensor.heater_device_power"
+    power_sensor_id = "sensor.heater_power"
 
     await run_powercalc_setup(
         hass,
@@ -111,43 +111,29 @@ async def test_smart_switch_power_input_yaml(
     assert hass.states.get(power_sensor_id).state == "0.52"
 
 
-async def test_smart_switch_power_input_gui_config_flow(
+async def test_gui_smart_switch_without_builtin_powermeter(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
-    Test a smart switch can be setup with GUI and a fixed power value for the appliance configured by the user
-    The values for standby power on and off should be taken from the power profile library.
-    The fixed power value from the user should be added to the total power consumption. standby_power_on + power
+    Test setting up smart switch with relay, but without a built-in powermeter
     """
+    hass.config.config_dir = get_test_config_dir()
     switch_id = "switch.heater"
-    manufacturer = "IKEA"
-    model = "TRADFRI control outlet"
+    power_sensor_id = "sensor.heater_power"
 
-    mock_entity_with_model_information(
-        entity_id=switch_id,
-        manufacturer=manufacturer,
-        model=model,
-    )
-
-    power_sensor_id = "sensor.heater_device_power"
-
-    await run_powercalc_setup(hass, {})
-
-    # Retrieve the discovery flow
-    flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
-    flow = flows[0]
-
-    assert flow["step_id"] == Step.LIBRARY
-    result = await hass.config_entries.flow.async_configure(
-        flow["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+    result = await start_discovery_flow(
+        hass,
+        mock_entity_with_model_information,
+        switch_id,
+        manufacturer="test",
+        model="smart_switch_without_pm",
     )
 
     # After confirming the manufacturer/model we must be directed to the fixed config step
-    assert result["step_id"] == Step.FIXED
+    assert result["step_id"] == Step.SMART_SWITCH
     result = await hass.config_entries.flow.async_configure(
-        flow["flow_id"],
+        result["flow_id"],
         {CONF_POWER: 50},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
@@ -156,20 +142,15 @@ async def test_smart_switch_power_input_gui_config_flow(
 
     config_entry = result["result"]
 
-    # Toggle the switch to different states and check for correct power values
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "unavailable"
-
     hass.states.async_set(switch_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "50.98"
+    assert hass.states.get(power_sensor_id).state == "50.70"
 
     hass.states.async_set(switch_id, STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "0.23"
+    assert hass.states.get(power_sensor_id).state == "0.30"
 
     # Change the power value via the options
     result = await initialize_options_flow(hass, config_entry, Step.FIXED)
@@ -183,7 +164,42 @@ async def test_smart_switch_power_input_gui_config_flow(
     hass.states.async_set(switch_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "100.98"
+    assert hass.states.get(power_sensor_id).state == "100.70"
+
+
+async def test_gui_smart_switch_with_builtin_powermeter(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """
+    Test setting up smart switch with relay, but with a built-in powermeter
+    """
+    hass.config.config_dir = get_test_config_dir()
+    switch_id = "switch.heater"
+    power_sensor_id = "sensor.heater_device_power"
+
+    result = await start_discovery_flow(
+        hass,
+        mock_entity_with_model_information,
+        switch_id,
+        manufacturer="test",
+        model="smart_switch_with_pm",
+    )
+
+    # After confirming the manufacturer/model we must be directed to the fixed config step
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+
+    await async_setup_entry(hass, result["result"])
+
+    hass.states.async_set(switch_id, STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_sensor_id).state == "0.70"
+
+    hass.states.async_set(switch_id, STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_sensor_id).state == "0.30"
 
 
 async def test_hue_smart_plug_is_discovered(
@@ -203,3 +219,28 @@ async def test_hue_smart_plug_is_discovered(
     mock_calls = mock_flow_init.mock_calls
     assert len(mock_calls) == 1
     assert mock_calls[0][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
+
+
+async def start_discovery_flow(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    entity_id: str,
+    manufacturer: str,
+    model: str,
+) -> FlowResult:
+    hass.config.config_dir = get_test_config_dir()
+
+    mock_entity_with_model_information(
+        entity_id=entity_id,
+        manufacturer=manufacturer,
+        model=model,
+    )
+
+    await run_powercalc_setup(hass, {})
+
+    # Retrieve the discovery flow
+    flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    flow = flows[0]
+
+    assert flow["step_id"] == Step.LIBRARY
+    return await confirm_auto_discovered_model(hass, flow)

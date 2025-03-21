@@ -3,7 +3,7 @@
 # The builder image, used to build the virtual environment
 FROM python:3.13-bullseye AS builder
 
-RUN pip install poetry==1.7.1
+RUN pip install poetry==2.0.1
 
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \

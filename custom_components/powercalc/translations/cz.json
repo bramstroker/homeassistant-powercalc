@@ -1,10 +1,13 @@
 {
   "common": {
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow"
+    "source_entity": "Source entity",
+    "source_device": "Source device",
+    "remarks_smart_switch": "Tento profil poskytuje pouze hodnoty napájení v pohotovostním režimu. \n Pokud máte spotřebič, který zapnutí spotřebovává pevně dané množství energie, můžete zadat tuto hodnotu v dalším kroku v nastavení",
+    "remarks_smart_dimmer": "Tento profil poskytuje pouze hodnoty spotřeby energie v pohotovostním režimu. \n V dalším kroku můžete volitelně zadat hodnoty připojeného světla"
   },
   "config": {
     "abort": {
-      "already_configured": "Sensor is already configured, specify a unique_id"
+      "already_configured": "Senzor je již nastaven, zadejte unikátní ID"
     },
     "error": {
       "daily_energy_mandatory": "You must supply at least one of Value or Value template",
@@ -13,7 +16,7 @@
       "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
       "group_mandatory": "You must define at least subgroups or power and energy-entities",
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
+      "linear_min_higher_as_max": "Maximální spotřeba nebůže být nižší, nežli minimální spotřeba",
       "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
       "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
       "lut_wrong_domain": "Only light entities can use the LUT mode",
@@ -22,32 +25,50 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Vybrat skupinu(y)",
+          "new_group": "Nová skupina"
+        },
+        "data_description": {
+          "new_group": "Pro vytvoření nové skupiny zadejte název skupiny"
+        },
+        "title": "Přiřadit do skupiny"
+      },
+      "availability_entity": {
+        "data": {
+          "availability_entity": "Availability entity"
+        },
+        "data_description": {
+          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+        },
+        "title": "Availability entity",
+        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Create utility meters",
-          "group": "Add to group",
           "name": "Název",
-          "on_time": "On time",
+          "on_time": "V čase",
           "start_time": "Start time",
           "unit_of_measurement": "Jednotka měření",
-          "update_frequency": "Update frequency",
+          "update_frequency": "Frekvence aktualizace",
           "value": "Hodnota",
           "value_template": "Šablona hodnoty"
         },
         "data_description": {
-          "group": "Fill in a custom group name to create a new group",
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Pokud ponecháte prázdné, výchozí hodnota je 1 den. Vždy zapnuto",
+          "update_frequency": "čas v sekundách mezi aktualizacemi stavu senzoru"
         },
-        "title": "Create a daily fixed sensor"
+        "title": "Vytvořit denní fixní senzor"
       },
       "group_domain": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
+          "name": "Název",
+          "create_energy_sensor": "Vytvořit senzor energie",
+          "create_utility_meters": "Vytvořit senzor spotřeby",
           "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "exclude_entities": "Vyloučit entity"
         },
         "title": "Create a domain based group sensor"
       },
@@ -58,24 +79,25 @@
           "states_power": "States power"
         },
         "data_description": {
-          "power": "A fixed power value in Watts when the entity is ON",
-          "power_template": "Template will be evaluated to get the power value in W",
+          "power": "Pevná hodnota příkonu ve wattech, když je entita zapnutá",
+          "power_template": "Šablona bude vyhodnocena pro získání hodnoty příkonu ve wattech",
           "states_power": "One 'state: power' pair on each row, see example above"
         },
-        "description": "Define a fixed power value for your entity. Alternatively you can define a power value per state. For example:\n\n`playing: 8.3`\n`paused: 2.25`",
+        "description": "Definujte fixní hodnotu příkonu pro vaši entitu. Případně můžete definovat hodnotu příkonu pro jednotlivé stavy. Například:\n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Fixed config"
       },
       "global_configuration": {
-        "title": "Global configuration",
+        "title": "Globální konfigurace",
         "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
         "data": {
           "create_energy_sensors": "Create energy sensors",
-          "create_utility_meters": "Create utility meters",
+          "create_utility_meters": "Vytvořit senzor spotřeby",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
+          "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "include_non_powercalc_sensors": "Zahrnout ne-powercalc senzory",
           "power_sensor_category": "Power sensor category",
           "power_sensor_friendly_naming": "Power sensor friendly name pattern",
           "power_sensor_naming": "Power sensor name pattern"
@@ -85,6 +107,7 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
+          "discovery_exclude_device_types": "Exclude device types from the discovery process",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
@@ -97,8 +120,8 @@
           "energy_sensor_category": "Energy sensor category",
           "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
           "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_sensor_precision": "Přesnost senzoru energie",
+          "energy_sensor_unit_prefix": "Předpona jednotky senzoru energie"
         }
       },
       "global_configuration_utility_meter": {
@@ -117,10 +140,12 @@
           "device": "Zařízení",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
+          "group_energy_start_at_zero": "Začít na nule",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
-          "hide_members": "Hide members",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "hide_members": "Skrýt členy",
+          "include_non_powercalc_sensors": "Zahrnout ne-powercalc senzory",
           "name": "Název",
           "sub_groups": "Podskupiny"
         },
@@ -130,12 +155,51 @@
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Další senzory energie (kWh) z vaší instalace HA k přidání",
+          "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Další senzory energie (W) z vaší instalace HA k přidání",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
           "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
         },
         "title": "Create a group sensor"
+      },
+      "group_subtract": {
+        "data": {
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "entity_id": "Základní entita",
+          "name": "Název",
+          "subtract_entities": "Odečíst entity"
+        },
+        "data_description": {
+          "entity_id": "Základní entita, od které se bude odečítat výkon",
+          "subtract_entities": "Vyberte všechny entity které chcete odečíst od základní entity"
+        },
+        "title": "Subtract group sensor"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Senzor síťového napájení",
+          "group_tracked_auto": "Automaticky přidané entity",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters"
+        },
+        "data_description": {
+          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
+          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+        },
+        "description": "Create a group sensor for all tracked and untracked power",
+        "title": "Create a tracked power sensor"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Tracked entities"
+        },
+        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
+        "title": "Select power entities"
       },
       "library": {
         "data": {
@@ -144,7 +208,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Pokud se rozhodnete nepotvrzovat, pak můžete zadat výrobce a model manuálně"
         },
-        "description": "Výrobce \"{manufacturer}\" a model \"{model}\" byl automaticky detekován pro vaše zařízení.{remarks}",
+        "description": "{source}\n\nVýrobce \"{manufacturer}\" a model \"{model}\" byl automaticky detekován pro vaše zařízení.{remarks}",
         "title": "Knihovna"
       },
       "library_multi_profile": {
@@ -152,13 +216,13 @@
           "model": "Select model"
         },
         "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
-        "title": "Library"
+        "title": "Knihovna"
       },
       "linear": {
         "data": {
           "attribute": "Atribut",
           "calibrate": "Kalibrační hodnoty",
-          "gamma_curve": "Gamma curve",
+          "gamma_curve": "Gama křivka",
           "max_power": "Maximální spotřeba",
           "min_power": "Minimální spotřeba"
         },
@@ -186,7 +250,8 @@
         "menu_options": {
           "group_custom": "Standard group",
           "group_domain": "Domain based group",
-          "group_subtract": "Subtract"
+          "group_subtract": "Subtract",
+          "group_tracked_untracked": "Tracked/untracked power"
         },
         "title": "Choose the group type",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
@@ -256,25 +321,11 @@
         "description": "Currently specific settings can only be configured globally",
         "title": "Create an energy sensor for an existing power sensor"
       },
-      "group_subtract": {
-        "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "subtract_entities": "Subtract entities"
-        },
-        "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
-        },
-        "title": "Subtract group sensor"
-      },
       "sub_profile": {
         "data": {
           "sub_profile": "Sub profile"
         },
-        "description": "This model has multiple sub profiles. Select one that suites your device",
+        "description": "This model has multiple sub profiles. Select one that suites your device\n\n\"{entity_id}\"{remarks}",
         "title": "Sub profile config"
       },
       "smart_switch": {
@@ -323,7 +374,6 @@
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Create utility meters",
           "entity_id": "Source entity",
-          "group": "Přidat do skupiny",
           "mode": "Výpočetní strategie",
           "name": "Název",
           "standby_power": "Standby power"
@@ -332,7 +382,6 @@
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "group": "Fill in a custom group name to create a new group",
           "name": "Leaving blank will take the name from the source entity",
           "standby_power": "Define the amount of power the device is consuming when in an OFF state"
         },
@@ -353,6 +402,20 @@
     "deprecated_platform_yaml": {
       "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
       "title": "Nastavení Powercalc YAML bylo přesunuto"
+    },
+    "sub_profile": {
+      "fix_flow": {
+        "step": {
+          "sub_profile": {
+            "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"{remarks}",
+            "title": "Select correct sub profile",
+            "data": {
+              "sub_profile": "Sub profile"
+            }
+          }
+        }
+      },
+      "title": "Sub profile selection required for {entry}"
     }
   },
   "options": {
@@ -442,6 +505,7 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
+          "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
@@ -454,6 +518,7 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
+          "discovery_exclude_device_types": "Exclude device types from the discovery process",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
@@ -487,6 +552,7 @@
           "device": "Zařízení",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
           "hide_members": "Hide members",
@@ -498,11 +564,45 @@
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
           "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
         }
+      },
+      "group_subtract": {
+        "data": {
+          "entity_id": "Base entity",
+          "subtract_entities": "Subtract entities"
+        },
+        "data_description": {
+          "entity_id": "The base entity to subtract the power from",
+          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+        },
+        "title": "Group options"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Mains power sensor",
+          "group_tracked_auto": "Entities auto added",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters"
+        },
+        "data_description": {
+          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
+          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+        },
+        "description": "Create a group sensor for all tracked and untracked power",
+        "title": "Create a tracked power sensor"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Tracked entities"
+        },
+        "title": "Select power entities"
       },
       "init": {
         "menu_options": {
@@ -510,13 +610,15 @@
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
-          "group": "Group options",
+          "group_custom": "Group options",
+          "group_subtract": "Group options",
+          "group_tracked_untracked": "Group options",
+          "group_tracked_untracked_manual": "Tracked entities",
           "library_options": "Library options",
           "linear": "Linear options",
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
-          "group_subtract": "Group options",
           "utility_meter_options": "Utility meter options",
           "wled": "WLED options"
         }
@@ -575,17 +677,6 @@
         "data_description": {
           "device": "Add the created energy sensor to an specific device"
         }
-      },
-      "group_subtract": {
-        "data": {
-          "entity_id": "Base entity",
-          "subtract_entities": "Subtract entities"
-        },
-        "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
-        },
-        "title": "Group options"
       },
       "utility_meter_options": {
         "title": "Utility meter options",
@@ -658,6 +749,10 @@
       "description": "Get current running playbook",
       "name": "Get active playbook"
     },
+    "get_group_entities": {
+      "description": "Retrieve all entity id's of a group energy or power sensor",
+      "name": "Get group entities"
+    },
     "increase_daily_energy": {
       "description": "Increases the sensor with a given amount.",
       "fields": {
@@ -667,6 +762,10 @@
         }
       },
       "name": "Increase daily energy sensor"
+    },
+    "reload": {
+      "description": "Reload Powercalc configuration and entities",
+      "name": "Reload"
     },
     "reset_energy": {
       "description": "Reset an energy sensor to zero kWh.",

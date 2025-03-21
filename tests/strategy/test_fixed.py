@@ -255,6 +255,22 @@ async def test_template_power_combined_with_multiply_factor(
     assert state.state == "2050.00"
 
 
+async def test_template_power_initial_value_after_startup(hass: HomeAssistant) -> None:
+    hass.states.async_set("input_number.test", "30")
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_number.test",
+            CONF_FIXED: {CONF_POWER: "{{states('input_number.test')}}"},
+        },
+    )
+
+    state = hass.states.get("sensor.test_power")
+    assert state
+    assert state.state == "30.00"
+
+
 async def test_duplicate_tracking_is_prevented(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """
     Make sure the source entity is only tracked once, when it is referenced both in template and entity_id.

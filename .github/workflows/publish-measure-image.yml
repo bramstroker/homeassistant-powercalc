@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - 'master'
+    paths:
+      - 'utils/measure/**'
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   docker:

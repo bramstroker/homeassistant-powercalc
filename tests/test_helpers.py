@@ -4,22 +4,23 @@ from unittest.mock import PropertyMock, patch
 import pytest
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.template import Template
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy
-from custom_components.powercalc.helpers import evaluate_power, get_or_create_unique_id
+from custom_components.powercalc.helpers import evaluate_power, get_or_create_unique_id, make_hashable
 
 
 @pytest.mark.parametrize(
     "power,output",
     [
         (Template("unknown"), None),
-        (Template("{{ 1 + 3 | float }}"), Decimal(4.0)),
-        (20.5, Decimal(20.5)),
+        (Template("{{ 1 + 3 | float }}"), Decimal("4.0")),
+        (20.5, Decimal("20.5")),
         ("foo", None),
-        (Decimal(40.65), Decimal(40.65)),
+        (Decimal("40.65"), Decimal("40.65")),
         ((1, 2), None),
     ],
 )
@@ -31,6 +32,14 @@ async def test_evaluate_power(
     if isinstance(power, Template):
         power.hass = hass
     assert await evaluate_power(power) == output
+
+
+@patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception()))
+async def test_evaluate_power_template_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    power = Template("{{ 1 + 3 }}")
+    power.hass = hass
+    await evaluate_power(power)
+    assert "Could not render power template" in caplog.text
 
 
 async def test_get_unique_id_from_config() -> None:
@@ -53,3 +62,15 @@ async def test_wled_unique_id() -> None:
         source_entity = SourceEntity("wled", "light.wled", "light", device_entry=device_entry)
         unique_id = get_or_create_unique_id({}, source_entity, mock_instance)
         assert unique_id == "pc_123456"
+
+
+@pytest.mark.parametrize(
+    "value,output",
+    [
+        ({"a", "b", "c"}, frozenset({"a", "b", "c"})),
+        (["a", "b", "c"], ("a", "b", "c")),
+        ({"a": 1, "b": 2}, frozenset([("a", 1), ("b", 2)])),
+    ],
+)
+async def test_make_hashable(value: set | list | dict, output: tuple | frozenset) -> None:
+    assert make_hashable(value) == output

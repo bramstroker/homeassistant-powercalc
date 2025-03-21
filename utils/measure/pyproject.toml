@@ -12,7 +12,7 @@ chardet = "^5.1"
 charset-normalizer = "^3.1"
 homeassistant-api = "^4.1"
 inquirer = "^3.1"
-numpy = "^1.22"
+numpy = "^2.2"
 opencv-python = "^4.7"
 phue = {git = "https://github.com/studioimaginaire/phue.git", rev = "6d8976be9b17da94887365e001e8475fe58c5f2d"}
 pytesseract = "^0.3"

@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-02-24T05:53:56.888505",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "shelly,PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.7:docker"
+  },
+  "name": "Hue Calla outdoor bollard",
+  "standby_power": 0.25,
+  "author": "dewbot6 <drewsnodgrass@comcast.net>"
+}

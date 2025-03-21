@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-02-27T12:07:36.676703",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "shelly,PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.8:docker"
+  },
+  "name": "\tHue Festavia gradient light string 250",
+  "standby_power": 0.35,
+  "author": "dewbot6 <drewsnodgrass@comcast.net>"
+}

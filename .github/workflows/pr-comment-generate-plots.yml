@@ -1,0 +1,51 @@
+name: PR comment - Generate plots
+
+on:
+  pull_request:
+    paths:
+       - '**/*.csv.gz'
+
+jobs:
+  generate-plots:
+    name: Generate plots
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: ./.github/workflows/poetry-composite-action
+        with:
+          directory: './utils/visualize'
+          cache_dependencies: 'false'
+      - uses: actions/github-script@v7
+        name: List changed files from the PR
+        id: list-files
+        with:
+          script: |
+            const { execSync } = require('child_process')
+            const { commits } = context.payload.pull_request
+            const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits} | grep -E '(brightness|color_temp|hs)\\.csv\\.gz$'`).toString()
+            const files = rawFiles.split('\n').filter(Boolean)
+            core.setOutput('changedFiles', "\"" + files.join("\" \"") + "\"")
+      - name: Run visualization tool
+        run: |
+          cd ./utils/visualize
+          for file in ${{ steps.list-files.outputs.changedFiles }}; do
+            echo "Generating plot for - ${file}."
+            if [ -f "${{ github.workspace }}/${file}" ]; then
+              poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
+            fi
+          done
+      - name: Save PR number
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          echo $PR_NUMBER > pr_number.txt
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plots
+          path: |
+            ./pr_number.txt
+            ./utils/visualize/*.png

@@ -1,0 +1,18 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-01-20T23:38:52 CET",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 1,
+    "VERSION": "v1.17.2:docker"
+  },
+  "name": "Shelly Duo RGBW",
+  "aliases": [
+    "SHCB-1"
+  ],
+  "standby_power": 0.65,
+  "author": "Michal Bartak <maxym.srpl@gmail.com>"
+}

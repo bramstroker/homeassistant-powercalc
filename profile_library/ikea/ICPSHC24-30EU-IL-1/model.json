@@ -1,0 +1,15 @@
+{
+  "created_at": "2025-02-12T13:05:00.000000",
+  "measure_description": "Standby power measured with smart plug",
+  "measure_device": "Nous A8T (esphome)",
+  "measure_method": "manual",
+  "calculation_strategy": "linear",
+  "device_type": "smart_dimmer",
+  "name": "TRADFRI LED driver, 30 w",
+  "aliases": [
+    "TRADFRI LED driver, 30 w (ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2"
+  ],
+  "standby_power": 0.31,
+  "standby_power_on": 0.35,
+  "author": "Marcus Voß <46140304+mvoss96@users.noreply.github.com>"
+}

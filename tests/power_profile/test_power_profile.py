@@ -1,13 +1,21 @@
+from typing import Any
+from unittest.mock import patch
+
 import pytest
-from homeassistant.const import STATE_OFF, STATE_ON
+from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_PAUSED, STATE_PLAYING
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.entity_registry import RegistryEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_MODEL,
     CONF_POWER,
+    DOMAIN,
     CalculationStrategy,
 )
 from custom_components.powercalc.errors import (
@@ -21,14 +29,14 @@ from custom_components.powercalc.power_profile.power_profile import (
     PowerProfile,
     SubProfileSelector,
 )
-from tests.common import get_test_profile_dir
+from tests.common import get_test_profile_dir, run_powercalc_setup
 
 
 async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("signify", "LCA001"),
-        get_test_profile_dir("signify-LCA001"),
+        get_test_profile_dir("signify_LCA001"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "signify"
@@ -154,7 +162,22 @@ async def test_vacuum_entity_domain_supported(hass: HomeAssistant) -> None:
         get_test_profile_dir("vacuum"),
     )
     assert power_profile.is_entity_domain_supported(
-        SourceEntity("vacuum.test", "test", "vacuum"),
+        RegistryEntry(
+            entity_id="vacuum.test",
+            unique_id="1234",
+            platform="xiaomi_miio",
+        ),
+    )
+
+
+async def test_light_domain_supported_for_smart_switch_device_type(hass: HomeAssistant) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
+        ModelInfo("dummy", "dummy"),
+        get_test_profile_dir("smart_switch"),
+    )
+    assert power_profile.is_entity_domain_supported(
+        SourceEntity("light.test", "test", "light"),
     )
 
 
@@ -162,7 +185,7 @@ async def test_discovery_does_not_break_when_unknown_device_type(hass: HomeAssis
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
-        get_test_profile_dir("unknown-device-type"),
+        get_test_profile_dir("unknown_device_type"),
     )
     assert not power_profile.is_entity_domain_supported(
         SourceEntity("switch.test", "test", "switch"),
@@ -309,3 +332,212 @@ async def test_device_type(hass: HomeAssistant) -> None:
     )
 
     assert power_profile.device_type == DeviceType.SMART_SPEAKER
+
+
+@pytest.mark.parametrize(
+    "json_data,expected_result",
+    [
+        (
+            {
+                "calculation_strategy": CalculationStrategy.FIXED,
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.COMPOSITE,
+                "fields": {
+                    "foo": {
+                        "label": "Foo",
+                        "selector": {"entity": {}},
+                    },
+                },
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.FIXED,
+                "fixed_config": {
+                    "power": 50,
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+                "linear_config": {
+                    "min_power": 50,
+                    "max_power": 100,
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.MULTI_SWITCH,
+                "multi_switch_config": {
+                    "power": 0.725,
+                    "power_off": 0.225,
+                },
+            },
+            True,
+        ),
+    ],
+)
+async def test_needs_user_configuration(hass: HomeAssistant, json_data: dict[str, Any], expected_result: bool) -> None:
+    power_profile = PowerProfile(
+        hass,
+        manufacturer="test",
+        model="test",
+        directory=get_test_profile_dir("media_player"),
+        json_data=json_data,
+    )
+
+    assert await power_profile.needs_user_configuration == expected_result
+
+
+@pytest.mark.parametrize(
+    "json_data,expected_result",
+    [
+        (
+            {
+                "calculation_strategy": CalculationStrategy.FIXED,
+                "fixed_config": {
+                    "power": 50,
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.FIXED,
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.FIXED,
+                "only_self_usage": True,
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+                "linear_config": {
+                    "min_power": 50,
+                    "max_power": 100,
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+                "only_self_usage": True,
+            },
+            False,
+        ),
+    ],
+)
+async def test_needs_fixed_power(hass: HomeAssistant, json_data: dict[str, Any], expected_result: bool) -> None:
+    power_profile = PowerProfile(
+        hass,
+        manufacturer="test",
+        model="test",
+        directory=get_test_profile_dir("smart_switch"),
+        json_data=json_data,
+    )
+
+    assert await power_profile.needs_user_configuration == expected_result
+
+
+@pytest.mark.parametrize(
+    "test_profile,expected_translation_key",
+    [
+        (
+            "smart_switch",
+            "component.powercalc.common.remarks_smart_switch",
+        ),
+        (
+            "smart_switch_with_pm",
+            None,
+        ),
+        (
+            "smart_dimmer",
+            "component.powercalc.common.remarks_smart_dimmer",
+        ),
+        (
+            "smart_dimmer_with_pm",
+            None,
+        ),
+        (
+            "media_player",
+            None,
+        ),
+    ],
+)
+async def test_discovery_flow_remarks(hass: HomeAssistant, test_profile: str, expected_translation_key: str | None) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
+        ModelInfo("test", "test"),
+        get_test_profile_dir(test_profile),
+    )
+
+    translations_keys = [
+        "component.powercalc.common.remarks_smart_dimmer",
+        "component.powercalc.common.remarks_smart_switch",
+    ]
+    with patch(
+        "homeassistant.helpers.translation.async_get_cached_translations",
+        return_value={key: key for key in translations_keys},
+    ):
+        assert power_profile.config_flow_discovery_remarks == expected_translation_key
+
+
+async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) -> None:
+    """
+    JSON data is cached for the same model. This caused the replaced `calculation_enabled_condition` to be replaced with the first entity.
+    On consequent retrievals of the same model the same condition was used, because it did not contain [[entity]] placeholder anymore.
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/3118
+    """
+    entry_a = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_ENTITY_ID: "media_player.a",
+            CONF_MANUFACTURER: "sonos",
+            CONF_MODEL: "playbar",
+        },
+    )
+    entry_b = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_ENTITY_ID: "media_player.b",
+            CONF_MANUFACTURER: "sonos",
+            CONF_MODEL: "playbar",
+        },
+    )
+    await hass.config_entries.async_add(entry_a)
+    await hass.config_entries.async_add(entry_b)
+    await run_powercalc_setup(hass)
+
+    hass.states.async_set("media_player.a", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 1})
+    hass.states.async_set("media_player.b", STATE_PAUSED)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.a_power").state == "26.90"
+    assert hass.states.get("sensor.b_power").state == "5.20"

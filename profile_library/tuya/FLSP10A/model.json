@@ -1,0 +1,17 @@
+{
+  "measure_description": "Eyeballed from the smartplug screen. Figures were steady",
+  "measure_method": "manual",
+  "measure_device": "Zhurui PR10-D",
+  "name": "Forever Light Smart Plug",
+  "standby_power": 0.52,
+  "standby_power_on": 1.06,
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "only_self_usage": true,
+  "created_at": "2025-02-15T09:30:00",
+  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
+  "aliases": [
+    "Forever Light Smart Plug FLSP10A",
+    "iqkfza3hyqb8f9ui"
+  ]
+}

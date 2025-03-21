@@ -13,13 +13,9 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
 )
 from tests.common import run_powercalc_setup
-from tests.conftest import MockEntityWithModel
 
 
-async def test_nintendo_switch(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
-) -> None:
+async def test_nintendo_switch(hass: HomeAssistant) -> None:
     """
     See https://community.home-assistant.io/t/powercalc-virtual-power-sensors/318515/840?u=bramski
     """

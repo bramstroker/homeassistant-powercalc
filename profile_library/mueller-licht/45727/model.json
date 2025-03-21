@@ -1,0 +1,18 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-01-25T17:25:15.201235",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "TP-Link HS110",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.2:docker"
+  },
+  "name": "Tint Amela 30cm, white+ambiance (1800-6500K)",
+  "aliases": [
+    "404094 (16W)"
+  ],
+  "standby_power": 0.3,
+  "author": "Dr-Seltsam <46630992+Dr-Seltsam@users.noreply.github.com>"
+}

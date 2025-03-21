@@ -9,6 +9,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.15.2:docker"
   },
+  "aliases": [
+    "929003666701"
+  ],
   "name": "Hue ambiance spot (LTG005)",
-  "standby_power": 0.1
+  "standby_power": 0.1,
+  "author": "Marius <33354141+Mariusthvdb@users.noreply.github.com>"
 }

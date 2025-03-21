@@ -21,6 +21,7 @@ from tests.common import create_mock_light_entity
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     assert_default_virtual_power_entry_data,
+    confirm_auto_discovered_model,
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
@@ -41,8 +42,8 @@ async def test_lut_manual_flow(hass: HomeAssistant) -> None:
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
-    assert {"value": "belkin", "label": "belkin"} in manufacturer_options
-    assert {"value": "signify", "label": "signify"} in manufacturer_options
+    assert {"value": "belkin", "label": "Belkin"} in manufacturer_options
+    assert {"value": "signify", "label": "Signify"} in manufacturer_options
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -100,6 +101,7 @@ async def test_lut_autodiscover_flow(
         "manufacturer": "ikea",
         "model": "LED1545G12",
         "remarks": None,
+        "source": "Source entity: light.test",
     }
 
     result = await set_virtual_power_configuration(
@@ -160,10 +162,7 @@ async def test_lut_autodiscover_flow_not_confirmed(
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.LIBRARY
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: False},
-    )
+    result = await confirm_auto_discovered_model(hass, result, confirmed=False)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.MANUFACTURER

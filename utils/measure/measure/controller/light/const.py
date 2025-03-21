@@ -4,10 +4,11 @@ MIN_MIRED = 150
 MAX_MIRED = 500
 
 
-class ColorMode(str, Enum):
+class LutMode(str, Enum):
     HS = "hs"
     COLOR_TEMP = "color_temp"
     BRIGHTNESS = "brightness"
+    EFFECT = "effect"
 
 
 class LightControllerType(str, Enum):

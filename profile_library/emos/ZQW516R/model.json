@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-12-22T15:07:26.348524",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 1,
+    "VERSION": "v1.16.6:docker"
+  },
+  "name": "Emos GoSmart A65 14W",
+  "standby_power": 0.5,
+  "author": "SamK <samotion2@gmail.com>"
+}

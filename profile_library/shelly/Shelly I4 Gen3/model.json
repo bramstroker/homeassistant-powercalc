@@ -1,0 +1,25 @@
+{
+  "created_at": "2025-01-27T11:56:26",
+  "measure_description": "Measured with 6.85W (average over 300s) dummy load over 300s and calculated average. Multiple combinations of settings were tested. Only eco mode only has an effect when WLAN-AP (range extender) is disabled.",
+  "measure_device": "Shelly PM Mini Gen3 (S3PM-001PCEU16)",
+  "measure_method": "script",
+  "measure_settings": {
+    "VERSION": "v1.17.1:docker"
+  },
+  "name": "Shelly I4 Gen3",
+  "alias": [
+    "S3SN-0024X"
+  ],
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "discovery_by": "device",
+  "device_type": "generic_iot",
+  "only_self_usage": true,
+  "calculation_strategy": "fixed",
+  "config_flow_discovery_remarks": "This device contains four button/switch detectors but does not switch itself any electrical devices.",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN + BT + ECO\": All three turned on, repeater turned off.\n\"WLAN + ECO\": Both turned on, repeater turned off.\n\"Other combinations\": For all other combinations. Maximum device power draw.",
+  "author": "CV",
+  "description": "Shelly i4 device to connect simple switches or buttons to for input. This device does not itself contain a rely."
+}

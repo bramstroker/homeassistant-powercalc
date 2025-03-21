@@ -1,6 +1,9 @@
 {
   "common": {
-    "remarks_smart_switch": "Este perfil solo provee valores de potencia en espera (standby). \nCuando tienes un aparato que encendido consume una cantidad fija de potencia, puedes proveer ese valor en el siguiente paso de la configuración"
+    "source_entity": "Source entity",
+    "source_device": "Source device",
+    "remarks_smart_switch": "Este perfil solo provee valores de potencia en espera (standby). \nCuando tienes un aparato que encendido consume una cantidad fija de potencia, puedes proveer ese valor en el siguiente paso de la configuración",
+    "remarks_smart_dimmer": "Este perfil solo proporciona valores de energía en Standby. \n En el siguiente paso puedes proporcionar opcionalmente los valores de la luz conectada"
   },
   "config": {
     "abort": {
@@ -9,7 +12,7 @@
     "error": {
       "daily_energy_mandatory": "Debes proveer al menos un valor o valor en plantilla",
       "entity_mandatory": "El sensor ya está configurado, especifique un identificador único (\"unique_id\")",
-      "fixed_mandatory": "Deber proveer al menos uno de los siguientes: potencia, potencia en plantilla, o potencia en un estado",
+      "fixed_mandatory": "Debes proveer al menos uno de los siguientes: potencia, potencia en plantilla, o potencia en un estado",
       "fixed_states_power_only": "Esta entidad solamente funciona con \"states_power\" y no con \"power\"",
       "group_mandatory": "Debes definir como mínimo subgrupos o potencia y entidades de energía",
       "linear_mandatory": "Debes proveer al menos potencia máxima (max_power) o calibrar",
@@ -22,10 +25,29 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Seleccionar grupo(s)",
+          "new_group": "Nuevo grupo"
+        },
+        "data_description": {
+          "new_group": "Rellena un nombre de grupo personalizado para crear un nuevo grupo"
+        },
+        "title": "Asignar a grupo"
+      },
+      "availability_entity": {
+        "data": {
+          "availability_entity": "Entidad de disponibilidad"
+        },
+        "data_description": {
+          "availability_entity": "Cuando esta entidad no está disponible, el sensor powercalc tampoco estará disponible"
+        },
+        "title": "Entidad de disponibilidad",
+        "description": "Este perfil es por dispositivo. Por favor, selecciona la entidad que se utilizará para determinar la disponibilidad del sensor powercalc"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Crear contadores eléctricos",
-          "group": "Añadir a un grupo",
           "name": "Nombre",
           "on_time": "Tiempo encendido",
           "start_time": "Hora de inicio",
@@ -35,7 +57,6 @@
           "value_template": "Plantilla de valor"
         },
         "data_description": {
-          "group": "Rellena un nombre de grupo customizado para crear un nuevo grupo",
           "on_time": "Cuando se deja vacío es 1 día por defecto. Siempre encendido",
           "update_frequency": "tiempo en segundos entre actualizaciones del estado del sensor"
         },
@@ -73,6 +94,7 @@
           "create_utility_meters": "Crear contadores eléctricos",
           "disable_extended_attributes": "Deshabilitar atributos extendidos",
           "disable_library_download": "Deshabilitar descarga de biblioteca remota",
+          "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Forzar frecuencia de actualización",
           "ignore_unavailable_state": "Ignorar estados no disponibles",
           "include_non_powercalc_sensors": "Incluye sensores no powercalc",
@@ -85,6 +107,7 @@
           "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc.",
           "disable_extended_attributes": "Deshabilitar todos los atributos extras que powercalc añade a la potencia, energía y estados de entidad de grupo. Esto ayudará a mantener la base de datos pequeña",
           "disable_library_download": "Deshabilitar la función de descarga de la biblioteca de Powercalc",
+          "discovery_exclude_device_types": "Exclude device types from the discovery process",
           "force_update_frequency": "Intervalo en el que se actualiza el estado del sensor, incluso cuando el valor de energía permanece igual. En segundos",
           "ignore_unavailable_state": "Mantener los sensores de Powercalc disponibles, incluso cuando la entidad original no esté disponible",
           "include_non_powercalc_sensors": "Controlar si quieres incluir sensores no powercalc en grupos"
@@ -117,6 +140,8 @@
           "device": "Dispositivo",
           "force_calculate_group_energy": "Forzar cálculo de energía",
           "group_energy_entities": "Entidades de energía adicionales",
+          "group_energy_start_at_zero": "Comenzar en cero",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Sensores de powercalc miembros",
           "group_power_entities": "Entidades de potencia adicionales",
           "hide_members": "Ocultar miembros",
@@ -130,12 +155,51 @@
           "device": "Añadir las entidades de grupo que powercalc crea a un dispositivo existente",
           "force_calculate_group_energy": "Por defecto powercalc suma los sensores de energía de los sensores miembros. Cambia esta opción para forzar la creación de un sensor \"Riemann Sum\"",
           "group_energy_entities": "Sensores de energía adicionales (kWh) de la instalación de HA para incluir",
+          "group_energy_start_at_zero": "Cuando está habilitado, el sensor de energía comenzará en cero cuando se cree el sensor. De lo contrario, se sumará todos los estados del sensor de energía actual",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Sensores de Powercalc a incluir en el grupo",
           "group_power_entities": "Sensores de potencia adicionales (W) de tu HA para incluir",
           "include_non_powercalc_sensors": "Controlar si incluir sensores no powercalc al usar la opción de área",
           "sub_groups": "Todos los sensores de los subgrupos seleccionados serán añadidos también a este grupo"
         },
         "title": "Crear gurpo de sensores"
+      },
+      "group_subtract": {
+        "data": {
+          "create_energy_sensor": "Crear sensor de energía",
+          "create_utility_meters": "Crear contadores eléctricos",
+          "entity_id": "Entidad base",
+          "name": "Nombre",
+          "subtract_entities": "Restar entidades"
+        },
+        "data_description": {
+          "entity_id": "La entidad base de la que restar la potencia",
+          "subtract_entities": "Seleccione todas las entidades que desea restar de la entidad base"
+        },
+        "title": "Restar sensor de grupo"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Sensor de potencia general",
+          "group_tracked_auto": "Entidades añadidas automáticamente",
+          "create_energy_sensor": "Crear sensor de energía",
+          "create_utility_meters": "Crear contadores eléctricos"
+        },
+        "data_description": {
+          "main_power_sensor": "Selecciona el sensor de potencia que contiene su consumo total de potencia. Cuando se deja vacío, sólo se creará un sensor de potencia rastreado",
+          "group_tracked_auto": "Powercalc añadirá automáticamente todos los sensores de potencia al grupo rastreado, omitiendo grupos powercalc. Deshabilita esto cuando quieras definir manualmente las entidades rastreadas",
+          "create_energy_sensor": "Si powercalc necesita crear un sensor de kWh",
+          "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc."
+        },
+        "description": "Crear un sensor de grupo para toda la potencia rastreada y no rastreada",
+        "title": "Crear un sensor de potencia rastreado"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Entidades rastreadas"
+        },
+        "description": "Selecciona todos los sensores de potencia que son parte del consumo rastreado. Ya está relleno de forma automática, pero puedes ajustarlo manualmente",
+        "title": "Seleccionar entidades de potencia"
       },
       "library": {
         "data": {
@@ -144,7 +208,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Si eliges no confirmar, puedes introducir el fabricante y el modelo tú mismo"
         },
-        "description": "El fabricante \"{manufacturer}\" y el modelo \"{model}\" fueron detectados automáticamente en su dispositivo.{remarks}",
+        "description": "{source}\n\nEl fabricante \"{manufacturer}\" y el modelo \"{model}\" fueron detectados automáticamente en su dispositivo.{remarks}",
         "title": "Biblioteca"
       },
       "library_multi_profile": {
@@ -186,7 +250,8 @@
         "menu_options": {
           "group_custom": "Estándar",
           "group_domain": "Dominio basado en",
-          "group_subtract": "Restar"
+          "group_subtract": "Restar",
+          "group_tracked_untracked": "Potencia rastreada/no rastreada"
         },
         "title": "Elija el tipo de grupo",
         "description": "Seleccione el tipo de sensor de grupo que desea crear. Elija un grupo basado en dominios si desea agrupar todas las entidades de un dominio específico, o crea un sensor que sume todo su sensor de energía. Elegir grupo estándar de otro modo"
@@ -256,25 +321,11 @@
         "description": "Actualmente los ajustes específicos solo pueden configurarse globalmente",
         "title": "Crear un sensor de energía para un sensor de potencia existente"
       },
-      "group_subtract": {
-        "data": {
-          "create_energy_sensor": "Crear sensor de energía",
-          "create_utility_meters": "Crear contadores eléctricos",
-          "entity_id": "Entidad base",
-          "name": "Nombre",
-          "subtract_entities": "Restar entidades"
-        },
-        "data_description": {
-          "entity_id": "La entidad base de la que restar la potencia",
-          "subtract_entities": "Seleccione todas las entidades que desea restar de la entidad base"
-        },
-        "title": "Restar sensor de grupo"
-      },
       "sub_profile": {
         "data": {
           "sub_profile": "Subperfil"
         },
-        "description": "Este modelo tiene múltiples subperfiles. Seleccione uno que se adapte a su dispositivo",
+        "description": "Este modelo tiene múltiples subperfiles. Seleccione uno que se adapte a su dispositivo\n\n\"{entity_id}\"{remarks}",
         "title": "Configuración del subperfil"
       },
       "smart_switch": {
@@ -323,7 +374,6 @@
           "create_energy_sensor": "Crear sensor de energía",
           "create_utility_meters": "Crear contadores eléctricos",
           "entity_id": "Entidad original",
-          "group": "Añadir al Grupo",
           "mode": "Estrategia de cálculo",
           "name": "Nombre",
           "standby_power": "Potencia en espera (standby)"
@@ -332,7 +382,6 @@
           "create_energy_sensor": "Si powercalc necesita crear un sensor de kWh",
           "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc.",
           "entity_id": "entidad en la que se basa la potencia virtual, el sensor de energía escuchará los cambios de estado de esta entidad para ser actualizada",
-          "group": "Rellena un nombre de grupo personalizado para crear un nuevo grupo",
           "name": "Dejar en blanco utilizará el nombre del dispositivo original",
           "standby_power": "Definir la cantidad de energía que consume el dispositivo cuando está apagado"
         },
@@ -353,6 +402,20 @@
     "deprecated_platform_yaml": {
       "description": "La configuración de los sensores usando `sensor->plataform` está ahora obsoleta. Necesita cambiar su configuración a `powercalc->sensores`. Haga clic en 'Learn more' para más instrucciones.",
       "title": "La configuración de Powercalc YAML se ha movido"
+    },
+    "sub_profile": {
+      "fix_flow": {
+        "step": {
+          "sub_profile": {
+            "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"{remarks}",
+            "title": "Select correct sub profile",
+            "data": {
+              "sub_profile": "Sub profile"
+            }
+          }
+        }
+      },
+      "title": "Sub profile selection required for {entry}"
     }
   },
   "options": {
@@ -442,6 +505,7 @@
           "create_utility_meters": "Crear contadores eléctricos",
           "disable_extended_attributes": "Deshabilitar atributos extendidos",
           "disable_library_download": "Deshabilitar descarga de biblioteca remota",
+          "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Forzar frecuencia de actualización",
           "ignore_unavailable_state": "Ignorar estado no disponible",
           "include_non_powercalc_sensors": "Incluir sensores que no son powercalc",
@@ -454,6 +518,7 @@
           "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc.",
           "disable_extended_attributes": "Deshabilitar todos los atributos extras que powercalc añade a la potencia, energía y estados de entidad de grupo. Esto ayudará a mantener la base de datos pequeña",
           "disable_library_download": "Deshabilitar la función de descarga de la biblioteca de Powercalc",
+          "discovery_exclude_device_types": "Exclude device types from the discovery process",
           "force_update_frequency": "Intervalo en el que se actualiza el estado del sensor, incluso cuando el valor de energía permanece igual. En segundos",
           "ignore_unavailable_state": "Mantener los sensores de Powercalc disponibles, incluso cuando la entidad original no esté disponible",
           "include_non_powercalc_sensors": "Controlar si quieres incluir sensores no powercalc en grupos"
@@ -487,6 +552,7 @@
           "device": "Dispositivo",
           "force_calculate_group_energy": "Forzar cálculo de energía",
           "group_energy_entities": "Entidades de energía adicionales",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Sensores miembros de powercalc",
           "group_power_entities": "Entidades de potencia adicionales",
           "hide_members": "Ocultar miembros",
@@ -498,11 +564,45 @@
           "device": "Añadir las entidades de grupo que powercalc crea a un dispositivo existente",
           "force_calculate_group_energy": "Por defecto powercalc suma los sensores de energía de los sensores miembros. Cambia esta opción para forzar la creación de un sensor \"Riemann Sum\"",
           "group_energy_entities": "Sensores de energía adicionales (kWh) de la instalación de HA para incluir",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Sensores de Powercalc a incluir en el grupo",
           "group_power_entities": "Sensores de potencia adicionales (W) de tu HA para incluir",
           "include_non_powercalc_sensors": "Controlar si incluir sensores no powercalc al usar la opción de área",
           "sub_groups": "Todos los sensores de los subgrupos seleccionados serán añadidos también a este grupo"
         }
+      },
+      "group_subtract": {
+        "data": {
+          "entity_id": "Entidad base",
+          "subtract_entities": "Restar entidades"
+        },
+        "data_description": {
+          "entity_id": "La entidad base de la que restar la potencia",
+          "subtract_entities": "Seleccione todas las entidades que desea restar de la entidad base"
+        },
+        "title": "Opciones de grupo"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Sensor de potencia general",
+          "group_tracked_auto": "Entidades añadidas automáticamente",
+          "create_energy_sensor": "Crear sensor de energía",
+          "create_utility_meters": "Crear contadores eléctricos"
+        },
+        "data_description": {
+          "main_power_sensor": "Selecciona el sensor de potencia que contiene su consumo total de potencia. Cuando se deja vacío, sólo se creará un sensor de potencia rastreado",
+          "group_tracked_auto": "Powercalc añadirá automáticamente todos los sensores de potencia al grupo rastreado, omitiendo grupos powercalc. Deshabilita esto cuando quieras definir manualmente las entidades rastreadas",
+          "create_energy_sensor": "Si powercalc necesita crear un sensor de kWh",
+          "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc."
+        },
+        "description": "Crear un sensor de grupo para toda la potencia rastreada y no rastreada",
+        "title": "Crear un sensor de potencia rastreado"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Entidades rastreadas"
+        },
+        "title": "Seleccionar entidades de potencia"
       },
       "init": {
         "menu_options": {
@@ -510,13 +610,15 @@
           "basic_options": "Opciones básicas",
           "daily_energy": "Opciones de energía diarias",
           "fixed": "Opciones fijadas",
-          "group": "Opciones de grupo",
+          "group_custom": "Opciones de grupo",
+          "group_subtract": "Opciones de grupo",
+          "group_tracked_untracked": "Opciones de grupo",
+          "group_tracked_untracked_manual": "Entidades rastreadas",
           "library_options": "Opciones de biblioteca",
           "linear": "Opciones lineales",
           "playbook": "Opciones de Reproducciones",
           "multi_switch": "Opciones multi-interruptor",
           "real_power": "Opciones de potencia real",
-          "group_subtract": "Opciones de grupo",
           "utility_meter_options": "Opciones de contador eléctrico",
           "wled": "Opciones de WLED"
         }
@@ -575,17 +677,6 @@
         "data_description": {
           "device": "Agrega el sensor de energía creado a un dispositivo específico"
         }
-      },
-      "group_subtract": {
-        "data": {
-          "entity_id": "Entidad base",
-          "subtract_entities": "Restar entidades"
-        },
-        "data_description": {
-          "entity_id": "La entidad base de la que restar la potencia",
-          "subtract_entities": "Seleccione todas las entidades que desea restar de la entidad base"
-        },
-        "title": "Opciones de grupo"
       },
       "utility_meter_options": {
         "title": "Opciones del contador electrico",
@@ -658,6 +749,10 @@
       "description": "Obtener reproducción ejecutándose actualmente",
       "name": "Obtener reproducción activa"
     },
+    "get_group_entities": {
+      "description": "Obtener todos los entitiy ids de un grupo de energía o sensor de potencia",
+      "name": "Obtener entidades de grupo"
+    },
     "increase_daily_energy": {
       "description": "Incrementa el sensor con una cantidad determinada.",
       "fields": {
@@ -667,6 +762,10 @@
         }
       },
       "name": "Aumentar el sensor de energía diario"
+    },
+    "reload": {
+      "description": "Reload Powercalc configuration and entities",
+      "name": "Reload"
     },
     "reset_energy": {
       "description": "Restablecer un sensor de energía a cero kWh.",

@@ -1,0 +1,35 @@
+{
+  "name": "My device",
+  "measure_method": "manual",
+  "measure_device": "xx",
+  "device_type": "generic_iot",
+  "calculation_strategy": "composite",
+  "fields": {
+    "some_entity": {
+      "label": "Some entity",
+      "description": "Select some entity",
+      "selector": {
+        "entity": {
+          "domain": "sensor"
+        }
+      }
+    }
+  },
+  "composite_config": [
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[some_entity]]",
+        "state": "on"
+      },
+      "fixed": {
+        "power": 20
+      }
+    },
+    {
+      "fixed": {
+        "power": 10
+      }
+    }
+  ]
+}

@@ -56,8 +56,6 @@ class MockLight(MockToggleEntity, LightEntity):
     """Mock light class."""
 
     color_mode = ColorMode.BRIGHTNESS
-    max_mireds = 500
-    min_mireds = 153
     supported_color_modes: ClassVar = [ColorMode.BRIGHTNESS]
     supported_features = LightEntityFeature(0)
 
