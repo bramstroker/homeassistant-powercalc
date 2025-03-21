@@ -10,5 +10,6 @@
     "VERSION": "v1.17.9:docker"
   },
   "name": "Phillips Calla Large Outdoor Pedestal",
-  "standby_power": 0.32
+  "standby_power": 0.32,
+  "author": "James Nobes <james@Jamess-MacBook-Pro.local>"
 }
