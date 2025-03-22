@@ -9,6 +9,7 @@ class LutMode(str, Enum):
     COLOR_TEMP = "color_temp"
     BRIGHTNESS = "brightness"
     EFFECT = "effect"
+    WHITE = "white"
 
 
 class LightControllerType(str, Enum):

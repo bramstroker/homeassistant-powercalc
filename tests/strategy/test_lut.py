@@ -131,6 +131,28 @@ async def test_effect_lut(hass: HomeAssistant, effect: str, brightness: int, exp
     )
 
 
+async def test_color_mode_white(hass: HomeAssistant) -> None:
+    """Test LUT lookup in effect mode"""
+    strategy = await _create_lut_strategy(
+        hass,
+        "test",
+        "test",
+        custom_profile_dir=get_test_profile_dir("lut_white"),
+    )
+    await _calculate_and_assert_power(
+        strategy,
+        state=State(
+            "light.test",
+            STATE_ON,
+            {
+                ATTR_COLOR_MODE: ColorMode.WHITE,
+                ATTR_BRIGHTNESS: 10,
+            },
+        ),
+        expected_power=10,
+    )
+
+
 async def test_effect_mode_unsupported(hass: HomeAssistant) -> None:
     """
     Test light is set in effect mode, but effect is not supported by the profile.

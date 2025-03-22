@@ -95,6 +95,9 @@ class LightRunner(MeasurementRunner):
     def prepare_measurements_for_mode(self, export_directory: str, mode: LutMode) -> MeasurementRunInput:
         """Fetch all variations for the given color mode and prepare the measurement session."""
 
+        if mode == LutMode.WHITE:
+            mode = LutMode.BRIGHTNESS
+
         csv_file_path = f"{export_directory}/{mode.value}.csv"
 
         resume_at = None
@@ -119,6 +122,14 @@ class LightRunner(MeasurementRunner):
         """Run the measurement session for lights"""
 
         mode = measurement_info.mode
+        if mode == LutMode.WHITE:
+            self.light_controller.change_light_state(
+                mode,
+                on=True,
+                bri=255,
+            )
+            mode = LutMode.BRIGHTNESS
+
         file_write_mode = "w"
         write_header_row = True
         if measurement_info.is_resuming:

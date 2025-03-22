@@ -39,6 +39,7 @@ class HassLightController(LightController):
             LutMode.COLOR_TEMP: self.build_ct_json_body,
             LutMode.BRIGHTNESS: self.build_bri_json_body,
             LutMode.EFFECT: self.build_effect_json_body,
+            LutMode.WHITE: self.build_white_json_body,
         }.get(lut_mode, self.build_bri_json_body)(**kwargs)
 
         try:
@@ -115,6 +116,12 @@ class HassLightController(LightController):
             "entity_id": self._entity_id,
             "effect": effect,
             "brightness": bri,
+        }
+
+    def build_white_json_body(self, bri: int) -> dict:
+        return {
+            "entity_id": self._entity_id,
+            "white": bri,
         }
 
     @staticmethod
