@@ -16,7 +16,7 @@
     "apicache": "^1.6.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "express": "^5.0.0",
     "express-prom-bundle": "^8.0.0",
     "pino": "^9.0.0",
     "pino-pretty": "^13.0.0",
