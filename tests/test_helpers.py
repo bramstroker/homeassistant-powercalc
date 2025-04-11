@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from decimal import Decimal
 from unittest.mock import PropertyMock, patch
 
@@ -14,24 +15,23 @@ from custom_components.powercalc.helpers import evaluate_power, get_or_create_un
 
 
 @pytest.mark.parametrize(
-    "power,output",
+    "power_factory,expected_output",
     [
-        (Template("unknown"), None),
-        (Template("{{ 1 + 3 | float }}"), Decimal("4.0")),
-        (20.5, Decimal("20.5")),
-        ("foo", None),
-        (Decimal("40.65"), Decimal("40.65")),
-        ((1, 2), None),
+        (lambda hass: Template("unknown", hass), None),
+        (lambda hass: Template("{{ 1 + 3 | float }}", hass), Decimal("4.0")),
+        (lambda hass: 20.5, Decimal("20.5")),
+        (lambda hass: "foo", None),
+        (lambda hass: Decimal("40.65"), Decimal("40.65")),
+        (lambda hass: (1, 2), None),
     ],
 )
 async def test_evaluate_power(
     hass: HomeAssistant,
-    power: Template | Decimal | float,
-    output: Decimal | None,
+    power_factory: Callable[[HomeAssistant], Template | Decimal | float],
+    expected_output: Decimal | None,
 ) -> None:
-    if isinstance(power, Template):
-        power.hass = hass
-    assert await evaluate_power(power) == output
+    power = power_factory(hass)
+    assert await evaluate_power(power) == expected_output
 
 
 @patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception()))
