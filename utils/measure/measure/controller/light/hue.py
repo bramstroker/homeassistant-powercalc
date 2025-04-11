@@ -4,7 +4,7 @@ import os
 from typing import Any
 
 import inquirer
-from phue import Bridge, PhueRegistrationException
+from phue import Bridge, PhueRegistrationException, PhueRequestTimeout
 
 from measure.const import PROJECT_DIR
 from measure.controller.light.const import LutMode
@@ -30,10 +30,18 @@ class HueLightController(LightController):
         **kwargs: Any,  # noqa: ANN401
     ) -> None:
         kwargs["on"] = on
-        if self.is_group:
-            self.bridge.set_group(self.light_id, kwargs)
-        else:
-            self.bridge.set_light(self.light_id, kwargs)
+        for attempt in range(3):
+            try:
+                if self.is_group:
+                    self.bridge.set_group(self.light_id, kwargs)
+                else:
+                    self.bridge.set_light(self.light_id, kwargs)
+                return
+            except PhueRequestTimeout as e:
+                if attempt == 2:
+                    raise LightControllerError(
+                        f"Failed to set light state after 3 attempts: {e}",
+                    ) from e
 
     def get_light_info(self) -> LightInfo:
         if self.is_group:
