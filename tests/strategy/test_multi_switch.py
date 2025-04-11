@@ -106,13 +106,6 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
         {
             CONF_NAME: "My sensor",
             CONF_MULTI_SWITCH: {
-                CONF_POWER: 0.5,
-                CONF_POWER_OFF: 1,
-            },
-        },
-        {
-            CONF_NAME: "My sensor",
-            CONF_MULTI_SWITCH: {
                 CONF_POWER_OFF: 0.5,
                 CONF_ENTITIES: [
                     "switch.test1",
