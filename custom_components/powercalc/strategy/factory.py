@@ -200,8 +200,6 @@ class PowerCalculatorStrategyFactory:
             raise StrategyConfigurationError("No multi_switch configuration supplied")
 
         entities: list[str] = multi_switch_config.get(CONF_ENTITIES, [])
-        if not entities:
-            raise StrategyConfigurationError("No switch entities supplied")
 
         on_power: Decimal | None = multi_switch_config.get(CONF_POWER)
         off_power: Decimal | None = multi_switch_config.get(CONF_POWER_OFF)

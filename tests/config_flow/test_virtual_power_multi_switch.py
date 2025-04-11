@@ -212,6 +212,31 @@ async def test_regression_2612(hass: HomeAssistant, mock_entity_with_model_infor
     assert hass.states.get("sensor.foo_bar_energy")
 
 
+async def test_setup_without_switches(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+    """
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/3218
+
+    Shelly 2.5 can have detached switches
+    Allow the user to setup this multi_switch profile without selecting any switches
+    """
+
+    hass.config.config_dir = get_test_config_dir()
+    device_entry = mock_device_with_switches(hass, 0)
+
+    result = await initialize_device_discovery_flow(hass, device_entry)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+    state = hass.states.get("sensor.test_power")
+    assert state
+    assert state.state == "0.50"
+
+
 async def test_light_switches_selectable(hass: HomeAssistant) -> None:
     """
     Some integrations allow you to change the type of a switch to light.

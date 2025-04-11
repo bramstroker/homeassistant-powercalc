@@ -697,7 +697,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             )
 
         default_entities = entity_selector.config.get("include_entities", [])
-        schema = vol.Schema({vol.Required(CONF_ENTITIES, default=default_entities): entity_selector})
+        schema = vol.Schema({vol.Optional(CONF_ENTITIES, default=default_entities): entity_selector})
 
         if not self.is_library_flow:
             schema = schema.extend(SCHEMA_POWER_MULTI_SWITCH_MANUAL.schema)
