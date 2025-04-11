@@ -49,7 +49,7 @@ async def create_subtract_group_sensors(
     sensors: list[Entity] = []
     power_sensor = SubtractGroupSensor(
         hass,
-        group_name,
+        name,
         config,
         entity_id,
         base_entity_id,
