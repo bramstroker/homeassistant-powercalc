@@ -29,7 +29,7 @@ class ProfileLibrary:
         self._hass = hass
         self._loader = loader
         self._profiles: dict[str, list[PowerProfile]] = {}
-        self._manufacturer_models: dict[str, list[str]] = {}
+        self._manufacturer_models: dict[str, set[str]] = {}
         self._manufacturer_device_types: dict[str, list] = {}
 
     async def initialize(self) -> None:
@@ -71,24 +71,24 @@ class ProfileLibrary:
         manufacturers = await self._loader.get_manufacturer_listing(device_types)
         return sorted(manufacturers)
 
-    async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None = None) -> list[str]:
+    async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None = None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
 
         resolved_manufacturers = await self._loader.find_manufacturers(manufacturer)
         if not resolved_manufacturers:
-            return []
-        all_models: list[str] = []
+            return set()
+        all_models: set[str] = set()
         for manufacturer in resolved_manufacturers:
             cache_key = f"{manufacturer}/{device_types}"
             cached_models = self._manufacturer_models.get(cache_key)
             if cached_models:
-                all_models.extend(cached_models)
+                all_models.update(cached_models)
                 continue
             models = await self._loader.get_model_listing(manufacturer, device_types)
-            self._manufacturer_models[cache_key] = sorted(models)
-            all_models.extend(models)
+            self._manufacturer_models[cache_key] = models
+            all_models.update(models)
 
-        return all_models
+        return set(sorted(all_models))  # noqa: C414
 
     async def get_profile(
         self,

@@ -40,6 +40,12 @@ async def test_model_listing(hass: HomeAssistant, manufacturer: str, expected_mo
         assert model in models
 
 
+async def test_model_listing_sorted(hass: HomeAssistant) -> None:
+    library = await ProfileLibrary.factory(hass)
+    models = await library.get_model_listing("signify")
+    assert models == set(sorted(models))  # noqa: C414
+
+
 @pytest.mark.parametrize(
     "model_info,expected_models",
     [
