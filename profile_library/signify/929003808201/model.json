@@ -10,7 +10,7 @@
     "VERSION": "v1.17.10:docker"
   },
   "name": "Hue Argenta color spot",
-  "standby_power": 0.1,
+  "standby_power": 0.4,
   "aliases": [
     "929003808201_01",
     "929003808201_02",
