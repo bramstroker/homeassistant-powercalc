@@ -4,7 +4,7 @@
   "measure_device": "GWPN1, GreenWave Reality Inc.",
   "name": "STARKVIND Air purifier table",
   "standby_power": 0.2,
-  "linear": {
+  "linear_config": {
     "attribute": "percentage",
     "calibrate": [
       "1 -> 1.6",
@@ -19,10 +19,6 @@
       "90 -> 24.5",
       "100 -> 24.8"
     ]
-  },
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
   },
   "device_type": "fan",
   "calculation_strategy": "linear",
