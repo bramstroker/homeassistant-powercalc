@@ -27,6 +27,7 @@ from measure.runner.average import AverageRunner
 from measure.runner.charging import ChargingRunner
 from measure.runner.const import QUESTION_MODE
 from measure.runner.errors import RunnerError
+from measure.runner.fan import FanRunner
 from measure.runner.light import LightRunner
 from measure.runner.recorder import RecorderRunner
 from measure.runner.runner import MeasurementRunner
@@ -53,6 +54,7 @@ logging.basicConfig(
 MEASURE_TYPE_RUNNER = {
     MeasureType.LIGHT: LightRunner,
     MeasureType.SPEAKER: SpeakerRunner,
+    MeasureType.FAN: FanRunner,
     MeasureType.RECORDER: RecorderRunner,
     MeasureType.AVERAGE: AverageRunner,
     MeasureType.CHARGING: ChargingRunner,
@@ -119,6 +121,11 @@ class Measure:
             _LOGGER.info(
                 "Selected media controller: %s",
                 self.config.selected_media_controller,
+            )
+        if self.measure_type == MeasureType.FAN:
+            _LOGGER.info(
+                "Selected fan controller: %s",
+                self.config.selected_fan_controller,
             )
 
         if self.config.selected_measure_type:

@@ -36,6 +36,7 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
             "selected_power_meter": "dummy",
             "selected_media_controller": "dummy",
             "selected_charging_controller": "dummy",
+            "selected_fan_controller": "dummy",
             "sleep_time": 0,
             "sleep_initial": 0,
             "sleep_standby": 0,

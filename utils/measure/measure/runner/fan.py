@@ -43,7 +43,7 @@ class FanRunner(MeasurementRunner):
 
     @staticmethod
     def _build_model_json_data(measurements: dict) -> dict:
-        calibrate_list = [f"{percentage} -> {power}" for percentage, power in measurements]
+        calibrate_list = [f"{percentage} -> {power:.2f}" for percentage, power in measurements.items()]
 
         return {
             "device_type": "fan",
