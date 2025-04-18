@@ -40,7 +40,7 @@ def test_run(mock_config_factory, export_path: str) -> None:  # noqa: ANN001
                 "85 -> 10.50",
                 "90 -> 10.50",
                 "95 -> 10.50",
-                # "85 -> 0.2"
+                "100 -> 10.50",
             ],
         },
     }

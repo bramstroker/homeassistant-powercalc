@@ -33,7 +33,7 @@ class FanRunner(MeasurementRunner):
         export_directory: str,
     ) -> RunnerResult | None:
         measurements: dict[int, float] = {}
-        for percentage in range(0, 100, 5):
+        for percentage in range(0, 101, 5):
             _LOGGER.info("Setting percentage to %d", percentage)
             self.fan_controller.set_percentage(percentage)
             time.sleep(self.config.sleep_time)
