@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from datetime import timedelta
 from enum import StrEnum
-from typing import Literal
 
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 from homeassistant.const import (
@@ -14,6 +13,7 @@ from homeassistant.const import (
     STATE_OPEN,
     STATE_STANDBY,
     STATE_UNAVAILABLE,
+    EntityCategory,
 )
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 
@@ -160,15 +160,10 @@ class UnitPrefix(StrEnum):
     TERA = "T"
 
 
-ENTITY_CATEGORY_CONFIG = "config"
-ENTITY_CATEGORY_DIAGNOSTIC = "diagnostic"
-ENTITY_CATEGORY_NONE: Literal[None] = None
-ENTITY_CATEGORY_SYSTEM = "system"
 ENTITY_CATEGORIES = [
-    ENTITY_CATEGORY_CONFIG,
-    ENTITY_CATEGORY_DIAGNOSTIC,
-    ENTITY_CATEGORY_NONE,
-    ENTITY_CATEGORY_SYSTEM,
+    EntityCategory.CONFIG,
+    EntityCategory.DIAGNOSTIC,
+    None,
 ]
 
 DEFAULT_GROUP_UPDATE_INTERVAL = 60
@@ -179,7 +174,7 @@ DEFAULT_ENERGY_INTEGRATION_METHOD = ENERGY_INTEGRATION_METHOD_LEFT
 DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 DEFAULT_ENERGY_SENSOR_PRECISION = 4
 DEFAULT_ENERGY_UNIT_PREFIX = UnitPrefix.KILO
-DEFAULT_ENTITY_CATEGORY: str | None = ENTITY_CATEGORY_NONE
+DEFAULT_ENTITY_CATEGORY: str | None = None
 DEFAULT_UTILITY_METER_TYPES = [DAILY, WEEKLY, MONTHLY]
 
 DISCOVERY_SOURCE_ENTITY = "source_entity"
