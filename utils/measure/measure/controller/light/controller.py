@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
-import inquirer.questions
-
+from measure.controller.answerable_protocol import Answerable
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 
 
@@ -40,21 +39,13 @@ class LightInfo:
     max_mired = property(get_max_mired, set_max_mired)
 
 
-class LightController(Protocol):
+class LightController(Answerable, Protocol):
     def change_light_state(self, lut_mode: LutMode, on: bool = True, **kwargs: Any) -> None:  # noqa: ANN401
         """Changes the light to a certain setting"""
         ...
 
     def get_light_info(self) -> LightInfo:
         """Get device information about the light"""
-        ...
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        """Get questions to ask for the chosen light controller"""
-        ...
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        """Process the answers of the questions"""
         ...
 
     def has_effect_support(self) -> bool:

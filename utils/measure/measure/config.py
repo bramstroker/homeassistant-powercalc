@@ -4,6 +4,7 @@ from decouple import Choices, UndefinedValueError, config
 
 from measure.const import MeasureType
 from measure.controller.charging.const import ChargingControllerType
+from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import LightControllerType
 from measure.controller.media.const import MediaControllerType
 from measure.powermeter.const import PowerMeterType
@@ -118,6 +119,14 @@ class MeasureConfig:
             "CHARGING_CONTROLLER",
             cast=Choices([t.value for t in ChargingControllerType]),
             default=ChargingControllerType.HASS.value,
+        )
+
+    @property
+    def selected_fan_controller(self) -> FanControllerType:
+        return config(
+            "FAN_CONTROLLER",
+            cast=Choices([t.value for t in FanControllerType]),
+            default=FanControllerType.HASS.value,
         )
 
     @property

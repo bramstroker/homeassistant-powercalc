@@ -1,9 +1,9 @@
-from typing import Any, Protocol
+from typing import Protocol
 
-import inquirer
+from measure.controller.answerable_protocol import Answerable
 
 
-class MediaController(Protocol):
+class MediaController(Answerable, Protocol):
     def set_volume(self, volume: int) -> None: ...
 
     def mute_volume(self) -> None: ...
@@ -11,7 +11,3 @@ class MediaController(Protocol):
     def play_audio(self, stream_url: str) -> None: ...
 
     def turn_off(self) -> None: ...
-
-    def get_questions(self) -> list[inquirer.questions.Question]: ...
-
-    def process_answers(self, answers: dict[str, Any]) -> None: ...
