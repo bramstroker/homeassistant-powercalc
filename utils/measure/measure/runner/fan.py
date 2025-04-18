@@ -10,11 +10,6 @@ from measure.controller.fan.factory import FanControllerFactory
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasureUtil
 
-DURATION_PER_VOLUME_LEVEL = 20
-STREAM_URL = "https://powercalc.s3.eu-west-1.amazonaws.com/g_pink.mp3"
-SLEEP_PRE_MEASURE = 2
-SLEEP_MUTE = 5
-
 _LOGGER = logging.getLogger("measure")
 
 
