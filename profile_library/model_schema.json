@@ -99,6 +99,7 @@
       "enum": [
         "camera",
         "cover",
+        "fan",
         "generic_iot",
         "light",
         "power_meter",

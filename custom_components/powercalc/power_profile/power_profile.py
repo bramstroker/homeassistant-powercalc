@@ -13,6 +13,7 @@ from typing import Any, NamedTuple, Protocol, cast
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
 from homeassistant.components.cover import DOMAIN as COVER_DOMAIN
+from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -38,6 +39,7 @@ _LOGGER = logging.getLogger(__name__)
 class DeviceType(StrEnum):
     CAMERA = "camera"
     COVER = "cover"
+    FAN = "fan"
     GENERIC_IOT = "generic_iot"
     LIGHT = "light"
     POWER_METER = "power_meter"
@@ -72,6 +74,7 @@ class CustomField:
 DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
+    DeviceType.FAN: FAN_DOMAIN,
     DeviceType.GENERIC_IOT: SENSOR_DOMAIN,
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
