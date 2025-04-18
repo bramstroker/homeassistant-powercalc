@@ -9,10 +9,6 @@
       
       
       
-        <link rel="prev" href="../../strategies/composite/">
-      
-      
-        <link rel="next" href="../sensor-configuration/">
       
       
       <link rel="icon" href="../../img/logo.svg">
@@ -20,7 +16,7 @@
     
     
       
-        <title>Global configuration - Powercalc documentation</title>
+        <title>Entity Category - Powercalc documentation</title>
       
     
     
@@ -72,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#global-configuration" class="md-skip">
+        <a href="#entity-category" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +101,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Global configuration
+              Entity Category
             
           </span>
         </div>
@@ -298,13 +294,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../global-configuration/" class="md-tabs__link">
           
   
   
@@ -1192,10 +1186,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -1213,22 +1205,19 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1241,7 +1230,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Configuration
@@ -1252,32 +1241,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Global configuration
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../global-configuration/" class="md-nav__link">
         
   
   
@@ -1288,62 +1255,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#gui-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      GUI configuration
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#yaml-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      YAML configuration
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuration options
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#change-gui-configuration-action" class="md-nav__link">
-    <span class="md-ellipsis">
-      Change GUI configuration action
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2837,7 +2748,7 @@
 
 
   
-    <a href="https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/source/configuration/global-configuration.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/source/configuration/entity-category.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2845,213 +2756,10 @@
   
 
 
-<h1 id="global-configuration">Global configuration</h1>
-<p>Powercalc offers configuration options that can be set globally. These global settings will apply to all sensors created with Powercalc.
-However, if you configure settings for an individual sensor, those specific settings will take precedence over the global configuration for that sensor.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Sensors created with the GUI do have a configuration set for <code>create_energy_sensors</code>, <code>create_utility_meters</code>, <code>ignore_unavailable_state</code> and <code>energy_integration_method</code>, changing global configuration will not affect the existing GUI configuration entries, to make it easy to change all of them Powercalc provides an action <code>powercalc.change_gui_config</code>. Refer to <a href="#change-gui-configuration-action">Change GUI configuration action</a>.</p>
-</div>
-<p>Global configuration can be defined both in <code>configuration.yaml</code> and in the GUI.</p>
-<h2 id="gui-configuration">GUI configuration</h2>
-<p>Click the button to go to the Powercalc configuration flow:</p>
-<p><a href="https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc"><img alt="config_flow_start" src="https://my.home-assistant.io/badges/config_flow_start.svg" /></a></p>
-<p>Select <code>Global configuration</code> and follow the instructions.</p>
-<p>When you'd like the change the configuration later, go to the Powercalc integration page, find the <code>Global configuration</code> entry and click on <code>Configure</code>.</p>
-<p><img alt="Configure" src="../../img/global_config_configure.png" /></p>
-<h2 id="yaml-configuration">YAML configuration</h2>
-<p>You can add the options to <code>configuration.yaml</code> under the <code>powercalc:</code> property, like so:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">powercalc</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">force_update_frequency</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">00:01:00</span><span class="w"> </span><span class="c1">#Each minute</span>
-<span class="w">  </span><span class="nt">power_sensor_naming</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{}</span><span class="nv"> </span><span class="s">Powersensor&quot;</span>
-<span class="w">  </span><span class="nt">create_energy_sensors</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-</code></pre></div>
-<h2 id="configuration-options">Configuration options</h2>
-<p>All the possible options are listed below.</p>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Requirement</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>create_domain_groups</td>
-<td>list</td>
-<td><strong>Optional</strong></td>
-<td></td>
-<td>Create grouped power sensor aggregating all powercalc sensors of given domains, see <a href="../../sensor-types/group/domain/">domain group</a></td>
-</tr>
-<tr>
-<td>create_energy_sensors</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>true</td>
-<td>Let the component automatically create energy sensors (kWh) for every power sensor</td>
-</tr>
-<tr>
-<td>create_utility_meters</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>false</td>
-<td>Set to <code>true</code> to automatically create utility meters of your energy sensors. See <a href="../../sensor-types/utility-meter/">utility meter</a></td>
-</tr>
-<tr>
-<td>disable_extended_attributes</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>false</td>
-<td>Set to <code>true</code> to disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small especially when you have a lot of powercalc sensors and frequent update ratio</td>
-</tr>
-<tr>
-<td>disable_library_download</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>false</td>
-<td>Set to <code>true</code> to disable the Powercalc library download feature, see <a href="../../library/library/">library</a></td>
-</tr>
-<tr>
-<td>discovery_exclude_device_types</td>
-<td>list</td>
-<td><strong>Optional</strong></td>
-<td></td>
-<td>Exclude device_types from the discovery process.</td>
-</tr>
-<tr>
-<td>enable_autodiscovery</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>true</td>
-<td>Whether you want powercalc to automatically setup power sensors for <a href="https://library.powercalc.nl">supported models</a> in your HA instance.</td>
-</tr>
-<tr>
-<td>energy_sensor_naming</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td>{} energy</td>
-<td>Change the name of the sensors. Use the <code>{}</code> placeholder for the entity name of your appliance. This will also change the entity_id of your sensor</td>
-</tr>
-<tr>
-<td>energy_sensor_friendly_naming</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td></td>
-<td>Change the friendly name of the sensors, Use <code>{}</code> placehorder for the original entity name.</td>
-</tr>
-<tr>
-<td>energy_sensor_category</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td></td>
-<td>Category for the created energy sensors. See <a href="../entity-category/">entity category</a>.</td>
-</tr>
-<tr>
-<td>energy_integration_method</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td>trapezoid</td>
-<td>Integration method for the energy sensor. See <a href="https://www.home-assistant.io/integrations/integration/#method">HA docs</a></td>
-</tr>
-<tr>
-<td>energy_sensor_precision</td>
-<td>numeric</td>
-<td><strong>Optional</strong></td>
-<td>4</td>
-<td>Number of decimals you want for the energy sensors. See <a href="https://www.home-assistant.io/integrations/integration/#round">HA docs</a></td>
-</tr>
-<tr>
-<td>energy_sensor_unit_prefix</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td></td>
-<td>Unit prefix for the energy sensor. See <a href="https://www.home-assistant.io/integrations/integration/#unit_prefix">HA docs</a>. Set to <code>none</code> for to create a Wh sensor</td>
-</tr>
-<tr>
-<td>force_update_frequency</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td>00:10:00</td>
-<td>Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS</td>
-</tr>
-<tr>
-<td>group_update_interval</td>
-<td>numeric</td>
-<td><strong>Optional</strong></td>
-<td>60</td>
-<td>Throttle state changes of group energy sensor to only once every x seconds. 0 is disabled</td>
-</tr>
-<tr>
-<td>ignore_unavailable_state</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>false</td>
-<td>Set to <code>true</code> when you want the power sensor to display a value (0 or <code>standby_power</code>) regardless of whether the source entity is available.</td>
-</tr>
-<tr>
-<td>power_sensor_naming</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td>{} power</td>
-<td>Change the name of the sensors. Use the <code>{}</code> placeholder for the entity name of your appliance. This will also change the entity_id of your sensor</td>
-</tr>
-<tr>
-<td>power_sensor_friendly_naming</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td></td>
-<td>Change the friendly name of the sensors, Use <code>{}</code> placehorder for the original entity name.</td>
-</tr>
-<tr>
-<td>power_sensor_category</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td></td>
-<td>Category for the created power sensors. See <a href="../entity-category/">entity category</a>.</td>
-</tr>
-<tr>
-<td>utility_meter_net_consumption</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>false</td>
-<td>Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative. See <a href="https://www.home-assistant.io/integrations/utility_meter/#net_consumption">utility_net_consumption</a></td>
-</tr>
-<tr>
-<td>utility_meter_offset</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td>00:00:00</td>
-<td>Offset for the utility meters. Format HH:MM:SS. See <a href="https://www.home-assistant.io/integrations/utility_meter/#offset">utility_offset</a></td>
-</tr>
-<tr>
-<td>utility_meter_types</td>
-<td>list</td>
-<td><strong>Optional</strong></td>
-<td>daily, weekly, monthly</td>
-<td>Define which cycles you want to create utility meters for. See <a href="https://www.home-assistant.io/integrations/utility_meter/#cycle">utility_cycle</a></td>
-</tr>
-<tr>
-<td>utility_meter_tariffs</td>
-<td>list</td>
-<td><strong>Optional</strong></td>
-<td></td>
-<td>Define different tariffs. See <a href="https://www.home-assistant.io/integrations/utility_meter/#tariffs">utility_tariffs</a>.</td>
-</tr>
-<tr>
-<td>include_non_powercalc_sensors</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>true</td>
-<td>Control whether you want to include non powercalc sensors in groups. See <a href="../../sensor-types/group/include-entities/">include entities</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="change-gui-configuration-action">Change GUI configuration action</h2>
-<p>To change the configuration options for all Powercalc GUI config entries at once you can utilize the action <code>powercalc.change_gui_config</code>.
-See <a href="../../actions/change-gui-configuration/">Change GUI Configuration</a> for more information.</p>
+<h1 id="entity-category">Entity Category</h1>
+<p>The <code>power_entity_category</code> and <code>energy_entity_category</code> settings define the entity category for the created power and energy sensors.</p>
+<p>In most cases, you won't need to change these. However, setting them to <code>diagnostic</code> can be helpful if you want to hide Powercalc sensors from automatically generated dashboards, especially when many sensors are created.</p>
+<p>Also see <a href="https://developers.home-assistant.io/docs/core/entity/#generic-properties">HA docs</a></p>
 
 
 
@@ -3084,7 +2792,7 @@ See <a href="../../actions/change-gui-configuration/">Change GUI Configuration</
     <span class="md-icon" title="Created">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 9, 2024 07:15:36">August 9, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 18, 2025 07:00:26">April 18, 2025</span>
   </span>
 
     
@@ -3116,44 +2824,6 @@ See <a href="../../actions/change-gui-configuration/">Change GUI Configuration</
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../../strategies/composite/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Composite">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                Composite
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../sensor-configuration/" class="md-footer__link md-footer__link--next" aria-label="Next: Sensor configuration">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Sensor configuration
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">
