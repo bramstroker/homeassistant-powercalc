@@ -9,6 +9,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.10:docker"
   },
-  "name": "Hue ambiance downlight (LDT001)",
+  "name": "Hue Aphelion Recessed Downlight White Ambiance",
   "standby_power": 0.45
 }
