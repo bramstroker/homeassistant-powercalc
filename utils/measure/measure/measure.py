@@ -231,7 +231,7 @@ class Measure:
         Returns generic questions which are asked regardless of the choosen device type
         Additionally the configured runner and power_meter can also provide further questions
         """
-        if self.measure_type in [MeasureType.LIGHT, MeasureType.SPEAKER, MeasureType.CHARGING]:
+        if self.measure_type not in [MeasureType.AVERAGE, MeasureType.RECORDER]:
             questions = [
                 inquirer.Confirm(
                     name=QUESTION_GENERATE_MODEL_JSON,
