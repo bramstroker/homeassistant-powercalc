@@ -3,9 +3,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from homeassistant_api import Client, HomeassistantAPIError
 from measure.const import QUESTION_ENTITY_ID
-from measure.controller.errors import ControllerError
+from measure.controller.errors import ApiConnectionError, ControllerError
 from measure.controller.fan.hass import HassFanController
-from measure.controller.light.errors import ApiConnectionError
 
 
 def test_set_percentage() -> None:
@@ -74,7 +73,7 @@ def test_get_questions() -> None:
         },
     ):
         questions = hass_controller.get_questions()
-        assert len(questions) == 2
+        assert len(questions) == 1
         assert questions[0].name == QUESTION_ENTITY_ID
         assert questions[0].choices == ["fan.test1", "fan.test2"]
 

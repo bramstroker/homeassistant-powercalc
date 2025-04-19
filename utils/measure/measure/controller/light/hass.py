@@ -52,7 +52,7 @@ class HassLightController(HassControllerBase, LightController):
         max_mired = MAX_MIRED
         if "min_color_temp_kelvin" in attrs:
             max_mired = self.kelvin_to_mired(attrs.get("min_color_temp_kelvin"))
-        return LightInfo(min_mired, max_mired)
+        return LightInfo("unknown", min_mired, max_mired)
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         return [
