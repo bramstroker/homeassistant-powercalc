@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from homeassistant_api import Client, HomeassistantAPIError, State
 from measure.const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
+from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
-from measure.controller.light.errors import ApiConnectionError
 from measure.controller.light.hass import HassLightController
 
 
