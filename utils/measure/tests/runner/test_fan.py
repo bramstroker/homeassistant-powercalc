@@ -20,7 +20,6 @@ def test_run(mock_config_factory, export_path: str) -> None:  # noqa: ANN001
         "calculation_strategy": "linear",
         "linear_config": {
             "calibrate": [
-                "0 -> 10.50",
                 "5 -> 10.50",
                 "10 -> 10.50",
                 "15 -> 10.50",
