@@ -17,7 +17,15 @@ from inquirer.questions import Question
 from inquirer.render import ConsoleRender
 
 from measure.config import MeasureConfig
-from measure.const import PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME, MeasureType
+from measure.const import (
+    PROJECT_DIR,
+    QUESTION_DUMMY_LOAD,
+    QUESTION_GENERATE_MODEL_JSON,
+    QUESTION_MEASURE_DEVICE,
+    QUESTION_MODEL_ID,
+    QUESTION_MODEL_NAME,
+    MeasureType,
+)
 from measure.controller.light.const import LutMode
 from measure.controller.light.errors import LightControllerError
 from measure.powermeter.errors import PowerMeterError
@@ -27,6 +35,7 @@ from measure.runner.average import AverageRunner
 from measure.runner.charging import ChargingRunner
 from measure.runner.const import QUESTION_MODE
 from measure.runner.errors import RunnerError
+from measure.runner.fan import FanRunner
 from measure.runner.light import LightRunner
 from measure.runner.recorder import RecorderRunner
 from measure.runner.runner import MeasurementRunner
@@ -53,11 +62,17 @@ logging.basicConfig(
 MEASURE_TYPE_RUNNER = {
     MeasureType.LIGHT: LightRunner,
     MeasureType.SPEAKER: SpeakerRunner,
+    MeasureType.FAN: FanRunner,
     MeasureType.RECORDER: RecorderRunner,
     MeasureType.AVERAGE: AverageRunner,
     MeasureType.CHARGING: ChargingRunner,
 }
 
+MODEL_ID_EXAMPLES = {
+    MeasureType.LIGHT: "LED1837R5",
+    MeasureType.SPEAKER: "One SL",
+    MeasureType.FAN: "AM07",
+}
 
 _LOGGER = logging.getLogger("measure")
 
@@ -120,6 +135,11 @@ class Measure:
                 "Selected media controller: %s",
                 self.config.selected_media_controller,
             )
+        if self.measure_type == MeasureType.FAN:
+            _LOGGER.info(
+                "Selected fan controller: %s",
+                self.config.selected_fan_controller,
+            )
 
         if self.config.selected_measure_type:
             self.measure_type = MeasureType(self.config.selected_measure_type)
@@ -140,16 +160,9 @@ class Measure:
         if answers.get(QUESTION_DUMMY_LOAD, False):
             measure_util.initialize_dummy_load()
 
-        export_directory = None
-        runner_export_directory = self.runner.get_export_directory()
-        if runner_export_directory:
-            export_directory = os.path.join(
-                PROJECT_DIR,
-                "export",
-                self.runner.get_export_directory(),
-            )
-            if not os.path.exists(export_directory):
-                os.makedirs(export_directory)
+        export_directory = str(os.path.join(PROJECT_DIR, "export", answers.get(QUESTION_MODEL_ID, "generic")))
+        if not os.path.exists(export_directory):
+            os.makedirs(export_directory)
 
         if answers.get(QUESTION_DUMMY_LOAD, False):
             input("Please connect the appliance you want to measure in parallel to the dummy load and press enter to start measurement session...")
@@ -224,7 +237,7 @@ class Measure:
         Returns generic questions which are asked regardless of the choosen device type
         Additionally the configured runner and power_meter can also provide further questions
         """
-        if self.measure_type in [MeasureType.LIGHT, MeasureType.SPEAKER, MeasureType.CHARGING]:
+        if self.measure_type not in [MeasureType.AVERAGE, MeasureType.RECORDER]:
             questions = [
                 inquirer.Confirm(
                     name=QUESTION_GENERATE_MODEL_JSON,
@@ -235,6 +248,11 @@ class Measure:
                     name=QUESTION_DUMMY_LOAD,
                     message="Do you want to use a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
                     default=False,
+                ),
+                inquirer.Text(
+                    name=QUESTION_MODEL_ID,
+                    message=f"Specify the model id. e.g. {MODEL_ID_EXAMPLES.get(self.measure_type, 'LED1837R5')}",
+                    validate=validate_required,
                 ),
                 inquirer.Text(
                     name=QUESTION_MODEL_NAME,

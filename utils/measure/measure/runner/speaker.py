@@ -91,6 +91,3 @@ class SpeakerRunner(MeasurementRunner):
         except ZeroReadingError:
             _LOGGER.error("Measured 0 watt as standby power.")
             return 0
-
-    def get_export_directory(self) -> str | None:
-        return "speaker"

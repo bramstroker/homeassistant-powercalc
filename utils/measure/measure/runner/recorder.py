@@ -61,6 +61,3 @@ class RecorderRunner(MeasurementRunner):
 
     def measure_standby_power(self) -> float:
         return 0
-
-    def get_export_directory(self) -> str:
-        return "recorder"

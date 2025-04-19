@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from homeassistant_api import Client, HomeassistantAPIError, State
 from measure.const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
+from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
-from measure.controller.light.errors import ApiConnectionError
 from measure.controller.light.hass import HassLightController
 
 
@@ -151,9 +151,8 @@ def test_get_questions() -> None:
         },
     ):
         questions = hass_controller.get_questions()
-        assert len(questions) == 2
+        assert len(questions) == 1
         assert questions[0].name == QUESTION_ENTITY_ID
-        assert questions[1].name == QUESTION_MODEL_ID
         assert questions[0].choices == ["light.test1", "light.test2"]
 
 

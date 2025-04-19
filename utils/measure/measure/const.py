@@ -21,6 +21,7 @@ class MeasureType(str, Enum):
     RECORDER = "Recorder"
     AVERAGE = "Average"
     CHARGING = "Charging device"
+    FAN = "Fan"
 
 
 class Trend(StrEnum):

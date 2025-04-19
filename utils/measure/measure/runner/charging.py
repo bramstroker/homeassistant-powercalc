@@ -132,6 +132,3 @@ class ChargingRunner(MeasurementRunner):
 
     def measure_standby_power(self) -> float:
         return 0
-
-    def get_export_directory(self) -> str | None:
-        return "charging"
