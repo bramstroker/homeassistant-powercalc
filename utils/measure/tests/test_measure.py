@@ -46,7 +46,8 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
             # DUMMY_LOAD
             "n",
             # MODEL_ID
-            "LCT010"
+            "m",
+            key.ENTER,
             # MODEL_NAME
             "a",
             key.ENTER,
@@ -67,8 +68,8 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
     with patch("builtins.input", return_value=""):
         measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/brightness.csv.gz"))
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/model.json"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/m/brightness.csv.gz"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/m/model.json"))
 
 
 def test_run_light(mock_config_factory) -> None:  # noqa: ANN001
