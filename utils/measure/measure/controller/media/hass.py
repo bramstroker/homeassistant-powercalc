@@ -1,10 +1,9 @@
 import logging
-from typing import Any
 
 import inquirer
 from homeassistant_api.errors import InternalServerError
 
-from measure.const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
+from measure.const import QUESTION_ENTITY_ID
 from measure.controller.hass_controller import HassControllerBase
 from measure.controller.media.controller import MediaController
 
@@ -12,10 +11,6 @@ _LOGGER = logging.getLogger("measure")
 
 
 class HassMediaController(HassControllerBase, MediaController):
-    def __init__(self, api_url: str, token: str) -> None:
-        self._model_id: str | None = None
-        super().__init__(api_url, token)
-
     def set_volume(self, volume: int) -> None:
         self.client.trigger_service(
             "media_player",
@@ -64,13 +59,4 @@ class HassMediaController(HassControllerBase, MediaController):
                 message="Select the media player",
                 choices=self.get_domain_entity_list("media_player"),
             ),
-            inquirer.Text(
-                name=QUESTION_MODEL_ID,
-                message="What model is your media player? Ex: Sonos One SL",
-                validate=lambda _, x: len(x) > 0,
-            ),
         ]
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        self._model_id = answers[QUESTION_MODEL_ID]
-        super().process_answers(answers)

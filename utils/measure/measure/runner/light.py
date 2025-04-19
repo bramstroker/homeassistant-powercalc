@@ -75,7 +75,7 @@ class LightRunner(MeasurementRunner):
         self.effect_list = self.light_controller.get_effect_list()
 
     def get_export_directory(self) -> str:
-        return f"{self.light_info.model_id}"
+        return "light"
 
     def run(self, answers: dict[str, Any], export_directory: str) -> RunnerResult | None:
         measurements_to_run = [self.prepare_measurements_for_mode(export_directory, mode) for mode in self.lut_modes]

@@ -7,7 +7,7 @@ from typing import Any
 import inquirer
 from homeassistant_api import HomeassistantAPIError
 
-from measure.const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
+from measure.const import QUESTION_ENTITY_ID
 from measure.controller.errors import ApiConnectionError
 from measure.controller.hass_controller import HassControllerBase
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
@@ -16,7 +16,6 @@ from measure.controller.light.controller import LightController, LightInfo
 
 class HassLightController(HassControllerBase, LightController):
     def __init__(self, api_url: str, token: str, transition_time: int) -> None:
-        self._model_id: str | None = None
         self._transition_time: int = transition_time
         super().__init__(api_url, token)
 
@@ -53,7 +52,7 @@ class HassLightController(HassControllerBase, LightController):
         max_mired = MAX_MIRED
         if "min_color_temp_kelvin" in attrs:
             max_mired = self.kelvin_to_mired(attrs.get("min_color_temp_kelvin"))
-        return LightInfo(self._model_id, min_mired, max_mired)
+        return LightInfo(min_mired, max_mired)
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         return [
@@ -61,11 +60,6 @@ class HassLightController(HassControllerBase, LightController):
                 name=QUESTION_ENTITY_ID,
                 message="Select the light entity",
                 choices=self.get_domain_entity_list("light"),
-            ),
-            inquirer.Text(
-                name=QUESTION_MODEL_ID,
-                message="What model is your light? Ex: LED1837R5",
-                validate=lambda _, x: len(x) > 0,
             ),
         ]
 
@@ -78,7 +72,6 @@ class HassLightController(HassControllerBase, LightController):
 
     def process_answers(self, answers: dict[str, Any]) -> None:
         super().process_answers(answers)
-        self._model_id = answers[QUESTION_MODEL_ID]
 
     def build_hs_json_body(self, bri: int, hue: int, sat: int) -> dict:
         return {
