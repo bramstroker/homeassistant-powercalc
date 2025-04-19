@@ -51,6 +51,7 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
                     "generate_model_json": True,
                     "dummy_load": False,
                     "model_name": "Test model",
+                    "model_id": "LCT010",
                     "measure_device": "Shelly Plug S",
                     "gzip": True,
                     "multiple_lights": False,

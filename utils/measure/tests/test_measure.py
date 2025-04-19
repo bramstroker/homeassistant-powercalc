@@ -45,6 +45,8 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
             "y",
             # DUMMY_LOAD
             "n",
+            # MODEL_ID
+            "LCT010"
             # MODEL_NAME
             "a",
             key.ENTER,
@@ -65,8 +67,8 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
     with patch("builtins.input", return_value=""):
         measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/light/brightness.csv.gz"))
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/light/model.json"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/brightness.csv.gz"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/model.json"))
 
 
 def test_run_light(mock_config_factory) -> None:  # noqa: ANN001
@@ -76,8 +78,8 @@ def test_run_light(mock_config_factory) -> None:  # noqa: ANN001
     measure = _create_measure_instance(config=mock_config)
     measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/light/brightness.csv.gz"))
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/light/model.json"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/brightness.csv.gz"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/model.json"))
 
 
 @patch("builtins.input", return_value="")
@@ -97,7 +99,7 @@ def test_run_smart_speaker(mock_input, mock_config_factory) -> None:  # noqa: AN
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/speaker/model.json"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/model.json"))
 
 
 @patch("builtins.input", return_value="")
@@ -114,7 +116,7 @@ def test_run_charging(mock_input, mock_config_factory) -> None:  # noqa: ANN001
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/charging/model.json"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/model.json"))
 
 
 @patch("builtins.input", return_value="")
@@ -130,7 +132,7 @@ def test_run_fan(mock_input, mock_config_factory) -> None:  # noqa: ANN001
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/fan/model.json"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/model.json"))
 
 
 @patch("builtins.input", return_value="")
@@ -156,7 +158,7 @@ def test_run_recorder(mock_input, mock_sleep, mock_config_factory) -> None:  # n
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 
-    csv_filepath = os.path.join(PROJECT_DIR, "export/recorder/test.csv")
+    csv_filepath = os.path.join(PROJECT_DIR, "export/generic/test.csv")
     assert os.path.exists(csv_filepath)
 
     with open(csv_filepath, newline="") as csv_file:
