@@ -65,8 +65,8 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
     with patch("builtins.input", return_value=""):
         measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/brightness.csv.gz"))
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/model.json"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/light/brightness.csv.gz"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/light/model.json"))
 
 
 def test_run_light(mock_config_factory) -> None:  # noqa: ANN001
@@ -76,8 +76,8 @@ def test_run_light(mock_config_factory) -> None:  # noqa: ANN001
     measure = _create_measure_instance(config=mock_config)
     measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/brightness.csv.gz"))
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/model.json"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/light/brightness.csv.gz"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/light/model.json"))
 
 
 @patch("builtins.input", return_value="")
@@ -115,6 +115,22 @@ def test_run_charging(mock_input, mock_config_factory) -> None:  # noqa: ANN001
         measure.start()
 
     assert os.path.exists(os.path.join(PROJECT_DIR, "export/charging/model.json"))
+
+
+@patch("builtins.input", return_value="")
+def test_run_fan(mock_input, mock_config_factory) -> None:  # noqa: ANN001
+    """Simulate a full run of the fan measure"""
+    mock_config = mock_config_factory(
+        question_defaults={
+            "selected_measure_type": MeasureType.FAN,
+        },
+    )
+
+    with patch.object(MeasureUtil, "take_average_measurement", return_value=1.5):
+        measure = _create_measure_instance(config=mock_config)
+        measure.start()
+
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/fan/model.json"))
 
 
 @patch("builtins.input", return_value="")
