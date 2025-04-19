@@ -53,6 +53,3 @@ class FanRunner(MeasurementRunner):
         self.fan_controller.turn_off()
         time.sleep(self.config.sleep_time)
         return self.measure_util.take_average_measurement(20)
-
-    def get_export_directory(self) -> str | None:
-        return "fan"
