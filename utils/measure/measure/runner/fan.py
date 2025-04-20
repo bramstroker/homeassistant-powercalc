@@ -12,6 +12,8 @@ from measure.util.measure_util import MeasureUtil
 
 _LOGGER = logging.getLogger("measure")
 
+SLEEP_TIME_PERCENTAGE_CHANGE = 10
+
 
 class FanRunner(MeasurementRunner):
     def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
@@ -31,7 +33,7 @@ class FanRunner(MeasurementRunner):
         for percentage in range(5, 101, 5):
             _LOGGER.info("Setting percentage to %d", percentage)
             self.fan_controller.set_percentage(percentage)
-            time.sleep(self.config.sleep_time)
+            time.sleep(SLEEP_TIME_PERCENTAGE_CHANGE)
             measurements[percentage] = self.measure_util.take_average_measurement(20)
 
         return RunnerResult(model_json_data=self._build_model_json_data(measurements))
