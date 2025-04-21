@@ -52,6 +52,7 @@ class FanRunner(MeasurementRunner):
         return self.fan_controller.get_questions()
 
     def measure_standby_power(self) -> float:
+        _LOGGER.info("Turning off fan to start measuring standby power")
         self.fan_controller.turn_off()
-        time.sleep(self.config.sleep_time)
+        time.sleep(SLEEP_TIME_PERCENTAGE_CHANGE)
         return self.measure_util.take_average_measurement(20)
