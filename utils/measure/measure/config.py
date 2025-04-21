@@ -9,6 +9,8 @@ from measure.controller.light.const import LightControllerType
 from measure.controller.media.const import MediaControllerType
 from measure.powermeter.const import PowerMeterType
 
+_LOGGER = logging.getLogger("measure")
+
 
 class MeasureConfig:
     @property
@@ -202,9 +204,14 @@ class MeasureConfig:
     @property
     def selected_measure_type(self) -> str | None:
         try:
-            return MeasureType(config("SELECTED_DEVICE_TYPE", default=config("SELECTED_MEASURE_TYPE")))
+            return MeasureType(config("SELECTED_MEASURE_TYPE"))
         except UndefinedValueError:
-            return None
+            try:
+                # Log deprecation warning
+                _LOGGER.warning("'SELECTED_DEVICE_TYPE' is deprecated. Use 'SELECTED_MEASURE_TYPE' instead.")
+                return MeasureType(config("SELECTED_DEVICE_TYPE"))
+            except UndefinedValueError:
+                return None
 
     @property
     def resume(self) -> bool:
