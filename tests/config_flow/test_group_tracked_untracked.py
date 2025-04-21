@@ -11,6 +11,7 @@ from custom_components.powercalc.config_flow import UNIQUE_ID_TRACKED_UNTRACKED,
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_EXCLUDE_ENTITIES,
     CONF_GROUP_TRACKED_AUTO,
     CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_GROUP_TYPE,
@@ -30,7 +31,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     """Test the tracked/untracked group flow."""
 
     await run_powercalc_setup(hass)
-    mock_sensors_in_registry(hass, ["sensor.1_power", "sensor.2_power"])
+    mock_sensors_in_registry(hass, ["sensor.1_power", "sensor.2_power", "sensor.3_power"])
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_TRACKED_UNTRACKED)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -43,12 +44,22 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         result["flow_id"],
         user_input,
     )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.GROUP_TRACKED_UNTRACKED_AUTO
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_EXCLUDE_ENTITIES: ["sensor.3_power"],
+        },
+    )
+
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_SENSOR_TYPE: SensorType.GROUP,
         CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
+        CONF_EXCLUDE_ENTITIES: ["sensor.3_power"],
         CONF_NAME: "Tracked / Untracked",
         CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
         CONF_GROUP_TRACKED_AUTO: True,
@@ -58,6 +69,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     hass.states.async_set("sensor.1_power", "10")
     hass.states.async_set("sensor.2_power", "20")
+    hass.states.async_set("sensor.3_power", "30")
     await hass.async_block_till_done()
     await hass.async_block_till_done()
 
