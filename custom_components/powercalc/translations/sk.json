@@ -201,6 +201,13 @@
         "description": "Vyberte všetky snímače výkonu, ktoré sú súčasťou sledovanej spotreby. Už je automaticky vyplnená, ale môžete ju manuálne upraviť",
         "title": "Vyberte mocenské entity"
       },
+      "group_tracked_untracked_auto": {
+        "data": {
+          "exclude_entities": "Exclude entities"
+        },
+        "description": "Exclude specific entities from the auto tracked group",
+        "title": "Auto tracked configuration"
+      },
       "library": {
         "data": {
           "confirm_autodisovered_model": "Potvrďte model"
