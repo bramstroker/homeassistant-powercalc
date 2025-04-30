@@ -10,5 +10,8 @@
     "VERSION": "v1.17.11:docker"
   },
   "name": "G95Gold",
-  "standby_power": 0.61
+  "standby_power": 0.61,
+  "aliases": [
+    "tuya"
+  ]
 }
