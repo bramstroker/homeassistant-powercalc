@@ -10,5 +10,6 @@
     "VERSION": "v1.17.11:docker"
   },
   "name": "SMART+ Filament Edison 52 E27 Amber dimmable",
-  "standby_power": 0.24
+  "standby_power": 0.24,
+  "author": "dells2k <53873738+dells2k@users.noreply.github.com>"
 }
