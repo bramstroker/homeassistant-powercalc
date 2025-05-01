@@ -7,9 +7,10 @@
     "VERSION": "v1.17.11:docker"
   },
   "name": "Shelly Plug S Gen3",
-  "alias": [
+  "aliases": [
     "S3PL-00112EU"
   ],
+  "discovery_by": "entity",
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
