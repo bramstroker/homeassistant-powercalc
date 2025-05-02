@@ -11,5 +11,6 @@
   },
   "name": "Smart LED Filament Gold Globe-lamp G95 7W",
   "standby_power": 0.61,
-  "aliases": []
+  "aliases": [],
+  "author": "Jort <63785276+JortvanSchijndel@users.noreply.github.com>"
 }
