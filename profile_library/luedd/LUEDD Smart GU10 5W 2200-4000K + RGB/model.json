@@ -11,7 +11,5 @@
   },
   "name": "LUEDD Smart GU10 5W 2200-4000K + RGB",
   "standby_power": 0.8,
-  "aliases": [
-    "tuya"
-  ]
+  "aliases": []
 }
