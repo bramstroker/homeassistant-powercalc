@@ -9,9 +9,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.11:docker"
   },
-  "name": "G95Gold",
+  "name": "Smart LED Filament Gold Globe-lamp G95 7W",
   "standby_power": 0.61,
-  "aliases": [
-    "tuya"
-  ]
+  "aliases": []
 }
