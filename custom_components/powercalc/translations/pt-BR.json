@@ -203,10 +203,10 @@
       },
       "group_tracked_untracked_auto": {
         "data": {
-          "exclude_entities": "Exclude entities"
+          "exclude_entities": "Excluir entidades"
         },
-        "description": "Exclude specific entities from the auto tracked group",
-        "title": "Auto tracked configuration"
+        "description": "Excluir entidades específicas do grupo auto-rastreado",
+        "title": "Configuração de rastreamento automático"
       },
       "library": {
         "data": {
