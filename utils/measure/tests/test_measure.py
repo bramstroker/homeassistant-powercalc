@@ -89,6 +89,7 @@ def test_run_smart_speaker(mock_input, mock_config_factory) -> None:  # noqa: AN
     mock_config = mock_config_factory(
         question_defaults={
             "selected_measure_type": MeasureType.SPEAKER,
+            "disable_streaming": False,
         },
     )
 
