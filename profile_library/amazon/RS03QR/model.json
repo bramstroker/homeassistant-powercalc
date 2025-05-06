@@ -27,5 +27,6 @@
     "VERSION": "master"
   },
   "name": "Amazon Echo Dot Gen 2",
-  "standby_power": 1.8
+  "standby_power": 1.8,
+  "author": "zenzmatz <eric.021292@gmail.com>"
 }
