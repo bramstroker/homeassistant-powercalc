@@ -1,9 +1,9 @@
 {
   "common": {
-    "source_entity": "Source entity",
-    "source_device": "Source device",
+    "source_entity": "Encja źródłowa",
+    "source_device": "Urządzenie źródłowe",
     "remarks_smart_switch": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n Gdy masz urządzenie, które zużywa stałą ilość energii po włączeniu, możesz podać tę wartość w następnym kroku przepływu konfiguracji",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "remarks_smart_dimmer": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n W następnym kroku możesz opcjonalnie podać wartości dla podłączonego światła"
   },
   "config": {
     "abort": {
@@ -27,23 +27,23 @@
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Wybierz grupę(y)",
+          "new_group": "Nowa grupa"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Wpisz własną nazwę grupy, aby utworzyć nową grupę"
         },
-        "title": "Assign to group"
+        "title": "Przypisz do grupy"
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Availability entity"
+          "availability_entity": "Encja dostępności"
         },
         "data_description": {
-          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+          "availability_entity": "Gdy ta encja jest niedostępna, sensor Powercalc będzie również niedostępny"
         },
-        "title": "Availability entity",
-        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+        "title": "Encja dostępności",
+        "description": "To jest profil na urządzenie. Proszę wybrać encję, która będzie używana do określenia dostępności sensora powercalc"
       },
       "daily_energy": {
         "data": {
@@ -65,12 +65,12 @@
       "group_domain": {
         "data": {
           "name": "Nazwa",
-          "create_energy_sensor": "Utwórz czujnik energii",
-          "create_utility_meters": "Utwórz liczniki mediów",
-          "domain": "Domena obiektu",
-          "exclude_entities": "Wyklucz obiekty"
+          "create_energy_sensor": "Utwórz sensor energii",
+          "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+          "domain": "Domena encji",
+          "exclude_entities": "Wyklucz encje"
         },
-        "title": "Utwórz czujnik grupy oparty na domenie"
+        "title": "Utwórz sensor grupy oparty na domenie"
       },
       "fixed": {
         "data": {
@@ -80,48 +80,48 @@
         },
         "data_description": {
           "power": "Stała wartość mocy w watach, gdy encja jest WŁĄCZONA",
-          "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w W",
-          "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz przykład powyżej"
+          "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w watach",
+          "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz [dokumentacja](https://docs.powercalc.nl/strategies/fixed/#power-per-state)"
         },
         "description": "Określ stałą wartość mocy dla swojej encji. Alternatywnie możesz zdefiniować wartość mocy dla każdego stanu. Na przykład:\n\n`odtwarzanie: 8.3`\n`pauza: 2.25`",
         "title": "Konfiguracja stała"
       },
       "global_configuration": {
         "title": "Konfiguracja globalna",
-        "description": "Skonfiguruj globalną konfigurację Powercalc. Aby uzyskać więcej informacji zobacz [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Dodatkowe opcje dla sensorów energi i liczników można podać w kolejnych krokach.",
+        "description": "Skonfiguruj globalną konfigurację Powercalc. Aby uzyskać więcej informacji zobacz [dokumentację](https://docs.powercalc.nl/configuration/global-configuration/). Dodatkowe opcje dla sensorów energi i liczników można podać w kolejnych krokach.",
         "data": {
           "create_energy_sensors": "Utwórz sensory energii",
           "create_utility_meters": "Utwórz liczniki mediów",
-          "disable_extended_attributes": "Disable extended attributes",
-          "disable_library_download": "Disable remote library download",
-          "discovery_exclude_device_types": "Discovery exclude device types",
-          "force_update_frequency": "Wymuś częstotliwość aktualizacji",
+          "disable_extended_attributes": "Wyłącz atrybuty rozszerzone",
+          "disable_library_download": "Wyłącz pobieranie biblioteki zdalnej",
+          "discovery_exclude_device_types": "Typy urządzeń wykluczone z wykrywania",
+          "force_update_frequency": "Częstotliwość wymuszonych aktualizacji",
           "ignore_unavailable_state": "Ignoruj stan niedostępny",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
+          "include_non_powercalc_sensors": "Dołącz sensory nie-Powercalc",
+          "power_sensor_category": "Kategoria sensorów mocy",
+          "power_sensor_friendly_naming": "Wzorzec przyjaznej nazwy sensora mocy",
+          "power_sensor_naming": "Wzorzec nazwy sensora mocy"
         },
         "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "discovery_exclude_device_types": "Exclude device types from the discovery process",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+          "create_energy_sensors": "Czy Powercalc musi utworzyć sensory kWh",
+          "create_utility_meters": "Pozwól, aby Powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
+          "disable_extended_attributes": "Wyłącz wszystkie dodatkowe atrybuty, które Powercalc dodaje do stanów encji zasilania, energii i grup. To pomoże zachować mały rozmiar bazy danych",
+          "disable_library_download": "Wyłącz funkcję pobierania biblioteki Powercalc",
+          "discovery_exclude_device_types": "Wyklucz typy urządzeń z procesu wyszukiwania",
+          "force_update_frequency": "Interwał aktualizacji stanu czujnika, nawet gdy wartość mocy pozostaje taka sama. W sekundach",
+          "ignore_unavailable_state": "Zachowaj dostępne sensory Powercalc, nawet gdy encja źródłowa jest niedostępna",
+          "include_non_powercalc_sensors": "Zdecyduj, czy chcesz włączyć sensory nie-Powercalc w grupach"
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
+        "title": "Opcje dotyczące energii",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "Metoda całkowania energii",
+          "energy_sensor_category": "Kategoria sensorów energii",
+          "energy_sensor_friendly_naming": "Wzorzec przyjaznej nazwy sensora energii",
+          "energy_sensor_naming": "Wzorzec nazwy sensora energii",
+          "energy_sensor_precision": "Dokładność sensora energii",
+          "energy_sensor_unit_prefix": "Przedrostek jednostki sensora energii"
         }
       },
       "global_configuration_utility_meter": {
@@ -135,78 +135,78 @@
       "group_custom": {
         "data": {
           "area": "Obszar",
-          "create_energy_sensor": "Utwórz czujnik energii",
-          "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+          "create_energy_sensor": "Utwórz sensor energii",
+          "create_utility_meters": "Utwórz liczniki mediów",
           "device": "Urządzenie",
-          "force_calculate_group_energy": "Force calculate energy",
-          "group_energy_entities": "Członek encji energii",
-          "group_energy_start_at_zero": "Start at zero",
-          "group_member_devices": "Member devices",
-          "group_member_sensors": "Członek czujników powercalc",
-          "group_power_entities": "Członek encji mocy",
+          "force_calculate_group_energy": "Wymuś obliczanie energii",
+          "group_energy_entities": "Dodatkowe encje energii",
+          "group_energy_start_at_zero": "Zacznij od zera",
+          "group_member_devices": "Urządzenia członkowie",
+          "group_member_sensors": "Członek sensorów powercalc",
+          "group_power_entities": "Dodatkowe encje mocy",
           "hide_members": "Ukryj członków",
-          "include_non_powercalc_sensors": "Dołącz czujniki nie-powercalc",
+          "include_non_powercalc_sensors": "Dołącz czujniki nie-Powercalc",
           "name": "Nazwa",
           "sub_groups": "Podgrupy"
         },
         "data_description": {
-          "area": "Dodaje wszystkie czujniki Powercalc z podanego obszaru",
-          "create_energy_sensor": "Czy powercalc musi utworzyć czujnik kWh",
+          "area": "Dodaje wszystkie sensory Powercalc z podanego obszaru",
+          "create_energy_sensor": "Czy Powercalc musi utworzyć czujnik kWh",
           "device": "Dodaj encje grupy utworzone przez Powercalc dla istniejącego urządzenia",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-          "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
-          "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
-          "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
-          "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
-          "include_non_powercalc_sensors": "Zdecyduj, czy dołączyć czujniki nie-powercalc podczas korzystania z opcji obszaru",
+          "force_calculate_group_energy": "Domyślnie sensory energi Powercalc sumuje z sensorów członków. Przełącz tę opcję, aby wymusić stworzenie sensora Suma Riemanna",
+          "group_energy_entities": "Dodatkowe czujniki energii (kWh) z instalacji HA w celu uwzględnienia",
+          "group_energy_start_at_zero": "Gdy włączone, sensor energii zacznie się od zera przy utworzeniu tego sensora. W przeciwnym razie zsumowane będą wszystkie aktualne stany sensorów energii",
+          "group_member_devices": "Dodaj encje zasilania i energii z wybranych urządzeń do grupy",
+          "group_member_sensors": "Sensory Powercalc do włączenia do grupy",
+          "group_power_entities": "Dodatkowe sensory mocy (W) z instalacji HA w celu uwzględnienia",
+          "include_non_powercalc_sensors": "Zdecyduj, czy dołączyć czujniki nie-Powercalc podczas korzystania z opcji obszaru",
           "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy"
         },
-        "title": "Utwórz czujnik grupy"
+        "title": "Utwórz sensor grupy"
       },
       "group_subtract": {
         "data": {
-          "create_energy_sensor": "Utwórz czujnik energii",
+          "create_energy_sensor": "Utwórz sensor energii",
           "create_utility_meters": "Utwórz liczniki mediów",
-          "entity_id": "Główny obiekt",
+          "entity_id": "Główna encja",
           "name": "Nazwa",
-          "subtract_entities": "Odejmujące obiekty"
+          "subtract_entities": "Odejmij encje"
         },
         "data_description": {
-          "entity_id": "Główny obiekt, od którego należy odejmować energie",
-          "subtract_entities": "Wybierz wszystkie elementy, które chcesz odjąć od podstawowego obiektu"
+          "entity_id": "Główna encja, od której należy odejmować moc",
+          "subtract_entities": "Wybierz wszystkie encje, które chcesz odjąć od głównej encji"
         },
         "title": "Odejmujący czujnik grupy"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Czujnik mocy zasilania sieciowego",
+          "group_tracked_auto": "Encje dodane automatycznie",
+          "create_energy_sensor": "Utwórz sensor energii",
+          "create_utility_meters": "Utwórz liczniki mediów"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Wybierz sensor mocy zawierający całkowite zużycie energii. Po pozostawieniu pustego zostanie utworzony tylko śledzony sensor mocy",
+          "group_tracked_auto": "Powercalc automatycznie doda wszystkie sensory mocy do grupy śledzonej, pomijając grupy Powercalc. Wyłącz to, gdy chcesz ręcznie zdefiniować śledzone encje",
+          "create_energy_sensor": "Czy Powercalc musi utworzyć sensor kWh",
+          "create_utility_meters": "Pozwól Powercalc stworzyć liczniki mediów, które pracują w cyklach dziennych, godzinowych itp."
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "Utwórz sensor grupy dla wszystkich śledzonych i nieśledzonych mocy",
+        "title": "Utwórz śledzony sensor mocy"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Śledzone encje"
         },
-        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
-        "title": "Select power entities"
+        "description": "Wybierz wszystkie sensory mocy, które są częścią śledzonego zużycia. Jest to już automatycznie wypełnione, ale można ręcznie dostosować",
+        "title": "Wybierz encje mocy"
       },
       "group_tracked_untracked_auto": {
         "data": {
-          "exclude_entities": "Exclude entities"
+          "exclude_entities": "Wyklucz encje"
         },
-        "description": "Exclude specific entities from the auto tracked group",
-        "title": "Auto tracked configuration"
+        "description": "Wyklucz konkretne encje z automatycznie śledzonej grupy",
+        "title": "Konfiguracja automatycznego śledzenia"
       },
       "library": {
         "data": {
@@ -215,15 +215,15 @@
         "data_description": {
           "confirm_autodisovered_model": "Jeśli zdecydujesz się nie potwierdzać, możesz samodzielnie wprowadzić producenta i model"
         },
-        "description": "{source}\n\nProducent \"{manufacturer}\" i model \"{model}\" zostały automatycznie wykryte dla twojego światła.{remarks}",
+        "description": "{source}\n\nProducent \"{manufacturer}\" i model \"{model}\" zostały automatycznie wykryte dla twojego urządzenia.{remarks}",
         "title": "Biblioteka"
       },
       "library_multi_profile": {
         "data": {
-          "model": "Select model"
+          "model": "Wybierz model"
         },
-        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
-        "title": "Library"
+        "description": "Producent \"{manufacturer}\" i model \"{model}\" zostały automatycznie wykryte dla Twojego urządzenia. Znaleziono wiele profili dla encji, które mogą być potencjalnie stosowane. Sprawdź dokładny model urządzenia w [bibliotece Powercalc]({library_link}) i wybierz poprawny",
+        "title": "Biblioteka"
       },
       "linear": {
         "data": {
@@ -250,22 +250,22 @@
         "data": {
           "model": "Identyfikator modelu"
         },
-        "description": "Wybierz model urządzenia. Zobacz listę [list]({supported_models_link}) obsługiwanych modeli, aby uzyskać więcej informacji",
+        "description": "Wybierz model urządzenia. Zobacz [listę]({supported_models_link}) obsługiwanych modeli, aby uzyskać więcej informacji",
         "title": "Konfiguracja modelu"
       },
       "menu_group": {
         "menu_options": {
           "group_custom": "Standardowa grupa",
           "group_domain": "Grupa oparta na domenie",
-          "group_subtract": "Subtract",
-          "group_tracked_untracked": "Tracked/untracked power"
+          "group_subtract": "Odejmij",
+          "group_tracked_untracked": "Moc śledzona/nieśledzona"
         },
         "title": "Wybierz typ grupy",
-        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
+        "description": "Wybierz typ sensora grupowego, który chcesz utworzyć. Wybierz grupę opartą na domenie, jeśli chcesz grupować wszystkie encje danej domeny lub utworzyć czujnik sumujący wszystkie sensory energii. Wybierz standardową grupę w innym przypadku"
       },
       "multi_switch": {
         "data": {
-          "entities": "Obiekty przełączników",
+          "entities": "Encje przełączników",
           "power": "WŁĄCZ zasilanie",
           "power_off": "WYŁĄCZ zasilanie"
         },
@@ -281,13 +281,13 @@
           "autostart": "Autostart",
           "playbooks": "Playbook'i",
           "repeat": "Powtarzaj",
-          "states_trigger": "Spust stanu"
+          "states_trigger": "Wyzwalacz stanu"
         },
         "data_description": {
           "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
           "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
           "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
-          "states_trigger": "Wywołaj playbook na podstawie zmiany stanu. Przykład\n\nodtwarzania: program1"
+          "states_trigger": "Wywołaj playbook na podstawie zmiany stanu. Przykład\n\nodtwarzanie: program1"
         },
         "title": "Konfiguracja Playbook'ów"
       },
@@ -295,7 +295,7 @@
         "data": {
           "calculation_enabled_condition": "Warunek włączenia obliczeń",
           "energy_integration_method": "Metoda całkowania energii",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_sensor_unit_prefix": "Przedrostek jednostki sensora energii",
           "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "multiply_factor": "Mnożnik",
           "multiply_factor_standby": "Mnożnik trybu gotowości (standby)",
@@ -315,13 +315,13 @@
       },
       "real_power": {
         "data": {
-          "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+          "create_utility_meters": "Utwórz liczniki mediów",
           "entity_id": "Identyfikator sensora mocy",
           "name": "Nazwa",
           "device": "Urządzenie"
         },
         "data_description": {
-          "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działąć w cyklach dziennych, godzinowych itp.",
+          "create_utility_meters": "Pozwól, aby Powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
           "name": "Podstawowa nazwa licznika energii i mediów. Pełna nazwa encji zostanie ustawiona zgodnie z ustawieniem energy_sensor_naming",
           "device": "Dodaj utworzony czujnik energii do konkretnego urządzenia"
         },
@@ -354,8 +354,8 @@
         "menu_options": {
           "daily_energy": "Dzienna energia",
           "group": "Grupa",
-          "global_configuration": "Global configuration",
-          "menu_group": "Group",
+          "global_configuration": "Ustawienia globalne",
+          "menu_group": "Grupa",
           "menu_library": "Moc wirtualna (biblioteka)",
           "real_power": "Energia z rzeczywistego sensora mocy",
           "virtual_power": "Moc wirtualna (ręcznie)"
@@ -379,7 +379,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Utwórz sensor energii",
-          "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+          "create_utility_meters": "Utwórz liczniki mediów",
           "entity_id": "Encja źródłowa",
           "mode": "Strategia obliczeniowa",
           "name": "Nazwa",
@@ -392,7 +392,7 @@
           "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",
           "standby_power": "Określ ilość energii zużywanej przez urządzenie w trybie czuwania (standby)"
         },
-        "description": "Więcej informacji o możliwych strategiach i opcjach konfiguracji znajdziesz w dokumentacji",
+        "description": "Więcej informacji o możliwych strategiach i opcjach konfiguracji znajdziesz w dokumentacji. Wymagana jest albo encja źródłowa, albo nazwa albo obie.",
         "title": "Stwórz wirtualny sensor mocy"
       },
       "wled": {
@@ -400,7 +400,7 @@
           "power_factor": "Współczynnik mocy (cos φ)",
           "voltage": "Napięcie"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see https://docs.powercalc.nl/strategies/wled/",
+        "description": "Upewnij się, że włączono ogranicznik jasności w oprogramowaniu WLED. Zobacz również https://docs.powercalc.nl/strategies/wled/",
         "title": "Konfiguracja WLED"
       }
     }
@@ -414,15 +414,15 @@
       "fix_flow": {
         "step": {
           "sub_profile": {
-            "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"{remarks}",
-            "title": "Select correct sub profile",
+            "description": "Ten model ma wiele podprofili. Wybierz taki, który pasuje do Twojego urządzenia\n\n\"{entity_id}\"{remarks}",
+            "title": "Wybierz prawidłowy podprofil",
             "data": {
-              "sub_profile": "Sub profile"
+              "sub_profile": "Podprofil"
             }
           }
         }
       },
-      "title": "Sub profile selection required for {entry}"
+      "title": "Wybór podprofilu jest wymagany dla {entry}"
     }
   },
   "options": {
@@ -443,7 +443,7 @@
         "title": "Opcje zaawansowane",
         "data": {
           "calculation_enabled_condition": "Warunek włączenia obliczeń",
-          "energy_integration_method": "Metoda integracji energii",
+          "energy_integration_method": "Metoda całkowania energii",
           "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "multiply_factor": "Mnożnik",
           "multiply_factor_standby": "Mnożnik trybu gotowości (standby)",
@@ -454,22 +454,22 @@
           "ignore_unavailable_state": "Przełącz to ustawienie, jeśli chcesz, aby czujnik mocy pozostał dostępny, nawet jeśli encja źródłowa jest niedostępna",
           "multiply_factor": "Mnoży obliczoną moc przez ten współczynnik. Może być przydatny dla grup świateł",
           "multiply_factor_standby": "Czy zastosować mnożnik również do mocy w trybie gotowości",
-          "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)"
+          "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności"
         }
       },
       "basic_options": {
         "title": "Opcje podstawowe",
         "data": {
           "create_energy_sensor": "Utwórz sensor energii",
-          "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
-          "entity_id": "Jednostka źródłowa",
+          "create_utility_meters": "Utwórz liczniki mediów",
+          "entity_id": "Encja źródłowa",
           "name": "Nazwa",
           "standby_power": "Moc w trybie czuwania"
         },
         "data_description": {
           "create_energy_sensor": "Czy powercalc musi utworzyć czujnik kWh",
-          "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działąć w cyklach dziennych, godzinowych itp.",
-          "entity_id": "obiekt źródłowy, na który opiera się wirtualna moc; sensor mocy będzie nasłuchiwał na zmiany stanu tego obiektu dla swojej aktualizacji",
+          "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
+          "entity_id": "Encja źródłowa, na której opiera się wirtualna moc; sensor mocy będzie nasłuchiwał zmiany stanu tej encji dla swojej aktualizacji",
           "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",
           "standby_power": "Określ ilość energii zużywanej przez urządzenie, gdy jest wyłączone"
         }
@@ -486,7 +486,7 @@
           "value_template": "Szablon wartości"
         },
         "data_description": {
-          "on_time": "Gdy pole pozostanie puste, to wartość domyślna wyniesie 1 dzień. zawsze włączone",
+          "on_time": "Gdy pole pozostanie puste, to wartość domyślna wyniesie 1 dzień. Zawsze włączone",
           "update_frequency": "czas w sekundach między aktualizacjami stanu sensora"
         }
       },
@@ -506,46 +506,46 @@
         }
       },
       "global_configuration": {
-        "title": "Basic options",
+        "title": "Opcje podstawowe",
         "data": {
-          "create_energy_sensors": "Create energy sensors",
+          "create_energy_sensors": "Utwórz sensory energii",
           "create_utility_meters": "Utwórz liczniki mediów",
-          "disable_extended_attributes": "Disable extended attributes",
-          "disable_library_download": "Disable remote library download",
-          "discovery_exclude_device_types": "Discovery exclude device types",
-          "force_update_frequency": "Force update frequency",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "",
-          "power_sensor_naming": "Wzór nazwy czujnika mocy"
+          "disable_extended_attributes": "Wyłącz atrybuty rozszerzone",
+          "disable_library_download": "Wyłącz pobieranie biblioteki zdalnej",
+          "discovery_exclude_device_types": "Typy urządzeń wykluczone z wykrywania",
+          "force_update_frequency": "Częstotliwość wymuszonych aktualizacji",
+          "ignore_unavailable_state": "Ignoruj stan niedostępny",
+          "include_non_powercalc_sensors": "Dołącz sensory nie-Powercalc",
+          "power_sensor_category": "Kategoria czujników mocy",
+          "power_sensor_friendly_naming": "Wzorzec przyjaznej nazwy sensora mocy",
+          "power_sensor_naming": "Wzorzec nazwy sensora mocy"
         },
         "data_description": {
           "create_energy_sensors": "Czy Powercalc musi utworzyć sensor kWh",
           "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "discovery_exclude_device_types": "Exclude device types from the discovery process",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+          "disable_extended_attributes": "Wyłącz wszystkie dodatkowe atrybuty, które Powercalc dodaje do stanów encji mocy, energii i grup. To pomoże zachować mały rozmiar bazy danych",
+          "disable_library_download": "Wyłącz funkcję pobierania biblioteki Powercalc",
+          "discovery_exclude_device_types": "Wyklucz typy urządzeń z procesu wyszukiwania",
+          "force_update_frequency": "Interwał aktualizacji stanu sensora, nawet gdy wartość mocy pozostaje taka sama. W sekundach",
+          "ignore_unavailable_state": "Zachowaj dostępne sensory Powercalc, nawet gdy encja źródłowa jest niedostępna",
+          "include_non_powercalc_sensors": "Zdecyduj, czy chcesz włączyć czujniki nieenergetyczne do grup"
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
-        "description": "Define the default settings for energy sensors here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
+        "title": "Opcje dotyczące energii",
+        "description": "Zdefiniuj tutaj domyślne ustawienia sensorów energii. Zobacz [documentację](https://docs.powercalc.nl/configuration/global-configuration/), aby uzyskać więcej informacji",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "Metoda całkowania energii",
+          "energy_sensor_category": "Kategoria sensorów energii",
+          "energy_sensor_friendly_naming": "Wzorzec przyjaznej nazwy sensora energii",
+          "energy_sensor_naming": "Wzorzec nazwy sensora energii",
+          "energy_sensor_precision": "Dokładność sensora energii",
+          "energy_sensor_unit_prefix": "Przedrostek jednostki sensora energii"
         }
       },
       "global_configuration_utility_meter": {
         "title": "Opcje licznika mediów",
-        "description": "Zdefiniuj domyślne ustawienia dla liczników mediów. Zobacz [documentation](https://docs.powercalc.nl/configuration/global-configuration/) aby uzyskać więcej informacji",
+        "description": "Zdefiniuj domyślne ustawienia dla liczników mediów. Zobacz [dokumentację](https://docs.powercalc.nl/configuration/global-configuration/) aby uzyskać więcej informacji",
         "data": {
           "utility_meter_net_consumption": "Zużycie netto licznika zużycia energii",
           "utility_meter_tariffs": "Taryfy licznika mediów",
@@ -557,71 +557,71 @@
         "data": {
           "area": "Obszar",
           "device": "Urządzenie",
-          "force_calculate_group_energy": "Force calculate energy",
+          "force_calculate_group_energy": "Wymuś obliczanie energii",
           "group_energy_entities": "Członek encji energii",
-          "group_member_devices": "Member devices",
-          "group_member_sensors": "Członek czujników powercalc",
-          "group_power_entities": "Członek encji mocy",
+          "group_member_devices": "Urządzenia członkowie",
+          "group_member_sensors": "Członek sensorów powercalc",
+          "group_power_entities": "Dodatkowe encje mocy",
           "hide_members": "Ukryj członków",
-          "include_non_powercalc_sensors": "Dołącz czujniki nie-powercalc",
+          "include_non_powercalc_sensors": "Dołącz czujniki nie-Powercalc",
           "sub_groups": "Podgrupy"
         },
         "data_description": {
           "area": "Dodaje wszystkie czujniki Powercalc z podanego obszaru",
           "device": "Dodaj encje grupy utworzone przez Powercalc dla istniejącego urządzenia",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-          "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
+          "force_calculate_group_energy": "Domyślnie Powercalc sumuje sensory energi z sensorów członków. Przełącz tę opcję, aby wymusić stworzenie sensora Suma Riemanna",
+          "group_energy_entities": "Dodatkowe czujniki energii (kWh) z instalacji HA w celu uwzględnienia",
+          "group_member_devices": "Dodaj encje zasilania i energii z wybranych urządzeń do grupy",
           "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
-          "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
-          "include_non_powercalc_sensors": "Zdecyduj, czy dołączyć czujniki nie-powercalc podczas korzystania z opcji obszaru",
+          "group_power_entities": "Dodatkowe sensory mocy (W) z instalacji HA w celu uwzględnienia",
+          "include_non_powercalc_sensors": "Zdecyduj, czy dołączyć czujniki nie-Powercalc podczas korzystania z opcji obszaru",
           "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy"
         }
       },
       "group_subtract": {
         "data": {
-          "entity_id": "Główny obiekt",
-          "subtract_entities": "Odejmujące obiekty"
+          "entity_id": "Główna encja",
+          "subtract_entities": "Encje odejmujące"
         },
         "data_description": {
-          "entity_id": "Główny obiekt, od którego należy odejmować energie",
+          "entity_id": "Główny obiekt, od którego należy odejmować energię",
           "subtract_entities": "Wybierz wszystkie elementy, które chcesz odjąć od podstawowego obiektu"
         },
         "title": "Opcje grupy"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Sensor mocy zasilania sieciowego",
+          "group_tracked_auto": "Encje dodane automatycznie",
+          "create_energy_sensor": "Utwórz sensor energii",
+          "create_utility_meters": "Utwórz liczniki mediów"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Wybierz sensor mocy zawierający całkowite zużycie energii. Po pozostawieniu pustego zostanie utworzony tylko śledzony sensor mocy",
+          "group_tracked_auto": "Powercalc automatycznie doda wszystkie sensory mocy do grupy śledzonej, pomijając grupy Powercalc. Wyłącz to, gdy chcesz ręcznie zdefiniować śledzone encje",
+          "create_energy_sensor": "Czy Powercalc musi utworzyć sensor kWh",
+          "create_utility_meters": "Pozwól, aby Powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp."
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "Utwórz sensor grupy dla wszystkich śledzonych i nieśledzonych mocy",
+        "title": "Utwórz śledzony sensor mocy"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Śledzone encje"
         },
-        "title": "Select power entities"
+        "title": "Wybierz encje mocy"
       },
       "init": {
         "menu_options": {
           "advanced_options": "Opcje zaawansowane",
           "basic_options": "Opcje podstawowe",
-          "daily_energy": "Dzienne opcje energii",
+          "daily_energy": "Opcje dziennej energii",
           "fixed": "Opcje stałe",
           "group_custom": "Opcje grupy",
           "group_subtract": "Opcje grupy",
-          "group_tracked_untracked": "Group options",
-          "group_tracked_untracked_manual": "Tracked entities",
-          "library_options": "Library options",
+          "group_tracked_untracked": "Opcje grupy",
+          "group_tracked_untracked_manual": "Śledzone encje",
+          "library_options": "Opcje biblioteki",
           "linear": "Opcje liniowe",
           "playbook": "Opcje playbook",
           "multi_switch": "Opcje wieloprzełącznika",
@@ -631,8 +631,8 @@
         }
       },
       "library_options": {
-        "title": "Library options",
-        "description": "Currently the following library profile is selected: \n manufacturer: {manufacturer}\n model: {model}\n\nIf you want to change the profile, click next."
+        "title": "Opcje biblioteki",
+        "description": "Obecnie wybrany jest następujący profil biblioteki: \n producent: {manufacturer}\n model: {model}\n\nJeśli chcesz zmienić profil, kliknij dalej."
       },
       "linear": {
         "title": "Opcje liniowe",
@@ -651,7 +651,7 @@
       "multi_switch": {
         "title": "Opcje wieloprzełącznika",
         "data": {
-          "entities": "Obiekty przełączników",
+          "entities": "Encje przełączników",
           "power": "WŁĄCZ zasilanie",
           "power_off": "WYŁĄCZ zasilanie"
         },
@@ -667,7 +667,7 @@
           "autostart": "Autostart",
           "playbooks": "Playbook'i",
           "repeat": "Powtarzaj",
-          "states_trigger": "Spust stanu"
+          "states_trigger": "Wyzwalacz stanu"
         },
         "data_description": {
           "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
@@ -682,7 +682,7 @@
           "device": "Urządzenie"
         },
         "data_description": {
-          "device": "Dodaj utworzony czujnik energii do konkretnego urządzenia"
+          "device": "Dodaj utworzony sensor energii do konkretnego urządzenia"
         }
       },
       "utility_meter_options": {
@@ -701,7 +701,7 @@
       "wled": {
         "title": "Opcje WLED",
         "data": {
-          "power_factor": "Współczynnik mocy",
+          "power_factor": "Współczynnik mocy (cos φ)",
           "voltage": "Napięcie"
         }
       }
@@ -757,8 +757,8 @@
       "name": "Pobierz aktywny playbook"
     },
     "get_group_entities": {
-      "description": "Retrieve all entity id's of a group energy or power sensor",
-      "name": "Get group entities"
+      "description": "Odzyskaj wszystkie identyfikatory encji grupy sensorów energii lub mocy",
+      "name": "Pobierz encje grupy"
     },
     "increase_daily_energy": {
       "description": "Zwiększa sensor o zadaną wartość.",
@@ -771,11 +771,11 @@
       "name": "Zwiększ dzienny sensor energii"
     },
     "reload": {
-      "description": "Reload Powercalc configuration and entities",
-      "name": "Reload"
+      "description": "Przeładuj konfigurację i encje Powercalc",
+      "name": "Przeładuj"
     },
     "reset_energy": {
-      "description": "Zresetuj czujnik energii do zera kWh.",
+      "description": "Zresetuj sensor energii do zera kWh.",
       "name": "Reset sensora energii"
     },
     "stop_playbook": {
