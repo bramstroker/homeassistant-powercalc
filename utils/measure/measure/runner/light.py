@@ -548,7 +548,7 @@ class LightRunner(MeasurementRunner):
                 return False
 
         should_resume = self.config.resume
-        if should_resume is None:
+        if should_resume:
             return inquirer.confirm(
                 message=f"CSV File {csv_file_path} already exists. Do you want to resume measurements?",
                 default=True,
