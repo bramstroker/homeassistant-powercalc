@@ -5,6 +5,7 @@ from typing import Any
 import inquirer
 
 from measure.config import MeasureConfig
+from measure.const import Trend
 from measure.controller.charging.const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import ChargingControllerError
@@ -49,12 +50,25 @@ class ChargingRunner(MeasurementRunner):
         print()
 
         battery_level = self.controller.get_battery_level()
-        measurements: dict[int, list[float]] = {}
 
         if battery_level < 100:
             self.wait_for_vacuum_to_start_charging()
 
+        charging_measurements = self.record_charging_phase(battery_level)
+
+        print("Done charging, start measurements for tapering phase..")
+
+        tapering_measurements = self.record_tapering_phase()
+
+        print("Done tapering, start measurements for trickle phase..")
+
+        trickle_power = self.measure_util.take_average_measurement(TRICKLE_CHARGING_TIME)
+
+        return RunnerResult(model_json_data=self._build_model_json_data(charging_measurements, trickle_power))
+
+    def record_charging_phase(self, battery_level: int) -> dict[int, list[float]]:
         error_count = 0
+        measurements: dict[int, list[float]] = {}
         while battery_level < 100:
             try:
                 battery_level = self.controller.get_battery_level()
@@ -75,13 +89,17 @@ class ChargingRunner(MeasurementRunner):
                 if error_count > 10:
                     raise RunnerError("Too many errors occurred during measurements. aborting") from e
                 time.sleep(self.config.sleep_time)
+        return measurements
 
-        print("Done charging, start measurements for trickle charging..")
-
-        trickle_power = self.measure_util.take_average_measurement(TRICKLE_CHARGING_TIME)
-        measurements[100] = [trickle_power]
-
-        return RunnerResult(model_json_data=self._build_model_json_data(measurements))
+    def record_tapering_phase(self) -> dict[int, list[float]]:
+        trend = Trend.DECREASING
+        while trend != Trend.STEADY:
+            measurements = [
+                self.measure_util.take_measurement() for _ in range(10)
+            ]
+            trend = self.measure_util.calculate_trend(measurements)
+            time.sleep(self.config.sleep_time)
+        return {}
 
     def wait_for_vacuum_to_start_charging(self) -> None:
         is_charging = self.controller.is_charging()
@@ -100,7 +118,11 @@ class ChargingRunner(MeasurementRunner):
         if wait_message_printed:
             print("vacuum cleaner started charging, starting measurements")
 
-    def _build_model_json_data(self, measurements: dict[int, list[float]]) -> dict:
+    def _build_model_json_data(
+        self,
+        measurements: dict[int, list[float]],
+        trickle_power: float
+    ) -> dict:
         """Build the model JSON data from the measurements"""
         calibrate_list = []
         for battery_level, powers in measurements.items():
