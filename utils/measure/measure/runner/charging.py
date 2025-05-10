@@ -94,9 +94,7 @@ class ChargingRunner(MeasurementRunner):
     def record_tapering_phase(self) -> dict[int, list[float]]:
         trend = Trend.DECREASING
         while trend != Trend.STEADY:
-            measurements = [
-                self.measure_util.take_measurement() for _ in range(10)
-            ]
+            measurements = [self.measure_util.take_measurement() for _ in range(10)]
             trend = self.measure_util.calculate_trend(measurements)
             time.sleep(self.config.sleep_time)
         return {}
@@ -121,7 +119,7 @@ class ChargingRunner(MeasurementRunner):
     def _build_model_json_data(
         self,
         measurements: dict[int, list[float]],
-        trickle_power: float
+        trickle_power: float,
     ) -> dict:
         """Build the model JSON data from the measurements"""
         calibrate_list = []
