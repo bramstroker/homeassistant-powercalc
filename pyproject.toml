@@ -18,7 +18,7 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.13",
 ]
-requires-python = ">=3.13.0"
+requires-python = ">=3.13"
 dependencies = ["homeassistant"]
 
 [tool.pytest.ini_options]
@@ -116,7 +116,7 @@ cronsim = "*"
 aioresponses = "^0.7.6"
 
 [tool.poetry.dependencies]
-python = ">=3.13,<3.14"
+python = ">=3.13.2,<3.14"
 
 [build-system]
 requires = ["poetry-core"]
