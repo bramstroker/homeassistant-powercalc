@@ -1,0 +1,5 @@
+{
+  "name": "AP + WLAN + Bluetooth",
+  "standby_power": 0.655,
+  "standby_power_on": 0.94
+}
