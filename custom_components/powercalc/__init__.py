@@ -304,10 +304,10 @@ def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
         global_config[CONF_FORCE_UPDATE_FREQUENCY] = timedelta(seconds=global_config[CONF_FORCE_UPDATE_FREQUENCY])
     if CONF_UTILITY_METER_OFFSET in global_config:
         global_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=global_config[CONF_UTILITY_METER_OFFSET])
-    if CONF_ENERGY_SENSOR_CATEGORY in global_config:
+    if global_config.get(CONF_ENERGY_SENSOR_CATEGORY):
         global_config[CONF_ENERGY_SENSOR_CATEGORY] = EntityCategory(global_config[CONF_ENERGY_SENSOR_CATEGORY])
-    if CONF_POWER_SENSOR_CATEGORY in global_config:
-        global_config[CONF_POWER_SENSOR_CATEGORY] = EntityCategory(global_config[CONF_ENERGY_SENSOR_CATEGORY])
+    if global_config.get(CONF_POWER_SENSOR_CATEGORY):
+        global_config[CONF_POWER_SENSOR_CATEGORY] = EntityCategory(global_config[CONF_POWER_SENSOR_CATEGORY])
     global_config[FLAG_HAS_GLOBAL_GUI_CONFIG] = True
 
     return global_config
