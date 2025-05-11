@@ -20,6 +20,7 @@ from homeassistant.const import (
     CONF_DOMAIN,
     CONF_SCAN_INTERVAL,
     EVENT_HOMEASSISTANT_STARTED,
+    EntityCategory,
     Platform,
 )
 from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
@@ -303,6 +304,10 @@ def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
         global_config[CONF_FORCE_UPDATE_FREQUENCY] = timedelta(seconds=global_config[CONF_FORCE_UPDATE_FREQUENCY])
     if CONF_UTILITY_METER_OFFSET in global_config:
         global_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=global_config[CONF_UTILITY_METER_OFFSET])
+    if global_config.get(CONF_ENERGY_SENSOR_CATEGORY):
+        global_config[CONF_ENERGY_SENSOR_CATEGORY] = EntityCategory(global_config[CONF_ENERGY_SENSOR_CATEGORY])
+    if global_config.get(CONF_POWER_SENSOR_CATEGORY):
+        global_config[CONF_POWER_SENSOR_CATEGORY] = EntityCategory(global_config[CONF_POWER_SENSOR_CATEGORY])
     global_config[FLAG_HAS_GLOBAL_GUI_CONFIG] = True
 
     return global_config
