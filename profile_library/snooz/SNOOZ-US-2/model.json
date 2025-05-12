@@ -35,5 +35,6 @@
     "VERSION": "v1.17.12:docker"
   },
   "name": "Snooz SNOOZ-US-2",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author": "Thomas R. Novak <trnovak@illinoisalumni.org>"
 }
