@@ -19,7 +19,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.normalized_name_base_registry import NormalizedNameBaseRegistryItems
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_registry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_registry, setup_test_component_platform
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -42,13 +42,11 @@ async def create_mock_light_entity(
     """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
     entity_registry = er.async_get(hass)
     device_registry = dr.async_get(hass)
-    platform: test_light_platform = getattr(hass.components, "test.light")
-    platform.init(empty=True)
 
     if not isinstance(entities, list):
         entities = [entities]
 
-    platform.ENTITIES.extend(entities)
+    setup_test_component_platform(hass, light.DOMAIN, entities)
 
     assert await async_setup_component(
         hass,
