@@ -5,7 +5,7 @@ import pytest
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceEntryDisabler, DeviceRegistry
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -106,13 +106,13 @@ async def test_entities_are_bound_to_source_device2(
     entity_reg = mock_registry(
         hass,
         {
-            switch_id: er.RegistryEntry(
+            switch_id: RegistryEntryWithDefaults(
                 entity_id=switch_id,
                 unique_id="1234",
                 platform="switch",
                 device_id=device_id,
             ),
-            power_sensor_id: er.RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="12345",
                 platform="sensor",
@@ -158,14 +158,14 @@ async def test_entities_are_bound_to_disabled_source_device(
     entity_reg = mock_registry(
         hass,
         {
-            light_id: er.RegistryEntry(
+            light_id: RegistryEntryWithDefaults(
                 entity_id=light_id,
                 disabled_by=er.RegistryEntryDisabler.DEVICE,
                 unique_id="1234",
                 platform="light",
                 device_id=device_id,
             ),
-            power_sensor_id: er.RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 disabled_by=er.RegistryEntryDisabler.DEVICE,
                 unique_id="1234",
@@ -242,13 +242,13 @@ async def test_change_device(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "entity1": er.RegistryEntry(
+            "entity1": RegistryEntryWithDefaults(
                 entity_id="sensor.entity1",
                 unique_id="1111",
                 platform="shelly",
                 device_id="device1",
             ),
-            "entity2": er.RegistryEntry(
+            "entity2": RegistryEntryWithDefaults(
                 entity_id="sensor.entity2",
                 unique_id="2222",
                 platform="shelly",

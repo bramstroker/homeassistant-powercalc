@@ -3,9 +3,8 @@ from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.selector import SelectSelector
-from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.config_flow import Step
@@ -196,7 +195,7 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "switch.test": RegistryEntry(
+            "switch.test": RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 unique_id="54543",
                 device_id=device_entry.id,

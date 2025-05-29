@@ -14,9 +14,8 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.util import dt
-from pytest_homeassistant_custom_component.common import async_fire_time_changed, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, async_fire_time_changed, mock_device_registry, mock_registry
 
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
@@ -57,7 +56,7 @@ async def test_composite(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "light.test": RegistryEntry(
+            "light.test": RegistryEntryWithDefaults(
                 entity_id="light.test",
                 unique_id="1234",
                 platform="light",
