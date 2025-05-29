@@ -5,6 +5,7 @@ from homeassistant.const import CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.entity_registry import RegistryEntry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults
 
 from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
 from custom_components.powercalc.group_include.filter import (
@@ -82,7 +83,7 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
     ],
 )
 async def test_label_filter(label: str, expected_result: bool) -> None:
-    entry = RegistryEntry(entity_id="sensor.test", unique_id="abc", platform="test", labels=["test"])
+    entry = RegistryEntryWithDefaults(entity_id="sensor.test", unique_id="abc", platform="test", labels=["test"])
     assert LabelFilter(label).is_valid(entry) == expected_result
 
 
@@ -111,17 +112,17 @@ async def test_null_filter() -> None:
     ],
 )
 async def test_category_filter(category: EntityCategory, filter_categories: list[EntityCategory], expected_result: bool) -> None:
-    entry = RegistryEntry(entity_id="sensor.test", unique_id="abc", platform="test", entity_category=category)
+    entry = RegistryEntryWithDefaults(entity_id="sensor.test", unique_id="abc", platform="test", entity_category=category)
     assert CategoryFilter(filter_categories).is_valid(entry) == expected_result
 
 
 async def test_lambda_filter() -> None:
     entity_filter = LambdaFilter(lambda entity: entity.entity_id == "sensor.test")
 
-    entry = RegistryEntry(entity_id="sensor.test", unique_id="abc", platform="test")
+    entry = RegistryEntryWithDefaults(entity_id="sensor.test", unique_id="abc", platform="test")
     assert entity_filter.is_valid(entry) is True
 
-    entry = RegistryEntry(entity_id="sensor.test2", unique_id="abc", platform="test")
+    entry = RegistryEntryWithDefaults(entity_id="sensor.test2", unique_id="abc", platform="test")
     assert entity_filter.is_valid(entry) is False
 
 
@@ -183,4 +184,4 @@ async def test_create_composite_filter2(hass: HomeAssistant, area_registry: Area
 
 
 def _create_registry_entry(entity_id: str = "switch.test") -> RegistryEntry:
-    return RegistryEntry(entity_id=entity_id, unique_id="abc", platform="test", device_id="my-device")
+    return RegistryEntryWithDefaults(entity_id=entity_id, unique_id="abc", platform="test", device_id="my-device")

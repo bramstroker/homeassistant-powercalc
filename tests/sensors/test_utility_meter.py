@@ -18,10 +18,10 @@ from homeassistant.components.utility_meter.sensor import (
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_ENTITY_ID, CONF_NAME, UnitOfEnergy
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
 )
@@ -124,19 +124,19 @@ async def test_utility_meter_is_not_created_twice(
     entity_registry = mock_registry(
         hass,
         {
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="1234",
                 name="Test power",
                 platform="powercalc",
             ),
-            energy_sensor_id: RegistryEntry(
+            energy_sensor_id: RegistryEntryWithDefaults(
                 entity_id=energy_sensor_id,
                 unique_id="1234_energy",
                 name="Test energy",
                 platform="powercalc",
             ),
-            utility_meter_id: RegistryEntry(
+            utility_meter_id: RegistryEntryWithDefaults(
                 entity_id=utility_meter_id,
                 unique_id="1234_energy_daily",
                 name="Test energy daily",
@@ -214,21 +214,21 @@ async def test_regression(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="29742725-6F34-49F2-91DE-589951306E9F",
                 name="Test power",
                 platform="sensor",
                 device_id=device_id,
             ),
-            power_sensor2_id: RegistryEntry(
+            power_sensor2_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="A1CBB81F-A958-482B-A10E-1DAA0652796A",
                 name="Test power2",
                 platform="sensor",
                 device_id=device_id,
             ),
-            energy_sensor_id: RegistryEntry(
+            energy_sensor_id: RegistryEntryWithDefaults(
                 entity_id=energy_sensor_id,
                 unique_id="4FA9B62F-E957-4366-B7DA-832C1D5F742D",
                 name="Test energy",

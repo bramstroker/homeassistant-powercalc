@@ -19,9 +19,9 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
+    RegistryEntryWithDefaults,
     async_fire_time_changed,
     mock_device_registry,
     mock_registry,
@@ -73,14 +73,14 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(
     mock_registry(
         hass,
         {
-            "sensor.existing_power": RegistryEntry(
+            "sensor.existing_power": RegistryEntryWithDefaults(
                 entity_id="sensor.existing_power",
                 unique_id="1234",
                 platform="sensor",
                 device_id="shelly-device-id",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.existing_energy": RegistryEntry(
+            "sensor.existing_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.existing_energy",
                 unique_id="12345",
                 platform="sensor",
@@ -144,14 +144,14 @@ async def test_force_create_energy_sensor_for_existing_power_sensor(
     mock_registry(
         hass,
         {
-            "sensor.existing_power": RegistryEntry(
+            "sensor.existing_power": RegistryEntryWithDefaults(
                 entity_id="sensor.existing_power",
                 unique_id="1234",
                 platform="sensor",
                 device_id="shelly-device-id",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.existing_energy": RegistryEntry(
+            "sensor.existing_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.existing_energy",
                 unique_id="12345",
                 platform="sensor",
@@ -201,7 +201,7 @@ async def test_force_create_energy_sensor_overrides_create_energy_sensors_option
     mock_registry(
         hass,
         {
-            "sensor.existing_power": RegistryEntry(
+            "sensor.existing_power": RegistryEntryWithDefaults(
                 entity_id="sensor.bedroom_airco_power",
                 unique_id="1234",
                 platform="sensor",
@@ -394,7 +394,7 @@ async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "sensor.test_power": RegistryEntry(
+            "sensor.test_power": RegistryEntryWithDefaults(
                 entity_id="sensor.test_power",
                 unique_id="12345",
                 platform="sensor",
