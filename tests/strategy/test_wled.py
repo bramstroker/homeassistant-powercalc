@@ -13,6 +13,7 @@ from pytest_homeassistant_custom_component.common import (
     RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
+    setup_test_component_platform,
 )
 
 import custom_components.test.sensor as test_sensor_platform
@@ -40,14 +41,13 @@ async def test_can_calculate_power(
 
     light_source_entity = await create_source_entity("light.test", hass)
 
-    platform: test_sensor_platform = getattr(hass.components, "test.sensor")
-    platform.init(empty=True)
-    estimated_current_entity = platform.MockSensor(
+    estimated_current_entity = test_sensor_platform.MockSensor(
         name="test_estimated_current",
         native_value="50.0",
         unique_id="abc",
     )
-    platform.ENTITIES[0] = estimated_current_entity
+
+    setup_test_component_platform(hass, sensor.DOMAIN, [estimated_current_entity])
 
     assert await async_setup_component(
         hass,
