@@ -14,9 +14,10 @@ from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
+from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
 )
@@ -144,7 +145,7 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
         mock_registry(
             hass,
             {
-                entity_id: RegistryEntry(
+                entity_id: RegistryEntryWithDefaults(
                     entity_id=entity_id,
                     unique_id=unique_id,
                     platform=platform,

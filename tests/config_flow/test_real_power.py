@@ -4,8 +4,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from pytest_homeassistant_custom_component.common import (
+    RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
 )
@@ -54,7 +54,7 @@ async def test_energy_sensor_is_bound_to_power_device(hass: HomeAssistant) -> No
     entity_registry = mock_registry(
         hass,
         {
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="123",
                 platform="sensor",
@@ -139,7 +139,7 @@ async def test_attach_to_custom_device(hass: HomeAssistant) -> None:
     entity_registry = mock_registry(
         hass,
         {
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="123",
                 platform="sensor",

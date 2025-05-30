@@ -20,6 +20,7 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    RegistryEntryWithDefaults,
     async_fire_time_changed,
     mock_device_registry,
     mock_registry,
@@ -317,13 +318,13 @@ async def test_autodiscover_continues_when_one_entity_fails(
     mock_registry(
         hass,
         {
-            "light.test1": RegistryEntry(
+            "light.test1": RegistryEntryWithDefaults(
                 entity_id="light.test1",
                 unique_id="1234",
                 platform="light",
                 device_id="signify-device",
             ),
-            "light.test2": RegistryEntry(
+            "light.test2": RegistryEntryWithDefaults(
                 entity_id="light.test2",
                 unique_id="1235",
                 platform="light",
@@ -367,19 +368,19 @@ async def test_exclude_device_types(
     mock_registry(
         hass,
         {
-            "light.test": RegistryEntry(
+            "light.test": RegistryEntryWithDefaults(
                 entity_id="light.test",
                 unique_id="1111",
                 platform="hue",
                 device_id="light-device",
             ),
-            "switch.test": RegistryEntry(
+            "switch.test": RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 unique_id="2222",
                 platform="shelly",
                 device_id="switch-device",
             ),
-            "cover.test": RegistryEntry(
+            "cover.test": RegistryEntryWithDefaults(
                 entity_id="cover.test",
                 unique_id="3333",
                 platform="shelly",
@@ -590,25 +591,25 @@ async def test_govee_segment_lights_skipped(
     mock_registry(
         hass,
         {
-            "light.floor_lamp_livingroom": RegistryEntry(
+            "light.floor_lamp_livingroom": RegistryEntryWithDefaults(
                 entity_id="light.floor_lamp_livingroom",
                 unique_id="gv2mqtt-F23DD0C844866B65",
                 platform="mqtt",
                 device_id="govee-device",
             ),
-            "light.floor_lamp_livingroom_segment_001": RegistryEntry(
+            "light.floor_lamp_livingroom_segment_001": RegistryEntryWithDefaults(
                 entity_id="light.floor_lamp_livingroom_segment_001",
                 unique_id="gv2mqtt-F23DD0C844866B65-0",
                 platform="mqtt",
                 device_id="govee-device",
             ),
-            "light.floor_lamp_livingroom_segment_002": RegistryEntry(
+            "light.floor_lamp_livingroom_segment_002": RegistryEntryWithDefaults(
                 entity_id="light.floor_lamp_livingroom_segment_002",
                 unique_id="gv2mqtt-F23DD0C844866B65-1",
                 platform="mqtt",
                 device_id="govee-device",
             ),
-            "light.floor_lamp_livingroom_segment_003": RegistryEntry(
+            "light.floor_lamp_livingroom_segment_003": RegistryEntryWithDefaults(
                 entity_id="light.floor_lamp_livingroom_segment_003",
                 unique_id="gv2mqtt-F23DD0C844866B65-2",
                 platform="mqtt",
@@ -679,7 +680,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
     "entity_entry,device_entry,model_info",
     [
         (
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 unique_id=uuid.uuid4(),
                 platform="switch",
@@ -688,7 +689,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
             None,
         ),
         (
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 unique_id=uuid.uuid4(),
                 platform="switch",
@@ -698,7 +699,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
             ModelInfo("foo", "bar", None),
         ),
         (
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 unique_id=uuid.uuid4(),
                 platform="switch",
@@ -708,7 +709,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
             None,
         ),
         (
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 unique_id=uuid.uuid4(),
                 platform="switch",
@@ -822,13 +823,13 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
     mock_registry(
         hass,
         {
-            "sensor.test_powercalc": RegistryEntry(
+            "sensor.test_powercalc": RegistryEntryWithDefaults(
                 entity_id="sensor.test_powercalc",
                 unique_id="1111",
                 platform="powercalc",
                 device_id="my-device",
             ),
-            "sensor.test_other": RegistryEntry(
+            "sensor.test_other": RegistryEntryWithDefaults(
                 entity_id="sensor.test_other",
                 unique_id="2222",
                 platform="other-platform",
@@ -848,7 +849,7 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
     [
         (
             [
-                RegistryEntry(
+                RegistryEntryWithDefaults(
                     entity_id="switch.test",
                     unique_id="1111",
                     platform="hue",
@@ -860,13 +861,13 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
         # Entity domains that are not supported must be ignored
         (
             [
-                RegistryEntry(
+                RegistryEntryWithDefaults(
                     entity_id="scene.test",
                     unique_id="1111",
                     platform="hue",
                     device_id="hue-device",
                 ),
-                RegistryEntry(
+                RegistryEntryWithDefaults(
                     entity_id="event.test",
                     unique_id="2222",
                     platform="hue",
@@ -878,7 +879,7 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
         # Powercalc sensors should not be considered for discovery
         (
             [
-                RegistryEntry(
+                RegistryEntryWithDefaults(
                     entity_id="sensor.test",
                     unique_id="1111",
                     platform="powercalc",
@@ -890,13 +891,13 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
         # SwitchAsX entities should be ignored
         (
             [
-                RegistryEntry(
+                RegistryEntryWithDefaults(
                     entity_id="switch.test",
                     unique_id="1111",
                     platform="mqtt",
                     device_id="some-device",
                 ),
-                RegistryEntry(
+                RegistryEntryWithDefaults(
                     entity_id="light.test",
                     unique_id="2222",
                     platform="switch_as_x",

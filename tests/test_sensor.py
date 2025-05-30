@@ -33,6 +33,7 @@ from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    RegistryEntryWithDefaults,
     mock_registry,
 )
 
@@ -565,7 +566,7 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
     entity_reg = mock_registry(
         hass,
         {
-            light_id: er.RegistryEntry(
+            light_id: RegistryEntryWithDefaults(
                 entity_id=light_id,
                 disabled_by=er.RegistryEntryDisabler.DEVICE,
                 unique_id="1234",
@@ -617,12 +618,12 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            original_light_id: er.RegistryEntry(
+            original_light_id: RegistryEntryWithDefaults(
                 entity_id=original_light_id,
                 unique_id=original_unique_id,
                 platform="light",
             ),
-            new_light_id: er.RegistryEntry(
+            new_light_id: RegistryEntryWithDefaults(
                 entity_id=original_light_id,
                 unique_id=new_unique_id,
                 platform="light",

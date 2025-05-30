@@ -14,9 +14,9 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
+from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.selector import SelectSelector
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
 from custom_components.powercalc import SensorType, async_migrate_entry
 from custom_components.powercalc.config_flow import Step
@@ -164,14 +164,14 @@ async def test_add_device_members_to_group(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "sensor.balcony_power": RegistryEntry(
+            "sensor.balcony_power": RegistryEntryWithDefaults(
                 entity_id="sensor.balcony_power",
                 unique_id="1111",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
                 device_id="my-device",
             ),
-            "sensor.balcony_energy": RegistryEntry(
+            "sensor.balcony_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.balcony_energy",
                 unique_id="2222",
                 platform="sensor",
@@ -337,13 +337,13 @@ async def test_include_area_powercalc_only(
     mock_registry(
         hass,
         {
-            "switch.switch": RegistryEntry(
+            "switch.switch": RegistryEntryWithDefaults(
                 entity_id="switch.switch",
                 unique_id="1111",
                 platform="switch",
                 area_id=area.id,
             ),
-            "sensor.existing_power": RegistryEntry(
+            "sensor.existing_power": RegistryEntryWithDefaults(
                 entity_id="sensor.existing_power",
                 unique_id="3333",
                 platform="sensor",

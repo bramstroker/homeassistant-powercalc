@@ -6,7 +6,7 @@ from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_PAUSED, STATE_PLAYING
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.entity_registry import RegistryEntry
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -134,10 +134,10 @@ async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
         ModelInfo("signify", "LCA007"),
     )
     assert power_profile.is_entity_domain_supported(
-        RegistryEntry(entity_id="light.test", platform="hue", unique_id="1234"),
+        RegistryEntryWithDefaults(entity_id="light.test", platform="hue", unique_id="1234"),
     )
     assert not power_profile.is_entity_domain_supported(
-        RegistryEntry(entity_id="switch.test", platform="bla", unique_id="1234"),
+        RegistryEntryWithDefaults(entity_id="switch.test", platform="bla", unique_id="1234"),
     )
 
 
@@ -147,7 +147,7 @@ async def test_hue_switch_supported_entity_domain(hass: HomeAssistant) -> None:
         ModelInfo("signify", "LOM001"),
     )
     assert power_profile.is_entity_domain_supported(
-        RegistryEntry(
+        RegistryEntryWithDefaults(
             entity_id="light.test",
             unique_id="1234",
             platform="hue",
@@ -162,7 +162,7 @@ async def test_vacuum_entity_domain_supported(hass: HomeAssistant) -> None:
         get_test_profile_dir("vacuum"),
     )
     assert power_profile.is_entity_domain_supported(
-        RegistryEntry(
+        RegistryEntryWithDefaults(
             entity_id="vacuum.test",
             unique_id="1234",
             platform="xiaomi_miio",
@@ -239,7 +239,7 @@ async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
     "registry_entry,expected_profile",
     [
         (
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 platform="tasmota",
                 unique_id="111",
@@ -247,7 +247,7 @@ async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
             "tasmota",
         ),
         (
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 platform="shelly",
                 unique_id="111",
