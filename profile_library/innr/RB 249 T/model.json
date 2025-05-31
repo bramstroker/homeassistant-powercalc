@@ -10,5 +10,6 @@
     "VERSION": "v1.17.13:docker"
   },
   "name": "RB249 T",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
 }
