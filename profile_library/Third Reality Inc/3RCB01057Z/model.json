@@ -1,7 +1,7 @@
 {
   "calculation_strategy": "lut",
   "device_type": "light",
-  "created_at": "2025-06-02T23:18:14.432434",
+  "created_at": "2025-06-02T23:18:14",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly mini PM Gen 3",
   "measure_method": "script",
@@ -12,6 +12,5 @@
   },
   "name": "SMART COLOR BULB ZL1",
   "standby_power": 0.38,
-  "created_at": "2025-06-02T23:18:14",
   "author": "mdb17 <mdb17@live.com>"
 }
