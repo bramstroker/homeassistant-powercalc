@@ -1607,19 +1607,19 @@ test = ["coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mock ; python_version < \"3.
 
 [[package]]
 name = "go2rtc-client"
-version = "0.1.3b0"
+version = "0.2.1"
 description = "Python client for go2rtc"
 optional = false
 python-versions = ">=3.12.0"
 groups = ["dev"]
 files = [
-    {file = "go2rtc_client-0.1.3b0-py3-none-any.whl", hash = "sha256:6bc962b57086f0f1ccdfb0d7e08b9f44fe62f508115e760cb8991a7b51b194b1"},
-    {file = "go2rtc_client-0.1.3b0.tar.gz", hash = "sha256:69d105bee627eca4e01afff94f0bba69b066dca9f4b22c132f4379973d2f5ac6"},
+    {file = "go2rtc_client-0.2.1-py3-none-any.whl", hash = "sha256:de767a6608cecfc69cd44f54db649af0233bc92ab5c6b408d6b60515b622c620"},
+    {file = "go2rtc_client-0.2.1.tar.gz", hash = "sha256:9b60e22a0f554c39f30b92b4abaf68efe41e6942aa2f25900efae7798c9747a8"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.10,<4.0"
-awesomeversion = ">=24.6,<25.0"
+awesomeversion = ">=24.6"
 mashumaro = ">=3.13,<4.0"
 orjson = ">=3.10,<4.0"
 webrtc-models = ">=0.1,<1.0"
@@ -1852,14 +1852,14 @@ files = [
 
 [[package]]
 name = "homeassistant"
-version = "2025.6.0b4"
+version = "2025.6.0b5"
 description = "Open-source home automation platform running on Python 3."
 optional = false
 python-versions = ">=3.13.2"
 groups = ["main", "dev"]
 files = [
-    {file = "homeassistant-2025.6.0b4-py3-none-any.whl", hash = "sha256:e8da199d14dfcd6beeb0cd321ab99967ea64fcd583f2d5b77ab9619bd6254523"},
-    {file = "homeassistant-2025.6.0b4.tar.gz", hash = "sha256:003ef4806bc1dd0ce9ec140b775d4acc9cf58ec7f4285b810473df424fe5c9aa"},
+    {file = "homeassistant-2025.6.0b5-py3-none-any.whl", hash = "sha256:40283060f1f26790db7e72c97caaef044f739c37dd6a8f0b30a26bb397af4599"},
+    {file = "homeassistant-2025.6.0b5.tar.gz", hash = "sha256:ff3b600892e54c9dce29f004db16cb2fffb06bc7127fdb0e050028903cab6b94"},
 ]
 
 [package.dependencies]
@@ -1924,18 +1924,18 @@ zeroconf = "0.147.0"
 
 [[package]]
 name = "homeassistant-stubs"
-version = "2025.6.0b4"
+version = "2025.6.0b5"
 description = "PEP 484 typing stubs for Home Assistant Core"
 optional = false
 python-versions = ">=3.13.2"
 groups = ["dev"]
 files = [
-    {file = "homeassistant_stubs-2025.6.0b4-py3-none-any.whl", hash = "sha256:5b3ae081e23c6c12882e0f23cf942adb5025a8690c27b606b37ef892a937b0e8"},
-    {file = "homeassistant_stubs-2025.6.0b4.tar.gz", hash = "sha256:26d98d9981f2f392dbd3e11258e247594c7abe1f08a80ca264ceb7e34b0dcfcf"},
+    {file = "homeassistant_stubs-2025.6.0b5-py3-none-any.whl", hash = "sha256:71ef7590fa29db016c102acd057bdebbf9aab2450d6a79c7ad2c8b972664e050"},
+    {file = "homeassistant_stubs-2025.6.0b5.tar.gz", hash = "sha256:e75a78d55823e9a3a510747d3d5dc2d990e34e22ab22653a11cf25783dcad4f5"},
 ]
 
 [package.dependencies]
-homeassistant = "2025.6.0b4"
+homeassistant = "2025.6.0b5"
 
 [[package]]
 name = "httpcore"
@@ -3773,21 +3773,21 @@ pytest = ">=6.0.0"
 
 [[package]]
 name = "pytest-homeassistant-custom-component"
-version = "0.13.248"
+version = "0.13.249"
 description = "Experimental package to automatically extract test plugins for Home Assistant custom components"
 optional = false
 python-versions = ">=3.13"
 groups = ["dev"]
 files = [
-    {file = "pytest_homeassistant_custom_component-0.13.248-py3-none-any.whl", hash = "sha256:1c98351d1bf4f4b17e406bf0af80abe500d1d66c9db9924d4d2dabb00af6acea"},
-    {file = "pytest_homeassistant_custom_component-0.13.248.tar.gz", hash = "sha256:8f80f7be80dd9c364212a890320c7db418e042d530998de08fd96d162957724a"},
+    {file = "pytest_homeassistant_custom_component-0.13.249-py3-none-any.whl", hash = "sha256:a06806191bbe7895f1fa45e25f4c8085f7bca9701cefe223aebac0c80cbb41dd"},
+    {file = "pytest_homeassistant_custom_component-0.13.249.tar.gz", hash = "sha256:61ab1f5ea106f0e3cbb90e4316fc02b1e9030f36fd2e5f2234a5081e79a64eef"},
 ]
 
 [package.dependencies]
 coverage = "7.6.12"
 freezegun = "1.5.1"
-go2rtc-client = "0.1.3b0"
-homeassistant = "2025.6.0b4"
+go2rtc-client = "0.2.1"
+homeassistant = "2025.6.0b5"
 license-expression = "30.4.1"
 mock-open = "1.4.0"
 numpy = "2.2.2"
@@ -5192,4 +5192,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13.2,<3.14"
-content-hash = "5e41d276a7cc57784c684cd0378f112d0f62cfb884c6a9fbf5a7a02fbf9b7a00"
+content-hash = "e0356178e059fd643015ee2c39eda7b87de3c88fcaf8cbbe6932934d2cd2b967"
