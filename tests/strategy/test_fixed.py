@@ -164,7 +164,7 @@ async def test_validation_error_state_power_only_entity_domain() -> None:
         strategy = FixedStrategy(
             power=20,
             per_state_power=None,
-            source_entity=create_source_entity("climate"),
+            source_entity=create_source_entity("vacuum"),
         )
         await strategy.validate_config()
 
