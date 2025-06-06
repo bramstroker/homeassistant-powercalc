@@ -2,7 +2,8 @@ import logging
 
 import pytest
 from homeassistant.components import input_number
-from homeassistant.const import CONF_ENTITY_ID, STATE_ON
+from homeassistant.components.climate import ATTR_FAN_MODE, ATTR_HVAC_ACTION, HVACAction
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
@@ -17,6 +18,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
+    CONF_STANDBY_POWER,
     CONF_STATES_POWER,
     DOMAIN,
     CalculationStrategy,
@@ -304,6 +306,91 @@ async def test_duplicate_tracking_is_prevented(hass: HomeAssistant, caplog: pyte
 
     state_change_logs = [record for record in caplog.records if 'State changed to "on". Power:12.00' in record.message]
     assert len(state_change_logs) == 1, "Expected only one state change log"
+
+
+async def test_climate_entity_on_off(hass: HomeAssistant) -> None:
+    """
+    Test that a climate entity with an on/off state works correctly with fixed power.
+    This is useful for entities that do not have a specific HVAC action.
+    """
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "climate.main_thermostat",
+            CONF_FIXED: {
+                CONF_POWER: 100,
+            },
+            CONF_STANDBY_POWER: 5,
+        },
+    )
+
+    hass.states.async_set("climate.main_thermostat", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.main_thermostat_power").state == "100.00"
+
+    hass.states.async_set("climate.main_thermostat", STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.main_thermostat_power").state == "5.00"
+
+
+async def test_state_power_mixed_with_power_template(hass: HomeAssistant) -> None:
+    """
+    Test that a climate entity with a power template and state-based power works correctly.
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/3312
+    """
+
+    climate_entity = "climate.main_thermostat"
+    power_entity = "sensor.main_thermostat_power"
+
+    template = """
+      {% if state_attr('climate.main_thermostat', 'fan_mode') == 'Low' %}
+        97.6
+      {% else %}
+        7.8
+      {% endif %}
+    """
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: climate_entity,
+            CONF_FIXED: {
+                CONF_POWER: template,
+                CONF_STATES_POWER: {
+                    "hvac_action|heating": 461.7,
+                    "hvac_action|cooling": 439.7,
+                },
+            },
+        },
+    )
+
+    hass.states.async_set(
+        climate_entity,
+        HVACAction.HEATING,
+        {ATTR_FAN_MODE: "Low", ATTR_HVAC_ACTION: HVACAction.HEATING},
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity).state == "461.70"
+
+    hass.states.async_set(
+        climate_entity,
+        HVACAction.COOLING,
+        {ATTR_FAN_MODE: "Low", ATTR_HVAC_ACTION: HVACAction.COOLING},
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity).state == "439.70"
+
+    hass.states.async_set(
+        climate_entity,
+        HVACAction.FAN,
+        {ATTR_FAN_MODE: "Low", ATTR_HVAC_ACTION: HVACAction.FAN},
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity).state == "97.60"
 
 
 async def _create_strategy(
