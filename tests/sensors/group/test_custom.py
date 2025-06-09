@@ -29,10 +29,11 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
+from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    RegistryEntryWithDefaults,
     async_fire_time_changed,
     mock_registry,
     mock_restore_cache_with_extra_data,
@@ -1330,14 +1331,14 @@ async def test_create_group_with_real_power_sensors(hass: HomeAssistant) -> None
     mock_registry(
         hass,
         {
-            "sensor.existing_power": RegistryEntry(
+            "sensor.existing_power": RegistryEntryWithDefaults(
                 entity_id="sensor.existing_power",
                 unique_id="1234",
                 platform="sensor",
                 device_id="shelly-device-id",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.existing_energy": RegistryEntry(
+            "sensor.existing_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.existing_energy",
                 unique_id="12345",
                 platform="sensor",
@@ -1475,13 +1476,13 @@ async def test_additional_energy_sensors(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "sensor.furnace_power": RegistryEntry(
+            "sensor.furnace_power": RegistryEntryWithDefaults(
                 entity_id="sensor.furnace_power",
                 unique_id="1111",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.furnace_energy": RegistryEntry(
+            "sensor.furnace_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.furnace_energy",
                 unique_id="2222",
                 platform="sensor",
@@ -1531,13 +1532,13 @@ async def test_force_calculate_energy_sensor(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "sensor.furnace_power": RegistryEntry(
+            "sensor.furnace_power": RegistryEntryWithDefaults(
                 entity_id="sensor.furnace_power",
                 unique_id="1111",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.lights_power": RegistryEntry(
+            "sensor.lights_power": RegistryEntryWithDefaults(
                 entity_id="sensor.lights_power",
                 unique_id="2222",
                 platform="sensor",
@@ -1740,14 +1741,14 @@ async def test_area_group(hass: HomeAssistant, area_registry: AreaRegistry) -> N
     mock_registry(
         hass,
         {
-            "sensor.test_power": RegistryEntry(
+            "sensor.test_power": RegistryEntryWithDefaults(
                 entity_id="sensor.test_power",
                 unique_id=1111,
                 platform="powercalc",
                 device_class=SensorDeviceClass.POWER,
                 area_id=area.id,
             ),
-            "sensor.test_energy": RegistryEntry(
+            "sensor.test_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.test_energy",
                 unique_id=2222,
                 platform="powercalc",

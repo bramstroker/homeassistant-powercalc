@@ -6,8 +6,8 @@ from homeassistant.const import (
     CONF_NAME,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import RegistryEntry
 from pytest_homeassistant_custom_component.common import (
+    RegistryEntryWithDefaults,
     mock_registry,
 )
 
@@ -29,37 +29,37 @@ async def test_domain_group_all(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "sensor.a_power": RegistryEntry(
+            "sensor.a_power": RegistryEntryWithDefaults(
                 entity_id="sensor.a_power",
                 unique_id="1111",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.b_power": RegistryEntry(
+            "sensor.b_power": RegistryEntryWithDefaults(
                 entity_id="sensor.b_power",
                 unique_id="2222",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.c_power": RegistryEntry(
+            "sensor.c_power": RegistryEntryWithDefaults(
                 entity_id="sensor.c_power",
                 unique_id="3333",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.d_power": RegistryEntry(
+            "sensor.d_power": RegistryEntryWithDefaults(
                 entity_id="sensor.c_power",
                 unique_id="4444",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.a_energy": RegistryEntry(
+            "sensor.a_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.a_energy",
                 unique_id="5555",
                 platform="sensor",
                 device_class=SensorDeviceClass.ENERGY,
             ),
-            "sensor.b_energy": RegistryEntry(
+            "sensor.b_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.b_energy",
                 unique_id="6666",
                 platform="sensor",

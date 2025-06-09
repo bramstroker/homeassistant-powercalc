@@ -9,7 +9,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.selector import EntitySelector
-from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.common import SourceEntity
@@ -260,14 +260,14 @@ async def test_light_switches_selectable(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "switch.test1": RegistryEntry(
+            "switch.test1": RegistryEntryWithDefaults(
                 id="switch.test1",
                 entity_id="switch.test1",
                 unique_id=f"{device_id}1",
                 device_id=device_id,
                 platform="switch",
             ),
-            "light.test2": RegistryEntry(
+            "light.test2": RegistryEntryWithDefaults(
                 id="light.test2",
                 entity_id="light.test2",
                 unique_id=f"{device_id}2",
@@ -338,7 +338,7 @@ def mock_device_with_switches(hass: HomeAssistant, num_switches: int = 2, manufa
     entities: dict[str, RegistryEntry] = {}
     for i in range(num_switches):
         entity_id = f"switch.test{i + 1}"
-        entry = RegistryEntry(
+        entry = RegistryEntryWithDefaults(
             id=entity_id,
             entity_id=entity_id,
             unique_id=f"{device_id}{i + 1}",

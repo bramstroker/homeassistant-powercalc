@@ -173,7 +173,7 @@ class PowerProfile:
     @property
     def linked_profile(self) -> str | None:
         """Get the linked profile."""
-        return self._json_data.get("linked_profile", self._json_data.get("linked_lut"))  # type: ignore[no-any-return]
+        return self._json_data.get("linked_profile", self._json_data.get("linked_lut"))
 
     @property
     def calculation_enabled_condition(self) -> str | None:
