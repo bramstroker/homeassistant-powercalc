@@ -231,8 +231,8 @@ async def _get_power_profile(
             sensor_config,
             model_info=model_info,
         )
-        if power_profile and power_profile.sub_profile_select:
-            await _select_sub_profile(hass, power_profile, power_profile.sub_profile_select, source_entity)
+        if power_profile and power_profile.has_sub_profile_select_matchers:
+            await _select_sub_profile(hass, power_profile, power_profile.sub_profile_select, source_entity)  # type: ignore
     except ModelNotSupportedError as err:
         if not is_fully_configured(sensor_config):
             _LOGGER.error(
@@ -489,10 +489,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Return entities and templates that should be tracked."""
         entities_to_track = copy(self._strategy_instance.get_entities_to_track()) if self._strategy_instance else []
 
-        if self._power_profile and self._power_profile.sub_profile_select:
+        if self._power_profile and self._power_profile.has_sub_profile_select_matchers:
             self._sub_profile_selector = SubProfileSelector(
                 self.hass,
-                self._power_profile.sub_profile_select,
+                self._power_profile.sub_profile_select,  # type: ignore
                 self._source_entity,
             )
             entities_to_track.extend(self._sub_profile_selector.get_tracking_entities())
