@@ -541,3 +541,25 @@ async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) 
 
     assert hass.states.get("sensor.a_power").state == "26.90"
     assert hass.states.get("sensor.b_power").state == "5.20"
+
+
+@pytest.mark.parametrize(
+    "test_profile,expected_result",
+    [
+        (
+            "sub_profile_only_default",
+            True,
+        ),
+        (
+            "sub_profile_match_integration",
+            False,
+        ),
+    ],
+)
+async def test_requires_manual_sub_profile_selection(hass: HomeAssistant, test_profile: str, expected_result: bool) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
+        ModelInfo("test", "test"),
+        get_test_profile_dir(test_profile),
+    )
+    assert await power_profile.requires_manual_sub_profile_selection == expected_result

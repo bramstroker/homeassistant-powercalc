@@ -355,10 +355,7 @@ class PowerProfile:
         if not await self.has_sub_profiles:
             return False
 
-        if not self.sub_profile_select:
-            return True
-
-        return not self.sub_profile_select.matchers
+        return not self.has_sub_profile_select_matchers
 
     @property
     def sub_profile_select(self) -> SubProfileSelectConfig | None:
@@ -367,6 +364,13 @@ class PowerProfile:
         if not select_dict:
             return None
         return SubProfileSelectConfig(**select_dict)
+
+    @property
+    def has_sub_profile_select_matchers(self) -> bool:
+        """Check whether the sub profile select has matchers."""
+        if not self.sub_profile_select:
+            return False
+        return bool(self.sub_profile_select.matchers)
 
     async def select_sub_profile(self, sub_profile: str) -> None:
         """Select a sub profile. Only applicable when to profile actually supports sub profiles."""
