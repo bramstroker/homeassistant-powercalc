@@ -9,7 +9,7 @@ from json import JSONDecodeError
 from typing import Any, NotRequired, TypedDict, cast
 
 import aiohttp
-from aiohttp import ClientError
+from aiohttp import ClientError, ClientTimeout
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
 
@@ -23,6 +23,8 @@ _LOGGER = logging.getLogger(__name__)
 DOWNLOAD_PROXY = "https://api.powercalc.nl"
 ENDPOINT_LIBRARY = f"{DOWNLOAD_PROXY}/library"
 ENDPOINT_DOWNLOAD = f"{DOWNLOAD_PROXY}/download"
+
+TIMEOUT_SECONDS = 30
 
 
 class LibraryModel(TypedDict):
@@ -103,7 +105,7 @@ class RemoteLoader(Loader):
             If download is successful, save it to local storage to use as fallback in case of internet connection issues.
             """
             _LOGGER.debug("Loading library.json from github")
-            async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
+            async with aiohttp.ClientSession(timeout=ClientTimeout(total=TIMEOUT_SECONDS)) as session, session.get(ENDPOINT_LIBRARY) as resp:
                 if resp.status != 200:
                     raise ProfileDownloadError("Failed to download library.json, unexpected status code")
 
@@ -253,7 +255,7 @@ class RemoteLoader(Loader):
         while retry_count < max_retries:
             try:
                 return await callback()
-            except (ClientError, ProfileDownloadError) as e:
+            except (ClientError, TimeoutError, ProfileDownloadError) as e:
                 _LOGGER.debug(e)
                 retry_count += 1
                 if retry_count == max_retries:
@@ -280,7 +282,7 @@ class RemoteLoader(Loader):
             with open(path, "wb") as f:
                 f.write(data)
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(timeout=ClientTimeout(total=TIMEOUT_SECONDS)) as session:
             try:
                 async with session.get(endpoint) as resp:
                     if resp.status != 200:

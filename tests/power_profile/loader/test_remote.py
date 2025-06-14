@@ -343,6 +343,32 @@ async def test_fallback_to_local_library_on_client_connection_error(
     assert len(caplog.records) == 2
 
 
+async def test_fallback_to_local_library_on_timeout(
+    hass: HomeAssistant,
+    mock_aioresponse: aioresponses,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """
+    Test that the local library is used when api.powercalc.nl times out.
+    """
+    shutil.copy(get_library_json_path(), hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json"))
+
+    caplog.set_level(logging.WARNING)
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=200,
+        repeat=True,
+        exception=TimeoutError("test"),
+    )
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+    await loader.initialize()
+
+    assert "signify" in loader.model_lookup
+    assert len(caplog.records) == 2
+
+
 async def test_fallback_to_local_library_fails(hass: HomeAssistant, mock_aioresponse: aioresponses, caplog: pytest.LogCaptureFixture) -> None:
     """
     After 3 retries, and the library.json is never downloaded before to .storage dir, it should raise a ProfileDownloadError.
@@ -380,6 +406,28 @@ async def test_fallback_to_local_profile(
         f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}",
         status=500,
         repeat=True,
+    )
+
+    await remote_loader.load_model(manufacturer, model, force_update=True)
+
+
+async def test_fallback_to_local_profile_on_timeout(
+    hass: HomeAssistant,
+    mock_aioresponse: aioresponses,
+    mock_library_json_response: None,
+    remote_loader: RemoteLoader,
+) -> None:
+    manufacturer = "signify"
+    model = "LCA001"
+    local_storage_path = remote_loader.get_storage_path(manufacturer, model)
+    clear_storage_dir(local_storage_path)
+    shutil.copytree(get_library_path(f"{manufacturer}/{model}"), local_storage_path)
+
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}",
+        status=200,
+        repeat=True,
+        exception=TimeoutError("test"),
     )
 
     await remote_loader.load_model(manufacturer, model, force_update=True)
