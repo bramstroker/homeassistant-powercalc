@@ -95,7 +95,7 @@ def make_hashable(arg: Any) -> Any:  # noqa: ANN401
     return arg
 
 
-def async_cache(func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[..., Coroutine[Any, Any, R]]:
+def async_cache[R](func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[..., Coroutine[Any, Any, R]]:
     """
     A decorator to cache results of an async function based on its arguments.
 
