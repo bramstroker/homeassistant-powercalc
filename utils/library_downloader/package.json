@@ -15,7 +15,7 @@
     "@octokit/rest": "^22.0.0",
     "apicache": "^1.6.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.0.0",
     "express": "^5.0.0",
     "express-prom-bundle": "^8.0.0",
     "pino": "^9.0.0",
