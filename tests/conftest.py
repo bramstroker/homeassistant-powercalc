@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import shutil
@@ -36,12 +35,6 @@ from tests.common import mock_area_registry
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(enable_custom_integrations: bool) -> Generator:
     yield
-
-
-@pytest.fixture(autouse=True)
-def enable_event_loop_debug(event_loop: asyncio.AbstractEventLoop) -> None:
-    """Override the fixture to disable event loop debug mode."""
-    event_loop.set_debug(False)  # Modify this behavior as needed
 
 
 @pytest.fixture(autouse=True)
