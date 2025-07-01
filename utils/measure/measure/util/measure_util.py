@@ -261,7 +261,7 @@ class MeasureUtil:
                 self.take_average_measurement(DUMMY_LOAD_MEASUREMENTS_DURATION, measure_resistance=True) for _ in range(DUMMY_LOAD_MEASUREMENT_COUNT)
             ]
 
-            trend = self._check_trend(averages)
+            trend = self.calculate_trend(averages)
 
             if not trend:
                 _LOGGER.error("Error during measurement: No trend could be calculated")
@@ -280,7 +280,7 @@ class MeasureUtil:
             f.write(str(average))
         return average
 
-    def _check_trend(self, averages: list[float]) -> Trend | None:
+    def calculate_trend(self, averages: list[float]) -> Trend | None:
         """
         Checks if the resistance readings of a dummy load are increasing, decreasing, or steady (fluctuating).
 
