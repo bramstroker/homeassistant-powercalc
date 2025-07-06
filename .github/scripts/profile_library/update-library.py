@@ -148,9 +148,7 @@ def get_manufacturer_json(manufacturer: str) -> dict:
             }
     except FileNotFoundError:
         default_json = {
-            "name": manufacturer,
-            "full_name": manufacturer,
-            "dir_name": manufacturer,
+            "name": manufacturer.capitalize(),
             "aliases": []
         }
         with open(json_path, "w", encoding="utf-8") as json_file:
