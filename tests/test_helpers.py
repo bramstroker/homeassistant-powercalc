@@ -3,6 +3,7 @@ from decimal import Decimal
 from unittest.mock import PropertyMock, patch
 
 import pytest
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import TemplateError
@@ -11,7 +12,7 @@ from homeassistant.helpers.template import Template
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy
-from custom_components.powercalc.helpers import evaluate_power, get_or_create_unique_id, make_hashable
+from custom_components.powercalc.helpers import evaluate_power, get_or_create_unique_id, get_related_entity_by_device_class, make_hashable
 
 
 @pytest.mark.parametrize(
@@ -74,3 +75,17 @@ async def test_wled_unique_id() -> None:
 )
 async def test_make_hashable(value: set | list | dict, output: tuple | frozenset) -> None:
     assert make_hashable(value) == output
+
+
+async def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Test get_related_entity_by_device_class when entity has no device_id."""
+    from unittest.mock import MagicMock
+
+    entity = MagicMock()
+    entity.entity_id = "light.test"
+    entity.device_id = None
+
+    result = get_related_entity_by_device_class(hass, entity, SensorDeviceClass.BATTERY)
+
+    assert result is None
+    assert "Entity light.test has no device_id, cannot find related entity" in caplog.text
