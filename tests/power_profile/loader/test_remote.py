@@ -391,7 +391,6 @@ async def test_fallback_to_local_library_fails(hass: HomeAssistant, mock_aioresp
 
 
 async def test_fallback_to_local_profile(
-    hass: HomeAssistant,
     mock_aioresponse: aioresponses,
     mock_library_json_response: None,
     remote_loader: RemoteLoader,
