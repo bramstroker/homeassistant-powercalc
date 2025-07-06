@@ -108,6 +108,7 @@ types-pytz = "^2024.1"
 types-croniter = "^2.0"
 croniter = "^6.0.0"
 aioresponses = "^0.7.6"
+pyturbojpeg = "^1.8.2"
 
 [tool.poetry.dependencies]
 python = ">=3.13.2,<3.14"
