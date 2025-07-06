@@ -3879,6 +3879,20 @@ text-unidecode = ">=1.3"
 unidecode = ["Unidecode (>=1.1.1)"]
 
 [[package]]
+name = "pyturbojpeg"
+version = "1.8.2"
+description = "A Python wrapper of libjpeg-turbo for decoding and encoding JPEG image."
+optional = false
+python-versions = "*"
+groups = ["dev"]
+files = [
+    {file = "PyTurboJPEG-1.8.2.tar.gz", hash = "sha256:b7d9625bbb2121b923228fc70d0c2b010b386687501f5b50acec4501222e152b"},
+]
+
+[package.dependencies]
+numpy = "*"
+
+[[package]]
 name = "pytz"
 version = "2025.2"
 description = "World timezone definitions, modern and historical"
@@ -5101,4 +5115,4 @@ ifaddr = ">=0.1.7"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13.2,<3.14"
-content-hash = "9597ab83d5ba2f5331bd8da32dde5c675c9439cfb94858c080b2105bc1983237"
+content-hash = "bd3e6d53e194e0565ca1cae8db579d459ec4c151912ef2aa8f57b0c1db3f131b"
