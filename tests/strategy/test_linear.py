@@ -18,8 +18,7 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.typing import ConfigType
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.common import create_source_entity
+from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
     CONF_CALIBRATE,
     CONF_LINEAR,
@@ -201,7 +200,7 @@ async def test_no_battery_entity_for_vacuum(
     )
 
     with pytest.raises(StrategyConfigurationError, match="No battery entity found for vacuum cleaner"):
-        assert await strategy.calculate(State("vacuum.test", STATE_DOCKED)) is None
+        await strategy.calculate(State("vacuum.test", STATE_DOCKED))
 
 
 async def test_custom_attribute(hass: HomeAssistant) -> None:

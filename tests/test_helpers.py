@@ -77,7 +77,7 @@ async def test_make_hashable(value: set | list | dict, output: tuple | frozenset
     assert make_hashable(value) == output
 
 
-async def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """Test get_related_entity_by_device_class when entity has no device_id."""
     from unittest.mock import MagicMock
 

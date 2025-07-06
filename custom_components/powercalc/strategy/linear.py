@@ -150,24 +150,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     def get_current_state_value(self, entity_state: State) -> int | None:
         """Get the current entity state, i.e. selected brightness."""
         if self._attribute:
-            value: int | None = entity_state.attributes.get(self._attribute)
-            if value is None:
-                _LOGGER.warning(
-                    "No %s attribute for entity: %s",
-                    self._attribute,
-                    entity_state.entity_id,
-                )
-                return None
-            if self._attribute == ATTR_BRIGHTNESS and value > 255:
-                value = 255
-            # Convert volume level to 0-100 range
-            if self._attribute == ATTR_MEDIA_VOLUME_LEVEL:
-                if entity_state.state != STATE_PLAYING:
-                    return None
-                if entity_state.attributes.get(ATTR_MEDIA_VOLUME_MUTED) is True:
-                    value = 0
-                value *= 100
-            return value
+            return self.get_value_from_attribute(entity_state)
 
         if self._value_entity.entity_id is not self._source_entity.entity_id:
             # If the value entity is different from the source entity, we need to fetch the state of the value entity
@@ -187,6 +170,26 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                 entity_state.entity_id,
             )
             return None
+
+    def get_value_from_attribute(self, entity_state: State) -> int | None:
+        value: int | None = entity_state.attributes.get(self._attribute)
+        if value is None:
+            _LOGGER.warning(
+                "No %s attribute for entity: %s",
+                self._attribute,
+                entity_state.entity_id,
+            )
+            return None
+        if self._attribute == ATTR_BRIGHTNESS and value > 255:
+            value = 255
+        # Convert volume level to 0-100 range
+        if self._attribute == ATTR_MEDIA_VOLUME_LEVEL:
+            if entity_state.state != STATE_PLAYING:
+                return None
+            if entity_state.attributes.get(ATTR_MEDIA_VOLUME_MUTED) is True:
+                value = 0
+            value *= 100
+        return value
 
     def get_attribute(self, entity_state: State) -> str | None:
         """Returns the attribute which contains the value for the linear calculation."""
