@@ -18,8 +18,8 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.typing import ConfigType
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
-from custom_components.powercalc.common import SourceEntity, create_source_entity
-from custom_components.powercalc.common import create_source_entity as create_source_entity2
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     CONF_CALIBRATE,
     CONF_LINEAR,
@@ -37,7 +37,7 @@ from tests.conftest import MockEntityWithModel
 async def test_light_max_power_only(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        create_source_entity("light"),
+        await create_source_entity("light.test", hass),
         {CONF_MAX_POWER: 255},
     )
 
@@ -48,7 +48,7 @@ async def test_light_max_power_only(hass: HomeAssistant) -> None:
 async def test_fan_min_and_max_power(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        create_source_entity("fan"),
+        await create_source_entity("fan.test", hass),
         {CONF_MIN_POWER: 10, CONF_MAX_POWER: 100},
     )
 
@@ -59,7 +59,7 @@ async def test_fan_min_and_max_power(hass: HomeAssistant) -> None:
 async def test_light_calibrate(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        create_source_entity("light"),
+        await create_source_entity("light.test", hass),
         {
             CONF_CALIBRATE: [
                 "1 -> 0.3",
@@ -115,7 +115,7 @@ async def test_light_calibrate(hass: HomeAssistant) -> None:
 async def test_vacuum_battery_level(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        create_source_entity("vacuum"),
+        await create_source_entity("vacuum.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -160,7 +160,7 @@ async def test_vacuum_battery_level_as_entity(
 
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity2("vacuum.test", hass),
+        await create_source_entity("vacuum.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -196,7 +196,7 @@ async def test_no_battery_entity_for_vacuum(
 
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity2("vacuum.test", hass),
+        await create_source_entity("vacuum.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -207,7 +207,7 @@ async def test_no_battery_entity_for_vacuum(
 async def test_custom_attribute(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        create_source_entity("fan"),
+        await create_source_entity("fan.test", hass),
         {CONF_ATTRIBUTE: "my_attribute", CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -218,7 +218,7 @@ async def test_custom_attribute(hass: HomeAssistant) -> None:
 async def test_power_is_none_when_state_is_none(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        create_source_entity("light"),
+        await create_source_entity("light.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -233,7 +233,7 @@ async def test_error_on_non_number_state(
     caplog.set_level(logging.ERROR)
     strategy = await _create_strategy_instance(
         hass,
-        create_source_entity("sensor"),
+        await create_source_entity("sensor.test", hass),
         {CONF_CALIBRATE: ["1 -> 0.3", "10 -> 1.25"]},
     )
 
@@ -248,7 +248,7 @@ async def test_validate_raises_exception_not_allowed_domain(
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,
-            create_source_entity("sensor"),
+            await create_source_entity("sensor.test", hass),
             {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
         )
 
@@ -259,7 +259,7 @@ async def test_validate_raises_exception_when_min_power_higher_than_max(
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,
-            create_source_entity("light"),
+            await create_source_entity("light.test", hass),
             {CONF_MIN_POWER: 150, CONF_MAX_POWER: 100},
         )
 
@@ -267,7 +267,7 @@ async def test_validate_raises_exception_when_min_power_higher_than_max(
 async def test_lower_value_than_calibration_table_defines(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        create_source_entity("light"),
+        await create_source_entity("light.test", hass),
         {
             CONF_CALIBRATE: [
                 "50 -> 5",
@@ -326,7 +326,7 @@ async def test_config_entry_with_calibrate_list(
 async def test_media_player_volume_level(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        create_source_entity("media_player"),
+        await create_source_entity("media_player.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -343,7 +343,7 @@ async def test_error_is_raised_on_unsupported_entity_domain(
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,
-            create_source_entity("input_boolean"),
+            await create_source_entity("input_boolean.test", hass),
             {CONF_MAX_POWER: 255},
         )
 
@@ -384,7 +384,7 @@ async def test_value_entity_not_found(
 
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity2("vacuum.test", hass),
+        await create_source_entity("vacuum.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
