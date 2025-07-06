@@ -8,8 +8,12 @@ from decimal import Decimal
 from functools import wraps
 from typing import Any, TypeVar
 
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import TemplateError
+from homeassistant.helpers import entity_registry
+from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
@@ -139,3 +143,27 @@ def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[s
                 # Replace [[variable]] with its value
                 data = data.replace(f"[[{match}]]", replacements[match])
     return data
+
+
+def get_related_entity_by_device_class(hass: HomeAssistant, entity: RegistryEntry, device_class: SensorDeviceClass) -> str | None:
+    """Get related entity from same device by device class."""
+
+    entity_reg = entity_registry.async_get(hass)
+    device_id = entity.device_id
+    if not device_id:
+        _LOGGER.debug("Entity %s has no device_id, cannot find related entity", entity.entity_id)
+        return None
+
+    related_entities = [
+        entity_entry.entity_id
+        for entity_entry in entity_registry.async_entries_for_device(
+            entity_reg,
+            device_id,
+        )
+        if (entity_entry.device_class or entity_entry.original_device_class) == device_class
+    ]
+    if not related_entities:
+        _LOGGER.debug("No related entities found for device %s with device class %s", device_id, device_class)
+        return None
+
+    return related_entities[0]

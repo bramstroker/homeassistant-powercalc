@@ -11,7 +11,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_MULTIPLY_FACTOR,
@@ -29,11 +29,9 @@ from custom_components.powercalc.strategy.factory import PowerCalculatorStrategy
 from custom_components.powercalc.strategy.fixed import FixedStrategy
 from tests.common import create_input_boolean, create_input_number, run_powercalc_setup
 
-from .common import create_source_entity
 
-
-async def test_simple_power() -> None:
-    source_entity = create_source_entity("switch")
+async def test_simple_power(hass: HomeAssistant) -> None:
+    source_entity = await create_source_entity("switch.test", hass)
     strategy = FixedStrategy(source_entity, power=50, per_state_power=None)
     assert await strategy.calculate(State(source_entity.entity_id, STATE_ON)) == 50
 
@@ -45,7 +43,7 @@ async def test_template_power(hass: HomeAssistant) -> None:
 
     template = "{{states('input_number.test')}}"
 
-    source_entity = create_source_entity("switch")
+    source_entity = await create_source_entity("switch.test", hass)
     strategy = await _create_strategy(
         hass,
         {
@@ -62,7 +60,7 @@ async def test_template_power(hass: HomeAssistant) -> None:
 
 
 async def test_states_power(hass: HomeAssistant) -> None:
-    source_entity = create_source_entity("media_player")
+    source_entity = await create_source_entity("media_player.test", hass)
     strategy = await _create_strategy(
         hass,
         {
@@ -91,7 +89,7 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
 
     await hass.async_block_till_done()
 
-    source_entity = create_source_entity("climate")
+    source_entity = await create_source_entity("climate.test", hass)
     strategy = await _create_strategy(
         hass,
         {
@@ -115,7 +113,7 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
 
 
 async def test_states_power_with_attributes(hass: HomeAssistant) -> None:
-    source_entity = create_source_entity("media_player")
+    source_entity = await create_source_entity("media_player.test", hass)
 
     strategy = await _create_strategy(
         hass,
@@ -149,22 +147,22 @@ async def test_states_power_with_attributes(hass: HomeAssistant) -> None:
     )
 
 
-async def test_validation_error_when_no_power_supplied() -> None:
+async def test_validation_error_when_no_power_supplied(hass: HomeAssistant) -> None:
     with pytest.raises(StrategyConfigurationError):
         strategy = FixedStrategy(
             power=None,
             per_state_power=None,
-            source_entity=create_source_entity("media_player"),
+            source_entity=await create_source_entity("media_player.test", hass),
         )
         await strategy.validate_config()
 
 
-async def test_validation_error_state_power_only_entity_domain() -> None:
+async def test_validation_error_state_power_only_entity_domain(hass: HomeAssistant) -> None:
     with pytest.raises(StrategyConfigurationError):
         strategy = FixedStrategy(
             power=20,
             per_state_power=None,
-            source_entity=create_source_entity("vacuum"),
+            source_entity=await create_source_entity("vacuum.test", hass),
         )
         await strategy.validate_config()
 

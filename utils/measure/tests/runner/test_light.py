@@ -1,5 +1,5 @@
 import os.path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from measure.controller.light.const import LutMode
@@ -40,7 +40,8 @@ def test_get_variations(mock_config_factory, mode: LutMode, expected_count: int)
     assert len(list(variations)) == expected_count
 
 
-def test_run(mock_config_factory, export_path: str) -> None:  # noqa: ANN001
+@patch("time.sleep", return_value=None)
+def test_run(mock_sleep, mock_config_factory, export_path: str) -> None:  # noqa: ANN001
     mock_config = mock_config_factory()
 
     measure_util_mock = MagicMock(MeasureUtil)

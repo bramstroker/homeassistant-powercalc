@@ -18,7 +18,7 @@ from custom_components.powercalc.const import (
     OFF_STATES,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
-from custom_components.powercalc.helpers import evaluate_power
+from custom_components.powercalc.helpers import evaluate_power, get_related_entity_by_device_class
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -82,18 +82,9 @@ class WledStrategy(PowerCalculationStrategyInterface):
             return entry.entity_id
 
         if self._light_entity.entity_entry:
-            device_id = self._light_entity.entity_entry.device_id
-            if device_id:
-                estimated_current_entities = [
-                    entity_entry.entity_id
-                    for entity_entry in entity_registry.async_entries_for_device(
-                        entity_reg,
-                        device_id,
-                    )
-                    if (entity_entry.device_class or entity_entry.original_device_class) == SensorDeviceClass.CURRENT
-                ]
-                if estimated_current_entities:
-                    return estimated_current_entities[0]
+            entity = get_related_entity_by_device_class(self._hass, self._light_entity.entity_entry, SensorDeviceClass.CURRENT)
+            if entity:
+                return entity
 
         raise StrategyConfigurationError("No estimated current entity found. Probably brightness limiter not enabled. See documentation")
 

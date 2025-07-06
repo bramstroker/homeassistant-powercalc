@@ -72,7 +72,8 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
     assert os.path.exists(os.path.join(PROJECT_DIR, "export/m/model.json"))
 
 
-def test_run_light(mock_config_factory) -> None:  # noqa: ANN001
+@patch("time.sleep", return_value=None)
+def test_run_light(mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
     """Simulate a full run of the light measure using brightness mode"""
     mock_config = mock_config_factory()
 
@@ -84,7 +85,8 @@ def test_run_light(mock_config_factory) -> None:  # noqa: ANN001
 
 
 @patch("builtins.input", return_value="")
-def test_run_smart_speaker(mock_input, mock_config_factory) -> None:  # noqa: ANN001
+@patch("time.sleep", return_value=None)
+def test_run_smart_speaker(mock_input, mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
     """Simulate a full run of the speaker measure"""
     mock_config = mock_config_factory(
         question_defaults={
@@ -105,7 +107,8 @@ def test_run_smart_speaker(mock_input, mock_config_factory) -> None:  # noqa: AN
 
 
 @patch("builtins.input", return_value="")
-def test_run_charging(mock_input, mock_config_factory) -> None:  # noqa: ANN001
+@patch("time.sleep", return_value=None)
+def test_run_charging(mock_input, mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
     """Simulate a full run of the charging measure"""
     mock_config = mock_config_factory(
         question_defaults={
@@ -122,7 +125,8 @@ def test_run_charging(mock_input, mock_config_factory) -> None:  # noqa: ANN001
 
 
 @patch("builtins.input", return_value="")
-def test_run_fan(mock_input, mock_config_factory) -> None:  # noqa: ANN001
+@patch("time.sleep", return_value=None)
+def test_run_fan(mock_input, mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
     """Simulate a full run of the fan measure"""
     mock_config = mock_config_factory(
         question_defaults={
