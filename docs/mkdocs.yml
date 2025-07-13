@@ -78,6 +78,7 @@ nav:
       - 'configuration/new-yaml-structure.md'
   - 'Misc':
       - 'misc/naming.md'
+      - 'misc/uninstall.md'
   - 'Library':
       - 'library/library.md'
       - 'library/discovery.md'
