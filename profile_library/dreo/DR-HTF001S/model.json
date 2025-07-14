@@ -7,14 +7,16 @@
   "linear_config": {
     "attribute": "percentage",
     "calibrate": [
-      "25 -> 24.52",
-      "50 -> 30.29",
-      "75 -> 34.33",
-      "100 -> 39.62"
+      "16 -> 21.46",
+      "33 -> 25.75",
+      "50 -> 28.61",
+      "66 -> 32.19",
+      "83 -> 39.62",
+      "100 -> 46.82"
     ]
   },
   "device_type": "fan",
   "calculation_strategy": "linear",
-  "created_at": "2025-07-14T09:52:08.375127+02:00",
+  "created_at": "2025-07-14T10:15:08.375127+02:00",
   "author": "miggi92 <miggi92@users.noreply.github.com>"
 }
