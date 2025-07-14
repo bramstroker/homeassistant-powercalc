@@ -3,13 +3,15 @@
   "measure_method": "manual",
   "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
   "name": "Dreo smart tower fan",
-  "standby_power": 0.87,
+  "standby_power": 2.31,
   "linear_config": {
     "attribute": "percentage",
     "calibrate": [
-      "25 -> 24.52",
-      "50 -> 30.29",
-      "75 -> 34.33",
+      "16 -> 17.76",
+      "33 -> 22.39",
+      "50 -> 25.75",
+      "66 -> 28.61",
+      "83 -> 32.19",
       "100 -> 39.62"
     ]
   },
