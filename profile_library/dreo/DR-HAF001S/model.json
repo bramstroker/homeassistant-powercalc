@@ -3,21 +3,14 @@
   "measure_method": "manual",
   "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
   "name": "Dreo Lynx S, smart desk fan",
-  "standby_power": 0.2,
+  "standby_power": 0.87,
   "linear_config": {
     "attribute": "percentage",
     "calibrate": [
-      "1 -> 1.6",
-      "10 -> 1.6",
-      "20 -> 2.2",
-      "30 -> 3.6",
-      "40 -> 5.8",
-      "50 -> 8.9",
-      "60 -> 13",
-      "70 -> 18.3",
-      "80 -> 21.4",
-      "90 -> 24.5",
-      "100 -> 24.8"
+      "25 -> 24.52",
+      "50 -> 30.29",
+      "75 -> 34.33",
+      "100 -> 39.62"
     ]
   },
   "device_type": "fan",
