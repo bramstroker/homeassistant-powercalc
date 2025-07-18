@@ -2,10 +2,10 @@
   "measure_description": "Measured standby power with LED off using a Shelly Plus Plug US.",
   "measure_method": "script",
   "measure_device": "Shelly Plus Plug US",
-  "name": "Aeotec Smart Switch 7 US",
+  "name": "ZWA023",
   "aliases": [
-    "ZWA023",
-    "Smart Switch 7 (B Plug)"
+    "Aeotec Smart Switch 7 US",
+    "Aeotec Smart Switch 7 (B Plug)"
   ],
   "discovery_by": "entity",
   "device_type": "smart_switch",
