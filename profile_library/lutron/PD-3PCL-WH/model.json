@@ -5,7 +5,7 @@
   "name": "PD-3PCL-WH (PlugInDimmer)",
   "aliases": [
     "PD-3PCL-WH",
-    "PlugInDimmer",
+    "PlugInDimmer"
   ],
   "discovery_by": "entity",
   "device_type": "smart_dimmer",
