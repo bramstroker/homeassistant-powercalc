@@ -2,11 +2,10 @@
   "measure_description": "Measured standby power with using a Shelly Plus Plug US. Standby power was almost too low to capture.",
   "measure_method": "script",
   "measure_device": "Shelly Plus Plug US",
-  "name": "Lutron PD-3PCL-WH",
+  "name": "PD-3PCL-WH (PlugInDimmer)",
   "aliases": [
-    "Caséta Plug-In Dimmer",
-    "Lamp Dimming Smart Plug",
-    "PlugInDimmer"
+    "PD-3PCL-WH",
+    "PlugInDimmer",
   ],
   "discovery_by": "entity",
   "device_type": "smart_dimmer",
