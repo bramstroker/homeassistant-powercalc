@@ -6,7 +6,9 @@
   "aliases": [
     "Shelly Plus Plug S V2",
     "SNPL-00112EU",
-    "SNPL-10112EU"
+    "SNPL-10112EU",
+    "SNPL-00116US",
+    "Shelly Plus Plug US"
   ],
   "discovery_by": "entity",
   "device_type": "smart_switch",
