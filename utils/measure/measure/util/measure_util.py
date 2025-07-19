@@ -237,7 +237,7 @@ class MeasureUtil:
         print("Tip: Use a dummy load with constant power consumption. Stick to resistive loads for the best results!")
         print("Important: Connect only the dummy load to your smart plug—not the device you're measuring.")
         print()
-        print("The script will now measure the dummy load and continue once it's consumption has stablized.")
+        print("The script will now measure the dummy load and continue once it's consumption has stabilized.")
         print("Depending on the dummy load this may take 2 hours.")
         print()
         input("Ready to begin measuring the dummy load? Hit Enter ")
@@ -270,7 +270,7 @@ class MeasureUtil:
             if trend == Trend.STEADY:
                 break
 
-            print(f"Dummy load resistance has not yet stablized and is {trend}, repeating.")
+            print(f"Dummy load resistance has not yet stabilized and is {trend}, repeating.")
 
         average = round(mean(averages), 2)
 

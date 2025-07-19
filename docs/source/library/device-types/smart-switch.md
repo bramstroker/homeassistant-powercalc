@@ -30,7 +30,7 @@ Assuming the user provides a value of 50W the following power values will be cal
 
 !!! note
 
-    During the configuration flow the user als has the option to toggle `self_usage_included` on or off.
+    During the configuration flow the user also has the option to toggle `self_usage_included` on or off.
     When toggled on the power when ON will be 50W instead of 50.7W, in the example above.
 
 ## Smart switch with built-in powermeter
