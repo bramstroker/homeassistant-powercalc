@@ -387,7 +387,7 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
 
 async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
     """
-    Test that the riemann integral sensor is correclty created and updated for a kW power sensor
+    Test that the riemann integral sensor is correctly created and updated for a kW power sensor
     Fixes https://github.com/bramstroker/homeassistant-powercalc/issues/1676
     """
 

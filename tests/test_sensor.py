@@ -121,7 +121,7 @@ async def test_legacy_yaml_platform_configuration(
 
 
 async def test_utility_meter_is_created(hass: HomeAssistant) -> None:
-    """Test that utility meters are succesfully created when `create_utility_meter: true`"""
+    """Test that utility meters are successfully created when `create_utility_meter: true`"""
     await create_input_boolean(hass)
 
     await run_powercalc_setup(

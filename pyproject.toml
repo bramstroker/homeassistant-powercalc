@@ -116,3 +116,8 @@ python = ">=3.13.2,<3.14"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.codespell]
+ignore-words-list = 'hass'
+check-filenames = true
+skip = '*/translations/*.json,*/package-lock.json'

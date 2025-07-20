@@ -45,6 +45,11 @@ repos:
         require_serial: true
         files: ^custom_components/powercalc
 
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+
 ci:
   autofix_commit_msg: |
     chore(lint): [pre-commit.ci] auto fixes from pre-commit.com hooks
