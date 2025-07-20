@@ -160,6 +160,7 @@ async def _create_virtual_energy_sensor(
     )
 
     return VirtualEnergySensor(
+        hass=hass,
         source_entity=power_sensor.entity_id,
         unique_id=unique_id,
         entity_id=entity_id,
@@ -236,6 +237,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
     def __init__(
         self,
+        hass: HomeAssistant,
         source_entity: str,
         entity_id: str,
         sensor_config: ConfigType,
@@ -251,6 +253,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         integration_method: str = sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD, DEFAULT_ENERGY_INTEGRATION_METHOD)
 
         params = {
+            "hass": hass,
             "source_entity": source_entity,
             "name": name,
             "round_digits": round_digits,
@@ -259,11 +262,12 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             "integration_method": integration_method,
             "unique_id": unique_id,
             "device_info": device_info,
+            "max_sub_interval": sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),
         }
 
         signature = inspect.signature(IntegrationSensor.__init__)
-        if "max_sub_interval" in signature.parameters:
-            params["max_sub_interval"] = sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY)
+
+        params = {key: val for key, val in params.items() if key in signature.parameters}
 
         super().__init__(**params)  # type: ignore[arg-type]
 
