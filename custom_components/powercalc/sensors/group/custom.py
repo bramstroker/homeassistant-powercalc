@@ -377,6 +377,7 @@ def create_grouped_energy_sensor(
         should_create_riemann = False
     if power_sensor and should_create_riemann:
         return VirtualEnergySensor(
+            hass=hass,
             source_entity=power_sensor.entity_id,
             entity_id=entity_id,
             name=name,

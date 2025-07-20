@@ -348,6 +348,7 @@ async def test_unit_prefix_kwh_default(hass: HomeAssistant) -> None:
 
 async def test_set_entity_category(hass: HomeAssistant) -> None:
     energy_sensor = VirtualEnergySensor(
+        hass=hass,
         source_entity="sensor.test_power",
         entity_id="sensor.test_energy",
         name="Test energy",
