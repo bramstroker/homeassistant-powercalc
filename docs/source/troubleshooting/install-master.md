@@ -10,4 +10,4 @@ If no new version of PowerCalc has been released yet and you need to test the la
 
 !!! note
 
-    Don't worry, next time a new version is released and you install it, HACS will update PowerCalc to the latest version, overwritting your temporary modifications.
+    Don't worry, next time a new version is released and you install it, HACS will update PowerCalc to the latest version, overwriting your temporary modifications.

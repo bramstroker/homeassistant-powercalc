@@ -74,7 +74,7 @@ class LocalLoader(Loader):
     async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
         """Load a model.json file from disk for a given manufacturer.lower() and model.lower()
         by querying the custom library.
-        If self._is_custom_directory == true model.json will be loaded directy from there.
+        If self._is_custom_directory == true model.json will be loaded directly from there.
 
         returns: tuple[dict, str] model.json as dictionary and model as lower case
         returns: None when manufacturer, model or model path not found
@@ -119,7 +119,7 @@ class LocalLoader(Loader):
 
     def _load_custom_library(self) -> None:
         """Loading custom models and aliases from file system.
-        Manufacturer directories without model directrories and model.json files within
+        Manufacturer directories without model directories and model.json files within
         are not loaded. Same is with model directories without model.json files.
         """
 

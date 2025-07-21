@@ -348,6 +348,7 @@ async def test_unit_prefix_kwh_default(hass: HomeAssistant) -> None:
 
 async def test_set_entity_category(hass: HomeAssistant) -> None:
     energy_sensor = VirtualEnergySensor(
+        hass=hass,
         source_entity="sensor.test_power",
         entity_id="sensor.test_energy",
         name="Test energy",
@@ -387,7 +388,7 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
 
 async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
     """
-    Test that the riemann integral sensor is correclty created and updated for a kW power sensor
+    Test that the riemann integral sensor is correctly created and updated for a kW power sensor
     Fixes https://github.com/bramstroker/homeassistant-powercalc/issues/1676
     """
 

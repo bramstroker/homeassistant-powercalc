@@ -520,7 +520,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         trigger_entity_id: str,
         state: State | None,
     ) -> None:
-        """Update power sensor based on new dependant entity state."""
+        """Update power sensor based on new dependent entity state."""
         self._standby_sensors.pop(self.entity_id, None)
         if self._sleep_power_timer:
             self._sleep_power_timer()

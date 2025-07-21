@@ -100,10 +100,10 @@ mkdocs-git-revision-date-localized-plugin = "*"
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.0.0"
 ruff = "^0.12.0"
-mypy = "1.16.1"
+mypy = "1.17.0"
 voluptuous-stubs = "^0.1"
 homeassistant-stubs = "*"
-pytest-homeassistant-custom-component = "0.13.261"
+pytest-homeassistant-custom-component = "0.13.262"
 types-pytz = "^2024.1"
 types-croniter = "^2.0"
 croniter = "^6.0.0"
@@ -116,3 +116,8 @@ python = ">=3.13.2,<3.14"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.codespell]
+ignore-words-list = 'hass'
+check-filenames = true
+skip = '*/translations/*.json,*/package-lock.json'

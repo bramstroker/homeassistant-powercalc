@@ -208,6 +208,7 @@ class TrackedPowerSensorFactory:
         name = generate_energy_sensor_name(self.config, sensor_type)
         entity_id = generate_energy_sensor_entity_id(self.hass, self.config, name=sensor_type, unique_id=unique_id)
         return VirtualEnergySensor(
+            hass=self.hass,
             source_entity=power_sensor.entity_id,
             entity_id=entity_id,
             name=name,

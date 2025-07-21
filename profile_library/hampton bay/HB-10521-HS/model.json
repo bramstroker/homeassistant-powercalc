@@ -12,5 +12,5 @@
   "name": "Smart 24ft LED Color Changing Plug-In String Lights",
   "standby_power": 1.45,
   "author": "Chris Hallgren <challgren@gmail.com>",
-  "config_flow_discovery_remarks": "***Warning** Supoort to provide measurements during an effect is running is not currently implemented."
+  "config_flow_discovery_remarks": "***Warning** Support to provide measurements during an effect is running is not currently implemented."
 }

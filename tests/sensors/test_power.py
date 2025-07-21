@@ -491,7 +491,7 @@ async def test_manually_configured_sensor_overrides_profile(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
-    Make sure that config settings done by user are not overriden by power profile
+    Make sure that config settings done by user are not overridden by power profile
     """
     entity_id = "light.test"
 

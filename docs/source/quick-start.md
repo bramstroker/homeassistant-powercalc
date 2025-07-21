@@ -52,7 +52,7 @@ Refer to [global configuration](configuration/global-configuration.md) for all s
 ## Energy dashboard
 
 If you want to use the virtual power sensors in the energy dashboard you'll need an energy sensor. Powercalc automatically creates one for every virtual power sensor. No need for any custom configuration.
-These energy sensors then can be selected in the energy dashboard under `Invididual devices`.
+These energy sensors then can be selected in the energy dashboard under `Individual devices`.
 
 You can disable the automatic creation of energy sensors with the option `create_energy_sensors` in your configuration (see [global configuration](configuration/global-configuration.md)).
 

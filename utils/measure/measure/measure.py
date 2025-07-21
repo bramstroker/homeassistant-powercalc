@@ -234,7 +234,7 @@ class Measure:
     def get_questions(self) -> list[Question]:
         """
         Build list of questions to ask.
-        Returns generic questions which are asked regardless of the choosen device type
+        Returns generic questions which are asked regardless of the chosen device type
         Additionally the configured runner and power_meter can also provide further questions
         """
         if self.measure_type not in [MeasureType.AVERAGE, MeasureType.RECORDER]:
