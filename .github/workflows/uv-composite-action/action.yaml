@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         cd $INPUT_DIRECTORY
-        uv pip install ".[dev]"
+        uv sync --extra=dev
         source .venv/bin/activate
       if: steps.cache-deps.outputs.cache-hit != 'true'
       env:
