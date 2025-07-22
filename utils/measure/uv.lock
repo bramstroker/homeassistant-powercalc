@@ -480,7 +480,7 @@ requires-dist = [
     { name = "inquirer", specifier = ">=3.1" },
     { name = "numpy", specifier = ">=2.2" },
     { name = "opencv-python", specifier = ">=4.7" },
-    { name = "phue", git = "https://github.com/studioimaginaire/phue.git?rev=6d8976be9b17da94887365e001e8475fe58c5f2d" },
+    { name = "phue", git = "https://github.com/studioimaginaire/phue.git?rev=f5c79ff07dafbaad155de6ca1cfd513705bbdbd3" },
     { name = "pycryptodome" },
     { name = "pytesseract", specifier = ">=0.3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.3" },
@@ -599,7 +599,7 @@ wheels = [
 [[package]]
 name = "phue"
 version = "1.2"
-source = { git = "https://github.com/studioimaginaire/phue.git?rev=6d8976be9b17da94887365e001e8475fe58c5f2d#6d8976be9b17da94887365e001e8475fe58c5f2d" }
+source = { git = "https://github.com/studioimaginaire/phue.git?rev=f5c79ff07dafbaad155de6ca1cfd513705bbdbd3#f5c79ff07dafbaad155de6ca1cfd513705bbdbd3" }
 
 [[package]]
 name = "pillow"

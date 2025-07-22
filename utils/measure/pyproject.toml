@@ -27,7 +27,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-phue = { git = "https://github.com/studioimaginaire/phue.git", rev = "6d8976be9b17da94887365e001e8475fe58c5f2d" }
+phue = { git = "https://github.com/studioimaginaire/phue.git", rev = "f5c79ff07dafbaad155de6ca1cfd513705bbdbd3" }
 
 [project.optional-dependencies]
 dev = [
