@@ -1,18 +1,18 @@
-name: "Install poetry and dependencies"
-description: "Install poetry and dependencies"
+name: "Install uv and dependencies"
+description: "Install uv and dependencies"
 inputs:
   directory:
-    description: 'Directory where you want to run poetry install'
+    description: 'Directory where you want to run uv install'
     required: false
     default: './'
   python_version:
     description: 'Python version to use'
     required: false
     default: '3.13'
-  poetry_version:
-    description: 'Poetry version to use'
+  uv_version:
+    description: 'uv version to use'
     required: false
-    default: '2.1.1'
+    default: '0.1.24'
   cache_dependencies:
     description: 'Whether the dependencies must be cached'
     required: false
@@ -24,29 +24,30 @@ runs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python_version }}
-    - name: Load cached Poetry installation
-      id: cached-poetry
+    - name: Load cached uv installation
+      id: cached-uv
       uses: actions/cache@v4
       with:
-        path: ~/.local
-        key: poetry-${{ inputs.poetry_version }}
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: ${{ inputs.poetry_version }}
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-        installer-parallel: true
+        path: ~/.cargo/bin/uv
+        key: uv-${{ inputs.uv_version }}
+    - name: Install uv
+      if: steps.cached-uv.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
     - name: cache dependencies
       if: inputs.cache_dependencies == 'true'
       id: cache-deps
       uses: actions/cache@v4
       with:
         path: .venv
-        key: pydeps-${{ hashFiles(format('{0}/poetry.lock', inputs.directory)) }}
+        key: pydeps-${{ hashFiles(format('{0}/pyproject.toml', inputs.directory)) }}
     - name: Install dependencies
       shell: bash
-      run: cd $INPUT_DIRECTORY; poetry install --no-interaction --no-root
+      run: |
+        cd $INPUT_DIRECTORY
+        uv sync --locked --extra=dev
+        source .venv/bin/activate
       if: steps.cache-deps.outputs.cache-hit != 'true'
       env:
         INPUT_DIRECTORY: ${{ inputs.directory }}

@@ -1,5 +1,6 @@
 [project]
 name = "Powercalc"
+version = "0.1.0"
 description = "Custom Home Assistant component for virtual power sensors"
 maintainers = [
   { name = "Bram Gerritsen", email = "bgerritsen@gmail.com" },
@@ -14,12 +15,12 @@ keywords = [
 classifiers = [
   "Intended Audience :: End Users/Desktop",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.13",
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.13.2,<4.0"
 dependencies = ["homeassistant"]
+license = "MIT"
 
 [tool.pytest.ini_options]
 testpaths = "tests"
@@ -82,40 +83,32 @@ ignore = ["S101"]
 [tool.ruff.lint.mccabe]
 max-complexity = 15
 
-[tool.poetry]
-name = "powercalc"
-version = "0.1.0"
-description = "Powercalc HA custom component"
-authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
-readme = "README.md"
+[project.optional-dependencies]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocs-git-revision-date-localized-plugin"
+]
+dev = [
+    "pre-commit>=4.0.0",
+    "ruff>=0.12.0",
+    "mypy==1.17.0",
+    "voluptuous-stubs>=0.1",
+    "homeassistant-stubs",
+    "pytest-homeassistant-custom-component==0.13.262",
+    "types-pytz>=2024.1",
+    "types-croniter>=2.0",
+    "croniter>=6.0.0",
+    "aioresponses>=0.7.6",
+    "pyturbojpeg>=1.8.2"
+]
 
-[tool.poetry.group.docs]
-optional = true
-
-[tool.poetry.group.docs.dependencies]
-mkdocs = "*"
-mkdocs-material = "*"
-mkdocs-git-revision-date-localized-plugin = "*"
-
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^4.0.0"
-ruff = "^0.12.0"
-mypy = "1.17.0"
-voluptuous-stubs = "^0.1"
-homeassistant-stubs = "*"
-pytest-homeassistant-custom-component = "0.13.262"
-types-pytz = "^2024.1"
-types-croniter = "^2.0"
-croniter = "^6.0.0"
-aioresponses = "^0.7.6"
-pyturbojpeg = "^1.8.2"
-
-[tool.poetry.dependencies]
-python = ">=3.13.2,<3.14"
+[tool.setuptools]
+packages = ["custom_components"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
 [tool.codespell]
 ignore-words-list = 'hass'

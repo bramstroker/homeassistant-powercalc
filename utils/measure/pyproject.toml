@@ -1,37 +1,47 @@
-[tool.poetry]
+[project]
 name = "measure"
 version = "0.1.0"
 description = "Powercalc measurement tool"
-authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
+authors = [
+    {name = "Bram Gerritsen", email = "bgerritsen@gmail.com"}
+]
 readme = "README.md"
+requires-python = ">=3.13,<4.0"
+dependencies = [
+    "aiohttp>=3.8",
+    "chardet>=5.1",
+    "charset-normalizer>=3.1",
+    "homeassistant-api~=4.0",
+    "inquirer>=3.1",
+    "numpy>=2.2",
+    "opencv-python>=4.7",
+    "pytesseract>=0.3",
+    "python-decouple>=3.4",
+    "python-kasa>=0.6",
+    "readchar>=4.0",
+    "requests>=2.28",
+    "tuyapower>=0.2",
+    "typing-extensions>=4.6",
+    "pycryptodome",
+    "phue"
+]
 
-[tool.poetry.dependencies]
-python = "^3.13"
-aiohttp = "^3.8"
-chardet = "^5.1"
-charset-normalizer = "^3.1"
-homeassistant-api = "^4.1"
-inquirer = "^3.1"
-numpy = "^2.2"
-opencv-python = "^4.7"
-phue = {git = "https://github.com/studioimaginaire/phue.git", rev = "6d8976be9b17da94887365e001e8475fe58c5f2d"}
-pytesseract = "^0.3"
-python-decouple = "^3.4"
-python-kasa = "^0.6"
-readchar = "^4.0"
-requests = "^2.28"
-tuyapower = "^0.2"
-typing-extensions = "^4.6"
-pycryptodome = "*"
+[tool.uv.sources]
+phue = { git = "https://github.com/studioimaginaire/phue.git", rev = "6d8976be9b17da94887365e001e8475fe58c5f2d" }
 
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.2"
-pytest = "^8.3.3"
-pytest-cov = "^6.0"
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.2",
+    "pytest>=8.3.3",
+    "pytest-cov>=6.0"
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["measure"]
 
 [tool.pytest.ini_options]
 pythonpath = "."

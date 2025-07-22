@@ -30,13 +30,7 @@
     },
     {
       "matchManagers": [
-        "poetry"
-      ],
-      "enabled": false
-    },
-    {
-      "matchManagers": [
-        "poetry"
+        "pip_requirements"
       ],
       "matchFileNames": [
         "pyproject.toml"
