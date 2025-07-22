@@ -4,8 +4,10 @@ import logging
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
+from awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import CONF_NAME
+from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 from homeassistant.helpers.typing import ConfigType
@@ -28,6 +30,9 @@ _LOGGER = logging.getLogger(__name__)
 class BaseEntity(Entity):
     async def async_added_to_hass(self) -> None:
         """Attach the entity to same device as the source entity."""
+        if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2025.8.0"):
+            return
+
         entity_reg = er.async_get(self.hass)
         entity_entry = entity_reg.async_get(self.entity_id)
         if entity_entry is None or not hasattr(self, "source_device_id"):
@@ -39,7 +44,7 @@ class BaseEntity(Entity):
         if not device_entry or device_entry.id == entity_entry.device_id:  # pragma: no cover
             return
         _LOGGER.debug("Binding %s to device %s", self.entity_id, device_id)
-        # entity_reg.async_update_entity(self.entity_id, device_id=device_id)
+        entity_reg.async_update_entity(self.entity_id, device_id=device_id)
 
 
 def generate_power_sensor_name(
