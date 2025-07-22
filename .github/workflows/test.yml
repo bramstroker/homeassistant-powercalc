@@ -31,7 +31,7 @@ jobs:
             -o console_output_style=count \
             -p no:sugar \
             tests
-          coverage lcov
+          uv run coverage lcov
       - name: Upload Coverage Results
         uses: coverallsapp/github-action@v2
         with:
