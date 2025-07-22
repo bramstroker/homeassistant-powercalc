@@ -14,7 +14,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - uses: ./.github/workflows/poetry-composite-action
+      - uses: ./.github/workflows/uv-composite-action
         with:
           directory: './utils/visualize'
           cache_dependencies: 'false'
@@ -34,7 +34,7 @@ jobs:
           for file in ${{ steps.list-files.outputs.changedFiles }}; do
             echo "Generating plot for - ${file}."
             if [ -f "${{ github.workspace }}/${file}" ]; then
-              poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
+              uv run python plot.py "${{ github.workspace }}/${file}" --output=auto
             fi
           done
       - name: Save PR number
