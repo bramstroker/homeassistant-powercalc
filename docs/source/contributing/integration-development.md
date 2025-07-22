@@ -42,7 +42,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Next install dependencies and enable virtual environment.
 
 ```bash
-uv sync --extra=dev
+uv sync --locked --extra=dev
 tests/setup.sh
 ```
 
