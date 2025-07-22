@@ -276,6 +276,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         self._sensor_config = sensor_config
         self.entity_id = entity_id
         self._attr_device_class = SensorDeviceClass.ENERGY
+        self._attr_suggested_display_precision = round_digits
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
 

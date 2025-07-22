@@ -18,6 +18,7 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
@@ -35,6 +36,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_ID,
+    CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
@@ -240,6 +242,21 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     energy_state = hass.states.get("sensor.test_energy")
     assert ATTR_SOURCE_DOMAIN not in energy_state.attributes
     assert ATTR_SOURCE_ENTITY not in energy_state.attributes
+
+
+async def test_rounding_precision(hass: HomeAssistant) -> None:
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup(
+        hass,
+        get_simple_fixed_config("input_boolean.test"),
+        {CONF_ENERGY_SENSOR_PRECISION: 2},
+    )
+
+    entity_registry = er.async_get(hass)
+    energy_entry = entity_registry.async_get("sensor.test_energy")
+    assert energy_entry
+    assert energy_entry.options == {"sensor": {"suggested_display_precision": 2}}
 
 
 async def test_real_energy_sensor(hass: HomeAssistant) -> None:
