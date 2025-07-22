@@ -24,5 +24,12 @@ find "$SEARCH_DIR" -type f -name "*.csv.gz" | while IFS= read -r file; do
   fi
 
   # Call plot.py using the absolute path
-  poetry run python "$SCRIPT_DIR/plot.py" "$file" --output="$output"
+  # Activate the virtual environment if it exists, otherwise run directly
+  if [ -f "$SCRIPT_DIR/.venv/bin/activate" ]; then
+    source "$SCRIPT_DIR/.venv/bin/activate"
+    python "$SCRIPT_DIR/plot.py" "$file" --output="$output"
+    deactivate
+  else
+    python "$SCRIPT_DIR/plot.py" "$file" --output="$output"
+  fi
 done
