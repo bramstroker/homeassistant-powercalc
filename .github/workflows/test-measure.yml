@@ -21,7 +21,7 @@ jobs:
           directory: './utils/measure'
       - name: Run tests
         run: |
-          cd utils/measure && uv run pytest \
+          cd ./utils/measure && pytest \
             -qq \
             --durations=10 \
             -o console_output_style=count \

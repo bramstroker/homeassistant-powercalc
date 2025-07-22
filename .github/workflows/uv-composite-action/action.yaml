@@ -47,6 +47,7 @@ runs:
       run: |
         cd $INPUT_DIRECTORY
         uv sync --dev
+        source .venv/bin/activate
       if: steps.cache-deps.outputs.cache-hit != 'true'
       env:
         INPUT_DIRECTORY: ${{ inputs.directory }}
