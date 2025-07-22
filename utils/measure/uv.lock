@@ -453,6 +453,7 @@ dependencies = [
     { name = "inquirer" },
     { name = "numpy" },
     { name = "opencv-python" },
+    { name = "phue" },
     { name = "pycryptodome" },
     { name = "pytesseract" },
     { name = "python-decouple" },
@@ -479,6 +480,7 @@ requires-dist = [
     { name = "inquirer", specifier = ">=3.1" },
     { name = "numpy", specifier = ">=2.2" },
     { name = "opencv-python", specifier = ">=4.7" },
+    { name = "phue", git = "https://github.com/studioimaginaire/phue.git?rev=6d8976be9b17da94887365e001e8475fe58c5f2d" },
     { name = "pycryptodome" },
     { name = "pytesseract", specifier = ">=0.3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.3" },
@@ -593,6 +595,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/a1/d4/1fc4078c65507b51b
 wheels = [
     { url = "https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484", size = 66469, upload-time = "2025-04-19T11:48:57.875Z" },
 ]
+
+[[package]]
+name = "phue"
+version = "1.2"
+source = { git = "https://github.com/studioimaginaire/phue.git?rev=6d8976be9b17da94887365e001e8475fe58c5f2d#6d8976be9b17da94887365e001e8475fe58c5f2d" }
 
 [[package]]
 name = "pillow"
