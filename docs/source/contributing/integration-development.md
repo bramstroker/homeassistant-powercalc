@@ -42,7 +42,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Next install dependencies and enable virtual environment.
 
 ```bash
-uv pip install ".[dev]"
+uv sync --extra=dev
 tests/setup.sh
 ```
 
