@@ -17,12 +17,13 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-      - uses: ./.github/workflows/poetry-composite-action
+      - uses: ./.github/workflows/uv-composite-action
       - name: Prepare test env
         run: bash tests/setup.sh
       - name: Run tests
         run: |
-          poetry run pytest \
+          source .venv/bin/activate
+          pytest \
             -qq \
             --timeout=9 \
             --durations=10 \
@@ -31,7 +32,7 @@ jobs:
             -o console_output_style=count \
             -p no:sugar \
             tests
-          poetry run coverage lcov
+          coverage lcov
       - name: Upload Coverage Results
         uses: coverallsapp/github-action@v2
         with:

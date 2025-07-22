@@ -34,22 +34,23 @@ So it's highly recommended to use the tests to verify your changes. See the [Run
 In order to run the tests, you need to install the dependencies. You can do this by running the following command:
 
 ```bash
-poetry env use 3.13
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 tests/setup.sh
-poetry install --no-root
+uv pip install -e ".[dev]"
 ```
 
 After the dependencies are installed, you can run the tests by executing the following command:
 
 ```bash
-poetry run pytest tests/
+pytest tests/
 ```
 
 We strive at 100% test coverage, so please make sure to write tests for your code.
 To check coverage you can run:
 
 ```bash
-poetry run pytest --cov custom_components.powercalc --cov-report xml:cov.xml --cov-report html tests/
+pytest --cov custom_components.powercalc --cov-report xml:cov.xml --cov-report html tests/
 ```
 
 This will generate a coverage report in the `htmlcov` directory.

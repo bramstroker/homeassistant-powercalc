@@ -1,0 +1,54 @@
+name: "Install uv and dependencies"
+description: "Install uv and dependencies"
+inputs:
+  directory:
+    description: 'Directory where you want to run uv install'
+    required: false
+    default: './'
+  python_version:
+    description: 'Python version to use'
+    required: false
+    default: '3.13'
+  uv_version:
+    description: 'uv version to use'
+    required: false
+    default: '0.1.24'
+  cache_dependencies:
+    description: 'Whether the dependencies must be cached'
+    required: false
+    default: 'true'
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python_version }}
+    - name: Load cached uv installation
+      id: cached-uv
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/bin/uv
+        key: uv-${{ inputs.uv_version }}
+    - name: Install uv
+      if: steps.cached-uv.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+    - name: cache dependencies
+      if: inputs.cache_dependencies == 'true'
+      id: cache-deps
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: pydeps-${{ hashFiles(format('{0}/pyproject.toml', inputs.directory)) }}
+    - name: Install dependencies
+      shell: bash
+      run: |
+        cd $INPUT_DIRECTORY
+        python -m venv .venv
+        source .venv/bin/activate
+        uv pip install -e ".[dev]"
+      if: steps.cache-deps.outputs.cache-hit != 'true'
+      env:
+        INPUT_DIRECTORY: ${{ inputs.directory }}

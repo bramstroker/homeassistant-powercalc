@@ -1,33 +1,34 @@
-[tool.poetry]
+[project]
 name = "powercalc-visualize"
 version = "0.1.0"
 description = ""
-authors = ["Bram <bgerritsen@emico.nl>"]
+authors = [
+    {name = "Bram Gerritsen", email = "bgerritsen@emico.nl"}
+]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = ">=3.13.0,<3.14"
-colour-science = "0.4.6"
-contourpy = "^1.0"
-cycler = "^0.11"
-fonttools = "^4.38"
-imageio = "^2.25"
-kiwisolver = "^1.4"
-matplotlib = "^3.6"
-numpy = "*"
-packaging = "^22.0"
-pandas = "^2.2"
-pillow = "^11.0"
-pyparsing = "^3.0"
-python-dateutil = "^2.8"
-pytz = "2022.7"
-scipy = "^1.12"
-six = "^1.16"
-typing-extensions = "^4.5"
-seaborn = "^0.13.2"
-plotly = "^6.0.0"
-
+requires-python = ">=3.13.0,<3.14"
+dependencies = [
+    "colour-science==0.4.6",
+    "contourpy>=1.0",
+    "cycler>=0.11",
+    "fonttools>=4.38",
+    "imageio>=2.25",
+    "kiwisolver>=1.4",
+    "matplotlib>=3.6",
+    "numpy",
+    "packaging>=22.0",
+    "pandas>=2.2",
+    "pillow>=11.0",
+    "pyparsing>=3.0",
+    "python-dateutil>=2.8",
+    "pytz==2022.7",
+    "scipy>=1.12",
+    "six>=1.16",
+    "typing-extensions>=4.5",
+    "seaborn>=0.13.2",
+    "plotly>=6.0.0"
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

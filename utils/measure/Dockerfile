@@ -3,18 +3,16 @@
 # The builder image, used to build the virtual environment
 FROM python:3.13-bullseye AS builder
 
-RUN pip install poetry==2.0.1
-
-ENV POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1 \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml ./
 
-RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
+RUN python -m venv .venv && \
+    . .venv/bin/activate && \
+    uv pip install -e . && \
+    uv pip install git+https://github.com/studioimaginaire/phue.git@6d8976be9b17da94887365e001e8475fe58c5f2d
 
 # The runtime image, used to just run the code provided its virtual environment
 FROM python:3.13-slim-bullseye AS runtime
