@@ -5,11 +5,11 @@ on:
   push:
     paths:
       - '**.py'
-      - 'poetry.lock'
+      - 'uv.lock'
   pull_request:
     paths:
       - '**.py'
-      - 'poetry.lock'
+      - 'uv.lock'
 
 jobs:
   mypy:

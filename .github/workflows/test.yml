@@ -8,7 +8,7 @@ on:
   pull_request:
     paths:
       - '**.py'
-      - 'poetry.lock'
+      - 'uv.lock'
 
 jobs:
   tests:
