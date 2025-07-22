@@ -46,9 +46,7 @@ runs:
       shell: bash
       run: |
         cd $INPUT_DIRECTORY
-        python -m venv .venv
-        source .venv/bin/activate
-        uv pip install -e ".[dev]"
+        uv sync --dev
       if: steps.cache-deps.outputs.cache-hit != 'true'
       env:
         INPUT_DIRECTORY: ${{ inputs.directory }}
