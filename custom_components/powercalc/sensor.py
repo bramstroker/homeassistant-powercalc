@@ -129,7 +129,7 @@ from .const import (
     SensorType,
     UnitPrefix,
 )
-from .device_binding import attach_entities_to_source_device, bind_config_entry_to_device
+from .device_binding import attach_entities_to_source_device
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
@@ -309,8 +309,6 @@ async def async_setup_entry(
         return
 
     sensor_config = convert_config_entry_to_sensor_config(entry, hass)
-
-    bind_config_entry_to_device(hass, entry)
 
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.unique_id
