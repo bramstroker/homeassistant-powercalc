@@ -11,7 +11,10 @@
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
-  "discovery_by": "device",
+  "sub_profile_select": {
+    "default": "+wlan"
+  },
+  "discovery_by": "entity",
   "device_type": "smart_switch",
   "only_self_usage": true,
   "calculation_strategy": "fixed",
