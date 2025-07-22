@@ -18,7 +18,7 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.13",
 ]
-requires-python = ">=3.13.2"
+requires-python = ">=3.13.2,<4.0"
 dependencies = ["homeassistant"]
 license = "MIT"
 
