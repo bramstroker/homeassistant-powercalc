@@ -429,6 +429,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             self._rounding_digits = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
         else:
             self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
+        self._attr_suggested_display_precision = self._rounding_digits
         self._sensor_config = sensor_config
         if unique_id:
             self._attr_unique_id = unique_id

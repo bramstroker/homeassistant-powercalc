@@ -251,6 +251,7 @@ async def create_utility_meter(
 
 class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
+    _attr_suggested_display_precision = rounding_digits
 
     @property
     def unique_id(self) -> str | None:

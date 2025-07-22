@@ -188,6 +188,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._on_time = on_time or timedelta(days=1)
         self._start_time = start_time
         self._rounding_digits = rounding_digits
+        self._attr_suggested_display_precision = self._rounding_digits
         self._attr_unique_id = sensor_config.get(CONF_UNIQUE_ID)
         self.entity_id = entity_id
         self._last_updated: float = dt_util.utcnow().timestamp()

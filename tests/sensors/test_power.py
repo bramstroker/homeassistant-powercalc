@@ -135,6 +135,11 @@ async def test_rounding_precision(hass: HomeAssistant) -> None:
         {CONF_POWER_SENSOR_PRECISION: 4},
     )
 
+    entity_registry = er.async_get(hass)
+    power_entry = entity_registry.async_get("sensor.test_power")
+    assert power_entry
+    assert power_entry.options == {"sensor": {"suggested_display_precision": 4}}
+
     state = hass.states.get("sensor.test_power")
     assert state.state == "0.0000"
 
