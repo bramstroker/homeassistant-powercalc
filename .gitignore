@@ -11,4 +11,4 @@ cov.xml
 
 custom_components/test
 
-Powercalc.egg-info/
+*.egg-info/
