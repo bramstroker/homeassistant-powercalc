@@ -67,7 +67,7 @@ def remove_stale_devices(
     config_entry: ConfigEntry,
     device_id: str,
 ) -> None:
-    """Remove stale devices from device registry."""
+    """Remove powercalc config entries from old devices."""
     device_reg = device_registry.async_get(hass)
     device_entries = device_registry.async_entries_for_config_entry(
         device_reg,
