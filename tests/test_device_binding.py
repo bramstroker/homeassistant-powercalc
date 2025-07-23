@@ -268,6 +268,7 @@ async def test_change_device(hass: HomeAssistant) -> None:
             **entry_data,
             CONF_DEVICE: "device1",
         },
+        unique_id="5345435",
     )
 
     device1 = device_registry.async_get("device1")

@@ -15,7 +15,6 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     EntityCategory,
 )
-from homeassistant.const import __version__ as HA_VERSION  # noqa
 
 MIN_HA_VERSION = "2024.4"
 
