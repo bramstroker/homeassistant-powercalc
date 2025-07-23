@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from homeassistant_api import Client, HomeassistantAPIError, State
+from homeassistant_api import Client, State
+from homeassistant_api.errors import HomeassistantAPIError
 from measure.const import QUESTION_ENTITY_ID
 from measure.controller.charging.const import (
     QUESTION_BATTERY_LEVEL_ATTRIBUTE,

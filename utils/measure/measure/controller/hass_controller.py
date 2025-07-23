@@ -1,6 +1,7 @@
 from typing import Any
 
-from homeassistant_api import Client, HomeassistantAPIError, State
+from homeassistant_api import Client, State
+from homeassistant_api.errors import HomeassistantAPIError
 
 from measure.const import QUESTION_ENTITY_ID
 from measure.controller.errors import ApiConnectionError, ControllerError
