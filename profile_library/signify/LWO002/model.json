@@ -5,7 +5,7 @@
   "name": "Hue White G25 E26 Edison Filament Globe Bluetooth",
   "standby_power": 0.35,
   "calculation_strategy": "lut",
-  "linked_lut": "signify/LWO001",
+  "linked_profile": "signify/LWO001",
   "aliases": [
     "9290022415"
   ],
