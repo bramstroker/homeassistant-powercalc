@@ -20,7 +20,7 @@
     
     
       
-        <title>Library structure - Powercalc documentation</title>
+        <title>Library Structure - Powercalc documentation</title>
       
     
     
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Library structure
+              Library Structure
             
           </span>
         </div>
@@ -1207,6 +1207,8 @@
       
         
       
+        
+      
     
     
     
@@ -1325,6 +1327,29 @@
   
   <span class="md-ellipsis">
     Standby power
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/entity-category/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Entity Category
     
   </span>
   
@@ -1596,7 +1621,7 @@
   
   
   <span class="md-ellipsis">
-    Library structure
+    Library Structure
     
   </span>
   
@@ -1609,7 +1634,7 @@
   
   
   <span class="md-ellipsis">
-    Library structure
+    Library Structure
     
   </span>
   
@@ -1638,12 +1663,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="model.json">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Required Fields
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discovery-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Discovery Behavior
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aliases-and-linked-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Aliases and Linked Profiles
+    </span>
+  </a>
+  
 </li>
       
         <li class="md-nav__item">
   <a href="#sub-profiles" class="md-nav__link">
     <span class="md-ellipsis">
-      Sub profiles
+      Sub-Profiles
     </span>
   </a>
   
@@ -2880,33 +2938,58 @@
   
 
 
-<h1 id="library-structure">Library structure</h1>
-<p>The library is structured in a multi level tree structure. The top level is the manufacturer, followed by the model id and optionally sub profiles.
-Manufacturer directory must hae a <code>manufacturer.json</code> file which contains the manufacturer name and optionally aliases.
-Each power profile has it's own subdirectory <code>{manufacturer}/{modelid}</code>. i.e. signify/LCT010, containing a <code>model.json</code> file and optionally CSV files for the LUT calculation strategy.</p>
-<h2 id="modeljson">model.json</h2>
-<p>Every profile MUST contain a <code>model.json</code> file which defines the supported calculation modes and other configuration.
-See the <a href="https://github.com/bramstroker/homeassistant-powercalc/blob/master/profile_library/model_schema.json">json schema</a> how the file must be structured.</p>
-<p>Required fields are:</p>
+<h1 id="library-structure">Library Structure</h1>
+<p>The library follows a multi-level tree structure:</p>
 <ul>
-<li><code>name</code>: The name of the device (this is only used in the <a href="https://library.powercalc.nl">Library</a>)</li>
-<li><code>device_type</code>: The type of the device. See the <a href="../device-types/">device types</a> section for more information.</li>
-<li><code>calculation_strategy</code>: The calculation strategy to use. See the <a href="../../strategies/">strategies</a> section for more information.</li>
-<li><code>measure_method</code>: The method used to measure the device. This can be <code>manual</code> or <code>script</code>.</li>
-<li><code>measure_device</code>: The device used to measure the power usage. (For example <code>Shelly PM Gen 3</code>)</li>
-<li><code>created_at</code>: The date when the profile was created. (ISO 8601 format, i.e. <code>2023-06-19T08:02:31</code>)</li>
-<li><code>author</code>: The author of the profile.</li>
+<li><strong>Top level</strong>: Manufacturer</li>
+<li><strong>Second level</strong>: Model ID</li>
+<li><strong>Optional</strong>: Sub-profiles for specific device behaviors</li>
 </ul>
-<p>You can use <code>aliases</code> to define alternative model names, which will be used during discovery.
-This can be helpful when same model is reported differently depending on the integration. For example, the same light bulb could be reported differently by the Hue integration compared to the deCONZ integration.</p>
-<p>By default Powercalc discovers on a "per entity" basis.
-This can cause issues when a device has multiple entities, causing multiple discoveries for the same device.
-When a profile does not have to be bound to a specific entity (light, switch etc.), you can set <code>discovery_by</code> to <code>device</code>.
-This will cause Powercalc to discover on a "per device" basis, which is more reliable.
-This setting is recommended for device types which map to <code>sensor</code> domain entities, these are: <code>network</code>, <code>power_meter</code> and <code>generic_iot</code>.</p>
-<h2 id="sub-profiles">Sub profiles</h2>
-<p>Some profiles might have multiple profiles. This is useful when a device has different power consumption based on the state of the device.
-See <a href="../sub-profiles/">sub profiles</a> for more information.</p>
+<p>Each <strong>manufacturer directory</strong> must include a <code>manufacturer.json</code> file. This file should contain the manufacturer's name and optionally a list of aliases.</p>
+<p>Each <strong>device profile</strong> resides in its own subdirectory:
+<code>{manufacturer}/{modelid}</code> (e.g., <code>signify/LCT010</code>)
+This directory contains a mandatory <code>model.json</code> file and, optionally, CSV files used for LUT (Look-Up Table) calculation strategies.</p>
+<h2 id="modeljson"><code>model.json</code></h2>
+<p>Every device profile <strong>must</strong> include a <code>model.json</code> file, which defines supported calculation modes and other configuration parameters.
+Refer to the <a href="https://github.com/bramstroker/homeassistant-powercalc/blob/master/profile_library/model_schema.json">JSON schema</a> for full details.</p>
+<h3 id="required-fields">Required Fields</h3>
+<ul>
+<li><code>name</code>: The device name (used only for display in the <a href="https://library.powercalc.nl">Library</a>).</li>
+<li><code>device_type</code>: The type of device. See <a href="../device-types/">Device Types</a> for details.</li>
+<li><code>calculation_strategy</code>: Strategy used for power calculation. See <a href="../../strategies/">Calculation Strategies</a>.</li>
+<li><code>measure_method</code>: Method used for power measurement. Options: <code>manual</code> or <code>script</code>.</li>
+<li><code>measure_device</code>: The measuring device (e.g., <code>Shelly PM Gen 3</code>).</li>
+<li><code>created_at</code>: Date the profile was created (ISO 8601 format, e.g., <code>2023-06-19T08:02:31</code>).</li>
+<li><code>author</code>: Author of the profile.</li>
+</ul>
+<h3 id="discovery-behavior">Discovery Behavior</h3>
+<p>By default, Powercalc performs discovery on a <strong>per-entity</strong> basis. This can cause issues if a device has multiple entities, resulting in multiple discoveries.</p>
+<p>To avoid this, you can set:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&quot;discovery_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;device&quot;</span>
+</code></pre></div>
+<p>This enables <strong>per-device</strong> discovery, which is more reliable.
+It is especially recommended for device types using <code>sensor</code> domain entities: <a href="../device-types/network/">network</a>, <a href="../device-types/power-meter/">power_meter</a>, and <a href="../device-types/generic-iot/">generic_iot</a>.</p>
+<hr />
+<h2 id="aliases-and-linked-profiles">Aliases and Linked Profiles</h2>
+<ul>
+<li>Use <code>aliases</code> to define alternative model names for discovery.
+  This is helpful when the same device is reported differently across integrations (e.g., Hue vs. deCONZ).</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using <code>aliases</code>, only discovery information is added to the <strong>existing</strong> profile in the library.</p>
+</div>
+<ul>
+<li>Use <code>linked_profile</code> to point to another profile that contains the measurement data.
+  This creates a <strong>separate</strong> entry in the library.</li>
+</ul>
+<p>Format: <code>manufacturer/modelid</code>
+  Example: <code>signify/LCT010</code></p>
+<hr />
+<h2 id="sub-profiles">Sub-Profiles</h2>
+<p>Some devices may have different power usage based on their state.
+In these cases, you can define multiple sub-profiles within the same model.</p>
+<p>See <a href="../sub-profiles/">Sub Profiles</a> for details.</p>
 
 
 
@@ -2929,7 +3012,7 @@ See <a href="../sub-profiles/">sub profiles</a> for more information.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 28, 2024 14:18:11 UTC">December 28, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 24, 2025 07:04:21 UTC">July 24, 2025</span>
   </span>
 
     
