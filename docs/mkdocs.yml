@@ -75,6 +75,7 @@ nav:
       - 'configuration/sensor-configuration.md'
       - 'configuration/multiply-factor.md'
       - 'configuration/standby-power.md'
+      - 'configuration/entity-category.md'
       - 'configuration/new-yaml-structure.md'
   - 'Misc':
       - 'misc/naming.md'
