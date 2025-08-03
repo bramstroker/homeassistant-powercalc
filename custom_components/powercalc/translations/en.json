@@ -425,6 +425,17 @@
       "title": "Sub profile selection required for {entry}"
     }
   },
+  "config_subentries": {
+    "group": {
+      "title": "Group",
+      "step": {
+        "user": {
+          "title": "Add group",
+          "description": "Configure the weather location"
+        }
+      }
+    }
+  },
   "options": {
     "abort": {
       "model_not_support": "Model not supported"

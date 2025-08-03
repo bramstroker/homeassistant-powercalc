@@ -714,72 +714,6 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
         return schema
 
-    def create_schema_group_custom(
-        self,
-        config_entry: ConfigEntry | None = None,
-        is_option_flow: bool = False,
-    ) -> vol.Schema:
-        """Create config schema for groups."""
-        member_sensors = [
-            selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.title)
-            for config_entry in self.hass.config_entries.async_entries(DOMAIN)
-            if config_entry.data.get(CONF_SENSOR_TYPE) in [SensorType.VIRTUAL_POWER, SensorType.REAL_POWER]
-            and config_entry.unique_id is not None
-            and config_entry.title is not None
-        ]
-        member_sensor_selector = selector.SelectSelector(
-            selector.SelectSelectorConfig(
-                options=member_sensors,
-                multiple=True,
-                mode=selector.SelectSelectorMode.DROPDOWN,
-            ),
-        )
-
-        schema = vol.Schema(
-            {
-                vol.Optional(CONF_GROUP_MEMBER_SENSORS): member_sensor_selector,
-                vol.Optional(CONF_GROUP_MEMBER_DEVICES): selector.DeviceSelector(
-                    selector.DeviceSelectorConfig(
-                        multiple=True,
-                        entity=selector.EntitySelectorConfig(
-                            device_class=[SensorDeviceClass.POWER, SensorDeviceClass.ENERGY],
-                        ),
-                    ),
-                ),
-                vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
-                    selector.EntitySelectorConfig(
-                        domain=Platform.SENSOR,
-                        device_class=SensorDeviceClass.POWER,
-                        multiple=True,
-                    ),
-                ),
-                vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
-                    selector.EntitySelectorConfig(
-                        domain=Platform.SENSOR,
-                        device_class=SensorDeviceClass.ENERGY,
-                        multiple=True,
-                    ),
-                ),
-                vol.Optional(CONF_SUB_GROUPS): self.create_group_selector(current_entry=config_entry),
-                vol.Optional(CONF_AREA): selector.AreaSelector(),
-                vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
-                vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
-                vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
-                vol.Optional(CONF_FORCE_CALCULATE_GROUP_ENERGY, default=False): selector.BooleanSelector(),
-            },
-        )
-
-        if not is_option_flow:
-            schema = schema.extend(
-                {
-                    vol.Optional(CONF_GROUP_ENERGY_START_AT_ZERO, default=True): selector.BooleanSelector(),
-                    **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
-                    **SCHEMA_UTILITY_METER_TOGGLE.schema,
-                },
-            )
-
-        return schema
-
     def create_schema_virtual_power(
         self,
     ) -> vol.Schema:
@@ -1597,114 +1531,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         return self.async_show_menu(step_id=Step.MENU_GROUP, menu_options=menu)
 
-    async def handle_group_step(
-        self,
-        group_type: GroupType,
-        user_input: dict[str, Any] | None = None,
-        schema: vol.Schema | None = None,
-        next_step: Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None,
-    ) -> FlowResult:
-        """Generic step to handle different group types."""
 
-        async def _validate(user_input: dict[str, Any]) -> dict[str, str]:
-            if group_type == GroupType.CUSTOM:
-                self.validate_group_input(user_input)
-
-            self.name = user_input.get(CONF_NAME)
-            self.sensor_config.update(user_input)
-            self.sensor_config.update(
-                {
-                    CONF_GROUP_TYPE: group_type,
-                },
-            )
-            return user_input
-
-        self.selected_sensor_type = SensorType.GROUP
-        return await self.handle_form_step(
-            PowercalcFormStep(
-                step=GROUP_STEP_MAPPING[group_type],
-                schema=schema or GROUP_SCHEMAS[group_type],
-                validate_user_input=_validate,
-                continue_utility_meter_options_step=True,
-                next_step=next_step,
-            ),
-            user_input,
-        )
-
-    async def async_step_group_custom(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
-        """Handle the flow for custom group sensor."""
-        schema = SCHEMA_GROUP.extend(self.create_schema_group_custom().schema)
-        return await self.handle_group_step(GroupType.CUSTOM, user_input, schema)
-
-    async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the flow for domain based group sensor."""
-        return await self.handle_group_step(GroupType.DOMAIN, user_input)
-
-    async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the flow for subtract group sensor."""
-        return await self.handle_group_step(GroupType.SUBTRACT, user_input)
-
-    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the flow for tracked/untracked group sensor."""
-        await self.async_set_unique_id(UNIQUE_ID_TRACKED_UNTRACKED)
-        self._abort_if_unique_id_configured()
-        if user_input is not None:
-            user_input[CONF_NAME] = "Tracked / Untracked"
-
-        async def _next_step(user_data: dict[str, Any]) -> Step | None:
-            return Step.GROUP_TRACKED_UNTRACKED_AUTO if bool(user_data.get(CONF_GROUP_TRACKED_AUTO, True)) else Step.GROUP_TRACKED_UNTRACKED_MANUAL
-
-        return await self.handle_group_step(
-            GroupType.TRACKED_UNTRACKED,
-            user_input,
-            schema=SCHEMA_GROUP_TRACKED_UNTRACKED,
-            next_step=_next_step,
-        )
-
-    async def async_step_group_tracked_untracked_auto(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the flow for tracked/untracked group sensor."""
-
-        tracked_entities = await find_auto_tracked_power_entities(self.hass)
-
-        schema = vol.Schema(
-            {
-                vol.Optional(CONF_EXCLUDE_ENTITIES): selector.EntitySelector(
-                    selector.EntitySelectorConfig(
-                        multiple=True,
-                        include_entities=list(tracked_entities),
-                    ),
-                ),
-            },
-        )
-
-        return await self.handle_form_step(
-            PowercalcFormStep(
-                step=Step.GROUP_TRACKED_UNTRACKED_AUTO,
-                schema=schema,
-                continue_utility_meter_options_step=True,
-            ),
-            user_input,
-        )
-
-    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the flow for tracked/untracked group sensor."""
-        schema = SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL
-        if not user_input:
-            entities, _ = await find_entities(self.hass)
-            tracked_entities = [entity.entity_id for entity in entities if isinstance(entity, PowerSensor)]
-            schema = self.fill_schema_defaults(schema, {CONF_GROUP_TRACKED_POWER_ENTITIES: tracked_entities})
-
-        return await self.handle_form_step(
-            PowercalcFormStep(
-                step=Step.GROUP_TRACKED_UNTRACKED_MANUAL,
-                schema=schema,
-                continue_utility_meter_options_step=True,
-            ),
-            user_input,
-        )
 
     async def async_step_library_multi_profile(
         self,
@@ -2217,7 +2044,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         )
 
 
-class GroupSubentryFlowHandler(ConfigSubentryFlow):
+class GroupSubentryFlowHandler(ConfigSubentryFlow, PowercalcCommonFlow):
     """Handle subentry flow for adding and modifying a location."""
 
     @property
@@ -2236,6 +2063,181 @@ class GroupSubentryFlowHandler(ConfigSubentryFlow):
 
         return self.async_show_menu(step_id="user", menu_options=menu)
 
+    async def handle_group_step(
+        self,
+        group_type: GroupType,
+        user_input: dict[str, Any] | None = None,
+        schema: vol.Schema | None = None,
+        next_step: Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None,
+    ) -> FlowResult:
+        """Generic step to handle different group types."""
+
+        async def _validate(user_input: dict[str, Any]) -> dict[str, str]:
+            if group_type == GroupType.CUSTOM:
+                self.validate_group_input(user_input)
+
+            self.name = user_input.get(CONF_NAME)
+            self.sensor_config.update(user_input)
+            self.sensor_config.update(
+                {
+                    CONF_GROUP_TYPE: group_type,
+                },
+            )
+            return user_input
+
+        self.selected_sensor_type = SensorType.GROUP
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=GROUP_STEP_MAPPING[group_type],
+                schema=schema or GROUP_SCHEMAS[group_type],
+                validate_user_input=_validate,
+                continue_utility_meter_options_step=True,
+                next_step=next_step,
+            ),
+            user_input,
+        )
+
+    async def async_step_group_custom(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Handle the flow for custom group sensor."""
+        schema = SCHEMA_GROUP.extend(self.create_schema_group_custom().schema)
+        return await self.handle_group_step(GroupType.CUSTOM, user_input, schema)
+
+    async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for domain based group sensor."""
+        return await self.handle_group_step(GroupType.DOMAIN, user_input)
+
+    async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for subtract group sensor."""
+        return await self.handle_group_step(GroupType.SUBTRACT, user_input)
+
+    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for tracked/untracked group sensor."""
+        await self.async_set_unique_id(UNIQUE_ID_TRACKED_UNTRACKED)
+        self._abort_if_unique_id_configured()
+        if user_input is not None:
+            user_input[CONF_NAME] = "Tracked / Untracked"
+
+        async def _next_step(user_data: dict[str, Any]) -> Step | None:
+            return Step.GROUP_TRACKED_UNTRACKED_AUTO if bool(user_data.get(CONF_GROUP_TRACKED_AUTO, True)) else Step.GROUP_TRACKED_UNTRACKED_MANUAL
+
+        return await self.handle_group_step(
+            GroupType.TRACKED_UNTRACKED,
+            user_input,
+            schema=SCHEMA_GROUP_TRACKED_UNTRACKED,
+            next_step=_next_step,
+        )
+
+    async def async_step_group_tracked_untracked_auto(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for tracked/untracked group sensor."""
+
+        tracked_entities = await find_auto_tracked_power_entities(self.hass)
+
+        schema = vol.Schema(
+            {
+                vol.Optional(CONF_EXCLUDE_ENTITIES): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        multiple=True,
+                        include_entities=list(tracked_entities),
+                    ),
+                ),
+            },
+        )
+
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GROUP_TRACKED_UNTRACKED_AUTO,
+                schema=schema,
+                continue_utility_meter_options_step=True,
+            ),
+            user_input,
+        )
+
+    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for tracked/untracked group sensor."""
+        schema = SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL
+        if not user_input:
+            entities, _ = await find_entities(self.hass)
+            tracked_entities = [entity.entity_id for entity in entities if isinstance(entity, PowerSensor)]
+            schema = self.fill_schema_defaults(schema, {CONF_GROUP_TRACKED_POWER_ENTITIES: tracked_entities})
+
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GROUP_TRACKED_UNTRACKED_MANUAL,
+                schema=schema,
+                continue_utility_meter_options_step=True,
+            ),
+            user_input,
+        )
+
+    def create_schema_group_custom(
+        self,
+        config_entry: ConfigEntry | None = None,
+        is_option_flow: bool = False,
+    ) -> vol.Schema:
+        """Create config schema for groups."""
+        member_sensors = [
+            selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.title)
+            for config_entry in self.hass.config_entries.async_entries(DOMAIN)
+            if config_entry.data.get(CONF_SENSOR_TYPE) in [SensorType.VIRTUAL_POWER, SensorType.REAL_POWER]
+            and config_entry.unique_id is not None
+            and config_entry.title is not None
+        ]
+        member_sensor_selector = selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=member_sensors,
+                multiple=True,
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            ),
+        )
+
+        schema = vol.Schema(
+            {
+                vol.Optional(CONF_GROUP_MEMBER_SENSORS): member_sensor_selector,
+                vol.Optional(CONF_GROUP_MEMBER_DEVICES): selector.DeviceSelector(
+                    selector.DeviceSelectorConfig(
+                        multiple=True,
+                        entity=selector.EntitySelectorConfig(
+                            device_class=[SensorDeviceClass.POWER, SensorDeviceClass.ENERGY],
+                        ),
+                    ),
+                ),
+                vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        domain=Platform.SENSOR,
+                        device_class=SensorDeviceClass.POWER,
+                        multiple=True,
+                    ),
+                ),
+                vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        domain=Platform.SENSOR,
+                        device_class=SensorDeviceClass.ENERGY,
+                        multiple=True,
+                    ),
+                ),
+                vol.Optional(CONF_SUB_GROUPS): self.create_group_selector(current_entry=config_entry),
+                vol.Optional(CONF_AREA): selector.AreaSelector(),
+                vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
+                vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
+                vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
+                vol.Optional(CONF_FORCE_CALCULATE_GROUP_ENERGY, default=False): selector.BooleanSelector(),
+            },
+        )
+
+        if not is_option_flow:
+            schema = schema.extend(
+                {
+                    vol.Optional(CONF_GROUP_ENERGY_START_AT_ZERO, default=True): selector.BooleanSelector(),
+                    **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+                    **SCHEMA_UTILITY_METER_TOGGLE.schema,
+                },
+            )
+
+        return schema
+
     async def async_step_menu_group(
         self,
         user_input: dict[str, Any] | None = None,
@@ -2246,3 +2248,22 @@ class GroupSubentryFlowHandler(ConfigSubentryFlow):
             menu.remove(Step.GROUP_TRACKED_UNTRACKED)
 
         return self.async_show_menu(step_id=Step.MENU_GROUP, menu_options=menu)
+
+    @callback
+    def persist_config_entry(self) -> FlowResult:
+        """Create the config entry."""
+        self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
+        self.sensor_config.update({CONF_NAME: self.name})
+
+        if self.source_entity_id:
+            self.sensor_config.update({CONF_ENTITY_ID: self.source_entity_id})
+
+        if (
+            self.selected_profile
+            and self.source_entity
+            and self.source_entity.device_entry
+            and self.selected_profile.discovery_by == DiscoveryBy.DEVICE
+        ):
+            self.sensor_config.update({CONF_DEVICE: self.source_entity.device_entry.id})
+
+        return self.async_create_entry(title=str(self.name), data=self.sensor_config)
