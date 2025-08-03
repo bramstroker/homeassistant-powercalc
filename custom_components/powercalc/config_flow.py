@@ -21,7 +21,9 @@ from homeassistant.config_entries import (
     ConfigEntryBaseFlow,
     ConfigFlow,
     ConfigFlowResult,
+    ConfigSubentryFlow,
     OptionsFlow,
+    SubentryFlowResult,
 )
 from homeassistant.const import (
     CONF_ATTRIBUTE,
@@ -1403,7 +1405,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
 
-    VERSION = 4
+    VERSION = 5
 
     def __init__(self) -> None:
         """Initialize options flow."""
@@ -1415,6 +1417,15 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Get the options flow for this handler."""
         return PowercalcOptionsFlow(config_entry)
+
+    @classmethod
+    @callback
+    def async_get_supported_subentry_types(
+        cls,
+        config_entry: ConfigEntry,
+    ) -> dict[str, type[ConfigSubentryFlow]]:
+        """Return subentries supported by this integration."""
+        return {"group": GroupSubentryFlowHandler}
 
     async def async_step_integration_discovery(
         self,
@@ -2204,3 +2215,34 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
             },
         )
+
+
+class GroupSubentryFlowHandler(ConfigSubentryFlow):
+    """Handle subentry flow for adding and modifying a location."""
+
+    @property
+    def _is_new(self) -> bool:
+        """Return if this is a new subentry."""
+        return self.source == "user"
+
+    async def async_step_user(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> SubentryFlowResult:
+        """User flow to add a new location."""
+        menu = MENU_GROUP.copy()
+        if self.hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, UNIQUE_ID_TRACKED_UNTRACKED):
+            menu.remove(Step.GROUP_TRACKED_UNTRACKED)
+
+        return self.async_show_menu(step_id="user", menu_options=menu)
+
+    async def async_step_menu_group(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Handle the group choice step."""
+        menu = MENU_GROUP.copy()
+        if self.hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, UNIQUE_ID_TRACKED_UNTRACKED):
+            menu.remove(Step.GROUP_TRACKED_UNTRACKED)
+
+        return self.async_show_menu(step_id=Step.MENU_GROUP, menu_options=menu)

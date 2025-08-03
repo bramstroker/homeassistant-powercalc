@@ -565,9 +565,75 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         if CONF_STATES_TRIGGER in conf_playbook:
             data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
 
-    hass.config_entries.async_update_entry(config_entry, data=data, version=4)
+    if version <= 4:
+        base_entry = await find_v5_base_entry(hass)
+        if not base_entry:
+            _LOGGER.debug(
+                "No existing V5 config entry found, creating a new one for migration",
+            )
+
+            # if _yaml_domain_config:
+            #     options = {
+            #         CONF_SHOW_ALL_DEVICES: _yaml_domain_config.get(CONF_SHOW_ALL_DEVICES, False),
+            #         CONF_HIDE_BATTERY: _yaml_domain_config.get(CONF_HIDE_BATTERY, False),
+            #         CONF_ROUND_BATTERY: _yaml_domain_config.get(CONF_ROUND_BATTERY, False),
+            #         CONF_DEFAULT_BATTERY_LOW_THRESHOLD: _yaml_domain_config.get(
+            #             CONF_DEFAULT_BATTERY_LOW_THRESHOLD, DEFAULT_BATTERY_LOW_THRESHOLD
+            #         ),
+            #         CONF_BATTERY_INCREASE_THRESHOLD: _yaml_domain_config.get(
+            #             CONF_BATTERY_INCREASE_THRESHOLD, DEFAULT_BATTERY_INCREASE_THRESHOLD
+            #         ),
+            #         CONF_ADVANCED_SETTINGS: {
+            #             CONF_ENABLE_AUTODISCOVERY: _yaml_domain_config.get(CONF_ENABLE_AUTODISCOVERY, True),
+            #             CONF_ENABLE_REPLACED: _yaml_domain_config.get(CONF_ENABLE_REPLACED, True),
+            #             CONF_USER_LIBRARY: _yaml_domain_config.get(CONF_USER_LIBRARY, ""),
+            #         },
+            #     }
+            # else:
+            #     options = {
+            #         CONF_SHOW_ALL_DEVICES: False,
+            #         CONF_HIDE_BATTERY: False,
+            #         CONF_ROUND_BATTERY: False,
+            #         CONF_DEFAULT_BATTERY_LOW_THRESHOLD: DEFAULT_BATTERY_LOW_THRESHOLD,
+            #         CONF_BATTERY_INCREASE_THRESHOLD: DEFAULT_BATTERY_INCREASE_THRESHOLD,
+            #         CONF_ADVANCED_SETTINGS: {
+            #             CONF_ENABLE_AUTODISCOVERY: True,
+            #             CONF_ENABLE_REPLACED: True,
+            #             CONF_USER_LIBRARY: "",
+            #         },
+            #     }
+
+            global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(
+                DOMAIN,
+                ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+            )
+            if global_config_entry:
+                _LOGGER.debug("Updating existing global config entry for Powercalc V5")
+                hass.config_entries.async_update_entry(
+                    global_config_entry,
+                    title="Powercalc V5",
+                    unique_id=DOMAIN,
+                    version=5,
+                )
+            else:
+                _LOGGER.debug("Creating new global config entry for Powercalc V5")
+
+    hass.config_entries.async_update_entry(config_entry, data=data, version=5)
 
     return True
+
+
+async def find_v5_base_entry(hass: HomeAssistant) -> ConfigEntry | None:
+    """Find the base entry for migration."""
+    existing_entries = hass.config_entries.async_entries(DOMAIN)
+    for entry in existing_entries:
+        if entry.version == 5 and entry.unique_id == DOMAIN:
+            _LOGGER.debug(
+                "Found existing V4 config entry %s, using it as the base for migration",
+                entry.entry_id,
+            )
+            return entry
+    return None
 
 
 async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
