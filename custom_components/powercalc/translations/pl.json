@@ -414,7 +414,7 @@
       "fix_flow": {
         "step": {
           "sub_profile": {
-            "description": "Ten model ma wiele podprofili. Wybierz taki, który pasuje do Twojego urządzenia\n\n\"{entity_id}\"{remarks}",
+            "description": "Ten model ma wiele podprofili. Wybierz taki, który pasuje do Twojego urządzenia\n\n\"{entity_id}\"\n\nProducent: {manufacturer}\nModel: {model}{remarks}",
             "title": "Wybierz prawidłowy podprofil",
             "data": {
               "sub_profile": "Podprofil"

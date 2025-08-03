@@ -414,7 +414,7 @@
       "fix_flow": {
         "step": {
           "sub_profile": {
-            "description": "Este dispositivo tem um modelo com vários sub perfis. Selecione um que corresponda à seguinte entidade deste dispositivo:\n\n\"{entity_id}\"{remarks}",
+            "description": "Este dispositivo tem um modelo com vários sub perfis. Selecione um que corresponda à seguinte entidade deste dispositivo:\n\n\"{entity_id}\"\n\nFabricante: {manufacturer}\nModelo: {model}{remarks}",
             "title": "Selecione o sub perfil correto",
             "data": {
               "sub_profile": "Sub perfil"

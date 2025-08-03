@@ -16,7 +16,15 @@ import voluptuous as vol
 from awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
-from homeassistant.config_entries import ConfigEntry, ConfigEntryBaseFlow, ConfigFlow, ConfigFlowResult, OptionsFlow
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigEntryBaseFlow,
+    ConfigFlow,
+    ConfigFlowResult,
+    ConfigSubentryFlow,
+    OptionsFlow,
+    SubentryFlowResult,
+)
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_DEVICE,
@@ -1176,6 +1184,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                     "description_placeholders": {
                         "entity_id": self.source_entity_id,
                         "remarks": remarks,
+                        "model": profile.model,
+                        "manufacturer": profile.manufacturer,
                     },
                 },
             ),
@@ -1407,6 +1417,15 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Get the options flow for this handler."""
         return PowercalcOptionsFlow(config_entry)
+
+    @classmethod
+    @callback
+    def async_get_supported_subentry_types(
+        cls,
+        config_entry: ConfigEntry,
+    ) -> dict[str, type[ConfigSubentryFlow]]:
+        """Return subentries supported by this integration."""
+        return {"group": LocationSubentryFlowHandler}
 
     async def async_step_integration_discovery(
         self,
@@ -2196,3 +2215,29 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
             },
         )
+
+
+class LocationSubentryFlowHandler(ConfigSubentryFlow):
+    """Handle subentry flow for adding and modifying a location."""
+
+    async def async_step_user(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> SubentryFlowResult:
+        """User flow to add a new location."""
+        menu = MENU_GROUP.copy()
+        if self.hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, UNIQUE_ID_TRACKED_UNTRACKED):
+            menu.remove(Step.GROUP_TRACKED_UNTRACKED)
+
+        return self.async_show_menu(step_id="user", menu_options=menu)
+
+    async def async_step_menu_group(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Handle the group choice step."""
+        menu = MENU_GROUP.copy()
+        if self.hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, UNIQUE_ID_TRACKED_UNTRACKED):
+            menu.remove(Step.GROUP_TRACKED_UNTRACKED)
+
+        return self.async_show_menu(step_id=Step.MENU_GROUP, menu_options=menu)
