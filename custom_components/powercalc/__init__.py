@@ -15,7 +15,7 @@ from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState, ConfigSubentry
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_SCAN_INTERVAL,
@@ -566,7 +566,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
             data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
 
     if version <= 4:
-        base_entry = await find_v5_base_entry(hass)
+        base_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, DOMAIN)
         if not base_entry:
             _LOGGER.debug(
                 "No existing V5 config entry found, creating a new one for migration",
@@ -616,9 +616,29 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                     version=5,
                 )
             else:
+                #todo, based on YAML config probably create base config entry?
                 _LOGGER.debug("Creating new global config entry for Powercalc V5")
 
-    hass.config_entries.async_update_entry(config_entry, data=data, version=5)
+        if not base_entry:
+            _LOGGER.critical("No base entry found for Powercalc V5 migration, aborting migration")
+            return False
+
+        sensor_type = SensorType(data.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER))
+        if sensor_type == SensorType.GROUP:
+            _LOGGER.debug("Migrating group sensor entry to V5")
+
+            subentry = ConfigSubentry(
+                data=config_entry.data,
+                subentry_type="group",
+                title=config_entry.title,
+                unique_id=config_entry.unique_id,
+            )
+
+            hass.config_entries.async_add_subentry(base_entry, subentry)
+            await hass.config_entries.async_remove(config_entry.entry_id)
+
+
+    #hass.config_entries.async_update_entry(config_entry, data=data, version=5)
 
     return True
 
