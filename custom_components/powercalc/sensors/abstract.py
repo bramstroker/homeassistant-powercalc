@@ -4,7 +4,6 @@ import logging
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
-from awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import CONF_NAME
 from homeassistant.const import __version__ as HA_VERSION  # noqa
@@ -30,8 +29,6 @@ _LOGGER = logging.getLogger(__name__)
 class BaseEntity(Entity):
     async def async_added_to_hass(self) -> None:
         """Attach the entity to same device as the source entity."""
-        if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2025.8.0"):
-            return
 
         entity_reg = er.async_get(self.hass)
         entity_entry = entity_reg.async_get(self.entity_id)

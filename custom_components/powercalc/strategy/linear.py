@@ -172,7 +172,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             return None
 
     def get_value_from_attribute(self, entity_state: State) -> int | None:
-        value: int | None = entity_state.attributes.get(self._attribute)
+        value: int | None = entity_state.attributes.get(self._attribute)  # type: ignore[arg-type]
         if value is None:
             _LOGGER.warning(
                 "No %s attribute for entity: %s",
@@ -196,7 +196,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if CONF_ATTRIBUTE in self._config:
             return str(self._config.get(CONF_ATTRIBUTE))
 
-        entity_domain = entity_state.domain  # type: ignore[attr-defined]
+        entity_domain = entity_state.domain
         return ENTITY_ATTRIBUTE_MAPPING.get(entity_domain)
 
     async def validate_config(self) -> None:
