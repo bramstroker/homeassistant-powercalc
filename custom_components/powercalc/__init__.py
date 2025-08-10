@@ -616,7 +616,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                     version=5,
                 )
             else:
-                #todo, based on YAML config probably create base config entry?
+                # todo, based on YAML config probably create base config entry?
                 _LOGGER.debug("Creating new global config entry for Powercalc V5")
 
         if not base_entry:
@@ -637,8 +637,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
             hass.config_entries.async_add_subentry(base_entry, subentry)
             await hass.config_entries.async_remove(config_entry.entry_id)
 
-
-    #hass.config_entries.async_update_entry(config_entry, data=data, version=5)
+    # hass.config_entries.async_update_entry(config_entry, data=data, version=5)
 
     return True
 
