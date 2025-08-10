@@ -20,11 +20,11 @@ async def attach_entities_to_source_device(
     config_entry: ConfigEntry | None,
     entities_to_add: list[Entity],
     hass: HomeAssistant,
-    source_entity: SourceEntity,
+    source_entity: SourceEntity | None,
 ) -> None:
     """Set the entity to same device as the source entity, if any available."""
 
-    device_entry = source_entity.device_entry
+    device_entry = source_entity.device_entry if source_entity else None
     if not device_entry and config_entry:
         device_id = config_entry.data.get(CONF_DEVICE)
         if device_id:
@@ -38,7 +38,7 @@ async def attach_entities_to_source_device(
 
     for entity in (entity for entity in entities_to_add if isinstance(entity, BaseEntity)):
         try:
-            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2025.8.0"):
+            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2025.8.0") and config_entry:
                 entity.device_entry = device_entry
             else:
                 entity.source_device_id = device_entry.id  # type: ignore
