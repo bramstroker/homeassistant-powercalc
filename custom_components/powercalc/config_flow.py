@@ -1531,8 +1531,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         return self.async_show_menu(step_id=Step.MENU_GROUP, menu_options=menu)
 
-
-
     async def async_step_library_multi_profile(
         self,
         user_input: dict[str, Any] | None = None,
