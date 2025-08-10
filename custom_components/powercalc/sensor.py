@@ -346,6 +346,8 @@ async def _async_setup_entities(
         _LOGGER.error(err)
         return
 
+    await attach_entities_to_source_device(config_entry, entities.new, hass, None)
+
     entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
     for entity in entities_to_add:
         if isinstance(entity, GroupedSensor | StandbyPowerSensor):

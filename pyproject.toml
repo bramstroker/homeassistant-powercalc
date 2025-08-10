@@ -92,10 +92,10 @@ docs = [
 dev = [
     "pre-commit>=4.0.0",
     "ruff>=0.12.0",
-    "mypy==1.17.0",
+    "mypy==1.17.1",
     "voluptuous-stubs>=0.1",
     "homeassistant-stubs",
-    "pytest-homeassistant-custom-component==0.13.263",
+    "pytest-homeassistant-custom-component==0.13.269",
     "types-pytz>=2024.1",
     "types-croniter>=2.0",
     "croniter>=6.0.0",

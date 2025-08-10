@@ -578,7 +578,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         if unit_of_measurement and self._attr_native_unit_of_measurement != unit_of_measurement:
             converter = UNIT_CONVERTERS[unit_of_measurement]
             convert = converter.converter_factory(unit_of_measurement, self._attr_native_unit_of_measurement)
-            value = convert(float(value))
+            value = str(convert(float(value)))
         try:
             return Decimal(value)
         except DecimalException as err:
