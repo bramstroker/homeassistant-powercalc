@@ -1182,8 +1182,6 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                     "description_placeholders": {
                         "entity_id": self.source_entity_id,
                         "remarks": remarks,
-                        "model": profile.model,
-                        "manufacturer": profile.manufacturer,
                     },
                 },
             ),
