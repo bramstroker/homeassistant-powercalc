@@ -47,6 +47,8 @@ class SubProfileRepairFlow(RepairsFlow):
             description_placeholders={
                 "entity_id": self._config_entry.data[CONF_ENTITY_ID],
                 "remarks": remarks or "",
+                "model": profile.model,
+                "manufacturer": profile.manufacturer,
             },
         )
 
