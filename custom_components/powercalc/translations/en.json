@@ -427,6 +427,10 @@
   },
   "config_subentries": {
     "group": {
+      "initiate_flow": {
+        "user": "Add group"
+      },
+      "entry_type": "Group",
       "title": "Group",
       "step": {
         "user": {

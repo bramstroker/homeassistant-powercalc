@@ -15,7 +15,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -148,7 +148,7 @@ async def create_group_sensors_yaml(
 
 async def create_group_sensors_gui(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: ConfigSubentry,
     sensor_config: dict,
 ) -> list[Entity]:
     """Create group sensors based on a config_entry."""
@@ -156,7 +156,7 @@ async def create_group_sensors_gui(
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     if not unique_id:
-        sensor_config[CONF_UNIQUE_ID] = entry.entry_id
+        sensor_config[CONF_UNIQUE_ID] = entry.subentry_id
 
     power_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER)
 
@@ -236,7 +236,7 @@ def filter_entity_list_by_class(
 
 async def resolve_entity_ids_recursively(  # noqa: C901
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: ConfigSubentry,
     device_class: SensorDeviceClass,
     resolved_ids: set[str] | None = None,
 ) -> set[str]:

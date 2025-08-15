@@ -1,4 +1,4 @@
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigSubentry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
@@ -15,7 +15,7 @@ from custom_components.powercalc.sensors.group.tracked_untracked import TrackedP
 async def create_group_sensors(
     hass: HomeAssistant,
     sensor_config: ConfigType,
-    config_entry: ConfigEntry | None,
+    config_entry: ConfigSubentry | None,
     entities: list[Entity] | None = None,
 ) -> list[Entity]:
     """Create group sensors for a given sensor configuration."""

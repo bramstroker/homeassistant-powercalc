@@ -25,6 +25,7 @@ from homeassistant.const import (
 )
 from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.data_entry_flow import AbortFlow
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.entity_platform import async_get_platforms
 from homeassistant.helpers.reload import async_integration_yaml_config
@@ -96,6 +97,7 @@ from .const import (
     SERVICE_UPDATE_LIBRARY,
     PowercalcDiscoveryType,
     SensorType,
+    SubentryType,
     UnitPrefix,
 )
 from .discovery import DiscoveryManager
@@ -211,6 +213,11 @@ CONFIG_SCHEMA = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
+
+SENSOR_TYPE_SUB_ENTRY_TYPE_MAP = {
+    SensorType.GROUP: SubentryType.GROUP,
+    SensorType.VIRTUAL_POWER: SubentryType.VIRTUAL_POWER,
+}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -566,80 +573,65 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
             data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
 
     if version <= 4:
-        base_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, DOMAIN)
-        if not base_entry:
-            _LOGGER.debug(
-                "No existing V5 config entry found, creating a new one for migration",
-            )
-
-            # if _yaml_domain_config:
-            #     options = {
-            #         CONF_SHOW_ALL_DEVICES: _yaml_domain_config.get(CONF_SHOW_ALL_DEVICES, False),
-            #         CONF_HIDE_BATTERY: _yaml_domain_config.get(CONF_HIDE_BATTERY, False),
-            #         CONF_ROUND_BATTERY: _yaml_domain_config.get(CONF_ROUND_BATTERY, False),
-            #         CONF_DEFAULT_BATTERY_LOW_THRESHOLD: _yaml_domain_config.get(
-            #             CONF_DEFAULT_BATTERY_LOW_THRESHOLD, DEFAULT_BATTERY_LOW_THRESHOLD
-            #         ),
-            #         CONF_BATTERY_INCREASE_THRESHOLD: _yaml_domain_config.get(
-            #             CONF_BATTERY_INCREASE_THRESHOLD, DEFAULT_BATTERY_INCREASE_THRESHOLD
-            #         ),
-            #         CONF_ADVANCED_SETTINGS: {
-            #             CONF_ENABLE_AUTODISCOVERY: _yaml_domain_config.get(CONF_ENABLE_AUTODISCOVERY, True),
-            #             CONF_ENABLE_REPLACED: _yaml_domain_config.get(CONF_ENABLE_REPLACED, True),
-            #             CONF_USER_LIBRARY: _yaml_domain_config.get(CONF_USER_LIBRARY, ""),
-            #         },
-            #     }
-            # else:
-            #     options = {
-            #         CONF_SHOW_ALL_DEVICES: False,
-            #         CONF_HIDE_BATTERY: False,
-            #         CONF_ROUND_BATTERY: False,
-            #         CONF_DEFAULT_BATTERY_LOW_THRESHOLD: DEFAULT_BATTERY_LOW_THRESHOLD,
-            #         CONF_BATTERY_INCREASE_THRESHOLD: DEFAULT_BATTERY_INCREASE_THRESHOLD,
-            #         CONF_ADVANCED_SETTINGS: {
-            #             CONF_ENABLE_AUTODISCOVERY: True,
-            #             CONF_ENABLE_REPLACED: True,
-            #             CONF_USER_LIBRARY: "",
-            #         },
-            #     }
-
-            global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(
-                DOMAIN,
-                ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
-            )
-            if global_config_entry:
-                _LOGGER.debug("Updating existing global config entry for Powercalc V5")
-                hass.config_entries.async_update_entry(
-                    global_config_entry,
-                    title="Powercalc V5",
-                    unique_id=DOMAIN,
-                    version=5,
-                )
-            else:
-                # todo, based on YAML config probably create base config entry?
-                _LOGGER.debug("Creating new global config entry for Powercalc V5")
-
+        base_entry = await ensure_v5_base_entry(hass)
         if not base_entry:
             _LOGGER.critical("No base entry found for Powercalc V5 migration, aborting migration")
             return False
 
         sensor_type = SensorType(data.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER))
-        if sensor_type == SensorType.GROUP:
-            _LOGGER.debug("Migrating group sensor entry to V5")
-
-            subentry = ConfigSubentry(
-                data=config_entry.data,
-                subentry_type="group",
-                title=config_entry.title,
-                unique_id=config_entry.unique_id,
+        sub_entry_type = SENSOR_TYPE_SUB_ENTRY_TYPE_MAP.get(sensor_type)
+        if not sub_entry_type:
+            _LOGGER.error(
+                "Unsupported sensor type %s for migration to V5, aborting migration",
+                sensor_type,
             )
+            return False
 
+        _LOGGER.debug("Migrating group sensor entry to V5")
+
+        subentry = ConfigSubentry(
+            data=config_entry.data,
+            subentry_type=str(sub_entry_type),
+            title=config_entry.title,
+            unique_id=config_entry.unique_id,
+        )
+
+        try:
             hass.config_entries.async_add_subentry(base_entry, subentry)
-            await hass.config_entries.async_remove(config_entry.entry_id)
+        except AbortFlow as e:  # pragma: no cover
+            _LOGGER.error("Failed to add subentry for group sensor migration: %s", e)
+            return False
+        await hass.config_entries.async_remove(config_entry.entry_id)
 
     # hass.config_entries.async_update_entry(config_entry, data=data, version=5)
 
     return True
+
+
+async def ensure_v5_base_entry(hass: HomeAssistant) -> ConfigEntry | None:
+    base_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, DOMAIN)
+    if not base_entry:
+        _LOGGER.debug(
+            "No existing V5 config entry found, creating a new one for migration",
+        )
+
+        global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(
+            DOMAIN,
+            ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        )
+        if global_config_entry:
+            _LOGGER.debug("Updating existing global config entry for Powercalc V5")
+            hass.config_entries.async_update_entry(
+                global_config_entry,
+                title="Powercalc V5",
+                unique_id=DOMAIN,
+                version=5,
+            )
+            base_entry = global_config_entry
+        else:
+            _LOGGER.debug("Creating new global config entry for Powercalc V5")
+            base_entry = await create_v5_base_entry_from_yaml(hass)
+    return base_entry
 
 
 async def find_v5_base_entry(hass: HomeAssistant) -> ConfigEntry | None:
@@ -653,6 +645,68 @@ async def find_v5_base_entry(hass: HomeAssistant) -> ConfigEntry | None:
             )
             return entry
     return None
+
+
+async def create_v5_base_entry_from_yaml(hass: HomeAssistant) -> ConfigEntry | None:
+    config_entry = ConfigEntry(
+        domain=DOMAIN,
+        title="Powercalc V5",
+        unique_id=DOMAIN,
+        version=5,
+        data={
+            CONF_FORCE_UPDATE_FREQUENCY: DEFAULT_UPDATE_FREQUENCY,
+            CONF_GROUP_UPDATE_INTERVAL: DEFAULT_GROUP_UPDATE_INTERVAL,
+            CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
+            CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
+            CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
+            CONF_ENERGY_INTEGRATION_METHOD: DEFAULT_ENERGY_INTEGRATION_METHOD,
+            CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
+            CONF_ENERGY_SENSOR_PRECISION: DEFAULT_ENERGY_SENSOR_PRECISION,
+            CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
+            CONF_ENERGY_SENSOR_UNIT_PREFIX: DEFAULT_ENERGY_UNIT_PREFIX,
+            CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
+            CONF_DISABLE_LIBRARY_DOWNLOAD: False,
+            CONF_ENABLE_AUTODISCOVERY: True,
+            CONF_CREATE_DOMAIN_GROUPS: [],
+            CONF_CREATE_ENERGY_SENSORS: True,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_UTILITY_METER_OFFSET: DEFAULT_OFFSET,
+            CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
+        },
+    )
+    await hass.config_entries.async_add(config_entry)
+
+
+# if _yaml_domain_config:
+#     options = {
+#         CONF_SHOW_ALL_DEVICES: _yaml_domain_config.get(CONF_SHOW_ALL_DEVICES, False),
+#         CONF_HIDE_BATTERY: _yaml_domain_config.get(CONF_HIDE_BATTERY, False),
+#         CONF_ROUND_BATTERY: _yaml_domain_config.get(CONF_ROUND_BATTERY, False),
+#         CONF_DEFAULT_BATTERY_LOW_THRESHOLD: _yaml_domain_config.get(
+#             CONF_DEFAULT_BATTERY_LOW_THRESHOLD, DEFAULT_BATTERY_LOW_THRESHOLD
+#         ),
+#         CONF_BATTERY_INCREASE_THRESHOLD: _yaml_domain_config.get(
+#             CONF_BATTERY_INCREASE_THRESHOLD, DEFAULT_BATTERY_INCREASE_THRESHOLD
+#         ),
+#         CONF_ADVANCED_SETTINGS: {
+#             CONF_ENABLE_AUTODISCOVERY: _yaml_domain_config.get(CONF_ENABLE_AUTODISCOVERY, True),
+#             CONF_ENABLE_REPLACED: _yaml_domain_config.get(CONF_ENABLE_REPLACED, True),
+#             CONF_USER_LIBRARY: _yaml_domain_config.get(CONF_USER_LIBRARY, ""),
+#         },
+#     }
+# else:
+#     options = {
+#         CONF_SHOW_ALL_DEVICES: False,
+#         CONF_HIDE_BATTERY: False,
+#         CONF_ROUND_BATTERY: False,
+#         CONF_DEFAULT_BATTERY_LOW_THRESHOLD: DEFAULT_BATTERY_LOW_THRESHOLD,
+#         CONF_BATTERY_INCREASE_THRESHOLD: DEFAULT_BATTERY_INCREASE_THRESHOLD,
+#         CONF_ADVANCED_SETTINGS: {
+#             CONF_ENABLE_AUTODISCOVERY: True,
+#             CONF_ENABLE_REPLACED: True,
+#             CONF_USER_LIBRARY: "",
+#         },
+#     }
 
 
 async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
