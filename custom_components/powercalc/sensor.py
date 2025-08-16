@@ -429,7 +429,7 @@ def save_entity_ids_on_config_entry(
     """
     _LOGGER.debug("Saving entity ids on config entry %s", sub_entry.subentry_id)
     power_entities = [e.entity_id for e in entities.all() if isinstance(e, VirtualPowerSensor)]
-    new_data = config_entry.data.copy()
+    new_data = sub_entry.data.copy()
     if power_entities:
         _LOGGER.debug("Setting power entity_id %s on config entry %s", power_entities[0], sub_entry.subentry_id)
         new_data.update({ENTRY_DATA_POWER_ENTITY: power_entities[0]})
