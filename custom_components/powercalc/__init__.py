@@ -247,6 +247,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DATA_STANDBY_POWER_SENSORS: {},
     }
 
+    await async_migrate_integration(hass, config)
+
     await register_services(hass)
     await setup_yaml_sensors(hass, config, global_config)
 
@@ -572,43 +574,62 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         if CONF_STATES_TRIGGER in conf_playbook:
             data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
 
-    if version <= 4:
-        base_entry = await ensure_v5_base_entry(hass)
-        if not base_entry:
-            _LOGGER.critical("No base entry found for Powercalc V5 migration, aborting migration")
-            return False
+    hass.config_entries.async_update_entry(config_entry, data=data, version=5)
 
-        sensor_type = SensorType(data.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER))
+    return True
+
+
+async def async_migrate_integration(hass: HomeAssistant, config: ConfigType) -> None:
+    """Migrate old config entries to the new V5 subentry structure."""
+    base_entry = await ensure_v5_base_entry(hass)
+    if not base_entry:
+        _LOGGER.critical("No base entry create for Powercalc V5 migration, aborting migration")
+        return
+
+    entries = [
+        entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.version < 5
+    ]
+    if not entries:
+        _LOGGER.debug("No entries to migrate to V5, skipping migration")
+        return
+
+    for entry in entries:
+        sensor_type = SensorType(entry.data.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER))
         sub_entry_type = SENSOR_TYPE_SUB_ENTRY_TYPE_MAP.get(sensor_type)
         if not sub_entry_type:
             _LOGGER.error(
                 "Unsupported sensor type %s for migration to V5, aborting migration",
                 sensor_type,
             )
-            return False
-
-        _LOGGER.debug("Migrating group sensor entry to V5")
+            continue
 
         subentry = ConfigSubentry(
-            data=config_entry.data,
+            data=entry.data,
             subentry_type=str(sub_entry_type),
-            title=config_entry.title,
-            unique_id=config_entry.unique_id,
+            title=entry.title,
+            unique_id=entry.unique_id,
         )
 
         try:
             hass.config_entries.async_add_subentry(base_entry, subentry)
         except AbortFlow as e:  # pragma: no cover
             _LOGGER.error("Failed to add subentry for group sensor migration: %s", e)
-            return False
-        await hass.config_entries.async_remove(config_entry.entry_id)
+            continue
+        await hass.config_entries.async_remove(entry.entry_id)
 
-    # hass.config_entries.async_update_entry(config_entry, data=data, version=5)
-
-    return True
-
+        _LOGGER.info(
+            "Entry %s successfully migrated to subentry of %s.",
+            entry.entry_id,
+            base_entry.entry_id,
+        )
 
 async def ensure_v5_base_entry(hass: HomeAssistant) -> ConfigEntry | None:
+    """
+    Starting from config entry version 5, we are using sub entries.
+    Make sure we have a single base entry for whole Powercalc integration.
+    If a global configuration config entry exists, we will use that as the base entry.
+    If no such entry exists, we will create a new base entry based on the YAML configuration.
+    """
     base_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, DOMAIN)
     if not base_entry:
         _LOGGER.debug(
