@@ -12,3 +12,6 @@ cov.xml
 custom_components/test
 
 *.egg-info/
+
+# PyEnv Version File
+.python-version
