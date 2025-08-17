@@ -587,9 +587,7 @@ async def async_migrate_integration(hass: HomeAssistant, config: ConfigType) -> 
         _LOGGER.critical("No base entry create for Powercalc V5 migration, aborting migration")
         return
 
-    entries = [
-        entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.version < 5
-    ]
+    entries = [entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.version < 5]
     if not entries:
         _LOGGER.debug("No entries to migrate to V5, skipping migration")
         return
@@ -623,6 +621,7 @@ async def async_migrate_integration(hass: HomeAssistant, config: ConfigType) -> 
             entry.entry_id,
             base_entry.entry_id,
         )
+
 
 async def ensure_v5_base_entry(hass: HomeAssistant) -> ConfigEntry | None:
     """
