@@ -1,0 +1,19 @@
+{
+  "measure_description": "Manually measured",
+  "measure_method": "manual",
+  "measure_device": "Meross MSS310",
+  "name": "Mi Smart Standing Fan 2",
+  "standby_power": 1,
+  "linear_config": {
+    "attribute": "percentage",
+    "calibrate": [
+      "33 -> 24",
+      "66 -> 26",
+      "100 -> 34"
+    ]
+  },
+  "device_type": "fan",
+  "calculation_strategy": "linear",
+  "created_at": "2025-08-14T10:10:08.375127+02:00",
+  "author": "olivr2s <olivr2s@users.noreply.github.com>"
+}
