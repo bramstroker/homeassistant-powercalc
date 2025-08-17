@@ -703,6 +703,7 @@ async def create_v5_base_entry_from_yaml(hass: HomeAssistant) -> ConfigEntry | N
     )
     await hass.config_entries.async_add(config_entry)
 
+
 async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
     """Repair issue with config entries having None as data."""
     entity_registry = er.async_get(hass)
