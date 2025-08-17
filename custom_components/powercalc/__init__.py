@@ -7,6 +7,7 @@ import logging
 import random
 import time
 from datetime import timedelta
+from types import MappingProxyType
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -674,6 +675,12 @@ async def create_v5_base_entry_from_yaml(hass: HomeAssistant) -> ConfigEntry | N
         title="Powercalc V5",
         unique_id=DOMAIN,
         version=5,
+        discovery_keys=MappingProxyType({}),
+        minor_version=1,
+        disabled_by=None,
+        options={},
+        source="import",
+        subentries_data={},
         data={
             CONF_FORCE_UPDATE_FREQUENCY: DEFAULT_UPDATE_FREQUENCY,
             CONF_GROUP_UPDATE_INTERVAL: DEFAULT_GROUP_UPDATE_INTERVAL,
@@ -696,39 +703,6 @@ async def create_v5_base_entry_from_yaml(hass: HomeAssistant) -> ConfigEntry | N
         },
     )
     await hass.config_entries.async_add(config_entry)
-
-
-# if _yaml_domain_config:
-#     options = {
-#         CONF_SHOW_ALL_DEVICES: _yaml_domain_config.get(CONF_SHOW_ALL_DEVICES, False),
-#         CONF_HIDE_BATTERY: _yaml_domain_config.get(CONF_HIDE_BATTERY, False),
-#         CONF_ROUND_BATTERY: _yaml_domain_config.get(CONF_ROUND_BATTERY, False),
-#         CONF_DEFAULT_BATTERY_LOW_THRESHOLD: _yaml_domain_config.get(
-#             CONF_DEFAULT_BATTERY_LOW_THRESHOLD, DEFAULT_BATTERY_LOW_THRESHOLD
-#         ),
-#         CONF_BATTERY_INCREASE_THRESHOLD: _yaml_domain_config.get(
-#             CONF_BATTERY_INCREASE_THRESHOLD, DEFAULT_BATTERY_INCREASE_THRESHOLD
-#         ),
-#         CONF_ADVANCED_SETTINGS: {
-#             CONF_ENABLE_AUTODISCOVERY: _yaml_domain_config.get(CONF_ENABLE_AUTODISCOVERY, True),
-#             CONF_ENABLE_REPLACED: _yaml_domain_config.get(CONF_ENABLE_REPLACED, True),
-#             CONF_USER_LIBRARY: _yaml_domain_config.get(CONF_USER_LIBRARY, ""),
-#         },
-#     }
-# else:
-#     options = {
-#         CONF_SHOW_ALL_DEVICES: False,
-#         CONF_HIDE_BATTERY: False,
-#         CONF_ROUND_BATTERY: False,
-#         CONF_DEFAULT_BATTERY_LOW_THRESHOLD: DEFAULT_BATTERY_LOW_THRESHOLD,
-#         CONF_BATTERY_INCREASE_THRESHOLD: DEFAULT_BATTERY_INCREASE_THRESHOLD,
-#         CONF_ADVANCED_SETTINGS: {
-#             CONF_ENABLE_AUTODISCOVERY: True,
-#             CONF_ENABLE_REPLACED: True,
-#             CONF_USER_LIBRARY: "",
-#         },
-#     }
-
 
 async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
     """Repair issue with config entries having None as data."""
