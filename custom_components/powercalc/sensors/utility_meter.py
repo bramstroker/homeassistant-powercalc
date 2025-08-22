@@ -251,12 +251,16 @@ async def create_utility_meter(
 
 class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
-    _attr_suggested_display_precision = rounding_digits
 
     @property
     def unique_id(self) -> str | None:
         """Return the unique id."""
         return self._attr_unique_id
+
+    @property
+    def suggested_display_precision(self) -> int | None:
+        """Return the suggested number of decimal digits for display."""
+        return self.rounding_digits
 
     @property
     def native_value(self) -> StateType | Decimal:
