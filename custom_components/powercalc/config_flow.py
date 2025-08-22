@@ -201,7 +201,6 @@ class Step(StrEnum):
 MENU_SENSOR_TYPE = [
     Step.VIRTUAL_POWER,
     Step.MENU_LIBRARY,
-    Step.MENU_GROUP,
     Step.DAILY_ENERGY,
     Step.REAL_POWER,
 ]
@@ -1357,7 +1356,10 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         config_entry: ConfigEntry,
     ) -> dict[str, type[ConfigSubentryFlow]]:
         """Return subentries supported by this integration."""
-        return {"group": GroupSubentryFlowHandler}
+        return {
+            "group": GroupSubentryFlowHandler,
+            "virtual_power": VirtualPowerSubentryFlowHandler,
+        }
 
     async def async_step_integration_discovery(
         self,
@@ -1409,13 +1411,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle the initial step."""
 
-        global_config_entry = self.hass.config_entries.async_entry_for_domain_unique_id(
-            DOMAIN,
-            ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
-        )
         menu = MENU_SENSOR_TYPE.copy()
-        if not global_config_entry:
-            menu.insert(0, Step.GLOBAL_CONFIGURATION)
 
         await self.async_set_unique_id(str(uuid.uuid4()))
 
@@ -2038,6 +2034,45 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
             },
         )
+
+
+class VirtualPowerSubentryFlowHandler(ConfigSubentryFlow, PowercalcCommonFlow):
+    """Handle subentry flow for adding and modifying a virtual power sensor."""
+
+    @property
+    def _is_new(self) -> bool:
+        """Return if this is a new subentry."""
+        return self.source == "user"
+
+    async def async_step_user(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> SubentryFlowResult:
+        """User flow to add a new virtual power sensor."""
+        menu = MENU_SENSOR_TYPE.copy()
+
+        #await self.async_set_unique_id(str(uuid.uuid4()))
+
+        return self.async_show_menu(step_id=Step.USER, menu_options=menu)
+
+    @callback
+    def persist_config_entry(self) -> FlowResult:
+        """Create the config entry."""
+        self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
+        self.sensor_config.update({CONF_NAME: self.name})
+
+        if self.source_entity_id:
+            self.sensor_config.update({CONF_ENTITY_ID: self.source_entity_id})
+
+        if (
+            self.selected_profile
+            and self.source_entity
+            and self.source_entity.device_entry
+            and self.selected_profile.discovery_by == DiscoveryBy.DEVICE
+        ):
+            self.sensor_config.update({CONF_DEVICE: self.source_entity.device_entry.id})
+
+        return self.async_create_entry(title=str(self.name), data=self.sensor_config)
 
 
 class GroupSubentryFlowHandler(ConfigSubentryFlow, PowercalcCommonFlow):

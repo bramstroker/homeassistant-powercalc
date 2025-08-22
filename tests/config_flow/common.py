@@ -11,7 +11,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.typing import ConfigType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import DiscoveryManager
+from custom_components.powercalc import DiscoveryManager, SubentryType
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
@@ -45,8 +45,9 @@ async def select_menu_item(
     next_step_id: Step | None = None,
 ) -> FlowResult:
     """Select a sensor type from the menu"""
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN,
+    main_config_entry = mock_main_config_entry(hass)
+    result = await hass.config_entries.subentries.async_init(
+        (main_config_entry.entry_id, SubentryType.VIRTUAL_POWER),
         context={"source": config_entries.SOURCE_USER},
     )
 
@@ -288,3 +289,14 @@ def assert_default_virtual_power_entry_data(
         }
         | expected_strategy_options
     )
+
+def mock_main_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+    """Mock a config entry."""
+    entry = MockConfigEntry(
+        title="Powercalc",
+        domain=DOMAIN,
+        data={},
+        version=5
+    )
+    entry.add_to_hass(hass)
+    return entry

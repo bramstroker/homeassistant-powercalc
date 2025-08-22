@@ -248,8 +248,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DATA_STANDBY_POWER_SENSORS: {},
     }
 
-    await async_migrate_integration(hass, config)
-
     await register_services(hass)
     await setup_yaml_sensors(hass, config, global_config)
 
@@ -478,6 +476,8 @@ async def setup_yaml_sensors(
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
 
+    await async_migrate_integration(hass)
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
@@ -580,8 +580,13 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
     return True
 
 
-async def async_migrate_integration(hass: HomeAssistant, config: ConfigType) -> None:
+async def async_migrate_integration(hass: HomeAssistant) -> None:
     """Migrate old config entries to the new V5 subentry structure."""
+    migrated = hass.data.get(DOMAIN, {}).get("migrated", False)
+    if migrated:
+        _LOGGER.debug("Powercalc V5 migration already done, skipping")
+        return
+
     base_entry = await ensure_v5_base_entry(hass)
     if not base_entry:
         _LOGGER.critical("No base entry create for Powercalc V5 migration, aborting migration")
@@ -621,6 +626,7 @@ async def async_migrate_integration(hass: HomeAssistant, config: ConfigType) -> 
             entry.entry_id,
             base_entry.entry_id,
         )
+    hass.data[DOMAIN]["migrated"] = True
 
 
 async def ensure_v5_base_entry(hass: HomeAssistant) -> ConfigEntry | None:
