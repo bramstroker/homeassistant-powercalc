@@ -17,6 +17,7 @@ from homeassistant.components.utility_meter.sensor import (
 )
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_ENTITY_ID, CONF_NAME, UnitOfEnergy
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
@@ -176,11 +177,13 @@ async def test_rounding_digits(hass: HomeAssistant) -> None:
     """Test that the rounding digits configuration `energy_sensor_precision` is respected."""
     await create_mocked_virtual_power_sensor_entry(
         hass,
+        unique_id="1234",
         extra_config={
             CONF_CREATE_UTILITY_METERS: True,
             CONF_ENERGY_SENSOR_PRECISION: 2,
         },
     )
+
     hass.states.async_set("sensor.test_energy", 1, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})
     await hass.async_block_till_done()
 
@@ -193,6 +196,11 @@ async def test_rounding_digits(hass: HomeAssistant) -> None:
             force_update=True,
         )
         await hass.async_block_till_done()
+
+    entity_registry = er.async_get(hass)
+    registry_entry = entity_registry.async_get("sensor.test_energy_daily")
+    assert registry_entry
+    assert registry_entry.options == {"sensor": {"suggested_display_precision": 2}}
 
     state = hass.states.get("sensor.test_energy_daily")
     assert state
