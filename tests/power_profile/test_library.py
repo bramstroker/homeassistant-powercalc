@@ -235,3 +235,31 @@ async def test_autodiscover_model_with_default_sub_profile(
     await run_powercalc_setup(hass, {CONF_ENTITY_ID: "switch.test"})
 
     assert hass.states.get("sensor.test_device_power").state == "1.00"
+
+
+async def test_linked_profile_fixed(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """
+    See https://github.com/bramstroker/homeassistant-powercalc/pull/3406
+    """
+    hass.config.config_dir = get_test_config_dir()
+    mock_entity_with_model_information(
+        "switch.test",
+        "test",
+        "linked_profile_fixed",
+        platform="shelly",
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+        },
+    )
+
+    hass.states.async_set("switch.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_device_power").state == "1.01"
