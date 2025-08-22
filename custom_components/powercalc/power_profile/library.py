@@ -137,7 +137,8 @@ class ProfileLibrary:
 
         if linked_profile := json_data.get("linked_profile", json_data.get("linked_lut")):
             linked_manufacturer, linked_model = linked_profile.split("/")
-            _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
+            linked_json_data, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
+            json_data.update(linked_json_data)
 
         return await self._create_power_profile_instance(model_info.manufacturer, model_info.model, directory, json_data)
 
