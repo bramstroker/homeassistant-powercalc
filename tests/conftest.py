@@ -71,6 +71,7 @@ def entity_reg(hass: HomeAssistant) -> EntityRegistry:
     """Return an empty, loaded, registry."""
     return mock_registry(hass)
 
+
 @pytest.fixture
 def mock_main_config_entry(hass: HomeAssistant) -> MockConfigEntry:
     """Mock a config entry."""
@@ -78,10 +79,11 @@ def mock_main_config_entry(hass: HomeAssistant) -> MockConfigEntry:
         title="Powercalc",
         domain=DOMAIN,
         data={},
-        version=5
+        version=5,
     )
     entry.add_to_hass(hass)
     return entry
+
 
 @pytest.fixture
 def mock_config_entry() -> MockConfigEntry:

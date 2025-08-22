@@ -290,13 +290,14 @@ def assert_default_virtual_power_entry_data(
         | expected_strategy_options
     )
 
+
 def mock_main_config_entry(hass: HomeAssistant) -> MockConfigEntry:
     """Mock a config entry."""
     entry = MockConfigEntry(
         title="Powercalc",
         domain=DOMAIN,
         data={},
-        version=5
+        version=5,
     )
     entry.add_to_hass(hass)
     return entry

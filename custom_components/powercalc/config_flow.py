@@ -2051,7 +2051,7 @@ class VirtualPowerSubentryFlowHandler(ConfigSubentryFlow, PowercalcCommonFlow):
         """User flow to add a new virtual power sensor."""
         menu = MENU_SENSOR_TYPE.copy()
 
-        #await self.async_set_unique_id(str(uuid.uuid4()))
+        # await self.async_set_unique_id(str(uuid.uuid4()))
 
         return self.async_show_menu(step_id=Step.USER, menu_options=menu)
 
