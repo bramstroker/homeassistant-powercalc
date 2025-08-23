@@ -181,6 +181,7 @@ async def initialize_sub_entry_flow(
         context={"source": config_entries.SOURCE_USER},
     )
 
+
 async def goto_virtual_power_strategy_step(
     hass: HomeAssistant,
     strategy: CalculationStrategy,

@@ -476,7 +476,7 @@ async def setup_yaml_sensors(
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
 
-    #await async_migrate_integration(hass)
+    # await async_migrate_integration(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
