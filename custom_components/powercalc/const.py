@@ -247,3 +247,10 @@ class GroupType(StrEnum):
     STANDBY = "standby"
     SUBTRACT = "subtract"
     TRACKED_UNTRACKED = "tracked_untracked"
+
+
+class SubentryType(StrEnum):
+    """Possible sub entry types."""
+
+    GROUP = "group"
+    VIRTUAL_POWER = "virtual_power"

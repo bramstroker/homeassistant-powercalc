@@ -1,7 +1,7 @@
 import inspect
 import logging
 
-from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry, ConfigFlow
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry, ConfigFlow, ConfigSubentry
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, callback
 
@@ -50,7 +50,7 @@ async def remove_group_from_power_sensor_entry(
     return entries_to_update
 
 
-async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigEntry) -> ConfigEntry | None:  # type: ignore
+async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigSubentry) -> ConfigEntry | None:  # type: ignore
     """
     When the user has set a group on a virtual power config entry,
     we need to add this config entry to the group members sensors and update the group.
@@ -78,7 +78,7 @@ async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigEntr
 
 async def add_to_associated_group(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: ConfigSubentry,
     group_entry_id: str,
 ) -> ConfigEntry | None:
     """When the user has set a group on a virtual power config entry,

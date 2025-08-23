@@ -7,6 +7,7 @@ import logging
 import random
 import time
 from datetime import timedelta
+from types import MappingProxyType
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -15,7 +16,7 @@ from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState, ConfigSubentry
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_SCAN_INTERVAL,
@@ -25,6 +26,7 @@ from homeassistant.const import (
 )
 from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.data_entry_flow import AbortFlow
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.entity_platform import async_get_platforms
 from homeassistant.helpers.reload import async_integration_yaml_config
@@ -96,6 +98,7 @@ from .const import (
     SERVICE_UPDATE_LIBRARY,
     PowercalcDiscoveryType,
     SensorType,
+    SubentryType,
     UnitPrefix,
 )
 from .discovery import DiscoveryManager
@@ -211,6 +214,11 @@ CONFIG_SCHEMA = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
+
+SENSOR_TYPE_SUB_ENTRY_TYPE_MAP = {
+    SensorType.GROUP: SubentryType.GROUP,
+    SensorType.VIRTUAL_POWER: SubentryType.VIRTUAL_POWER,
+}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -468,6 +476,8 @@ async def setup_yaml_sensors(
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
 
+    # await async_migrate_integration(hass)
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
@@ -565,9 +575,139 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         if CONF_STATES_TRIGGER in conf_playbook:
             data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
 
-    hass.config_entries.async_update_entry(config_entry, data=data, version=4)
+    hass.config_entries.async_update_entry(config_entry, data=data, version=5)
 
     return True
+
+
+async def async_migrate_integration(hass: HomeAssistant) -> None:
+    """Migrate old config entries to the new V5 subentry structure."""
+    migrated = hass.data.get(DOMAIN, {}).get("migrated", False)
+    if migrated:
+        _LOGGER.debug("Powercalc V5 migration already done, skipping")
+        return
+
+    base_entry = await ensure_v5_base_entry(hass)
+    if not base_entry:
+        _LOGGER.critical("No base entry create for Powercalc V5 migration, aborting migration")
+        return
+
+    entries = [entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.version < 5]
+    if not entries:
+        _LOGGER.debug("No entries to migrate to V5, skipping migration")
+        return
+
+    for entry in entries:
+        sensor_type = SensorType(entry.data.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER))
+        sub_entry_type = SENSOR_TYPE_SUB_ENTRY_TYPE_MAP.get(sensor_type)
+        if not sub_entry_type:
+            _LOGGER.error(
+                "Unsupported sensor type %s for migration to V5, aborting migration",
+                sensor_type,
+            )
+            continue
+
+        subentry = ConfigSubentry(
+            data=entry.data,
+            subentry_type=str(sub_entry_type),
+            title=entry.title,
+            unique_id=entry.unique_id,
+        )
+
+        try:
+            hass.config_entries.async_add_subentry(base_entry, subentry)
+        except AbortFlow as e:  # pragma: no cover
+            _LOGGER.error("Failed to add subentry for group sensor migration: %s", e)
+            continue
+        await hass.config_entries.async_remove(entry.entry_id)
+
+        _LOGGER.info(
+            "Entry %s successfully migrated to subentry of %s.",
+            entry.entry_id,
+            base_entry.entry_id,
+        )
+    hass.data[DOMAIN]["migrated"] = True
+
+
+async def ensure_v5_base_entry(hass: HomeAssistant) -> ConfigEntry | None:
+    """
+    Starting from config entry version 5, we are using sub entries.
+    Make sure we have a single base entry for whole Powercalc integration.
+    If a global configuration config entry exists, we will use that as the base entry.
+    If no such entry exists, we will create a new base entry based on the YAML configuration.
+    """
+    base_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, DOMAIN)
+    if not base_entry:
+        _LOGGER.debug(
+            "No existing V5 config entry found, creating a new one for migration",
+        )
+
+        global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(
+            DOMAIN,
+            ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        )
+        if global_config_entry:
+            _LOGGER.debug("Updating existing global config entry for Powercalc V5")
+            hass.config_entries.async_update_entry(
+                global_config_entry,
+                title="Powercalc V5",
+                unique_id=DOMAIN,
+                version=5,
+            )
+            base_entry = global_config_entry
+        else:
+            _LOGGER.debug("Creating new global config entry for Powercalc V5")
+            base_entry = await create_v5_base_entry_from_yaml(hass)
+    return base_entry
+
+
+async def find_v5_base_entry(hass: HomeAssistant) -> ConfigEntry | None:
+    """Find the base entry for migration."""
+    existing_entries = hass.config_entries.async_entries(DOMAIN)
+    for entry in existing_entries:
+        if entry.version == 5 and entry.unique_id == DOMAIN:
+            _LOGGER.debug(
+                "Found existing V4 config entry %s, using it as the base for migration",
+                entry.entry_id,
+            )
+            return entry
+    return None
+
+
+async def create_v5_base_entry_from_yaml(hass: HomeAssistant) -> ConfigEntry | None:
+    config_entry = ConfigEntry(
+        domain=DOMAIN,
+        title="Powercalc V5",
+        unique_id=DOMAIN,
+        version=5,
+        discovery_keys=MappingProxyType({}),
+        minor_version=1,
+        disabled_by=None,
+        options={},
+        source="import",
+        subentries_data={},
+        data={
+            CONF_FORCE_UPDATE_FREQUENCY: DEFAULT_UPDATE_FREQUENCY,
+            CONF_GROUP_UPDATE_INTERVAL: DEFAULT_GROUP_UPDATE_INTERVAL,
+            CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
+            CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
+            CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
+            CONF_ENERGY_INTEGRATION_METHOD: DEFAULT_ENERGY_INTEGRATION_METHOD,
+            CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
+            CONF_ENERGY_SENSOR_PRECISION: DEFAULT_ENERGY_SENSOR_PRECISION,
+            CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
+            CONF_ENERGY_SENSOR_UNIT_PREFIX: DEFAULT_ENERGY_UNIT_PREFIX,
+            CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
+            CONF_DISABLE_LIBRARY_DOWNLOAD: False,
+            CONF_ENABLE_AUTODISCOVERY: True,
+            CONF_CREATE_DOMAIN_GROUPS: [],
+            CONF_CREATE_ENERGY_SENSORS: True,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_UTILITY_METER_OFFSET: DEFAULT_OFFSET,
+            CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
+        },
+    )
+    await hass.config_entries.async_add(config_entry)
 
 
 async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
