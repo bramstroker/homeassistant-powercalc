@@ -1,0 +1,27 @@
+{
+  "measure_description": "Streamed white noise from Spotify for this test",
+  "measure_method": "manual",
+  "measure_device": "Meross Smart Plug mss305 8.0.0",
+  "name": "Sony LF-S50G",
+  "standby_power": 3.28,
+  "device_type": "smart_speaker",
+  "calculation_strategy": "linear",
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "linear_config": {
+    "calibrate": [
+      "0 -> 3.79",
+      "10 -> 3.79",
+      "20 -> 3.81",
+      "30 -> 3.83",
+      "40 -> 3.85",
+      "50 -> 3.86",
+      "60 -> 3.99",
+      "70 -> 4.08",
+      "80 -> 4.22",
+      "90 -> 5.35",
+      "100 -> 6.90"
+    ]
+  },
+  "created_at": "2025-08-27T11:10:15",
+  "author": "jonathanlflatt <jonathan@flatt.de>"
+}
