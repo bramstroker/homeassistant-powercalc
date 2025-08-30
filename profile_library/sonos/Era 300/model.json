@@ -1,0 +1,32 @@
+{
+  "author": "barndawgie <jbarnard@gmail.com>",
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2025-08-30T17:48:07.362112",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "10 -> 7.77",
+      "20 -> 7.86",
+      "30 -> 7.97",
+      "40 -> 8.26",
+      "50 -> 9.14",
+      "60 -> 11.6",
+      "70 -> 15.89",
+      "80 -> 21.93",
+      "90 -> 33.21",
+      "100 -> 49.17",
+      "0 -> 1.9"
+    ]
+  },
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug US",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.19:docker"
+  },
+  "name": "Sonos Era 300",
+  "standby_power": 1.8
+}
