@@ -195,7 +195,10 @@ def create_dataframe_for_json_file(file_path: str) -> pandas.DataFrame:
                 "watt": watt,
             }
         )
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    # Sort by volume to ensure points are plotted in the correct order
+    df = df.sort_values(by=label)
+    return df
 
 
 def main() -> None:
