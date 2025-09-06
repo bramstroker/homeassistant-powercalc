@@ -10,5 +10,11 @@
     "VERSION": "v1.17.14:docker"
   },
   "name": "Hue white ambiance E27 with Bluetooth",
-  "standby_power": 0.18
+  "standby_power": 0.18,
+  "aliases": [
+    "046677548490",
+    "929002226701",
+    "046677548568",
+    "929002226711"
+  ]
 }
