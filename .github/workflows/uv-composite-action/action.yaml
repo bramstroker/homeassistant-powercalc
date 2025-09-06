@@ -21,7 +21,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python_version }}
     - name: Load cached uv installation
@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         cd $INPUT_DIRECTORY
-        uv sync --frozen
+        uv sync --frozen --extra=dev --prerelease=allow
         source .venv/bin/activate
       if: steps.cache-deps.outputs.cache-hit != 'true'
       env:
