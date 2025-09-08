@@ -1,7 +1,7 @@
 {
   "measure_description": "Manually measured",
   "measure_method": "manual",
-  "measure_device": "GWPN1, GreenWave Reality Inc.",
+  "measure_device": "GreenWave GWPN1",
   "name": "STARKVIND Air purifier table",
   "standby_power": 0.2,
   "linear_config": {

@@ -2,7 +2,7 @@
   "calculation_strategy": "lut",
   "created_at": "2025-02-08T10:24:51.629523",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "TP-Link HS110",
+  "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,

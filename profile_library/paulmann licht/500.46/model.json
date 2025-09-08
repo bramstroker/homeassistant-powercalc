@@ -2,7 +2,7 @@
   "calculation_strategy": "lut",
   "created_at": "2025-02-02T20:03:18.447883",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly PMmini gen3",
+  "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,

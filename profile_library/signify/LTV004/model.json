@@ -2,7 +2,7 @@
   "calculation_strategy": "lut",
   "created_at": "2025-07-18T03:17:17.110351",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly Plus Plug US (SNPL-00116US)",
+  "measure_device": "Shelly Plus Plug US",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 10,
