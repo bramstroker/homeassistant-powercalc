@@ -19,7 +19,7 @@
     ]
   },
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly PM mini Gen3",
+  "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,

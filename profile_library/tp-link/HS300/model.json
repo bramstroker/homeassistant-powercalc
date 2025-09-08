@@ -4,7 +4,7 @@
   "discovery_by": "device",
   "calculation_strategy": "multi_switch",
   "measure_method": "manual",
-  "measure_device": "Kill-a-Watt",
+  "measure_device": "P3 P4400 Kill A Watt Usage Monitor",
   "multi_switch_config": {
     "power": 0.725,
     "power_off": 0.225

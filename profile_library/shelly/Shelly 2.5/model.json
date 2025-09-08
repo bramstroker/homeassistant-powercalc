@@ -1,7 +1,7 @@
 {
   "measure_description": "The measured device fw: 1.14.1-rc1, Eco Mode enabled, Wifi Client enabled, LED disabled. The result represents the average value of measurements collected from the measurement device API for the following scenarios: dumb device/baseline consumption (~4.9W), all relays turned off, one relay turned on",
   "measure_method": "manual",
-  "measure_device": "Shelly PM Mini gen3",
+  "measure_device": "Shelly PM Mini Gen3",
   "measure_device_firmware": "20241011-114503/1.4.4-g6d2a586",
   "measure_settings": {
     "SAMPLE_COUNT": 200,
