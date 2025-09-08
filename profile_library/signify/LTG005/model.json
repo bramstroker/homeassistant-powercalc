@@ -2,7 +2,7 @@
   "calculation_strategy": "lut",
   "created_at": "2024-11-24T18:30:23.893152",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "GWPN1,GreenWave Reality Inc.",
+  "measure_device": "GreenWave GWPN1",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 3,

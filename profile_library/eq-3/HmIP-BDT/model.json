@@ -1,6 +1,6 @@
 {
   "measure_description": "Manually measured with dummy load attached at 7.61W (average over 300s).",
-  "measure_device": "Shelly PM Mini Gen3 (S3PM-001PCEU16)",
+  "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
   "measure_settings": {
     "VERSION": "v1.17.1:docker"

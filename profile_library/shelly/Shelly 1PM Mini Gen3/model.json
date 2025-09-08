@@ -1,7 +1,7 @@
 {
   "created_at": "2025-02-23T11:56:26",
   "measure_description": "Measured with 7.5W (average over 300s) dummy load over 300s and calculated average. Multiple combinations of settings were tested. Firmware version 1.44",
-  "measure_device": "Shelly PM Mini Gen3 (S3PM-001PCEU16)",
+  "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
   "measure_settings": {
     "VERSION": "v1.17.1:docker"

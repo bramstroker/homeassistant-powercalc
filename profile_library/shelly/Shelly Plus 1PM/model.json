@@ -1,7 +1,7 @@
 {
   "measure_description": "Measured with 7.5W (average over 300s) dummy load over 300s and calculated average. Multiple combinations of settings were tested. Firmware version 1.44",
   "measure_method": "manual",
-  "measure_device": "Shelly PM Mini Gen3 (S3PM-001PCEU16)",
+  "measure_device": "Shelly PM Mini Gen3",
   "measure_device_firmware": "20241011-114503/1.4.4-g6d2a586",
   "measure_settings": {
     "SAMPLE_COUNT": 200,
