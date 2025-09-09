@@ -538,7 +538,7 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
 
     def process_states_power(states_power: dict) -> dict:
         """Convert state power values to Template objects where necessary."""
-        return {key: Template(value) if isinstance(value, str) and "{{" in value else value for key, value in states_power.items()}
+        return {key: Template(value, hass) if isinstance(value, str) and "{{" in value else value for key, value in states_power.items()}
 
     def process_calibrate(calibrate: dict) -> list[str]:
         """Convert calibration dictionary to list of strings."""
