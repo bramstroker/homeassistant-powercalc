@@ -10,5 +10,10 @@
     "VERSION": "v1.17.15:docker"
   },
   "name": "Hue White and color ambiance A19 800 lumen",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "aliases": [
+    "046677548483",
+    "9290022266A",
+    "929002226611"
+  ]
 }
