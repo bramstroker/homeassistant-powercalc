@@ -1,0 +1,19 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-07-24T09:10:34.528340",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug US (SNPL-00116US)",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 10,
+    "SLEEP_TIME": 5,
+    "VERSION": "v1.17.15:docker"
+  },
+  "name": "Hue White and color ambiance A19 800 lumen",
+  "standby_power": 0.2,
+  "aliases": [
+    "046677548483",
+    "9290022266A",
+    "929002226611"
+  ]
+}
