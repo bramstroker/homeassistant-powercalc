@@ -9,6 +9,9 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.9:docker"
   },
+  "aliases": [
+    "LCD010"
+  ],
   "name": "Hue White and Color Ambiance Slim Downlight 6 inch",
   "standby_power": 0.49,
   "author": "dewbot6 <drewsnodgrass@comcast.net>"
