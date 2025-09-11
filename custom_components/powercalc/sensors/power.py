@@ -679,7 +679,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     async def is_calculation_enabled(self, entity_state: State) -> bool:
         template = self._calculation_enabled_condition
         if not template:
-            return self._strategy_instance.is_enabled(entity_state)
+            return self._strategy_instance.is_enabled(entity_state)  # type: ignore
 
         return bool(template.async_render())
 
