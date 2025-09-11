@@ -21,5 +21,9 @@ class PowerCalculationStrategyInterface:
         """Return if this strategy can calculate standby power."""
         return False
 
+    def is_enabled(self, entity_state: State) -> bool:
+        """Return if this strategy is enabled based on entity state."""
+        return True
+
     async def on_start(self, hass: HomeAssistant) -> None:
         """Called after HA has started"""

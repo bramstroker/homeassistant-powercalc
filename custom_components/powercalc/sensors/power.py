@@ -591,7 +591,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         # Handle standby power
         standby_power = None
-        if entity_state.state in OFF_STATES or not await self.is_calculation_enabled():
+        if entity_state.state in OFF_STATES or not await self.is_calculation_enabled(entity_state):
             if isinstance(self._strategy_instance, PlaybookStrategy):
                 await self._strategy_instance.stop_playbook()
             standby_power = await self.calculate_standby_power(entity_state)
@@ -676,10 +676,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         return standby_power
 
-    async def is_calculation_enabled(self) -> bool:
+    async def is_calculation_enabled(self, entity_state: State) -> bool:
         template = self._calculation_enabled_condition
         if not template:
-            return True
+            return self._strategy_instance.is_enabled(entity_state)  # type: ignore
 
         return bool(template.async_render())
 
