@@ -11,6 +11,7 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     STATE_IDLE,
     STATE_ON,
+    STATE_PAUSED,
     STATE_PLAYING,
 )
 from homeassistant.core import HomeAssistant, State
@@ -388,3 +389,27 @@ async def test_value_entity_not_found(
     )
 
     assert await strategy.calculate(State("light.test", STATE_ON)) is None
+
+
+@pytest.mark.parametrize(
+    "source_entity,state,expected_result",
+    [
+        (
+            SourceEntity(object_id="test", entity_id="media_player.test", domain="media_player"),
+            State("media_player.test", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 0.5}),
+            True,
+        ),
+        (
+            SourceEntity(object_id="test", entity_id="media_player.test", domain="media_player"),
+            State("media_player.test", STATE_PAUSED),
+            False,
+        ),
+    ],
+)
+async def test_is_enabled(hass: HomeAssistant, source_entity: SourceEntity, state: State, expected_result: bool) -> None:
+    strategy = await _create_strategy_instance(
+        hass,
+        source_entity,
+        {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
+    )
+    assert strategy.is_enabled(state) is expected_result
