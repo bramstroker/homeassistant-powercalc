@@ -1,0 +1,17 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-09-10T07:24:05.419728",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug US",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 10,
+    "SLEEP_TIME": 5,
+    "VERSION": "v1.17.19:docker"
+  },
+  "name": "Hue white ambiance E26 1600lm with Bluetooth",
+  "standby_power": 0.22,
+  "aliases": [
+    "929002335105"
+  ]
+}
