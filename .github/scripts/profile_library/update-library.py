@@ -180,7 +180,7 @@ def get_model_list() -> list[dict]:
                     "directory": model_directory,
                     "updated_at": get_last_commit_time(model_directory).isoformat(),
                     "full_path": json_path,
-                    "max_power": get_max_power(model_data),
+                    "max_power": get_max_power(model_directory, model_data),
                 },
             )
             if "device_type" not in model_data:
@@ -204,8 +204,7 @@ def get_color_modes(model_directory: str) -> set:
     return color_modes
 
 
-def get_max_power(model_data: dict) -> float | None:
-    model_directory = model_data.get("directory")
+def get_max_power(model_directory: str, model_data: dict) -> float | None:
     calculation_strategy = model_data.get("calculation_strategy", "lut")
     if calculation_strategy == "lut":
         max_power = 0
