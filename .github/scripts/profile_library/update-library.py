@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import glob
+import gzip
 import hashlib
 import json
 import os
 import subprocess
 import sys
 from datetime import datetime
+from decimal import Decimal
 from pathlib import Path
 
 import git
@@ -21,7 +24,6 @@ sys.path.insert(
 
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
 DATA_DIR = f"{PROJECT_ROOT}/profile_library"
-
 
 def generate_library_json(model_listing: list[dict]) -> None:
     manufacturers: dict[str, dict] = {}
@@ -166,24 +168,25 @@ def get_model_list() -> list[dict]:
         recursive=True,
     ):
         with open(json_path) as json_file:
-            model_directory = os.path.dirname(json_path)
             model_data: dict = json.load(json_file)
-            color_modes = get_color_modes(model_directory, DATA_DIR, model_data)
-            updated_at = get_last_commit_time(model_directory).isoformat()
-            manufacturer = os.path.basename(os.path.dirname(model_directory))
+            model_directory = os.path.dirname(json_path)
+            if "linked_profile" in model_data:
+                model_directory = os.path.join(DATA_DIR, model_data["linked_profile"])
 
             model_data.update(
                 {
                     "model": os.path.basename(model_directory),
-                    "manufacturer": manufacturer,
+                    "manufacturer": os.path.basename(os.path.dirname(model_directory)),
                     "directory": model_directory,
-                    "updated_at": updated_at,
+                    "updated_at": get_last_commit_time(model_directory).isoformat(),
                     "full_path": json_path,
+                    "max_power": get_max_power(model_data),
                 },
             )
             if "device_type" not in model_data:
                 model_data["device_type"] = "light"
 
+            color_modes = get_color_modes(model_directory)
             if color_modes:
                 model_data["color_modes"] = list(color_modes)
             models.append(model_data)
@@ -191,10 +194,7 @@ def get_model_list() -> list[dict]:
     return models
 
 
-def get_color_modes(model_directory: str, data_dir: str, model_data: dict) -> set:
-    if "linked_profile" in model_data:
-        model_directory = os.path.join(data_dir, model_data["linked_profile"])
-
+def get_color_modes(model_directory: str) -> set:
     color_modes = set()
     for path in glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True):
         filename = os.path.basename(path)
@@ -202,6 +202,44 @@ def get_color_modes(model_directory: str, data_dir: str, model_data: dict) -> se
         color_mode = filename[:index]
         color_modes.add(color_mode)
     return color_modes
+
+
+def get_max_power(model_data: dict) -> float | None:
+    model_directory = model_data.get("directory")
+    calculation_strategy = model_data.get("calculation_strategy", "lut")
+    if calculation_strategy == "lut":
+        max_power = 0
+        for path in glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True):
+            with gzip.open(path, 'rt') as f:
+                reader = csv.reader(f)
+                next(reader, None)  # skip header row
+                for row in reader:
+                    if not row:
+                        continue
+                    try:
+                        watt = float(row[-1])
+                    except (ValueError, IndexError):
+                        continue
+                    if watt > max_power:
+                        max_power = watt
+        return max_power
+    if calculation_strategy == "linear":
+        linear_config = model_data.get("linear_config", {})
+        if "calibrate" in linear_config:
+            power_values = [float(line.split("->")[1].strip()) for line in linear_config.get("calibrate", []) if "->" in line]
+            return max(power_values)
+        return max(linear_config.get("max_power", 0), model_data.get("standby_power_on", 0))
+    if calculation_strategy == "fixed":
+        fixed_config = model_data.get("fixed_config", {})
+        power_values = [
+            fixed_config.get("power", 0),
+            model_data.get("standby_power_on", 0),
+        ]
+        states_power = fixed_config.get("states_power", {})
+        power_values.extend(states_power.values())
+
+        return max(power_values)
+    return None
 
 
 def get_last_commit_time(directory: str) -> datetime:
