@@ -2,6 +2,7 @@ import logging
 
 import pytest
 import voluptuous as vol
+from custom_components.test.light import MockLight
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
@@ -33,7 +34,6 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
-from custom_components.test.light import MockLight
 from tests.common import create_mock_light_entity, get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
