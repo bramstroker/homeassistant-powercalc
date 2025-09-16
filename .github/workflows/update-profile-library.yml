@@ -38,8 +38,10 @@ jobs:
           add: 'profile_library'
           message: 'Update profile library'
       - name: Purge powercalc API memory cache
+        env:
+          API_KEY: ${{ secrets.POWERCALC_API_KEY }}
         run: |
-          curl -X GET "https://api.powercalc.nl/cache/flush" -H  "Authorization: Bearer ${{ secrets.POWERCALC_API_KEY }}"
+          curl -X GET "https://api.powercalc.nl/cache/flush" -H "Authorization: Bearer $API_KEY"
       - name: Purge cloudflare cache
         uses: jakejarvis/cloudflare-purge-action@master
         env:
