@@ -232,7 +232,7 @@ class OcrRegionSelection:
                 2,
             )
         else:
-            (h, w) = frame.shape[:2]
+            (h, _) = frame.shape[:2]
             y_center = h // 2
             cv2.rectangle(
                 frame,
