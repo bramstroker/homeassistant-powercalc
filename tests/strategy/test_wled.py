@@ -1,6 +1,5 @@
 import logging
 
-import custom_components.test.sensor as test_sensor_platform
 import pytest
 from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
@@ -17,6 +16,7 @@ from pytest_homeassistant_custom_component.common import (
     setup_test_component_platform,
 )
 
+import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
