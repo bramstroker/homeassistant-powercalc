@@ -42,9 +42,6 @@ def generate_library_json(model_listing: list[dict]) -> None:
         if device_type not in manufacturer["device_types"]:
             manufacturer["device_types"].append(device_type)
 
-        mapped_fields = {
-            "model": "id",
-        }
         skipped_fields = [
             "calculation_enabled_condition",
             "config_flow_discovery_remarks",
@@ -60,7 +57,7 @@ def generate_library_json(model_listing: list[dict]) -> None:
             "sub_profile_select",
         ]
         mapped_dict = {
-            mapped_fields.get(key, key): value for key, value in model.items() if key not in skipped_fields
+            key: value for key, value in model.items() if key not in skipped_fields
         }
         mapped_dict["hash"] = hashlib.md5(json.dumps(mapped_dict, sort_keys=True).encode()).hexdigest()
         manufacturer["models"].append(mapped_dict)
@@ -170,12 +167,12 @@ def get_model_list() -> list[dict]:
         with open(json_path) as json_file:
             model_data: dict = json.load(json_file)
             model_directory = os.path.dirname(json_path)
+            model_data['id'] = os.path.basename(model_directory)
             if "linked_profile" in model_data:
                 model_directory = os.path.join(DATA_DIR, model_data["linked_profile"])
 
             model_data.update(
                 {
-                    "model": os.path.basename(model_directory),
                     "manufacturer": os.path.basename(os.path.dirname(model_directory)),
                     "directory": model_directory,
                     "updated_at": get_last_commit_time(model_directory).isoformat(),
