@@ -118,6 +118,10 @@ nav:
       - 'troubleshooting/debug-logging.md'
       - 'troubleshooting/install-master.md'
       - 'troubleshooting/yeelight.md'
+  - 'Cookbook':
+      - 'cookbook/index.md'
+      - 'cookbook/hvac.md'
+      - 'cookbook/ups.md'
   - 'Contributing':
       - 'contributing/index.md'
       - 'contributing/integration-development.md'
