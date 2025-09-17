@@ -4,7 +4,7 @@ This recipe demonstrates how to set up virtual power sensors for HVAC (Heating, 
 
 ## Basic Configuration
 
-For a simple HVAC setup where you know the approximate power consumption for different modes, you can use the fixed strategy with states_power option.
+For a simple HVAC setup where you know the approximate power consumption for different modes, you can use the [fixed strategy](../strategies/fixed.md) with [states_power](../strategies/fixed.md#power-per-state) option.
 
 ```yaml
 powercalc:

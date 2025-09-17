@@ -4,7 +4,7 @@ This recipe demonstrates how to set up virtual power sensors for UPS (Uninterrup
 
 ## Basic Configuration
 
-For a simple UPS setup where you know the approximate power consumption for different states, you can use the Fixed strategy with a template:
+For a simple UPS setup where you know the approximate power consumption for different states, you can use the [fixed strategy](../strategies/fixed.md) with a template:
 
 ```yaml
 powercalc:
