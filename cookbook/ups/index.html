@@ -3056,45 +3056,54 @@
 <span class="w">          </span><span class="no">{% endif %}</span>
 </code></pre></div>
 <h2 id="ups-with-network-interface">UPS with Network Interface</h2>
-<p>For UPS devices with network monitoring capabilities (like those with Network Management Cards), you can use the NUT (Network UPS Tools) integration in Home Assistant and then create virtual power sensors based on the data it provides:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># First set up the NUT integration in your configuration.yaml</span>
-<span class="nt">nut</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">resources</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ups.load</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">battery.charge</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ups.status</span>
-
-<span class="c1"># Then create power sensors based on NUT data</span>
-<span class="nt">powercalc</span><span class="p">:</span>
+<p>For UPS devices with network monitoring capabilities (like those with Network Management Cards), you can use the <a href="https://www.home-assistant.io/integrations/nut/">NUT (Network UPS Tools) integration</a> in Home Assistant and then create virtual power sensors based on the data it provides:</p>
+<p>Change the <code>rated_w</code> and <code>idle_w</code> values to match your UPS specifications.
+To measure <code>idle_w</code>, you can use a power meter to measure the UPS power consumption when it is online but not supplying any load.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">powercalc</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">sensors</span><span class="p">:</span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">entity_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sensor.ups_battery_charge</span>
 <span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">UPS Power Consumption</span>
 <span class="w">      </span><span class="nt">fixed</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">power</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
-<span class="w">          </span><span class="no">{% set status = states(&#39;sensor.ups_status&#39;) %}</span>
-<span class="w">          </span><span class="no">{% set load = states(&#39;sensor.ups_load&#39;) | float %}</span>
-<span class="w">          </span><span class="no">{% set charge = states(&#39;sensor.ups_battery_charge&#39;) | float %}</span>
+<span class="w">          </span><span class="no">{# --- Inputs --- #}</span>
+<span class="w">          </span><span class="no">{% set status = states(&#39;sensor.ups_status_data&#39;) | upper %}</span>
+<span class="w">          </span><span class="no">{% set load_pct = states(&#39;sensor.ups_load&#39;) | float(0) %}</span>
+<span class="w">          </span><span class="no">{% set soc = states(&#39;sensor.ups_battery_charge&#39;) | float(0) %}</span>
 
-<span class="w">          </span><span class="no">{% if &#39;OL&#39; in status and &#39;CHRG&#39; in status %}</span>
-<span class="w">            </span><span class="no">{# Charging mode - power depends on battery level #}</span>
-<span class="w">            </span><span class="no">{% if charge &lt; 20 %}</span>
-<span class="w">              </span><span class="no">50</span>
-<span class="w">            </span><span class="no">{% elif charge &lt; 50 %}</span>
-<span class="w">              </span><span class="no">40</span>
-<span class="w">            </span><span class="no">{% elif charge &lt; 80 %}</span>
-<span class="w">              </span><span class="no">30</span>
-<span class="w">            </span><span class="no">{% else %}</span>
-<span class="w">              </span><span class="no">15</span>
-<span class="w">            </span><span class="no">{% endif %}</span>
+<span class="w">          </span><span class="no">{% set rated_w = 500.0 %}  {# CHANGE ME #}</span>
+<span class="w">          </span><span class="no">{# Idle overhead while online (W). Many small UPSes burn 3–10W just being on. #}</span>
+<span class="w">          </span><span class="no">{% set idle_w = 6.0 %}   {# CHANGE ME #}</span>
+
+<span class="w">          </span><span class="no">{# Convert % load to output watts supplied by UPS #}</span>
+<span class="w">          </span><span class="no">{% set load_w = (load_pct / 100.0) * rated_w %}</span>
+
+<span class="w">          </span><span class="no">{# Rough efficiency model (worse at very low load) #}</span>
+<span class="w">          </span><span class="no">{% set eff =</span>
+<span class="w">             </span><span class="no">0.85 if load_pct &lt; 10 else</span>
+<span class="w">             </span><span class="no">0.90 if load_pct &lt; 20 else</span>
+<span class="w">             </span><span class="no">0.93 if load_pct &lt; 40 else</span>
+<span class="w">             </span><span class="no">0.95 if load_pct &lt; 60 else</span>
+<span class="w">             </span><span class="no">0.96 if load_pct &lt; 80 else</span>
+<span class="w">             </span><span class="no">0.97</span>
+<span class="w">          </span><span class="no">%}</span>
+
+<span class="w">          </span><span class="no">{# Extra charge power when charging (very rough): higher when SoC is low #}</span>
+<span class="w">          </span><span class="no">{% set charge_w =</span>
+<span class="w">             </span><span class="no">35.0 if &#39;CHRG&#39; in status and soc &lt; 50 else</span>
+<span class="w">             </span><span class="no">20.0 if &#39;CHRG&#39; in status and soc &lt; 80 else</span>
+<span class="w">             </span><span class="no">8.0  if &#39;CHRG&#39; in status</span>
+<span class="w">             </span><span class="no">else 0.0</span>
+<span class="w">          </span><span class="no">%}</span>
+
+<span class="w">          </span><span class="no">{% if &#39;OB&#39; in status %}</span>
+<span class="w">            </span><span class="no">0</span>
 <span class="w">          </span><span class="no">{% elif &#39;OL&#39; in status %}</span>
-<span class="w">            </span><span class="no">{# Online but not charging - minimal power #}</span>
-<span class="w">            </span><span class="no">5</span>
-<span class="w">          </span><span class="no">{% elif &#39;OB&#39; in status %}</span>
-<span class="w">            </span><span class="no">{# On battery - efficiency loss based on load #}</span>
-<span class="w">            </span><span class="no">{{ load * 0.5 }}</span>
+<span class="w">            </span><span class="no">{{ (load_w / eff) + idle_w + charge_w }}</span>
+<span class="w">          </span><span class="no">{% elif &#39;BYPASS&#39; in status %}</span>
+<span class="w">            </span><span class="no">{# Bypass usually means raw mains to load; input ~= load + tiny overhead #}</span>
+<span class="w">            </span><span class="no">{{ load_w + 2.0 }}</span>
 <span class="w">          </span><span class="no">{% else %}</span>
-<span class="w">            </span><span class="no">{# Unknown state - assume minimal power #}</span>
-<span class="w">            </span><span class="no">5</span>
+<span class="w">            </span><span class="no">{{ &#39;unavailable&#39; }}</span>
 <span class="w">          </span><span class="no">{% endif %}</span>
 </code></pre></div>
 <p>These examples should provide a good starting point for monitoring the power consumption of various UPS devices. Remember to adjust the power values based on your specific UPS model's specifications or measurements.</p>
@@ -3120,7 +3129,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 17, 2025 17:39:03 UTC">September 17, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2025 07:17:11 UTC">September 18, 2025</span>
   </span>
 
     
