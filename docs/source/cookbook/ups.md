@@ -22,47 +22,57 @@ powercalc:
 
 ## UPS with Network Interface
 
-For UPS devices with network monitoring capabilities (like those with Network Management Cards), you can use the NUT (Network UPS Tools) integration in Home Assistant and then create virtual power sensors based on the data it provides:
+For UPS devices with network monitoring capabilities (like those with Network Management Cards), you can use the [NUT (Network UPS Tools) integration](https://www.home-assistant.io/integrations/nut/) in Home Assistant and then create virtual power sensors based on the data it provides:
+
+Change the `rated_w` and `idle_w` values to match your UPS specifications.
+To measure `idle_w`, you can use a power meter to measure the UPS power consumption when it is online but not supplying any load.
 
 ```yaml
-# First set up the NUT integration in your configuration.yaml
-nut:
-  resources:
-    - ups.load
-    - battery.charge
-    - ups.status
-
-# Then create power sensors based on NUT data
 powercalc:
   sensors:
     - entity_id: sensor.ups_battery_charge
       name: UPS Power Consumption
       fixed:
         power: >-
-          {% set status = states('sensor.ups_status') %}
-          {% set load = states('sensor.ups_load') | float %}
-          {% set charge = states('sensor.ups_battery_charge') | float %}
+          {# --- Inputs --- #}
+          {% set status = states('sensor.ups_status_data') | upper %}
+          {% set load_pct = states('sensor.ups_load') | float(0) %}
+          {% set soc = states('sensor.ups_battery_charge') | float(0) %}
 
-          {% if 'OL' in status and 'CHRG' in status %}
-            {# Charging mode - power depends on battery level #}
-            {% if charge < 20 %}
-              50
-            {% elif charge < 50 %}
-              40
-            {% elif charge < 80 %}
-              30
-            {% else %}
-              15
-            {% endif %}
+          {% set rated_w = 500.0 %}  {# CHANGE ME #}
+          {# Idle overhead while online (W). Many small UPSes burn 3–10W just being on. #}
+          {% set idle_w = 6.0 %}   {# CHANGE ME #}
+
+          {# Convert % load to output watts supplied by UPS #}
+          {% set load_w = (load_pct / 100.0) * rated_w %}
+
+          {# Rough efficiency model (worse at very low load) #}
+          {% set eff =
+             0.85 if load_pct < 10 else
+             0.90 if load_pct < 20 else
+             0.93 if load_pct < 40 else
+             0.95 if load_pct < 60 else
+             0.96 if load_pct < 80 else
+             0.97
+          %}
+
+          {# Extra charge power when charging (very rough): higher when SoC is low #}
+          {% set charge_w =
+             35.0 if 'CHRG' in status and soc < 50 else
+             20.0 if 'CHRG' in status and soc < 80 else
+             8.0  if 'CHRG' in status
+             else 0.0
+          %}
+
+          {% if 'OB' in status %}
+            0
           {% elif 'OL' in status %}
-            {# Online but not charging - minimal power #}
-            5
-          {% elif 'OB' in status %}
-            {# On battery - efficiency loss based on load #}
-            {{ load * 0.5 }}
+            {{ (load_w / eff) + idle_w + charge_w }}
+          {% elif 'BYPASS' in status %}
+            {# Bypass usually means raw mains to load; input ~= load + tiny overhead #}
+            {{ load_w + 2.0 }}
           {% else %}
-            {# Unknown state - assume minimal power #}
-            5
+            {{ 'unavailable' }}
           {% endif %}
 ```
 
