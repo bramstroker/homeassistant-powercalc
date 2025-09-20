@@ -1,7 +1,7 @@
 {
   "common": {
-    "source_entity": "Source entity",
-    "source_device": "Source device",
+    "source_entity": "Entidad de origen",
+    "source_device": "Dispositivo de origen",
     "remarks_smart_switch": "Este perfil solo provee valores de potencia en espera (standby). \nCuando tienes un aparato que encendido consume una cantidad fija de potencia, puedes proveer ese valor en el siguiente paso de la configuración",
     "remarks_smart_dimmer": "Este perfil solo proporciona valores de energía en Standby. \n En el siguiente paso puedes proporcionar opcionalmente los valores de la luz conectada"
   },
@@ -156,13 +156,13 @@
           "force_calculate_group_energy": "Por defecto powercalc suma los sensores de energía de los sensores miembros. Cambia esta opción para forzar la creación de un sensor \"Riemann Sum\"",
           "group_energy_entities": "Sensores de energía adicionales (kWh) de la instalación de HA para incluir",
           "group_energy_start_at_zero": "Cuando está habilitado, el sensor de energía comenzará en cero cuando se cree el sensor. De lo contrario, se sumará todos los estados del sensor de energía actual",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
+          "group_member_devices": "Añade entidades de potencia y energía de los dispositivos seleccionados al grupo",
           "group_member_sensors": "Sensores de Powercalc a incluir en el grupo",
           "group_power_entities": "Sensores de potencia adicionales (W) de tu HA para incluir",
           "include_non_powercalc_sensors": "Controlar si incluir sensores no powercalc al usar la opción de área",
           "sub_groups": "Todos los sensores de los subgrupos seleccionados serán añadidos también a este grupo"
         },
-        "title": "Crear gurpo de sensores"
+        "title": "Crear grupo de sensores"
       },
       "group_subtract": {
         "data": {
@@ -297,7 +297,7 @@
           "energy_integration_method": "Método de integración de energía",
           "energy_sensor_unit_prefix": "Prefijo de unidad de sensor de energía",
           "ignore_unavailable_state": "Ignorar estado no disponible",
-          "multiply_factor": "Multiplicar factor",
+          "multiply_factor": "Factor de multiplicación",
           "multiply_factor_standby": "Factor de multiplicación en espera",
           "unavailable_power": "Energía no disponible",
           "utility_meter_tariffs": "Tarifas de contadores eléctricos"
@@ -380,7 +380,7 @@
         "data": {
           "create_energy_sensor": "Crear sensor de energía",
           "create_utility_meters": "Crear contadores eléctricos",
-          "entity_id": "Entidad original",
+          "entity_id": "Entidad de origen",
           "mode": "Estrategia de cálculo",
           "name": "Nombre",
           "standby_power": "Potencia en espera (standby)"
@@ -415,14 +415,14 @@
         "step": {
           "sub_profile": {
             "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"\n\nManufacturer: {manufacturer}\nModel: {model}{remarks}",
-            "title": "Select correct sub profile",
+            "title": "Seleccione el subperfil correcto",
             "data": {
-              "sub_profile": "Sub profile"
+              "sub_profile": "Subperfil"
             }
           }
         }
       },
-      "title": "Sub profile selection required for {entry}"
+      "title": "Se requiere la selección de un subperfil para {entry}"
     }
   },
   "options": {
@@ -487,7 +487,7 @@
         },
         "data_description": {
           "on_time": "Cuando se deja vacío es 1 día por defecto. Siempre encendido",
-          "update_frequency": "tiempo en segundos entre actualizaciones del estado del sensor"
+          "update_frequency": "Tiempo en segundos entre actualizaciones del estado del sensor"
         }
       },
       "fixed": {
@@ -571,7 +571,7 @@
           "device": "Añadir las entidades de grupo que powercalc crea a un dispositivo existente",
           "force_calculate_group_energy": "Por defecto powercalc suma los sensores de energía de los sensores miembros. Cambia esta opción para forzar la creación de un sensor \"Riemann Sum\"",
           "group_energy_entities": "Sensores de energía adicionales (kWh) de la instalación de HA para incluir",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
+          "group_member_devices": "Añade entidades de potencia y energía de los dispositivos seleccionados al grupo",
           "group_member_sensors": "Sensores de Powercalc a incluir en el grupo",
           "group_power_entities": "Sensores de potencia adicionales (W) de tu HA para incluir",
           "include_non_powercalc_sensors": "Controlar si incluir sensores no powercalc al usar la opción de área",
@@ -771,8 +771,8 @@
       "name": "Aumentar el sensor de energía diario"
     },
     "reload": {
-      "description": "Reload Powercalc configuration and entities",
-      "name": "Reload"
+      "description": "Recarga la configuración de Powercalc y las entidades",
+      "name": "Recargar"
     },
     "reset_energy": {
       "description": "Restablecer un sensor de energía a cero kWh.",
