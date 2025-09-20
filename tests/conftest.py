@@ -73,6 +73,19 @@ def entity_reg(hass: HomeAssistant) -> EntityRegistry:
 
 
 @pytest.fixture
+def mock_main_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+    """Mock a config entry."""
+    entry = MockConfigEntry(
+        title="Powercalc",
+        domain=DOMAIN,
+        data={},
+        version=5,
+    )
+    entry.add_to_hass(hass)
+    return entry
+
+
+@pytest.fixture
 def mock_config_entry() -> MockConfigEntry:
     """Return the default mocked config entry."""
     return MockConfigEntry(
