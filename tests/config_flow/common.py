@@ -11,7 +11,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.typing import ConfigType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import DiscoveryManager
+from custom_components.powercalc import DiscoveryManager, SubentryType
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
@@ -42,15 +42,14 @@ DEFAULT_UNIQUE_ID = "7c009ef6829f"
 async def select_menu_item(
     hass: HomeAssistant,
     menu_item: Step,
+    result: FlowResult | None = None,
     next_step_id: Step | None = None,
 ) -> FlowResult:
     """Select a sensor type from the menu"""
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN,
-        context={"source": config_entries.SOURCE_USER},
-    )
+    if not result:
+        result = await initialize_sub_entry_flow(hass, SubentryType.VIRTUAL_POWER)
 
-    result = await hass.config_entries.flow.async_configure(
+    result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
         {"next_step_id": menu_item},
     )
@@ -170,6 +169,19 @@ async def initialize_discovery_flow(
     return await confirm_auto_discovered_model(hass, result)
 
 
+async def initialize_sub_entry_flow(
+    hass: HomeAssistant,
+    subentry_type: SubentryType,
+    main_entry: config_entries.ConfigEntry | None = None,
+) -> FlowResult:
+    if main_entry is None:
+        main_entry = mock_main_config_entry(hass)
+    return await hass.config_entries.subentries.async_init(
+        (main_entry.entry_id, subentry_type),
+        context={"source": config_entries.SOURCE_USER},
+    )
+
+
 async def goto_virtual_power_strategy_step(
     hass: HomeAssistant,
     strategy: CalculationStrategy,
@@ -188,8 +200,9 @@ async def goto_virtual_power_strategy_step(
     elif CONF_MODE not in user_input:
         user_input[CONF_MODE] = strategy
 
-    result = await select_menu_item(hass, Step.VIRTUAL_POWER)
-    result = await hass.config_entries.flow.async_configure(
+    result = await initialize_sub_entry_flow(hass, SubentryType.VIRTUAL_POWER)
+    result = await select_menu_item(hass, Step.VIRTUAL_POWER, result)
+    result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
         user_input,
     )
@@ -288,3 +301,15 @@ def assert_default_virtual_power_entry_data(
         }
         | expected_strategy_options
     )
+
+
+def mock_main_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+    """Mock a config entry."""
+    entry = MockConfigEntry(
+        title="Powercalc",
+        domain=DOMAIN,
+        data={},
+        version=5,
+    )
+    entry.add_to_hass(hass)
+    return entry

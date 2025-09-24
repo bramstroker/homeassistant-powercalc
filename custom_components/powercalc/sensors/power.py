@@ -13,7 +13,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
@@ -115,7 +115,7 @@ async def create_power_sensor(
     hass: HomeAssistant,
     sensor_config: dict,
     source_entity: SourceEntity,
-    config_entry: ConfigEntry | None,
+    config_entry: ConfigSubentry | None,
 ) -> PowerSensor:
     """Create the power sensor based on powercalc sensor configuration."""
     if CONF_POWER_SENSOR_ID in sensor_config:
@@ -134,7 +134,7 @@ async def create_virtual_power_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
     source_entity: SourceEntity,
-    config_entry: ConfigEntry | None,
+    config_entry: ConfigSubentry | None,
 ) -> VirtualPowerSensor:
     """Create the power sensor entity."""
     try:
@@ -149,12 +149,12 @@ async def create_virtual_power_sensor(
                 ir.async_create_issue(
                     hass,
                     DOMAIN,
-                    f"sub_profile_{config_entry.entry_id}",
+                    f"sub_profile_{config_entry.subentry_id}",
                     is_fixable=True,
                     severity=ir.IssueSeverity.WARNING,
                     translation_key="sub_profile",
                     translation_placeholders={"entry": config_entry.title},
-                    data={"config_entry_id": config_entry.entry_id},
+                    data={"config_entry_id": config_entry.subentry_id},
                 )
 
         name = generate_power_sensor_name(

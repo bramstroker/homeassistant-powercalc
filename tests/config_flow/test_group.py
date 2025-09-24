@@ -51,6 +51,7 @@ from custom_components.powercalc.const import (
     ENTRY_DATA_ENERGY_ENTITY,
     CalculationStrategy,
     GroupType,
+    SubentryType,
 )
 from custom_components.powercalc.sensors.group.config_entry_utils import add_to_associated_groups
 from tests.common import (
@@ -63,18 +64,20 @@ from tests.config_flow.common import (
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
+    initialize_sub_entry_flow,
     select_menu_item,
     set_virtual_power_configuration,
 )
 
 
 async def test_create_group_entry(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
+    result = await initialize_sub_entry_flow(hass, SubentryType.GROUP)
+    result = await select_menu_item(hass, Step.GROUP_CUSTOM, result)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
     }
-    result = await hass.config_entries.flow.async_configure(
+    result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
         user_input,
     )
