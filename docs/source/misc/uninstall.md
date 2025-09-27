@@ -39,3 +39,8 @@ You may safely remove:
 
 !!! note
     After uninstalling, all Powercalc virtual power and energy sensors will be removed from your Home Assistant instance. If you were using these sensors in the Energy Dashboard or in automations, you'll need to update those configurations.
+
+## Extra
+
+If you get the error after `Integration not found: Powercalc` after restarting Home Assistant, you probably have some ignored entries.
+To fix this, restart HA in safe mode, go to `Devices & Services`, find and remove the ignored powercalc entries, and restart HA again.
