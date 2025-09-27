@@ -11,6 +11,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
+    CONF_GROUP_POWER_ENTITIES,
     CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_POWER,
@@ -282,3 +283,44 @@ async def test_change_device(hass: HomeAssistant) -> None:
 
     device2 = device_registry.async_get("device2")
     assert device2.config_entries == {config_entry.entry_id}
+
+
+async def test_remove_device_from_config_entry(hass: HomeAssistant) -> None:
+    """
+    Test that config_entry is removed from device when device is removed from config entry data
+    See: https://github.com/bramstroker/homeassistant-powercalc/discussions/3476
+    """
+    device_registry = mock_device_registry(
+        hass,
+        {
+            "device1": DeviceEntry(
+                id="device1",
+                manufacturer="shelly",
+                model="PlugS",
+            ),
+        },
+    )
+
+    entry_data = {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_NAME: "Test",
+        CONF_GROUP_POWER_ENTITIES: ["sensor.test_power"],
+    }
+    config_entry = await setup_config_entry(
+        hass,
+        {
+            **entry_data,
+            CONF_DEVICE: "device1",
+        },
+        unique_id="5345435",
+    )
+
+    device1 = device_registry.async_get("device1")
+    assert device1.config_entries == {config_entry.entry_id}
+
+    # Remove device from config entry data
+    hass.config_entries.async_update_entry(config_entry, data={**entry_data})
+    await hass.async_block_till_done()
+
+    device1 = device_registry.async_get("device1")
+    assert not device1

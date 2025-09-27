@@ -10,6 +10,7 @@ from homeassistant.helpers.device_registry import DeviceEntry, DeviceInfo
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 
+from custom_components.powercalc import CONF_SENSOR_TYPE, SensorType
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.sensors.abstract import BaseEntity
 
@@ -31,6 +32,10 @@ async def attach_entities_to_source_device(
             device_entry = device_registry.async_get(hass).async_get(device_id)
 
     if not device_entry:
+        if config_entry:
+            sensor_type = SensorType(config_entry.data.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER))
+            if sensor_type == SensorType.GROUP:
+                remove_stale_devices(hass, config_entry, None)
         return
 
     if config_entry:
@@ -65,7 +70,7 @@ def bind_config_entry_to_device(hass: HomeAssistant, config_entry: ConfigEntry, 
 def remove_stale_devices(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
-    device_id: str,
+    device_id: str | None,
 ) -> None:
     """Remove powercalc config entries from old devices."""
     device_reg = device_registry.async_get(hass)
