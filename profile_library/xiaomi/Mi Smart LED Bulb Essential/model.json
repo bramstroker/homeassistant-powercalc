@@ -9,7 +9,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.19:docker"
   },
-  "name": "Mi LED Smart Bulb",
+  "name": "Mi Smart LED Bulb Essential",
   "standby_power": 1.2,
   "author": "Alexandre Bertrand <alexandrebertrand96@gmail.com>"
 }
