@@ -36,7 +36,7 @@ async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> No
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("signify", "LCA001"),
-        get_test_profile_dir("signify_LCA001"),
+        custom_directory=get_test_profile_dir("signify_LCA001"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "signify"
@@ -52,7 +52,7 @@ async def test_load_fixed_profile(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("fixed"),
+        custom_directory=get_test_profile_dir("fixed"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.FIXED
     assert power_profile.standby_power == 0.5
@@ -66,7 +66,7 @@ async def test_load_linear_profile(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("linear"),
+        custom_directory=get_test_profile_dir("linear"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LINEAR
     assert power_profile.standby_power == 0.5
@@ -80,7 +80,7 @@ async def test_load_linked_profile(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("signify", "LCA007"),
-        get_test_profile_dir("linked_profile"),
+        custom_directory=get_test_profile_dir("linked_profile"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "signify"
@@ -105,7 +105,7 @@ async def test_load_sub_profile_without_model_json(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test/a"),
-        get_test_profile_dir("sub_profile"),
+        custom_directory=get_test_profile_dir("sub_profile"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "test"
@@ -159,7 +159,7 @@ async def test_vacuum_entity_domain_supported(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("roborock", "s6_maxv"),
-        get_test_profile_dir("vacuum"),
+        custom_directory=get_test_profile_dir("vacuum"),
     )
     assert power_profile.is_entity_domain_supported(
         RegistryEntryWithDefaults(
@@ -174,7 +174,7 @@ async def test_light_domain_supported_for_smart_switch_device_type(hass: HomeAss
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("smart_switch"),
+        custom_directory=get_test_profile_dir("smart_switch"),
     )
     assert power_profile.is_entity_domain_supported(
         SourceEntity("light.test", "test", "light"),
@@ -185,7 +185,7 @@ async def test_discovery_does_not_break_when_unknown_device_type(hass: HomeAssis
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
-        get_test_profile_dir("unknown_device_type"),
+        custom_directory=get_test_profile_dir("unknown_device_type"),
     )
     assert not power_profile.is_entity_domain_supported(
         SourceEntity("switch.test", "test", "switch"),
@@ -196,7 +196,7 @@ async def test_sub_profile_matcher_attribute(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_match_attribute"),
+        custom_directory=get_test_profile_dir("sub_profile_match_attribute"),
     )
     selector = SubProfileSelector(
         hass,
@@ -219,7 +219,7 @@ async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_match_entity_id"),
+        custom_directory=get_test_profile_dir("sub_profile_match_entity_id"),
     )
     selector = SubProfileSelector(
         hass,
@@ -265,7 +265,7 @@ async def test_sub_profile_matcher_integration(
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_match_integration"),
+        custom_directory=get_test_profile_dir("sub_profile_match_integration"),
     )
 
     source_entity = SourceEntity(
@@ -317,7 +317,7 @@ async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("smart_switch"),
+        custom_directory=get_test_profile_dir("smart_switch"),
     )
 
     await power_profile.select_sub_profile("foo")
@@ -328,7 +328,7 @@ async def test_device_type(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("media_player"),
+        custom_directory=get_test_profile_dir("media_player"),
     )
 
     assert power_profile.device_type == DeviceType.SMART_SPEAKER
@@ -495,7 +495,7 @@ async def test_discovery_flow_remarks(hass: HomeAssistant, test_profile: str, ex
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
-        get_test_profile_dir(test_profile),
+        custom_directory=get_test_profile_dir(test_profile),
     )
 
     translations_keys = [
@@ -560,6 +560,6 @@ async def test_requires_manual_sub_profile_selection(hass: HomeAssistant, test_p
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
-        get_test_profile_dir(test_profile),
+        custom_directory=get_test_profile_dir(test_profile),
     )
     assert await power_profile.requires_manual_sub_profile_selection == expected_result

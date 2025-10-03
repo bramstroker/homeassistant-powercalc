@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 import os
 
-from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
@@ -18,7 +18,6 @@ from custom_components.powercalc.errors import ModelNotSupportedError
 from .error import LibraryError
 from .library import ModelInfo, ProfileLibrary
 from .power_profile import PowerProfile
-from ..common import SourceEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,11 +55,9 @@ async def get_power_profile(
     library = await ProfileLibrary.factory(hass)
     try:
         variables = config.get(CONF_VARIABLES, {}).copy()
-        if CONF_ENTITY_ID in config:
-            variables["entity"] = config[CONF_ENTITY_ID]
-
         profile = await library.get_profile(
             ModelInfo(manufacturer or "", model or "", model_id),
+            source_entity,
             custom_model_directory,
             variables,
             process_variables,

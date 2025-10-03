@@ -8,6 +8,7 @@ from typing import Any, NamedTuple, cast
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.singleton import singleton
 
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DOMAIN, DOMAIN_CONFIG
 from custom_components.powercalc.helpers import replace_placeholders
 
@@ -93,6 +94,7 @@ class ProfileLibrary:
     async def get_profile(
         self,
         model_info: ModelInfo,
+        source_entity: SourceEntity | None = None,
         custom_directory: str | None = None,
         variables: dict[str, str] | None = None,
         process_variables: bool = True,
@@ -104,7 +106,7 @@ class ProfileLibrary:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
-        profile = await self.create_power_profile(model_info, custom_directory, variables, process_variables)
+        profile = await self.create_power_profile(model_info, source_entity, custom_directory, variables, process_variables)
 
         if sub_profile:
             await profile.select_sub_profile(sub_profile)
@@ -114,6 +116,7 @@ class ProfileLibrary:
     async def create_power_profile(
         self,
         model_info: ModelInfo,
+        source_entity: SourceEntity | None = None,
         custom_directory: str | None = None,
         variables: dict[str, str] | None = None,
         process_variables: bool = True,
@@ -131,9 +134,12 @@ class ProfileLibrary:
         # json_data is potentially retrieved from cache, so we need to copy it to avoid modifying the cache
         json_data = json_data.copy()
         if process_variables:
+            variables = variables or {}
             if json_data.get("fields"):  # When custom fields in profile are defined, make sure all variables are passed
-                self.validate_variables(json_data, variables or {})
-            json_data = cast(dict, replace_placeholders(json_data, variables or {}))
+                self.validate_variables(json_data, variables)
+            if source_entity:
+                variables["entity"] = source_entity.entity_id
+            json_data = cast(dict, replace_placeholders(json_data, variables))
 
         if linked_profile := json_data.get("linked_profile", json_data.get("linked_lut")):
             linked_manufacturer, linked_model = linked_profile.split("/")
