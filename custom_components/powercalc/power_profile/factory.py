@@ -18,6 +18,7 @@ from custom_components.powercalc.errors import ModelNotSupportedError
 from .error import LibraryError
 from .library import ModelInfo, ProfileLibrary
 from .power_profile import PowerProfile
+from ..common import SourceEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ _LOGGER = logging.getLogger(__name__)
 async def get_power_profile(
     hass: HomeAssistant,
     config: dict,
+    source_entity: SourceEntity,
     model_info: ModelInfo | None = None,
     log_errors: bool = True,
     process_variables: bool = True,

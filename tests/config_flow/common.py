@@ -138,6 +138,7 @@ async def initialize_discovery_flow(
             await get_power_profile(
                 hass,
                 {},
+                source_entity,
                 await discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry),
             ),
         ]

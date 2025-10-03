@@ -1871,6 +1871,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             self.selected_profile = await get_power_profile(
                 self.hass,
                 {},
+                self.source_entity,
                 model_info,
             )
             if self.selected_profile and not self.strategy:
