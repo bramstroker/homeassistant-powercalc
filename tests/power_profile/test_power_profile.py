@@ -105,7 +105,7 @@ async def test_load_sub_profile_without_model_json(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test/a"),
-        custom_directory=get_test_profile_dir("sub_profile"),
+        custom_directory=get_test_profile_dir("sub_profile2"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "test"
