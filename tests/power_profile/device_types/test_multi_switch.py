@@ -26,7 +26,7 @@ async def test_multi_switch(hass: HomeAssistant) -> None:
         {
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: "Outlet",
-            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("multi_switch"),
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("multi_switch2"),
             CONF_MULTI_SWITCH: {
                 CONF_ENTITIES: [switch1_id, switch2_id],
             },

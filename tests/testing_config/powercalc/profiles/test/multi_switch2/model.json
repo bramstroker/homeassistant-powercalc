@@ -1,0 +1,14 @@
+{
+  "name": "Kasa Smart Wi-Fi Power Strip",
+  "discovery_by": "device",
+  "device_type": "smart_switch",
+  "calculation_strategy": "multi_switch",
+  "standby_power": 0.25,
+  "multi_switch_config": {
+    "power": 0.7
+  },
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power"
+  },
+  "only_self_usage": true
+}

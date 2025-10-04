@@ -159,7 +159,7 @@ async def test_vacuum_entity_domain_supported(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("roborock", "s6_maxv"),
-        custom_directory=get_test_profile_dir("vacuum"),
+        custom_directory=get_test_profile_dir("vacuum_robot"),
     )
     assert power_profile.is_entity_domain_supported(
         RegistryEntryWithDefaults(
