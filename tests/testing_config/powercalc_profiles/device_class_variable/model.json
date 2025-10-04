@@ -1,0 +1,8 @@
+{
+  "name": "Device Class Variable Test",
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": 10
+  },
+  "calculation_enabled_condition": "{{ is_state('[[entity:temperature]]', 'on') }}"
+}

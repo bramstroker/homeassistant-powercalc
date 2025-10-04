@@ -1,3 +1,4 @@
+import json
 from collections.abc import Callable
 from decimal import Decimal
 from unittest.mock import PropertyMock, patch
@@ -12,7 +13,14 @@ from homeassistant.helpers.template import Template
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy
-from custom_components.powercalc.helpers import evaluate_power, get_or_create_unique_id, get_related_entity_by_device_class, make_hashable
+from custom_components.powercalc.helpers import (
+    collect_placeholders,
+    evaluate_power,
+    get_or_create_unique_id,
+    get_related_entity_by_device_class,
+    make_hashable,
+)
+from tests.common import get_test_config_dir
 
 
 @pytest.mark.parametrize(
@@ -89,3 +97,19 @@ def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, ca
 
     assert result is None
     assert "Entity light.test has no device_id, cannot find related entity" in caplog.text
+
+
+@pytest.mark.parametrize(
+    "file_path,expected_placeholders",
+    [
+        ("powercalc/profiles/test/custom_fields/model.json", {"some_entity"}),
+        ("powercalc_profiles/custom_fields_template/model.json", {"num_switches"}),
+        ("powercalc_profiles/device_class_variable/model.json", {"entity:temperature"}),
+        ("powercalc_profiles/download/model.json", {"entity"}),
+    ],
+)
+def test_collect_placeholder(file_path: str, expected_placeholders: set[str]) -> None:
+    with open(get_test_config_dir(file_path), encoding="utf-8") as f:
+        json_data = json.loads(f.read())
+    found = collect_placeholders(json_data)
+    assert found == expected_placeholders

@@ -23,6 +23,8 @@ from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
+PLACEHOLDER_REGEX = re.compile(r"\[\[\s*([A-Za-z_]\w*(?::[A-Za-z_]\w*)*)\s*\]\]")
+
 
 async def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
     """When power is a template render it."""
@@ -125,6 +127,19 @@ def async_cache[R](func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[...,
         return result
 
     return wrapper
+
+
+def collect_placeholders(data: list | str | dict[str, Any]) -> set[str]:
+    found: set[str] = set()
+    if isinstance(data, dict):
+        for v in data.values():
+            found |= collect_placeholders(v)
+    elif isinstance(data, list):
+        for v in data:
+            found |= collect_placeholders(v)
+    elif isinstance(data, str):
+        found |= set(PLACEHOLDER_REGEX.findall(data))
+    return found
 
 
 def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[str, str]) -> list | str | dict[str, Any]:
