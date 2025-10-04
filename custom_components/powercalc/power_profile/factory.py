@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 async def get_power_profile(
     hass: HomeAssistant,
     config: dict,
-    source_entity: SourceEntity,
+    source_entity: SourceEntity | None = None,
     model_info: ModelInfo | None = None,
     log_errors: bool = True,
     process_variables: bool = True,

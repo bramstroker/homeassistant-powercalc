@@ -64,8 +64,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     ) -> None:
         self._config = config
         self._hass = hass
-        self._source_entity = source_entity
-        self._value_entity = None
+        self._source_entity: SourceEntity = source_entity
+        self._value_entity: SourceEntity | None = None
         self._attribute: str | None = None
         self._standby_power = standby_power
         self._initialized: bool = False
@@ -93,7 +93,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         _LOGGER.debug(
             "%s: Linear mode state value: %d range(%d-%d)",
-            self._value_entity.entity_id,
+            self._value_entity.entity_id,  # type: ignore
             value,
             min_value,
             max_value,
@@ -151,7 +151,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def get_entity_value_range(self) -> tuple:
         """Get the min/max range for a given entity domain."""
-        if self._value_entity.domain == light.DOMAIN:
+        if self._value_entity.domain == light.DOMAIN:  # type: ignore
             return 0, 255
 
         return 0, 100
@@ -161,13 +161,13 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if self._attribute:
             return self.get_value_from_attribute(entity_state)
 
-        if self._value_entity.entity_id is not self._source_entity.entity_id:
+        if self._value_entity.entity_id is not self._source_entity.entity_id:  # type: ignore
             # If the value entity is different from the source entity, we need to fetch the state of the value entity
-            entity_state = self._hass.states.get(self._value_entity.entity_id)
+            entity_state = self._hass.states.get(self._value_entity.entity_id)  # type: ignore
             if not entity_state:
                 _LOGGER.error(
                     "Value entity %s not found",
-                    self._value_entity.entity_id,
+                    self._value_entity.entity_id,  # type: ignore
                 )
                 return None
 

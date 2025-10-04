@@ -136,7 +136,7 @@ class ProfileLibrary:
         json_data = json_data.copy()
         if process_variables:
             if json_data.get("fields"):  # When custom fields in profile are defined, make sure all variables are passed
-                self.validate_variables(json_data, variables)
+                self.validate_variables(json_data, variables or {})
 
             placeholders = collect_placeholders(json_data)
             replacements = self.compute_replacement_variables(placeholders, variables or {}, source_entity)
@@ -149,20 +149,21 @@ class ProfileLibrary:
 
         return await self._create_power_profile_instance(model_info.manufacturer, model_info.model, directory, json_data)
 
-    def compute_replacement_variables(self, placeholders: set[str], variables: dict[str, str], source_entity: SourceEntity) -> dict[str, str]:
+    def compute_replacement_variables(self, placeholders: set[str], variables: dict[str, str], source_entity: SourceEntity | None) -> dict[str, str]:
         variables = variables or {}
 
-        if "entity" in placeholders and source_entity:
-            variables["entity"] = source_entity.entity_id
+        if source_entity:
+            if "entity" in placeholders:
+                variables["entity"] = source_entity.entity_id
 
-        # If ANY namespaced entity:* placeholder is present, check if the specific one for device_class is needed
-        for key in {p for p in placeholders if p.startswith("entity_by_device_class:")}:
-            _, device_class = key.split(":", 1)
-            device_class = SensorDeviceClass(device_class)
-            related_entity = get_related_entity_by_device_class(self._hass, source_entity.entity_entry, device_class)
-            if not related_entity:
-                raise LibraryError(f"Could not find related entity for device class {device_class} of entity {source_entity.entity_id}")
-            variables[key] = related_entity
+            # If ANY namespaced entity:* placeholder is present, check if the specific one for device_class is needed
+            for key in {p for p in placeholders if p.startswith("entity_by_device_class:")}:
+                _, device_class = key.split(":", 1)
+                device_class = SensorDeviceClass(device_class)
+                related_entity = get_related_entity_by_device_class(self._hass, source_entity.entity_entry, device_class)  # type: ignore
+                if not related_entity:
+                    raise LibraryError(f"Could not find related entity for device class {device_class} of entity {source_entity.entity_id}")
+                variables[key] = related_entity
 
         return variables
 
