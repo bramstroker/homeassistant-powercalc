@@ -645,9 +645,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             self.sensor_config.get(CONF_MODE) or self.selected_profile.calculation_strategy,  # type: ignore
         )
         factory = PowerCalculatorStrategyFactory(self.hass)
-        strategy = await factory.create(user_input or self.sensor_config, strategy_name, self.selected_profile, self.source_entity)  # type: ignore
         try:
-            await strategy.validate_config()
+            await factory.create(user_input or self.sensor_config, strategy_name, self.selected_profile, self.source_entity)  # type: ignore
         except StrategyConfigurationError as error:
             _LOGGER.error(str(error))
             raise SchemaFlowError(error.get_config_flow_translate_key() or "unknown") from error
@@ -1035,6 +1034,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                     str(self.sensor_config.get(CONF_MANUFACTURER)),
                     str(user_input.get(CONF_MODEL)),
                 ),
+                self.source_entity,
             )
             self.selected_profile = profile
             if self.selected_profile and not await self.selected_profile.needs_user_configuration:
@@ -1166,6 +1166,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 str(self.sensor_config.get(CONF_MANUFACTURER)),
                 str(self.sensor_config.get(CONF_MODEL)),
             ),
+            self.source_entity,
             process_variables=False,
         )
         remarks = profile.config_flow_sub_profile_remarks
@@ -1871,6 +1872,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             self.selected_profile = await get_power_profile(
                 self.hass,
                 {},
+                self.source_entity,
                 model_info,
             )
             if self.selected_profile and not self.strategy:

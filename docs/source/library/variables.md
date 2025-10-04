@@ -1,10 +1,23 @@
-# Custom fields
+# Variables
+
+Powercalc library model.json files support the use of variables and custom fields to enhance flexibility and user customization.
+
+## Built-in variables
+
+You can use the following built-in variables in the `model.json` file.
+
+`[[entity]]`: The entity ID of the entity for which the power sensor is being created.
+
+`[[entity_by_device_class:{device_class}]]`: Finds an entity with the specified device class in the same device as `[[entity]]`.
+For example, `[[entity_by_device_class:temperature]]` will find a temperature sensor in the same device, and `[[entity_by_device_class:battery]]` will find a battery sensor.
+
+## Custom fields
 
 Sometimes there is a need to ask the user to provide some additional data for a profile.
 This can be done by adding custom fields to the profile configuration.
 During discovery flow, or when user adds from library their will be an additional step where the user can provide the custom fields.
 
-## Adding custom fields
+### Adding custom fields
 
 You can add one or more custom fields to a profile by adding a `fields` section to the profile configuration.
 
@@ -34,7 +47,7 @@ After setup Powercalc will replace this with the value the user provided.
 !!! note
     Not all selectors are tested. Some might not be supported. `number` and `entity` are tested and should work.
 
-### Example number selector
+#### Example number selector
 
 In the example below we have a profile that asks the user to provide a number.
 The profile then calculates the power usage based on the number provided.
@@ -63,7 +76,7 @@ The profile then calculates the power usage based on the number provided.
 
 When the user provides the number `2`, the template will be ``{{ 2 * 0.20 }}`` which will result in `0.40`.
 
-### Example entity selector
+#### Example entity selector
 
 In the example below we have a profile that asks the user to select a binary sensor.
 The profile then calculates the power usage based on the state of the binary sensor.
