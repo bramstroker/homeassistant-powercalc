@@ -63,6 +63,7 @@ from .const import (
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
     CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
+    CONF_DISCOVERY_EXCLUDE_SELF_USAGE,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
@@ -563,6 +564,7 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
                 multiple=True,
             ),
         ),
+        vol.Optional(CONF_DISCOVERY_EXCLUDE_SELF_USAGE, default=False): selector.BooleanSelector(),
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 )

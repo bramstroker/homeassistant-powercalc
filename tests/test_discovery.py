@@ -4,7 +4,6 @@ from datetime import timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from custom_components.test.light import MockLight
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
@@ -27,7 +26,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc import SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
+from custom_components.powercalc import CONF_DISCOVERY_EXCLUDE_SELF_USAGE, SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
@@ -47,6 +46,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.library import ModelInfo
+from custom_components.test.light import MockLight
 
 from .common import create_mock_light_entity, get_test_config_dir, run_powercalc_setup
 from .conftest import MockEntityWithModel
@@ -401,6 +401,31 @@ async def test_exclude_device_types(
     )
 
     assert len(mock_flow_init.mock_calls) == 1
+
+
+async def test_exclude_self_usage(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """Test that entities with excluded device types are not considered for discovery"""
+
+    hass.config.config_dir = get_test_config_dir()
+    mock_entity_with_model_information(
+        "switch.test",
+        "test",
+        "smart_switch_with_pm_new",
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {},
+        {
+            CONF_DISCOVERY_EXCLUDE_SELF_USAGE: True,
+        },
+    )
+
+    assert len(mock_flow_init.mock_calls) == 0
 
 
 async def test_load_model_with_slashes(
