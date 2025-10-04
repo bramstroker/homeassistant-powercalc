@@ -69,18 +69,22 @@ class PowerCalculatorStrategyFactory:
         }
 
         if strategy == CalculationStrategy.COMPOSITE:
-            strategy = await self._create_composite(config, source_entity, power_profile)
-            await strategy.validate_config()
-            await strategy.initialize()
-            return strategy
+            return await self._prepare(
+                await self._create_composite(config, source_entity, power_profile),
+            )
 
         if strategy in strategy_mapping:
-            strategy = strategy_mapping[strategy]()
-            await strategy.validate_config()
-            await strategy.initialize()
-            return strategy
+            return await self._prepare(
+                strategy_mapping[strategy](),
+            )
 
         raise UnsupportedStrategyError("Invalid calculation strategy", strategy)
+
+    @staticmethod
+    async def _prepare(instance: PowerCalculationStrategyInterface) -> PowerCalculationStrategyInterface:
+        await instance.validate_config()
+        await instance.initialize()
+        return instance
 
     def _create_linear(
         self,
