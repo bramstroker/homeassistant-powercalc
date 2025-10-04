@@ -95,7 +95,7 @@ dev = [
     "mypy==1.18.2",
     "voluptuous-stubs>=0.1",
     "homeassistant-stubs",
-    "pytest-homeassistant-custom-component==0.13.281",
+    "pytest-homeassistant-custom-component==0.13.286",
     "types-pytz>=2024.1",
     "types-croniter>=2.0",
     "croniter>=6.0.0",
