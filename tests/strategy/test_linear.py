@@ -379,6 +379,54 @@ async def test_value_entity_not_found(
     assert await strategy.calculate(State("light.test", STATE_ON)) is None
 
 
+async def test_value_entity_state_not_found(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test that None is returned when the value entity state is not found in Home Assistant."""
+    caplog.set_level(logging.ERROR)
+
+    mock_device_registry(
+        hass,
+        {
+            "vacuum-device": DeviceEntry(
+                id="vacuum-device",
+                manufacturer="test",
+                model="test",
+            ),
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "vacuum.test": RegistryEntryWithDefaults(
+                entity_id="vacuum.test",
+                unique_id="1111",
+                platform="test",
+                device_id="vacuum-device",
+            ),
+            "sensor.test_battery": RegistryEntryWithDefaults(
+                entity_id="sensor.test_battery",
+                unique_id="2222",
+                platform="sensor",
+                device_id="vacuum-device",
+                original_device_class=SensorDeviceClass.BATTERY,
+            ),
+        },
+    )
+
+    strategy = await _create_strategy_instance(
+        hass,
+        await create_source_entity("vacuum.test", hass),
+        {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
+    )
+
+    state = State("vacuum.test", STATE_DOCKED)
+    assert await strategy.calculate(state) is None
+
+    assert "Value entity sensor.test_battery not found" in caplog.text
+
+
 @pytest.mark.parametrize(
     "source_entity,state,expected_result",
     [

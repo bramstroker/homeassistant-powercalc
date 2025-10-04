@@ -151,8 +151,8 @@ def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[s
         for i in range(len(data)):
             data[i] = replace_placeholders(data[i], replacements)
     elif isinstance(data, str):
-        # Adjust regex to match [[variable]]
-        matches = re.findall(r"\[\[\s*(\w+)\s*\]\]", data)
+        # Use the same regex pattern as PLACEHOLDER_REGEX
+        matches = PLACEHOLDER_REGEX.findall(data)
         for match in matches:
             if match in replacements:
                 # Replace [[variable]] with its value

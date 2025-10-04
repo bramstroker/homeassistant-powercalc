@@ -19,6 +19,7 @@ from custom_components.powercalc.helpers import (
     get_or_create_unique_id,
     get_related_entity_by_device_class,
     make_hashable,
+    replace_placeholders,
 )
 from tests.common import get_test_config_dir
 
@@ -113,3 +114,12 @@ def test_collect_placeholder(file_path: str, expected_placeholders: set[str]) ->
         json_data = json.loads(f.read())
     found = collect_placeholders(json_data)
     assert found == expected_placeholders
+
+
+def test_replace_placeholder() -> None:
+    json_data = {
+        "name": "Test [[entity_by_device_class:temperature]]",
+    }
+    placeholders = {"entity_by_device_class:temperature": "sensor.test"}
+    replace_placeholders(json_data, placeholders)
+    assert json_data["name"] == "Test sensor.test"
