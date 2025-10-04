@@ -143,7 +143,7 @@ class LocalLoader(Loader):
 
                 model_json_path = os.path.join(model_path, "model.json")
                 if not os.path.exists(model_json_path):
-                    _LOGGER.error("model.json should exist in %s!", model_path)
+                    _LOGGER.warning("model.json should exist in %s!", model_path)
                     continue
 
                 model_json = self._load_json(model_json_path)

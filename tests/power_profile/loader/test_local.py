@@ -27,7 +27,7 @@ async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant, caplog: 
 
 async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     loader = LocalLoader(hass, get_test_profile_dir("missing_model_json"))
-    with caplog.at_level(logging.ERROR):
+    with caplog.at_level(logging.WARNING):
         await loader.initialize()
         assert "model.json should exist in" in caplog.text
 

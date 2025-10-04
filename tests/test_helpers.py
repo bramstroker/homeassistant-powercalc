@@ -21,7 +21,7 @@ from custom_components.powercalc.helpers import (
     make_hashable,
     replace_placeholders,
 )
-from tests.common import get_test_config_dir
+from tests.common import get_test_profile_dir
 
 
 @pytest.mark.parametrize(
@@ -103,14 +103,14 @@ def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, ca
 @pytest.mark.parametrize(
     "file_path,expected_placeholders",
     [
-        ("powercalc/profiles/test/custom_fields/model.json", {"some_entity"}),
-        ("powercalc_profiles/custom_fields_template/model.json", {"num_switches"}),
-        ("powercalc_profiles/device_class_variable/model.json", {"entity_by_device_class:temperature"}),
-        ("powercalc_profiles/download/model.json", {"entity"}),
+        ("custom_fields/model.json", {"some_entity"}),
+        ("custom_fields_template/model.json", {"num_switches"}),
+        ("device_class_variable/model.json", {"entity_by_device_class:temperature"}),
+        ("download/model.json", {"entity"}),
     ],
 )
 def test_collect_placeholder(file_path: str, expected_placeholders: set[str]) -> None:
-    with open(get_test_config_dir(file_path), encoding="utf-8") as f:
+    with open(get_test_profile_dir(file_path), encoding="utf-8") as f:
         json_data = json.loads(f.read())
     found = collect_placeholders(json_data)
     assert found == expected_placeholders

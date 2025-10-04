@@ -151,7 +151,7 @@ def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
 def get_test_profile_dir(sub_dir: str) -> str:
     return os.path.join(
         os.path.dirname(__file__),
-        "testing_config/powercalc_profiles",
+        "testing_config/powercalc/profiles/test",
         sub_dir,
     )
 
