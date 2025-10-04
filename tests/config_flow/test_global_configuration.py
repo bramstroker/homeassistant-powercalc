@@ -10,8 +10,13 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES, CONF_DISCOVERY_EXCLUDE_SELF_USAGE, \
-    CONF_GROUP_UPDATE_INTERVAL, DEFAULT_GROUP_UPDATE_INTERVAL, DeviceType
+from custom_components.powercalc import (
+    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
+    CONF_DISCOVERY_EXCLUDE_SELF_USAGE,
+    CONF_GROUP_UPDATE_INTERVAL,
+    DEFAULT_GROUP_UPDATE_INTERVAL,
+    DeviceType,
+)
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_DOMAIN_GROUPS,
