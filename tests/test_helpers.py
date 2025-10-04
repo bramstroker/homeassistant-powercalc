@@ -104,7 +104,7 @@ def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, ca
     [
         ("powercalc/profiles/test/custom_fields/model.json", {"some_entity"}),
         ("powercalc_profiles/custom_fields_template/model.json", {"num_switches"}),
-        ("powercalc_profiles/device_class_variable/model.json", {"entity:temperature"}),
+        ("powercalc_profiles/device_class_variable/model.json", {"entity_by_device_class:temperature"}),
         ("powercalc_profiles/download/model.json", {"entity"}),
     ],
 )
