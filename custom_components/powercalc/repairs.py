@@ -6,6 +6,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import CONF_MODEL, CONF_SUB_PROFILE
 from custom_components.powercalc.flow_helper.schema import build_sub_profile_schema
 from custom_components.powercalc.power_profile.factory import get_power_profile
@@ -33,7 +34,8 @@ class SubProfileRepairFlow(RepairsFlow):
             self._hass.config_entries.async_update_entry(self._config_entry, data=new_data)
             return self.async_create_entry(title="", data={})
 
-        profile = await get_power_profile(self.hass, dict(self._config_entry.data))
+        source_entity = await create_source_entity(self._config_entry.data[CONF_ENTITY_ID], self._hass)
+        profile = await get_power_profile(self.hass, dict(self._config_entry.data), source_entity)
         assert profile
         sub_profile_schema = await build_sub_profile_schema(profile, None)
 
@@ -45,7 +47,7 @@ class SubProfileRepairFlow(RepairsFlow):
             step_id="sub_profile",
             data_schema=sub_profile_schema,
             description_placeholders={
-                "entity_id": self._config_entry.data[CONF_ENTITY_ID],
+                "entity_id": source_entity.entity_id,
                 "remarks": remarks or "",
                 "model": profile.model,
                 "manufacturer": profile.manufacturer,

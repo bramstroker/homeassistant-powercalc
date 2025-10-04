@@ -63,7 +63,7 @@ async def test_discovery_flow(
 async def test_discovery_flow_remarks_are_shown(hass: HomeAssistant) -> None:
     """Model.json can provide remarks to show in the discovery flow. Check if these are displayed correctly"""
     source_entity = await create_source_entity("media_player.test", hass)
-    power_profile = await get_power_profile(hass, {}, ModelInfo("sonos", "one"))
+    power_profile = await get_power_profile(hass, {}, source_entity, ModelInfo("sonos", "one"))
     result = await initialize_discovery_flow(hass, source_entity, power_profile)
     assert result["description_placeholders"]["remarks"] is not None
 
@@ -117,8 +117,8 @@ async def test_discovery_flow_multi_profiles(
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
     power_profiles = [
-        await get_power_profile(hass, {}, ModelInfo("signify", "LCT010")),
-        await get_power_profile(hass, {}, ModelInfo("signify", "LCT012")),
+        await get_power_profile(hass, {}, source_entity, ModelInfo("signify", "LCT010")),
+        await get_power_profile(hass, {}, source_entity, ModelInfo("signify", "LCT012")),
     ]
     result = await initialize_discovery_flow(hass, source_entity, power_profiles)
 
@@ -211,7 +211,7 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
         device_entry=device_entry,
     )
     power_profiles = [
-        await get_power_profile(hass, {}, ModelInfo("test", "discovery_type_device")),
+        await get_power_profile(hass, {}, source_entity, ModelInfo("test", "discovery_type_device")),
     ]
     result = await initialize_discovery_flow(hass, source_entity, power_profiles)
 

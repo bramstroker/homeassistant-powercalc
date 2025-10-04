@@ -228,7 +228,7 @@ class DiscoveryManager:
 
         power_profiles = []
         for model_info in models:
-            profile = await get_power_profile(self.hass, {}, model_info=model_info, process_variables=False)
+            profile = await get_power_profile(self.hass, {}, source_entity, model_info=model_info, process_variables=False)
             if not profile or profile.discovery_by != discovery_type:  # pragma: no cover
                 continue
             if discovery_type == DiscoveryBy.ENTITY and not profile.is_entity_domain_supported(

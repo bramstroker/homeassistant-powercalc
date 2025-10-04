@@ -28,6 +28,8 @@ Refer to the [JSON schema](https://github.com/bramstroker/homeassistant-powercal
 - `created_at`: Date the profile was created (ISO 8601 format, e.g., `2023-06-19T08:02:31`).
 - `author`: Author of the profile.
 
+You can use some built-in variables and custom fields which are replaced in model.json, more about it explained in [Variables](variables.md).
+
 ### Discovery Behavior
 
 By default, Powercalc performs discovery on a **per-entity** basis. This can cause issues if a device has multiple entities, resulting in multiple discoveries.

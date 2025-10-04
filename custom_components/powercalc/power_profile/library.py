@@ -5,11 +5,13 @@ import os
 import re
 from typing import Any, NamedTuple, cast
 
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.singleton import singleton
 
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DOMAIN, DOMAIN_CONFIG
-from custom_components.powercalc.helpers import replace_placeholders
+from custom_components.powercalc.helpers import collect_placeholders, get_related_entity_by_device_class, replace_placeholders
 
 from .error import LibraryError
 from .loader.composite import CompositeLoader
@@ -93,6 +95,7 @@ class ProfileLibrary:
     async def get_profile(
         self,
         model_info: ModelInfo,
+        source_entity: SourceEntity | None = None,
         custom_directory: str | None = None,
         variables: dict[str, str] | None = None,
         process_variables: bool = True,
@@ -104,7 +107,7 @@ class ProfileLibrary:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
-        profile = await self.create_power_profile(model_info, custom_directory, variables, process_variables)
+        profile = await self.create_power_profile(model_info, source_entity, custom_directory, variables, process_variables)
 
         if sub_profile:
             await profile.select_sub_profile(sub_profile)
@@ -114,6 +117,7 @@ class ProfileLibrary:
     async def create_power_profile(
         self,
         model_info: ModelInfo,
+        source_entity: SourceEntity | None = None,
         custom_directory: str | None = None,
         variables: dict[str, str] | None = None,
         process_variables: bool = True,
@@ -133,7 +137,10 @@ class ProfileLibrary:
         if process_variables:
             if json_data.get("fields"):  # When custom fields in profile are defined, make sure all variables are passed
                 self.validate_variables(json_data, variables or {})
-            json_data = cast(dict, replace_placeholders(json_data, variables or {}))
+
+            placeholders = collect_placeholders(json_data)
+            replacements = self.compute_replacement_variables(placeholders, variables or {}, source_entity)
+            json_data = cast(dict, replace_placeholders(json_data, replacements))
 
         if linked_profile := json_data.get("linked_profile", json_data.get("linked_lut")):
             linked_manufacturer, linked_model = linked_profile.split("/")
@@ -141,6 +148,24 @@ class ProfileLibrary:
             json_data.update(linked_json_data)
 
         return await self._create_power_profile_instance(model_info.manufacturer, model_info.model, directory, json_data)
+
+    def compute_replacement_variables(self, placeholders: set[str], variables: dict[str, str], source_entity: SourceEntity | None) -> dict[str, str]:
+        variables = variables or {}
+
+        if source_entity:
+            if "entity" in placeholders:
+                variables["entity"] = source_entity.entity_id
+
+            # If ANY namespaced entity:* placeholder is present, check if the specific one for device_class is needed
+            for key in {p for p in placeholders if p.startswith("entity_by_device_class:")}:
+                _, device_class = key.split(":", 1)
+                device_class = SensorDeviceClass(device_class)
+                related_entity = get_related_entity_by_device_class(self._hass, source_entity.entity_entry, device_class)  # type: ignore
+                if not related_entity:
+                    raise LibraryError(f"Could not find related entity for device class {device_class} of entity {source_entity.entity_id}")
+                variables[key] = related_entity
+
+        return variables
 
     @staticmethod
     def validate_variables(json_data: dict[str, Any], variables: dict[str, str]) -> None:
