@@ -65,6 +65,7 @@ class DiscoveryManager:
         hass: HomeAssistant,
         ha_config: ConfigType,
         exclude_device_types: list[DeviceType] | None = None,
+        exclude_self_usage_profiles: bool = False,
     ) -> None:
         self.hass = hass
         self.ha_config = ha_config
@@ -73,6 +74,7 @@ class DiscoveryManager:
         self.initialized_flows: set[str] = set()
         self.library: ProfileLibrary | None = None
         self._exclude_device_types = exclude_device_types or []
+        self._exclude_self_usage_profiles = exclude_self_usage_profiles or False
 
     async def setup(self) -> None:
         """Setup the discovery manager. Start initial discovery and setup interval based rediscovery."""
@@ -236,6 +238,8 @@ class DiscoveryManager:
             ):
                 continue
             if profile.device_type in self._exclude_device_types:
+                continue
+            if self._exclude_self_usage_profiles and profile.only_self_usage:
                 continue
             power_profiles.append(profile)
 
