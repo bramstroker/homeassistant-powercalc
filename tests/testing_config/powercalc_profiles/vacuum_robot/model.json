@@ -4,7 +4,6 @@
   "created_at": "2024-11-03T09:06:38.483511",
   "device_type": "vacuum robot",
   "linear_config": {
-    "attribute": "battery_level",
     "calibrate": [
       "0 -> 20",
       "1 -> 20",

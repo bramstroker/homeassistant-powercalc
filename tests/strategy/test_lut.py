@@ -158,7 +158,7 @@ async def test_effect_mode_unsupported(hass: HomeAssistant) -> None:
     Test light is set in effect mode, but effect is not supported by the profile.
     In this case normal LUT for color mode should be used.
     """
-    strategy = await _create_lut_strategy(hass, "signify", "LWB010", "light.test")
+    strategy = await _create_lut_strategy(hass, "signify", "LWB010")
     await _calculate_and_assert_power(
         strategy,
         state=State(

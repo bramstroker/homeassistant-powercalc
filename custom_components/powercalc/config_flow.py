@@ -645,9 +645,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             self.sensor_config.get(CONF_MODE) or self.selected_profile.calculation_strategy,  # type: ignore
         )
         factory = PowerCalculatorStrategyFactory(self.hass)
-        strategy = await factory.create(user_input or self.sensor_config, strategy_name, self.selected_profile, self.source_entity)  # type: ignore
         try:
-            await strategy.validate_config()
+            await factory.create(user_input or self.sensor_config, strategy_name, self.selected_profile, self.source_entity)  # type: ignore
         except StrategyConfigurationError as error:
             _LOGGER.error(str(error))
             raise SchemaFlowError(error.get_config_flow_translate_key() or "unknown") from error

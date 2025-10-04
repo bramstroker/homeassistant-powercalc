@@ -112,18 +112,7 @@ async def test_light_calibrate(hass: HomeAssistant) -> None:
     )
 
 
-async def test_vacuum_battery_level(hass: HomeAssistant) -> None:
-    strategy = await _create_strategy_instance(
-        hass,
-        await create_source_entity("vacuum.test", hass),
-        {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
-    )
-
-    state = State("vacuum.test", STATE_DOCKED, {"battery_level": 50})
-    assert await strategy.calculate(state) == 60
-
-
-async def test_vacuum_battery_level_as_entity(
+async def test_vacuum_battery_level(
     hass: HomeAssistant,
 ) -> None:
     mock_device_registry(
@@ -194,14 +183,12 @@ async def test_no_battery_entity_for_vacuum(
         },
     )
 
-    strategy = await _create_strategy_instance(
-        hass,
-        await create_source_entity("vacuum.test", hass),
-        {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
-    )
-
     with pytest.raises(StrategyConfigurationError, match="No battery entity found for vacuum cleaner"):
-        await strategy.calculate(State("vacuum.test", STATE_DOCKED))
+        await _create_strategy_instance(
+            hass,
+            await create_source_entity("vacuum.test", hass),
+            {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
+        )
 
 
 async def test_custom_attribute(hass: HomeAssistant) -> None:
@@ -293,6 +280,7 @@ async def _create_strategy_instance(
     )
 
     await strategy.validate_config()
+    await strategy.initialize()
 
     return strategy
 

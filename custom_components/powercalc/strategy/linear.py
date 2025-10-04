@@ -15,8 +15,9 @@ from homeassistant.components.media_player import (
     STATE_PLAYING,
 )
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import ATTR_BATTERY_LEVEL, CONF_ATTRIBUTE
+from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers.event import TrackTemplate
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
@@ -48,7 +49,6 @@ ENTITY_ATTRIBUTE_MAPPING = {
     fan.DOMAIN: ATTR_PERCENTAGE,
     light.DOMAIN: ATTR_BRIGHTNESS,
     media_player.DOMAIN: ATTR_MEDIA_VOLUME_LEVEL,
-    vacuum.DOMAIN: ATTR_BATTERY_LEVEL,
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,18 +65,21 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._config = config
         self._hass = hass
         self._source_entity = source_entity
-        self._value_entity = source_entity
+        self._value_entity = None
         self._attribute: str | None = None
         self._standby_power = standby_power
         self._initialized: bool = False
         self._calibration: list[tuple[int, float]] | None = None
 
+    async def initialize(self) -> None:
+        """Initialize the strategy, called once on creation."""
+        self._value_entity = await self.get_value_entity()
+        self._calibration = self.create_calibrate_list()
+
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate the current power consumption."""
         if not self._initialized:
-            self._calibration = self.create_calibrate_list()
             self._attribute = self.get_attribute(entity_state)
-            self._value_entity = await self.get_value_entity(entity_state)
             self._initialized = True
 
         value = self.get_current_state_value(entity_state)
@@ -229,9 +232,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                 "linear_min_higher_as_max",
             )
 
-    async def get_value_entity(self, entity_state: State) -> SourceEntity:
+    async def get_value_entity(self) -> SourceEntity:
         """Set the value entity based on the current state."""
-        if self._source_entity.domain == vacuum.DOMAIN and self._attribute not in entity_state.attributes and self._source_entity.entity_entry:
+        if self._source_entity.domain == vacuum.DOMAIN and self._attribute is None and self._source_entity.entity_entry:
             # For vacuum cleaner, battery level is a separate entity
             related_entity = get_related_entity_by_device_class(
                 self._hass,
@@ -243,7 +246,13 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                     "No battery entity found for vacuum cleaner",
                     "linear_no_battery_entity",
                 )
-            self._attribute = None
             return await create_source_entity(related_entity, self._hass)
 
-        return self._value_entity
+        return self._value_entity or self._source_entity
+
+    def get_entities_to_track(self) -> list[str | TrackTemplate]:
+        """Return entities to track for this strategy."""
+        if self._value_entity and self._value_entity.entity_id != self._source_entity.entity_id:
+            return [self._value_entity.entity_id]
+
+        return []

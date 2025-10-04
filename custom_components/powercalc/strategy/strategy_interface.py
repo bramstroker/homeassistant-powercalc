@@ -7,6 +7,9 @@ from homeassistant.helpers.event import TrackTemplate
 
 
 class PowerCalculationStrategyInterface:
+    async def initialize(self) -> None:
+        """Initialize the strategy, called once on creation."""
+
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate power consumption based on entity state."""
 
