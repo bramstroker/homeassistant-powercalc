@@ -791,7 +791,7 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
             CONF_ENTITY_ID: "light.test",
             CONF_MANUFACTURER: "test",
             CONF_MODEL: "sub_profile/a",
-            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("sub_profile"),
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("sub_profile2"),
         },
         unique_id,
     )
