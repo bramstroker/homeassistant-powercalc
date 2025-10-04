@@ -5,7 +5,8 @@
   "measure_device_firmware": "1.3.4 Build 250403 Rel.150504",
   "name": "Bosch Smart Home Controller 1 Gen.",
   "aliases": [
-    "SHC1"
+    "SHC1",
+    "SmartHomeController"
   ],
   "discovery_by": "device",
   "device_type": "generic_iot",
