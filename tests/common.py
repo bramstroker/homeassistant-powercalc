@@ -1,6 +1,5 @@
 import os
 
-import custom_components.test.light as test_light_platform
 import homeassistant.helpers.area_registry as ar
 from homeassistant import config_entries
 from homeassistant.components import input_boolean, input_number, light
@@ -22,6 +21,7 @@ from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_registry, setup_test_component_platform
 
+import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_MODE,
@@ -151,7 +151,7 @@ def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
 def get_test_profile_dir(sub_dir: str) -> str:
     return os.path.join(
         os.path.dirname(__file__),
-        "testing_config/powercalc_profiles",
+        "testing_config/powercalc/profiles/test",
         sub_dir,
     )
 
