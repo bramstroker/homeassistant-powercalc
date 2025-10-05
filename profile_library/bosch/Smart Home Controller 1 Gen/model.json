@@ -12,7 +12,7 @@
   "device_type": "generic_iot",
   "calculation_strategy": "fixed",
   "fixed_config": {
-    "power": 1.76
+    "power": 1.78
   },
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
