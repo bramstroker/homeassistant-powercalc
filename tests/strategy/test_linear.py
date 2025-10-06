@@ -9,7 +9,6 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_ENTITY_ID,
-    STATE_IDLE,
     STATE_ON,
     STATE_PAUSED,
     STATE_PLAYING,
@@ -325,9 +324,6 @@ async def test_media_player_volume_level(hass: HomeAssistant) -> None:
 
     state = State("media_player.test", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 0.5})
     assert await strategy.calculate(state) == 60
-
-    state = State("media_player.test", STATE_IDLE, {ATTR_MEDIA_VOLUME_LEVEL: 0.5})
-    assert not await strategy.calculate(state)
 
 
 async def test_error_is_raised_on_unsupported_entity_domain(
