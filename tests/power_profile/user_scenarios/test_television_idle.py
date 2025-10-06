@@ -11,7 +11,7 @@ async def test_media_player_idle(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
-    See https://github.com/bramstroker/homeassistant-powercalc/issues/3370#issuecomment-3102005428
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/3492
     """
 
     await run_powercalc_setup(
