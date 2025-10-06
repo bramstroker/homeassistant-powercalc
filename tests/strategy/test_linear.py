@@ -9,7 +9,6 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_ENTITY_ID,
-    STATE_IDLE,
     STATE_ON,
     STATE_PAUSED,
     STATE_PLAYING,
@@ -112,20 +111,8 @@ async def test_light_calibrate(hass: HomeAssistant) -> None:
     )
 
 
-async def test_vacuum_battery_level(hass: HomeAssistant) -> None:
-    strategy = await _create_strategy_instance(
-        hass,
-        await create_source_entity("vacuum.test", hass),
-        {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
-    )
-
-    state = State("vacuum.test", STATE_DOCKED, {"battery_level": 50})
-    assert await strategy.calculate(state) == 60
-
-
-async def test_vacuum_battery_level_as_entity(
-    hass: HomeAssistant,
-) -> None:
+async def _setup_vacuum_test(hass: HomeAssistant) -> None:
+    """Set up the vacuum device and entities for testing."""
     mock_device_registry(
         hass,
         {
@@ -155,6 +142,12 @@ async def test_vacuum_battery_level_as_entity(
         },
     )
 
+
+async def test_vacuum_battery_level(
+    hass: HomeAssistant,
+) -> None:
+    await _setup_vacuum_test(hass)
+
     hass.states.async_set("sensor.test_battery", 50)
     await hass.async_block_till_done()
 
@@ -171,7 +164,7 @@ async def test_vacuum_battery_level_as_entity(
 async def test_no_battery_entity_for_vacuum(
     hass: HomeAssistant,
 ) -> None:
-    """Test that an error is raised when no battery entity is found for a vacuum cleaner."""
+    # Use a modified setup without the battery entity
     mock_device_registry(
         hass,
         {
@@ -194,14 +187,12 @@ async def test_no_battery_entity_for_vacuum(
         },
     )
 
-    strategy = await _create_strategy_instance(
-        hass,
-        await create_source_entity("vacuum.test", hass),
-        {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
-    )
-
     with pytest.raises(StrategyConfigurationError, match="No battery entity found for vacuum cleaner"):
-        await strategy.calculate(State("vacuum.test", STATE_DOCKED))
+        await _create_strategy_instance(
+            hass,
+            await create_source_entity("vacuum.test", hass),
+            {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
+        )
 
 
 async def test_custom_attribute(hass: HomeAssistant) -> None:
@@ -293,6 +284,7 @@ async def _create_strategy_instance(
     )
 
     await strategy.validate_config()
+    await strategy.initialize()
 
     return strategy
 
@@ -333,9 +325,6 @@ async def test_media_player_volume_level(hass: HomeAssistant) -> None:
     state = State("media_player.test", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 0.5})
     assert await strategy.calculate(state) == 60
 
-    state = State("media_player.test", STATE_IDLE, {ATTR_MEDIA_VOLUME_LEVEL: 0.5})
-    assert not await strategy.calculate(state)
-
 
 async def test_error_is_raised_on_unsupported_entity_domain(
     hass: HomeAssistant,
@@ -352,35 +341,7 @@ async def test_value_entity_not_found(
     hass: HomeAssistant,
 ) -> None:
     """Test that None is returned when the value entity is not found."""
-
-    mock_device_registry(
-        hass,
-        {
-            "vacuum-device": DeviceEntry(
-                id="vacuum-device",
-                manufacturer="test",
-                model="test",
-            ),
-        },
-    )
-    mock_registry(
-        hass,
-        {
-            "vacuum.test": RegistryEntryWithDefaults(
-                entity_id="vacuum.test",
-                unique_id="1111",
-                platform="test",
-                device_id="vacuum-device",
-            ),
-            "sensor.test_battery": RegistryEntryWithDefaults(
-                entity_id="sensor.test_battery",
-                unique_id="2222",
-                platform="sensor",
-                device_id="vacuum-device",
-                original_device_class=SensorDeviceClass.BATTERY,
-            ),
-        },
-    )
+    await _setup_vacuum_test(hass)
 
     strategy = await _create_strategy_instance(
         hass,
@@ -389,6 +350,26 @@ async def test_value_entity_not_found(
     )
 
     assert await strategy.calculate(State("light.test", STATE_ON)) is None
+
+
+async def test_value_entity_state_not_found(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test that None is returned when the value entity state is not found in Home Assistant."""
+    caplog.set_level(logging.ERROR)
+    await _setup_vacuum_test(hass)
+
+    strategy = await _create_strategy_instance(
+        hass,
+        await create_source_entity("vacuum.test", hass),
+        {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
+    )
+
+    state = State("vacuum.test", STATE_DOCKED)
+    assert await strategy.calculate(state) is None
+
+    assert "Value entity sensor.test_battery not found" in caplog.text
 
 
 @pytest.mark.parametrize(

@@ -229,6 +229,7 @@ async def _get_power_profile(
         power_profile = await get_power_profile(
             hass,
             sensor_config,
+            source_entity,
             model_info=model_info,
         )
         if power_profile and power_profile.has_sub_profile_select_matchers:

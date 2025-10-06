@@ -447,7 +447,7 @@ async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
 
     source_entity = await create_source_entity(DUMMY_ENTITY_ID, hass)
     power_profiles = [
-        await get_power_profile(hass, {}, ModelInfo("test", "discovery_type_device")),
+        await get_power_profile(hass, {}, source_entity, ModelInfo("test", "discovery_type_device")),
     ]
     result = await initialize_discovery_flow(hass, source_entity, power_profiles)
     result = await confirm_auto_discovered_model(hass, result)

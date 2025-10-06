@@ -551,7 +551,7 @@ async def test_find_model(
     with patch("custom_components.powercalc.power_profile.loader.remote.RemoteLoader.load_library_json") as mock_load_lib:
 
         def load_library_json() -> dict:
-            library_path = get_test_config_dir(f"powercalc_profiles/{library_dir}/library.json") if library_dir else get_library_json_path()
+            library_path = get_test_config_dir(f"library_mock/{library_dir}/library.json") if library_dir else get_library_json_path()
             with open(library_path) as f:
                 return json.load(f)
 

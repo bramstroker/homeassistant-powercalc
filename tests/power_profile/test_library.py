@@ -7,6 +7,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_DISABLE_LIBRARY_DOWNLOAD
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.power_profile.error import LibraryError, LibraryLoadingError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.loader.composite import CompositeLoader
@@ -134,6 +135,7 @@ async def test_exception_is_raised_when_no_model_json_present(
     with pytest.raises(LibraryLoadingError):
         await library.create_power_profile(
             ModelInfo("foo", "bar"),
+            await create_source_entity("light.test", hass),
             get_test_profile_dir("no_model_json"),
         )
 
@@ -159,7 +161,10 @@ async def test_create_power_raise_library_error_when_model_not_found(hass: HomeA
     library = ProfileLibrary(hass, loader=mock_loader)
     await library.initialize()
     with pytest.raises(LibraryError):
-        await library.create_power_profile(ModelInfo("signify", "LCT010"))
+        await library.create_power_profile(
+            ModelInfo("signify", "LCT010"),
+            await create_source_entity("light.test", hass),
+        )
 
 
 async def test_create_power_raise_library_error_when_manufacturer_not_found(hass: HomeAssistant) -> None:
@@ -170,7 +175,10 @@ async def test_create_power_raise_library_error_when_manufacturer_not_found(hass
     library = ProfileLibrary(hass, loader=mock_loader)
     await library.initialize()
     with pytest.raises(LibraryError):
-        await library.create_power_profile(ModelInfo("signify", "LCT010"))
+        await library.create_power_profile(
+            ModelInfo("signify", "LCT010"),
+            await create_source_entity("light.test", hass),
+        )
 
 
 async def test_download_feature_can_be_disabled(hass: HomeAssistant) -> None:

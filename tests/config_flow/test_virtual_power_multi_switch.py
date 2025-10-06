@@ -309,6 +309,7 @@ async def initialize_device_discovery_flow(hass: HomeAssistant, device_entry: De
         await get_power_profile(
             hass,
             {},
+            source_entity,
             ModelInfo(device_entry.manufacturer, device_entry.model),
         ),
     ]
