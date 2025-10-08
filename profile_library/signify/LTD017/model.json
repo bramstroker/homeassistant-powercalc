@@ -2,7 +2,7 @@
   "calculation_strategy": "lut",
   "created_at": "2025-10-08T14:47:08.152473",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly Plus Plug US (SNPL-00116US)",
+  "measure_device": "Shelly Plus Plug US",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 10,
@@ -10,5 +10,8 @@
     "VERSION": "v1.17.22:docker"
   },
   "name": "Hue white ambiance extra bright high lumen dimmable LED smart retrofit recessed 6\" downlight",
-  "standby_power": 0.22
+  "standby_power": 0.22,
+  "aliases": [
+    "578526"
+  ]
 }
