@@ -10,5 +10,6 @@
     "VERSION": "v1.17.22:docker"
   },
   "name": "Gledopto GL-B-004P",
-  "standby_power": 0.36
+  "standby_power": 0.36,
+  "author": "Jurjen <96632856+Coornh@users.noreply.github.com>"
 }
