@@ -1467,6 +1467,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle the initial step."""
 
+        self.is_library_flow = False
         global_config_entry = self.hass.config_entries.async_entry_for_domain_unique_id(
             DOMAIN,
             ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
