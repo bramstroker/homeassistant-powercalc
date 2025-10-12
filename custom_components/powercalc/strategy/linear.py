@@ -6,7 +6,7 @@ from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import fan, light, media_player, vacuum
+from homeassistant.components import fan, light, media_player, vacuum, lawn_mower
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.components.media_player import (
@@ -31,7 +31,7 @@ from custom_components.powercalc.helpers import get_related_entity_by_device_cla
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
-ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN, vacuum.DOMAIN]
+ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN, vacuum.DOMAIN, lawn_mower.DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
