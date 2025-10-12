@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import vacuum, lawn_mower
+from homeassistant.components import lawn_mower, vacuum
 from homeassistant.core import State
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template

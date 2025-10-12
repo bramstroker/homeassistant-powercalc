@@ -6,7 +6,7 @@ from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import fan, light, media_player, vacuum, lawn_mower
+from homeassistant.components import fan, lawn_mower, light, media_player, vacuum
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.components.media_player import (
