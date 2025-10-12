@@ -9,9 +9,9 @@
   },
   "device_type": "television",
   "calculation_strategy": "fixed",
-    "fixed_config": {
+  "fixed_config": {
     "states_power": {
-      "on": 79.80,
+      "on": 79.8,
       "off": 36.09
     }
   },
