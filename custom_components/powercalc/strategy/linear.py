@@ -232,8 +232,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     async def get_value_entity(self) -> SourceEntity:
         """Set the value entity based on the current state."""
-        if self._source_entity.domain == vacuum.DOMAIN and self._attribute is None and self._source_entity.entity_entry:
-            # For vacuum cleaner, battery level is a separate entity
+        if (self._source_entity.domain == vacuum.DOMAIN or self._source_entity.domain == lawn_mower.DOMAIN) and self._attribute is None and self._source_entity.entity_entry:
+            # For vacuum cleaner and lawn mower, battery level is a separate entity
             related_entity = get_related_entity_by_device_class(
                 self._hass,
                 self._source_entity.entity_entry,
