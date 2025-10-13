@@ -7,7 +7,7 @@
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
-  "device_type": "television",
+  "device_type": "generic_iot",
   "calculation_strategy": "fixed",
   "fixed_config": {
     "states_power": {
