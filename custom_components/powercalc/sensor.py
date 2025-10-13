@@ -48,7 +48,6 @@ from .const import (
     CONF_AND,
     CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
-    CONF_CALIBRATE,
     CONF_COMPOSITE,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
@@ -540,10 +539,6 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
         """Convert state power values to Template objects where necessary."""
         return {key: Template(value, hass) if isinstance(value, str) and "{{" in value else value for key, value in states_power.items()}
 
-    def process_calibrate(calibrate: dict) -> list[str]:
-        """Convert calibration dictionary to list of strings."""
-        return [f"{k} -> {v}" for k, v in calibrate.items()]
-
     def process_daily_fixed_energy() -> None:
         """Process daily fixed energy configuration."""
         if CONF_DAILY_FIXED_ENERGY not in sensor_config:
@@ -571,8 +566,6 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
             return
 
         linear_config = copy.copy(sensor_config[CONF_LINEAR])
-        if CONF_CALIBRATE in linear_config:
-            linear_config[CONF_CALIBRATE] = process_calibrate(linear_config[CONF_CALIBRATE])
         sensor_config[CONF_LINEAR] = linear_config
 
     def process_calculation_enabled_condition() -> None:
