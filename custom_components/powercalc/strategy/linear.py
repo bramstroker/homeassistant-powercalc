@@ -132,6 +132,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         calibration_list: list[tuple[int, float]] = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
+        if isinstance(calibrate, dict):
+            calibrate = [f"{key} -> {value}" for key, value in calibrate.items()]
+
         if calibrate is None or len(calibrate) == 0:
             full_range = self.get_entity_value_range()
             min_value = full_range[0]
