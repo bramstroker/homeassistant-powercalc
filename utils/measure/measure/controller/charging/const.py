@@ -8,6 +8,7 @@ class ChargingControllerType(str, Enum):
 
 class ChargingDeviceType(str, Enum):
     VACUUM_ROBOT = "vacuum_robot"
+    LAWN_MOWER_ROBOT = "lawn_mower_robot"
 
 
 class BatteryLevelSourceType(str, Enum):
