@@ -10,6 +10,9 @@
     "VERSION": "v1.13.4:docker"
   },
   "name": "Hue Akari Downlight",
+  "aliases": [
+    "8719514344723"
+  ],
   "standby_power": 0.2,
   "author": "niggles1973 <95966990+niggles1973@users.noreply.github.com>"
 }
