@@ -5,8 +5,9 @@
   "composite_config": [
     {
       "condition": {
+        "entity_id": "[[entity_by_device_class:battery_charging]]",
         "condition": "state",
-        "state": "docked"
+        "state": "on"
       },
       "linear": {
         "calibrate": [

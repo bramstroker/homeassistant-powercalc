@@ -8,6 +8,7 @@ from decimal import Decimal
 from functools import wraps
 from typing import Any, TypeVar
 
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
@@ -160,7 +161,11 @@ def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[s
     return data
 
 
-def get_related_entity_by_device_class(hass: HomeAssistant, entity: RegistryEntry, device_class: SensorDeviceClass) -> str | None:
+def get_related_entity_by_device_class(
+    hass: HomeAssistant,
+    entity: RegistryEntry,
+    device_class: SensorDeviceClass | BinarySensorDeviceClass,
+) -> str | None:
     """Get related entity from same device by device class."""
 
     entity_reg = entity_registry.async_get(hass)
