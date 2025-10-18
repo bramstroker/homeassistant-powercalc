@@ -1,6 +1,5 @@
 {
   "measure_description": "Measurements were taken in several scenarios with different picture profiles. Tested were: playing this YouTube video via the internal YouTube player and via a connected device over HDMI: https://www.youtube.com/watch?v=6FsYk9GIv2Y&t=1781s, and watching channels via the Sat tuner. The TV is an LCD and shows very consistent power consumption across all profiles, so a calculation is possible.",
-  
   "measure_method": "script",
   "measure_device": "Tapo P115",
   "measure_device_firmware": "1.3.4 Build 250403 Rel.150504",
