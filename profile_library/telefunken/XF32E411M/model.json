@@ -12,7 +12,7 @@
   "power_sensor_naming": "{} Device Power",
   "energy_sensor_naming": "{} Device Energy",
   "name": "Telefunken XF32E411M",
-  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_enabled_condition": "{{not is_state('[[entity]]', 'unavailable') }}",
   "standby_power": 0.3,
   "device_type": "television",
   "calculation_strategy": "linear",
