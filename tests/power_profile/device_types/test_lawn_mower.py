@@ -14,7 +14,7 @@ from custom_components.powercalc.const import (
 from tests.common import get_test_profile_dir, run_powercalc_setup
 
 
-async def test_vacuum_robot(
+async def test_lawn_mower(
     hass: HomeAssistant,
 ) -> None:
     """
