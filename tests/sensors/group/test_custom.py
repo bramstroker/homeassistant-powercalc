@@ -28,13 +28,14 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.device_registry import DeviceRegistry
+from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
     async_fire_time_changed,
+    mock_device_registry,
     mock_registry,
     mock_restore_cache_with_extra_data,
 )
@@ -58,11 +59,13 @@ from custom_components.powercalc.const import (
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
+    CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_MODE,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
@@ -81,7 +84,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-from custom_components.powercalc.sensors.group.custom import PreviousStateStore
+from custom_components.powercalc.sensors.group.custom import PreviousStateStore, resolve_entity_ids_recursively
 from tests.common import (
     create_input_boolean,
     create_input_booleans,
@@ -1735,49 +1738,6 @@ async def test_start_at_zero(hass: HomeAssistant, entry_data: dict[str, Any]) ->
         assert hass.states.get("sensor.testgroup_energy").state == "0.1000"
 
 
-async def test_area_group(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
-    area = area_registry.async_get_or_create("Bedroom")
-
-    mock_registry(
-        hass,
-        {
-            "sensor.test_power": RegistryEntryWithDefaults(
-                entity_id="sensor.test_power",
-                unique_id=1111,
-                platform="powercalc",
-                device_class=SensorDeviceClass.POWER,
-                area_id=area.id,
-            ),
-            "sensor.test_energy": RegistryEntryWithDefaults(
-                entity_id="sensor.test_energy",
-                unique_id=2222,
-                platform="powercalc",
-                device_class=SensorDeviceClass.ENERGY,
-                area_id=area.id,
-            ),
-        },
-    )
-
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
-            CONF_AREA: "Bedroom",
-            CONF_CREATE_ENERGY_SENSOR: True,
-            CONF_CREATE_UTILITY_METERS: False,
-            CONF_GROUP_TYPE: GroupType.CUSTOM,
-            CONF_NAME: "TestArea123",
-            CONF_SENSOR_TYPE: SensorType.GROUP,
-        },
-        unique_id="42343887",
-    )
-    config_entry.add_to_hass(hass)
-
-    await run_powercalc_setup(hass, {})
-
-    power_state = hass.states.get("sensor.testarea123_power")
-    assert power_state
-
-
 async def test_energy_throttle(hass: HomeAssistant) -> None:
     """Test that energy sensor is not updated more than once per minute"""
 
@@ -1836,6 +1796,92 @@ async def test_energy_throttle_disabled(hass: HomeAssistant) -> None:
         hass.states.async_set("sensor.b_energy", "5.00")
         await hass.async_block_till_done()
         assert hass.states.get("sensor.testgroup_energy").state == "9.0000"
+
+
+async def test_resolve_entity_ids_area(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+    area = area_registry.async_get_or_create("Bedroom")
+
+    mock_registry(
+        hass,
+        {
+            "sensor.test_power": RegistryEntryWithDefaults(
+                entity_id="sensor.test_power",
+                unique_id=1111,
+                platform="powercalc",
+                device_class=SensorDeviceClass.POWER,
+                area_id=area.id,
+            ),
+            "sensor.test_energy": RegistryEntryWithDefaults(
+                entity_id="sensor.test_energy",
+                unique_id=2222,
+                platform="powercalc",
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+        },
+    )
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_AREA: "Bedroom",
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_GROUP_TYPE: GroupType.CUSTOM,
+            CONF_NAME: "TestArea123",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+        },
+        unique_id="42343887",
+    )
+    resolved = await resolve_entity_ids_recursively(hass, config_entry, SensorDeviceClass.ENERGY)
+    assert resolved == {"sensor.test_energy"}
+
+    resolved = await resolve_entity_ids_recursively(hass, config_entry, SensorDeviceClass.POWER)
+    assert resolved == {"sensor.test_power"}
+
+
+async def test_resolve_entity_ids_skips_tasmota_yesterday_and_today(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "sensor.test_total": RegistryEntryWithDefaults(
+                entity_id="sensor.test_total",
+                unique_id=1111,
+                platform="tasmota",
+                device_class=SensorDeviceClass.ENERGY,
+                device_id="device_1",
+            ),
+            "sensor.test_yesterday": RegistryEntryWithDefaults(
+                entity_id="sensor.test_yesterday",
+                unique_id=2222,
+                platform="tasmota",
+                device_class=SensorDeviceClass.ENERGY,
+                device_id="device_1",
+            ),
+        },
+    )
+
+    mock_device_registry(
+        hass,
+        {
+            "device_1": DeviceEntry(
+                id="device_1",
+                manufacturer="Tasmota",
+                model="Generic",
+            ),
+        },
+    )
+
+    group_entry = MockConfigEntry(
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_MEMBER_DEVICES: ["device_1"],
+            CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        },
+    )
+    resolved = await resolve_entity_ids_recursively(hass, group_entry, SensorDeviceClass.ENERGY)
+    assert resolved == {"sensor.test_total"}
 
 
 async def _create_energy_group(

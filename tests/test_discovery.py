@@ -216,84 +216,76 @@ async def test_config_entry_overrides_autodiscovered(
     assert not caplog.records
 
 
-async def test_autodiscover_skips_disabled_entities(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
-) -> None:
-    """Auto discovery should not consider disabled entities"""
-    mock_entity_with_model_information(
-        "light.test",
-        "signify",
-        "LCT010",
-        disabled_by=er.RegistryEntryDisabler.HASS,
-    )
-
-    await run_powercalc_setup(hass, {})
-
-    assert not hass.states.get("sensor.test_power")
-
-
-async def test_autodiscover_skips_entities_with_empty_manufacturer(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
-) -> None:
-    mock_entity_with_model_information("light.test", "", "LCT010")
-
-    await run_powercalc_setup(hass, {})
-
-    assert not hass.states.get("sensor.test_power")
-
-
-async def test_autodiscover_skips_diagnostics_entities(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
-) -> None:
-    """Auto discovery should not consider entities with entity_category diagnostic"""
-
-    mock_entity_with_model_information(
-        "switch.test",
-        "Shelly",
-        "Shelly Plug S",
-        entity_category=EntityCategory.DIAGNOSTIC,
-    )
-
-    await run_powercalc_setup(hass, {})
-
-    assert not hass.states.get("sensor.test_device_power")
-
-
-async def test_autodiscover_skips_printer_ink(
+@pytest.mark.parametrize(
+    "entity_id,manufacturer,model,extra_kwargs",
+    [
+        # Test case for disabled entities
+        (
+            "light.test",
+            "signify",
+            "LCT010",
+            {"disabled_by": er.RegistryEntryDisabler.HASS},
+        ),
+        # Test case for entities with empty manufacturer
+        (
+            "light.test",
+            "",
+            "LCT010",
+            {},
+        ),
+        # Test case for diagnostic entities
+        (
+            "switch.test",
+            "Shelly",
+            "Shelly Plug S",
+            {"entity_category": EntityCategory.DIAGNOSTIC},
+        ),
+        # Test case for printer ink entities
+        (
+            "sensor.epson_et_3760_series_black_ink",
+            "EPSON",
+            "ET-3760 Series",
+            {"unit_of_measurement": "%"},
+        ),
+        # Test case for unsupported domains
+        (
+            "device_tracker.test",
+            "signify",
+            "LCT010",
+            {},
+        ),
+        # Test case for unknown device type
+        (
+            "vacuum.test",
+            "test",
+            "unknown_device_type",
+            {},
+        ),
+    ],
+)
+async def test_autodiscover_skipped(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
+    entity_id: str,
+    manufacturer: str,
+    model: str,
+    extra_kwargs: dict,
 ) -> None:
-    """Auto discovery should not consider printer entities with ink in the name"""
+    """Test that auto discovery skips entities based on various conditions."""
+
+    hass.config.config_dir = get_test_config_dir()
 
     mock_entity_with_model_information(
-        "sensor.epson_et_3760_series_black_ink",
-        "EPSON",
-        "ET-3760 Series",
-        unit_of_measurement="%",
+        entity_id,
+        manufacturer,
+        model,
+        **extra_kwargs,
     )
 
     await run_powercalc_setup(hass, {})
 
     assert len(mock_flow_init.mock_calls) == 0
-
-
-async def test_autodiscover_skips_unsupported_domains(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
-) -> None:
-    mock_entity_with_model_information(
-        "device_tracker.test",
-        "signify",
-        "LCT010",
-    )
-
-    await run_powercalc_setup(hass, {})
-
-    assert not hass.states.get("sensor.test_power")
 
 
 async def test_autodiscover_continues_when_one_entity_fails(

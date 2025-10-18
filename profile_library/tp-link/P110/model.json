@@ -13,5 +13,8 @@
   "calculation_strategy": "fixed",
   "only_self_usage": true,
   "created_at": "2025-03-05T17:26:19",
+  "aliases": [
+    "256"
+  ],
   "author": "Alex Zamponi <562324+alexz707@users.noreply.github.com>"
 }

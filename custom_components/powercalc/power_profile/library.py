@@ -5,6 +5,7 @@ import os
 import re
 from typing import Any, NamedTuple, cast
 
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.singleton import singleton
@@ -159,7 +160,10 @@ class ProfileLibrary:
             # If ANY namespaced entity:* placeholder is present, check if the specific one for device_class is needed
             for key in {p for p in placeholders if p.startswith("entity_by_device_class:")}:
                 _, device_class = key.split(":", 1)
-                device_class = SensorDeviceClass(device_class)
+                try:
+                    device_class = SensorDeviceClass(device_class)
+                except ValueError:
+                    device_class = cast(SensorDeviceClass, BinarySensorDeviceClass(device_class))
                 related_entity = get_related_entity_by_device_class(self._hass, source_entity.entity_entry, device_class)  # type: ignore
                 if not related_entity:
                     raise LibraryError(f"Could not find related entity for device class {device_class} of entity {source_entity.entity_id}")
