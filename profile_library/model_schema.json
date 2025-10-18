@@ -107,8 +107,10 @@
         "smart_dimmer",
         "smart_switch",
         "smart_speaker",
+        "television",
         "network",
-        "vacuum_robot"
+        "vacuum_robot",
+        "lawn_mower_robot"
       ],
       "description": "Type of device"
     },

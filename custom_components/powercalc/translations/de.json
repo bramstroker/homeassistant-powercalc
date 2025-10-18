@@ -220,7 +220,7 @@
       },
       "library_multi_profile": {
         "data": {
-          "model": "Select model"
+          "model": "Modell wählen"
         },
         "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
         "title": "Bibliothek"
@@ -427,7 +427,7 @@
   },
   "options": {
     "abort": {
-      "model_not_support": "Model not supported"
+      "model_not_support": "Model nicht unterstützt"
     },
     "error": {
       "fixed_mandatory": "Sie müssen mindestens eines von Leistung, Leistung-Template oder Leistung je Zustand angeben",

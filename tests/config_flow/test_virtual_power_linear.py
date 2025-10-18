@@ -4,6 +4,7 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
+    CONF_CALIBRATE,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
@@ -42,6 +43,17 @@ async def test_create_linear_sensor_entry(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
+
+async def test_calibrate_list(hass: HomeAssistant) -> None:
+    result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.LINEAR)
+    result = await set_virtual_power_configuration(
+        hass,
+        result,
+        {CONF_CALIBRATE: {"1": 10, "20": 25, "40": 50}},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
 async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant) -> None:

@@ -6,7 +6,7 @@ from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import fan, light, media_player, vacuum
+from homeassistant.components import fan, lawn_mower, light, media_player, vacuum
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.components.media_player import (
@@ -31,7 +31,7 @@ from custom_components.powercalc.helpers import get_related_entity_by_device_cla
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
-ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN, vacuum.DOMAIN]
+ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN, vacuum.DOMAIN, lawn_mower.DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
@@ -132,6 +132,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         calibration_list: list[tuple[int, float]] = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
+        if isinstance(calibrate, dict):
+            calibrate = [f"{key} -> {value}" for key, value in calibrate.items()]
+
         if calibrate is None or len(calibrate) == 0:
             full_range = self.get_entity_value_range()
             min_value = full_range[0]
@@ -232,8 +235,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     async def get_value_entity(self) -> SourceEntity:
         """Set the value entity based on the current state."""
-        if self._source_entity.domain == vacuum.DOMAIN and self._attribute is None and self._source_entity.entity_entry:
-            # For vacuum cleaner, battery level is a separate entity
+        if self._source_entity.domain in (vacuum.DOMAIN, lawn_mower.DOMAIN) and self._attribute is None and self._source_entity.entity_entry:
+            # For vacuum cleaner and lawn mower, battery level is a separate entity
             related_entity = get_related_entity_by_device_class(
                 self._hass,
                 self._source_entity.entity_entry,

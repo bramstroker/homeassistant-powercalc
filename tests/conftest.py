@@ -2,7 +2,8 @@ import json
 import os
 import shutil
 import uuid
-from collections.abc import Generator
+from collections.abc import Callable, Generator
+from datetime import timedelta
 from typing import Any, Protocol
 from unittest.mock import AsyncMock, patch
 
@@ -14,6 +15,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.util import Throttle
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
@@ -35,17 +37,6 @@ from tests.common import mock_area_registry
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(enable_custom_integrations: bool) -> Generator:
     yield
-
-
-@pytest.fixture(autouse=True)
-def expected_lingering_timers() -> bool:
-    """Temporary ability to bypass test failures.
-    Parametrize to True to bypass the pytest failure.
-    @pytest.mark.parametrize("expected_lingering_timers", [True])
-    This should be removed when all lingering timers have been cleaned up.
-    See https://github.com/MatthewFlamm/pytest-homeassistant-custom-component/issues/153
-    """
-    return True
 
 
 @pytest.fixture
@@ -184,3 +175,55 @@ def mock_remote_loader(request: SubRequest, hass: HomeAssistant) -> Generator:
 
         mock_load_lib.side_effect = load_library_json
         yield
+
+
+def _collect_throttles(func: Callable) -> Generator[Throttle]:
+    """Yield any captured Throttle objects across wraps."""
+    seen = set()
+    while func is not None:
+        closure = getattr(func, "__closure__", ()) or ()
+        for cell in closure:
+            obj = getattr(cell, "cell_contents", None)
+            if obj is not None and id(obj) not in seen and obj.__class__.__name__ == "Throttle":
+                seen.add(id(obj))
+                yield obj
+        func = getattr(func, "__wrapped__", None)
+
+
+def _defang_throttle(thrs: list[Throttle]) -> None:
+    for t in thrs:
+        t.min_time = timedelta(0)
+        t.limit_no_throttle = None
+
+
+def _restore_throttle(originals: list[tuple[Throttle, timedelta, timedelta | None]]) -> None:
+    for t, min_time, limit_nt in originals:
+        t.min_time = min_time
+        t.limit_no_throttle = limit_nt
+
+
+_ORIGINAL_THROTTLES = []
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _disable_power_throttle_by_default() -> None:
+    from custom_components.powercalc.sensors.power import VirtualPowerSensor
+
+    target = VirtualPowerSensor._handle_source_entity_state_change_throttled  # noqa: SLF001
+    throttles = list(_collect_throttles(target))
+    if not throttles:
+        return
+
+    _ORIGINAL_THROTTLES[:] = [(t, t.min_time, t.limit_no_throttle) for t in throttles]
+
+    _defang_throttle(throttles)
+
+
+@pytest.fixture
+def enable_throttle() -> Generator[None]:
+    """Use real throttling in this test, then turn it off again."""
+    _restore_throttle(_ORIGINAL_THROTTLES)
+    try:
+        yield
+    finally:
+        _defang_throttle([t for t, *_ in _ORIGINAL_THROTTLES])

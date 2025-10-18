@@ -19,6 +19,7 @@ from measure.runner.const import QUESTION_CHARGING_DEVICE_TYPE
 
 DEVICE_TYPE_DOMAIN = {
     ChargingDeviceType.VACUUM_ROBOT: "vacuum",
+    ChargingDeviceType.LAWN_MOWER_ROBOT: "lawn_mower",
 }
 
 ATTR_BATTERY_LEVEL = "battery_level"
