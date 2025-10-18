@@ -2,7 +2,6 @@ import logging
 import uuid
 
 import pytest
-from custom_components.test.light import MockLight
 from homeassistant.components import light
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
@@ -28,6 +27,7 @@ from pytest_homeassistant_custom_component.common import (
 )
 
 from custom_components.powercalc import CONF_CREATE_UTILITY_METERS
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_ALL,
@@ -52,12 +52,15 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.group_include.include import find_entities
+from custom_components.test.light import MockLight
 from tests.common import (
     create_discoverable_light,
     create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup,
 )
+from tests.config_flow.common import initialize_discovery_flow
+from tests.conftest import MockEntityWithModel
 
 
 @pytest.mark.parametrize(
@@ -1331,6 +1334,32 @@ async def test_irrelevant_entity_domains_are_skipped(hass: HomeAssistant, caplog
 
     assert "scene.test" not in caplog.text
     assert "event.test" not in caplog.text
+
+
+async def test_prevent_duplicate_entities_when_using_include_all(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "All",
+                CONF_INCLUDE: {
+                    CONF_ALL: None,
+                },
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    source_entity = await create_source_entity("light.test", hass)
+    await initialize_discovery_flow(hass, source_entity, confirm_autodiscovered_model=True)
+
+    assert hass.states.get("sensor.test_power")
+    assert not hass.states.get("sensor.test_power_2")
 
 
 def _create_powercalc_config_entry(
