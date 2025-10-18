@@ -191,7 +191,9 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
                     sub_strategy.condition_config,
                     track_templates,
                 )
-        return track_templates
+
+        track_entities = [entity for sub_strategy in self.strategies for entity in sub_strategy.strategy.get_entities_to_track()]
+        return track_templates + track_entities
 
     def can_calculate_standby(self) -> bool:
         """Return if this strategy can calculate standby power."""
