@@ -1,0 +1,14 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-10-18T22:51:14.407086",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug S",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 4,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.24:docker"
+  },
+  "name": "Aqara LED Bulb T2(GU10, CCT) (Color: White, SKU: AL230GLW02, model: LB-L03E, 4.9 W, 100-240 V, 50/60 Hz, 450 lm @ 2700K, CRI: 90, beam angle: 50\u00b0)",
+  "standby_power": 0.39
+}
