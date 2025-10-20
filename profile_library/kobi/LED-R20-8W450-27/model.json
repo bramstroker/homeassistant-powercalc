@@ -1,0 +1,18 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-10-20T06:54:05.787604",
+  "measure_description": "Measured with utils/measure script using a Sonoff S31 and a Lutron Diva DVRF-6L-WH dimmer with trim 10",
+  "measure_device": "Sonoff S31",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 5,
+    "VERSION": "v1.17.24:docker"
+  },
+  "name": "Kobi R20 LED Bulb - 8W 450lm (2700k)",
+  "aliases": [
+    "LED-8R2027"
+  ],    
+  "standby_power": 0,
+  "author": "sg1888 <sg1888@users.noreply.github.com>"
+}
