@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-10-20T00:08:23.585178",
+  "measure_description": "Measured with utils/measure script using a Sonoff S31 and a Lutron Diva DVRF-6L-WH dimmer with trim 14",
+  "measure_device": "Sonoff S31",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 5,
+    "VERSION": "v1.17.24:docker"
+  },
+  "name": "FEIT E12 Candelabra LED Bulb - 4.8W 310lm (3000k)",
+  "standby_power": 0,
+  "author": "sg1888 <sg1888@users.noreply.github.com>"
+}
