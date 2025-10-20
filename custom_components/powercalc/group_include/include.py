@@ -37,11 +37,11 @@ async def find_entities(
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug("Found possible include entities: %s", [entity.entity_id for entity in source_entities])
 
-    source_entity_powercalc_entity_map: dict[str, list] = domain_data.get(DATA_CONFIGURED_ENTITIES, {})
+    source_entity_powercalc_entity_map: dict[str, list[tuple[Entity, bool]]] = domain_data.get(DATA_CONFIGURED_ENTITIES, {})
     powercalc_entities: dict[str, Entity] = domain_data.get(DATA_ENTITIES, {})
     for source_entity in source_entities:
         if source_entity.entity_id in source_entity_powercalc_entity_map:
-            resolved_entities.extend(source_entity_powercalc_entity_map[source_entity.entity_id])
+            resolved_entities.extend([entity for entity, _ in source_entity_powercalc_entity_map[source_entity.entity_id]])
             continue
 
         if source_entity.entity_id in powercalc_entities:

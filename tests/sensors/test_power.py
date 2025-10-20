@@ -1,8 +1,10 @@
 import logging
 import uuid
+from collections.abc import Generator
 from datetime import timedelta
 
 import pytest
+from freezegun.api import FrozenDateTimeFactory
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
@@ -840,3 +842,63 @@ async def test_availability_entity(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "10.00"
+
+
+async def test_throttle_within_1_second(hass: HomeAssistant, enable_throttle: Generator[None], caplog: pytest.LogCaptureFixture) -> None:
+    """Test triggering multiple state changes within the 1 second throttle interval"""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_NAME: "Test",
+            CONF_FIXED: {CONF_POWER: 10},
+        },
+    )
+
+    # Trigger 4 state changes directly after another within 1 second
+    hass.states.async_set("light.test", STATE_ON)
+    hass.states.async_set("light.test", STATE_OFF)
+    hass.states.async_set("light.test", STATE_ON)
+    hass.states.async_set("light.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    # Power sensor state should match the first state change
+    assert hass.states.get("sensor.test_power").state == "10.00"
+
+    # Only 1 log entry should be present indicating throttling is active
+    throttle_logs = [record for record in caplog.records if "State changed" in record.message]
+    assert len(throttle_logs) == 1
+
+
+async def test_throttle_above_1_second(
+    hass: HomeAssistant,
+    enable_throttle: Generator[None],
+    freezer: FrozenDateTimeFactory,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test triggering multiple state changes above the 1 second throttle interval"""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_NAME: "Test",
+            CONF_FIXED: {CONF_POWER: 10},
+        },
+    )
+
+    # Trigger 2 state changes directly after another within 1 second
+    hass.states.async_set("light.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    freezer.tick(timedelta(seconds=3))
+    async_fire_time_changed(hass)
+
+    hass.states.async_set("light.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    # Power sensor state should match the first state change
+    assert hass.states.get("sensor.test_power").state == "0.00"
+
+    # O2 log entries should be present indicating throttling is active
+    throttle_logs = [record for record in caplog.records if "State changed" in record.message]
+    assert len(throttle_logs) == 2
