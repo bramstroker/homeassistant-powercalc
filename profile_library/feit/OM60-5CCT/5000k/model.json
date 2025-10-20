@@ -1,0 +1,14 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-10-19T07:05:41.997918",
+  "measure_description": "Measured with utils/measure script using a Sonoff S31 and a Lutron Diva DVRF-6L-WH dimmer with trim 20",
+  "measure_device": "Sonoff S31",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 5,
+    "VERSION": "v1.17.24:docker"
+  },
+  "name": "FEIT A19 Adjustable 5-CCT LED Bulb - 8.8W 800lm (5000k)",
+  "standby_power": 0
+}
