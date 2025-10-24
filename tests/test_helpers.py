@@ -32,6 +32,7 @@ from tests.common import get_test_profile_dir
         (lambda hass: 20.5, Decimal("20.5")),
         (lambda hass: "foo", None),
         (lambda hass: Decimal("40.65"), Decimal("40.65")),
+        (lambda hass: "40,65", Decimal("40.65")),
         (lambda hass: (1, 2), None),
     ],
 )

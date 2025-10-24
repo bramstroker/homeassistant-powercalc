@@ -43,6 +43,8 @@ async def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
             if power == "unknown":
                 return None
 
+        if isinstance(power, str):
+            power = power.strip().replace(",", ".")
         return Decimal(power)  # type: ignore[arg-type]
     except (decimal.DecimalException, ValueError):
         _LOGGER.error("Could not convert power value %s to decimal", power)
