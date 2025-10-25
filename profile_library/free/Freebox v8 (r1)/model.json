@@ -3,10 +3,7 @@
   "measure_method": "script",
   "measure_device": "TP-Link Tapo P110",
   "name": "Freebox v8 (r1)",
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
+  "discovery_by": "device",
   "device_type": "network",
   "calculation_strategy": "fixed",
   "fixed_config": {
