@@ -1,5 +1,4 @@
 {
-  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
   "created_at": "2025-10-13T17:19:21.329606",
   "device_type": "lawn_mower_robot",
   "calculation_strategy": "composite",
@@ -14,7 +13,6 @@
         "state": "on"
       },
       "linear": {
-        "attribute": null,
         "calibrate": [
           "0 -> 64.11",
           "1 -> 63.92",
@@ -106,8 +104,8 @@
     {
       "fixed": {
         "states_power": {
-          "mowing": 2.15,
-          "returning": 2.15
+          "mowing": 11.55,
+          "returning": 11.55
         }
       }
     }
@@ -121,6 +119,5 @@
     "VERSION": "master"
   },
   "name": "YUKA mini 600",
-  "standby_power": 11.8,
   "author": "Alexandre Bertrand <alexandrebertrand96@gmail.com>"
 }
