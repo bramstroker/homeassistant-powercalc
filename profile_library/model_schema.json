@@ -216,6 +216,10 @@
         }
       }
     },
+    "is_dumb_bulb": {
+      "type": "boolean",
+      "description": "The profile is for a dumb light bulb, not having smart capabilities"
+    },
     "name": {
       "type": "string",
       "description": "The full name"
