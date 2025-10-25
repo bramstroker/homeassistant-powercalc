@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-10-18T10:05:00.720472",
+  "measure_description": "Measured with utils/measure script using Lutron Caseta Diva with Trim 14",
+  "measure_device": "Sonoff S31",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 3,
+    "SLEEP_TIME": 10,
+    "VERSION": "v1.17.23:docker"
+  },
+  "name": "FEIT BR30 LED Bulb - BPCEBR30/DM/LED - 13W, 750lm, (2700k)",
+  "standby_power": 0.0,
+  "author": "sg1888 <sg1888@users.noreply.github.com>"
+}
