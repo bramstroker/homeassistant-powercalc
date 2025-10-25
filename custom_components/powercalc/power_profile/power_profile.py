@@ -77,7 +77,7 @@ DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
     DeviceType.FAN: FAN_DOMAIN,
-    DeviceType.GENERIC_IOT: SENSOR_DOMAIN,
+    DeviceType.GENERIC_IOT: {SENSOR_DOMAIN, MEDIA_PLAYER_DOMAIN},
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
     DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
