@@ -48,6 +48,7 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
+from homeassistant.util import Throttle
 from homeassistant.util.unit_conversion import (
     BaseUnitConverter,
     EnergyConverter,
@@ -425,12 +426,14 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         # Remove own entity from entities, when it happens to be there. To prevent recursion
         entities.discard(entity_id)
         self._entities = entities
+        self._sensor_config = sensor_config
         if self._is_energy_sensor:
             self._rounding_digits = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
+            self._update_interval: int = int(sensor_config.get(CONF_GROUP_UPDATE_INTERVAL, 60))
         else:
             self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
+            self._update_interval = 2
         self._attr_suggested_display_precision = self._rounding_digits
-        self._sensor_config = sensor_config
         if unique_id:
             self._attr_unique_id = unique_id
         self.entity_id = entity_id
@@ -442,7 +445,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._group_type = group_type
         self._start_time: float = time.time()
         self._last_update_time: float = 0
-        self._update_interval: int = int(self._sensor_config.get(CONF_GROUP_UPDATE_INTERVAL, 60))
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -490,6 +492,12 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         calculated_new_state = self.calculate_new_state(new_state)
         self.set_new_state(calculated_new_state)
 
+    @Throttle(timedelta(seconds=2))
+    @callback
+    def on_state_change_throttled(self, event: Event[EventStateChangedData]) -> None:
+        """Throttled version of on_state_change, triggered when one of the group entities changes state."""
+        self.on_state_change(event)
+
     async def init_domain_group(self) -> None:
         if self._group_type != GroupType.DOMAIN:
             return
@@ -516,11 +524,13 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             self.async_write_ha_state()
             return
 
+        # Use throttled version for power sensors, regular version for energy sensors
+        callback_method = self.on_state_change_throttled if not self._is_energy_sensor else self.on_state_change
         self.async_on_remove(
             async_track_state_change_event(
                 self.hass,
                 self._entities,
-                self.on_state_change,
+                callback_method,
             ),
         )
 

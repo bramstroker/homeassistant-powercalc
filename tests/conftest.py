@@ -207,10 +207,18 @@ _ORIGINAL_THROTTLES = []
 
 @pytest.fixture(autouse=True, scope="session")
 def _disable_power_throttle_by_default() -> None:
+    from custom_components.powercalc.sensors.group.custom import GroupedSensor
     from custom_components.powercalc.sensors.power import VirtualPowerSensor
 
-    target = VirtualPowerSensor._handle_source_entity_state_change_throttled  # noqa: SLF001
-    throttles = list(_collect_throttles(target))
+    # Disable throttling for VirtualPowerSensor
+    target1 = VirtualPowerSensor._handle_source_entity_state_change_throttled  # noqa: SLF001
+    throttles1 = list(_collect_throttles(target1))
+
+    # Disable throttling for GroupedSensor
+    target2 = GroupedSensor.on_state_change_throttled
+    throttles2 = list(_collect_throttles(target2))
+
+    throttles = throttles1 + throttles2
     if not throttles:
         return
 

@@ -1,10 +1,12 @@
 import logging
+from collections.abc import Generator
 from datetime import timedelta
 from typing import Any
 from unittest.mock import patch
 
 import pytest
 from freezegun import freeze_time
+from freezegun.api import FrozenDateTimeFactory
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.sensor import (
     SensorDeviceClass,
@@ -1796,6 +1798,94 @@ async def test_energy_throttle_disabled(hass: HomeAssistant) -> None:
         hass.states.async_set("sensor.b_energy", "5.00")
         await hass.async_block_till_done()
         assert hass.states.get("sensor.testgroup_energy").state == "9.0000"
+
+
+async def test_power_throttle(
+    hass: HomeAssistant,
+    enable_throttle: Generator[None],
+    freezer: FrozenDateTimeFactory,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test that power sensor updates are throttled."""
+
+    group_entity = "sensor.testgroup_power"
+    member_1_entity = "sensor.test_power"
+    member_2_entity = "sensor.test2_power"
+
+    async def set_states(states: list[tuple[str, str]]) -> None:
+        for entity_id, value in states:
+            hass.states.async_set(entity_id, value)
+        await hass.async_block_till_done()
+
+    def advance(seconds: int) -> None:
+        freezer.tick(timedelta(seconds=seconds))
+        async_fire_time_changed(hass)
+
+    def assert_group(value: str) -> None:
+        assert hass.states.get(group_entity).state == value
+
+    def assert_group_state_change_count(expected: int) -> None:
+        log_marker = "Group sensor sensor.testgroup_power. State change"
+        count = sum(log_marker in rec.message for rec in caplog.records)
+        assert count == expected, f"Expected {expected} state change(s), got {count}"
+
+    await run_powercalc_setup(
+        hass,
+        [
+            get_simple_fixed_config("switch.test"),
+            get_simple_fixed_config("switch.test2"),
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_ENTITIES: [
+                    {CONF_ENTITY_ID: "switch.test"},
+                    {CONF_ENTITY_ID: "switch.test2"},
+                ],
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+                CONF_CREATE_ENERGY_SENSOR: False,
+            },
+        ],
+    )
+
+    # Initial member states, spaced so throttling windows don't overlap
+    hass.states.async_set(member_1_entity, "1.00")
+    await hass.async_block_till_done()
+    freezer.tick(timedelta(seconds=5))
+    hass.states.async_set(member_2_entity, "1.00")
+    await hass.async_block_till_done()
+
+    # Act & Assert: window #1
+    caplog.clear()
+    advance(3)
+
+    await set_states(
+        [
+            (member_1_entity, "2.00"),
+            (member_2_entity, "3.00"),
+        ],
+    )
+
+    # Only the first state change in the throttle window should be registered:
+    #  test_power 2.00 + test2_power 1.00 = 3.00
+    assert_group("3.00")
+    assert_group_state_change_count(1)
+
+    # Act & Assert: window #2
+    caplog.clear()
+    advance(3)
+
+    await set_states(
+        [
+            (member_2_entity, "6.00"),
+            (member_1_entity, "2.00"),
+            (member_1_entity, "3.00"),
+            (member_2_entity, "3.00"),
+        ],
+    )
+
+    # Again, only the first change within the window should register:
+    #  test_power 2.00 + test2_power 6.00 = 8.00
+    assert_group("8.00")
+    assert_group_state_change_count(1)
 
 
 async def test_resolve_entity_ids_area(hass: HomeAssistant, area_registry: AreaRegistry) -> None:

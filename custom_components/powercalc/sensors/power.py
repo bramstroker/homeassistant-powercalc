@@ -60,7 +60,6 @@ from custom_components.powercalc.const import (
     CONF_DELAY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_STANDBY_POWER,
-    CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
@@ -366,7 +365,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._standby_power_on = standby_power_on
         self._attr_force_update = True
         self._attr_unique_id = unique_id
-        self._update_frequency: timedelta = sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY)  # type: ignore
         self._multiply_factor = sensor_config.get(CONF_MULTIPLY_FACTOR)
         self._multiply_factor_standby = bool(sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY, False))
         self._ignore_unavailable_state = bool(sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE, False))
