@@ -432,7 +432,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             self._update_interval: int = int(sensor_config.get(CONF_GROUP_UPDATE_INTERVAL, 60))
         else:
             self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
-            self._update_interval = 2
         self._attr_suggested_display_precision = self._rounding_digits
         if unique_id:
             self._attr_unique_id = unique_id
