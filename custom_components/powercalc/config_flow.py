@@ -121,7 +121,7 @@ from .const import (
 )
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
-from .flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
+from .flow_helper.common import PowercalcFlow, PowercalcFormStep, PowercalcOptionFlowProtocol, Step, fill_schema_defaults
 from .flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from .flow_helper.group import (
     GroupConfigFlow,
@@ -424,7 +424,7 @@ STRATEGY_SCHEMAS: dict[CalculationStrategy, vol.Schema] = {
 
 
 # noinspection PyTypeChecker
-class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
+class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, PowercalcFlow):
     def __init__(self) -> None:
         """Initialize options flow."""
         self.sensor_config: ConfigType = {}
@@ -1426,7 +1426,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         return self.async_create_entry(title=str(self.name), data=self.sensor_config)
 
 
-class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
+class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow, PowercalcOptionFlowProtocol):
     """Handle an option flow for PowerCalc."""
 
     def __init__(self, config_entry: ConfigEntry) -> None:
@@ -1439,6 +1439,15 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         self.source_entity_id: str = self.sensor_config.get(CONF_ENTITY_ID)  # type: ignore
         self.strategy = self.sensor_config.get(CONF_MODE)
         self.group_flow = GroupOptionsFlow(self)
+
+    @callback
+    def abort_if_unique_id_configured(self) -> None:
+        """Return if unique_id is already configured."""
+        return
+
+    async def async_set_unique_id(self, unique_id: str) -> None:
+        """Set the unique ID of the flow."""
+        return
 
     async def async_step_init(
         self,

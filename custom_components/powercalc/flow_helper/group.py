@@ -272,7 +272,7 @@ def create_group_selector(
     )
 
 
-async def create_schema_tracked_untracked_auto(hass: HomeAssistant) -> dict[str, Any]:
+async def create_schema_tracked_untracked_auto(hass: HomeAssistant) -> vol.Schema:
     """Handle the flow for tracked/untracked group sensor."""
     tracked_entities = await find_auto_tracked_power_entities(hass)
 
@@ -292,7 +292,7 @@ async def create_schema_group_tracked_untracked_manual(
     hass: HomeAssistant,
     user_input: dict[str, Any] | None = None,
     schema: vol.Schema | None = None,
-) -> dict[str, Any]:
+) -> vol.Schema:
     """Handle the flow for tracked/untracked group sensor."""
     if not schema:
         schema = SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL
@@ -322,7 +322,7 @@ class GroupConfigFlow:
     We deliberately keep this controller dumb: it only handles group UX.
     """
 
-    def __init__(self, flow: PowercalcOptionFlowProtocol) -> None:
+    def __init__(self, flow: PowercalcFlow) -> None:
         self.flow = flow
 
     async def async_step_menu_group(self) -> FlowResult:
@@ -418,7 +418,7 @@ class GroupConfigFlow:
 class GroupOptionsFlow:
     """Handle an option flow for PowerCalc."""
 
-    def __init__(self, flow: PowercalcFlow) -> None:
+    def __init__(self, flow: PowercalcOptionFlowProtocol) -> None:
         self.flow = flow
 
     async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> FlowResult:

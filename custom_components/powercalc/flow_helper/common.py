@@ -1,5 +1,5 @@
 import copy
-from collections.abc import Callable, Coroutine
+from collections.abc import Callable, Container, Coroutine, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, Protocol
@@ -72,7 +72,14 @@ class PowercalcFlow(Protocol):
     selected_sensor_type: str | None
 
     async def async_set_unique_id(self, unique_id: str) -> None: ...
-    def async_show_menu(self, *, step_id: str, menu_options: list[str]) -> FlowResult: ...
+
+    def async_show_menu(
+        self,
+        *,
+        step_id: str | None = None,
+        menu_options: Container[str],
+        description_placeholders: Mapping[str, str] | None = None,
+    ) -> FlowResult: ...
     async def handle_form_step(
         self,
         form_step: PowercalcFormStep,
@@ -82,6 +89,7 @@ class PowercalcFlow(Protocol):
 
 
 class PowercalcOptionFlowProtocol(PowercalcFlow, Protocol):
+    config_entry: Any
     async def async_handle_options_step(self, user_input: dict[str, Any] | None, schema: vol.Schema, step: Step) -> FlowResult: ...
 
 
