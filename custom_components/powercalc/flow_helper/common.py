@@ -91,6 +91,7 @@ class PowercalcFlow(Protocol):
 
 class PowercalcOptionFlowProtocol(PowercalcFlow, Protocol):
     config_entry: Any
+
     async def async_handle_options_step(self, user_input: dict[str, Any] | None, schema: vol.Schema, step: Step) -> FlowResult: ...
 
 
