@@ -1445,7 +1445,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow, PowercalcOptionFlow
         """Return if unique_id is already configured."""
         return
 
-    async def async_set_unique_id(self, unique_id: str) -> None:
+    async def async_set_unique_id(self, unique_id: str | None, raise_on_progress: bool = True) -> None:
         """Set the unique ID of the flow."""
         return
 

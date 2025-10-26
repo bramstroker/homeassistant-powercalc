@@ -71,13 +71,14 @@ class PowercalcFlow(Protocol):
     name: str | None
     selected_sensor_type: str | None
 
-    async def async_set_unique_id(self, unique_id: str) -> None: ...
+    async def async_set_unique_id(self, unique_id: str | None, raise_on_progress: bool = True) -> None: ...
 
     def async_show_menu(
         self,
         *,
         step_id: str | None = None,
-        menu_options: Container[str],
+        menu_options: Container[str] | dict[str, str],
+        sort: bool = False,
         description_placeholders: Mapping[str, str] | None = None,
     ) -> FlowResult: ...
     async def handle_form_step(
