@@ -1,5 +1,4 @@
 import voluptuous as vol
-from custom_components.test.light import MockLight
 from homeassistant import data_entry_flow
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.const import DAILY
@@ -53,6 +52,7 @@ from custom_components.powercalc.const import (
     GroupType,
 )
 from custom_components.powercalc.sensors.group.config_entry_utils import add_to_associated_groups
+from custom_components.test.light import MockLight
 from tests.common import (
     create_mock_light_entity,
     create_mocked_virtual_power_sensor_entry,

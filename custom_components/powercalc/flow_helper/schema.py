@@ -1,8 +1,20 @@
 import voluptuous as vol
 from homeassistant.helpers import selector
 
-from custom_components.powercalc.const import CONF_SUB_PROFILE
+from custom_components.powercalc.const import CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS, CONF_SUB_PROFILE
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
+
+SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
+    {
+        vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): selector.BooleanSelector(),
+    },
+)
+
+SCHEMA_ENERGY_SENSOR_TOGGLE = vol.Schema(
+    {
+        vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): selector.BooleanSelector(),
+    },
+)
 
 
 async def build_sub_profile_schema(
