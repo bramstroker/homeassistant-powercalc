@@ -97,15 +97,17 @@
           "96 -> 24.72",
           "97 -> 22.42",
           "98 -> 21.75",
-          "100 -> 11.96"
+          "100 -> 11.55"
         ]
       }
     },
     {
       "fixed": {
         "states_power": {
-          "mowing": 11.55,
-          "returning": 11.55
+          "mowing": 2.15,
+          "returning": 2.15,
+          "paused": 2.15,
+          "error": 2.15
         }
       }
     }
@@ -119,5 +121,6 @@
     "VERSION": "master"
   },
   "name": "YUKA mini 600",
+  "standby_power": 2.15,
   "author": "Alexandre Bertrand <alexandrebertrand96@gmail.com>"
 }
