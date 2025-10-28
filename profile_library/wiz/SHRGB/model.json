@@ -1,0 +1,14 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-10-28T04:32:28.311339",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug S",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 4,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.24:docker"
+  },
+  "name": "WiZ Smart Bulb A80 E27 922-65 RGB (type SHRGB, model 8719514554634, 18.5 W, 220-240 V, 50/60 Hz, 2452 lm @ 4000K, CRI: 90, beam angle: 360\u00b0)",
+  "standby_power": 0.31
+}
