@@ -121,7 +121,7 @@ from .const import (
 )
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
-from .flow_helper.common import PowercalcFlow, PowercalcFormStep, PowercalcOptionFlowProtocol, Step, fill_schema_defaults
+from .flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
 from .flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from .flow_helper.group import (
     GroupConfigFlow,
@@ -424,7 +424,7 @@ STRATEGY_SCHEMAS: dict[CalculationStrategy, vol.Schema] = {
 
 
 # noinspection PyTypeChecker
-class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, PowercalcFlow):
+class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     def __init__(self) -> None:
         """Initialize options flow."""
         self.sensor_config: ConfigType = {}
@@ -1426,7 +1426,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         return self.async_create_entry(title=str(self.name), data=self.sensor_config)
 
 
-class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow, PowercalcOptionFlowProtocol):
+class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     """Handle an option flow for PowerCalc."""
 
     def __init__(self, config_entry: ConfigEntry) -> None:

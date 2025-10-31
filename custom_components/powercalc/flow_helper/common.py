@@ -1,11 +1,10 @@
 import copy
-from collections.abc import Callable, Container, Coroutine, Mapping
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any, Protocol
+from typing import Any
 
 import voluptuous as vol
-from homeassistant.data_entry_flow import FlowResult
 
 
 class Step(StrEnum):
@@ -63,36 +62,6 @@ class PowercalcFormStep:
     continue_utility_meter_options_step: bool = False
     continue_advanced_step: bool = False
     form_kwarg: dict[str, Any] | None = None
-
-
-class PowercalcFlow(Protocol):
-    hass: Any
-    sensor_config: dict[str, Any]
-    name: str | None
-    selected_sensor_type: str | None
-
-    async def async_set_unique_id(self, unique_id: str | None, raise_on_progress: bool = True) -> None: ...
-
-    def async_show_menu(
-        self,
-        *,
-        step_id: str | None = None,
-        menu_options: Container[str] | dict[str, str],
-        sort: bool = False,
-        description_placeholders: Mapping[str, str] | None = None,
-    ) -> FlowResult: ...
-    async def handle_form_step(
-        self,
-        form_step: PowercalcFormStep,
-        user_input: dict[str, Any] | None,
-    ) -> FlowResult: ...
-    def abort_if_unique_id_configured(self) -> None: ...
-
-
-class PowercalcOptionFlowProtocol(PowercalcFlow, Protocol):
-    config_entry: Any
-
-    async def async_handle_options_step(self, user_input: dict[str, Any] | None, schema: vol.Schema, step: Step) -> FlowResult: ...
 
 
 def fill_schema_defaults(

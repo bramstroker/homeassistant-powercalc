@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Coroutine
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 from homeassistant.const import (
     CONF_DEVICE,
     CONF_DOMAIN,
@@ -42,12 +42,17 @@ from custom_components.powercalc.const import (
     GroupType,
     SensorType,
 )
-from custom_components.powercalc.flow_helper.common import PowercalcFlow, PowercalcFormStep, PowercalcOptionFlowProtocol, Step, fill_schema_defaults
+from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE
 from custom_components.powercalc.group_include.include import find_entities
 from custom_components.powercalc.sensors.group.config_entry_utils import get_group_entries
 from custom_components.powercalc.sensors.group.tracked_untracked import find_auto_tracked_power_entities
 from custom_components.powercalc.sensors.power import PowerSensor
+
+if TYPE_CHECKING:
+    from custom_components.powercalc.config_flow import PowercalcConfigFlow, PowercalcOptionsFlow
+# F = TypeVar("F", bound="PowercalcConfigFlow")
+# O = TypeVar("O", bound="PowercalcOptionsFlow")
 
 # Constants
 UNIQUE_ID_TRACKED_UNTRACKED = "pc_tracked_untracked"
@@ -322,10 +327,10 @@ class GroupConfigFlow:
     We deliberately keep this controller dumb: it only handles group UX.
     """
 
-    def __init__(self, flow: PowercalcFlow) -> None:
+    def __init__(self, flow: PowercalcConfigFlow) -> None:
         self.flow = flow
 
-    async def async_step_menu_group(self) -> FlowResult:
+    async def async_step_menu_group(self) -> ConfigFlowResult:
         menu = [Step.GROUP_CUSTOM, Step.GROUP_DOMAIN, Step.GROUP_SUBTRACT, Step.GROUP_TRACKED_UNTRACKED]
         # Hide tracked/untracked if already present
         entry = self.flow.hass.config_entries.async_entry_for_domain_unique_id(
@@ -418,7 +423,7 @@ class GroupConfigFlow:
 class GroupOptionsFlow:
     """Handle an option flow for PowerCalc."""
 
-    def __init__(self, flow: PowercalcOptionFlowProtocol) -> None:
+    def __init__(self, flow: PowercalcOptionsFlow) -> None:
         self.flow = flow
 
     async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> FlowResult:
