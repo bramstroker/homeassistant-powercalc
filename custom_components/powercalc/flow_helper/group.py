@@ -51,8 +51,6 @@ from custom_components.powercalc.sensors.power import PowerSensor
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcConfigFlow, PowercalcOptionsFlow
-# F = TypeVar("F", bound="PowercalcConfigFlow")
-# O = TypeVar("O", bound="PowercalcOptionsFlow")
 
 # Constants
 UNIQUE_ID_TRACKED_UNTRACKED = "pc_tracked_untracked"
