@@ -19,7 +19,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     GroupType,
 )
-from custom_components.powercalc.flow_helper.group import UNIQUE_ID_TRACKED_UNTRACKED
+from custom_components.powercalc.flow_helper.flows.group import UNIQUE_ID_TRACKED_UNTRACKED
 from tests.common import mock_sensors_in_registry, run_powercalc_setup
 from tests.config_flow.common import (
     create_mock_entry,
