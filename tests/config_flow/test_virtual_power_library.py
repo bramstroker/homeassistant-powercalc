@@ -16,10 +16,7 @@ from custom_components.powercalc import (
     DEFAULT_ENERGY_INTEGRATION_METHOD,
 )
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.config_flow import (
-    CONF_CONFIRM_AUTODISCOVERED_MODEL,
-    Step,
-)
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -31,6 +28,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight

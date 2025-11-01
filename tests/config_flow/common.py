@@ -14,7 +14,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.config_flow import (
-    CONF_CONFIRM_AUTODISCOVERED_MODEL,
     DOMAIN,
     Step,
 )
@@ -32,6 +31,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 

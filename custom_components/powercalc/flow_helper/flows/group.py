@@ -19,12 +19,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
+from homeassistant.helpers.selector import TextSelector
 
 from custom_components.powercalc.const import (
     CONF_AREA,
     CONF_EXCLUDE_ENTITIES,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
-    CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP, CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
@@ -35,7 +36,7 @@ from custom_components.powercalc.const import (
     CONF_HIDE_MEMBERS,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_MAIN_POWER_SENSOR,
-    CONF_SENSOR_TYPE,
+    CONF_NEW_GROUP, CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     CONF_SUBTRACT_ENTITIES,
     DOMAIN,
@@ -50,7 +51,7 @@ from custom_components.powercalc.sensors.group.tracked_untracked import find_aut
 from custom_components.powercalc.sensors.power import PowerSensor
 
 if TYPE_CHECKING:
-    from custom_components.powercalc.config_flow import PowercalcConfigFlow, PowercalcOptionsFlow
+    from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
 
 # Constants
 UNIQUE_ID_TRACKED_UNTRACKED = "pc_tracked_untracked"
@@ -307,6 +308,40 @@ async def create_schema_group_tracked_untracked_manual(
 
     return schema
 
+class GroupCommonFlow:
+    def __init__(self, flow: PowercalcCommonFlow) -> None:
+        self.flow = flow
+
+    async def async_step_assign_groups(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for assigning groups."""
+        group_entries = get_group_entries(self.flow.hass, GroupType.CUSTOM)
+        if not group_entries:
+            return await self.flow.handle_final_steps()
+
+        schema = vol.Schema(
+            {
+                vol.Optional(CONF_GROUP): create_group_selector(self.flow.hass, group_entries=group_entries),
+                vol.Optional(CONF_NEW_GROUP): TextSelector(),
+            },
+        )
+
+        async def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
+            groups = user_input.get(CONF_GROUP) or []
+            new_group = user_input.get(CONF_NEW_GROUP)
+            if new_group:
+                groups.append(new_group)
+            return {CONF_GROUP: groups}
+
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.ASSIGN_GROUPS,
+                schema=schema,
+                continue_advanced_step=True,
+                continue_utility_meter_options_step=True,
+                validate_user_input=_validate,
+            ),
+            user_input,
+        )
 
 class GroupConfigFlow:
     """

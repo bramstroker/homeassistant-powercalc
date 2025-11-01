@@ -16,7 +16,7 @@ from homeassistant.const import (
     EntityCategory,
 )
 
-MIN_HA_VERSION = "2024.4"
+MIN_HA_VERSION = "2025.1"
 
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
