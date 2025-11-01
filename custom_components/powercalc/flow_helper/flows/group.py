@@ -368,7 +368,7 @@ class GroupConfigFlow(GroupFlow):
         super().__init__(flow)
         self.flow: PowercalcConfigFlow = flow
 
-    async def async_step_menu_group(self) -> ConfigFlowResult:
+    async def async_step_menu_group(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         menu = [Step.GROUP_CUSTOM, Step.GROUP_DOMAIN, Step.GROUP_SUBTRACT, Step.GROUP_TRACKED_UNTRACKED]
         # Hide tracked/untracked if already present
         entry = self.flow.hass.config_entries.async_entry_for_domain_unique_id(

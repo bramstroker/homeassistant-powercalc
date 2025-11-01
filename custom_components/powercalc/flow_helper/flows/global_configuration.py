@@ -126,7 +126,7 @@ class GlobalConfigurationFlow:
                 return self.flow.persist_config_entry()
 
         if not bool(self.flow.global_config.get(CONF_CREATE_ENERGY_SENSORS)) or user_input is not None:
-            return await self.flow.async_step_global_configuration_utility_meter()
+            return await self.async_step_global_configuration_utility_meter()
 
         return await self.flow.handle_form_step(
             PowercalcFormStep(
@@ -170,7 +170,7 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
 
         if user_input is not None:
             self.flow.global_config.update(user_input)
-            return await self.flow.async_step_global_configuration_energy()
+            return await self.async_step_global_configuration_energy()
 
         return await self.flow.handle_form_step(
             PowercalcFormStep(

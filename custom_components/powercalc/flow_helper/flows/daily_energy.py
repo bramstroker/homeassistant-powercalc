@@ -18,7 +18,7 @@ from custom_components.powercalc.const import (
     CONF_VALUE_TEMPLATE,
     SensorType,
 )
-from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
+from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
 from custom_components.powercalc.flow_helper.schema import SCHEMA_UTILITY_METER_TOGGLE
 from custom_components.powercalc.sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 
@@ -103,3 +103,11 @@ class DailyEnergyConfigFlow:
 class DailyEnergyOptionsFlow:
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
         self.flow: PowercalcOptionsFlow = flow
+
+    async def async_step_daily_energy(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the daily energy options flow."""
+        schema = fill_schema_defaults(
+            SCHEMA_DAILY_ENERGY_OPTIONS,
+            self.flow.sensor_config[CONF_DAILY_FIXED_ENERGY],
+        )
+        return await self.flow.async_handle_options_step(user_input, schema, Step.DAILY_ENERGY)

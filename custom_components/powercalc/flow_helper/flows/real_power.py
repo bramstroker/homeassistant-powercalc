@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
 from homeassistant.components.sensor import SensorDeviceClass
@@ -33,6 +33,7 @@ SCHEMA_REAL_POWER = vol.Schema(
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 ).extend(SCHEMA_REAL_POWER_OPTIONS.schema)
+
 
 class RealPowerConfigFlow:
     def __init__(self, flow: PowercalcConfigFlow) -> None:

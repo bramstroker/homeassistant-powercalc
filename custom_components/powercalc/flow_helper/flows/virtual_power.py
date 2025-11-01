@@ -9,7 +9,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS
+from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS, DeviceType
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     CONF_AUTOSTART,
@@ -35,9 +35,9 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
+from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults
 from custom_components.powercalc.flow_helper.flows.global_configuration import get_global_powercalc_config
-from custom_components.powercalc.flow_helper.flows.library import SCHEMA_POWER_OPTIONS_LIBRARY
+from custom_components.powercalc.flow_helper.flows.library import SCHEMA_POWER_OPTIONS_LIBRARY, SCHEMA_POWER_SMART_SWITCH
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE
 from custom_components.powercalc.strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
@@ -298,6 +298,22 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
             last_step=False,
         )
 
+    async def async_step_fixed(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for fixed sensor."""
+        return await self.handle_strategy_step(CalculationStrategy.FIXED, user_input)
+
+    async def async_step_linear(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for fixed sensor."""
+        return await self.handle_strategy_step(CalculationStrategy.LINEAR, user_input)
+
+    async def async_step_multi_switch(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for multi switch strategy."""
+        return await self.handle_strategy_step(CalculationStrategy.MULTI_SWITCH, user_input)
+
+    async def async_step_wled(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for WLED sensor."""
+        return await self.handle_strategy_step(CalculationStrategy.WLED, user_input)
+
     async def async_step_playbook(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for playbook sensor."""
 
@@ -311,7 +327,7 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
         """Forward to the next step based on the selected strategy."""
         step = STRATEGY_STEP_MAPPING.get(strategy)
         if step is None:
-            return await self.flow.async_step_library()
+            return await self.flow.flow_handlers[FlowType.LIBRARY].async_step_library()  # type:ignore
         method = getattr(self.flow, f"async_step_{step}")
         return await method()  # type: ignore
 
@@ -333,3 +349,39 @@ class VirtualPowerOptionsFlow(VirtualPowerFlow):
                 continue
             strategy_options[str(key)] = user_input.get(key)
         return strategy_options
+
+    async def async_step_fixed(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the basic options flow."""
+        return await self.async_handle_strategy_options_step(user_input)
+
+    async def async_step_linear(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the basic options flow."""
+        return await self.async_handle_strategy_options_step(user_input)
+
+    async def async_step_wled(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the basic options flow."""
+        return await self.async_handle_strategy_options_step(user_input)
+
+    async def async_step_multi_switch(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the basic options flow."""
+        return await self.async_handle_strategy_options_step(user_input)
+
+    async def async_step_playbook(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the basic options flow."""
+        return await self.async_handle_strategy_options_step(user_input)
+
+    async def async_handle_strategy_options_step(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the option processing for the selected strategy."""
+        step = STRATEGY_STEP_MAPPING.get(self.flow.strategy or CalculationStrategy.FIXED, Step.FIXED)
+
+        schema = self.create_strategy_schema()
+        if self.flow.selected_profile and self.flow.selected_profile.device_type == DeviceType.SMART_SWITCH:
+            schema = SCHEMA_POWER_SMART_SWITCH
+
+        strategy_options = self.flow.sensor_config.get(str(self.flow.strategy)) or {}
+        merged_options = {
+            **self.flow.sensor_config,
+            **{k: v for k, v in strategy_options.items() if k not in self.flow.sensor_config},
+        }
+        schema = fill_schema_defaults(schema, merged_options)
+        return await self.flow.async_handle_options_step(user_input, schema, step)
