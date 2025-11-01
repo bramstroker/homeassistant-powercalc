@@ -19,7 +19,8 @@ from custom_components.powercalc.const import CONF_AUTOSTART, CONF_CALCULATION_E
     CONF_STATES_POWER, CONF_STATE_TRIGGER, CONF_UNAVAILABLE_POWER, \
     CalculationStrategy, \
     DUMMY_ENTITY_ID, SensorType
-from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
+from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults
+from custom_components.powercalc.flow_helper.flows.global_configuration import get_global_powercalc_config
 from custom_components.powercalc.flow_helper.flows.library import SCHEMA_POWER_OPTIONS_LIBRARY
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_ENERGY_SENSOR_TOGGLE, \
     SCHEMA_UTILITY_METER_TOGGLE
@@ -220,7 +221,7 @@ class VirtualPowerCommonFlow:
             step_id=Step.POWER_ADVANCED,
             data_schema=fill_schema_defaults(
                 schema,
-                self.flow.global_config_common_flow.get_global_powercalc_config(),
+                get_global_powercalc_config(self.flow),
             ),
             errors={},
         )
@@ -254,7 +255,7 @@ class VirtualPowerConfigFlow:
 
         power_options = fill_schema_defaults(
             options_schema,
-            self.flow.global_config_common_flow.get_global_powercalc_config(),
+            get_global_powercalc_config(self.flow),
         )
         return schema.extend(power_options.schema)  # type: ignore
 

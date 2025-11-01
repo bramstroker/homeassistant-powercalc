@@ -45,6 +45,14 @@ class Step(StrEnum):
     GLOBAL_CONFIGURATION_ENERGY = "global_configuration_energy"
     GLOBAL_CONFIGURATION_UTILITY_METER = "global_configuration_utility_meter"
 
+class FlowType(StrEnum):
+    VIRTUAL_POWER = "virtual_power"
+    DAILY_ENERGY = "daily_energy"
+    #REAL_POWER = "real_power"
+    LIBRARY = "library"
+    GROUP = "group"
+    GLOBAL_CONFIGURATION = "global_configuration"
+
 @dataclass(slots=True)
 class PowercalcFormStep:
     schema: vol.Schema | Callable[[], Coroutine[Any, Any, vol.Schema | None]]

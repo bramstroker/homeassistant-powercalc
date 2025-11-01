@@ -95,30 +95,31 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
 )
 
 
+def get_global_powercalc_config(flow) -> ConfigType:
+    """Get the global powercalc config."""
+    if flow.global_config:
+        return flow.global_config
+    powercalc = flow.hass.data.get(DOMAIN) or {}
+    global_config = dict.copy(powercalc.get(DOMAIN_CONFIG) or {})
+    force_update_frequency = global_config.get(CONF_FORCE_UPDATE_FREQUENCY)
+    if isinstance(force_update_frequency, timedelta):
+        global_config[CONF_FORCE_UPDATE_FREQUENCY] = force_update_frequency.total_seconds()
+    utility_meter_offset = global_config.get(CONF_UTILITY_METER_OFFSET)
+    if isinstance(utility_meter_offset, timedelta):
+        global_config[CONF_UTILITY_METER_OFFSET] = utility_meter_offset.days
+    if CONF_SENSORS in global_config:
+        global_config.pop(CONF_SENSORS)
+    flow.global_config = global_config
+    return global_config
+
+
 class GlobalConfigurationFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
 
-    def get_global_powercalc_config(self) -> ConfigType:
-        """Get the global powercalc config."""
-        if self.flow.global_config:
-            return self.flow.global_config
-        powercalc = self.flow.hass.data.get(DOMAIN) or {}
-        global_config = dict.copy(powercalc.get(DOMAIN_CONFIG) or {})
-        force_update_frequency = global_config.get(CONF_FORCE_UPDATE_FREQUENCY)
-        if isinstance(force_update_frequency, timedelta):
-            global_config[CONF_FORCE_UPDATE_FREQUENCY] = force_update_frequency.total_seconds()
-        utility_meter_offset = global_config.get(CONF_UTILITY_METER_OFFSET)
-        if isinstance(utility_meter_offset, timedelta):
-            global_config[CONF_UTILITY_METER_OFFSET] = utility_meter_offset.days
-        if CONF_SENSORS in global_config:
-            global_config.pop(CONF_SENSORS)
-        self.flow.global_config = global_config
-        return global_config
-
     async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
-        self.flow.global_config = self.get_global_powercalc_config()
+        get_global_powercalc_config(self.flow)
         await self.flow.async_set_unique_id(ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
         self.flow.abort_if_unique_id_configured()
 
@@ -185,7 +186,7 @@ class GlobalConfigurationConfigFlow:
 
     async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
-        self.flow.global_config = self.flow.get_global_powercalc_config()
+        get_global_powercalc_config(self.flow)
         await self.flow.async_set_unique_id(ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
         self.flow.abort_if_unique_id_configured()
 
