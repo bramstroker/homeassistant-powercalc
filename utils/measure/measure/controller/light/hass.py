@@ -4,8 +4,8 @@ import math
 import time
 from typing import Any
 
-import inquirer
 from homeassistant_api.errors import HomeassistantAPIError
+import inquirer
 
 from measure.const import QUESTION_ENTITY_ID
 from measure.controller.errors import ApiConnectionError

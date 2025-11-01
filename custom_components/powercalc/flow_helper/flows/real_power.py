@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import voluptuous as vol
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
+import voluptuous as vol
 
 from custom_components.powercalc import SensorType
 from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults

@@ -1,5 +1,5 @@
-import voluptuous as vol
 from homeassistant.helpers.selector import selector
+import voluptuous as vol
 
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 

@@ -1,7 +1,6 @@
 from datetime import timedelta
 from unittest.mock import patch
 
-import pytest
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
@@ -18,6 +17,7 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     async_fire_time_changed,

@@ -1,17 +1,14 @@
 from __future__ import annotations
 
-import decimal
-import logging
 from collections.abc import Callable
 from datetime import datetime, time, timedelta
+import decimal
 from decimal import Decimal
+import logging
 from typing import Any
 
-import homeassistant.helpers.config_validation as cv
-import homeassistant.util.dt as dt_util
-import voluptuous as vol
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
+    DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
@@ -25,10 +22,13 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import TemplateError
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
+import homeassistant.util.dt as dt_util
+import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (

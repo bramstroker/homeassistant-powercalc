@@ -1,11 +1,11 @@
 import asyncio
+from collections.abc import Callable, Coroutine
+from functools import partial
 import json
+from json import JSONDecodeError
 import logging
 import os
 import shutil
-from collections.abc import Callable, Coroutine
-from functools import partial
-from json import JSONDecodeError
 from typing import Any, NotRequired, TypedDict, cast
 
 import aiohttp

@@ -1,7 +1,5 @@
 import logging
 
-import custom_components.test.sensor as test_sensor_platform
-import pytest
 from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, ConfigEntry
@@ -10,6 +8,7 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.setup import async_setup_component
+import pytest
 from pytest_homeassistant_custom_component.common import (
     RegistryEntryWithDefaults,
     mock_device_registry,
@@ -27,6 +26,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
+import custom_components.test.sensor as test_sensor_platform
 from tests.common import run_powercalc_setup
 from tests.conftest import MockEntityWithModel
 

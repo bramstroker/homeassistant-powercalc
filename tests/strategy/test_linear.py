@@ -1,6 +1,5 @@
 import logging
 
-import pytest
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL
@@ -16,6 +15,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.typing import ConfigType
+import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity

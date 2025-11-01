@@ -1,10 +1,10 @@
 import logging
 
-import homeassistant.helpers.entity_registry as er
-import pytest
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceEntryDisabler, DeviceRegistry
+import homeassistant.helpers.entity_registry as er
+import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
 from custom_components.powercalc.const import (

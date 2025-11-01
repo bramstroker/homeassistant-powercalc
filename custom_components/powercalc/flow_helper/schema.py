@@ -1,6 +1,6 @@
-import voluptuous as vol
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
 from homeassistant.helpers import selector
+import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,

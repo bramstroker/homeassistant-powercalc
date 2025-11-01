@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import logging
 
-import homeassistant.helpers.device_registry as dr
-import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import CONF_NAME
-from homeassistant.const import __version__ as HA_VERSION  # noqa
+from homeassistant.const import (
+    CONF_NAME,
+    __version__ as HA_VERSION,  # noqa
+)
 from homeassistant.core import HomeAssistant, callback
+import homeassistant.helpers.device_registry as dr
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc import DEFAULT_ENERGY_NAME_PATTERN, DEFAULT_POWER_NAME_PATTERN

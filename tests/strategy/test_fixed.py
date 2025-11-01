@@ -1,7 +1,6 @@
-import logging
 from collections.abc import Generator
+import logging
 
-import pytest
 from homeassistant.components import input_number
 from homeassistant.components.climate import ATTR_FAN_MODE, ATTR_HVAC_ACTION, HVACAction
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
@@ -10,6 +9,7 @@ from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
+import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity

@@ -1,10 +1,9 @@
-import voluptuous as vol
-from custom_components.test.light import MockLight
 from homeassistant import data_entry_flow
 from homeassistant.components.light import ColorMode
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import SelectSelector
+import voluptuous as vol
 
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
@@ -18,6 +17,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
+from custom_components.test.light import MockLight
 from tests.common import create_mock_light_entity
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,

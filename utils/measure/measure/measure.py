@@ -2,16 +2,15 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 import json
 import logging
 import os
 import sys
-from datetime import datetime
 from typing import Any
 
+from decouple import UndefinedValueError, config as decouple_config
 import inquirer
-from decouple import UndefinedValueError
-from decouple import config as decouple_config
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
 from inquirer.render import ConsoleRender

@@ -1,14 +1,13 @@
 import logging
 
-import pytest
-import voluptuous as vol
-from custom_components.test.light import MockLight
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.selector import SelectSelector
+import pytest
 from pytest_homeassistant_custom_component.common import mock_device_registry
+import voluptuous as vol
 
 from custom_components.powercalc import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -32,6 +31,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
+from custom_components.test.light import MockLight
 from tests.common import create_mock_light_entity, get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,

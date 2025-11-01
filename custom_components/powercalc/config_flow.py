@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import logging
-import uuid
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+import logging
 from typing import Any, cast
+import uuid
 
-import voluptuous as vol
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigEntryBaseFlow,
@@ -24,10 +23,10 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers import selector
+from homeassistant.helpers import entity_registry as er, selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+import voluptuous as vol
 
 from .common import SourceEntity, create_source_entity
 from .const import (

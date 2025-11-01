@@ -1,11 +1,11 @@
 import os.path
 from unittest.mock import MagicMock, patch
 
-import pytest
 from measure.controller.light.const import LutMode
 from measure.runner.const import QUESTION_MODE
 from measure.runner.light import LightRunner
 from measure.util.measure_util import MeasureUtil
+import pytest
 
 
 @pytest.mark.parametrize(

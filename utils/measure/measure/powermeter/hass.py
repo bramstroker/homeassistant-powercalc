@@ -3,8 +3,8 @@ from __future__ import annotations
 import time
 from typing import Any
 
-import inquirer
 from homeassistant_api import Client, Entity
+import inquirer
 
 from measure.const import QUESTION_DUMMY_LOAD
 from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID

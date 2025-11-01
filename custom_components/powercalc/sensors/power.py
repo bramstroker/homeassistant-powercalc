@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 from copy import copy
 from datetime import timedelta
 from decimal import Decimal
+import logging
 from typing import Any, cast
 
-import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -31,10 +30,10 @@ from homeassistant.core import (
     callback,
 )
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers import start
+from homeassistant.helpers import issue_registry as ir, start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import (
     EventStateChangedData,
     TrackTemplate,

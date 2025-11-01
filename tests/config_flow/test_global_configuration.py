@@ -2,12 +2,12 @@ import asyncio
 from datetime import timedelta
 from typing import Any
 
-import pytest
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON, EntityCategory
 from homeassistant.core import HomeAssistant
+import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (

@@ -1,16 +1,16 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 import os
 import shutil
-from collections.abc import Callable
 from typing import Any, Protocol
 from unittest.mock import MagicMock, patch
 
-import pytest
 from decouple import UndefinedValueError
 from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR
 from measure.controller.light.const import LutMode
+import pytest
 
 
 @pytest.fixture(autouse=True)

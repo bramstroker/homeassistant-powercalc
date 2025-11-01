@@ -1,8 +1,8 @@
 import logging
 
-import pytest
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
+import pytest
 
 from custom_components.powercalc.const import CONF_CUSTOM_MODEL_DIRECTORY
 from custom_components.powercalc.power_profile.error import LibraryLoadingError

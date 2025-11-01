@@ -1,14 +1,14 @@
-import json
-import uuid
 from collections.abc import Mapping
+import json
 from typing import Any
+import uuid
 
-import pytest
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.typing import ConfigType
+import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import DiscoveryManager

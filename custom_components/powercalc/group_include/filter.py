@@ -1,22 +1,22 @@
 from __future__ import annotations
 
-import re
 from collections.abc import Callable, Iterable
 from enum import StrEnum
+import re
 from typing import Protocol, cast
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.area_registry import AreaEntry
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
+import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_ALL,

@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import gzip
-import logging
-import os
 from collections import defaultdict
 from collections.abc import Mapping
 from csv import reader
@@ -10,9 +7,11 @@ from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
 from functools import partial
+import gzip
+import logging
+import os
 from typing import Any, TextIO
 
-import numpy as np
 from homeassistant.components import light
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -25,6 +24,7 @@ from homeassistant.components.light import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.util.color import color_temperature_kelvin_to_mired, color_temperature_to_hs
+import numpy as np
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.errors import (

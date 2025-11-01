@@ -1,9 +1,9 @@
 import logging
 
-import pytest
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
+import pytest
 from pytest_homeassistant_custom_component.common import (
     RegistryEntryWithDefaults,
     mock_device_registry,

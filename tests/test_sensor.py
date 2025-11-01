@@ -1,9 +1,7 @@
-import logging
 from datetime import timedelta
+import logging
 from unittest.mock import patch
 
-import homeassistant.helpers.entity_registry as er
-import pytest
 from homeassistant.components import light, sensor
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.light import (
@@ -29,8 +27,10 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
+import homeassistant.helpers.entity_registry as er
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,

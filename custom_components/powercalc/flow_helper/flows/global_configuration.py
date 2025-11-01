@@ -3,11 +3,11 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
-import voluptuous as vol
 from homeassistant.const import CONF_SENSORS, UnitOfTime
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.typing import ConfigType
+import voluptuous as vol
 
 from custom_components.powercalc import (
     CONF_CREATE_ENERGY_SENSORS,

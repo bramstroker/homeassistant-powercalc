@@ -1,7 +1,7 @@
 import logging
 
-import inquirer
 from homeassistant_api.errors import InternalServerError
+import inquirer
 
 from measure.const import QUESTION_ENTITY_ID
 from measure.controller.hass_controller import HassControllerBase

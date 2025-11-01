@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import voluptuous as vol
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector, translation
+import voluptuous as vol
 
 from custom_components.powercalc import (
     DOMAIN,

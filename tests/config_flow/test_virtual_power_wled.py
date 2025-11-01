@@ -1,5 +1,3 @@
-import custom_components.test.sensor as test_sensor_platform
-from custom_components.test.light import MockLight
 from homeassistant import data_entry_flow
 from homeassistant.components import sensor
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_ON
@@ -19,6 +17,8 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.test.light import MockLight
+import custom_components.test.sensor as test_sensor_platform
 from tests.common import create_mock_light_entity
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,

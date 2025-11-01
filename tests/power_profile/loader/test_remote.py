@@ -1,16 +1,16 @@
 import contextlib
+from functools import partial
 import json
 import logging
 import os
 import shutil
-from functools import partial
 from unittest.mock import patch
 
-import pytest
 from aiohttp import ClientError
 from aioresponses import aioresponses
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
+import pytest
 
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError

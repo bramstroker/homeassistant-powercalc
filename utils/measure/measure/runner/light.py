@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 import csv
+from dataclasses import asdict, dataclass
+from datetime import datetime as dt
 import gzip
 import logging
 import os
 import re
 import shutil
 import time
-from collections.abc import Iterator
-from dataclasses import asdict, dataclass
-from datetime import datetime as dt
 from typing import Any, TextIO
 
 import inquirer

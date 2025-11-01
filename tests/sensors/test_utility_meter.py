@@ -1,9 +1,7 @@
-import logging
 from datetime import timedelta
+import logging
 from unittest.mock import patch
 
-import homeassistant.util.dt as dt_util
-import pytest
 from freezegun import freeze_time
 from homeassistant.components import utility_meter
 from homeassistant.components.sensor import SensorDeviceClass
@@ -20,6 +18,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.setup import async_setup_component
+import homeassistant.util.dt as dt_util
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,

@@ -1,13 +1,12 @@
+from collections.abc import Callable, Generator
+from datetime import timedelta
 import json
 import os
 import shutil
-import uuid
-from collections.abc import Callable, Generator
-from datetime import timedelta
 from typing import Any, Protocol
 from unittest.mock import AsyncMock, patch
+import uuid
 
-import pytest
 from _pytest.fixtures import SubRequest
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
@@ -16,6 +15,7 @@ from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.util import Throttle
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,

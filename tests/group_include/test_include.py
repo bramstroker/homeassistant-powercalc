@@ -1,8 +1,6 @@
 import logging
 import uuid
 
-import pytest
-from custom_components.test.light import MockLight
 from homeassistant.components import light
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
@@ -20,6 +18,7 @@ from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntryDisabler
 from homeassistant.setup import async_setup_component
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
@@ -53,6 +52,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.group_include.include import find_entities
+from custom_components.test.light import MockLight
 from tests.common import (
     create_discoverable_light,
     create_mock_light_entity,

@@ -1,5 +1,5 @@
-import copy
 from collections.abc import Callable, Coroutine
+import copy
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any

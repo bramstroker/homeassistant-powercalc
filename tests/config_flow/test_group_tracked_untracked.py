@@ -1,10 +1,10 @@
-import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import (
     CONF_NAME,
     CONF_SENSOR_TYPE,
 )
 from homeassistant.core import HomeAssistant
+import voluptuous as vol
 
 from custom_components.powercalc import SensorType
 from custom_components.powercalc.config_flow import Step

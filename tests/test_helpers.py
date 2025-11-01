@@ -1,15 +1,15 @@
-import json
 from collections.abc import Callable
 from decimal import Decimal
+import json
 from unittest.mock import PropertyMock, patch
 
-import pytest
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.template import Template
+import pytest
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy

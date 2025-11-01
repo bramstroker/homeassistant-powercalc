@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import voluptuous as vol
 from homeassistant.const import CONF_NAME, CONF_UNIQUE_ID, CONF_UNIT_OF_MEASUREMENT, UnitOfEnergy, UnitOfPower, UnitOfTime
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
+import voluptuous as vol
 
 from custom_components.powercalc import CONF_CREATE_UTILITY_METERS
 from custom_components.powercalc.const import (

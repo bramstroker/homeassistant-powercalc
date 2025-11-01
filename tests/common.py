@@ -1,7 +1,5 @@
 import os
 
-import custom_components.test.light as test_light_platform
-import homeassistant.helpers.area_registry as ar
 from homeassistant import config_entries
 from homeassistant.components import input_boolean, input_number, light
 from homeassistant.components.light import ColorMode
@@ -15,8 +13,8 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
+import homeassistant.helpers.area_registry as ar
 from homeassistant.helpers.normalized_name_base_registry import NormalizedNameBaseRegistryItems
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
@@ -33,6 +31,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+import custom_components.test.light as test_light_platform
 
 
 async def create_mock_light_entity(

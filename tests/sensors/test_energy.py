@@ -1,8 +1,7 @@
-import logging
 from datetime import timedelta
+import logging
 from unittest.mock import patch
 
-import pytest
 from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -21,6 +20,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt
+import pytest
 from pytest_homeassistant_custom_component.common import (
     RegistryEntryWithDefaults,
     async_fire_time_changed,
