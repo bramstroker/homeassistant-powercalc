@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import logging
 from decimal import Decimal
+import logging
 from typing import Any
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
 from homeassistant.components import fan, lawn_mower, light, media_player, vacuum
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
@@ -17,7 +15,9 @@ from homeassistant.components.media_player import (
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
+import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (

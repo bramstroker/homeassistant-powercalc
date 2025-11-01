@@ -1,10 +1,10 @@
 from typing import Any
 
-import pytest
-import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
+import pytest
+import voluptuous as vol
 
 from custom_components.powercalc import CONF_POWER
 from custom_components.powercalc.config_flow import Step

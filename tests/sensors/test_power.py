@@ -1,9 +1,8 @@
-import logging
-import uuid
 from collections.abc import Generator
 from datetime import timedelta
+import logging
+import uuid
 
-import pytest
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -36,6 +35,7 @@ from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssista
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockEntity,
     MockEntityPlatform,

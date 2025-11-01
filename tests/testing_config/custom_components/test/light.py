@@ -4,8 +4,8 @@ Provide a mock light platform.
 Call init before using it in your tests to ensure clean test data.
 """
 
-import uuid
 from typing import ClassVar
+import uuid
 
 from homeassistant.components.light import ColorMode, LightEntity, LightEntityFeature
 from homeassistant.config_entries import ConfigEntry

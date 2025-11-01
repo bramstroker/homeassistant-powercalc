@@ -3,13 +3,13 @@ from __future__ import annotations
 import re
 from typing import NamedTuple
 
-import homeassistant.helpers.device_registry as dr
-import homeassistant.helpers.entity_registry as er
-import voluptuous as vol
 from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES, ColorMode
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, split_entity_id
+import homeassistant.helpers.device_registry as dr
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.template import is_number
+import voluptuous as vol
 
 from .const import (
     CONF_CREATE_ENERGY_SENSOR,

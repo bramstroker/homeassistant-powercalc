@@ -1,13 +1,13 @@
-import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import (
     CONF_NAME,
     CONF_SENSOR_TYPE,
 )
 from homeassistant.core import HomeAssistant
+import voluptuous as vol
 
 from custom_components.powercalc import SensorType
-from custom_components.powercalc.config_flow import UNIQUE_ID_TRACKED_UNTRACKED, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -19,6 +19,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     GroupType,
 )
+from custom_components.powercalc.flow_helper.flows.group import UNIQUE_ID_TRACKED_UNTRACKED
 from tests.common import mock_sensors_in_registry, run_powercalc_setup
 from tests.config_flow.common import (
     create_mock_entry,

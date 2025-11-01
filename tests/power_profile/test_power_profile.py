@@ -1,11 +1,11 @@
 from typing import Any
 from unittest.mock import patch
 
-import pytest
 from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_PAUSED, STATE_PLAYING
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.entity_registry import RegistryEntry
+import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults
 
 from custom_components.powercalc.common import SourceEntity

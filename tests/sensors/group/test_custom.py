@@ -1,10 +1,9 @@
-import logging
 from collections.abc import Generator
 from datetime import timedelta
+import logging
 from typing import Any
 from unittest.mock import patch
 
-import pytest
 from freezegun import freeze_time
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -33,6 +32,7 @@ from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.util import dt
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,

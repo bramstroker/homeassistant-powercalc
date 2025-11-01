@@ -1,6 +1,6 @@
+from collections.abc import Generator
 import json
 import os
-from collections.abc import Generator
 
 PROFILE_DIRECTORY = os.path.join(os.path.dirname(__file__), "../../profile_library")
 

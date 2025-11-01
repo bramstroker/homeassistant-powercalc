@@ -1,5 +1,5 @@
-import pytest
 from homeassistant.core import HomeAssistant
+import pytest
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import CalculationStrategy

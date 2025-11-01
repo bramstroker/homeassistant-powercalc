@@ -1,11 +1,10 @@
 from __future__ import annotations
 
+from decimal import Decimal
 import inspect
 import logging
-from decimal import Decimal
 from typing import cast
 
-import homeassistant.helpers.entity_registry as er
 from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
@@ -17,6 +16,7 @@ from homeassistant.components.utility_meter.select import TariffSelect
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import StateType
 
 from custom_components.powercalc.const import (

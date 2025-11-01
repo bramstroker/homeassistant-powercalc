@@ -1,5 +1,5 @@
-import os
 from enum import Enum, StrEnum
+import os
 from pathlib import Path
 
 QUESTION_GENERATE_MODEL_JSON = "generate_model_json"

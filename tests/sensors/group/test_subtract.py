@@ -1,7 +1,7 @@
-import pytest
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
+import pytest
 
 from custom_components.powercalc import (
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,

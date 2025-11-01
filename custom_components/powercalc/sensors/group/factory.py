@@ -3,12 +3,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 
+from custom_components.powercalc.const import CONF_GROUP_TYPE, GroupType
+from custom_components.powercalc.errors import SensorConfigurationError
 import custom_components.powercalc.sensors.group.custom as custom_group
 import custom_components.powercalc.sensors.group.domain as domain_group
 import custom_components.powercalc.sensors.group.standby as standby_group
 import custom_components.powercalc.sensors.group.subtract as subtract_group
-from custom_components.powercalc.const import CONF_GROUP_TYPE, GroupType
-from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.sensors.group.tracked_untracked import TrackedPowerSensorFactory
 
 

@@ -1,10 +1,8 @@
-import logging
-import uuid
 from datetime import timedelta
+import logging
 from unittest.mock import AsyncMock, patch
+import uuid
 
-import pytest
-from custom_components.test.light import MockLight
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
@@ -19,6 +17,7 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.util import dt
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
@@ -47,6 +46,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.library import ModelInfo
+from custom_components.test.light import MockLight
 
 from .common import create_mock_light_entity, get_test_config_dir, run_powercalc_setup
 from .conftest import MockEntityWithModel

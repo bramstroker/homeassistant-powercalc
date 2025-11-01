@@ -1,13 +1,11 @@
 from __future__ import annotations
 
+from decimal import Decimal
 import inspect
 import logging
-from decimal import Decimal
 
-import homeassistant.helpers.entity_registry as er
 from homeassistant.components.integration.sensor import IntegrationSensor
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
@@ -18,6 +16,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityCategory
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity

@@ -1,19 +1,19 @@
-import logging
 from decimal import Decimal
+import logging
 
-import pytest
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
     ATTR_EFFECT,
     ATTR_HS_COLOR,
+    DOMAIN as LIGHT_DOMAIN,
     ColorMode,
 )
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
 from homeassistant.util import color as color_util
+import pytest
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, CalculationStrategy

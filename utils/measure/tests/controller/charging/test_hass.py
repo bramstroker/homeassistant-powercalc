@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock, patch
 
-import pytest
 from homeassistant_api import Client, State
 from homeassistant_api.errors import HomeassistantAPIError
 from measure.const import QUESTION_ENTITY_ID
@@ -15,6 +14,7 @@ from measure.controller.charging.errors import BatteryLevelRetrievalError
 from measure.controller.charging.hass import ATTR_BATTERY_LEVEL, HassChargingController
 from measure.controller.errors import ApiConnectionError
 from measure.runner.const import QUESTION_CHARGING_DEVICE_TYPE
+import pytest
 
 
 def test_get_battery_level_attribute() -> None:

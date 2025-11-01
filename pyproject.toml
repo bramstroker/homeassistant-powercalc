@@ -32,9 +32,11 @@ markers = [
 log_level = "DEBUG"
 asyncio_default_fixture_loop_scope = "function"
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components", "powercalc"]
+known-third-party = ["homeassistant"]
+force-sort-within-sections = true
+combine-as-imports = true
 
 [tool.mypy]
 python_version = "3.13"
@@ -82,6 +84,9 @@ ignore = ["S101"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 15
+
+[tool.uv]
+prerelease = "allow"
 
 [project.optional-dependencies]
 docs = [

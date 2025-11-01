@@ -1,11 +1,11 @@
 from unittest.mock import MagicMock, patch
 
-import pytest
 from homeassistant_api import Client
 from homeassistant_api.errors import HomeassistantAPIError
 from measure.const import QUESTION_ENTITY_ID
 from measure.controller.errors import ApiConnectionError, ControllerError
 from measure.controller.fan.hass import HassFanController
+import pytest
 
 
 def test_set_percentage() -> None:

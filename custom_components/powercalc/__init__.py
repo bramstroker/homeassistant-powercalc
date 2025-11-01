@@ -3,14 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import timedelta
 import logging
 import random
 import time
-from datetime import timedelta
 
-import homeassistant.helpers.config_validation as cv
-import homeassistant.helpers.entity_registry as er
-import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
@@ -22,13 +19,16 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STARTED,
     EntityCategory,
     Platform,
+    __version__ as HA_VERSION,  # noqa: N812
 )
-from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
 from homeassistant.core import HomeAssistant, ServiceCall
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.entity_platform import async_get_platforms
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.reload import async_integration_yaml_config
 from homeassistant.helpers.typing import ConfigType
+import voluptuous as vol
 
 from .common import validate_name_pattern
 from .const import (

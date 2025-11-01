@@ -2,9 +2,9 @@ import logging
 import os.path
 from unittest.mock import AsyncMock, patch
 
-import pytest
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
+import pytest
 
 from custom_components.powercalc import CONF_DISABLE_LIBRARY_DOWNLOAD
 from custom_components.powercalc.common import create_source_entity

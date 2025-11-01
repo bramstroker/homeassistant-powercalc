@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-import json
-import logging
-import os
-import re
 from collections import defaultdict
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
+import json
+import logging
+import os
+import re
 from typing import Any, NamedTuple, Protocol, cast
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN

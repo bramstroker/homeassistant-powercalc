@@ -1,13 +1,12 @@
+from collections.abc import Iterator
 import csv
+from io import StringIO
 import logging
 import os
 import sys
-from collections.abc import Iterator
-from io import StringIO
 from typing import Any
 from unittest.mock import patch
 
-import pytest
 from inquirer import events
 from inquirer.render import ConsoleRender
 from measure.config import MeasureConfig
@@ -16,6 +15,7 @@ from measure.controller.charging.const import ChargingDeviceType
 from measure.measure import Measure
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.util.measure_util import MeasureUtil
+import pytest
 from readchar import key
 
 

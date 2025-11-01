@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import logging
-import os
-import sys
-import threading
-import time
 from datetime import datetime
 from decimal import Decimal, DecimalException
+import logging
+import os
 from pathlib import Path
+import sys
+import threading
 from threading import Thread
+import time
 
 import cv2
 import numpy as np

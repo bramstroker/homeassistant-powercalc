@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import logging
 from decimal import Decimal
+import logging
 from typing import cast
 
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_UNAVAILABLE

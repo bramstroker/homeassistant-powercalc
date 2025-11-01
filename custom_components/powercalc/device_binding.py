@@ -2,8 +2,10 @@ import logging
 
 from awesomeversion import AwesomeVersion
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_DEVICE
-from homeassistant.const import __version__ as HA_VERSION  # noqa
+from homeassistant.const import (
+    CONF_DEVICE,
+    __version__ as HA_VERSION,  # noqa
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceInfo

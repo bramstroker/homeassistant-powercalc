@@ -1,12 +1,12 @@
+from collections.abc import Callable, Coroutine
 import decimal
+from decimal import Decimal
+from functools import wraps
 import logging
 import os.path
 import re
-import uuid
-from collections.abc import Callable, Coroutine
-from decimal import Decimal
-from functools import wraps
 from typing import Any, TypeVar
+import uuid
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass

@@ -1,9 +1,9 @@
 from unittest.mock import patch
 
-import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
+import voluptuous as vol
 
 from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_FIXED, CONF_POWER_TEMPLATE
 from custom_components.powercalc.config_flow import Step

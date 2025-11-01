@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-import logging
 from decimal import Decimal
+import logging
 
-import voluptuous as vol
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.typing import ConfigType
+import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (

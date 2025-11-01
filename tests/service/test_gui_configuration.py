@@ -1,10 +1,10 @@
 import uuid
 
-import pytest
 from homeassistant.const import CONF_ENTITY_ID, CONF_MODE, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.typing import ConfigType
+import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import CONF_FIXED, CONF_SENSOR_TYPE, DOMAIN, SensorType

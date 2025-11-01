@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from datetime import datetime as dt
 import logging
 import os
-import time
-from datetime import datetime as dt
 from statistics import mean
+import time
 
 import numpy as np
 

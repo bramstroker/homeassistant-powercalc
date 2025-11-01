@@ -16,7 +16,7 @@ from homeassistant.const import (
     EntityCategory,
 )
 
-MIN_HA_VERSION = "2024.4"
+MIN_HA_VERSION = "2025.1"
 
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
@@ -180,6 +180,8 @@ DEFAULT_UTILITY_METER_TYPES = [DAILY, WEEKLY, MONTHLY]
 DISCOVERY_SOURCE_ENTITY = "source_entity"
 DISCOVERY_POWER_PROFILES = "power_profiles"
 DISCOVERY_TYPE = "discovery_type"
+
+LIBRARY_URL = "https://library.powercalc.nl"
 
 MANUFACTURER_WLED = "WLED"
 

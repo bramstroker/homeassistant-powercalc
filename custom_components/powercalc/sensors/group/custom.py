@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-import logging
-import time
 from abc import abstractmethod
 from collections.abc import Callable
 from datetime import timedelta
 from decimal import Decimal, DecimalException
+import logging
+import time
 from typing import Any
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
+    DOMAIN as SENSOR_DOMAIN,
     RestoreSensor,
     SensorDeviceClass,
     SensorEntity,
@@ -37,8 +37,7 @@ from homeassistant.core import (
     callback,
 )
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers import start
+from homeassistant.helpers import entity_registry as er, start
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
     EventStateChangedData,

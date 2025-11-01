@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import logging
 from decimal import Decimal
+import logging
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.const import CONF_ENTITIES, STATE_CLOSING, STATE_ON, STATE_OPENING, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
+import voluptuous as vol
 
 from custom_components.powercalc.const import CONF_POWER, CONF_POWER_OFF, DUMMY_ENTITY_ID
 

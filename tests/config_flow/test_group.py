@@ -1,5 +1,3 @@
-import voluptuous as vol
-from custom_components.test.light import MockLight
 from homeassistant import data_entry_flow
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.const import DAILY
@@ -18,6 +16,7 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.selector import SelectSelector
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
+import voluptuous as vol
 
 from custom_components.powercalc import SensorType, async_migrate_entry
 from custom_components.powercalc.config_flow import Step
@@ -53,6 +52,7 @@ from custom_components.powercalc.const import (
     GroupType,
 )
 from custom_components.powercalc.sensors.group.config_entry_utils import add_to_associated_groups
+from custom_components.test.light import MockLight
 from tests.common import (
     create_mock_light_entity,
     create_mocked_virtual_power_sensor_entry,

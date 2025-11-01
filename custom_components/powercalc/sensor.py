@@ -2,19 +2,15 @@
 
 from __future__ import annotations
 
-import copy
-import logging
-import uuid
 from collections.abc import Mapping
+import copy
 from dataclasses import dataclass, field
 from datetime import timedelta
+import logging
 from typing import Any, cast
+import uuid
 
-import homeassistant.helpers.config_validation as cv
-import homeassistant.helpers.entity_registry as er
-import voluptuous as vol
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry
@@ -26,8 +22,10 @@ from homeassistant.const import (
 )
 from homeassistant.core import Event, HomeAssistant, SupportsResponse, callback
 from homeassistant.helpers import entity_platform
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.entity_registry import (
     EVENT_ENTITY_REGISTRY_UPDATED,
     RegistryEntryDisabler,
@@ -35,6 +33,7 @@ from homeassistant.helpers.entity_registry import (
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+import voluptuous as vol
 
 from . import DATA_GROUP_ENTITIES
 from .common import (

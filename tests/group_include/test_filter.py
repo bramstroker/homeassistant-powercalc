@@ -1,10 +1,10 @@
 from unittest.mock import MagicMock
 
-import pytest
 from homeassistant.const import CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.entity_registry import RegistryEntry
+import pytest
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults
 
 from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
