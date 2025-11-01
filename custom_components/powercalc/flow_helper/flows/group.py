@@ -310,6 +310,7 @@ async def create_schema_group_tracked_untracked_manual(
 
     return schema
 
+
 class GroupFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
@@ -344,6 +345,7 @@ class GroupFlow:
             ),
             user_input,
         )
+
 
 class GroupConfigFlow(GroupFlow):
     """

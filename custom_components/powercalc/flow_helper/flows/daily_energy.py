@@ -23,7 +23,7 @@ from custom_components.powercalc.flow_helper.schema import SCHEMA_UTILITY_METER_
 from custom_components.powercalc.sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 
 if TYPE_CHECKING:
-    from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
+    from custom_components.powercalc.config_flow import PowercalcConfigFlow, PowercalcOptionsFlow
 
 SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
     {
@@ -73,6 +73,7 @@ def build_daily_energy_config(user_input: dict[str, Any], schema: vol.Schema) ->
             config[CONF_DAILY_FIXED_ENERGY][str(key)] = val
     return config
 
+
 class DailyEnergyConfigFlow:
     def __init__(self, flow: PowercalcConfigFlow) -> None:
         self.flow = flow
@@ -98,6 +99,7 @@ class DailyEnergyConfigFlow:
             ),
             user_input,
         )
+
 
 class DailyEnergyOptionsFlow:
     def __init__(self, flow: PowercalcOptionsFlow) -> None:

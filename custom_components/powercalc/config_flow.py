@@ -60,7 +60,7 @@ from .flow_helper.flows.group import (
     GroupConfigFlow,
     GroupOptionsFlow,
 )
-from .flow_helper.flows.library import SCHEMA_POWER_SMART_SWITCH, LibraryFlow, LibraryConfigFlow, LibraryOptionsFlow
+from .flow_helper.flows.library import SCHEMA_POWER_SMART_SWITCH, LibraryConfigFlow, LibraryOptionsFlow
 from .flow_helper.flows.virtual_power import (
     SCHEMA_POWER_ADVANCED,
     STRATEGY_STEP_MAPPING,
@@ -134,6 +134,7 @@ FLOW_HANDLERS: dict[FlowType, dict] = {
         "options": GlobalConfigurationOptionsFlow,
     },
 }
+
 
 # noinspection PyTypeChecker
 class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):

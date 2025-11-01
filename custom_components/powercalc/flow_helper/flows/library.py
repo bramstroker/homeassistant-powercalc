@@ -53,6 +53,7 @@ SCHEMA_POWER_SMART_SWITCH = vol.Schema(
     },
 )
 
+
 class LibraryFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
@@ -298,7 +299,7 @@ class LibraryConfigFlow(LibraryFlow):
         """This step gets executed when multiple profiles are found for the source entity."""
         if user_input is not None:
             selected_model: str = user_input.get(CONF_MODEL)  # type: ignore
-            selected_profile = self.flow.discovered_profiles.get(selected_model)  # todo, can discovered_profiles be moved to here?
+            selected_profile = self.flow.discovered_profiles.get(selected_model)
             if selected_profile is None:  # pragma: no cover
                 return self.flow.async_abort(reason="invalid_profile")
             self.flow.selected_profile = selected_profile

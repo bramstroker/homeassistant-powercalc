@@ -128,6 +128,7 @@ STRATEGY_STEP_MAPPING: dict[CalculationStrategy, Step] = {
     CalculationStrategy.WLED: Step.WLED,
 }
 
+
 class VirtualPowerFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
@@ -240,6 +241,7 @@ class VirtualPowerFlow:
             errors={},
         )
 
+
 class VirtualPowerConfigFlow(VirtualPowerFlow):
     def __init__(self, flow: PowercalcConfigFlow) -> None:
         super().__init__(flow)
@@ -307,6 +309,7 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
             errors=errors,
             last_step=False,
         )
+
 
 class VirtualPowerOptionsFlow(VirtualPowerFlow):
     def __init__(self, flow: PowercalcOptionsFlow) -> None:

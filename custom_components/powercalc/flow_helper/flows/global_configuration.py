@@ -95,7 +95,7 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
 )
 
 
-def get_global_powercalc_config(flow) -> ConfigType:
+def get_global_powercalc_config(flow: PowercalcCommonFlow) -> ConfigType:
     """Get the global powercalc config."""
     if flow.global_config:
         return flow.global_config
