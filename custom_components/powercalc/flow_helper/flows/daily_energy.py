@@ -76,7 +76,7 @@ def build_daily_energy_config(user_input: dict[str, Any], schema: vol.Schema) ->
 
 class DailyEnergyConfigFlow:
     def __init__(self, flow: PowercalcConfigFlow) -> None:
-        self.flow = flow
+        self.flow: PowercalcConfigFlow = flow
 
     async def async_step_daily_energy(
         self,
@@ -103,4 +103,4 @@ class DailyEnergyConfigFlow:
 
 class DailyEnergyOptionsFlow:
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
-        self.flow = flow
+        self.flow: PowercalcOptionsFlow = flow

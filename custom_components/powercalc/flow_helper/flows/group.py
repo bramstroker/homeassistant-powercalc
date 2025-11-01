@@ -366,7 +366,7 @@ class GroupConfigFlow(GroupFlow):
 
     def __init__(self, flow: PowercalcConfigFlow) -> None:
         super().__init__(flow)
-        self.flow = flow
+        self.flow: PowercalcConfigFlow = flow
 
     async def async_step_menu_group(self) -> ConfigFlowResult:
         menu = [Step.GROUP_CUSTOM, Step.GROUP_DOMAIN, Step.GROUP_SUBTRACT, Step.GROUP_TRACKED_UNTRACKED]
@@ -463,7 +463,7 @@ class GroupOptionsFlow(GroupFlow):
 
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
         super().__init__(flow)
-        self.flow = flow
+        self.flow: PowercalcOptionsFlow = flow
 
     async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the group options flow."""

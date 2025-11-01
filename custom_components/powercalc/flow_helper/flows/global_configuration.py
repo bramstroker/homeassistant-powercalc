@@ -183,7 +183,7 @@ class GlobalConfigurationFlow:
 class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
     def __init__(self, flow: PowercalcConfigFlow) -> None:
         super().__init__(flow)
-        self.flow = flow
+        self.flow: PowercalcConfigFlow = flow
 
     async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
@@ -208,7 +208,7 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
 class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
         super().__init__(flow)
-        self.flow = flow
+        self.flow: PowercalcOptionsFlow = flow
 
     def build_global_config_menu(self) -> dict[Step, str]:
         """Build menu for global configuration"""

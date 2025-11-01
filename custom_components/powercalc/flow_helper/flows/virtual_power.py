@@ -245,7 +245,7 @@ class VirtualPowerFlow:
 class VirtualPowerConfigFlow(VirtualPowerFlow):
     def __init__(self, flow: PowercalcConfigFlow) -> None:
         super().__init__(flow)
-        self.flow = flow
+        self.flow: PowercalcConfigFlow = flow
 
     def create_schema_virtual_power(
         self,
@@ -314,7 +314,7 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
 class VirtualPowerOptionsFlow(VirtualPowerFlow):
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
         super().__init__(flow)
-        self.flow = flow
+        self.flow: PowercalcOptionsFlow = flow
 
     def build_strategy_config(
         self,
