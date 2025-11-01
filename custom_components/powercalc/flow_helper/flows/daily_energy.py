@@ -73,10 +73,6 @@ def build_daily_energy_config(user_input: dict[str, Any], schema: vol.Schema) ->
             config[CONF_DAILY_FIXED_ENERGY][str(key)] = val
     return config
 
-class DailyEnergyCommonFlow:
-    def __init__(self, flow: PowercalcCommonFlow) -> None:
-        self.flow = flow
-
 class DailyEnergyConfigFlow:
     def __init__(self, flow: PowercalcConfigFlow) -> None:
         self.flow = flow

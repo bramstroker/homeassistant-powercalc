@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Callable, TYPE_CHECKING
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
 from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, Platform
@@ -9,21 +10,34 @@ from homeassistant.helpers import selector
 
 from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.const import CONF_AUTOSTART, CONF_CALCULATION_ENABLED_CONDITION, \
-    CONF_CALIBRATE, CONF_GAMMA_CURVE, CONF_IGNORE_UNAVAILABLE_STATE, \
-    CONF_MAX_POWER, CONF_MIN_POWER, CONF_MODE, CONF_MULTIPLY_FACTOR, CONF_MULTIPLY_FACTOR_STANDBY, CONF_PLAYBOOKS, \
-    CONF_POWER, \
-    CONF_POWER_OFF, CONF_POWER_TEMPLATE, \
-    CONF_REPEAT, \
-    CONF_STANDBY_POWER, \
-    CONF_STATES_POWER, CONF_STATE_TRIGGER, CONF_UNAVAILABLE_POWER, \
-    CalculationStrategy, \
-    DUMMY_ENTITY_ID, SensorType
-from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults
+from custom_components.powercalc.const import (
+    CONF_AUTOSTART,
+    CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_CALIBRATE,
+    CONF_GAMMA_CURVE,
+    CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_MAX_POWER,
+    CONF_MIN_POWER,
+    CONF_MODE,
+    CONF_MULTIPLY_FACTOR,
+    CONF_MULTIPLY_FACTOR_STANDBY,
+    CONF_PLAYBOOKS,
+    CONF_POWER,
+    CONF_POWER_OFF,
+    CONF_POWER_TEMPLATE,
+    CONF_REPEAT,
+    CONF_STANDBY_POWER,
+    CONF_STATE_TRIGGER,
+    CONF_STATES_POWER,
+    CONF_UNAVAILABLE_POWER,
+    DUMMY_ENTITY_ID,
+    CalculationStrategy,
+    SensorType,
+)
+from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
 from custom_components.powercalc.flow_helper.flows.global_configuration import get_global_powercalc_config
 from custom_components.powercalc.flow_helper.flows.library import SCHEMA_POWER_OPTIONS_LIBRARY
-from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_ENERGY_SENSOR_TOGGLE, \
-    SCHEMA_UTILITY_METER_TOGGLE
+from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE
 from custom_components.powercalc.strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
 if TYPE_CHECKING:
@@ -114,7 +128,7 @@ STRATEGY_STEP_MAPPING: dict[CalculationStrategy, Step] = {
     CalculationStrategy.WLED: Step.WLED,
 }
 
-class VirtualPowerCommonFlow:
+class VirtualPowerFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
 
@@ -226,10 +240,10 @@ class VirtualPowerCommonFlow:
             errors={},
         )
 
-class VirtualPowerConfigFlow:
+class VirtualPowerConfigFlow(VirtualPowerFlow):
     def __init__(self, flow: PowercalcConfigFlow) -> None:
+        super().__init__(flow)
         self.flow = flow
-        self.virtual_power_common_flow = VirtualPowerCommonFlow(flow)
 
     def create_schema_virtual_power(
         self,
@@ -285,7 +299,7 @@ class VirtualPowerConfigFlow:
                 self.flow.selected_sensor_type = SensorType.VIRTUAL_POWER
                 self.flow.sensor_config.update(user_input)
 
-                return await self.virtual_power_common_flow.forward_to_strategy_step(selected_strategy)
+                return await self.forward_to_strategy_step(selected_strategy)
 
         return self.flow.async_show_form(
             step_id=Step.VIRTUAL_POWER,
@@ -294,17 +308,17 @@ class VirtualPowerConfigFlow:
             last_step=False,
         )
 
-class VirtualPowerOptionsFlow:
+class VirtualPowerOptionsFlow(VirtualPowerFlow):
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
-        self.main_flow = flow
-        self.common_flow = VirtualPowerCommonFlow(flow)
+        super().__init__(flow)
+        self.flow = flow
 
     def build_strategy_config(
         self,
         user_input: dict[str, Any],
     ) -> dict[str, Any]:
         """Build the config dict needed for the configured strategy."""
-        strategy_schema = self.common_flow.create_strategy_schema()
+        strategy_schema = self.create_strategy_schema()
         strategy_options: dict[str, Any] = {}
         for key in strategy_schema.schema:
             if user_input.get(key) is None:

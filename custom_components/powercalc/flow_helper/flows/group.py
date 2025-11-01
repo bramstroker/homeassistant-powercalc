@@ -25,7 +25,8 @@ from custom_components.powercalc.const import (
     CONF_AREA,
     CONF_EXCLUDE_ENTITIES,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
-    CONF_GROUP, CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP,
+    CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
@@ -36,7 +37,8 @@ from custom_components.powercalc.const import (
     CONF_HIDE_MEMBERS,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_MAIN_POWER_SENSOR,
-    CONF_NEW_GROUP, CONF_SENSOR_TYPE,
+    CONF_NEW_GROUP,
+    CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     CONF_SUBTRACT_ENTITIES,
     DOMAIN,
@@ -308,7 +310,7 @@ async def create_schema_group_tracked_untracked_manual(
 
     return schema
 
-class GroupCommonFlow:
+class GroupFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
 
@@ -343,7 +345,7 @@ class GroupCommonFlow:
             user_input,
         )
 
-class GroupConfigFlow:
+class GroupConfigFlow(GroupFlow):
     """
     Encapsulates all group-related steps for config & options flows.
     Composition-based: call from ConfigFlow/OptionsFlow and delegate here.
@@ -361,6 +363,7 @@ class GroupConfigFlow:
     """
 
     def __init__(self, flow: PowercalcConfigFlow) -> None:
+        super().__init__(flow)
         self.flow = flow
 
     async def async_step_menu_group(self) -> ConfigFlowResult:
@@ -453,10 +456,11 @@ class GroupConfigFlow:
         )
 
 
-class GroupOptionsFlow:
+class GroupOptionsFlow(GroupFlow):
     """Handle an option flow for PowerCalc."""
 
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
+        super().__init__(flow)
         self.flow = flow
 
     async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> FlowResult:

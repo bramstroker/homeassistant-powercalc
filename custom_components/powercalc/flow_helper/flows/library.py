@@ -10,18 +10,25 @@ from custom_components.powercalc import (
     DOMAIN,
     DeviceType,
 )
-from custom_components.powercalc.const import CONF_AVAILABILITY_ENTITY, CONF_FIXED, CONF_MANUFACTURER, CONF_MODE, \
-    CONF_MODEL, \
-    CONF_POWER, CONF_SELF_USAGE_INCLUDED, \
-    CONF_SUB_PROFILE, \
-    CONF_VARIABLES, LIBRARY_URL, CalculationStrategy
+from custom_components.powercalc.const import (
+    CONF_AVAILABILITY_ENTITY,
+    CONF_FIXED,
+    CONF_MANUFACTURER,
+    CONF_MODE,
+    CONF_MODEL,
+    CONF_POWER,
+    CONF_SELF_USAGE_INCLUDED,
+    CONF_SUB_PROFILE,
+    CONF_VARIABLES,
+    LIBRARY_URL,
+    CalculationStrategy,
+)
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
 from custom_components.powercalc.flow_helper.dynamic_field_builder import build_dynamic_field_schema
-from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE, \
-    build_sub_profile_schema
+from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE, build_sub_profile_schema
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
-from custom_components.powercalc.power_profile.power_profile import DOMAIN_DEVICE_TYPE_MAPPING, DEVICE_TYPE_DOMAIN, DiscoveryBy
+from custom_components.powercalc.power_profile.power_profile import DEVICE_TYPE_DOMAIN, DOMAIN_DEVICE_TYPE_MAPPING, DiscoveryBy
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
@@ -46,7 +53,7 @@ SCHEMA_POWER_SMART_SWITCH = vol.Schema(
     },
 )
 
-class LibraryCommonFlow:
+class LibraryFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
 
@@ -279,8 +286,9 @@ class LibraryCommonFlow:
         )
 
 
-class LibraryConfigFlow:
+class LibraryConfigFlow(LibraryFlow):
     def __init__(self, flow: PowercalcConfigFlow) -> None:
+        super().__init__(flow)
         self.flow = flow
 
     async def async_step_library_multi_profile(
@@ -380,8 +388,9 @@ class LibraryConfigFlow:
         return await self.flow.async_step_manufacturer()
 
 
-class LibraryOptionsFlow:
+class LibraryOptionsFlow(LibraryFlow):
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
+        super().__init__(flow)
         self.flow = flow
 
     async def async_step_library_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
