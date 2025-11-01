@@ -35,7 +35,7 @@ from custom_components.powercalc import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     DeviceType,
 )
-from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
+from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_UTILITY_METER_OPTIONS, SCHEMA_UTILITY_METER_TOGGLE
 
 if TYPE_CHECKING:
@@ -131,8 +131,8 @@ class GlobalConfigurationFlow:
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_ENERGY,
-                schema=SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR
-            )
+                schema=SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR,
+            ),
         )
 
     async def async_step_global_configuration_utility_meter(self, user_input: dict[str, Any] | None = None) -> FlowResult:
@@ -152,8 +152,8 @@ class GlobalConfigurationFlow:
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_UTILITY_METER,
-                schema=SCHEMA_UTILITY_METER_OPTIONS
-            )
+                schema=SCHEMA_UTILITY_METER_OPTIONS,
+            ),
         )
 
 
@@ -175,8 +175,8 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION,
-                schema=SCHEMA_GLOBAL_CONFIGURATION
-            )
+                schema=SCHEMA_GLOBAL_CONFIGURATION,
+            ),
         )
 
 
@@ -206,6 +206,6 @@ class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION,
-                schema=SCHEMA_GLOBAL_CONFIGURATION
-            )
+                schema=SCHEMA_GLOBAL_CONFIGURATION,
+            ),
         )

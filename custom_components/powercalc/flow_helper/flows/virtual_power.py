@@ -7,6 +7,7 @@ import voluptuous as vol
 from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, Platform
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
+from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 
 from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS
 from custom_components.powercalc.common import create_source_entity
@@ -228,7 +229,7 @@ class VirtualPowerFlow:
                     schema,
                     get_global_powercalc_config(self.flow),
                 ),
-            )
+            ),
         )
 
 
@@ -265,10 +266,7 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
         )
         return schema.extend(power_options.schema)  # type: ignore
 
-    async def async_step_virtual_power(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    async def async_step_virtual_power(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for virtual power sensor."""
         errors: dict[str, str] = {}
 
@@ -300,10 +298,16 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
             last_step=False,
         )
 
-    async def forward_to_strategy_step(
-        self,
-        strategy: CalculationStrategy,
-    ) -> FlowResult:
+    async def async_step_playbook(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for playbook sensor."""
+
+        def _validate(user_input: dict[str, Any]) -> None:
+            if user_input.get(CONF_PLAYBOOKS) is None or len(user_input.get(CONF_PLAYBOOKS)) == 0:  # type: ignore
+                raise SchemaFlowError("playbook_mandatory")
+
+        return await self.handle_strategy_step(CalculationStrategy.PLAYBOOK, user_input, _validate)
+
+    async def forward_to_strategy_step(self, strategy: CalculationStrategy) -> FlowResult:
         """Forward to the next step based on the selected strategy."""
         step = STRATEGY_STEP_MAPPING.get(strategy)
         if step is None:
