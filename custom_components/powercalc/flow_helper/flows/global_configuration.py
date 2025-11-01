@@ -35,7 +35,7 @@ from custom_components.powercalc import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     DeviceType,
 )
-from custom_components.powercalc.flow_helper.common import Step, fill_schema_defaults
+from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_UTILITY_METER_OPTIONS, SCHEMA_UTILITY_METER_TOGGLE
 
 if TYPE_CHECKING:
@@ -117,25 +117,6 @@ class GlobalConfigurationFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
 
-    async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the global configuration step."""
-        get_global_powercalc_config(self.flow)
-        await self.flow.async_set_unique_id(ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
-        self.flow.abort_if_unique_id_configured()
-
-        if user_input is not None:
-            self.flow.global_config.update(user_input)
-            return await self.flow.async_step_global_configuration_energy()
-
-        return self.flow.async_show_form(
-            step_id=Step.GLOBAL_CONFIGURATION,
-            data_schema=fill_schema_defaults(
-                SCHEMA_GLOBAL_CONFIGURATION,
-                self.flow.global_config,
-            ),
-            errors={},
-        )
-
     async def async_step_global_configuration_energy(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
 
@@ -147,13 +128,11 @@ class GlobalConfigurationFlow:
         if not bool(self.flow.global_config.get(CONF_CREATE_ENERGY_SENSORS)) or user_input is not None:
             return await self.flow.async_step_global_configuration_utility_meter()
 
-        return self.flow.async_show_form(
-            step_id=Step.GLOBAL_CONFIGURATION_ENERGY,
-            data_schema=fill_schema_defaults(
-                SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR,
-                self.flow.global_config,
-            ),
-            errors={},
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GLOBAL_CONFIGURATION_ENERGY,
+                schema=SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR
+            )
         )
 
     async def async_step_global_configuration_utility_meter(self, user_input: dict[str, Any] | None = None) -> FlowResult:
@@ -165,18 +144,16 @@ class GlobalConfigurationFlow:
                 return self.flow.persist_config_entry()
 
         if not bool(self.flow.global_config.get(CONF_CREATE_UTILITY_METERS)) or user_input is not None:
-            return self.flow.async_create_entry(
+            return self.flow.async_create_entry(  # type: ignore
                 title="Global Configuration",
                 data=self.flow.global_config,
             )
 
-        return self.flow.async_show_form(
-            step_id=Step.GLOBAL_CONFIGURATION_UTILITY_METER,
-            data_schema=fill_schema_defaults(
-                SCHEMA_UTILITY_METER_OPTIONS,
-                self.flow.global_config,
-            ),
-            errors={},
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GLOBAL_CONFIGURATION_UTILITY_METER,
+                schema=SCHEMA_UTILITY_METER_OPTIONS
+            )
         )
 
 
@@ -195,20 +172,18 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
             self.flow.global_config.update(user_input)
             return await self.flow.async_step_global_configuration_energy()
 
-        return self.flow.async_show_form(
-            step_id=Step.GLOBAL_CONFIGURATION,
-            data_schema=fill_schema_defaults(
-                SCHEMA_GLOBAL_CONFIGURATION,
-                self.flow.global_config,
-            ),
-            errors={},
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GLOBAL_CONFIGURATION,
+                schema=SCHEMA_GLOBAL_CONFIGURATION
+            )
         )
 
 
 class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
         super().__init__(flow)
-        self.flow: PowercalcOptionsFlow = flow
+        self.flow = flow
 
     def build_global_config_menu(self) -> dict[Step, str]:
         """Build menu for global configuration"""
@@ -228,11 +203,9 @@ class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
             self.flow.global_config.update(user_input)
             return self.flow.persist_config_entry()
 
-        return self.flow.async_show_form(
-            step_id=Step.GLOBAL_CONFIGURATION,
-            data_schema=fill_schema_defaults(
-                SCHEMA_GLOBAL_CONFIGURATION,
-                self.flow.global_config,
-            ),
-            errors={},
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GLOBAL_CONFIGURATION,
+                schema=SCHEMA_GLOBAL_CONFIGURATION
+            )
         )

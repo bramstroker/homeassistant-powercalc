@@ -58,7 +58,6 @@ SCHEMA_DAILY_ENERGY = vol.Schema(
 ).extend(SCHEMA_DAILY_ENERGY_OPTIONS.schema)
 
 
-@staticmethod
 def build_daily_energy_config(user_input: dict[str, Any], schema: vol.Schema) -> dict[str, Any]:
     """Build the config under daily_energy: key."""
     config: dict[str, Any] = {

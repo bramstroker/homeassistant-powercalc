@@ -205,17 +205,6 @@ class VirtualPowerFlow:
             user_input,
         )
 
-    async def forward_to_strategy_step(
-        self,
-        strategy: CalculationStrategy,
-    ) -> FlowResult:
-        """Forward to the next step based on the selected strategy."""
-        step = STRATEGY_STEP_MAPPING.get(strategy)
-        if step is None:
-            return await self.flow.async_step_library()
-        method = getattr(self.flow, f"async_step_{step}")
-        return await method()  # type: ignore
-
     async def async_step_power_advanced(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for advanced options."""
 
@@ -232,13 +221,14 @@ class VirtualPowerFlow:
         if self.flow.sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
             schema = schema.extend(SCHEMA_ENERGY_OPTIONS.schema)
 
-        return self.flow.async_show_form(
-            step_id=Step.POWER_ADVANCED,
-            data_schema=fill_schema_defaults(
-                schema,
-                get_global_powercalc_config(self.flow),
-            ),
-            errors={},
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.POWER_ADVANCED,
+                schema=fill_schema_defaults(
+                    schema,
+                    get_global_powercalc_config(self.flow),
+                ),
+            )
         )
 
 
@@ -303,12 +293,23 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
 
                 return await self.forward_to_strategy_step(selected_strategy)
 
-        return self.flow.async_show_form(
+        return self.flow.async_show_form(  # type: ignore
             step_id=Step.VIRTUAL_POWER,
             data_schema=self.create_schema_virtual_power(),
             errors=errors,
             last_step=False,
         )
+
+    async def forward_to_strategy_step(
+        self,
+        strategy: CalculationStrategy,
+    ) -> FlowResult:
+        """Forward to the next step based on the selected strategy."""
+        step = STRATEGY_STEP_MAPPING.get(strategy)
+        if step is None:
+            return await self.flow.async_step_library()
+        method = getattr(self.flow, f"async_step_{step}")
+        return await method()  # type: ignore
 
 
 class VirtualPowerOptionsFlow(VirtualPowerFlow):

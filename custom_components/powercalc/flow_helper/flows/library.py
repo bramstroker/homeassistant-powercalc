@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector, translation
 
@@ -145,7 +146,7 @@ class LibraryFlow:
     async def async_step_post_library(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    ) -> FlowResult | ConfigFlowResult:
         """
         Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered.
         Forwards to the next step in the flow.
@@ -295,7 +296,7 @@ class LibraryConfigFlow(LibraryFlow):
     async def async_step_library_multi_profile(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    ) -> FlowResult | ConfigFlowResult:
         """This step gets executed when multiple profiles are found for the source entity."""
         if user_input is not None:
             selected_model: str = user_input.get(CONF_MODEL)  # type: ignore

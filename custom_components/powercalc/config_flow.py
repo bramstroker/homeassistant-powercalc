@@ -296,7 +296,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """
         return await self.flow_handlers[FlowType.LIBRARY].async_step_post_library(user_input)
 
-    async def async_step_availability_entity(self, user_input: dict[str, Any] | None = None) -> FlowResult | None:
+    async def async_step_availability_entity(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for availability entity."""
         return await self.flow_handlers[FlowType.LIBRARY].async_step_availability_entity(user_input)
 
