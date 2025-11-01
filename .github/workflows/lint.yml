@@ -27,6 +27,15 @@ jobs:
       - name: Checkout Powercalc
         uses: actions/checkout@v5
       - uses: ./.github/workflows/uv-composite-action
+      - name: Inspect Ruff environment
+        run: |
+          python -V
+          uv run ruff --version
+          uv run ruff config
+          echo "---- files Ruff will check ----"
+          uv run ruff config --show-files | sed -n '1,120p'
+          echo "---- explain I001 ----"
+          uv run ruff check --explain I001
       - name: Run Ruff
         run: |
           uv run ruff check .
