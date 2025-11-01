@@ -1,6 +1,9 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.13.2, <4.0"
+
+[options]
+prerelease-mode = "allow"
 
 [[package]]
 name = "acme"
