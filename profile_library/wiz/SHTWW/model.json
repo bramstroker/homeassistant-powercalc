@@ -9,6 +9,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.22:docker"
   },
-  "name": "Philips Smart LED A67 E27 Tunable White 2700K-6500K (type SHTWW, model 9290024496A, 13 W, 220-240 V, 50/60 Hz, 1521 lm, beam angle: 360°)",
-  "standby_power": 0.3
+  "name": "Philips Smart LED A67 E27 Tunable White 2700K-6500K (type SHTWW, model 9290024496A, 13 W, 220-240 V, 50/60 Hz, 1521 lm, beam angle: 360\u00b0)",
+  "standby_power": 0.3,
+  "author": "schuppan <120984051+schuppan@users.noreply.github.com>"
 }
