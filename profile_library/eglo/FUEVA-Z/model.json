@@ -1,7 +1,7 @@
 {
   "aliases": [
     "33957",
-    "AwoX (LED light with color temperature)"
+    "AwoX LED light with color temperature"
   ],
   "author": "Tom Frenzel <admin@tom-frenzel.de>",
   "calculation_strategy": "lut",
@@ -14,6 +14,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.24:docker"
   },
-  "name": "EGLO FUEVA-Z",
+  "name": "EGLO FUEVA-Z (28.5cm)",
   "standby_power": 0.13
 }
