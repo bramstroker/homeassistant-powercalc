@@ -1,7 +1,6 @@
 {
   "aliases": [
-    "33957",
-    "AwoX LED light with color temperature"
+    "33957"
   ],
   "author": "Tom Frenzel <admin@tom-frenzel.de>",
   "calculation_strategy": "lut",
