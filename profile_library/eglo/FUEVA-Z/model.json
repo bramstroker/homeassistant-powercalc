@@ -1,15 +1,18 @@
 {
+  "aliases": [
+    "33957"
+  ],
+  "author": "Tom Frenzel <admin@tom-frenzel.de>",
   "calculation_strategy": "lut",
-  "created_at": "2025-11-02T07:53:49.775711",
+  "created_at": "2025-11-02T16:45:52.478404",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly 1PM Mini",
+  "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.24:docker"
   },
-  "name": "GL-D-004P",
-  "standby_power": 0.22,
-  "author": "Peklaa <57568760+Peklaa@users.noreply.github.com>"
+  "name": "EGLO FUEVA-Z (28.5cm)",
+  "standby_power": 0.13
 }
