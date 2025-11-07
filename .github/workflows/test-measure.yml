@@ -19,6 +19,7 @@ jobs:
       - uses: ./.github/workflows/uv-composite-action
         with:
           directory: './utils/measure'
+          python_version: '3.13'
       - name: Run tests
         run: |
           cd ./utils/measure && uv run pytest \
