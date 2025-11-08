@@ -12,6 +12,7 @@ import sys
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
+from typing import Mapping
 
 import git
 
@@ -24,6 +25,9 @@ sys.path.insert(
 
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
 DATA_DIR = f"{PROJECT_ROOT}/profile_library"
+
+def create_model_hash(mapping: Mapping) -> str:
+    return hashlib.md5(json.dumps(mapping, sort_keys=True).encode()).hexdigest()
 
 def generate_library_json(model_listing: list[dict]) -> None:
     manufacturers: dict[str, dict] = {}
@@ -59,7 +63,9 @@ def generate_library_json(model_listing: list[dict]) -> None:
         mapped_dict = {
             key: value for key, value in model.items() if key not in skipped_fields
         }
-        mapped_dict["hash"] = hashlib.md5(json.dumps(mapped_dict, sort_keys=True).encode()).hexdigest()
+        # Create a copy of mapped_dict without has_sub_profiles for hash calculation
+        hash_dict = {key: value for key, value in mapped_dict.items() if key != "has_sub_profiles"}
+        mapped_dict["hash"] = create_model_hash(hash_dict)
         manufacturer["models"].append(mapped_dict)
 
     json_data = {
