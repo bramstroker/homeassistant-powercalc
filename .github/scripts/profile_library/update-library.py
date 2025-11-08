@@ -63,8 +63,7 @@ def generate_library_json(model_listing: list[dict]) -> None:
         mapped_dict = {
             key: value for key, value in model.items() if key not in skipped_fields
         }
-        # Create a copy of mapped_dict without has_sub_profiles for hash calculation
-        hash_dict = {key: value for key, value in mapped_dict.items() if key != "has_sub_profiles"}
+        hash_dict = {key: value for key, value in mapped_dict.items() if key != "sub_profile_count"}
         mapped_dict["hash"] = create_model_hash(hash_dict)
         manufacturer["models"].append(mapped_dict)
 
@@ -184,7 +183,7 @@ def get_model_list() -> list[dict]:
                     "updated_at": get_last_commit_time(model_directory).isoformat(),
                     "full_path": json_path,
                     "max_power": get_max_power(model_directory, model_data),
-                    "has_sub_profiles": has_sub_profiles(model_directory),
+                    "sub_profile_count": get_sub_profile_count(model_directory),
                 },
             )
             if "device_type" not in model_data:
@@ -208,9 +207,9 @@ def get_color_modes(model_directory: str) -> set:
     return color_modes
 
 
-def has_sub_profiles(model_directory: str) -> bool:
+def get_sub_profile_count(model_directory: str) -> int:
     path = Path(model_directory)
-    return any(p.is_dir() for p in path.iterdir())
+    return sum(1 for p in path.iterdir() if p.is_dir())
 
 def get_max_power(model_directory: str, model_data: dict) -> float | None:
     calculation_strategy = model_data.get("calculation_strategy", "lut")
