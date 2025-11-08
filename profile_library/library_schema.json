@@ -85,6 +85,10 @@
           "type": "string",
           "format": "date-time",
           "description": "Last update of the model"
+        },
+        "has_sub_profiles": {
+          "type": "boolean",
+          "description": "Indicates whether the profile has sub profiles"
         }
       }
     },
