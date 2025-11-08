@@ -16,7 +16,7 @@ classifiers = [
   "Intended Audience :: End Users/Desktop",
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
 requires-python = ">=3.13.2,<4.0"
 dependencies = ["homeassistant"]
@@ -39,7 +39,7 @@ force-sort-within-sections = true
 combine-as-imports = true
 
 [tool.mypy]
-python_version = "3.13"
+python_version = "3.14"
 show_error_codes = true
 follow_imports = "silent"
 local_partial_types = true
@@ -71,7 +71,7 @@ source = ["custom_components/powercalc", "utils", "tests"]
 
 [tool.ruff]
 line-length = 150
-target-version = "py313"
+target-version = "py314"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.lint]
