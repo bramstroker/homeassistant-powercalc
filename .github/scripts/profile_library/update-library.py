@@ -178,6 +178,7 @@ def get_model_list() -> list[dict]:
                     "updated_at": get_last_commit_time(model_directory).isoformat(),
                     "full_path": json_path,
                     "max_power": get_max_power(model_directory, model_data),
+                    "has_sub_profiles": has_sub_profiles(model_directory),
                 },
             )
             if "device_type" not in model_data:
@@ -200,6 +201,10 @@ def get_color_modes(model_directory: str) -> set:
         color_modes.add(color_mode)
     return color_modes
 
+
+def has_sub_profiles(model_directory: str) -> bool:
+    path = Path(model_directory)
+    return any(p.is_dir() for p in path.iterdir())
 
 def get_max_power(model_directory: str, model_data: dict) -> float | None:
     calculation_strategy = model_data.get("calculation_strategy", "lut")
