@@ -87,6 +87,9 @@ max-complexity = 15
 
 [tool.uv]
 prerelease = "allow"
+override-dependencies = [
+  "mashumaro[msgpack]==3.17",
+]
 
 [project.optional-dependencies]
 docs = [
