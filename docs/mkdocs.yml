@@ -2,6 +2,7 @@ site_name: Powercalc documentation
 docs_dir: source
 theme:
   name: material
+  variant: classic
   features:
     - navigation.tabs
     - navigation.sections
@@ -30,6 +31,9 @@ theme:
   favicon: img/logo.svg
 extra:
   generator: false
+  analytics:
+    provider: google
+    property: G-XPYSM71YND
 plugins:
   - search
   - git-revision-date-localized:

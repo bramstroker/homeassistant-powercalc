@@ -118,6 +118,11 @@ packages = ["custom_components"]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[dependency-groups]
+docs = [
+    "zensical>=0.0.5",
+]
+
 [tool.codespell]
 ignore-words-list = 'hass'
 check-filenames = true
