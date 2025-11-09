@@ -19,6 +19,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
+      - run: curl -LsSf https://astral.sh/uv/install.sh | sh
       - run: uv sync --group docs
       - run: uv run zensical build --clean
       - uses: actions/upload-pages-artifact@v4
