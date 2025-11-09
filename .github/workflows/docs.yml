@@ -19,12 +19,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - run: cd docs
       - run: pip install zensical
+        working-directory: docs
       - run: zensical build --clean
+        working-directory: docs
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: site
+          path: docs/site
       - uses: actions/deploy-pages@v4
 #  deploy-old:
 #    runs-on: ubuntu-latest
