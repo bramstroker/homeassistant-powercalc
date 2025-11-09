@@ -93,9 +93,7 @@ override-dependencies = [
 
 [project.optional-dependencies]
 docs = [
-    "mkdocs",
-    "mkdocs-material",
-    "mkdocs-git-revision-date-localized-plugin"
+    "zensical"
 ]
 dev = [
     "pre-commit>=4.0.0",
