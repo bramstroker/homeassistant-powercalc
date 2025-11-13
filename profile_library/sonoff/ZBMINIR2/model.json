@@ -3,7 +3,7 @@
   "measure_method": "manual",
   "measure_device": "PeakTech 4350",
   "name": "ZBMINIR2",
-  "standby_power": 0.80,
+  "standby_power": 0.8,
   "standby_power_on": 1.56,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
