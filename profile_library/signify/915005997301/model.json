@@ -9,6 +9,9 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.14.10:docker"
   },
+  "aliases": [
+    "915005997201"
+  ],  
   "name": "Hue Infuse Medium Ceiling Lamp",
   "standby_power": 0.16,
   "author": "vladi-k <53343355+vladi-k@users.noreply.github.com>"
