@@ -9,7 +9,11 @@
     "VERSION": "v1.11.6:docker"
   },
   "name": "Hue Signe Gradient Table Lamp",
+  "device_type": "light",
   "standby_power": 0.6,
+  "aliases": [
+    "915005987001"
+  ],
   "author": "pwnagepeter <hauke@pwnagepeter.net>",
   "created_at": "2024-07-21T11:13:03"
 }
