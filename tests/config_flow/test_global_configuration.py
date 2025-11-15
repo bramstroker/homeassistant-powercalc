@@ -11,7 +11,10 @@ import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
-    CONF_DISCOVERY, CONF_EXCLUDE_DEVICE_TYPES, CONF_EXCLUDE_SELF_USAGE, CONF_GROUP_UPDATE_INTERVAL,
+    CONF_DISCOVERY,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
+    CONF_GROUP_UPDATE_INTERVAL,
     DEFAULT_GROUP_UPDATE_INTERVAL,
     DeviceType,
 )

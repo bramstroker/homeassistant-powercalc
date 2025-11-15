@@ -14,8 +14,10 @@ from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
-    CONF_DISCOVERY, CONF_DOMAIN,
-    CONF_ENABLED, CONF_SCAN_INTERVAL,
+    CONF_DISCOVERY,
+    CONF_DOMAIN,
+    CONF_ENABLED,
+    CONF_SCAN_INTERVAL,
     EVENT_HOMEASSISTANT_STARTED,
     EntityCategory,
     Platform,
@@ -41,13 +43,16 @@ from .const import (
     CONF_DISCOVERY,
     CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
     CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
-    CONF_ENABLE_AUTODISCOVERY_DEPRECATED, CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+    CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
-    CONF_EXCLUDE_DEVICE_TYPES, CONF_EXCLUDE_SELF_USAGE, CONF_FIXED,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
+    CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GROUP_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -130,7 +135,7 @@ CONFIG_SCHEMA = vol.Schema(
             ),
             cv.deprecated(
                 CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
-                replacement_key=CONF_DISCOVERY
+                replacement_key=CONF_DISCOVERY,
             ),
             vol.Schema(
                 {
@@ -180,7 +185,7 @@ CONFIG_SCHEMA = vol.Schema(
                                 [cls.value for cls in DeviceType],
                             ),
                             vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): cv.boolean,
-                        }
+                        },
                     ),
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,

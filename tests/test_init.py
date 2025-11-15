@@ -4,7 +4,8 @@ from homeassistant.components import input_boolean, light
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import (
-    CONF_ENABLED, CONF_ENTITY_ID,
+    CONF_ENABLED,
+    CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
@@ -15,8 +16,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import CONF_DISCOVERY, DOMAIN_CONFIG, SERVICE_RELOAD, async_migrate_entry, \
-    repair_none_config_entries_issue
+from custom_components.powercalc import CONF_DISCOVERY, DOMAIN_CONFIG, SERVICE_RELOAD, async_migrate_entry, repair_none_config_entries_issue
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
