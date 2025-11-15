@@ -45,7 +45,6 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
-    CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
@@ -343,7 +342,6 @@ async def test_can_include_autodiscovered_entity_in_group(
                 CONF_ENTITIES: [{CONF_ENTITY_ID: "light.testa"}],
             },
         ],
-        {CONF_ENABLE_AUTODISCOVERY: True},
     )
 
     assert len(caplog.records) == 0
