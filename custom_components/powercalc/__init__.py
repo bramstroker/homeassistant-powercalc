@@ -14,8 +14,8 @@ from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
-    CONF_DOMAIN,
-    CONF_SCAN_INTERVAL,
+    CONF_DISCOVERY, CONF_DOMAIN,
+    CONF_ENABLED, CONF_SCAN_INTERVAL,
     EVENT_HOMEASSISTANT_STARTED,
     EntityCategory,
     Platform,
@@ -38,16 +38,16 @@ from .const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
-    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
-    CONF_DISCOVERY_EXCLUDE_SELF_USAGE,
-    CONF_ENABLE_AUTODISCOVERY,
-    CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_DISCOVERY,
+    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
+    CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
+    CONF_ENABLE_AUTODISCOVERY_DEPRECATED, CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
-    CONF_FIXED,
+    CONF_EXCLUDE_DEVICE_TYPES, CONF_EXCLUDE_SELF_USAGE, CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GROUP_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -120,6 +120,18 @@ CONFIG_SCHEMA = vol.Schema(
                 CONF_SCAN_INTERVAL,
                 replacement_key=CONF_FORCE_UPDATE_FREQUENCY,
             ),
+            cv.deprecated(
+                CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
+                replacement_key=CONF_DISCOVERY,
+            ),
+            cv.deprecated(
+                CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
+                replacement_key=CONF_DISCOVERY,
+            ),
+            cv.deprecated(
+                CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+                replacement_key=CONF_DISCOVERY
+            ),
             vol.Schema(
                 {
                     vol.Optional(
@@ -160,7 +172,16 @@ CONFIG_SCHEMA = vol.Schema(
                         CONF_DISABLE_LIBRARY_DOWNLOAD,
                         default=False,
                     ): cv.boolean,
-                    vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
+                    vol.Optional(CONF_DISCOVERY): vol.Schema(
+                        {
+                            vol.Optional(CONF_ENABLED, default=True): cv.boolean,
+                            vol.Optional(CONF_EXCLUDE_DEVICE_TYPES): vol.All(
+                                cv.ensure_list,
+                                [cls.value for cls in DeviceType],
+                            ),
+                            vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): cv.boolean,
+                        }
+                    ),
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
@@ -202,11 +223,6 @@ CONFIG_SCHEMA = vol.Schema(
                         [SENSOR_CONFIG],
                     ),
                     vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS): cv.boolean,
-                    vol.Optional(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES): vol.All(
-                        cv.ensure_list,
-                        [cls.value for cls in DeviceType],
-                    ),
-                    vol.Optional(CONF_DISCOVERY_EXCLUDE_SELF_USAGE, default=False): cv.boolean,
                 },
             ),
         ),
@@ -261,8 +277,10 @@ async def create_discovery_manager_instance(
     ha_config: ConfigType,
     global_powercalc_config: ConfigType,
 ) -> DiscoveryManager:
-    exclude_device_types = [DeviceType(device_type) for device_type in global_powercalc_config.get(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES, [])]
-    exclude_self_usage = global_powercalc_config.get(CONF_DISCOVERY_EXCLUDE_SELF_USAGE, False)
+    discovery_config = global_powercalc_config.get(CONF_DISCOVERY, {})
+    exclude_device_types = [DeviceType(device_type) for device_type in discovery_config.get(CONF_EXCLUDE_DEVICE_TYPES, [])]
+    exclude_self_usage = discovery_config.get(CONF_EXCLUDE_SELF_USAGE, False)
+    enable_autodiscovery = discovery_config.get(CONF_ENABLED, True)
 
     manager = DiscoveryManager(
         hass,
@@ -270,7 +288,7 @@ async def create_discovery_manager_instance(
         exclude_device_types=exclude_device_types,
         exclude_self_usage_profiles=exclude_self_usage,
     )
-    if global_powercalc_config.get(CONF_ENABLE_AUTODISCOVERY):
+    if enable_autodiscovery:
         await manager.setup()
     return manager
 
@@ -292,7 +310,11 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
-        CONF_ENABLE_AUTODISCOVERY: True,
+        CONF_DISCOVERY: {
+            CONF_ENABLED: True,
+            CONF_EXCLUDE_SELF_USAGE: False,
+            CONF_EXCLUDE_DEVICE_TYPES: [],
+        },
         CONF_UTILITY_METER_OFFSET: DEFAULT_OFFSET,
         CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
@@ -302,6 +324,14 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
     if global_config_entry:
         _LOGGER.debug("Found global configuration entry: %s", global_config_entry.data)
         global_config.update(get_global_gui_configuration(global_config_entry))
+
+    # Handle legacy config. Might be removed in future Powercalc version
+    if CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED in global_config:
+        global_config[CONF_DISCOVERY][CONF_EXCLUDE_DEVICE_TYPES] = global_config[CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED]
+    if CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED in global_config:
+        global_config[CONF_DISCOVERY][CONF_EXCLUDE_SELF_USAGE] = global_config[CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED]
+    if CONF_ENABLE_AUTODISCOVERY_DEPRECATED in global_config:
+        global_config[CONF_DISCOVERY][CONF_ENABLED] = global_config[CONF_ENABLE_AUTODISCOVERY_DEPRECATED]
 
     return global_config
 
@@ -316,6 +346,7 @@ def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
         global_config[CONF_ENERGY_SENSOR_CATEGORY] = EntityCategory(global_config[CONF_ENERGY_SENSOR_CATEGORY])
     if global_config.get(CONF_POWER_SENSOR_CATEGORY):
         global_config[CONF_POWER_SENSOR_CATEGORY] = EntityCategory(global_config[CONF_POWER_SENSOR_CATEGORY])
+
     global_config[FLAG_HAS_GLOBAL_GUI_CONFIG] = True
 
     return global_config

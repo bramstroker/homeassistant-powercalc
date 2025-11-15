@@ -5,15 +5,13 @@ from typing import Any
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON, EntityCategory
+from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON, EntityCategory
 from homeassistant.core import HomeAssistant
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
-    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
-    CONF_DISCOVERY_EXCLUDE_SELF_USAGE,
-    CONF_GROUP_UPDATE_INTERVAL,
+    CONF_DISCOVERY, CONF_EXCLUDE_DEVICE_TYPES, CONF_EXCLUDE_SELF_USAGE, CONF_GROUP_UPDATE_INTERVAL,
     DEFAULT_GROUP_UPDATE_INTERVAL,
     DeviceType,
 )
@@ -24,7 +22,6 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
-    CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_NAMING,
@@ -82,11 +79,19 @@ async def test_config_flow(hass: HomeAssistant) -> None:
             CONF_CREATE_UTILITY_METERS: True,
             CONF_POWER_SENSOR_PRECISION: 4,
             CONF_FORCE_UPDATE_FREQUENCY: 300,
-            CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES: [DeviceType.SMART_SWITCH],
         },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_DISCOVERY
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_EXCLUDE_DEVICE_TYPES: [DeviceType.SMART_SWITCH],
+        },
+    )
+
     assert result["step_id"] == Step.GLOBAL_CONFIGURATION_ENERGY
 
     result = await hass.config_entries.flow.async_configure(
@@ -114,7 +119,11 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_CREATE_UTILITY_METERS: True,
         CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
         CONF_DISABLE_LIBRARY_DOWNLOAD: True,
-        CONF_ENABLE_AUTODISCOVERY: True,
+        CONF_DISCOVERY: {
+            CONF_ENABLED: True,
+            CONF_EXCLUDE_DEVICE_TYPES: [DeviceType.SMART_SWITCH],
+            CONF_EXCLUDE_SELF_USAGE: False,
+        },
         CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
         CONF_ENERGY_SENSOR_CATEGORY: None,
         CONF_ENERGY_SENSOR_NAMING: "{} energy",
@@ -131,8 +140,6 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_UTILITY_METER_OFFSET: 0,
         CONF_UTILITY_METER_TARIFFS: ["foo"],
         CONF_UTILITY_METER_TYPES: [DAILY],
-        CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES: [DeviceType.SMART_SWITCH],
-        CONF_DISCOVERY_EXCLUDE_SELF_USAGE: False,
     }
     config_entry: ConfigEntry = result["result"]
     assert config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID
@@ -159,6 +166,12 @@ async def test_energy_and_utility_options_skipped(hass: HomeAssistant, user_inpu
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         user_input,
+    )
+
+    # Submit discovery step
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
     )
 
     if expected_step:
@@ -373,7 +386,7 @@ def create_mock_global_config_entry(hass: HomeAssistant, data: dict[str, Any]) -
             CONF_CREATE_DOMAIN_GROUPS: [],
             CONF_CREATE_ENERGY_SENSORS: True,
             CONF_CREATE_UTILITY_METERS: False,
-            CONF_ENABLE_AUTODISCOVERY: True,
+            CONF_DISCOVERY: {CONF_ENABLED: True},
             CONF_UTILITY_METER_OFFSET: 0,
             CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
             CONF_INCLUDE_NON_POWERCALC_SENSORS: True,

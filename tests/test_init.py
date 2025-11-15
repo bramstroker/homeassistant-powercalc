@@ -4,7 +4,7 @@ from homeassistant.components import input_boolean, light
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import (
-    CONF_ENTITY_ID,
+    CONF_ENABLED, CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
@@ -15,13 +15,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import DOMAIN_CONFIG, SERVICE_RELOAD, async_migrate_entry, repair_none_config_entries_issue
+from custom_components.powercalc import CONF_DISCOVERY, DOMAIN_CONFIG, SERVICE_RELOAD, async_migrate_entry, \
+    repair_none_config_entries_issue
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
-    CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_MANUFACTURER,
@@ -55,7 +55,9 @@ async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry) ->
     await create_input_boolean(hass)
 
     domain_config = {
-        CONF_ENABLE_AUTODISCOVERY: False,
+        CONF_DISCOVERY: {
+            CONF_ENABLED: False,
+        },
         CONF_CREATE_DOMAIN_GROUPS: [
             input_boolean.DOMAIN,
             light.DOMAIN,  # No light entities were created, so this group should not be created
@@ -131,7 +133,6 @@ async def test_domain_group_with_utility_meter(
     entry.add_to_hass(hass)
 
     domain_config = {
-        CONF_ENABLE_AUTODISCOVERY: True,
         CONF_CREATE_DOMAIN_GROUPS: [light.DOMAIN],
         CONF_CREATE_UTILITY_METERS: True,
         CONF_UTILITY_METER_TYPES: [DAILY],
@@ -297,8 +298,8 @@ async def test_reload_service_global_configuration(hass: HomeAssistant) -> None:
     Test new global configuration is applied correctly.
     Also verify utility meters are created after setting this to true
     """
-    initial_config = {CONF_ENABLE_AUTODISCOVERY: True, CONF_CREATE_UTILITY_METERS: False}
-    new_config = {CONF_ENABLE_AUTODISCOVERY: False, CONF_CREATE_UTILITY_METERS: True}
+    initial_config = {CONF_DISCOVERY: {CONF_ENABLED: True}, CONF_CREATE_UTILITY_METERS: False}
+    new_config = {CONF_DISCOVERY: {CONF_ENABLED: False}, CONF_CREATE_UTILITY_METERS: True}
 
     sensor_config = get_simple_fixed_config("light.test", 50)
 
@@ -313,7 +314,7 @@ async def test_reload_service_global_configuration(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
         domain_config = hass.data[DOMAIN][DOMAIN_CONFIG]
-        assert not domain_config[CONF_ENABLE_AUTODISCOVERY]
+        assert not domain_config[CONF_DISCOVERY][CONF_ENABLED]
         assert domain_config[CONF_CREATE_UTILITY_METERS]
 
         assert hass.states.get("sensor.test_power")
