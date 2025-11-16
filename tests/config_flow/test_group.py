@@ -19,7 +19,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry, Regist
 import voluptuous as vol
 
 from custom_components.powercalc import SensorType, async_migrate_entry
-from custom_components.powercalc.config_flow import Step
+from custom_components.powercalc.config_flow import PowercalcConfigFlow, Step
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_AREA,
@@ -619,7 +619,7 @@ async def test_migrate_config_entry_from_version_2(hass: HomeAssistant) -> None:
     mock_entry.add_to_hass(hass)
     await async_migrate_entry(hass, mock_entry)
     hass.config_entries.async_get_entry(mock_entry.entry_id)
-    assert mock_entry.version == 4
+    assert mock_entry.version == PowercalcConfigFlow.VERSION
     assert mock_entry.data.get(CONF_CREATE_ENERGY_SENSOR)
 
 

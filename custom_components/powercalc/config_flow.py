@@ -274,12 +274,12 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
         schema = await self._get_schema(form_step)
         # noinspection PyTypeChecker
+        form_data = form_step.form_data
+        if form_data is None:
+            form_data = {**self.sensor_config, **get_global_powercalc_config(self)}
         return self.async_show_form(
             step_id=form_step.step,
-            data_schema=fill_schema_defaults(
-                schema,
-                {**self.sensor_config, **get_global_powercalc_config(self)},
-            ),
+            data_schema=fill_schema_defaults(schema, form_data),
             errors={"base": str(error)} if error else {},
             last_step=last_step,
             **(form_step.form_kwarg or {}),
@@ -304,7 +304,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
 
-    VERSION = 4
+    VERSION = 5
 
     def __init__(self) -> None:
         """Initialize options flow."""

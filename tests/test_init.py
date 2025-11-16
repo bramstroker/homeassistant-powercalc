@@ -4,7 +4,8 @@ from homeassistant.components import input_boolean, light
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import (
-    CONF_ENABLED, CONF_ENTITY_ID,
+    CONF_ENABLED,
+    CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
@@ -15,13 +16,25 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import CONF_DISCOVERY, DOMAIN_CONFIG, SERVICE_RELOAD, async_migrate_entry, \
-    repair_none_config_entries_issue
+from custom_components.powercalc import (
+    CONF_DISCOVERY,
+    DOMAIN_CONFIG,
+    SERVICE_RELOAD,
+    DeviceType,
+    async_migrate_entry,
+    repair_none_config_entries_issue,
+)
+from custom_components.powercalc.config_flow import PowercalcConfigFlow
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
+    CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
+    CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
     CONF_FIXED,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_MANUFACTURER,
@@ -38,6 +51,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SensorType,
 )
 
@@ -184,7 +198,7 @@ async def test_create_config_entry_without_energy_sensor(
             CONF_POWER_TEMPLATE: template,
         },
     }
-    assert new_entry.version == 4
+    assert new_entry.version == PowercalcConfigFlow.VERSION
 
 
 async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
@@ -223,7 +237,7 @@ async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
 
 async def test_migrate_config_entry_version_4(hass: HomeAssistant) -> None:
     """
-    Test that a config entry is migrated from version 4 to version 5.
+    Test that a config entry is migrated from version 3 to version 4.
     """
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -243,7 +257,7 @@ async def test_migrate_config_entry_version_4(hass: HomeAssistant) -> None:
 
     await async_migrate_entry(hass, entry)
 
-    assert entry.version == 4
+    assert entry.version == PowercalcConfigFlow.VERSION
     assert entry.data == {
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_NAME: "testentry",
@@ -252,6 +266,34 @@ async def test_migrate_config_entry_version_4(hass: HomeAssistant) -> None:
             CONF_STATE_TRIGGER: {
                 "foo": "bar",
             },
+        },
+    }
+
+
+async def test_migrate_config_entry_version_5(hass: HomeAssistant) -> None:
+    """
+    Test that a config entry is migrated from version 4 to version 5.
+    """
+    entry = MockConfigEntry(
+        entry_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        domain=DOMAIN,
+        data={
+            CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED: True,
+            CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED: [DeviceType.COVER],
+            CONF_ENABLE_AUTODISCOVERY_DEPRECATED: False,
+        },
+        version=4,
+    )
+    entry.add_to_hass(hass)
+
+    await async_migrate_entry(hass, entry)
+
+    assert entry.version == PowercalcConfigFlow.VERSION
+    assert entry.data == {
+        CONF_DISCOVERY: {
+            CONF_ENABLED: False,
+            CONF_EXCLUDE_DEVICE_TYPES: [DeviceType.COVER],
+            CONF_EXCLUDE_SELF_USAGE: True,
         },
     }
 

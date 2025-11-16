@@ -72,6 +72,7 @@ class PowercalcFormStep:
     continue_utility_meter_options_step: bool = False
     continue_advanced_step: bool = False
     form_kwarg: dict[str, Any] | None = None
+    form_data: dict[str, Any] | None = None
 
 
 def fill_schema_defaults(

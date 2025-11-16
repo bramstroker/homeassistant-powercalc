@@ -19,7 +19,9 @@ from custom_components.powercalc import (
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
-    CONF_EXCLUDE_DEVICE_TYPES, CONF_EXCLUDE_SELF_USAGE, CONF_FORCE_UPDATE_FREQUENCY,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
+    CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GROUP_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
@@ -130,11 +132,14 @@ class GlobalConfigurationFlow:
             if self.flow.is_options_flow:
                 return self.flow.persist_config_entry()
 
+        global_config = get_global_powercalc_config(self.flow)
+        discovery_options: dict[str, Any] = global_config.get(CONF_DISCOVERY, {})
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_DISCOVERY,
                 schema=SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY,
                 next_step=Step.GLOBAL_CONFIGURATION_ENERGY,
+                form_data=discovery_options,
             ),
             user_input,
         )

@@ -11,7 +11,10 @@ import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
-    CONF_DISCOVERY, CONF_EXCLUDE_DEVICE_TYPES, CONF_EXCLUDE_SELF_USAGE, CONF_GROUP_UPDATE_INTERVAL,
+    CONF_DISCOVERY,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
+    CONF_GROUP_UPDATE_INTERVAL,
     DEFAULT_GROUP_UPDATE_INTERVAL,
     DeviceType,
 )
@@ -316,6 +319,32 @@ async def test_utility_meter_options_flow(hass: HomeAssistant) -> None:
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_TARIFFS] == ["peak", "off_peak"]
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_OFFSET] == timedelta(days=1)
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_NET_CONSUMPTION]
+
+
+async def test_discovery_options_flow(hass: HomeAssistant) -> None:
+    """Test discovery options flow."""
+    entry = create_mock_global_config_entry(
+        hass,
+        {},
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION_DISCOVERY)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_ENABLED: True,
+            CONF_EXCLUDE_SELF_USAGE: True,
+            CONF_EXCLUDE_DEVICE_TYPES: [DeviceType.SMART_SWITCH],
+        },
+    )
+
+    # Check if config entry data is updated.
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    discovery_options = entry.data[CONF_DISCOVERY]
+    assert discovery_options[CONF_ENABLED]
+    assert discovery_options[CONF_EXCLUDE_SELF_USAGE]
+    assert discovery_options[CONF_EXCLUDE_DEVICE_TYPES] == [DeviceType.SMART_SWITCH]
 
 
 async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> None:

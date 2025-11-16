@@ -14,8 +14,8 @@ from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
-    CONF_DISCOVERY, CONF_DOMAIN,
-    CONF_ENABLED, CONF_SCAN_INTERVAL,
+    CONF_DOMAIN,
+    CONF_ENABLED,
     EVENT_HOMEASSISTANT_STARTED,
     EntityCategory,
     Platform,
@@ -41,13 +41,16 @@ from .const import (
     CONF_DISCOVERY,
     CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
     CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
-    CONF_ENABLE_AUTODISCOVERY_DEPRECATED, CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+    CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
-    CONF_EXCLUDE_DEVICE_TYPES, CONF_EXCLUDE_SELF_USAGE, CONF_FIXED,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
+    CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GROUP_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -113,25 +116,22 @@ PLATFORMS = [Platform.SENSOR]
 
 FLAG_HAS_GLOBAL_GUI_CONFIG = "has_global_gui_config"
 
+DISCOVERY_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_ENABLED, default=True): cv.boolean,
+        vol.Optional(CONF_EXCLUDE_DEVICE_TYPES): vol.All(
+            cv.ensure_list,
+            [cls.value for cls in DeviceType],
+        ),
+        vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): cv.boolean,
+    },
+)
 CONFIG_SCHEMA = vol.Schema(
     {
-        DOMAIN: vol.All(
-            cv.deprecated(
-                CONF_SCAN_INTERVAL,
-                replacement_key=CONF_FORCE_UPDATE_FREQUENCY,
-            ),
-            cv.deprecated(
-                CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
-                replacement_key=CONF_DISCOVERY,
-            ),
-            cv.deprecated(
-                CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
-                replacement_key=CONF_DISCOVERY,
-            ),
-            cv.deprecated(
-                CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
-                replacement_key=CONF_DISCOVERY
-            ),
+        vol.Optional(DOMAIN, default=dict): vol.All(
+            cv.deprecated(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED, replacement_key=CONF_DISCOVERY),
+            cv.deprecated(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED),
+            cv.deprecated(CONF_ENABLE_AUTODISCOVERY_DEPRECATED),
             vol.Schema(
                 {
                     vol.Optional(
@@ -172,16 +172,13 @@ CONFIG_SCHEMA = vol.Schema(
                         CONF_DISABLE_LIBRARY_DOWNLOAD,
                         default=False,
                     ): cv.boolean,
-                    vol.Optional(CONF_DISCOVERY): vol.Schema(
-                        {
-                            vol.Optional(CONF_ENABLED, default=True): cv.boolean,
-                            vol.Optional(CONF_EXCLUDE_DEVICE_TYPES): vol.All(
-                                cv.ensure_list,
-                                [cls.value for cls in DeviceType],
-                            ),
-                            vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): cv.boolean,
-                        }
+                    vol.Optional(CONF_DISCOVERY, default=DISCOVERY_SCHEMA({})): DISCOVERY_SCHEMA,
+                    vol.Optional(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED): vol.All(
+                        cv.ensure_list,
+                        [cls.value for cls in DeviceType],
                     ),
+                    vol.Optional(CONF_ENABLE_AUTODISCOVERY_DEPRECATED, default=True): cv.boolean,
+                    vol.Optional(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED, default=False): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
@@ -320,18 +317,25 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
     }
 
+    # Handle legacy discovery config. Might be removed in future Powercalc version
+    discovery_options = global_config.setdefault(CONF_DISCOVERY, {})
+    deprecated_map = {
+        CONF_EXCLUDE_DEVICE_TYPES: CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
+        CONF_EXCLUDE_SELF_USAGE: CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
+        CONF_ENABLED: CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+    }
+
+    for new_key, old_key in deprecated_map.items():
+        if new_key not in discovery_options and old_key in global_config:
+            discovery_options[new_key] = global_config[old_key]
+
+        global_config.pop(old_key, None)
+
+    # Load GUI configuration, if any, and update the global configuration with the GUI config
     global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
     if global_config_entry:
         _LOGGER.debug("Found global configuration entry: %s", global_config_entry.data)
         global_config.update(get_global_gui_configuration(global_config_entry))
-
-    # Handle legacy config. Might be removed in future Powercalc version
-    if CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED in global_config:
-        global_config[CONF_DISCOVERY][CONF_EXCLUDE_DEVICE_TYPES] = global_config[CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED]
-    if CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED in global_config:
-        global_config[CONF_DISCOVERY][CONF_EXCLUDE_SELF_USAGE] = global_config[CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED]
-    if CONF_ENABLE_AUTODISCOVERY_DEPRECATED in global_config:
-        global_config[CONF_DISCOVERY][CONF_ENABLED] = global_config[CONF_ENABLE_AUTODISCOVERY_DEPRECATED]
 
     return global_config
 
@@ -604,7 +608,21 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         if CONF_STATES_TRIGGER in conf_playbook:
             data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
 
-    hass.config_entries.async_update_entry(config_entry, data=data, version=4)
+    if version <= 4 and config_entry.entry_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+        discovery_config = {
+            CONF_ENABLED: data.get(CONF_ENABLE_AUTODISCOVERY_DEPRECATED, True),
+            CONF_EXCLUDE_DEVICE_TYPES: data.get(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED, []),
+            CONF_EXCLUDE_SELF_USAGE: data.get(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED, False),
+        }
+        data[CONF_DISCOVERY] = discovery_config
+        for key in [
+            CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+            CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
+            CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
+        ]:
+            data.pop(key, None)
+
+    hass.config_entries.async_update_entry(config_entry, data=data, version=5)
 
     return True
 
