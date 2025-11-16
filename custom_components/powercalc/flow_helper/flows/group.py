@@ -508,8 +508,6 @@ class GroupOptionsFlow(GroupFlow):
     def build_group_menu(self) -> list[Step]:
         """Build the group menu."""
         group_type = self.flow.sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM)
-        if group_type == GroupType.CUSTOM:
-            return [Step.GROUP_CUSTOM]
         if group_type == GroupType.DOMAIN:
             return [Step.GROUP_DOMAIN]
         if group_type == GroupType.SUBTRACT:
@@ -518,4 +516,4 @@ class GroupOptionsFlow(GroupFlow):
             return [Step.GROUP_TRACKED_UNTRACKED] + (
                 [Step.GROUP_TRACKED_UNTRACKED_MANUAL] if not self.flow.sensor_config.get("group_tracked_auto", True) else []
             )
-        return []
+        return [Step.GROUP_CUSTOM]

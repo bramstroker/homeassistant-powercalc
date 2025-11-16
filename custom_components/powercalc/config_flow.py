@@ -180,7 +180,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         for handler in self.flow_handlers.values():
             if hasattr(handler, step_method):
                 return await getattr(handler, step_method)(user_input)  # type:ignore
-        raise SchemaFlowError("No handler defined")
+        raise SchemaFlowError("No handler defined")  # pragma: nocover
 
     async def validate_strategy_config(self, user_input: dict[str, Any] | None = None) -> None:
         """Validate the strategy config."""
@@ -423,11 +423,11 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     @callback
     def abort_if_unique_id_configured(self) -> None:
         """Return if unique_id is already configured."""
-        return
+        # pragma: nocover
 
     async def async_set_unique_id(self, unique_id: str | None, raise_on_progress: bool = True) -> None:
         """Set the unique ID of the flow."""
-        return
+        # pragma: nocover
 
     async def async_step_init(
         self,

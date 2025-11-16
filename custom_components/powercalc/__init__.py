@@ -33,7 +33,6 @@ import voluptuous as vol
 from .common import validate_name_pattern
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
-    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
@@ -50,23 +49,17 @@ from .const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
-    CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GROUP_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
-    CONF_PLAYBOOK,
-    CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
-    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_SENSORS,
-    CONF_STATE_TRIGGER,
-    CONF_STATES_TRIGGER,
     CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
@@ -103,6 +96,7 @@ from .const import (
     UnitPrefix,
 )
 from .discovery import DiscoveryManager
+from .migrate import async_migrate_config_entry, handle_legacy_discovery_config
 from .power_profile.power_profile import DeviceType
 from .sensor import SENSOR_CONFIG
 from .sensors.group.config_entry_utils import (
@@ -129,7 +123,7 @@ DISCOVERY_SCHEMA = vol.Schema(
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(DOMAIN, default=dict): vol.All(
-            cv.deprecated(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED, replacement_key=CONF_DISCOVERY),
+            cv.deprecated(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED),
             cv.deprecated(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED),
             cv.deprecated(CONF_ENABLE_AUTODISCOVERY_DEPRECATED),
             vol.Schema(
@@ -177,8 +171,8 @@ CONFIG_SCHEMA = vol.Schema(
                         cv.ensure_list,
                         [cls.value for cls in DeviceType],
                     ),
-                    vol.Optional(CONF_ENABLE_AUTODISCOVERY_DEPRECATED, default=True): cv.boolean,
-                    vol.Optional(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED, default=False): cv.boolean,
+                    vol.Optional(CONF_ENABLE_AUTODISCOVERY_DEPRECATED): cv.boolean,
+                    vol.Optional(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
@@ -241,7 +235,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         _LOGGER.critical(msg)
         return False
 
-    global_config = get_global_configuration(hass, config)
+    global_config = await get_global_configuration(hass, config)
 
     discovery_manager = await create_discovery_manager_instance(hass, config, global_config)
     hass.data[DOMAIN] = {
@@ -290,7 +284,7 @@ async def create_discovery_manager_instance(
     return manager
 
 
-def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
+async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
     global_config = config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
@@ -317,19 +311,7 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
     }
 
-    # Handle legacy discovery config. Might be removed in future Powercalc version
-    discovery_options = global_config.setdefault(CONF_DISCOVERY, {})
-    deprecated_map = {
-        CONF_EXCLUDE_DEVICE_TYPES: CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
-        CONF_EXCLUDE_SELF_USAGE: CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
-        CONF_ENABLED: CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
-    }
-
-    for new_key, old_key in deprecated_map.items():
-        if new_key not in discovery_options and old_key in global_config:
-            discovery_options[new_key] = global_config[old_key]
-
-        global_config.pop(old_key, None)
+    await handle_legacy_discovery_config(hass, global_config)
 
     # Load GUI configuration, if any, and update the global configuration with the GUI config
     global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
@@ -387,11 +369,11 @@ async def register_services(hass: HomeAssistant) -> None:
         for reset_platform in reset_platforms:
             await reset_platform.async_reset()
         if not reload_config:
-            return
+            return  # pragma: nocover
 
         hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []
         hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES] = {}
-        hass.data[DOMAIN][DOMAIN_CONFIG] = get_global_configuration(hass, reload_config)
+        hass.data[DOMAIN][DOMAIN_CONFIG] = await get_global_configuration(hass, reload_config)
 
         # Reload YAML sensors if any
         if DOMAIN in reload_config:
@@ -592,38 +574,7 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Migrate old entry."""
-    version = config_entry.version
-    data = {**config_entry.data}
-
-    if version <= 1:
-        conf_fixed = data.get(CONF_FIXED, {})
-        if CONF_POWER in conf_fixed and CONF_POWER_TEMPLATE in conf_fixed:
-            conf_fixed.pop(CONF_POWER, None)
-
-    if version <= 2 and data.get(CONF_SENSOR_TYPE) and CONF_CREATE_ENERGY_SENSOR not in data:
-        data[CONF_CREATE_ENERGY_SENSOR] = True
-
-    if version <= 3:
-        conf_playbook = data.get(CONF_PLAYBOOK, {})
-        if CONF_STATES_TRIGGER in conf_playbook:
-            data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
-
-    if version <= 4 and config_entry.entry_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-        discovery_config = {
-            CONF_ENABLED: data.get(CONF_ENABLE_AUTODISCOVERY_DEPRECATED, True),
-            CONF_EXCLUDE_DEVICE_TYPES: data.get(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED, []),
-            CONF_EXCLUDE_SELF_USAGE: data.get(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED, False),
-        }
-        data[CONF_DISCOVERY] = discovery_config
-        for key in [
-            CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
-            CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
-            CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
-        ]:
-            data.pop(key, None)
-
-    hass.config_entries.async_update_entry(config_entry, data=data, version=5)
-
+    await async_migrate_config_entry(hass, config_entry)
     return True
 
 
