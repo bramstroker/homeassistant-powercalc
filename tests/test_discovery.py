@@ -589,6 +589,23 @@ async def test_wled_not_discovered_twice(
     assert len(mock_calls) == 0
 
 
+async def test_wled_skipped_when_light_device_type_excluded(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
+) -> None:
+    mock_entity_with_model_information("light.test", "WLED", "FOSS")
+
+    await run_powercalc_setup(
+        hass,
+        {},
+        {CONF_DISCOVERY: {CONF_EXCLUDE_DEVICE_TYPES: [DeviceType.LIGHT]}},
+    )
+
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 0
+
+
 async def test_govee_segment_lights_skipped(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
