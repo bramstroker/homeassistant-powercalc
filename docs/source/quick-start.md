@@ -44,7 +44,8 @@ When your appliance is not supported out of the box (or you want to have more co
 
     ```yaml
     powercalc:
-        enable_autodiscovery: false
+      discovery:
+        enabled: false
     ```
 
 Refer to [global configuration](configuration/global-configuration.md) for all settings you can do on global level.
