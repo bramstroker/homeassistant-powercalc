@@ -328,8 +328,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         """Handle integration discovery."""
         _LOGGER.debug("Starting discovery flow: %s", discovery_info)
 
-        self.skip_advanced_step = True  # We don't want to ask advanced options when discovered
-
         await self.async_set_unique_id(discovery_info.get(CONF_UNIQUE_ID, str(uuid.uuid4())))
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
@@ -344,8 +342,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if DISCOVERY_POWER_PROFILES in discovery_info:
             power_profiles = discovery_info[DISCOVERY_POWER_PROFILES]
             self.discovered_profiles = {profile.unique_id: profile for profile in power_profiles}
-            if len(power_profiles) == 1:
-                self.selected_profile = power_profiles[0]
             del discovery_info[DISCOVERY_POWER_PROFILES]
 
         self.sensor_config = discovery_info.copy()
@@ -355,6 +351,8 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             "manufacturer": str(self.sensor_config.get(CONF_MANUFACTURER)),
             "model": str(self.sensor_config.get(CONF_MODEL)),
         }
+
+        self.skip_advanced_step = True  # We don't want to ask advanced options when discovered
         self.is_library_flow = True
 
         if discovery_info.get(CONF_MODE) == CalculationStrategy.WLED:
@@ -363,6 +361,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if len(power_profiles) > 1:
             return cast(ConfigFlowResult, await self.flow_handlers[FlowType.LIBRARY].async_step_library_multi_profile())
 
+        self.selected_profile = power_profiles[0]
         return cast(ConfigFlowResult, await self.flow_handlers[FlowType.LIBRARY].async_step_library())
 
     async def async_step_user(
