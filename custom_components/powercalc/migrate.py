@@ -89,4 +89,5 @@ async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dic
         severity=ir.IssueSeverity.WARNING,
         translation_key="legacy_discovery_config",
         learn_more_url="https://docs.powercalc.nl/configuration/migration/discovery-config",
+        breaks_in_ha_version="2026.06",
     )

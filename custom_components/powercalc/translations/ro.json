@@ -94,7 +94,6 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
-          "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
@@ -107,10 +106,22 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "discovery_exclude_device_types": "Exclude device types from the discovery process",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Opțiuni de descoperire",
+        "description": "Powercalc poate scana sistemul dvs. pentru dispozitive și entități care au profiluri de putere în biblioteca încorporată. Opțiunile de mai jos vă permit să ajustați acest comportament.",
+        "data": {
+          "enabled": "Activați descoperirea",
+          "exclude_device_types": "Tipuri de dispozitive excluse",
+          "exclude_self_usage": "Excludeți utilizarea proprie"
+        },
+        "data_description": {
+          "exclude_device_types": "Excludeți unul sau mai multe tipuri specifice de dispozitive de la descoperire.",
+          "exclude_self_usage": "Excludeți profilurile de utilizare proprie pentru întrerupătoarele inteligente."
         }
       },
       "global_configuration_energy": {
@@ -410,6 +421,10 @@
       "description": "Configurarea senzorilor folosind `senzor->platform` a fost retrasă. Trebuie să vă schimbați configurația la `powercalc->senzori`. Faceți clic pe 'Aflați mai multe' pentru instrucțiuni suplimentare.",
       "title": "Configurația Powercalc YAML a fost mutată"
     },
+    "legacy_discovery_config": {
+      "title": "Configurația YAML de descoperire s-a schimbat",
+      "description": "Configurația dvs. YAML trebuie actualizată la noua structură."
+    },
     "sub_profile": {
       "fix_flow": {
         "step": {
@@ -512,7 +527,6 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
-          "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
@@ -525,10 +539,22 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "discovery_exclude_device_types": "Exclude device types from the discovery process",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Opțiuni de descoperire",
+        "description": "Gestionați setarea de descoperire. Consultați [documentația](https://docs.powercalc.nl/library/discovery/) pentru mai multe informații",
+        "data": {
+          "enabled": "Activați descoperirea",
+          "exclude_device_types": "Tipuri de dispozitive excluse",
+          "exclude_self_usage": "Excludeți utilizarea proprie"
+        },
+        "data_description": {
+          "exclude_device_types": "Excludeți unul sau mai multe tipuri specifice de dispozitive de la descoperire.",
+          "exclude_self_usage": "Excludeți profilurile de utilizare proprie pentru întrerupătoarele inteligente."
         }
       },
       "global_configuration_energy": {

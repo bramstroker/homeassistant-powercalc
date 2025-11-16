@@ -94,7 +94,6 @@
           "create_utility_meters": "Verbrauchszähler erstellen",
           "disable_extended_attributes": "Erweiterte Attribute deaktivieren",
           "disable_library_download": "Download der Internet-Bibliothek deaktivieren",
-          "discovery_exclude_device_types": "Von Entdeckung ausgeschlossene Gerätetypen",
           "force_update_frequency": "Aktualisierungsfrequenz erzwingen",
           "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
           "include_non_powercalc_sensors": "Nicht-Powercalc Sensoren einschließen",
@@ -107,10 +106,22 @@
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten.",
           "disable_extended_attributes": "Deaktivieren Sie alle zusätzlichen Attribute, die Powercalc zu den Status der Leistungs-, Energie- und Gruppeneinheiten hinzufügt. Dies wird helfen, die Größe der Datenbank gering zu halten",
           "disable_library_download": "Deaktiviere die Powercalc Bibliothek Downloadfunktion",
-          "discovery_exclude_device_types": "Schließe Gerätetypen vom Entdeckungsprozess aus",
           "force_update_frequency": "Intervall, in dem der Sensorzustand aktualisiert wird, auch wenn der Leistungswert gleich bleibt. In Sekunden",
           "ignore_unavailable_state": "Powercalc-Sensoren verfügbar halten, auch wenn die Quell-Entität nicht verfügbar ist",
           "include_non_powercalc_sensors": "Legen Sie fest, ob Sie Nicht-Powercalc Sensoren in Gruppen einschließen möchten"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Entdeckungsoptionen",
+        "description": "Powercalc kann Ihr System nach Geräten und Entitäten scannen, die Profile in der integrierten Bibliothek haben. Mit den folgenden Optionen können Sie dieses Verhalten anpassen.",
+        "data": {
+          "enabled": "Entdeckung aktivieren",
+          "exclude_device_types": "Ausgeschlossene Gerätetypen",
+          "exclude_self_usage": "Eigenverbrauch ausschließen"
+        },
+        "data_description": {
+          "exclude_device_types": "Schließen Sie einen oder mehrere bestimmte Gerätetypen von der Entdeckung aus.",
+          "exclude_self_usage": "Schließen Sie Eigenverbrauchsprofile für Smart-Switches aus."
         }
       },
       "global_configuration_energy": {
@@ -410,6 +421,10 @@
       "description": "Das Konfigurieren von Sensoren mit 'sensor->platform' ist veraltet. Sie müssen Ihre Konfiguration auf 'powercalc->sensors' umstellen. Klicken Sie auf 'Mehr erfahren' für weitere Anweisungen.",
       "title": "Powercalc YAML Konfiguration wurde verschoben"
     },
+    "legacy_discovery_config": {
+      "title": "Discovery YAML Konfiguration geändert",
+      "description": "Ihre YAML-Konfiguration muss auf die neue Struktur aktualisiert werden."
+    },
     "sub_profile": {
       "fix_flow": {
         "step": {
@@ -512,7 +527,6 @@
           "create_utility_meters": "Verbrauchszähler erstellen",
           "disable_extended_attributes": "Erweiterte Attribute deaktivieren",
           "disable_library_download": "Download der Internet-Bibliothek deaktivieren",
-          "discovery_exclude_device_types": "Von Entdeckung ausgeschlossene Gerätetypen",
           "force_update_frequency": "Aktualisierungsfrequenz erzwingen",
           "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
           "include_non_powercalc_sensors": "Schließe Nicht-Powercalc Sensoren ein",
@@ -523,12 +537,24 @@
         "data_description": {
           "create_energy_sensors": "Ob Powercalc kWh Sensoren erstellen soll",
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "discovery_exclude_device_types": "Exclude device types from the discovery process",
+          "disable_extended_attributes": "Deaktivieren Sie alle zusätzlichen Attribute, die Powercalc zu den Status der Leistungs-, Energie- und Gruppeneinheiten hinzufügt. Dies wird helfen, die Größe der Datenbank gering zu halten",
+          "disable_library_download": "Deaktiviere die Powercalc Bibliothek Downloadfunktion",
           "force_update_frequency": "Intervall, in dem der Sensorzustand aktualisiert wird, auch wenn der Leistungswert gleich bleibt. In Sekunden",
           "ignore_unavailable_state": "Powercalc-Sensoren verfügbar halten, auch wenn die Quell-Entität nicht verfügbar ist",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+          "include_non_powercalc_sensors": "Legen Sie fest, ob Sie Nicht-Powercalc Sensoren in Gruppen einschließen möchten"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Entdeckungsoptionen",
+        "description": "Verwalten Sie die Entdeckungseinstellung. Siehe [Dokumentation](https://docs.powercalc.nl/library/discovery/) für weitere Informationen",
+        "data": {
+          "enabled": "Entdeckung aktivieren",
+          "exclude_device_types": "Ausgeschlossene Gerätetypen",
+          "exclude_self_usage": "Eigenverbrauch ausschließen"
+        },
+        "data_description": {
+          "exclude_device_types": "Schließen Sie einen oder mehrere bestimmte Gerätetypen von der Entdeckung aus.",
+          "exclude_self_usage": "Schließen Sie Eigenverbrauchsprofile für Smart-Switches aus."
         }
       },
       "global_configuration_energy": {

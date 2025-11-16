@@ -94,7 +94,6 @@
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
-          "discovery_exclude_device_types": "Discovery sluit apparaat types uit",
           "force_update_frequency": "Geforceerde update frequentie",
           "ignore_unavailable_state": "Negeer onbeschikbaar status",
           "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
@@ -107,10 +106,22 @@
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
-          "discovery_exclude_device_types": "Apparaattypes uitsluiten van het ontdekkingsproces",
           "force_update_frequency": "Interval waarop de sensorstatus wordt bijgewerkt, zelfs wanneer de stroomwaarde hetzelfde blijft. In seconden",
           "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
           "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Ontdekkingsopties",
+        "description": "Powercalc kan uw systeem scannen op apparaten en entiteiten die vermogensprofielen hebben in de ingebouwde bibliotheek. Met de onderstaande opties kunt u dit gedrag fijnafstemmen.",
+        "data": {
+          "enabled": "Ontdekking inschakelen",
+          "exclude_device_types": "Uitgesloten apparaattypes",
+          "exclude_self_usage": "Eigen gebruik uitsluiten"
+        },
+        "data_description": {
+          "exclude_device_types": "Sluit één of meer specifieke apparaattypes uit van ontdekking.",
+          "exclude_self_usage": "Sluit profielen voor eigen gebruik uit voor slimme schakelaars."
         }
       },
       "global_configuration_energy": {
@@ -410,6 +421,10 @@
       "description": "Configuratie middels `sensor->platform` is verouderd. Verander je configratie naar `powercalc->sensors`. Klik op 'Meer informatie' voor verder uitleg.",
       "title": "Powercalc YAML configuratie is verplaatst"
     },
+    "legacy_discovery_config": {
+      "title": "Discovery YAML configuratie gewijzigd",
+      "description": "Je YAML configuratie moet worden bijgewerkt naar de nieuwe structuur."
+    },
     "sub_profile": {
       "fix_flow": {
         "step": {
@@ -512,7 +527,6 @@
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
-          "discovery_exclude_device_types": "Discovery sluit apparaat types uit",
           "force_update_frequency": "Geforceerde update frequentie",
           "ignore_unavailable_state": "Negeer onbeschikbaar status",
           "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
@@ -525,10 +539,22 @@
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
-          "discovery_exclude_device_types": "Apparaattypes uitsluiten van het ontdekkingsproces",
           "force_update_frequency": "Interval waarop de sensorstatus wordt bijgewerkt, zelfs wanneer de stroomwaarde hetzelfde blijft. In seconden",
           "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
           "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Ontdekkingsopties",
+        "description": "Beheer de ontdekkingsinstelling. Zie [documentatie](https://docs.powercalc.nl/library/discovery/) voor meer informatie",
+        "data": {
+          "enabled": "Ontdekking inschakelen",
+          "exclude_device_types": "Uitgesloten apparaattypes",
+          "exclude_self_usage": "Eigen gebruik uitsluiten"
+        },
+        "data_description": {
+          "exclude_device_types": "Sluit één of meer specifieke apparaattypes uit van ontdekking.",
+          "exclude_self_usage": "Sluit profielen voor eigen gebruik uit voor slimme schakelaars."
         }
       },
       "global_configuration_energy": {
