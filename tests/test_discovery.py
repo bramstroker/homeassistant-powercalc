@@ -29,7 +29,9 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc import CONF_DISCOVERY, SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
-    CONF_EXCLUDE_DEVICE_TYPES, CONF_EXCLUDE_SELF_USAGE, CONF_FIXED,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
+    CONF_FIXED,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -388,7 +390,7 @@ async def test_exclude_device_types(
                     DeviceType.SMART_SWITCH,
                     DeviceType.COVER,
                 ],
-            }
+            },
         },
     )
 
@@ -415,7 +417,7 @@ async def test_exclude_self_usage(
         {
             CONF_DISCOVERY: {
                 CONF_EXCLUDE_SELF_USAGE: True,
-            }
+            },
         },
     )
 
