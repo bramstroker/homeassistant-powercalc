@@ -2,9 +2,15 @@ from homeassistant import data_entry_flow
 from homeassistant.const import CONF_DOMAIN
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS, CONF_SENSOR_TYPE
 from custom_components.powercalc.config_flow import Step
-from custom_components.powercalc.const import CONF_GROUP_TYPE, GroupType, SensorType
+from custom_components.powercalc.const import (
+    CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_UTILITY_METERS,
+    CONF_GROUP_TYPE,
+    CONF_SENSOR_TYPE,
+    GroupType,
+    SensorType,
+)
 from tests.config_flow.common import create_mock_entry
 
 

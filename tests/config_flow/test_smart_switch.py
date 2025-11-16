@@ -6,7 +6,6 @@ from homeassistant.core import HomeAssistant
 import pytest
 import voluptuous as vol
 
-from custom_components.powercalc import CONF_POWER
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -15,6 +14,7 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
+    CONF_POWER,
     CONF_SELF_USAGE_INCLUDED,
     CONF_SENSOR_TYPE,
     CalculationStrategy,

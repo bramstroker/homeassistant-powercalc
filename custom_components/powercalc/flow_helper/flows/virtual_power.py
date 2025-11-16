@@ -9,12 +9,13 @@ from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 import voluptuous as vol
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS, DeviceType
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     CONF_AUTOSTART,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
+    CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_UTILITY_METERS,
     CONF_GAMMA_CURVE,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MAX_POWER,
@@ -39,6 +40,7 @@ from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFo
 from custom_components.powercalc.flow_helper.flows.global_configuration import get_global_powercalc_config
 from custom_components.powercalc.flow_helper.flows.library import SCHEMA_POWER_OPTIONS_LIBRARY, SCHEMA_POWER_SMART_SWITCH
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE
+from custom_components.powercalc.power_profile.power_profile import DeviceType
 from custom_components.powercalc.strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
 if TYPE_CHECKING:
