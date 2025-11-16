@@ -80,7 +80,8 @@ nav:
       - 'configuration/multiply-factor.md'
       - 'configuration/standby-power.md'
       - 'configuration/entity-category.md'
-      - 'configuration/new-yaml-structure.md'
+      - 'configuration/migration/new-yaml-structure.md'
+      - 'configuration/migration/discovery-config.md'
       - 'configuration/update-frequency.md'
   - 'Misc':
       - 'misc/naming.md'
