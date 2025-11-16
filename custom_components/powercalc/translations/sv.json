@@ -527,7 +527,6 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Inaktivera utökade attribut",
           "disable_library_download": "Disable remote library download",
-          "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
