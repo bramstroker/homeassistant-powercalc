@@ -247,6 +247,8 @@ class DiscoveryManager:
 
     async def init_wled_flow(self, model_info: ModelInfo, source_entity: SourceEntity) -> None:
         """Initialize the discovery flow for a WLED light."""
+        if DeviceType.LIGHT in self._exclude_device_types:
+            return
         unique_id = f"pc_{source_entity.device_entry.id}" if source_entity.device_entry else get_or_create_unique_id({}, source_entity, None)
         if self._is_already_discovered(source_entity, unique_id):
             _LOGGER.debug(
