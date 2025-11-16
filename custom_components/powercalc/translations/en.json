@@ -422,8 +422,8 @@
       "title": "Powercalc YAML configuration has moved"
     },
     "legacy_discovery_config": {
-      "description": "You need to update your YAML configuration for new structure",
-      "title": "Discovery YAML configuration structure has been changed"
+      "title": "Discovery YAML configuration changed",
+      "description": "Your YAML configuration needs to be updated to the new structure."
     },
     "sub_profile": {
       "fix_flow": {
@@ -548,7 +548,7 @@
       },
       "global_configuration_discovery": {
         "title": "Discovery options",
-        "description": "Manage discovery setting. See[documentation](https://docs.powercalc.nl/library/discovery/) for more info",
+        "description": "Manage discovery setting. See [documentation](https://docs.powercalc.nl/library/discovery/) for more info",
         "data": {
           "enabled": "Enable discovery",
           "exclude_device_types": "Excluded device types",
