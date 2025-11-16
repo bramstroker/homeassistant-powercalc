@@ -7,16 +7,19 @@ from homeassistant.helpers.typing import ConfigType
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import CONF_FIXED, CONF_SENSOR_TYPE, DOMAIN, SensorType
 from custom_components.powercalc.const import (
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_FIXED,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_POWER,
+    CONF_SENSOR_TYPE,
+    DOMAIN,
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHOD_RIGHT,
     ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
     SERVICE_CHANGE_GUI_CONFIGURATION,
     CalculationStrategy,
+    SensorType,
 )
 from tests.common import run_powercalc_setup
 

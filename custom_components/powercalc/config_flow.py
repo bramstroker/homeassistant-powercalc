@@ -180,7 +180,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         for handler in self.flow_handlers.values():
             if hasattr(handler, step_method):
                 return await getattr(handler, step_method)(user_input)  # type:ignore
-        raise SchemaFlowError("No handler defined")
+        raise SchemaFlowError("No handler defined")  # pragma: nocover
 
     async def validate_strategy_config(self, user_input: dict[str, Any] | None = None) -> None:
         """Validate the strategy config."""
@@ -274,12 +274,12 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
         schema = await self._get_schema(form_step)
         # noinspection PyTypeChecker
+        form_data = form_step.form_data
+        if form_data is None:
+            form_data = {**self.sensor_config, **get_global_powercalc_config(self)}
         return self.async_show_form(
             step_id=form_step.step,
-            data_schema=fill_schema_defaults(
-                schema,
-                {**self.sensor_config, **get_global_powercalc_config(self)},
-            ),
+            data_schema=fill_schema_defaults(schema, form_data),
             errors={"base": str(error)} if error else {},
             last_step=last_step,
             **(form_step.form_kwarg or {}),
@@ -304,7 +304,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
 
-    VERSION = 4
+    VERSION = 5
 
     def __init__(self) -> None:
         """Initialize options flow."""
@@ -423,11 +423,11 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     @callback
     def abort_if_unique_id_configured(self) -> None:
         """Return if unique_id is already configured."""
-        return
+        # pragma: nocover
 
     async def async_set_unique_id(self, unique_id: str | None, raise_on_progress: bool = True) -> None:
         """Set the unique ID of the flow."""
-        return
+        # pragma: nocover
 
     async def async_step_init(
         self,

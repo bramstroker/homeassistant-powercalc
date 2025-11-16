@@ -5,17 +5,19 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 import voluptuous as vol
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_FIXED, CONF_POWER_TEMPLATE
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_FIXED,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
     CONF_POWER,
+    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,

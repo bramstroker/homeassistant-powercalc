@@ -13,8 +13,8 @@ import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.entity_registry import EVENT_ENTITY_REGISTRY_UPDATED, EventEntityRegistryUpdatedData
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR
 from custom_components.powercalc.const import (
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_EXCLUDE_ENTITIES,

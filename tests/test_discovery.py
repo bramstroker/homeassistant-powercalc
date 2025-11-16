@@ -10,7 +10,7 @@ from homeassistant.components.light import (
     ColorMode,
 )
 from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_INTEGRATION_DISCOVERY
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_SOURCE, CONF_UNIQUE_ID, STATE_ON
+from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, CONF_SOURCE, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -26,11 +26,11 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc import CONF_DISCOVERY_EXCLUDE_SELF_USAGE, SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
+from custom_components.powercalc import CONF_DISCOVERY, SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
-    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
-    CONF_ENABLE_AUTODISCOVERY,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
     CONF_FIXED,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -121,7 +121,7 @@ async def test_autodiscovery_disabled(
 
     mock_entity_with_model_information("light.testa", "lidl", "HG06106C")
 
-    await run_powercalc_setup(hass, {}, {CONF_ENABLE_AUTODISCOVERY: False})
+    await run_powercalc_setup(hass, {}, {CONF_DISCOVERY: {CONF_ENABLED: False}})
 
     assert not hass.states.get("sensor.testa_power")
     assert not hass.config_entries.async_entries(DOMAIN)
@@ -146,7 +146,7 @@ async def test_autodiscovery_skipped_for_lut_with_subprofiles(
         capabilities={ATTR_SUPPORTED_COLOR_MODES: [ColorMode.COLOR_TEMP, ColorMode.HS]},
     )
 
-    await run_powercalc_setup(hass, {}, {CONF_ENABLE_AUTODISCOVERY: True})
+    await run_powercalc_setup(hass)
 
     assert not hass.states.get("sensor.testa_power")
     assert not caplog.records
@@ -385,10 +385,12 @@ async def test_exclude_device_types(
         hass,
         {},
         {
-            CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES: [
-                DeviceType.SMART_SWITCH,
-                DeviceType.COVER,
-            ],
+            CONF_DISCOVERY: {
+                CONF_EXCLUDE_DEVICE_TYPES: [
+                    DeviceType.SMART_SWITCH,
+                    DeviceType.COVER,
+                ],
+            },
         },
     )
 
@@ -413,7 +415,9 @@ async def test_exclude_self_usage(
         hass,
         {},
         {
-            CONF_DISCOVERY_EXCLUDE_SELF_USAGE: True,
+            CONF_DISCOVERY: {
+                CONF_EXCLUDE_SELF_USAGE: True,
+            },
         },
     )
 
@@ -759,7 +763,7 @@ async def test_interval_based_rediscovery(
 
     mock_entity_with_model_information("light.test", "signify", "LCT010")
 
-    await run_powercalc_setup(hass, {}, {CONF_ENABLE_AUTODISCOVERY: True})
+    await run_powercalc_setup(hass)
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=2))
     await hass.async_block_till_done(True)

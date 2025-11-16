@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.const import CONF_SENSORS, UnitOfTime
+from homeassistant.const import CONF_ENABLED, CONF_SENSORS, UnitOfTime
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.typing import ConfigType
@@ -14,12 +14,13 @@ from custom_components.powercalc import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
-    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
-    CONF_DISCOVERY_EXCLUDE_SELF_USAGE,
+    CONF_DISCOVERY,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GROUP_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -65,15 +66,21 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_LIBRARY_DOWNLOAD, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
-        vol.Optional(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES): selector.SelectSelector(
+        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+    },
+)
+
+SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY = vol.Schema(
+    {
+        vol.Optional(CONF_ENABLED, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_EXCLUDE_DEVICE_TYPES): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=[cls.value for cls in DeviceType],
                 mode=selector.SelectSelectorMode.DROPDOWN,
                 multiple=True,
             ),
         ),
-        vol.Optional(CONF_DISCOVERY_EXCLUDE_SELF_USAGE, default=False): selector.BooleanSelector(),
-        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+        vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): selector.BooleanSelector(),
     },
 )
 
@@ -116,6 +123,26 @@ def get_global_powercalc_config(flow: PowercalcCommonFlow) -> ConfigType:
 class GlobalConfigurationFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
+
+    async def async_step_global_configuration_discovery(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the discovery configuration step."""
+
+        if user_input is not None:
+            self.flow.global_config.update({CONF_DISCOVERY: user_input})
+            if self.flow.is_options_flow:
+                return self.flow.persist_config_entry()
+
+        global_config = get_global_powercalc_config(self.flow)
+        discovery_options: dict[str, Any] = global_config.get(CONF_DISCOVERY, {})
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GLOBAL_CONFIGURATION_DISCOVERY,
+                schema=SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY,
+                next_step=Step.GLOBAL_CONFIGURATION_ENERGY,
+                form_data=discovery_options,
+            ),
+            user_input,
+        )
 
     async def async_step_global_configuration_energy(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
@@ -170,7 +197,7 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
 
         if user_input is not None:
             self.flow.global_config.update(user_input)
-            return await self.async_step_global_configuration_energy()
+            return await self.async_step_global_configuration_discovery()
 
         return await self.flow.handle_form_step(
             PowercalcFormStep(
@@ -189,6 +216,7 @@ class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
         """Build menu for global configuration"""
         menu = {
             Step.GLOBAL_CONFIGURATION: "Basic options",
+            Step.GLOBAL_CONFIGURATION_DISCOVERY: "Discovery options",
         }
         if self.flow.global_config.get(CONF_CREATE_ENERGY_SENSORS):
             menu[Step.GLOBAL_CONFIGURATION_ENERGY] = "Energy options"

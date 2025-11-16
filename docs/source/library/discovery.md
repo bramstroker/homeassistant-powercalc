@@ -18,16 +18,46 @@ If a match is found, the model id is matched. Both the directory_name (model id)
 
 You can enable [debug logging](../troubleshooting/debug-logging.md) to debug the matching process.
 
-## Excluding device types
+## Discovery configuration
 
-You can exclude devices from being discovered by Powercalc by using the `exclude_device_types` option in the configuration.
-For example, to exclude power meters and smart switches, when you are not interested in keeping track of self-consumption of these devices:
+Powercalc includes several global configuration options that let you fine-tune the behavior of the discovery routine.
+
+You can manage them with YAML using the `powercalc->discovery` key.
+Or use the GUI, see [Global Configuration](../configuration/global-configuration.md).
+
+### Disable autodiscovery
+
+Discovery is enabled by default.
+If you want to turn it off entirely, use the following configuration:
 
 ```yaml
 powercalc:
-  exclude_device_types:
-    - power_meter
-    - smart_switch
+  discovery:
+    enabled: false
 ```
 
-You can also use the GUI for this global configuration, see [Global Configuration](../configuration/global-configuration.md).
+### Excluding device types
+
+You can exclude devices from being discovered by Powercalc by using the `exclude_device_types` option in the configuration.
+An overview of possible device types can be found [here](device-types/index.md).
+
+```yaml
+powercalc:
+  discovery:
+    exclude_device_types:
+      - power_meter
+      - cover
+```
+
+### Excluding self-usage
+
+Many smart switches with power monitoring do not report their own internal consumption.
+Powercalc includes power profiles to estimate this self-usage, but not everyone finds these sensors useful, especially when you have many switches, as they can create a lot of extra discoveries.
+
+You can disable self-usage profiles with:
+
+```yaml
+powercalc:
+  discovery:
+    exclude_self_usage: true
+```

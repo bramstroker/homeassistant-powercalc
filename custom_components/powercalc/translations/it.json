@@ -94,7 +94,6 @@
           "create_utility_meters": "Crea contatori di utilità",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disabilita il download remoto della libreria",
-          "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Forza frequenza di aggiornamento",
           "ignore_unavailable_state": "Ignora stato non disponibile",
           "include_non_powercalc_sensors": "Includi sensori non powercalc",
@@ -107,10 +106,22 @@
           "create_utility_meters": "",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "discovery_exclude_device_types": "Exclude device types from the discovery process",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Opzioni di scoperta",
+        "description": "Powercalc può scansionare il tuo sistema alla ricerca di dispositivi ed entità che hanno profili di potenza nella libreria integrata. Le opzioni seguenti ti permettono di regolare questo comportamento.",
+        "data": {
+          "enabled": "Abilita scoperta",
+          "exclude_device_types": "Tipi di dispositivi esclusi",
+          "exclude_self_usage": "Escludi auto-utilizzo"
+        },
+        "data_description": {
+          "exclude_device_types": "Escludi uno o più tipi specifici di dispositivi dalla scoperta.",
+          "exclude_self_usage": "Escludi i profili di auto-utilizzo per gli interruttori intelligenti."
         }
       },
       "global_configuration_energy": {
@@ -410,6 +421,10 @@
       "description": "Configurare i sensori usando `sensor->piattaforma` è stato deprecato. È necessario modificare la configurazione in `powercalc->sensor`. Fare clic su 'Ulteriori informazioni' per ulteriori istruzioni.",
       "title": "La configurazione di Powercalc YAML è stata spostata"
     },
+    "legacy_discovery_config": {
+      "title": "La configurazione YAML di scoperta è cambiata",
+      "description": "La tua configurazione YAML deve essere aggiornata alla nuova struttura."
+    },
     "sub_profile": {
       "fix_flow": {
         "step": {
@@ -512,7 +527,6 @@
           "create_utility_meters": "Crea contatori di utilità",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disabilita il download remoto della libreria",
-          "discovery_exclude_device_types": "Discovery exclude device types",
           "force_update_frequency": "Forza frequenza di aggiornamento",
           "ignore_unavailable_state": "Ignora stato non disponibile",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
@@ -525,10 +539,22 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "discovery_exclude_device_types": "Exclude device types from the discovery process",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Opzioni di scoperta",
+        "description": "Gestisci l'impostazione di scoperta. Vedi la [documentazione](https://docs.powercalc.nl/library/discovery/) per maggiori informazioni",
+        "data": {
+          "enabled": "Abilita scoperta",
+          "exclude_device_types": "Tipi di dispositivi esclusi",
+          "exclude_self_usage": "Escludi auto-utilizzo"
+        },
+        "data_description": {
+          "exclude_device_types": "Escludi uno o più tipi specifici di dispositivi dalla scoperta.",
+          "exclude_self_usage": "Escludi i profili di auto-utilizzo per gli interruttori intelligenti."
         }
       },
       "global_configuration_energy": {

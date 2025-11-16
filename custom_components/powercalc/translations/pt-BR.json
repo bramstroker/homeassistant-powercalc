@@ -94,7 +94,6 @@
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar download da biblioteca remota",
-          "discovery_exclude_device_types": "A descoberta exclui tipos de dispositivos",
           "force_update_frequency": "Forçar frequência de atualização",
           "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
@@ -107,10 +106,22 @@
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados da energia, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
-          "discovery_exclude_device_types": "Excluir tipos de dispositivos do processo de descoberta",
           "force_update_frequency": "Intervalo em que o estado do sensor é atualizado, mesmo quando o valor de energia permanece o mesmo. Em segundos",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Opções de descoberta",
+        "description": "O Powercalc pode escanear seu sistema em busca de dispositivos e entidades que tenham perfis de potência na biblioteca integrada. As opções abaixo permitem ajustar esse comportamento.",
+        "data": {
+          "enabled": "Habilitar descoberta",
+          "exclude_device_types": "Tipos de dispositivos excluídos",
+          "exclude_self_usage": "Excluir uso próprio"
+        },
+        "data_description": {
+          "exclude_device_types": "Exclua um ou mais tipos específicos de dispositivos da descoberta.",
+          "exclude_self_usage": "Exclua perfis de uso próprio para interruptores inteligentes."
         }
       },
       "global_configuration_energy": {
@@ -409,6 +420,10 @@
     "deprecated_platform_yaml": {
       "description": "A configuração de sensores usando `sensor->platform` foi descontinuada. Você precisa alterar sua configuração para `powercalc->sensores`. Clique em 'Saiba mais' para mais instruções.",
       "title": "Configuração YAML do Powercalc foi movida"
+    },
+    "legacy_discovery_config": {
+      "title": "A configuração YAML de descoberta foi alterada",
+      "description": "Sua configuração YAML precisa ser atualizada para a nova estrutura."
     },
     "sub_profile": {
       "fix_flow": {
