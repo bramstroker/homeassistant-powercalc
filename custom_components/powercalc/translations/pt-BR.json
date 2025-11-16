@@ -527,7 +527,6 @@
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar o download da biblioteca remota",
-          "discovery_exclude_device_types": "A descoberta exclui tipos de dispositivos",
           "force_update_frequency": "Forçar frequência de atualização",
           "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
@@ -540,10 +539,22 @@
           "create_utility_meters": "Deixe que energia crie medidores utilitários, de ciclo diário, horário, etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados de potência, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
-          "discovery_exclude_device_types": "Excluir tipos de dispositivos do processo de descoberta",
           "force_update_frequency": "Intervalo em que o estado do sensor é atualizado, mesmo quando o valor de energia permanece o mesmo. Em segundos",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Discovery options",
+        "description": "Manage discovery setting. See [documentation](https://docs.powercalc.nl/library/discovery/) for more info",
+        "data": {
+          "enabled": "Enable discovery",
+          "exclude_device_types": "Excluded device types",
+          "exclude_self_usage": "Exclude self-usage"
+        },
+        "data_description": {
+          "exclude_device_types": "Exclude one or more specific device types from discovery.",
+          "exclude_self_usage": "Exclude self-usage profiles for smart switches."
         }
       },
       "global_configuration_energy": {
