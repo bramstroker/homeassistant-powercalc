@@ -8,6 +8,7 @@
     "VERSION": "master"
   },
   "name": "Hue Enrave Medium",
+  "device_type": "light",
   "standby_power": 0.1,
   "calculation_strategy": "lut",
   "aliases": [
