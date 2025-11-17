@@ -8,8 +8,12 @@
     "VERSION": "master"
   },
   "name": "Hue Enrave Medium",
+  "device_type": "light",
   "standby_power": 0.1,
   "calculation_strategy": "lut",
+  "aliases": [
+    "915005997601"
+  ],
   "created_at": "2022-10-29T18:30:36",
   "author": "Niklas Ausborn <niklas@ausborn.de>"
 }
