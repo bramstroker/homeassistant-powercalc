@@ -16,7 +16,7 @@ jobs:
     name: Run tests
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: ./.github/workflows/uv-composite-action
       - name: Prepare test env
         run: bash tests/setup.sh

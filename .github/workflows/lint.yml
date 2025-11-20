@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Powercalc
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: ./.github/workflows/uv-composite-action
       - name: Run MyPy
         run: |
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Powercalc
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: ./.github/workflows/uv-composite-action
       - name: Run Ruff
         run: |
