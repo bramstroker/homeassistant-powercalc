@@ -4,21 +4,22 @@ This page explains how to control update frequency for different sensors in Powe
 
 ## Sensor Update Behavior
 
-### Individual Sensors
-- **Power Sensors**:
-  - Update immediately when their source entity changes state
-- **Energy Sensors**:
-  - Update when power sensor changes state
-  - Also update at interval set by `energy_update_interval` even if power remains constant. Setting this to 0 disables time based updates.
+### Individual Power Sensors
+- Updated immediately when their source entity changes state
+- Will prevent a new state write when the calculated power remains the same as the last reported value
 
-### Group Sensors
-- **Group Power Sensors**:
-  - Throttled by `group_power_update_interval` (default: 2 seconds)
-  - Update when member sensors change, respecting throttle interval
-- **Group Energy Sensors**:
-  - Default update interval: 60 seconds
-  - Configurable via `group_energy_update_interval`
-  - Set to 0 to disable throttling
+### Individual Energy Sensors
+- Updated when power sensor changes state
+- Also update at interval set by `energy_update_interval` even if power remains constant. Setting this to 0 disables time based updates.
+
+### Group Power Sensors
+- Throttled by `group_power_update_interval` (default: 2 seconds)
+- Update when member sensors change, respecting throttle interval
+
+### Group Energy Sensors
+- Default update interval: 60 seconds
+- Configurable via `group_energy_update_interval`
+- Set to 0 to disable throttling
 
 ### Daily Energy Sensors
 - Default update frequency: 30 minutes (1800 seconds)
@@ -35,6 +36,7 @@ powercalc:
 ## Why Throttling Matters
 
 Throttling helps:
+
 1. **Reduce System Load**: Fewer updates means less computational demand
 2. **Prevent Database Bloat**: Fewer state changes recorded
 3. **Improve Reliability**: Ensures accurate calculations between updates
