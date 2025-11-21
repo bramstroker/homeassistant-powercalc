@@ -33,8 +33,8 @@ async def test_real_power(hass: HomeAssistant) -> None:
     )
 
     # Submit energy options step
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
     assert result["step_id"] == Step.ENERGY_OPTIONS
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
 
     # Submit utility meter options step with default settings
     result = await hass.config_entries.flow.async_configure(

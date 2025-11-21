@@ -36,7 +36,8 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
-    CONF_ENERGY_FILTER_OUTLIERS, CONF_ENERGY_SENSOR_ID,
+    CONF_ENERGY_FILTER_OUTLIERS,
+    CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
@@ -521,7 +522,7 @@ async def test_outlier_filtering(hass: HomeAssistant, caplog: pytest.LogCaptureF
             CONF_NAME: "Test",
             CONF_POWER_SENSOR_ID: power_sensor_id,
             CONF_ENERGY_FILTER_OUTLIERS: True,
-        }
+        },
     )
 
     hass.states.async_set(power_sensor_id, "100", {ATTR_UNIT_OF_MEASUREMENT: "W"})

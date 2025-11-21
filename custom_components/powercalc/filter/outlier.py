@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Iterable
 import statistics
-from typing import Deque, Iterable
 
 
 class OutlierFilter:
@@ -21,7 +21,7 @@ class OutlierFilter:
         self._window_size = window_size
         self._min_samples = min_samples
         self._max_z_score = max_z_score
-        self._values: Deque[float] = deque(maxlen=window_size)
+        self._values: deque[float] = deque(maxlen=window_size)
 
     @property
     def values(self) -> Iterable[float]:

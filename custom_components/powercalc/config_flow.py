@@ -67,7 +67,8 @@ from .flow_helper.flows.virtual_power import (
 )
 from .flow_helper.schema import (
     SCHEMA_ENERGY_SENSOR_TOGGLE,
-    SCHEMA_SENSOR_ENERGY_OPTIONS, SCHEMA_UTILITY_METER_OPTIONS,
+    SCHEMA_SENSOR_ENERGY_OPTIONS,
+    SCHEMA_UTILITY_METER_OPTIONS,
     SCHEMA_UTILITY_METER_TOGGLE,
 )
 from .power_profile.factory import get_power_profile
