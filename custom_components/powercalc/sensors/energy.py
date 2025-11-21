@@ -10,7 +10,9 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDevic
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
-    STATE_UNAVAILABLE, STATE_UNKNOWN, UnitOfEnergy,
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
+    UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
 )
@@ -25,7 +27,8 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
-    CONF_ENERGY_FILTER_OUTLIERS, CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_FILTER_OUTLIERS,
+    CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_PRECISION,
@@ -41,13 +44,13 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.errors import SensorConfigurationError
 
+from ..filter.outlier import OutlierFilter
 from .abstract import (
     BaseEntity,
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
 )
 from .power import PowerSensor, RealPowerSensor
-from ..filter.outlier import OutlierFilter
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"

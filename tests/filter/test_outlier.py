@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from custom_components.powercalc.filter.outlier import OutlierFilter
 
 
