@@ -43,8 +43,8 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.errors import SensorConfigurationError
+from custom_components.powercalc.filter.outlier import OutlierFilter
 
-from ..filter.outlier import OutlierFilter
 from .abstract import (
     BaseEntity,
     generate_energy_sensor_entity_id,
