@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Callable
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal, DecimalException
 import logging
 import time
@@ -31,6 +31,7 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import (
+    CALLBACK_TYPE,
     Event,
     HomeAssistant,
     State,
@@ -41,6 +42,7 @@ from homeassistant.helpers import entity_registry as er, start
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
     EventStateChangedData,
+    async_call_later,
     async_track_state_change_event,
     async_track_time_interval,
 )
@@ -445,6 +447,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._group_type = group_type
         self._start_time: float = time.time()
         self._last_update_time: float = 0
+        self._sub_interval_exceeded_callback: CALLBACK_TYPE = lambda *args: None
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -454,6 +457,8 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             await self.restore_last_state()
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
+        if self._update_interval > 0:
+            self.async_on_remove(self._cancel_max_sub_interval_exceeded_callback)
 
         self.async_on_remove(start.async_at_start(self.hass, self.on_start))
 
@@ -554,21 +559,39 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             return
 
         current_time = time.time()
-        should_throttle = self._should_throttle(current_time)
+        throttled = self._should_throttle(current_time)
+        _LOGGER.debug("State update for %s: %s (throttled=%s)", self.entity_id, state, throttled)
 
-        write_state = True
-        if should_throttle and current_time - self._last_update_time < self._update_interval:
-            write_state = False
         self._attr_available = True
-        self._set_native_value(state, write_state=write_state)
-        if should_throttle and write_state:
-            self._last_update_time = current_time
+        if throttled:
+
+            @callback
+            def _integrate_on_max_sub_interval_exceeded_callback(now: datetime) -> None:
+                self.async_write_ha_state()
+
+            self._sub_interval_exceeded_callback = async_call_later(
+                self.hass,
+                self._update_interval,
+                _integrate_on_max_sub_interval_exceeded_callback,
+            )
+            self._set_native_value(state, write_state=False)
+            return
+
+        self._cancel_max_sub_interval_exceeded_callback()
+        self._set_native_value(state, write_state=True)
+        self._last_update_time = current_time
 
     def _should_throttle(self, current_time: float) -> bool:
         if self._update_interval == 0:
             return False
 
-        return not current_time - self._start_time < 5
+        if current_time - self._start_time < 5:
+            return False
+
+        return current_time - self._last_update_time < self._update_interval
+
+    def _cancel_max_sub_interval_exceeded_callback(self) -> None:
+        self._sub_interval_exceeded_callback()
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
         """Convert value of member entity state to match the unit of measurement of the group sensor."""
