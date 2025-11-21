@@ -47,7 +47,7 @@ class RealPowerConfigFlow:
             PowercalcFormStep(
                 step=Step.REAL_POWER,
                 schema=SCHEMA_REAL_POWER,
-                continue_utility_meter_options_step=True,
+                next_step=Step.ENERGY_OPTIONS,
             ),
             user_input,
         )

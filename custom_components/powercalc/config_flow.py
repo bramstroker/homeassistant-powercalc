@@ -67,7 +67,7 @@ from .flow_helper.flows.virtual_power import (
 )
 from .flow_helper.schema import (
     SCHEMA_ENERGY_SENSOR_TOGGLE,
-    SCHEMA_UTILITY_METER_OPTIONS,
+    SCHEMA_SENSOR_ENERGY_OPTIONS, SCHEMA_UTILITY_METER_OPTIONS,
     SCHEMA_UTILITY_METER_TOGGLE,
 )
 from .power_profile.factory import get_power_profile
@@ -300,6 +300,17 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             user_input,
         )
 
+    async def async_step_energy_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for utility meter options."""
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Step.ENERGY_OPTIONS,
+                schema=SCHEMA_SENSOR_ENERGY_OPTIONS,
+                continue_utility_meter_options_step=not self.is_options_flow,
+            ),
+            user_input,
+        )
+
 
 class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
@@ -486,7 +497,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         if self.selected_sensor_type == SensorType.DAILY_ENERGY:
             menu.append(Step.DAILY_ENERGY)
         if self.selected_sensor_type == SensorType.REAL_POWER:
-            menu.append(Step.REAL_POWER)
+            menu.extend([Step.REAL_POWER, Step.ENERGY_OPTIONS])
         if self.selected_sensor_type == SensorType.GROUP:
             menu.extend(self.flow_handlers[FlowType.GROUP].build_group_menu())
 

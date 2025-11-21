@@ -62,6 +62,17 @@
         },
         "title": "Create a daily fixed sensor"
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outliers": "Filter outliers"
+        },
+        "data_description": {
+          "energy_filter_outliers": "Enable filtering of outlier values in the energy sensor"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Name",
@@ -319,6 +330,7 @@
           "calculation_enabled_condition": "Calculation enabled condition",
           "energy_integration_method": "Energy integration method",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_filter_outliers": "Energy filter outliers",
           "ignore_unavailable_state": "Ignore unavailable state",
           "multiply_factor": "Multiply factor",
           "multiply_factor_standby": "Multiply factor standby",
@@ -327,6 +339,7 @@
         },
         "data_description": {
           "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
+          "energy_filter_outliers": "Enable filtering of outlier values in the energy sensor",
           "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
           "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
           "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
@@ -517,6 +530,17 @@
           "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outliers": "Filter outliers"
+        },
+        "data_description": {
+          "energy_filter_outliers": "Enable filtering of outlier values in the energy sensor"
+        }
+      },
       "fixed": {
         "title": "Fixed options",
         "data": {
@@ -666,6 +690,7 @@
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
+          "energy_options": "Energy options",
           "fixed": "Fixed options",
           "group_custom": "Group options",
           "group_subtract": "Group options",

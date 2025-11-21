@@ -39,7 +39,8 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults
 from custom_components.powercalc.flow_helper.flows.global_configuration import get_global_powercalc_config
 from custom_components.powercalc.flow_helper.flows.library import SCHEMA_POWER_OPTIONS_LIBRARY, SCHEMA_POWER_SMART_SWITCH
-from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE
+from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_ENERGY_SENSOR_TOGGLE, \
+    SCHEMA_SENSOR_ENERGY_OPTIONS, SCHEMA_UTILITY_METER_TOGGLE
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 from custom_components.powercalc.strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
@@ -222,7 +223,7 @@ class VirtualPowerFlow:
 
         schema = SCHEMA_POWER_ADVANCED
         if self.flow.sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
-            schema = schema.extend(SCHEMA_ENERGY_OPTIONS.schema)
+            schema = schema.extend(SCHEMA_SENSOR_ENERGY_OPTIONS.schema)
 
         return await self.flow.handle_form_step(
             PowercalcFormStep(

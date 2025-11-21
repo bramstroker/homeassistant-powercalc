@@ -20,7 +20,7 @@ from custom_components.powercalc.config_flow import (
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
-    CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_FILTER_OUTLIERS, CONF_ENERGY_INTEGRATION_METHOD,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -286,6 +286,7 @@ def assert_default_virtual_power_entry_data(
             CONF_CREATE_UTILITY_METERS: False,
             CONF_NAME: "test",
             CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_LEFT,
+            CONF_ENERGY_FILTER_OUTLIERS: False,
         }
         | expected_strategy_options
     )

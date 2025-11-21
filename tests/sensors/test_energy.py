@@ -36,7 +36,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
-    CONF_ENERGY_SENSOR_ID,
+    CONF_ENERGY_FILTER_OUTLIERS, CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
@@ -509,3 +509,32 @@ async def test_force_updated_at_interval(hass: HomeAssistant) -> None:
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=40))
     await hass.async_block_till_done()
     assert hass.states.get(energy_sensor_id).state == "0.1011"
+
+
+async def test_outlier_filtering(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.DEBUG)
+
+    power_sensor_id = "sensor.test_power"
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_POWER_SENSOR_ID: power_sensor_id,
+            CONF_ENERGY_FILTER_OUTLIERS: True,
+        }
+    )
+
+    hass.states.async_set(power_sensor_id, "100", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "120", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "500", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "1200", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "200", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "400", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "7000000", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "500", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "1100", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "20", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    hass.states.async_set(power_sensor_id, "80", {ATTR_UNIT_OF_MEASUREMENT: "W"})
+    await hass.async_block_till_done()
+
+    assert "Rejecting power value 7000000 as outlier for energy integration" in caplog.text

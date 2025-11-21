@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 import inspect
 import logging
@@ -10,11 +10,11 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDevic
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
-    UnitOfEnergy,
+    STATE_UNAVAILABLE, STATE_UNKNOWN, UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant, State, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
@@ -25,7 +25,7 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
-    CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_FILTER_OUTLIERS, CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_PRECISION,
@@ -47,6 +47,7 @@ from .abstract import (
     generate_energy_sensor_name,
 )
 from .power import PowerSensor, RealPowerSensor
+from ..filter.outlier import OutlierFilter
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -280,6 +281,33 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         self._attr_suggested_display_precision = round_digits
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
+        self._filter_outliers = bool(sensor_config.get(CONF_ENERGY_FILTER_OUTLIERS, False))
+        self._outlier_filter = OutlierFilter(
+            window_size=30,
+            min_samples=5,
+            max_z_score=3.5,
+        )
+
+    def _integrate_on_state_change(
+        self,
+        old_timestamp: datetime | None,
+        new_timestamp: datetime | None,
+        old_state: State | None,
+        new_state: State | None,
+    ) -> None:
+        """Override to add outlier filtering."""
+
+        if self._filter_outliers:
+            valid_state = new_state is not None and new_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE)
+            if valid_state and not self._outlier_filter.accept(float(new_state.state)):
+                _LOGGER.debug(
+                    "%s: Rejecting power value %s as outlier for energy integration",
+                    self.entity_id,
+                    new_state.state,
+                )
+                return
+
+        super()._integrate_on_state_change(old_timestamp, new_timestamp, old_state, new_state)
 
     @property
     def extra_state_attributes(self) -> dict[str, str] | None:
