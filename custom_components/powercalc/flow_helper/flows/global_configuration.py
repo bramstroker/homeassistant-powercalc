@@ -30,12 +30,10 @@ from custom_components.powercalc import (
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
-    CONF_POWER_UPDATE_INTERVAL,
     CONF_UTILITY_METER_OFFSET,
     DEFAULT_ENERGY_UPDATE_INTERVAL,
     DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
     DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
-    DEFAULT_POWER_UPDATE_INTERVAL,
     DOMAIN,
     DOMAIN_CONFIG,
     ENTITY_CATEGORIES,
@@ -86,9 +84,6 @@ SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY = vol.Schema(
 
 SCHEMA_GLOBAL_CONFIGURATION_THROTTLING = vol.Schema(
     {
-        vol.Optional(CONF_POWER_UPDATE_INTERVAL, default=DEFAULT_POWER_UPDATE_INTERVAL): selector.NumberSelector(
-            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
-        ),
         vol.Optional(CONF_ENERGY_UPDATE_INTERVAL, default=DEFAULT_ENERGY_UPDATE_INTERVAL): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),

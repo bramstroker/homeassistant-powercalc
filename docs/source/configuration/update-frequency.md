@@ -7,8 +7,7 @@ All configuration options mentioned here can be set globally in the `powercalc` 
 
 Individual power sensors (created for each device) have the following update frequency characteristics:
 
-- By default, power sensors are throttled to update once per second.
-- This means that even if the source entity changes state multiple times within a second, the power sensor will only update once.
+- Power sensors update immediately when their underlying source entity state changes.
 
 ## Individual Energy Sensors
 

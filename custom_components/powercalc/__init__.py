@@ -61,7 +61,6 @@ from .const import (
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
-    CONF_POWER_UPDATE_INTERVAL,
     CONF_SENSOR_TYPE,
     CONF_SENSORS,
     CONF_UNAVAILABLE_POWER,
@@ -85,7 +84,6 @@ from .const import (
     DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
     DEFAULT_POWER_NAME_PATTERN,
     DEFAULT_POWER_SENSOR_PRECISION,
-    DEFAULT_POWER_UPDATE_INTERVAL,
     DEFAULT_UTILITY_METER_TYPES,
     DISCOVERY_TYPE,
     DOMAIN,
@@ -149,10 +147,6 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_GROUP_ENERGY_UPDATE_INTERVAL,
                         default=DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
-                    ): cv.positive_int,
-                    vol.Optional(
-                        CONF_POWER_UPDATE_INTERVAL,
-                        default=DEFAULT_POWER_UPDATE_INTERVAL,
                     ): cv.positive_int,
                     vol.Optional(
                         CONF_ENERGY_UPDATE_INTERVAL,
@@ -318,7 +312,6 @@ async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> C
         CONF_ENERGY_SENSOR_UNIT_PREFIX: DEFAULT_ENERGY_UNIT_PREFIX,
         CONF_GROUP_ENERGY_UPDATE_INTERVAL: DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
         CONF_GROUP_POWER_UPDATE_INTERVAL: DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
-        CONF_POWER_UPDATE_INTERVAL: DEFAULT_POWER_UPDATE_INTERVAL,
         CONF_ENERGY_UPDATE_INTERVAL: DEFAULT_ENERGY_UPDATE_INTERVAL,
         CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
         CONF_IGNORE_UNAVAILABLE_STATE: False,

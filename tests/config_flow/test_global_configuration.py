@@ -16,7 +16,6 @@ from custom_components.powercalc import (
     CONF_EXCLUDE_SELF_USAGE,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_GROUP_POWER_UPDATE_INTERVAL,
-    DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
     DeviceType,
 )
 from custom_components.powercalc.config_flow import Step
@@ -42,7 +41,6 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
-    CONF_POWER_UPDATE_INTERVAL,
     CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_NET_CONSUMPTION,
     CONF_UTILITY_METER_OFFSET,
@@ -51,9 +49,7 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_NAME_PATTERN,
     DEFAULT_ENERGY_SENSOR_PRECISION,
-    DEFAULT_ENERGY_UPDATE_INTERVAL,
     DEFAULT_ENTITY_CATEGORY,
-    DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
     DEFAULT_POWER_NAME_PATTERN,
     DEFAULT_POWER_SENSOR_PRECISION,
     DEFAULT_UTILITY_METER_TYPES,
@@ -103,7 +99,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {
-            CONF_POWER_UPDATE_INTERVAL: 20,
+            CONF_ENERGY_UPDATE_INTERVAL: 20,
         },
     )
 
@@ -144,10 +140,9 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_ENERGY_SENSOR_NAMING: "{} energy",
         CONF_ENERGY_SENSOR_PRECISION: 4,
         CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
-        CONF_GROUP_ENERGY_UPDATE_INTERVAL: DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
-        CONF_GROUP_POWER_UPDATE_INTERVAL: DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
-        CONF_POWER_UPDATE_INTERVAL: 20,
-        CONF_ENERGY_UPDATE_INTERVAL: DEFAULT_ENERGY_UPDATE_INTERVAL,
+        CONF_GROUP_ENERGY_UPDATE_INTERVAL: 0,
+        CONF_GROUP_POWER_UPDATE_INTERVAL: 0,
+        CONF_ENERGY_UPDATE_INTERVAL: 20,
         CONF_IGNORE_UNAVAILABLE_STATE: False,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_POWER_SENSOR_CATEGORY: None,
@@ -164,7 +159,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
     assert global_config[CONF_DISABLE_LIBRARY_DOWNLOAD]
     assert global_config[CONF_POWER_SENSOR_PRECISION] == 4
-    assert global_config[CONF_POWER_UPDATE_INTERVAL] == 20
+    assert global_config[CONF_ENERGY_UPDATE_INTERVAL] == 20
 
 
 @pytest.mark.parametrize(

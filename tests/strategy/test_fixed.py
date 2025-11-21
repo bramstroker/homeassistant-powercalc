@@ -1,4 +1,3 @@
-from collections.abc import Generator
 import logging
 
 from homeassistant.components import input_number
@@ -272,7 +271,7 @@ async def test_template_power_initial_value_after_startup(hass: HomeAssistant) -
     assert state.state == "30.00"
 
 
-async def test_duplicate_tracking_is_prevented(hass: HomeAssistant, caplog: pytest.LogCaptureFixture, enable_throttle: Generator[None]) -> None:
+async def test_duplicate_tracking_is_prevented(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """
     Make sure the source entity is only tracked once, when it is referenced both in template and entity_id.
     see: https://github.com/bramstroker/homeassistant-powercalc/issues/2802

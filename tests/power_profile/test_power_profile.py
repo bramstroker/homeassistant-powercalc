@@ -515,6 +515,8 @@ async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) 
     On consequent retrievals of the same model the same condition was used, because it did not contain [[entity]] placeholder anymore.
     See https://github.com/bramstroker/homeassistant-powercalc/issues/3118
     """
+    await run_powercalc_setup(hass)
+
     entry_a = MockConfigEntry(
         domain=DOMAIN,
         data={
@@ -533,7 +535,6 @@ async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) 
     )
     await hass.config_entries.async_add(entry_a)
     await hass.config_entries.async_add(entry_b)
-    await run_powercalc_setup(hass)
 
     hass.states.async_set("media_player.a", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 1})
     hass.states.async_set("media_player.b", STATE_PAUSED)

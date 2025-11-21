@@ -1,4 +1,3 @@
-from collections.abc import Generator
 from datetime import timedelta
 import logging
 from typing import Any
@@ -1802,7 +1801,6 @@ async def test_energy_throttle_disabled(hass: HomeAssistant) -> None:
 
 async def test_power_throttle(
     hass: HomeAssistant,
-    enable_throttle: Generator[None],
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

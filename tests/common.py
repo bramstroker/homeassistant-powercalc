@@ -20,6 +20,7 @@ from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_registry, setup_test_component_platform
 
+from custom_components.powercalc import CONF_ENERGY_UPDATE_INTERVAL, CONF_GROUP_ENERGY_UPDATE_INTERVAL, CONF_GROUP_POWER_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_MODE,
@@ -91,7 +92,15 @@ async def run_powercalc_setup(
     sensor_config: list[ConfigType] | ConfigType | None = None,
     domain_config: ConfigType | None = None,
 ) -> None:
+    domain_config = {
+        CONF_ENERGY_UPDATE_INTERVAL: 0,
+        CONF_GROUP_ENERGY_UPDATE_INTERVAL: 0,
+        CONF_GROUP_POWER_UPDATE_INTERVAL: 0,
+        **(domain_config or {}),
+    }
+
     config = {DOMAIN: domain_config or {}}
+
     if not sensor_config:
         sensor_config = {}
     if sensor_config and not isinstance(sensor_config, list):

@@ -47,7 +47,6 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
-from homeassistant.util import Throttle
 from homeassistant.util.unit_conversion import (
     BaseUnitConverter,
     EnergyConverter,
@@ -493,12 +492,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         calculated_new_state = self.calculate_new_state(new_state)
         self.set_new_state(calculated_new_state)
 
-    @Throttle(timedelta(seconds=2))
-    @callback
-    def on_state_change_throttled(self, event: Event[EventStateChangedData]) -> None:
-        """Throttled version of on_state_change, triggered when one of the group entities changes state."""
-        self.on_state_change(event)
-
     async def init_domain_group(self) -> None:
         if self._group_type != GroupType.DOMAIN:
             return
@@ -525,13 +518,11 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             self.async_write_ha_state()
             return
 
-        # Use throttled version for power sensors, regular version for energy sensors
-        callback_method = self.on_state_change_throttled if not self._is_energy_sensor else self.on_state_change
         self.async_on_remove(
             async_track_state_change_event(
                 self.hass,
                 self._entities,
-                callback_method,
+                self.on_state_change,
             ),
         )
 
@@ -575,9 +566,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
     def _should_throttle(self, current_time: float) -> bool:
         if self._update_interval == 0:
-            return False
-
-        if not self._is_energy_sensor:
             return False
 
         return not current_time - self._start_time < 5
