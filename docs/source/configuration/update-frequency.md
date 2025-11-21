@@ -1,47 +1,74 @@
-# Update Frequency and Throttling
+# Update Frequency & Throttling
 
-This page explains how to control update frequency for different sensors in Powercalc. All options can be set globally in the `powercalc` configuration or via the GUI.
+This page describes how Powercalc manages update intervals for its
+various sensors, and how you can adjust these behaviors.
+All settings can be defined globally through YAML under the `powercalc:`
+key, or configured via the GUI Global Configuration entry.
 
-## Sensor Update Behavior
+## How Sensors Update
 
 ### Individual Power Sensors
-- Updated immediately when their source entity changes state
-- Will prevent a new state write when the calculated power remains the same as the last reported value
+
+-   Update immediately whenever the source entity changes state.
+-   A new state is **not** written if the calculated power value hasn't
+    changed from the previously reported value.
 
 ### Individual Energy Sensors
-- Updated when power sensor changes state
-- Also update at interval set by `energy_update_interval` even if power remains constant. Setting this to 0 disables time based updates.
+
+-   Update whenever their corresponding power sensor changes.
+-   Additionally update on a fixed interval defined by
+    `energy_update_interval`, even if power is constant. (default: **10 minutes**)
+-   Set to `0` to disable time-based updates.
 
 ### Group Power Sensors
-- Throttled by `group_power_update_interval` (default: 2 seconds)
-- Update when member sensors change, respecting throttle interval
+
+-   Updates are throttled using `group_power_update_interval` (default:
+    **2 seconds**).
+-   All underlying member state changes are processed, but writes to
+    Home Assistant respect the throttle interval.
+-   Set to `0` to disable throttling entirely.
 
 ### Group Energy Sensors
-- Default update interval: 60 seconds
-- Configurable via `group_energy_update_interval`
-- Set to 0 to disable throttling
+
+-   Updates are throttled using `group_energy_update_interval` (default:
+    **60 seconds**).
+-   All underlying member state changes are processed, but writes to
+    Home Assistant respect the throttle interval.
+-   Set to `0` to disable throttling entirely.
 
 ### Daily Energy Sensors
-- Default update frequency: 30 minutes (1800 seconds)
-- Configurable during setup for each sensor
+
+-   Default update interval: **30 minutes (1800 seconds)**.
+-   This interval is configurable per sensor during setup.
 
 ## Configuration Example
 
-```yaml
+``` yaml
 powercalc:
-  energy_update_interval: 120  # Force update every 2 minutes
-  group_power_update_interval: 30  # Update group power sensors every 30 seconds
+  energy_update_interval: 120              # Update every 2 minutes
+  group_power_update_interval: 30          # Throttle group power updates to 30 seconds
+  group_energy_update_interval: 120        # Override default 60 sec group energy updates
 ```
 
-## Why Throttling Matters
+## Why Throttling Is Important
 
-Throttling helps:
+Throttling helps maintain system performance and data quality:
 
-1. **Reduce System Load**: Fewer updates means less computational demand
-2. **Prevent Database Bloat**: Fewer state changes recorded
-3. **Improve Reliability**: Ensures accurate calculations between updates
+1.  **Reduces System Load**
+    Limits redundant updates, which is useful in setups with many
+    sensors.
+
+2.  **Prevents Database Bloat**
+    Fewer state changes means fewer writes to the recorder database.
+
+3.  **Improves Reliability**
+    Powercalc still processes all underlying state changes internally,
+    ensuring accurate calculations even when updates are delayed.
 
 ## Best Practices
-- Default values work well for most setups
-- Increase intervals if you have many sensors and notice performance issues
-- Decrease intervals for more real-time data, but be mindful of system impact
+
+-   Default intervals are suitable for most installations.
+-   Increase update intervals if you have many sensors or notice
+    performance issues.
+-   Decrease intervals for more real-time readings --- but keep in mind
+    the increased system load and recorder usage.
