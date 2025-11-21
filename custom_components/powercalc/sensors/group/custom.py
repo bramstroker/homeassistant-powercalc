@@ -465,7 +465,8 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._async_hide_members(self._sensor_config.get(CONF_HIDE_MEMBERS) or False)
 
     async def async_will_remove_from_hass(self) -> None:
-        """This will trigger when entity is about to be removed from HA
+        """
+        This will trigger when entity is about to be removed from HA
         Unhide the entities, when they where hidden before.
         """
         if self._sensor_config.get(CONF_HIDE_MEMBERS) is True:
@@ -569,7 +570,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             def _update_interval_callback(now: datetime) -> None:
                 self.async_write_ha_state()
 
-            self._sub_interval_exceeded_callback = async_call_later(
+            self._update_interval_exceeded_callback = async_call_later(
                 self.hass,
                 self._update_interval,
                 _update_interval_callback,
@@ -585,6 +586,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         if self._update_interval == 0:
             return False
 
+        # Don't throttle initial updates within first 5 seconds after startup
         if current_time - self._start_time < 5:
             return False
 
