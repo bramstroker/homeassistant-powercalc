@@ -87,7 +87,6 @@ async def test_config_flow(hass: HomeAssistant) -> None:
             CONF_CREATE_ENERGY_SENSORS: True,
             CONF_CREATE_UTILITY_METERS: True,
             CONF_POWER_SENSOR_PRECISION: 4,
-            CONF_FORCE_UPDATE_FREQUENCY: 300,
         },
     )
 
@@ -98,6 +97,14 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         result["flow_id"],
         {
             CONF_EXCLUDE_DEVICE_TYPES: [DeviceType.SMART_SWITCH],
+        },
+    )
+
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_THROTTLING
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_FORCE_UPDATE_FREQUENCY: 300,
         },
     )
 
@@ -186,6 +193,12 @@ async def test_energy_and_utility_options_skipped(hass: HomeAssistant, user_inpu
         {},
     )
 
+    # Submit throttling step
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
+
     if expected_step:
         assert result["type"] == data_entry_flow.FlowResultType.FORM
         assert result["step_id"] == expected_step
@@ -234,7 +247,6 @@ async def test_basic_options_flow(hass: HomeAssistant) -> None:
         CONF_POWER_SENSOR_NAMING: "{} power_watt",
         CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} friendly",
         CONF_POWER_SENSOR_CATEGORY: EntityCategory.CONFIG,
-        CONF_FORCE_UPDATE_FREQUENCY: 20,
         CONF_IGNORE_UNAVAILABLE_STATE: True,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: False,
         CONF_DISABLE_EXTENDED_ATTRIBUTES: True,
@@ -252,7 +264,6 @@ async def test_basic_options_flow(hass: HomeAssistant) -> None:
     assert entry.data[CONF_POWER_SENSOR_NAMING] == "{} power_watt"
     assert entry.data[CONF_POWER_SENSOR_FRIENDLY_NAMING] == "{} friendly"
     assert entry.data[CONF_POWER_SENSOR_CATEGORY] == EntityCategory.CONFIG
-    assert entry.data[CONF_FORCE_UPDATE_FREQUENCY] == 20
     assert entry.data[CONF_IGNORE_UNAVAILABLE_STATE]
     assert not entry.data[CONF_INCLUDE_NON_POWERCALC_SENSORS]
     assert entry.data[CONF_DISABLE_EXTENDED_ATTRIBUTES]

@@ -19,17 +19,25 @@ from custom_components.powercalc import (
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
+    CONF_ENERGY_UPDATE_INTERVAL,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
     CONF_FORCE_UPDATE_FREQUENCY,
-    CONF_GROUP_UPDATE_INTERVAL_DEPRECATED,
+    CONF_GROUP_ENERGY_UPDATE_INTERVAL,
+    CONF_GROUP_POWER_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_POWER_UPDATE_INTERVAL,
     CONF_UTILITY_METER_OFFSET,
+    DEFAULT_ENERGY_UPDATE_INTERVAL,
+    DEFAULT_FORCE_UPDATE_FREQUENCY,
+    DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
+    DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
+    DEFAULT_POWER_UPDATE_INTERVAL,
     DOMAIN,
     DOMAIN_CONFIG,
     ENTITY_CATEGORIES,
@@ -55,12 +63,6 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
             selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
         ),
-        vol.Optional(CONF_GROUP_UPDATE_INTERVAL_DEPRECATED): selector.NumberSelector(
-            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
-        ),
-        vol.Optional(CONF_FORCE_UPDATE_FREQUENCY): selector.NumberSelector(
-            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
-        ),
         vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): selector.BooleanSelector(),
@@ -81,6 +83,26 @@ SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY = vol.Schema(
             ),
         ),
         vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): selector.BooleanSelector(),
+    },
+)
+
+SCHEMA_GLOBAL_CONFIGURATION_THROTTLING = vol.Schema(
+    {
+        vol.Optional(CONF_POWER_UPDATE_INTERVAL, default=DEFAULT_POWER_UPDATE_INTERVAL): selector.NumberSelector(
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
+        ),
+        vol.Optional(CONF_FORCE_UPDATE_FREQUENCY, default=DEFAULT_FORCE_UPDATE_FREQUENCY.seconds): selector.NumberSelector(
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
+        ),
+        vol.Optional(CONF_ENERGY_UPDATE_INTERVAL, default=DEFAULT_ENERGY_UPDATE_INTERVAL): selector.NumberSelector(
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
+        ),
+        vol.Optional(CONF_GROUP_POWER_UPDATE_INTERVAL, default=DEFAULT_GROUP_POWER_UPDATE_INTERVAL): selector.NumberSelector(
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
+        ),
+        vol.Optional(CONF_GROUP_ENERGY_UPDATE_INTERVAL, default=DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL): selector.NumberSelector(
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
+        ),
     },
 )
 
@@ -138,8 +160,25 @@ class GlobalConfigurationFlow:
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_DISCOVERY,
                 schema=SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY,
-                next_step=Step.GLOBAL_CONFIGURATION_ENERGY,
+                next_step=Step.GLOBAL_CONFIGURATION_THROTTLING,
                 form_data=discovery_options,
+            ),
+            user_input,
+        )
+
+    async def async_step_global_configuration_throttling(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the throttling related options."""
+
+        if user_input is not None:
+            self.flow.global_config.update(user_input)
+            if self.flow.is_options_flow:
+                return self.flow.persist_config_entry()
+
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GLOBAL_CONFIGURATION_THROTTLING,
+                schema=SCHEMA_GLOBAL_CONFIGURATION_THROTTLING,
+                next_step=Step.GLOBAL_CONFIGURATION_ENERGY,
             ),
             user_input,
         )
@@ -217,6 +256,7 @@ class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
         menu = {
             Step.GLOBAL_CONFIGURATION: "Basic options",
             Step.GLOBAL_CONFIGURATION_DISCOVERY: "Discovery options",
+            Step.GLOBAL_CONFIGURATION_THROTTLING: "Throttling options",
         }
         if self.flow.global_config.get(CONF_CREATE_ENERGY_SENSORS):
             menu[Step.GLOBAL_CONFIGURATION_ENERGY] = "Energy options"

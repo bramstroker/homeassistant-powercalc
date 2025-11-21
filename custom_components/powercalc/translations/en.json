@@ -94,7 +94,6 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "power_sensor_category": "Power sensor category",
@@ -106,7 +105,6 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
         }
@@ -133,6 +131,24 @@
           "energy_sensor_naming": "Energy sensor name pattern",
           "energy_sensor_precision": "Energy sensor precision",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Throttling options",
+        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "data": {
+          "force_update_frequency": "Force update frequency",
+          "group_energy_update_interval": "Group energy update interval",
+          "group_power_update_interval": "Group power update interval",
+          "energy_update_interval": "Energy update interval",
+          "power_update_interval": "Power update interval"
+        },
+        "data_description": {
+          "force_update_frequency": "Interval at which the energy sensor state is updated, even when the power value stays the same. In seconds",
+          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
+          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
+          "power_update_interval": "Interval at which power sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
@@ -527,7 +543,6 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "power_sensor_category": "Power sensor category",
@@ -539,7 +554,6 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
         }
@@ -567,6 +581,24 @@
           "energy_sensor_naming": "Energy sensor name pattern",
           "energy_sensor_precision": "Energy sensor precision",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Throttling options",
+        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "data": {
+          "force_update_frequency": "Force update frequency",
+          "group_energy_update_interval": "Group energy update interval",
+          "group_power_update_interval": "Group power update interval",
+          "energy_update_interval": "Energy update interval",
+          "power_update_interval": "Power update interval"
+        },
+        "data_description": {
+          "force_update_frequency": "Interval at which the energy sensor state is updated, even when the power value stays the same. In seconds",
+          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
+          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
+          "power_update_interval": "Interval at which power sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
