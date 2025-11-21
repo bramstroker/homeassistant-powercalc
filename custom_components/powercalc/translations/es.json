@@ -140,14 +140,12 @@
         "data": {
           "group_energy_update_interval": "Intervalo de actualización de energía de grupo",
           "group_power_update_interval": "Intervalo de actualización de potencia de grupo",
-          "energy_update_interval": "Intervalo de actualización de energía",
-          "power_update_interval": "Intervalo de actualización de potencia"
+          "energy_update_interval": "Intervalo de actualización de energía"
         },
         "data_description": {
           "group_energy_update_interval": "Intervalo en el que se actualizan los sensores de energía de grupo. En segundos. Establecer a 0 para deshabilitar",
           "group_power_update_interval": "Intervalo en el que se actualizan los sensores de potencia de grupo. En segundos. Establecer a 0 para deshabilitar",
-          "energy_update_interval": "Intervalo en el que se actualizan los sensores de energía. En segundos. Establecer a 0 para deshabilitar",
-          "power_update_interval": "Intervalo en el que se actualizan los sensores de potencia. En segundos. Establecer a 0 para deshabilitar"
+          "energy_update_interval": "Intervalo en el que se actualizan los sensores de energía. En segundos. Establecer a 0 para deshabilitar"
         }
       },
       "global_configuration_utility_meter": {

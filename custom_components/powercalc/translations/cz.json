@@ -140,14 +140,12 @@
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval",
-          "power_update_interval": "Power update interval"
+          "energy_update_interval": "Energy update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
           "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
-          "power_update_interval": "Interval at which power sensors are updated. In seconds. Set to 0 to disable"
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
@@ -592,14 +590,12 @@
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval",
-          "power_update_interval": "Power update interval"
+          "energy_update_interval": "Energy update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
           "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
-          "power_update_interval": "Interval at which power sensors are updated. In seconds. Set to 0 to disable"
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {

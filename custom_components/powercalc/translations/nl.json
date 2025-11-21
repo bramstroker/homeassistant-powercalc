@@ -140,14 +140,12 @@
         "data": {
           "group_energy_update_interval": "Groep energie update interval",
           "group_power_update_interval": "Groep vermogen update interval",
-          "energy_update_interval": "Energie update interval",
-          "power_update_interval": "Vermogen update interval"
+          "energy_update_interval": "Energie update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Interval waarop groep energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
           "group_power_update_interval": "Interval waarop groep vermogensensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
-          "energy_update_interval": "Interval waarop energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
-          "power_update_interval": "Interval waarop vermogensensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen"
+          "energy_update_interval": "Interval waarop energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen"
         }
       },
       "global_configuration_utility_meter": {

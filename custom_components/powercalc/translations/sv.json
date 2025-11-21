@@ -140,14 +140,12 @@
         "data": {
           "group_energy_update_interval": "Uppdateringsintervall för gruppenergi",
           "group_power_update_interval": "Uppdateringsintervall för gruppeffekt",
-          "energy_update_interval": "Uppdateringsintervall för energi",
-          "power_update_interval": "Uppdateringsintervall för effekt"
+          "energy_update_interval": "Uppdateringsintervall för energi"
         },
         "data_description": {
           "group_energy_update_interval": "Intervall då gruppens energisensorer uppdateras. I sekunder. Ställ in på 0 för att inaktivera",
           "group_power_update_interval": "Intervall då gruppens effektsensorer uppdateras. I sekunder. Ställ in på 0 för att inaktivera",
-          "energy_update_interval": "Intervall då energisensorer uppdateras. I sekunder. Ställ in på 0 för att inaktivera",
-          "power_update_interval": "Intervall då effektsensorer uppdateras. I sekunder. Ställ in på 0 för att inaktivera"
+          "energy_update_interval": "Intervall då energisensorer uppdateras. I sekunder. Ställ in på 0 för att inaktivera"
         }
       },
       "global_configuration_utility_meter": {
