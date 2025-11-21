@@ -15,13 +15,15 @@ class OutlierFilter:
     def __init__(
         self,
         window_size: int = 30,
-        min_samples: int = 5,
-        max_z_score: float = 3.5,
+        min_samples: int = 10,
+        max_z_score: float = 5.0,
+        max_expected_step: int = 1000,
     ) -> None:
         self._window_size = window_size
         self._min_samples = min_samples
         self._max_z_score = max_z_score
         self._values: deque[float] = deque(maxlen=window_size)
+        self._max_expected_step = max_expected_step
 
     @property
     def values(self) -> Iterable[float]:
@@ -33,14 +35,23 @@ class OutlierFilter:
             return False
 
         median = statistics.median(self._values)
-        abs_devs = [abs(x - median) for x in self._values]
-        mad = statistics.median(abs_devs)
 
-        if mad == 0:
-            # All recent values are (almost) identical → treat everything as inlier
+        # 1) Always allow downward transitions (light turning OFF)
+        if value <= median:
             return False
 
-        # Modified Z-score
+        # 2) Allow reasonable upward transitions (light turning ON)
+        # e.g. below 200 W difference - always accept
+        if value - median < self._max_expected_step:
+            return False
+
+        # 3) For larger jumps, use proper outlier detection (MAD)
+        abs_devs = [abs(x - median) for x in self._values]
+        mad = statistics.median(abs_devs) or 0
+
+        if mad == 0:
+            return False
+
         z = 0.6745 * (value - median) / mad
         return abs(z) > self._max_z_score
 
