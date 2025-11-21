@@ -124,7 +124,6 @@
       },
       "global_configuration_energy": {
         "title": "Energieoptionen",
-        "description": "Legen Sie hier die Standardeinstellungen für Energiesensoren fest. Siehe [Dokumentation](https://docs.powercalc.nl/configuration/global-configuration/) für weitere Informationen",
         "data": {
           "energy_integration_method": "Energie-Integrationsmethode",
           "energy_sensor_category": "Energiesensor-Kategorie",
@@ -150,7 +149,6 @@
       },
       "global_configuration_utility_meter": {
         "title": "Verbrauchszähler Einstellungen",
-        "description": "Legen Sie hier die Standardeinstellungen für Verbrauchszähler fest. Siehe [Dokumentation](https://docs.powercalc.nl/configuration/global-configuration/) für weitere Informationen",
         "data": {
           "utility_meter_net_consumption": "Verbrauchszähler Nettoverbrauch",
           "utility_meter_tariffs": "Verbrauchszähler Tarife",
@@ -465,9 +463,6 @@
       "linear_mandatory": "Sie müssen mindestens Maximale Leistung oder Kalibrierung angeben",
       "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung",
       "linear_unsupported_domain": "Domäne der Entität wird für den linearen Modus nicht unterstützt. Muss einer der folgenden Werte sein: Ventilator, Licht oder Mediaplayer. Sie können jedoch die Kalibrierungsoption verwenden",
-      "lut_unsupported_color_mode": "Das LUT-Profil unterstützt einen der Farbmodi Ihres Lichts nicht. Siehe in die Logs für weitere Informationen",
-      "lut_wrong_domain": "Nur Licht Entitäten können den LUT Modus verwenden",
-      "playbook_mandatory": "Sie müssen mindestens ein Playbook angeben",
       "unknown": "Unbekannter Fehler aufgetreten, bitte sehe in die Logs für weitere Informationen"
     },
     "step": {
@@ -582,6 +577,20 @@
           "energy_sensor_naming": "Muster für den Namen des Energiesensors",
           "energy_sensor_precision": "Genauigkeit des Energiesensors",
           "energy_sensor_unit_prefix": "Präfix für Energiesensoren-Einheit"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Throttling options",
+        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "data": {
+          "group_energy_update_interval": "Group energy update interval",
+          "group_power_update_interval": "Group power update interval",
+          "energy_update_interval": "Energy update interval"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
+          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
