@@ -421,7 +421,7 @@
       "description": "Konfigurácia senzorov pomocou `sensor->platform` bola zastaraná. Musíte zmeniť konfiguráciu na `powercalc->sensors`. Kliknite na 'Viac informácií' pre ďalšie pokyny.",
       "title": "Konfigurácia Powercalc YAML bola presunutá"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "Konfigurácia YAML objavovania sa zmenila",
       "description": "Vaša konfigurácia YAML musí byť aktualizovaná na novú štruktúru."
     },

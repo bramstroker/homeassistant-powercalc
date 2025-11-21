@@ -42,7 +42,6 @@ from pytest_homeassistant_custom_component.common import (
     mock_restore_cache_with_extra_data,
 )
 
-from custom_components.powercalc import CONF_GROUP_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -61,6 +60,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
+    CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -1783,7 +1783,7 @@ async def test_energy_throttle(hass: HomeAssistant) -> None:
 async def test_energy_throttle_disabled(hass: HomeAssistant) -> None:
     """Test that energy sensor throttling can be disabled"""
 
-    await run_powercalc_setup(hass, {}, {CONF_GROUP_UPDATE_INTERVAL: 0})
+    await run_powercalc_setup(hass, {}, {CONF_GROUP_ENERGY_UPDATE_INTERVAL: 0})
     await _create_energy_group(
         hass,
         "TestGroup",

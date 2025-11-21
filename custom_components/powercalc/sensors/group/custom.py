@@ -54,6 +54,7 @@ from homeassistant.util.unit_conversion import (
     PowerConverter,
 )
 
+from custom_components.powercalc import CONF_GROUP_ENERGY_UPDATE_INTERVAL, DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -70,8 +71,8 @@ from custom_components.powercalc.const import (
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_GROUP_POWER_UPDATE_INTERVAL,
     CONF_GROUP_TYPE,
-    CONF_GROUP_UPDATE_INTERVAL,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
@@ -81,6 +82,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_NET_CONSUMPTION,
     DATA_DOMAIN_ENTITIES,
     DEFAULT_ENERGY_SENSOR_PRECISION,
+    DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
     DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
@@ -428,10 +430,10 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._sensor_config = sensor_config
         if self._is_energy_sensor:
             self._rounding_digits = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
-            self._update_interval: int = int(sensor_config.get(CONF_GROUP_UPDATE_INTERVAL, 60))
+            self._update_interval: int = int(sensor_config.get(CONF_GROUP_ENERGY_UPDATE_INTERVAL, DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL))
         else:
             self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
-            self._update_interval = 2
+            self._update_interval = int(sensor_config.get(CONF_GROUP_POWER_UPDATE_INTERVAL, DEFAULT_GROUP_POWER_UPDATE_INTERVAL))
         self._attr_suggested_display_precision = self._rounding_digits
         if unique_id:
             self._attr_unique_id = unique_id

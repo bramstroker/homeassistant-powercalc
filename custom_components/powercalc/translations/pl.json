@@ -421,9 +421,9 @@
       "description": "Konfigurowanie czujników przy użyciu `sensor->platform` zostało uznane za przestarzałe. Musisz zmienić konfigurację na `powercalc->sensors`. Aby uzyskać dalsze instrukcje, kliknij 'Dowiedz się więcej'.",
       "title": "Konfiguracja Powercalc w trybie YAML została zmieniona (breaking change)"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "Konfiguracja YAML wykrywania została zmieniona",
-      "description": "Twoja konfiguracja YAML musi zostać zaktualizowana do nowej struktury."
+      "description": "Twoja konfiguracja YAML dla {type} musi zostać zaktualizowana do nowej struktury. Aby uzyskać więcej informacji, kliknij 'Dowiedz się więcej'."
     },
     "sub_profile": {
       "fix_flow": {

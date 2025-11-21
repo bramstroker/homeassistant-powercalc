@@ -421,7 +421,7 @@
       "description": "A configuração de sensores usando `sensor->platform` foi descontinuada. Deve mudar a sua configuração para `powercalc->sensors`. Clicar em 'Saber mais' para instruções mais detalhadas.",
       "title": "A configuração YAML do Powercalc foi movida"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "A configuração YAML de descoberta foi alterada",
       "description": "Sua configuração YAML precisa ser atualizada para a nova estrutura."
     },

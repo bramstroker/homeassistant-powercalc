@@ -22,7 +22,7 @@ from custom_components.powercalc import (
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
     CONF_FORCE_UPDATE_FREQUENCY,
-    CONF_GROUP_UPDATE_INTERVAL,
+    CONF_GROUP_UPDATE_INTERVAL_DEPRECATED,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_POWER_SENSOR_CATEGORY,
@@ -55,7 +55,7 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
             selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
         ),
-        vol.Optional(CONF_GROUP_UPDATE_INTERVAL): selector.NumberSelector(
+        vol.Optional(CONF_GROUP_UPDATE_INTERVAL_DEPRECATED): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
         vol.Optional(CONF_FORCE_UPDATE_FREQUENCY): selector.NumberSelector(

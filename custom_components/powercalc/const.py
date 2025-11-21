@@ -62,6 +62,8 @@ CONF_EXCLUDE_SELF_USAGE = "exclude_self_usage"
 CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED = "discovery_exclude_device_types"
 CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED = "discovery_exclude_self_usage"
 CONF_ENABLE_AUTODISCOVERY_DEPRECATED = "enable_autodiscovery"
+CONF_GROUP_UPDATE_INTERVAL_DEPRECATED = "group_update_interval"
+
 CONF_ENERGY_INTEGRATION_METHOD = "energy_integration_method"
 CONF_ENERGY_SENSOR_CATEGORY = "energy_sensor_category"
 CONF_ENERGY_SENSOR_FRIENDLY_NAMING = "energy_sensor_friendly_naming"
@@ -69,6 +71,7 @@ CONF_ENERGY_SENSOR_ID = "energy_sensor_id"
 CONF_ENERGY_SENSOR_NAMING = "energy_sensor_naming"
 CONF_ENERGY_SENSOR_PRECISION = "energy_sensor_precision"
 CONF_ENERGY_SENSOR_UNIT_PREFIX = "energy_sensor_unit_prefix"
+CONF_ENERGY_UPDATE_INTERVAL = "energy_update_interval"
 CONF_EXCLUDE_ENTITIES = "exclude_entities"
 CONF_FILTER = "filter"
 CONF_FIXED = "fixed"
@@ -79,13 +82,14 @@ CONF_GAMMA_CURVE = "gamma_curve"
 CONF_GROUP = "group"
 CONF_GROUP_ENERGY_ENTITIES = "group_energy_entities"
 CONF_GROUP_ENERGY_START_AT_ZERO = "group_energy_start_at_zero"
+CONF_GROUP_ENERGY_UPDATE_INTERVAL = "group_energy_update_interval"
 CONF_GROUP_MEMBER_DEVICES = "group_member_devices"
 CONF_GROUP_MEMBER_SENSORS = "group_member_sensors"
 CONF_GROUP_POWER_ENTITIES = "group_power_entities"
+CONF_GROUP_POWER_UPDATE_INTERVAL = "group_power_update_interval"
 CONF_GROUP_TRACKED_AUTO = "group_tracked_auto"
 CONF_GROUP_TRACKED_POWER_ENTITIES = "group_tracked_entities"
 CONF_GROUP_TYPE = "group_type"
-CONF_GROUP_UPDATE_INTERVAL = "group_update_interval"
 CONF_HIDE_MEMBERS = "hide_members"
 CONF_IGNORE_UNAVAILABLE_STATE = "ignore_unavailable_state"
 CONF_INCLUDE = "include"
@@ -115,6 +119,7 @@ CONF_POWER_SENSOR_ID = "power_sensor_id"
 CONF_POWER_SENSOR_NAMING = "power_sensor_naming"
 CONF_POWER_SENSOR_PRECISION = "power_sensor_precision"
 CONF_POWER_TEMPLATE = "power_template"
+CONF_POWER_UPDATE_INTERVAL = "power_update_interval"
 CONF_REPEAT = "repeat"
 CONF_SELF_USAGE_INCLUDED = "self_usage_included"
 CONF_SENSOR_TYPE = "sensor_type"
@@ -171,10 +176,13 @@ ENTITY_CATEGORIES = [
     None,
 ]
 
-DEFAULT_GROUP_UPDATE_INTERVAL = 60
-DEFAULT_UPDATE_FREQUENCY = timedelta(minutes=10)
+DEFAULT_GROUP_POWER_UPDATE_INTERVAL = 2
+DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL = 60
+DEFAULT_FORCE_UPDATE_FREQUENCY = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
 DEFAULT_POWER_SENSOR_PRECISION = 2
+DEFAULT_POWER_UPDATE_INTERVAL = 1
+DEFAULT_ENERGY_UPDATE_INTERVAL = 0
 DEFAULT_ENERGY_INTEGRATION_METHOD = ENERGY_INTEGRATION_METHOD_LEFT
 DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 DEFAULT_ENERGY_SENSOR_PRECISION = 4

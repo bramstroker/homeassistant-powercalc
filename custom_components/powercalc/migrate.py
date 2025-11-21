@@ -4,6 +4,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.issue_registry import async_create_issue
 
+from custom_components.powercalc import CONF_GROUP_UPDATE_INTERVAL_DEPRECATED
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_DISCOVERY,
@@ -13,6 +14,7 @@ from custom_components.powercalc.const import (
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
     CONF_FIXED,
+    CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
@@ -87,7 +89,33 @@ async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dic
         issue_id="legacy_discovery_config",
         is_fixable=False,
         severity=ir.IssueSeverity.WARNING,
-        translation_key="legacy_discovery_config",
+        translation_key="legacy_config",
+        translation_placeholders={
+            "type": "discovery",
+        },
         learn_more_url="https://docs.powercalc.nl/configuration/migration/discovery-config",
+        breaks_in_ha_version="2026.06",
+    )
+
+
+async def handle_legacy_update_interval_config(hass: HomeAssistant, global_config: dict) -> None:
+    """Handle legacy group update interval config. Might be removed in future Powercalc version"""
+    if CONF_GROUP_UPDATE_INTERVAL_DEPRECATED not in global_config:
+        return
+
+    global_config[CONF_GROUP_ENERGY_UPDATE_INTERVAL] = global_config[CONF_GROUP_UPDATE_INTERVAL_DEPRECATED]
+    global_config.pop(CONF_GROUP_UPDATE_INTERVAL_DEPRECATED, None)
+
+    async_create_issue(
+        hass=hass,
+        domain=DOMAIN,
+        issue_id="legacy_update_interval_config",
+        is_fixable=False,
+        severity=ir.IssueSeverity.WARNING,
+        translation_key="legacy_config",
+        translation_placeholders={
+            "type": "group_update_interval",
+        },
+        learn_more_url="https://docs.powercalc.nl/configuration/migration/update-interval-config",
         breaks_in_ha_version="2026.06",
     )

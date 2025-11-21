@@ -421,7 +421,7 @@
       "description": "Configurarea senzorilor folosind `senzor->platform` a fost retrasă. Trebuie să vă schimbați configurația la `powercalc->senzori`. Faceți clic pe 'Aflați mai multe' pentru instrucțiuni suplimentare.",
       "title": "Configurația Powercalc YAML a fost mutată"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "Configurația YAML de descoperire s-a schimbat",
       "description": "Configurația dvs. YAML trebuie actualizată la noua structură."
     },

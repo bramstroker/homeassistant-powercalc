@@ -421,9 +421,9 @@
       "description": "Das Konfigurieren von Sensoren mit 'sensor->platform' ist veraltet. Sie müssen Ihre Konfiguration auf 'powercalc->sensors' umstellen. Klicken Sie auf 'Mehr erfahren' für weitere Anweisungen.",
       "title": "Powercalc YAML Konfiguration wurde verschoben"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "Discovery YAML Konfiguration geändert",
-      "description": "Ihre YAML-Konfiguration muss auf die neue Struktur aktualisiert werden."
+      "description": "Ihre YAML-Konfiguration für {type} muss auf die neue Struktur aktualisiert werden. Klicken Sie auf 'Mehr erfahren' für weitere Informationen."
     },
     "sub_profile": {
       "fix_flow": {

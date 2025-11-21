@@ -421,9 +421,9 @@
       "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
       "title": "Nastavení Powercalc YAML bylo přesunuto"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "Konfigurace YAML pro objevování se změnila",
-      "description": "Vaše konfigurace YAML musí být aktualizována na novou strukturu."
+      "description": "Vaše konfigurace YAML pro {type} musí být aktualizována na novou strukturu. Klikněte na 'Další informace' pro více informací."
     },
     "sub_profile": {
       "fix_flow": {

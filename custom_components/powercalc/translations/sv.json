@@ -421,7 +421,7 @@
       "description": "Att konfigurera sensorer med sensor->plattform har fasats ut. Du behöver ändra din konfiguration till powercalc->sensorer. Klicka på 'Läs mer' för ytterligare instruktioner.",
       "title": "Powercalc YAML konfiguration har flyttats"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "Discovery YAML-konfiguration har ändrats",
       "description": "Din YAML-konfiguration behöver uppdateras till den nya strukturen."
     },
