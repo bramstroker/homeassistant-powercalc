@@ -300,8 +300,8 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     ) -> None:
         """Override to add outlier filtering."""
 
-        if self._filter_outliers:
-            valid_state = new_state is not None and new_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE)
+        if self._filter_outliers and new_state is not None:
+            valid_state = new_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE)
             if valid_state and not self._outlier_filter.accept(float(new_state.state)):
                 _LOGGER.debug(
                     "%s: Rejecting power value %s as outlier for energy integration",
