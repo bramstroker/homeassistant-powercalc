@@ -61,7 +61,7 @@ SCHEMA_SENSOR_ENERGY_OPTIONS = SCHEMA_ENERGY_OPTIONS.extend(
         {
             vol.Optional(CONF_ENERGY_FILTER_OUTLIERS, default=False): selector.BooleanSelector(),
         },
-    ).schema
+    ).schema,
 )
 
 
