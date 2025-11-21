@@ -447,7 +447,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._group_type = group_type
         self._start_time: float = time.time()
         self._last_update_time: float = 0
-        self._sub_interval_exceeded_callback: CALLBACK_TYPE = lambda *args: None
+        self._update_interval_exceeded_callback: CALLBACK_TYPE = lambda *args: None
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -458,7 +458,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
         if self._update_interval > 0:
-            self.async_on_remove(self._cancel_max_sub_interval_exceeded_callback)
+            self.async_on_remove(self._cancel_update_interval_exceeded_callback)
 
         self.async_on_remove(start.async_at_start(self.hass, self.on_start))
 
@@ -566,18 +566,18 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         if throttled:
 
             @callback
-            def _integrate_on_max_sub_interval_exceeded_callback(now: datetime) -> None:
+            def _update_interval_callback(now: datetime) -> None:
                 self.async_write_ha_state()
 
             self._sub_interval_exceeded_callback = async_call_later(
                 self.hass,
                 self._update_interval,
-                _integrate_on_max_sub_interval_exceeded_callback,
+                _update_interval_callback,
             )
             self._set_native_value(state, write_state=False)
             return
 
-        self._cancel_max_sub_interval_exceeded_callback()
+        self._cancel_update_interval_exceeded_callback()
         self._set_native_value(state, write_state=True)
         self._last_update_time = current_time
 
@@ -590,8 +590,8 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
         return current_time - self._last_update_time < self._update_interval
 
-    def _cancel_max_sub_interval_exceeded_callback(self) -> None:
-        self._sub_interval_exceeded_callback()
+    def _cancel_update_interval_exceeded_callback(self) -> None:
+        self._update_interval_exceeded_callback()
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
         """Convert value of member entity state to match the unit of measurement of the group sensor."""
