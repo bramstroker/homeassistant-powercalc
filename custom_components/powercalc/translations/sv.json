@@ -124,7 +124,6 @@
       },
       "global_configuration_energy": {
         "title": "Energialternativ",
-        "description": "Definiera standardinställningar för energisensorer här. Se [dokumentation](https://docs.powercalc.nl/configuration/global-configuration/) för mer information",
         "data": {
           "energy_integration_method": "Energy integration method",
           "energy_sensor_category": "Energy sensor category",
@@ -150,7 +149,6 @@
       },
       "global_configuration_utility_meter": {
         "title": "Utility meter options",
-        "description": "Definiera standardinställningar för bruksmätare här. Se [dokumentation](https://docs.powercalc.nl/configuration/global-configuration/) för mer information",
         "data": {
           "utility_meter_net_consumption": "Utility meter net consumption",
           "utility_meter_tariffs": "Utility meter tariffs",
@@ -579,6 +577,20 @@
           "energy_sensor_naming": "Energy sensor name pattern",
           "energy_sensor_precision": "Energy sensor precision",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Throttling options",
+        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "data": {
+          "group_energy_update_interval": "Group energy update interval",
+          "group_power_update_interval": "Group power update interval",
+          "energy_update_interval": "Energy update interval"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
+          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {

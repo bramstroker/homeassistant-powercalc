@@ -124,7 +124,6 @@
       },
       "global_configuration_energy": {
         "title": "Energy options",
-        "description": "Define the default settings for energy sensors here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
         "data": {
           "energy_integration_method": "Energy integration method",
           "energy_sensor_category": "Energy sensor category",
@@ -150,7 +149,6 @@
       },
       "global_configuration_utility_meter": {
         "title": "Utility meter options",
-        "description": "Define the default settings for utility meters here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
         "data": {
           "utility_meter_net_consumption": "Utility meter net consumption",
           "utility_meter_tariffs": "Utility meter tariffs",
@@ -465,9 +463,6 @@
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
       "linear_min_higher_as_max": "Maximální spotřeba nebůže být nižší, nežli minimální spotřeba",
       "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
-      "lut_wrong_domain": "Only light entities can use the LUT mode",
-      "playbook_mandatory": "You need to specify at least one playbook",
       "unknown": "Došlo k neznámé chybě. Více informací najdete v logu"
     },
     "step": {
