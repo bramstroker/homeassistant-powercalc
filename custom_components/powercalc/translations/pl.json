@@ -94,7 +94,6 @@
           "create_utility_meters": "Utwórz liczniki mediów",
           "disable_extended_attributes": "Wyłącz atrybuty rozszerzone",
           "disable_library_download": "Wyłącz pobieranie biblioteki zdalnej",
-          "force_update_frequency": "Częstotliwość wymuszonych aktualizacji",
           "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "include_non_powercalc_sensors": "Dołącz sensory nie-Powercalc",
           "power_sensor_category": "Kategoria sensorów mocy",
@@ -106,7 +105,6 @@
           "create_utility_meters": "Pozwól, aby Powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
           "disable_extended_attributes": "Wyłącz wszystkie dodatkowe atrybuty, które Powercalc dodaje do stanów encji zasilania, energii i grup. To pomoże zachować mały rozmiar bazy danych",
           "disable_library_download": "Wyłącz funkcję pobierania biblioteki Powercalc",
-          "force_update_frequency": "Interwał aktualizacji stanu czujnika, nawet gdy wartość mocy pozostaje taka sama. W sekundach",
           "ignore_unavailable_state": "Zachowaj dostępne sensory Powercalc, nawet gdy encja źródłowa jest niedostępna",
           "include_non_powercalc_sensors": "Zdecyduj, czy chcesz włączyć sensory nie-Powercalc w grupach"
         }
@@ -126,6 +124,7 @@
       },
       "global_configuration_energy": {
         "title": "Opcje dotyczące energii",
+        "description": "Zdefiniuj tutaj domyślne ustawienia sensorów energii. Zobacz [dokumentację](https://docs.powercalc.nl/configuration/global-configuration/) aby uzyskać więcej informacji",
         "data": {
           "energy_integration_method": "Metoda całkowania energii",
           "energy_sensor_category": "Kategoria sensorów energii",
@@ -135,8 +134,25 @@
           "energy_sensor_unit_prefix": "Przedrostek jednostki sensora energii"
         }
       },
+      "global_configuration_throttling": {
+        "title": "Opcje ograniczania",
+        "description": "Ustaw interwały aktualizacji dla różnych typów sensorów. Zobacz [dokumentację](https://docs.powercalc.nl/configuration/update-frequency/) aby uzyskać więcej informacji",
+        "data": {
+          "group_energy_update_interval": "Interwał aktualizacji energii grupy",
+          "group_power_update_interval": "Interwał aktualizacji mocy grupy",
+          "energy_update_interval": "Interwał aktualizacji energii",
+          "power_update_interval": "Interwał aktualizacji mocy"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interwał aktualizacji sensorów energii grupy. W sekundach. Ustaw na 0, aby wyłączyć",
+          "group_power_update_interval": "Interwał aktualizacji sensorów mocy grupy. W sekundach. Ustaw na 0, aby wyłączyć",
+          "energy_update_interval": "Interwał aktualizacji sensorów energii. W sekundach. Ustaw na 0, aby wyłączyć",
+          "power_update_interval": "Interwał aktualizacji sensorów mocy. W sekundach. Ustaw na 0, aby wyłączyć"
+        }
+      },
       "global_configuration_utility_meter": {
         "title": "Opcje licznika mediów",
+        "description": "Zdefiniuj domyślne ustawienia dla liczników mediów. Zobacz [dokumentację](https://docs.powercalc.nl/configuration/global-configuration/) aby uzyskać więcej informacji",
         "data": {
           "utility_meter_net_consumption": "Zużycie netto licznika zużycia energii",
           "utility_meter_tariffs": "Taryfy licznika mediów",
@@ -527,7 +543,6 @@
           "create_utility_meters": "Utwórz liczniki mediów",
           "disable_extended_attributes": "Wyłącz atrybuty rozszerzone",
           "disable_library_download": "Wyłącz pobieranie biblioteki zdalnej",
-          "force_update_frequency": "Częstotliwość wymuszonych aktualizacji",
           "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "include_non_powercalc_sensors": "Dołącz sensory nie-Powercalc",
           "power_sensor_category": "Kategoria czujników mocy",
@@ -539,7 +554,6 @@
           "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
           "disable_extended_attributes": "Wyłącz wszystkie dodatkowe atrybuty, które Powercalc dodaje do stanów encji mocy, energii i grup. To pomoże zachować mały rozmiar bazy danych",
           "disable_library_download": "Wyłącz funkcję pobierania biblioteki Powercalc",
-          "force_update_frequency": "Interwał aktualizacji stanu sensora, nawet gdy wartość mocy pozostaje taka sama. W sekundach",
           "ignore_unavailable_state": "Zachowaj dostępne sensory Powercalc, nawet gdy encja źródłowa jest niedostępna",
           "include_non_powercalc_sensors": "Zdecyduj, czy chcesz włączyć czujniki nieenergetyczne do grup"
         }

@@ -94,7 +94,6 @@
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
-          "force_update_frequency": "Geforceerde update frequentie",
           "ignore_unavailable_state": "Negeer onbeschikbaar status",
           "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
           "power_sensor_category": "Vermogen sensor categorie",
@@ -106,7 +105,6 @@
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
-          "force_update_frequency": "Interval waarop de sensorstatus wordt bijgewerkt, zelfs wanneer de stroomwaarde hetzelfde blijft. In seconden",
           "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
           "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen"
         }
@@ -126,6 +124,7 @@
       },
       "global_configuration_energy": {
         "title": "Energie opties",
+        "description": "Definieer hier de standaard instellingen voor energiesensoren. Zie [documentatie](https://docs.powercalc.nl/configuration/global-configuration/) voor meer informatie",
         "data": {
           "energy_integration_method": "Energie integratie methode",
           "energy_sensor_category": "Energie sensor categorie",
@@ -135,8 +134,25 @@
           "energy_sensor_unit_prefix": "Voorvoegsel van de energiesensor eenheid"
         }
       },
+      "global_configuration_throttling": {
+        "title": "Throttling opties",
+        "description": "Stel update intervallen in voor de verschillende sensor types. Zie [documentatie](https://docs.powercalc.nl/configuration/update-frequency/) voor meer informatie",
+        "data": {
+          "group_energy_update_interval": "Groep energie update interval",
+          "group_power_update_interval": "Groep vermogen update interval",
+          "energy_update_interval": "Energie update interval",
+          "power_update_interval": "Vermogen update interval"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval waarop groep energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
+          "group_power_update_interval": "Interval waarop groep vermogensensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
+          "energy_update_interval": "Interval waarop energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
+          "power_update_interval": "Interval waarop vermogensensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen"
+        }
+      },
       "global_configuration_utility_meter": {
         "title": "Nutsmeter opties",
+        "description": "Definieer hier de standaard instellingen voor nutsmeters. Zie [documentatie](https://docs.powercalc.nl/configuration/global-configuration/) voor meer informatie",
         "data": {
           "utility_meter_net_consumption": "Netto verbruik",
           "utility_meter_tariffs": "Nutsmeter tarieven",
@@ -527,7 +543,6 @@
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
-          "force_update_frequency": "Geforceerde update frequentie",
           "ignore_unavailable_state": "Negeer onbeschikbaar status",
           "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
           "power_sensor_category": "Vermogen sensor categorie",
@@ -539,7 +554,6 @@
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
-          "force_update_frequency": "Interval waarop de sensorstatus wordt bijgewerkt, zelfs wanneer de stroomwaarde hetzelfde blijft. In seconden",
           "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
           "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen"
         }

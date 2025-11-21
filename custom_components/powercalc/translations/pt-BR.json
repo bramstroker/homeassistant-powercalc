@@ -94,7 +94,6 @@
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar download da biblioteca remota",
-          "force_update_frequency": "Forçar frequência de atualização",
           "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
           "power_sensor_category": "Categoria do sensor de energia",
@@ -106,7 +105,6 @@
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados da energia, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
-          "force_update_frequency": "Intervalo em que o estado do sensor é atualizado, mesmo quando o valor de energia permanece o mesmo. Em segundos",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
         }
@@ -126,6 +124,7 @@
       },
       "global_configuration_energy": {
         "title": "Opções de energia",
+        "description": "Defina as configurações padrão para sensores de energia aqui. Veja [documentação](https://docs.powercalc.nl/configuration/global-configuration/) para mais informações",
         "data": {
           "energy_integration_method": "Método de integração de energia",
           "energy_sensor_category": "Categoria do sensor de energia",
@@ -135,8 +134,25 @@
           "energy_sensor_unit_prefix": "Prefixo de unidade do sensor de energia"
         }
       },
+      "global_configuration_throttling": {
+        "title": "Opções de limitação",
+        "description": "Defina intervalos de atualização para os diferentes tipos de sensores. Veja [documentação](https://docs.powercalc.nl/configuration/update-frequency/) para mais informações",
+        "data": {
+          "group_energy_update_interval": "Intervalo de atualização de energia do grupo",
+          "group_power_update_interval": "Intervalo de atualização de potência do grupo",
+          "energy_update_interval": "Intervalo de atualização de energia",
+          "power_update_interval": "Intervalo de atualização de potência"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Intervalo em que os sensores de energia do grupo são atualizados. Em segundos. Defina como 0 para desativar",
+          "group_power_update_interval": "Intervalo em que os sensores de potência do grupo são atualizados. Em segundos. Defina como 0 para desativar",
+          "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar",
+          "power_update_interval": "Intervalo em que os sensores de potência são atualizados. Em segundos. Defina como 0 para desativar"
+        }
+      },
       "global_configuration_utility_meter": {
         "title": "Opções do medidor de utilidade",
+        "description": "Defina as configurações padrão para medidores de utilidade aqui. Veja [documentação](https://docs.powercalc.nl/configuration/global-configuration/) para mais informações",
         "data": {
           "utility_meter_net_consumption": "Consumo líquido do medidor de utilidade",
           "utility_meter_tariffs": "Tarifas do medidor de utilidade",
@@ -527,7 +543,6 @@
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar o download da biblioteca remota",
-          "force_update_frequency": "Forçar frequência de atualização",
           "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
           "power_sensor_category": "Categoria do sensor de potência",
@@ -539,7 +554,6 @@
           "create_utility_meters": "Deixe que energia crie medidores utilitários, de ciclo diário, horário, etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados de potência, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
-          "force_update_frequency": "Intervalo em que o estado do sensor é atualizado, mesmo quando o valor de energia permanece o mesmo. Em segundos",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
         }

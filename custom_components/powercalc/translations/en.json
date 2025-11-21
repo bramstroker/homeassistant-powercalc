@@ -137,14 +137,12 @@
         "title": "Throttling options",
         "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
         "data": {
-          "force_update_frequency": "Force update frequency",
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
           "energy_update_interval": "Energy update interval",
           "power_update_interval": "Power update interval"
         },
         "data_description": {
-          "force_update_frequency": "Interval at which the energy sensor state is updated, even when the power value stays the same. In seconds",
           "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
           "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
           "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
@@ -587,14 +585,12 @@
         "title": "Throttling options",
         "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
         "data": {
-          "force_update_frequency": "Force update frequency",
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
           "energy_update_interval": "Energy update interval",
           "power_update_interval": "Power update interval"
         },
         "data_description": {
-          "force_update_frequency": "Interval at which the energy sensor state is updated, even when the power value stays the same. In seconds",
           "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
           "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
           "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",

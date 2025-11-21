@@ -56,7 +56,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
-    CONF_FORCE_UPDATE_FREQUENCY,
+    CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
@@ -1572,7 +1572,7 @@ async def test_force_calculate_energy_sensor(hass: HomeAssistant) -> None:
         ],
         {
             CONF_CREATE_ENERGY_SENSORS: False,
-            CONF_FORCE_UPDATE_FREQUENCY: 60,
+            CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED: 60,
             CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
         },
     )

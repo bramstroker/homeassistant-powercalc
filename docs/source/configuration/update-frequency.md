@@ -1,6 +1,7 @@
 # Update Frequency and Throttling
 
 This page explains the various options available for controlling the update frequency of different sensors in Powercalc, as well as the built-in throttling capabilities.
+All configuration options mentioned here can be set globally in the `powercalc` configuration section or by using the GUI global configuration.
 
 ## Individual Power Sensors
 
@@ -13,15 +14,14 @@ Individual power sensors (created for each device) have the following update fre
 
 Individual energy sensors derive their values from power sensors and have the following update frequency characteristics:
 
-- Energy sensors calculate energy consumption based on power readings.
-- They can be configured to force updates at a specific frequency using the `force_update_frequency` option.
-- The default force update frequency is 10 minutes.
+- Energy sensors calculate energy consumption based on power readings. It will update immediately when the power sensor changes state.
+- The interval can be set by `energy_update_interval` option. The energy sensor will update based on this interval even if the power sensor stays constant.
 
 ## Group Power Sensors
 
 Group power sensors (which combine multiple power sensors) have the following update frequency characteristics:
 
-- Group power sensors are throttled to update once every 2 seconds.
+- Group power sensors are throttled to update once every x seconds, which is configurable by the `group_power_update_interval` option.
 - This means that group power sensors will update immediately when any of their member sensors change state, but not more frequently than every 2 seconds.
 
 ## Group Energy Sensors
@@ -29,7 +29,7 @@ Group power sensors (which combine multiple power sensors) have the following up
 Group energy sensors (which combine multiple energy sensors) have the following update frequency characteristics:
 
 - Group energy sensors have a default update interval of 60 seconds.
-- This interval can be configured using the `group_update_interval` option.
+- This interval can be configured using the `group_energy_update_interval` option.
 - Throttling is applied based on this update interval.
 - Setting `group_update_interval` to 0 disables throttling, allowing the sensor to update immediately when any of its member sensors change state.
 
@@ -38,7 +38,7 @@ Group energy sensors (which combine multiple energy sensors) have the following 
 Daily energy sensors have the following update frequency characteristics:
 
 - Daily energy sensors have a default update frequency of 30 minutes (1800 seconds).
-- This is a fixed value and cannot be configured.
+- You can configure this on a per-sensor basis during the configuration flow.
 
 ## Configuration Options
 
@@ -46,8 +46,8 @@ You can set global update frequency options in your configuration:
 
 ```yaml
 powercalc:
-  force_update_frequency: 00:05:00  # Force update every 5 minutes
-  group_update_interval: 120   # Update group energy sensors every 2 minutes (in seconds)
+  energy_update_interval: 120  # Force update every 2 minutes
+  group_power_update_interval: 30   # Update group power sensors every 30 seconds
 ```
 
 ## Throttling Behavior

@@ -27,7 +27,6 @@ You can add the options to `configuration.yaml` under the `powercalc:` property,
 
 ```yaml
 powercalc:
-  force_update_frequency: 00:01:00 #Each minute
   power_sensor_naming: "{} Powersensor"
   create_energy_sensors: false
 ```
@@ -51,7 +50,6 @@ All the possible options are listed below.
 | energy_sensor_precision       | numeric    | **Optional** | 4                      | Number of decimals you want for the energy sensors. See [HA docs](https://www.home-assistant.io/integrations/integration/#round)                                                                                                     |
 | energy_sensor_unit_prefix     | string     | **Optional** |                        | Unit prefix for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#unit_prefix). Set to `none` for to create a Wh sensor                                                                       |
 | energy_update_interval        | numeric    | **Optional** | 0                      | Throttle state changes of energy sensor to only once every x seconds. 0 is disabled. See [update-frequency](update-frequency.md)                                                                                                     |
-| force_update_frequency        | string     | **Optional** | 00:10:00               | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS. See [update-frequency](update-frequency.md)                                                                                |
 | group_energy_update_interval  | numeric    | **Optional** | 60                     | Throttle state changes of group energy sensor to only once every x seconds. 0 is disabled. See [update-frequency](update-frequency.md)                                                                                               |
 | group_power_update_interval   | numeric    | **Optional** | 2                      | Throttle state changes of group power sensor to only once every x seconds. 0 is disabled. See [update-frequency](update-frequency.md)                                                                                                |
 | ignore_unavailable_state      | boolean    | **Optional** | false                  | Set to `true` when you want the power sensor to display a value (0 or `standby_power`) regardless of whether the source entity is available.                                                                                         |

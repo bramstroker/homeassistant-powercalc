@@ -1,16 +1,19 @@
+from datetime import timedelta
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ENABLED
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.issue_registry import async_create_issue
 
-from custom_components.powercalc import CONF_GROUP_UPDATE_INTERVAL_DEPRECATED
+from custom_components.powercalc import CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED, CONF_GROUP_UPDATE_INTERVAL_DEPRECATED
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_DISCOVERY,
     CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
     CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
     CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+    CONF_ENERGY_UPDATE_INTERVAL,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
     CONF_FIXED,
@@ -100,11 +103,23 @@ async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dic
 
 async def handle_legacy_update_interval_config(hass: HomeAssistant, global_config: dict) -> None:
     """Handle legacy group update interval config. Might be removed in future Powercalc version"""
-    if CONF_GROUP_UPDATE_INTERVAL_DEPRECATED not in global_config:
-        return
 
-    global_config[CONF_GROUP_ENERGY_UPDATE_INTERVAL] = global_config[CONF_GROUP_UPDATE_INTERVAL_DEPRECATED]
-    global_config.pop(CONF_GROUP_UPDATE_INTERVAL_DEPRECATED, None)
+    has_legacy_config = False
+    if CONF_GROUP_UPDATE_INTERVAL_DEPRECATED in global_config:
+        global_config[CONF_GROUP_ENERGY_UPDATE_INTERVAL] = global_config[CONF_GROUP_UPDATE_INTERVAL_DEPRECATED]
+        global_config.pop(CONF_GROUP_UPDATE_INTERVAL_DEPRECATED, None)
+        has_legacy_config = True
+
+    if CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED in global_config:
+        legacy_config = global_config[CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED]
+        if isinstance(legacy_config, timedelta):
+            legacy_config = legacy_config.seconds
+        global_config[CONF_ENERGY_UPDATE_INTERVAL] = legacy_config
+        global_config.pop(CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED, None)
+        has_legacy_config = True
+
+    if not has_legacy_config:
+        return
 
     async_create_issue(
         hass=hass,

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
 from enum import StrEnum
 
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
@@ -63,6 +62,7 @@ CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED = "discovery_exclude_device_types
 CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED = "discovery_exclude_self_usage"
 CONF_ENABLE_AUTODISCOVERY_DEPRECATED = "enable_autodiscovery"
 CONF_GROUP_UPDATE_INTERVAL_DEPRECATED = "group_update_interval"
+CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED = "force_update_frequency"
 
 CONF_ENERGY_INTEGRATION_METHOD = "energy_integration_method"
 CONF_ENERGY_SENSOR_CATEGORY = "energy_sensor_category"
@@ -77,7 +77,6 @@ CONF_FILTER = "filter"
 CONF_FIXED = "fixed"
 CONF_FORCE_CALCULATE_GROUP_ENERGY = "force_calculate_group_energy"
 CONF_FORCE_ENERGY_SENSOR_CREATION = "force_energy_sensor_creation"
-CONF_FORCE_UPDATE_FREQUENCY = "force_update_frequency"
 CONF_GAMMA_CURVE = "gamma_curve"
 CONF_GROUP = "group"
 CONF_GROUP_ENERGY_ENTITIES = "group_energy_entities"
@@ -178,11 +177,10 @@ ENTITY_CATEGORIES = [
 
 DEFAULT_GROUP_POWER_UPDATE_INTERVAL = 2
 DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL = 60
-DEFAULT_FORCE_UPDATE_FREQUENCY = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
 DEFAULT_POWER_SENSOR_PRECISION = 2
 DEFAULT_POWER_UPDATE_INTERVAL = 1
-DEFAULT_ENERGY_UPDATE_INTERVAL = 0
+DEFAULT_ENERGY_UPDATE_INTERVAL = 600
 DEFAULT_ENERGY_INTEGRATION_METHOD = ENERGY_INTEGRATION_METHOD_LEFT
 DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 DEFAULT_ENERGY_SENSOR_PRECISION = 4

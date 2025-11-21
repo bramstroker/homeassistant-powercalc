@@ -22,7 +22,6 @@ from custom_components.powercalc import (
     CONF_ENERGY_UPDATE_INTERVAL,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
-    CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_GROUP_POWER_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -34,7 +33,6 @@ from custom_components.powercalc import (
     CONF_POWER_UPDATE_INTERVAL,
     CONF_UTILITY_METER_OFFSET,
     DEFAULT_ENERGY_UPDATE_INTERVAL,
-    DEFAULT_FORCE_UPDATE_FREQUENCY,
     DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
     DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
     DEFAULT_POWER_UPDATE_INTERVAL,
@@ -91,9 +89,6 @@ SCHEMA_GLOBAL_CONFIGURATION_THROTTLING = vol.Schema(
         vol.Optional(CONF_POWER_UPDATE_INTERVAL, default=DEFAULT_POWER_UPDATE_INTERVAL): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
-        vol.Optional(CONF_FORCE_UPDATE_FREQUENCY, default=DEFAULT_FORCE_UPDATE_FREQUENCY.seconds): selector.NumberSelector(
-            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
-        ),
         vol.Optional(CONF_ENERGY_UPDATE_INTERVAL, default=DEFAULT_ENERGY_UPDATE_INTERVAL): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
@@ -130,9 +125,6 @@ def get_global_powercalc_config(flow: PowercalcCommonFlow) -> ConfigType:
         return flow.global_config
     powercalc = flow.hass.data.get(DOMAIN) or {}
     global_config = dict.copy(powercalc.get(DOMAIN_CONFIG) or {})
-    force_update_frequency = global_config.get(CONF_FORCE_UPDATE_FREQUENCY)
-    if isinstance(force_update_frequency, timedelta):
-        global_config[CONF_FORCE_UPDATE_FREQUENCY] = force_update_frequency.total_seconds()
     utility_meter_offset = global_config.get(CONF_UTILITY_METER_OFFSET)
     if isinstance(utility_meter_offset, timedelta):
         global_config[CONF_UTILITY_METER_OFFSET] = utility_meter_offset.days
