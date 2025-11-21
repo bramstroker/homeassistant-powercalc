@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from decimal import Decimal
 import inspect
 import logging
@@ -29,11 +30,12 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_ENERGY_UPDATE_INTERVAL,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
-    CONF_FORCE_UPDATE_FREQUENCY,
     CONF_POWER_SENSOR_ID,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_SENSOR_PRECISION,
+    DEFAULT_ENERGY_UPDATE_INTERVAL,
     UnitPrefix,
 )
 from custom_components.powercalc.device_binding import get_device_info
@@ -261,7 +263,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             "integration_method": integration_method,
             "unique_id": unique_id,
             "device_info": device_info,
-            "max_sub_interval": sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),
+            "max_sub_interval": timedelta(seconds=sensor_config.get(CONF_ENERGY_UPDATE_INTERVAL, DEFAULT_ENERGY_UPDATE_INTERVAL)),
         }
 
         signature = inspect.signature(IntegrationSensor.__init__)

@@ -1,4 +1,3 @@
-from collections.abc import Generator
 from datetime import timedelta
 import logging
 from typing import Any
@@ -42,7 +41,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_restore_cache_with_extra_data,
 )
 
-from custom_components.powercalc import CONF_GROUP_UPDATE_INTERVAL
+from custom_components.powercalc import CONF_GROUP_POWER_UPDATE_INTERVAL, DEFAULT_ENERGY_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -57,10 +56,11 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
-    CONF_FORCE_UPDATE_FREQUENCY,
+    CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
+    CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -1572,7 +1572,7 @@ async def test_force_calculate_energy_sensor(hass: HomeAssistant) -> None:
         ],
         {
             CONF_CREATE_ENERGY_SENSORS: False,
-            CONF_FORCE_UPDATE_FREQUENCY: 60,
+            CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED: 60,
             CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
         },
     )
@@ -1740,8 +1740,12 @@ async def test_start_at_zero(hass: HomeAssistant, entry_data: dict[str, Any]) ->
         assert hass.states.get("sensor.testgroup_energy").state == "0.1000"
 
 
-async def test_energy_throttle(hass: HomeAssistant) -> None:
+async def test_energy_throttle(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
     """Test that energy sensor is not updated more than once per minute"""
+
+    def advance(seconds: int) -> None:
+        freezer.tick(timedelta(seconds=seconds))
+        async_fire_time_changed(hass)
 
     hass.states.async_set("sensor.a_energy", "2.00")
     hass.states.async_set("sensor.b_energy", "3.00")
@@ -1761,29 +1765,28 @@ async def test_energy_throttle(hass: HomeAssistant) -> None:
 
     assert hass.states.get("sensor.testgroup_energy").state == "5.5000"
 
-    now = dt.utcnow()
-    with freeze_time(now + timedelta(seconds=15)):
-        # Do 3 state changes after startup period has expired and throttling is activated
-        # Only the first state change should be processed and written to state machine
-        # Which means 3.50 - 3.00 = 0.50 should be added to the group energy total
-        hass.states.async_set("sensor.b_energy", "3.50")
-        hass.states.async_set("sensor.a_energy", "2.75")
-        hass.states.async_set("sensor.b_energy", "4.00")
-        await hass.async_block_till_done()
-        assert hass.states.get("sensor.testgroup_energy").state == "6.0000"
+    advance(DEFAULT_ENERGY_UPDATE_INTERVAL + 2)
+    # Do 3 state changes after startup period has expired and throttling is activated
+    # Only the first state change should be processed and written to state machine
+    # Which means 3.50 - 3.00 = 0.50 should be added to the group energy total
+    hass.states.async_set("sensor.b_energy", "3.50")
+    hass.states.async_set("sensor.a_energy", "2.75")
+    hass.states.async_set("sensor.b_energy", "4.00")
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.testgroup_energy").state == "6.0000"
 
-    with freeze_time(now + timedelta(seconds=120)):
-        # Do another state change after the throttle period has expired
-        # This state change should be processed and written to state machine, in addition to previously collected state changes
-        hass.states.async_set("sensor.b_energy", "4.25")
-        await hass.async_block_till_done()
-        assert hass.states.get("sensor.testgroup_energy").state == "7.0000"
+    advance(DEFAULT_ENERGY_UPDATE_INTERVAL + 2)
+    # Do another state change after the throttle period has expired
+    # This state change should be processed and written to state machine, in addition to previously collected state changes
+    hass.states.async_set("sensor.b_energy", "4.25")
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.testgroup_energy").state == "7.0000"
 
 
 async def test_energy_throttle_disabled(hass: HomeAssistant) -> None:
     """Test that energy sensor throttling can be disabled"""
 
-    await run_powercalc_setup(hass, {}, {CONF_GROUP_UPDATE_INTERVAL: 0})
+    await run_powercalc_setup(hass, {}, {CONF_GROUP_ENERGY_UPDATE_INTERVAL: 0})
     await _create_energy_group(
         hass,
         "TestGroup",
@@ -1802,9 +1805,7 @@ async def test_energy_throttle_disabled(hass: HomeAssistant) -> None:
 
 async def test_power_throttle(
     hass: HomeAssistant,
-    enable_throttle: Generator[None],
     freezer: FrozenDateTimeFactory,
-    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test that power sensor updates are throttled."""
 
@@ -1821,14 +1822,6 @@ async def test_power_throttle(
         freezer.tick(timedelta(seconds=seconds))
         async_fire_time_changed(hass)
 
-    def assert_group(value: str) -> None:
-        assert hass.states.get(group_entity).state == value
-
-    def assert_group_state_change_count(expected: int) -> None:
-        log_marker = "Group sensor sensor.testgroup_power. State change"
-        count = sum(log_marker in rec.message for rec in caplog.records)
-        assert count == expected, f"Expected {expected} state change(s), got {count}"
-
     await run_powercalc_setup(
         hass,
         [
@@ -1844,6 +1837,9 @@ async def test_power_throttle(
                 CONF_CREATE_ENERGY_SENSOR: False,
             },
         ],
+        {
+            CONF_GROUP_POWER_UPDATE_INTERVAL: 2,
+        },
     )
 
     # Initial member states, spaced so throttling windows don't overlap
@@ -1854,7 +1850,6 @@ async def test_power_throttle(
     await hass.async_block_till_done()
 
     # Act & Assert: window #1
-    caplog.clear()
     advance(3)
 
     await set_states(
@@ -1866,11 +1861,9 @@ async def test_power_throttle(
 
     # Only the first state change in the throttle window should be registered:
     #  test_power 2.00 + test2_power 1.00 = 3.00
-    assert_group("3.00")
-    assert_group_state_change_count(1)
+    assert hass.states.get(group_entity).state == "3.00"
 
     # Act & Assert: window #2
-    caplog.clear()
     advance(3)
 
     await set_states(
@@ -1884,8 +1877,13 @@ async def test_power_throttle(
 
     # Again, only the first change within the window should register:
     #  test_power 2.00 + test2_power 6.00 = 8.00
-    assert_group("8.00")
-    assert_group_state_change_count(1)
+    assert hass.states.get(group_entity).state == "8.00"
+
+    advance(3)
+
+    # After another 3 seconds elapsed and no state changes it should have the last two known state values from last window
+    #  test_power 3.00 + test2_power 3.00 = 6.00
+    assert hass.states.get(group_entity).state == "6.00"
 
 
 async def test_resolve_entity_ids_area(hass: HomeAssistant, area_registry: AreaRegistry) -> None:

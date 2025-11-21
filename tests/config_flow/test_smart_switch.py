@@ -20,7 +20,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import get_test_config_dir
+from tests.common import get_test_config_dir, run_powercalc_setup
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
@@ -46,6 +46,8 @@ async def test_smart_switch_flow(
     user_input: dict[str, Any],
     expected_fixed_power: float,
 ) -> None:
+    await run_powercalc_setup(hass)
+
     hass.config.config_dir = get_test_config_dir()
     mock_entity_with_model_information(
         "switch.test",

@@ -94,7 +94,6 @@
           "create_utility_meters": "Vytvorte merače spotreby",
           "disable_extended_attributes": "Zakázať rozšírené atribúty",
           "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
-          "force_update_frequency": "Vynútiť frekvenciu aktualizácie",
           "ignore_unavailable_state": "Ignorovať nedostupný stav",
           "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
           "power_sensor_category": "Kategória snímača výkonu",
@@ -106,7 +105,6 @@
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "disable_extended_attributes": "Vypnite všetky extra atribúty, ktoré powercalc pridáva k stavu energie, energie a skupiny. To pomôže udržať veľkosť databázy malú",
           "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",
-          "force_update_frequency": "Interval, v ktorom sa aktualizuje stav snímača, aj keď hodnota výkonu zostáva rovnaká. V sekundách",
           "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
           "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
         }
@@ -126,6 +124,7 @@
       },
       "global_configuration_energy": {
         "title": "Energetické možnosti",
+        "description": "Tu definujte predvolené nastavenia pre snímače energie. Ďalšie informácie nájdete v [dokumentácii](https://docs.powercalc.nl/configuration/global-configuration/)",
         "data": {
           "energy_integration_method": "Metóda energetickej integrácie",
           "energy_sensor_category": "Kategória snímača energie",
@@ -135,8 +134,23 @@
           "energy_sensor_unit_prefix": "Predpona jednotky snímača energie"
         }
       },
+      "global_configuration_throttling": {
+        "title": "Možnosti obmedzenia",
+        "description": "Nastavte intervaly aktualizácie pre rôzne typy senzorov. Ďalšie informácie nájdete v [dokumentácii](https://docs.powercalc.nl/configuration/update-frequency/)",
+        "data": {
+          "group_energy_update_interval": "Interval aktualizácie skupinovej energie",
+          "group_power_update_interval": "Interval aktualizácie skupinového výkonu",
+          "energy_update_interval": "Interval aktualizácie energie"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval, v ktorom sa aktualizujú snímače skupinovej energie. V sekundách. Nastavte na 0 pre vypnutie",
+          "group_power_update_interval": "Interval, v ktorom sa aktualizujú snímače skupinového výkonu. V sekundách. Nastavte na 0 pre vypnutie",
+          "energy_update_interval": "Interval, v ktorom sa aktualizujú snímače energie. V sekundách. Nastavte na 0 pre vypnutie"
+        }
+      },
       "global_configuration_utility_meter": {
         "title": "Možnosti elektromera",
+        "description": "Tu definujte predvolené nastavenia pre elektromery. Ďalšie informácie nájdete v [dokumentácii](https://docs.powercalc.nl/configuration/global-configuration/)",
         "data": {
           "utility_meter_net_consumption": "Čistá spotreba inžinierskych sietí",
           "utility_meter_tariffs": "Tarify za elektromery",
@@ -421,7 +435,7 @@
       "description": "Konfigurácia senzorov pomocou `sensor->platform` bola zastaraná. Musíte zmeniť konfiguráciu na `powercalc->sensors`. Kliknite na 'Viac informácií' pre ďalšie pokyny.",
       "title": "Konfigurácia Powercalc YAML bola presunutá"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "Konfigurácia YAML objavovania sa zmenila",
       "description": "Vaša konfigurácia YAML musí byť aktualizovaná na novú štruktúru."
     },
@@ -527,7 +541,6 @@
           "create_utility_meters": "Vytvorte merače spotreby",
           "disable_extended_attributes": "Zakázať rozšírené atribúty",
           "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
-          "force_update_frequency": "Vynútiť frekvenciu aktualizácie",
           "ignore_unavailable_state": "Ignorovať nedostupný stav",
           "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
           "power_sensor_category": "Kategória snímača výkonu",
@@ -539,7 +552,6 @@
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "disable_extended_attributes": "Zakážte všetky extra atribúty, ktoré powercalc pridáva k výkonu, energii a stavom entity skupiny. Pomôže to udržať veľkosť databázy malú",
           "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",
-          "force_update_frequency": "Interval, v ktorom sa aktualizuje stav snímača, aj keď hodnota výkonu zostáva rovnaká. V sekundách",
           "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
           "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
         }

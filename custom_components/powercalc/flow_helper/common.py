@@ -44,6 +44,7 @@ class Step(StrEnum):
     GLOBAL_CONFIGURATION = "global_configuration"
     GLOBAL_CONFIGURATION_DISCOVERY = "global_configuration_discovery"
     GLOBAL_CONFIGURATION_ENERGY = "global_configuration_energy"
+    GLOBAL_CONFIGURATION_THROTTLING = "global_configuration_throttling"
     GLOBAL_CONFIGURATION_UTILITY_METER = "global_configuration_utility_meter"
 
 

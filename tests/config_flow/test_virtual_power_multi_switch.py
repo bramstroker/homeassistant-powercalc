@@ -68,6 +68,8 @@ async def test_discovery_flow(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
+    await run_powercalc_setup(hass)
+
     hass.config.config_dir = get_test_config_dir()
     device_entry = mock_device_with_switches(hass, 2)
 

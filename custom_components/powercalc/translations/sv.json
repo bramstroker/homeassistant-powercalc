@@ -94,7 +94,6 @@
           "create_utility_meters": "Skapa bruksmätare",
           "disable_extended_attributes": "Inaktivera utökade attribut",
           "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignorera ej tillgängligt tillstånd",
           "include_non_powercalc_sensors": "Inkludera icke-powercalc sensorer",
           "power_sensor_category": "Kategori för strömsensor",
@@ -106,7 +105,6 @@
           "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykler dag, timme etc.",
           "disable_extended_attributes": "Inaktivera alla extra attribut powercalc bidrar till effekt, energi och grupp enhet stater. Detta kommer att bidra till att hålla databasen storlek liten",
           "disable_library_download": "Inaktivera nedladdningsfunktionen för Powercalc-biblioteket",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Håll Powercalc-sensorer tillgängliga, även när källenheten inte är tillgänglig",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
         }
@@ -126,6 +124,7 @@
       },
       "global_configuration_energy": {
         "title": "Energialternativ",
+        "description": "Definiera standardinställningar för energisensorer här. Se [dokumentation](https://docs.powercalc.nl/configuration/global-configuration/) för mer information",
         "data": {
           "energy_integration_method": "Energy integration method",
           "energy_sensor_category": "Energy sensor category",
@@ -135,8 +134,23 @@
           "energy_sensor_unit_prefix": "Energy sensor unit prefix"
         }
       },
+      "global_configuration_throttling": {
+        "title": "Begränsningsalternativ",
+        "description": "Ställ in uppdateringsintervall för de olika sensortyperna. Se [dokumentation](https://docs.powercalc.nl/configuration/update-frequency/) för mer information",
+        "data": {
+          "group_energy_update_interval": "Uppdateringsintervall för gruppenergi",
+          "group_power_update_interval": "Uppdateringsintervall för gruppeffekt",
+          "energy_update_interval": "Uppdateringsintervall för energi"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Intervall då gruppens energisensorer uppdateras. I sekunder. Ställ in på 0 för att inaktivera",
+          "group_power_update_interval": "Intervall då gruppens effektsensorer uppdateras. I sekunder. Ställ in på 0 för att inaktivera",
+          "energy_update_interval": "Intervall då energisensorer uppdateras. I sekunder. Ställ in på 0 för att inaktivera"
+        }
+      },
       "global_configuration_utility_meter": {
         "title": "Utility meter options",
+        "description": "Definiera standardinställningar för bruksmätare här. Se [dokumentation](https://docs.powercalc.nl/configuration/global-configuration/) för mer information",
         "data": {
           "utility_meter_net_consumption": "Utility meter net consumption",
           "utility_meter_tariffs": "Utility meter tariffs",
@@ -421,7 +435,7 @@
       "description": "Att konfigurera sensorer med sensor->plattform har fasats ut. Du behöver ändra din konfiguration till powercalc->sensorer. Klicka på 'Läs mer' för ytterligare instruktioner.",
       "title": "Powercalc YAML konfiguration har flyttats"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "Discovery YAML-konfiguration har ändrats",
       "description": "Din YAML-konfiguration behöver uppdateras till den nya strukturen."
     },
@@ -527,7 +541,6 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Inaktivera utökade attribut",
           "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "power_sensor_category": "Power sensor category",
@@ -539,7 +552,6 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
         }

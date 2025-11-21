@@ -94,7 +94,6 @@
           "create_utility_meters": "Verbrauchszähler erstellen",
           "disable_extended_attributes": "Erweiterte Attribute deaktivieren",
           "disable_library_download": "Download der Internet-Bibliothek deaktivieren",
-          "force_update_frequency": "Aktualisierungsfrequenz erzwingen",
           "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
           "include_non_powercalc_sensors": "Nicht-Powercalc Sensoren einschließen",
           "power_sensor_category": "Leistungssensor-Kategorie",
@@ -106,7 +105,6 @@
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten.",
           "disable_extended_attributes": "Deaktivieren Sie alle zusätzlichen Attribute, die Powercalc zu den Status der Leistungs-, Energie- und Gruppeneinheiten hinzufügt. Dies wird helfen, die Größe der Datenbank gering zu halten",
           "disable_library_download": "Deaktiviere die Powercalc Bibliothek Downloadfunktion",
-          "force_update_frequency": "Intervall, in dem der Sensorzustand aktualisiert wird, auch wenn der Leistungswert gleich bleibt. In Sekunden",
           "ignore_unavailable_state": "Powercalc-Sensoren verfügbar halten, auch wenn die Quell-Entität nicht verfügbar ist",
           "include_non_powercalc_sensors": "Legen Sie fest, ob Sie Nicht-Powercalc Sensoren in Gruppen einschließen möchten"
         }
@@ -126,6 +124,7 @@
       },
       "global_configuration_energy": {
         "title": "Energieoptionen",
+        "description": "Legen Sie hier die Standardeinstellungen für Energiesensoren fest. Siehe [Dokumentation](https://docs.powercalc.nl/configuration/global-configuration/) für weitere Informationen",
         "data": {
           "energy_integration_method": "Energie-Integrationsmethode",
           "energy_sensor_category": "Energiesensor-Kategorie",
@@ -135,8 +134,23 @@
           "energy_sensor_unit_prefix": "Präfix für Energiesensoren-Einheit"
         }
       },
+      "global_configuration_throttling": {
+        "title": "Drosselungsoptionen",
+        "description": "Legen Sie Aktualisierungsintervalle für die verschiedenen Sensortypen fest. Siehe [Dokumentation](https://docs.powercalc.nl/configuration/update-frequency/) für weitere Informationen",
+        "data": {
+          "group_energy_update_interval": "Gruppenenergie-Aktualisierungsintervall",
+          "group_power_update_interval": "Gruppenleistung-Aktualisierungsintervall",
+          "energy_update_interval": "Energie-Aktualisierungsintervall"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Intervall, in dem Gruppenenergie-Sensoren aktualisiert werden. In Sekunden. Auf 0 setzen, um zu deaktivieren",
+          "group_power_update_interval": "Intervall, in dem Gruppenleistung-Sensoren aktualisiert werden. In Sekunden. Auf 0 setzen, um zu deaktivieren",
+          "energy_update_interval": "Intervall, in dem Energiesensoren aktualisiert werden. In Sekunden. Auf 0 setzen, um zu deaktivieren"
+        }
+      },
       "global_configuration_utility_meter": {
         "title": "Verbrauchszähler Einstellungen",
+        "description": "Legen Sie hier die Standardeinstellungen für Verbrauchszähler fest. Siehe [Dokumentation](https://docs.powercalc.nl/configuration/global-configuration/) für weitere Informationen",
         "data": {
           "utility_meter_net_consumption": "Verbrauchszähler Nettoverbrauch",
           "utility_meter_tariffs": "Verbrauchszähler Tarife",
@@ -421,9 +435,9 @@
       "description": "Das Konfigurieren von Sensoren mit 'sensor->platform' ist veraltet. Sie müssen Ihre Konfiguration auf 'powercalc->sensors' umstellen. Klicken Sie auf 'Mehr erfahren' für weitere Anweisungen.",
       "title": "Powercalc YAML Konfiguration wurde verschoben"
     },
-    "legacy_discovery_config": {
+    "legacy_config": {
       "title": "Discovery YAML Konfiguration geändert",
-      "description": "Ihre YAML-Konfiguration muss auf die neue Struktur aktualisiert werden."
+      "description": "Ihre YAML-Konfiguration für {type} muss auf die neue Struktur aktualisiert werden. Klicken Sie auf 'Mehr erfahren' für weitere Informationen."
     },
     "sub_profile": {
       "fix_flow": {
@@ -451,6 +465,9 @@
       "linear_mandatory": "Sie müssen mindestens Maximale Leistung oder Kalibrierung angeben",
       "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung",
       "linear_unsupported_domain": "Domäne der Entität wird für den linearen Modus nicht unterstützt. Muss einer der folgenden Werte sein: Ventilator, Licht oder Mediaplayer. Sie können jedoch die Kalibrierungsoption verwenden",
+      "lut_unsupported_color_mode": "Das LUT-Profil unterstützt einen der Farbmodi Ihres Lichts nicht. Siehe in die Logs für weitere Informationen",
+      "lut_wrong_domain": "Nur Licht Entitäten können den LUT Modus verwenden",
+      "playbook_mandatory": "Sie müssen mindestens ein Playbook angeben",
       "unknown": "Unbekannter Fehler aufgetreten, bitte sehe in die Logs für weitere Informationen"
     },
     "step": {
@@ -527,7 +544,6 @@
           "create_utility_meters": "Verbrauchszähler erstellen",
           "disable_extended_attributes": "Erweiterte Attribute deaktivieren",
           "disable_library_download": "Download der Internet-Bibliothek deaktivieren",
-          "force_update_frequency": "Aktualisierungsfrequenz erzwingen",
           "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
           "include_non_powercalc_sensors": "Schließe Nicht-Powercalc Sensoren ein",
           "power_sensor_category": "Leistungssensor-Kategorie",
@@ -539,7 +555,6 @@
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten.",
           "disable_extended_attributes": "Deaktivieren Sie alle zusätzlichen Attribute, die Powercalc zu den Status der Leistungs-, Energie- und Gruppeneinheiten hinzufügt. Dies wird helfen, die Größe der Datenbank gering zu halten",
           "disable_library_download": "Deaktiviere die Powercalc Bibliothek Downloadfunktion",
-          "force_update_frequency": "Intervall, in dem der Sensorzustand aktualisiert wird, auch wenn der Leistungswert gleich bleibt. In Sekunden",
           "ignore_unavailable_state": "Powercalc-Sensoren verfügbar halten, auch wenn die Quell-Entität nicht verfügbar ist",
           "include_non_powercalc_sensors": "Legen Sie fest, ob Sie Nicht-Powercalc Sensoren in Gruppen einschließen möchten"
         }

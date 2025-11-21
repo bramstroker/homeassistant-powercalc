@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Callable
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal, DecimalException
 import logging
 import time
@@ -31,6 +31,7 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import (
+    CALLBACK_TYPE,
     Event,
     HomeAssistant,
     State,
@@ -41,19 +42,20 @@ from homeassistant.helpers import entity_registry as er, start
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
     EventStateChangedData,
+    async_call_later,
     async_track_state_change_event,
     async_track_time_interval,
 )
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
-from homeassistant.util import Throttle
 from homeassistant.util.unit_conversion import (
     BaseUnitConverter,
     EnergyConverter,
     PowerConverter,
 )
 
+from custom_components.powercalc import CONF_GROUP_ENERGY_UPDATE_INTERVAL, DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -70,8 +72,8 @@ from custom_components.powercalc.const import (
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_GROUP_POWER_UPDATE_INTERVAL,
     CONF_GROUP_TYPE,
-    CONF_GROUP_UPDATE_INTERVAL,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
@@ -81,6 +83,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_NET_CONSUMPTION,
     DATA_DOMAIN_ENTITIES,
     DEFAULT_ENERGY_SENSOR_PRECISION,
+    DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
     DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
@@ -428,10 +431,10 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._sensor_config = sensor_config
         if self._is_energy_sensor:
             self._rounding_digits = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
-            self._update_interval: int = int(sensor_config.get(CONF_GROUP_UPDATE_INTERVAL, 60))
+            self._update_interval: int = int(sensor_config.get(CONF_GROUP_ENERGY_UPDATE_INTERVAL, DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL))
         else:
             self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
-            self._update_interval = 2
+            self._update_interval = int(sensor_config.get(CONF_GROUP_POWER_UPDATE_INTERVAL, DEFAULT_GROUP_POWER_UPDATE_INTERVAL))
         self._attr_suggested_display_precision = self._rounding_digits
         if unique_id:
             self._attr_unique_id = unique_id
@@ -444,6 +447,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._group_type = group_type
         self._start_time: float = time.time()
         self._last_update_time: float = 0
+        self._update_interval_exceeded_callback: CALLBACK_TYPE = lambda *args: None
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -453,13 +457,16 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             await self.restore_last_state()
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
+        if self._update_interval > 0:
+            self.async_on_remove(self._cancel_update_interval_exceeded_callback)
 
         self.async_on_remove(start.async_at_start(self.hass, self.on_start))
 
         self._async_hide_members(self._sensor_config.get(CONF_HIDE_MEMBERS) or False)
 
     async def async_will_remove_from_hass(self) -> None:
-        """This will trigger when entity is about to be removed from HA
+        """
+        This will trigger when entity is about to be removed from HA
         Unhide the entities, when they where hidden before.
         """
         if self._sensor_config.get(CONF_HIDE_MEMBERS) is True:
@@ -491,12 +498,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         calculated_new_state = self.calculate_new_state(new_state)
         self.set_new_state(calculated_new_state)
 
-    @Throttle(timedelta(seconds=2))
-    @callback
-    def on_state_change_throttled(self, event: Event[EventStateChangedData]) -> None:
-        """Throttled version of on_state_change, triggered when one of the group entities changes state."""
-        self.on_state_change(event)
-
     async def init_domain_group(self) -> None:
         if self._group_type != GroupType.DOMAIN:
             return
@@ -523,13 +524,11 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             self.async_write_ha_state()
             return
 
-        # Use throttled version for power sensors, regular version for energy sensors
-        callback_method = self.on_state_change_throttled if not self._is_energy_sensor else self.on_state_change
         self.async_on_remove(
             async_track_state_change_event(
                 self.hass,
                 self._entities,
-                callback_method,
+                self.on_state_change,
             ),
         )
 
@@ -561,24 +560,39 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             return
 
         current_time = time.time()
-        should_throttle = self._should_throttle(current_time)
+        throttled = self._should_throttle(current_time)
 
-        write_state = True
-        if should_throttle and current_time - self._last_update_time < self._update_interval:
-            write_state = False
         self._attr_available = True
-        self._set_native_value(state, write_state=write_state)
-        if should_throttle and write_state:
-            self._last_update_time = current_time
+        if throttled:
+
+            @callback
+            def _update_interval_callback(now: datetime) -> None:
+                self.async_write_ha_state()
+
+            self._update_interval_exceeded_callback = async_call_later(
+                self.hass,
+                self._update_interval,
+                _update_interval_callback,
+            )
+            self._set_native_value(state, write_state=False)
+            return
+
+        self._cancel_update_interval_exceeded_callback()
+        self._set_native_value(state, write_state=True)
+        self._last_update_time = current_time
 
     def _should_throttle(self, current_time: float) -> bool:
         if self._update_interval == 0:
             return False
 
-        if not self._is_energy_sensor:
+        # Don't throttle initial updates within first 5 seconds after startup
+        if current_time - self._start_time < 5:
             return False
 
-        return not current_time - self._start_time < 5
+        return current_time - self._last_update_time < self._update_interval
+
+    def _cancel_update_interval_exceeded_callback(self) -> None:
+        self._update_interval_exceeded_callback()
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
         """Convert value of member entity state to match the unit of measurement of the group sensor."""

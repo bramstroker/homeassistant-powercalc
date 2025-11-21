@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 from copy import copy
-from datetime import timedelta
 from decimal import Decimal
 import logging
 from typing import Any, cast
@@ -43,7 +42,6 @@ from homeassistant.helpers.event import (
 )
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, StateType
-from homeassistant.util import Throttle
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -416,7 +414,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async def appliance_state_listener(event: Event[EventStateChangedData]) -> None:
             """Handle for state changes for dependent sensors."""
             new_state = event.data.get("new_state")
-            await self._handle_source_entity_state_change_throttled(
+            await self._handle_source_entity_state_change(
                 self._source_entity.entity_id,
                 new_state,
             )
@@ -424,7 +422,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async def template_change_listener(*_: Any) -> None:  # noqa: ANN401
             """Handle for state changes for referenced templates."""
             state = self.hass.states.get(self._source_entity.entity_id)
-            await self._handle_source_entity_state_change_throttled(
+            await self._handle_source_entity_state_change(
                 self._source_entity.entity_id,
                 state,
             )
@@ -505,14 +503,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         self._calculation_enabled_condition = template
 
-    @Throttle(timedelta(seconds=1))
-    async def _handle_source_entity_state_change_throttled(
-        self,
-        trigger_entity_id: str,
-        state: State | None,
-    ) -> None:
-        await self._handle_source_entity_state_change(trigger_entity_id, state)
-
     async def _handle_source_entity_state_change(
         self,
         trigger_entity_id: str,
@@ -533,15 +523,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 "%s: Source entity has an invalid state, setting power sensor to unavailable",
                 trigger_entity_id,
             )
-            self._power = None
-            self.async_write_ha_state()
+            self._update_power_and_write_state(None)
             return
 
         await self._switch_sub_profile_dynamically(state)
-        self._power = await self.calculate_power(state)
-
-        if self._power is not None:
-            self._power = round(self._power, self._rounding_digits)
+        power = await self.calculate_power(state)
 
         _LOGGER.debug(
             '%s: State changed to "%s". Power:%s',
@@ -550,17 +536,35 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self._power,
         )
 
-        self.async_write_ha_state()
+        self._update_power_and_write_state(power)
         async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
+
+    def _update_power_and_write_state(self, power: Decimal | None) -> None:
+        """Update the power sensor and write HA state."""
+
+        available = False
+        if power is not None:
+            power = round(power, self._rounding_digits)
+            available = True
+
+        if self._availability_entity:
+            state = self.hass.states.get(self._availability_entity)
+            available = bool(state and state.state != STATE_UNAVAILABLE)
+
+        # Prevent writing the same state twice to the state machine
+        if self._power == power and self.available == available:
+            return
+
+        self._power = power
+        self._attr_available = available
+        self.async_write_ha_state()
 
     @callback
     def _update_power_sensor(self, power: Decimal) -> None:
         """Update the power sensor with new power value from strategy and write HA state."""
-        self._power = power
         if self._multiply_factor:
-            self._power *= Decimal(self._multiply_factor)
-        self._power = round(self._power, self._rounding_digits)
-        self.async_write_ha_state()
+            power *= Decimal(self._multiply_factor)
+        self._update_power_and_write_state(power)
 
     def _has_valid_state(self, state: State) -> bool:
         """Check if the state is valid, we can use it for power calculation."""
@@ -653,8 +657,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 power = Decimal(sleep_power.get(CONF_POWER) or 0)
                 if self._multiply_factor_standby and self._multiply_factor:
                     power *= Decimal(self._multiply_factor)
-                self._power = round(power, self._rounding_digits)
-                self.async_write_ha_state()
+                self._update_power_and_write_state(power)
 
             self._sleep_power_timer = async_call_later(
                 self.hass,
@@ -693,15 +696,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
         return cast(StateType, self._power)
-
-    @property
-    def available(self) -> bool:
-        """Return True if entity is available."""
-        if self._availability_entity:
-            state = self.hass.states.get(self._availability_entity)
-            return bool(state and state.state != STATE_UNAVAILABLE)
-
-        return self._power is not None
 
     def set_energy_sensor_attribute(self, entity_id: str) -> None:
         """Set the energy sensor on the state attributes."""

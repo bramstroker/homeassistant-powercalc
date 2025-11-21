@@ -47,10 +47,13 @@ from .const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_ENERGY_UPDATE_INTERVAL,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
-    CONF_FORCE_UPDATE_FREQUENCY,
-    CONF_GROUP_UPDATE_INTERVAL,
+    CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED,
+    CONF_GROUP_ENERGY_UPDATE_INTERVAL,
+    CONF_GROUP_POWER_UPDATE_INTERVAL,
+    CONF_GROUP_UPDATE_INTERVAL_DEPRECATED,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
@@ -75,11 +78,12 @@ from .const import (
     DEFAULT_ENERGY_NAME_PATTERN,
     DEFAULT_ENERGY_SENSOR_PRECISION,
     DEFAULT_ENERGY_UNIT_PREFIX,
+    DEFAULT_ENERGY_UPDATE_INTERVAL,
     DEFAULT_ENTITY_CATEGORY,
-    DEFAULT_GROUP_UPDATE_INTERVAL,
+    DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
+    DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
     DEFAULT_POWER_NAME_PATTERN,
     DEFAULT_POWER_SENSOR_PRECISION,
-    DEFAULT_UPDATE_FREQUENCY,
     DEFAULT_UTILITY_METER_TYPES,
     DISCOVERY_TYPE,
     DOMAIN,
@@ -96,7 +100,7 @@ from .const import (
     UnitPrefix,
 )
 from .discovery import DiscoveryManager
-from .migrate import async_migrate_config_entry, handle_legacy_discovery_config
+from .migrate import async_migrate_config_entry, handle_legacy_discovery_config, handle_legacy_update_interval_config
 from .power_profile.power_profile import DeviceType
 from .sensor import SENSOR_CONFIG
 from .sensors.group.config_entry_utils import (
@@ -126,15 +130,27 @@ CONFIG_SCHEMA = vol.Schema(
             cv.deprecated(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED),
             cv.deprecated(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED),
             cv.deprecated(CONF_ENABLE_AUTODISCOVERY_DEPRECATED),
+            cv.deprecated(CONF_GROUP_UPDATE_INTERVAL_DEPRECATED),
+            cv.deprecated(CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED),
             vol.Schema(
                 {
                     vol.Optional(
-                        CONF_FORCE_UPDATE_FREQUENCY,
-                        default=DEFAULT_UPDATE_FREQUENCY,
+                        CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED,
                     ): cv.time_period,
                     vol.Optional(
-                        CONF_GROUP_UPDATE_INTERVAL,
-                        default=DEFAULT_GROUP_UPDATE_INTERVAL,
+                        CONF_GROUP_UPDATE_INTERVAL_DEPRECATED,
+                    ): cv.positive_int,
+                    vol.Optional(
+                        CONF_GROUP_POWER_UPDATE_INTERVAL,
+                        default=DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
+                    ): cv.positive_int,
+                    vol.Optional(
+                        CONF_GROUP_ENERGY_UPDATE_INTERVAL,
+                        default=DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
+                    ): cv.positive_int,
+                    vol.Optional(
+                        CONF_ENERGY_UPDATE_INTERVAL,
+                        default=DEFAULT_ENERGY_UPDATE_INTERVAL,
                     ): cv.positive_int,
                     vol.Optional(
                         CONF_POWER_SENSOR_NAMING,
@@ -294,8 +310,9 @@ async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> C
         CONF_ENERGY_SENSOR_PRECISION: DEFAULT_ENERGY_SENSOR_PRECISION,
         CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
         CONF_ENERGY_SENSOR_UNIT_PREFIX: DEFAULT_ENERGY_UNIT_PREFIX,
-        CONF_FORCE_UPDATE_FREQUENCY: DEFAULT_UPDATE_FREQUENCY,
-        CONF_GROUP_UPDATE_INTERVAL: DEFAULT_GROUP_UPDATE_INTERVAL,
+        CONF_GROUP_ENERGY_UPDATE_INTERVAL: DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
+        CONF_GROUP_POWER_UPDATE_INTERVAL: DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
+        CONF_ENERGY_UPDATE_INTERVAL: DEFAULT_ENERGY_UPDATE_INTERVAL,
         CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
         CONF_IGNORE_UNAVAILABLE_STATE: False,
         CONF_CREATE_DOMAIN_GROUPS: [],
@@ -312,6 +329,7 @@ async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> C
     }
 
     await handle_legacy_discovery_config(hass, global_config)
+    await handle_legacy_update_interval_config(hass, global_config)
 
     # Load GUI configuration, if any, and update the global configuration with the GUI config
     global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
@@ -324,8 +342,6 @@ async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> C
 
 def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
     global_config = dict(config_entry.data)
-    if CONF_FORCE_UPDATE_FREQUENCY in global_config:
-        global_config[CONF_FORCE_UPDATE_FREQUENCY] = timedelta(seconds=global_config[CONF_FORCE_UPDATE_FREQUENCY])
     if CONF_UTILITY_METER_OFFSET in global_config:
         global_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=global_config[CONF_UTILITY_METER_OFFSET])
     if global_config.get(CONF_ENERGY_SENSOR_CATEGORY):
