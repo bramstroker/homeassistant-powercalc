@@ -561,7 +561,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
         current_time = time.time()
         throttled = self._should_throttle(current_time)
-        _LOGGER.debug("State update for %s: %s (throttled=%s)", self.entity_id, state, throttled)
 
         self._attr_available = True
         if throttled:
