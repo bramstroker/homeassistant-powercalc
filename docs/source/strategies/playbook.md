@@ -1,4 +1,4 @@
-# Playbook Strategy
+# Playbook
 
 ## Overview
 
