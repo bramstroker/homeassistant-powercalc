@@ -340,6 +340,12 @@ class DiscoveryManager:
         """Disable the discovery."""
         self._status = DiscoveryStatus.DISABLED
         self.initialized_flows = set()
+        flows = self.hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+        for flow in flows:
+            if flow["context"]["source"] != SOURCE_INTEGRATION_DISCOVERY:
+                continue
+            self.hass.config_entries.flow.async_abort(flow["flow_id"])
+        return
 
     async def extract_model_info_from_device_info(
         self,

@@ -955,7 +955,7 @@ async def test_get_entities(hass: HomeAssistant, entity_entries: list[RegistryEn
     assert entity_ids == expected_entities
 
 
-async def test_discovery_enable_toggle_runtime(
+async def test_discovery_enable_runtime(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
@@ -985,3 +985,36 @@ async def test_discovery_enable_toggle_runtime(
     await hass.async_block_till_done()
 
     assert len(mock_flow_init.mock_calls) == 1
+
+
+async def test_discovery_disable_runtime(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    entry = MockConfigEntry(
+        entry_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        unique_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        domain=DOMAIN,
+        data={
+            CONF_DISCOVERY: {
+                CONF_ENABLED: True,
+            },
+        },
+        version=PowercalcConfigFlow.VERSION,
+    )
+    entry.add_to_hass(hass)
+
+    await run_powercalc_setup(hass)
+
+    flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    assert len(flows) == 1
+
+    new_data = entry.data.copy()
+    new_data[CONF_DISCOVERY] = {CONF_ENABLED: False}
+    hass.config_entries.async_update_entry(entry, data=new_data)
+    await hass.async_block_till_done()
+
+    flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    assert len(flows) == 0
