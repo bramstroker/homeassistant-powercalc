@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, Platform
+from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_ID, CONF_NAME, CONF_PATH, Platform
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
@@ -89,7 +89,19 @@ SCHEMA_POWER_LINEAR = vol.Schema(
 
 SCHEMA_POWER_PLAYBOOK = vol.Schema(
     {
-        vol.Optional(CONF_PLAYBOOKS): selector.ObjectSelector(),
+        vol.Optional(CONF_PLAYBOOKS): selector.ObjectSelector(
+            {
+                "multiple": True,
+                "fields": {
+                    CONF_ID: {
+                        "selector": {"text": None},
+                    },
+                    CONF_PATH: {
+                        "selector": {"text": None},
+                    },
+                },
+            },
+        ),
         vol.Optional(CONF_REPEAT): selector.BooleanSelector(),
         vol.Optional(CONF_AUTOSTART): selector.TextSelector(),
         vol.Optional(CONF_STATE_TRIGGER): selector.ObjectSelector(),

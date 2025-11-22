@@ -304,7 +304,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
 
-    VERSION = 5
+    VERSION = 6
 
     def __init__(self) -> None:
         """Initialize options flow."""

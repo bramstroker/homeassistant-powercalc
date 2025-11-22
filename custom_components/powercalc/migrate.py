@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_ENABLED
+from homeassistant.const import CONF_ENABLED, CONF_ID, CONF_PATH
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.issue_registry import async_create_issue
@@ -19,6 +19,7 @@ from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_PLAYBOOK,
+    CONF_PLAYBOOKS,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
@@ -60,7 +61,12 @@ async def async_migrate_config_entry(hass: HomeAssistant, config_entry: ConfigEn
         ]:
             data.pop(key, None)
 
-    hass.config_entries.async_update_entry(config_entry, data=data, version=5)
+    if version <= 5:
+        conf_playbook = data.get(CONF_PLAYBOOK, {})
+        if CONF_PLAYBOOKS in conf_playbook:
+            data[CONF_PLAYBOOK][CONF_PLAYBOOKS] = [{CONF_ID: key, CONF_PATH: val} for key, val in conf_playbook.pop(CONF_PLAYBOOKS).items()]
+
+    hass.config_entries.async_update_entry(config_entry, data=data, version=6)
 
 
 async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dict) -> None:
