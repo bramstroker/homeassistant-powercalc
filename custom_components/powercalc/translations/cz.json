@@ -62,6 +62,19 @@
         },
         "title": "Vytvořit denní fixní senzor"
       },
+      "energy_options": {
+        "title": "Možnosti energie",
+        "data": {
+          "energy_integration_method": "Metoda integrace",
+          "energy_sensor_unit_prefix": "Předpona jednotky",
+          "energy_filter_outlier_enabled": "Filtrovat odlehlé hodnoty",
+          "energy_filter_outlier_max_step": "Maximální krok filtru odlehlých hodnot"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Povolit filtrování odlehlých hodnot v senzoru energie",
+          "energy_filter_outlier_max_step": "Maximální očekávaný krok v hodnotách výkonu (ve wattech) pro filtr odlehlých hodnot"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Název",

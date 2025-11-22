@@ -62,6 +62,19 @@
         },
         "title": "Utwórz dzienny czujnik stały"
       },
+      "energy_options": {
+        "title": "Opcje energii",
+        "data": {
+          "energy_integration_method": "Metoda integracji",
+          "energy_sensor_unit_prefix": "Prefiks jednostki",
+          "energy_filter_outlier_enabled": "Filtruj wartości odstające",
+          "energy_filter_outlier_max_step": "Maksymalny krok filtra wartości odstających"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Włącz filtrowanie wartości odstających w sensorze energii",
+          "energy_filter_outlier_max_step": "Maksymalny oczekiwany krok w wartościach mocy (w watach) dla filtra wartości odstających"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Nazwa",

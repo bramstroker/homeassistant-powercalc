@@ -62,6 +62,19 @@
         },
         "title": "Crea un sensore fisso giornaliero"
       },
+      "energy_options": {
+        "title": "Opzioni energia",
+        "data": {
+          "energy_integration_method": "Metodo di integrazione",
+          "energy_sensor_unit_prefix": "Prefisso unità",
+          "energy_filter_outlier_enabled": "Filtra valori anomali",
+          "energy_filter_outlier_max_step": "Passo massimo del filtro valori anomali"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Abilita il filtraggio dei valori anomali nel sensore di energia",
+          "energy_filter_outlier_max_step": "Passo massimo previsto nei valori di potenza (in watt) per il filtro dei valori anomali"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Nome",

@@ -62,6 +62,19 @@
         },
         "title": "Créer un capteur fixe quotidien"
       },
+      "energy_options": {
+        "title": "Options d'énergie",
+        "data": {
+          "energy_integration_method": "Méthode d'intégration",
+          "energy_sensor_unit_prefix": "Préfixe d'unité",
+          "energy_filter_outlier_enabled": "Filtrer les valeurs aberrantes",
+          "energy_filter_outlier_max_step": "Étape maximale du filtre des valeurs aberrantes"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Activer le filtrage des valeurs aberrantes dans le capteur d'énergie",
+          "energy_filter_outlier_max_step": "Étape maximale attendue dans les valeurs de puissance (en watts) pour le filtre des valeurs aberrantes"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Name",

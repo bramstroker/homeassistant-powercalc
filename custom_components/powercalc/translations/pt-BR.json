@@ -62,6 +62,19 @@
         },
         "title": "Criar um sensor fixo diário"
       },
+      "energy_options": {
+        "title": "Opções de energia",
+        "data": {
+          "energy_integration_method": "Método de integração",
+          "energy_sensor_unit_prefix": "Prefixo de unidade",
+          "energy_filter_outlier_enabled": "Filtrar valores discrepantes",
+          "energy_filter_outlier_max_step": "Passo máximo do filtro de valores discrepantes"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Ativar filtragem de valores discrepantes no sensor de energia",
+          "energy_filter_outlier_max_step": "Passo máximo esperado nos valores de potência (em watts) para o filtro de valores discrepantes"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Nome",

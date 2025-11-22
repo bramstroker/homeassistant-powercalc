@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import deque
-from collections.abc import Iterable
 import statistics
 
 
@@ -26,8 +25,8 @@ class OutlierFilter:
         self._max_expected_step = max_expected_step
 
     @property
-    def values(self) -> Iterable[float]:
-        return tuple(self._values)
+    def values(self) -> list[float]:
+        return list(self._values)
 
     def _is_outlier(self, value: float) -> bool:
         """Return True if value is considered an outlier."""
@@ -50,7 +49,7 @@ class OutlierFilter:
         mad = statistics.median(abs_devs) or 0
 
         if mad == 0:
-            return False
+            return False  # pragma: no cover
 
         z = 0.6745 * (value - median) / mad
         return abs(z) > self._max_z_score

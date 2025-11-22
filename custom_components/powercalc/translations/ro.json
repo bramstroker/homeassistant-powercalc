@@ -62,6 +62,19 @@
         },
         "title": "Creați un senzor fix zilnic"
       },
+      "energy_options": {
+        "title": "Opțiuni energie",
+        "data": {
+          "energy_integration_method": "Metodă de integrare",
+          "energy_sensor_unit_prefix": "Prefix unitate",
+          "energy_filter_outlier_enabled": "Filtrare valori aberante",
+          "energy_filter_outlier_max_step": "Pasul maxim al filtrului de valori aberante"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Activați filtrarea valorilor aberante în senzorul de energie",
+          "energy_filter_outlier_max_step": "Pasul maxim așteptat în valorile de putere (în wați) pentru filtrul de valori aberante"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Name",

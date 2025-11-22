@@ -10,8 +10,21 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc import CONF_CREATE_UTILITY_METERS, CONF_UTILITY_METER_TARIFFS, CONF_UTILITY_METER_TYPES, SensorType
+from custom_components.powercalc import (
+    CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_UTILITY_METER_TARIFFS,
+    CONF_UTILITY_METER_TYPES,
+    SensorType,
+)
 from custom_components.powercalc.config_flow import Step
+from custom_components.powercalc.const import (
+    CONF_ENERGY_FILTER_OUTLIER_ENABLED,
+    CONF_ENERGY_FILTER_OUTLIER_MAX,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
+    UnitPrefix,
+)
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -136,6 +149,37 @@ async def test_real_power_options(hass: HomeAssistant) -> None:
     state = hass.states.get("sensor.some_name_energy")
     assert state
     assert state.attributes.get("source") == "sensor.my_new_real_power"
+
+
+async def test_energy_options_flow(hass: HomeAssistant) -> None:
+    """Test energy options flow."""
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_NAME: "Some name",
+            CONF_ENTITY_ID: "sensor.my_real_power",
+            CONF_SENSOR_TYPE: SensorType.REAL_POWER,
+            CONF_CREATE_UTILITY_METERS: False,
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.ENERGY_OPTIONS)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
+            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
+            CONF_ENERGY_FILTER_OUTLIER_ENABLED: True,
+            CONF_ENERGY_FILTER_OUTLIER_MAX: 2000,
+        },
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_ENERGY_INTEGRATION_METHOD] == ENERGY_INTEGRATION_METHOD_TRAPEZODIAL
+    assert entry.data[CONF_ENERGY_SENSOR_UNIT_PREFIX] == UnitPrefix.KILO
+    assert entry.data[CONF_ENERGY_FILTER_OUTLIER_ENABLED]
+    assert entry.data[CONF_ENERGY_FILTER_OUTLIER_MAX] == 2000
 
 
 async def test_attach_to_custom_device(hass: HomeAssistant) -> None:

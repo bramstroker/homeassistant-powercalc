@@ -13,8 +13,8 @@ def test_accept_during_warmup() -> None:
     assert outlier_filter.accept(30.0) is True
 
     # Check that values were added to the window
-    assert len(outlier_filter._values) == 3  # noqa: SLF001
-    assert list(outlier_filter._values) == [10.0, 20.0, 30.0]  # noqa: SLF001
+    assert len(outlier_filter.values) == 3
+    assert list(outlier_filter.values) == [10.0, 20.0, 30.0]
 
 
 def test_accept_rejects_outliers() -> None:
@@ -33,8 +33,8 @@ def test_accept_rejects_outliers() -> None:
     assert outlier_filter.accept(200.0) is False
 
     # Check that only the accepted value was added to the window
-    assert len(outlier_filter._values) == 4  # noqa: SLF001
-    assert 200.0 not in outlier_filter._values  # noqa: SLF001
+    assert len(outlier_filter.values) == 4
+    assert 200.0 not in outlier_filter.values
 
 
 def test_window_size_limit() -> None:
@@ -46,8 +46,8 @@ def test_window_size_limit() -> None:
     outlier_filter.accept(30.0)
     outlier_filter.accept(40.0)
 
-    assert len(outlier_filter._values) == 3  # noqa: SLF001
-    assert list(outlier_filter._values) == [20.0, 30.0, 40.0]  # noqa: SLF001
+    assert len(outlier_filter.values) == 3
+    assert list(outlier_filter.values) == [20.0, 30.0, 40.0]
 
 
 def test_is_outlier_with_identical_values() -> None:

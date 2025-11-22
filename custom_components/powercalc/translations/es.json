@@ -62,6 +62,19 @@
         },
         "title": "Crear un sensor diario fijado"
       },
+      "energy_options": {
+        "title": "Opciones de energía",
+        "data": {
+          "energy_integration_method": "Método de integración",
+          "energy_sensor_unit_prefix": "Prefijo de unidad",
+          "energy_filter_outlier_enabled": "Filtrar valores atípicos",
+          "energy_filter_outlier_max_step": "Paso máximo del filtro de valores atípicos"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Habilitar el filtrado de valores atípicos en el sensor de energía",
+          "energy_filter_outlier_max_step": "Paso máximo esperado en valores de potencia (en vatios) para el filtro de valores atípicos"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Nombre",

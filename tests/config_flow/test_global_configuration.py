@@ -360,6 +360,31 @@ async def test_discovery_options_flow(hass: HomeAssistant) -> None:
     assert discovery_options[CONF_EXCLUDE_DEVICE_TYPES] == [DeviceType.SMART_SWITCH]
 
 
+async def test_throttling_options_flow(hass: HomeAssistant) -> None:
+    """Test throttling options flow."""
+    entry = create_mock_global_config_entry(
+        hass,
+        {},
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION_THROTTLING)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_ENERGY_UPDATE_INTERVAL: 20,
+            CONF_GROUP_POWER_UPDATE_INTERVAL: 15,
+            CONF_GROUP_ENERGY_UPDATE_INTERVAL: 30,
+        },
+    )
+
+    # Check if config entry data is updated.
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_ENERGY_UPDATE_INTERVAL] == 20
+    assert entry.data[CONF_GROUP_POWER_UPDATE_INTERVAL] == 15
+    assert entry.data[CONF_GROUP_ENERGY_UPDATE_INTERVAL] == 30
+
+
 async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> None:
     """Test entities are reloaded reflecting changes."""
 
