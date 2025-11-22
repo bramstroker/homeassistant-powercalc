@@ -99,7 +99,7 @@ from .const import (
     SensorType,
     UnitPrefix,
 )
-from .discovery import DiscoveryManager
+from .discovery import DiscoveryManager, DiscoveryStatus
 from .migrate import async_migrate_config_entry, handle_legacy_discovery_config, handle_legacy_update_interval_config
 from .power_profile.power_profile import DeviceType
 from .sensor import SENSOR_CONFIG
@@ -294,9 +294,9 @@ async def create_discovery_manager_instance(
         ha_config,
         exclude_device_types=exclude_device_types,
         exclude_self_usage_profiles=exclude_self_usage,
+        enabled=enable_autodiscovery,
     )
-    if enable_autodiscovery:
-        await manager.setup()
+    await manager.setup()
     return manager
 
 
@@ -520,6 +520,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
         if global_config.get(FLAG_HAS_GLOBAL_GUI_CONFIG, False) is False:
             await apply_global_gui_configuration_changes(hass, entry)
+
+        discovery_enabled = bool(entry.data.get(CONF_DISCOVERY, {}).get(CONF_ENABLED, False))
+        discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+        if discovery_enabled and discovery_manager.status == DiscoveryStatus.DISABLED:
+            _LOGGER.debug("Enabling discovery manager based on global configuration")
+            discovery_manager.enable()
+            await discovery_manager.setup()
+        if not discovery_enabled and discovery_manager.status != DiscoveryStatus.DISABLED:
+            _LOGGER.debug("Disabling discovery manager based on global configuration")
+            await discovery_manager.disable()
 
     return True
 
