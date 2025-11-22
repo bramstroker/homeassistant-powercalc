@@ -40,6 +40,7 @@ class Step(StrEnum):
     USER = "user"
     SMART_SWITCH = "smart_switch"
     INIT = "init"
+    ENERGY_OPTIONS = "energy_options"
     UTILITY_METER_OPTIONS = "utility_meter_options"
     GLOBAL_CONFIGURATION = "global_configuration"
     GLOBAL_CONFIGURATION_DISCOVERY = "global_configuration_discovery"

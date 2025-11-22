@@ -62,6 +62,19 @@
         },
         "title": "Maak een dagelijkse energieverbruik sensor"
       },
+      "energy_options": {
+        "title": "Energie opties",
+        "data": {
+          "energy_integration_method": "Integratie methode",
+          "energy_sensor_unit_prefix": "Eenheid voorvoegsel",
+          "energy_filter_outlier_enabled": "Filter uitschieters",
+          "energy_filter_outlier_max_step": "Maximale stap voor uitschieter filter"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Schakel filtering van uitschieters in de energiesensor in",
+          "energy_filter_outlier_max_step": "Maximale verwachte stap in vermogenswaarden (in watt) voor het uitschieter filter"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Naam",

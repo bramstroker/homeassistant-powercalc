@@ -62,6 +62,19 @@
         },
         "title": "Einen daily fixed-Sensor erstellen"
       },
+      "energy_options": {
+        "title": "Energieoptionen",
+        "data": {
+          "energy_integration_method": "Integrationsmethode",
+          "energy_sensor_unit_prefix": "Einheitenpräfix",
+          "energy_filter_outlier_enabled": "Ausreißer filtern",
+          "energy_filter_outlier_max_step": "Maximaler Schritt für Ausreißerfilter"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Aktivieren Sie die Filterung von Ausreißerwerten im Energiesensor",
+          "energy_filter_outlier_max_step": "Maximaler erwarteter Schritt in Leistungswerten (in Watt) für den Ausreißerfilter"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Name",

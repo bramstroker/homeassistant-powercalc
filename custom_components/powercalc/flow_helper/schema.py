@@ -5,6 +5,8 @@ import voluptuous as vol
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_FILTER_OUTLIER_ENABLED,
+    CONF_ENERGY_FILTER_OUTLIER_MAX,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_SUB_PROFILE,
@@ -53,6 +55,15 @@ SCHEMA_ENERGY_OPTIONS = vol.Schema(
             ),
         ),
     },
+)
+
+SCHEMA_SENSOR_ENERGY_OPTIONS = SCHEMA_ENERGY_OPTIONS.extend(
+    vol.Schema(
+        {
+            vol.Optional(CONF_ENERGY_FILTER_OUTLIER_ENABLED, default=False): selector.BooleanSelector(),
+            vol.Optional(CONF_ENERGY_FILTER_OUTLIER_MAX): selector.NumberSelector(),
+        },
+    ).schema,
 )
 
 

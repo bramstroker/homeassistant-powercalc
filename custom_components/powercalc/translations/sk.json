@@ -62,6 +62,19 @@
         },
         "title": "Vytvorte denný pevný snímač"
       },
+      "energy_options": {
+        "title": "Možnosti energie",
+        "data": {
+          "energy_integration_method": "Metóda integrácie",
+          "energy_sensor_unit_prefix": "Predpona jednotky",
+          "energy_filter_outlier_enabled": "Filtrovať odľahlé hodnoty",
+          "energy_filter_outlier_max_step": "Maximálny krok filtra odľahlých hodnôt"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Povoliť filtrovanie odľahlých hodnôt v snímači energie",
+          "energy_filter_outlier_max_step": "Maximálny očakávaný krok v hodnotách výkonu (vo wattoch) pre filter odľahlých hodnôt"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Názov",

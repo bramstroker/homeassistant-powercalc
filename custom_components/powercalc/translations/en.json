@@ -62,6 +62,19 @@
         },
         "title": "Create a daily fixed sensor"
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Name",
@@ -318,19 +331,21 @@
           "calculation_enabled_condition": "Calculation enabled condition",
           "energy_integration_method": "Energy integration method",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignore unavailable state",
           "multiply_factor": "Multiply factor",
           "multiply_factor_standby": "Multiply factor standby",
-          "unavailable_power": "Unavailable power",
-          "utility_meter_tariffs": "Utility meter tariffs"
+          "unavailable_power": "Unavailable power"
         },
         "data_description": {
           "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
           "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
           "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
         },
         "description": "The options below are for advanced powercalc configuration. Most users will not use this so you may skip these",
         "title": "Advanced options"
@@ -516,6 +531,19 @@
           "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Fixed options",
         "data": {
@@ -665,6 +693,7 @@
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
+          "energy_options": "Energy options",
           "fixed": "Fixed options",
           "group_custom": "Group options",
           "group_subtract": "Group options",
