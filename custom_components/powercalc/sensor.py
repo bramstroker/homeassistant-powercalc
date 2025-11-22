@@ -17,7 +17,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
+    CONF_ID,
     CONF_NAME,
+    CONF_PATH,
     CONF_UNIQUE_ID,
 )
 from homeassistant.core import Event, HomeAssistant, SupportsResponse, callback
@@ -80,6 +82,7 @@ from .const import (
     CONF_ON_TIME,
     CONF_OR,
     CONF_PLAYBOOK,
+    CONF_PLAYBOOKS,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
@@ -586,11 +589,19 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
         if CONF_UTILITY_METER_OFFSET in sensor_config:
             sensor_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=sensor_config[CONF_UTILITY_METER_OFFSET])
 
+    def process_playbook_config() -> None:
+        if CONF_PLAYBOOK not in sensor_config:
+            return
+        playbook_config = copy.copy(sensor_config[CONF_PLAYBOOK])
+        playbook_config[CONF_PLAYBOOKS] = {item[CONF_ID]: item[CONF_PATH] for item in playbook_config[CONF_PLAYBOOKS]}
+        sensor_config[CONF_PLAYBOOK] = playbook_config
+
     handle_sensor_type()
 
     process_daily_fixed_energy()
     process_fixed_config()
     process_linear_config()
+    process_playbook_config()
     process_calculation_enabled_condition()
     process_utility_meter_offset()
 

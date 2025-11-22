@@ -304,7 +304,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
 
-    VERSION = 5
+    VERSION = 6
 
     def __init__(self) -> None:
         """Initialize options flow."""
@@ -570,7 +570,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 self._process_user_input(user_input, SCHEMA_POWER_SMART_SWITCH)
                 user_input = {CONF_POWER: user_input.get(CONF_POWER, 0)}
 
-            strategy_options = self.flow_handlers[FlowType.VIRTUAL_POWER].build_strategy_config(user_input or {})
+            strategy_options = await self.flow_handlers[FlowType.VIRTUAL_POWER].build_strategy_config(user_input or {})
 
             if self.strategy != CalculationStrategy.LUT:
                 self.sensor_config.update({str(self.strategy): strategy_options})
