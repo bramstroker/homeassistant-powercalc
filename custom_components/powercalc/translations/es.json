@@ -321,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Indique para iniciar una reproducción cuando comience HA. Por ejemplo, 'programa1'",
-          "playbooks": "Introduzca un libro de reproducción en cada línea. Ejemplo\n\nprograma1: lavadora/programa1.csv",
           "repeat": "Alternar cuando quieras seguir repitiendo la reproducción una vez completada",
           "states_trigger": "Dispara una reproducción basada en un cambio de estado. Ejemplo\n\nreproduciendo: programa1"
         },
@@ -332,19 +331,21 @@
           "calculation_enabled_condition": "Condición de cálculo habilitada",
           "energy_integration_method": "Método de integración de energía",
           "energy_sensor_unit_prefix": "Prefijo de unidad de sensor de energía",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignorar estado no disponible",
           "multiply_factor": "Factor de multiplicación",
           "multiply_factor_standby": "Factor de multiplicación en espera",
-          "unavailable_power": "Energía no disponible",
-          "utility_meter_tariffs": "Tarifas de contadores eléctricos"
+          "unavailable_power": "Energía no disponible"
         },
         "data_description": {
           "calculation_enabled_condition": "La estrategia de cálculo de energía configurada solo se ejecutará cuando esta plantilla se evalúe a verdadero o 1, de lo contrario el sensor de energía mostrará 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Cambiar esta opción cuando desea que el sensor de potencia permanezca disponible incluso si la entidad fuente no está disponible",
           "multiply_factor": "Multiplica la potencia calculada por esta proporción. Puede ser útil para grupos de luces",
           "multiply_factor_standby": "Si también se aplica el factor de multiplicación a la potencia en modo de espera",
-          "unavailable_power": "Potencia en W para grabar cuando la entidad origen tiene un estado no disponible",
-          "utility_meter_tariffs": "Una lista de tarifas soportadas, dejar vacío si sólo se necesita una tarifa única."
+          "unavailable_power": "Potencia en W para grabar cuando la entidad origen tiene un estado no disponible"
         },
         "description": "Las opciones a continuación son para la configuración avanzada de powercalc. La mayoría de los usuarios no lo usarán así que las puedes omitir",
         "title": "Opciones avanzadas"
@@ -530,6 +531,19 @@
           "update_frequency": "Tiempo en segundos entre actualizaciones del estado del sensor"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Opciones fijas",
         "data": {
@@ -679,6 +693,7 @@
           "advanced_options": "Opciones avanzadas",
           "basic_options": "Opciones básicas",
           "daily_energy": "Opciones de energía diarias",
+          "energy_options": "Energy options",
           "fixed": "Opciones fijadas",
           "group_custom": "Opciones de grupo",
           "group_subtract": "Opciones de grupo",
@@ -734,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Indique para iniciar una reproducción cuando comience HA. Por ejemplo, 'programa1'",
-          "playbooks": "Introduzca un libro de reproducción en cada línea. Ejemplo\n\nprograma1: lavadora/programa1.csv",
           "repeat": "Alternar cuando quieras seguir repitiendo la reproducción una vez completada",
           "states_trigger": "Dispara una reproducción basada en un cambio de estado. Ejemplo\n\nreproduciendo: programa1"
         }

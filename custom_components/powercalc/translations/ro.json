@@ -321,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Indicați începerea unui anumit manual de joc când începe HA. adică 'program1'",
-          "playbooks": "Introduceți un manual pe fiecare linie. Exemplu\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Comutați când doriți să continuați să repetați manualul după finalizarea acestuia",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         },
@@ -332,19 +331,21 @@
           "calculation_enabled_condition": "Condiție de calcul activat",
           "energy_integration_method": "Metoda de integrare energetică",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignorați starea indisponibilă",
           "multiply_factor": "Factorul de multiplicare",
           "multiply_factor_standby": "Factor de multiplicare standby",
-          "unavailable_power": "Putere indisponibilă",
-          "utility_meter_tariffs": "Tarifele contoarelor"
+          "unavailable_power": "Putere indisponibilă"
         },
         "data_description": {
           "calculation_enabled_condition": "Strategia configurată de calcul al puterii va fi executată numai atunci când acest șablon este evaluat la adevărat sau la 1, altfel senzorul de putere va afișa 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Comutați această setare atunci când doriți ca senzorul de putere să rămână disponibil chiar dacă entitatea sursă nu este disponibilă",
           "multiply_factor": "Înmulțiți puterea calculată cu acest raport. Poate fi util pentru grupuri de lumina",
           "multiply_factor_standby": "Dacă se aplică și factorul de multiplicare la puterea standby",
-          "unavailable_power": "Putere în W pentru a înregistra atunci când entitatea sursă are o stare indisponibilă",
-          "utility_meter_tariffs": "O listă de tarife acceptate, lăsați necompletat dacă este necesar doar un singur tarif."
+          "unavailable_power": "Putere în W pentru a înregistra atunci când entitatea sursă are o stare indisponibilă"
         },
         "description": "Opțiunile de mai jos sunt pentru configurarea avansată powercalc. Majoritatea utilizatorilor nu vor folosi acest lucru, așa că le puteți sări peste acestea",
         "title": "Opțiuni avansate"
@@ -530,6 +531,19 @@
           "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Fixed options",
         "data": {
@@ -679,6 +693,7 @@
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
+          "energy_options": "Energy options",
           "fixed": "Fixed options",
           "group_custom": "Group options",
           "group_subtract": "Group options",
@@ -734,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Indicați începerea unui anumit manual de joc când începe HA. adică 'program1'",
-          "playbooks": "Introduceți un playbook pe fiecare linie. Exemplu\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Comutați când doriți să continuați să repetați manualul după finalizarea acestuia",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         }

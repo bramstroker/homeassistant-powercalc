@@ -321,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
-          "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
           "states_trigger": "Spustite playbook na základe zmeny stavu. Príklad\n\nprehrávanie: program1"
         },
@@ -332,19 +331,21 @@
           "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
           "energy_integration_method": "Metóda energetickej integrácie",
           "energy_sensor_unit_prefix": "Predpona jednotky snímača energie",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignorovať nedostupný stav",
           "multiply_factor": "Násobný faktor",
           "multiply_factor_standby": "Pohotovostný režim s násobným faktorom",
-          "unavailable_power": "Nedostupné napájanie",
-          "utility_meter_tariffs": "Tarify za elektromery"
+          "unavailable_power": "Nedostupné napájanie"
         },
         "data_description": {
           "calculation_enabled_condition": "Konfigurovaná stratégia výpočtu výkonu sa vykoná len vtedy, keď sa táto šablóna vyhodnotí ako pravda alebo 1, inak snímač výkonu zobrazí 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Toto nastavenie prepnite, ak chcete, aby snímač výkonu zostal dostupný, aj keď zdrojová entita nie je k dispozícii",
           "multiply_factor": "Vynásobí vypočítaný výkon týmto pomerom. Môže byť užitočné pre ľahké skupiny",
           "multiply_factor_standby": "Či sa má použiť multiplikačný faktor aj na výkon v pohotovostnom režime",
-          "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav",
-          "utility_meter_tariffs": "Zoznam podporovaných taríf, ponechajte prázdne, ak potrebujete iba jeden tarif."
+          "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav"
         },
         "description": "Možnosti uvedené nižšie sú pre pokročilú konfiguráciu powercalc. Väčšina používateľov to nebude používať, takže ich môžete preskočiť",
         "title": "Pokročilé nastavenia"
@@ -530,6 +531,19 @@
           "update_frequency": "čas v sekundách medzi aktualizáciami stavu snímača"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Pevné možnosti",
         "data": {
@@ -679,6 +693,7 @@
           "advanced_options": "Pokročilé možnosti",
           "basic_options": "Základné možnosti",
           "daily_energy": "Denné energetické možnosti",
+          "energy_options": "Energy options",
           "fixed": "Pevné možnosti",
           "group_custom": "Možnosti skupiny",
           "group_subtract": "Možnosti skupiny",
@@ -734,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
-          "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
           "states_trigger": "Spustite playbook na základe zmeny stavu. Príklad\n\nprehrávanie: program1"
         }

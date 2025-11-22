@@ -321,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
-          "playbooks": "Plaats een playbook op iedere regel. Voorbeeld\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beëindigd",
           "states_trigger": "Start een bepaald playbook gebaseerd op status. Voorbeeld\n\nplaying: program1"
         },
@@ -332,19 +331,21 @@
           "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
           "energy_integration_method": "Energie integratie methode",
           "energy_sensor_unit_prefix": "Voorvoegsel van de energiesensor eenheid",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Negeer onbeschikbaar status",
           "multiply_factor": "Vermenigvuldigingsfactor",
           "multiply_factor_standby": "Vermenigvuldigingsfactor standby",
-          "unavailable_power": "Vermogen indien onbeschikbaar",
-          "utility_meter_tariffs": "Nutsmeter tarieven"
+          "unavailable_power": "Vermogen indien onbeschikbaar"
         },
         "data_description": {
           "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de sensor 0 tonen",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
           "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
           "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
-          "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is",
-          "utility_meter_tariffs": "Een lijst met ondersteunde tarieven; laat leeg als er maar één tarief nodig is."
+          "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is"
         },
         "description": "De volgende opties zijn voor advanceerde gebruikers. In de meeste gevallen kan je dit overslaan",
         "title": "Geavanceerde opties"
@@ -530,6 +531,19 @@
           "update_frequency": "tijd in seconden tussen status updates van de sensor"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Fixed opties",
         "data": {
@@ -679,6 +693,7 @@
           "advanced_options": "Geavanceerde opties",
           "basic_options": "Basisopties",
           "daily_energy": "Dagelijkse energie opties",
+          "energy_options": "Energy options",
           "fixed": "Fixed opties",
           "group_custom": "Groep opties",
           "group_subtract": "Groep opties",
@@ -734,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
-          "playbooks": "Plaats een playbook op iedere regel. Voorbeeld\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beeindigd",
           "states_trigger": "Start een bepaald playbook gebaseerd op status. Voorbeeld\n\nplaying: program1"
         }
