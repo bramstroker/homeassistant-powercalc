@@ -28,6 +28,7 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc import CONF_DISCOVERY, SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
+from custom_components.powercalc.config_flow import PowercalcConfigFlow
 from custom_components.powercalc.const import (
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
@@ -42,6 +43,7 @@ from custom_components.powercalc.const import (
     CONF_WLED,
     DOMAIN,
     DUMMY_ENTITY_ID,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SensorType,
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
@@ -951,3 +953,35 @@ async def test_get_entities(hass: HomeAssistant, entity_entries: list[RegistryEn
     discovery_manager = DiscoveryManager(hass, {})
     entity_ids = [entity.entity_id for entity in await discovery_manager.get_entities()]
     assert entity_ids == expected_entities
+
+
+async def test_discovery_enable_toggle_runtime(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
+) -> None:
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    entry = MockConfigEntry(
+        entry_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        unique_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        domain=DOMAIN,
+        data={
+            CONF_DISCOVERY: {
+                CONF_ENABLED: False,
+            },
+        },
+        version=PowercalcConfigFlow.VERSION,
+    )
+    entry.add_to_hass(hass)
+
+    await run_powercalc_setup(hass)
+
+    assert len(mock_flow_init.mock_calls) == 0
+
+    new_data = entry.data.copy()
+    new_data[CONF_DISCOVERY] = {CONF_ENABLED: True}
+    hass.config_entries.async_update_entry(entry, data=new_data)
+    await hass.async_block_till_done()
+
+    assert len(mock_flow_init.mock_calls) == 1
