@@ -321,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Toggle when you want to keep repeating the playbook after it completes",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         },
@@ -332,19 +331,21 @@
           "calculation_enabled_condition": "Podmínka povolení výpočtu",
           "energy_integration_method": "Metoda energetické integrace",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignorovat nedostupný stav",
           "multiply_factor": "Koeficient násobení",
           "multiply_factor_standby": "Pohotovostní koeficient násobení",
-          "unavailable_power": "Napájení není k dispozici",
-          "utility_meter_tariffs": "Utility meter tariffs"
+          "unavailable_power": "Napájení není k dispozici"
         },
         "data_description": {
           "calculation_enabled_condition": "Konfigurovaná strategie výpočtu spotřeby bude aplikováná, pouze pokud se tato šablona vyhodnotí jako true nebo 1. Jinak bude senzor zobrazovat 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Přepněte toto nastavení, pokud chcete, aby byl senzor energie k dispozici i v případě, že zdrojová entita není dostupná",
           "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
           "multiply_factor_standby": "Použít multiplikační faktor na pohotovostní režim",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
         },
         "description": "Níže uvedené možnosti jsou pro pokročilou konfiguraci powercalc. Většina uživatelů je nebude používat, takže je můžete přeskočit",
         "title": "Pokročilá nastavení"
@@ -530,6 +531,19 @@
           "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Fixed options",
         "data": {
@@ -679,6 +693,7 @@
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
+          "energy_options": "Energy options",
           "fixed": "Fixed options",
           "group_custom": "Group options",
           "group_subtract": "Group options",
@@ -734,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Toggle when you want to keep repeating the playbook after it completes",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         }

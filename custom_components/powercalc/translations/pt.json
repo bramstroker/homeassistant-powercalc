@@ -321,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Indicar para iniciar uma determinada sequência quando o HA inicia. Ex: 'program1'",
-          "playbooks": "Introduza uma sequência em cada linha. Exemplo\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Alternar se pretende que a sequência reinicie e repita após terminar",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         },
@@ -332,19 +331,21 @@
           "calculation_enabled_condition": "Condição para considerar o cálculo",
           "energy_integration_method": "Método de integração de energia",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignorar para estado indisponível",
           "multiply_factor": "Factor de multiplicação",
           "multiply_factor_standby": "Multiply factor standby",
-          "unavailable_power": "Potência indisponível",
-          "utility_meter_tariffs": "Utility meter tariffs"
+          "unavailable_power": "Potência indisponível"
         },
         "data_description": {
           "calculation_enabled_condition": "A estratégia de cálculo defenida só será executada se este template retornar 'true' ou 1, caso contrário retornará 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Ligue esta opção para que o sensor de potência continue disponível mesmo que a entidade fonte fique indisponível",
           "multiply_factor": "Multiplica a potência calculada por este valor. Pode ser útil para grupos de luzes",
           "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "unavailable_power": "Potência em W para considerar quando a entidade fonte está em estado indisponível",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "unavailable_power": "Potência em W para considerar quando a entidade fonte está em estado indisponível"
         },
         "description": "As opções abaixo são para configurações avançadas de powercalc. A maioria dos utilizadores não usará estas opções e podem ser ignoradas.",
         "title": "Opções avançadas"
@@ -530,6 +531,19 @@
           "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Fixed options",
         "data": {
@@ -679,6 +693,7 @@
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
+          "energy_options": "Energy options",
           "fixed": "Fixed options",
           "group_custom": "Group options",
           "group_subtract": "Group options",
@@ -734,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Instruir para iniciar uma Sequência automaticamente quando o HA iniciar. Ex: 'program1'",
-          "playbooks": "Introduza uma Sequência em cada linha. Examplo\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Ligar se pretende continuar a repetir a Sequência após terminar",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         }

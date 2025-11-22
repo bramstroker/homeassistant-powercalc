@@ -321,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
-          "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
           "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
           "states_trigger": "Wywołaj playbook na podstawie zmiany stanu. Przykład\n\nodtwarzanie: program1"
         },
@@ -332,19 +331,21 @@
           "calculation_enabled_condition": "Warunek włączenia obliczeń",
           "energy_integration_method": "Metoda całkowania energii",
           "energy_sensor_unit_prefix": "Przedrostek jednostki sensora energii",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "multiply_factor": "Mnożnik",
           "multiply_factor_standby": "Mnożnik trybu gotowości (standby)",
-          "unavailable_power": "Wartość mocy dla niedostęności",
-          "utility_meter_tariffs": "Taryfy licznika mediów"
+          "unavailable_power": "Wartość mocy dla niedostęności"
         },
         "data_description": {
           "calculation_enabled_condition": "Skonfigurowana strategia obliczania mocy zostanie wykonana tylko wtedy, gdy ten szablon oszacuje prawdę lub 1, w przeciwnym razie czujnik mocy wyświetli 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Przełącz to ustawienie, jeśli chcesz, aby czujnik mocy pozostał dostępny, nawet jeśli encja źródłowa jest niedostępna",
           "multiply_factor": "Mnoży obliczoną moc przez ten współczynnik. Może być przydatny dla grup świateł",
           "multiply_factor_standby": "Czy zastosować mnożnik również do mocy w trybie gotowości",
-          "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)",
-          "utility_meter_tariffs": "Lista wspieranych taryf, pozostaw puste, jeśli tylko jedna taryfa jest potrzebna."
+          "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)"
         },
         "description": "Poniższe opcje dotyczą zaawansowanej konfiguracji Powercalc. Większość użytkowników nie będzie z tego korzystać, więc możesz je pominąć",
         "title": "Opcje zaawansowane"
@@ -530,6 +531,19 @@
           "update_frequency": "czas w sekundach między aktualizacjami stanu sensora"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Opcje stałe",
         "data": {
@@ -679,6 +693,7 @@
           "advanced_options": "Opcje zaawansowane",
           "basic_options": "Opcje podstawowe",
           "daily_energy": "Opcje dziennej energii",
+          "energy_options": "Energy options",
           "fixed": "Opcje stałe",
           "group_custom": "Opcje grupy",
           "group_subtract": "Opcje grupy",
@@ -734,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
-          "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
           "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
           "states_trigger": "Wywołaj playbook na podstawie zmiany stanu. Przykład\n\nodtwarzania: program1"
         }

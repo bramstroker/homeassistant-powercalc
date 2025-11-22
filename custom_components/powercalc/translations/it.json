@@ -321,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Toggle when you want to keep repeating the playbook after it completes",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         },
@@ -332,19 +331,21 @@
           "calculation_enabled_condition": "Calculation enabled condition",
           "energy_integration_method": "Energy integration method",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignora stato non disponibile",
           "multiply_factor": "Fattore moltiplicatore",
           "multiply_factor_standby": "Moltiplica fattore standby",
-          "unavailable_power": "Potenza non disponibile",
-          "utility_meter_tariffs": "Utility meter tariffs"
+          "unavailable_power": "Potenza non disponibile"
         },
         "data_description": {
           "calculation_enabled_condition": "La strategia di calcolo dell'alimentazione configurata sarà eseguita solo quando questo modello valuta a true o 1, altrimenti il sensore di alimentazione visualizzerà 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Attiva/disattiva questa impostazione quando vuoi che il sensore di alimentazione rimanga disponibile anche se l'entità di origine non è disponibile",
           "multiply_factor": "Moltiplica la potenza calcolata per questo rapporto. Può essere utile per i gruppi di luce",
           "multiply_factor_standby": "Indica se applicare anche il fattore di moltiplicazione alla potenza standby",
-          "unavailable_power": "Potenza in W per registrare quando l'entità di origine ha uno stato non disponibile",
-          "utility_meter_tariffs": "Un elenco di tariffe sostenute, lasciare vuoto se è necessaria una tariffa unica."
+          "unavailable_power": "Potenza in W per registrare quando l'entità di origine ha uno stato non disponibile"
         },
         "description": "Le opzioni sottostanti sono per la configurazione avanzata di powercalc. La maggior parte degli utenti non lo userà in modo da poter saltare queste opzioni",
         "title": "Opzioni avanzate"
@@ -530,6 +531,19 @@
           "update_frequency": "tempo in secondi tra gli aggiornamenti di stato del sensore"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Opzioni corrette",
         "data": {
@@ -679,6 +693,7 @@
           "advanced_options": "Opzioni avanzate",
           "basic_options": "Opzioni di base",
           "daily_energy": "Opzioni energetiche giornaliere",
+          "energy_options": "Energy options",
           "fixed": "Fixed options",
           "group_custom": "Opzioni del gruppo",
           "group_subtract": "Opzioni del gruppo",
@@ -734,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Toggle when you want to keep repeating the playbook after it completes",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         }
