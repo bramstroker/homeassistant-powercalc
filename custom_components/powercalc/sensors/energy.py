@@ -27,7 +27,8 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
-    CONF_ENERGY_FILTER_OUTLIERS,
+    CONF_ENERGY_FILTER_OUTLIER_ENABLED,
+    CONF_ENERGY_FILTER_OUTLIER_MAX,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
@@ -284,11 +285,12 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         self._attr_suggested_display_precision = round_digits
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
-        self._filter_outliers = bool(sensor_config.get(CONF_ENERGY_FILTER_OUTLIERS, False))
+        self._filter_outliers = bool(sensor_config.get(CONF_ENERGY_FILTER_OUTLIER_ENABLED, False))
         self._outlier_filter = OutlierFilter(
             window_size=30,
             min_samples=5,
             max_z_score=3.5,
+            max_expected_step=sensor_config.get(CONF_ENERGY_FILTER_OUTLIER_MAX, 1000),
         )
 
     def _integrate_on_state_change(
