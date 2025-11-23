@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+from functools import partial
 import logging
 import random
 import time
+from typing import Any
 
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -19,7 +21,7 @@ from homeassistant.const import (
     Platform,
     __version__ as HA_VERSION,  # noqa: N812
 )
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import Event, HomeAssistant, ServiceCall
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.entity_platform import async_get_platforms
@@ -283,6 +285,10 @@ async def register_services(hass: HomeAssistant) -> None:
             _LOGGER.debug("Reloading config entry %s", entry.entry_id)
             await hass.config_entries.async_reload(entry.entry_id)
 
+        global_config = await get_global_configuration(hass, reload_config)
+        setup_domain_groups(hass, global_config)
+        await create_standby_group(hass, global_config)
+
     hass.services.async_register(
         DOMAIN,
         SERVICE_RELOAD,
@@ -290,21 +296,26 @@ async def register_services(hass: HomeAssistant) -> None:
     )
 
 
-def setup_standby_group(hass: HomeAssistant, domain_config: ConfigType) -> None:
-    async def _create_standby_group(event: None) -> None:
-        hass.async_create_task(
-            async_load_platform(
-                hass,
-                SENSOR_DOMAIN,
-                DOMAIN,
-                {DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP},
-                domain_config,
-            ),
-        )
+async def create_standby_group(
+    hass: HomeAssistant,
+    domain_config: ConfigType,
+    event: Event[Any] | None = None,
+) -> None:
+    hass.async_create_task(
+        async_load_platform(
+            hass,
+            SENSOR_DOMAIN,
+            DOMAIN,
+            {DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP},
+            domain_config,
+        ),
+    )
 
+
+def setup_standby_group(hass: HomeAssistant, domain_config: ConfigType) -> None:
     hass.bus.async_listen_once(
         EVENT_HOMEASSISTANT_STARTED,
-        _create_standby_group,
+        partial(create_standby_group, hass, domain_config),
     )
 
 
