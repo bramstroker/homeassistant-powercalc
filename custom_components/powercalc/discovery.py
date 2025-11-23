@@ -343,7 +343,7 @@ class DiscoveryManager:
         flows = self.hass.config_entries.flow.async_progress_by_handler(DOMAIN)
         for flow in flows:
             if flow["context"]["source"] != SOURCE_INTEGRATION_DISCOVERY:
-                continue
+                continue  # pragma: no cover
             self.hass.config_entries.flow.async_abort(flow["flow_id"])
         return
 

@@ -46,7 +46,7 @@ from custom_components.powercalc.const import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SensorType,
 )
-from custom_components.powercalc.discovery import get_power_profile_by_source_entity
+from custom_components.powercalc.discovery import DiscoveryStatus, get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 
@@ -1018,3 +1018,13 @@ async def test_discovery_disable_runtime(
 
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     assert len(flows) == 0
+
+
+async def test_discovery_process_is_locked(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.DEBUG)
+
+    discovery_manager = DiscoveryManager(hass, {})
+    discovery_manager._status = DiscoveryStatus.IN_PROGRESS  # noqa: SLF001
+    await discovery_manager.start_discovery()
+
+    assert "Discovery already in progress, skipping new discovery run" in caplog.text
