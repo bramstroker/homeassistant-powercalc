@@ -88,12 +88,12 @@ async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> C
         global_config.update(get_global_gui_configuration(global_config_entry))
 
     # Then override with YAML configuration if available
-    yaml_config = config.get(DOMAIN)
+    yaml_config: dict = config.get(DOMAIN, {})
     if yaml_config:
         global_config.update(yaml_config)
 
-    await handle_legacy_discovery_config(hass, global_config)
-    await handle_legacy_update_interval_config(hass, global_config)
+    await handle_legacy_discovery_config(hass, global_config, yaml_config)
+    await handle_legacy_update_interval_config(hass, global_config, yaml_config)
 
     return global_config
 

@@ -39,7 +39,7 @@ async def test_legacy_discovery_config_raises_issue(hass: HomeAssistant) -> None
     assert issue
 
 
-async def test_legacy_update_interval_config_raises_issue(hass: HomeAssistant) -> None:
+async def test_legacy_update_interval_config_issue_raised(hass: HomeAssistant) -> None:
     await run_powercalc_setup(
         hass,
         {},
@@ -58,6 +58,14 @@ async def test_legacy_update_interval_config_raises_issue(hass: HomeAssistant) -
     assert global_config[CONF_ENERGY_UPDATE_INTERVAL] == 900
     assert CONF_GROUP_UPDATE_INTERVAL_DEPRECATED not in global_config
     assert CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED not in global_config
+
+
+async def test_legacy_update_interval_config_issue_not_raised(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(hass)
+
+    issue_registry = ir.async_get(hass)
+    issue = issue_registry.async_get_issue(DOMAIN, "legacy_update_interval_config")
+    assert not issue
 
 
 async def test_migrate_config_entry_playbooks(hass: HomeAssistant) -> None:
