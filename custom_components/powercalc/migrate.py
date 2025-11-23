@@ -70,7 +70,7 @@ async def async_migrate_config_entry(hass: HomeAssistant, config_entry: ConfigEn
     hass.config_entries.async_update_entry(config_entry, data=data, version=6)
 
 
-async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dict) -> None:
+async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dict, yaml_config: dict) -> None:
     """Handle legacy discovery config. Might be removed in future Powercalc version"""
     discovery_options = global_config.setdefault(CONF_DISCOVERY, {})
     deprecated_map = {
@@ -81,11 +81,11 @@ async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dic
 
     legacy_discovery_config = False
     for new_key, old_key in deprecated_map.items():
-        if old_key not in global_config:
+        if old_key not in yaml_config:
             continue
 
         if new_key not in discovery_options:
-            discovery_options[new_key] = global_config[old_key]  # pragma: nocover
+            discovery_options[new_key] = yaml_config[old_key]  # pragma: nocover
 
         global_config.pop(old_key, None)
         legacy_discovery_config = True
@@ -108,17 +108,17 @@ async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dic
     )
 
 
-async def handle_legacy_update_interval_config(hass: HomeAssistant, global_config: dict) -> None:
+async def handle_legacy_update_interval_config(hass: HomeAssistant, global_config: dict, yaml_config: dict) -> None:
     """Handle legacy group update interval config. Might be removed in future Powercalc version"""
 
     has_legacy_config = False
-    if CONF_GROUP_UPDATE_INTERVAL_DEPRECATED in global_config:
-        global_config[CONF_GROUP_ENERGY_UPDATE_INTERVAL] = global_config[CONF_GROUP_UPDATE_INTERVAL_DEPRECATED]
+    if CONF_GROUP_UPDATE_INTERVAL_DEPRECATED in yaml_config:
+        global_config[CONF_GROUP_ENERGY_UPDATE_INTERVAL] = yaml_config[CONF_GROUP_UPDATE_INTERVAL_DEPRECATED]
         global_config.pop(CONF_GROUP_UPDATE_INTERVAL_DEPRECATED, None)
         has_legacy_config = True
 
-    if CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED in global_config:
-        legacy_config = global_config[CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED]
+    if CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED in yaml_config:
+        legacy_config = yaml_config[CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED]
         if isinstance(legacy_config, timedelta):
             legacy_config = legacy_config.seconds
         global_config[CONF_ENERGY_UPDATE_INTERVAL] = legacy_config
