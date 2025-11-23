@@ -41,7 +41,6 @@ from pytest_homeassistant_custom_component.common import (
     mock_restore_cache_with_extra_data,
 )
 
-from custom_components.powercalc import CONF_GROUP_POWER_UPDATE_INTERVAL, DEFAULT_ENERGY_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -64,6 +63,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_GROUP_POWER_UPDATE_INTERVAL,
     CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -75,6 +75,7 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CONF_SUB_GROUPS,
     CONF_UNAVAILABLE_POWER,
+    DEFAULT_ENERGY_UPDATE_INTERVAL,
     DOMAIN,
     DUMMY_ENTITY_ID,
     ENTRY_DATA_ENERGY_ENTITY,

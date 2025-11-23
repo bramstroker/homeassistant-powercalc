@@ -6,7 +6,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.issue_registry import async_create_issue
 
-from custom_components.powercalc import CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED, CONF_GROUP_UPDATE_INTERVAL_DEPRECATED
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_DISCOVERY,
@@ -17,7 +16,9 @@ from custom_components.powercalc.const import (
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
     CONF_FIXED,
+    CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
+    CONF_GROUP_UPDATE_INTERVAL_DEPRECATED,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_POWER,

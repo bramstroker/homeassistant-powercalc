@@ -1,5 +1,7 @@
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
+from homeassistant.const import UnitOfPower
 from homeassistant.helpers import selector
+from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig, NumberSelectorMode
 import voluptuous as vol
 
 from custom_components.powercalc.const import (
@@ -61,7 +63,9 @@ SCHEMA_SENSOR_ENERGY_OPTIONS = SCHEMA_ENERGY_OPTIONS.extend(
     vol.Schema(
         {
             vol.Optional(CONF_ENERGY_FILTER_OUTLIER_ENABLED, default=False): selector.BooleanSelector(),
-            vol.Optional(CONF_ENERGY_FILTER_OUTLIER_MAX): selector.NumberSelector(),
+            vol.Optional(CONF_ENERGY_FILTER_OUTLIER_MAX): NumberSelector(
+                NumberSelectorConfig(mode=NumberSelectorMode.BOX, unit_of_measurement=UnitOfPower.WATT),
+            ),
         },
     ).schema,
 )
