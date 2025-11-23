@@ -1,0 +1,3 @@
+powercalc:
+  discovery:
+    enabled: true

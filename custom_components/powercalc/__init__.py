@@ -92,6 +92,7 @@ from .migrate import async_migrate_config_entry
 from .power_profile.power_profile import DeviceType
 from .sensor import SENSOR_CONFIG
 from .sensors.group.config_entry_utils import (
+    get_entries_excluding_global_config,
     get_entries_having_subgroup,
     remove_group_from_power_sensor_entry,
     remove_power_sensor_from_associated_groups,
@@ -425,9 +426,7 @@ async def apply_global_gui_configuration_changes(hass: HomeAssistant, entry: Con
     """Apply global configuration changes to all entities."""
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
     global_config.update(get_global_gui_configuration(entry))
-    for entry in hass.config_entries.async_entries(DOMAIN):
-        if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-            continue
+    for entry in get_entries_excluding_global_config(hass):
         if entry.state != ConfigEntryState.LOADED:  # pragma: no cover
             continue
         await hass.config_entries.async_reload(entry.entry_id)

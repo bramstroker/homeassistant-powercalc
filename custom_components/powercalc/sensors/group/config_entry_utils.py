@@ -5,7 +5,7 @@ from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry, ConfigFlow
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, callback
 
-from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, SensorType
+from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID, SensorType
 from custom_components.powercalc.const import CONF_GROUP, CONF_GROUP_MEMBER_SENSORS, CONF_GROUP_TYPE, CONF_SUB_GROUPS, GroupType
 
 _LOGGER = logging.getLogger(__name__)
@@ -159,3 +159,8 @@ def get_group_entries(hass: HomeAssistant, group_type: GroupType | None = None) 
         if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
         and (group_type is None or entry.data.get(CONF_GROUP_TYPE, GroupType.CUSTOM) == group_type)
     ]
+
+
+@callback
+def get_entries_excluding_global_config(hass: HomeAssistant) -> list[ConfigEntry]:
+    return [entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.unique_id != ENTRY_GLOBAL_CONFIG_UNIQUE_ID]
