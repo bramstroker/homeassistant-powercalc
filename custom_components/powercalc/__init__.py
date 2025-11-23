@@ -3,21 +3,19 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import timedelta
 import logging
 import random
 import time
 
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
+from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENABLED,
     EVENT_HOMEASSISTANT_STARTED,
-    EntityCategory,
     Platform,
     __version__ as HA_VERSION,  # noqa: N812
 )
@@ -31,6 +29,7 @@ from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
 from .common import validate_name_pattern
+from .configuration.global_config import FLAG_HAS_GLOBAL_GUI_CONFIG, get_global_configuration, get_global_gui_configuration
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -74,17 +73,6 @@ from .const import (
     DATA_GROUP_ENTITIES,
     DATA_STANDBY_POWER_SENSORS,
     DATA_USED_UNIQUE_IDS,
-    DEFAULT_ENERGY_INTEGRATION_METHOD,
-    DEFAULT_ENERGY_NAME_PATTERN,
-    DEFAULT_ENERGY_SENSOR_PRECISION,
-    DEFAULT_ENERGY_UNIT_PREFIX,
-    DEFAULT_ENERGY_UPDATE_INTERVAL,
-    DEFAULT_ENTITY_CATEGORY,
-    DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
-    DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
-    DEFAULT_POWER_NAME_PATTERN,
-    DEFAULT_POWER_SENSOR_PRECISION,
-    DEFAULT_UTILITY_METER_TYPES,
     DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -100,7 +88,7 @@ from .const import (
     UnitPrefix,
 )
 from .discovery import DiscoveryManager, DiscoveryStatus
-from .migrate import async_migrate_config_entry, handle_legacy_discovery_config, handle_legacy_update_interval_config
+from .migrate import async_migrate_config_entry
 from .power_profile.power_profile import DeviceType
 from .sensor import SENSOR_CONFIG
 from .sensors.group.config_entry_utils import (
@@ -112,16 +100,14 @@ from .service.gui_configuration import SERVICE_SCHEMA, change_gui_configuration
 
 PLATFORMS = [Platform.SENSOR]
 
-FLAG_HAS_GLOBAL_GUI_CONFIG = "has_global_gui_config"
-
 DISCOVERY_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_ENABLED, default=True): cv.boolean,
+        vol.Optional(CONF_ENABLED): cv.boolean,
         vol.Optional(CONF_EXCLUDE_DEVICE_TYPES): vol.All(
             cv.ensure_list,
             [cls.value for cls in DeviceType],
         ),
-        vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): cv.boolean,
+        vol.Optional(CONF_EXCLUDE_SELF_USAGE): cv.boolean,
     },
 )
 CONFIG_SCHEMA = vol.Schema(
@@ -137,98 +123,40 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED,
                     ): cv.time_period,
-                    vol.Optional(
-                        CONF_GROUP_UPDATE_INTERVAL_DEPRECATED,
-                    ): cv.positive_int,
-                    vol.Optional(
-                        CONF_GROUP_POWER_UPDATE_INTERVAL,
-                        default=DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
-                    ): cv.positive_int,
-                    vol.Optional(
-                        CONF_GROUP_ENERGY_UPDATE_INTERVAL,
-                        default=DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
-                    ): cv.positive_int,
-                    vol.Optional(
-                        CONF_ENERGY_UPDATE_INTERVAL,
-                        default=DEFAULT_ENERGY_UPDATE_INTERVAL,
-                    ): cv.positive_int,
-                    vol.Optional(
-                        CONF_POWER_SENSOR_NAMING,
-                        default=DEFAULT_POWER_NAME_PATTERN,
-                    ): validate_name_pattern,
-                    vol.Optional(
-                        CONF_POWER_SENSOR_FRIENDLY_NAMING,
-                    ): validate_name_pattern,
-                    vol.Optional(
-                        CONF_POWER_SENSOR_CATEGORY,
-                        default=DEFAULT_ENTITY_CATEGORY,
-                    ): vol.In(ENTITY_CATEGORIES),
-                    vol.Optional(
-                        CONF_ENERGY_SENSOR_NAMING,
-                        default=DEFAULT_ENERGY_NAME_PATTERN,
-                    ): validate_name_pattern,
-                    vol.Optional(
-                        CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
-                    ): validate_name_pattern,
-                    vol.Optional(
-                        CONF_ENERGY_SENSOR_CATEGORY,
-                        default=DEFAULT_ENTITY_CATEGORY,
-                    ): vol.In(ENTITY_CATEGORIES),
-                    vol.Optional(
-                        CONF_DISABLE_EXTENDED_ATTRIBUTES,
-                        default=False,
-                    ): cv.boolean,
-                    vol.Optional(
-                        CONF_DISABLE_LIBRARY_DOWNLOAD,
-                        default=False,
-                    ): cv.boolean,
-                    vol.Optional(CONF_DISCOVERY, default=DISCOVERY_SCHEMA({})): DISCOVERY_SCHEMA,
+                    vol.Optional(CONF_GROUP_UPDATE_INTERVAL_DEPRECATED): cv.positive_int,
+                    vol.Optional(CONF_GROUP_POWER_UPDATE_INTERVAL): cv.positive_int,
+                    vol.Optional(CONF_GROUP_ENERGY_UPDATE_INTERVAL): cv.positive_int,
+                    vol.Optional(CONF_ENERGY_UPDATE_INTERVAL): cv.positive_int,
+                    vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
+                    vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): validate_name_pattern,
+                    vol.Optional(CONF_POWER_SENSOR_CATEGORY): vol.In(ENTITY_CATEGORIES),
+                    vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
+                    vol.Optional(CONF_ENERGY_SENSOR_FRIENDLY_NAMING): validate_name_pattern,
+                    vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): vol.In(ENTITY_CATEGORIES),
+                    vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES): cv.boolean,
+                    vol.Optional(CONF_DISABLE_LIBRARY_DOWNLOAD): cv.boolean,
+                    vol.Optional(CONF_DISCOVERY): DISCOVERY_SCHEMA,
                     vol.Optional(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED): vol.All(
                         cv.ensure_list,
                         [cls.value for cls in DeviceType],
                     ),
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY_DEPRECATED): cv.boolean,
                     vol.Optional(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED): cv.boolean,
-                    vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
-                    vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
-                    vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
-                        cv.ensure_list,
-                        [cv.string],
-                    ),
-                    vol.Optional(
-                        CONF_UTILITY_METER_TYPES,
-                        default=DEFAULT_UTILITY_METER_TYPES,
-                    ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
+                    vol.Optional(CONF_CREATE_ENERGY_SENSORS): cv.boolean,
+                    vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
+                    vol.Optional(CONF_UTILITY_METER_TARIFFS): vol.All(cv.ensure_list, [cv.string]),
+                    vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
                     vol.Optional(
                         CONF_UTILITY_METER_OFFSET,
-                        default=DEFAULT_OFFSET,
                     ): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
-                    vol.Optional(
-                        CONF_ENERGY_INTEGRATION_METHOD,
-                        default=DEFAULT_ENERGY_INTEGRATION_METHOD,
-                    ): vol.In(ENERGY_INTEGRATION_METHODS),
-                    vol.Optional(
-                        CONF_ENERGY_SENSOR_PRECISION,
-                        default=DEFAULT_ENERGY_SENSOR_PRECISION,
-                    ): cv.positive_int,
-                    vol.Optional(
-                        CONF_POWER_SENSOR_PRECISION,
-                        default=DEFAULT_POWER_SENSOR_PRECISION,
-                    ): cv.positive_int,
-                    vol.Optional(
-                        CONF_ENERGY_SENSOR_UNIT_PREFIX,
-                        default=UnitPrefix.KILO,
-                    ): vol.In([cls.value for cls in UnitPrefix]),
-                    vol.Optional(CONF_CREATE_DOMAIN_GROUPS, default=[]): vol.All(
-                        cv.ensure_list,
-                        [cv.string],
-                    ),
+                    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(ENERGY_INTEGRATION_METHODS),
+                    vol.Optional(CONF_ENERGY_SENSOR_PRECISION): cv.positive_int,
+                    vol.Optional(CONF_POWER_SENSOR_PRECISION): cv.positive_int,
+                    vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): vol.In([cls.value for cls in UnitPrefix]),
+                    vol.Optional(CONF_CREATE_DOMAIN_GROUPS): vol.All(cv.ensure_list, [cv.string]),
                     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
                     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
-                    vol.Optional(CONF_SENSORS): vol.All(
-                        cv.ensure_list,
-                        [SENSOR_CONFIG],
-                    ),
+                    vol.Optional(CONF_SENSORS): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
                     vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS): cv.boolean,
                 },
             ),
@@ -298,60 +226,6 @@ async def create_discovery_manager_instance(
     )
     await manager.setup()
     return manager
-
-
-async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
-    global_config = config.get(DOMAIN) or {
-        CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
-        CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
-        CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
-        CONF_ENERGY_INTEGRATION_METHOD: DEFAULT_ENERGY_INTEGRATION_METHOD,
-        CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
-        CONF_ENERGY_SENSOR_PRECISION: DEFAULT_ENERGY_SENSOR_PRECISION,
-        CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
-        CONF_ENERGY_SENSOR_UNIT_PREFIX: DEFAULT_ENERGY_UNIT_PREFIX,
-        CONF_GROUP_ENERGY_UPDATE_INTERVAL: DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
-        CONF_GROUP_POWER_UPDATE_INTERVAL: DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
-        CONF_ENERGY_UPDATE_INTERVAL: DEFAULT_ENERGY_UPDATE_INTERVAL,
-        CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
-        CONF_IGNORE_UNAVAILABLE_STATE: False,
-        CONF_CREATE_DOMAIN_GROUPS: [],
-        CONF_CREATE_ENERGY_SENSORS: True,
-        CONF_CREATE_UTILITY_METERS: False,
-        CONF_DISCOVERY: {
-            CONF_ENABLED: True,
-            CONF_EXCLUDE_SELF_USAGE: False,
-            CONF_EXCLUDE_DEVICE_TYPES: [],
-        },
-        CONF_UTILITY_METER_OFFSET: DEFAULT_OFFSET,
-        CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
-        CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
-    }
-
-    await handle_legacy_discovery_config(hass, global_config)
-    await handle_legacy_update_interval_config(hass, global_config)
-
-    # Load GUI configuration, if any, and update the global configuration with the GUI config
-    global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
-    if global_config_entry:
-        _LOGGER.debug("Found global configuration entry: %s", global_config_entry.data)
-        global_config.update(get_global_gui_configuration(global_config_entry))
-
-    return global_config
-
-
-def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
-    global_config = dict(config_entry.data)
-    if CONF_UTILITY_METER_OFFSET in global_config:
-        global_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=global_config[CONF_UTILITY_METER_OFFSET])
-    if global_config.get(CONF_ENERGY_SENSOR_CATEGORY):
-        global_config[CONF_ENERGY_SENSOR_CATEGORY] = EntityCategory(global_config[CONF_ENERGY_SENSOR_CATEGORY])
-    if global_config.get(CONF_POWER_SENSOR_CATEGORY):
-        global_config[CONF_POWER_SENSOR_CATEGORY] = EntityCategory(global_config[CONF_POWER_SENSOR_CATEGORY])
-
-    global_config[FLAG_HAS_GLOBAL_GUI_CONFIG] = True
-
-    return global_config
 
 
 async def register_services(hass: HomeAssistant) -> None:

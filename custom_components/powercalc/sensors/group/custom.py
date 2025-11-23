@@ -55,7 +55,6 @@ from homeassistant.util.unit_conversion import (
     PowerConverter,
 )
 
-from custom_components.powercalc import CONF_GROUP_ENERGY_UPDATE_INTERVAL, DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -69,6 +68,7 @@ from custom_components.powercalc.const import (
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
+    CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -83,6 +83,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_NET_CONSUMPTION,
     DATA_DOMAIN_ENTITIES,
     DEFAULT_ENERGY_SENSOR_PRECISION,
+    DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
     DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
     DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,

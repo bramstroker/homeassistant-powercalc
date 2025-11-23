@@ -13,13 +13,14 @@ from homeassistant.helpers.entity import Entity, async_generate_entity_id
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc import DEFAULT_ENERGY_NAME_PATTERN, DEFAULT_POWER_NAME_PATTERN
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
+    DEFAULT_ENERGY_NAME_PATTERN,
+    DEFAULT_POWER_NAME_PATTERN,
     DOMAIN,
 )
 

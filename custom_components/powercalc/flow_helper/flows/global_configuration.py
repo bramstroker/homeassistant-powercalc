@@ -9,7 +9,8 @@ from homeassistant.helpers import selector
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
-from custom_components.powercalc import (
+from custom_components.powercalc import DeviceType
+from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
@@ -38,7 +39,6 @@ from custom_components.powercalc import (
     DOMAIN_CONFIG,
     ENTITY_CATEGORIES,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
-    DeviceType,
 )
 from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_UTILITY_METER_OPTIONS, SCHEMA_UTILITY_METER_TOGGLE
