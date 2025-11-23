@@ -8,6 +8,7 @@ However, if you configure settings for an individual sensor, those specific sett
     Sensors created with the GUI do have a configuration set for `create_energy_sensors`, `create_utility_meters`, `ignore_unavailable_state` and `energy_integration_method`, changing global configuration will not affect the existing GUI configuration entries, to make it easy to change all of them Powercalc provides an action `powercalc.change_gui_config`. Refer to [Change GUI configuration action](#change-gui-configuration-action).
 
 Global configuration can be defined both in `configuration.yaml` and in the GUI.
+When you define a configuration option in both places, the YAML configuration will take precedence over the GUI configuration.
 
 ## GUI configuration
 
