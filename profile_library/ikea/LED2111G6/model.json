@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-11-24T08:26:40.406094",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "IKEA INSPELNING Smart plug",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 5,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.18.0:docker"
+  },
+  "name": "TRADFRI bulb E14 CWS globe 806lm",
+  "standby_power": 0.1
+  "author": "LtKowalski <232428921+LtKowalski@users.noreply.github.com>"
+}
