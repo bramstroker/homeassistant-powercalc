@@ -15,6 +15,7 @@ DURATION_PER_VOLUME_LEVEL = 20
 STREAM_URL = "https://powercalc.s3.eu-west-1.amazonaws.com/g_pink.mp3"
 SLEEP_PRE_MEASURE = 2
 SLEEP_MUTE = 5
+QUESTION_DISABLE_STREAMING = "disable_streaming"
 
 _LOGGER = logging.getLogger("measure")
 
@@ -44,11 +45,14 @@ class SpeakerRunner(MeasurementRunner):
         )
         input("Hit enter when you are ready to start..")
 
+        disable_streaming = bool(answers.get(QUESTION_DISABLE_STREAMING, False))
+
         for volume in range(10, 101, 10):
             _LOGGER.info("Setting volume to %d", volume)
             self.media_controller.set_volume(volume)
-            _LOGGER.info("Start streaming noise")
-            self.media_controller.play_audio(STREAM_URL)
+            if not disable_streaming:
+                _LOGGER.info("Start streaming noise")
+                self.media_controller.play_audio(STREAM_URL)
             time.sleep(SLEEP_PRE_MEASURE)
             summary[volume] = self.measure_util.take_average_measurement(duration)
 
@@ -76,7 +80,17 @@ class SpeakerRunner(MeasurementRunner):
         }
 
     def get_questions(self) -> list[inquirer.questions.Question]:
-        return self.media_controller.get_questions()
+        questions = self.media_controller.get_questions()
+        questions.extend(
+            [
+                inquirer.Confirm(
+                    name=QUESTION_DISABLE_STREAMING,
+                    message="Amazon Alexa devices do not support direct streaming. Set this option to `y` to disable automatic streaming. You need to manually stream pink noise. See the documentation for more info",  # noqa: E501
+                    default=False,
+                ),
+            ],
+        )
+        return questions
 
     def measure_standby_power(self) -> float:
         self.media_controller.turn_off()
@@ -91,6 +105,3 @@ class SpeakerRunner(MeasurementRunner):
         except ZeroReadingError:
             _LOGGER.error("Measured 0 watt as standby power.")
             return 0
-
-    def get_export_directory(self) -> str | None:
-        return "speaker"

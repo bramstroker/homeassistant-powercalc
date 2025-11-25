@@ -1,24 +1,25 @@
 from __future__ import annotations
 
-import json
-import logging
-import os
-import re
 from collections import defaultdict
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
+import json
+import logging
+import os
+import re
 from typing import Any, NamedTuple, Protocol, cast
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
 from homeassistant.components.cover import DOMAIN as COVER_DOMAIN
+from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
+from homeassistant.components.lawn_mower import DOMAIN as LAWN_MOWER_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.vacuum import DOMAIN as VACUUM_DOMAIN
-from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import translation
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -38,6 +39,7 @@ _LOGGER = logging.getLogger(__name__)
 class DeviceType(StrEnum):
     CAMERA = "camera"
     COVER = "cover"
+    FAN = "fan"
     GENERIC_IOT = "generic_iot"
     LIGHT = "light"
     POWER_METER = "power_meter"
@@ -45,8 +47,10 @@ class DeviceType(StrEnum):
     SMART_DIMMER = "smart_dimmer"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
+    TELEVISION = "television"
     NETWORK = "network"
     VACUUM_ROBOT = "vacuum_robot"
+    LAWN_MOWER_ROBOT = "lawn_mower_robot"
 
 
 class DiscoveryBy(StrEnum):
@@ -72,15 +76,18 @@ class CustomField:
 DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
-    DeviceType.GENERIC_IOT: SENSOR_DOMAIN,
+    DeviceType.FAN: FAN_DOMAIN,
+    DeviceType.GENERIC_IOT: {SENSOR_DOMAIN, MEDIA_PLAYER_DOMAIN},
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
     DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
     DeviceType.SMART_SWITCH: {SWITCH_DOMAIN, LIGHT_DOMAIN},
     DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
+    DeviceType.TELEVISION: MEDIA_PLAYER_DOMAIN,
     DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
     DeviceType.PRINTER: SENSOR_DOMAIN,
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
+    DeviceType.LAWN_MOWER_ROBOT: LAWN_MOWER_DOMAIN,
 }
 
 SUPPORTED_DOMAINS: set[str] = {domain for domains in DEVICE_TYPE_DOMAIN.values() for domain in (domains if isinstance(domains, set) else {domains})}
@@ -170,7 +177,7 @@ class PowerProfile:
     @property
     def linked_profile(self) -> str | None:
         """Get the linked profile."""
-        return self._json_data.get("linked_profile", self._json_data.get("linked_lut"))  # type: ignore[no-any-return]
+        return self._json_data.get("linked_profile", self._json_data.get("linked_lut"))
 
     @property
     def calculation_enabled_condition(self) -> str | None:
@@ -302,6 +309,11 @@ class PowerProfile:
 
         return remarks
 
+    @property
+    def config_flow_sub_profile_remarks(self) -> str | None:
+        """Get extra remarks to show at the config flow sub profile step."""
+        return self._json_data.get("config_flow_sub_profile_remarks")
+
     def get_default_discovery_remarks_translation_key(self) -> str | None:
         """When no remarks are provided in the profile, see if we need to show a default remark."""
         if self.device_type == DeviceType.SMART_SWITCH and self.needs_fixed_config:
@@ -342,12 +354,27 @@ class PowerProfile:
         return len(await self.get_sub_profiles()) > 0
 
     @property
+    async def requires_manual_sub_profile_selection(self) -> bool:
+        """Check whether this profile requires manual sub profile selection."""
+        if not await self.has_sub_profiles:
+            return False
+
+        return not self.has_sub_profile_select_matchers
+
+    @property
     def sub_profile_select(self) -> SubProfileSelectConfig | None:
         """Get the configuration for automatic sub profile switching."""
         select_dict = self._json_data.get("sub_profile_select")
         if not select_dict:
             return None
         return SubProfileSelectConfig(**select_dict)
+
+    @property
+    def has_sub_profile_select_matchers(self) -> bool:
+        """Check whether the sub profile select has matchers."""
+        if not self.sub_profile_select:
+            return False
+        return bool(self.sub_profile_select.matchers)
 
     async def select_sub_profile(self, sub_profile: str) -> None:
         """Select a sub profile. Only applicable when to profile actually supports sub profiles."""
@@ -419,7 +446,7 @@ class SubProfileSelector:
 
     def _build_matchers(self) -> list[SubProfileMatcher]:
         """Create matchers from json config."""
-        return [self._create_matcher(matcher_config) for matcher_config in self._config.matchers]
+        return [self._create_matcher(matcher_config) for matcher_config in self._config.matchers or []]
 
     def select_sub_profile(self, entity_state: State) -> str:
         """Dynamically tries to select a sub profile depending on the entity state.
@@ -460,7 +487,7 @@ class SubProfileSelector:
 
 class SubProfileSelectConfig(NamedTuple):
     default: str
-    matchers: list[dict]
+    matchers: list[dict] | None = None
 
 
 class SubProfileMatcher(Protocol):

@@ -10,6 +10,10 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Hue Infuse Medium Ceiling Lamp",
+  "device_type": "light",
   "standby_power": 0.16,
+  "aliases": [
+    "915005997201"
+  ],
   "author": "vladi-k <53343355+vladi-k@users.noreply.github.com>"
 }

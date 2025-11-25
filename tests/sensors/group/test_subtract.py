@@ -1,8 +1,14 @@
-import pytest
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
+import pytest
 
+from custom_components.powercalc import (
+    CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+    CONF_ENERGY_SENSOR_NAMING,
+    CONF_POWER_SENSOR_FRIENDLY_NAMING,
+    CONF_POWER_SENSOR_NAMING,
+)
 from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
@@ -120,3 +126,32 @@ async def test_validate(config: ConfigType, valid: bool) -> None:
             validate_config(config)
     else:
         validate_config(config)
+
+
+async def test_friendly_naming(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "test",
+            CONF_GROUP_TYPE: GroupType.SUBTRACT,
+            CONF_ENTITY_ID: "sensor.a_power",
+            CONF_SUBTRACT_ENTITIES: [
+                "sensor.b_power",
+                "sensor.c_power",
+            ],
+        },
+        {
+            CONF_ENERGY_SENSOR_NAMING: "{} powercalc energy",
+            CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Powercalc Energy",
+            CONF_POWER_SENSOR_NAMING: "{} powercalc power",
+            CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Powercalc Power",
+        },
+    )
+
+    power_state = hass.states.get("sensor.test_powercalc_power")
+    assert power_state
+    assert power_state.attributes["friendly_name"] == "test Powercalc Power"
+
+    energy_state = hass.states.get("sensor.test_powercalc_energy")
+    assert energy_state
+    assert energy_state.attributes["friendly_name"] == "test Powercalc Energy"

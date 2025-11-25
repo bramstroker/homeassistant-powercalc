@@ -9,6 +9,7 @@ from measure.controller.charging.const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, 
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import ChargingControllerError
 from measure.controller.charging.factory import ChargingControllerFactory
+from measure.controller.charging.hass import ATTR_BATTERY_LEVEL
 from measure.runner.const import QUESTION_CHARGING_DEVICE_TYPE
 from measure.runner.errors import RunnerError
 from measure.runner.runner import MeasurementRunner, RunnerResult
@@ -38,7 +39,7 @@ class ChargingRunner(MeasurementRunner):
         export_directory: str,
     ) -> RunnerResult | None:
         self.charging_device_type = ChargingDeviceType(answers[QUESTION_CHARGING_DEVICE_TYPE])
-        self.battery_level_attribute = answers.get(QUESTION_BATTERY_LEVEL_ATTRIBUTE)
+        self.battery_level_attribute = answers.get(QUESTION_BATTERY_LEVEL_ATTRIBUTE, ATTR_BATTERY_LEVEL)
 
         print(
             "Make sure the device is as close to 0% charged as possible before starting the test.",
@@ -132,6 +133,3 @@ class ChargingRunner(MeasurementRunner):
 
     def measure_standby_power(self) -> float:
         return 0
-
-    def get_export_directory(self) -> str | None:
-        return "charging"

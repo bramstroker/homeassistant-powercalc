@@ -14,7 +14,7 @@ Use this when you want to set power on a linear scale. Useful for dimmable light
 
 ## :material-notebook-multiple: [LUT](lut.md)
 
-Use a Lookup table to map a given light brighness and color to a power value in Watt. Most of powercalc built-in profiles use this.
+Use a Lookup table to map a given light brightness and color to a power value in Watt. Most of powercalc built-in profiles use this.
 You'll need to use the measure utility to create these LUT files.
 
 ## :material-power-settings: [Multi Switch](multi-switch.md)

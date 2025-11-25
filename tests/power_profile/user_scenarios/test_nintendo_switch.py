@@ -28,7 +28,7 @@ async def test_nintendo_switch(hass: HomeAssistant) -> None:
         {
             CONF_ENTITY_ID: device_tracker_id,
             CONF_FIXED: {
-                CONF_POWER: "{{ iif(state_attr('media_player.baa', 'source') == 'Game', 8.0, 0) }}",
+                CONF_POWER: "{{ iif(state_attr('media_player.baa', 'source') == 'Game', 8.0, 0) }}",  # codespell:ignore iif
             },
             CONF_SLEEP_POWER: {
                 CONF_POWER: 0,

@@ -155,21 +155,4 @@ When you are not interested in the individual energy sensors of each light this 
 
 ## Action get_group_entities
 
-Powercalc provides an action `Powercalc: get group entities` to get all entity_id's of group members.
-
-```yaml
-action: powercalc.get_group_entities
-target:
-  entity_id: sensor.my_group_power
-data: {}
-```
-
-Response:
-
-```yaml
-sensor.tracked_power:
-  entities:
-    - sensor.kitchen_light_power
-    - sensor.furnace_power
-    - sensor.magic_power
-```
+Powercalc provides an action [`Powercalc: get group entities`](../../actions/get-group-entities.md) to get all entity_id's of group members.

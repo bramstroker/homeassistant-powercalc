@@ -1,23 +1,22 @@
 from __future__ import annotations
 
-import re
 from collections.abc import Callable, Iterable
 from enum import StrEnum
+import re
 from typing import Protocol, cast
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, EntityCategory
-from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.area_registry import AreaEntry
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
+import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_ALL,
@@ -263,6 +262,14 @@ class AreaFilter(EntityFilter):
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.area_id == self.area.id or entity.device_id in self.area_devices
+
+
+class DeviceFilter(EntityFilter):
+    def __init__(self, device: str | set[str]) -> None:
+        self.device: set[str] = {device} if isinstance(device, str) else device
+
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return entity.device_id in self.device
 
 
 class CompositeFilter(EntityFilter):

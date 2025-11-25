@@ -1,6 +1,5 @@
 import logging
 
-import pytest
 from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, ConfigEntry
@@ -8,14 +7,15 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_OFF, STATE_
 from homeassistant.core import HomeAssistant, State
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
+import pytest
 from pytest_homeassistant_custom_component.common import (
+    RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
+    setup_test_component_platform,
 )
 
-import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
@@ -26,6 +26,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
+import custom_components.test.sensor as test_sensor_platform
 from tests.common import run_powercalc_setup
 from tests.conftest import MockEntityWithModel
 
@@ -40,14 +41,13 @@ async def test_can_calculate_power(
 
     light_source_entity = await create_source_entity("light.test", hass)
 
-    platform: test_sensor_platform = getattr(hass.components, "test.sensor")
-    platform.init(empty=True)
-    estimated_current_entity = platform.MockSensor(
+    estimated_current_entity = test_sensor_platform.MockSensor(
         name="test_estimated_current",
         native_value="50.0",
         unique_id="abc",
     )
-    platform.ENTITIES[0] = estimated_current_entity
+
+    setup_test_component_platform(hass, sensor.DOMAIN, [estimated_current_entity])
 
     assert await async_setup_component(
         hass,
@@ -85,13 +85,13 @@ async def test_find_estimated_current_entity_by_device_class(
     mock_registry(
         hass,
         {
-            "light.test": RegistryEntry(
+            "light.test": RegistryEntryWithDefaults(
                 entity_id="light.test",
                 unique_id="1234",
                 platform="light",
                 device_id="wled-device-id",
             ),
-            "sensor.test_current": RegistryEntry(
+            "sensor.test_current": RegistryEntryWithDefaults(
                 entity_id="sensor.test_current",
                 unique_id="1234",
                 platform="sensor",
@@ -119,7 +119,7 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
         mock_registry(
             hass,
             {
-                "light.test": RegistryEntry(
+                "light.test": RegistryEntryWithDefaults(
                     entity_id="light.test",
                     unique_id="1234",
                     platform="light",
@@ -152,33 +152,33 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant, caplog: pytest.LogCa
     mock_registry(
         hass,
         {
-            "light.test": RegistryEntry(
+            "light.test": RegistryEntryWithDefaults(
                 entity_id="light.test",
                 unique_id="1234",
                 platform="light",
                 device_id="wled-device",
             ),
-            "light.test_master": RegistryEntry(
+            "light.test_master": RegistryEntryWithDefaults(
                 entity_id="light.test_master",
                 unique_id="1234-master",
                 platform="light",
                 original_name="Master",
                 device_id="wled-device",
             ),
-            "light.test_segment1": RegistryEntry(
+            "light.test_segment1": RegistryEntryWithDefaults(
                 entity_id="light.test_segment1",
                 unique_id="1234-segment",
                 platform="light",
                 original_name="WLED Segment1",
                 device_id="wled-device",
             ),
-            "light.test_segment_1_2": RegistryEntry(
+            "light.test_segment_1_2": RegistryEntryWithDefaults(
                 entity_id="light.test_segment_1_2",
                 unique_id="1234-segment",
                 platform="light",
                 device_id="wled-device",
             ),
-            "sensor.test_current": RegistryEntry(
+            "sensor.test_current": RegistryEntryWithDefaults(
                 entity_id="sensor.test_current",
                 unique_id="1234",
                 platform="sensor",
@@ -229,13 +229,13 @@ async def test_yaml_configuration(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "light.test": RegistryEntry(
+            "light.test": RegistryEntryWithDefaults(
                 entity_id="light.test",
                 unique_id="1234",
                 platform="light",
                 device_id="wled-device",
             ),
-            "sensor.test_current": RegistryEntry(
+            "sensor.test_current": RegistryEntryWithDefaults(
                 entity_id="sensor.test_current",
                 unique_id="1234",
                 platform="sensor",
@@ -277,13 +277,13 @@ async def test_estimated_current_sensor_unavailable(hass: HomeAssistant, caplog:
     mock_registry(
         hass,
         {
-            "light.test": RegistryEntry(
+            "light.test": RegistryEntryWithDefaults(
                 entity_id="light.test",
                 unique_id="1234",
                 platform="light",
                 device_id="wled-device-id",
             ),
-            "sensor.test_current": RegistryEntry(
+            "sensor.test_current": RegistryEntryWithDefaults(
                 entity_id="sensor.test_current",
                 unique_id="1234",
                 platform="sensor",

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import logging
-import os
-import sys
-import threading
-import time
 from datetime import datetime
 from decimal import Decimal, DecimalException
+import logging
+import os
 from pathlib import Path
+import sys
+import threading
 from threading import Thread
+import time
 
 import cv2
 import numpy as np
@@ -232,7 +232,7 @@ class OcrRegionSelection:
                 2,
             )
         else:
-            (h, w) = frame.shape[:2]
+            (h, _) = frame.shape[:2]
             y_center = h // 2
             cv2.rectangle(
                 frame,

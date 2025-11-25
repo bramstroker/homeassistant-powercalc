@@ -1,7 +1,6 @@
 import logging
 import uuid
 
-import pytest
 from homeassistant.components import light
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
@@ -17,15 +16,18 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry, RegistryEntryDisabler
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntryDisabler
 from homeassistant.setup import async_setup_component
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
 )
 
 from custom_components.powercalc import CONF_CREATE_UTILITY_METERS
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_ALL,
@@ -57,6 +59,8 @@ from tests.common import (
     get_simple_fixed_config,
     run_powercalc_setup,
 )
+from tests.config_flow.common import initialize_discovery_flow
+from tests.conftest import MockEntityWithModel
 
 
 @pytest.mark.parametrize(
@@ -202,17 +206,17 @@ async def test_include_domain_list(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "switch.test": RegistryEntry(
+            "switch.test": RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 unique_id="1111",
                 platform="switch",
             ),
-            "light.test2": RegistryEntry(
+            "light.test2": RegistryEntryWithDefaults(
                 entity_id="light.test2",
                 unique_id="2222",
                 platform="light",
             ),
-            "sensor.test3": RegistryEntry(
+            "sensor.test3": RegistryEntryWithDefaults(
                 entity_id="sensor.test3",
                 unique_id="3333",
                 platform="sensor",
@@ -279,12 +283,12 @@ async def test_include_group(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "switch.tv": RegistryEntry(
+            "switch.tv": RegistryEntryWithDefaults(
                 entity_id="switch.tv",
                 unique_id="12345",
                 platform="switch",
             ),
-            "switch.soundbar": RegistryEntry(
+            "switch.soundbar": RegistryEntryWithDefaults(
                 entity_id="switch.soundbar",
                 unique_id="123456",
                 platform="switch",
@@ -347,13 +351,13 @@ async def test_include_skips_unsupported_entities(hass: HomeAssistant, caplog: p
     mock_registry(
         hass,
         {
-            "light.a": RegistryEntry(
+            "light.a": RegistryEntryWithDefaults(
                 entity_id="light.a",
                 unique_id="111",
                 platform="light",
                 device_id="device-a",
             ),
-            "light.b": RegistryEntry(
+            "light.b": RegistryEntryWithDefaults(
                 entity_id="light.b",
                 unique_id="222",
                 platform="light",
@@ -495,14 +499,14 @@ async def test_include_filter_domain(
     mock_registry(
         hass,
         {
-            "light.test_light": RegistryEntry(
+            "light.test_light": RegistryEntryWithDefaults(
                 entity_id="light.test_light",
                 unique_id="1111",
                 platform="light",
                 device_id="light-device-id",
                 area_id=area.id,
             ),
-            "switch.test_switch": RegistryEntry(
+            "switch.test_switch": RegistryEntryWithDefaults(
                 entity_id="switch.test_switch",
                 unique_id="2222",
                 platform="switch",
@@ -621,21 +625,21 @@ async def test_include_non_powercalc_entities_in_group(
     mock_registry(
         hass,
         {
-            shelly_power_sensor: RegistryEntry(
+            shelly_power_sensor: RegistryEntryWithDefaults(
                 entity_id=shelly_power_sensor,
                 unique_id="1111",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
                 area_id=area.id,
             ),
-            shelly_energy_sensor: RegistryEntry(
+            shelly_energy_sensor: RegistryEntryWithDefaults(
                 entity_id=shelly_energy_sensor,
                 unique_id="2222",
                 platform="sensor",
                 device_class=SensorDeviceClass.ENERGY,
                 area_id=area.id,
             ),
-            "light.test": RegistryEntry(
+            "light.test": RegistryEntryWithDefaults(
                 entity_id="light.test",
                 unique_id="3333",
                 platform="light",
@@ -766,14 +770,14 @@ async def test_power_group_does_not_include_binary_sensors(
     mock_registry(
         hass,
         {
-            "binary_sensor.test": RegistryEntry(
+            "binary_sensor.test": RegistryEntryWithDefaults(
                 entity_id="binary_sensor.test",
                 unique_id="1111",
                 platform="binary_sensor",
                 device_class=SensorDeviceClass.POWER,
                 area_id=area.id,
             ),
-            "sensor.test": RegistryEntry(
+            "sensor.test": RegistryEntryWithDefaults(
                 entity_id="sensor.test",
                 unique_id="2222",
                 platform="sensor",
@@ -804,24 +808,24 @@ async def test_energy_group_does_not_include_utility_meters(hass: HomeAssistant)
     mock_registry(
         hass,
         {
-            "light.test": RegistryEntry(
+            "light.test": RegistryEntryWithDefaults(
                 entity_id="light.test",
                 unique_id="1111",
                 platform="light",
             ),
-            "sensor.test": RegistryEntry(
+            "sensor.test": RegistryEntryWithDefaults(
                 entity_id="sensor.test",
                 unique_id="2222",
                 platform="sensor",
                 device_class=SensorDeviceClass.ENERGY,
             ),
-            "sensor.test_daily": RegistryEntry(
+            "sensor.test_daily": RegistryEntryWithDefaults(
                 entity_id="sensor.test_daily",
                 unique_id="3333",
                 platform="utility_meter",
                 device_class=SensorDeviceClass.ENERGY,
             ),
-            "sensor.test_hourly": RegistryEntry(
+            "sensor.test_hourly": RegistryEntryWithDefaults(
                 entity_id="sensor.test_hourly",
                 unique_id="4444",
                 platform="utility_meter",
@@ -859,26 +863,26 @@ async def test_include_group_does_not_include_disabled_sensors(hass: HomeAssista
     mock_registry(
         hass,
         {
-            "sensor.test_energy": RegistryEntry(
+            "sensor.test_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.test_energy",
                 unique_id="1111",
                 platform="sensor",
                 device_class=SensorDeviceClass.ENERGY,
             ),
-            "sensor.test_disabled_energy": RegistryEntry(
+            "sensor.test_disabled_energy": RegistryEntryWithDefaults(
                 entity_id="sensor.test_disabled_energy",
                 unique_id="2222",
                 platform="sensor",
                 device_class=SensorDeviceClass.ENERGY,
                 disabled_by=RegistryEntryDisabler.USER,
             ),
-            "sensor.test_power": RegistryEntry(
+            "sensor.test_power": RegistryEntryWithDefaults(
                 entity_id="sensor.test_power",
                 unique_id="3333",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
             ),
-            "sensor.test_disabled_power": RegistryEntry(
+            "sensor.test_disabled_power": RegistryEntryWithDefaults(
                 entity_id="sensor.test_disabled_power",
                 unique_id="4444",
                 platform="sensor",
@@ -912,14 +916,14 @@ async def test_include_by_label(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "sensor.test": RegistryEntry(
+            "sensor.test": RegistryEntryWithDefaults(
                 entity_id="sensor.test",
                 unique_id="1111",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
                 labels=["my_label"],
             ),
-            "sensor.test2": RegistryEntry(
+            "sensor.test2": RegistryEntryWithDefaults(
                 entity_id="sensor.test",
                 unique_id="2222",
                 platform="sensor",
@@ -949,7 +953,7 @@ async def test_include_by_wildcard(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "binary_sensor.test": RegistryEntry(
+            "binary_sensor.test": RegistryEntryWithDefaults(
                 entity_id="sensor.tv_power",
                 unique_id="1111",
                 platform="binary_sensor",
@@ -1028,24 +1032,24 @@ async def test_include_complex_nested_filters(
     mock_registry(
         hass,
         {
-            "switch.test": RegistryEntry(
+            "switch.test": RegistryEntryWithDefaults(
                 entity_id="binary_sensor.test",
                 unique_id="1111",
                 platform="binary_sensor",
             ),
-            "switch.tv": RegistryEntry(
+            "switch.tv": RegistryEntryWithDefaults(
                 entity_id="switch.tv",
                 unique_id="2222",
                 platform="switch",
                 area_id=area.id,
             ),
-            "light.tv_ambilights": RegistryEntry(
+            "light.tv_ambilights": RegistryEntryWithDefaults(
                 entity_id="light.tv_ambilights",
                 unique_id="3333",
                 platform="light",
                 area_id=area.id,
             ),
-            "light.living_room": RegistryEntry(
+            "light.living_room": RegistryEntryWithDefaults(
                 entity_id="light.living_room",
                 unique_id="4444",
                 platform="light",
@@ -1092,25 +1096,25 @@ async def test_include_by_area_combined_with_domain_filter(hass: HomeAssistant, 
     mock_registry(
         hass,
         {
-            "switch.kitchen_switch": RegistryEntry(
+            "switch.kitchen_switch": RegistryEntryWithDefaults(
                 entity_id="switch.kitchen_switch",
                 unique_id="1111",
                 platform="switch",
                 area_id=area_kitchen.id,
             ),
-            "switch.conservatory_switch": RegistryEntry(
+            "switch.conservatory_switch": RegistryEntryWithDefaults(
                 entity_id="switch.conservatory_switch",
                 unique_id="2222",
                 platform="switch",
                 area_id=area_conservatory.id,
             ),
-            "light.kitchen_light": RegistryEntry(
+            "light.kitchen_light": RegistryEntryWithDefaults(
                 entity_id="light.kitchen_light",
                 unique_id="3333",
                 platform="light",
                 area_id=area_kitchen.id,
             ),
-            "light.conservatory_light": RegistryEntry(
+            "light.conservatory_light": RegistryEntryWithDefaults(
                 entity_id="light.conservatory_light",
                 unique_id="4444",
                 platform="light",
@@ -1177,17 +1181,17 @@ async def test_include_all(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "switch.switch": RegistryEntry(
+            "switch.switch": RegistryEntryWithDefaults(
                 entity_id="switch.switch",
                 unique_id="1111",
                 platform="switch",
             ),
-            "light.light": RegistryEntry(
+            "light.light": RegistryEntryWithDefaults(
                 entity_id="light.light",
                 unique_id="2222",
                 platform="light",
             ),
-            "sensor.existing_power": RegistryEntry(
+            "sensor.existing_power": RegistryEntryWithDefaults(
                 entity_id="sensor.existing_power",
                 unique_id="3333",
                 platform="sensor",
@@ -1224,12 +1228,12 @@ async def test_exclude_non_powercalc_sensors(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "switch.switch": RegistryEntry(
+            "switch.switch": RegistryEntryWithDefaults(
                 entity_id="switch.switch",
                 unique_id="1111",
                 platform="switch",
             ),
-            "sensor.existing_power": RegistryEntry(
+            "sensor.existing_power": RegistryEntryWithDefaults(
                 entity_id="sensor.existing_power",
                 unique_id="3333",
                 platform="sensor",
@@ -1304,19 +1308,19 @@ async def test_irrelevant_entity_domains_are_skipped(hass: HomeAssistant, caplog
     mock_registry(
         hass,
         {
-            "light.test": RegistryEntry(
+            "light.test": RegistryEntryWithDefaults(
                 entity_id="light.test",
                 unique_id="2222",
                 platform="hue",
                 device_id="device-a",
             ),
-            "scene.test": RegistryEntry(
+            "scene.test": RegistryEntryWithDefaults(
                 entity_id="scene.test",
                 unique_id="3333",
                 platform="hue",
                 device_id="device-a",
             ),
-            "event.test": RegistryEntry(
+            "event.test": RegistryEntryWithDefaults(
                 entity_id="event.test",
                 unique_id="4444",
                 platform="hue",
@@ -1330,6 +1334,32 @@ async def test_irrelevant_entity_domains_are_skipped(hass: HomeAssistant, caplog
 
     assert "scene.test" not in caplog.text
     assert "event.test" not in caplog.text
+
+
+async def test_prevent_duplicate_entities_when_using_include_all(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "All",
+                CONF_INCLUDE: {
+                    CONF_ALL: None,
+                },
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    source_entity = await create_source_entity("light.test", hass)
+    await initialize_discovery_flow(hass, source_entity, confirm_autodiscovered_model=True)
+
+    assert hass.states.get("sensor.test_power")
+    assert not hass.states.get("sensor.test_power_2")
 
 
 def _create_powercalc_config_entry(

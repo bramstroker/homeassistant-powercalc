@@ -1,6 +1,6 @@
 from datetime import timedelta
+from unittest.mock import patch
 
-import pytest
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
@@ -9,12 +9,15 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIT_OF_MEASUREMENT,
+    EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant, State
+from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     async_fire_time_changed,
@@ -24,6 +27,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
+    CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_ON_TIME,
@@ -48,6 +52,7 @@ from tests.common import (
     create_input_number,
     run_powercalc_setup,
 )
+from tests.config_flow.test_global_configuration import create_mock_global_config_entry
 
 
 async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant) -> None:
@@ -537,7 +542,7 @@ async def test_name_and_entity_id_can_be_inherited_from_source_entity(
 async def test_create_daily_energy_sensor_using_config_entry(
     hass: HomeAssistant,
 ) -> None:
-    config_entry_group = MockConfigEntry(
+    config_entry = MockConfigEntry(
         domain=DOMAIN,
         data={
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
@@ -550,13 +555,57 @@ async def test_create_daily_energy_sensor_using_config_entry(
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
-    config_entry_group.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_energy")
 
     assert hass.states.get("sensor.test_energy_daily")
+
+
+async def test_template_error_catched(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    with patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception())):
+        await run_powercalc_setup(
+            hass,
+            {
+                CONF_ENERGY_SENSOR_NAMING: "{} Energy",
+                CONF_NAME: "My sensor",
+                CONF_DAILY_FIXED_ENERGY: {
+                    CONF_VALUE: "{{ 1 + 3 }}",
+                },
+            },
+        )
+        await _trigger_periodic_update(hass, 10)
+        assert "Could not render value template" in caplog.text
+
+
+async def test_entity_category(hass: HomeAssistant) -> None:
+    global_config_entry = create_mock_global_config_entry(
+        hass,
+        {
+            CONF_ENERGY_SENSOR_CATEGORY: EntityCategory.DIAGNOSTIC,
+        },
+    )
+    global_config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(global_config_entry.entry_id)
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
+            CONF_NAME: "Test",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
+                CONF_VALUE: 200,
+            },
+        },
+    )
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_energy")
 
 
 async def _trigger_periodic_update(

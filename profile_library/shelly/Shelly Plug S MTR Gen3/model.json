@@ -1,0 +1,23 @@
+{
+  "created_at": "2025-05-01T21:56:26",
+  "measure_description": "Measured with 1.5W (average over 600s) dummy load over 600s and calculated average. WLAN RSSI: -40 dBm, Firmware version 1.2.3. Note: firmware have Shelly's confirmed bug with LED settings when ECO mode used, LED settings are not always applying correctly, and measurements are made only in a situation where the settings correspond to the actual behavior of the LED",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "VERSION": "v1.17.11:docker"
+  },
+  "name": "Shelly Plug S Gen3",
+  "aliases": [
+    "S3PL-00112EU"
+  ],
+  "discovery_by": "entity",
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "only_self_usage": true,
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your device settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw. Different WLAN signal can change power draw.\n\"+WLAN +ECO +LED\": WLAN client on, repeater turned off, BT turned off, 100% green/red brightness with switch state LED indication mode\n\\n\"+WLAN +ECO -LED\": WLAN client on, repeater turned off, BT turned off, LED indication turned off.",
+  "author": "Largelos"
+}

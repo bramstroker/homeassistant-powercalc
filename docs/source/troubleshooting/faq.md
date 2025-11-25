@@ -41,9 +41,4 @@ Alternatively you can use the [fixed](../strategies/fixed.md) or [linear](../str
 ## Why does Powercalc create additional power sensor for my smart plug?
 
 Powercalc provides profiles for some smart plugs which don't provide their self usage. Even though their consumption is very small, they will add up to your total consumption in your house. So you'll get a power sensor so you'll know how much the smart plug itself uses. Hence the naming `_device_power` and `_device_energy`.
-When you don't want these in your installation you can simply ignore the provided discoveries.
-
-## My YAML power and energy entities are not listed in integrations or devices. But they are listed in the global entity list. What's up doc? 🐰
-
-Adding a sensor using the YAML method will not add the Powercalc integration page. Only entities created with the GUI will appear there.
-The sensor will functionally be the same, and you can find it in the global entities list.
+When you don't want these in your installation you can remove them by using the [exclude_self usage](../library/discovery.md#excluding-self-usage) option.

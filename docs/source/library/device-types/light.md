@@ -30,9 +30,11 @@ You can check the supported modes in HA Developer Tools.
 > - hs.csv.gz (hue/saturation, colored lamps)
 > - color_temp.csv.gz (color temperature)
 > - brightness.csv.gz (brightness only lights)
+> - effect.csv.gz (lights with predefined effect)
 
 Some lights support two color modes (both `hs` and `color_temp`), so there must be two CSV files.
-When your light supports `xy` color mode, you just need to provide the `hs` CSV file.
+When your light supports `xy` color mode, you just need to provide the `hs` CSV file. When your light supports
+predefined `effect` mode, you should also include the `effect` CSV file.
 
 The files must be gzipped to keep the repository footprint small.
 
@@ -44,12 +46,13 @@ Example directory structure:
     - model.json
     - hs.csv.gz
     - color_temp.csv.gz
+    - effect.csv.gz
 ```
 
 ### Expected file structure
 
 - The file **MUST** contain a header row.
-- Watt value decimal point must be a `.` not a `,`. i.e. `18.4`
+- Watt value decimal point **MUST** be a `.` not a `,`. i.e. `18.4`
 - The data rows in the CSV files **MUST** have the following column order:
 
 **hs.csv**
@@ -68,6 +71,12 @@ bri,mired,watt
 
 ```text
 bri,watt
+```
+
+**effects.csv**
+
+```text
+effect,bri,watt
 ```
 
 **\*Ranges\***:

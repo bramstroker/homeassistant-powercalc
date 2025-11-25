@@ -5,5 +5,7 @@
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
-  }
+  },
+  "calculation_strategy": "fixed",
+  "config_flow_sub_profile_remarks": "More info\n\nBla bla\n*Bla bla*"
 }

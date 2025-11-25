@@ -26,38 +26,58 @@ You could either install with HACS (recommended) or manual.
 
 ## Set up power sensors
 
-Powercalc has a built-in library of more than 400 power profiles. Currently, this exists mostly of lights.
-These profiles have been measured and provided by users. See [supported models](https://library.powercalc.nl) for the listing of supported devices.
+Powercalc includes a built-in library with 500+ measured power profiles, mostly for lighting devices.
+These profiles are measured and created by Powercalc users. See the [library website](https://library.powercalc.nl) for the listing of supported devices.
 
-Powercalc scans your HA instance for entities which are supported for automatic configuration. It does that based on the manufacturer and model information known in HA.
-After following the installation steps above and restarting HA power (W) and energy sensors (kWh) should appear and you can add them to your installation by clicking `CONFIGURE`, as displayed in the screenshot below
+After installation and restart, Powercalc will automatically:
+
+- Scan your Home Assistant installation
+- Detect supported entities using their *manufacturer* and *model*
+- Offer to create virtual **power (W)** and **energy (kWh)** sensors
+
+If devices are found, you will see prompts as shown below. Click `ADD` to create the sensors.
 
 ![Discovery](img/discovery.png)
 
-When this is not the case please check the logs for any errors, you can also enable [Debug logging](troubleshooting/debug-logging.md) to get more details about the discovery routine.
+If no sensors appear:
 
-When your appliance is not supported out of the box (or you want to have more control) you have extensive options for manual configuration. Please proceed to [Sensor types](sensor-types/index.md) for further instructions.
+- Check the Home Assistant logs for Powercalc-related errors
+- Optionally enable [debug logging](troubleshooting/debug-logging.md) for detailed discovery info
+
+If your device is not yet supported or if you prefer full manual control, you can configure sensors yourself.
+See: [Sensor types](sensor-types/index.md).
 
 !!! tip
 
-    When you don't want powercalc to automatically discover sensors in your installation you can disable that behaviour to get full manual control:
+    Don’t want automatic discovery? Disable it:
 
     ```yaml
     powercalc:
-        enable_autodiscovery: false
+      discovery:
+        enabled: false
     ```
 
 Refer to [global configuration](configuration/global-configuration.md) for all settings you can do on global level.
 
 ## Energy dashboard
 
-If you want to use the virtual power sensors in the energy dashboard you'll need an energy sensor. Powercalc automatically creates one for every virtual power sensor. No need for any custom configuration.
-These energy sensors then can be selected in the energy dashboard under `Invididual devices`.
+To use virtual power sensors in the Energy Dashboard, you need energy sensors.
+Powercalc automatically creates a corresponding [**energy sensor**](sensor-types/energy-sensor.md) for each virtual power sensor, no configuration required.
 
-You can disable the automatic creation of energy sensors with the option `create_energy_sensors` in your configuration (see [global configuration](configuration/global-configuration.md)).
+You can add these energy sensors to the energy dashboard under **Settings → Energy → Individual devices**.
+
+If you prefer to manage energy sensors yourself, you can disable automatic creation using:
+
+``` yaml
+powercalc:
+  create_energy_sensors: false
+```
+
+(See [global configuration](configuration/global-configuration.md))
 
 !!! note
 
-    It can take some time for the energy sensors to appear in the energy dashboard, sometimes more than an hour. Just have a little patience ;-)
+    New energy sensors may take some time to appear in the Energy Dashboard, sometimes up to an hour.
+    This is normal; just give Home Assistant a bit of time.
 
 [hacs]: https://hacs.xyz/

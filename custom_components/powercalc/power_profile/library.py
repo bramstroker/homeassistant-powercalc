@@ -5,11 +5,14 @@ import os
 import re
 from typing import Any, NamedTuple, cast
 
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.singleton import singleton
 
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DOMAIN, DOMAIN_CONFIG
-from custom_components.powercalc.helpers import replace_placeholders
+from custom_components.powercalc.helpers import collect_placeholders, get_related_entity_by_device_class, replace_placeholders
 
 from .error import LibraryError
 from .loader.composite import CompositeLoader
@@ -29,7 +32,7 @@ class ProfileLibrary:
         self._hass = hass
         self._loader = loader
         self._profiles: dict[str, list[PowerProfile]] = {}
-        self._manufacturer_models: dict[str, list[str]] = {}
+        self._manufacturer_models: dict[str, set[str]] = {}
         self._manufacturer_device_types: dict[str, list] = {}
 
     async def initialize(self) -> None:
@@ -66,33 +69,34 @@ class ProfileLibrary:
 
         return CompositeLoader(loaders)
 
-    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None = None) -> list[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None = None) -> list[tuple[str, str]]:
         """Get listing of available manufacturers."""
         manufacturers = await self._loader.get_manufacturer_listing(device_types)
         return sorted(manufacturers)
 
-    async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None = None) -> list[str]:
+    async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None = None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
 
         resolved_manufacturers = await self._loader.find_manufacturers(manufacturer)
         if not resolved_manufacturers:
-            return []
-        all_models: list[str] = []
+            return set()
+        all_models: set[str] = set()
         for manufacturer in resolved_manufacturers:
             cache_key = f"{manufacturer}/{device_types}"
             cached_models = self._manufacturer_models.get(cache_key)
             if cached_models:
-                all_models.extend(cached_models)
+                all_models.update(cached_models)
                 continue
             models = await self._loader.get_model_listing(manufacturer, device_types)
-            self._manufacturer_models[cache_key] = sorted(models)
-            all_models.extend(models)
+            self._manufacturer_models[cache_key] = models
+            all_models.update(models)
 
-        return all_models
+        return set(sorted(all_models))  # noqa: C414
 
     async def get_profile(
         self,
         model_info: ModelInfo,
+        source_entity: SourceEntity | None = None,
         custom_directory: str | None = None,
         variables: dict[str, str] | None = None,
         process_variables: bool = True,
@@ -104,7 +108,7 @@ class ProfileLibrary:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
-        profile = await self.create_power_profile(model_info, custom_directory, variables, process_variables)
+        profile = await self.create_power_profile(model_info, source_entity, custom_directory, variables, process_variables)
 
         if sub_profile:
             await profile.select_sub_profile(sub_profile)
@@ -114,6 +118,7 @@ class ProfileLibrary:
     async def create_power_profile(
         self,
         model_info: ModelInfo,
+        source_entity: SourceEntity | None = None,
         custom_directory: str | None = None,
         variables: dict[str, str] | None = None,
         process_variables: bool = True,
@@ -127,16 +132,44 @@ class ProfileLibrary:
             model_info = next(iter(models))
 
         json_data, directory = await self._load_model_data(model_info.manufacturer, model_info.model, custom_directory)
+
+        # json_data is potentially retrieved from cache, so we need to copy it to avoid modifying the cache
+        json_data = json_data.copy()
         if process_variables:
             if json_data.get("fields"):  # When custom fields in profile are defined, make sure all variables are passed
                 self.validate_variables(json_data, variables or {})
-            json_data = cast(dict, replace_placeholders(json_data, variables or {}))
+
+            placeholders = collect_placeholders(json_data)
+            replacements = self.compute_replacement_variables(placeholders, variables or {}, source_entity)
+            json_data = cast(dict, replace_placeholders(json_data, replacements))
 
         if linked_profile := json_data.get("linked_profile", json_data.get("linked_lut")):
             linked_manufacturer, linked_model = linked_profile.split("/")
-            _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
+            linked_json_data, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
+            json_data.update(linked_json_data)
 
         return await self._create_power_profile_instance(model_info.manufacturer, model_info.model, directory, json_data)
+
+    def compute_replacement_variables(self, placeholders: set[str], variables: dict[str, str], source_entity: SourceEntity | None) -> dict[str, str]:
+        variables = variables or {}
+
+        if source_entity:
+            if "entity" in placeholders:
+                variables["entity"] = source_entity.entity_id
+
+            # If ANY namespaced entity:* placeholder is present, check if the specific one for device_class is needed
+            for key in {p for p in placeholders if p.startswith("entity_by_device_class:")}:
+                _, device_class = key.split(":", 1)
+                try:
+                    device_class = SensorDeviceClass(device_class)
+                except ValueError:
+                    device_class = cast(SensorDeviceClass, BinarySensorDeviceClass(device_class))
+                related_entity = get_related_entity_by_device_class(self._hass, source_entity.entity_entry, device_class)  # type: ignore
+                if not related_entity:
+                    raise LibraryError(f"Could not find related entity for device class {device_class} of entity {source_entity.entity_id}")
+                variables[key] = related_entity
+
+        return variables
 
     @staticmethod
     def validate_variables(json_data: dict[str, Any], variables: dict[str, str]) -> None:

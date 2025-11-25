@@ -2,6 +2,7 @@ site_name: Powercalc documentation
 docs_dir: source
 theme:
   name: material
+  variant: classic
   features:
     - navigation.tabs
     - navigation.sections
@@ -30,6 +31,9 @@ theme:
   favicon: img/logo.svg
 extra:
   generator: false
+  analytics:
+    provider: google
+    property: G-XPYSM71YND
 plugins:
   - search
   - git-revision-date-localized:
@@ -71,22 +75,32 @@ nav:
       - 'strategies/wled.md'
       - 'strategies/composite.md'
   - 'Configuration':
+      - 'configuration/index.md'
       - 'configuration/global-configuration.md'
       - 'configuration/sensor-configuration.md'
       - 'configuration/multiply-factor.md'
       - 'configuration/standby-power.md'
-      - 'configuration/new-yaml-structure.md'
+      - 'configuration/entity-category.md'
+      - 'configuration/outlier-filter.md'
+      - 'configuration/update-frequency.md'
+      - 'Migration':
+        - 'configuration/migration/new-yaml-structure.md'
+        - 'configuration/migration/discovery-config.md'
+        - 'configuration/migration/update-interval-config.md'
   - 'Misc':
       - 'misc/naming.md'
+      - 'misc/uninstall.md'
   - 'Library':
       - 'library/library.md'
+      - 'library/discovery.md'
       - 'library/structure.md'
       - 'library/sub-profiles.md'
-      - 'library/custom-fields.md'
+      - 'library/variables.md'
       - 'Device types':
           - 'library/device-types/index.md'
           - 'library/device-types/camera.md'
           - 'library/device-types/cover.md'
+          - 'library/device-types/fan.md'
           - 'library/device-types/generic-iot.md'
           - 'library/device-types/light.md'
           - 'library/device-types/power-meter.md'
@@ -96,12 +110,28 @@ nav:
           - 'library/device-types/smart-speaker.md'
           - 'library/device-types/network.md'
           #- 'library/device-types/vacuum-robot.md'
+  - 'Actions':
+      - 'actions/activate-playbook.md'
+      - 'actions/calibrate-energy.md'
+      - 'actions/calibrate-utility-meter.md'
+      - 'actions/change-gui-configuration.md'
+      - 'actions/get-group-entities.md'
+      - 'actions/increase-daily-energy.md'
+      - 'actions/reload.md'
+      - 'actions/reset-energy.md'
+      - 'actions/stop-playbook.md'
+      - 'actions/switch-sub-profile.md'
+      - 'actions/update-library.md'
   - 'Troubleshooting':
       - 'troubleshooting/faq.md'
       - 'troubleshooting/data-correction.md'
       - 'troubleshooting/debug-logging.md'
       - 'troubleshooting/install-master.md'
       - 'troubleshooting/yeelight.md'
+  - 'Cookbook':
+      - 'cookbook/index.md'
+      - 'cookbook/hvac.md'
+      - 'cookbook/ups.md'
   - 'Contributing':
       - 'contributing/index.md'
       - 'contributing/integration-development.md'

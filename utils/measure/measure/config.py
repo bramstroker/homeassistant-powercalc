@@ -4,9 +4,12 @@ from decouple import Choices, UndefinedValueError, config
 
 from measure.const import MeasureType
 from measure.controller.charging.const import ChargingControllerType
+from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import LightControllerType
 from measure.controller.media.const import MediaControllerType
 from measure.powermeter.const import PowerMeterType
+
+_LOGGER = logging.getLogger("measure")
 
 
 class MeasureConfig:
@@ -93,6 +96,10 @@ class MeasureConfig:
         return round(32 / self.hs_sat_precision)
 
     @property
+    def effect_bri_steps(self) -> int:
+        return config("EFFECT_BRI_STEPS", default=40, cast=int)
+
+    @property
     def selected_light_controller(self) -> LightControllerType:
         return config(
             "LIGHT_CONTROLLER",
@@ -117,10 +124,19 @@ class MeasureConfig:
         )
 
     @property
+    def selected_fan_controller(self) -> FanControllerType:
+        return config(
+            "FAN_CONTROLLER",
+            cast=Choices([t.value for t in FanControllerType]),
+            default=FanControllerType.HASS.value,
+        )
+
+    @property
     def selected_power_meter(self) -> PowerMeterType:
         return config(
             "POWER_METER",
             cast=Choices([t.value for t in PowerMeterType]),
+            default=PowerMeterType.HASS.value,
         )
 
     @property
@@ -129,7 +145,7 @@ class MeasureConfig:
 
     @property
     def sleep_initial(self) -> int:
-        return 10
+        return config("SLEEP_INITIAL", default=10, cast=int)
 
     @property
     def sleep_standby(self) -> int:
@@ -156,6 +172,14 @@ class MeasureConfig:
         return config("SLEEP_TIME_CT", default=10, cast=int)
 
     @property
+    def measure_time_effect(self) -> int:
+        return config("MEASURE_TIME_EFFECT", default=10, cast=int)
+
+    @property
+    def sleep_time_effect_change(self) -> int:
+        return config("SLEEP_TIME_EFFECT_CHANGE", default=5, cast=int)
+
+    @property
     def sleep_time_nudge(self) -> float:
         return config("SLEEP_TIME_NUDGE", default=10, cast=float)
 
@@ -180,9 +204,14 @@ class MeasureConfig:
     @property
     def selected_measure_type(self) -> str | None:
         try:
-            return MeasureType(config("SELECTED_DEVICE_TYPE", default=config("SELECTED_MEASURE_TYPE")))
+            return MeasureType(config("SELECTED_MEASURE_TYPE"))
         except UndefinedValueError:
-            return None
+            try:
+                # Log deprecation warning
+                _LOGGER.warning("'SELECTED_DEVICE_TYPE' is deprecated. Use 'SELECTED_MEASURE_TYPE' instead.")
+                return MeasureType(config("SELECTED_DEVICE_TYPE"))
+            except UndefinedValueError:
+                return None
 
     @property
     def resume(self) -> bool:

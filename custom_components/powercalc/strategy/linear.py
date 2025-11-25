@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import logging
 from decimal import Decimal
+import logging
 from typing import Any
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
-from homeassistant.components import fan, light, media_player
+from homeassistant.components import fan, lawn_mower, light, media_player, vacuum
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.components.media_player import (
@@ -14,10 +12,14 @@ from homeassistant.components.media_player import (
     ATTR_MEDIA_VOLUME_MUTED,
     STATE_PLAYING,
 )
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
+import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.event import TrackTemplate
+import voluptuous as vol
 
-from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
     CONF_CALIBRATE,
     CONF_GAMMA_CURVE,
@@ -25,10 +27,11 @@ from custom_components.powercalc.const import (
     CONF_MIN_POWER,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.helpers import get_related_entity_by_device_class
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
-ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN]
+ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN, vacuum.DOMAIN, lawn_mower.DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
@@ -41,6 +44,12 @@ CONFIG_SCHEMA = vol.Schema(
         vol.Optional(CONF_ATTRIBUTE): cv.string,
     },
 )
+
+ENTITY_ATTRIBUTE_MAPPING = {
+    fan.DOMAIN: ATTR_PERCENTAGE,
+    light.DOMAIN: ATTR_BRIGHTNESS,
+    media_player.DOMAIN: ATTR_MEDIA_VOLUME_LEVEL,
+}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -55,14 +64,23 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     ) -> None:
         self._config = config
         self._hass = hass
-        self._source_entity = source_entity
+        self._source_entity: SourceEntity = source_entity
+        self._value_entity: SourceEntity | None = None
+        self._attribute: str | None = None
         self._standby_power = standby_power
+        self._initialized: bool = False
         self._calibration: list[tuple[int, float]] | None = None
+
+    async def initialize(self) -> None:
+        """Initialize the strategy, called once on creation."""
+        self._value_entity = await self.get_value_entity()
+        self._calibration = self.create_calibrate_list()
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate the current power consumption."""
-        if self._calibration is None:
-            self._calibration = self.create_calibrate_list()
+        if not self._initialized:
+            self._attribute = self.get_attribute(entity_state)
+            self._initialized = True
 
         value = self.get_current_state_value(entity_state)
         if value is None:
@@ -75,7 +93,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         _LOGGER.debug(
             "%s: Linear mode state value: %d range(%d-%d)",
-            self._source_entity.entity_id,
+            self._value_entity.entity_id,  # type: ignore
             value,
             min_value,
             max_value,
@@ -95,6 +113,12 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         return Decimal(power)
 
+    def is_enabled(self, entity_state: State) -> bool:
+        """Return if this strategy is enabled based on entity state."""
+        if self._source_entity.domain == media_player.DOMAIN and entity_state.state is not STATE_PLAYING:  # noqa: SIM103
+            return False
+        return True
+
     def get_min_calibrate(self, value: int) -> tuple[int, float]:
         """Get closest lower value from calibration table."""
         return min(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
@@ -108,6 +132,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         calibration_list: list[tuple[int, float]] = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
+        if isinstance(calibrate, dict):
+            calibrate = [f"{key} -> {value}" for key, value in calibrate.items()]
+
         if calibrate is None or len(calibrate) == 0:
             full_range = self.get_entity_value_range()
             min_value = full_range[0]
@@ -127,40 +154,25 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def get_entity_value_range(self) -> tuple:
         """Get the min/max range for a given entity domain."""
-        if self._source_entity.domain == fan.DOMAIN:
-            return 0, 100
-
-        if self._source_entity.domain == light.DOMAIN:
+        if self._value_entity.domain == light.DOMAIN:  # type: ignore
             return 0, 255
 
-        if self._source_entity.domain == media_player.DOMAIN:
-            return 0, 100
-        raise StrategyConfigurationError(
-            "Unsupported domain for linear strategy",
-        )  # pragma: no cover
+        return 0, 100
 
     def get_current_state_value(self, entity_state: State) -> int | None:
         """Get the current entity state, i.e. selected brightness."""
-        attribute = self.get_attribute(entity_state)
-        if attribute:
-            value: int | None = entity_state.attributes.get(attribute)
-            if value is None:
-                _LOGGER.warning(
-                    "No %s attribute for entity: %s",
-                    attribute,
-                    entity_state.entity_id,
+        if self._attribute:
+            return self.get_value_from_attribute(entity_state)
+
+        if self._value_entity.entity_id is not self._source_entity.entity_id:  # type: ignore
+            # If the value entity is different from the source entity, we need to fetch the state of the value entity
+            entity_state = self._hass.states.get(self._value_entity.entity_id)  # type: ignore
+            if not entity_state:
+                _LOGGER.error(
+                    "Value entity %s not found",
+                    self._value_entity.entity_id,  # type: ignore
                 )
                 return None
-            if attribute == ATTR_BRIGHTNESS and value > 255:
-                value = 255
-            # Convert volume level to 0-100 range
-            if attribute == ATTR_MEDIA_VOLUME_LEVEL:
-                if entity_state.state != STATE_PLAYING:
-                    return None
-                if entity_state.attributes.get(ATTR_MEDIA_VOLUME_MUTED) is True:
-                    value = 0
-                value *= 100
-            return value
 
         try:
             return int(float(entity_state.state))
@@ -171,22 +183,31 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             )
             return None
 
+    def get_value_from_attribute(self, entity_state: State) -> int | None:
+        value: int | None = entity_state.attributes.get(self._attribute)  # type: ignore[arg-type]
+        if value is None:
+            _LOGGER.warning(
+                "No %s attribute for entity: %s",
+                self._attribute,
+                entity_state.entity_id,
+            )
+            return None
+        if self._attribute == ATTR_BRIGHTNESS and value > 255:
+            value = 255
+        # Convert volume level to 0-100 range
+        if self._attribute == ATTR_MEDIA_VOLUME_LEVEL:
+            if entity_state.attributes.get(ATTR_MEDIA_VOLUME_MUTED) is True:
+                value = 0
+            value *= 100
+        return value
+
     def get_attribute(self, entity_state: State) -> str | None:
-        """Returns the attribute which needs to be read for the linear calculation."""
+        """Returns the attribute which contains the value for the linear calculation."""
         if CONF_ATTRIBUTE in self._config:
             return str(self._config.get(CONF_ATTRIBUTE))
 
-        entity_domain = entity_state.domain  # type: ignore[attr-defined]
-        if entity_domain == light.DOMAIN:
-            return ATTR_BRIGHTNESS
-
-        if entity_domain == fan.DOMAIN:
-            return ATTR_PERCENTAGE
-
-        if entity_domain == media_player.DOMAIN:
-            return ATTR_MEDIA_VOLUME_LEVEL
-
-        return None
+        entity_domain = entity_state.domain
+        return ENTITY_ATTRIBUTE_MAPPING.get(entity_domain)
 
     async def validate_config(self) -> None:
         """Validate correct setup of the strategy."""
@@ -211,3 +232,28 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                 "Max power cannot be lower than min power",
                 "linear_min_higher_as_max",
             )
+
+    async def get_value_entity(self) -> SourceEntity:
+        """Set the value entity based on the current state."""
+        if self._source_entity.domain in (vacuum.DOMAIN, lawn_mower.DOMAIN) and self._attribute is None and self._source_entity.entity_entry:
+            # For vacuum cleaner and lawn mower, battery level is a separate entity
+            related_entity = get_related_entity_by_device_class(
+                self._hass,
+                self._source_entity.entity_entry,
+                SensorDeviceClass.BATTERY,
+            )
+            if not related_entity:
+                raise StrategyConfigurationError(
+                    "No battery entity found for vacuum cleaner",
+                    "linear_no_battery_entity",
+                )
+            return await create_source_entity(related_entity, self._hass)
+
+        return self._value_entity or self._source_entity
+
+    def get_entities_to_track(self) -> list[str | TrackTemplate]:
+        """Return entities to track for this strategy."""
+        if self._value_entity and self._value_entity.entity_id != self._source_entity.entity_id:
+            return [self._value_entity.entity_id]
+
+        return []

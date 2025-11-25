@@ -4,9 +4,10 @@ import os
 from typing import Any
 
 import inquirer
-from phue import Bridge, PhueRegistrationException
+from phue import Bridge, PhueRegistrationException, PhueRequestTimeout
 
 from measure.const import PROJECT_DIR
+from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
 from measure.controller.light.errors import LightControllerError, ModelNotDiscoveredError
 
@@ -24,15 +25,23 @@ class HueLightController(LightController):
 
     def change_light_state(
         self,
-        color_mode: str,
+        lut_mode: LutMode,
         on: bool = True,
-        **kwargs,  # noqa: ANN003
+        **kwargs: Any,  # noqa: ANN401
     ) -> None:
         kwargs["on"] = on
-        if self.is_group:
-            self.bridge.set_group(self.light_id, kwargs)
-        else:
-            self.bridge.set_light(self.light_id, kwargs)
+        for attempt in range(3):
+            try:
+                if self.is_group:
+                    self.bridge.set_group(self.light_id, kwargs)
+                else:
+                    self.bridge.set_light(self.light_id, kwargs)
+                return
+            except PhueRequestTimeout as e:
+                if attempt == 2:
+                    raise LightControllerError(
+                        f"Failed to set light state after 3 attempts: {e}",
+                    ) from e
 
     def get_light_info(self) -> LightInfo:
         if self.is_group:
@@ -104,3 +113,9 @@ class HueLightController(LightController):
         light_type, light_id = answers["light"].split(":")
         self.is_group = light_type == TYPE_GROUP
         self.light_id = int(light_id)
+
+    def has_effect_support(self) -> bool:
+        return False
+
+    def get_effect_list(self) -> list[str]:
+        return []

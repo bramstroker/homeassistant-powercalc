@@ -5,28 +5,28 @@ on:
   push:
     paths:
       - '**.py'
-      - 'poetry.lock'
+      - 'uv.lock'
   pull_request:
     paths:
       - '**.py'
-      - 'poetry.lock'
+      - 'uv.lock'
 
 jobs:
   mypy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Powercalc
-        uses: actions/checkout@v4
-      - uses: ./.github/workflows/poetry-composite-action
+        uses: actions/checkout@v6
+      - uses: ./.github/workflows/uv-composite-action
       - name: Run MyPy
         run: |
-          poetry run mypy ./custom_components/powercalc
+          uv run mypy ./custom_components/powercalc
   ruff:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Powercalc
-        uses: actions/checkout@v4
-      - uses: ./.github/workflows/poetry-composite-action
+        uses: actions/checkout@v6
+      - uses: ./.github/workflows/uv-composite-action
       - name: Run Ruff
         run: |
-          poetry run ruff check .
+          uv run ruff check .

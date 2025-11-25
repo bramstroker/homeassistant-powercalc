@@ -1,22 +1,23 @@
 from __future__ import annotations
 
-import logging
 from enum import StrEnum
+import logging
 from typing import Any
 
-import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_UNIQUE_ID, EVENT_HOMEASSISTANT_STARTED
 from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers.entity import Entity
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.entity_registry import EVENT_ENTITY_REGISTRY_UPDATED, EventEntityRegistryUpdatedData
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR
 from custom_components.powercalc.const import (
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_EXCLUDE_ENTITIES,
     CONF_GROUP_TRACKED_AUTO,
     CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_MAIN_POWER_SENSOR,
@@ -24,6 +25,7 @@ from custom_components.powercalc.const import (
     GroupType,
     UnitPrefix,
 )
+from custom_components.powercalc.group_include.filter import LambdaFilter
 from custom_components.powercalc.group_include.include import find_entities
 from custom_components.powercalc.sensors.abstract import (
     generate_energy_sensor_entity_id,
@@ -43,6 +45,15 @@ _LOGGER = logging.getLogger(__name__)
 class SensorType(StrEnum):
     TRACKED = "tracked"
     UNTRACKED = "untracked"
+
+
+async def find_auto_tracked_power_entities(hass: HomeAssistant, exclude_entities: set[str] | None = None) -> set[str]:
+    """Find tracked power entities."""
+    entity_filter = None
+    if exclude_entities:
+        entity_filter = LambdaFilter(lambda entity: entity.entity_id not in exclude_entities)
+    entities, _ = await find_entities(hass, entity_filter)
+    return {entity.entity_id for entity in entities if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)}
 
 
 class TrackedPowerSensorFactory:
@@ -115,8 +126,8 @@ class TrackedPowerSensorFactory:
 
         self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _start_entity_registry_listener)
 
-        entities, _ = await find_entities(self.hass)
-        return {entity.entity_id for entity in entities if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)}
+        exclude_entities = self.config.get(CONF_EXCLUDE_ENTITIES)
+        return await find_auto_tracked_power_entities(self.hass, set(exclude_entities) if exclude_entities else None)
 
     async def _handle_entity_registry_updated(
         self,
@@ -197,6 +208,7 @@ class TrackedPowerSensorFactory:
         name = generate_energy_sensor_name(self.config, sensor_type)
         entity_id = generate_energy_sensor_entity_id(self.hass, self.config, name=sensor_type, unique_id=unique_id)
         return VirtualEnergySensor(
+            hass=self.hass,
             source_entity=power_sensor.entity_id,
             entity_id=entity_id,
             name=name,

@@ -16,7 +16,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import get_test_config_dir
+from tests.common import get_test_config_dir, run_powercalc_setup
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
@@ -33,10 +33,10 @@ async def test_create_entry(hass: HomeAssistant) -> None:
         hass,
         result,
         {
-            CONF_PLAYBOOKS: {
-                "playbook1": "test.csv",
-                "playbook2": "test2.csv",
-            },
+            CONF_PLAYBOOKS: [
+                {"id": "playbook1", "path": "test.csv"},
+                {"id": "playbook2", "path": "test2.csv"},
+            ],
             CONF_REPEAT: True,
             CONF_AUTOSTART: "playbook1",
         },
@@ -48,10 +48,10 @@ async def test_create_entry(hass: HomeAssistant) -> None:
         result["data"],
         {
             CONF_PLAYBOOK: {
-                CONF_PLAYBOOKS: {
-                    "playbook1": "test.csv",
-                    "playbook2": "test2.csv",
-                },
+                CONF_PLAYBOOKS: [
+                    {"id": "playbook1", "path": "test.csv"},
+                    {"id": "playbook2", "path": "test2.csv"},
+                ],
                 CONF_REPEAT: True,
                 CONF_AUTOSTART: "playbook1",
             },
@@ -72,10 +72,10 @@ async def test_options_flow(hass: HomeAssistant) -> None:
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.PLAYBOOK,
             CONF_PLAYBOOK: {
-                CONF_PLAYBOOKS: {
-                    "playbook1": "test.csv",
-                    "playbook2": "test2.csv",
-                },
+                CONF_PLAYBOOKS: [
+                    {"id": "playbook1", "path": "test.csv"},
+                    {"id": "playbook2", "path": "test2.csv"},
+                ],
                 CONF_REPEAT: False,
                 CONF_AUTOSTART: "playbook1",
             },
@@ -85,10 +85,10 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     result = await initialize_options_flow(hass, entry, Step.PLAYBOOK)
 
     user_input = {
-        CONF_PLAYBOOKS: {
-            "playbook1": "test.csv",
-            "playbook2": "test2.csv",
-        },
+        CONF_PLAYBOOKS: [
+            {"id": "playbook1", "path": "test.csv"},
+            {"id": "playbook2", "path": "test2.csv"},
+        ],
         CONF_REPEAT: True,
         CONF_AUTOSTART: "playbook2",
     }
@@ -127,16 +127,18 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
         hass,
         result,
         {
-            CONF_PLAYBOOKS: {
-                "playbook1": "test.csv",
-                "playbook2": "test2.csv",
-            },
+            CONF_PLAYBOOKS: [
+                {"id": "playbook1", "path": "test.csv"},
+                {"id": "playbook2", "path": "test2.csv"},
+            ],
             CONF_STATE_TRIGGER: {
                 STATE_IDLE: "playbook1",
                 STATE_PLAYING: "playbook2",
             },
         },
     )
+
+    await run_powercalc_setup(hass, {})
 
     hass.states.async_set("media_player.test", STATE_IDLE)
     await hass.async_block_till_done()

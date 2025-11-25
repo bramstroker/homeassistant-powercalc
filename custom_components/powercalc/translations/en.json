@@ -1,5 +1,7 @@
 {
   "common": {
+    "source_entity": "Source entity",
+    "source_device": "Source device",
     "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
     "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
   },
@@ -60,6 +62,19 @@
         },
         "title": "Create a daily fixed sensor"
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "group_domain": {
         "data": {
           "name": "Name",
@@ -92,7 +107,6 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "power_sensor_category": "Power sensor category",
@@ -104,9 +118,21 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Discovery options",
+        "description": "Powercalc can scan your system for devices and entities that have power profiles in the built-in library. The options below let you fine-tune this behavior.",
+        "data": {
+          "enabled": "Enable discovery",
+          "exclude_device_types": "Excluded device types",
+          "exclude_self_usage": "Exclude self-usage"
+        },
+        "data_description": {
+          "exclude_device_types": "Exclude one or more specific device types from discovery.",
+          "exclude_self_usage": "Exclude self-usage profiles for smart switches."
         }
       },
       "global_configuration_energy": {
@@ -118,6 +144,20 @@
           "energy_sensor_naming": "Energy sensor name pattern",
           "energy_sensor_precision": "Energy sensor precision",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Throttling options",
+        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "data": {
+          "group_energy_update_interval": "Group energy update interval",
+          "group_power_update_interval": "Group power update interval",
+          "energy_update_interval": "Energy update interval"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
+          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
@@ -137,6 +177,7 @@
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
           "group_energy_start_at_zero": "Start at zero",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
           "hide_members": "Hide members",
@@ -151,6 +192,7 @@
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
           "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
@@ -195,6 +237,13 @@
         "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
         "title": "Select power entities"
       },
+      "group_tracked_untracked_auto": {
+        "data": {
+          "exclude_entities": "Exclude entities"
+        },
+        "description": "Exclude specific entities from the auto tracked group",
+        "title": "Auto tracked configuration"
+      },
       "library": {
         "data": {
           "confirm_autodisovered_model": "Confirm model"
@@ -202,7 +251,7 @@
         "data_description": {
           "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
         },
-        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}",
+        "description": "{source}\n\nManufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}",
         "title": "Library"
       },
       "library_multi_profile": {
@@ -272,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Toggle when you want to keep repeating the playbook after it completes",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         },
@@ -283,19 +331,21 @@
           "calculation_enabled_condition": "Calculation enabled condition",
           "energy_integration_method": "Energy integration method",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignore unavailable state",
           "multiply_factor": "Multiply factor",
           "multiply_factor_standby": "Multiply factor standby",
-          "unavailable_power": "Unavailable power",
-          "utility_meter_tariffs": "Utility meter tariffs"
+          "unavailable_power": "Unavailable power"
         },
         "data_description": {
           "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
           "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
           "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
         },
         "description": "The options below are for advanced powercalc configuration. Most users will not use this so you may skip these",
         "title": "Advanced options"
@@ -319,7 +369,7 @@
         "data": {
           "sub_profile": "Sub profile"
         },
-        "description": "This model has multiple sub profiles. Select one that suites your device",
+        "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"{remarks}",
         "title": "Sub profile config"
       },
       "smart_switch": {
@@ -396,6 +446,24 @@
     "deprecated_platform_yaml": {
       "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
       "title": "Powercalc YAML configuration has moved"
+    },
+    "legacy_config": {
+      "title": "YAML configuration changed",
+      "description": "Your YAML configuration for {type} needs to be updated to the new structure. Click learn more for further information."
+    },
+    "sub_profile": {
+      "fix_flow": {
+        "step": {
+          "sub_profile": {
+            "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"\n\nManufacturer: {manufacturer}\nModel: {model}{remarks}",
+            "title": "Select correct sub profile",
+            "data": {
+              "sub_profile": "Sub profile"
+            }
+          }
+        }
+      },
+      "title": "Sub profile selection required for {entry}"
     }
   },
   "options": {
@@ -463,6 +531,19 @@
           "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Fixed options",
         "data": {
@@ -485,7 +566,6 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "power_sensor_category": "Power sensor category",
@@ -497,9 +577,21 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Discovery options",
+        "description": "Manage discovery setting. See [documentation](https://docs.powercalc.nl/library/discovery/) for more info",
+        "data": {
+          "enabled": "Enable discovery",
+          "exclude_device_types": "Excluded device types",
+          "exclude_self_usage": "Exclude self-usage"
+        },
+        "data_description": {
+          "exclude_device_types": "Exclude one or more specific device types from discovery.",
+          "exclude_self_usage": "Exclude self-usage profiles for smart switches."
         }
       },
       "global_configuration_energy": {
@@ -512,6 +604,20 @@
           "energy_sensor_naming": "Energy sensor name pattern",
           "energy_sensor_precision": "Energy sensor precision",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Throttling options",
+        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "data": {
+          "group_energy_update_interval": "Group energy update interval",
+          "group_power_update_interval": "Group power update interval",
+          "energy_update_interval": "Energy update interval"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
+          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
@@ -530,6 +636,7 @@
           "device": "Device",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
           "hide_members": "Hide members",
@@ -541,6 +648,7 @@
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
@@ -585,6 +693,7 @@
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
+          "energy_options": "Energy options",
           "fixed": "Fixed options",
           "group_custom": "Group options",
           "group_subtract": "Group options",
@@ -640,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Toggle when you want to keep repeating the playbook after it completes",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         }
@@ -738,6 +846,10 @@
         }
       },
       "name": "Increase daily energy sensor"
+    },
+    "reload": {
+      "description": "Reload Powercalc configuration and entities",
+      "name": "Reload"
     },
     "reset_energy": {
       "description": "Reset an energy sensor to zero kWh.",

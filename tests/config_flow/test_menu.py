@@ -1,7 +1,7 @@
-import pytest
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
+import pytest
 
 from custom_components.powercalc import DOMAIN
 from custom_components.powercalc.config_flow import Step

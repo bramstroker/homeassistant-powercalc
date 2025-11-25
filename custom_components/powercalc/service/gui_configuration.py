@@ -1,7 +1,7 @@
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
+import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 
 from custom_components.powercalc import (
     CONF_CREATE_UTILITY_METERS,

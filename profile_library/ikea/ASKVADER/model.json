@@ -15,7 +15,7 @@
     "E1836",
     "On/Off plug (ASKVADER on/off switch)"
   ],
-  "only_self_usage": true,
+  "only_self_usage": false,
   "created_at": "2023-12-31T20:16:31",
   "author": "confucius78 <dekker.wj@gmail.com>"
 }

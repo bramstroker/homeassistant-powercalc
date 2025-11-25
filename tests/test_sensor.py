@@ -1,9 +1,7 @@
-import logging
 from datetime import timedelta
+import logging
 from unittest.mock import patch
 
-import homeassistant.helpers.entity_registry as er
-import pytest
 from homeassistant.components import light, sensor
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.light import (
@@ -29,10 +27,13 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
+import homeassistant.helpers.entity_registry as er
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    RegistryEntryWithDefaults,
     mock_registry,
 )
 
@@ -44,7 +45,6 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
-    CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
@@ -120,7 +120,7 @@ async def test_legacy_yaml_platform_configuration(
 
 
 async def test_utility_meter_is_created(hass: HomeAssistant) -> None:
-    """Test that utility meters are succesfully created when `create_utility_meter: true`"""
+    """Test that utility meters are successfully created when `create_utility_meter: true`"""
     await create_input_boolean(hass)
 
     await run_powercalc_setup(
@@ -342,7 +342,6 @@ async def test_can_include_autodiscovered_entity_in_group(
                 CONF_ENTITIES: [{CONF_ENTITY_ID: "light.testa"}],
             },
         ],
-        {CONF_ENABLE_AUTODISCOVERY: True},
     )
 
     assert len(caplog.records) == 0
@@ -565,7 +564,7 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
     entity_reg = mock_registry(
         hass,
         {
-            light_id: er.RegistryEntry(
+            light_id: RegistryEntryWithDefaults(
                 entity_id=light_id,
                 disabled_by=er.RegistryEntryDisabler.DEVICE,
                 unique_id="1234",
@@ -617,12 +616,12 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            original_light_id: er.RegistryEntry(
+            original_light_id: RegistryEntryWithDefaults(
                 entity_id=original_light_id,
                 unique_id=original_unique_id,
                 platform="light",
             ),
-            new_light_id: er.RegistryEntry(
+            new_light_id: RegistryEntryWithDefaults(
                 entity_id=original_light_id,
                 unique_id=new_unique_id,
                 platform="light",

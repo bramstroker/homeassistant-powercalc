@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
-from homeassistant.components import climate, vacuum
+from homeassistant.components import lawn_mower, vacuum
 from homeassistant.core import State
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
+import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_POWER, CONF_STATES_POWER
@@ -26,8 +26,8 @@ CONFIG_SCHEMA = vol.Schema(
 )
 
 STATE_BASED_ENTITY_DOMAINS = [
-    climate.DOMAIN,
     vacuum.DOMAIN,
+    lawn_mower.DOMAIN,
 ]
 
 

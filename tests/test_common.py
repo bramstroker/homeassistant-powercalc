@@ -1,8 +1,9 @@
-import pytest
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
+import pytest
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults
 
 from custom_components.powercalc import (
     CONF_CREATE_ENERGY_SENSORS,
@@ -70,7 +71,7 @@ async def test_merge_configuration(
         ),
         (
             "switch.my_switch",
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.my_switch",
                 unique_id="abc",
                 platform="switch",
@@ -81,7 +82,7 @@ async def test_merge_configuration(
         ),
         (
             "switch.my_switch",
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.my_switch",
                 unique_id="abc",
                 platform="switch",
@@ -92,6 +93,21 @@ async def test_merge_configuration(
                 name="My awesome switchy",
             ),
             "My awesome switchy",
+        ),
+        (
+            "switch.livingroom-smartplug-television",
+            RegistryEntryWithDefaults(
+                entity_id="switch.livingroom-smartplug-television",
+                unique_id="abc",
+                platform="switch",
+                has_entity_name=True,
+                name=None,
+                original_name="Television",
+            ),
+            DeviceEntry(
+                name="Livingroom-SmartPlug",
+            ),
+            "Livingroom-SmartPlug Television",
         ),
     ],
 )

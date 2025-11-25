@@ -4,14 +4,27 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from pytest_homeassistant_custom_component.common import (
+    RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
 )
 
-from custom_components.powercalc import CONF_CREATE_UTILITY_METERS, CONF_UTILITY_METER_TARIFFS, CONF_UTILITY_METER_TYPES, SensorType
+from custom_components.powercalc import (
+    CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_UTILITY_METER_TARIFFS,
+    CONF_UTILITY_METER_TYPES,
+    SensorType,
+)
 from custom_components.powercalc.config_flow import Step
+from custom_components.powercalc.const import (
+    CONF_ENERGY_FILTER_OUTLIER_ENABLED,
+    CONF_ENERGY_FILTER_OUTLIER_MAX,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
+    UnitPrefix,
+)
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -31,6 +44,10 @@ async def test_real_power(hass: HomeAssistant) -> None:
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
+
+    # Submit energy options step
+    assert result["step_id"] == Step.ENERGY_OPTIONS
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
 
     # Submit utility meter options step with default settings
     result = await hass.config_entries.flow.async_configure(
@@ -54,7 +71,7 @@ async def test_energy_sensor_is_bound_to_power_device(hass: HomeAssistant) -> No
     entity_registry = mock_registry(
         hass,
         {
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="123",
                 platform="sensor",
@@ -84,6 +101,10 @@ async def test_energy_sensor_is_bound_to_power_device(hass: HomeAssistant) -> No
             CONF_CREATE_UTILITY_METERS: False,
         },
     )
+
+    # Submit energy options step
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
     config_entry: ConfigEntry = result["result"]
@@ -130,6 +151,37 @@ async def test_real_power_options(hass: HomeAssistant) -> None:
     assert state.attributes.get("source") == "sensor.my_new_real_power"
 
 
+async def test_energy_options_flow(hass: HomeAssistant) -> None:
+    """Test energy options flow."""
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_NAME: "Some name",
+            CONF_ENTITY_ID: "sensor.my_real_power",
+            CONF_SENSOR_TYPE: SensorType.REAL_POWER,
+            CONF_CREATE_UTILITY_METERS: False,
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.ENERGY_OPTIONS)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
+            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
+            CONF_ENERGY_FILTER_OUTLIER_ENABLED: True,
+            CONF_ENERGY_FILTER_OUTLIER_MAX: 2000,
+        },
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_ENERGY_INTEGRATION_METHOD] == ENERGY_INTEGRATION_METHOD_TRAPEZODIAL
+    assert entry.data[CONF_ENERGY_SENSOR_UNIT_PREFIX] == UnitPrefix.KILO
+    assert entry.data[CONF_ENERGY_FILTER_OUTLIER_ENABLED]
+    assert entry.data[CONF_ENERGY_FILTER_OUTLIER_MAX] == 2000
+
+
 async def test_attach_to_custom_device(hass: HomeAssistant) -> None:
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/2046"""
 
@@ -139,7 +191,7 @@ async def test_attach_to_custom_device(hass: HomeAssistant) -> None:
     entity_registry = mock_registry(
         hass,
         {
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="123",
                 platform="sensor",
@@ -171,6 +223,9 @@ async def test_attach_to_custom_device(hass: HomeAssistant) -> None:
         },
     )
 
+    # Submit energy options step
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
     await hass.async_block_till_done()
 
     energy_sensor_entry = entity_registry.async_get("sensor.test_energy")
@@ -188,6 +243,9 @@ async def test_no_error_is_raised_when_device_not_exists(hass: HomeAssistant) ->
         },
     )
 
+    # Submit energy options step
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_energy")
@@ -204,6 +262,9 @@ async def test_create_utility_meter_tariff_sensors(hass: HomeAssistant) -> None:
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
+
+    # Submit energy options step
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.UTILITY_METER_OPTIONS

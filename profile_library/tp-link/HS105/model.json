@@ -1,0 +1,13 @@
+{
+  "measure_description": "Manually measured and used a dummy load of 0.5W since the KP125M doesn't detect loads of less than 0.5W.",
+  "measure_method": "manual",
+  "measure_device": "TP-Link Kasa KP125M",
+  "name": "TP-Link Kasa Smart WiFi Plug Mini",
+  "standby_power": 0.23,
+  "standby_power_on": 0.72,
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "only_self_usage": false,
+  "created_at": "2025-01-21T10:00:00",
+  "author": "Thiago Oliveira <infratl@gmail.com>"
+}

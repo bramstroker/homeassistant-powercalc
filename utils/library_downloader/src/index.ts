@@ -1,8 +1,8 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+import express, {Express, Request, Response, NextFunction} from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import apicache from "apicache";
-import { Octokit } from "@octokit/rest";
+import {Octokit} from "@octokit/rest";
 import pino from "pino";
 import promClient from "prom-client";
 import promBundle from "express-prom-bundle";
@@ -21,7 +21,7 @@ const defaultBranch = process.env.REPO_BRANCH || "master"
 const app: Express = express();
 const logger = pino(
     {
-        level: logLevel
+      level: logLevel
     }
 );
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
@@ -47,15 +47,20 @@ let promDownloadCounter = new promClient.Counter({
 promClient.register.registerMetric(promDownloadCounter);
 
 const metricsMiddleware = promBundle({
-    autoregister: false,
-    includeMethod: true,
-    includePath: true,
-    includeStatusCode: true,
-    includeUp: true,
+  autoregister: false,
+  includeMethod: true,
+  includePath: true,
+  includeStatusCode: true,
+  includeUp: true,
 });
 app.use(metricsMiddleware)
 
 app.use(cors())
+
+app.use((req, res, next) => {
+  console.log(`Request received: ${req.method} ${req.url}`);
+  next();
+});
 
 // API cache middleware
 apicache.options({
@@ -83,17 +88,17 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
 
 const getRepository: (req: Request) => Repository = (req: Request) => {
   const repositoryHeader = req.header("X-Powercalc-Repository")
-    if (repositoryHeader) {
-        const parts = repositoryHeader.split("/")
+  if (repositoryHeader) {
+    const parts = repositoryHeader.split("/")
 
-        return {
-            owner: parts[0],
-            repo: parts[1],
-            branch: parts[2],
-            path: parts.slice(3).join('/')
-        }
+    return {
+      owner: parts[0],
+      repo: parts[1],
+      branch: parts[2],
+      path: parts.slice(3).join('/')
     }
-    return { owner: defaultOwner, repo: defaultRepo, path: defaultPath, branch: defaultBranch }
+  }
+  return {owner: defaultOwner, repo: defaultRepo, path: defaultPath, branch: defaultBranch}
 };
 
 const getRawBaseUri: (repository: Repository) => string = (repository: Repository) => {
@@ -101,123 +106,123 @@ const getRawBaseUri: (repository: Repository) => string = (repository: Repositor
 }
 
 app.get(
-  "/download/:manufacturer/:model",
-  cache("1 hour"),
-  async (req: Request, res: Response) => {
-    const octokit = new Octokit({
-      auth: githubToken,
-    });
-    const manufacturer = req.params.manufacturer;
-    const model = req.params.model;
-    if (!manufacturer || !model) {
-      logger.error(
-        "Manufacturer %s or model %s not provided",
-        manufacturer,
-        model
-      );
-      res.status(422).json({ message: "No manufacturer or model provided" });
-      return;
-    }
-
-    const repository = getRepository(req)
-    logger.debug("Repository: %s/%s/%s", repository.owner, repository.repo, repository.path)
-
-    const fetchContents = async (
-      path: string,
-      newPath: string | null = null,
-    ): Promise<LibraryFile[]> => {
-      if (newPath === null) {
-        newPath = path;
-      }
-
-      let { data } = await octokit.repos.getContent({
-        owner: repository.owner,
-        repo: repository.repo,
-        path: newPath,
-        ref: repository.branch
+    "/download/:manufacturer/:model",
+    cache("1 hour"),
+    async (req: Request, res: Response) => {
+      const octokit = new Octokit({
+        auth: githubToken,
       });
-
-      if (!Array.isArray(data)) {
-        data = [data]
-      }
-
-      const subContents = await Promise.all(
-        data.map(async (item): Promise<LibraryFile[]> => {
-          logger.debug(item.type)
-          if (item.type === "file") {
-            if (!item.path.startsWith(path)) {
-                throw new Error("No match found.");
-            }
-            const modifiedPath = item.path.substring(path.length + 1);
-            return [{ path: modifiedPath, url: item.download_url ?? "" }];
-          } else if (item.type === "symlink") {
-            const target = item.target
-            return await fetchContents(target.replace("../", repository.path + "/"))
-          } else if (item.type === "dir") {
-            const newPath = `${path}/${item.name}`;
-            return await fetchContents(path, newPath);
-          } else {
-            return [];
-          }
-        })
-      );
-
-      return subContents.flat();
-    };
-
-    const labels = { manufacturer: manufacturer, model: model };
-
-    try {
-      const libraryPath = repository.path;
-      const pattern = req.query.includePlots ? '.*' : '^(?!.*\.png$).*'
-      let files = await fetchContents(
-        libraryPath + "/" + manufacturer + "/" + model
-      );
-      files = files.filter((item) => new RegExp(pattern).test(item.path))
-      if (files.length === 0) {
-        logger.error("No data found for: %s/%s", manufacturer, model);
-        res.status(404).json({ message: "No download url's found" });
+      const manufacturer = req.params.manufacturer;
+      const model = req.params.model;
+      if (!manufacturer || !model) {
+        logger.error(
+            "Manufacturer %s or model %s not provided",
+            manufacturer,
+            model
+        );
+        res.status(422).json({message: "No manufacturer or model provided"});
         return;
       }
-      logger.info("Data successfully retrieved for %s/%s", manufacturer, model);
-      promDownloadCounter.inc(labels);
-      res.json(files);
-    } catch (error) {
-      logger.error("Error fetching data: %s", error);
-      logger.error("Model not found %s/%s", manufacturer, model);
-      res
-        .status(404)
-        .json({ message: "Model not found %s/%s", manufacturer, model });
+
+      const repository = getRepository(req)
+      logger.debug("Repository: %s/%s/%s", repository.owner, repository.repo, repository.path)
+
+      const fetchContents = async (
+          path: string,
+          newPath: string | null = null,
+      ): Promise<LibraryFile[]> => {
+        if (newPath === null) {
+          newPath = path;
+        }
+
+        let {data} = await octokit.repos.getContent({
+          owner: repository.owner,
+          repo: repository.repo,
+          path: newPath,
+          ref: repository.branch
+        });
+
+        if (!Array.isArray(data)) {
+          data = [data]
+        }
+
+        const subContents = await Promise.all(
+            data.map(async (item): Promise<LibraryFile[]> => {
+              logger.debug(item.type)
+              if (item.type === "file") {
+                if (!item.path.startsWith(path)) {
+                  throw new Error("No match found.");
+                }
+                const modifiedPath = item.path.substring(path.length + 1);
+                return [{path: modifiedPath, url: item.download_url ?? ""}];
+              } else if (item.type === "symlink") {
+                const target = (item as any).target
+                return await fetchContents(target.replace("../", repository.path + "/"))
+              } else if (item.type === "dir") {
+                const newPath = `${path}/${item.name}`;
+                return await fetchContents(path, newPath);
+              } else {
+                return [];
+              }
+            })
+        );
+
+        return subContents.flat();
+      };
+
+      const labels = {manufacturer: manufacturer, model: model};
+
+      try {
+        const libraryPath = repository.path;
+        const pattern = req.query.includePlots ? '.*' : '^(?!.*\.png$).*'
+        let files = await fetchContents(
+            libraryPath + "/" + manufacturer + "/" + model
+        );
+        files = files.filter((item) => new RegExp(pattern).test(item.path))
+        if (files.length === 0) {
+          logger.error("No data found for: %s/%s", manufacturer, model);
+          res.status(404).json({message: "No download url's found"});
+          return;
+        }
+        logger.info("Data successfully retrieved for %s/%s", manufacturer, model);
+        promDownloadCounter.inc(labels);
+        res.json(files);
+      } catch (error) {
+        logger.error("Error fetching data: %s", error);
+        logger.error("Model not found %s/%s", manufacturer, model);
+        res
+            .status(404)
+            .json({message: "Model not found %s/%s", manufacturer, model});
+      }
     }
-  }
 );
 
 app.get("/profile/:manufacturer/:model", cache("1 hour"), async (req: Request, res: Response) => {
   const repository = getRepository(req)
 
   const manufacturer = req.params.manufacturer;
-    const model = req.params.model;
-    if (!manufacturer || !model) {
-      logger.error(
+  const model = req.params.model;
+  if (!manufacturer || !model) {
+    logger.error(
         "Manufacturer %s or model %s not provided",
         manufacturer,
         model
-      );
-      res.status(422).json({ message: "No manufacturer or model provided" });
-      return;
-    }
+    );
+    res.status(422).json({message: "No manufacturer or model provided"});
+    return;
+  }
 
-    const url = getRawBaseUri(repository) + '/' + manufacturer + '/' + model + '/model.json';
-    logger.debug("Fetching profile: %s/%s", manufacturer, model);
+  const url = getRawBaseUri(repository) + '/' + manufacturer + '/' + model + '/model.json';
+  logger.debug("Fetching profile: %s/%s", manufacturer, model);
 
-    try {
-      const resp = await fetch(url);
-      res.set('Cache-Control', 'public, max-age=3600');
-      res.json(await resp.json());
-    } catch (error) {
-      logger.error("Error fetching profile: %s", error);
-      res.status(404).json({ message: "Could not find profile" });
-    }
+  try {
+    const resp = await fetch(url);
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.json(await resp.json());
+  } catch (error) {
+    logger.error("Error fetching profile: %s", error);
+    res.status(404).json({message: "Could not find profile"});
+  }
 });
 
 app.get("/library", cache("1 hour"), async (req: Request, res: Response) => {
@@ -231,7 +236,30 @@ app.get("/library", cache("1 hour"), async (req: Request, res: Response) => {
     res.json(await resp.json());
   } catch (error) {
     logger.error("Error fetching library: %s", error);
-    res.status(500).json({ message: "Error fetching library" });
+    res.status(500).json({message: "Error fetching library"});
+  }
+});
+
+app.get("/manufacturer/:manufacturer", cache("1 hour"), async (req: Request, res: Response) => {
+  const repository = getRepository(req)
+
+  const manufacturer = req.params.manufacturer;
+  if (!manufacturer) {
+    logger.error("Manufacturer not provided");
+    res.status(422).json({message: "No manufacturer provided"});
+    return;
+  }
+
+  const url = getRawBaseUri(repository) + '/' + manufacturer + '/manufacturer.json';
+  logger.debug("Fetching manufacturer: %s", manufacturer);
+
+  try {
+    const resp = await fetch(url);
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.json(await resp.json());
+  } catch (error) {
+    logger.error("Error fetching manufacturer: %s", error);
+    res.status(404).json({message: "Could not find manufacturer"});
   }
 });
 

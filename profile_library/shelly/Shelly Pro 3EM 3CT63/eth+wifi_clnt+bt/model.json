@@ -1,0 +1,7 @@
+{
+  "measure_description": "The device measured with Ethernet port, Wifi client and BlueTooth enabled. Other interfaces were disabled",
+  "name": "Eth + WiFi Client + BT",
+  "standby_power": 1.3395,
+  "created_at": "2024-01-03T20:07:00 CET",
+  "author": "Michal Bartak <maxym.srpl@gmail.com>"
+}

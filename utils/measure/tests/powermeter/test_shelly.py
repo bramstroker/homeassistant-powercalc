@@ -1,8 +1,8 @@
 from unittest.mock import patch
 
-import pytest
 from measure.powermeter.errors import ApiConnectionError
 from measure.powermeter.shelly import ShellyPowerMeter
+import pytest
 from requests import RequestException
 
 from ..conftest import MockRequestsGetFactory  # noqa

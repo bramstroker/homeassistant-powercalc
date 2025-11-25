@@ -43,3 +43,9 @@ It does that by playing pink noise at different volumes and measuring the power 
 After starting the measure tool, select `Smart speaker` in the first step of the wizard.
 
 The process will take less than 5 minutes to complete.
+
+!!! note
+
+    Amazon Alexa devices do not support streaming pink noise MP3 directly. To circumvent this you can manually stream pink noise using Spotify or any other streaming service.
+    For Spotify you can use: https://open.spotify.com/track/1H6TQatZRjQ4edzz0jsOqk?si=3ba2040261054fca
+    Make sure to disable streaming in the measure tool, you can select this in the wizard.

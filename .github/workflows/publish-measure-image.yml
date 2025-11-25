@@ -4,15 +4,18 @@ on:
   push:
     branches:
       - 'master'
+    paths:
+      - 'utils/measure/**'
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Get version
         id: version
         uses: home-assistant/actions/helpers/version@master

@@ -8,7 +8,16 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The full name"
+      "description": "The directory name",
+      "deprecated": true
+    },
+    "full_name": {
+      "type": "string",
+      "description": "The full vendor/brand name"
+    },
+    "dir_name": {
+      "type": "string",
+      "description": "The directory name"
     },
     "aliases": {
       "type": "array",
