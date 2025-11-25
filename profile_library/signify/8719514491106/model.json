@@ -10,5 +10,6 @@
     "VERSION": "v1.17.2:docker"
   },
   "name": "Philips Hue White Ambiance E14 Luster/Tropfenform",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "device_type": light
 }
