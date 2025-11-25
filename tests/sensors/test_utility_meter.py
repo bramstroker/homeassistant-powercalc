@@ -1,9 +1,7 @@
-import logging
 from datetime import timedelta
+import logging
 from unittest.mock import patch
 
-import homeassistant.util.dt as dt_util
-import pytest
 from freezegun import freeze_time
 from homeassistant.components import utility_meter
 from homeassistant.components.sensor import SensorDeviceClass
@@ -17,11 +15,14 @@ from homeassistant.components.utility_meter.sensor import (
 )
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_ENTITY_ID, CONF_NAME, UnitOfEnergy
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
+import homeassistant.util.dt as dt_util
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
 )
@@ -124,19 +125,19 @@ async def test_utility_meter_is_not_created_twice(
     entity_registry = mock_registry(
         hass,
         {
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="1234",
                 name="Test power",
                 platform="powercalc",
             ),
-            energy_sensor_id: RegistryEntry(
+            energy_sensor_id: RegistryEntryWithDefaults(
                 entity_id=energy_sensor_id,
                 unique_id="1234_energy",
                 name="Test energy",
                 platform="powercalc",
             ),
-            utility_meter_id: RegistryEntry(
+            utility_meter_id: RegistryEntryWithDefaults(
                 entity_id=utility_meter_id,
                 unique_id="1234_energy_daily",
                 name="Test energy daily",
@@ -176,11 +177,13 @@ async def test_rounding_digits(hass: HomeAssistant) -> None:
     """Test that the rounding digits configuration `energy_sensor_precision` is respected."""
     await create_mocked_virtual_power_sensor_entry(
         hass,
+        unique_id="1234",
         extra_config={
             CONF_CREATE_UTILITY_METERS: True,
             CONF_ENERGY_SENSOR_PRECISION: 2,
         },
     )
+
     hass.states.async_set("sensor.test_energy", 1, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})
     await hass.async_block_till_done()
 
@@ -193,6 +196,11 @@ async def test_rounding_digits(hass: HomeAssistant) -> None:
             force_update=True,
         )
         await hass.async_block_till_done()
+
+    entity_registry = er.async_get(hass)
+    registry_entry = entity_registry.async_get("sensor.test_energy_daily")
+    assert registry_entry
+    assert registry_entry.options == {"sensor": {"suggested_display_precision": 2}}
 
     state = hass.states.get("sensor.test_energy_daily")
     assert state
@@ -214,21 +222,21 @@ async def test_regression(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="29742725-6F34-49F2-91DE-589951306E9F",
                 name="Test power",
                 platform="sensor",
                 device_id=device_id,
             ),
-            power_sensor2_id: RegistryEntry(
+            power_sensor2_id: RegistryEntryWithDefaults(
                 entity_id=power_sensor_id,
                 unique_id="A1CBB81F-A958-482B-A10E-1DAA0652796A",
                 name="Test power2",
                 platform="sensor",
                 device_id=device_id,
             ),
-            energy_sensor_id: RegistryEntry(
+            energy_sensor_id: RegistryEntryWithDefaults(
                 entity_id=energy_sensor_id,
                 unique_id="4FA9B62F-E957-4366-B7DA-832C1D5F742D",
                 name="Test energy",

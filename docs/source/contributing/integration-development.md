@@ -31,25 +31,32 @@ So it's highly recommended to use the tests to verify your changes. See the [Run
 
 ## Running the tests
 
-In order to run the tests, you need to install the dependencies. You can do this by running the following command:
+In order to run the tests, you need to install the dependencies.
+
+Make sure you have uv installed:
 
 ```bash
-poetry env use 3.13
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Next install dependencies and enable virtual environment.
+
+```bash
+uv sync --locked --extra=dev
 tests/setup.sh
-poetry install --no-root
 ```
 
 After the dependencies are installed, you can run the tests by executing the following command:
 
 ```bash
-poetry run pytest tests/
+uv run pytest tests/
 ```
 
 We strive at 100% test coverage, so please make sure to write tests for your code.
 To check coverage you can run:
 
 ```bash
-poetry run pytest --cov custom_components.powercalc --cov-report xml:cov.xml --cov-report html tests/
+uv run pytest --cov custom_components.powercalc --cov-report xml:cov.xml --cov-report html tests/
 ```
 
 This will generate a coverage report in the `htmlcov` directory.

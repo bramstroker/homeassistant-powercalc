@@ -3,13 +3,13 @@ from __future__ import annotations
 import re
 from typing import NamedTuple
 
-import homeassistant.helpers.device_registry as dr
-import homeassistant.helpers.entity_registry as er
-import voluptuous as vol
 from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES, ColorMode
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, split_entity_id
+import homeassistant.helpers.device_registry as dr
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.template import is_number
+import voluptuous as vol
 
 from .const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -95,10 +95,14 @@ def get_wrapped_entity_name(
 ) -> str:
     """Construct entity name based on the wrapped entity"""
     if entity_entry:
-        if entity_entry.name is None and entity_entry.has_entity_name and device_entry:
-            return device_entry.name_by_user or device_entry.name or object_id
+        if entity_entry.name:
+            return entity_entry.name
+        if entity_entry.has_entity_name and device_entry:
+            device_name = device_entry.name_by_user or device_entry.name
+            if device_name:
+                return f"{device_name} {entity_entry.original_name}" if entity_entry.original_name else device_name
 
-        return entity_entry.name or entity_entry.original_name or object_id
+        return entity_entry.original_name or object_id
 
     entity_state = hass.states.get(entity_id)
     if entity_state:

@@ -1,16 +1,21 @@
 from typing import Any
 from unittest.mock import patch
 
-import pytest
-from homeassistant.const import STATE_OFF, STATE_ON
+from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_PAUSED, STATE_PLAYING
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.entity_registry import RegistryEntry
+import pytest
+from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_MODEL,
     CONF_POWER,
+    DOMAIN,
     CalculationStrategy,
 )
 from custom_components.powercalc.errors import (
@@ -24,14 +29,14 @@ from custom_components.powercalc.power_profile.power_profile import (
     PowerProfile,
     SubProfileSelector,
 )
-from tests.common import get_test_profile_dir
+from tests.common import get_test_profile_dir, run_powercalc_setup
 
 
 async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("signify", "LCA001"),
-        get_test_profile_dir("signify_LCA001"),
+        custom_directory=get_test_profile_dir("signify_LCA001"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "signify"
@@ -47,7 +52,7 @@ async def test_load_fixed_profile(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("fixed"),
+        custom_directory=get_test_profile_dir("fixed"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.FIXED
     assert power_profile.standby_power == 0.5
@@ -61,7 +66,7 @@ async def test_load_linear_profile(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("linear"),
+        custom_directory=get_test_profile_dir("linear"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LINEAR
     assert power_profile.standby_power == 0.5
@@ -75,7 +80,7 @@ async def test_load_linked_profile(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("signify", "LCA007"),
-        get_test_profile_dir("linked_profile"),
+        custom_directory=get_test_profile_dir("linked_profile"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "signify"
@@ -100,7 +105,7 @@ async def test_load_sub_profile_without_model_json(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test/a"),
-        get_test_profile_dir("sub_profile"),
+        custom_directory=get_test_profile_dir("sub_profile2"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "test"
@@ -129,10 +134,10 @@ async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
         ModelInfo("signify", "LCA007"),
     )
     assert power_profile.is_entity_domain_supported(
-        RegistryEntry(entity_id="light.test", platform="hue", unique_id="1234"),
+        RegistryEntryWithDefaults(entity_id="light.test", platform="hue", unique_id="1234"),
     )
     assert not power_profile.is_entity_domain_supported(
-        RegistryEntry(entity_id="switch.test", platform="bla", unique_id="1234"),
+        RegistryEntryWithDefaults(entity_id="switch.test", platform="bla", unique_id="1234"),
     )
 
 
@@ -142,7 +147,7 @@ async def test_hue_switch_supported_entity_domain(hass: HomeAssistant) -> None:
         ModelInfo("signify", "LOM001"),
     )
     assert power_profile.is_entity_domain_supported(
-        RegistryEntry(
+        RegistryEntryWithDefaults(
             entity_id="light.test",
             unique_id="1234",
             platform="hue",
@@ -154,10 +159,10 @@ async def test_vacuum_entity_domain_supported(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("roborock", "s6_maxv"),
-        get_test_profile_dir("vacuum"),
+        custom_directory=get_test_profile_dir("vacuum_robot"),
     )
     assert power_profile.is_entity_domain_supported(
-        RegistryEntry(
+        RegistryEntryWithDefaults(
             entity_id="vacuum.test",
             unique_id="1234",
             platform="xiaomi_miio",
@@ -169,7 +174,7 @@ async def test_light_domain_supported_for_smart_switch_device_type(hass: HomeAss
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("smart_switch"),
+        custom_directory=get_test_profile_dir("smart_switch"),
     )
     assert power_profile.is_entity_domain_supported(
         SourceEntity("light.test", "test", "light"),
@@ -180,7 +185,7 @@ async def test_discovery_does_not_break_when_unknown_device_type(hass: HomeAssis
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
-        get_test_profile_dir("unknown_device_type"),
+        custom_directory=get_test_profile_dir("unknown_device_type"),
     )
     assert not power_profile.is_entity_domain_supported(
         SourceEntity("switch.test", "test", "switch"),
@@ -191,7 +196,7 @@ async def test_sub_profile_matcher_attribute(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_match_attribute"),
+        custom_directory=get_test_profile_dir("sub_profile_match_attribute"),
     )
     selector = SubProfileSelector(
         hass,
@@ -214,7 +219,7 @@ async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_match_entity_id"),
+        custom_directory=get_test_profile_dir("sub_profile_match_entity_id"),
     )
     selector = SubProfileSelector(
         hass,
@@ -234,7 +239,7 @@ async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
     "registry_entry,expected_profile",
     [
         (
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 platform="tasmota",
                 unique_id="111",
@@ -242,7 +247,7 @@ async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
             "tasmota",
         ),
         (
-            RegistryEntry(
+            RegistryEntryWithDefaults(
                 entity_id="switch.test",
                 platform="shelly",
                 unique_id="111",
@@ -260,7 +265,7 @@ async def test_sub_profile_matcher_integration(
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_match_integration"),
+        custom_directory=get_test_profile_dir("sub_profile_match_integration"),
     )
 
     source_entity = SourceEntity(
@@ -312,7 +317,7 @@ async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("smart_switch"),
+        custom_directory=get_test_profile_dir("smart_switch"),
     )
 
     await power_profile.select_sub_profile("foo")
@@ -323,7 +328,7 @@ async def test_device_type(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
-        get_test_profile_dir("media_player"),
+        custom_directory=get_test_profile_dir("media_player"),
     )
 
     assert power_profile.device_type == DeviceType.SMART_SPEAKER
@@ -490,7 +495,7 @@ async def test_discovery_flow_remarks(hass: HomeAssistant, test_profile: str, ex
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
-        get_test_profile_dir(test_profile),
+        custom_directory=get_test_profile_dir(test_profile),
     )
 
     translations_keys = [
@@ -502,3 +507,60 @@ async def test_discovery_flow_remarks(hass: HomeAssistant, test_profile: str, ex
         return_value={key: key for key in translations_keys},
     ):
         assert power_profile.config_flow_discovery_remarks == expected_translation_key
+
+
+async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) -> None:
+    """
+    JSON data is cached for the same model. This caused the replaced `calculation_enabled_condition` to be replaced with the first entity.
+    On consequent retrievals of the same model the same condition was used, because it did not contain [[entity]] placeholder anymore.
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/3118
+    """
+    await run_powercalc_setup(hass)
+
+    entry_a = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_ENTITY_ID: "media_player.a",
+            CONF_MANUFACTURER: "sonos",
+            CONF_MODEL: "playbar",
+        },
+    )
+    entry_b = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_ENTITY_ID: "media_player.b",
+            CONF_MANUFACTURER: "sonos",
+            CONF_MODEL: "playbar",
+        },
+    )
+    await hass.config_entries.async_add(entry_a)
+    await hass.config_entries.async_add(entry_b)
+
+    hass.states.async_set("media_player.a", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 1})
+    hass.states.async_set("media_player.b", STATE_PAUSED)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.a_power").state == "26.90"
+    assert hass.states.get("sensor.b_power").state == "5.20"
+
+
+@pytest.mark.parametrize(
+    "test_profile,expected_result",
+    [
+        (
+            "sub_profile_only_default",
+            True,
+        ),
+        (
+            "sub_profile_match_integration",
+            False,
+        ),
+    ],
+)
+async def test_requires_manual_sub_profile_selection(hass: HomeAssistant, test_profile: str, expected_result: bool) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
+        ModelInfo("test", "test"),
+        custom_directory=get_test_profile_dir(test_profile),
+    )
+    assert await power_profile.requires_manual_sub_profile_selection == expected_result

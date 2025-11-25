@@ -1,12 +1,11 @@
 from typing import Any
 
-import pytest
-import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
+import pytest
+import voluptuous as vol
 
-from custom_components.powercalc import CONF_POWER
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -15,12 +14,13 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
+    CONF_POWER,
     CONF_SELF_USAGE_INCLUDED,
     CONF_SENSOR_TYPE,
     CalculationStrategy,
     SensorType,
 )
-from tests.common import get_test_config_dir
+from tests.common import get_test_config_dir, run_powercalc_setup
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
@@ -46,6 +46,8 @@ async def test_smart_switch_flow(
     user_input: dict[str, Any],
     expected_fixed_power: float,
 ) -> None:
+    await run_powercalc_setup(hass)
+
     hass.config.config_dir = get_test_config_dir()
     mock_entity_with_model_information(
         "switch.test",

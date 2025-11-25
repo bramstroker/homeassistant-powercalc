@@ -1,4 +1,6 @@
 {
-  "name": "tp-link",
-  "aliases": []
+  "name": "TP-Link",
+  "aliases": [
+    "Tapo"
+  ]
 }

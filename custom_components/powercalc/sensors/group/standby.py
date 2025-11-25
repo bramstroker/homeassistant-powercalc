@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import logging
 from decimal import Decimal
+import logging
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,

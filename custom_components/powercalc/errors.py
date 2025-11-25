@@ -6,7 +6,7 @@ from homeassistant.exceptions import HomeAssistantError
 
 
 class PowercalcSetupError(HomeAssistantError):
-    """Raised when an error occured during powercalc sensor setup."""
+    """Raised when an error occurred during powercalc sensor setup."""
 
 
 class SensorConfigurationError(PowercalcSetupError):

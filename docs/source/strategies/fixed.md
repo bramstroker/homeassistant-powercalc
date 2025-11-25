@@ -76,7 +76,7 @@ powercalc:
     Some states you cannot use as they are considered "off" for powercalc. In this case you'll need to use `standby_power`.
     The states which this applies to are `off`, `not_home`, `standby` and `unavailable`.
 
-You can also use state attributes. Use the `|` delimiter to seperate the attribute and value. Here is en example:
+You can also use state attributes. Use the `|` delimiter to separate the attribute and value. Here is en example:
 
 ```yaml
 powercalc:

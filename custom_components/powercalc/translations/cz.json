@@ -1,11 +1,13 @@
 {
   "common": {
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "source_entity": "Source entity",
+    "source_device": "Source device",
+    "remarks_smart_switch": "Tento profil poskytuje pouze hodnoty napájení v pohotovostním režimu. \n Pokud máte spotřebič, který zapnutí spotřebovává pevně dané množství energie, můžete zadat tuto hodnotu v dalším kroku v nastavení",
+    "remarks_smart_dimmer": "Tento profil poskytuje pouze hodnoty spotřeby energie v pohotovostním režimu. \n V dalším kroku můžete volitelně zadat hodnoty připojeného světla"
   },
   "config": {
     "abort": {
-      "already_configured": "Sensor is already configured, specify a unique_id"
+      "already_configured": "Senzor je již nastaven, zadejte unikátní ID"
     },
     "error": {
       "daily_energy_mandatory": "You must supply at least one of Value or Value template",
@@ -14,7 +16,7 @@
       "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
       "group_mandatory": "You must define at least subgroups or power and energy-entities",
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
+      "linear_min_higher_as_max": "Maximální spotřeba nebůže být nižší, nežli minimální spotřeba",
       "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
       "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
       "lut_wrong_domain": "Only light entities can use the LUT mode",
@@ -25,13 +27,13 @@
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Vybrat skupinu(y)",
+          "new_group": "Nová skupina"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Pro vytvoření nové skupiny zadejte název skupiny"
         },
-        "title": "Assign to group"
+        "title": "Přiřadit do skupiny"
       },
       "availability_entity": {
         "data": {
@@ -47,26 +49,39 @@
         "data": {
           "create_utility_meters": "Create utility meters",
           "name": "Název",
-          "on_time": "On time",
+          "on_time": "V čase",
           "start_time": "Start time",
           "unit_of_measurement": "Jednotka měření",
-          "update_frequency": "Update frequency",
+          "update_frequency": "Frekvence aktualizace",
           "value": "Hodnota",
           "value_template": "Šablona hodnoty"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Pokud ponecháte prázdné, výchozí hodnota je 1 den. Vždy zapnuto",
+          "update_frequency": "čas v sekundách mezi aktualizacemi stavu senzoru"
         },
-        "title": "Create a daily fixed sensor"
+        "title": "Vytvořit denní fixní senzor"
+      },
+      "energy_options": {
+        "title": "Možnosti energie",
+        "data": {
+          "energy_integration_method": "Metoda integrace",
+          "energy_sensor_unit_prefix": "Předpona jednotky",
+          "energy_filter_outlier_enabled": "Filtrovat odlehlé hodnoty",
+          "energy_filter_outlier_max_step": "Maximální krok filtru odlehlých hodnot"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Povolit filtrování odlehlých hodnot v senzoru energie",
+          "energy_filter_outlier_max_step": "Maximální očekávaný krok v hodnotách výkonu (ve wattech) pro filtr odlehlých hodnot"
+        }
       },
       "group_domain": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
+          "name": "Název",
+          "create_energy_sensor": "Vytvořit senzor energie",
+          "create_utility_meters": "Vytvořit senzor spotřeby",
           "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "exclude_entities": "Vyloučit entity"
         },
         "title": "Create a domain based group sensor"
       },
@@ -77,24 +92,23 @@
           "states_power": "States power"
         },
         "data_description": {
-          "power": "A fixed power value in Watts when the entity is ON",
-          "power_template": "Template will be evaluated to get the power value in W",
+          "power": "Pevná hodnota příkonu ve wattech, když je entita zapnutá",
+          "power_template": "Šablona bude vyhodnocena pro získání hodnoty příkonu ve wattech",
           "states_power": "One 'state: power' pair on each row, see example above"
         },
-        "description": "Define a fixed power value for your entity. Alternatively you can define a power value per state. For example:\n\n`playing: 8.3`\n`paused: 2.25`",
+        "description": "Definujte fixní hodnotu příkonu pro vaši entitu. Případně můžete definovat hodnotu příkonu pro jednotlivé stavy. Například:\n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Fixed config"
       },
       "global_configuration": {
-        "title": "Global configuration",
+        "title": "Globální konfigurace",
         "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
         "data": {
           "create_energy_sensors": "Create energy sensors",
-          "create_utility_meters": "Create utility meters",
+          "create_utility_meters": "Vytvořit senzor spotřeby",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "include_non_powercalc_sensors": "Zahrnout ne-powercalc senzory",
           "power_sensor_category": "Power sensor category",
           "power_sensor_friendly_naming": "Power sensor friendly name pattern",
           "power_sensor_naming": "Power sensor name pattern"
@@ -104,9 +118,21 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Možnosti objevování",
+        "description": "Powercalc může skenovat váš systém pro zařízení a entity, které mají profily v integrované knihovně. Níže uvedené možnosti vám umožňují toto chování přizpůsobit.",
+        "data": {
+          "enabled": "Povolit objevování",
+          "exclude_device_types": "Vyloučené typy zařízení",
+          "exclude_self_usage": "Vyloučit vlastní spotřebu"
+        },
+        "data_description": {
+          "exclude_device_types": "Vyloučit jeden nebo více konkrétních typů zařízení z objevování.",
+          "exclude_self_usage": "Vyloučit profily vlastní spotřeby pro chytré spínače."
         }
       },
       "global_configuration_energy": {
@@ -116,8 +142,22 @@
           "energy_sensor_category": "Energy sensor category",
           "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
           "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_sensor_precision": "Přesnost senzoru energie",
+          "energy_sensor_unit_prefix": "Předpona jednotky senzoru energie"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Throttling options",
+        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "data": {
+          "group_energy_update_interval": "Group energy update interval",
+          "group_power_update_interval": "Group power update interval",
+          "energy_update_interval": "Energy update interval"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
+          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
@@ -136,11 +176,12 @@
           "device": "Zařízení",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
-          "group_energy_start_at_zero": "Start at zero",
+          "group_energy_start_at_zero": "Začít na nule",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
-          "hide_members": "Hide members",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "hide_members": "Skrýt členy",
+          "include_non_powercalc_sensors": "Zahrnout ne-powercalc senzory",
           "name": "Název",
           "sub_groups": "Podskupiny"
         },
@@ -151,6 +192,7 @@
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Další senzory energie (kWh) z vaší instalace HA k přidání",
           "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Další senzory energie (W) z vaší instalace HA k přidání",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
@@ -162,20 +204,20 @@
         "data": {
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "subtract_entities": "Subtract entities"
+          "entity_id": "Základní entita",
+          "name": "Název",
+          "subtract_entities": "Odečíst entity"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "Základní entita, od které se bude odečítat výkon",
+          "subtract_entities": "Vyberte všechny entity které chcete odečíst od základní entity"
         },
         "title": "Subtract group sensor"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
+          "main_power_sensor": "Senzor síťového napájení",
+          "group_tracked_auto": "Automaticky přidané entity",
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Create utility meters"
         },
@@ -195,6 +237,13 @@
         "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
         "title": "Select power entities"
       },
+      "group_tracked_untracked_auto": {
+        "data": {
+          "exclude_entities": "Exclude entities"
+        },
+        "description": "Exclude specific entities from the auto tracked group",
+        "title": "Auto tracked configuration"
+      },
       "library": {
         "data": {
           "confirm_autodisovered_model": "Potvrdit model"
@@ -202,7 +251,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Pokud se rozhodnete nepotvrzovat, pak můžete zadat výrobce a model manuálně"
         },
-        "description": "Výrobce \"{manufacturer}\" a model \"{model}\" byl automaticky detekován pro vaše zařízení.{remarks}",
+        "description": "{source}\n\nVýrobce \"{manufacturer}\" a model \"{model}\" byl automaticky detekován pro vaše zařízení.{remarks}",
         "title": "Knihovna"
       },
       "library_multi_profile": {
@@ -210,13 +259,13 @@
           "model": "Select model"
         },
         "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
-        "title": "Library"
+        "title": "Knihovna"
       },
       "linear": {
         "data": {
           "attribute": "Atribut",
           "calibrate": "Kalibrační hodnoty",
-          "gamma_curve": "Gamma curve",
+          "gamma_curve": "Gama křivka",
           "max_power": "Maximální spotřeba",
           "min_power": "Minimální spotřeba"
         },
@@ -272,7 +321,6 @@
         },
         "data_description": {
           "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Toggle when you want to keep repeating the playbook after it completes",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         },
@@ -283,19 +331,21 @@
           "calculation_enabled_condition": "Podmínka povolení výpočtu",
           "energy_integration_method": "Metoda energetické integrace",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_filter_outlier_enabled": "Energy filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step",
           "ignore_unavailable_state": "Ignorovat nedostupný stav",
           "multiply_factor": "Koeficient násobení",
           "multiply_factor_standby": "Pohotovostní koeficient násobení",
-          "unavailable_power": "Napájení není k dispozici",
-          "utility_meter_tariffs": "Utility meter tariffs"
+          "unavailable_power": "Napájení není k dispozici"
         },
         "data_description": {
           "calculation_enabled_condition": "Konfigurovaná strategie výpočtu spotřeby bude aplikováná, pouze pokud se tato šablona vyhodnotí jako true nebo 1. Jinak bude senzor zobrazovat 0",
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Přepněte toto nastavení, pokud chcete, aby byl senzor energie k dispozici i v případě, že zdrojová entita není dostupná",
           "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
           "multiply_factor_standby": "Použít multiplikační faktor na pohotovostní režim",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
         },
         "description": "Níže uvedené možnosti jsou pro pokročilou konfiguraci powercalc. Většina uživatelů je nebude používat, takže je můžete přeskočit",
         "title": "Pokročilá nastavení"
@@ -319,7 +369,7 @@
         "data": {
           "sub_profile": "Sub profile"
         },
-        "description": "This model has multiple sub profiles. Select one that suites your device",
+        "description": "This model has multiple sub profiles. Select one that suites your device\n\n\"{entity_id}\"{remarks}",
         "title": "Sub profile config"
       },
       "smart_switch": {
@@ -396,6 +446,24 @@
     "deprecated_platform_yaml": {
       "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
       "title": "Nastavení Powercalc YAML bylo přesunuto"
+    },
+    "legacy_config": {
+      "title": "Konfigurace YAML pro objevování se změnila",
+      "description": "Vaše konfigurace YAML pro {type} musí být aktualizována na novou strukturu. Klikněte na 'Další informace' pro více informací."
+    },
+    "sub_profile": {
+      "fix_flow": {
+        "step": {
+          "sub_profile": {
+            "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"\n\nManufacturer: {manufacturer}\nModel: {model}{remarks}",
+            "title": "Select correct sub profile",
+            "data": {
+              "sub_profile": "Sub profile"
+            }
+          }
+        }
+      },
+      "title": "Sub profile selection required for {entry}"
     }
   },
   "options": {
@@ -463,6 +531,19 @@
           "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
+      "energy_options": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Integration method",
+          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_filter_outlier_enabled": "Filter outliers",
+          "energy_filter_outlier_max_step": "Outlier filter max step"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+        }
+      },
       "fixed": {
         "title": "Fixed options",
         "data": {
@@ -485,7 +566,6 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "power_sensor_category": "Power sensor category",
@@ -497,9 +577,21 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Možnosti objevování",
+        "description": "Spravujte nastavení objevování. Viz [dokumentace](https://docs.powercalc.nl/library/discovery/) pro více informací",
+        "data": {
+          "enabled": "Povolit objevování",
+          "exclude_device_types": "Vyloučené typy zařízení",
+          "exclude_self_usage": "Vyloučit vlastní spotřebu"
+        },
+        "data_description": {
+          "exclude_device_types": "Vyloučit jeden nebo více konkrétních typů zařízení z objevování.",
+          "exclude_self_usage": "Vyloučit profily vlastní spotřeby pro chytré spínače."
         }
       },
       "global_configuration_energy": {
@@ -512,6 +604,20 @@
           "energy_sensor_naming": "Energy sensor name pattern",
           "energy_sensor_precision": "Energy sensor precision",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Throttling options",
+        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "data": {
+          "group_energy_update_interval": "Group energy update interval",
+          "group_power_update_interval": "Group power update interval",
+          "energy_update_interval": "Energy update interval"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
+          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
@@ -530,6 +636,7 @@
           "device": "Zařízení",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
           "hide_members": "Hide members",
@@ -541,6 +648,7 @@
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
@@ -585,6 +693,7 @@
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
+          "energy_options": "Energy options",
           "fixed": "Fixed options",
           "group_custom": "Group options",
           "group_subtract": "Group options",
@@ -640,7 +749,6 @@
         },
         "data_description": {
           "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Toggle when you want to keep repeating the playbook after it completes",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         }
@@ -738,6 +846,10 @@
         }
       },
       "name": "Increase daily energy sensor"
+    },
+    "reload": {
+      "description": "Reload Powercalc configuration and entities",
+      "name": "Reload"
     },
     "reset_energy": {
       "description": "Reset an energy sensor to zero kWh.",

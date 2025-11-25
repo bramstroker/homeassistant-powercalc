@@ -4,15 +4,18 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_FIXED, CONF_UTILITY_METER_TYPES, DATA_GROUP_ENTITIES
 from custom_components.powercalc.const import (
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_FIXED,
     CONF_GROUP_TRACKED_AUTO,
     CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_GROUP_TYPE,
     CONF_MAIN_POWER_SENSOR,
     CONF_POWER,
     CONF_SENSOR_TYPE,
+    CONF_UTILITY_METER_TYPES,
+    DATA_GROUP_ENTITIES,
     DOMAIN,
     DUMMY_ENTITY_ID,
     GroupType,

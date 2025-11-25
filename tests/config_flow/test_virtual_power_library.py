@@ -1,36 +1,33 @@
 import logging
 
-import pytest
-import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.selector import SelectSelector
+import pytest
 from pytest_homeassistant_custom_component.common import mock_device_registry
+import voluptuous as vol
 
-from custom_components.powercalc import (
+from custom_components.powercalc.common import create_source_entity
+from custom_components.powercalc.config_flow import Step
+from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_FILTER_OUTLIER_ENABLED,
     CONF_ENERGY_INTEGRATION_METHOD,
-    DEFAULT_ENERGY_INTEGRATION_METHOD,
-)
-from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.config_flow import (
-    CONF_CONFIRM_AUTODISCOVERED_MODEL,
-    Step,
-)
-from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
     CONF_SENSOR_TYPE,
     CONF_SUB_PROFILE,
     CONF_VARIABLES,
+    DEFAULT_ENERGY_INTEGRATION_METHOD,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
@@ -120,8 +117,8 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain(
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
-    assert {"value": "sonos", "label": "sonos"} not in manufacturer_options
-    assert {"value": "signify", "label": "signify"} in manufacturer_options
+    assert {"value": "sonos", "label": "Sonos"} not in manufacturer_options
+    assert {"value": "signify", "label": "Signify"} in manufacturer_options
 
 
 async def test_manufacturer_listing_is_filtered_by_entity_domain2(
@@ -141,8 +138,8 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain2(
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
-    assert {"value": "sonos", "label": "sonos"} not in manufacturer_options
-    assert {"value": "shelly", "label": "shelly"} in manufacturer_options
+    assert {"value": "sonos", "label": "Sonos"} not in manufacturer_options
+    assert {"value": "shelly", "label": "Shelly"} in manufacturer_options
 
 
 async def test_fixed_power_is_skipped_when_only_self_usage_true(hass: HomeAssistant) -> None:
@@ -215,6 +212,44 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_MANUFACTURER] == "signify"
     assert entry.data[CONF_MODEL] == "LWB010"
+
+
+async def test_change_sub_profile_options_flow(hass: HomeAssistant) -> None:
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.spots_kitchen",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "yeelight",
+            CONF_MODEL: "YLDD04YL/standard_length",
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={},
+    )
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MANUFACTURER: "yeelight"},
+    )
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MODEL: "YLDD04YL"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.SUB_PROFILE
+
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_SUB_PROFILE: "extension_5x1meter"},
+    )
+
+    assert entry.data[CONF_MANUFACTURER] == "yeelight"
+    assert entry.data[CONF_MODEL] == "YLDD04YL/extension_5x1meter"
 
 
 async def test_configured_model_populated_in_options_flow(hass: HomeAssistant) -> None:
@@ -320,6 +355,7 @@ async def test_profile_with_custom_fields(
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_ENERGY_INTEGRATION_METHOD: DEFAULT_ENERGY_INTEGRATION_METHOD,
+        CONF_ENERGY_FILTER_OUTLIER_ENABLED: False,
         CONF_ENTITY_ID: "sensor.test",
         CONF_NAME: "test",
         CONF_MANUFACTURER: "test",
@@ -343,6 +379,7 @@ async def test_sub_profiles_select_options(hass: HomeAssistant) -> None:
     result = await select_manufacturer_and_model(hass, result, "test", "sub_profile")
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.SUB_PROFILE
+    assert result["description_placeholders"]["remarks"] == "\n\nMore info\n\nBla bla\n*Bla bla*"
 
     data_schema: vol.Schema = result["data_schema"]
     sub_profile_selector: SelectSelector = data_schema.schema["sub_profile"]
@@ -360,6 +397,39 @@ async def test_sub_profiles_select_options(hass: HomeAssistant) -> None:
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
+async def test_sub_profile_selection_available_default_sub_profile(hass: HomeAssistant) -> None:
+    """
+    Test the sub profile selection is still provided to the user, even when a default sub profile is defined.
+    We only want to omit the sub profile step when matchers are defined.
+    """
+    hass.config.config_dir = get_test_config_dir()
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "switch.test"},
+    )
+    result = await select_manufacturer_and_model(hass, result, "test", "sub_profile_default")
+
+    data_schema: vol.Schema = result["data_schema"]
+    sub_profile_selector: SelectSelector = data_schema.schema["sub_profile"]
+    options = sub_profile_selector.config["options"]
+    assert options == [{"label": "Name A", "value": "a"}, {"label": "Name B", "value": "b"}]
+
+
+async def test_sub_profile_selection_omitted(hass: HomeAssistant) -> None:
+    """
+    Test the sub profile selection is omitted when matchers are defined.
+    """
+    hass.config.config_dir = get_test_config_dir()
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "switch.test"},
+    )
+    result = await select_manufacturer_and_model(hass, result, "test", "sub_profile_matchers")
+    assert result["step_id"] != Step.SUB_PROFILE
+
+
 async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
     mock_device_registry(
@@ -375,7 +445,7 @@ async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
 
     source_entity = await create_source_entity(DUMMY_ENTITY_ID, hass)
     power_profiles = [
-        await get_power_profile(hass, {}, ModelInfo("test", "discovery_type_device")),
+        await get_power_profile(hass, {}, source_entity, ModelInfo("test", "discovery_type_device")),
     ]
     result = await initialize_discovery_flow(hass, source_entity, power_profiles)
     result = await confirm_auto_discovered_model(hass, result)

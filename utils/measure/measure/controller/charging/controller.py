@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, Protocol
+from typing import Protocol
 
-import inquirer.questions
+from measure.controller.answerable_protocol import Answerable
 
 
-class ChargingController(Protocol):
+class ChargingController(Answerable, Protocol):
     def get_battery_level(self) -> int:
         """Get actual battery level of the device"""
         ...
@@ -16,12 +16,4 @@ class ChargingController(Protocol):
 
     def is_charging(self) -> bool:
         """Check if the device is currently charging"""
-        ...
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        """Get questions to ask for the chosen light controller"""
-        ...
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        """Process the answers of the questions"""
         ...

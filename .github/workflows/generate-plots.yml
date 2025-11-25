@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: ./.github/workflows/poetry-composite-action
+      - uses: ./.github/workflows/uv-composite-action
         with:
           directory: './utils/visualize'
           cache_dependencies: 'false'

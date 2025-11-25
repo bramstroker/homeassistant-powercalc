@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-05-30T11:16:31.955415",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Nous A1",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.13:docker"
+  },
+  "name": "RB249 T",
+  "standby_power": 0.35,
+  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
+}

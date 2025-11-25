@@ -3,8 +3,8 @@ from homeassistant.components import sensor
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
+from pytest_homeassistant_custom_component.common import setup_test_component_platform
 
-import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
@@ -18,6 +18,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.test.light import MockLight
+import custom_components.test.sensor as test_sensor_platform
 from tests.common import create_mock_light_entity
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
@@ -82,14 +83,14 @@ async def _create_wled_entities(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     await create_mock_light_entity(hass, light_entity)
 
-    platform: test_sensor_platform = getattr(hass.components, "test.sensor")
-    platform.init(empty=True)
-    estimated_current_entity = platform.MockSensor(
+    estimated_current_entity = test_sensor_platform.MockSensor(
         name="test_estimated_current",
         native_value="5.0",
         unique_id=DEFAULT_UNIQUE_ID,
     )
-    platform.ENTITIES[0] = estimated_current_entity
+    entities = [estimated_current_entity]
+
+    setup_test_component_platform(hass, sensor.DOMAIN, entities)
 
     assert await async_setup_component(
         hass,

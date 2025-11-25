@@ -1,5 +1,6 @@
 [project]
 name = "Powercalc"
+version = "0.1.0"
 description = "Custom Home Assistant component for virtual power sensors"
 maintainers = [
   { name = "Bram Gerritsen", email = "bgerritsen@gmail.com" },
@@ -14,12 +15,12 @@ keywords = [
 classifiers = [
   "Intended Audience :: End Users/Desktop",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
-requires-python = ">=3.13.0"
+requires-python = ">=3.13.2,<4.0"
 dependencies = ["homeassistant"]
+license = "MIT"
 
 [tool.pytest.ini_options]
 testpaths = "tests"
@@ -31,12 +32,14 @@ markers = [
 log_level = "DEBUG"
 asyncio_default_fixture_loop_scope = "function"
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components", "powercalc"]
+known-third-party = ["homeassistant"]
+force-sort-within-sections = true
+combine-as-imports = true
 
 [tool.mypy]
-python_version = "3.13"
+python_version = "3.14"
 show_error_codes = true
 follow_imports = "silent"
 local_partial_types = true
@@ -68,7 +71,7 @@ source = ["custom_components/powercalc", "utils", "tests"]
 
 [tool.ruff]
 line-length = 150
-target-version = "py313"
+target-version = "py314"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.lint]
@@ -82,42 +85,43 @@ ignore = ["S101"]
 [tool.ruff.lint.mccabe]
 max-complexity = 15
 
-[tool.poetry]
-name = "powercalc"
-version = "0.1.0"
-description = "Powercalc HA custom component"
-authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
-readme = "README.md"
+[tool.uv]
+prerelease = "allow"
+override-dependencies = [
+  "mashumaro[msgpack]==3.17",
+]
 
-[tool.poetry.group.docs]
-optional = true
+[project.optional-dependencies]
+docs = [
+    "zensical"
+]
+dev = [
+    "pre-commit>=4.0.0",
+    "ruff>=0.13.0",
+    "mypy==1.18.2",
+    "voluptuous-stubs>=0.1",
+    "homeassistant-stubs",
+    "pytest-homeassistant-custom-component==0.13.297",
+    "types-pytz>=2024.1",
+    "types-croniter>=2.0",
+    "croniter>=6.0.0",
+    "aioresponses>=0.7.6",
+    "pyturbojpeg>=1.8.2"
+]
 
-[tool.poetry.group.docs.dependencies]
-mkdocs = "*"
-mkdocs-material = "*"
-mkdocs-git-revision-date-localized-plugin = "*"
-
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^4.0.0"
-ruff = "^0.9.0"
-mypy = "1.14.1"
-numpy = "*"
-voluptuous-stubs = "^0.1"
-homeassistant-stubs = "*"
-pytest-homeassistant-custom-component = "0.13.203"
-types-pytz = "^2024.1"
-types-croniter = "^2.0"
-croniter = "^6.0.0"
-pytest-cov = "^6.0"
-# Requirements below are needed since HA 2023.9.3, not sure why
-psutil_home_assistant = "*"
-fnv_hash_fast = "*"
-cronsim = "*"
-
-[tool.poetry.dependencies]
-python = ">=3.13,<3.14"
-aioresponses = "^0.7.6"
+[tool.setuptools]
+packages = ["custom_components"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+docs = [
+    "zensical>=0.0.5",
+]
+
+[tool.codespell]
+ignore-words-list = 'hass'
+check-filenames = true
+skip = '*/translations/*.json,*/package-lock.json'

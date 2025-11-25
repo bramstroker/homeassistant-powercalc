@@ -17,16 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: plots
           path: artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
-      - name: Read PR number
-        id: read-pr-number
-        run: |
-          echo "PR_NUMBER=$(cat artifacts/pr_number.txt)" >> $GITHUB_ENV
       - name: Upload the plots to Imgur
         uses: devicons/public-upload-to-imgur@v2
         id: imgur_step
@@ -45,10 +41,11 @@ jobs:
           done
           echo 'EOF' >> $GITHUB_OUTPUT
       - name: Post Comment on PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
-            const prNumber = process.env.PR_NUMBER;
+            const fs = require('fs');
+            const prNumber = Number(fs.readFileSync('artifacts/pr_number.txt'));
             const repo = context.repo;
             const prMessage = process.env.PR_MESSAGE;
 
@@ -76,4 +73,3 @@ jobs:
             }
         env:
           PR_MESSAGE: ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
-          PR_NUMBER: ${{ env.PR_NUMBER }}

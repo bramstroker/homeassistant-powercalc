@@ -10,6 +10,9 @@
   },
   "name": "TRÅDFRI LED bulb E27 1055 lumen, smart wireless dimmable/white spectrum globe",
   "standby_power": 0.19,
+  "aliases": [
+    "TRADFRI bulb E27 WS globe 1055lm"
+  ],
   "created_at": "2023-12-28T17:44:26",
   "author": "Jari Eskelinen <jari.eskelinen@iki.fi>"
 }

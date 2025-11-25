@@ -17,13 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.13'
+          python-version: '3.14'
       - name: Install dependencies
         run: |
           python -m pip install -r ${{ github.workspace }}/.github/scripts/profile_library/requirements.txt
@@ -38,8 +38,10 @@ jobs:
           add: 'profile_library'
           message: 'Update profile library'
       - name: Purge powercalc API memory cache
+        env:
+          API_KEY: ${{ secrets.POWERCALC_API_KEY }}
         run: |
-          curl -X GET "https://api.powercalc.nl/cache/flush" -H  "Authorization: Bearer ${{ secrets.POWERCALC_API_KEY }}"
+          curl -X GET "https://api.powercalc.nl/cache/flush" -H "Authorization: Bearer $API_KEY"
       - name: Purge cloudflare cache
         uses: jakejarvis/cloudflare-purge-action@master
         env:

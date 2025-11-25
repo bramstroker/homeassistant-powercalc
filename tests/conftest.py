@@ -1,22 +1,22 @@
-import asyncio
+from collections.abc import Generator
 import json
 import os
 import shutil
-import uuid
-from collections.abc import Generator
 from typing import Any, Protocol
 from unittest.mock import AsyncMock, patch
+import uuid
 
-import pytest
 from _pytest.fixtures import SubRequest
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
+from homeassistant.helpers.entity_registry import EntityRegistry
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
 )
@@ -35,23 +35,6 @@ from tests.common import mock_area_registry
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(enable_custom_integrations: bool) -> Generator:
     yield
-
-
-@pytest.fixture(autouse=True)
-def enable_event_loop_debug(event_loop: asyncio.AbstractEventLoop) -> None:
-    """Override the fixture to disable event loop debug mode."""
-    event_loop.set_debug(False)  # Modify this behavior as needed
-
-
-@pytest.fixture(autouse=True)
-def expected_lingering_timers() -> bool:
-    """Temporary ability to bypass test failures.
-    Parametrize to True to bypass the pytest failure.
-    @pytest.mark.parametrize("expected_lingering_timers", [True])
-    This should be removed when all lingering timers have been cleaned up.
-    See https://github.com/MatthewFlamm/pytest-homeassistant-custom-component/issues/153
-    """
-    return True
 
 
 @pytest.fixture
@@ -144,7 +127,7 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
         mock_registry(
             hass,
             {
-                entity_id: RegistryEntry(
+                entity_id: RegistryEntryWithDefaults(
                     entity_id=entity_id,
                     unique_id=unique_id,
                     platform=platform,

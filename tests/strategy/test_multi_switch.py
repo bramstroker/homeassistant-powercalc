@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-import pytest
 from homeassistant.const import (
     CONF_ENTITIES,
     CONF_NAME,
@@ -12,6 +11,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
+import pytest
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import CONF_MULTI_SWITCH, CONF_POWER, CONF_POWER_OFF, CalculationStrategy
@@ -102,13 +102,6 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
     [
         {
             CONF_NAME: "My sensor",
-        },
-        {
-            CONF_NAME: "My sensor",
-            CONF_MULTI_SWITCH: {
-                CONF_POWER: 0.5,
-                CONF_POWER_OFF: 1,
-            },
         },
         {
             CONF_NAME: "My sensor",

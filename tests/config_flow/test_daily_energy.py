@@ -16,12 +16,14 @@ from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_GROUP,
     CONF_GROUP_MEMBER_SENSORS,
+    CONF_GROUP_TYPE,
     CONF_ON_TIME,
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
+    GroupType,
 )
 from tests.config_flow.common import (
     create_mock_entry,
@@ -163,6 +165,7 @@ async def test_add_to_group(hass: HomeAssistant) -> None:
         {
             CONF_NAME: "My group",
             CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_TYPE: GroupType.CUSTOM,
         },
     )
 

@@ -81,6 +81,10 @@
       "type": "string",
       "description": "Some remarks to show in the GUI config flow on first step of discovery"
     },
+    "config_flow_sub_profile_remarks": {
+      "type": "string",
+      "description": "Some remarks to show in the GUI config flow on sub profile selection step"
+    },
     "created_at": {
       "type": "string",
       "format": "date-time",
@@ -95,6 +99,7 @@
       "enum": [
         "camera",
         "cover",
+        "fan",
         "generic_iot",
         "light",
         "power_meter",
@@ -102,8 +107,10 @@
         "smart_dimmer",
         "smart_switch",
         "smart_speaker",
+        "television",
         "network",
-        "vacuum_robot"
+        "vacuum_robot",
+        "lawn_mower_robot"
       ],
       "description": "Type of device"
     },
@@ -208,6 +215,10 @@
           }
         }
       }
+    },
+    "is_dumb_bulb": {
+      "type": "boolean",
+      "description": "The profile is for a dumb light bulb, not having smart capabilities"
     },
     "name": {
       "type": "string",

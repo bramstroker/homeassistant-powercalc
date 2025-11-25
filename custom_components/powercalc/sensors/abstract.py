@@ -2,21 +2,25 @@ from __future__ import annotations
 
 import logging
 
-import homeassistant.helpers.device_registry as dr
-import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import CONF_NAME
+from homeassistant.const import (
+    CONF_NAME,
+    __version__ as HA_VERSION,  # noqa
+)
 from homeassistant.core import HomeAssistant, callback
+import homeassistant.helpers.device_registry as dr
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc import DEFAULT_ENERGY_NAME_PATTERN, DEFAULT_POWER_NAME_PATTERN
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
+    DEFAULT_ENERGY_NAME_PATTERN,
+    DEFAULT_POWER_NAME_PATTERN,
     DOMAIN,
 )
 
@@ -28,6 +32,7 @@ _LOGGER = logging.getLogger(__name__)
 class BaseEntity(Entity):
     async def async_added_to_hass(self) -> None:
         """Attach the entity to same device as the source entity."""
+
         entity_reg = er.async_get(self.hass)
         entity_entry = entity_reg.async_get(self.entity_id)
         if entity_entry is None or not hasattr(self, "source_device_id"):

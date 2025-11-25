@@ -1,6 +1,5 @@
 from unittest.mock import AsyncMock
 
-import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_DEVICE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
@@ -9,7 +8,8 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.selector import EntitySelector
-from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
+import voluptuous as vol
 
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.common import SourceEntity
@@ -68,6 +68,8 @@ async def test_discovery_flow(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
+    await run_powercalc_setup(hass)
+
     hass.config.config_dir = get_test_config_dir()
     device_entry = mock_device_with_switches(hass, 2)
 
@@ -212,6 +214,31 @@ async def test_regression_2612(hass: HomeAssistant, mock_entity_with_model_infor
     assert hass.states.get("sensor.foo_bar_energy")
 
 
+async def test_setup_without_switches(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+    """
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/3218
+
+    Shelly 2.5 can have detached switches
+    Allow the user to setup this multi_switch profile without selecting any switches
+    """
+
+    hass.config.config_dir = get_test_config_dir()
+    device_entry = mock_device_with_switches(hass, 0)
+
+    result = await initialize_device_discovery_flow(hass, device_entry)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+    state = hass.states.get("sensor.test_power")
+    assert state
+    assert state.state == "0.50"
+
+
 async def test_light_switches_selectable(hass: HomeAssistant) -> None:
     """
     Some integrations allow you to change the type of a switch to light.
@@ -235,14 +262,14 @@ async def test_light_switches_selectable(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
-            "switch.test1": RegistryEntry(
+            "switch.test1": RegistryEntryWithDefaults(
                 id="switch.test1",
                 entity_id="switch.test1",
                 unique_id=f"{device_id}1",
                 device_id=device_id,
                 platform="switch",
             ),
-            "light.test2": RegistryEntry(
+            "light.test2": RegistryEntryWithDefaults(
                 id="light.test2",
                 entity_id="light.test2",
                 unique_id=f"{device_id}2",
@@ -284,6 +311,7 @@ async def initialize_device_discovery_flow(hass: HomeAssistant, device_entry: De
         await get_power_profile(
             hass,
             {},
+            source_entity,
             ModelInfo(device_entry.manufacturer, device_entry.model),
         ),
     ]
@@ -313,7 +341,7 @@ def mock_device_with_switches(hass: HomeAssistant, num_switches: int = 2, manufa
     entities: dict[str, RegistryEntry] = {}
     for i in range(num_switches):
         entity_id = f"switch.test{i + 1}"
-        entry = RegistryEntry(
+        entry = RegistryEntryWithDefaults(
             id=entity_id,
             entity_id=entity_id,
             unique_id=f"{device_id}{i + 1}",

@@ -1,36 +1,55 @@
+from collections.abc import Callable
 from decimal import Decimal
+import json
 from unittest.mock import PropertyMock, patch
 
-import pytest
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.template import Template
+import pytest
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy
-from custom_components.powercalc.helpers import evaluate_power, get_or_create_unique_id, make_hashable
+from custom_components.powercalc.helpers import (
+    collect_placeholders,
+    evaluate_power,
+    get_or_create_unique_id,
+    get_related_entity_by_device_class,
+    make_hashable,
+    replace_placeholders,
+)
+from tests.common import get_test_profile_dir
 
 
 @pytest.mark.parametrize(
-    "power,output",
+    "power_factory,expected_output",
     [
-        (Template("unknown"), None),
-        (Template("{{ 1 + 3 | float }}"), Decimal("4.0")),
-        (20.5, Decimal("20.5")),
-        ("foo", None),
-        (Decimal("40.65"), Decimal("40.65")),
-        ((1, 2), None),
+        (lambda hass: Template("unknown", hass), None),
+        (lambda hass: Template("{{ 1 + 3 | float }}", hass), Decimal("4.0")),
+        (lambda hass: 20.5, Decimal("20.5")),
+        (lambda hass: "foo", None),
+        (lambda hass: Decimal("40.65"), Decimal("40.65")),
+        (lambda hass: (1, 2), None),
     ],
 )
 async def test_evaluate_power(
     hass: HomeAssistant,
-    power: Template | Decimal | float,
-    output: Decimal | None,
+    power_factory: Callable[[HomeAssistant], Template | Decimal | float],
+    expected_output: Decimal | None,
 ) -> None:
-    if isinstance(power, Template):
-        power.hass = hass
-    assert await evaluate_power(power) == output
+    power = power_factory(hass)
+    assert await evaluate_power(power) == expected_output
+
+
+@patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception()))
+async def test_evaluate_power_template_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    power = Template("{{ 1 + 3 }}")
+    power.hass = hass
+    await evaluate_power(power)
+    assert "Could not render power template" in caplog.text
 
 
 async def test_get_unique_id_from_config() -> None:
@@ -65,3 +84,42 @@ async def test_wled_unique_id() -> None:
 )
 async def test_make_hashable(value: set | list | dict, output: tuple | frozenset) -> None:
     assert make_hashable(value) == output
+
+
+def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Test get_related_entity_by_device_class when entity has no device_id."""
+    from unittest.mock import MagicMock
+
+    entity = MagicMock()
+    entity.entity_id = "light.test"
+    entity.device_id = None
+
+    result = get_related_entity_by_device_class(hass, entity, SensorDeviceClass.BATTERY)
+
+    assert result is None
+    assert "Entity light.test has no device_id, cannot find related entity" in caplog.text
+
+
+@pytest.mark.parametrize(
+    "file_path,expected_placeholders",
+    [
+        ("custom_fields/model.json", {"some_entity"}),
+        ("custom_fields_template/model.json", {"num_switches"}),
+        ("device_class_variable/model.json", {"entity_by_device_class:temperature"}),
+        ("download/model.json", {"entity"}),
+    ],
+)
+def test_collect_placeholder(file_path: str, expected_placeholders: set[str]) -> None:
+    with open(get_test_profile_dir(file_path), encoding="utf-8") as f:
+        json_data = json.loads(f.read())
+    found = collect_placeholders(json_data)
+    assert found == expected_placeholders
+
+
+def test_replace_placeholder() -> None:
+    json_data = {
+        "name": "Test [[entity_by_device_class:temperature]]",
+    }
+    placeholders = {"entity_by_device_class:temperature": "sensor.test"}
+    replace_placeholders(json_data, placeholders)
+    assert json_data["name"] == "Test sensor.test"

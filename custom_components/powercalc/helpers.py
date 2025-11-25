@@ -1,14 +1,20 @@
+from collections.abc import Callable, Coroutine
 import decimal
+from decimal import Decimal
+from functools import wraps
 import logging
 import os.path
 import re
-import uuid
-from collections.abc import Callable, Coroutine
-from decimal import Decimal
-from functools import wraps
 from typing import Any, TypeVar
+import uuid
 
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
+from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import TemplateError
+from homeassistant.helpers import entity_registry
+from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
@@ -17,6 +23,8 @@ from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrate
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
+
+PLACEHOLDER_REGEX = re.compile(r"\[\[\s*([A-Za-z_]\w*(?::[A-Za-z_]\w*)*)\s*\]\]")
 
 
 async def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
@@ -27,7 +35,11 @@ async def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
 
     try:
         if isinstance(power, Template):
-            power = power.async_render()
+            try:
+                power = power.async_render()
+            except TemplateError as ex:
+                _LOGGER.error("Could not render power template %s: %s", power, ex)
+                return None
             if power == "unknown":
                 return None
 
@@ -90,7 +102,7 @@ def make_hashable(arg: Any) -> Any:  # noqa: ANN401
     return arg
 
 
-def async_cache(func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[..., Coroutine[Any, Any, R]]:
+def async_cache[R](func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[..., Coroutine[Any, Any, R]]:
     """
     A decorator to cache results of an async function based on its arguments.
 
@@ -118,6 +130,19 @@ def async_cache(func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[..., Co
     return wrapper
 
 
+def collect_placeholders(data: list | str | dict[str, Any]) -> set[str]:
+    found: set[str] = set()
+    if isinstance(data, dict):
+        for v in data.values():
+            found |= collect_placeholders(v)
+    elif isinstance(data, list):
+        for v in data:
+            found |= collect_placeholders(v)
+    elif isinstance(data, str):
+        found |= set(PLACEHOLDER_REGEX.findall(data))
+    return found
+
+
 def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[str, str]) -> list | str | dict[str, Any]:
     """Replace placeholders in a dictionary with values from a replacement dictionary."""
     if isinstance(data, dict):
@@ -127,10 +152,38 @@ def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[s
         for i in range(len(data)):
             data[i] = replace_placeholders(data[i], replacements)
     elif isinstance(data, str):
-        # Adjust regex to match [[variable]]
-        matches = re.findall(r"\[\[\s*(\w+)\s*\]\]", data)
+        # Use the same regex pattern as PLACEHOLDER_REGEX
+        matches = PLACEHOLDER_REGEX.findall(data)
         for match in matches:
             if match in replacements:
                 # Replace [[variable]] with its value
                 data = data.replace(f"[[{match}]]", replacements[match])
     return data
+
+
+def get_related_entity_by_device_class(
+    hass: HomeAssistant,
+    entity: RegistryEntry,
+    device_class: SensorDeviceClass | BinarySensorDeviceClass,
+) -> str | None:
+    """Get related entity from same device by device class."""
+
+    entity_reg = entity_registry.async_get(hass)
+    device_id = entity.device_id
+    if not device_id:
+        _LOGGER.debug("Entity %s has no device_id, cannot find related entity", entity.entity_id)
+        return None
+
+    related_entities = [
+        entity_entry.entity_id
+        for entity_entry in entity_registry.async_entries_for_device(
+            entity_reg,
+            device_id,
+        )
+        if (entity_entry.device_class or entity_entry.original_device_class) == device_class
+    ]
+    if not related_entities:
+        _LOGGER.debug("No related entities found for device %s with device class %s", device_id, device_class)
+        return None
+
+    return related_entities[0]

@@ -1,6 +1,5 @@
 import os
 
-import homeassistant.helpers.area_registry as ar
 from homeassistant import config_entries
 from homeassistant.components import input_boolean, input_number, light
 from homeassistant.components.light import ColorMode
@@ -14,15 +13,14 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.helpers import device_registry as dr, entity_registry as er
+import homeassistant.helpers.area_registry as ar
 from homeassistant.helpers.normalized_name_base_registry import NormalizedNameBaseRegistryItems
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_registry, setup_test_component_platform
 
-import custom_components.test.light as test_light_platform
+from custom_components.powercalc import CONF_ENERGY_UPDATE_INTERVAL, CONF_GROUP_ENERGY_UPDATE_INTERVAL, CONF_GROUP_POWER_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_MODE,
@@ -34,6 +32,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+import custom_components.test.light as test_light_platform
 
 
 async def create_mock_light_entity(
@@ -43,13 +42,11 @@ async def create_mock_light_entity(
     """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
     entity_registry = er.async_get(hass)
     device_registry = dr.async_get(hass)
-    platform: test_light_platform = getattr(hass.components, "test.light")
-    platform.init(empty=True)
 
     if not isinstance(entities, list):
         entities = [entities]
 
-    platform.ENTITIES.extend(entities)
+    setup_test_component_platform(hass, light.DOMAIN, entities)
 
     assert await async_setup_component(
         hass,
@@ -95,7 +92,15 @@ async def run_powercalc_setup(
     sensor_config: list[ConfigType] | ConfigType | None = None,
     domain_config: ConfigType | None = None,
 ) -> None:
+    domain_config = {
+        CONF_ENERGY_UPDATE_INTERVAL: 0,
+        CONF_GROUP_ENERGY_UPDATE_INTERVAL: 0,
+        CONF_GROUP_POWER_UPDATE_INTERVAL: 0,
+        **(domain_config or {}),
+    }
+
     config = {DOMAIN: domain_config or {}}
+
     if not sensor_config:
         sensor_config = {}
     if sensor_config and not isinstance(sensor_config, list):
@@ -121,7 +126,7 @@ async def create_input_boolean(hass: HomeAssistant, name: str = "test") -> None:
 
 
 async def create_input_booleans(hass: HomeAssistant, names: list[str]) -> None:
-    config = {"input_boolean": {name: None for name in names}}
+    config = {"input_boolean": dict.fromkeys(names)}
     assert await async_setup_component(
         hass,
         input_boolean.DOMAIN,
@@ -154,7 +159,7 @@ def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
 def get_test_profile_dir(sub_dir: str) -> str:
     return os.path.join(
         os.path.dirname(__file__),
-        "testing_config/powercalc_profiles",
+        "testing_config/powercalc/profiles/test",
         sub_dir,
     )
 
@@ -242,7 +247,7 @@ def mock_sensors_in_registry(
 ) -> None:
     entries = {}
     for entity_id in power_entities or []:
-        entries[entity_id] = RegistryEntry(
+        entries[entity_id] = RegistryEntryWithDefaults(
             entity_id=entity_id,
             name=entity_id,
             unique_id=entity_id,
@@ -250,7 +255,7 @@ def mock_sensors_in_registry(
             device_class=SensorDeviceClass.POWER,
         )
     for entity_id in energy_entities or []:
-        entries[entity_id] = RegistryEntry(
+        entries[entity_id] = RegistryEntryWithDefaults(
             entity_id=entity_id,
             name=entity_id,
             unique_id=entity_id,

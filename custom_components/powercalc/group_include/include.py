@@ -37,18 +37,20 @@ async def find_entities(
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug("Found possible include entities: %s", [entity.entity_id for entity in source_entities])
 
-    source_entity_powercalc_entity_map: dict[str, list] = domain_data.get(DATA_CONFIGURED_ENTITIES, {})
+    source_entity_powercalc_entity_map: dict[str, list[tuple[Entity, bool]]] = domain_data.get(DATA_CONFIGURED_ENTITIES, {})
     powercalc_entities: dict[str, Entity] = domain_data.get(DATA_ENTITIES, {})
     for source_entity in source_entities:
         if source_entity.entity_id in source_entity_powercalc_entity_map:
-            resolved_entities.extend(source_entity_powercalc_entity_map[source_entity.entity_id])
+            resolved_entities.extend([entity for entity, _ in source_entity_powercalc_entity_map[source_entity.entity_id]])
             continue
 
         if source_entity.entity_id in powercalc_entities:
             resolved_entities.append(powercalc_entities[source_entity.entity_id])
             continue
 
-        if source_entity.domain == sensor.DOMAIN and source_entity.platform != DOMAIN and include_non_powercalc:
+        if source_entity.domain == sensor.DOMAIN:
+            if source_entity.platform != DOMAIN and not include_non_powercalc:
+                continue
             device_class = source_entity.device_class or source_entity.original_device_class
             if device_class == SensorDeviceClass.POWER:
                 resolved_entities.append(RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement))
@@ -70,6 +72,9 @@ def _build_filter(entity_filter: EntityFilter | None) -> EntityFilter:
         [
             DomainFilter(SUPPORTED_DOMAINS),
             LambdaFilter(lambda entity: entity.platform != "utility_meter"),
+            LambdaFilter(lambda entity: not str(entity.unique_id).startswith("powercalc_standby_group")),
+            LambdaFilter(lambda entity: "tracked_" not in str(entity.unique_id)),
+            LambdaFilter(lambda entity: entity.platform != "tasmota" or not str(entity.entity_id).endswith(("_yesterday", "_today"))),
         ],
     )
     if not entity_filter:

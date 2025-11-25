@@ -10,3 +10,8 @@ cov.xml
 .DS_Store
 
 custom_components/test
+
+*.egg-info/
+
+# PyEnv Version File
+.python-version

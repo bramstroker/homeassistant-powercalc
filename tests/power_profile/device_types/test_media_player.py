@@ -3,8 +3,12 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
+    CONF_LINEAR,
     CONF_MANUFACTURER,
+    CONF_MAX_POWER,
+    CONF_MIN_POWER,
     CONF_MODEL,
+    CONF_STANDBY_POWER,
 )
 from tests.common import get_test_profile_dir, run_powercalc_setup
 from tests.conftest import MockEntityWithModel
@@ -74,3 +78,39 @@ async def test_media_player(
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "1.65"
+
+
+async def test_media_player_manual_configuration(hass: HomeAssistant) -> None:
+    entity_id = "media_player.test"
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: entity_id,
+            CONF_STANDBY_POWER: 2,
+            CONF_LINEAR: {
+                CONF_MIN_POWER: 5,
+                CONF_MAX_POWER: 50,
+            },
+        },
+    )
+
+    hass.states.async_set(
+        entity_id,
+        STATE_PLAYING,
+        {"volume_level": 0.20, "is_volume_muted": False},
+    )
+
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_sensor_id).state == "14.00"
+
+    hass.states.async_set(
+        entity_id,
+        STATE_PAUSED,
+    )
+
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_sensor_id).state == "2.00"

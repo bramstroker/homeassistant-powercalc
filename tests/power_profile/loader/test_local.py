@@ -1,8 +1,8 @@
 import logging
 
-import pytest
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
+import pytest
 
 from custom_components.powercalc.const import CONF_CUSTOM_MODEL_DIRECTORY
 from custom_components.powercalc.power_profile.error import LibraryLoadingError
@@ -27,7 +27,7 @@ async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant, caplog: 
 
 async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     loader = LocalLoader(hass, get_test_profile_dir("missing_model_json"))
-    with caplog.at_level(logging.ERROR):
+    with caplog.at_level(logging.WARNING):
         await loader.initialize()
         assert "model.json should exist in" in caplog.text
 
@@ -91,10 +91,16 @@ async def test_find_manufacturers(hass: HomeAssistant, manufacturer: str, expect
 
 async def test_get_manufacturer_listing(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
-    assert await loader.get_manufacturer_listing(None) == {"tp-link", "tasmota", "test", "hidden-directories", "casing"}
-    assert "tp-link" in await loader.get_manufacturer_listing({DeviceType.SMART_SWITCH})
-    assert "tp-link" in await loader.get_manufacturer_listing({DeviceType.LIGHT})
-    assert "tp-link" not in await loader.get_manufacturer_listing({DeviceType.COVER})
+    assert await loader.get_manufacturer_listing(None) == {
+        ("tp-link", "tp-link"),
+        ("tasmota", "tasmota"),
+        ("test", "test"),
+        ("hidden-directories", "hidden-directories"),
+        ("casing", "casing"),
+    }
+    assert ("tp-link", "tp-link") in await loader.get_manufacturer_listing({DeviceType.SMART_SWITCH})
+    assert ("tp-link", "tp-link") in await loader.get_manufacturer_listing({DeviceType.LIGHT})
+    assert ("tp-link", "tp-link") not in await loader.get_manufacturer_listing({DeviceType.COVER})
 
 
 async def test_get_model_listing(hass: HomeAssistant) -> None:

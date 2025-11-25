@@ -15,13 +15,12 @@ You can also set this option per sensor in YAML or when you use the GUI you can 
 
 ## Resetting energy sensor
 
-Powercalc provides an action `powercalc.reset_energy` which you can call to reset energy sensors to 0 kWh.
+Powercalc provides an action [`powercalc.reset_energy`](../actions/reset-energy.md) which you can call to reset energy sensors to 0 kWh.
 You can call this action from the GUI (`Developer tools` -> `Actions`) or use this in automations.
 
 ## Calibrating energy sensor
 
-Powercalc provides an action `powercalc.calibrate_energy` which you can call to set an energy sensor to a forced new value.
-This can be useful if somehow the energy sensor has an erronous value.
-Groups which this energy sensor is part of will also be increased with the new value.
+Powercalc provides an action [`powercalc.calibrate_energy`](../actions/calibrate-energy.md) which you can call to set an energy sensor to a forced new value.
+This can be useful if somehow the energy sensor has an erroneous value.
 
 You can call this action from the GUI (`Developer tools` -> `Actions`).

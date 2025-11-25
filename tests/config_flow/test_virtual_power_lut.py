@@ -1,11 +1,11 @@
-import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.components.light import ColorMode
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import SelectSelector
+import voluptuous as vol
 
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_MANUFACTURER,
@@ -16,6 +16,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.test.light import MockLight
 from tests.common import create_mock_light_entity
 from tests.config_flow.common import (
@@ -42,8 +43,8 @@ async def test_lut_manual_flow(hass: HomeAssistant) -> None:
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
-    assert {"value": "belkin", "label": "belkin"} in manufacturer_options
-    assert {"value": "signify", "label": "signify"} in manufacturer_options
+    assert {"value": "belkin", "label": "Belkin"} in manufacturer_options
+    assert {"value": "signify", "label": "Signify"} in manufacturer_options
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -101,6 +102,7 @@ async def test_lut_autodiscover_flow(
         "manufacturer": "ikea",
         "model": "LED1545G12",
         "remarks": None,
+        "source": "Source entity: light.test",
     }
 
     result = await set_virtual_power_configuration(

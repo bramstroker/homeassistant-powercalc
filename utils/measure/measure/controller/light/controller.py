@@ -4,7 +4,7 @@ from typing import Any, Protocol
 
 import inquirer.questions
 
-from measure.controller.light.const import MAX_MIRED, MIN_MIRED
+from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 
 
 class LightInfo:
@@ -41,7 +41,7 @@ class LightInfo:
 
 
 class LightController(Protocol):
-    def change_light_state(self, color_mode: str, on: bool = True, **kwargs) -> None:  # type: ignore[no-untyped-def]  # noqa: ANN003
+    def change_light_state(self, lut_mode: LutMode, on: bool = True, **kwargs: Any) -> None:  # noqa: ANN401
         """Changes the light to a certain setting"""
         ...
 
@@ -55,4 +55,12 @@ class LightController(Protocol):
 
     def process_answers(self, answers: dict[str, Any]) -> None:
         """Process the answers of the questions"""
+        ...
+
+    def has_effect_support(self) -> bool:
+        """Check if the light controller supports effects"""
+        ...
+
+    def get_effect_list(self) -> list[str]:
+        """Get the list of supported effects"""
         ...

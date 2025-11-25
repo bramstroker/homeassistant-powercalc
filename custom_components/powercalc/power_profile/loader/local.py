@@ -25,17 +25,17 @@ class LocalLoader(Loader):
         if not self._is_custom_directory:
             await self._hass.async_add_executor_job(self._load_custom_library)
 
-    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[tuple[str, str]]:
         """Get listing of all available manufacturers or filtered by model device_type."""
         if device_types is None:
-            return set(self._manufacturer_model_listing.keys())
+            return {(manufacturer, manufacturer) for manufacturer in self._manufacturer_model_listing}
 
-        manufacturers: set[str] = set()
+        manufacturers: set[tuple[str, str]] = set()
         for manufacturer in self._manufacturer_model_listing:
             models = await self.get_model_listing(manufacturer, device_types)
             if not models:
                 continue
-            manufacturers.add(manufacturer)
+            manufacturers.add((manufacturer, manufacturer))
 
         return manufacturers
 
@@ -74,7 +74,7 @@ class LocalLoader(Loader):
     async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
         """Load a model.json file from disk for a given manufacturer.lower() and model.lower()
         by querying the custom library.
-        If self._is_custom_directory == true model.json will be loaded directy from there.
+        If self._is_custom_directory == true model.json will be loaded directly from there.
 
         returns: tuple[dict, str] model.json as dictionary and model as lower case
         returns: None when manufacturer, model or model path not found
@@ -119,7 +119,7 @@ class LocalLoader(Loader):
 
     def _load_custom_library(self) -> None:
         """Loading custom models and aliases from file system.
-        Manufacturer directories without model directrories and model.json files within
+        Manufacturer directories without model directories and model.json files within
         are not loaded. Same is with model directories without model.json files.
         """
 
@@ -143,7 +143,7 @@ class LocalLoader(Loader):
 
                 model_json_path = os.path.join(model_path, "model.json")
                 if not os.path.exists(model_json_path):
-                    _LOGGER.error("model.json should exist in %s!", model_path)
+                    _LOGGER.warning("model.json should exist in %s!", model_path)
                     continue
 
                 model_json = self._load_json(model_json_path)

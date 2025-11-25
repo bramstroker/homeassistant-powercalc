@@ -22,11 +22,11 @@ Go to the directory you created in a command line.
 
 ##### Linux and MacOS
 ```
-docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
+docker run --pull=always --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
 ```
 ##### Windows
 ```
-docker run --rm --name=measure --env-file=.env -v %CD%/export:/app/export -v %CD%/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
+docker run --pull=always --rm --name=measure --env-file=.env -v %CD%/export:/app/export -v %CD%/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
 ```
 Note: if you use PowerShell instead of the Windows command line tool, you must use the full paths instead of relative paths.
 
@@ -34,31 +34,30 @@ The script will ask you a few questions, than proceed taking measurements.
 
 After the measurements are finished you will find the files in `export` directory.
 
-To update the Docker container to the latest version of the script:
-```
-docker pull bramgerritsen/powercalc-measure
-```
-
 ### Native
 
 Use this installation method when the docker method is not working for you or you want to do any development on the script.
 
 **Prerequisites:**
-- Make sure you have Python 3 running on your system. Version 3.12 is recommended.
-- Install poetry. `curl -sSL https://install.python-poetry.org | python3 -` or see https://python-poetry.org/docs/
+- Make sure you have Python 3 running on your system. Version 3.13 is recommended.
+- Install uv. `curl -LsSf https://astral.sh/uv/install.sh | sh` or see https://github.com/astral-sh/uv
 
-Poetry allows you to create virtual environment and manage dependencies.
+uv allows you to create virtual environment and manage dependencies.
 To install the dependencies:
 
 ```
 cd utils/measure
-poetry install
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e .
+uv pip install git+https://github.com/studioimaginaire/phue.git@6d8976be9b17da94887365e001e8475fe58c5f2d
 ```
 
 #### Start measurements
 
 ```
-poetry run python -m measure.measure
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+python -m measure.measure
 ```
 
 The script will ask you a few questions, than proceed taking measurements.

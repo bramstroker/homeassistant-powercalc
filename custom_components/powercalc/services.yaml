@@ -1,22 +1,17 @@
-reset_energy:
-  name: Reset energy sensor
-  description: Reset an energy sensor to zero kWh
+activate_playbook:
+  name: Activate playbook
+  description: Activate playbook
   target:
     entity:
       domain: sensor
-      device_class: energy
-calibrate_utility_meter:
-  name: Calibrate utility meter
-  description: Calibrates a utility meter sensor.
-  target:
-    entity:
-      domain: sensor
+      integration: powercalc
+      device_class: power
   fields:
-    value:
-      name: Value
-      description: Value to which set the meter
-      example: "100"
+    playbook_id:
+      name: Playbook
+      description: Playbook identifier
       required: true
+      example: program1
       selector:
         text:
 calibrate_energy:
@@ -34,59 +29,17 @@ calibrate_energy:
       required: true
       selector:
         text:
-increase_daily_energy:
-  name: Increase daily energy sensor
-  description: Increases the sensor with a given amount
+calibrate_utility_meter:
+  name: Calibrate utility meter
+  description: Calibrates a utility meter sensor.
   target:
     entity:
       domain: sensor
-      integration: powercalc
-      device_class: energy
   fields:
     value:
       name: Value
-      description: Amount to add to the sensor
+      description: Value to which set the meter
       example: "100"
-      required: true
-      selector:
-        text:
-activate_playbook:
-  name: Activate playbook
-  description: Activate playbook
-  target:
-    entity:
-      domain: sensor
-      integration: powercalc
-      device_class: power
-  fields:
-    playbook_id:
-      name: Playbook
-      description: Playbook identifier
-      required: true
-      example: program1
-      selector:
-        text:
-stop_playbook:
-  name: Stop playbook
-  description: Stop active playbook
-  target:
-    entity:
-      domain: sensor
-      integration: powercalc
-      device_class: power
-switch_sub_profile:
-  name: Switch to another sub profile
-  description: Some profiles in the library has different sub profiles. This service allows you to switch to another one.
-  target:
-    entity:
-      domain: sensor
-      integration: powercalc
-      device_class: power
-  fields:
-    profile:
-      name: Sub profile
-      description: Define one of the possible sub profiles
-      example: "night_vision"
       required: true
       selector:
         text:
@@ -117,6 +70,56 @@ get_group_entities:
     entity:
       domain: sensor
       integration: powercalc
+increase_daily_energy:
+  name: Increase daily energy sensor
+  description: Increases the sensor with a given amount
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
+      device_class: energy
+  fields:
+    value:
+      name: Value
+      description: Amount to add to the sensor
+      example: "100"
+      required: true
+      selector:
+        text:
+reload:
+  name: Reload config entries
+  description: Reload all Powercalc config entries
+reset_energy:
+  name: Reset energy sensor
+  description: Reset an energy sensor to zero kWh
+  target:
+    entity:
+      domain: sensor
+      device_class: energy
+stop_playbook:
+  name: Stop playbook
+  description: Stop active playbook
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
+      device_class: power
+switch_sub_profile:
+  name: Switch to another sub profile
+  description: Some profiles in the library has different sub profiles. This service allows you to switch to another one.
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
+      device_class: power
+  fields:
+    profile:
+      name: Sub profile
+      description: Define one of the possible sub profiles
+      example: "night_vision"
+      required: true
+      selector:
+        text:
 update_library:
   name: Update profile library
   description: Update the profile library and reinitialize discovery

@@ -41,7 +41,7 @@ def test_build_schema(hass: HomeAssistant) -> None:
     assert "test1" in schema.schema
     test1 = schema.schema["test1"]
     assert isinstance(test1, EntitySelector)
-    assert test1.config == {"multiple": True, "device_class": ["power"]}
+    assert test1.config == {"multiple": True, "device_class": ["power"], "reorder": False}
 
     assert "test2" in schema.schema
     test2 = schema.schema["test2"]

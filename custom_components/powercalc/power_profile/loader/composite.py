@@ -13,7 +13,7 @@ class CompositeLoader(Loader):
     async def initialize(self) -> None:
         [await loader.initialize() for loader in self.loaders]  # type: ignore[func-returns-value]
 
-    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[tuple[str, str]]:
         """Get listing of available manufacturers."""
 
         return {manufacturer for loader in self.loaders for manufacturer in await loader.get_manufacturer_listing(device_types)}

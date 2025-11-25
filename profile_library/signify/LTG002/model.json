@@ -10,7 +10,8 @@
   "standby_power": 0.3,
   "calculation_strategy": "lut",
   "aliases": [
-    "929001953301"
+    "929001953301",
+    "9290019533"
   ],
   "created_at": "2021-10-08T13:31:47",
   "author": "mariwing <mariwing@gmail.com>"

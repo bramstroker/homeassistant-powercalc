@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-04-18T08:54:05.495469",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly 1PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.10:docker"
+  },
+  "name": "Hue Aphelion Recessed Downlight White Ambiance",
+  "standby_power": 0.45,
+  "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>"
+}

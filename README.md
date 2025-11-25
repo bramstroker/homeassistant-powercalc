@@ -24,3 +24,6 @@ Go to the [Quick Start](https://docs.powercalc.nl/quick-start/) for installation
 
 - [Full Documentation](https://docs.powercalc.nl)
 - [Profile library](https://library.powercalc.nl)
+
+### Powered by
+[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSource)

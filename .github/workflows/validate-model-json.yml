@@ -1,4 +1,4 @@
-name: validate-light-model
+name: validate-model-json
 
 on:
   pull_request_target:
@@ -15,7 +15,7 @@ jobs:
     name: Validate model.json
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
@@ -24,6 +24,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           json_schema: ./profile_library/model_schema.json
-          json_path_pattern: model.json$
+          json_path_pattern: ^profile_library/[^/]+/[^/]+/model.json$
           send_comment: true
           clear_comments: true

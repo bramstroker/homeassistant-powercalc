@@ -10,15 +10,15 @@ jobs:
     name: Generate plots
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - uses: ./.github/workflows/poetry-composite-action
+      - uses: ./.github/workflows/uv-composite-action
         with:
           directory: './utils/visualize'
           cache_dependencies: 'false'
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         name: List changed files from the PR
         id: list-files
         with:
@@ -34,7 +34,7 @@ jobs:
           for file in ${{ steps.list-files.outputs.changedFiles }}; do
             echo "Generating plot for - ${file}."
             if [ -f "${{ github.workspace }}/${file}" ]; then
-              poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
+              uv run python plot.py "${{ github.workspace }}/${file}" --output=auto
             fi
           done
       - name: Save PR number
@@ -43,7 +43,7 @@ jobs:
         run: |
           echo $PR_NUMBER > pr_number.txt
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: plots
           path: |

@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-10-10T17:24:09.605888",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug S",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 4,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.22:docker"
+  },
+  "name": "Philips Smart LED A67 E27 Tunable White 2700K-6500K (type SHTWW, model 9290024496A, 13 W, 220-240 V, 50/60 Hz, 1521 lm, beam angle: 360°)",
+  "standby_power": 0.3,
+  "author": "schuppan <120984051+schuppan@users.noreply.github.com>"
+}

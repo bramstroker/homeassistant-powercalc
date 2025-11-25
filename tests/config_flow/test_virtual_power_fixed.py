@@ -1,22 +1,25 @@
 from unittest.mock import patch
 
-import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
+import voluptuous as vol
 
-from custom_components.powercalc import CONF_FIXED, CONF_POWER_TEMPLATE
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_FIXED,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
     CONF_POWER,
+    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
+    CONF_STANDBY_POWER,
     CONF_STATES_POWER,
     ENERGY_INTEGRATION_METHOD_RIGHT,
     CalculationStrategy,
@@ -107,6 +110,10 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
     )
 
     result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
+
+    schema_keys = list(result["data_schema"].schema.keys())
+    assert schema_keys == [CONF_ENTITY_ID, CONF_STANDBY_POWER, CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS]
+
     await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={CONF_ENTITY_ID: "light.test", CONF_CREATE_UTILITY_METERS: True},

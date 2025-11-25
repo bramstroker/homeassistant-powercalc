@@ -69,6 +69,11 @@
             "type": "string"
           }
         },
+        "max_power": {
+          "type": "number",
+          "description": "Maximum power consumption of the model in Watts",
+          "minimum": 0
+        },
         "aliases": {
           "type": "array",
           "description": "List of aliases for the model",
@@ -80,6 +85,10 @@
           "type": "string",
           "format": "date-time",
           "description": "Last update of the model"
+        },
+        "has_sub_profiles": {
+          "type": "boolean",
+          "description": "Indicates whether the profile has sub profiles"
         }
       }
     },
