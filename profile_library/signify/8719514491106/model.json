@@ -11,5 +11,6 @@
   },
   "name": "Philips Hue White Ambiance E14 Luster/Tropfenform LTU001",
   "standby_power": 0.2,
-  "device_type": "light"
+  "device_type": "light",
+  "author": "Macstar1601 <97288314+Macstar1601@users.noreply.github.com>"
 }
