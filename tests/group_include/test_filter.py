@@ -9,7 +9,7 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 import pytest
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry
 
-from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_FLOOR, CONF_OR, CONF_WILDCARD
+from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.group_include.filter import (
     AreaFilter,
@@ -106,7 +106,12 @@ async def test_label_filter(label: str, expected_result: bool) -> None:
     ],
 )
 async def test_floor_filter(
-    hass: HomeAssistant, entity_device: str | None, entity_area: str | None, floor: str | list[str], expected_result: bool, expect_exception: bool
+    hass: HomeAssistant,
+    entity_device: str | None,
+    entity_area: str | None,
+    floor: str | list[str],
+    expected_result: bool,
+    expect_exception: bool,
 ) -> None:
     floor_reg = floor_registry.async_get(hass)
     floor_entry1 = floor_reg.async_create("First floor")

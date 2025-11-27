@@ -14,7 +14,6 @@ from homeassistant.helpers.area_registry import AreaEntry
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.helpers.floor_registry import FloorEntry
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol

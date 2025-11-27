@@ -15,7 +15,6 @@ from homeassistant.helpers import floor_registry
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry
-from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.selector import SelectSelector
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
 import voluptuous as vol
@@ -313,7 +312,7 @@ async def test_group_include_floor(
                 device_class=SensorDeviceClass.POWER,
                 area_id=area.id,
             ),
-        }
+        },
     )
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
