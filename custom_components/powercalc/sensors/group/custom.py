@@ -65,7 +65,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_EXCLUDE_ENTITIES,
-    CONF_FORCE_CALCULATE_GROUP_ENERGY,
+    CONF_FLOOR, CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
@@ -95,7 +95,8 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from custom_components.powercalc.device_binding import get_device_info
-from custom_components.powercalc.group_include.filter import AreaFilter, CompositeFilter, DeviceFilter, EntityFilter, FilterOperator
+from custom_components.powercalc.group_include.filter import AreaFilter, CompositeFilter, DeviceFilter, EntityFilter, \
+    FilterOperator, FloorFilter
 from custom_components.powercalc.group_include.include import find_entities
 from custom_components.powercalc.sensors.abstract import (
     BaseEntity,
@@ -273,12 +274,14 @@ async def resolve_entity_ids_recursively(  # noqa: C901
 
     async def add_device_and_area_entities() -> None:
         """Add entities from the defined areas."""
-        if CONF_AREA not in entry.data and CONF_GROUP_MEMBER_DEVICES not in entry.data:
+        if all(k not in entry.data for k in (CONF_AREA, CONF_FLOOR, CONF_GROUP_MEMBER_DEVICES)):
             return
 
         filters: list[EntityFilter] = []
         if CONF_AREA in entry.data:
             filters.append(AreaFilter(hass, entry.data[CONF_AREA]))
+        if CONF_FLOOR in entry.data:
+            filters.append(FloorFilter(hass, entry.data[CONF_FLOOR]))
         if CONF_GROUP_MEMBER_DEVICES in entry.data:
             filters.append(DeviceFilter(set(entry.data[CONF_GROUP_MEMBER_DEVICES])))
         entity_filter = CompositeFilter(filters, FilterOperator.OR)

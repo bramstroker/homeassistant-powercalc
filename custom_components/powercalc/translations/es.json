@@ -171,6 +171,7 @@
       "group_custom": {
         "data": {
           "area": "Área",
+          "floor": "Planta",
           "create_energy_sensor": "Crear sensor de energía",
           "create_utility_meters": "Crear contadores eléctricos",
           "device": "Dispositivo",
@@ -187,6 +188,7 @@
         },
         "data_description": {
           "area": "Añade todos los sensores de potencia del área especificada",
+          "floor": "Añade todos los sensores de potencia de la planta especificada",
           "create_energy_sensor": "Si powercalc necesita crear un sensor kWh",
           "device": "Añadir las entidades de grupo que powercalc crea a un dispositivo existente",
           "force_calculate_group_energy": "Por defecto powercalc suma los sensores de energía de los sensores miembros. Cambia esta opción para forzar la creación de un sensor \"Riemann Sum\"",
@@ -633,6 +635,7 @@
         "title": "Opciones de grupo",
         "data": {
           "area": "Área",
+          "floor": "Planta",
           "device": "Dispositivo",
           "force_calculate_group_energy": "Forzar cálculo de energía",
           "group_energy_entities": "Entidades de energía adicionales",
@@ -645,6 +648,7 @@
         },
         "data_description": {
           "area": "Añade todos los sensores de potencia del área especificada",
+          "floor": "Añade todos los sensores de potencia de la planta especificada",
           "device": "Añadir las entidades de grupo que powercalc crea a un dispositivo existente",
           "force_calculate_group_energy": "Por defecto powercalc suma los sensores de energía de los sensores miembros. Cambia esta opción para forzar la creación de un sensor \"Riemann Sum\"",
           "group_energy_entities": "Sensores de energía adicionales (kWh) de la instalación de HA para incluir",

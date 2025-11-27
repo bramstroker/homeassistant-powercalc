@@ -11,9 +11,11 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import floor_registry
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.selector import SelectSelector
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
 import voluptuous as vol
@@ -27,6 +29,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
+    CONF_FLOOR,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
@@ -287,6 +290,52 @@ async def test_group_include_area(
     assert energy_state
 
     assert hass.states.get("sensor.my_group_sensor_energy_daily")
+
+
+async def test_group_include_floor(
+    hass: HomeAssistant,
+    area_registry: AreaRegistry,
+) -> None:
+    """Test that the floor option is included in the group configuration."""
+    floor_reg = floor_registry.async_get(hass)
+    floor = floor_reg.async_create("My floor")
+
+    area = area_registry.async_get_or_create("My area")
+    area_registry.async_update(area.id, floor_id=floor.floor_id)
+
+    mock_registry(
+        hass,
+        {
+            "sensor.test_power": RegistryEntryWithDefaults(
+                entity_id="sensor.test_power",
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                area_id=area.id,
+            ),
+        }
+    )
+
+    result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
+    user_input = {
+        CONF_NAME: "My floor group",
+        CONF_CREATE_ENERGY_SENSOR: False,
+        CONF_FLOOR: floor.floor_id,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_FLOOR] == floor.floor_id
+
+    hass.states.async_set("sensor.test_power", 5)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.my_floor_group_power")
+    assert power_state
+    assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
 
 
 async def test_can_unset_area(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
