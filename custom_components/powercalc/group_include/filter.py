@@ -9,11 +9,12 @@ from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.helpers import area_registry, device_registry, entity_registry
+from homeassistant.helpers import area_registry, device_registry, floor_registry, entity_registry
 from homeassistant.helpers.area_registry import AreaEntry
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.helpers.floor_registry import FloorEntry
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
@@ -23,7 +24,7 @@ from custom_components.powercalc.const import (
     CONF_AND,
     CONF_AREA,
     CONF_FILTER,
-    CONF_GROUP,
+    CONF_FLOOR, CONF_GROUP,
     CONF_LABEL,
     CONF_OR,
     CONF_TEMPLATE,
@@ -41,6 +42,7 @@ FILTER_CONFIG = vol.Schema(
     {
         vol.Optional(CONF_ALL): None,
         vol.Optional(CONF_AREA): cv.string,
+        vol.Optional(CONF_FLOOR): cv.string,
         vol.Optional(CONF_GROUP): cv.entity_id,
         vol.Optional(CONF_DOMAIN): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
         vol.Optional(CONF_LABEL): cv.string,
@@ -81,6 +83,7 @@ def create_filter(
     filter_mapping: dict[str, Callable[[], EntityFilter]] = {
         CONF_DOMAIN: lambda: DomainFilter(filter_config),  # type: ignore
         CONF_AREA: lambda: AreaFilter(hass, filter_config),  # type: ignore
+        CONF_FLOOR: lambda: FloorFilter(hass, filter_config),  # type: ignore
         CONF_LABEL: lambda: LabelFilter(filter_config),  # type: ignore
         CONF_WILDCARD: lambda: WildcardFilter(filter_config),  # type: ignore
         CONF_GROUP: lambda: GroupFilter(hass, filter_config),  # type: ignore
@@ -271,6 +274,31 @@ class DeviceFilter(EntityFilter):
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.device_id in self.device
 
+class FloorFilter(EntityFilter):
+    def __init__(self, hass: HomeAssistant, floor_id: str) -> None:
+        floor_reg = floor_registry.async_get(hass)
+        floor = floor_reg.async_get_floor(floor_id)
+        if floor is None:
+            floor = floor_reg.async_get_floor_by_name(str(floor_id))
+
+        if floor is None or floor.floor_id is None:
+            raise SensorConfigurationError(
+                f"No floor with id or name '{floor_id}' found in your HA instance",
+            )
+
+        area_reg = area_registry.async_get(hass)
+
+        self.floor: FloorEntry = floor
+        self.devices: list[str] = []
+        self.areas: list[AreaEntry] = area_registry.async_entries_for_floor(area_reg, floor.floor_id)
+        self.area_ids = [area.id for area in self.areas if area.id is not None]
+
+        device_reg = device_registry.async_get(hass)
+        for area in self.areas:
+            self.devices.extend([device.id for device in device_registry.async_entries_for_area(device_reg, area.id)])
+
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return entity.area_id in self.area_ids or entity.device_id in self.devices
 
 class CompositeFilter(EntityFilter):
     def __init__(
