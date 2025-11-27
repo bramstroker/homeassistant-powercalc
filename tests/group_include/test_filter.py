@@ -1,14 +1,12 @@
-from dis import name
 from unittest.mock import MagicMock
 
 from homeassistant.const import CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import area_registry, floor_registry
-from homeassistant.helpers.area_registry import AreaEntry, AreaRegistry
+from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 import pytest
-from homeassistant.helpers.floor_registry import FloorEntry
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry
 
 from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
@@ -20,7 +18,8 @@ from custom_components.powercalc.group_include.filter import (
     DeviceFilter,
     DomainFilter,
     FilterOperator,
-    FloorFilter, LabelFilter,
+    FloorFilter,
+    LabelFilter,
     LambdaFilter,
     NotFilter,
     NullFilter,
@@ -101,7 +100,9 @@ async def test_label_filter(label: str, expected_result: bool) -> None:
         ("my_device", None, "floor2", False, True),
     ],
 )
-async def test_floor_filter(hass: HomeAssistant, entity_device: str | None, entity_area: str | None, floor: str, expected_result: bool, expect_exception: bool) -> None:
+async def test_floor_filter(
+    hass: HomeAssistant, entity_device: str | None, entity_area: str | None, floor: str, expected_result: bool, expect_exception: bool
+) -> None:
     floor_reg = floor_registry.async_get(hass)
     floor_entry1 = floor_reg.async_create("First floor")
     floor_reg = floor_registry.async_get(hass)
@@ -125,7 +126,7 @@ async def test_floor_filter(hass: HomeAssistant, entity_device: str | None, enti
                 name="My device",
                 manufacturer="Mock",
                 model="Device",
-                area_id="kitchen"
+                area_id="kitchen",
             ),
         },
     )
@@ -143,6 +144,7 @@ async def test_floor_filter(hass: HomeAssistant, entity_device: str | None, enti
         return
 
     assert FloorFilter(hass, floor).is_valid(entry) == expected_result
+
 
 @pytest.mark.parametrize(
     "device,expected_result",

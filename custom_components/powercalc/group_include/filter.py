@@ -9,7 +9,7 @@ from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.helpers import area_registry, device_registry, floor_registry, entity_registry
+from homeassistant.helpers import area_registry, device_registry, entity_registry, floor_registry
 from homeassistant.helpers.area_registry import AreaEntry
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_component import EntityComponent
@@ -24,7 +24,8 @@ from custom_components.powercalc.const import (
     CONF_AND,
     CONF_AREA,
     CONF_FILTER,
-    CONF_FLOOR, CONF_GROUP,
+    CONF_FLOOR,
+    CONF_GROUP,
     CONF_LABEL,
     CONF_OR,
     CONF_TEMPLATE,
@@ -274,6 +275,7 @@ class DeviceFilter(EntityFilter):
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.device_id in self.device
 
+
 class FloorFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, floor_id: str) -> None:
         floor_reg = floor_registry.async_get(hass)
@@ -299,6 +301,7 @@ class FloorFilter(EntityFilter):
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.area_id in self.area_ids or entity.device_id in self.devices
+
 
 class CompositeFilter(EntityFilter):
     def __init__(
