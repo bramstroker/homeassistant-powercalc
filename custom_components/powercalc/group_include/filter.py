@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Sequence
 from enum import StrEnum
 import re
 from typing import Protocol, cast
@@ -10,7 +10,6 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers import area_registry, device_registry, entity_registry, floor_registry
-from homeassistant.helpers.area_registry import AreaEntry
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -22,6 +21,7 @@ from custom_components.powercalc.const import (
     CONF_ALL,
     CONF_AND,
     CONF_AREA,
+    CONF_CATEGORY,
     CONF_FILTER,
     CONF_FLOOR,
     CONF_GROUP,
@@ -41,11 +41,12 @@ class FilterOperator(StrEnum):
 FILTER_CONFIG = vol.Schema(
     {
         vol.Optional(CONF_ALL): None,
-        vol.Optional(CONF_AREA): cv.string,
+        vol.Optional(CONF_AREA): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
+        vol.Optional(CONF_CATEGORY): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
         vol.Optional(CONF_FLOOR): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
-        vol.Optional(CONF_GROUP): cv.entity_id,
+        vol.Optional(CONF_GROUP): vol.Any(vol.All(cv.ensure_list, [cv.entity_id]), cv.entity_id),
         vol.Optional(CONF_DOMAIN): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
-        vol.Optional(CONF_LABEL): cv.string,
+        vol.Optional(CONF_LABEL): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
         vol.Optional(CONF_TEMPLATE): cv.template,
         vol.Optional(CONF_WILDCARD): cv.string,
     },
@@ -83,6 +84,7 @@ def create_filter(
     filter_mapping: dict[str, Callable[[], EntityFilter]] = {
         CONF_DOMAIN: lambda: DomainFilter(filter_config),  # type: ignore
         CONF_AREA: lambda: AreaFilter(hass, filter_config),  # type: ignore
+        CONF_CATEGORY: lambda: CategoryFilter(filter_config),  # type: ignore
         CONF_FLOOR: lambda: FloorFilter(hass, filter_config),  # type: ignore
         CONF_LABEL: lambda: LabelFilter(filter_config),  # type: ignore
         CONF_WILDCARD: lambda: WildcardFilter(filter_config),  # type: ignore
@@ -121,9 +123,16 @@ class DomainFilter(EntityFilter):
 
 
 class GroupFilter(EntityFilter):
-    def __init__(self, hass: HomeAssistant, group_id: str) -> None:
-        domain = split_entity_id(group_id)[0]
-        self.filter = LightGroupFilter(hass, group_id) if domain == LIGHT_DOMAIN else StandardGroupFilter(hass, group_id)
+    def __init__(self, hass: HomeAssistant, group_id: str | Iterable[str]) -> None:
+        group_ids = [group_id] if isinstance(group_id, str) else group_id
+
+        filters = []
+        for single_group_id in group_ids:
+            domain = split_entity_id(single_group_id)[0]
+            filter_instance = LightGroupFilter(hass, single_group_id) if domain == LIGHT_DOMAIN else StandardGroupFilter(hass, single_group_id)
+            filters.append(filter_instance)
+
+        self.filter = CompositeFilter(filters, FilterOperator.OR) if len(filters) > 1 else filters[0]
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return self.filter.is_valid(entity)
@@ -223,16 +232,27 @@ class TemplateFilter(EntityFilter):
 
 
 class LabelFilter(EntityFilter):
-    def __init__(self, label: str) -> None:
-        self.label = label
+    def __init__(self, label: str | Iterable[str]) -> None:
+        self.labels = [label] if isinstance(label, str) else label
 
     def is_valid(self, entity: RegistryEntry) -> bool:
-        return self.label in entity.labels
+        return any(label in entity.labels for label in self.labels)
 
 
 class CategoryFilter(EntityFilter):
-    def __init__(self, categories: list[EntityCategory]) -> None:
-        self.categories = categories
+    def __init__(self, categories: EntityCategory | str | Iterable[EntityCategory | str]) -> None:
+        if isinstance(categories, (EntityCategory, str)):
+            categories = [categories]
+
+        self.categories = []
+        for category in categories:
+            if not isinstance(category, EntityCategory):
+                try:
+                    self.categories.append(EntityCategory(category))
+                except ValueError as err:
+                    raise SensorConfigurationError(f"Invalid entity category: {category}") from err
+            else:
+                self.categories.append(category)
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.entity_category in self.categories
@@ -247,24 +267,30 @@ class LambdaFilter(EntityFilter):
 
 
 class AreaFilter(EntityFilter):
-    def __init__(self, hass: HomeAssistant, area_id_or_name: str) -> None:
+    def __init__(self, hass: HomeAssistant, area_id: str | Iterable[str]) -> None:
+        self.area_ids: list[str] = []
+        self.area_devices: list[str] = []
+
+        area_ids = [area_id] if isinstance(area_id, str) else area_id
+
         area_reg = area_registry.async_get(hass)
-        area = area_reg.async_get_area(area_id_or_name)
-        if area is None:
-            area = area_reg.async_get_area_by_name(str(area_id_or_name))
-
-        if area is None or area.id is None:
-            raise SensorConfigurationError(
-                f"No area with id or name '{area_id_or_name}' found in your HA instance",
-            )
-
-        self.area: AreaEntry = area
-
         device_reg = device_registry.async_get(hass)
-        self.area_devices = [device.id for device in device_registry.async_entries_for_area(device_reg, area.id)]
+
+        for area_id in area_ids:
+            area = area_reg.async_get_area(area_id)
+            if area is None:
+                area = area_reg.async_get_area_by_name(str(area_id))
+
+            if area is None or area.id is None:
+                raise SensorConfigurationError(
+                    f"No area with id or name '{area_id}' found in your HA instance",
+                )
+
+            self.area_ids.append(area.id)
+            self.area_devices.extend([device.id for device in device_registry.async_entries_for_area(device_reg, area.id)])
 
     def is_valid(self, entity: RegistryEntry) -> bool:
-        return entity.area_id == self.area.id or entity.device_id in self.area_devices
+        return entity.area_id in self.area_ids or entity.device_id in self.area_devices
 
 
 class DeviceFilter(EntityFilter):
@@ -309,7 +335,7 @@ class FloorFilter(EntityFilter):
 class CompositeFilter(EntityFilter):
     def __init__(
         self,
-        filters: list[EntityFilter],
+        filters: Sequence[EntityFilter],
         operator: FilterOperator = FilterOperator.AND,
     ) -> None:
         self.filters = filters
