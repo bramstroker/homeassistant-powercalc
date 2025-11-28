@@ -1,5 +1,6 @@
 from datetime import timedelta
 import logging
+from typing import Any
 from unittest.mock import AsyncMock, patch
 import uuid
 
@@ -26,7 +27,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc import CONF_DISCOVERY, SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
+from custom_components.powercalc import CONF_DISCOVERY, CONF_ENABLE_AUTODISCOVERY_DEPRECATED, SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import PowercalcConfigFlow
 from custom_components.powercalc.const import (
@@ -1015,6 +1016,26 @@ async def test_discovery_disable_runtime(
     new_data[CONF_DISCOVERY] = {CONF_ENABLED: False}
     hass.config_entries.async_update_entry(entry, data=new_data)
     await hass.async_block_till_done()
+
+    flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    assert len(flows) == 0
+
+
+@pytest.mark.parametrize(
+    "global_config",
+    [
+        ({CONF_ENABLE_AUTODISCOVERY_DEPRECATED: False}),
+        ({CONF_DISCOVERY: {CONF_ENABLED: False}}),
+    ],
+)
+async def test_discovery_disabled(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    global_config: dict[str, Any],
+) -> None:
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    await run_powercalc_setup(hass, {}, global_config)
 
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     assert len(flows) == 0

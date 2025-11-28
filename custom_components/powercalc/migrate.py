@@ -84,8 +84,7 @@ async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dic
         if old_key not in yaml_config:
             continue
 
-        if new_key not in discovery_options:
-            discovery_options[new_key] = yaml_config[old_key]  # pragma: nocover
+        discovery_options[new_key] = yaml_config[old_key]  # pragma: nocover
 
         global_config.pop(old_key, None)
         legacy_discovery_config = True
