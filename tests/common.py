@@ -257,6 +257,7 @@ def mock_floor_registry(
     fixture instead.
     """
     from homeassistant.helpers.floor_registry import DATA_REGISTRY
+
     registry = FloorRegistry(hass)
     registry.floors = FloorRegistryItems()
     if mock_entries:
