@@ -17,6 +17,17 @@ If you used YAML you need to restart Home Assistant fully to reload the group.
 
 ## Include
 
+
+!!! note
+
+    Filters `area`, `floor`, `group`, `domain` and `label` can be used with multiple values.
+
+    ```yaml
+      area:
+        - bathroom
+        - kitchen
+    ```
+
 ### Area
 
 ```yaml
