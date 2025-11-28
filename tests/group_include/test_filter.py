@@ -89,11 +89,30 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
         (["test2"], False),
         (["test", "test2"], True),
         (["test2", "test3"], False),
+        ("device-label", True),
     ],
 )
-async def test_label_filter(label: str | list[str], expected_result: bool) -> None:
-    entry = RegistryEntryWithDefaults(entity_id="sensor.test", unique_id="abc", platform="test", labels=["test"])
-    assert LabelFilter(label).is_valid(entry) == expected_result
+async def test_label_filter(hass: HomeAssistant, label: str | list[str], expected_result: bool) -> None:
+    mock_device_registry(
+        hass,
+        {
+            "my-device": DeviceEntry(
+                id="my-device",
+                name="My device",
+                manufacturer="Mock",
+                model="Device",
+                labels=["device-label"],
+            ),
+        },
+    )
+    entry = RegistryEntryWithDefaults(
+        entity_id="sensor.test",
+        unique_id="abc",
+        platform="test",
+        labels=["test"],
+        device_id="my-device",
+    )
+    assert LabelFilter(hass, label).is_valid(entry) == expected_result
 
 
 @pytest.mark.parametrize(

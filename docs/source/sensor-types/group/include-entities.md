@@ -90,6 +90,7 @@ powercalc:
 ### Label
 
 Filters entities by a [label](https://www.home-assistant.io/docs/organizing/labels/).
+Supports both labels defined on the entity and labels defined on the device.
 
 ```yaml
 powercalc:
