@@ -280,7 +280,6 @@ class FloorFilter(EntityFilter):
         self.area_ids: list[str] = []
         self.devices: list[str] = []
 
-        # Convert to list if it's a single string
         floor_ids = [floor_id] if isinstance(floor_id, str) else floor_id
 
         floor_reg = floor_registry.async_get(hass)
