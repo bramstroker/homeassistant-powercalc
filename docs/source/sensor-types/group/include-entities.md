@@ -1,7 +1,7 @@
 # Dynamically including entities
 
-Powercalc provides several methods to automatically include a bunch of entities in a group with the `include` option.
-In addition to that you can use filters to exclude certain entities.
+Powercalc provides several methods to automatically include a bunch of entities in a group with the `include` option. The `include` option is used to set the initial entity set for your group.
+In addition to that you can use `filter` options to further narrow down this initial set by excluding certain entities.
 
 !!! note
 
@@ -146,8 +146,8 @@ powercalc:
 
 ## Filters
 
-Besides the base filters described above which build the base include you can also apply additional filters to further narrow down the list of items.
-These filters accept the same configuration as described above.
+While the `include` options above are used to set the initial entity set for your group, you can also apply additional `filter` options to further narrow down this initial set.
+These filters accept the same configuration as the include options described above, but they are applied after the initial entity set is determined by the `include` options.
 
 For example to include all light entities from area outdoor.
 
