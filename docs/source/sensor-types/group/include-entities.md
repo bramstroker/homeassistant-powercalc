@@ -53,16 +53,6 @@ powercalc:
 
 This will include all entities that are in areas assigned to the specified floor. Like area filtering, this can be combined with other options:
 
-```yaml
-powercalc:
-  sensors:
-    - create_group: First Floor Lights
-      include:
-        floor: first_floor
-        filter:
-          domain: light
-```
-
 ### Group
 
 Includes entities from an existing Home Assistant [group](https://www.home-assistant.io/integrations/group/) or [light group](https://www.home-assistant.io/integrations/light.group/))
