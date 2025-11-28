@@ -171,6 +171,7 @@
       "group_custom": {
         "data": {
           "area": "Bereich",
+          "floor": "Etage",
           "create_energy_sensor": "Energiesensor erstellen",
           "create_utility_meters": "Utilitymeter erstellen",
           "device": "Gerät",
@@ -187,6 +188,7 @@
         },
         "data_description": {
           "area": "Fügt alle Leistungssensoren aus dem angegebenen Bereich hinzu",
+          "floor": "Fügt alle Leistungssensoren aus der angegebenen Etage hinzu",
           "create_energy_sensor": "Ob powercalc einen kWh Sensor erstellen muss",
           "device": "Füge die von Powercalc erstellten Gruppenentitäten einem bestehenden Gerät hinzu",
           "force_calculate_group_energy": "Standardmäßig summiert Powercalc die Energiesensoren der Mitgliedssensoren. Schalten Sie diese Option um, um die Erstellung eines Riemann Summen Sensors zu erzwingen",
@@ -633,6 +635,7 @@
         "title": "Gruppeneinstellungen",
         "data": {
           "area": "Bereich",
+          "floor": "Etage",
           "device": "Gerät",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Energie-Entitäten der Gruppe",
@@ -645,6 +648,7 @@
         },
         "data_description": {
           "area": "Fügt alle Leistungssensoren aus dem angegebenen Bereich hinzu",
+          "floor": "Fügt alle Leistungssensoren aus der angegebenen Etage hinzu",
           "device": "Füge die von Powercalc erstellten Gruppenentitäten einem bestehenden Gerät hinzu",
           "force_calculate_group_energy": "Standardmäßig summiert Powercalc die Energiesensoren der Mitgliedssensoren. Schalten Sie diese Option um, um die Erstellung eines Riemann Summen Sensors zu erzwingen",
           "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",

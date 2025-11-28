@@ -171,6 +171,7 @@
       "group_custom": {
         "data": {
           "area": "Ruimte",
+          "floor": "Verdieping",
           "create_energy_sensor": "Creëer energie sensoren",
           "create_utility_meters": "Creëer utiliteit meters",
           "device": "Apparaat",
@@ -187,6 +188,7 @@
         },
         "data_description": {
           "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
+          "floor": "Voeg alle powercalc sensoren van de gespecificeerde verdieping toe",
           "create_energy_sensor": "Laat powercalc een kWh meter maken",
           "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
           "force_calculate_group_energy": "Standaard worden de energiesensoren van de individuele sensoren opgeteld. Schakel deze optie in om een Riemann Sum sensor te forceren",
@@ -633,6 +635,7 @@
         "title": "Groep opties",
         "data": {
           "area": "Ruimte",
+          "floor": "Verdieping",
           "device": "Apparaat",
           "force_calculate_group_energy": "Forceer berekenen energie",
           "group_energy_entities": "Additionele energie entiteiten",
@@ -645,6 +648,7 @@
         },
         "data_description": {
           "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
+          "floor": "Voeg alle powercalc sensoren van de gespecificeerde verdieping toe",
           "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
           "force_calculate_group_energy": "Standaard worden de energiesensoren van de individuele sensoren opgeteld. Schakel deze optie in om een Riemann Sum sensor te forceren",
           "group_energy_entities": "Additionele energie entiteiten (kWh)",

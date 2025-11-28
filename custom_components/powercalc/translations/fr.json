@@ -171,6 +171,7 @@
       "group_custom": {
         "data": {
           "area": "Zone",
+          "floor": "Étage",
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Créer des compteurs d'électricité",
           "device": "Device",
@@ -187,6 +188,7 @@
         },
         "data_description": {
           "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
+          "floor": "Ajoute tous les capteurs powercalc de l'étage spécifié",
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
@@ -633,6 +635,7 @@
         "title": "Group options",
         "data": {
           "area": "Zone",
+          "floor": "Étage",
           "device": "Device",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Entités d'énergies supplémentaires",
@@ -645,6 +648,7 @@
         },
         "data_description": {
           "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
+          "floor": "Ajoute tous les capteurs powercalc de l'étage spécifié",
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",

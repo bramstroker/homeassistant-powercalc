@@ -24,6 +24,7 @@ import voluptuous as vol
 from custom_components.powercalc.const import (
     CONF_AREA,
     CONF_EXCLUDE_ENTITIES,
+    CONF_FLOOR,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
@@ -180,6 +181,7 @@ def validate_group_input(user_input: dict[str, Any] | None = None) -> None:
         CONF_GROUP_MEMBER_SENSORS,
         CONF_GROUP_MEMBER_DEVICES,
         CONF_AREA,
+        CONF_FLOOR,
     }
 
     if not any(key in (user_input or {}) for key in required_keys):
@@ -234,6 +236,7 @@ def create_schema_group_custom(
             ),
             vol.Optional(CONF_SUB_GROUPS): create_group_selector(hass, current_entry=config_entry),
             vol.Optional(CONF_AREA): selector.AreaSelector(),
+            vol.Optional(CONF_FLOOR): selector.FloorSelector(),
             vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
             vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
             vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),

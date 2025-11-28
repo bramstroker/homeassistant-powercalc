@@ -65,6 +65,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_EXCLUDE_ENTITIES,
+    CONF_FLOOR,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
@@ -95,8 +96,9 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from custom_components.powercalc.device_binding import get_device_info
-from custom_components.powercalc.group_include.filter import AreaFilter, CompositeFilter, DeviceFilter, EntityFilter, FilterOperator
+from custom_components.powercalc.group_include.filter import AreaFilter, CompositeFilter, DeviceFilter, EntityFilter, FilterOperator, FloorFilter
 from custom_components.powercalc.group_include.include import find_entities
+from custom_components.powercalc.helpers import async_cache
 from custom_components.powercalc.sensors.abstract import (
     BaseEntity,
     generate_energy_sensor_entity_id,
@@ -223,9 +225,12 @@ async def create_group_sensors_custom(
 
 def filter_entity_list_by_class(
     all_entities: list,
-    class_name: type[EnergySensor | PowerSensor],
+    class_name: type[EnergySensor | PowerSensor] | SensorDeviceClass,
     default_filters: list[Callable] | None = None,
 ) -> list[str]:
+    """Filter entity list to only include entities of the given class."""
+    if isinstance(class_name, SensorDeviceClass):
+        class_name = PowerSensor if class_name == SensorDeviceClass.POWER else EnergySensor
     filter_list = default_filters.copy() if default_filters else []
     filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
     filter_list.append(lambda elm: isinstance(elm, class_name))
@@ -238,7 +243,23 @@ def filter_entity_list_by_class(
     ]
 
 
-async def resolve_entity_ids_recursively(  # noqa: C901
+@async_cache
+async def build_entity_include_filter(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+) -> EntityFilter:
+    """Build and cache the entity filter based on the entry data."""
+    filters: list[EntityFilter] = []
+    if CONF_AREA in entry.data:
+        filters.append(AreaFilter(hass, entry.data[CONF_AREA]))
+    if CONF_FLOOR in entry.data:
+        filters.append(FloorFilter(hass, entry.data[CONF_FLOOR]))
+    if CONF_GROUP_MEMBER_DEVICES in entry.data:
+        filters.append(DeviceFilter(set(entry.data[CONF_GROUP_MEMBER_DEVICES])))
+    return CompositeFilter(filters, FilterOperator.OR)
+
+
+async def resolve_entity_ids_recursively(
     hass: HomeAssistant,
     entry: ConfigEntry,
     device_class: SensorDeviceClass,
@@ -271,29 +292,17 @@ async def resolve_entity_ids_recursively(  # noqa: C901
         conf_key = CONF_GROUP_POWER_ENTITIES if device_class == SensorDeviceClass.POWER else CONF_GROUP_ENERGY_ENTITIES
         resolved_ids.update(entry.data.get(conf_key) or [])
 
-    async def add_device_and_area_entities() -> None:
-        """Add entities from the defined areas."""
-        if CONF_AREA not in entry.data and CONF_GROUP_MEMBER_DEVICES not in entry.data:
+    async def add_include_based_sensors() -> None:
+        """Add entities from the defined areas, devices and floors."""
+        if all(k not in entry.data for k in (CONF_AREA, CONF_FLOOR, CONF_GROUP_MEMBER_DEVICES)):
             return
 
-        filters: list[EntityFilter] = []
-        if CONF_AREA in entry.data:
-            filters.append(AreaFilter(hass, entry.data[CONF_AREA]))
-        if CONF_GROUP_MEMBER_DEVICES in entry.data:
-            filters.append(DeviceFilter(set(entry.data[CONF_GROUP_MEMBER_DEVICES])))
-        entity_filter = CompositeFilter(filters, FilterOperator.OR)
-
-        resolved_area_entities, _ = await find_entities(
+        resolved_entities, _ = await find_entities(
             hass,
-            entity_filter,
+            await build_entity_include_filter(hass, entry),
             bool(entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS)),
         )
-        area_entities = [
-            entity.entity_id
-            for entity in resolved_area_entities
-            if isinstance(entity, PowerSensor if device_class == SensorDeviceClass.POWER else EnergySensor)
-        ]
-        resolved_ids.update(area_entities)
+        resolved_ids.update(filter_entity_list_by_class(resolved_entities, device_class))
 
     async def add_subgroup_entities() -> None:
         """Recursively add entities from subgroups."""
@@ -312,7 +321,7 @@ async def resolve_entity_ids_recursively(  # noqa: C901
     # Process the main logic
     add_member_entry_ids()
     add_specified_sensors()
-    await add_device_and_area_entities()
+    await add_include_based_sensors()
     await add_subgroup_entities()
 
     return resolved_ids
