@@ -14,5 +14,6 @@
   "aliases": [
     "SHRGB"
   ],
-  "device_type": "light"
+  "device_type": "light",
+  "author": "Mike Debney <mike.debney@outlook.com>"
 }
