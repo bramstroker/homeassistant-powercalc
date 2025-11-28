@@ -198,8 +198,6 @@ By default all the include options will include any power and/or energy sensor f
 When you don't want that behaviour you can set `include_non_powercalc_sensors` to `false`.
 
 ```yaml
-.. code-block:: yaml
-
 powercalc:
   sensors:
     - create_group: Outdoor lights
@@ -211,8 +209,6 @@ powercalc:
 You can also set this option globally:
 
 ```yaml
-.. code-block:: yaml
-
 powercalc:
   include_non_powercalc_sensors: false
 ```
