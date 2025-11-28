@@ -86,7 +86,7 @@ def create_filter(
         CONF_AREA: lambda: AreaFilter(hass, filter_config),  # type: ignore
         CONF_CATEGORY: lambda: CategoryFilter(filter_config),  # type: ignore
         CONF_FLOOR: lambda: FloorFilter(hass, filter_config),  # type: ignore
-        CONF_LABEL: lambda: LabelFilter(filter_config),  # type: ignore
+        CONF_LABEL: lambda: LabelFilter(hass, filter_config),  # type: ignore
         CONF_WILDCARD: lambda: WildcardFilter(filter_config),  # type: ignore
         CONF_GROUP: lambda: GroupFilter(hass, filter_config),  # type: ignore
         CONF_TEMPLATE: lambda: TemplateFilter(hass, filter_config),  # type: ignore
@@ -232,11 +232,15 @@ class TemplateFilter(EntityFilter):
 
 
 class LabelFilter(EntityFilter):
-    def __init__(self, label: str | Iterable[str]) -> None:
+    def __init__(self, hass: HomeAssistant, label: str | Iterable[str]) -> None:
         self.labels = [label] if isinstance(label, str) else label
+        self.devices: set[str] = set()
+        device_reg = device_registry.async_get(hass)
+        for label in self.labels:
+            self.devices.update([device.id for device in device_registry.async_entries_for_label(device_reg, label)])
 
     def is_valid(self, entity: RegistryEntry) -> bool:
-        return any(label in entity.labels for label in self.labels)
+        return any(label in entity.labels for label in self.labels) or entity.device_id in self.devices
 
 
 class CategoryFilter(EntityFilter):
@@ -269,7 +273,7 @@ class LambdaFilter(EntityFilter):
 class AreaFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, area_id: str | Iterable[str]) -> None:
         self.area_ids: list[str] = []
-        self.area_devices: list[str] = []
+        self.area_devices: set[str] = set()
 
         area_ids = [area_id] if isinstance(area_id, str) else area_id
 
@@ -287,7 +291,7 @@ class AreaFilter(EntityFilter):
                 )
 
             self.area_ids.append(area.id)
-            self.area_devices.extend([device.id for device in device_registry.async_entries_for_area(device_reg, area.id)])
+            self.area_devices.update([device.id for device in device_registry.async_entries_for_area(device_reg, area.id)])
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.area_id in self.area_ids or entity.device_id in self.area_devices
