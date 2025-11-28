@@ -171,6 +171,7 @@
       "group_custom": {
         "data": {
           "area": "Oblasť",
+          "floor": "Floor",
           "create_energy_sensor": "Vytvoriť snímač energie",
           "create_utility_meters": "Vytvorte merače spotreby",
           "device": "Zariadenie",
@@ -187,6 +188,7 @@
         },
         "data_description": {
           "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
+          "floor": "Adds all power sensors from the specified floor",
           "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh snímač",
           "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
           "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
@@ -633,6 +635,7 @@
         "title": "Možnosti skupiny",
         "data": {
           "area": "Oblasť",
+          "floor": "Floor",
           "device": "Zariadenie",
           "force_calculate_group_energy": "Sila vypočítať energiu",
           "group_energy_entities": "Ďalšie energetické entity",
@@ -645,6 +648,7 @@
         },
         "data_description": {
           "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
+          "floor": "Adds all power sensors from the specified floor",
           "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
           "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
           "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahŕňajú",

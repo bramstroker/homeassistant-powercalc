@@ -171,6 +171,7 @@
       "group_custom": {
         "data": {
           "area": "Oblast",
+          "floor": "Floor",
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Create utility meters",
           "device": "Zařízení",
@@ -187,6 +188,7 @@
         },
         "data_description": {
           "area": "Přidá všechny energetické senzory z určené oblasti",
+          "floor": "Adds all power sensors from the specified floor",
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
@@ -633,6 +635,7 @@
         "title": "Group options",
         "data": {
           "area": "Oblast",
+          "floor": "Floor",
           "device": "Zařízení",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
@@ -645,6 +648,7 @@
         },
         "data_description": {
           "area": "Přidá všechny powercalc senzory z určené oblasti",
+          "floor": "Adds all power sensors from the specified floor",
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",

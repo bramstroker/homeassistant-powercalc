@@ -171,6 +171,7 @@
       "group_custom": {
         "data": {
           "area": "Område",
+          "floor": "Floor",
           "create_energy_sensor": "Skapa energisensor",
           "create_utility_meters": "Skapa bruksmätare",
           "device": "Enhet",
@@ -187,6 +188,7 @@
         },
         "data_description": {
           "area": "Lägg till alla powercalc sensorer från det specifierade området",
+          "floor": "Adds all power sensors from the specified floor",
           "create_energy_sensor": "Om powercalc ska skapa en kWh sensor",
           "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
@@ -633,6 +635,7 @@
         "title": "Group options",
         "data": {
           "area": "Område",
+          "floor": "Floor",
           "device": "Enhet",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Medlem energi entiteter",
@@ -645,6 +648,7 @@
         },
         "data_description": {
           "area": "Lägg till alla powercalc sensorer från det specifierade området",
+          "floor": "Adds all power sensors from the specified floor",
           "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
