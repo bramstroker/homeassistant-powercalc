@@ -346,7 +346,7 @@ def create_grouped_power_sensor(
         unique_id=unique_id,
     )
 
-    _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s)", name, entity_id)
+    _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s, unique_id=%s)", name, entity_id, unique_id)
 
     return GroupedPowerSensor(
         hass=hass,
