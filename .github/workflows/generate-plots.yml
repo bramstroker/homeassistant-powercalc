@@ -28,3 +28,4 @@ jobs:
         if: github.ref == 'refs/heads/master'
         with:
           message: 'chore: generate plots'
+          pull: '--rebase --autostash'
