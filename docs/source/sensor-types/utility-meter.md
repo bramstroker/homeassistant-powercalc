@@ -13,7 +13,9 @@ powercalc:
 ```
 
 By default utility meters are created for `daily`, `weekly`, `monthly` cycles.
-You can change this behaviour with the `utility_meter_types` configuration option.
+All valid values are `quarter-hourly`, `hourly`, `daily`, `weekly`, `monthly`, `bimonthly`, `quarterly` and `yearly`. E.g. cycle value bimonthly will reset the counter once in two months.
+
+You can change this behaviour with the `utility_meter_types` configuration option globally or per sensor or group (this will override global settings for this particular sensor or group).
 
 ```yaml
 powercalc:
