@@ -1,0 +1,25 @@
+{
+  "measure_description": "The measured device fw: 1.7.1. The result represents the average value of measurements collected from the measuring device API for the following scenarios: dumb device/baseline consumption (~3.8W) and several device configurations. See sub-profiles.",
+  "measure_method": "manual",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_device_firmware": "20250520-083712/1.6.2-gc8a76e2",
+  "measure_settings": {
+    "SAMPLE_COUNT": 200,
+    "SLEEP_TIME": 0.5
+  },
+  "name": "Shelly 1PM Mini Gen4",
+  "aliases": [
+    "S4SW-001P8EU",
+    "Shelly Mini1PMG4"
+  ],
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "only_self_usage": true,
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your Shelly configuration.\nIf not sure, select 'Other combinations' which will report the highest possible draw.",
+  "created_at": "2025-11-29T10:48:00 CET",
+  "author": "Michal Bartak <maxym.srpl@gmail.com>"
+}
