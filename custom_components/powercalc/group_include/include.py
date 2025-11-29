@@ -35,7 +35,7 @@ async def find_entities(
     discoverable_entities: list[str] = []
     source_entities = await get_filtered_entity_list(hass, _build_filter(entity_filter))
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
-        _LOGGER.debug("Found possible include entities: %s", [entity.entity_id for entity in source_entities])
+        _LOGGER.debug("Source entities: %s", [entity.entity_id for entity in source_entities])
 
     source_entity_powercalc_entity_map: dict[str, list[tuple[Entity, bool]]] = domain_data.get(DATA_CONFIGURED_ENTITIES, {})
     powercalc_entities: dict[str, Entity] = domain_data.get(DATA_ENTITIES, {})
@@ -63,6 +63,10 @@ async def find_entities(
         )
         if power_profile and not await power_profile.needs_user_configuration and power_profile.is_entity_domain_supported(source_entity):
             discoverable_entities.append(source_entity.entity_id)
+
+    if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
+        _LOGGER.debug("Resolved entities: %s", [entity.entity_id for entity in resolved_entities])
+        _LOGGER.debug("Discoverable entities: %s", discoverable_entities)
 
     return resolved_entities, discoverable_entities
 
