@@ -86,7 +86,10 @@ class LightRunner(MeasurementRunner):
         [self.run_mode(answers, measurement_info, all_variations, left_variations) for measurement_info in measurements_to_run]
 
         return RunnerResult(
-            model_json_data={"calculation_strategy": "lut"},
+            model_json_data={
+                "device_type": "light",
+                "calculation_strategy": "lut",
+            },
         )
 
     def prepare_measurements_for_mode(self, export_directory: str, mode: LutMode) -> MeasurementRunInput:

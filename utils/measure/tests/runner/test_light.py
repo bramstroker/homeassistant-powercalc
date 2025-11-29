@@ -48,6 +48,10 @@ def test_run(mock_sleep, mock_config_factory, export_path: str) -> None:  # noqa
     runner = LightRunner(measure_util_mock, mock_config)
     runner.prepare({QUESTION_MODE: {LutMode.BRIGHTNESS}})
 
-    runner.run({}, export_path)
+    result = runner.run({}, export_path)
+    assert result.model_json_data == {
+        "device_type": "light",
+        "calculation_strategy": "lut",
+    }
 
     assert os.path.exists(os.path.join(export_path, "brightness.csv.gz"))
