@@ -1328,9 +1328,9 @@ async def test_irrelevant_entity_domains_are_skipped(hass: HomeAssistant, caplog
             ),
         },
     )
-    _, discoverable_entities = await find_entities(hass)
-    assert len(discoverable_entities) == 1
-    assert "light.test" in discoverable_entities
+    result = await find_entities(hass)
+    assert len(result.discoverable) == 1
+    assert "light.test" in result.discoverable
 
     assert "scene.test" not in caplog.text
     assert "event.test" not in caplog.text

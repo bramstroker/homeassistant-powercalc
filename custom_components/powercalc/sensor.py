@@ -737,9 +737,9 @@ async def add_discovered_entities(
         include_config: dict = cast(dict, config[CONF_INCLUDE])
         include_non_powercalc: bool = include_config.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True)
         entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
-        found_entities, discoverable_entities = await find_entities(hass, entity_filter, include_non_powercalc)
-        entities_to_add.existing.extend(found_entities)
-        for entity_id in discoverable_entities:
+        found_entities = await find_entities(hass, entity_filter, include_non_powercalc)
+        entities_to_add.existing.extend(found_entities.resolved)
+        for entity_id in found_entities.discoverable:
             sensor_configs[entity_id] = {CONF_ENTITY_ID: entity_id}
 
 

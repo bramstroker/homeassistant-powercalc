@@ -307,8 +307,8 @@ async def create_schema_group_tracked_untracked_manual(
         schema = SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL
 
     if not user_input:
-        entities, _ = await find_entities(hass)
-        tracked_entities = [entity.entity_id for entity in entities if isinstance(entity, PowerSensor)]
+        result = await find_entities(hass)
+        tracked_entities = [entity.entity_id for entity in result.resolved if isinstance(entity, PowerSensor)]
         schema = fill_schema_defaults(schema, {CONF_GROUP_TRACKED_POWER_ENTITIES: tracked_entities})
 
     return schema

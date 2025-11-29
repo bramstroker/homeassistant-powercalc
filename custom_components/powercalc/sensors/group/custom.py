@@ -297,12 +297,12 @@ async def resolve_entity_ids_recursively(
         if all(k not in entry.data for k in (CONF_AREA, CONF_FLOOR, CONF_GROUP_MEMBER_DEVICES)):
             return
 
-        resolved_entities, _ = await find_entities(
+        result = await find_entities(
             hass,
             await build_entity_include_filter(hass, entry),
             bool(entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS)),
         )
-        resolved_ids.update(filter_entity_list_by_class(resolved_entities, device_class))
+        resolved_ids.update(filter_entity_list_by_class(result.resolved, device_class))
 
     async def add_subgroup_entities() -> None:
         """Recursively add entities from subgroups."""
@@ -346,7 +346,7 @@ def create_grouped_power_sensor(
         unique_id=unique_id,
     )
 
-    _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s)", name, entity_id)
+    _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s, unique_id=%s)", name, entity_id, unique_id)
 
     return GroupedPowerSensor(
         hass=hass,

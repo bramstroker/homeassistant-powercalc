@@ -52,8 +52,8 @@ async def find_auto_tracked_power_entities(hass: HomeAssistant, exclude_entities
     entity_filter = None
     if exclude_entities:
         entity_filter = LambdaFilter(lambda entity: entity.entity_id not in exclude_entities)
-    entities, _ = await find_entities(hass, entity_filter)
-    return {entity.entity_id for entity in entities if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)}
+    result = await find_entities(hass, entity_filter)
+    return {entity.entity_id for entity in result.resolved if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)}
 
 
 class TrackedPowerSensorFactory:
