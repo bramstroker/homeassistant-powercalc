@@ -2,7 +2,7 @@
   "created_at": "2025-10-13T17:19:21.329606",
   "device_type": "lawn_mower_robot",
   "calculation_strategy": "composite",
-  "alias": [
+  "aliases": [
     "YUKA mini 600 (YUKA mini 600)"
   ],
   "composite_config": [
