@@ -7,7 +7,7 @@
     "VERSION": "v1.17.12:docker"
   },
   "name": "Shelly 1 Mini Gen4",
-  "alias": [
+  "aliases": [
     "S4SW-001X8EU"
   ],
   "sensor_config": {

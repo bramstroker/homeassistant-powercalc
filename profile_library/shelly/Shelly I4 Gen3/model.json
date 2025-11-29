@@ -7,7 +7,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "Shelly I4 Gen3",
-  "alias": [
+  "aliases": [
     "S3SN-0024X"
   ],
   "sensor_config": {
