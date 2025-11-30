@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feat/release-draft
   pull_request:
     types: [opened, reopened, synchronize]
 
@@ -16,6 +17,21 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      - name: Generate Release Drafter config with supporters
+        env:
+          BMC_API_TOKEN: ${{ secrets.BMC_API_TOKEN }}
+          BMC_SLUG: ${{ secrets.BMC_SLUG }}
+        run: |
+          set -eu
+
+          SUPPORTERS_SECTION="$(python scripts/generate_supporters_section.py)"
+
+          # Escape for sed (slashes, ampersands)
+          SUPPORTERS_SECTION_ESCAPED=$(printf '%s\n' "$SUPPORTERS_SECTION" | sed 's/[&/\]/\\&/g')
+
+          sed "s#<!-- SUPPORTERS_SECTION -->#${SUPPORTERS_SECTION_ESCAPED}#" \
+            .github/release-drafter.base.yml \
+            > .github/release-drafter.generated.yml
       - name: Create Release
         uses: release-drafter/release-drafter@v6
         with:
