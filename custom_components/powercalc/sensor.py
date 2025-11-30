@@ -932,7 +932,7 @@ async def check_entity_not_already_configured(
         raise SensorAlreadyConfiguredError(entity_id, existing_entities)
 
     # YAML flow without unique_id cannot add when any entity already exists
-    if context.is_yaml and not unique_id and entities:
+    if context.is_yaml and not sensor_config.get(CONF_UNIQUE_ID) and existing_entities:
         raise SensorAlreadyConfiguredError(entity_id, existing_entities)
 
 

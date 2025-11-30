@@ -40,6 +40,8 @@ from custom_components.powercalc.const import (
     CONF_INCLUDE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_LABEL,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
     CONF_OR,
     CONF_POWER,
     CONF_SENSOR_TYPE,
@@ -1360,6 +1362,50 @@ async def test_prevent_duplicate_entities_when_using_include_all(
 
     assert hass.states.get("sensor.test_power")
     assert not hass.states.get("sensor.test_power_2")
+
+
+async def test_include_with_gui_and_yaml_entry(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """Test include works correctly when individual entity is configured both with YAML and GUI"""
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "pc_68291146-1592-4cfa-b5fb-bfeefcf9c691",
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT015",
+            ENTRY_DATA_POWER_ENTITY: "sensor.test_power",
+            ENTRY_DATA_ENERGY_ENTITY: "sensor.test_energy",
+        },
+        unique_id="pc_68291146-1592-4cfa-b5fb-bfeefcf9c691",
+    )
+    entry.add_to_hass(hass)
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_ENTITY_ID: "light.test",
+            },
+            {
+                CONF_CREATE_GROUP: "My Group",
+                CONF_INCLUDE: {
+                    CONF_DOMAIN: "light",
+                },
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    state = hass.states.get("sensor.my_group_power")
+    assert state
+    assert state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
+    assert not hass.states.get("sensor.test_power2")
 
 
 def _create_powercalc_config_entry(
