@@ -24,7 +24,7 @@ jobs:
         run: |
           set -eu
 
-          SUPPORTERS_SECTION="$(python scripts/generate_supporters_section.py)"
+          SUPPORTERS_SECTION="$(python .github/scripts/generate_supporters_section.py)"
 
           # Escape for sed (slashes, ampersands)
           SUPPORTERS_SECTION_ESCAPED=$(printf '%s\n' "$SUPPORTERS_SECTION" | sed 's/[&/\]/\\&/g')
