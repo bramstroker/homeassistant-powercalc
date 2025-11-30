@@ -114,12 +114,10 @@ class EntityFilter(Protocol):
 
 class DomainFilter(EntityFilter):
     def __init__(self, domain: str | Iterable[str]) -> None:
-        self.domain = domain if isinstance(domain, str) else set(domain)
+        self.domains = {domain} if isinstance(domain, str) else set(domain)
 
     def is_valid(self, entity: RegistryEntry) -> bool:
-        if isinstance(self.domain, set):
-            return entity.domain in self.domain
-        return entity.domain == self.domain
+        return entity.domain in self.domains
 
 
 class GroupFilter(EntityFilter):
