@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 from homeassistant.const import CONF_DOMAIN, STATE_ON, EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import area_registry, floor_registry
+from homeassistant.helpers import area_registry, floor_registry, label_registry
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -81,18 +81,20 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
 
 
 @pytest.mark.parametrize(
-    "label,expected_result",
+    "label,expected_result,expect_exception",
     [
-        ("test", True),
-        ("test2", False),
-        (["test"], True),
-        (["test2"], False),
-        (["test", "test2"], True),
-        (["test2", "test3"], False),
-        ("device-label", True),
+        ("test", True, False),
+        ("test2", False, False),
+        (["test"], True, False),
+        (["test2"], False, False),
+        (["test", "test2"], True, False),
+        (["test2", "test3"], False, False),
+        ("device_label", True, False),
+        ("My Label with Spaces", True, False),
+        ("unknown", False, True),
     ],
 )
-async def test_label_filter(hass: HomeAssistant, label: str | list[str], expected_result: bool) -> None:
+async def test_label_filter(hass: HomeAssistant, label: str | list[str], expected_result: bool, expect_exception: bool) -> None:
     mock_device_registry(
         hass,
         {
@@ -101,17 +103,28 @@ async def test_label_filter(hass: HomeAssistant, label: str | list[str], expecte
                 name="My device",
                 manufacturer="Mock",
                 model="Device",
-                labels=["device-label"],
+                labels=["device_label"],
             ),
         },
     )
+
+    label_reg = label_registry.async_get(hass)
+    for label_name in ["test", "test2", "test3", "device-label", "My Label with Spaces"]:
+        label_reg.async_create(label_name)
+
     entry = RegistryEntryWithDefaults(
         entity_id="sensor.test",
         unique_id="abc",
         platform="test",
-        labels=["test"],
+        labels=["test", "my_label_with_spaces"],
         device_id="my-device",
     )
+
+    if expect_exception:
+        with pytest.raises(SensorConfigurationError):
+            LabelFilter(hass, label).is_valid(entry)
+        return
+
     assert LabelFilter(hass, label).is_valid(entry) == expected_result
 
 
