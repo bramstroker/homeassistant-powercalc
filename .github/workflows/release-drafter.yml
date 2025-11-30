@@ -26,8 +26,10 @@ jobs:
 
           SUPPORTERS_SECTION="$(python .github/scripts/generate_supporters_section.py)"
 
-          # Escape for sed (slashes, ampersands)
-          SUPPORTERS_SECTION_ESCAPED=$(printf '%s\n' "$SUPPORTERS_SECTION" | sed 's/[&/\]/\\&/g')
+          # Escape &, /, \ and # for sed replacement
+          SUPPORTERS_SECTION_ESCAPED=$(printf '%s\n' "$SUPPORTERS_SECTION" \
+            | sed -e 's/[&/\]/\\&/g' \
+                  -e 's/#/\\#/g')
 
           sed "s#<!-- SUPPORTERS_SECTION -->#${SUPPORTERS_SECTION_ESCAPED}#" \
             .github/release-drafter.base.yml \
