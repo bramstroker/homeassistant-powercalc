@@ -16,13 +16,26 @@ You could either install with HACS (recommended) or manual.
 
 **Post installation steps**
 
-1. Add the following entry to `configuration.yaml`:
+After you have downloaded the integration you must enable it.
+Powercalc supports both GUI and YAML configuration. Depending on your preference, follow the steps below.
 
-    ```yaml
-    powercalc:
-    ```
+=== "GUI (recommended)"
 
-2. Restart HA
+    Add the integration via the Home Assistant GUI:
+
+    [![image](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc)
+
+    Choose `Global Configuration` and follow the wizard to define global options.
+
+=== "YAML"
+
+    - Add the following entry to `configuration.yaml`:
+
+       ```yaml
+       powercalc:
+       ```
+
+    - Restart HA
 
 ## Set up power sensors
 
