@@ -27,15 +27,15 @@ jobs:
           python << 'PY'
           from pathlib import Path
           from subprocess import check_output
-          
+
           section = check_output(
               ["python", ".github/scripts/generate_supporters_section.py"],
               text=True,
           )
-          
+
           base_path = Path(".github/release-drafter.base.yml")
           out_path = Path(".github/release-drafter.generated.yml")
-          
+
           template = base_path.read_text()
           out_path.write_text(template.replace("<!-- SUPPORTERS_SECTION -->", section))
           PY
