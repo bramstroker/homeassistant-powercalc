@@ -323,9 +323,6 @@ def build_supporters_section(token: str, slug: str) -> str:
     lines.append("")
     lines.append(f"Support the project at https://buymeacoffee.com/{slug}")
 
-    while len(lines) >= 2 and not lines[-2].strip():
-        lines.pop(-2)
-
     return "\n".join(lines)
 
 

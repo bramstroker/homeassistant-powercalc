@@ -39,6 +39,6 @@ jobs:
         with:
           footer: ${{ steps.supporters.outputs.value }}
           config-name: release-drafter.yml
-#          disable-releaser: github.ref != 'refs/heads/main'
+          disable-releaser: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
