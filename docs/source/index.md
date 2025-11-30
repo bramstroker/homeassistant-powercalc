@@ -8,4 +8,6 @@ Follow [Quick start](quick-start.md) for the initial installation / setup
 
 :material-library: [Profile library](https://library.powercalc.nl)
 
+:material-coffee: [Buy Me A Coffee](https://www.buymeacoffee.com/bramski)
+
 ![](img/logo2.svg){: style="height:250px;width:250px"}
