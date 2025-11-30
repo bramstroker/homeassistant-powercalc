@@ -126,6 +126,7 @@ nav:
       - 'troubleshooting/faq.md'
       - 'troubleshooting/data-correction.md'
       - 'troubleshooting/debug-logging.md'
+      - 'troubleshooting/download-diagnostics.md'
       - 'troubleshooting/install-master.md'
       - 'troubleshooting/yeelight.md'
   - 'Cookbook':
