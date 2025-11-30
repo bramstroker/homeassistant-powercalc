@@ -18,6 +18,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Generate Release Drafter config with supporters
+        id: supporters
         env:
           BMC_API_TOKEN: ${{ secrets.BMC_API_TOKEN }}
           BMC_SLUG: ${{ secrets.BMC_SLUG }}
