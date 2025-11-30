@@ -24,16 +24,21 @@ jobs:
         run: |
           set -eu
 
-          SUPPORTERS_SECTION="$(python .github/scripts/generate_supporters_section.py)"
-
-          # Escape &, /, \ and # for sed replacement
-          SUPPORTERS_SECTION_ESCAPED=$(printf '%s\n' "$SUPPORTERS_SECTION" \
-            | sed -e 's/[&/\]/\\&/g' \
-                  -e 's/#/\\#/g')
-
-          sed "s#<!-- SUPPORTERS_SECTION -->#${SUPPORTERS_SECTION_ESCAPED}#" \
-            .github/release-drafter.base.yml \
-            > .github/release-drafter.generated.yml
+          python << 'PY'
+          from pathlib import Path
+          from subprocess import check_output
+          
+          section = check_output(
+              ["python", ".github/scripts/generate_supporters_section.py"],
+              text=True,
+          )
+          
+          base_path = Path(".github/release-drafter.base.yml")
+          out_path = Path(".github/release-drafter.generated.yml")
+          
+          template = base_path.read_text()
+          out_path.write_text(template.replace("<!-- SUPPORTERS_SECTION -->", section))
+          PY
       - name: Create Release
         uses: release-drafter/release-drafter@v6
         with:
