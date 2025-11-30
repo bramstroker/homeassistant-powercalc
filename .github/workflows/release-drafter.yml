@@ -23,14 +23,14 @@ jobs:
           BMC_SLUG: ${{ secrets.BMC_SLUG }}
         run: |
           set -eu
-          
+
           section="$(python .github/scripts/generate_supporters_section.py)"
-          
+
           # Escape for GitHub output (%, CR, LF)
           section="${section//'%'/'%25'}"
           section="${section//$'\n'/'%0A'}"
           section="${section//$'\r'/'%0D'}"
-          
+
           echo "value=$section" >> "$GITHUB_OUTPUT"
       - name: Create Release
         uses: release-drafter/release-drafter@v6
