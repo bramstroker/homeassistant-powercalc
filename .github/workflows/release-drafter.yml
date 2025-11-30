@@ -23,29 +23,19 @@ jobs:
           BMC_SLUG: ${{ secrets.BMC_SLUG }}
         run: |
           set -eu
-
-          python << 'PY'
-          from pathlib import Path
-          from subprocess import check_output
-
-          section = check_output(
-              ["python", ".github/scripts/generate_supporters_section.py"],
-              text=True,
-          )
-
-          base_path = Path(".github/release-drafter.yml")
-          out_path = Path(".github/release-drafter.generated.yml")
-
-          template = base_path.read_text()
-          print(template)
-          new_template = template.replace("<!-- SUPPORTERS_SECTION -->", section)
-          print(new_template)
-          out_path.write_text(new_template)
-
-          PY
+          
+          section="$(python .github/scripts/generate_supporters_section.py)"
+          
+          # Escape for GitHub output (%, CR, LF)
+          section="${section//'%'/'%25'}"
+          section="${section//$'\n'/'%0A'}"
+          section="${section//$'\r'/'%0D'}"
+          
+          echo "value=$section" >> "$GITHUB_OUTPUT"
       - name: Create Release
         uses: release-drafter/release-drafter@v6
         with:
+          footer: ${{ steps.supporters.outputs.value }}
           config-name: release-drafter.generated.yml
 #          disable-releaser: github.ref != 'refs/heads/main'
         env:
