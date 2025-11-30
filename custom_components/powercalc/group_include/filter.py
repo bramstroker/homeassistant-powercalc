@@ -9,7 +9,7 @@ from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.helpers import area_registry, device_registry, entity_registry, floor_registry
+from homeassistant.helpers import area_registry, device_registry, entity_registry, floor_registry, label_registry
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -233,11 +233,27 @@ class TemplateFilter(EntityFilter):
 
 class LabelFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, label: str | Iterable[str]) -> None:
-        self.labels = [label] if isinstance(label, str) else label
+        self._hass = hass
+        labels = [label] if isinstance(label, str) else label
+        self.labels = [self._get_label_id(label) for label in labels]
         self.devices: set[str] = set()
         device_reg = device_registry.async_get(hass)
-        for label in self.labels:
-            self.devices.update([device.id for device in device_registry.async_entries_for_label(device_reg, label)])
+        for label_id in self.labels:
+            self.devices.update([device.id for device in device_registry.async_entries_for_label(device_reg, label_id)])
+
+    def _get_label_id(self, label: str) -> str:
+        label_reg = label_registry.async_get(self._hass)
+        label_entry = label_reg.async_get_label(label)
+        if label_entry:
+            return label_entry.label_id
+
+        label_entry = label_reg.async_get_label_by_name(str(label))
+        if label_entry:
+            return label_entry.label_id
+
+        raise SensorConfigurationError(
+            f"No label with id or name '{label}' found in your HA instance",
+        )
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return any(label in entity.labels for label in self.labels) or entity.device_id in self.devices
