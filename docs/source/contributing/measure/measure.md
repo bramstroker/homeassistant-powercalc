@@ -41,10 +41,6 @@ The script will ask you a few questions and will start switching your light to a
 Depending on the selected color mode and sleep settings this will take a while. This will take 1 hour to a few hours to complete.
 Time to take a cup of coffee.
 
-### Measure smart speakers
-
-Version 1.2.0 of the measure script fully automates the measurement session for smart speakers. Just select `Smart speaker` in the first step of the wizard.
-
 ## Prepare / finalize the files
 
 When the script has finished you can find the actual files in `/utils/measure/export` directory.
@@ -67,17 +63,9 @@ To create a Pull Request (PR) on the Powercalc GitHub repository, follow these s
 
 ## Common Problems
 
-### Getting lot of 0 readings
+### Getting 0 Watt readings during session of for standby_power
 
-Some power sensors, such as Arlec PC191HA, PC287HA appear not able to sense small amounts of current/power.
-
-Sometimes, measuring multiple of the same light is required to get an accurate set of readings.
-
-To do this, use the [group integration](https://www.home-assistant.io/integrations/group/), ensure your lights are configured in an identical fashion.
-
-When this is also not working use one of the recommended smart plugs
-
-You could also use a dummy load. This is a device that consumes a fixed amount of power. This can be used to increase the power consumption of the light, so the power meter can measure it more accurately.
+See [Standby troubleshooting](standby_troubleshooting.md)
 
 ### Tuya power plug will not connect
 

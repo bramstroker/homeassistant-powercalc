@@ -134,10 +134,11 @@ nav:
       - 'cookbook/ups.md'
   - 'Contributing':
       - 'contributing/index.md'
-      - 'contributing/integration-development.md'
       - 'Measure':
-        - 'contributing/measure.md'
-        - 'contributing/measure-ocr.md'
+          - 'contributing/measure/measure.md'
+          - 'contributing/measure/measure-ocr.md'
+          - 'contributing/measure/standby_troubleshooting.md'
+      - 'contributing/integration-development.md'
       - 'contributing/translating.md'
   - 'Tutorials':
       - 'community/tutorials.md'
