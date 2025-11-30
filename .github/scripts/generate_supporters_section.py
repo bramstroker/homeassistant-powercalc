@@ -295,7 +295,7 @@ def build_supporters_section(token: str, slug: str) -> str:
     tiered = group_supporters_by_tier(supporters)
 
     lines: list[str] = []
-    lines.append("Supporters powering this project ⚡ 👇")
+    lines.append("## Supporters powering this project ⚡ 👇")
     lines.append("")
 
     # Monthly supporters first
@@ -320,10 +320,9 @@ def build_supporters_section(token: str, slug: str) -> str:
             lines.append("and other legends")
         lines.append("")
 
-    # Call to action
+    lines.append("")
     lines.append(f"Support the project at https://buymeacoffee.com/{slug}")
 
-    # Trim trailing empty lines (but keep CTA)
     while len(lines) >= 2 and not lines[-2].strip():
         lines.pop(-2)
 
