@@ -415,6 +415,35 @@ async def test_restore_state(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.testgroup_energy").state == "0.5000"
 
 
+async def test_restore_state_no_error_when_unavailable(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.WARNING)
+    mock_restore_cache_with_extra_data(
+        hass,
+        (
+            (
+                State(
+                    "sensor.testgroup_energy",
+                    STATE_UNAVAILABLE,
+                ),
+                {"native_unit_of_measurement": None, "native_value": None},
+            ),
+        ),
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("switch.test"),
+            ],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    assert "Could not restore last state" not in caplog.text
+
+
 async def test_mega_watt_hour(hass: HomeAssistant) -> None:
     await create_input_boolean(hass, "test1")
 
