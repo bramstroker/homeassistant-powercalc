@@ -33,8 +33,8 @@ jobs:
               text=True,
           )
 
-          base_path = Path(".github/release-drafter.base.yml")
-          out_path = Path(".github/release-drafter.generated.yml")
+          base_path = Path(".github/release-drafter.yml")
+          out_path = Path(".github/release-drafter.yml")
 
           template = base_path.read_text()
           out_path.write_text(template.replace("<!-- SUPPORTERS_SECTION -->", section))
