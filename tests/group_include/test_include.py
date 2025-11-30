@@ -1379,6 +1379,7 @@ async def test_include_with_gui_and_yaml_entry(
             CONF_ENTITY_ID: "light.test",
             CONF_MANUFACTURER: "signify",
             CONF_MODEL: "LCT015",
+            CONF_CREATE_UTILITY_METERS: True,
             ENTRY_DATA_POWER_ENTITY: "sensor.test_power",
             ENTRY_DATA_ENERGY_ENTITY: "sensor.test_energy",
         },

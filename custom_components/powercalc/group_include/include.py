@@ -16,6 +16,7 @@ from custom_components.powercalc.discovery import get_power_profile_by_source_en
 from custom_components.powercalc.power_profile.power_profile import SUPPORTED_DOMAINS
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
+from custom_components.powercalc.sensors.utility_meter import VirtualUtilityMeter
 
 from .filter import CompositeFilter, DomainFilter, EntityFilter, LambdaFilter, get_filtered_entity_list
 
@@ -32,6 +33,7 @@ async def find_entities(
     hass: HomeAssistant,
     entity_filter: EntityFilter | None = None,
     include_non_powercalc: bool = True,
+    exclude_utility_meters: bool = True,
 ) -> FindEntitiesResult:
     """
     Based on the given entity filter, fetch all power and energy sensors from the HA instance.
@@ -92,6 +94,9 @@ async def find_entities(
         )
         if power_profile and not await power_profile.needs_user_configuration and power_profile.is_entity_domain_supported(source_entity):
             discoverable_entities.append(entity_id)
+
+    if exclude_utility_meters:
+        resolved_entities = [entity for entity in resolved_entities if not isinstance(entity, VirtualUtilityMeter)]
 
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug("Resolved entities: %s", [entity.entity_id for entity in resolved_entities])
