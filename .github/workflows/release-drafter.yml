@@ -27,7 +27,7 @@ jobs:
 
           set -eu
           section="$(python .github/scripts/generate_supporters_section.py)"
-      
+
           # Store multiline output safely
           {
             echo "value<<EOF"
