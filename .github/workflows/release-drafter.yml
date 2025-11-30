@@ -41,7 +41,7 @@ jobs:
           new_template = template.replace("<!-- SUPPORTERS_SECTION -->", section)
           print(new_template)
           out_path.write_text(new_template)
-          
+
           PY
       - name: Create Release
         uses: release-drafter/release-drafter@v6
