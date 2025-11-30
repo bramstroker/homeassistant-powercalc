@@ -34,14 +34,19 @@ jobs:
           )
 
           base_path = Path(".github/release-drafter.yml")
-          out_path = Path(".github/release-drafter.yml")
+          out_path = Path(".github/release-drafter.generated.yml")
 
           template = base_path.read_text()
-          out_path.write_text(template.replace("<!-- SUPPORTERS_SECTION -->", section))
+          print(template)
+          new_template = template.replace("<!-- SUPPORTERS_SECTION -->", section)
+          print(new_template)
+          out_path.write_text(new_template)
+          
           PY
       - name: Create Release
         uses: release-drafter/release-drafter@v6
-#        with:
+        with:
+          config-name: release-drafter.generated.yml
 #          disable-releaser: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
