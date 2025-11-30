@@ -41,7 +41,7 @@ jobs:
           PY
       - name: Create Release
         uses: release-drafter/release-drafter@v6
-        with:
-          disable-releaser: github.ref != 'refs/heads/main'
+#        with:
+#          disable-releaser: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
