@@ -17,6 +17,7 @@ from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntryDisabler
+from homeassistant.helpers import label_registry
 from homeassistant.setup import async_setup_component
 import pytest
 from pytest_homeassistant_custom_component.common import (
@@ -935,6 +936,9 @@ async def test_include_by_label(hass: HomeAssistant) -> None:
         },
     )
 
+    label_reg = label_registry.async_get(hass)
+    label_reg.async_create("my_label")
+
     await run_powercalc_setup(
         hass,
         {
@@ -1366,9 +1370,10 @@ async def test_prevent_duplicate_entities_when_using_include_all(
 
 async def test_include_with_gui_and_yaml_entry(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
+    mock_entity_with_model_information: MockEntityWithModel
 ) -> None:
     """Test include works correctly when individual entity is configured both with YAML and GUI"""
+
     mock_entity_with_model_information("light.test", "signify", "LCT010")
 
     entry = MockConfigEntry(
