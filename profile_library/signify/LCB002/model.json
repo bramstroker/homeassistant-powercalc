@@ -1,0 +1,16 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-11-27T02:19:50.297429",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Kauf PLF12",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.19.0:docker"
+  },
+  "name": " Hue White and Color Ambiance BR30 E26",
+  "standby_power": 0.1,
+  "author": "John Pham <jhnphm@gmail.com>",
+  "device_type": "light"
+}
