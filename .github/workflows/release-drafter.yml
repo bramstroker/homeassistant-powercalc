@@ -25,14 +25,15 @@ jobs:
         run: |
           set -eu
 
+          set -eu
           section="$(python .github/scripts/generate_supporters_section.py)"
-
-          # Escape for GitHub output (%, CR, LF)
-          section="${section//'%'/'%25'}"
-          section="${section//$'\n'/'%0A'}"
-          section="${section//$'\r'/'%0D'}"
-
-          echo "value=$section" >> "$GITHUB_OUTPUT"
+      
+          # Store multiline output safely
+          {
+            echo "value<<EOF"
+            echo "$section"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
       - name: Create Release
         uses: release-drafter/release-drafter@v6
         with:
