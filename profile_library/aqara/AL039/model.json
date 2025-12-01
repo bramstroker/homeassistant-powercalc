@@ -10,7 +10,7 @@
     "VERSION": "v1.19.1:docker"
   },
   "name": "Aqara LED Light Bulb T1",
-  "standby_power": 0.40,
+  "standby_power": 0.4,
   "aliases": [
     "AL039"
   ],
