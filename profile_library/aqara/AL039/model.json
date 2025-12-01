@@ -12,6 +12,7 @@
   "name": "Aqara LED Light Bulb T1",
   "standby_power": 0.4,
   "aliases": [
+    "Aqara LED Light Bulb T1",
     "AL039"
   ],
   "device_type": "light",
