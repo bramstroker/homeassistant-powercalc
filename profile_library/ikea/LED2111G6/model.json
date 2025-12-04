@@ -12,5 +12,8 @@
   "name": "TRADFRI bulb E14 CWS globe 806lm",
   "standby_power": 0.46,
   "device_type": "light",
-  "author": "LtKowalski <232428921+LtKowalski@users.noreply.github.com>"
+  "author": "LtKowalski <232428921+LtKowalski@users.noreply.github.com>",
+  "aliases": [
+    "TRADFRI bulb E14 CWS globe 806lm"
+  ]
 }
