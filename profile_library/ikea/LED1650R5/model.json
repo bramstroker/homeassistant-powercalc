@@ -9,5 +9,6 @@
     "TRADFRI bulb GU10 W 400lm"
   ],
   "created_at": "2021-06-28T17:41:00",
-  "author": "nepozs <56661567+nepozs@users.noreply.github.com>"
+  "author": "nepozs <56661567+nepozs@users.noreply.github.com>",
+  "device_type": "light"
 }

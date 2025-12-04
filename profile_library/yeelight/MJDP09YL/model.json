@@ -15,5 +15,6 @@
     "yeelink.light.mbulb3",
     "Mesh: MJDP09YL, yeelink.light.mbulb3"
   ],
-  "author": "Ed Kutuev <ed@napych.com>"
+  "author": "Ed Kutuev <ed@napych.com>",
+  "device_type": "light"
 }

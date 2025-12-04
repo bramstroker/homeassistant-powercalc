@@ -11,5 +11,6 @@
   },
   "name": "Hue G125 E27 Filament Globe Bulb",
   "standby_power": 0.15,
-  "author": "Pierre <397503+bemble@users.noreply.github.com>"
+  "author": "Pierre <397503+bemble@users.noreply.github.com>",
+  "device_type": "light"
 }

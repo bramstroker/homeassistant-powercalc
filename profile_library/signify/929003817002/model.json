@@ -11,5 +11,6 @@
   },
   "name": "Hue Solo Lightstrip (5 mtr.)",
   "standby_power": 0.3,
-  "author": "Gerd Rütten <97361636+GerdRuetten@users.noreply.github.com>"
+  "author": "Gerd Rütten <97361636+GerdRuetten@users.noreply.github.com>",
+  "device_type": "light"
 }

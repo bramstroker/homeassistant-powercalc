@@ -14,5 +14,6 @@
   "name": "Hue Discover white and color ambiance flood light",
   "standby_power": 0.5,
   "created_at": "2023-02-12T12:11:40",
-  "author": "Marc Geurts <geurtsmarc@hotmail.com>"
+  "author": "Marc Geurts <geurtsmarc@hotmail.com>",
+  "device_type": "light"
 }

@@ -14,5 +14,6 @@
   "fixed_config": {
     "power": 37.0
   },
-  "author": "brianegge <brianegge@gmail.com>"
+  "author": "brianegge <brianegge@gmail.com>",
+  "device_type": "light"
 }

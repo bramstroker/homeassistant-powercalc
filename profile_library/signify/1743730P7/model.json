@@ -11,5 +11,6 @@
   },
   "name": "Phillips Calla Large Outdoor Pedestal",
   "standby_power": 0.32,
-  "author": "James Nobes <james@Jamess-MacBook-Pro.local>"
+  "author": "James Nobes <james@Jamess-MacBook-Pro.local>",
+  "device_type": "light"
 }

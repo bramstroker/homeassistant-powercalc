@@ -11,5 +11,6 @@
   "standby_power": 0.38,
   "calculation_strategy": "lut",
   "created_at": "2025-06-02T23:18:14.432434",
-  "author": "mdb17 <mdb17@users.noreply.github.com>"
+  "author": "mdb17 <mdb17@users.noreply.github.com>",
+  "device_type": "light"
 }

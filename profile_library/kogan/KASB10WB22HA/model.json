@@ -11,5 +11,6 @@
   },
   "name": "Kogan SmarterHome 10W White Smart Bulb",
   "standby_power": 1.0,
-  "author": "Stuart Mackintosh <19421356+stuartmackintosh@users.noreply.github.com>"
+  "author": "Stuart Mackintosh <19421356+stuartmackintosh@users.noreply.github.com>",
+  "device_type": "light"
 }

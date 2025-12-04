@@ -11,5 +11,6 @@
   },
   "name": "Livarno Home RGB+CCT LED light strip 2m",
   "standby_power": 0.33,
-  "author": "RubenKelevra <cyrond@gmail.com>"
+  "author": "RubenKelevra <cyrond@gmail.com>",
+  "device_type": "light"
 }

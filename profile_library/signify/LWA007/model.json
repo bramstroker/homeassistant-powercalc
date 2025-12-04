@@ -11,5 +11,6 @@
   },
   "name": "LWA007",
   "standby_power": 0.35,
-  "author": "Zachery Notz <31785616+TheZackCodec@users.noreply.github.com>"
+  "author": "Zachery Notz <31785616+TheZackCodec@users.noreply.github.com>",
+  "device_type": "light"
 }

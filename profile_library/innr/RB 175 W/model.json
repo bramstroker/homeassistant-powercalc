@@ -6,5 +6,6 @@
   "measure_device": "Zhurui PR10-D",
   "measure_description": "Bulbs was measured twice at each dim setting (100 points) and mean value was used when there were differences",
   "created_at": "2021-06-26T22:33:35",
-  "author": "nepozs <szopen@os.pl>"
+  "author": "nepozs <szopen@os.pl>",
+  "device_type": "light"
 }

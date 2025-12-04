@@ -12,5 +12,6 @@
   "name": "Livarno Lux E27 bulb CCT",
   "standby_power": 0.31,
   "created_at": "2023-02-10T09:29:19",
-  "author": "Perfunctory85 <105150364+Perfunctory85@users.noreply.github.com>"
+  "author": "Perfunctory85 <105150364+Perfunctory85@users.noreply.github.com>",
+  "device_type": "light"
 }

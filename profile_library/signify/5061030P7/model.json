@@ -14,5 +14,6 @@
   ],
   "name": "Hue Centris 2-Spot Ceiling Light",
   "standby_power": 0.4,
-  "author": "Emil Blixt Hansen <42203610+blixtdevelopment@users.noreply.github.com>"
+  "author": "Emil Blixt Hansen <42203610+blixtdevelopment@users.noreply.github.com>",
+  "device_type": "light"
 }

@@ -1,6 +1,6 @@
 {
   "measure_description": "From manufacturer specifications",
-  "measure_method": "From manufacturer specifications",
+  "measure_method": "manual",
   "measure_device": "From manufacturer specifications",
   "name": "HmIP-FDT",
   "standby_power": 0.4,

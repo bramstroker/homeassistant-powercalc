@@ -11,5 +11,6 @@
   },
   "name": "1412",
   "standby_power": 0.57,
-  "author": "Chris Hallgren <challgren@gmail.com>"
+  "author": "Chris Hallgren <challgren@gmail.com>",
+  "device_type": "light"
 }

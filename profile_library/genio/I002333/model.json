@@ -11,5 +11,6 @@
   "standby_power": 0.87,
   "calculation_strategy": "lut",
   "created_at": "2022-08-13T17:54:04",
-  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
+  "device_type": "light"
 }

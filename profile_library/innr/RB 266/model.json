@@ -11,5 +11,6 @@
   "name": "RB 266 Smart Bulb White E27 780lm (2700K)",
   "standby_power": 0.31,
   "created_at": "2023-12-17T16:08:33",
-  "author": "swiggers <rafael@swiggers.net>"
+  "author": "swiggers <rafael@swiggers.net>",
+  "device_type": "light"
 }

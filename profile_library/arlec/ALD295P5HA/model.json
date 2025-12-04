@@ -11,5 +11,6 @@
   },
   "name": "Arlec 9W 92mm Grid Connect Smart RGB+CCT LED Downlight",
   "standby_power": 0.5,
-  "author": "Stuart Mackintosh <19421356+stuartmackintosh@users.noreply.github.com>"
+  "author": "Stuart Mackintosh <19421356+stuartmackintosh@users.noreply.github.com>",
+  "device_type": "light"
 }

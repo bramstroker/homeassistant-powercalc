@@ -12,5 +12,6 @@
   "calculation_strategy": "lut",
   "linked_profile": "ikea/LED1937T5_E27",
   "created_at": "2024-12-08T10:13:50",
-  "author": "bramstroker <bgerritsen@gmail.com>"
+  "author": "bramstroker <bgerritsen@gmail.com>",
+  "device_type": "light"
 }

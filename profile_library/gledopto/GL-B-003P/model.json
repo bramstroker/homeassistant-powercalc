@@ -11,5 +11,6 @@
   },
   "name": "LED Filament Lamp A60 7W",
   "standby_power": 0.12,
-  "author": "Jurjen <96632856+Coornh@users.noreply.github.com>"
+  "author": "Jurjen <96632856+Coornh@users.noreply.github.com>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "Tuya Zigbee 3.0 Bulb E27 RGB+CW+WW 15W",
   "standby_power": 0.52,
-  "author": "Dr-Seltsam <46630992+Dr-Seltsam@users.noreply.github.com>"
+  "author": "Dr-Seltsam <46630992+Dr-Seltsam@users.noreply.github.com>",
+  "device_type": "light"
 }

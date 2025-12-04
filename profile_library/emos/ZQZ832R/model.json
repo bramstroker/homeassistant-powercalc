@@ -11,5 +11,6 @@
   "name": "GOSMART LED MR16 4,8W GU10",
   "standby_power": 0.24,
   "created_at": "2024-03-01T21:31:06",
-  "author": "Lacimaci78 <135170078+Lacimaci78@users.noreply.github.com>"
+  "author": "Lacimaci78 <135170078+Lacimaci78@users.noreply.github.com>",
+  "device_type": "light"
 }

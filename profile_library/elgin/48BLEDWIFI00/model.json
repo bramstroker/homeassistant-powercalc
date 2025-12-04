@@ -14,5 +14,6 @@
   },
   "name": "Elgin Smart Color 10W",
   "standby_power": 0.8,
-  "author": "Diefferson Koderer Môro <diefferson.moro@gmail.com>"
+  "author": "Diefferson Koderer Môro <diefferson.moro@gmail.com>",
+  "device_type": "light"
 }

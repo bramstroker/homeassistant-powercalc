@@ -16,5 +16,6 @@
   ],
   "name": "Hue Gradient Signe Floor Light",
   "standby_power": 0.54,
-  "author": "Manuel Kasper <mk@neon1.net>"
+  "author": "Manuel Kasper <mk@neon1.net>",
+  "device_type": "light"
 }

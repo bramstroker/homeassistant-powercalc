@@ -11,5 +11,6 @@
   "standby_power": 0.7,
   "calculation_strategy": "lut",
   "created_at": "2022-08-21T08:18:17",
-  "author": "Emory Penney <emory.j.penney@intel.com>"
+  "author": "Emory Penney <emory.j.penney@intel.com>",
+  "device_type": "light"
 }

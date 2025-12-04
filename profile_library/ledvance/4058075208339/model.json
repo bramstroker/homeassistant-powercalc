@@ -14,5 +14,6 @@
   ],
   "name": "SMART+ ZB FLEX 3P RGB + TW",
   "standby_power": 0.26,
-  "author": "RubenKelevra <cyrond@gmail.com>"
+  "author": "RubenKelevra <cyrond@gmail.com>",
+  "device_type": "light"
 }

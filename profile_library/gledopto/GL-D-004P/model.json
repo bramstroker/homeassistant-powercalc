@@ -11,5 +11,6 @@
   },
   "name": "GL-D-004P",
   "standby_power": 0.22,
-  "author": "Peklaa <57568760+Peklaa@users.noreply.github.com>"
+  "author": "Peklaa <57568760+Peklaa@users.noreply.github.com>",
+  "device_type": "light"
 }

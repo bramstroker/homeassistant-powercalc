@@ -11,5 +11,6 @@
   },
   "name": "IKEA JETSTRÖM L2206",
   "standby_power": 0.32,
-  "author": "SAF <andrei.staicu@gmail.com>"
+  "author": "SAF <andrei.staicu@gmail.com>",
+  "device_type": "light"
 }

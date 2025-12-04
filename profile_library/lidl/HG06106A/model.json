@@ -11,5 +11,6 @@
   "name": "Livarno Lux GU10 4.5W RGBCT Bulb",
   "standby_power": 0.36,
   "created_at": "2024-02-03T09:39:50",
-  "author": "bobsbrain <46463210+bobsbrain@users.noreply.github.com>"
+  "author": "bobsbrain <46463210+bobsbrain@users.noreply.github.com>",
+  "device_type": "light"
 }

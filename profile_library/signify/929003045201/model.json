@@ -16,5 +16,6 @@
     "929003045201_03"
   ],
   "standby_power": 0.26,
-  "author": "Morpheus361 <marco.morpheus@kabelmail.de>"
+  "author": "Morpheus361 <marco.morpheus@kabelmail.de>",
+  "device_type": "light"
 }

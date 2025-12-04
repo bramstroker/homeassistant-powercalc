@@ -14,5 +14,6 @@
     "SHCB-1"
   ],
   "standby_power": 0.65,
-  "author": "Michal Bartak <maxym.srpl@gmail.com>"
+  "author": "Michal Bartak <maxym.srpl@gmail.com>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "ikuu 92mm Walter 9W Smart LED Downlight RGB+CCT Zigbee",
   "standby_power": 0.43,
-  "author": "hemiceni <ivansiegmann@live.com>"
+  "author": "hemiceni <ivansiegmann@live.com>",
+  "device_type": "light"
 }

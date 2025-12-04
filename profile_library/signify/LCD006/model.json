@@ -11,5 +11,6 @@
   "name": "Hue White and Color Ambiance Downlight 4 inch",
   "standby_power": 0.3,
   "created_at": "2024-01-08T20:35:44",
-  "author": "Emory Penney <treadstoneit@gmail.com>"
+  "author": "Emory Penney <treadstoneit@gmail.com>",
+  "device_type": "light"
 }

@@ -14,5 +14,6 @@
     "VERSION": "v1.17.24:docker"
   },
   "name": "EGLO FUEVA-Z (28.5cm)",
-  "standby_power": 0.13
+  "standby_power": 0.13,
+  "device_type": "light"
 }

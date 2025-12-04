@@ -6,6 +6,7 @@
   "aliases": [
     "SNPL-00116US"
   ],
+  "calculation_strategy": "lut",
   "discovery_by": "entity",
   "device_type": "smart_switch",
   "linked_profile": "shelly/shelly plus plug s",

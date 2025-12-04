@@ -11,5 +11,6 @@
   "name": "Livarno Lux smart LED mood light",
   "standby_power": 0.2,
   "created_at": "2024-03-14T18:59:57",
-  "author": "martinkura-svk <84280167+martinkura-svk@users.noreply.github.com>"
+  "author": "martinkura-svk <84280167+martinkura-svk@users.noreply.github.com>",
+  "device_type": "light"
 }

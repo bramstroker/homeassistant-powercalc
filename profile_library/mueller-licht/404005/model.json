@@ -11,5 +11,6 @@
   },
   "name": "tint GU10 spot white+color",
   "standby_power": 1.27,
-  "author": "Amjad Saadeh <amjad@saadeh.dev>"
+  "author": "Amjad Saadeh <amjad@saadeh.dev>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "Innr Light Strip Colour",
   "standby_power": 0.3,
-  "author": "Amjad Saadeh <amjad@saadeh.dev>"
+  "author": "Amjad Saadeh <amjad@saadeh.dev>",
+  "device_type": "light"
 }

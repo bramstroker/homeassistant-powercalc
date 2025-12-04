@@ -11,5 +11,6 @@
   },
   "name": "Slim recessed light S",
   "standby_power": 0.42,
-  "author": "buttonger <buttonger@users.noreply.github.com>"
+  "author": "buttonger <buttonger@users.noreply.github.com>",
+  "device_type": "light"
 }

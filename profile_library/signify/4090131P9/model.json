@@ -11,5 +11,6 @@
   "name": "Hue Sana Wall Light",
   "standby_power": 0.31,
   "author": "pwnagepeter <hauke@pwnagepeter.net>",
-  "created_at": "2024-07-21T11:13:03"
+  "created_at": "2024-07-21T11:13:03",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "Livarno Home outdoor LED band",
   "standby_power": 0.2,
-  "author": "bragra <bragragithub@gradussen.com>"
+  "author": "bragra <bragragithub@gradussen.com>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "Livarno Lux E14 6.5W RGBCT Candle Bulb",
   "standby_power": 0.4,
-  "author": "RubenKelevra <cyrond@gmail.com>"
+  "author": "RubenKelevra <cyrond@gmail.com>",
+  "device_type": "light"
 }

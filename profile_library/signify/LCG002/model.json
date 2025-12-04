@@ -30,5 +30,6 @@
     "5061031P7_03"
   ],
   "created_at": "2021-09-14T11:40:23",
-  "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>"
+  "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
+  "device_type": "light"
 }

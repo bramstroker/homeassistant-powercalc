@@ -14,5 +14,6 @@
     "404094 (16W)"
   ],
   "standby_power": 0.3,
-  "author": "Dr-Seltsam <46630992+Dr-Seltsam@users.noreply.github.com>"
+  "author": "Dr-Seltsam <46630992+Dr-Seltsam@users.noreply.github.com>",
+  "device_type": "light"
 }
