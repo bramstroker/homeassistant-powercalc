@@ -9,7 +9,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.1:docker"
   },
-   "aliases": [
+  "aliases": [
     "Nanoleaf HSL BFD",
     "N7102K02-25HSL"
   ],
