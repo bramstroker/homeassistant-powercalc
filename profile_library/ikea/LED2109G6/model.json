@@ -12,6 +12,7 @@
   "standby_power": 0.17,
   "author": "marthubner <86839034+marthubner@users.noreply.github.com>",
   "created_at": "2024-12-14T09:59:57",
+  "device_type": "light",
   "aliases": [
     "TRADFRI bulb E27 CWS globe 806lm"
   ]
