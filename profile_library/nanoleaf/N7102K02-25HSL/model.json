@@ -9,6 +9,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.1:docker"
   },
+   "aliases": [
+    "Nanoleaf HSL BFD",
+    "N7102K02-25HSL"
+  ],
+  "device_type": "light",
   "name": "Nanoleaf HSL BFD",
   "standby_power": 2.1
 }
