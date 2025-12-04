@@ -11,5 +11,6 @@
   },
   "name": "E27 RGB LED 10W 2700K 9971013",
   "standby_power": 0.38,
-  "author": "Jort <63785276+JortvanSchijndel@users.noreply.github.com>"
+  "author": "Jort <63785276+JortvanSchijndel@users.noreply.github.com>",
+  "device_type": "light"
 }

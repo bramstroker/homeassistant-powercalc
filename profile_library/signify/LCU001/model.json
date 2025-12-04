@@ -11,5 +11,6 @@
   },
   "name": "Hue color luster",
   "standby_power": 0.22,
-  "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>"
+  "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>",
+  "device_type": "light"
 }

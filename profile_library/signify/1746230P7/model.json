@@ -14,5 +14,6 @@
   "name": "Hue Lily XL outdoor spot light",
   "standby_power": 0.25,
   "created_at": "2023-02-14T18:42:39",
-  "author": "Marc Geurts <geurtsmarc@hotmail.com>"
+  "author": "Marc Geurts <geurtsmarc@hotmail.com>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "Hue Flourish Ceiling Light",
   "standby_power": 0.5,
-  "author": "deceju <111586992+deceju@users.noreply.github.com>"
+  "author": "deceju <111586992+deceju@users.noreply.github.com>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "Paulmann Licht GmbH RGBW Reflector GU10 350lm 4.8W",
   "standby_power": 0.25,
-  "author": "71820SM01 <141442191+71820SM01@users.noreply.github.com>"
+  "author": "71820SM01 <141442191+71820SM01@users.noreply.github.com>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "WiZ Smart Bulb A80 E27 922-65 RGB (type SHRGB, model 8719514554634, 18.5 W, 220-240 V, 50/60 Hz, 2452 lm @ 4000K, CRI: 90, beam angle: 360°)",
   "standby_power": 0.31,
-  "author": "schuppan <120984051+schuppan@users.noreply.github.com>"
+  "author": "schuppan <120984051+schuppan@users.noreply.github.com>",
+  "device_type": "light"
 }

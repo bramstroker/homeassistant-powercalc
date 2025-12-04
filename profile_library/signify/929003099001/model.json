@@ -11,5 +11,6 @@
   "name": "Hue white ambiance Aurelle square panel",
   "standby_power": 0.3,
   "created_at": "2023-04-03T21:42:31",
-  "author": "vandalon <joris@vandalon.nl>"
+  "author": "vandalon <joris@vandalon.nl>",
+  "device_type": "light"
 }

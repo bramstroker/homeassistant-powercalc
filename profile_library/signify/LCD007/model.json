@@ -11,5 +11,6 @@
   },
   "name": "Hue White and Color Ambiance Slim Downlight 6 inch",
   "standby_power": 0.49,
-  "author": "dewbot6 <drewsnodgrass@comcast.net>"
+  "author": "dewbot6 <drewsnodgrass@comcast.net>",
+  "device_type": "light"
 }

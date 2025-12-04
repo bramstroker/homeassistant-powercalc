@@ -14,5 +14,6 @@
     "ceiling10"
   ],
   "created_at": "2022-03-17T21:45:16",
-  "author": "Morten Trab <morten@trab.dk>"
+  "author": "Morten Trab <morten@trab.dk>",
+  "device_type": "light"
 }

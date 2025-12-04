@@ -15,5 +15,6 @@
     "yeelink.light.ml2",
     "Mesh: YLDP25YL/YLDP26YL, yeelink.light.ml2"
   ],
-  "author": "Ed Kutuev <ed@napych.com>"
+  "author": "Ed Kutuev <ed@napych.com>",
+  "device_type": "light"
 }

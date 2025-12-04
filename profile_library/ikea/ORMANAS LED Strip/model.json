@@ -11,5 +11,6 @@
   },
   "name": "ORMANAS LED Strip",
   "standby_power": 0.1,
-  "author": "Marius <33354141+Mariusthvdb@users.noreply.github.com>"
+  "author": "Marius <33354141+Mariusthvdb@users.noreply.github.com>",
+  "device_type": "light"
 }

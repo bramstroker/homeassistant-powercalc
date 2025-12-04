@@ -11,5 +11,6 @@
   },
   "name": "SMART+ Filament Edison 52 E27 Amber dimmable",
   "standby_power": 0.24,
-  "author": "dells2k <53873738+dells2k@users.noreply.github.com>"
+  "author": "dells2k <53873738+dells2k@users.noreply.github.com>",
+  "device_type": "light"
 }

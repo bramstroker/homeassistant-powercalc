@@ -12,5 +12,6 @@
   "name": "NYMANE PENDANT",
   "standby_power": 0.29,
   "created_at": "2024-01-13T09:03:27",
-  "author": "Mr. Bubbles <manni@zapto.de>"
+  "author": "Mr. Bubbles <manni@zapto.de>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   "name": "TP-Link Tapo L900-5",
   "standby_power": 0.24,
   "created_at": "2023-01-03T08:53:36",
-  "author": "Harry W <hjohnw13@gmail.com>"
+  "author": "Harry W <hjohnw13@gmail.com>",
+  "device_type": "light"
 }

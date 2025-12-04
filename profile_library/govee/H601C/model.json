@@ -11,5 +11,6 @@
   },
   "name": "Govee Smart LED Downlight",
   "standby_power": 0.85,
-  "author": "Brian Egge <brianegge@gmail.com>"
+  "author": "Brian Egge <brianegge@gmail.com>",
+  "device_type": "light"
 }

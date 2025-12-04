@@ -11,5 +11,6 @@
   },
   "name": "Play Gradient Lightstrip 65 Inch",
   "standby_power": 0.07,
-  "author": "dewbot6 <drewsnodgrass@comcast.net>"
+  "author": "dewbot6 <drewsnodgrass@comcast.net>",
+  "device_type": "light"
 }

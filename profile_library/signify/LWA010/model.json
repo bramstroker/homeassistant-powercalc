@@ -11,5 +11,6 @@
   "standby_power": 0.4,
   "calculation_strategy": "lut",
   "created_at": "2022-12-28T10:31:30",
-  "author": "Paul Nicholls <paul.n@next.gen.nz>"
+  "author": "Paul Nicholls <paul.n@next.gen.nz>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "Hue white and color GU10 400lm",
   "standby_power": 0.2,
-  "author": "matteobreschig <69394134+matteobreschig@users.noreply.github.com>"
+  "author": "matteobreschig <69394134+matteobreschig@users.noreply.github.com>",
+  "device_type": "light"
 }

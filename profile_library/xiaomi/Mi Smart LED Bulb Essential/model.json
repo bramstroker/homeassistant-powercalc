@@ -11,5 +11,6 @@
   },
   "name": "Mi Smart LED Bulb Essential",
   "standby_power": 1.2,
-  "author": "Alexandre Bertrand <alexandrebertrand96@gmail.com>"
+  "author": "Alexandre Bertrand <alexandrebertrand96@gmail.com>",
+  "device_type": "light"
 }

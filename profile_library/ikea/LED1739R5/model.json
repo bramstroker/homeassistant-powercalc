@@ -11,5 +11,6 @@
   },
   "name": "TRADFRI bulb GU10 WS 400 lm, dimmable, white spectrum",
   "standby_power": 0.26,
-  "author": "Bram Eikelboom <9055503+bram96@users.noreply.github.com>"
+  "author": "Bram Eikelboom <9055503+bram96@users.noreply.github.com>",
+  "device_type": "light"
 }

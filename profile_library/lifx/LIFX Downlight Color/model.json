@@ -14,5 +14,6 @@
     "LIFX Downlight"
   ],
   "created_at": "2022-10-05T13:31:39",
-  "author": "Joshua Rich <joshua.rich@gmail.com>"
+  "author": "Joshua Rich <joshua.rich@gmail.com>",
+  "device_type": "light"
 }

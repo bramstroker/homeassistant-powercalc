@@ -11,5 +11,6 @@
   },
   "name": "LIVARNO home Tischleuchte",
   "standby_power": 0.7,
-  "author": "RubenKelevra <cyrond@gmail.com>"
+  "author": "RubenKelevra <cyrond@gmail.com>",
+  "device_type": "light"
 }

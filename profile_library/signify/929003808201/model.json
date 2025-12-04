@@ -20,5 +20,6 @@
     "929003808101_02",
     "929003808101_03"
   ],
-  "author": "Wouter Rutgers <git@wouterrutgers.nl>"
+  "author": "Wouter Rutgers <git@wouterrutgers.nl>",
+  "device_type": "light"
 }

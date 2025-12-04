@@ -11,5 +11,6 @@
   "standby_power": 0.57,
   "calculation_strategy": "lut",
   "created_at": "2022-02-19T20:16:46",
-  "author": "Jamie De Vivo <jamiedevivoo@users.noreply.github.com>"
+  "author": "Jamie De Vivo <jamiedevivoo@users.noreply.github.com>",
+  "device_type": "light"
 }

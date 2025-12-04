@@ -11,5 +11,6 @@
   },
   "name": "Hue White and color ambiance Perifo cylinder spotlight",
   "standby_power": 0.15,
-  "author": "dewbot6 <drewsnodgrass@comcast.net>"
+  "author": "dewbot6 <drewsnodgrass@comcast.net>",
+  "device_type": "light"
 }

@@ -11,5 +11,6 @@
   },
   "name": "Govee H7020 String lights",
   "standby_power": 1.8,
-  "author": "Chris Hallgren <challgren@gmail.com>"
+  "author": "Chris Hallgren <challgren@gmail.com>",
+  "device_type": "light"
 }

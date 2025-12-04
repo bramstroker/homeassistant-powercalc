@@ -14,5 +14,6 @@
   "aliases": [
     "PAR16-GL-WIFILIC-TY-RGBCW"
   ],
-  "author": "Jort <63785276+JortvanSchijndel@users.noreply.github.com>"
+  "author": "Jort <63785276+JortvanSchijndel@users.noreply.github.com>",
+  "device_type": "light"
 }

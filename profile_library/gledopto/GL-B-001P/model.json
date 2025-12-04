@@ -11,5 +11,6 @@
   "standby_power": 0.31,
   "calculation_strategy": "lut",
   "created_at": "2022-09-11T17:05:58",
-  "author": "el97 <erik1337.el@gmail.com>"
+  "author": "el97 <erik1337.el@gmail.com>",
+  "device_type": "light"
 }

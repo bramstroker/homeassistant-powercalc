@@ -8,6 +8,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.1:docker"
   },
+  "calculation_strategy": "lut",
   "name": "Ceiling light T1M",
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
@@ -15,5 +16,6 @@
   },
   "standby_power": 0.18,
   "author": "CV",
-  "config_flow_discovery_remarks": "This device has separate light entities for the RGB ring and the white center light. You will be prompted to select a sub-profile. Choose the one according to the entity_id presented at that time.\nThe standby power of the device is 0.36W but divided between both light equally at this moment due to no better solutions (2025-01-27). If you only setup one light you need to correct the value yourself."
+  "config_flow_discovery_remarks": "This device has separate light entities for the RGB ring and the white center light. You will be prompted to select a sub-profile. Choose the one according to the entity_id presented at that time.\nThe standby power of the device is 0.36W but divided between both light equally at this moment due to no better solutions (2025-01-27). If you only setup one light you need to correct the value yourself.",
+  "device_type": "light"
 }

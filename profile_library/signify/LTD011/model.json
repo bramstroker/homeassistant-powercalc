@@ -11,5 +11,6 @@
   },
   "name": "Hue Garnea Downlight",
   "standby_power": 0.19,
-  "author": "James Nobes <james@MacBookPro.localdomain>"
+  "author": "James Nobes <james@MacBookPro.localdomain>",
+  "device_type": "light"
 }

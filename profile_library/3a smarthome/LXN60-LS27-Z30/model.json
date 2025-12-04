@@ -11,5 +11,6 @@
   "standby_power": 0.64,
   "calculation_strategy": "lut",
   "created_at": "2023-12-06T18:41:16",
-  "author": "Erhan Cakirman <1724594+ecakirman@users.noreply.github.com>"
+  "author": "Erhan Cakirman <1724594+ecakirman@users.noreply.github.com>",
+  "device_type": "light"
 }

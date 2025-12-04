@@ -11,5 +11,6 @@
   },
   "name": "Hue White and color ambiance Perifo cylinder pendant",
   "standby_power": 0.19,
-  "author": "dewbot6 <drewsnodgrass@comcast.net>"
+  "author": "dewbot6 <drewsnodgrass@comcast.net>",
+  "device_type": "light"
 }

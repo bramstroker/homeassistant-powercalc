@@ -11,5 +11,6 @@
   },
   "name": "WiZ A80.E27",
   "standby_power": 0.4,
-  "author": "Cam Murray <camurray@microsoft.com>"
+  "author": "Cam Murray <camurray@microsoft.com>",
+  "device_type": "light"
 }

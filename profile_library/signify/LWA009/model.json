@@ -6,5 +6,6 @@
   "measure_device": "Shelly Plug S",
   "measure_description": "Measured twice with script made by bramstroker using 9 sec pauses and partially verified manual",
   "created_at": "2021-08-21T07:43:16",
-  "author": "nepozs <56661567+nepozs@users.noreply.github.com>"
+  "author": "nepozs <56661567+nepozs@users.noreply.github.com>",
+  "device_type": "light"
 }

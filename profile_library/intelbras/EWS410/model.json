@@ -11,5 +11,6 @@
   },
   "name": "Intelbras EWS 410",
   "standby_power": 0.62,
-  "author": "Felipe Marinho <felipevm97@gmail.com>"
+  "author": "Felipe Marinho <felipevm97@gmail.com>",
+  "device_type": "light"
 }

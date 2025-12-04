@@ -11,5 +11,6 @@
   },
   "name": "Paulmann Licht Areo VariFit 230mm 2000lm 500.46",
   "standby_power": 0.25,
-  "author": "metzi <147942647+mime24@users.noreply.github.com>"
+  "author": "metzi <147942647+mime24@users.noreply.github.com>",
+  "device_type": "light"
 }

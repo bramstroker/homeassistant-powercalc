@@ -14,5 +14,6 @@
   "aliases": [
     "LIFX A21 1600lm US"
   ],
-  "author": "TheRealBernie <22334007+TheRealBernie@users.noreply.github.com>"
+  "author": "TheRealBernie <22334007+TheRealBernie@users.noreply.github.com>",
+  "device_type": "light"
 }

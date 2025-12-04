@@ -11,5 +11,6 @@
   },
   "name": "Elgato Light Strip",
   "standby_power": 0.55,
-  "author": "Franck Nijhof <opensource@frenck.dev>"
+  "author": "Franck Nijhof <opensource@frenck.dev>",
+  "device_type": "light"
 }

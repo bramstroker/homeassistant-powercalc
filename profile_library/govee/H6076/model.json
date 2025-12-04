@@ -11,5 +11,6 @@
   "name": "Govee RGBICW Smart Corner Floor Lamp",
   "standby_power": 2.14,
   "created_at": "2023-12-19T13:09:21",
-  "author": "Sku1ly <45756272+Sku1ly@users.noreply.github.com>"
+  "author": "Sku1ly <45756272+Sku1ly@users.noreply.github.com>",
+  "device_type": "light"
 }

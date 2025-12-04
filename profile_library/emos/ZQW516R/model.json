@@ -11,5 +11,6 @@
   },
   "name": "Emos GoSmart A65 14W",
   "standby_power": 0.5,
-  "author": "SamK <samotion2@gmail.com>"
+  "author": "SamK <samotion2@gmail.com>",
+  "device_type": "light"
 }

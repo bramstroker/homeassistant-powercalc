@@ -8,5 +8,6 @@
   "measure_method": "script",
   "linked_profile": "signify/LCG002",
   "created_at": "2023-01-19T11:04:29",
-  "author": "201505409"
+  "author": "201505409",
+  "device_type": "light"
 }

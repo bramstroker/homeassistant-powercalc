@@ -11,5 +11,6 @@
   },
   "name": "Elgato Light Strip Pro",
   "standby_power": 1.2,
-  "author": "Franck Nijhof <opensource@frenck.dev>"
+  "author": "Franck Nijhof <opensource@frenck.dev>",
+  "device_type": "light"
 }

@@ -12,5 +12,6 @@
   "aliases": [],
   "name": "Hue Welcome outdoor wall",
   "standby_power": 0.5,
-  "author": "Paul Bottein"
+  "author": "Paul Bottein",
+  "device_type": "light"
 }

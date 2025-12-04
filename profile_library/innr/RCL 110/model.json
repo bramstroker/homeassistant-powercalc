@@ -11,5 +11,6 @@
   "name": "Innr RCL 110",
   "standby_power": 0.4,
   "created_at": "2023-04-04T18:59:45",
-  "author": "vandalon <joris@vandalon.nl>"
+  "author": "vandalon <joris@vandalon.nl>",
+  "device_type": "light"
 }
