@@ -1,8 +1,4 @@
 {
-  "name": "IKEA Control outlet",
-  "measure_method": "manual",
-  "measure_device": "IKEA Control outlet",
-  "device_type": "smart_switch",
   "calculation_strategy": "composite",
   "composite_config": [
     {
@@ -20,5 +16,9 @@
         "power": 0.52
       }
     }
-  ]
+  ],
+  "device_type": "smart_switch",
+  "measure_device": "IKEA Control outlet",
+  "measure_method": "manual",
+  "name": "IKEA Control outlet"
 }

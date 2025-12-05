@@ -1,4 +1,8 @@
 {
+  "aliases": [
+    "roborock.vacuum.a10"
+  ],
+  "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
   "calculation_strategy": "linear",
   "created_at": "2024-11-11T17:19:55.943226",
@@ -111,9 +115,5 @@
     "VERSION": "master"
   },
   "name": "Roborock S6 MaxV",
-  "aliases": [
-    "roborock.vacuum.a10"
-  ],
-  "standby_power": 0.1,
-  "author": "RubenKelevra <cyrond@gmail.com>"
+  "standby_power": 0.1
 }

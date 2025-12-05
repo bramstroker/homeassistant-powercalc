@@ -1,4 +1,12 @@
 {
+  "aliases": [
+    "8718699703424",
+    "LCL006"
+  ],
+  "author": "KrzysztofHajdamowicz <uosiumen@gmail.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-03-29T12:17:41",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
@@ -8,13 +16,5 @@
     "VERSION": "v0.18.4:docker"
   },
   "name": "Hue white and color ambiance LightStrip plus",
-  "standby_power": 0.4,
-  "calculation_strategy": "lut",
-  "aliases": [
-    "8718699703424",
-    "LCL006"
-  ],
-  "created_at": "2022-03-29T12:17:41",
-  "author": "KrzysztofHajdamowicz <uosiumen@gmail.com>",
-  "device_type": "light"
+  "standby_power": 0.4
 }

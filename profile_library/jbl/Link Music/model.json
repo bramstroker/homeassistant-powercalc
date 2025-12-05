@@ -1,4 +1,8 @@
 {
+  "aliases": [
+    "JBL Link Music"
+  ],
+  "author": "Marcus Voß <46140304+mvoss96@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2025-02-10T16:32:20.219347",
@@ -20,17 +24,13 @@
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A8T",
-  "measure_method": "script",
   "measure_device_firmware": "EspHome",
+  "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.6:docker"
   },
   "name": "JBL Link Music",
-  "standby_power": 1.7,
-  "aliases": [
-    "JBL Link Music"
-  ],
-  "author": "Marcus Voß <46140304+mvoss96@users.noreply.github.com>"
+  "standby_power": 1.7
 }

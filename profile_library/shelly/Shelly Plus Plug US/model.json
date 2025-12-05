@@ -1,15 +1,15 @@
 {
-  "measure_description": "Measured with an Aeotec ZWA023 and seems to align with (more precise) measurements from Shelly Plus Plug S.",
-  "measure_method": "script",
-  "measure_device": "Aeotec ZWA023",
-  "name": "Shelly Plus Plug US",
   "aliases": [
     "SNPL-00116US"
   ],
+  "author": "barndawgie <jbarnard@gmail.com>",
   "calculation_strategy": "lut",
-  "discovery_by": "entity",
-  "device_type": "smart_switch",
-  "linked_profile": "shelly/shelly plus plug s",
   "created_at": "2025-07-15T04:34:00",
-  "author": "barndawgie <jbarnard@gmail.com>"
+  "device_type": "smart_switch",
+  "discovery_by": "entity",
+  "linked_profile": "shelly/shelly plus plug s",
+  "measure_description": "Measured with an Aeotec ZWA023 and seems to align with (more precise) measurements from Shelly Plus Plug S.",
+  "measure_device": "Aeotec ZWA023",
+  "measure_method": "script",
+  "name": "Shelly Plus Plug US"
 }

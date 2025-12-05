@@ -1,12 +1,12 @@
 {
-  "name": "Hue White GU10",
-  "standby_power": 0.4,
+  "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
   "calculation_strategy": "lut",
+  "created_at": "2021-09-12T16:46:36",
+  "device_type": "light",
+  "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",
-  "measure_description": "Measure Script for Tasmota",
   "measure_method": "script",
-  "created_at": "2021-09-12T16:46:36",
-  "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
-  "device_type": "light"
+  "name": "Hue White GU10",
+  "standby_power": 0.4
 }

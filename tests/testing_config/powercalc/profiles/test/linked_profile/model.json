@@ -1,6 +1,6 @@
 {
-  "name": "Linked profile",
-  "standby_power": 0.4,
   "calculation_strategy": "lut",
-  "linked_profile": "signify/LCA006"
+  "linked_profile": "signify/LCA006",
+  "name": "Linked profile",
+  "standby_power": 0.4
 }

@@ -1,13 +1,13 @@
 {
-  "measure_description": "Used measure tool - used average for 2 hours for each state",
-  "measure_method": "manual",
-  "measure_device": "TP-Link Kasa KP125M",
-  "name": "Indoor Cam C120",
-  "device_type": "camera",
-  "calculation_strategy": "fixed",
   "aliases": [
     "T8400"
   ],
   "author": "dxmnkd316 <46753733+dxmnkd316@users.noreply.github.com>",
-  "created_at": "2024-12-14T09:59:57"
+  "calculation_strategy": "fixed",
+  "created_at": "2024-12-14T09:59:57",
+  "device_type": "camera",
+  "measure_description": "Used measure tool - used average for 2 hours for each state",
+  "measure_device": "TP-Link Kasa KP125M",
+  "measure_method": "manual",
+  "name": "Indoor Cam C120"
 }

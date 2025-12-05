@@ -1,4 +1,8 @@
 {
+  "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-10-16T16:46:33",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",
@@ -8,9 +12,5 @@
     "VERSION": "v0.26.1:docker"
   },
   "name": "Govee Lyra RGBICWW Corner Floor Lamp",
-  "standby_power": 1.78,
-  "calculation_strategy": "lut",
-  "created_at": "2022-10-16T16:46:33",
-  "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
-  "device_type": "light"
+  "standby_power": 1.78
 }

@@ -1,5 +1,9 @@
 {
+  "author": "CV",
+  "calculation_strategy": "lut",
+  "config_flow_discovery_remarks": "This device has separate light entities for the RGB ring and the white center light. You will be prompted to select a sub-profile. Choose the one according to the entity_id presented at that time.\nThe standby power of the device is 0.36W but divided between both light equally at this moment due to no better solutions (2025-01-27). If you only setup one light you need to correct the value yourself.",
   "created_at": "2025-01-18T11:56:26.347610",
+  "device_type": "light",
   "measure_description": "Measured with 6.85W (average over 300s) dummy load. Brightness 1, light still off. Standby power is 0.36W for this device in total but due to limitations divided between the two lights.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
@@ -8,14 +12,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.1:docker"
   },
-  "calculation_strategy": "lut",
   "name": "Ceiling light T1M",
   "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
   },
-  "standby_power": 0.18,
-  "author": "CV",
-  "config_flow_discovery_remarks": "This device has separate light entities for the RGB ring and the white center light. You will be prompted to select a sub-profile. Choose the one according to the entity_id presented at that time.\nThe standby power of the device is 0.36W but divided between both light equally at this moment due to no better solutions (2025-01-27). If you only setup one light you need to correct the value yourself.",
-  "device_type": "light"
+  "standby_power": 0.18
 }

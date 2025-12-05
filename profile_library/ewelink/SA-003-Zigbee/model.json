@@ -1,17 +1,17 @@
 {
-  "measure_description": "measure script recorder over 2 minutes",
-  "measure_method": "manual",
-  "measure_device": "Shelly PM Mini Gen3",
-  "name": "SA-003-Zigbee",
-  "standby_power": 0.378,
-  "standby_power_on": 1.191,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
-  "device_type": "smart_switch",
+  "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_strategy": "fixed",
-  "only_self_usage": false,
   "created_at": "2024-12-01T20:44:00",
-  "author": "RubenKelevra <cyrond@gmail.com>"
+  "device_type": "smart_switch",
+  "measure_description": "measure script recorder over 2 minutes",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "manual",
+  "name": "SA-003-Zigbee",
+  "only_self_usage": false,
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "standby_power": 0.378,
+  "standby_power_on": 1.191
 }

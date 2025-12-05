@@ -1,4 +1,11 @@
 {
+  "aliases": [
+    "9290024691A"
+  ],
+  "author": "Shaun McCloud <shaun.thomas.mccloud@gmail.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2024-06-19T13:39:30",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "HOPI HP-9800",
   "measure_method": "script",
@@ -8,12 +15,5 @@
     "VERSION": "v1.2.0:docker"
   },
   "name": "Hue White Bulb A19 E26 1100lm with Bluetooth",
-  "standby_power": 0.2,
-  "calculation_strategy": "lut",
-  "aliases": [
-    "9290024691A"
-  ],
-  "created_at": "2024-06-19T13:39:30",
-  "author": "Shaun McCloud <shaun.thomas.mccloud@gmail.com>",
-  "device_type": "light"
+  "standby_power": 0.2
 }

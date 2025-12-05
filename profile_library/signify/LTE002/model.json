@@ -1,4 +1,11 @@
 {
+  "aliases": [
+    "9290022944"
+  ],
+  "author": "xpenno255 <47892554+xpenno255@users.noreply.github.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-05-06T22:10:00",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Gosund UP111",
   "measure_device_firmware": "Tuya",
@@ -9,12 +16,5 @@
     "VERSION": "v0.19.15:docker"
   },
   "name": "Hue White Ambiance E14 w/ BT",
-  "standby_power": 0.2,
-  "calculation_strategy": "lut",
-  "aliases": [
-    "9290022944"
-  ],
-  "created_at": "2022-05-06T22:10:00",
-  "author": "xpenno255 <47892554+xpenno255@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.2
 }

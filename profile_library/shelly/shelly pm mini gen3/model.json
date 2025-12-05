@@ -1,20 +1,20 @@
 {
-  "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=ZXC4vft57gU",
-  "measure_method": "manual",
-  "measure_device": "GW Instek GPM-8310",
-  "name": "Shelly PM Mini Gen3",
   "aliases": [
     "S3PM-001PCEU16"
   ],
-  "discovery_by": "device",
-  "device_type": "power_meter",
-  "only_self_usage": true,
+  "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_strategy": "fixed",
-  "standby_power": 0.642,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
   "created_at": "2024-12-01T16:51:00",
-  "author": "RubenKelevra <cyrond@gmail.com>"
+  "device_type": "power_meter",
+  "discovery_by": "device",
+  "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=ZXC4vft57gU",
+  "measure_device": "GW Instek GPM-8310",
+  "measure_method": "manual",
+  "name": "Shelly PM Mini Gen3",
+  "only_self_usage": true,
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "standby_power": 0.642
 }

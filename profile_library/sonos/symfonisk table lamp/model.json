@@ -1,6 +1,8 @@
 {
+  "author": "bragra <bragragithub@gradussen.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
+  "created_at": "2024-03-30T12:45:23",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -26,7 +28,5 @@
     "VERSION": "v1.11.3:docker"
   },
   "name": "SYMFONISK Table lamp",
-  "standby_power": 2.6,
-  "created_at": "2024-03-30T12:45:23",
-  "author": "bragra <bragragithub@gradussen.com>"
+  "standby_power": 2.6
 }

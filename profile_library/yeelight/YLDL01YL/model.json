@@ -1,4 +1,11 @@
 {
+  "aliases": [
+    "ceiling10"
+  ],
+  "author": "Morten Trab <morten@trab.dk>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-03-17T21:45:16",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
@@ -8,12 +15,5 @@
     "VERSION": "master"
   },
   "name": "Yeelight YLDL01YL Downlight",
-  "standby_power": 0.72,
-  "calculation_strategy": "lut",
-  "aliases": [
-    "ceiling10"
-  ],
-  "created_at": "2022-03-17T21:45:16",
-  "author": "Morten Trab <morten@trab.dk>",
-  "device_type": "light"
+  "standby_power": 0.72
 }

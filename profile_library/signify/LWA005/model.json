@@ -1,4 +1,9 @@
 {
+  "aliases": [],
+  "author": "Scott Hoyt <scottrhoyt@gmail.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-05-11T16:41:49",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff S31",
   "measure_method": "script",
@@ -8,10 +13,5 @@
     "VERSION": "v0.19.15:docker"
   },
   "name": "Hue Filament E26",
-  "standby_power": 0.11,
-  "calculation_strategy": "lut",
-  "aliases": [],
-  "created_at": "2022-05-11T16:41:49",
-  "author": "Scott Hoyt <scottrhoyt@gmail.com>",
-  "device_type": "light"
+  "standby_power": 0.11
 }

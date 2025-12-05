@@ -1,6 +1,8 @@
 {
+  "author": "Jurjen <96632856+Coornh@users.noreply.github.com>",
   "calculation_strategy": "lut",
   "created_at": "2025-10-14T22:32:31.894453",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen3",
   "measure_method": "script",
@@ -10,7 +12,5 @@
     "VERSION": "v1.17.23:docker"
   },
   "name": "LED Filament Lamp A60 7W",
-  "standby_power": 0.12,
-  "author": "Jurjen <96632856+Coornh@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.12
 }

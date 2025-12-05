@@ -1,5 +1,11 @@
 {
+  "aliases": [
+    "Hue Outdoor Lucca"
+  ],
+  "author": "TyzzyT <80623729+TyzzyT@users.noreply.github.com>",
   "calculation_strategy": "lut",
+  "created_at": "2023-06-28T07:43:28",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",
@@ -8,12 +14,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.6.6:docker"
   },
-  "aliases": [
-    "Hue Outdoor Lucca"
-  ],
   "name": "1740193P0",
-  "standby_power": 0.35,
-  "created_at": "2023-06-28T07:43:28",
-  "author": "TyzzyT <80623729+TyzzyT@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.35
 }

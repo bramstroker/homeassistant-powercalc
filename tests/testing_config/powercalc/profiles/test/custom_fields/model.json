@@ -1,20 +1,5 @@
 {
-  "name": "My device",
-  "measure_method": "manual",
-  "measure_device": "xx",
-  "device_type": "generic_iot",
   "calculation_strategy": "composite",
-  "fields": {
-    "some_entity": {
-      "label": "Some entity",
-      "description": "Select some entity",
-      "selector": {
-        "entity": {
-          "domain": "sensor"
-        }
-      }
-    }
-  },
   "composite_config": [
     {
       "condition": {
@@ -31,5 +16,20 @@
         "power": 10
       }
     }
-  ]
+  ],
+  "device_type": "generic_iot",
+  "fields": {
+    "some_entity": {
+      "description": "Select some entity",
+      "label": "Some entity",
+      "selector": {
+        "entity": {
+          "domain": "sensor"
+        }
+      }
+    }
+  },
+  "measure_device": "xx",
+  "measure_method": "manual",
+  "name": "My device"
 }

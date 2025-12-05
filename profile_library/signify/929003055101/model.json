@@ -1,5 +1,13 @@
 {
+  "aliases": [
+    "929003055001",
+    "929003055101",
+    "929003055201"
+  ],
+  "author": "dansie <dansie@users.noreply.github.com>",
   "calculation_strategy": "lut",
+  "created_at": "2023-11-01T15:35:10",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script; 6.1 Watts dummy load",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
@@ -9,13 +17,5 @@
     "VERSION": "v1.9.5:docker"
   },
   "name": "Philips Hue White Ambiance Being Ceiling Light",
-  "standby_power": 0.47,
-  "aliases": [
-    "929003055001",
-    "929003055101",
-    "929003055201"
-  ],
-  "created_at": "2023-11-01T15:35:10",
-  "author": "dansie <dansie@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.47
 }

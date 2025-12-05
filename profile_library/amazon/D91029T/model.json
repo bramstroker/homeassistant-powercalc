@@ -1,6 +1,15 @@
 {
+  "aliases": [
+    "A32DOYMUN6DTXA",
+    "A1RABVCI4QCIKC",
+    "C78MP8",
+    "ECHO A32DOYMUN6DTXA",
+    "ECHO A1RABVCI4QCIKC"
+  ],
+  "author": "wranglatang <30660751+wranglatang@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
+  "created_at": "2023-03-10T17:16:45",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -26,14 +35,5 @@
     "VERSION": "master"
   },
   "name": "Amazon Alexa Echo Dot Gen 3",
-  "standby_power": 1.75,
-  "aliases": [
-    "A32DOYMUN6DTXA",
-    "A1RABVCI4QCIKC",
-    "C78MP8",
-    "ECHO A32DOYMUN6DTXA",
-    "ECHO A1RABVCI4QCIKC"
-  ],
-  "created_at": "2023-03-10T17:16:45",
-  "author": "wranglatang <30660751+wranglatang@users.noreply.github.com>"
+  "standby_power": 1.75
 }

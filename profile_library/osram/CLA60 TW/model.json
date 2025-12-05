@@ -1,4 +1,11 @@
 {
+  "aliases": [
+    "AC03642"
+  ],
+  "author": "Jan Hoff <15184352+mehgrmlhmpf@users.noreply.github.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-04-24T20:45:34",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",
@@ -8,12 +15,5 @@
     "VERSION": "v0.19.11:docker"
   },
   "name": "Smart+ Classic E27 tunable white",
-  "standby_power": 0.5,
-  "calculation_strategy": "lut",
-  "aliases": [
-    "AC03642"
-  ],
-  "created_at": "2022-04-24T20:45:34",
-  "author": "Jan Hoff <15184352+mehgrmlhmpf@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.5
 }

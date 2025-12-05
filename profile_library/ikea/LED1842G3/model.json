@@ -1,4 +1,11 @@
 {
+  "aliases": [
+    "TRADFRI bulb E27 WW clear 250lm"
+  ],
+  "author": "alanpaone <alanpaone@gmail.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-01-05T14:50:43",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff S31",
   "measure_method": "script",
@@ -8,12 +15,5 @@
     "VERSION": "v0.13.5"
   },
   "name": "TRADFRI bulb E27 WW clear 250lm",
-  "standby_power": 0.551,
-  "calculation_strategy": "lut",
-  "aliases": [
-    "TRADFRI bulb E27 WW clear 250lm"
-  ],
-  "created_at": "2022-01-05T14:50:43",
-  "author": "alanpaone <alanpaone@gmail.com>",
-  "device_type": "light"
+  "standby_power": 0.551
 }

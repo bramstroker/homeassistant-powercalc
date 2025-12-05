@@ -1,19 +1,19 @@
 {
-  "name": "Hue White A60 E27 Bluetooth (800 lm)",
-  "standby_power": 0.41,
+  "aliases": [
+    "929001821618"
+  ],
+  "author": "Benedikt Vollmerhaus <30414540+BVollmerhaus@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
+  "created_at": "2022-10-04T23:07:22",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script; 2 bulbs, no dummy load",
+  "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 3,
     "SLEEP_TIME": 60,
     "VERSION": "v0.26.1:docker"
   },
-  "aliases": [
-    "929001821618"
-  ],
-  "created_at": "2022-10-04T23:07:22",
-  "author": "Benedikt Vollmerhaus <30414540+BVollmerhaus@users.noreply.github.com>",
-  "device_type": "light"
+  "name": "Hue White A60 E27 Bluetooth (800 lm)",
+  "standby_power": 0.41
 }

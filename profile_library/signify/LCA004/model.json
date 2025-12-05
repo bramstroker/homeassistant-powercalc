@@ -1,5 +1,8 @@
 {
+  "author": "Mikael Ganehag Brorsson <mikael.brorsson@gmail.com>",
   "calculation_strategy": "lut",
+  "created_at": "2023-02-09T19:19:56",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
@@ -9,8 +12,5 @@
     "VERSION": "v1.3.1:docker"
   },
   "name": "LCA004",
-  "standby_power": 0.33,
-  "created_at": "2023-02-09T19:19:56",
-  "author": "Mikael Ganehag Brorsson <mikael.brorsson@gmail.com>",
-  "device_type": "light"
+  "standby_power": 0.33
 }

@@ -1,6 +1,11 @@
 {
+  "aliases": [
+    "915005997201"
+  ],
+  "author": "vladi-k <53343355+vladi-k@users.noreply.github.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-10-14T20:25:19.457076",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
@@ -10,10 +15,5 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Hue Infuse Medium Ceiling Lamp",
-  "device_type": "light",
-  "standby_power": 0.16,
-  "aliases": [
-    "915005997201"
-  ],
-  "author": "vladi-k <53343355+vladi-k@users.noreply.github.com>"
+  "standby_power": 0.16
 }

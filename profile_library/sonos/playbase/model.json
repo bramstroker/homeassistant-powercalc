@@ -1,12 +1,12 @@
 {
-  "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using HAOS; manual mute/zero volume measurement.",
-  "measure_method": "script",
-  "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
-  "name": "Sonos Playbase",
-  "standby_power": 2.9,
-  "device_type": "smart_speaker",
-  "calculation_strategy": "linear",
+  "aliases": [
+    "Playbase"
+  ],
+  "author": "alvinchen1 <26409535+alvinchen1@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2023-04-07T17:05:01",
+  "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
       "0 -> 3.70",
@@ -22,9 +22,9 @@
       "100 -> 34.50"
     ]
   },
-  "aliases": [
-    "Playbase"
-  ],
-  "created_at": "2023-04-07T17:05:01",
-  "author": "alvinchen1 <26409535+alvinchen1@users.noreply.github.com>"
+  "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using HAOS; manual mute/zero volume measurement.",
+  "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
+  "measure_method": "script",
+  "name": "Sonos Playbase",
+  "standby_power": 2.9
 }

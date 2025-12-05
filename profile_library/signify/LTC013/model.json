@@ -1,5 +1,11 @@
 {
+  "aliases": [
+    "929003099201"
+  ],
+  "author": "matteobreschig <69394134+matteobreschig@users.noreply.github.com>",
   "calculation_strategy": "lut",
+  "created_at": "2023-06-05T11:09:22",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
@@ -9,11 +15,5 @@
     "VERSION": "master"
   },
   "name": "Hue Aurelle Square Panel Light 30x30cm",
-  "standby_power": 0.4,
-  "aliases": [
-    "929003099201"
-  ],
-  "created_at": "2023-06-05T11:09:22",
-  "author": "matteobreschig <69394134+matteobreschig@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.4
 }

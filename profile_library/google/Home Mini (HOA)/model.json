@@ -1,12 +1,12 @@
 {
-  "measure_description": "Streamed 'Armin van Buuren - Come Around Again' using spotify, and took average measurements using the measure.py tool on different volume levels",
-  "measure_method": "manual",
-  "measure_device": "Shelly Plug S",
-  "name": "Google Home Mini",
-  "standby_power": 1.65,
-  "device_type": "smart_speaker",
-  "calculation_strategy": "linear",
+  "aliases": [
+    "Google Home Mini"
+  ],
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2022-10-05T10:14:54",
+  "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
       "0 -> 1.80",
@@ -22,9 +22,9 @@
       "100 -> 2.49"
     ]
   },
-  "aliases": [
-    "Google Home Mini"
-  ],
-  "created_at": "2022-10-05T10:14:54",
-  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
+  "measure_description": "Streamed 'Armin van Buuren - Come Around Again' using spotify, and took average measurements using the measure.py tool on different volume levels",
+  "measure_device": "Shelly Plug S",
+  "measure_method": "manual",
+  "name": "Google Home Mini",
+  "standby_power": 1.65
 }

@@ -1,6 +1,9 @@
 {
+  "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>",
   "calculation_strategy": "lut",
+  "config_flow_discovery_remarks": "This profile was measured with the default included PSU. If you run this with a PSU that is different from the included PSU this can skew the readings.",
   "created_at": "2024-06-20T11:25:39.819433",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
@@ -10,8 +13,5 @@
     "VERSION": "v1.12.6:docker"
   },
   "name": "Hue lightstrip outdoor",
-  "standby_power": 0.25,
-  "config_flow_discovery_remarks": "This profile was measured with the default included PSU. If you run this with a PSU that is different from the included PSU this can skew the readings.",
-  "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.25
 }

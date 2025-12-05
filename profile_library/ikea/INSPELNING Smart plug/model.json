@@ -1,20 +1,20 @@
 {
-  "measure_description": "Manually measured (Schuko/EU model@230V)",
-  "measure_method": "manual",
-  "measure_device": "Zhurui PR10-C",
-  "name": "INSPELNING Smart plug",
-  "standby_power": 0.23,
-  "standby_power_on": 0.8,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
-  "device_type": "smart_switch",
-  "calculation_strategy": "fixed",
-  "only_self_usage": true,
   "aliases": [
     "E2206"
   ],
   "author": "ZleekWolf <folfy@users.noreply.github.com>",
-  "created_at": "2025-01-24T08:23:25"
+  "calculation_strategy": "fixed",
+  "created_at": "2025-01-24T08:23:25",
+  "device_type": "smart_switch",
+  "measure_description": "Manually measured (Schuko/EU model@230V)",
+  "measure_device": "Zhurui PR10-C",
+  "measure_method": "manual",
+  "name": "INSPELNING Smart plug",
+  "only_self_usage": true,
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "standby_power": 0.23,
+  "standby_power_on": 0.8
 }

@@ -1,16 +1,16 @@
 {
-  "name": "Hue Single Filament Bulb ST19 E26",
-  "standby_power": 0.5,
-  "calculation_strategy": "lut",
-  "measure_device": "Gosund SP111",
-  "measure_device_firmware": "Tasmota 9.5.0",
-  "measure_description": "Measure Script for Tasmota",
-  "measure_method": "script",
-  "linked_profile": "signify/LWV001",
   "aliases": [
     "046677551780"
   ],
-  "created_at": "2022-05-29T15:18:24",
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
-  "device_type": "light"
+  "calculation_strategy": "lut",
+  "created_at": "2022-05-29T15:18:24",
+  "device_type": "light",
+  "linked_profile": "signify/LWV001",
+  "measure_description": "Measure Script for Tasmota",
+  "measure_device": "Gosund SP111",
+  "measure_device_firmware": "Tasmota 9.5.0",
+  "measure_method": "script",
+  "name": "Hue Single Filament Bulb ST19 E26",
+  "standby_power": 0.5
 }

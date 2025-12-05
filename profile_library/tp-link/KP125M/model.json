@@ -1,20 +1,20 @@
 {
-  "measure_description": "Manually measured",
-  "measure_method": "manual",
-  "measure_device": "Eve Energy Matter 20EBU4101",
-  "name": "TP-Link Kasa KP125M",
-  "standby_power": 0.475,
-  "standby_power_on": 0.92,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
-  "device_type": "smart_switch",
-  "calculation_strategy": "fixed",
-  "only_self_usage": true,
   "aliases": [
     "KP125M"
   ],
   "author": "dxmnkd316 <46753733+dxmnkd316@users.noreply.github.com>",
-  "created_at": "2025-01-19T12:28:06"
+  "calculation_strategy": "fixed",
+  "created_at": "2025-01-19T12:28:06",
+  "device_type": "smart_switch",
+  "measure_description": "Manually measured",
+  "measure_device": "Eve Energy Matter 20EBU4101",
+  "measure_method": "manual",
+  "name": "TP-Link Kasa KP125M",
+  "only_self_usage": true,
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "standby_power": 0.475,
+  "standby_power_on": 0.92
 }
