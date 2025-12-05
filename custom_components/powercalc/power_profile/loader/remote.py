@@ -237,7 +237,7 @@ class RemoteLoader(Loader):
         retry_count: int,
     ) -> tuple[dict, str] | None:
         """Handle JSON decode errors with retry logic."""
-        _LOGGER.error("model.json file is not valid JSON")
+        _LOGGER.error("model.json file is not valid JSON for manufacturer: %s, model: %s", manufacturer, model)
         if retry_count < 2:
             _LOGGER.debug("Retrying to load model.json file")
             return await self.load_model(manufacturer, model, True, retry_count + 1)
