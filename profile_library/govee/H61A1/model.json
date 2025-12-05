@@ -10,7 +10,7 @@
     "VERSION": "v1.19.1:docker"
   },
   "name": "Govee Neon Rope Light",
-  "standby_power": 2.67
+  "standby_power": 2.67,
   "author": "Minne <fendersfolly@icloud.com",
   "device_type": "light"
 }
