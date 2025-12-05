@@ -26,6 +26,7 @@ from custom_components.powercalc.const import (
     CONF_FLOOR,
     CONF_GROUP,
     CONF_LABEL,
+    CONF_NOT,
     CONF_OR,
     CONF_TEMPLATE,
     CONF_WILDCARD,
@@ -36,6 +37,7 @@ from custom_components.powercalc.errors import SensorConfigurationError
 class FilterOperator(StrEnum):
     AND = "and"
     OR = "or"
+    NOT = "not"
 
 
 FILTER_CONFIG = vol.Schema(
@@ -73,6 +75,9 @@ def create_composite_filter(
             filter_instance = create_filter(key, val, hass)
             filters.append(filter_instance)
 
+    if filter_operator == FilterOperator.NOT:
+        return NotFilter(CompositeFilter(filters))
+
     return CompositeFilter(filters, filter_operator)
 
 
@@ -93,6 +98,7 @@ def create_filter(
         CONF_ALL: lambda: NullFilter(),
         CONF_OR: lambda: create_composite_filter(filter_config, hass, FilterOperator.OR),  # type: ignore
         CONF_AND: lambda: create_composite_filter(filter_config, hass, FilterOperator.AND),  # type: ignore
+        CONF_NOT: lambda: create_composite_filter(filter_config, hass, FilterOperator.NOT),  # type: ignore
     }
 
     return filter_mapping.get(filter_type, lambda: NullFilter())()
