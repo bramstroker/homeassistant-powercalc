@@ -173,21 +173,21 @@ powercalc:
           domain: light
 ```
 
-To exclude sensors based on a label:
+To further narrow down based on a label:
 
 ```yaml
 powercalc:
   sensors:
-    - create_group: All lights
+    - create_group: All spots
       include:
         domain: light
         filter:
-          label: excludePowercalc
+          label: spotlight
 ```
 
-### AND/OR
+### AND/OR/NOT
 
-You can also chain nested filter using and / or construction:
+You can also chain nested filter using and / or / not construction:
 
 ```yaml
 powercalc:
@@ -202,6 +202,36 @@ powercalc:
             - and:
               - domain: binary_sensor
               - wildcard: "*swimming_pool*"
+```
+
+#### NOT
+
+The `not` filter negates the result of the filter(s) it contains. This is useful when you want to exclude certain entities from your group.
+
+```yaml
+powercalc:
+  sensors:
+    - create_group: All lights except bathroom
+      include:
+        domain: light
+        filter:
+          not:
+            - area: bathroom
+```
+
+You can also combine `not` with other filters:
+
+```yaml
+powercalc:
+  sensors:
+    - create_group: Complex filter example
+      include:
+        domain: light
+        filter:
+          and:
+            - area: living_room
+            - not:
+                - wildcard: "*ignore*"
 ```
 
 ## Exclude non powercalc sensors

@@ -43,6 +43,7 @@ from custom_components.powercalc.const import (
     CONF_LABEL,
     CONF_MANUFACTURER,
     CONF_MODEL,
+    CONF_NOT,
     CONF_OR,
     CONF_POWER,
     CONF_SENSOR_TYPE,
@@ -1227,6 +1228,79 @@ async def test_include_all(hass: HomeAssistant) -> None:
         "sensor.switch_power",
         "sensor.light_power",
         "sensor.existing_power",
+    }
+
+
+async def test_include_by_label_filter_other_label(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/3685"""
+
+    label_reg = label_registry.async_get(hass)
+    label_reg.async_create("my_label")
+    label_reg.async_create("exclude_powercalc")
+
+    mock_device_registry(
+        hass,
+        {
+            "device-a": DeviceEntry(
+                id="device-a",
+                manufacturer="Signify",
+                model="LCT012",
+                labels=["my_label"],
+            ),
+        },
+    )
+
+    mock_registry(
+        hass,
+        {
+            "sensor.some_energy": RegistryEntryWithDefaults(
+                entity_id="sensor.some_energy",
+                unique_id="1111",
+                platform="sensor",
+                device_id="device-a",
+                original_device_class=SensorDeviceClass.ENERGY,
+            ),
+            "sensor.some_energy2": RegistryEntryWithDefaults(
+                entity_id="sensor.some_energy2",
+                unique_id="2222",
+                platform="sensor",
+                device_id="device-a",
+                labels=["exclude_powercalc"],
+                original_device_class=SensorDeviceClass.ENERGY,
+            ),
+            "sensor.some_energy3": RegistryEntryWithDefaults(
+                entity_id="sensor.some_energy3",
+                unique_id="3333",
+                platform="sensor",
+                device_id="device-a",
+                labels=["exclude_powercalc"],
+                original_device_class=SensorDeviceClass.ENERGY,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "My group",
+                CONF_INCLUDE: {
+                    CONF_LABEL: "my_label",
+                    CONF_FILTER: {
+                        CONF_NOT: {
+                            CONF_LABEL: "exclude_powercalc",
+                        },
+                    },
+                },
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.my_group_energy")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.some_energy",
     }
 
 
