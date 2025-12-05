@@ -11,4 +11,6 @@
   },
   "name": "Govee Neon Rope Light",
   "standby_power": 2.67
+  "author": "Minne <fendersfolly@icloud.com",
+  "device_type": "light"
 }
