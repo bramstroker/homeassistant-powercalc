@@ -1,4 +1,11 @@
 {
+  "aliases": [
+    "FLOALT panel WS 30x90"
+  ],
+  "author": "Florian B <DerFlob@users.noreply.github.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-02-12T15:41:16",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 3EM",
   "measure_method": "script",
@@ -8,12 +15,5 @@
     "VERSION": "v0.17.0:docker"
   },
   "name": "FLOALT panel WS 30x90",
-  "standby_power": 0.45,
-  "calculation_strategy": "lut",
-  "aliases": [
-    "FLOALT panel WS 30x90"
-  ],
-  "created_at": "2022-02-12T15:41:16",
-  "author": "Florian B <DerFlob@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.45
 }

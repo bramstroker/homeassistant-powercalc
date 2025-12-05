@@ -1,5 +1,8 @@
 {
+  "author": "WarLL3 <94110496+WarLL3@users.noreply.github.com>",
   "calculation_strategy": "lut",
+  "created_at": "2023-09-19T18:51:11",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
@@ -9,8 +12,5 @@
     "VERSION": "v1.9.4:docker"
   },
   "name": "STOFTMOLN ceiling/wall lamp WW37",
-  "standby_power": 0.11,
-  "created_at": "2023-09-19T18:51:11",
-  "author": "WarLL3 <94110496+WarLL3@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.11
 }

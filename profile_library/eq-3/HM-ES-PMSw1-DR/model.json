@@ -1,4 +1,9 @@
 {
+  "author": "CV",
+  "calculation_strategy": "fixed",
+  "created_at": "2024-09-06T18:37:40",
+  "description": "HomematicIP DIN rail mount smart switch with power measurement integrated for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device.",
+  "device_type": "smart_switch",
   "measure_description": "Manually measured with dummy load attached at 7.7W (average over 300s) multiple times, than calculated average of that.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
@@ -6,16 +11,11 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "HM-ES-PMSw1-DR",
-  "standby_power": 0.37,
-  "standby_power_on": 0.73,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
-  "device_type": "smart_switch",
-  "calculation_strategy": "fixed",
   "only_self_usage": true,
-  "created_at": "2024-09-06T18:37:40",
-  "author": "CV",
-  "description": "HomematicIP DIN rail mount smart switch with power measurement integrated for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device."
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "standby_power": 0.37,
+  "standby_power_on": 0.73
 }

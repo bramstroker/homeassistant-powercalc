@@ -1,16 +1,4 @@
 {
-  "calculation_strategy": "lut",
-  "created_at": "2025-05-17T02:32:38.554855",
-  "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly PM Mini Gen3",
-  "measure_method": "script",
-  "measure_settings": {
-    "SAMPLE_COUNT": 2,
-    "SLEEP_TIME": 3,
-    "VERSION": "v1.17.12:docker"
-  },
-  "name": "Hue Argenta color spot",
-  "standby_power": 0.14,
   "aliases": [
     "929003808201_01",
     "929003808201_02",
@@ -21,5 +9,17 @@
     "929003808101_03"
   ],
   "author": "Wouter Rutgers <git@wouterrutgers.nl>",
-  "device_type": "light"
+  "calculation_strategy": "lut",
+  "created_at": "2025-05-17T02:32:38.554855",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.12:docker"
+  },
+  "name": "Hue Argenta color spot",
+  "standby_power": 0.14
 }

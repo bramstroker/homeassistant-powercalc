@@ -1,17 +1,17 @@
 {
-  "measure_description": "Measured with utils/measure script",
-  "measure_method": "script",
-  "measure_device": "Shelly Plus Plug S",
-  "name": "Gas sensor",
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
-  "device_type": "network",
+  "author": "Andrzej Dopierala <undefine@aramin.net>",
   "calculation_strategy": "fixed",
+  "created_at": "2024-12-27T12:00:00",
+  "device_type": "network",
   "fixed_config": {
     "power": 0.88
   },
-  "created_at": "2024-12-27T12:00:00",
-  "author": "Andrzej Dopierala <undefine@aramin.net>"
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug S",
+  "measure_method": "script",
+  "name": "Gas sensor",
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  }
 }

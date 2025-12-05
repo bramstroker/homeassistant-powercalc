@@ -1,6 +1,8 @@
 {
+  "author": "Chris Hallgren <challgren@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2025-02-11T20:22:23.527420",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
@@ -10,7 +12,5 @@
     "VERSION": "master"
   },
   "name": "Govee H7020 String lights",
-  "standby_power": 1.8,
-  "author": "Chris Hallgren <challgren@gmail.com>",
-  "device_type": "light"
+  "standby_power": 1.8
 }

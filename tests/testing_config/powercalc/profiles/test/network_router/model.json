@@ -1,12 +1,12 @@
 {
-  "measure_description": "Measured with utils/measure script (1h average)",
-  "measure_method": "script",
-  "measure_device": "TP-Link Tapo P110",
-  "name": "Test",
-  "device_type": "network",
   "calculation_strategy": "fixed",
+  "device_type": "network",
   "discovery_by": "device",
   "fixed_config": {
     "power": 10.42
-  }
+  },
+  "measure_description": "Measured with utils/measure script (1h average)",
+  "measure_device": "TP-Link Tapo P110",
+  "measure_method": "script",
+  "name": "Test"
 }

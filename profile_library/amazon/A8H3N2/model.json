@@ -1,4 +1,10 @@
 {
+  "aliases": [
+    "A15996VY63BQ2D",
+    "A8H3N2",
+    "KNIGHT A15996VY63BQ2D"
+  ],
+  "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2024-07-05T16:34:44.695639",
@@ -22,11 +28,5 @@
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "manual",
   "name": "Amazon Echo Show 8 (2nd Generation)",
-  "aliases": [
-    "A15996VY63BQ2D",
-    "A8H3N2",
-    "KNIGHT A15996VY63BQ2D"
-  ],
-  "standby_power": 4.28,
-  "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>"
+  "standby_power": 4.28
 }

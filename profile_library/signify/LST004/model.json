@@ -1,16 +1,16 @@
 {
-  "name": "Hue White and Color Ambiance LED Outdoor Lightstrip (5m)",
-  "standby_power": 0.4,
-  "calculation_strategy": "lut",
-  "measure_device": "Gosund SP111",
-  "measure_device_firmware": "Tasmota 9.5.0",
-  "measure_description": "Measure Script for Tasmota",
-  "measure_method": "script",
   "aliases": [
     "LST003",
     "9290018187B"
   ],
-  "created_at": "2021-08-29T21:30:20",
   "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
-  "device_type": "light"
+  "calculation_strategy": "lut",
+  "created_at": "2021-08-29T21:30:20",
+  "device_type": "light",
+  "measure_description": "Measure Script for Tasmota",
+  "measure_device": "Gosund SP111",
+  "measure_device_firmware": "Tasmota 9.5.0",
+  "measure_method": "script",
+  "name": "Hue White and Color Ambiance LED Outdoor Lightstrip (5m)",
+  "standby_power": 0.4
 }

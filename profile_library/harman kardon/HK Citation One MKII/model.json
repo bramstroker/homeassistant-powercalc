@@ -1,6 +1,11 @@
 {
+  "aliases": [
+    "HK Citation One"
+  ],
+  "author": "Imperial-Guard <33509000+Imperial-Guard@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
+  "created_at": "2023-11-01T15:32:57",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -26,10 +31,5 @@
     "VERSION": "v1.9.6:docker"
   },
   "name": "Harman Kardon Citation One",
-  "standby_power": 2.01,
-  "aliases": [
-    "HK Citation One"
-  ],
-  "created_at": "2023-11-01T15:32:57",
-  "author": "Imperial-Guard <33509000+Imperial-Guard@users.noreply.github.com>"
+  "standby_power": 2.01
 }

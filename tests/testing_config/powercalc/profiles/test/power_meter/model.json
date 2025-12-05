@@ -1,13 +1,13 @@
 {
-  "measure_method": "manual",
-  "measure_device": "Some device",
-  "name": "Some power meter",
-  "standby_power": 0.3,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
-  "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "only_self_usage": true
+  "device_type": "smart_switch",
+  "measure_device": "Some device",
+  "measure_method": "manual",
+  "name": "Some power meter",
+  "only_self_usage": true,
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "standby_power": 0.3
 }

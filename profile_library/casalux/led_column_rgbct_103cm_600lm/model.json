@@ -1,6 +1,8 @@
 {
+  "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-10-21T22:17:19.484216",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug",
   "measure_method": "script",
@@ -10,7 +12,5 @@
     "VERSION": "master"
   },
   "name": "Casalux LED Lichtsäule (103 cm, 600 lm, RGBCT) - ESP8266/ESPHome conversion",
-  "standby_power": 1.15,
-  "author": "RubenKelevra <cyrond@gmail.com>",
-  "device_type": "light"
+  "standby_power": 1.15
 }

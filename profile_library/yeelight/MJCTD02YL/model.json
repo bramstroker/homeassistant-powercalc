@@ -1,5 +1,8 @@
 {
+  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "lut",
+  "created_at": "2025-04-11T07:30:00",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
@@ -9,8 +12,5 @@
     "VERSION": "v1.17.9:docker"
   },
   "name": "Xiaomi Mi Bedside Lamp 2",
-  "standby_power": 0.86,
-  "created_at": "2025-04-11T07:30:00",
-  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
-  "device_type": "light"
+  "standby_power": 0.86
 }

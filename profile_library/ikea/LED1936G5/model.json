@@ -1,4 +1,9 @@
 {
+  "author": "bramstroker <bgerritsen@gmail.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2024-12-08T10:13:50",
+  "device_type": "light",
+  "linked_profile": "ikea/LED1937T5_E27",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",
@@ -8,10 +13,5 @@
     "VERSION": "v1.0.3:docker"
   },
   "name": "TRADFRI LED bulb E27 470 lumen, dimmable, opal white",
-  "standby_power": 0.2,
-  "calculation_strategy": "lut",
-  "linked_profile": "ikea/LED1937T5_E27",
-  "created_at": "2024-12-08T10:13:50",
-  "author": "bramstroker <bgerritsen@gmail.com>",
-  "device_type": "light"
+  "standby_power": 0.2
 }

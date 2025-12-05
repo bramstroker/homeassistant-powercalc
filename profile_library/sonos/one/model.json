@@ -1,12 +1,13 @@
 {
-  "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals, and took average measurements over 20s. Sonos microphone (voice assistant) on.",
-  "measure_method": "manual",
-  "measure_device": "TP-Link Kasa HS110",
-  "name": "Sonos One",
-  "standby_power": 2.92,
-  "device_type": "smart_speaker",
-  "calculation_strategy": "linear",
+  "aliases": [
+    "Sonos ONE"
+  ],
+  "author": "Thorjan Knudsvik <t@knudsvik.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "config_flow_discovery_remarks": "**Warning**, please verify this device is a single speaker and not part of a stereo or Home theater configuration. This powercalc profile is specifically for a single speaker, so when you accept it anyway power estimation will be way off. When this is the case for you please ignore this discovery by clicking the three dots and ignore.",
+  "created_at": "2022-11-06T19:24:46",
+  "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
       "0 -> 3.22",
@@ -22,10 +23,9 @@
       "100 -> 14.43"
     ]
   },
-  "aliases": [
-    "Sonos ONE"
-  ],
-  "config_flow_discovery_remarks": "**Warning**, please verify this device is a single speaker and not part of a stereo or Home theater configuration. This powercalc profile is specifically for a single speaker, so when you accept it anyway power estimation will be way off. When this is the case for you please ignore this discovery by clicking the three dots and ignore.",
-  "created_at": "2022-11-06T19:24:46",
-  "author": "Thorjan Knudsvik <t@knudsvik.com>"
+  "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals, and took average measurements over 20s. Sonos microphone (voice assistant) on.",
+  "measure_device": "TP-Link Kasa HS110",
+  "measure_method": "manual",
+  "name": "Sonos One",
+  "standby_power": 2.92
 }

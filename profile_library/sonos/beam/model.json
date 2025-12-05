@@ -1,12 +1,13 @@
 {
-  "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using HAOS; manual mute/zero volume measurement.",
-  "measure_method": "script",
-  "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
-  "name": "Sonos Beam",
-  "standby_power": 6.0,
-  "device_type": "smart_speaker",
-  "calculation_strategy": "linear",
+  "aliases": [
+    "Beam"
+  ],
+  "author": "alvinchen1 <26409535+alvinchen1@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "config_flow_discovery_remarks": "**Warning**, please verify this device is a single speaker and not part of a stereo or Home theater configuration. This powercalc profile is specifically for a single speaker, so when you accept it anyway power estimation will be way off. When this is the case for you please ignore this discovery by clicking the three dots and ignore.",
+  "created_at": "2024-06-07T12:11:13",
+  "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
       "0 -> 7.30",
@@ -22,10 +23,9 @@
       "100 -> 23.60"
     ]
   },
-  "aliases": [
-    "Beam"
-  ],
-  "config_flow_discovery_remarks": "**Warning**, please verify this device is a single speaker and not part of a stereo or Home theater configuration. This powercalc profile is specifically for a single speaker, so when you accept it anyway power estimation will be way off. When this is the case for you please ignore this discovery by clicking the three dots and ignore.",
-  "created_at": "2024-06-07T12:11:13",
-  "author": "alvinchen1 <26409535+alvinchen1@users.noreply.github.com>"
+  "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using HAOS; manual mute/zero volume measurement.",
+  "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
+  "measure_method": "script",
+  "name": "Sonos Beam",
+  "standby_power": 6.0
 }

@@ -1,23 +1,23 @@
 {
+  "aliases": [
+    "SHPLG-S"
+  ],
+  "author": "SBD",
+  "calculation_strategy": "fixed",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN\": No Access Point (AP), no ECO mode, only connected to network.\n\"WLAN + ECO\": ECO setting turned on, repeater (AP) turned off.",
   "created_at": "2025-06-07",
+  "device_type": "smart_switch",
+  "discovery_by": "entity",
   "measure_description": "Manual measurement of single smart plug. Measured values ",
   "measure_device": "Brennenstuhl EM 231-A",
   "measure_method": "manual",
   "name": "Shelly Plug S",
-  "aliases": [
-    "SHPLG-S"
-  ],
+  "only_self_usage": true,
   "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
   },
   "sub_profile_select": {
     "default": "+wlan"
-  },
-  "discovery_by": "entity",
-  "device_type": "smart_switch",
-  "only_self_usage": true,
-  "calculation_strategy": "fixed",
-  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN\": No Access Point (AP), no ECO mode, only connected to network.\n\"WLAN + ECO\": ECO setting turned on, repeater (AP) turned off.",
-  "author": "SBD"
+  }
 }

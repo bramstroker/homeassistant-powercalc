@@ -1,6 +1,8 @@
 {
+  "author": "bragra <bragragithub@gradussen.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-08-11T14:22:26.721254",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
@@ -10,7 +12,5 @@
     "VERSION": "v1.14.0:docker"
   },
   "name": "Livarno Home outdoor LED band",
-  "standby_power": 0.2,
-  "author": "bragra <bragragithub@gradussen.com>",
-  "device_type": "light"
+  "standby_power": 0.2
 }

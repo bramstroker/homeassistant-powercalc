@@ -1,5 +1,8 @@
 {
+  "author": "naamah75 <webmaster@naamah.it>",
   "calculation_strategy": "lut",
+  "created_at": "2023-05-18T15:02:14",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",
@@ -9,8 +12,5 @@
     "VERSION": "v1.6.0:docker"
   },
   "name": "Tapo L530E",
-  "standby_power": 0.4,
-  "created_at": "2023-05-18T15:02:14",
-  "author": "naamah75 <webmaster@naamah.it>",
-  "device_type": "light"
+  "standby_power": 0.4
 }

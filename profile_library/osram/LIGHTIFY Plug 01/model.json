@@ -1,21 +1,21 @@
 {
-  "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
-  "measure_method": "manual",
-  "measure_device": "Zhurui PR10-D",
-  "name": "Osram Lightify Plug 01",
-  "standby_power": 0.44,
-  "standby_power_on": 1.04,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
-  "device_type": "smart_switch",
-  "calculation_strategy": "fixed",
-  "only_self_usage": false,
   "aliases": [
     "Plug 01",
     "AB3257001NJ"
   ],
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
+  "calculation_strategy": "fixed",
   "created_at": "2022-09-06T08:26:19",
-  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
+  "device_type": "smart_switch",
+  "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
+  "measure_device": "Zhurui PR10-D",
+  "measure_method": "manual",
+  "name": "Osram Lightify Plug 01",
+  "only_self_usage": false,
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "standby_power": 0.44,
+  "standby_power_on": 1.04
 }

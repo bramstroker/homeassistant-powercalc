@@ -1,18 +1,18 @@
 {
-  "name": "IKEA Control outlet",
   "aliases": [
     "HS400",
     "hs500"
   ],
+  "calculation_strategy": "multi_switch",
   "device_type": "smart_switch",
   "discovery_by": "device",
-  "calculation_strategy": "multi_switch",
   "multi_switch_config": {
     "power": 0.82,
     "power_off": 0.52
   },
+  "name": "IKEA Control outlet",
+  "only_self_usage": true,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power"
-  },
-  "only_self_usage": true
+  }
 }

@@ -1,5 +1,8 @@
 {
+  "author": "Perfunctory85 <105150364+Perfunctory85@users.noreply.github.com>",
   "calculation_strategy": "lut",
+  "created_at": "2023-02-10T09:29:19",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Gosund SP1",
   "measure_device_firmware": "Tasmota",
@@ -10,8 +13,5 @@
     "VERSION": "v1.3.3:docker"
   },
   "name": "Livarno Lux E27 bulb CCT",
-  "standby_power": 0.31,
-  "created_at": "2023-02-10T09:29:19",
-  "author": "Perfunctory85 <105150364+Perfunctory85@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.31
 }

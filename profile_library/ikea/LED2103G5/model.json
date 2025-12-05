@@ -1,5 +1,11 @@
 {
+  "aliases": [
+    "TRADFRI bulb E27 WW globe 806lm"
+  ],
+  "author": "dansie <dansie@users.noreply.github.com>",
   "calculation_strategy": "lut",
+  "created_at": "2023-10-28T17:09:48",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script; 6.1 Watts dummy load",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
@@ -9,11 +15,5 @@
     "VERSION": "v1.9.5:docker"
   },
   "name": "TRADFRI bulb E27 WW globe 806lm",
-  "standby_power": 0.11,
-  "aliases": [
-    "TRADFRI bulb E27 WW globe 806lm"
-  ],
-  "created_at": "2023-10-28T17:09:48",
-  "author": "dansie <dansie@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.11
 }

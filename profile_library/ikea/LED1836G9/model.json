@@ -1,13 +1,13 @@
 {
-  "measure_device": "Shelly Plug S",
-  "measure_method": "script",
-  "name": "TRADFRI bulb E27 WW 806lm",
-  "standby_power": 0.4,
-  "calculation_strategy": "lut",
   "aliases": [
     "TRADFRI bulb E27 WW 806lm"
   ],
-  "created_at": "2021-09-20T22:08:50",
   "author": "mariwing <mariwing@gmail.com>",
-  "device_type": "light"
+  "calculation_strategy": "lut",
+  "created_at": "2021-09-20T22:08:50",
+  "device_type": "light",
+  "measure_device": "Shelly Plug S",
+  "measure_method": "script",
+  "name": "TRADFRI bulb E27 WW 806lm",
+  "standby_power": 0.4
 }

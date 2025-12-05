@@ -1,4 +1,9 @@
 {
+  "author": "Jari Eskelinen <jari.eskelinen@iki.fi>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-12-25T09:44:08",
+  "device_type": "light",
+  "linked_profile": "signify/3216331P6",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",
@@ -8,10 +13,5 @@
     "VERSION": "master"
   },
   "name": "Hue White Ambiance Aurelle Square",
-  "standby_power": 0.35,
-  "calculation_strategy": "lut",
-  "linked_profile": "signify/3216331P6",
-  "created_at": "2022-12-25T09:44:08",
-  "author": "Jari Eskelinen <jari.eskelinen@iki.fi>",
-  "device_type": "light"
+  "standby_power": 0.35
 }

@@ -1,12 +1,10 @@
 {
-  "created_at": "2025-10-13T17:19:21.329606",
-  "device_type": "lawn_mower_robot",
   "calculation_strategy": "composite",
   "composite_config": [
     {
       "condition": {
-        "entity_id": "[[entity_by_device_class:battery_charging]]",
         "condition": "state",
+        "entity_id": "[[entity_by_device_class:battery_charging]]",
         "state": "on"
       },
       "linear": {
@@ -107,5 +105,7 @@
       }
     }
   ],
+  "created_at": "2025-10-13T17:19:21.329606",
+  "device_type": "lawn_mower_robot",
   "name": "Test"
 }

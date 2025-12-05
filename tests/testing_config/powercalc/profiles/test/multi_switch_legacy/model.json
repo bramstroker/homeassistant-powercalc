@@ -1,12 +1,12 @@
 {
-  "name": "Kasa Smart Wi-Fi Power Strip",
-  "discovery_by": "device",
-  "device_type": "smart_switch",
   "calculation_strategy": "multi_switch",
+  "device_type": "smart_switch",
+  "discovery_by": "device",
   "multi_switch_config": {
     "power": 0.7,
     "power_off": 0.25
   },
+  "name": "Kasa Smart Wi-Fi Power Strip",
   "sensor_config": {
     "power_sensor_naming": "{} Device Power"
   }

@@ -1,4 +1,12 @@
 {
+  "aliases": [
+    "LWA028",
+    "9290024693"
+  ],
+  "author": "Paul Nicholls <paul.n@next.gen.nz>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-12-28T10:31:30",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "HOPI HP-9800",
   "measure_method": "script",
@@ -8,13 +16,5 @@
     "VERSION": "v1.2.0:docker"
   },
   "name": "Hue White Bulb A60 B22 1100lm with Bluetooth",
-  "standby_power": 0.39,
-  "calculation_strategy": "lut",
-  "aliases": [
-    "LWA028",
-    "9290024693"
-  ],
-  "created_at": "2022-12-28T10:31:30",
-  "author": "Paul Nicholls <paul.n@next.gen.nz>",
-  "device_type": "light"
+  "standby_power": 0.39
 }

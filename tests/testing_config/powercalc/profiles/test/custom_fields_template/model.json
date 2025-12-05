@@ -1,17 +1,14 @@
 {
-  "name": "My device",
-  "measure_method": "manual",
-  "measure_device": "xx",
-  "device_type": "generic_iot",
   "calculation_strategy": "fixed",
+  "device_type": "generic_iot",
   "fields": {
     "num_switches": {
-      "label": "Number of switches",
       "description": "Enter some number",
+      "label": "Number of switches",
       "selector": {
         "number": {
-          "min": 0,
           "max": 4,
+          "min": 0,
           "step": 1
         }
       }
@@ -19,5 +16,8 @@
   },
   "fixed_config": {
     "power": "{{ [[num_switches]] * 0.20 }}"
-  }
+  },
+  "measure_device": "xx",
+  "measure_method": "manual",
+  "name": "My device"
 }

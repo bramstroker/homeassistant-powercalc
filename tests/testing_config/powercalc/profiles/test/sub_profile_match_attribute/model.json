@@ -1,18 +1,18 @@
 {
+  "calculation_strategy": "lut",
   "name": "Test",
   "standby_power": 0.47,
-  "calculation_strategy": "lut",
   "sub_profile_select": {
+    "default": "a",
     "matchers": [
       {
-        "type": "attribute",
         "attribute": "some",
         "map": {
           "a": "a",
           "b": "b"
-        }
+        },
+        "type": "attribute"
       }
-    ],
-    "default": "a"
+    ]
   }
 }

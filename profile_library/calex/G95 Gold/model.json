@@ -1,6 +1,9 @@
 {
+  "aliases": [],
+  "author": "Jort <63785276+JortvanSchijndel@users.noreply.github.com>",
   "calculation_strategy": "lut",
   "created_at": "2025-04-28T23:34:57.359526",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
@@ -10,8 +13,5 @@
     "VERSION": "v1.17.11:docker"
   },
   "name": "Smart LED Filament Gold Globe-lamp G95 7W",
-  "standby_power": 0.61,
-  "aliases": [],
-  "author": "Jort <63785276+JortvanSchijndel@users.noreply.github.com>",
-  "device_type": "light"
+  "standby_power": 0.61
 }

@@ -1,5 +1,13 @@
 {
+  "aliases": [
+    "929003045001_01",
+    "929003045001_02",
+    "929003045001_03"
+  ],
+  "author": "mariwing <mariwing@gmail.com>",
   "calculation_strategy": "lut",
+  "created_at": "2023-03-19T08:54:20",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
@@ -9,13 +17,5 @@
     "VERSION": "master"
   },
   "name": "Hue White Ambiance Milliskin",
-  "standby_power": 0.3,
-  "aliases": [
-    "929003045001_01",
-    "929003045001_02",
-    "929003045001_03"
-  ],
-  "created_at": "2023-03-19T08:54:20",
-  "author": "mariwing <mariwing@gmail.com>",
-  "device_type": "light"
+  "standby_power": 0.3
 }

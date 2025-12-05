@@ -1,4 +1,8 @@
 {
+  "author": "Morten Trab <morten@trab.dk>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-04-03T10:46:35",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
@@ -8,9 +12,5 @@
     "VERSION": "master"
   },
   "name": "Ledvance LDVWF30FILE27RGBW",
-  "standby_power": 1.04,
-  "calculation_strategy": "lut",
-  "created_at": "2022-04-03T10:46:35",
-  "author": "Morten Trab <morten@trab.dk>",
-  "device_type": "light"
+  "standby_power": 1.04
 }

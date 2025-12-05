@@ -1,11 +1,11 @@
 {
-  "name": "Some profile with sub profiles",
-  "discovery_by": "entity",
-  "device_type": "smart_switch",
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
   "calculation_strategy": "fixed",
-  "config_flow_sub_profile_remarks": "More info\n\nBla bla\n*Bla bla*"
+  "config_flow_sub_profile_remarks": "More info\n\nBla bla\n*Bla bla*",
+  "device_type": "smart_switch",
+  "discovery_by": "entity",
+  "name": "Some profile with sub profiles",
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  }
 }

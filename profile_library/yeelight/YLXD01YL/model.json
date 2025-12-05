@@ -1,4 +1,11 @@
 {
+  "aliases": [
+    "ceiling1"
+  ],
+  "author": "RaphV90 <77358711+RaphV90@users.noreply.github.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2023-04-02T10:50:00",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script.",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
@@ -9,21 +16,14 @@
   },
   "name": "Yeelight Smart LED Ceiling Light",
   "standby_power": 0.9,
-  "calculation_strategy": "lut",
   "sub_profile_select": {
+    "default": "default",
     "matchers": [
       {
-        "type": "entity_id",
         "pattern": ".*_nightlight$",
-        "profile": "nightlight"
+        "profile": "nightlight",
+        "type": "entity_id"
       }
-    ],
-    "default": "default"
-  },
-  "aliases": [
-    "ceiling1"
-  ],
-  "created_at": "2023-04-02T10:50:00",
-  "author": "RaphV90 <77358711+RaphV90@users.noreply.github.com>",
-  "device_type": "light"
+    ]
+  }
 }

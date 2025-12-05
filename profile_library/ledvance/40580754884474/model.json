@@ -1,4 +1,8 @@
 {
+  "author": "Kenneth Fribert <fribse@gmail.com>",
+  "calculation_strategy": "lut",
+  "created_at": "2022-11-16T20:39:28",
+  "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
@@ -8,9 +12,5 @@
     "VERSION": "v1.1.1:docker"
   },
   "name": "SMART+ WIFI PLANON FRAMELESS TW RGB 600x600",
-  "standby_power": 1.0,
-  "calculation_strategy": "lut",
-  "created_at": "2022-11-16T20:39:28",
-  "author": "Kenneth Fribert <fribse@gmail.com>",
-  "device_type": "light"
+  "standby_power": 1.0
 }

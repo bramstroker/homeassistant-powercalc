@@ -1,14 +1,14 @@
 {
-  "name": "Hue White Ambiance Bulb A60 E27",
-  "calculation_strategy": "lut",
-  "measure_method": "script",
-  "measure_device": "Shelly 1PM",
-  "standby_power": 0.4,
-  "measure_description": "Used script utils/measure_shelly.py from repository, estimated standby",
   "aliases": [
     "8718699673147"
   ],
-  "created_at": "2021-09-01T18:40:45",
   "author": "wormiedk <wormie@alberg.dk>",
-  "device_type": "light"
+  "calculation_strategy": "lut",
+  "created_at": "2021-09-01T18:40:45",
+  "device_type": "light",
+  "measure_description": "Used script utils/measure_shelly.py from repository, estimated standby",
+  "measure_device": "Shelly 1PM",
+  "measure_method": "script",
+  "name": "Hue White Ambiance Bulb A60 E27",
+  "standby_power": 0.4
 }
