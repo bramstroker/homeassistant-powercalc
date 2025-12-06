@@ -77,7 +77,6 @@ from tests.common import (
     create_input_boolean,
     create_input_number,
     get_simple_fixed_config,
-    get_test_config_dir,
     get_test_profile_dir,
     run_powercalc_setup,
     setup_config_entry,
@@ -175,8 +174,6 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant) ->
 
 
 async def test_standby_power(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass)
-
     await run_powercalc_setup(
         hass,
         {
@@ -334,9 +331,6 @@ async def test_strategy_enabled_condition_template_tracking(
 
 
 async def test_template_entity_tracking(hass: HomeAssistant) -> None:
-    await create_input_number(hass, "test", 0)
-    await create_input_boolean(hass)
-
     await run_powercalc_setup(
         hass,
         {
@@ -397,7 +391,6 @@ async def test_error_when_model_not_supported(
 ) -> None:
     caplog.set_level(logging.ERROR)
 
-    await create_input_boolean(hass)
     await run_powercalc_setup(
         hass,
         {
@@ -478,8 +471,6 @@ async def test_unavailable_power(hass: HomeAssistant) -> None:
 
 
 async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass)
-
     await run_powercalc_setup(
         hass,
         get_simple_fixed_config("input_boolean.test"),
@@ -676,7 +667,6 @@ async def test_entity_category(hass: HomeAssistant) -> None:
 
 
 async def test_sub_profile_default_select(hass: HomeAssistant) -> None:
-    hass.config.config_dir = get_test_config_dir()
     await run_powercalc_setup(
         hass,
         {
@@ -709,7 +699,7 @@ async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
 
     hass.states.async_set("camera.test", STATE_IDLE)
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     power_state = hass.states.get("sensor.test_power")
     assert power_state
@@ -765,7 +755,7 @@ async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profi
 
     hass.states.async_set("light.test", STATE_ON)
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     with pytest.raises(HomeAssistantError):
         await hass.services.async_call(
@@ -806,7 +796,7 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
         },
     )
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     with pytest.raises(HomeAssistantError):
         await hass.services.async_call(

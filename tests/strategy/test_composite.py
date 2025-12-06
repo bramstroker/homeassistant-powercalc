@@ -35,7 +35,6 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.strategy.composite import CompositeMode
 from tests.common import (
-    get_test_config_dir,
     get_test_profile_dir,
     run_powercalc_setup,
 )
@@ -237,8 +236,6 @@ async def test_nested_conditions(hass: HomeAssistant) -> None:
 
 
 async def test_playbook(hass: HomeAssistant) -> None:
-    hass.config.config_dir = get_test_config_dir()
-
     dishwasher_mode_entity = "sensor.dishwasher_operating_mode"
 
     hass.states.async_set(dishwasher_mode_entity, "Cycle Complete")

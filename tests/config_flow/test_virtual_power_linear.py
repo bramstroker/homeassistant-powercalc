@@ -15,7 +15,6 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
@@ -96,7 +95,6 @@ async def test_linear_options_hidden_from_menu_for_self_usage_profiles(hass: Hom
     Fixed options should be hidden from the menu for self usage profiles
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2935
     """
-    hass.config.config_dir = get_test_config_dir()
     entry = create_mock_entry(
         hass,
         {

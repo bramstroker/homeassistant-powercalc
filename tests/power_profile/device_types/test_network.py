@@ -5,7 +5,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, DUMMY_ENTITY_ID
-from tests.common import get_test_config_dir, run_powercalc_setup
+from tests.common import run_powercalc_setup
 from tests.conftest import MockEntityWithModel
 
 
@@ -51,7 +51,6 @@ async def test_router_discovery_by_device(
     """
     Test that smart plug can be setup from profile library
     """
-    hass.config.config_dir = get_test_config_dir()
 
     mock_entity_with_model_information(
         "switch.freebox",

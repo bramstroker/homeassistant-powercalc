@@ -51,7 +51,7 @@ from custom_components.powercalc.discovery import DiscoveryStatus, get_power_pro
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 
-from .common import create_mock_light_entity, get_test_config_dir, run_powercalc_setup
+from .common import create_mock_light_entity, run_powercalc_setup
 from .conftest import MockEntityWithModel
 
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
@@ -73,7 +73,7 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init: AsyncMock) -> 
     lightc.model = "NONEXISTING"
     await create_mock_light_entity(hass, [lighta, lightb, lightc])
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     # Check that two discovery flows have been initialized
     # LightA and LightB should be discovered, LightC not
@@ -111,7 +111,7 @@ async def test_discovery_skipped_when_confirmed_by_user(
     )
     config_entry.add_to_hass(hass)
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     assert not mock_flow_init.mock_calls
 
@@ -197,7 +197,7 @@ async def test_config_entry_overrides_autodiscovered(
         {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS},
     )
 
-    await run_powercalc_setup(hass, {}, {})
+    await run_powercalc_setup(hass)
 
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -276,9 +276,6 @@ async def test_autodiscover_skipped(
     extra_kwargs: dict,
 ) -> None:
     """Test that auto discovery skips entities based on various conditions."""
-
-    hass.config.config_dir = get_test_config_dir()
-
     mock_entity_with_model_information(
         entity_id,
         manufacturer,
@@ -286,7 +283,7 @@ async def test_autodiscover_skipped(
         **extra_kwargs,
     )
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     assert len(mock_flow_init.mock_calls) == 0
 
@@ -329,7 +326,7 @@ async def test_autodiscover_continues_when_one_entity_fails(
     )
     with patch("custom_components.powercalc.power_profile.library.ProfileLibrary.find_models", new_callable=AsyncMock) as mock_find_models:
         mock_find_models.side_effect = [Exception("Test exception"), {ModelInfo("signify", "LCT010")}]
-        await run_powercalc_setup(hass, {})
+        await run_powercalc_setup(hass)
         assert "Error during entity discovery" in caplog.text
 
 
@@ -406,8 +403,6 @@ async def test_exclude_self_usage(
     mock_flow_init: AsyncMock,
 ) -> None:
     """Test that entities with excluded device types are not considered for discovery"""
-
-    hass.config.config_dir = get_test_config_dir()
     mock_entity_with_model_information(
         "switch.test",
         "test",
@@ -552,7 +547,7 @@ async def test_same_entity_is_not_discovered_twice(
 
     mock_entity_with_model_information("light.test", "signify", "LCT010")
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     mock_calls = mock_flow_init.mock_calls
     assert len(mock_calls) == 0
@@ -586,7 +581,7 @@ async def test_wled_not_discovered_twice(
 
     mock_entity_with_model_information("light.test", "WLED", "FOSS")
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     mock_calls = mock_flow_init.mock_calls
     assert len(mock_calls) == 0
@@ -659,7 +654,7 @@ async def test_govee_segment_lights_skipped(
         },
     )
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     mock_calls = mock_flow_init.mock_calls
     assert len(mock_calls) == 1
@@ -711,7 +706,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
     )
     config_entry.add_to_hass(hass)
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     assert not hass.states.get("sensor.test_power")
     assert "Already setup with discovery, skipping" in caplog.text
@@ -803,7 +798,7 @@ async def test_update_profile_service(
 
     mock_entity_with_model_information("light.test", "signify", "LCT010")
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     await hass.services.async_call(
         DOMAIN,
@@ -819,8 +814,6 @@ async def test_discovery_by_device(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    hass.config.config_dir = get_test_config_dir()
-
     mock_device_registry(
         hass,
         {
@@ -832,7 +825,7 @@ async def test_discovery_by_device(
         },
     )
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     mock_calls = mock_flow_init.mock_calls
     assert mock_calls[0][1] == (DOMAIN,)
@@ -849,8 +842,6 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
     mock_flow_init: AsyncMock,
 ) -> None:
     """Powercalc sensors should not be considered for discovery"""
-    hass.config.config_dir = get_test_config_dir()
-
     mock_device_registry(
         hass,
         {
@@ -879,7 +870,7 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
         },
     )
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     mock_calls = mock_flow_init.mock_calls
     assert len(mock_calls) == 1

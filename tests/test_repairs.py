@@ -6,12 +6,11 @@ from homeassistant.setup import async_setup_component
 
 from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, SensorType
 from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL
-from tests.common import get_test_config_dir, setup_config_entry
+from tests.common import setup_config_entry
 
 
 async def test_sub_profile_repair(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
     """Test sub profile repair"""
-    hass.config.config_dir = get_test_config_dir()
     config_entry = await setup_config_entry(
         hass,
         {
@@ -40,7 +39,6 @@ async def test_sub_profile_repair(hass: HomeAssistant, issue_registry: ir.IssueR
 
 
 async def test_no_sub_profile_repair_raised(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
-    hass.config.config_dir = get_test_config_dir()
     config_entry = await setup_config_entry(
         hass,
         {

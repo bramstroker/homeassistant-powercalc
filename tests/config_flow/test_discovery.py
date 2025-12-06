@@ -21,7 +21,6 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_ENTITY_ID,
     DEFAULT_UNIQUE_ID,
@@ -178,8 +177,6 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
 
 
 async def test_discovery_by_device(hass: HomeAssistant) -> None:
-    hass.config.config_dir = get_test_config_dir()
-
     device_entry = DeviceEntry(
         name="FooBar",
         id="youless-device",

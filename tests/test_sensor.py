@@ -63,7 +63,6 @@ from custom_components.powercalc.const import (
 
 from .common import (
     create_input_boolean,
-    create_input_booleans,
     get_simple_fixed_config,
     run_powercalc_setup,
 )
@@ -121,8 +120,6 @@ async def test_legacy_yaml_platform_configuration(
 
 async def test_utility_meter_is_created(hass: HomeAssistant) -> None:
     """Test that utility meters are successfully created when `create_utility_meter: true`"""
-    await create_input_boolean(hass)
-
     await run_powercalc_setup(
         hass,
         {
@@ -145,8 +142,6 @@ async def test_utility_meter_is_created(hass: HomeAssistant) -> None:
 
 
 async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
-    await create_input_booleans(hass, ["test", "test1", "test2"])
-
     await run_powercalc_setup(
         hass,
         {
@@ -235,7 +230,6 @@ async def test_error_when_configuring_same_entity_twice(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.ERROR)
-    await create_input_boolean(hass)
 
     await run_powercalc_setup(
         hass,
@@ -251,8 +245,6 @@ async def test_error_when_configuring_same_entity_twice(
 
 
 async def test_alternate_naming_strategy(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass)
-
     await run_powercalc_setup(
         hass,
         {
@@ -277,8 +269,6 @@ async def test_alternate_naming_strategy(hass: HomeAssistant) -> None:
 
 
 async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass)
-
     await run_powercalc_setup(
         hass,
         [
@@ -311,7 +301,7 @@ async def test_unsupported_model_is_skipped_from_autodiscovery(
     mock_entity_with_model_information("light.test", "lidl", "non_existing_model")
 
     # Run powercalc setup with autodiscovery
-    await run_powercalc_setup(hass, {}, {})
+    await run_powercalc_setup(hass)
 
     assert "Model not found in library, skipping discovery" in caplog.text
 
@@ -398,8 +388,6 @@ async def test_user_can_rename_entity_id(
 async def test_setup_multiple_entities_in_single_platform_config(
     hass: HomeAssistant,
 ) -> None:
-    await create_input_booleans(hass, ["test1", "test2", "test3"])
-
     await run_powercalc_setup(
         hass,
         {

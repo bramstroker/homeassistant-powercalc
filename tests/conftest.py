@@ -30,12 +30,17 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
-from tests.common import mock_area_registry, mock_floor_registry
+from tests.common import get_test_config_dir, mock_area_registry, mock_floor_registry
 
 
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(enable_custom_integrations: bool) -> Generator:
     yield
+
+
+@pytest.fixture(autouse=True)
+def configure_hass_config_dir(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
 
 
 @pytest.fixture

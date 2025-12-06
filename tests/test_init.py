@@ -8,7 +8,6 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
-    EVENT_HOMEASSISTANT_STARTED,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
@@ -84,9 +83,6 @@ async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry) ->
         domain_config,
     )
 
-    hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
-    await hass.async_block_till_done()
-
     group_state = hass.states.get("sensor.all_input_boolean_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_power"}
@@ -153,9 +149,6 @@ async def test_domain_group_with_utility_meter(
     }
 
     await run_powercalc_setup(hass, {}, domain_config)
-
-    hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.all_light_power")
     assert hass.states.get("sensor.all_light_energy")

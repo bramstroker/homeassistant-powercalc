@@ -27,7 +27,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.fixed import FixedStrategy
-from tests.common import create_input_boolean, create_input_number, run_powercalc_setup
+from tests.common import run_powercalc_setup
 
 
 async def test_simple_power(hass: HomeAssistant) -> None:
@@ -37,7 +37,7 @@ async def test_simple_power(hass: HomeAssistant) -> None:
 
 
 async def test_template_power(hass: HomeAssistant) -> None:
-    await create_input_number(hass, "test", 42)
+    hass.states.async_set("input_number.test", "42")
 
     await hass.async_block_till_done()
 
@@ -170,9 +170,6 @@ async def test_validation_error_state_power_only_entity_domain(hass: HomeAssista
 async def test_config_entry_with_template_rendered_correctly(
     hass: HomeAssistant,
 ) -> None:
-    await create_input_boolean(hass, "test")
-    await create_input_number(hass, "test", 30)
-
     template = "{{states('input_number.test')|float}}"
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -199,8 +196,6 @@ async def test_config_entry_with_template_rendered_correctly(
 
 
 async def test_config_entry_with_states_power_template(hass: HomeAssistant) -> None:
-    await create_input_number(hass, "test", 30)
-
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data={
@@ -233,9 +228,6 @@ async def test_template_power_combined_with_multiply_factor(
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/1369
     """
-
-    await create_input_boolean(hass, "test")
-    await create_input_number(hass, "test", 30)
 
     await run_powercalc_setup(
         hass,

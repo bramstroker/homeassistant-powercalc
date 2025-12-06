@@ -96,7 +96,7 @@ async def test_per_device_discovery_from_gui(hass: HomeAssistant) -> None:
 
     hass.states.async_set("sensor.some_entity", "50.00")
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     power_state = hass.states.get("sensor.test_device_power")
     assert power_state

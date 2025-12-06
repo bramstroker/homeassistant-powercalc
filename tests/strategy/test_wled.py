@@ -189,8 +189,7 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant, caplog: pytest.LogCa
         },
     )
 
-    await run_powercalc_setup(hass, {}, {})
-    await hass.async_block_till_done()
+    await run_powercalc_setup(hass)
 
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     assert len(flows) == 1
