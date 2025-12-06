@@ -58,6 +58,7 @@ from homeassistant.util.unit_conversion import (
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
+    CONF_ALL,
     CONF_AREA,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
@@ -434,6 +435,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         unique_id: str | None = None,
         device_id: str | None = None,
     ) -> None:
+        self.entity_id = entity_id
+        self.source_device_id = device_id
+
         self._attr_name = name
         # Remove own entity from entities, when it happens to be there. To prevent recursion
         entities.discard(entity_id)
@@ -448,11 +452,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._attr_suggested_display_precision = self._rounding_digits
         if unique_id:
             self._attr_unique_id = unique_id
-        self.entity_id = entity_id
-        self.source_device_id = device_id
         self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
         self._native_value_exact = Decimal(0)
-        self._states: dict[str, Decimal] = {}
+        self._member_states: dict[str, Decimal] = {}
         self._ignore_unavailable_state = bool(self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE))
         self._group_type = group_type
         self._start_time: float = time.time()
@@ -462,9 +464,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
         await super().async_added_to_hass()
-
-        if isinstance(self, GroupedEnergySensor):
-            await self.restore_last_state()
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
         if self._update_interval > 0:
@@ -512,7 +511,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         if self._group_type != GroupType.DOMAIN:
             return
         domain = self._sensor_config.get(CONF_DOMAIN)
-        if domain == "all":
+        if domain == CONF_ALL:
             entity_registry = er.async_get(self.hass)
             entities = [entity.entity_id for entity in entity_registry.entities.values() if entity.device_class == self.device_class]
         else:
@@ -665,24 +664,24 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
         member_available_states: list[State],
         member_states: list[State],
     ) -> Decimal | str:
-        self._states = {state.entity_id: self._get_state_value_in_native_unit(state) for state in member_available_states}
+        self._member_states = {state.entity_id: self._get_state_value_in_native_unit(state) for state in member_available_states}
         return self.get_summed_state()
 
     def calculate_new_state(self, state: State) -> Decimal | str:
         if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
-            if state.entity_id in self._states:
-                del self._states[state.entity_id]
+            if state.entity_id in self._member_states:
+                del self._member_states[state.entity_id]
         else:
-            self._states[state.entity_id] = self._get_state_value_in_native_unit(state)
+            self._member_states[state.entity_id] = self._get_state_value_in_native_unit(state)
         return self.get_summed_state()
 
     def get_summed_state(self) -> Decimal | str:
-        if not self._states:
+        if not self._member_states:
             if self._ignore_unavailable_state:
                 return Decimal(0)
             return STATE_UNAVAILABLE
 
-        return Decimal(sum(self._states.values()))
+        return Decimal(sum(self._member_states.values()))
 
 
 class GroupedEnergySensor(GroupedSensor, EnergySensor):
@@ -718,6 +717,12 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.NONE),
             UnitOfEnergy.WATT_HOUR,
         )
+
+    async def async_added_to_hass(self) -> None:
+        """Register state listeners."""
+        await self.restore_last_state()
+
+        await super().async_added_to_hass()
 
     async def async_reset(self) -> None:
         """Reset the group sensor and underlying member sensor when supported."""
