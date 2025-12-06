@@ -10,6 +10,7 @@ from homeassistant.helpers.typing import ConfigType
 from custom_components.powercalc.const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_STANDBY_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISCOVERY,
@@ -69,6 +70,7 @@ async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> C
         CONF_IGNORE_UNAVAILABLE_STATE: False,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,
+        CONF_CREATE_STANDBY_GROUP: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_DISCOVERY: {
             CONF_ENABLED: True,
