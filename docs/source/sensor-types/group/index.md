@@ -22,6 +22,6 @@ Use this group to subtract the power of one or more entities from another entity
 
 This group is used to get a sum of all tracked or untracked power sensors.
 
-- [Standby group](../standby.md)
+- [Standby group](standby.md)
 
 This group is created by default and sums all power when devices are in standby mode.
