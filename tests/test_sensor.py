@@ -63,7 +63,6 @@ from custom_components.powercalc.const import (
 
 from .common import (
     create_input_boolean,
-    create_input_booleans,
     get_simple_fixed_config,
     run_powercalc_setup,
 )

@@ -27,7 +27,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.fixed import FixedStrategy
-from tests.common import create_input_boolean, create_input_number, run_powercalc_setup
+from tests.common import run_powercalc_setup
 
 
 async def test_simple_power(hass: HomeAssistant) -> None:
