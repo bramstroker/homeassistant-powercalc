@@ -141,7 +141,7 @@ async def create_group_sensors_yaml(
     power_sensor_ids = filter_entity_list_by_class(entities, PowerSensor, filters)
 
     create_energy_sensor: bool = sensor_config.get(CONF_CREATE_ENERGY_SENSOR, True)
-    energy_sensor_ids = []
+    energy_sensor_ids: set[str] = set()
     if create_energy_sensor:
         energy_sensor_ids = filter_entity_list_by_class(
             entities,
@@ -150,7 +150,7 @@ async def create_group_sensors_yaml(
         )
 
     group_name = str(sensor_config.get(CONF_CREATE_GROUP))
-    return await create_group_sensors_custom(hass, group_name, sensor_config, set(power_sensor_ids), set(energy_sensor_ids))
+    return await create_group_sensors_custom(hass, group_name, sensor_config, power_sensor_ids, energy_sensor_ids)
 
 
 async def create_group_sensors_gui(
@@ -195,7 +195,7 @@ async def create_group_sensors_custom(
             group_name,
             group_type,
             sensor_config,
-            set(power_sensor_ids),
+            power_sensor_ids,
         )
         group_sensors.append(power_sensor)
 
@@ -206,7 +206,7 @@ async def create_group_sensors_custom(
             group_name,
             group_type,
             sensor_config,
-            set(energy_sensor_ids),
+            energy_sensor_ids,
             power_sensor,
         )
 
@@ -228,20 +228,20 @@ def filter_entity_list_by_class(
     all_entities: list,
     class_name: type[EnergySensor | PowerSensor] | SensorDeviceClass,
     default_filters: list[Callable] | None = None,
-) -> list[str]:
+) -> set[str]:
     """Filter entity list to only include entities of the given class."""
     if isinstance(class_name, SensorDeviceClass):
         class_name = PowerSensor if class_name == SensorDeviceClass.POWER else EnergySensor
     filter_list = default_filters.copy() if default_filters else []
     filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
     filter_list.append(lambda elm: isinstance(elm, class_name))
-    return [
+    return {
         x.entity_id
         for x in filter(
             lambda x: all(f(x) for f in filter_list),
             all_entities,
         )
-    ]
+    }
 
 
 @async_cache
@@ -513,7 +513,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         domain = self._sensor_config.get(CONF_DOMAIN)
         if domain == CONF_ALL:
             entity_registry = er.async_get(self.hass)
-            entities = [entity.entity_id for entity in entity_registry.entities.values() if entity.device_class == self.device_class]
+            entities = {entity.entity_id for entity in entity_registry.entities.values() if entity.device_class == self.device_class}
         else:
             entities = self.hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES).get(domain, [])
             entities = filter_entity_list_by_class(
