@@ -9,8 +9,10 @@ import shutil
 from typing import Any, NotRequired, TypedDict, cast
 
 import aiohttp
-from aiohttp import ClientError, ClientTimeout
+from aiohttp import ClientError
+import async_timeout
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import STORAGE_DIR
 
 from custom_components.powercalc.helpers import async_cache
@@ -54,7 +56,9 @@ class RemoteLoader(Loader):
 
     async def initialize(self) -> None:
         """Initialize the loader."""
+
         self.library_contents = await self.load_library_json()
+
         self.profile_hashes = await self.hass.async_add_executor_job(self.load_profile_hashes)
 
         self.model_infos.clear()
@@ -105,21 +109,29 @@ class RemoteLoader(Loader):
             If download is successful, save it to local storage to use as fallback in case of internet connection issues.
             """
             _LOGGER.debug("Loading library.json from github")
-            async with aiohttp.ClientSession(timeout=ClientTimeout(total=TIMEOUT_SECONDS)) as session, session.get(ENDPOINT_LIBRARY) as resp:
-                if resp.status != 200:
-                    raise ProfileDownloadError("Failed to download library.json, unexpected status code")
 
-                def _save_to_local_storage(data: bytes) -> None:
-                    """Save library.json to local storage"""
-                    os.makedirs(os.path.dirname(local_path), exist_ok=True)
-                    with open(local_path, "wb") as f:
-                        f.write(data)
+            session = async_get_clientsession(self.hass)
 
-                json_data = cast(dict[str, Any], await resp.json())
+            try:
+                async with async_timeout.timeout(TIMEOUT_SECONDS), session.get(ENDPOINT_LIBRARY) as resp:
+                    if resp.status != 200:
+                        raise ProfileDownloadError(
+                            f"Failed to download library.json, unexpected status code: {resp.status}",
+                        )
 
-                await self.hass.async_add_executor_job(_save_to_local_storage, await resp.read())
+                    data = await resp.read()
 
-                return json_data
+            except (TimeoutError, ClientError) as err:
+                raise ProfileDownloadError(f"Failed to download library.json: {err}") from err
+
+            def _save_to_local_storage(data: bytes) -> None:
+                os.makedirs(os.path.dirname(local_path), exist_ok=True)
+                with open(local_path, "wb") as f:
+                    f.write(data)
+
+            await self.hass.async_add_executor_job(_save_to_local_storage, data)
+
+            return cast(dict[str, Any], json.loads(data))
 
         try:
             return cast(dict[str, Any], await self.download_with_retry(_download_remote_library_json))
@@ -282,8 +294,10 @@ class RemoteLoader(Loader):
             with open(path, "wb") as f:
                 f.write(data)
 
-        async with aiohttp.ClientSession(timeout=ClientTimeout(total=TIMEOUT_SECONDS)) as session:
-            try:
+        session = async_get_clientsession(self.hass)
+
+        try:
+            async with async_timeout.timeout(TIMEOUT_SECONDS):
                 async with session.get(endpoint) as resp:
                     if resp.status != 200:
                         raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
@@ -300,8 +314,8 @@ class RemoteLoader(Loader):
 
                         contents = await resp.read()
                         await self.hass.async_add_executor_job(_save_file, contents, resource.get("path"))
-            except aiohttp.ClientError as e:
-                raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
+        except (TimeoutError, aiohttp.ClientError) as e:
+            raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
 
     def load_profile_hashes(self) -> dict[str, str]:
         """Load profile hashes from local storage"""
