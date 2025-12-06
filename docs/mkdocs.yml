@@ -60,6 +60,7 @@ nav:
          - 'sensor-types/group/custom.md'
          - 'sensor-types/group/domain.md'
          - 'sensor-types/group/subtract.md'
+         - 'sensor-types/group/standby.md'
          - 'sensor-types/group/tracked-untracked.md'
          - 'sensor-types/group/include-entities.md'
       - 'sensor-types/real-power-sensor.md'
