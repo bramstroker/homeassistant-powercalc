@@ -797,27 +797,30 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             self.entity_id,
             state.entity_id,
         )
-        cur_state_value = self._get_state_value_in_native_unit(state)
-        prev_state_value = self._get_state_value_in_native_unit(prev_state) if prev_state else Decimal(0)
+
+        cur_value = self._get_state_value_in_native_unit(state)
+        prev_value = self._get_state_value_in_native_unit(prev_state) if prev_state is not None else Decimal(0)
+
+        # Always store current state as the new "previous" state
         self._prev_state_store.set_entity_state(
             self.entity_id,
             state.entity_id,
             state,
         )
 
-        start_at_zero = bool(self._sensor_config.get(CONF_GROUP_ENERGY_START_AT_ZERO, True))
-        delta = Decimal(0) if not prev_state and start_at_zero else cur_state_value - prev_state_value
+        start_at_zero = self._sensor_config.get(CONF_GROUP_ENERGY_START_AT_ZERO, True)
+        if prev_state is None and start_at_zero:  # noqa: SIM108
+            delta = Decimal(0)
+        else:
+            delta = cur_value - prev_value
 
         if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
-            rounded_delta = round(delta, self._rounding_digits)
-            rounded_prev = round(prev_state_value, self._rounding_digits)
-            rounded_cur = round(cur_state_value, self._rounding_digits)
             _LOGGER.debug(
                 "delta for entity %s: %s, prev=%s, cur=%s",
                 state.entity_id,
-                rounded_delta,
-                rounded_prev,
-                rounded_cur,
+                round(delta, self._rounding_digits),
+                round(prev_value, self._rounding_digits),
+                round(cur_value, self._rounding_digits),
             )
 
         if delta < 0:
@@ -825,7 +828,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                 "skipping state for %s, probably erroneous value or sensor was reset",
                 state.entity_id,
             )
-            delta = Decimal(0)
+            return Decimal(0)
 
         return delta
 
@@ -885,11 +888,10 @@ class PreviousStateStore:
         self.hass = hass
 
     def get_entity_state(self, group: str, entity_id: str) -> State | None:
-        """Retrieve the previous state."""
-        if group in self.states and entity_id in self.states[group]:
-            return self.states[group][entity_id]
-
-        return None
+        group_states = self.states.get(group)
+        if group_states is None:
+            return None
+        return group_states.get(entity_id)
 
     def set_entity_state(self, group: str, entity_id: str, state: State) -> None:
         """Set the state for an energy sensor."""
