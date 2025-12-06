@@ -8,7 +8,6 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
-    EVENT_HOMEASSISTANT_STARTED,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
