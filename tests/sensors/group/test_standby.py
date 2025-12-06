@@ -7,6 +7,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 
+from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP
 from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_MANUFACTURER,
@@ -99,3 +100,28 @@ async def test_self_usage_sensors_included(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.all_standby_power").state == "0.30"
+
+
+async def test_disable_group_creation(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "input_boolean.test1",
+                    CONF_STANDBY_POWER: 0.2,
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {CONF_POWER: 20},
+                },
+            ],
+        },
+        {
+            CONF_CREATE_STANDBY_GROUP: False,
+        },
+    )
+
+    hass.states.async_set("input_boolean.test1", STATE_OFF)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.all_standby_power")
+    assert not power_state
