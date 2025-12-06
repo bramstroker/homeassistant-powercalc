@@ -210,7 +210,7 @@ async def test_entities_are_bound_to_source_device3(
             CONF_DEVICE: device_id,
         },
     )
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     power_entity_entry = entity_reg.async_get("sensor.test_device_power")
     assert power_entity_entry

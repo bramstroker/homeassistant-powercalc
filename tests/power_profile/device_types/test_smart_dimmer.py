@@ -107,7 +107,7 @@ async def test_smart_dimmer_power_input_gui_config_flow(
 
     power_sensor_id = "sensor.test_power"
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     # Retrieve the discovery flow
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)

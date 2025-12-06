@@ -204,7 +204,7 @@ async def test_regression_2612(hass: HomeAssistant, mock_entity_with_model_infor
         },
     )
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     assert hass.states.get("sensor.foo_bar_power")
     assert hass.states.get("sensor.foo_bar_energy")

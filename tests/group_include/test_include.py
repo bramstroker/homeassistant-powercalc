@@ -273,9 +273,6 @@ async def test_include_template(hass: HomeAssistant) -> None:
         ],
     )
 
-    await hass.async_start()
-    await hass.async_block_till_done()
-
     group_state = hass.states.get("sensor.lights_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_spots_power"}
@@ -749,7 +746,7 @@ async def test_area_groups_as_subgroups(
     )
     group_b_entry.add_to_hass(hass)
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     group_a_power = hass.states.get("sensor.groupa_power")
     assert group_a_power

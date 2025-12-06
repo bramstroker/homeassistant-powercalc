@@ -135,7 +135,7 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
         },
     )
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     hass.states.async_set("media_player.test", STATE_IDLE)
     await hass.async_block_till_done()

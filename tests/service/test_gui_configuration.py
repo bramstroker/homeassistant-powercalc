@@ -46,7 +46,7 @@ async def test_change_gui_configuration(hass: HomeAssistant) -> None:
     config_entry_c = create_config_entry("light.c", {})
     config_entry_c.add_to_hass(hass)
 
-    await run_powercalc_setup(hass, {}, {})
+    await run_powercalc_setup(hass)
 
     await call_service(hass, CONF_IGNORE_UNAVAILABLE_STATE, "1")
     await call_service(
@@ -68,7 +68,7 @@ async def test_change_gui_configuration(hass: HomeAssistant) -> None:
 
 
 async def test_error_on_invalid_integration_method(hass: HomeAssistant) -> None:
-    await run_powercalc_setup(hass, {}, {})
+    await run_powercalc_setup(hass)
 
     with pytest.raises(HomeAssistantError):
         await call_service(hass, CONF_ENERGY_INTEGRATION_METHOD, "foo")

@@ -301,7 +301,7 @@ async def test_unsupported_model_is_skipped_from_autodiscovery(
     mock_entity_with_model_information("light.test", "lidl", "non_existing_model")
 
     # Run powercalc setup with autodiscovery
-    await run_powercalc_setup(hass, {}, {})
+    await run_powercalc_setup(hass)
 
     assert "Model not found in library, skipping discovery" in caplog.text
 

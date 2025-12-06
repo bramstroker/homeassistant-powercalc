@@ -212,7 +212,7 @@ async def test_hue_smart_plug_is_discovered(
         platform="hue",
         unique_id="1234",
     )
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     mock_calls = mock_flow_init.mock_calls
     assert len(mock_calls) == 1
@@ -232,7 +232,7 @@ async def start_discovery_flow(
         model=model,
     )
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     # Retrieve the discovery flow
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)

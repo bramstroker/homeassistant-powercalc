@@ -699,7 +699,7 @@ async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
 
     hass.states.async_set("camera.test", STATE_IDLE)
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     power_state = hass.states.get("sensor.test_power")
     assert power_state
@@ -755,7 +755,7 @@ async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profi
 
     hass.states.async_set("light.test", STATE_ON)
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     with pytest.raises(HomeAssistantError):
         await hass.services.async_call(
@@ -796,7 +796,7 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
         },
     )
 
-    await run_powercalc_setup(hass, {})
+    await run_powercalc_setup(hass)
 
     with pytest.raises(HomeAssistantError):
         await hass.services.async_call(

@@ -71,7 +71,7 @@ from tests.config_flow.common import (
 
 async def test_config_flow(hass: HomeAssistant) -> None:
     """Test full configuration flow."""
-    await run_powercalc_setup(hass, {}, {})
+    await run_powercalc_setup(hass)
 
     result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
 
@@ -416,7 +416,7 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
     )
     await hass.config_entries.async_setup(global_config_entry.entry_id)
 
-    await run_powercalc_setup(hass, {}, {})
+    await run_powercalc_setup(hass)
 
     assert hass.states.get("sensor.test_power").state == "50.00"
 
