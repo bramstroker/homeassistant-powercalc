@@ -138,14 +138,14 @@ async def create_group_sensors_yaml(
     filters: list[Callable] | None = None,
 ) -> list[Entity]:
     """Create grouped power and energy sensors."""
-    power_sensor_ids = filter_entity_list_by_class(entities, PowerSensor, filters)
+    power_sensor_ids = filter_entity_list_by_class(entities, SensorDeviceClass.POWER, filters)
 
     create_energy_sensor: bool = sensor_config.get(CONF_CREATE_ENERGY_SENSOR, True)
     energy_sensor_ids: set[str] = set()
     if create_energy_sensor:
         energy_sensor_ids = filter_entity_list_by_class(
             entities,
-            EnergySensor,
+            SensorDeviceClass.ENERGY,
             filters,
         )
 
@@ -226,12 +226,11 @@ async def create_group_sensors_custom(
 
 def filter_entity_list_by_class(
     all_entities: list,
-    class_name: type[EnergySensor | PowerSensor] | SensorDeviceClass,
+    device_class: SensorDeviceClass,
     default_filters: list[Callable] | None = None,
 ) -> set[str]:
     """Filter entity list to only include entities of the given class."""
-    if isinstance(class_name, SensorDeviceClass):
-        class_name = PowerSensor if class_name == SensorDeviceClass.POWER else EnergySensor
+    class_name = PowerSensor if device_class == SensorDeviceClass.POWER else EnergySensor
     filter_list = default_filters.copy() if default_filters else []
     filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
     filter_list.append(lambda elm: isinstance(elm, class_name))
@@ -518,7 +517,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             entities = self.hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES).get(domain, [])
             entities = filter_entity_list_by_class(
                 entities,
-                EnergySensor if self._is_energy_sensor else PowerSensor,
+                SensorDeviceClass.ENERGY if self._is_energy_sensor else SensorDeviceClass.POWER,
             )
         excluded_entities = self._sensor_config.get(CONF_EXCLUDE_ENTITIES) or []
         self._entities = set({entity for entity in entities if entity not in excluded_entities})
