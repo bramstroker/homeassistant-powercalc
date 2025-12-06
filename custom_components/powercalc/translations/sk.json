@@ -104,6 +104,7 @@
         "description": "Nastavte globálnu konfiguráciu pre Powercalc. Ďalšie informácie nájdete v [dokumentácii](https://docs.powercalc.nl/configuration/global-configuration/). Ďalšie možnosti pre snímače energie a elektromery môžu byť poskytnuté v ďalších krokoch.",
         "data": {
           "create_energy_sensors": "Vytvorte energetické senzory",
+          "create_standby_group": "Create standby group",
           "create_utility_meters": "Vytvorte merače spotreby",
           "disable_extended_attributes": "Zakázať rozšírené atribúty",
           "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
@@ -115,6 +116,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
+          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "disable_extended_attributes": "Vypnite všetky extra atribúty, ktoré powercalc pridáva k stavu energie, energie a skupiny. To pomôže udržať veľkosť databázy malú",
           "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",
@@ -565,6 +567,7 @@
         "title": "Základné možnosti",
         "data": {
           "create_energy_sensors": "Vytvorte energetické senzory",
+          "create_standby_group": "Create standby group",
           "create_utility_meters": "Vytvorte merače spotreby",
           "disable_extended_attributes": "Zakázať rozšírené atribúty",
           "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
@@ -576,6 +579,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
+          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "disable_extended_attributes": "Zakážte všetky extra atribúty, ktoré powercalc pridáva k výkonu, energii a stavom entity skupiny. Pomôže to udržať veľkosť databázy malú",
           "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",

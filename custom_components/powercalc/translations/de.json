@@ -104,6 +104,7 @@
         "description": "Globale Konfiguration für Powercalc einrichten. Weitere Informationen hierzu finden Sie in der [Dokumentation](https://docs.powercalc.nl/configuration/global-configuration/). In den nächsten Schritten können weitere Optionen für Energiesensoren und Stromzähler angegeben werden.",
         "data": {
           "create_energy_sensors": "Energiesensor erstellen",
+          "create_standby_group": "Create standby group",
           "create_utility_meters": "Verbrauchszähler erstellen",
           "disable_extended_attributes": "Erweiterte Attribute deaktivieren",
           "disable_library_download": "Download der Internet-Bibliothek deaktivieren",
@@ -115,6 +116,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Ob Powercalc kWh Sensoren erstellen soll",
+          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten.",
           "disable_extended_attributes": "Deaktivieren Sie alle zusätzlichen Attribute, die Powercalc zu den Status der Leistungs-, Energie- und Gruppeneinheiten hinzufügt. Dies wird helfen, die Größe der Datenbank gering zu halten",
           "disable_library_download": "Deaktiviere die Powercalc Bibliothek Downloadfunktion",
@@ -565,6 +567,7 @@
         "title": "Grundeinstellungen",
         "data": {
           "create_energy_sensors": "Energiesensor erstellen",
+          "create_standby_group": "Create standby group",
           "create_utility_meters": "Verbrauchszähler erstellen",
           "disable_extended_attributes": "Erweiterte Attribute deaktivieren",
           "disable_library_download": "Download der Internet-Bibliothek deaktivieren",
@@ -576,6 +579,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Ob Powercalc kWh Sensoren erstellen soll",
+          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten.",
           "disable_extended_attributes": "Deaktivieren Sie alle zusätzlichen Attribute, die Powercalc zu den Status der Leistungs-, Energie- und Gruppeneinheiten hinzufügt. Dies wird helfen, die Größe der Datenbank gering zu halten",
           "disable_library_download": "Deaktiviere die Powercalc Bibliothek Downloadfunktion",

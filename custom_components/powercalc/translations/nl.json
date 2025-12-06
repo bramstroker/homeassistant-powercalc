@@ -104,6 +104,7 @@
         "description": "Stel de globale configuratie in voor Powercalc. Voor meer informatie zie de [documentation](https://docs.powercalc. l/configuratie/global-configuration/). Extra opties voor energiesensors en nutsmeters kunnen in de volgende stappen worden geleverd.",
         "data": {
           "create_energy_sensors": "Creëer energie sensoren",
+          "create_standby_group": "Create standby group",
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
@@ -115,6 +116,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Of powercalc kWh sensoren moet maken",
+          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
@@ -565,6 +567,7 @@
         "title": "Basisopties",
         "data": {
           "create_energy_sensors": "Creëer energie sensoren",
+          "create_standby_group": "Create standby group",
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
@@ -576,6 +579,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Of powercalc kWh sensoren moet maken",
+          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",

@@ -104,6 +104,7 @@
         "description": "Configuração global do Powercalc. Para obter mais informações, consulte o [documentation](https://docs.powercalc. l/configuration/global-configuration/). Opções adicionais para sensores de energia e medidores de utilidade podem ser fornecidas nos próximos passos.",
         "data": {
           "create_energy_sensors": "Criar sensor de consumo",
+          "create_standby_group": "Create standby group",
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar download da biblioteca remota",
@@ -115,6 +116,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Se o powercalc precisa criar um sensor kWh",
+          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados da energia, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
@@ -565,6 +567,7 @@
         "title": "Opções básicas",
         "data": {
           "create_energy_sensors": "Criar sensor de consumo",
+          "create_standby_group": "Create standby group",
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar o download da biblioteca remota",
@@ -576,6 +579,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Se o powercalc precisa criar sensores kWh",
+          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Deixe que energia crie medidores utilitários, de ciclo diário, horário, etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados de potência, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
