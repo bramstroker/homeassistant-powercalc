@@ -15,7 +15,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     DOMAIN,
 )
-from tests.common import get_test_config_dir, get_test_profile_dir, run_powercalc_setup
+from tests.common import get_test_profile_dir, run_powercalc_setup
 from tests.config_flow.common import confirm_auto_discovered_model, initialize_options_flow
 from tests.conftest import MockEntityWithModel
 
@@ -118,7 +118,6 @@ async def test_gui_smart_switch_without_builtin_powermeter(
     """
     Test setting up smart switch with relay, but without a built-in powermeter
     """
-    hass.config.config_dir = get_test_config_dir()
     switch_id = "switch.heater"
     power_sensor_id = "sensor.heater_power"
 
@@ -174,7 +173,6 @@ async def test_gui_smart_switch_with_builtin_powermeter(
     """
     Test setting up smart switch with relay, but with a built-in powermeter
     """
-    hass.config.config_dir = get_test_config_dir()
     switch_id = "switch.heater"
     power_sensor_id = "sensor.heater_device_power"
 
@@ -228,8 +226,6 @@ async def start_discovery_flow(
     manufacturer: str,
     model: str,
 ) -> FlowResult:
-    hass.config.config_dir = get_test_config_dir()
-
     mock_entity_with_model_information(
         entity_id=entity_id,
         manufacturer=manufacturer,

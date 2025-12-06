@@ -7,13 +7,12 @@ import pytest
 from custom_components.powercalc.const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL, CONF_VARIABLES, DUMMY_ENTITY_ID
 from custom_components.powercalc.power_profile.error import LibraryError
 from custom_components.powercalc.power_profile.library import ProfileLibrary
-from tests.common import get_test_config_dir, get_test_profile_dir, run_powercalc_setup
+from tests.common import get_test_profile_dir, run_powercalc_setup
 
 
 async def test_custom_field_variables_from_yaml_config(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """Test custom field variables can be passed from YAML configuration"""
     caplog.set_level(logging.ERROR)
-    hass.config.config_dir = get_test_config_dir()
 
     hass.states.async_set("sensor.test", STATE_ON)
     await hass.async_block_till_done()
@@ -39,7 +38,6 @@ async def test_custom_field_variables_from_yaml_config(hass: HomeAssistant, capl
 async def test_validation_fails_when_not_all_variables_passed(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """Test error is logged when not all variables are passed, when setting up profile with custom fields"""
     caplog.set_level(logging.ERROR)
-    hass.config.config_dir = get_test_config_dir()
 
     await run_powercalc_setup(
         hass,

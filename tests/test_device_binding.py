@@ -20,7 +20,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SensorType,
 )
-from tests.common import get_test_config_dir, run_powercalc_setup, setup_config_entry
+from tests.common import run_powercalc_setup, setup_config_entry
 from tests.config_flow.common import create_mock_entry
 
 
@@ -193,8 +193,6 @@ async def test_entities_are_bound_to_source_device3(
     hass: HomeAssistant,
     entity_reg: er.EntityRegistry,
 ) -> None:
-    hass.config.config_dir = get_test_config_dir()
-
     device_id = "abc"
     mock_device_registry(
         hass,

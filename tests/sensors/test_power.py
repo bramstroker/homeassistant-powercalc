@@ -77,7 +77,6 @@ from tests.common import (
     create_input_boolean,
     create_input_number,
     get_simple_fixed_config,
-    get_test_config_dir,
     get_test_profile_dir,
     run_powercalc_setup,
     setup_config_entry,
@@ -668,7 +667,6 @@ async def test_entity_category(hass: HomeAssistant) -> None:
 
 
 async def test_sub_profile_default_select(hass: HomeAssistant) -> None:
-    hass.config.config_dir = get_test_config_dir()
     await run_powercalc_setup(
         hass,
         {

@@ -29,7 +29,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.common import get_test_config_dir, run_powercalc_setup
+from tests.common import run_powercalc_setup
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     create_mock_entry,
@@ -70,7 +70,6 @@ async def test_discovery_flow(
 ) -> None:
     await run_powercalc_setup(hass)
 
-    hass.config.config_dir = get_test_config_dir()
     device_entry = mock_device_with_switches(hass, 2)
 
     result = await initialize_device_discovery_flow(hass, device_entry)
@@ -119,7 +118,6 @@ async def test_discovery_flow(
 
 async def test_switch_entities_automatically_populated_from_device(hass: HomeAssistant) -> None:
     """When setting up multi switch, the switch entities should be automatically populated from the device."""
-    hass.config.config_dir = get_test_config_dir()
     device_entry = mock_device_with_switches(hass, 4)
 
     result = await initialize_device_discovery_flow(hass, device_entry)
@@ -146,8 +144,6 @@ async def test_discovery_flow_once_per_unique_device(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    hass.config.config_dir = get_test_config_dir()
-
     mock_device_with_switches(hass, 6)
 
     discovery_manager = DiscoveryManager(hass, {})
@@ -221,8 +217,6 @@ async def test_setup_without_switches(hass: HomeAssistant, mock_entity_with_mode
     Shelly 2.5 can have detached switches
     Allow the user to setup this multi_switch profile without selecting any switches
     """
-
-    hass.config.config_dir = get_test_config_dir()
     device_entry = mock_device_with_switches(hass, 0)
 
     result = await initialize_device_discovery_flow(hass, device_entry)
@@ -244,8 +238,6 @@ async def test_light_switches_selectable(hass: HomeAssistant) -> None:
     Some integrations allow you to change the type of a switch to light.
     Make sure that light entities are also selectable in the multi switch setup
     """
-    hass.config.config_dir = get_test_config_dir()
-
     device_id = "abcdef"
     device_entry = DeviceEntry(
         id=device_id,

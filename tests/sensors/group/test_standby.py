@@ -16,7 +16,7 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CalculationStrategy,
 )
-from tests.common import get_test_config_dir, run_powercalc_setup
+from tests.common import run_powercalc_setup
 
 
 async def test_standby_group(hass: HomeAssistant) -> None:
@@ -64,7 +64,6 @@ async def test_standby_group(hass: HomeAssistant) -> None:
 
 
 async def test_self_usage_sensors_included(hass: HomeAssistant) -> None:
-    hass.config.config_dir = get_test_config_dir()
     await run_powercalc_setup(
         hass,
         {

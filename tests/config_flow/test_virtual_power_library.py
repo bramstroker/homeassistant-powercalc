@@ -31,7 +31,7 @@ from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_A
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
-from tests.common import create_mock_light_entity, get_test_config_dir
+from tests.common import create_mock_light_entity
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
@@ -143,7 +143,6 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain2(
 
 
 async def test_fixed_power_is_skipped_when_only_self_usage_true(hass: HomeAssistant) -> None:
-    hass.config.config_dir = get_test_config_dir()
     result = await select_menu_item(hass, Step.MENU_LIBRARY)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -301,7 +300,6 @@ async def test_configured_model_populated_in_options_flow(hass: HomeAssistant) -
 
 async def test_source_entity_not_visible_in_options_when_discovery_by_device(hass: HomeAssistant) -> None:
     """When discovery mode was by device, source entity should not be visible in options."""
-    hass.config.config_dir = get_test_config_dir()
     entry = create_mock_entry(
         hass,
         {
@@ -324,7 +322,6 @@ async def test_profile_with_custom_fields(
 ) -> None:
     caplog.set_level(logging.ERROR)
 
-    hass.config.config_dir = get_test_config_dir()
     mock_entity_with_model_information(
         "sensor.test",
         "test",
@@ -370,7 +367,6 @@ async def test_profile_with_custom_fields(
 
 
 async def test_sub_profiles_select_options(hass: HomeAssistant) -> None:
-    hass.config.config_dir = get_test_config_dir()
     result = await select_menu_item(hass, Step.MENU_LIBRARY)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -402,7 +398,6 @@ async def test_sub_profile_selection_available_default_sub_profile(hass: HomeAss
     Test the sub profile selection is still provided to the user, even when a default sub profile is defined.
     We only want to omit the sub profile step when matchers are defined.
     """
-    hass.config.config_dir = get_test_config_dir()
     result = await select_menu_item(hass, Step.MENU_LIBRARY)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -420,7 +415,6 @@ async def test_sub_profile_selection_omitted(hass: HomeAssistant) -> None:
     """
     Test the sub profile selection is omitted when matchers are defined.
     """
-    hass.config.config_dir = get_test_config_dir()
     result = await select_menu_item(hass, Step.MENU_LIBRARY)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -431,7 +425,6 @@ async def test_sub_profile_selection_omitted(hass: HomeAssistant) -> None:
 
 
 async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
-    hass.config.config_dir = get_test_config_dir()
     mock_device_registry(
         hass,
         {

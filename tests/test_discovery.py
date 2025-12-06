@@ -51,7 +51,7 @@ from custom_components.powercalc.discovery import DiscoveryStatus, get_power_pro
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 
-from .common import create_mock_light_entity, get_test_config_dir, run_powercalc_setup
+from .common import create_mock_light_entity, run_powercalc_setup
 from .conftest import MockEntityWithModel
 
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
@@ -276,9 +276,6 @@ async def test_autodiscover_skipped(
     extra_kwargs: dict,
 ) -> None:
     """Test that auto discovery skips entities based on various conditions."""
-
-    hass.config.config_dir = get_test_config_dir()
-
     mock_entity_with_model_information(
         entity_id,
         manufacturer,
@@ -406,8 +403,6 @@ async def test_exclude_self_usage(
     mock_flow_init: AsyncMock,
 ) -> None:
     """Test that entities with excluded device types are not considered for discovery"""
-
-    hass.config.config_dir = get_test_config_dir()
     mock_entity_with_model_information(
         "switch.test",
         "test",
@@ -819,8 +814,6 @@ async def test_discovery_by_device(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    hass.config.config_dir = get_test_config_dir()
-
     mock_device_registry(
         hass,
         {
@@ -849,8 +842,6 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
     mock_flow_init: AsyncMock,
 ) -> None:
     """Powercalc sensors should not be considered for discovery"""
-    hass.config.config_dir = get_test_config_dir()
-
     mock_device_registry(
         hass,
         {
