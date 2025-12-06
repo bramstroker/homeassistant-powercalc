@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from datetime import timedelta
 import logging
 from typing import Any
@@ -385,47 +386,44 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.testgroup_energy").state == "100.0000"
 
 
-async def test_restore_state(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass, "test1")
-
-    mock_restore_cache_with_extra_data(
-        hass,
+@pytest.mark.parametrize(
+    "last_state,last_sensor_data,expected_state,expect_warning",
+    [
         (
-            (
-                State(
-                    "sensor.testgroup_energy",
-                    "0.5000",
-                ),
-                {"native_unit_of_measurement": None, "native_value": 0.5},
-            ),
+            State("sensor.testgroup_energy", "0.5000"),
+            {"native_unit_of_measurement": None, "native_value": 0.5},
+            "0.5000",
+            False,
         ),
-    )
-
-    await run_powercalc_setup(
-        hass,
-        {
-            CONF_CREATE_GROUP: "TestGroup",
-            CONF_ENTITIES: [
-                get_simple_fixed_config("input_boolean.test1"),
-            ],
-            CONF_IGNORE_UNAVAILABLE_STATE: True,
-        },
-    )
-
-    assert hass.states.get("sensor.testgroup_energy").state == "0.5000"
-
-
-async def test_restore_state_no_error_when_unavailable(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+        (
+            State("sensor.testgroup_energy", STATE_UNAVAILABLE),
+            {"native_unit_of_measurement": None, "native_value": None},
+            "0.0000",
+            False,
+        ),
+        (
+            State("sensor.testgroup_energy", "boo"),
+            {"native_unit_of_measurement": None, "native_value": None},
+            "0.0000",
+            True,
+        ),
+    ],
+)
+async def test_restore_state(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+    last_state: State,
+    last_sensor_data: Mapping[str, Any],
+    expected_state: str,
+    expect_warning: bool,
+) -> None:
     caplog.set_level(logging.WARNING)
     mock_restore_cache_with_extra_data(
         hass,
         (
             (
-                State(
-                    "sensor.testgroup_energy",
-                    STATE_UNAVAILABLE,
-                ),
-                {"native_unit_of_measurement": None, "native_value": None},
+                last_state,
+                last_sensor_data,
             ),
         ),
     )
@@ -441,7 +439,10 @@ async def test_restore_state_no_error_when_unavailable(hass: HomeAssistant, capl
         },
     )
 
-    assert "Could not restore last state" not in caplog.text
+    if expect_warning:
+        assert "Could not restore last state" in caplog.text
+
+    assert hass.states.get("sensor.testgroup_energy").state == expected_state
 
 
 async def test_mega_watt_hour(hass: HomeAssistant) -> None:
