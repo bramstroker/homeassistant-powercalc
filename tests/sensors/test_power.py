@@ -175,8 +175,6 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant) ->
 
 
 async def test_standby_power(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass)
-
     await run_powercalc_setup(
         hass,
         {
@@ -334,9 +332,6 @@ async def test_strategy_enabled_condition_template_tracking(
 
 
 async def test_template_entity_tracking(hass: HomeAssistant) -> None:
-    await create_input_number(hass, "test", 0)
-    await create_input_boolean(hass)
-
     await run_powercalc_setup(
         hass,
         {
@@ -397,7 +392,6 @@ async def test_error_when_model_not_supported(
 ) -> None:
     caplog.set_level(logging.ERROR)
 
-    await create_input_boolean(hass)
     await run_powercalc_setup(
         hass,
         {
@@ -478,8 +472,6 @@ async def test_unavailable_power(hass: HomeAssistant) -> None:
 
 
 async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass)
-
     await run_powercalc_setup(
         hass,
         get_simple_fixed_config("input_boolean.test"),

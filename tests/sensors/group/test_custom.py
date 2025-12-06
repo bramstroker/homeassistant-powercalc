@@ -90,7 +90,6 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.sensors.group.custom import PreviousStateStore, resolve_entity_ids_recursively
 from tests.common import (
-    create_input_boolean,
     create_input_booleans,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
@@ -355,8 +354,6 @@ async def test_reset_service(hass: HomeAssistant) -> None:
 
 
 async def test_calibrate_service(hass: HomeAssistant) -> None:
-    await create_input_booleans(hass, ["test1", "test2"])
-
     await run_powercalc_setup(
         hass,
         {
@@ -445,8 +442,6 @@ async def test_restore_state(
 
 
 async def test_mega_watt_hour(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass, "test1")
-
     await run_powercalc_setup(
         hass,
         {
@@ -468,7 +463,6 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant) -
     When any of the group members becomes unavailable the energy group should also be unavailable
     Group power sensor must only be unavailable when ALL group members are unavailable
     """
-    await create_input_booleans(hass, ["test1", "test2"])
     hass.states.async_set("input_boolean.test1", STATE_UNAVAILABLE)
     hass.states.async_set("input_boolean.test2", STATE_UNAVAILABLE)
     await hass.async_block_till_done()
@@ -512,7 +506,6 @@ async def test_energy_group_available_when_members_temporarily_unavailable(
     When any of the member sensors of a grouped energy sensor become unavailable,
      we try to use the last know correct state value of the member sensor
     """
-    await create_input_booleans(hass, ["test1", "test2"])
     await run_powercalc_setup(
         hass,
         {
@@ -555,7 +548,6 @@ async def test_energy_group_available_when_members_temporarily_unavailable(
 
 async def test_hide_members(hass: HomeAssistant) -> None:
     entity_reg = er.async_get(hass)
-    await create_input_booleans(hass, ["one", "two"])
 
     await run_powercalc_setup(
         hass,
@@ -687,8 +679,6 @@ async def test_group_utility_meter(
         "abcdef_energy",
         suggested_object_id="testgroup_energy",
     )
-
-    await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup(
         hass,
@@ -868,8 +858,6 @@ async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(
 
 
 async def test_custom_naming_pattern(hass: HomeAssistant) -> None:
-    await create_input_booleans(hass, ["test1", "test2"])
-
     await run_powercalc_setup(
         hass,
         {
@@ -888,8 +876,6 @@ async def test_custom_naming_pattern(hass: HomeAssistant) -> None:
 
 
 async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
-    await create_input_booleans(hass, ["test1", "test2"])
-
     await run_powercalc_setup(
         hass,
         {
@@ -1094,8 +1080,6 @@ async def test_gui_discovered_entity_in_yaml_group(
 
 
 async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
-    await create_input_booleans(hass, ["test1", "test2"])
-
     await run_powercalc_setup(
         hass,
         {
