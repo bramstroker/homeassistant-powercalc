@@ -619,6 +619,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         # Add standby power-on adjustments if applicable
         if self._standby_power_on and not standby_power:
             additional_standby_power = self._standby_power_on
+            self._standby_sensors[self.entity_id] = self._standby_power_on
             if self._multiply_factor_standby and self._multiply_factor:
                 additional_standby_power *= Decimal(self._multiply_factor)
             power += additional_standby_power

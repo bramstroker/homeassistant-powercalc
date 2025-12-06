@@ -101,7 +101,6 @@ from tests.common import (
 
 async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
     ent_reg = er.async_get(hass)
-    await create_input_booleans(hass, ["test1", "test2"])
     hass.states.async_set("input_boolean.test1", STATE_ON)
     hass.states.async_set("input_boolean.test2", STATE_ON)
 

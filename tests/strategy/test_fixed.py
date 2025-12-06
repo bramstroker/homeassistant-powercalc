@@ -37,7 +37,7 @@ async def test_simple_power(hass: HomeAssistant) -> None:
 
 
 async def test_template_power(hass: HomeAssistant) -> None:
-    await create_input_number(hass, "test", 42)
+    hass.states.async_set("input_number.test", "42")
 
     await hass.async_block_till_done()
 
