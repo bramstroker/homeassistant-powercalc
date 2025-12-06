@@ -416,7 +416,7 @@ def generate_unique_id(sensor_config: dict[str, Any]) -> str:
     return str(sensor_config[CONF_NAME])
 
 
-class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
+class GroupedSensor(BaseEntity, SensorEntity):
     """Base class for grouped sensors."""
 
     _attr_should_poll = False
@@ -683,7 +683,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
         return Decimal(sum(self._member_states.values()))
 
 
-class GroupedEnergySensor(GroupedSensor, EnergySensor):
+class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
     """Grouped energy sensor. Sums all values of underlying individual energy sensors."""
 
     _attr_device_class = SensorDeviceClass.ENERGY
