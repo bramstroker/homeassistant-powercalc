@@ -104,7 +104,7 @@
         "description": "Stel de globale configuratie in voor Powercalc. Voor meer informatie zie de [documentation](https://docs.powercalc. l/configuratie/global-configuration/). Extra opties voor energiesensors en nutsmeters kunnen in de volgende stappen worden geleverd.",
         "data": {
           "create_energy_sensors": "Creëer energie sensoren",
-          "create_standby_group": "Create standby group",
+          "create_standby_group": "Maak standby-groep",
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
@@ -116,7 +116,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Of powercalc kWh sensoren moet maken",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+          "create_standby_group": "Maak groep met een totaal van alle stand-by en zelfgebruik van IOT apparaten",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
@@ -243,9 +243,9 @@
       },
       "group_tracked_untracked_auto": {
         "data": {
-          "exclude_entities": "Exclude entities"
+          "exclude_entities": "Entiteiten uitsluiten"
         },
-        "description": "Exclude specific entities from the auto tracked group",
+        "description": "Specifieke entiteiten uitsluiten van de auto tracked groep",
         "title": "Auto tracked configuration"
       },
       "library": {
@@ -335,8 +335,8 @@
           "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
           "energy_integration_method": "Energie integratie methode",
           "energy_sensor_unit_prefix": "Voorvoegsel van de energiesensor eenheid",
-          "energy_filter_outlier_enabled": "Energy filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step",
+          "energy_filter_outlier_enabled": "Filter energie uitschieters",
+          "energy_filter_outlier_max_step": "Maximale stap voor uitschieter filter",
           "ignore_unavailable_state": "Negeer onbeschikbaar status",
           "multiply_factor": "Vermenigvuldigingsfactor",
           "multiply_factor_standby": "Vermenigvuldigingsfactor standby",
@@ -344,8 +344,8 @@
         },
         "data_description": {
           "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de sensor 0 tonen",
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
+          "energy_filter_outlier_enabled": "Schakel filtering van uitschieters in de energiesensor in",
+          "energy_filter_outlier_max_step": "Maximale verwachte stap in vermogenswaarden (in watt) voor het uitschieter filter",
           "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
           "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
           "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
@@ -536,16 +536,16 @@
         }
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Energie opties",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_integration_method": "Integratie methode",
+          "energy_sensor_unit_prefix": "Eenheid voorvoegsel",
+          "energy_filter_outlier_enabled": "Filter uitschieters",
+          "energy_filter_outlier_max_step": "Maximale stap voor uitschieter filter"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "Schakel filtering van uitschieters in de energiesensor in",
+          "energy_filter_outlier_max_step": "Maximale verwachte stap in vermogenswaarden (in watt) voor het uitschieter filter"
         }
       },
       "fixed": {
@@ -567,7 +567,7 @@
         "title": "Basisopties",
         "data": {
           "create_energy_sensors": "Creëer energie sensoren",
-          "create_standby_group": "Create standby group",
+          "create_standby_group": "Maak standby-groep",
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
@@ -579,7 +579,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Of powercalc kWh sensoren moet maken",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+          "create_standby_group": "Maak groep met een totaal van alle stand-by en zelfgebruik van IOT apparaten",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
@@ -613,17 +613,17 @@
         }
       },
       "global_configuration_throttling": {
-        "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "title": "Throttling opties",
+        "description": "Stel update intervallen in voor de verschillende sensor types. Zie [documentatie](https://docs.powercalc.nl/configuration/update-frequency/) voor meer informatie",
         "data": {
-          "group_energy_update_interval": "Group energy update interval",
-          "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval"
+          "group_energy_update_interval": "Groep energie update interval",
+          "group_power_update_interval": "Groep vermogen update interval",
+          "energy_update_interval": "Energie update interval"
         },
         "data_description": {
-          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
-          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
+          "group_energy_update_interval": "Interval waarop groep energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
+          "group_power_update_interval": "Interval waarop groep vermogensensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
+          "energy_update_interval": "Interval waarop energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen"
         }
       },
       "global_configuration_utility_meter": {
@@ -701,7 +701,7 @@
           "advanced_options": "Geavanceerde opties",
           "basic_options": "Basisopties",
           "daily_energy": "Dagelijkse energie opties",
-          "energy_options": "Energy options",
+          "energy_options": "Energie opties",
           "fixed": "Fixed opties",
           "group_custom": "Groep opties",
           "group_subtract": "Groep opties",
