@@ -104,7 +104,7 @@ class LocalLoader(Loader):
         model_json = lib_model.json_data
         return model_json, model_path
 
-    async def find_model(self, manufacturer: str, search: set[str]) -> set[str]:
+    async def find_model(self, manufacturer: str, search: set[str], skip_aliases: bool = False) -> set[str]:
         """Find a model for a given manufacturer. Also must check aliases."""
         _manufacturer = manufacturer.lower()
 

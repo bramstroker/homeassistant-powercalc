@@ -108,6 +108,12 @@ class ProfileLibrary:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
+        if not custom_directory:
+            models = await self.find_models(model_info, skip_aliases=True)
+            if not models:
+                raise LibraryError(f"Model {model_info.manufacturer} {model_info.model} not found")
+            model_info = next(iter(models))
+
         profile = await self.create_power_profile(model_info, source_entity, custom_directory, variables, process_variables)
 
         if sub_profile:
@@ -124,12 +130,6 @@ class ProfileLibrary:
         process_variables: bool = True,
     ) -> PowerProfile:
         """Create a power profile object from the model JSON data."""
-
-        if not custom_directory:
-            models = await self.find_models(model_info)
-            if not models:
-                raise LibraryError(f"Model {model_info.manufacturer} {model_info.model} not found")
-            model_info = next(iter(models))
 
         json_data, directory = await self._load_model_data(model_info.manufacturer, model_info.model, custom_directory)
 
@@ -189,7 +189,7 @@ class ProfileLibrary:
         """Resolve the manufacturer, either from the model info or by loading it."""
         return await self._loader.find_manufacturers(manufacturer)
 
-    async def find_models(self, model_info: ModelInfo) -> set[ModelInfo]:
+    async def find_models(self, model_info: ModelInfo, skip_aliases: bool = False) -> set[ModelInfo]:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
         search: set[str] = set()
         for model_identifier in (model_info.model_id, model_info.model):
@@ -211,7 +211,7 @@ class ProfileLibrary:
             return found_models
 
         for manufacturer in manufacturers:
-            models = await self._loader.find_model(manufacturer, search)
+            models = await self._loader.find_model(manufacturer, search, skip_aliases)
             if models:
                 found_models.update(ModelInfo(manufacturer, model) for model in models)
 

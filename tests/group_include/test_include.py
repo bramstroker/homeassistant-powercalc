@@ -338,12 +338,12 @@ async def test_include_skips_unsupported_entities(hass: HomeAssistant, caplog: p
         {
             "device-a": DeviceEntry(
                 id="device-a",
-                manufacturer="Signify",
+                manufacturer="signify",
                 model="LCT012",
             ),
             "device-b": DeviceEntry(
                 id="device-b",
-                manufacturer="Signify",
+                manufacturer="signify",
                 model="Room",
             ),
         },

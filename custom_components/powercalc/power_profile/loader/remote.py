@@ -80,9 +80,19 @@ class RemoteLoader(Loader):
             model_lookup: dict[str, list[LibraryModel]] = {}
             for model in models:
                 model_id = str(model.get("id")).lower()
-                model_lookup.setdefault(model_id, []).append(model)
+
+                # Exact match → append first (high priority)
+                bucket = model_lookup.setdefault(model_id, [])
+                bucket.append(model)
+
+                # Aliases → append after (lower priority)
                 for alias in model.get("aliases", []):
-                    model_lookup.setdefault(alias.lower(), []).append(model)
+                    bucket_alias = model_lookup.setdefault(alias.lower(), [])
+                    # Only append if it's not the exact-id bucket
+                    if bucket_alias is bucket:
+                        # alias == id → ignore, already added
+                        continue
+                    bucket_alias.append(model)
 
             self.model_lookup[manufacturer_name] = model_lookup
 
@@ -169,11 +179,27 @@ class RemoteLoader(Loader):
         }
 
     @async_cache
-    async def find_model(self, manufacturer: str, search: set[str]) -> set[str]:
-        """Find the model in the library."""
+    async def find_model(self, manufacturer: str, search: set[str], skip_aliases: bool = False) -> set[str]:
+        """Find matching model IDs in the library."""
 
         models = self.model_lookup.get(manufacturer, {})
-        return {model["id"] for phrase in search if (phrase_lower := phrase.lower()) in models for model in models[phrase_lower]}
+        search_lower = {s.lower() for s in search}
+        result = set()
+
+        for phrase_lower in search_lower:
+            if phrase_lower not in models:
+                continue
+
+            for model in models[phrase_lower]:
+                model_id = model["id"]
+                if model_id != phrase_lower and skip_aliases:
+                    aliases = {a.lower() for a in model.get("aliases", [])}
+                    if search_lower & aliases:
+                        continue
+
+                result.add(model_id)
+
+        return result
 
     @async_cache
     async def load_model(
