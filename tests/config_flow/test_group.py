@@ -11,10 +11,10 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import floor_registry
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.selector import SelectSelector
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
 import voluptuous as vol
@@ -294,10 +294,10 @@ async def test_group_include_area(
 async def test_group_include_floor(
     hass: HomeAssistant,
     area_registry: AreaRegistry,
+    floor_registry: FloorRegistry,
 ) -> None:
     """Test that the floor option is included in the group configuration."""
-    floor_reg = floor_registry.async_get(hass)
-    floor = floor_reg.async_create("My floor")
+    floor = floor_registry.async_create("My floor")
 
     area = area_registry.async_get_or_create("My area")
     area_registry.async_update(area.id, floor_id=floor.floor_id)

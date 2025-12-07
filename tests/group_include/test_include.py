@@ -14,10 +14,10 @@ from homeassistant.const import (
     STATE_OFF,
 )
 from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.helpers import label_registry
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntryDisabler
+from homeassistant.helpers.label_registry import LabelRegistry
 from homeassistant.setup import async_setup_component
 import pytest
 from pytest_homeassistant_custom_component.common import (
@@ -913,7 +913,7 @@ async def test_include_group_does_not_include_disabled_sensors(hass: HomeAssista
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test_energy"}
 
 
-async def test_include_by_label(hass: HomeAssistant) -> None:
+async def test_include_by_label(hass: HomeAssistant, label_registry: LabelRegistry) -> None:
     mock_registry(
         hass,
         {
@@ -934,8 +934,7 @@ async def test_include_by_label(hass: HomeAssistant) -> None:
         },
     )
 
-    label_reg = label_registry.async_get(hass)
-    label_reg.async_create("my_label")
+    label_registry.async_create("my_label")
 
     await run_powercalc_setup(
         hass,
@@ -1228,12 +1227,11 @@ async def test_include_all(hass: HomeAssistant) -> None:
     }
 
 
-async def test_include_by_label_filter_other_label(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+async def test_include_by_label_filter_other_label(hass: HomeAssistant, label_registry: LabelRegistry) -> None:
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/3685"""
 
-    label_reg = label_registry.async_get(hass)
-    label_reg.async_create("my_label")
-    label_reg.async_create("exclude_powercalc")
+    label_registry.async_create("my_label")
+    label_registry.async_create("exclude_powercalc")
 
     mock_device_registry(
         hass,

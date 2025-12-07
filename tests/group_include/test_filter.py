@@ -2,10 +2,11 @@ from unittest.mock import MagicMock
 
 from homeassistant.const import CONF_DOMAIN, STATE_ON, EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import area_registry, floor_registry, label_registry
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.helpers.floor_registry import FloorRegistry
+from homeassistant.helpers.label_registry import LabelRegistry
 import pytest
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
@@ -94,7 +95,13 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
         ("unknown", False, True),
     ],
 )
-async def test_label_filter(hass: HomeAssistant, label: str | list[str], expected_result: bool, expect_exception: bool) -> None:
+async def test_label_filter(
+    hass: HomeAssistant,
+    label_registry: LabelRegistry,
+    label: str | list[str],
+    expected_result: bool,
+    expect_exception: bool,
+) -> None:
     mock_device_registry(
         hass,
         {
@@ -108,9 +115,8 @@ async def test_label_filter(hass: HomeAssistant, label: str | list[str], expecte
         },
     )
 
-    label_reg = label_registry.async_get(hass)
     for label_name in ["test", "test2", "test3", "device-label", "My Label with Spaces"]:
-        label_reg.async_create(label_name)
+        label_registry.async_create(label_name)
 
     entry = RegistryEntryWithDefaults(
         entity_id="sensor.test",
@@ -144,26 +150,25 @@ async def test_label_filter(hass: HomeAssistant, label: str | list[str], expecte
 )
 async def test_floor_filter(
     hass: HomeAssistant,
+    floor_registry: FloorRegistry,
+    area_registry: AreaRegistry,
     entity_device: str | None,
     entity_area: str | None,
     floor: str | list[str],
     expected_result: bool,
     expect_exception: bool,
 ) -> None:
-    floor_reg = floor_registry.async_get(hass)
-    floor_entry1 = floor_reg.async_create("First floor")
-    floor_reg = floor_registry.async_get(hass)
-    floor_entry2 = floor_reg.async_create("Second floor")
+    floor_entry1 = floor_registry.async_create("First floor")
+    floor_entry2 = floor_registry.async_create("Second floor")
 
-    area_reg = area_registry.async_get(hass)
-    area_entry1 = area_reg.async_get_or_create("Kitchen")
-    area_reg.async_update(area_id=area_entry1.id, floor_id=floor_entry1.floor_id)
-    area_entry2 = area_reg.async_get_or_create("Living room")
-    area_reg.async_update(area_id=area_entry2.id, floor_id=floor_entry1.floor_id)
-    area_entry3 = area_reg.async_get_or_create("Bathroom")
-    area_reg.async_update(area_id=area_entry3.id, floor_id=floor_entry2.floor_id)
-    area_entry4 = area_reg.async_get_or_create("Bedroom1")
-    area_reg.async_update(area_id=area_entry4.id, floor_id=floor_entry2.floor_id)
+    area_entry1 = area_registry.async_get_or_create("Kitchen")
+    area_registry.async_update(area_id=area_entry1.id, floor_id=floor_entry1.floor_id)
+    area_entry2 = area_registry.async_get_or_create("Living room")
+    area_registry.async_update(area_id=area_entry2.id, floor_id=floor_entry1.floor_id)
+    area_entry3 = area_registry.async_get_or_create("Bathroom")
+    area_registry.async_update(area_id=area_entry3.id, floor_id=floor_entry2.floor_id)
+    area_entry4 = area_registry.async_get_or_create("Bedroom1")
+    area_registry.async_update(area_id=area_entry4.id, floor_id=floor_entry2.floor_id)
 
     mock_device_registry(
         hass,
@@ -334,15 +339,15 @@ async def test_create_composite_filter2(hass: HomeAssistant, area_registry: Area
 )
 async def test_area_filter(
     hass: HomeAssistant,
+    area_registry: AreaRegistry,
     entity_device: str | None,
     entity_area: str | None,
     area: str | list[str],
     expected_result: bool,
     expect_exception: bool,
 ) -> None:
-    area_reg = area_registry.async_get(hass)
-    area_reg.async_get_or_create("Kitchen")
-    area_reg.async_get_or_create("Bathroom")
+    area_registry.async_get_or_create("Kitchen")
+    area_registry.async_get_or_create("Bathroom")
 
     mock_device_registry(
         hass,

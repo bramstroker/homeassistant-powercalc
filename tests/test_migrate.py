@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers.issue_registry import IssueRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
@@ -25,7 +25,7 @@ from custom_components.powercalc.const import (
 from tests.common import run_powercalc_setup
 
 
-async def test_legacy_discovery_config_raises_issue(hass: HomeAssistant) -> None:
+async def test_legacy_discovery_config_raises_issue(hass: HomeAssistant, issue_registry: IssueRegistry) -> None:
     await run_powercalc_setup(
         hass,
         {},
@@ -34,12 +34,10 @@ async def test_legacy_discovery_config_raises_issue(hass: HomeAssistant) -> None
         },
     )
 
-    issue_registry = ir.async_get(hass)
-    issue = issue_registry.async_get_issue(DOMAIN, "legacy_discovery_config")
-    assert issue
+    assert issue_registry.async_get_issue(DOMAIN, "legacy_discovery_config")
 
 
-async def test_legacy_update_interval_config_issue_raised(hass: HomeAssistant) -> None:
+async def test_legacy_update_interval_config_issue_raised(hass: HomeAssistant, issue_registry: IssueRegistry) -> None:
     await run_powercalc_setup(
         hass,
         {},
@@ -49,9 +47,7 @@ async def test_legacy_update_interval_config_issue_raised(hass: HomeAssistant) -
         },
     )
 
-    issue_registry = ir.async_get(hass)
-    issue = issue_registry.async_get_issue(DOMAIN, "legacy_update_interval_config")
-    assert issue
+    assert issue_registry.async_get_issue(DOMAIN, "legacy_update_interval_config")
 
     global_config = hass.data[DOMAIN]["config"]
     assert global_config[CONF_GROUP_ENERGY_UPDATE_INTERVAL] == 80
@@ -60,12 +56,10 @@ async def test_legacy_update_interval_config_issue_raised(hass: HomeAssistant) -
     assert CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED not in global_config
 
 
-async def test_legacy_update_interval_config_issue_not_raised(hass: HomeAssistant) -> None:
+async def test_legacy_update_interval_config_issue_not_raised(hass: HomeAssistant, issue_registry: IssueRegistry) -> None:
     await run_powercalc_setup(hass)
 
-    issue_registry = ir.async_get(hass)
-    issue = issue_registry.async_get_issue(DOMAIN, "legacy_update_interval_config")
-    assert not issue
+    assert not issue_registry.async_get_issue(DOMAIN, "legacy_update_interval_config")
 
 
 async def test_migrate_config_entry_playbooks(hass: HomeAssistant) -> None:

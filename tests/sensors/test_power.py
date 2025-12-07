@@ -31,7 +31,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import (
@@ -125,7 +125,7 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant) -> None:
     }
 
 
-async def test_rounding_precision(hass: HomeAssistant) -> None:
+async def test_rounding_precision(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     await create_input_boolean(hass)
 
     await run_powercalc_setup(
@@ -134,7 +134,6 @@ async def test_rounding_precision(hass: HomeAssistant) -> None:
         {CONF_POWER_SENSOR_PRECISION: 4},
     )
 
-    entity_registry = er.async_get(hass)
     power_entry = entity_registry.async_get("sensor.test_power")
     assert power_entry
     assert power_entry.options == {"sensor": {"suggested_display_precision": 4}}
@@ -646,7 +645,7 @@ async def test_standby_power_invalid_template(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == "20.00"
 
 
-async def test_entity_category(hass: HomeAssistant) -> None:
+async def test_entity_category(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     """Test setting an entity_category on the power sensor"""
 
     await run_powercalc_setup(
@@ -660,7 +659,6 @@ async def test_entity_category(hass: HomeAssistant) -> None:
         },
     )
 
-    entity_registry = er.async_get(hass)
     power_entry = entity_registry.async_get("sensor.test_power")
     assert power_entry
     assert power_entry.entity_category == EntityCategory.DIAGNOSTIC
