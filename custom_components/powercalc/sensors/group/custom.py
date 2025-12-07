@@ -459,6 +459,7 @@ class GroupedSensor(BaseEntity, SensorEntity):
         self._start_time: float = time.time()
         self._last_update_time: float = 0
         self._update_interval_exceeded_callback: CALLBACK_TYPE = lambda *args: None
+        self._unit_converter_cache: dict[str, Callable[[float], float]] = {}
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -604,12 +605,11 @@ class GroupedSensor(BaseEntity, SensorEntity):
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
         """Convert value of member entity state to match the unit of measurement of the group sensor."""
-        value = state.state
-        unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-        if unit_of_measurement and self._attr_native_unit_of_measurement != unit_of_measurement:
-            converter = UNIT_CONVERTERS[unit_of_measurement]
-            convert = converter.converter_factory(unit_of_measurement, self._attr_native_unit_of_measurement)
-            value = str(convert(float(value)))
+        value: str | float = state.state
+        unit = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+        if unit and self._attr_native_unit_of_measurement != unit:
+            converter = UNIT_CONVERTERS[unit]
+            value = converter.convert(float(value), unit, self._attr_native_unit_of_measurement)
         try:
             return Decimal(value)
         except DecimalException as err:
