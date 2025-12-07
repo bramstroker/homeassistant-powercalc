@@ -221,14 +221,14 @@ async def test_add_device_members_to_group(hass: HomeAssistant) -> None:
 
 async def test_group_include_area(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     # Create light entity and add to group My area
     light = MockLight("test")
     await create_mock_light_entity(hass, light)
     area = area_registry.async_get_or_create("My area")
-    entity_reg.async_update_entity(light.entity_id, area_id=area.id)
+    entity_registry.async_update_entity(light.entity_id, area_id=area.id)
 
     result = await goto_virtual_power_strategy_step(
         hass,

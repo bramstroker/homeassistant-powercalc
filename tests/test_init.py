@@ -64,7 +64,7 @@ from .common import (
 from .conftest import MockEntityWithModel
 
 
-async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry) -> None:
+async def test_domain_groups(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     await create_input_boolean(hass)
 
     domain_config = {
@@ -89,12 +89,12 @@ async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry) ->
 
     assert hass.states.get("sensor.all_light_power").state == STATE_UNAVAILABLE
 
-    entity_entry = entity_reg.async_get("sensor.all_input_boolean_power")
+    entity_entry = entity_registry.async_get("sensor.all_input_boolean_power")
     assert entity_entry
     assert entity_entry.platform == "powercalc"
 
 
-async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry) -> None:
+async def test_unload_entry(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     unique_id = "98493943242"
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -113,7 +113,7 @@ async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry) -> 
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testentry_power")
-    assert entity_reg.async_get("sensor.testentry_power")
+    assert entity_registry.async_get("sensor.testentry_power")
 
     await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()

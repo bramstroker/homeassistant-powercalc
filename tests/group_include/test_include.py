@@ -76,14 +76,14 @@ from tests.conftest import MockEntityWithModel
 )
 async def test_include_area(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
     area_input: str,
 ) -> None:
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
     area = area_registry.async_get_or_create("Bathroom 1")
-    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area.id)
+    entity_registry.async_update_entity("light.bathroom_mirror", area_id=area.id)
 
     _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
@@ -491,7 +491,6 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
 
 async def test_include_filter_domain(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     area = area_registry.async_get_or_create("Bathroom 1")
@@ -560,7 +559,7 @@ async def test_include_filter_domain(
 
 async def test_include_yaml_configured_entity(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     """Test that include also includes entities that the user configured with YAML"""
@@ -575,9 +574,9 @@ async def test_include_yaml_configured_entity(
     )
 
     area = area_registry.async_get_or_create("My area")
-    entity_reg.async_update_entity(light_a.entity_id, area_id=area.id)
-    entity_reg.async_update_entity(light_b.entity_id, area_id=area.id)
-    entity_reg.async_update_entity(light_c.entity_id, area_id=area.id)
+    entity_registry.async_update_entity(light_a.entity_id, area_id=area.id)
+    entity_registry.async_update_entity(light_b.entity_id, area_id=area.id)
+    entity_registry.async_update_entity(light_c.entity_id, area_id=area.id)
 
     _create_powercalc_config_entry(hass, light_a.entity_id)
 
@@ -675,7 +674,7 @@ async def test_include_non_powercalc_entities_in_group(
 
 async def test_group_setup_continues_when_subgroup_has_no_include_entities(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     """
@@ -685,7 +684,7 @@ async def test_group_setup_continues_when_subgroup_has_no_include_entities(
 
     area_bathroom = area_registry.async_get_or_create("Bathroom")
     area_registry.async_get_or_create("Bedroom")
-    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
+    entity_registry.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
 
     _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
@@ -713,14 +712,14 @@ async def test_group_setup_continues_when_subgroup_has_no_include_entities(
 
 async def test_area_groups_as_subgroups(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
     area_bathroom = area_registry.async_get_or_create("Bathroom")
     area_registry.async_get_or_create("Bedroom")
-    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
+    entity_registry.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
 
     _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 

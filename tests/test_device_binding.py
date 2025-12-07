@@ -26,8 +26,8 @@ from tests.config_flow.common import create_mock_entry
 
 async def test_entities_are_bound_to_source_device(
     hass: HomeAssistant,
-    entity_reg: er.EntityRegistry,
-    device_reg: DeviceRegistry,
+    entity_registry: er.EntityRegistry,
+    device_registry: DeviceRegistry,
 ) -> None:
     """
     Test that all powercalc created sensors are attached to same device as the source entity
@@ -36,7 +36,7 @@ async def test_entities_are_bound_to_source_device(
     # Create a device
     config_entry = MockConfigEntry(domain="test")
     config_entry.add_to_hass(hass)
-    device_entry = device_reg.async_get_or_create(
+    device_entry = device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
         connections={("dummy", "abcdef")},
         manufacturer="Google Inc.",
@@ -45,7 +45,7 @@ async def test_entities_are_bound_to_source_device(
 
     # Create a source entity which is bound to the device
     unique_id = "34445329342797234"
-    entity_reg.async_get_or_create(
+    entity_registry.async_get_or_create(
         "switch",
         "switch",
         unique_id,
@@ -71,15 +71,15 @@ async def test_entities_are_bound_to_source_device(
     await hass.async_block_till_done()
 
     # Assert that all the entities are bound to correct device
-    power_entity_entry = entity_reg.async_get("sensor.google_home_power")
+    power_entity_entry = entity_registry.async_get("sensor.google_home_power")
     assert power_entity_entry
     assert power_entity_entry.device_id == device_entry.id
 
-    energy_entity_entry = entity_reg.async_get("sensor.google_home_energy")
+    energy_entity_entry = entity_registry.async_get("sensor.google_home_energy")
     assert energy_entity_entry
     assert energy_entity_entry.device_id == device_entry.id
 
-    utility_entity_entry = entity_reg.async_get("sensor.google_home_energy_daily")
+    utility_entity_entry = entity_registry.async_get("sensor.google_home_energy_daily")
     assert utility_entity_entry
     assert utility_entity_entry.device_id == device_entry.id
 
@@ -191,7 +191,7 @@ async def test_entities_are_bound_to_disabled_source_device(
 
 async def test_entities_are_bound_to_source_device3(
     hass: HomeAssistant,
-    entity_reg: er.EntityRegistry,
+    entity_registry: er.EntityRegistry,
 ) -> None:
     device_id = "abc"
     mock_device_registry(
@@ -212,7 +212,7 @@ async def test_entities_are_bound_to_source_device3(
     )
     await run_powercalc_setup(hass)
 
-    power_entity_entry = entity_reg.async_get("sensor.test_device_power")
+    power_entity_entry = entity_registry.async_get("sensor.test_device_power")
     assert power_entity_entry
     assert power_entity_entry.device_id == device_id
 

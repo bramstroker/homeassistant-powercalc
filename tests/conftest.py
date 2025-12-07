@@ -50,30 +50,6 @@ def enable_custom_integrations(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-def area_reg(hass: HomeAssistant) -> AreaRegistry:
-    """Return an empty, loaded, registry."""
-    return mock_area_registry(hass)
-
-
-@pytest.fixture
-def floor_reg(hass: HomeAssistant) -> FloorRegistry:
-    """Return an empty, loaded, floor registry."""
-    return mock_floor_registry(hass)
-
-
-@pytest.fixture
-def device_reg(hass: HomeAssistant) -> DeviceRegistry:
-    """Return an empty, loaded, registry."""
-    return mock_device_registry(hass)
-
-
-@pytest.fixture
-def entity_reg(hass: HomeAssistant) -> EntityRegistry:
-    """Return an empty, loaded, registry."""
-    return mock_registry(hass)
-
-
-@pytest.fixture
 def mock_config_entry() -> MockConfigEntry:
     """Return the default mocked config entry."""
     return MockConfigEntry(

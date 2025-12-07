@@ -660,15 +660,15 @@ async def test_members_are_unhiden_after_group_removed(
 
 async def test_group_utility_meter(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
 ) -> None:
-    entity_reg.async_get_or_create(
+    entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
         "abcdef",
         suggested_object_id="testgroup_power",
     )
-    entity_reg.async_get_or_create(
+    entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
         "abcdef_energy",
@@ -1385,8 +1385,8 @@ async def test_create_group_with_real_power_sensors(hass: HomeAssistant) -> None
 
 async def test_bind_to_configured_device(
     hass: HomeAssistant,
-    entity_reg: er.EntityRegistry,
-    device_reg: DeviceRegistry,
+    entity_registry: er.EntityRegistry,
+    device_registry: DeviceRegistry,
 ) -> None:
     """
     Test that all powercalc created sensors are attached to same device as the source entity
@@ -1395,7 +1395,7 @@ async def test_bind_to_configured_device(
     # Create a device
     config_entry = MockConfigEntry(domain="test")
     config_entry.add_to_hass(hass)
-    device_entry = device_reg.async_get_or_create(
+    device_entry = device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
         connections={("dummy", "abcdef")},
         manufacturer="Google Inc.",
@@ -1424,7 +1424,7 @@ async def test_bind_to_configured_device(
     )
 
     # Assert that all the entities are bound to correct device
-    group_entity = entity_reg.async_get("sensor.mygroup_power")
+    group_entity = entity_registry.async_get("sensor.mygroup_power")
     assert group_entity
     assert group_entity.device_id == device_entry.id
 
