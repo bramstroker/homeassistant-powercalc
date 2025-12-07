@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from decimal import Decimal
 import inspect
 import logging
+from typing import Any
 
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDeviceClass, SensorStateClass
@@ -293,14 +294,14 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             max_expected_step=sensor_config.get(CONF_ENERGY_FILTER_OUTLIER_MAX, 1000),
         )
 
-    def _integrate_on_state_change(
-        self,
-        old_timestamp: datetime | None,
-        new_timestamp: datetime | None,
-        old_state: State | None,
-        new_state: State | None,
-    ) -> None:
+    def _integrate_on_state_change(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Override to add outlier filtering."""
+
+        new_state: State | None = kwargs.get("new_state")
+        if new_state is None and args:
+            last_arg = args[-1]
+            if isinstance(last_arg, State):
+                new_state = last_arg
 
         if self._filter_outliers and new_state is not None:
             valid_state = new_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE)
@@ -312,7 +313,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
                 )
                 return
 
-        super()._integrate_on_state_change(old_timestamp, new_timestamp, old_state, new_state)
+        super()._integrate_on_state_change(*args, **kwargs)
 
     @property
     def extra_state_attributes(self) -> dict[str, str] | None:
