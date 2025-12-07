@@ -1899,6 +1899,17 @@ async def test_power_throttle(
     #  test_power 3.00 + test2_power 3.00 = 6.00
     assert hass.states.get(group_entity).state == "6.00"
 
+    await set_states(
+        [
+            (member_1_entity, "0.00"),
+            (member_2_entity, "0.00"),
+        ],
+    )
+
+    advance(3)
+
+    assert hass.states.get(group_entity).state == "0.00"
+
 
 async def test_resolve_entity_ids_area(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
     area = area_registry.async_get_or_create("Bedroom")

@@ -676,9 +676,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
 
     def get_summed_state(self) -> Decimal | str:
         if not self._member_states:
-            if self._ignore_unavailable_state:
-                return Decimal(0)
-            return STATE_UNAVAILABLE
+            return Decimal(0) if self._ignore_unavailable_state else STATE_UNAVAILABLE
 
         return Decimal(sum(self._member_states.values()))
 
