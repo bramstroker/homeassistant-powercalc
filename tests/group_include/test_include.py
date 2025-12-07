@@ -14,10 +14,10 @@ from homeassistant.const import (
     STATE_OFF,
 )
 from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.helpers import label_registry
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntryDisabler
+from homeassistant.helpers.label_registry import LabelRegistry
 from homeassistant.setup import async_setup_component
 import pytest
 from pytest_homeassistant_custom_component.common import (
@@ -76,14 +76,14 @@ from tests.conftest import MockEntityWithModel
 )
 async def test_include_area(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
     area_input: str,
 ) -> None:
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
     area = area_registry.async_get_or_create("Bathroom 1")
-    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area.id)
+    entity_registry.async_update_entity("light.bathroom_mirror", area_id=area.id)
 
     _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
@@ -491,7 +491,6 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
 
 async def test_include_filter_domain(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     area = area_registry.async_get_or_create("Bathroom 1")
@@ -560,7 +559,7 @@ async def test_include_filter_domain(
 
 async def test_include_yaml_configured_entity(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     """Test that include also includes entities that the user configured with YAML"""
@@ -575,9 +574,9 @@ async def test_include_yaml_configured_entity(
     )
 
     area = area_registry.async_get_or_create("My area")
-    entity_reg.async_update_entity(light_a.entity_id, area_id=area.id)
-    entity_reg.async_update_entity(light_b.entity_id, area_id=area.id)
-    entity_reg.async_update_entity(light_c.entity_id, area_id=area.id)
+    entity_registry.async_update_entity(light_a.entity_id, area_id=area.id)
+    entity_registry.async_update_entity(light_b.entity_id, area_id=area.id)
+    entity_registry.async_update_entity(light_c.entity_id, area_id=area.id)
 
     _create_powercalc_config_entry(hass, light_a.entity_id)
 
@@ -675,7 +674,7 @@ async def test_include_non_powercalc_entities_in_group(
 
 async def test_group_setup_continues_when_subgroup_has_no_include_entities(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     """
@@ -685,7 +684,7 @@ async def test_group_setup_continues_when_subgroup_has_no_include_entities(
 
     area_bathroom = area_registry.async_get_or_create("Bathroom")
     area_registry.async_get_or_create("Bedroom")
-    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
+    entity_registry.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
 
     _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
@@ -713,14 +712,14 @@ async def test_group_setup_continues_when_subgroup_has_no_include_entities(
 
 async def test_area_groups_as_subgroups(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
     area_bathroom = area_registry.async_get_or_create("Bathroom")
     area_registry.async_get_or_create("Bedroom")
-    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
+    entity_registry.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
 
     _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
@@ -913,7 +912,7 @@ async def test_include_group_does_not_include_disabled_sensors(hass: HomeAssista
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test_energy"}
 
 
-async def test_include_by_label(hass: HomeAssistant) -> None:
+async def test_include_by_label(hass: HomeAssistant, label_registry: LabelRegistry) -> None:
     mock_registry(
         hass,
         {
@@ -934,8 +933,7 @@ async def test_include_by_label(hass: HomeAssistant) -> None:
         },
     )
 
-    label_reg = label_registry.async_get(hass)
-    label_reg.async_create("my_label")
+    label_registry.async_create("my_label")
 
     await run_powercalc_setup(
         hass,
@@ -1228,12 +1226,11 @@ async def test_include_all(hass: HomeAssistant) -> None:
     }
 
 
-async def test_include_by_label_filter_other_label(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+async def test_include_by_label_filter_other_label(hass: HomeAssistant, label_registry: LabelRegistry) -> None:
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/3685"""
 
-    label_reg = label_registry.async_get(hass)
-    label_reg.async_create("my_label")
-    label_reg.async_create("exclude_powercalc")
+    label_registry.async_create("my_label")
+    label_registry.async_create("exclude_powercalc")
 
     mock_device_registry(
         hass,

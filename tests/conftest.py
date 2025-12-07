@@ -10,10 +10,7 @@ from _pytest.fixtures import SubRequest
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
-from homeassistant.helpers.floor_registry import FloorRegistry
+from homeassistant.helpers.device_registry import DeviceEntry
 import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -30,7 +27,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
-from tests.common import get_test_config_dir, mock_area_registry, mock_floor_registry
+from tests.common import get_test_config_dir
 
 
 @pytest.fixture(autouse=True)
@@ -47,30 +44,6 @@ def configure_hass_config_dir(hass: HomeAssistant) -> None:
 def enable_custom_integrations(hass: HomeAssistant) -> None:
     """Enable custom integrations defined in the test dir."""
     hass.data.pop(loader.DATA_CUSTOM_COMPONENTS)
-
-
-@pytest.fixture
-def area_reg(hass: HomeAssistant) -> AreaRegistry:
-    """Return an empty, loaded, registry."""
-    return mock_area_registry(hass)
-
-
-@pytest.fixture
-def floor_reg(hass: HomeAssistant) -> FloorRegistry:
-    """Return an empty, loaded, floor registry."""
-    return mock_floor_registry(hass)
-
-
-@pytest.fixture
-def device_reg(hass: HomeAssistant) -> DeviceRegistry:
-    """Return an empty, loaded, registry."""
-    return mock_device_registry(hass)
-
-
-@pytest.fixture
-def entity_reg(hass: HomeAssistant) -> EntityRegistry:
-    """Return an empty, loaded, registry."""
-    return mock_registry(hass)
 
 
 @pytest.fixture

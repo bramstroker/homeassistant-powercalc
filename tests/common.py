@@ -15,6 +15,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 import homeassistant.helpers.area_registry as ar
+from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.floor_registry import FloorEntry, FloorRegistry, FloorRegistryItems
 from homeassistant.helpers.normalized_name_base_registry import NormalizedNameBaseRegistryItems
 from homeassistant.helpers.typing import ConfigType, StateType
@@ -274,7 +275,7 @@ def mock_sensors_in_registry(
     hass: HomeAssistant,
     power_entities: list[str] | None = None,
     energy_entities: list[str] | None = None,
-) -> None:
+) -> EntityRegistry:
     entries = {}
     for entity_id in power_entities or []:
         entries[entity_id] = RegistryEntryWithDefaults(
@@ -292,7 +293,7 @@ def mock_sensors_in_registry(
             platform="sensor",
             device_class=SensorDeviceClass.ENERGY,
         )
-    mock_registry(hass, entries)
+    return mock_registry(hass, entries)
 
 
 def assert_entity_state(

@@ -4,9 +4,8 @@ from homeassistant import data_entry_flow
 from homeassistant.const import CONF_DEVICE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.helpers.selector import EntitySelector
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 import voluptuous as vol
@@ -41,7 +40,7 @@ from tests.config_flow.common import (
 from tests.conftest import MockEntityWithModel
 
 
-async def test_create_multi_switch_sensor_entry(hass: HomeAssistant) -> None:
+async def test_create_multi_switch_sensor_entry(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.MULTI_SWITCH, {CONF_NAME: "test"})
     result = await set_virtual_power_configuration(
         hass,
@@ -59,9 +58,7 @@ async def test_create_multi_switch_sensor_entry(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 
-    entity_reg = er.async_get(hass)
-    entry = entity_reg.async_get("sensor.test_power")
-    assert entry
+    assert entity_registry.async_get("sensor.test_power")
 
 
 async def test_discovery_flow(

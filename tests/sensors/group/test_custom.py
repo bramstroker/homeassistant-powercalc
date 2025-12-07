@@ -98,8 +98,7 @@ from tests.common import (
 )
 
 
-async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
-    ent_reg = er.async_get(hass)
+async def test_grouped_power_sensor(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     hass.states.async_set("input_boolean.test1", STATE_ON)
     hass.states.async_set("input_boolean.test2", STATE_ON)
 
@@ -129,7 +128,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
     power_state = hass.states.get("sensor.test1_power")
     assert power_state
 
-    power_entry = ent_reg.async_get("sensor.testgroup_power")
+    power_entry = entity_registry.async_get("sensor.testgroup_power")
     assert power_entry
     assert power_entry.unique_id == "group_unique_id"
 
@@ -147,7 +146,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
     hass.states.async_set("sensor.test1_energy", "40.00")
     await hass.async_block_till_done()
 
-    energy_entry = ent_reg.async_get("sensor.testgroup_energy")
+    energy_entry = entity_registry.async_get("sensor.testgroup_energy")
     assert energy_entry
     assert energy_entry.unique_id == "group_unique_id_energy"
 
@@ -546,9 +545,7 @@ async def test_energy_group_available_when_members_temporarily_unavailable(
         assert energy_state.state == "3.2000"
 
 
-async def test_hide_members(hass: HomeAssistant) -> None:
-    entity_reg = er.async_get(hass)
-
+async def test_hide_members(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     await run_powercalc_setup(
         hass,
         {
@@ -569,13 +566,12 @@ async def test_hide_members(hass: HomeAssistant) -> None:
         },
     )
 
-    assert entity_reg.async_get("sensor.one_power").hidden_by == er.RegistryEntryHider.INTEGRATION
-    assert entity_reg.async_get("sensor.two_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+    assert entity_registry.async_get("sensor.one_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+    assert entity_registry.async_get("sensor.two_power").hidden_by == er.RegistryEntryHider.INTEGRATION
 
 
-async def test_unhide_members(hass: HomeAssistant) -> None:
-    entity_reg = er.async_get(hass)
-    entity_reg.async_get_or_create(
+async def test_unhide_members(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
+    entity_registry.async_get_or_create(
         SENSOR_DOMAIN,
         DOMAIN,
         "abcdef",
@@ -598,12 +594,11 @@ async def test_unhide_members(hass: HomeAssistant) -> None:
         },
     )
 
-    assert entity_reg.async_get("sensor.test_power").hidden_by is None
+    assert entity_registry.async_get("sensor.test_power").hidden_by is None
 
 
-async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant) -> None:
-    entity_reg = er.async_get(hass)
-    entity_reg.async_get_or_create(
+async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
+    entity_registry.async_get_or_create(
         SENSOR_DOMAIN,
         DOMAIN,
         "abcdef",
@@ -626,14 +621,14 @@ async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant) -> None:
         },
     )
 
-    assert entity_reg.async_get("sensor.test_power").hidden_by is er.RegistryEntryHider.USER
+    assert entity_registry.async_get("sensor.test_power").hidden_by is er.RegistryEntryHider.USER
 
 
 async def test_members_are_unhiden_after_group_removed(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
 ) -> None:
-    entity_reg.async_get_or_create(
+    entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
         "abcdef",
@@ -651,29 +646,29 @@ async def test_members_are_unhiden_after_group_removed(
     )
 
     assert hass.states.get("sensor.mygroup_power")
-    assert entity_reg.async_get("sensor.test_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+    assert entity_registry.async_get("sensor.test_power").hidden_by == er.RegistryEntryHider.INTEGRATION
 
     # Remove the config entry
     assert await hass.config_entries.async_remove(config_entry.entry_id)
     await hass.async_block_till_done()
 
-    assert entity_reg.async_get("sensor.test_power").hidden_by is None
+    assert entity_registry.async_get("sensor.test_power").hidden_by is None
 
     assert not hass.states.get("sensor.mygroup_power")
-    assert not entity_reg.async_get("sensor.mygroup_power")
+    assert not entity_registry.async_get("sensor.mygroup_power")
 
 
 async def test_group_utility_meter(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_registry: EntityRegistry,
 ) -> None:
-    entity_reg.async_get_or_create(
+    entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
         "abcdef",
         suggested_object_id="testgroup_power",
     )
-    entity_reg.async_get_or_create(
+    entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
         "abcdef_energy",
@@ -1390,8 +1385,8 @@ async def test_create_group_with_real_power_sensors(hass: HomeAssistant) -> None
 
 async def test_bind_to_configured_device(
     hass: HomeAssistant,
-    entity_reg: er.EntityRegistry,
-    device_reg: DeviceRegistry,
+    entity_registry: er.EntityRegistry,
+    device_registry: DeviceRegistry,
 ) -> None:
     """
     Test that all powercalc created sensors are attached to same device as the source entity
@@ -1400,7 +1395,7 @@ async def test_bind_to_configured_device(
     # Create a device
     config_entry = MockConfigEntry(domain="test")
     config_entry.add_to_hass(hass)
-    device_entry = device_reg.async_get_or_create(
+    device_entry = device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
         connections={("dummy", "abcdef")},
         manufacturer="Google Inc.",
@@ -1429,7 +1424,7 @@ async def test_bind_to_configured_device(
     )
 
     # Assert that all the entities are bound to correct device
-    group_entity = entity_reg.async_get("sensor.mygroup_power")
+    group_entity = entity_registry.async_get("sensor.mygroup_power")
     assert group_entity
     assert group_entity.device_id == device_entry.id
 

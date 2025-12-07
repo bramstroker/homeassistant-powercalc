@@ -343,19 +343,19 @@ async def test_can_include_autodiscovered_entity_in_group(
 
 async def test_user_can_rename_entity_id(
     hass: HomeAssistant,
-    entity_reg: er.EntityRegistry,
+    entity_registry: er.EntityRegistry,
 ) -> None:
     """
     When the power/energy sensors exist already with an unique ID, don't change the entity ID
     This allows the users to change the entity ID's from the GUI
     """
-    entity_reg.async_get_or_create(
+    entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
         "abcdef",
         suggested_object_id="my_renamed_power",
     )
-    entity_reg.async_get_or_create(
+    entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
         "abcdef_energy",
@@ -410,7 +410,7 @@ async def test_setup_multiple_entities_in_single_platform_config(
 
 async def test_change_options_of_renamed_sensor(
     hass: HomeAssistant,
-    entity_reg: er.EntityRegistry,
+    entity_registry: er.EntityRegistry,
 ) -> None:
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -430,7 +430,7 @@ async def test_change_options_of_renamed_sensor(
 
     assert hass.states.get("sensor.test_energy_daily").name == "test energy daily"
 
-    entity_reg.async_update_entity(
+    entity_registry.async_update_entity(
         entity_id="sensor.test_energy_daily",
         name="Renamed daily utility meter",
     )
@@ -450,16 +450,16 @@ async def test_change_options_of_renamed_sensor(
 
 async def test_renaming_sensor_is_retained_after_startup(
     hass: HomeAssistant,
-    entity_reg: er.EntityRegistry,
+    entity_registry: er.EntityRegistry,
 ) -> None:
-    entity_reg.async_get_or_create(
+    entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
         "abcdef",
         suggested_object_id="test_power",
     )
     await hass.async_block_till_done()
-    entity_reg.async_update_entity(entity_id="sensor.test_power", name="Renamed power")
+    entity_registry.async_update_entity(entity_id="sensor.test_power", name="Renamed power")
     await hass.async_block_till_done()
 
     entry = MockConfigEntry(

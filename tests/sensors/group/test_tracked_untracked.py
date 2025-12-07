@@ -1,7 +1,6 @@
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.const import (
@@ -133,12 +132,11 @@ async def test_auto_tracking_entities(hass: HomeAssistant) -> None:
 
 async def test_entity_registry_updates(hass: HomeAssistant) -> None:
     """Test that the tracked power sensor is updated when power sensors are added or removed to the system"""
-    mock_sensors_in_registry(
+    entity_registry = mock_sensors_in_registry(
         hass,
         ["sensor.test1_power", "sensor.test2_power", "sensor.test3_power"],
         ["sensor.test1_energy"],
     )
-    entity_registry = er.async_get(hass)
     create_mock_entry(
         hass,
         {
