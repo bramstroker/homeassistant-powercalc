@@ -18,6 +18,9 @@
       },
       "description": "Aliases for this model"
     },
+    "author": {
+      "type": "string"
+    },
     "calculation_enabled_condition": {
       "type": "string",
       "description": "Template which can be evaluated."

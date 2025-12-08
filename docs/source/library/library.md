@@ -30,7 +30,7 @@ When it can be useful to share this model with the community, please consider su
 
 Custom models are stored in the `config/powercalc/profiles` directory.
 
-You'll need to apply the same structure as the core library, with a subdirectory for the manufacturer and model id.
+You'll need to apply the same [structure](structure.md) as the core library, with a subdirectory for the manufacturer and model id.
 
 For example:
 
