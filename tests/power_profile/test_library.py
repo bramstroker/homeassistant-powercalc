@@ -43,7 +43,16 @@ async def test_model_listing(hass: HomeAssistant, manufacturer: str, expected_mo
 async def test_model_listing_sorted(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     models = await library.get_model_listing("signify")
-    assert models == set(sorted(models))  # noqa: C414
+
+    expected = [
+        "1740193P0",
+        "9290030514",
+        "LCA007",
+        "LCT010",
+        "LWA017",
+    ]
+    indices = [models.index(x) for x in expected]
+    assert indices == sorted(indices)
 
 
 @pytest.mark.parametrize(
@@ -90,8 +99,8 @@ async def test_non_existing_manufacturer_returns_empty_model_list(
         (ModelInfo("signify", "LCT010"), "signify", "LCT010"),
         (ModelInfo("signify", "LCA001"), "signify", "LCA001"),
         (ModelInfo("signify", "Hue go (LLC020)"), "signify", "LLC020"),
-        (ModelInfo("ikea", "TRADFRI bulb E14 WS opal 400lm"), "ikea", "LED1536G5"),
         (ModelInfo("signify", "Hue go", "LLC020"), "signify", "LLC020"),
+        (ModelInfo("wiz", "SHRGB"), "wiz", "SHRGB"),
     ],
 )
 async def test_get_profile(
