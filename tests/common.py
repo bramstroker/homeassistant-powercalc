@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from homeassistant import config_entries
 from homeassistant.components import input_boolean, input_number, light
@@ -181,6 +182,9 @@ async def setup_config_entry(
     title: str = "Mock Title",
 ) -> MockConfigEntry:
     """Setup and add a Powercalc config entry"""
+    if unique_id is None:
+        unique_id = str(uuid.uuid4())
+
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data=entry_data,

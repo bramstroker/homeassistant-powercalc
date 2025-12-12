@@ -102,7 +102,7 @@ from .sensors.group.config_entry_utils import (
 )
 from .service.gui_configuration import SERVICE_SCHEMA, change_gui_configuration
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.SELECT]
 
 DISCOVERY_SCHEMA = vol.Schema(
     {
@@ -199,6 +199,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     }
 
     await register_services(hass)
+
+    await async_load_platform(hass, Platform.SELECT, DOMAIN, {}, config)
     await setup_yaml_sensors(hass, config, global_config)
 
     setup_domain_groups(hass, global_config)
@@ -399,7 +401,8 @@ async def setup_yaml_sensors(
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
 
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(entry, [Platform.SELECT])
+    await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
 
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
 
