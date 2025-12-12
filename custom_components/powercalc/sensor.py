@@ -846,7 +846,7 @@ async def create_individual_sensors(
             attach_energy_sensor_to_power_sensor(power_sensor, energy_sensor)
 
     if energy_sensor:
-        entities_to_add.extend(await create_utility_meters(hass, energy_sensor, sensor_config))
+        entities_to_add.extend(await create_utility_meters(hass, energy_sensor, sensor_config, config_entry))
 
     await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
 

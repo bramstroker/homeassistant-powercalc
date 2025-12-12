@@ -21,7 +21,6 @@ from homeassistant.setup import async_setup_component
 import homeassistant.util.dt as dt_util
 import pytest
 from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
     RegistryEntryWithDefaults,
     mock_device_registry,
     mock_registry,
@@ -43,7 +42,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import create_input_boolean, create_mocked_virtual_power_sensor_entry, run_powercalc_setup
+from tests.common import create_input_boolean, create_mocked_virtual_power_sensor_entry, run_powercalc_setup, setup_config_entry
 
 
 async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
@@ -86,32 +85,46 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     assert general_sensor_hourly
 
 
-async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant) -> None:
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
+    entry1 = await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-            CONF_UNIQUE_ID: "abc",
             CONF_ENTITY_ID: "switch.test",
             CONF_FIXED: {CONF_POWER: 50},
             CONF_CREATE_UTILITY_METERS: True,
-        },
-        unique_id="abc",
-    )
-    entry.add_to_hass(hass)
-
-    await run_powercalc_setup(
-        hass,
-        {},
-        {
             CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
             CONF_UTILITY_METER_TYPES: [DAILY],
         },
+        title="Entry1",
+    )
+
+    entry2 = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "switch.test2",
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
+        title="Entry2",
     )
 
     tariff_select = hass.states.get("select.test_energy_daily")
     assert tariff_select
     assert tariff_select.state == "peak"
+
+    registry_entry = entity_registry.async_get("select.test_energy_daily")
+    assert registry_entry
+    assert registry_entry.platform == DOMAIN
+    assert registry_entry.config_entry_id == entry1.entry_id
+
+    registry_entry = entity_registry.async_get("select.test2_energy_daily")
+    assert registry_entry
+    assert registry_entry.platform == DOMAIN
+    assert registry_entry.config_entry_id == entry2.entry_id
 
 
 async def test_utility_meter_is_not_created_twice(
