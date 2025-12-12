@@ -3,7 +3,7 @@
     "source_entity": "Entità sorgente",
     "source_device": "Dispositivo sorgente",
     "remarks_smart_switch": "Questo profilo fornisce solo valori di potenza in standby. Quando hai un dispositivo che consuma una quantità fissa di potenza quando è acceso, puoi fornire quel valore nel passaggio successivo del flusso di configurazione",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "remarks_smart_dimmer": "Questo profilo fornisce solo valori di potenza in standby. \n Nel passo successivo è possibile fornire facoltativamente i valori della luce collegata"
   },
   "config": {
     "abort": {
@@ -15,7 +15,7 @@
       "fixed_mandatory": "È necessario fornire almeno uno tra Potenza, Modello di potenza o Stati di potenza",
       "fixed_states_power_only": "Questa entità può funzionare solo con 'states_power' non 'power'",
       "group_mandatory": "È necessario definire almeno sottogruppi o entità di potere e di energia",
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
+      "linear_mandatory": "È necessario fornire almeno una di max_power o calibrare",
       "linear_min_higher_as_max": "La potenza massima non può essere inferiore a quella minima",
       "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
       "lut_unsupported_color_mode": "Il profilo LUT non supporta una delle modalità di colore della luce. Vedi i registri per maggiori informazioni",
@@ -213,7 +213,7 @@
           "subtract_entities": "Sottrai entità"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
+          "entity_id": "L'entità base da dove sottrarre energia",
           "subtract_entities": "Select all the entities you want to subtract from the base entity"
         },
         "title": "Sottrai sensore di gruppo"
