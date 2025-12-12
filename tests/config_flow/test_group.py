@@ -433,19 +433,11 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
     Only entries with a unique ID must be selectable
     """
 
-    config_entry_1 = await create_mocked_virtual_power_sensor_entry(
-        hass,
-        "VirtualPower1",
-        "abcdef",
-    )
-    config_entry_2 = await create_mocked_virtual_power_sensor_entry(
-        hass,
-        "VirtualPower2",
-        None,
-    )
+    config_entry_1 = await create_mocked_virtual_power_sensor_entry(hass, "VirtualPower1")
+    config_entry_2 = await create_mocked_virtual_power_sensor_entry(hass, "VirtualPower2")
     config_entry_3 = MockConfigEntry(
         domain=DOMAIN,
-        unique_id="abcdefg",
+        unique_id=None,
         data={
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_ENTITY_ID: "sensor.dummy",
@@ -455,8 +447,6 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         title="VirtualPower3",
     )
     config_entry_3.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry_3.entry_id)
-    await hass.async_block_till_done()
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -465,7 +455,8 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
     options = select.config["options"]
     assert len(options) == 2
     assert {"value": config_entry_1.entry_id, "label": "VirtualPower1"} in options
-    assert {"value": config_entry_2.entry_id, "label": "VirtualPower2"} not in options
+    assert {"value": config_entry_2.entry_id, "label": "VirtualPower2"} in options
+    assert {"value": config_entry_3.entry_id, "label": "VirtualPower3"} not in options
 
     user_input = {
         CONF_NAME: "My group sensor",
