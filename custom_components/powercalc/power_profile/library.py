@@ -50,7 +50,7 @@ class ProfileLibrary:
         return library
 
     @staticmethod
-    def create_loader(hass: HomeAssistant) -> Loader:
+    def create_loader(hass: HomeAssistant, skip_remote_loader: bool = False) -> Loader:
         loaders: list[Loader] = [
             LocalLoader(hass, data_dir)
             for data_dir in [
@@ -64,7 +64,7 @@ class ProfileLibrary:
         domain_config = hass.data.get(DOMAIN, {})
         global_config = domain_config.get(DOMAIN_CONFIG, {})
         disable_library_download: bool = bool(global_config.get(CONF_DISABLE_LIBRARY_DOWNLOAD, False))
-        if not disable_library_download:
+        if not disable_library_download and not skip_remote_loader:
             loaders.append(RemoteLoader(hass))
 
         return CompositeLoader(loaders)

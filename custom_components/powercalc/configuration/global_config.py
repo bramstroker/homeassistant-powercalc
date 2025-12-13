@@ -14,6 +14,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISCOVERY,
+    CONF_ENABLE_ANALYTICS,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_NAMING,
@@ -55,6 +56,7 @@ _LOGGER = logging.getLogger(__name__)
 async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
     # Default configuration values
     default_config = {
+        CONF_ENABLE_ANALYTICS: False,
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
         CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,

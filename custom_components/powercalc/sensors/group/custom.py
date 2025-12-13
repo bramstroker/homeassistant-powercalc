@@ -163,7 +163,7 @@ async def create_group_sensors_gui(
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     if not unique_id:
-        sensor_config[CONF_UNIQUE_ID] = entry.entry_id
+        sensor_config[CONF_UNIQUE_ID] = entry.entry_id  # pragma: nocover
 
     power_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER)
 

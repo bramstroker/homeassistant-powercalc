@@ -13,6 +13,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.powercalc import (
     CONF_CREATE_STANDBY_GROUP,
     CONF_DISCOVERY,
+    CONF_ENABLE_ANALYTICS,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
@@ -126,6 +127,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
+        CONF_ENABLE_ANALYTICS: False,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_STANDBY_GROUP: True,
         CONF_CREATE_ENERGY_SENSORS: True,
