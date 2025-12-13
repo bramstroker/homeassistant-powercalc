@@ -69,7 +69,9 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
+    DATA_ANALYTICS,
     DATA_DISCOVERY_MANAGER,
+    DATA_POWER_PROFILES,
     DATA_STANDBY_POWER_SENSORS,
     DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
@@ -171,6 +173,9 @@ async def create_virtual_power_sensor(
         calculation_strategy_factory = PowerCalculatorStrategyFactory.get_instance(hass)
 
         standby_power, standby_power_on = _get_standby_power(sensor_config, power_profile)
+
+        if power_profile:
+            hass.data[DOMAIN][DATA_ANALYTICS].setdefault(DATA_POWER_PROFILES, []).append(power_profile)
 
         _LOGGER.debug(
             "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s unique_id=%s)",

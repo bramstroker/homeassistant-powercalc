@@ -27,6 +27,9 @@ DATA_ENTITIES = "entities"
 DATA_GROUP_ENTITIES = "group_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
 DATA_STANDBY_POWER_SENSORS = "standby_power_sensors"
+DATA_ANALYTICS = "analytics"
+DATA_POWER_PROFILES = "power_profiles"
+DATA_SENSOR_TYPE_COUNTS = "sensor_type_counts"
 
 ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
 ENTRY_DATA_POWER_ENTITY = "_power_entity"
@@ -197,6 +200,7 @@ DISCOVERY_POWER_PROFILES = "power_profiles"
 DISCOVERY_TYPE = "discovery_type"
 
 LIBRARY_URL = "https://library.powercalc.nl"
+API_URL = "https://api.powercalc.nl"
 
 MANUFACTURER_WLED = "WLED"
 

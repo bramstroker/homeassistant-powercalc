@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from collections.abc import Mapping
 import copy
 from dataclasses import dataclass, field
@@ -37,7 +38,7 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 import voluptuous as vol
 
-from . import DATA_GROUP_ENTITIES
+from . import DATA_ANALYTICS, DATA_GROUP_ENTITIES
 from .common import (
     SourceEntity,
     create_source_entity,
@@ -108,6 +109,7 @@ from .const import (
     DATA_CONFIGURED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
     DATA_ENTITIES,
+    DATA_SENSOR_TYPE_COUNTS,
     DATA_USED_UNIQUE_IDS,
     DISCOVERY_TYPE,
     DOMAIN,
@@ -679,7 +681,10 @@ async def setup_individual_sensors(
 ) -> EntitiesBucket:
     """Set up an individual sensor."""
     merged_sensor_config = get_merged_sensor_configuration(global_config, config)
-    sensor_type = config.get(CONF_SENSOR_TYPE)
+    sensor_type = SensorType(str(config.get(CONF_SENSOR_TYPE)))
+
+    sensor_type_counts: dict[SensorType, int] = hass.data[DOMAIN][DATA_ANALYTICS].setdefault(DATA_SENSOR_TYPE_COUNTS, defaultdict(int))
+    sensor_type_counts[sensor_type] += 1
 
     if sensor_type == SensorType.GROUP:
         return EntitiesBucket(new=await create_group_sensors(hass, merged_sensor_config, config_entry))

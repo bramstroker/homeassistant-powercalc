@@ -21,15 +21,17 @@ from homeassistant.const import (
     Platform,
     __version__ as HA_VERSION,  # noqa: N812
 )
-from homeassistant.core import Event, HomeAssistant, ServiceCall
+from homeassistant.core import Event, HassJob, HomeAssistant, ServiceCall, callback
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.entity_platform import async_get_platforms
 import homeassistant.helpers.entity_registry as er
+from homeassistant.helpers.event import async_call_later, async_track_time_interval
 from homeassistant.helpers.reload import async_integration_yaml_config
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
+from .analytics.analytics import ANALYTICS_INTERVAL, Analytics
 from .common import validate_name_pattern
 from .configuration.global_config import FLAG_HAS_GLOBAL_GUI_CONFIG, get_global_configuration, get_global_gui_configuration
 from .const import (
@@ -69,6 +71,7 @@ from .const import (
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
+    DATA_ANALYTICS,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DATA_DOMAIN_ENTITIES,
@@ -196,6 +199,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DATA_ENTITIES: {},
         DATA_USED_UNIQUE_IDS: [],
         DATA_STANDBY_POWER_SENSORS: {},
+        DATA_ANALYTICS: {},
     }
 
     await register_services(hass)
@@ -211,7 +215,41 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     except Exception as e:  # noqa: BLE001  # pragma: no cover
         _LOGGER.error("problem while cleaning up None entities", exc_info=e)  # pragma: no cover
 
+    await init_analytics(hass)
+
     return True
+
+
+async def init_analytics(hass: HomeAssistant) -> None:
+    """Initialize the Analytics manager and schedule daily submission"""
+    analytics = Analytics(hass)
+
+    # Load stored data
+    # await analytics.load()
+
+    @callback
+    def start_schedule(_event: Event) -> None:
+        """Start the send schedule after the started event."""
+        async_call_later(
+            hass,
+            10,
+            HassJob(
+                analytics.send_analytics,
+                name="powercalc analytics startup",
+                cancel_on_shutdown=True,
+            ),
+        )
+
+        # Send every day
+        async_track_time_interval(
+            hass,
+            analytics.send_analytics,
+            ANALYTICS_INTERVAL,
+            name="powercalc analytics daily",
+            cancel_on_shutdown=True,
+        )
+
+    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, start_schedule)
 
 
 async def create_discovery_manager_instance(
@@ -270,6 +308,7 @@ async def register_services(hass: HomeAssistant) -> None:
 
         hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []
         hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES] = {}
+        hass.data[DOMAIN][DATA_ANALYTICS] = {}
         hass.data[DOMAIN][DOMAIN_CONFIG] = await get_global_configuration(hass, reload_config)
 
         # Reload YAML sensors if any
