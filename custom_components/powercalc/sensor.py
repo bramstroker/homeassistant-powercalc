@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter
 from collections.abc import Mapping
 import copy
 from dataclasses import dataclass, field
@@ -39,6 +39,7 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 import voluptuous as vol
 
 from . import DATA_ANALYTICS, DATA_GROUP_ENTITIES
+from .analytics.analytics import RuntimeAnalyticsData
 from .common import (
     SourceEntity,
     create_source_entity,
@@ -106,11 +107,11 @@ from .const import (
     CONF_VALUE_TEMPLATE,
     CONF_VARIABLES,
     CONF_WLED,
-    DATA_CONFIG_TYPE_COUNTS,
+    DATA_CONFIG_TYPES,
     DATA_CONFIGURED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
     DATA_ENTITIES,
-    DATA_SENSOR_TYPE_COUNTS,
+    DATA_SENSOR_TYPES,
     DATA_USED_UNIQUE_IDS,
     DISCOVERY_TYPE,
     DOMAIN,
@@ -685,12 +686,9 @@ async def setup_individual_sensors(
     sensor_type = SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
 
     # Collect runtime analytics data, for publishing later on.
-    analytics_data = hass.data[DOMAIN][DATA_ANALYTICS]
-    sensor_type_counts: dict[SensorType, int] = analytics_data.setdefault(DATA_SENSOR_TYPE_COUNTS, defaultdict(int))
-    sensor_type_counts[sensor_type] += 1
-    config_type_counts: dict[str, int] = analytics_data.setdefault(DATA_CONFIG_TYPE_COUNTS, defaultdict(int))
-    config_type = "yaml" if context.is_yaml else "gui"
-    config_type_counts[config_type] += 1
+    analytics_data: RuntimeAnalyticsData = hass.data[DOMAIN][DATA_ANALYTICS]
+    analytics_data.setdefault(DATA_SENSOR_TYPES, Counter())[sensor_type] += 1
+    analytics_data.setdefault(DATA_CONFIG_TYPES, Counter())["yaml" if context.is_yaml else "gui"] += 1
 
     if sensor_type == SensorType.GROUP:
         return EntitiesBucket(new=await create_group_sensors(hass, merged_sensor_config, config_entry))

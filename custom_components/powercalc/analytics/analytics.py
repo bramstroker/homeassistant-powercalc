@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from asyncio import timeout
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 import logging
-from typing import Any
+from typing import Any, TypedDict
 import uuid
 
 import aiohttp
@@ -19,12 +19,14 @@ from custom_components.powercalc.const import (
     API_URL,
     CONF_ENABLE_ANALYTICS,
     DATA_ANALYTICS,
-    DATA_CONFIG_TYPE_COUNTS,
+    DATA_CONFIG_TYPES,
     DATA_POWER_PROFILES,
-    DATA_SENSOR_TYPE_COUNTS,
+    DATA_SENSOR_TYPES,
+    DATA_STRATEGIES,
     DOMAIN,
     DOMAIN_CONFIG,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+    CalculationStrategy,
     SensorType,
 )
 from custom_components.powercalc.power_profile.library import ProfileLibrary
@@ -37,6 +39,13 @@ STORAGE_KEY = "powercalc.analytics"
 STORAGE_VERSION = 1
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class RuntimeAnalyticsData(TypedDict, total=False):
+    sensor_types: Counter[SensorType]
+    config_types: Counter[str]
+    strategies: Counter[CalculationStrategy]
+    power_profiles: list[PowerProfile]
 
 
 @dataclass
@@ -71,9 +80,7 @@ class Analytics:
 
     async def _prepare_payload(self) -> dict:
         powercalc_integration = await async_get_integration(self.hass, DOMAIN)
-        runtime_data = self.hass.data[DOMAIN][DATA_ANALYTICS]
-        sensor_type_counts: dict[SensorType, int] = runtime_data.setdefault(DATA_SENSOR_TYPE_COUNTS, defaultdict(int))
-        config_type_counts: dict[str, int] = runtime_data.setdefault(DATA_CONFIG_TYPE_COUNTS, defaultdict(int))
+        runtime_data: RuntimeAnalyticsData = self.hass.data[DOMAIN][DATA_ANALYTICS]
         global_config_entry = self.hass.config_entries.async_entry_for_domain_unique_id(
             DOMAIN,
             ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
@@ -86,10 +93,11 @@ class Analytics:
             "custom_profile_count": await self._get_custom_profile_count(),
             "has_global_gui_config": global_config_entry is not None,
             "counts": {
-                "by_config_type": config_type_counts,
-                "by_sensor_type": sensor_type_counts,
+                "by_config_type": runtime_data.setdefault(DATA_CONFIG_TYPES, Counter()),
+                "by_sensor_type": runtime_data.setdefault(DATA_SENSOR_TYPES, Counter()),
                 "by_manufacturer": self._get_manufacturer_counts(),
                 "by_model": self._get_model_counts(),
+                "by_strategy": runtime_data.setdefault(DATA_STRATEGIES, Counter()),
             },
         }
 

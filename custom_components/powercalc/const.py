@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Literal
 
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 from homeassistant.const import (
@@ -28,9 +29,10 @@ DATA_GROUP_ENTITIES = "group_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
 DATA_STANDBY_POWER_SENSORS = "standby_power_sensors"
 DATA_ANALYTICS = "analytics"
-DATA_POWER_PROFILES = "power_profiles"
-DATA_SENSOR_TYPE_COUNTS = "sensor_type_counts"
-DATA_CONFIG_TYPE_COUNTS = "config_type_counts"
+DATA_POWER_PROFILES: Literal["power_profiles"] = "power_profiles"
+DATA_SENSOR_TYPES: Literal["sensor_types"] = "sensor_types"
+DATA_CONFIG_TYPES: Literal["config_types"] = "config_types"
+DATA_STRATEGIES: Literal["strategies"] = "strategies"
 
 ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
 ENTRY_DATA_POWER_ENTITY = "_power_entity"

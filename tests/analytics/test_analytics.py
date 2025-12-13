@@ -14,7 +14,15 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClien
 
 from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP
 from custom_components.powercalc.analytics.analytics import ENDPOINT_ANALYTICS, Analytics
-from custom_components.powercalc.const import CONF_ENABLE_ANALYTICS, CONF_MANUFACTURER, CONF_MODEL, DOMAIN, DOMAIN_CONFIG, SensorType
+from custom_components.powercalc.const import (
+    CONF_ENABLE_ANALYTICS,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
+    DOMAIN,
+    DOMAIN_CONFIG,
+    CalculationStrategy,
+    SensorType,
+)
 from tests.common import get_simple_fixed_config, run_powercalc_setup
 
 MOCK_PAYLOAD = {
@@ -76,6 +84,7 @@ async def test_send_analytics_success(
     assert posted_json["counts"]["by_sensor_type"] == {SensorType.VIRTUAL_POWER: 2}
     assert posted_json["counts"]["by_manufacturer"] == {"signify": 1}
     assert posted_json["counts"]["by_model"] == {"signify:LCT010": 1}
+    assert posted_json["counts"]["by_strategy"] == {CalculationStrategy.FIXED: 1, CalculationStrategy.LUT: 1}
 
 
 @pytest.mark.usefixtures("payload_mock")

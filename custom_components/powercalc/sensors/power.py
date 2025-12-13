@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections import Counter
 from copy import copy
 from decimal import Decimal
 import logging
@@ -43,6 +44,7 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, StateType
 
+from custom_components.powercalc.analytics.analytics import RuntimeAnalyticsData
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
@@ -73,6 +75,7 @@ from custom_components.powercalc.const import (
     DATA_DISCOVERY_MANAGER,
     DATA_POWER_PROFILES,
     DATA_STANDBY_POWER_SENSORS,
+    DATA_STRATEGIES,
     DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
     DUMMY_ENTITY_ID,
@@ -174,8 +177,11 @@ async def create_virtual_power_sensor(
 
         standby_power, standby_power_on = _get_standby_power(sensor_config, power_profile)
 
+        # Collect runtime statistics, which we can publish daily
+        analytics_data: RuntimeAnalyticsData = hass.data[DOMAIN][DATA_ANALYTICS]
+        analytics_data.setdefault(DATA_STRATEGIES, Counter())[strategy] += 1
         if power_profile:
-            hass.data[DOMAIN][DATA_ANALYTICS].setdefault(DATA_POWER_PROFILES, []).append(power_profile)
+            analytics_data.setdefault(DATA_POWER_PROFILES, []).append(power_profile)
 
         _LOGGER.debug(
             "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s unique_id=%s)",
