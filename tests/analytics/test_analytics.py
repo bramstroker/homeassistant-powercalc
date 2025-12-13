@@ -2,10 +2,10 @@
 
 from collections.abc import Generator
 from datetime import timedelta
-import json
 from unittest.mock import patch
 
 import aiohttp
+from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt
 import pytest
@@ -14,7 +14,7 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClien
 
 from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP
 from custom_components.powercalc.analytics.analytics import ENDPOINT_ANALYTICS, Analytics
-from custom_components.powercalc.const import CONF_ENABLE_ANALYTICS, DOMAIN, DOMAIN_CONFIG, SensorType
+from custom_components.powercalc.const import CONF_ENABLE_ANALYTICS, CONF_MANUFACTURER, CONF_MODEL, DOMAIN, DOMAIN_CONFIG, SensorType
 from tests.common import get_simple_fixed_config, run_powercalc_setup
 
 MOCK_PAYLOAD = {
@@ -37,35 +37,6 @@ def enable_analytics(hass: HomeAssistant) -> Generator[None]:
     yield
 
 
-@pytest.mark.asyncio
-async def test_prepare_payload(hass: HomeAssistant) -> None:
-    """Test the _prepare_payload method."""
-    analytics = Analytics(hass)
-
-    # Mock the get_count_by_sensor_type function
-    mock_counts = {SensorType.VIRTUAL_POWER: 5, SensorType.GROUP: 2}
-
-    # Since the function is called directly without await in _prepare_payload,
-    # we need to mock it to return the value directly, not as a coroutine
-    with (
-        patch("custom_components.powercalc.analytics.analytics.get_count_by_sensor_type", return_value=mock_counts),
-        patch("homeassistant.helpers.system_info.async_get_system_info", return_value={"installation_type": "Home Assistant OS"}),
-    ):
-        payload = await analytics._prepare_payload()
-
-    # Verify the payload structure
-    assert "install_id" in payload
-    assert "ts" in payload
-    assert "powercalc_version" in payload
-    assert "ha_version" in payload
-    assert "counts" in payload
-    assert payload["counts"] == mock_counts
-    assert "by_manufacturer" in payload
-    assert "by_model" in payload
-
-    assert json.dumps(payload)
-
-
 async def test_send_analytics_success(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
@@ -77,7 +48,14 @@ async def test_send_analytics_success(
 
     await run_powercalc_setup(
         hass,
-        get_simple_fixed_config("switch.test", 50),
+        [
+            get_simple_fixed_config("switch.test", 50),
+            {
+                CONF_ENTITY_ID: "light.test",
+                CONF_MANUFACTURER: "signify",
+                CONF_MODEL: "LCT010",
+            },
+        ],
         {
             CONF_ENABLE_ANALYTICS: True,
             CONF_CREATE_STANDBY_GROUP: False,
@@ -94,8 +72,30 @@ async def test_send_analytics_success(
     mock_call = aioclient_mock.mock_calls[0]
     posted_json = mock_call[2]
     assert posted_json["custom_profile_count"] > 50
-    assert posted_json["counts"]["by_config_type"] == {"yaml": 1}
-    assert posted_json["counts"]["by_sensor_type"] == {SensorType.VIRTUAL_POWER: 1}
+    assert posted_json["counts"]["by_config_type"] == {"yaml": 2}
+    assert posted_json["counts"]["by_sensor_type"] == {SensorType.VIRTUAL_POWER: 2}
+    assert posted_json["counts"]["by_manufacturer"] == {"signify": 1}
+    assert posted_json["counts"]["by_model"] == {"signify:LCT010": 1}
+
+
+@pytest.mark.usefixtures("payload_mock")
+async def test_install_id_is_stored(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+) -> None:
+    aioclient_mock.post(ENDPOINT_ANALYTICS, json={}, status=204)
+
+    analytics = Analytics(hass)
+    await analytics.load()
+
+    # Sending analytics without an install_id known should generate a new uuid
+    await analytics.send_analytics()
+    install_id = analytics.install_id
+
+    # Create fresh analytics instance. install_id should be used from store powercalc.analytics
+    analytics = Analytics(hass)
+    await analytics.load()
+    assert install_id == analytics.install_id
 
 
 @pytest.mark.usefixtures("payload_mock")
