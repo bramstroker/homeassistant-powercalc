@@ -246,7 +246,7 @@
           "exclude_entities": "Entiteiten uitsluiten"
         },
         "description": "Specifieke entiteiten uitsluiten van de auto tracked groep",
-        "title": "Auto tracked configuration"
+        "title": "Auto tracked configuratie"
       },
       "library": {
         "data": {
