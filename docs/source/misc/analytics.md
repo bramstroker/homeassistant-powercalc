@@ -45,7 +45,29 @@ We do **not** collect:
 
 Analytics is **disabled by default**.
 
-If you choose to enable it, you can disable it at any time in the Powercalc configuration.
+### How to enable analytics
+
+You can enable analytics in two ways:
+
+#### Using the GUI
+
+See [Global Configuration](../configuration/global-configuration.md) how to modify the global configuration options
+You can find the toggle in `Basic Options`
+
+#### Using YAML configuration
+
+Add the following to your `configuration.yaml` file:
+
+```yaml
+powercalc:
+  enable_analytics: true
+```
+
+### Disabling analytics
+
+If you've enabled analytics, you can disable it at any time by:
+- Turning off the option in the GUI configuration
+- Setting `enable_analytics: false` in your YAML configuration
 
 ---
 
