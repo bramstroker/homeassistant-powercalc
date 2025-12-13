@@ -1,6 +1,6 @@
 # Analytics
 
-Powercalc can **optionally** send a small amount of **anonymous, aggregated usage data**. This helps us understand real-world usage and improve the integration over time.
+Powercalc can optionally send a small amount of anonymous, aggregated usage data. This helps us understand real-world usage and improve the integration over time.
 
 This feature is **opt-in**, can be disabled at any time.
 
@@ -66,6 +66,7 @@ powercalc:
 ### Disabling analytics
 
 If you've enabled analytics, you can disable it at any time by:
+
 - Turning off the option in the GUI configuration
 - Setting `enable_analytics: false` in your YAML configuration
 
