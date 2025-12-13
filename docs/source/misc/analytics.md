@@ -1,4 +1,4 @@
-# Analytics & Telemetry
+# Analytics
 
 Powercalc can **optionally** send a small amount of **anonymous, aggregated usage data**. This helps us understand real-world usage and improve the integration over time.
 

@@ -1,56 +1,137 @@
+from __future__ import annotations
+
 from asyncio import timeout
 from collections import defaultdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 import logging
+from typing import Any
 import uuid
 
 import aiohttp
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.storage import Store
 from homeassistant.loader import async_get_integration
 
-from custom_components.powercalc.analytics.collection import get_manufacturer_counts, get_model_counts
-from custom_components.powercalc.const import API_URL, DATA_ANALYTICS, DATA_SENSOR_TYPE_COUNTS, DOMAIN, SensorType
+from custom_components.powercalc.const import (
+    API_URL,
+    CONF_ENABLE_ANALYTICS,
+    DATA_ANALYTICS,
+    DATA_CONFIG_TYPE_COUNTS,
+    DATA_POWER_PROFILES,
+    DATA_SENSOR_TYPE_COUNTS,
+    DOMAIN,
+    DOMAIN_CONFIG,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+    SensorType,
+)
+from custom_components.powercalc.power_profile.library import ProfileLibrary
+from custom_components.powercalc.power_profile.power_profile import PowerProfile
+from custom_components.powercalc.sensors.group.config_entry_utils import get_entries_excluding_global_config
 
 ENDPOINT_ANALYTICS = f"{API_URL}/analytics"
 ANALYTICS_INTERVAL = timedelta(days=1)
+STORAGE_KEY = "powercalc.analytics"
+STORAGE_VERSION = 1
 
 _LOGGER = logging.getLogger(__name__)
+
+
+@dataclass
+class AnalyticsData:
+    """Analytics data."""
+
+    install_id: str | None
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> AnalyticsData:
+        """Initialize analytics data from a dict."""
+        return cls(
+            data["install_id"],
+        )
 
 
 class Analytics:
     def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
         self.session = async_get_clientsession(hass)
+        self._store = Store[dict[str, Any]](hass, STORAGE_VERSION, STORAGE_KEY)
+        self._data: AnalyticsData = AnalyticsData(install_id=None)
+
+    async def load(self) -> None:
+        stored = await self._store.async_load()
+        if stored:
+            self._data = AnalyticsData.from_dict(stored)
+
+    @property
+    def install_id(self) -> str | None:
+        return self._data.install_id
 
     async def _prepare_payload(self) -> dict:
-        uid = str(uuid.uuid4())  # maybe take from HA analytics
         powercalc_integration = await async_get_integration(self.hass, DOMAIN)
-        sensor_type_counts: dict[SensorType, int] = self.hass.data[DOMAIN][DATA_ANALYTICS].setdefault(DATA_SENSOR_TYPE_COUNTS, defaultdict(int))
+        runtime_data = self.hass.data[DOMAIN][DATA_ANALYTICS]
+        sensor_type_counts: dict[SensorType, int] = runtime_data.setdefault(DATA_SENSOR_TYPE_COUNTS, defaultdict(int))
+        config_type_counts: dict[str, int] = runtime_data.setdefault(DATA_CONFIG_TYPE_COUNTS, defaultdict(int))
+        global_config_entry = self.hass.config_entries.async_entry_for_domain_unique_id(
+            DOMAIN,
+            ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        )
         payload: dict = {
-            "install_id": uid,
-            "ts": "2025-12-13T08:12:00Z",
+            "install_id": self.install_id,
             "powercalc_version": powercalc_integration.version,
             "ha_version": HA_VERSION,
-            "counts": sensor_type_counts,
-            # "config_entry_count": 0,
-            "by_manufacturer": get_manufacturer_counts(self.hass),
-            "by_model": get_model_counts(self.hass),
+            "config_entry_count": len(get_entries_excluding_global_config(self.hass)),
+            "custom_profile_count": await self._get_custom_profile_count(),
+            "has_global_gui_config": global_config_entry is not None,
+            "counts": {
+                "by_config_type": config_type_counts,
+                "by_sensor_type": sensor_type_counts,
+                "by_manufacturer": self._get_manufacturer_counts(),
+                "by_model": self._get_model_counts(),
+            },
         }
+
         return payload
+
+    async def _get_custom_profile_count(self) -> int:
+        loader = ProfileLibrary.create_loader(self.hass, True)
+        await loader.initialize()
+        total = 0
+        for manufacturer in await loader.get_manufacturer_listing(None):
+            total += len(await loader.get_model_listing(manufacturer[0], None))
+        return total
+
+    def _get_manufacturer_counts(self) -> dict[str, int]:
+        profiles: list[PowerProfile] = self.hass.data[DOMAIN][DATA_ANALYTICS].setdefault(DATA_POWER_PROFILES, [])
+        counts: dict[str, int] = defaultdict(int)
+
+        for profile in profiles:
+            counts[profile.manufacturer] += 1
+
+        return dict(counts)
+
+    def _get_model_counts(self) -> dict[str, int]:
+        profiles: list[PowerProfile] = self.hass.data[DOMAIN][DATA_ANALYTICS].setdefault(DATA_POWER_PROFILES, [])
+        counts: dict[str, int] = defaultdict(int)
+
+        for profile in profiles:
+            key = f"{profile.manufacturer}:{profile.model}"
+            counts[key] += 1
+
+        return dict(counts)
 
     async def send_analytics(self, _: datetime | None = None) -> None:
         """Send analytics."""
+        global_config = self.hass.data.get(DOMAIN, {}).get(DOMAIN_CONFIG, {})
+        if not global_config.get(CONF_ENABLE_ANALYTICS, True):
+            _LOGGER.debug("Analytics is disabled in global configuration")
+            return
 
-        # Check opt-in
-        # if not self.onboarded or not self.preferences.get(ATTR_BASE, False):
-        #     LOGGER.debug("Nothing to submit")
-        #     return
-
-        # if self._data.uuid is None:
-        #     self._data.uuid = gen_uuid()
-        #     await self._store.async_save(dataclass_asdict(self._data))
+        if self._data.install_id is None:
+            self._data.install_id = str(uuid.uuid4())
+            await self._store.async_save(asdict(self._data))
 
         payload = await self._prepare_payload()
 

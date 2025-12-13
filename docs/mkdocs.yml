@@ -121,6 +121,7 @@ nav:
       - 'actions/switch-sub-profile.md'
       - 'actions/update-library.md'
   - 'Misc':
+      - 'misc/analytics.md'
       - 'misc/naming.md'
       - 'misc/uninstall.md'
   - 'Troubleshooting':

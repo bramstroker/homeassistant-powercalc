@@ -17,6 +17,7 @@ from custom_components.powercalc.const import (
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
     CONF_DISCOVERY,
+    CONF_ENABLE_ANALYTICS,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
@@ -49,6 +50,7 @@ if TYPE_CHECKING:
 
 SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
     {
+        vol.Optional(CONF_ENABLE_ANALYTICS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.SelectSelector(

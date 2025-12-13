@@ -44,6 +44,7 @@ from .const import (
     CONF_DISCOVERY,
     CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
     CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
+    CONF_ENABLE_ANALYTICS,
     CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
@@ -127,6 +128,7 @@ CONFIG_SCHEMA = vol.Schema(
             cv.deprecated(CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED),
             vol.Schema(
                 {
+                    vol.Optional(CONF_ENABLE_ANALYTICS): cv.boolean,
                     vol.Optional(
                         CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED,
                     ): cv.time_period,
@@ -223,9 +225,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 async def init_analytics(hass: HomeAssistant) -> None:
     """Initialize the Analytics manager and schedule daily submission"""
     analytics = Analytics(hass)
-
-    # Load stored data
-    # await analytics.load()
+    await analytics.load()
 
     @callback
     def start_schedule(_event: Event) -> None:
@@ -240,7 +240,6 @@ async def init_analytics(hass: HomeAssistant) -> None:
             ),
         )
 
-        # Send every day
         async_track_time_interval(
             hass,
             analytics.send_analytics,
