@@ -125,7 +125,7 @@ class Analytics:
     async def send_analytics(self, _: datetime | None = None) -> None:
         """Send analytics."""
         global_config = self.hass.data.get(DOMAIN, {}).get(DOMAIN_CONFIG, {})
-        if not global_config.get(CONF_ENABLE_ANALYTICS, True):
+        if not global_config.get(CONF_ENABLE_ANALYTICS, False):
             _LOGGER.debug("Analytics is disabled in global configuration")
             return
 
@@ -137,7 +137,7 @@ class Analytics:
 
         try:
             async with timeout(30):
-                response = await self.session.post(ENDPOINT_ANALYTICS, json=payload, headers={"Authorization": "Bearer foo"})
+                response = await self.session.post(ENDPOINT_ANALYTICS, json=payload)
                 if response.status == 204:
                     _LOGGER.error(
                         ("Submitted Powercalc analytics. Information submitted includes %s"),

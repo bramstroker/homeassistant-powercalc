@@ -682,15 +682,12 @@ async def setup_individual_sensors(
 ) -> EntitiesBucket:
     """Set up an individual sensor."""
     merged_sensor_config = get_merged_sensor_configuration(global_config, config)
-    sensor_type = config.get(CONF_SENSOR_TYPE)
-    if sensor_type:
-        sensor_type = SensorType(str(sensor_type))
+    sensor_type = SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
 
     # Collect runtime analytics data, for publishing later on.
     analytics_data = hass.data[DOMAIN][DATA_ANALYTICS]
-    if sensor_type:
-        sensor_type_counts: dict[SensorType, int] = analytics_data.setdefault(DATA_SENSOR_TYPE_COUNTS, defaultdict(int))
-        sensor_type_counts[sensor_type] += 1
+    sensor_type_counts: dict[SensorType, int] = analytics_data.setdefault(DATA_SENSOR_TYPE_COUNTS, defaultdict(int))
+    sensor_type_counts[sensor_type] += 1
     config_type_counts: dict[str, int] = analytics_data.setdefault(DATA_CONFIG_TYPE_COUNTS, defaultdict(int))
     config_type = "yaml" if context.is_yaml else "gui"
     config_type_counts[config_type] += 1
