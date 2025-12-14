@@ -38,9 +38,6 @@ jobs:
           footer: ${{ steps.supporters.outputs.value }}
           config-name: release-drafter.yml
 
-          # Keep drafts separated by branch
-          #commitish: ${{ github.ref_name }}  # codespell:ignore
-
           # Mark beta as prerelease and auto-increment beta.N
           prerelease: ${{ github.ref_name == 'beta' }}
           prerelease-identifier: beta
