@@ -108,6 +108,7 @@
           "create_utility_meters": "Vytvorte merače spotreby",
           "disable_extended_attributes": "Zakázať rozšírené atribúty",
           "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
+          "enable_analytics": "Enable anonymous analytics",
           "ignore_unavailable_state": "Ignorovať nedostupný stav",
           "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
           "power_sensor_category": "Kategória snímača výkonu",
@@ -120,6 +121,7 @@
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "disable_extended_attributes": "Vypnite všetky extra atribúty, ktoré powercalc pridáva k stavu energie, energie a skupiny. To pomôže udržať veľkosť databázy malú",
           "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",
+          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
           "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
         }
@@ -571,6 +573,7 @@
           "create_utility_meters": "Vytvorte merače spotreby",
           "disable_extended_attributes": "Zakázať rozšírené atribúty",
           "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
+          "enable_analytics": "Enable anonymous analytics",
           "ignore_unavailable_state": "Ignorovať nedostupný stav",
           "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
           "power_sensor_category": "Kategória snímača výkonu",
@@ -583,6 +586,7 @@
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "disable_extended_attributes": "Zakážte všetky extra atribúty, ktoré powercalc pridáva k výkonu, energii a stavom entity skupiny. Pomôže to udržať veľkosť databázy malú",
           "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",
+          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
           "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
         }

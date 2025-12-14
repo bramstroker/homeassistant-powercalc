@@ -108,6 +108,7 @@
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar download da biblioteca remota",
+          "enable_analytics": "Enable anonymous analytics",
           "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
           "power_sensor_category": "Categoria do sensor de energia",
@@ -120,6 +121,7 @@
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados da energia, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
+          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
         }
@@ -571,6 +573,7 @@
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar o download da biblioteca remota",
+          "enable_analytics": "Enable anonymous analytics",
           "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
           "power_sensor_category": "Categoria do sensor de potência",
@@ -583,6 +586,7 @@
           "create_utility_meters": "Deixe que energia crie medidores utilitários, de ciclo diário, horário, etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados de potência, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
+          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
         }
