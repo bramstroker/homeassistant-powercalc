@@ -1,0 +1,17 @@
+{
+  "author": "Robert M. Albrecht <powercalc@romal.org>",
+  "calculation_strategy": "fixed",
+  "created_at": "2025-12-14T07:38:00",
+  "device_type": "printer",
+  "fixed_config": {
+    "states_power": {
+      "stopped": 0.54,
+      "idle": 7,
+      "printing": 13
+    }
+  },
+  "measure_description": "Printer was measured while standby, idle and printing",
+  "measure_device": "Nous A1T",
+  "measure_method": "manual",
+  "name": "EPSON ET-15000 Series"
+}
