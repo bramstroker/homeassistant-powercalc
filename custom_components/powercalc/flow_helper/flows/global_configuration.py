@@ -50,7 +50,6 @@ if TYPE_CHECKING:
 
 SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
     {
-        vol.Optional(CONF_ENABLE_ANALYTICS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.SelectSelector(
@@ -62,6 +61,7 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
             selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
         ),
+        vol.Optional(CONF_ENABLE_ANALYTICS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): selector.BooleanSelector(),
