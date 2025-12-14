@@ -20,6 +20,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     DOMAIN,
     DOMAIN_CONFIG,
+    SERVICE_RELOAD,
     CalculationStrategy,
     SensorType,
 )
@@ -190,3 +191,23 @@ async def test_no_duplicate_count_after_entry_reload(hass: HomeAssistant) -> Non
 
     assert payload["counts"]["by_config_type"] == {"gui": 1}
     assert payload["counts"]["by_manufacturer"] == {"test": 1}
+
+
+async def test_no_duplicate_count_after_config_reload(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        get_simple_fixed_config("switch.test", 50),
+        {CONF_CREATE_STANDBY_GROUP: False},
+    )
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_RELOAD,
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
+    analytics = Analytics(hass)
+    payload = await analytics._prepare_payload()  # noqa: SLF001
+
+    assert payload["counts"]["by_config_type"] == {"yaml": 1}
