@@ -28,6 +28,40 @@ The payload only contains **aggregated counts**, for example:
 
 No per-device identifiers are included.
 
+??? abstract "example JSON payload"
+
+    ```json
+    {
+      "counts": {
+        "by_model": {
+          "signify:LCT024": 2,
+          "signify:LLC020": 2,
+          "shelly:shelly plug s": 1
+        },
+        "by_config_type": {
+          "gui": 8
+        },
+        "by_sensor_type": {
+          "group": 1,
+          "real_power": 1,
+          "virtual_power": 6
+        },
+        "by_manufacturer": {
+          "shelly": 1,
+          "signify": 4
+        }
+      },
+      "ha_version": "2025.10.0.dev0",
+      "install_id": "081ac191-2667-4242-8226-ecc66b1f7e9e",
+      "group_size_max": 2,
+      "group_size_min": 2,
+      "powercalc_version": "0.1.1",
+      "config_entry_count": 8,
+      "custom_profile_count": 12,
+      "has_global_gui_config": true
+    }
+    ```
+
 ---
 
 ## What data is *not* collected
