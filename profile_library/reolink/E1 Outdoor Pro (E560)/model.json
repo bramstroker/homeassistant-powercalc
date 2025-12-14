@@ -6,7 +6,6 @@
   "fixed_config": {
     "power": 10
   },
-  "measure_description": "Manually measured",
   "measure_device": "Nous A1T",
   "measure_method": "manual",
   "measure_description": "Measured and averaged over several weeks with a Nous A1T calibrated by www.mediarath.de",
