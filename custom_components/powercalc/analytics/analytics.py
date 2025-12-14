@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 from asyncio import timeout
-from collections import Counter, defaultdict
+from collections import Counter
+from collections.abc import Hashable
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 import logging
-from typing import Any, TypedDict
+from typing import Any, Literal, TypedDict
 import uuid
 
 import aiohttp
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -40,12 +42,15 @@ STORAGE_VERSION = 1
 
 _LOGGER = logging.getLogger(__name__)
 
+_SEEN_KEY: Literal["_seen"] = "_seen"
+
 
 class RuntimeAnalyticsData(TypedDict, total=False):
     sensor_types: Counter[SensorType]
     config_types: Counter[str]
     strategies: Counter[CalculationStrategy]
     power_profiles: list[PowerProfile]
+    _seen: dict[str, set[str]]
 
 
 @dataclass
@@ -60,6 +65,54 @@ class AnalyticsData:
         return cls(
             data["install_id"],
         )
+
+
+def collect_analytics(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry | None,
+) -> AnalyticsCollector:
+    """Return analytics collector instance"""
+    analytics_data: RuntimeAnalyticsData = hass.data[DOMAIN][DATA_ANALYTICS]
+    return AnalyticsCollector(analytics_data, config_entry)
+
+
+class AnalyticsCollector:
+    def __init__(
+        self,
+        data: RuntimeAnalyticsData,
+        config_entry: ConfigEntry | None,
+    ) -> None:
+        self._data = data
+        self._entry_id = config_entry.entry_id if config_entry else None
+        self._seen: dict[str, set[str]] = data.setdefault(_SEEN_KEY, {})
+
+    def _already_seen(self, key: str) -> bool:
+        """Check whether we already collected analytics for a give config entry"""
+        if not self._entry_id:
+            return False
+
+        seen_for_key = self._seen.setdefault(key, set())
+        if self._entry_id in seen_for_key:
+            return True
+
+        seen_for_key.add(self._entry_id)
+        return False
+
+    def inc(self, key: str, value: Hashable) -> None:
+        """Increment counter"""
+        if self._already_seen(key):
+            return
+
+        counter: Counter[Hashable] = self._data.setdefault(key, Counter())  # type:ignore
+        counter[value] += 1
+
+    def add(self, key: str, value: Any) -> None:  # noqa: ANN401
+        """Add value to listing"""
+        if self._already_seen(key) or value is None:
+            return
+
+        lst: list[Any] = self._data.setdefault(key, [])  # type:ignore
+        lst.append(value)
 
 
 class Analytics:
@@ -81,6 +134,7 @@ class Analytics:
     async def _prepare_payload(self) -> dict:
         powercalc_integration = await async_get_integration(self.hass, DOMAIN)
         runtime_data: RuntimeAnalyticsData = self.hass.data[DOMAIN][DATA_ANALYTICS]
+        power_profiles: list[PowerProfile] = runtime_data.get(DATA_POWER_PROFILES, [])
         global_config_entry = self.hass.config_entries.async_entry_for_domain_unique_id(
             DOMAIN,
             ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
@@ -95,8 +149,8 @@ class Analytics:
             "counts": {
                 "by_config_type": runtime_data.setdefault(DATA_CONFIG_TYPES, Counter()),
                 "by_sensor_type": runtime_data.setdefault(DATA_SENSOR_TYPES, Counter()),
-                "by_manufacturer": self._get_manufacturer_counts(),
-                "by_model": self._get_model_counts(),
+                "by_manufacturer": Counter(profile.manufacturer for profile in power_profiles),
+                "by_model": Counter(f"{profile.manufacturer}:{profile.model}" for profile in power_profiles),
                 "by_strategy": runtime_data.setdefault(DATA_STRATEGIES, Counter()),
             },
         }
@@ -110,25 +164,6 @@ class Analytics:
         for manufacturer in await loader.get_manufacturer_listing(None):
             total += len(await loader.get_model_listing(manufacturer[0], None))
         return total
-
-    def _get_manufacturer_counts(self) -> dict[str, int]:
-        profiles: list[PowerProfile] = self.hass.data[DOMAIN][DATA_ANALYTICS].setdefault(DATA_POWER_PROFILES, [])
-        counts: dict[str, int] = defaultdict(int)
-
-        for profile in profiles:
-            counts[profile.manufacturer] += 1
-
-        return dict(counts)
-
-    def _get_model_counts(self) -> dict[str, int]:
-        profiles: list[PowerProfile] = self.hass.data[DOMAIN][DATA_ANALYTICS].setdefault(DATA_POWER_PROFILES, [])
-        counts: dict[str, int] = defaultdict(int)
-
-        for profile in profiles:
-            key = f"{profile.manufacturer}:{profile.model}"
-            counts[key] += 1
-
-        return dict(counts)
 
     async def send_analytics(self, _: datetime | None = None) -> None:
         """Send analytics."""

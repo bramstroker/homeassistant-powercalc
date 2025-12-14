@@ -12,7 +12,7 @@ import pytest
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
-from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP
+from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP, CONF_SENSOR_TYPE
 from custom_components.powercalc.analytics.analytics import ENDPOINT_ANALYTICS, Analytics
 from custom_components.powercalc.const import (
     CONF_ENABLE_ANALYTICS,
@@ -23,7 +23,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import get_simple_fixed_config, run_powercalc_setup
+from tests.common import get_simple_fixed_config, run_powercalc_setup, setup_config_entry
 
 MOCK_PAYLOAD = {
     "test": "data",
@@ -170,3 +170,23 @@ async def test_send_analytics_disabled(
     await analytics.send_analytics()
 
     assert aioclient_mock.call_count == 0
+
+
+async def test_no_duplicate_count_after_entry_reload(hass: HomeAssistant) -> None:
+    entry = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "lut_white",
+        },
+    )
+    await hass.config_entries.async_reload(entry.entry_id)
+    await hass.config_entries.async_reload(entry.entry_id)
+
+    analytics = Analytics(hass)
+    payload = await analytics._prepare_payload()  # noqa: SLF001
+
+    assert payload["counts"]["by_config_type"] == {"gui": 1}
+    assert payload["counts"]["by_manufacturer"] == {"test": 1}
