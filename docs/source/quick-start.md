@@ -27,19 +27,24 @@ Powercalc supports both GUI and YAML configuration. Depending on your preference
 
     Choose `Global Configuration` and follow the wizard to define global options.
 
+!!! tip
+
+    Enabling [analytics](misc/analytics.md) helps the development team understand how Powercalc is being used and prioritize improvements. The data collected is anonymous and includes information like the number of sensors, types of configurations, and device models. You can opt in during the Global Configuration setup.
+
 === "YAML"
 
     - Add the following entry to `configuration.yaml`:
 
        ```yaml
        powercalc:
+         enable_analytics: true # optional, remove this line when you don't want to provide analytics
        ```
 
     - Restart HA
 
 ## Set up power sensors
 
-Powercalc includes a built-in library with 500+ measured power profiles, mostly for lighting devices.
+Powercalc includes a built-in library with 600+ measured power profiles, mostly for lighting devices.
 These profiles are measured and created by Powercalc users. See the [library website](https://library.powercalc.nl) for the listing of supported devices.
 
 After installation and restart, Powercalc will automatically:

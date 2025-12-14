@@ -15,6 +15,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import STORAGE_DIR
 
+from custom_components.powercalc.const import API_URL
 from custom_components.powercalc.helpers import async_cache
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
@@ -22,9 +23,8 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 _LOGGER = logging.getLogger(__name__)
 
-DOWNLOAD_PROXY = "https://api.powercalc.nl"
-ENDPOINT_LIBRARY = f"{DOWNLOAD_PROXY}/library"
-ENDPOINT_DOWNLOAD = f"{DOWNLOAD_PROXY}/download"
+ENDPOINT_LIBRARY = f"{API_URL}/library"
+ENDPOINT_DOWNLOAD = f"{API_URL}/download"
 
 TIMEOUT_SECONDS = 30
 

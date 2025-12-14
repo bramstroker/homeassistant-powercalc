@@ -40,6 +40,7 @@ plugins:
       enable_creation_date: true
 markdown_extensions:
   - admonition
+  - pymdownx.details
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
@@ -121,6 +122,7 @@ nav:
       - 'actions/switch-sub-profile.md'
       - 'actions/update-library.md'
   - 'Misc':
+      - 'misc/analytics.md'
       - 'misc/naming.md'
       - 'misc/uninstall.md'
   - 'Troubleshooting':

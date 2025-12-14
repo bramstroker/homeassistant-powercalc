@@ -5,8 +5,17 @@ from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry, ConfigFlow
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, callback
 
-from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID, SensorType
-from custom_components.powercalc.const import CONF_GROUP, CONF_GROUP_MEMBER_SENSORS, CONF_GROUP_TYPE, CONF_SUB_GROUPS, GroupType
+from custom_components.powercalc.const import (
+    CONF_GROUP,
+    CONF_GROUP_MEMBER_SENSORS,
+    CONF_GROUP_TYPE,
+    CONF_SENSOR_TYPE,
+    CONF_SUB_GROUPS,
+    DOMAIN,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+    GroupType,
+    SensorType,
+)
 
 _LOGGER = logging.getLogger(__name__)
 

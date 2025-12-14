@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Literal
 
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 from homeassistant.const import (
@@ -27,6 +28,13 @@ DATA_ENTITIES = "entities"
 DATA_GROUP_ENTITIES = "group_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
 DATA_STANDBY_POWER_SENSORS = "standby_power_sensors"
+DATA_ANALYTICS = "analytics"
+DATA_ANALYTICS_SEEN_ENTRIES = "analytics_seen_entries"
+DATA_POWER_PROFILES: Literal["power_profiles"] = "power_profiles"
+DATA_SENSOR_TYPES: Literal["sensor_types"] = "sensor_types"
+DATA_CONFIG_TYPES: Literal["config_types"] = "config_types"
+DATA_STRATEGIES: Literal["strategies"] = "strategies"
+DATA_GROUP_SIZES: Literal["group_sizes"] = "group_sizes"
 
 ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
 ENTRY_DATA_POWER_ENTITY = "_power_entity"
@@ -36,6 +44,7 @@ DUMMY_ENTITY_ID = "sensor.dummy"
 
 CONF_ALL = "all"
 CONF_AND = "and"
+CONF_ENABLE_ANALYTICS = "enable_analytics"
 CONF_AREA = "area"
 CONF_AUTOSTART = "autostart"
 CONF_AVAILABILITY_ENTITY = "availability_entity"
@@ -197,6 +206,7 @@ DISCOVERY_POWER_PROFILES = "power_profiles"
 DISCOVERY_TYPE = "discovery_type"
 
 LIBRARY_URL = "https://library.powercalc.nl"
+API_URL = "https://api.powercalc.nl"
 
 MANUFACTURER_WLED = "WLED"
 
