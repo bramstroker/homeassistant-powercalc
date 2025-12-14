@@ -40,7 +40,6 @@ jobs:
 
           # Keep drafts separated by branch
           commitish: ${{ github.ref_name }}  # codespell:ignore
-          filter-by-commitish: true
 
           # Mark beta as prerelease and auto-increment beta.N
           prerelease: ${{ github.ref_name == 'beta' }}
