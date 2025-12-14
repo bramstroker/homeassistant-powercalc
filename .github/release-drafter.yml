@@ -2,6 +2,7 @@ name-template: 'v$RESOLVED_VERSION 🌈'
 tag-template: 'v$RESOLVED_VERSION'
 change-template: '- #$NUMBER $TITLE @$AUTHOR'
 sort-direction: ascending
+include-pre-releases: true
 exclude-contributors:
   - 'github-actions[bot]'
   - 'github-actions'
