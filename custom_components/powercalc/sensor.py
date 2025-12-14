@@ -38,6 +38,7 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 import voluptuous as vol
 
 from . import DATA_GROUP_ENTITIES
+from .analytics.analytics import collect_analytics
 from .common import (
     SourceEntity,
     create_source_entity,
@@ -105,9 +106,11 @@ from .const import (
     CONF_VALUE_TEMPLATE,
     CONF_VARIABLES,
     CONF_WLED,
+    DATA_CONFIG_TYPES,
     DATA_CONFIGURED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
     DATA_ENTITIES,
+    DATA_SENSOR_TYPES,
     DATA_USED_UNIQUE_IDS,
     DISCOVERY_TYPE,
     DOMAIN,
@@ -679,7 +682,12 @@ async def setup_individual_sensors(
 ) -> EntitiesBucket:
     """Set up an individual sensor."""
     merged_sensor_config = get_merged_sensor_configuration(global_config, config)
-    sensor_type = config.get(CONF_SENSOR_TYPE)
+    sensor_type = SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
+
+    # Collect runtime analytics data, for publishing later on.
+    a = collect_analytics(hass, config_entry)
+    a.inc(DATA_SENSOR_TYPES, sensor_type)
+    a.inc(DATA_CONFIG_TYPES, "yaml" if context.is_yaml else "gui")
 
     if sensor_type == SensorType.GROUP:
         return EntitiesBucket(new=await create_group_sensors(hass, merged_sensor_config, config_entry))

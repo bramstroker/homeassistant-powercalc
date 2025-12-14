@@ -101,6 +101,7 @@ async def test_non_existing_manufacturer_returns_empty_model_list(
         (ModelInfo("signify", "Hue go (LLC020)"), "signify", "LLC020"),
         (ModelInfo("signify", "Hue go", "LLC020"), "signify", "LLC020"),
         (ModelInfo("wiz", "SHRGB"), "wiz", "SHRGB"),
+        (ModelInfo("tuya", "TS011F"), "tuya", "TS011F"),
     ],
 )
 async def test_get_profile(

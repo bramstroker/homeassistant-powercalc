@@ -17,9 +17,11 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
     CONF_DISCOVERY,
+    DATA_DISCOVERY_MANAGER,
     DOMAIN_CONFIG,
     SERVICE_RELOAD,
     DeviceType,
+    DiscoveryManager,
     async_migrate_entry,
     repair_none_config_entries_issue,
 )
@@ -289,6 +291,20 @@ async def test_migrate_config_entry_version_5(hass: HomeAssistant) -> None:
             CONF_EXCLUDE_SELF_USAGE: True,
         },
     }
+
+
+async def test_powercalc_initialized_on_global_config_entry(hass: HomeAssistant) -> None:
+    await setup_config_entry(
+        hass,
+        {
+            CONF_UNIQUE_ID: ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+            CONF_DISCOVERY: {
+                CONF_ENABLED: True,
+            },
+        },
+    )
+
+    assert isinstance(hass.data[DOMAIN][DATA_DISCOVERY_MANAGER], DiscoveryManager)
 
 
 async def test_reload_service_yaml_sensors(hass: HomeAssistant) -> None:

@@ -43,6 +43,7 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, StateType
 
+from custom_components.powercalc.analytics.analytics import collect_analytics
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
@@ -70,7 +71,9 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
     DATA_DISCOVERY_MANAGER,
+    DATA_POWER_PROFILES,
     DATA_STANDBY_POWER_SENSORS,
+    DATA_STRATEGIES,
     DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
     DUMMY_ENTITY_ID,
@@ -171,6 +174,11 @@ async def create_virtual_power_sensor(
         calculation_strategy_factory = PowerCalculatorStrategyFactory.get_instance(hass)
 
         standby_power, standby_power_on = _get_standby_power(sensor_config, power_profile)
+
+        # Collect runtime statistics, which we can publish daily
+        a = collect_analytics(hass, config_entry)
+        a.inc(DATA_STRATEGIES, strategy)
+        a.add(DATA_POWER_PROFILES, power_profile)
 
         _LOGGER.debug(
             "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s unique_id=%s)",

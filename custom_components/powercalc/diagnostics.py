@@ -20,7 +20,7 @@ async def async_get_config_entry_diagnostics(
 
     data: dict = {
         "entry": entry.as_dict(),
-        "config_entry_count_per_type": await get_count_by_type(hass),
+        "config_entry_count_per_type": await get_count_by_sensor_type(hass),
         "yaml_config": await get_yaml_configuration(hass),
     }
 
@@ -31,17 +31,7 @@ async def async_get_config_entry_diagnostics(
     return data
 
 
-async def get_yaml_configuration(hass: HomeAssistant) -> dict:
-    """Return the YAML configuration for powercalc integration."""
-    try:
-        yaml_config = await async_integration_yaml_config(hass, DOMAIN)
-        return yaml_config.get(DOMAIN, {})  # type: ignore
-    except Exception as err:  # noqa: BLE001  # pragma: nocover
-        _LOGGER.error("Could not retrieve YAML config: %s", err)
-        return {}
-
-
-async def get_count_by_type(hass: HomeAssistant) -> dict[SensorType, int]:
+async def get_count_by_sensor_type(hass: HomeAssistant) -> dict[SensorType, int]:
     count_per_type = {}
     entries = get_entries_excluding_global_config(hass)
     for e in entries:
@@ -50,3 +40,13 @@ async def get_count_by_type(hass: HomeAssistant) -> dict[SensorType, int]:
             count_per_type[sensor_type] = 0
         count_per_type[sensor_type] += 1
     return count_per_type
+
+
+async def get_yaml_configuration(hass: HomeAssistant) -> dict:
+    """Return the YAML configuration for powercalc integration."""
+    try:
+        yaml_config = await async_integration_yaml_config(hass, DOMAIN)
+        return yaml_config.get(DOMAIN, {})  # type: ignore
+    except Exception as err:  # noqa: BLE001  # pragma: nocover
+        _LOGGER.error("Could not retrieve YAML config: %s", err)
+        return {}
