@@ -10,8 +10,4 @@
   "measure_device": "Nous A1Z",
   "measure_method": "manual",
   "name": "FRITZ!Box 5690 Pro",
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  }
 }
