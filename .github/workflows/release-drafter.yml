@@ -39,10 +39,10 @@ jobs:
           config-name: release-drafter.yml
 
           # Keep drafts separated by branch
-          commitish: ${{ github.ref_name }}  # codespell:ignore
+          #commitish: ${{ github.ref_name }}  # codespell:ignore
 
           # Mark beta as prerelease and auto-increment beta.N
           prerelease: ${{ github.ref_name == 'beta' }}
-          prerelease-identifier: ${{ github.ref_name == 'beta' && 'beta' || '' }}
+          prerelease-identifier: beta
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -3,7 +3,7 @@ tag-template: 'v$RESOLVED_VERSION'
 change-template: '- #$NUMBER $TITLE @$AUTHOR'
 sort-direction: ascending
 include-pre-releases: true
-filter-by-commitish: true
+#filter-by-commitish: true
 exclude-contributors:
   - 'github-actions[bot]'
   - 'github-actions'
