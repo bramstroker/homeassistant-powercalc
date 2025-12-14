@@ -10,6 +10,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.2:docker"
   },
-  "name": "Phillips Hue Enrave",
+  "name": "Hue Enrave",
   "standby_power": 0.07
 }
