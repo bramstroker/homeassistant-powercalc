@@ -192,7 +192,7 @@ class RemoteLoader(Loader):
 
             for model in models[phrase_lower]:
                 model_id = model["id"]
-                if model_id != phrase_lower and skip_aliases:
+                if model_id.lower() != phrase_lower and skip_aliases:
                     aliases = {a.lower() for a in model.get("aliases", [])}
                     if search_lower & aliases:
                         continue
