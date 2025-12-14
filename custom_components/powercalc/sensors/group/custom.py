@@ -55,6 +55,7 @@ from homeassistant.util.unit_conversion import (
     PowerConverter,
 )
 
+from custom_components.powercalc.analytics.analytics import collect_analytics
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -84,6 +85,7 @@ from custom_components.powercalc.const import (
     CONF_SUB_GROUPS,
     CONF_UTILITY_METER_NET_CONSUMPTION,
     DATA_DOMAIN_ENTITIES,
+    DATA_GROUP_SIZES,
     DEFAULT_ENERGY_SENSOR_PRECISION,
     DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
     DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
@@ -220,6 +222,10 @@ async def create_group_sensors_custom(
                 sensor_config,
             ),
         )
+
+    a = collect_analytics(hass, None)
+    a.add(DATA_GROUP_SIZES, len(power_sensor_ids))
+    a.add(DATA_GROUP_SIZES, len(energy_sensor_ids))
 
     return group_sensors
 

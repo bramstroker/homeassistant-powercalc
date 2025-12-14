@@ -22,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_ANALYTICS,
     DATA_ANALYTICS,
     DATA_CONFIG_TYPES,
+    DATA_GROUP_SIZES,
     DATA_POWER_PROFILES,
     DATA_SENSOR_TYPES,
     DATA_STRATEGIES,
@@ -50,6 +51,7 @@ class RuntimeAnalyticsData(TypedDict, total=False):
     config_types: Counter[str]
     strategies: Counter[CalculationStrategy]
     power_profiles: list[PowerProfile]
+    group_sizes: list[int]
     _seen: dict[str, set[str]]
 
 
@@ -135,6 +137,7 @@ class Analytics:
         powercalc_integration = await async_get_integration(self.hass, DOMAIN)
         runtime_data: RuntimeAnalyticsData = self.hass.data[DOMAIN][DATA_ANALYTICS]
         power_profiles: list[PowerProfile] = runtime_data.get(DATA_POWER_PROFILES, [])
+        group_sizes: list[int] = runtime_data.get(DATA_GROUP_SIZES, [])
         global_config_entry = self.hass.config_entries.async_entry_for_domain_unique_id(
             DOMAIN,
             ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
@@ -146,6 +149,8 @@ class Analytics:
             "config_entry_count": len(get_entries_excluding_global_config(self.hass)),
             "custom_profile_count": await self._get_custom_profile_count(),
             "has_global_gui_config": global_config_entry is not None,
+            "group_size_min": min(group_sizes, default=0),
+            "group_size_max": max(group_sizes, default=0),
             "counts": {
                 "by_config_type": runtime_data.setdefault(DATA_CONFIG_TYPES, Counter()),
                 "by_sensor_type": runtime_data.setdefault(DATA_SENSOR_TYPES, Counter()),
@@ -181,13 +186,13 @@ class Analytics:
         try:
             async with timeout(30):
                 response = await self.session.post(ENDPOINT_ANALYTICS, json=payload)
-                if response.status == 204:
-                    _LOGGER.error(
+                if 200 <= response.status < 300:
+                    _LOGGER.info(
                         ("Submitted Powercalc analytics. Information submitted includes %s"),
                         payload,
                     )
                 else:
-                    _LOGGER.error(
+                    _LOGGER.warning(
                         "Sending analytics failed with statuscode %s from %s",
                         response.status,
                         ENDPOINT_ANALYTICS,

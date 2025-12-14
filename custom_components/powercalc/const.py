@@ -34,6 +34,7 @@ DATA_POWER_PROFILES: Literal["power_profiles"] = "power_profiles"
 DATA_SENSOR_TYPES: Literal["sensor_types"] = "sensor_types"
 DATA_CONFIG_TYPES: Literal["config_types"] = "config_types"
 DATA_STRATEGIES: Literal["strategies"] = "strategies"
+DATA_GROUP_SIZES: Literal["group_sizes"] = "group_sizes"
 
 ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
 ENTRY_DATA_POWER_ENTITY = "_power_entity"
