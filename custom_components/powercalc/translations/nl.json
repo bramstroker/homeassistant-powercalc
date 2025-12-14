@@ -108,6 +108,7 @@
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
+          "enable_analytics": "Anonieme analytics inschakelen",
           "ignore_unavailable_state": "Negeer onbeschikbaar status",
           "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
           "power_sensor_category": "Vermogen sensor categorie",
@@ -120,6 +121,7 @@
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
+          "enable_analytics": "Sta Powercalc toe om anonieme en geaggregeerde gebruiksstatistieken te verzenden om de integratie te helpen verbeteren",
           "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
           "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen"
         }
@@ -571,6 +573,7 @@
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
           "disable_library_download": "Uitschakelen van externe bibliotheek download",
+          "enable_analytics": "Anonieme analytics inschakelen",
           "ignore_unavailable_state": "Negeer onbeschikbaar status",
           "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
           "power_sensor_category": "Vermogen sensor categorie",
@@ -583,6 +586,7 @@
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
+          "enable_analytics": "Sta Powercalc toe om anonieme en geaggregeerde gebruiksstatistieken te verzenden om de integratie te helpen verbeteren",
           "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
           "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen"
         }

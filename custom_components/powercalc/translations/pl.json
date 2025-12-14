@@ -108,6 +108,7 @@
           "create_utility_meters": "Utwórz liczniki mediów",
           "disable_extended_attributes": "Wyłącz atrybuty rozszerzone",
           "disable_library_download": "Wyłącz pobieranie biblioteki zdalnej",
+          "enable_analytics": "Enable anonymous analytics",
           "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "include_non_powercalc_sensors": "Dołącz sensory nie-Powercalc",
           "power_sensor_category": "Kategoria sensorów mocy",
@@ -120,6 +121,7 @@
           "create_utility_meters": "Pozwól, aby Powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
           "disable_extended_attributes": "Wyłącz wszystkie dodatkowe atrybuty, które Powercalc dodaje do stanów encji zasilania, energii i grup. To pomoże zachować mały rozmiar bazy danych",
           "disable_library_download": "Wyłącz funkcję pobierania biblioteki Powercalc",
+          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Zachowaj dostępne sensory Powercalc, nawet gdy encja źródłowa jest niedostępna",
           "include_non_powercalc_sensors": "Zdecyduj, czy chcesz włączyć sensory nie-Powercalc w grupach"
         }
@@ -571,6 +573,7 @@
           "create_utility_meters": "Utwórz liczniki mediów",
           "disable_extended_attributes": "Wyłącz atrybuty rozszerzone",
           "disable_library_download": "Wyłącz pobieranie biblioteki zdalnej",
+          "enable_analytics": "Enable anonymous analytics",
           "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "include_non_powercalc_sensors": "Dołącz sensory nie-Powercalc",
           "power_sensor_category": "Kategoria czujników mocy",
@@ -583,6 +586,7 @@
           "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
           "disable_extended_attributes": "Wyłącz wszystkie dodatkowe atrybuty, które Powercalc dodaje do stanów encji mocy, energii i grup. To pomoże zachować mały rozmiar bazy danych",
           "disable_library_download": "Wyłącz funkcję pobierania biblioteki Powercalc",
+          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Zachowaj dostępne sensory Powercalc, nawet gdy encja źródłowa jest niedostępna",
           "include_non_powercalc_sensors": "Zdecyduj, czy chcesz włączyć czujniki nieenergetyczne do grup"
         }

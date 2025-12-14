@@ -108,6 +108,7 @@
           "create_utility_meters": "Skapa bruksmätare",
           "disable_extended_attributes": "Inaktivera utökade attribut",
           "disable_library_download": "Disable remote library download",
+          "enable_analytics": "Enable anonymous analytics",
           "ignore_unavailable_state": "Ignorera ej tillgängligt tillstånd",
           "include_non_powercalc_sensors": "Inkludera icke-powercalc sensorer",
           "power_sensor_category": "Kategori för strömsensor",
@@ -120,6 +121,7 @@
           "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykler dag, timme etc.",
           "disable_extended_attributes": "Inaktivera alla extra attribut powercalc bidrar till effekt, energi och grupp enhet stater. Detta kommer att bidra till att hålla databasen storlek liten",
           "disable_library_download": "Inaktivera nedladdningsfunktionen för Powercalc-biblioteket",
+          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Håll Powercalc-sensorer tillgängliga, även när källenheten inte är tillgänglig",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
         }
@@ -571,6 +573,7 @@
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Inaktivera utökade attribut",
           "disable_library_download": "Disable remote library download",
+          "enable_analytics": "Enable anonymous analytics",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "power_sensor_category": "Power sensor category",
@@ -583,6 +586,7 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
+          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
         }
