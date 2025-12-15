@@ -98,7 +98,7 @@ docs = [
 dev = [
     "pre-commit>=4.0.0",
     "ruff>=0.13.0",
-    "mypy==1.19.0",
+    "mypy==1.19.1",
     "voluptuous-stubs>=0.1",
     "homeassistant-stubs",
     "pytest-homeassistant-custom-component==0.13.300",
