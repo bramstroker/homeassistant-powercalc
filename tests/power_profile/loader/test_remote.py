@@ -613,4 +613,4 @@ async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aiorespon
     assert len(model_listing) == 2
 
     models = await library.find_models(ModelInfo("my-alias", "model1"))
-    assert models == {ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")}
+    assert sorted(models) == [ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")]
