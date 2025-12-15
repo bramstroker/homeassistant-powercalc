@@ -215,7 +215,7 @@ class ProfileLibrary:
             if models:
                 found_models.extend(ModelInfo(manufacturer, model) for model in models)
 
-        return found_models
+        return list(dict.fromkeys(found_models))
 
     async def _load_model_data(self, manufacturer: str, model: str, custom_directory: str | None) -> tuple[dict, str]:
         """Load the model data from the appropriate directory."""
