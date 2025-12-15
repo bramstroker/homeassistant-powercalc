@@ -11,5 +11,6 @@
     "VERSION": "v1.19.2:docker"
   },
   "name": "Philips Hue Devere",
-  "standby_power": 0.09
+  "standby_power": 0.09,
+  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>"
 }
