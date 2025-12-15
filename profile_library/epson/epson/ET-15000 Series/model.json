@@ -6,7 +6,7 @@
   "fixed_config": {
     "states_power": {
       "stopped": 0.54,
-      "idle": 7,
+      "idle": 2,
       "printing": 13
     }
   },
