@@ -58,15 +58,15 @@ async def test_model_listing_sorted(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "model_info,expected_models",
     [
-        (ModelInfo("signify", "LCT010"), {"LCT010"}),
-        (ModelInfo("lidl", "HG06106A/HG06104A"), {"HG06104A", "HG06106A"}),
-        (ModelInfo("Philips", "LTA009"), {"LTA009"}),
+        (ModelInfo("signify", "LCT010"), ["LCT010"]),
+        (ModelInfo("lidl", "HG06106A/HG06104A"), ["HG06104A", "HG06106A"]),
+        (ModelInfo("Philips", "LTA009"), ["LTA009"]),
     ],
 )
 async def test_find_models(hass: HomeAssistant, model_info: ModelInfo, expected_models: set[str]) -> None:
     library = await ProfileLibrary.factory(hass)
-    models = await library.find_models(model_info)
-    assert {model.model for model in models} == expected_models
+    models = sorted(await library.find_models(model_info))
+    assert [model.model for model in models] == expected_models
 
 
 async def test_get_sub_profile_listing(hass: HomeAssistant) -> None:
