@@ -109,7 +109,7 @@ class ProfileLibrary:
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
         if not custom_directory:
-            models = await self.find_models(model_info, skip_aliases=True)
+            models = await self.find_models(model_info)
             if not models:
                 raise LibraryError(f"Model {model_info.manufacturer} {model_info.model} not found")
             model_info = next(iter(models))
@@ -189,7 +189,7 @@ class ProfileLibrary:
         """Resolve the manufacturer, either from the model info or by loading it."""
         return await self._loader.find_manufacturers(manufacturer)
 
-    async def find_models(self, model_info: ModelInfo, skip_aliases: bool = False) -> set[ModelInfo]:
+    async def find_models(self, model_info: ModelInfo) -> list[ModelInfo]:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
         search: set[str] = set()
         for model_identifier in (model_info.model_id, model_info.model):
@@ -206,14 +206,14 @@ class ProfileLibrary:
                     search.update(model_identifier.split("/"))
 
         manufacturers = await self._loader.find_manufacturers(model_info.manufacturer)
-        found_models: set[ModelInfo] = set()
         if not manufacturers:
-            return found_models
+            return []
 
+        found_models: list[ModelInfo] = []
         for manufacturer in manufacturers:
-            models = await self._loader.find_model(manufacturer, search, skip_aliases)
+            models = await self._loader.find_model(manufacturer, search)
             if models:
-                found_models.update(ModelInfo(manufacturer, model) for model in models)
+                found_models.extend(ModelInfo(manufacturer, model) for model in models)
 
         return found_models
 
