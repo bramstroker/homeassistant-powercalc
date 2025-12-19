@@ -27,7 +27,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.fixed import FixedStrategy
-from tests.common import run_powercalc_setup
+from tests.common import run_powercalc_setup, setup_config_entry
 
 
 async def test_simple_power(hass: HomeAssistant) -> None:
@@ -195,11 +195,29 @@ async def test_config_entry_with_template_rendered_correctly(
     assert state.state == "40.00"
 
 
+async def test_config_entry_with_states_power(hass: HomeAssistant) -> None:
+    await setup_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "valve.living_room_heating",
+            CONF_FIXED: {
+                CONF_STATES_POWER: {
+                    "closed": 0,
+                    "open": 0.696,
+                },
+            },
+        },
+    )
+
+    hass.states.async_set("valve.living_room_heating", "open")
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.living_room_heating_power").state == "0.70"
+
+
 async def test_config_entry_with_states_power_template(hass: HomeAssistant) -> None:
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
-            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+    await setup_config_entry(
+        hass,
+        {
             CONF_ENTITY_ID: "media_player.test",
             CONF_FIXED: {
                 CONF_STATES_POWER: {
@@ -209,9 +227,6 @@ async def test_config_entry_with_states_power_template(hass: HomeAssistant) -> N
             },
         },
     )
-    config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
 
     hass.states.async_set("media_player.test", "playing")
     hass.states.async_set("input_number.test", 40)
