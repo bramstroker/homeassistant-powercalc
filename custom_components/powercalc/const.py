@@ -5,11 +5,13 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Literal
 
+from homeassistant.components import cover, device_tracker
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 from homeassistant.const import (
     STATE_CLOSED,
     STATE_NOT_HOME,
     STATE_OFF,
+    STATE_OPEN,
     STATE_STANDBY,
     STATE_UNAVAILABLE,
     EntityCategory,
@@ -232,7 +234,11 @@ SERVICE_RELOAD = "reload"
 
 SIGNAL_POWER_SENSOR_STATE_CHANGE = "powercalc_power_sensor_state_change"
 
-OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE, STATE_CLOSED)
+OFF_STATES = {STATE_OFF, STATE_STANDBY, STATE_UNAVAILABLE}
+OFF_STATES_BY_DOMAIN: dict[str, set[str]] = {
+    cover.DOMAIN: {STATE_CLOSED, STATE_OPEN},
+    device_tracker.DOMAIN: {STATE_NOT_HOME},
+}
 
 
 class CalculationStrategy(StrEnum):

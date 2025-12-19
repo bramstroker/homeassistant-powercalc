@@ -78,6 +78,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     DUMMY_ENTITY_ID,
     OFF_STATES,
+    OFF_STATES_BY_DOMAIN,
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
     CalculationStrategy,
 )
@@ -364,6 +365,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._calculation_strategy = calculation_strategy
         self._calculation_enabled_condition: Template | None = None
         self._source_entity = source_entity
+        self._off_states: set[str] = OFF_STATES_BY_DOMAIN.get(source_entity.domain, set()) | OFF_STATES
         self._attr_name = name
         self._power: Decimal | None = None
         self._standby_power = standby_power
@@ -602,7 +604,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         # Handle standby power
         standby_power = None
-        if entity_state.state in OFF_STATES or not await self.is_calculation_enabled(entity_state):
+        if entity_state.state in self._off_states or not await self.is_calculation_enabled(entity_state):
             if isinstance(self._strategy_instance, PlaybookStrategy):
                 await self._strategy_instance.stop_playbook()
             standby_power = await self.calculate_standby_power(entity_state)

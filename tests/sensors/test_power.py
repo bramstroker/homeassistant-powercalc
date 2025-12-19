@@ -22,9 +22,12 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
+    STATE_CLOSED,
     STATE_IDLE,
     STATE_OFF,
     STATE_ON,
+    STATE_OPEN,
+    STATE_OPENING,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     EntityCategory,
@@ -827,4 +830,27 @@ async def test_availability_entity(hass: HomeAssistant) -> None:
     hass.states.async_set("sensor.availability", STATE_ON)
     await hass.async_block_till_done()
 
+    assert hass.states.get("sensor.test_power").state == "10.00"
+
+
+async def test_cover_entity_standby_power(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "cover.test",
+            CONF_STANDBY_POWER: 1.5,
+            CONF_FIXED: {CONF_POWER: 10},
+        },
+    )
+
+    hass.states.async_set("cover.test", STATE_CLOSED)
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.test_power").state == "1.50"
+
+    hass.states.async_set("cover.test", STATE_OPEN)
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.test_power").state == "1.50"
+
+    hass.states.async_set("cover.test", STATE_OPENING)
+    await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power").state == "10.00"
