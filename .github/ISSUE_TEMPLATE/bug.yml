@@ -53,4 +53,4 @@ body:
 - type: textarea
   attributes:
     label: "Diagnostics dump or YAML config"
-    description: "When you have setup sensors using the GUI please drag the diagnostics dump file here. (see https://www.home-assistant.io/integrations/diagnostics/ for info). When you have used YAML please put the related YAML configuration here"
+    description: "When you have setup sensors using the GUI please drag the diagnostics dump file here. (see https://docs.powercalc.nl/troubleshooting/download-diagnostics/ for info). When you have used YAML please put the related YAML configuration here"
