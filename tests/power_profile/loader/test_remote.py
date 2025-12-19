@@ -531,13 +531,13 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
 @pytest.mark.parametrize(
     "manufacturer,phrases,expected_models,library_dir",
     [
-        ("apple", {"HomePod (gen 2)"}, {"MQJ83"}, None),
-        ("apple", {"Non existing model"}, set(), None),
-        ("signify", {"LCA001", "LCT010"}, {"LCT010", "LCA001"}, None),
-        ("signify", {"lca001"}, {"LCA001"}, None),
-        ("test_manu", {"CCT Light"}, {"model1", "model2"}, "multi_profile"),
-        ("eq-3", {"HMIP-PSM"}, {"HmIP-PSM"}, None),
-        ("shelly", {"Shelly 1PM mini gen3"}, {"Shelly 1PM Mini Gen3"}, None),
+        ("apple", {"HomePod (gen 2)"}, ["MQJ83"], None),
+        ("apple", {"Non existing model"}, [], None),
+        ("signify", {"LCA001", "LCT010"}, ["LCA001", "LCT010"], None),
+        ("signify", {"lca001"}, ["LCA001"], None),
+        ("test_manu", {"CCT Light"}, ["model1", "model2"], "multi_profile"),
+        ("eq-3", {"HMIP-PSM"}, ["HmIP-PSM"], None),
+        ("shelly", {"Shelly 1PM mini gen3"}, ["Shelly 1PM Mini Gen3"], None),
     ],
 )
 @pytest.mark.skip_remote_loader_mocking
@@ -560,7 +560,8 @@ async def test_find_model(
         loader = RemoteLoader(hass)
         loader.retry_timeout = 0
         await loader.initialize()
-        assert await loader.find_model(manufacturer, phrases) == expected_models
+        actual_models = await loader.find_model(manufacturer, phrases)
+        assert sorted(actual_models) == expected_models
 
 
 def clear_storage_dir(storage_path: str) -> None:
@@ -612,4 +613,4 @@ async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aiorespon
     assert len(model_listing) == 2
 
     models = await library.find_models(ModelInfo("my-alias", "model1"))
-    assert models == {ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")}
+    assert sorted(models) == [ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")]
