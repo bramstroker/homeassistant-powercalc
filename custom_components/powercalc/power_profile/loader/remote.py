@@ -179,27 +179,10 @@ class RemoteLoader(Loader):
         }
 
     @async_cache
-    async def find_model(self, manufacturer: str, search: set[str], skip_aliases: bool = False) -> set[str]:
+    async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
         """Find matching model IDs in the library."""
-
         models = self.model_lookup.get(manufacturer, {})
-        search_lower = {s.lower() for s in search}
-        result = set()
-
-        for phrase_lower in search_lower:
-            if phrase_lower not in models:
-                continue
-
-            for model in models[phrase_lower]:
-                model_id = model["id"]
-                if model_id.lower() != phrase_lower and skip_aliases:
-                    aliases = {a.lower() for a in model.get("aliases", [])}
-                    if search_lower & aliases:
-                        continue
-
-                result.add(model_id)
-
-        return result
+        return [model["id"] for phrase in search if (phrase_lower := phrase.lower()) in models for model in models[phrase_lower]]
 
     @async_cache
     async def load_model(

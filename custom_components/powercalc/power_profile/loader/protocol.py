@@ -19,5 +19,5 @@ class Loader(Protocol):
     async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
         """Load and optionally download a model profile."""
 
-    async def find_model(self, manufacturer: str, search: set[str], skip_aliases: bool = False) -> set[str]:
+    async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
         """Check if a model is available. Also must check aliases."""

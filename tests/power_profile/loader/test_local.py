@@ -35,20 +35,20 @@ async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pyt
 @pytest.mark.parametrize(
     "manufacturer,search,expected",
     [
-        ["tp-link", {"HS300"}, {"HS300"}],
-        ["TP-link", {"HS300"}, {"HS300"}],
-        ["tp-link", {"hs300"}, {"HS300"}],
-        ["TP-link", {"hs300"}, {"HS300"}],
-        ["tp-link", {"HS400"}, {"HS400"}],  # alias
-        ["tp-link", {"hs400"}, {"HS400"}],  # alias
-        ["tp-link", {"Hs500"}, {"hs500"}],  # alias
-        ["tp-link", {"bla"}, set()],
-        ["foo", {"bar"}, set()],
-        ["casing", {"CaSinG- Test"}, {"CaSinG- Test"}],
-        ["casing", {"CasinG- test"}, {"CaSinG- Test"}],
-        ["casing", {"CASING- TEST"}, {"CaSinG- Test"}],
-        ["hidden-directories", {".test"}, set()],
-        ["hidden-directories", {".hidden_model"}, set()],
+        ["tp-link", {"HS300"}, ["HS300"]],
+        ["TP-link", {"HS300"}, ["HS300"]],
+        ["tp-link", {"hs300"}, ["HS300"]],
+        ["TP-link", {"hs300"}, ["HS300"]],
+        ["tp-link", {"HS400"}, ["HS400"]],  # alias
+        ["tp-link", {"hs400"}, ["HS400"]],  # alias
+        ["tp-link", {"Hs500"}, ["hs500"]],  # alias
+        ["tp-link", {"bla"}, []],
+        ["foo", {"bar"}, []],
+        ["casing", {"CaSinG- Test"}, ["CaSinG- Test"]],
+        ["casing", {"CasinG- test"}, ["CaSinG- Test"]],
+        ["casing", {"CASING- TEST"}, ["CaSinG- Test"]],
+        ["hidden-directories", {".test"}, []],
+        ["hidden-directories", {".hidden_model"}, []],
     ],
 )
 async def test_find_model(hass: HomeAssistant, manufacturer: str, search: set[str], expected: str | None) -> None:
