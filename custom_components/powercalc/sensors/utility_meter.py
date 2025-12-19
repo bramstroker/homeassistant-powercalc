@@ -128,20 +128,19 @@ async def create_meters_for_type(
 
     # Create tariff-specific utility meters
     if tariffs:
-        tariff_sensors.extend(
-            await create_tariff_meters(
-                hass,
-                energy_sensor,
-                entity_id,
-                name,
-                sensor_config,
-                config_entry,
-                meter_type,
-                unique_id,
-                tariffs,
-            ),
+        new_tariff_sensors = await create_tariff_meters(
+            hass,
+            energy_sensor,
+            entity_id,
+            name,
+            sensor_config,
+            config_entry,
+            meter_type,
+            unique_id,
+            tariffs,
         )
-        utility_meters.extend(tariff_sensors)
+        tariff_sensors.extend(new_tariff_sensors)
+        utility_meters.extend(new_tariff_sensors)
 
     hass.data[DATA_UTILITY][entity_id] = {DATA_TARIFF_SENSORS: tariff_sensors}
     return utility_meters
