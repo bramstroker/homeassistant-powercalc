@@ -4,6 +4,10 @@ Powercalc can optionally send a small amount of anonymous, aggregated usage data
 
 This feature is **opt-in**, can be disabled at any time.
 
+!!! note
+
+    This feature was introduced in v1.20.0-beta.1. Versions before this do not send analytics.
+
 ---
 
 ## Why we collect analytics
