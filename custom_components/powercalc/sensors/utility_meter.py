@@ -29,7 +29,7 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_SENSOR_PRECISION,
     DOMAIN,
 )
-from custom_components.powercalc.select import SIGNAL_CREATE_SELECT_ENTITIES
+from custom_components.powercalc.select import DATA_PENDING_SELECT_ENTITIES, SIGNAL_CREATE_SELECT_ENTITIES
 
 from .abstract import BaseEntity
 from .energy import EnergySensor, RealEnergySensor
@@ -199,10 +199,13 @@ async def create_tariff_select(
         tariffs,
         unique_id=select_unique_id,
     )
+    key = config_entry.entry_id if config_entry else ""
+    pending = hass.data[DOMAIN].setdefault(DATA_PENDING_SELECT_ENTITIES, {}).setdefault(key, [])
+    pending.append(tariff_select)
 
     async_dispatcher_send(
         hass,
-        SIGNAL_CREATE_SELECT_ENTITIES.format(config_entry.entry_id if config_entry else ""),
+        SIGNAL_CREATE_SELECT_ENTITIES.format(key),
         [tariff_select],
     )
 
