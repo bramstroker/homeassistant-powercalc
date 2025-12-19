@@ -11,5 +11,6 @@
     "VERSION": "v1.19.2:docker"
   },
   "name": "Smart LED Mood Light",
-  "standby_power": 0.05
+  "standby_power": 0.05,
+  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>"
 }
