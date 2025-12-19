@@ -195,23 +195,53 @@ async def test_config_entry_with_template_rendered_correctly(
     assert state.state == "40.00"
 
 
-async def test_config_entry_with_states_power(hass: HomeAssistant) -> None:
+@pytest.mark.parametrize(
+    "entity_id,states_power,expected_power",
+    [
+        (
+            "valve.living_room_heating",
+            {
+                "closed": 0,
+                "open": 0.696,
+            },
+            {
+                "open": "0.70",
+            },
+        ),
+        (
+            "cover.my_screen",
+            {
+                "closing": 0.4,
+                "opening": 0.8,
+            },
+            {
+                "closed": "0.00",
+                "closing": "0.40",
+                "opening": "0.80",
+            },
+        ),
+    ],
+)
+async def test_config_entry_with_states_power(
+    hass: HomeAssistant,
+    entity_id: str,
+    states_power: dict[str, float],
+    expected_power: dict[str, str],
+) -> None:
     await setup_config_entry(
         hass,
         {
-            CONF_ENTITY_ID: "valve.living_room_heating",
+            CONF_ENTITY_ID: entity_id,
             CONF_FIXED: {
-                CONF_STATES_POWER: {
-                    "closed": 0,
-                    "open": 0.696,
-                },
+                CONF_STATES_POWER: states_power,
             },
         },
     )
 
-    hass.states.async_set("valve.living_room_heating", "open")
-    await hass.async_block_till_done()
-    assert hass.states.get("sensor.living_room_heating_power").state == "0.70"
+    for state, expected in expected_power.items():
+        hass.states.async_set(entity_id, state)
+        await hass.async_block_till_done()
+        assert hass.states.get(f"sensor.{entity_id.split('.')[1]}_power").state == expected
 
 
 async def test_config_entry_with_states_power_template(hass: HomeAssistant) -> None:
