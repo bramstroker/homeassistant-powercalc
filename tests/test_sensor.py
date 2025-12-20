@@ -390,14 +390,12 @@ async def test_setup_multiple_entities_in_single_platform_config(
 ) -> None:
     await run_powercalc_setup(
         hass,
-        {
-            CONF_ENTITIES: [
-                get_simple_fixed_config("input_boolean.test1"),
-                get_simple_fixed_config("input_boolean.test2"),
-                # Omitting the entity_id should log an error, but still successfully create the other entities
-                {CONF_NAME: "test3", CONF_FIXED: {CONF_POWER: 20}},
-            ],
-        },
+        [
+            get_simple_fixed_config("input_boolean.test1"),
+            get_simple_fixed_config("input_boolean.test2"),
+            # Omitting the entity_id should log an error, but still successfully create the other entities
+            {CONF_NAME: "test3", CONF_FIXED: {CONF_POWER: 20}},
+        ],
     )
 
     await hass.async_start()
@@ -487,29 +485,27 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
 
     await run_powercalc_setup(
         hass,
-        {
-            CONF_ENTITIES: [
-                {
-                    CONF_ENTITY_ID: "input_boolean.test",
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_FIXED: {CONF_POWER: 40},
-                },
-                {
-                    CONF_ENTITY_ID: "input_boolean.test2",
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_FIXED: {},
-                },
-                {
-                    CONF_ENTITIES: [
-                        {
-                            CONF_ENTITY_ID: "input_boolean.test3",
-                            CONF_MODE: CalculationStrategy.FIXED,
-                            CONF_FIXED: {},
-                        },
-                    ],
-                },
-            ],
-        },
+        [
+            {
+                CONF_ENTITY_ID: "input_boolean.test",
+                CONF_MODE: CalculationStrategy.FIXED,
+                CONF_FIXED: {CONF_POWER: 40},
+            },
+            {
+                CONF_ENTITY_ID: "input_boolean.test2",
+                CONF_MODE: CalculationStrategy.FIXED,
+                CONF_FIXED: {},
+            },
+            {
+                CONF_ENTITIES: [
+                    {
+                        CONF_ENTITY_ID: "input_boolean.test3",
+                        CONF_MODE: CalculationStrategy.FIXED,
+                        CONF_FIXED: {},
+                    },
+                ],
+            },
+        ],
     )
     await hass.async_block_till_done()
 
