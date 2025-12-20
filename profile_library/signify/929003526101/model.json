@@ -11,5 +11,5 @@
     "VERSION": "v1.19.5:docker"
   },
   "name": "Xamento Einbauspot",
-  "standby_power": 0
+  "standby_power": 0.07
 }
