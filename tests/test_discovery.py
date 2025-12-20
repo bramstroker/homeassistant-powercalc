@@ -29,7 +29,6 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc import CONF_DISCOVERY, CONF_ENABLE_AUTODISCOVERY_DEPRECATED, SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.config_flow import PowercalcConfigFlow
 from custom_components.powercalc.const import (
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
@@ -44,14 +43,14 @@ from custom_components.powercalc.const import (
     CONF_WLED,
     DOMAIN,
     DUMMY_ENTITY_ID,
-    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SensorType,
 )
 from custom_components.powercalc.discovery import DiscoveryStatus, get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 
-from .common import create_mock_light_entity, run_powercalc_setup
+from .common import create_mock_light_entity, run_powercalc_setup, setup_config_entry
+from .config_flow.test_global_configuration import create_mock_global_config_entry
 from .conftest import MockEntityWithModel
 
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
@@ -199,21 +198,16 @@ async def test_config_entry_overrides_autodiscovered(
 
     await run_powercalc_setup(hass)
 
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_NAME: "testing",
             CONF_ENTITY_ID: "light.testing",
             CONF_MANUFACTURER: "signify",
             CONF_MODEL: "LWA017",
         },
-        unique_id="abcdef",
     )
-    entry.add_to_hass(hass)
-
-    await hass.config_entries.async_setup(entry.entry_id)
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testing_power")
     assert not caplog.records
@@ -954,18 +948,14 @@ async def test_discovery_enable_runtime(
 ) -> None:
     mock_entity_with_model_information("light.test", "signify", "LCT010")
 
-    entry = MockConfigEntry(
-        entry_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
-        unique_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
-        domain=DOMAIN,
-        data={
+    entry = create_mock_global_config_entry(
+        hass,
+        {
             CONF_DISCOVERY: {
                 CONF_ENABLED: False,
             },
         },
-        version=PowercalcConfigFlow.VERSION,
     )
-    entry.add_to_hass(hass)
 
     await run_powercalc_setup(hass)
 
@@ -985,18 +975,10 @@ async def test_discovery_disable_runtime(
 ) -> None:
     mock_entity_with_model_information("light.test", "signify", "LCT010")
 
-    entry = MockConfigEntry(
-        entry_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
-        unique_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
-        domain=DOMAIN,
-        data={
-            CONF_DISCOVERY: {
-                CONF_ENABLED: True,
-            },
-        },
-        version=PowercalcConfigFlow.VERSION,
+    entry = create_mock_global_config_entry(
+        hass,
+        {CONF_DISCOVERY: {CONF_ENABLED: True}},
     )
-    entry.add_to_hass(hass)
 
     await run_powercalc_setup(hass)
 

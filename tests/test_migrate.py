@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.issue_registry import IssueRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -9,16 +10,26 @@ from custom_components.powercalc import (
     CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED,
     CONF_GROUP_UPDATE_INTERVAL_DEPRECATED,
     DOMAIN,
+    DeviceType,
     async_migrate_entry,
 )
 from custom_components.powercalc.config_flow import PowercalcConfigFlow
 from custom_components.powercalc.const import (
+    CONF_DISCOVERY,
+    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
+    CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
     CONF_ENERGY_UPDATE_INTERVAL,
+    CONF_EXCLUDE_DEVICE_TYPES,
+    CONF_EXCLUDE_SELF_USAGE,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_MODE,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_SENSOR_TYPE,
+    CONF_STATE_TRIGGER,
+    CONF_STATES_TRIGGER,
+    DUMMY_ENTITY_ID,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     CalculationStrategy,
     SensorType,
 )
@@ -86,3 +97,66 @@ async def test_migrate_config_entry_playbooks(hass: HomeAssistant) -> None:
         {"id": "evening_playbook", "path": "evening_playbook.yaml"},
         {"id": "morning_playbook", "path": "morning_playbook.yaml"},
     ]
+
+
+async def test_migrate_config_entry_version_4(hass: HomeAssistant) -> None:
+    """
+    Test that a config entry is migrated from version 3 to version 4.
+    """
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_NAME: "testentry",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_PLAYBOOK: {
+                CONF_STATES_TRIGGER: {
+                    "foo": "bar",
+                },
+            },
+        },
+        version=3,
+    )
+    entry.add_to_hass(hass)
+
+    await async_migrate_entry(hass, entry)
+
+    assert entry.version == PowercalcConfigFlow.VERSION
+    assert entry.data == {
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_NAME: "testentry",
+        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+        CONF_PLAYBOOK: {
+            CONF_STATE_TRIGGER: {
+                "foo": "bar",
+            },
+        },
+    }
+
+
+async def test_migrate_config_entry_version_5(hass: HomeAssistant) -> None:
+    """
+    Test that a config entry is migrated from version 4 to version 5.
+    """
+    entry = MockConfigEntry(
+        entry_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        domain=DOMAIN,
+        data={
+            CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED: True,
+            CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED: [DeviceType.COVER],
+            CONF_ENABLE_AUTODISCOVERY_DEPRECATED: False,
+        },
+        version=4,
+    )
+    entry.add_to_hass(hass)
+
+    await async_migrate_entry(hass, entry)
+
+    assert entry.version == PowercalcConfigFlow.VERSION
+    assert entry.data == {
+        CONF_DISCOVERY: {
+            CONF_ENABLED: False,
+            CONF_EXCLUDE_DEVICE_TYPES: [DeviceType.COVER],
+            CONF_EXCLUDE_SELF_USAGE: True,
+        },
+    }

@@ -495,18 +495,14 @@ async def test_real_power_entry_selectable_as_group_member(
         "VirtualPower1",
         "abcdef",
     )
-    config_entry_2 = MockConfigEntry(
-        domain=DOMAIN,
-        unique_id="abcdefg",
-        data={
+    config_entry_2 = await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.REAL_POWER,
             CONF_ENTITY_ID: "sensor.real_power",
         },
         title="RealPower1",
     )
-    config_entry_2.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry_2.entry_id)
-    await hass.async_block_till_done()
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
     assert result["type"] == data_entry_flow.FlowResultType.FORM

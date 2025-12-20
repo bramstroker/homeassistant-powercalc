@@ -16,7 +16,6 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
-    DOMAIN,
     DUMMY_ENTITY_ID,
     SensorType,
 )
@@ -55,20 +54,16 @@ async def test_entities_are_bound_to_source_device(
     await hass.async_block_till_done()
 
     # Create powercalc sensors
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_ENTITY_ID: "switch.google_home",
             CONF_CREATE_ENERGY_SENSOR: True,
             CONF_CREATE_UTILITY_METERS: True,
             CONF_FIXED: {CONF_POWER: 50},
         },
-        unique_id=unique_id,
     )
-    entry.add_to_hass(hass)
-    await hass.config_entries.async_setup(entry.entry_id)
-    await hass.async_block_till_done()
 
     # Assert that all the entities are bound to correct device
     power_entity_entry = entity_registry.async_get("sensor.google_home_power")

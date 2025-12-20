@@ -9,7 +9,6 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
@@ -20,7 +19,6 @@ from custom_components.powercalc.const import (
     CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
-    DOMAIN,
     CalculationStrategy,
     SensorType,
 )
@@ -171,9 +169,10 @@ async def test_config_entry_with_template_rendered_correctly(
     hass: HomeAssistant,
 ) -> None:
     template = "{{states('input_number.test')|float}}"
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+
+    await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_ENTITY_ID: "input_boolean.test",
             CONF_FIXED: {
@@ -182,9 +181,6 @@ async def test_config_entry_with_template_rendered_correctly(
             },
         },
     )
-    config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
 
     hass.states.async_set("input_boolean.test", STATE_ON)
     hass.states.async_set("input_number.test", 40)
