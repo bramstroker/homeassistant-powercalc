@@ -19,7 +19,6 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
     async_fire_time_changed,
     mock_restore_cache,
 )
@@ -51,6 +50,7 @@ from tests.common import (
     create_input_boolean,
     create_input_number,
     run_powercalc_setup,
+    setup_config_entry,
 )
 from tests.config_flow.test_global_configuration import create_mock_global_config_entry
 
@@ -314,9 +314,9 @@ async def test_config_flow_template_value(hass: HomeAssistant) -> None:
     Test that power sensor is correctly created when a template is used as the value
     See https://github.com/bramstroker/homeassistant-powercalc/issues/980
     """
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_NAME: "My daily",
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
             CONF_DAILY_FIXED_ENERGY: {
@@ -325,9 +325,6 @@ async def test_config_flow_template_value(hass: HomeAssistant) -> None:
             },
         },
     )
-    entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(entry.entry_id)
-    await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.my_daily_power")
     assert power_state
@@ -335,9 +332,9 @@ async def test_config_flow_template_value(hass: HomeAssistant) -> None:
 
 
 async def test_config_flow_decimal_value(hass: HomeAssistant) -> None:
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_NAME: "My daily",
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
             CONF_DAILY_FIXED_ENERGY: {
@@ -346,9 +343,6 @@ async def test_config_flow_decimal_value(hass: HomeAssistant) -> None:
             },
         },
     )
-    entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(entry.entry_id)
-    await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.my_daily_power")
     assert power_state
@@ -542,9 +536,9 @@ async def test_name_and_entity_id_can_be_inherited_from_source_entity(
 async def test_create_daily_energy_sensor_using_config_entry(
     hass: HomeAssistant,
 ) -> None:
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
             CONF_NAME: "Test",
             CONF_DAILY_FIXED_ENERGY: {
@@ -555,9 +549,6 @@ async def test_create_daily_energy_sensor_using_config_entry(
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
-    config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_energy")
 
@@ -590,9 +581,9 @@ async def test_entity_category(hass: HomeAssistant) -> None:
     global_config_entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(global_config_entry.entry_id)
 
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
             CONF_NAME: "Test",
             CONF_DAILY_FIXED_ENERGY: {
@@ -601,9 +592,6 @@ async def test_entity_category(hass: HomeAssistant) -> None:
             },
         },
     )
-    config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_energy")
 

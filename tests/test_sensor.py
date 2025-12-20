@@ -32,7 +32,6 @@ from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
     RegistryEntryWithDefaults,
     mock_registry,
 )
@@ -65,6 +64,7 @@ from .common import (
     create_input_boolean,
     get_simple_fixed_config,
     run_powercalc_setup,
+    setup_config_entry,
 )
 from .config_flow.common import initialize_options_flow
 from .conftest import MockEntityWithModel
@@ -412,9 +412,9 @@ async def test_change_options_of_renamed_sensor(
     hass: HomeAssistant,
     entity_registry: er.EntityRegistry,
 ) -> None:
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    entry = await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_ENTITY_ID: "input_boolean.test",
@@ -422,11 +422,7 @@ async def test_change_options_of_renamed_sensor(
             CONF_CREATE_UTILITY_METERS: True,
             CONF_FIXED: {CONF_POWER: 50},
         },
-        unique_id="abcdef",
     )
-    entry.add_to_hass(hass)
-    await hass.config_entries.async_setup(entry.entry_id)
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_energy_daily").name == "test energy daily"
 
@@ -462,9 +458,9 @@ async def test_renaming_sensor_is_retained_after_startup(
     entity_registry.async_update_entity(entity_id="sensor.test_power", name="Renamed power")
     await hass.async_block_till_done()
 
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_ENTITY_ID: "input_boolean.test",
@@ -474,9 +470,6 @@ async def test_renaming_sensor_is_retained_after_startup(
         },
         unique_id="abcdef",
     )
-    entry.add_to_hass(hass)
-    await hass.config_entries.async_setup(entry.entry_id)
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").name == "Renamed power"
 
@@ -527,9 +520,9 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
 async def test_create_config_entry_without_energy_sensor(
     hass: HomeAssistant,
 ) -> None:
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_CREATE_ENERGY_SENSOR: False,
             CONF_NAME: "testentry",
@@ -538,10 +531,6 @@ async def test_create_config_entry_without_energy_sensor(
         },
         unique_id="abcd",
     )
-    entry.add_to_hass(hass)
-
-    await hass.config_entries.async_setup(entry.entry_id)
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testentry_power")
     assert not hass.states.get("sensor.testentry_energy")
@@ -561,9 +550,9 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
         },
     )
 
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    entry = await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_CREATE_ENERGY_SENSOR: False,
             CONF_NAME: "testentry",
@@ -572,7 +561,6 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
         },
         unique_id="abcd",
     )
-    entry.add_to_hass(hass)
 
     await run_powercalc_setup(
         hass,
@@ -618,9 +606,9 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
     )
 
     # Create an existing config entry referencing the original source entity
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    entry = await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_CREATE_ENERGY_SENSOR: True,
             CONF_CREATE_UTILITY_METERS: True,
@@ -632,7 +620,6 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
         },
         unique_id=original_unique_id,
     )
-    entry.add_to_hass(hass)
 
     await run_powercalc_setup(
         hass,
@@ -672,26 +659,9 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
 
 
 async def test_regression(hass: HomeAssistant) -> None:
-    #
-    # {
-    #     "entity_id": "light.standing_lamp",
-    #     "mode": "fixed",
-    #     "create_energy_sensor": true,
-    #     "create_utility_meters": false,
-    #     "fixed": {
-    #         "power": 11.0
-    #     },
-    #     "energy_integration_method": "left",
-    #     "unique_id": "pc_91b5b2b04e889549cb19effa3dea97e1",
-    #     "sensor_type": "virtual_power",
-    #     "name": "Standing lamp",
-    #     "_power_entity": "sensor.standing_lamp_power",
-    #     "_energy_entity": "sensor.standing_lamp_power"
-    # }
-
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_CREATE_ENERGY_SENSOR: True,
             CONF_CREATE_UTILITY_METERS: False,
@@ -704,7 +674,6 @@ async def test_regression(hass: HomeAssistant) -> None:
         },
         unique_id="pc_91b5b2b04e889549cb19effa3dea97e1",
     )
-    entry.add_to_hass(hass)
 
     await run_powercalc_setup(
         hass,

@@ -205,10 +205,7 @@ async def test_energy_and_utility_options_skipped(hass: HomeAssistant, user_inpu
 
 async def test_initialize_options_succeeds_with_yaml_sensors_in_config(hass: HomeAssistant) -> None:
     """Test options flow is initialized when sensors are defined in YAML configuration."""
-    entry = create_mock_global_config_entry(
-        hass,
-        {},
-    )
+    entry = create_mock_global_config_entry(hass, {})
 
     await run_powercalc_setup(hass, get_simple_fixed_config("input_boolean.test", 50), {})
 
@@ -218,10 +215,7 @@ async def test_initialize_options_succeeds_with_yaml_sensors_in_config(hass: Hom
 
 async def test_global_configuration_can_only_be_configured_once(hass: HomeAssistant) -> None:
     """Test global configuration can only be configured once."""
-    create_mock_global_config_entry(
-        hass,
-        {},
-    )
+    create_mock_global_config_entry(hass, {})
 
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -232,10 +226,7 @@ async def test_global_configuration_can_only_be_configured_once(hass: HomeAssist
 
 async def test_basic_options_flow(hass: HomeAssistant) -> None:
     """Test basic options flow."""
-    entry = create_mock_global_config_entry(
-        hass,
-        {},
-    )
+    entry = create_mock_global_config_entry(hass, {})
 
     result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION)
 
@@ -340,10 +331,7 @@ async def test_utility_meter_options_flow(hass: HomeAssistant) -> None:
 
 async def test_discovery_options_flow(hass: HomeAssistant) -> None:
     """Test discovery options flow."""
-    entry = create_mock_global_config_entry(
-        hass,
-        {},
-    )
+    entry = create_mock_global_config_entry(hass, {})
 
     result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION_DISCOVERY)
 
@@ -366,10 +354,7 @@ async def test_discovery_options_flow(hass: HomeAssistant) -> None:
 
 async def test_throttling_options_flow(hass: HomeAssistant) -> None:
     """Test throttling options flow."""
-    entry = create_mock_global_config_entry(
-        hass,
-        {},
-    )
+    entry = create_mock_global_config_entry(hass, {})
 
     result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION_THROTTLING)
 
@@ -438,9 +423,9 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
     assert hass.states.get("sensor.test_power").state == "50.0000"
 
 
-def create_mock_global_config_entry(hass: HomeAssistant, data: dict[str, Any]) -> MockConfigEntry:
+def create_mock_global_config_entry(hass: HomeAssistant, data: dict[str, Any], add: bool = True) -> MockConfigEntry:
     """Create a mock entry."""
-    return create_mock_entry(
+    entry = create_mock_entry(
         hass,
         {
             CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
@@ -465,3 +450,7 @@ def create_mock_global_config_entry(hass: HomeAssistant, data: dict[str, Any]) -
         },
         unique_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     )
+    if add:
+        entry.add_to_hass(hass)
+
+    return entry

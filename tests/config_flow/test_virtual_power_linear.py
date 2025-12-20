@@ -15,6 +15,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from tests.common import setup_config_entry
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
@@ -95,7 +96,7 @@ async def test_linear_options_hidden_from_menu_for_self_usage_profiles(hass: Hom
     Fixed options should be hidden from the menu for self usage profiles
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2935
     """
-    entry = create_mock_entry(
+    entry = await setup_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "sensor.dummy",
@@ -105,9 +106,6 @@ async def test_linear_options_hidden_from_menu_for_self_usage_profiles(hass: Hom
             CONF_MODEL: "smart_dimmer_with_pm",
         },
     )
-
-    await hass.config_entries.async_setup(entry.entry_id)
-    await hass.async_block_till_done()
 
     result = await hass.config_entries.options.async_init(
         entry.entry_id,

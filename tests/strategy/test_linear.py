@@ -16,7 +16,7 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.typing import ConfigType
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
@@ -25,11 +25,11 @@ from custom_components.powercalc.const import (
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_SENSOR_TYPE,
-    DOMAIN,
     SensorType,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.linear import LinearStrategy
+from tests.common import setup_config_entry
 from tests.conftest import MockEntityWithModel
 
 
@@ -295,17 +295,14 @@ async def test_config_entry_with_calibrate_list(
 ) -> None:
     mock_entity_with_model_information("light.test")
 
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_ENTITY_ID: "light.test",
             CONF_LINEAR: {CONF_CALIBRATE: {"1": 0.4, "25": 1.2, "100": 3, "255": 5.3}},
         },
     )
-    config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
 
     hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 25})
     await hass.async_block_till_done()
