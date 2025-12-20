@@ -112,6 +112,7 @@ from .const import (
     DATA_ENTITIES,
     DATA_SENSOR_TYPES,
     DATA_USED_UNIQUE_IDS,
+    DATA_USES_INCLUDE,
     DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -744,6 +745,8 @@ async def add_discovered_entities(
 ) -> None:
     """Add discovered entities based on include configuration."""
     if CONF_INCLUDE in config:
+        collect_analytics(hass).set_flag(DATA_USES_INCLUDE)
+
         include_config: dict = cast(dict, config[CONF_INCLUDE])
         include_non_powercalc: bool = include_config.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True)
         entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
