@@ -11,5 +11,6 @@
     "VERSION": "v1.19.5:docker"
   },
   "name": "Hue Xamento rececessed spotlight",
-  "standby_power": 0.07
+  "standby_power": 0.07,
+  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>"
 }
