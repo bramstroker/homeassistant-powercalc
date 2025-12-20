@@ -10,6 +10,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.4:docker"
   },
-  "name": "Govee",
+  "name": "Govee Smart Outdoor String Lights",
   "standby_power": 2.65
 }
