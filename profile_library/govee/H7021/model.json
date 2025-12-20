@@ -11,5 +11,6 @@
     "VERSION": "v1.19.4:docker"
   },
   "name": "Govee Smart Outdoor String Lights",
-  "standby_power": 2.65
+  "standby_power": 2.65,
+  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>"
 }
