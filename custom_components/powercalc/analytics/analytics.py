@@ -23,6 +23,7 @@ from custom_components.powercalc.const import (
     DATA_ANALYTICS,
     DATA_CONFIG_TYPES,
     DATA_GROUP_SIZES,
+    DATA_HAS_GROUP_INCLUDE,
     DATA_POWER_PROFILES,
     DATA_SENSOR_TYPES,
     DATA_STRATEGIES,
@@ -52,6 +53,7 @@ class RuntimeAnalyticsData(TypedDict, total=False):
     strategies: Counter[CalculationStrategy]
     power_profiles: list[PowerProfile]
     group_sizes: list[int]
+    uses_include: bool
     _seen: dict[str, set[str]]
 
 
@@ -71,7 +73,7 @@ class AnalyticsData:
 
 def collect_analytics(
     hass: HomeAssistant,
-    config_entry: ConfigEntry | None,
+    config_entry: ConfigEntry | None = None,
 ) -> AnalyticsCollector:
     """Return analytics collector instance"""
     analytics_data: RuntimeAnalyticsData = hass.data[DOMAIN][DATA_ANALYTICS]
@@ -116,6 +118,13 @@ class AnalyticsCollector:
         lst: list[Any] = self._data.setdefault(key, [])  # type:ignore
         lst.append(value)
 
+    def set_flag(self, key: str) -> None:
+        """Set a boolean flag to True"""
+        if self._already_seen(key):
+            return
+
+        self._data[key] = True  # type:ignore
+
 
 class Analytics:
     def __init__(self, hass: HomeAssistant) -> None:
@@ -149,6 +158,7 @@ class Analytics:
             "config_entry_count": len(get_entries_excluding_global_config(self.hass)),
             "custom_profile_count": await self._get_custom_profile_count(),
             "has_global_gui_config": global_config_entry is not None,
+            "has_group_include": runtime_data.get(DATA_HAS_GROUP_INCLUDE, False),
             "group_size_min": min(group_sizes, default=0),
             "group_size_max": max(group_sizes, default=0),
             "counts": {
