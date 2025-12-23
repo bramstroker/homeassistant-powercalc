@@ -15,6 +15,7 @@ from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.entity import async_generate_entity_id
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import StateType
 
@@ -198,6 +199,8 @@ async def create_tariff_select(
         tariffs,
         unique_id=select_unique_id,
     )
+    tariff_select.entity_id = async_generate_entity_id("select.{}", name, hass=hass)
+
     key = config_entry.entry_id if config_entry else ""
     pending = hass.data[DOMAIN].setdefault(DATA_PENDING_SELECT_ENTITIES, {}).setdefault(key, [])
     pending.append(tariff_select)

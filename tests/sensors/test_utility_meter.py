@@ -84,6 +84,19 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     general_sensor_hourly = hass.states.get("sensor.test_energy_hourly")
     assert general_sensor_hourly
 
+    tariff_select = hass.states.get("select.test_energy_daily")
+    assert tariff_select
+    assert tariff_select.state == "peak"
+
+    hass.states.async_set("select.test_energy_daily", "offpeak")
+    await hass.async_block_till_done()
+
+    peak_sensor = hass.states.get("sensor.test_energy_daily_peak")
+    assert peak_sensor.attributes[ATTR_STATUS] == PAUSED
+
+    offpeak_sensor = hass.states.get("sensor.test_energy_daily_offpeak")
+    assert offpeak_sensor.attributes[ATTR_STATUS] == COLLECTING
+
 
 async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     entry1 = await setup_config_entry(
