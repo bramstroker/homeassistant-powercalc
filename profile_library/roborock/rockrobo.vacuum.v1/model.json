@@ -95,6 +95,5 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.5:docker"
   },
-  "name": "Xiaomi Mi Robot Vacuum V1",
-  "standby_power": 0
+  "name": "Xiaomi Mi Robot Vacuum V1"
 }
