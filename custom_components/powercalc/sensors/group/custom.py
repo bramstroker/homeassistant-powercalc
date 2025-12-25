@@ -223,9 +223,7 @@ async def create_group_sensors_custom(
             ),
         )
 
-    a = collect_analytics(hass, None)
-    a.add(DATA_GROUP_SIZES, len(power_sensor_ids))
-    a.add(DATA_GROUP_SIZES, len(energy_sensor_ids))
+    collect_analytics(hass, None).add(DATA_GROUP_SIZES, len(power_sensor_ids) + len(energy_sensor_ids))
 
     return group_sensors
 

@@ -5,7 +5,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import aiohttp
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt
 import pytest
@@ -15,6 +15,7 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClien
 from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP, CONF_SENSOR_TYPE
 from custom_components.powercalc.analytics.analytics import ENDPOINT_ANALYTICS, Analytics
 from custom_components.powercalc.const import (
+    CONF_CREATE_GROUP,
     CONF_ENABLE_ANALYTICS,
     CONF_MANUFACTURER,
     CONF_MODEL,
@@ -211,3 +212,29 @@ async def test_no_duplicate_count_after_config_reload(hass: HomeAssistant) -> No
     payload = await analytics._prepare_payload()  # noqa: SLF001
 
     assert payload["counts"]["by_config_type"] == {"yaml": 1}
+
+
+async def test_group_sizes(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "group1",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("switch.test1", 50),
+                get_simple_fixed_config("switch.test2", 75),
+                {
+                    CONF_CREATE_GROUP: "group2",
+                    CONF_ENTITIES: [
+                        get_simple_fixed_config("switch.test3", 50),
+                        get_simple_fixed_config("switch.test4", 50),
+                        get_simple_fixed_config("switch.test5", 50),
+                    ],
+                },
+            ],
+        },
+    )
+
+    analytics = Analytics(hass)
+    payload = await analytics._prepare_payload()  # noqa: SLF001
+
+    assert payload["group_sizes"] == {6: 1, 10: 1}

@@ -159,8 +159,7 @@ class Analytics:
             "custom_profile_count": await self._get_custom_profile_count(),
             "has_global_gui_config": global_config_entry is not None,
             "has_group_include": runtime_data.get(DATA_HAS_GROUP_INCLUDE, False),
-            "group_size_min": min(group_sizes, default=0),
-            "group_size_max": max(group_sizes, default=0),
+            "group_sizes": Counter(group_sizes),
             "counts": {
                 "by_config_type": runtime_data.setdefault(DATA_CONFIG_TYPES, Counter()),
                 "by_sensor_type": runtime_data.setdefault(DATA_SENSOR_TYPES, Counter()),
