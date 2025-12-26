@@ -12,7 +12,7 @@ import pytest
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
-from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP, CONF_SENSOR_TYPE
+from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP, CONF_SENSOR_TYPE, DeviceType
 from custom_components.powercalc.analytics.analytics import ENDPOINT_ANALYTICS, Analytics
 from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
@@ -87,6 +87,8 @@ async def test_send_analytics_success(
     assert posted_json["counts"]["by_manufacturer"] == {"signify": 1}
     assert posted_json["counts"]["by_model"] == {"signify:LCT010": 1}
     assert posted_json["counts"]["by_strategy"] == {CalculationStrategy.FIXED: 1, CalculationStrategy.LUT: 1}
+    assert posted_json["counts"]["by_device_type"] == {DeviceType.LIGHT: 1}
+    assert posted_json["counts"]["by_source_domain"] == {"light": 1, "switch": 1}
 
 
 @pytest.mark.usefixtures("payload_mock")

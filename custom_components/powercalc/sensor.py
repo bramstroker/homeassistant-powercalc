@@ -112,6 +112,7 @@ from .const import (
     DATA_ENTITIES,
     DATA_HAS_GROUP_INCLUDE,
     DATA_SENSOR_TYPES,
+    DATA_SOURCE_DOMAINS,
     DATA_USED_UNIQUE_IDS,
     DISCOVERY_TYPE,
     DOMAIN,
@@ -825,6 +826,7 @@ async def create_individual_sensors(
     """Create entities (power, energy, utility meters) which track the appliance."""
 
     source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
+
     if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
         used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []  # pragma: no cover
 
@@ -865,6 +867,8 @@ async def create_individual_sensors(
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
     if unique_id:
         used_unique_ids.append(unique_id)
+
+    collect_analytics(hass, config_entry).inc(DATA_SOURCE_DOMAINS, source_entity.domain)
 
     return EntitiesBucket(new=entities_to_add, existing=[])
 
