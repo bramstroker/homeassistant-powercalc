@@ -23,6 +23,7 @@ from custom_components.powercalc.const import (
     DOMAIN_CONFIG,
     SERVICE_RELOAD,
     CalculationStrategy,
+    GroupType,
     SensorType,
 )
 from tests.common import get_simple_fixed_config, run_powercalc_setup, setup_config_entry
@@ -240,3 +241,4 @@ async def test_group_sizes(hass: HomeAssistant) -> None:
     payload = await analytics._prepare_payload()  # noqa: SLF001
 
     assert payload["group_sizes"] == {6: 1, 10: 1}
+    assert payload["counts"]["by_group_type"] == {GroupType.CUSTOM: 2, GroupType.STANDBY: 1}

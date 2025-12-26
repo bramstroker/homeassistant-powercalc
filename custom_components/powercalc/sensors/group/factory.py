@@ -3,7 +3,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.const import CONF_GROUP_TYPE, GroupType
+from custom_components.powercalc.analytics.analytics import collect_analytics
+from custom_components.powercalc.const import CONF_GROUP_TYPE, DATA_GROUP_TYPES, GroupType
 from custom_components.powercalc.errors import SensorConfigurationError
 import custom_components.powercalc.sensors.group.custom as custom_group
 import custom_components.powercalc.sensors.group.domain as domain_group
@@ -20,6 +21,8 @@ async def create_group_sensors(
 ) -> list[Entity]:
     """Create group sensors for a given sensor configuration."""
     group_type: GroupType = GroupType(sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM))
+    collect_analytics(hass, config_entry).inc(DATA_GROUP_TYPES, group_type)
+
     if group_type == GroupType.DOMAIN:
         return await domain_group.create_domain_group_sensor(
             hass,
