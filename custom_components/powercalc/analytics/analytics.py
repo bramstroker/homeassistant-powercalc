@@ -26,6 +26,7 @@ from custom_components.powercalc.const import (
     DATA_HAS_GROUP_INCLUDE,
     DATA_POWER_PROFILES,
     DATA_SENSOR_TYPES,
+    DATA_SOURCE_DOMAINS,
     DATA_STRATEGIES,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -52,6 +53,7 @@ class RuntimeAnalyticsData(TypedDict, total=False):
     config_types: Counter[str]
     strategies: Counter[CalculationStrategy]
     power_profiles: list[PowerProfile]
+    source_domains: Counter[str]
     group_sizes: list[int]
     uses_include: bool
     _seen: dict[str, set[str]]
@@ -162,10 +164,12 @@ class Analytics:
             "group_sizes": Counter(group_sizes),
             "counts": {
                 "by_config_type": runtime_data.setdefault(DATA_CONFIG_TYPES, Counter()),
+                "by_device_type": Counter(profile.device_type for profile in power_profiles),
                 "by_sensor_type": runtime_data.setdefault(DATA_SENSOR_TYPES, Counter()),
                 "by_manufacturer": Counter(profile.manufacturer for profile in power_profiles),
                 "by_model": Counter(f"{profile.manufacturer}:{profile.model}" for profile in power_profiles),
                 "by_strategy": runtime_data.setdefault(DATA_STRATEGIES, Counter()),
+                "by_source_domain": runtime_data.setdefault(DATA_SOURCE_DOMAINS, Counter()),
             },
         }
 
