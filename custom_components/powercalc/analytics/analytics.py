@@ -22,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_ANALYTICS,
     DATA_ANALYTICS,
     DATA_CONFIG_TYPES,
+    DATA_ENTITY_TYPES,
     DATA_GROUP_SIZES,
     DATA_GROUP_TYPES,
     DATA_HAS_GROUP_INCLUDE,
@@ -33,6 +34,7 @@ from custom_components.powercalc.const import (
     DOMAIN_CONFIG,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     CalculationStrategy,
+    EntityType,
     GroupType,
     SensorType,
 )
@@ -58,6 +60,7 @@ class RuntimeAnalyticsData(TypedDict, total=False):
     source_domains: Counter[str]
     group_types: Counter[GroupType]
     group_sizes: list[int]
+    entity_types: Counter[EntityType]
     uses_include: bool
     _seen: dict[str, set[str]]
 
@@ -155,6 +158,7 @@ class Analytics:
         )
         payload: dict = {
             "install_id": self.install_id,
+            "install_date": await self._get_install_date(),
             "powercalc_version": powercalc_integration.version,
             "ha_version": HA_VERSION,
             "config_entry_count": len(get_entries_excluding_global_config(self.hass)),
@@ -171,10 +175,22 @@ class Analytics:
                 "by_strategy": runtime_data.setdefault(DATA_STRATEGIES, Counter()),
                 "by_source_domain": runtime_data.setdefault(DATA_SOURCE_DOMAINS, Counter()),
                 "by_group_type": runtime_data.setdefault(DATA_GROUP_TYPES, Counter()),
+                "by_entity_type": runtime_data.setdefault(DATA_ENTITY_TYPES, Counter()),
             },
         }
 
         return payload
+
+    async def _get_install_date(self) -> str | None:
+        min_date = None
+        for entry in self.hass.config_entries.async_entries(DOMAIN):
+            if min_date is None or entry.created_at < min_date:
+                min_date = entry.created_at
+
+        if min_date:
+            return min_date.isoformat()
+
+        return None
 
     async def _get_custom_profile_count(self) -> int:
         loader = ProfileLibrary.create_loader(self.hass, True)

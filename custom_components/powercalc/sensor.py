@@ -13,6 +13,7 @@ import uuid
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
+from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ENTITIES,
@@ -110,6 +111,7 @@ from .const import (
     DATA_CONFIGURED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
     DATA_ENTITIES,
+    DATA_ENTITY_TYPES,
     DATA_HAS_GROUP_INCLUDE,
     DATA_SENSOR_TYPES,
     DATA_SOURCE_DOMAINS,
@@ -133,6 +135,7 @@ from .const import (
     SERVICE_STOP_PLAYBOOK,
     SERVICE_SWITCH_SUB_PROFILE,
     CalculationStrategy,
+    EntityType,
     GroupType,
     PowercalcDiscoveryType,
     SensorType,
@@ -188,7 +191,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MULTI_SWITCH): MULTI_SWITCH_SCHEMA,
     vol.Optional(CONF_WLED): WLED_SCHEMA,
     vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
-    vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,  # type: ignore
+    vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION): cv.boolean,
@@ -373,6 +376,7 @@ async def _async_setup_entities(
             hass.data[DOMAIN][DATA_GROUP_ENTITIES][entity.entity_id] = entity
         else:
             hass.data[DOMAIN][DATA_ENTITIES][entity.entity_id] = entity
+            collect_analytics(hass, config_entry).inc(DATA_ENTITY_TYPES, _resolve_entity_type(entity))
 
     # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
     # Remove entities which are disabled because of a disabled device from the list of entities to add
@@ -432,6 +436,16 @@ def _register_entity_id_change_listener(
         _entity_rename_listener,
         event_filter=_filter_entity_id,
     )
+
+
+def _resolve_entity_type(entity: Entity) -> EntityType:
+    if isinstance(entity, UtilityMeterSensor):
+        return EntityType.UTILITY_METER
+    if isinstance(entity, EnergySensor):
+        return EntityType.ENERGY_SENSOR
+    if isinstance(entity, PowerSensor):
+        return EntityType.POWER_SENSOR
+    return EntityType.UNKNOWN
 
 
 @callback

@@ -13,6 +13,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
 from custom_components.powercalc import DOMAIN
+from custom_components.powercalc.analytics.analytics import collect_analytics
+from custom_components.powercalc.const import DATA_ENTITY_TYPES, EntityType
 
 SIGNAL_CREATE_SELECT_ENTITIES = "powercalc_create_select_entities_{}"
 DATA_PENDING_SELECT_ENTITIES = "powercalc_pending_select_entities"
@@ -33,6 +35,7 @@ def delayed_add_entities_handler(
     @callback
     def _handle_new_entities(entities: list[SelectEntity]) -> None:
         _LOGGER.debug("Adding TariffSelect entities signal")
+        collect_analytics(hass, entry).inc(DATA_ENTITY_TYPES, EntityType.TARIFF_SELECT)
         async_add_entities(entities)
 
     return async_dispatcher_connect(
@@ -53,6 +56,7 @@ async def async_setup_platform(
     pending = hass.data[DOMAIN].setdefault(DATA_PENDING_SELECT_ENTITIES, {}).pop(key, [])
     if pending:
         _LOGGER.debug("Adding TariffSelect entities pending")  # pragma: no cover
+        collect_analytics(hass, None).inc(DATA_ENTITY_TYPES, EntityType.TARIFF_SELECT)
         async_add_entities(pending)  # pragma: no cover
 
     delayed_add_entities_handler(hass, async_add_entities)
@@ -68,6 +72,7 @@ async def async_setup_entry(
     pending = hass.data[DOMAIN].setdefault(DATA_PENDING_SELECT_ENTITIES, {}).pop(key, [])
     if pending:
         _LOGGER.debug("Adding TariffSelect entities pending")
+        collect_analytics(hass, entry).inc(DATA_ENTITY_TYPES, EntityType.TARIFF_SELECT)
         async_add_entities(pending)
 
     unsub = delayed_add_entities_handler(hass, async_add_entities, entry)
