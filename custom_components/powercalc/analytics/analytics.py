@@ -125,9 +125,6 @@ class AnalyticsCollector:
 
     def set_flag(self, key: str) -> None:
         """Set a boolean flag to True"""
-        if self._already_seen(key):
-            return
-
         self._data[key] = True  # type:ignore
 
 

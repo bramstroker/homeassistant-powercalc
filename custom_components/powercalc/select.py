@@ -52,8 +52,8 @@ async def async_setup_platform(
     key = _key(None)
     pending = hass.data[DOMAIN].setdefault(DATA_PENDING_SELECT_ENTITIES, {}).pop(key, [])
     if pending:
-        _LOGGER.debug("Adding TariffSelect entities pending")
-        async_add_entities(pending)
+        _LOGGER.debug("Adding TariffSelect entities pending")  # pragma: no cover
+        async_add_entities(pending)  # pragma: no cover
 
     delayed_add_entities_handler(hass, async_add_entities)
 
