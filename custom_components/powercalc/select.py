@@ -54,10 +54,10 @@ async def async_setup_platform(
     """Setup sensors from YAML config sensor entries."""
     key = _key(None)
     pending = hass.data[DOMAIN].setdefault(DATA_PENDING_SELECT_ENTITIES, {}).pop(key, [])
-    if pending:
-        _LOGGER.debug("Adding TariffSelect entities pending")  # pragma: no cover
+    if pending:  # pragma: no cover
+        _LOGGER.debug("Adding TariffSelect entities pending")
         collect_analytics(hass, None).inc(DATA_ENTITY_TYPES, EntityType.TARIFF_SELECT)
-        async_add_entities(pending)  # pragma: no cover
+        async_add_entities(pending)
 
     delayed_add_entities_handler(hass, async_add_entities)
 

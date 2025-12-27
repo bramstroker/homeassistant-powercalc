@@ -445,7 +445,7 @@ def _resolve_entity_type(entity: Entity) -> EntityType:
         return EntityType.ENERGY_SENSOR
     if isinstance(entity, PowerSensor):
         return EntityType.POWER_SENSOR
-    return EntityType.UNKNOWN
+    return EntityType.UNKNOWN  # pragma: no cover
 
 
 @callback

@@ -28,13 +28,15 @@ The payload only contains **aggregated counts**, for example:
 - total number of Powercalc entities
 - counts per sensor type (e.g. virtual power, group, daily energy)
 - counts per manufacturer and model (aggregated)
-- counts per device type (e.g. light, plug)
+- counts per device type (e.g. light, smart_switch)
 - counts per calculation strategy (e.g. lut, fixed)
-- counts per source domain (e.g. light, switch)
+- counts per source domain (e.g. light, switch, input_boolean)
 - counts per group type (e.g. custom, standby)
+- counts per entity type (e.g. power_sensor, energy_sensor, utility_meter)
 - group sizes (number of entities in each group)
 - whether group includes are used
 - Powercalc version and Home Assistant version
+- installation date
 
 No per-device identifiers are included.
 
@@ -75,10 +77,15 @@ No per-device identifiers are included.
         "by_group_type": {
           "custom": 1,
           "standby": 1
+        },
+        "by_entity_type": {
+          "power_sensor": 5,
+          "energy_sensor": 3
         }
       },
       "ha_version": "2025.10.0.dev0",
       "install_id": "081ac191-2667-4242-8226-ecc66b1f7e9e",
+      "install_date": "2023-01-15T12:34:56.789012",
       "group_sizes": {
         "2": 1,
         "5": 1
