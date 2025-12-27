@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "9290019532"
+  ],
   "author": "Emory Penney <treadstoneit@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-01-08T20:35:25",

@@ -1,7 +1,7 @@
 {
   "aliases": [
-    "LWA028",
-    "9290024693"
+    "9290024693",
+    "LWA028"
   ],
   "author": "Paul Nicholls <paul.n@next.gen.nz>",
   "calculation_strategy": "lut",

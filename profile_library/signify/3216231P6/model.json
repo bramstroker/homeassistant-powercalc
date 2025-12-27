@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "9150059208"
+  ],
   "author": "Jari Eskelinen <jari.eskelinen@iki.fi>",
   "calculation_strategy": "lut",
   "created_at": "2022-12-25T09:44:08",

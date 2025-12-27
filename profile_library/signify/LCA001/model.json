@@ -1,9 +1,12 @@
 {
   "aliases": [
     "9290022166",
+    "9290022266A",
+    "9290022574",
+    "9290022615",
+    "9290022699",
     "929003053401",
-    "LCA005",
-    "9290022266A"
+    "LCA005"
   ],
   "author": "CM000n <simon.hoerrle@gmail.com>",
   "calculation_strategy": "lut",

@@ -1,4 +1,8 @@
 {
+  "aliases": [
+    "9150059977"
+  ],
+  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>",
   "calculation_strategy": "lut",
   "created_at": "2025-12-10T01:04:33.504403",
   "device_type": "light",
@@ -11,6 +15,5 @@
     "VERSION": "v1.19.2:docker"
   },
   "name": "Philips Hue Devere",
-  "standby_power": 0.09,
-  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>"
+  "standby_power": 0.09
 }

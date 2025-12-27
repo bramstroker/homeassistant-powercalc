@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "9150058718"
+  ],
   "author": "pwnagepeter <hauke@pwnagepeter.net>",
   "calculation_strategy": "lut",
   "created_at": "2024-07-21T11:13:03",

@@ -1,5 +1,7 @@
 {
-  "aliases": [],
+  "aliases": [
+    "9290024692"
+  ],
   "author": "KrzysztofHajdamowicz <uosiu@uosiu.info>",
   "calculation_strategy": "lut",
   "created_at": "2022-02-15T19:56:28",

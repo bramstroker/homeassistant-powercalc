@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "9150058246"
+  ],
   "author": "Emory Penney <emory.j.penney@intel.com>",
   "calculation_strategy": "lut",
   "created_at": "2022-08-21T08:18:17",

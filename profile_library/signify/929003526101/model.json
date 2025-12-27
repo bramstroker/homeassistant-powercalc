@@ -1,4 +1,8 @@
 {
+  "aliases": [
+    "9290035261"
+  ],
+  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>",
   "calculation_strategy": "lut",
   "created_at": "2025-12-20T00:35:52.561434",
   "device_type": "light",
@@ -11,6 +15,5 @@
     "VERSION": "v1.19.5:docker"
   },
   "name": "Hue Xamento rececessed spotlight",
-  "standby_power": 0.07,
-  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>"
+  "standby_power": 0.07
 }

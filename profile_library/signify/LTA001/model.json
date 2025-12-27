@@ -1,6 +1,9 @@
 {
   "aliases": [
-    "9290022169"
+    "9290012001",
+    "9290022169",
+    "9290022575",
+    "9290022576"
   ],
   "author": "smonesi <63957397+smonesi@users.noreply.github.com>",
   "calculation_strategy": "lut",

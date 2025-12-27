@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "9150058754"
+  ],
   "author": "James Nobes <james@MacBookPro.localdomain>",
   "calculation_strategy": "lut",
   "created_at": "2025-03-12T22:12:11.404691",

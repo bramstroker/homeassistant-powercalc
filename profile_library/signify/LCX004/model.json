@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "9290029949"
+  ],
   "author": "AJ Banck <ajbanck@planet.nl>",
   "calculation_strategy": "lut",
   "created_at": "2023-02-04T15:26:14",
