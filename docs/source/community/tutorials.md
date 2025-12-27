@@ -19,6 +19,7 @@ Here we keep a listing of available resources which might help getting started.
 ### German:
 
 <div style="display: flex; gap: 10px;">
+    <iframe width="300" height="200" src="https://www.youtube.com/embed/AATiQd8Snbw?si=HtZgEMumfu1bBV5Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     <iframe width="300" height="200" src="https://www.youtube.com/embed/Anw34kwSo2s?si=NDq3d_z5TWUFSPF4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     <iframe width="300" height="200" src="https://www.youtube.com/embed/lyKJ90tDTWM?si=TYoJkRhWb2zVxbdR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </div>
