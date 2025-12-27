@@ -1,5 +1,7 @@
 {
-  "aliases": [],
+  "aliases": [
+    "9150057316"
+  ],
   "author": "Paul Bottein",
   "calculation_strategy": "lut",
   "created_at": "2024-06-13T13:09:23.423201",

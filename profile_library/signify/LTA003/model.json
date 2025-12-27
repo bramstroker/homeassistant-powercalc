@@ -1,5 +1,7 @@
 {
-  "aliases": [],
+  "aliases": [
+    "9290022267"
+  ],
   "author": "Scott Hoyt <scottrhoyt@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2022-05-11T17:43:04",
