@@ -8,6 +8,7 @@ import aiohttp
 from freezegun import freeze_time
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
@@ -27,6 +28,7 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_ANALYTICS,
     CONF_MANUFACTURER,
     CONF_MODEL,
+    CONF_SENSORS,
     DOMAIN,
     DOMAIN_CONFIG,
     SERVICE_RELOAD,
@@ -208,23 +210,33 @@ async def test_no_duplicate_count_after_entry_reload(hass: HomeAssistant) -> Non
 
 
 async def test_no_duplicate_count_after_config_reload(hass: HomeAssistant) -> None:
-    await run_powercalc_setup(
-        hass,
-        get_simple_fixed_config("switch.test", 50),
-        {CONF_CREATE_STANDBY_GROUP: False},
-    )
+    yaml_config = {
+        DOMAIN: {
+            CONF_SENSORS: [
+                get_simple_fixed_config("switch.test", 50),
+                {
+                    CONF_ENTITIES: [
+                        get_simple_fixed_config("switch.test2", 50),
+                    ],
+                },
+            ],
+            CONF_CREATE_STANDBY_GROUP: False,
+        },
+    }
+    await async_setup_component(hass, DOMAIN, yaml_config)
 
-    await hass.services.async_call(
-        DOMAIN,
-        SERVICE_RELOAD,
-        blocking=True,
-    )
-    await hass.async_block_till_done()
+    with patch("homeassistant.config.load_yaml_config_file", return_value=yaml_config):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_RELOAD,
+            blocking=True,
+        )
+        await hass.async_block_till_done()
 
     analytics = Analytics(hass)
     payload = await analytics._prepare_payload()  # noqa: SLF001
 
-    assert payload["counts"]["by_config_type"] == {"yaml": 1}
+    assert payload["counts"]["by_config_type"] == {"yaml": 2}
 
 
 async def test_group_sizes(hass: HomeAssistant) -> None:
@@ -252,6 +264,7 @@ async def test_group_sizes(hass: HomeAssistant) -> None:
 
     assert payload["group_sizes"] == {6: 1, 10: 1}
     assert payload["counts"]["by_group_type"] == {GroupType.CUSTOM: 2, GroupType.STANDBY: 1}
+    assert payload["counts"]["by_config_type"] == {"yaml": 7}
 
 
 async def test_entity_types(hass: HomeAssistant) -> None:
@@ -275,6 +288,7 @@ async def test_entity_types(hass: HomeAssistant) -> None:
         EntityType.UTILITY_METER: 4,
         EntityType.TARIFF_SELECT: 2,
     }
+    assert payload["counts"]["by_config_type"] == {"yaml": 1}
 
 
 async def test_install_date(hass: HomeAssistant) -> None:
@@ -304,3 +318,16 @@ async def test_install_date(hass: HomeAssistant) -> None:
     payload = await analytics._prepare_payload()  # noqa: SLF001
 
     assert payload["install_date"] == "2023-01-15T00:00:00+00:00"
+
+
+async def test_standby_group_sensor_is_not_marked_as_yaml(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {},
+        {CONF_CREATE_STANDBY_GROUP: True},
+    )
+
+    analytics = Analytics(hass)
+    payload = await analytics._prepare_payload()  # noqa: SLF001
+
+    assert payload["counts"]["by_config_type"] == {}
