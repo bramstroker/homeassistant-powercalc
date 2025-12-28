@@ -311,6 +311,7 @@ async def async_setup_platform(
         config,
         async_add_entities,
         is_yaml=True,
+        discovery_type=discovery_info.get(DISCOVERY_TYPE) if discovery_info else None,
     )
 
 
@@ -353,6 +354,7 @@ async def _async_setup_entities(
     async_add_entities: AddEntitiesCallback,
     config_entry: ConfigEntry | None = None,
     is_yaml: bool = False,
+    discovery_type: PowercalcDiscoveryType | None = None,
 ) -> None:
     """Main routine to setup power/energy sensors from provided configuration."""
     try:
@@ -360,6 +362,7 @@ async def _async_setup_entities(
             group=CONF_CREATE_GROUP in config,
             entity_config=config,
             is_yaml=is_yaml,
+            discovery_type=discovery_type,
         )
         entities = await create_sensors(hass, config, context, config_entry)
         if config_entry:
@@ -700,15 +703,26 @@ async def setup_individual_sensors(
     merged_sensor_config = get_merged_sensor_configuration(global_config, config)
     sensor_type = SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
 
-    # Collect runtime analytics data, for publishing later on.
-    a = collect_analytics(hass, config_entry)
-    a.inc(DATA_SENSOR_TYPES, sensor_type)
-    a.inc(DATA_CONFIG_TYPES, "yaml" if context.is_yaml else "gui")
-
     if sensor_type == SensorType.GROUP:
+        collect_sensor_analytics(hass, sensor_type, context.discovery_type, config_entry)
         return EntitiesBucket(new=await create_group_sensors(hass, merged_sensor_config, config_entry))
 
-    return await create_individual_sensors(hass, merged_sensor_config, context, config_entry)
+    return await create_individual_sensors(hass, merged_sensor_config, context, sensor_type, config_entry)
+
+
+def collect_sensor_analytics(
+    hass: HomeAssistant,
+    sensor_type: SensorType,
+    discovery_type: PowercalcDiscoveryType | None,
+    config_entry: ConfigEntry | None = None,
+) -> None:
+    """Collect sensor analytics data."""
+    a = collect_analytics(hass, config_entry)
+    a.inc(DATA_SENSOR_TYPES, sensor_type)
+    if discovery_type and discovery_type == PowercalcDiscoveryType.USER_YAML:
+        a.inc(DATA_CONFIG_TYPES, "yaml")
+    if config_entry:
+        a.inc(DATA_CONFIG_TYPES, "gui")
 
 
 async def setup_nested_or_group_sensors(
@@ -742,6 +756,7 @@ async def handle_nested_entity(
                 group=context.group,
                 entity_config=entity_config,
                 is_yaml=context.is_yaml,
+                discovery_type=context.discovery_type,
             ),
         )
         entities_to_add.extend_items(child_entities)
@@ -793,10 +808,12 @@ async def create_entities_sensors(
                     hass,
                     merged_sensor_config,
                     config_entry=config_entry,
+                    sensor_type=merged_sensor_config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER),
                     context=CreationContext(
                         group=context.group,
                         entity_config=sensor_config,
                         is_yaml=context.is_yaml,
+                        discovery_type=context.discovery_type,
                     ),
                 ),
             )
@@ -821,6 +838,9 @@ async def create_group_if_needed(
     """Create group sensors if required by the configuration."""
     if CONF_CREATE_GROUP not in config:
         return
+
+    collect_sensor_analytics(hass, SensorType.GROUP, PowercalcDiscoveryType.USER_YAML)
+
     entities_to_add.new.extend(
         await create_group_sensors(
             hass,
@@ -835,6 +855,7 @@ async def create_individual_sensors(
     hass: HomeAssistant,
     sensor_config: dict,
     context: CreationContext,
+    sensor_type: SensorType,
     config_entry: ConfigEntry | None = None,
 ) -> EntitiesBucket:
     """Create entities (power, energy, utility meters) which track the appliance."""
@@ -857,6 +878,8 @@ async def create_individual_sensors(
         if context.group and list(context.entity_config.keys()) == [CONF_ENTITY_ID]:
             return EntitiesBucket([], error.get_existing_entities())
         raise error
+
+    collect_sensor_analytics(hass, sensor_type, context.discovery_type, config_entry)
 
     entities_to_add: list[Entity] = []
     energy_sensor = await handle_energy_sensor_creation(hass, sensor_config, source_entity, entities_to_add)
@@ -991,3 +1014,4 @@ class CreationContext:
     group: bool = field(default=False)
     entity_config: ConfigType = field(default_factory=dict)
     is_yaml: bool = field(default=False)
+    discovery_type: PowercalcDiscoveryType | None = field(default=None)
