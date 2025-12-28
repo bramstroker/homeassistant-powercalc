@@ -1,5 +1,7 @@
 {
-  "aliases": [],
+  "aliases": [
+    "9290024778"
+  ],
   "author": "Roeland Lutters <Roeland.lutters@telenet.be>",
   "calculation_strategy": "lut",
   "created_at": "2022-03-20T17:09:41",

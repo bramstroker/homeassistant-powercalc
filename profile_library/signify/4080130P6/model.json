@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "9150059123"
+  ],
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2023-03-12T09:45:12",
