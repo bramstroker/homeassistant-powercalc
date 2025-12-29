@@ -14,5 +14,6 @@
     "VERSION": "v1.20.0:docker"
   },
   "name": "Signify Hue white BR30",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author": "Mayu <38099964+MayuCat@users.noreply.github.com>"
 }
