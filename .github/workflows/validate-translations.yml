@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - custom_components/powercalc/translations/*.json
+  workflow_dispatch:
 
 permissions:
   contents: read
