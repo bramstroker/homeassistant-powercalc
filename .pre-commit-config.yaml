@@ -50,6 +50,12 @@ repos:
     hooks:
       - id: codespell
 
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.36.0
+    hooks:
+      - id: check-github-workflows
+        args: [ "--verbose" ]
+
 ci:
   autofix_commit_msg: |
     chore(lint): [pre-commit.ci] auto fixes from pre-commit.com hooks
