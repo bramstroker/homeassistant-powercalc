@@ -119,7 +119,7 @@ def validate_translations(translations_dir: Path) -> list[str]:
     return errors
 
 def main():
-    repo_root = Path(__file__).parent.parent.parent.parent
+    repo_root = Path(__file__).parent.parent.parent
 
     translations_dir = repo_root / "custom_components" / "powercalc" / "translations"
 
