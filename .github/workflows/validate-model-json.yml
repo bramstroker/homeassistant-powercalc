@@ -1,4 +1,4 @@
-name: validate-model-json
+name: Validate model.json
 
 on:
   pull_request_target:
