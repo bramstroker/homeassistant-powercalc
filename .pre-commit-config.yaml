@@ -49,6 +49,8 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
+        args:
+          - --skip=model.json
 
 ci:
   autofix_commit_msg: |
