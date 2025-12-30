@@ -455,7 +455,7 @@
     },
     "legacy_config": {
       "title": "Konfigurácia YAML objavovania sa zmenila",
-      "description": "Vaša konfigurácia YAML musí byť aktualizovaná na novú štruktúru."
+      "description": "Vaša konfigurácia YAML pre {type} musí byť aktualizovaná na novú štruktúru."
     },
     "sub_profile": {
       "fix_flow": {
