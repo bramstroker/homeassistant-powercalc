@@ -124,4 +124,4 @@ docs = [
 [tool.codespell]
 ignore-words-list = 'hass'
 check-filenames = true
-skip = '*/translations/*.json,*/package-lock.json'
+skip = '*/translations/*.json,*/package-lock.json,*/model.json,*/library.json'
