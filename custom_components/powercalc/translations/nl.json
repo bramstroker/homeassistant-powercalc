@@ -455,7 +455,7 @@
     },
     "legacy_config": {
       "title": "Discovery YAML configuratie gewijzigd",
-      "description": "Je YAML configuratie voor {type} moet worden bijgewerkt naar de nieuwe structuur. Klik op 'Meer informatie' voor verder uitleg."
+      "description": "Je YAML configuratie voor moet worden bijgewerkt naar de nieuwe structuur. Klik op 'Meer informatie' voor verder uitleg."
     },
     "sub_profile": {
       "fix_flow": {
