@@ -455,7 +455,7 @@
     },
     "legacy_config": {
       "title": "Discovery YAML-konfiguration har ändrats",
-      "description": "Din YAML-konfiguration behöver uppdateras till den nya strukturen."
+      "description": "Din YAML-konfiguration för {type} behöver uppdateras till den nya strukturen."
     },
     "sub_profile": {
       "fix_flow": {
