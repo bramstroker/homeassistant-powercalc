@@ -4,7 +4,8 @@ from asyncio import timeout
 from collections import Counter
 from collections.abc import Hashable
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
+from itertools import chain
 import logging
 from typing import Any, Literal, TypedDict
 import uuid
@@ -13,6 +14,7 @@ import aiohttp
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.loader import async_get_integration
@@ -156,7 +158,7 @@ class Analytics:
             DOMAIN,
             ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
         )
-        payload: dict = {
+        return {
             "install_id": self.install_id,
             "install_date": await self._get_install_date(),
             "powercalc_version": powercalc_integration.version,
@@ -179,18 +181,21 @@ class Analytics:
             },
         }
 
-        return payload
-
     async def _get_install_date(self) -> str | None:
-        min_date = None
-        for entry in self.hass.config_entries.async_entries(DOMAIN):
-            if min_date is None or entry.created_at < min_date:
-                min_date = entry.created_at
+        """
+        Get the install date based on the earliest created_at date of config entries and entities.
+        """
+        cutoff = datetime(2000, 1, 1, tzinfo=UTC)
+        dates = chain(
+            (e.created_at for e in self.hass.config_entries.async_entries(DOMAIN) if e.created_at > cutoff),
+            (e.created_at for e in entity_registry.async_get(self.hass).entities.values() if e.domain != DOMAIN and e.created_at > cutoff),
+        )
 
-        if min_date:
-            return min_date.isoformat()
-
-        return None
+        try:
+            install_date = min(dates)
+            return install_date.isoformat(timespec="seconds").replace("+00:00", "Z")
+        except ValueError:
+            return None
 
     async def _get_custom_profile_count(self) -> int:
         loader = ProfileLibrary.create_loader(self.hass, True)
