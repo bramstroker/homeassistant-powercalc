@@ -9,7 +9,7 @@
 To start measuring you'll need the following:
 
 - A computer (running Windows, Linux, MacOSX).
-- Supported smartplug which can accurately measure small currents (Shelly PM mini Gen3 recommended)
+- Supported smartplug which can accurately measure small currents (Shelly PM Mini Gen3 recommended)
 - A fixture in which you can fit your light and a power plug on the other end which you can connect to your smartplug.
 - Install the measure script as described here: <https://github.com/bramstroker/homeassistant-powercalc/blob/master/utils/measure/README.md>
 
