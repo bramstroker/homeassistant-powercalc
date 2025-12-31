@@ -37,6 +37,7 @@ The payload only contains **aggregated counts**, for example:
 - whether group includes are used
 - Powercalc version and Home Assistant version
 - installation date
+- your country-code (derived server-side from your IP-address), example: "NL" for Netherlands.
 
 No per-device identifiers are included.
 
