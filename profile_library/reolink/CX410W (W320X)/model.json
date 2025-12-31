@@ -1,0 +1,13 @@
+{
+  "author": "Robert M. Albrecht <powercalc@romal.org>",
+  "calculation_strategy": "fixed",
+  "created_at": "2025-12-14T13:00:00",
+  "device_type": "camera",
+  "fixed_config": {
+    "power": 8.5
+  },
+  "measure_description": "Measured and averaged over several weeks with a Nous A1T calibrated by www.mediarath.de",
+  "measure_device": "Nous A1T",
+  "measure_method": "manual",
+  "name": "ColorX Smart 2K Wi-Fi Security Camera with True Full-Color Night Vision"
+}
