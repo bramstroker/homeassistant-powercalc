@@ -104,11 +104,11 @@
         "description": "Globale Konfiguration für Powercalc einrichten. Weitere Informationen hierzu finden Sie in der [Dokumentation](https://docs.powercalc.nl/configuration/global-configuration/). In den nächsten Schritten können weitere Optionen für Energiesensoren und Stromzähler angegeben werden.",
         "data": {
           "create_energy_sensors": "Energiesensor erstellen",
-          "create_standby_group": "Create standby group",
+          "create_standby_group": "Standby-Gruppe erstellen",
           "create_utility_meters": "Verbrauchszähler erstellen",
           "disable_extended_attributes": "Erweiterte Attribute deaktivieren",
           "disable_library_download": "Download der Internet-Bibliothek deaktivieren",
-          "enable_analytics": "Enable anonymous analytics",
+          "enable_analytics": "Erlauben Sie anonyme Analysen",
           "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
           "include_non_powercalc_sensors": "Nicht-Powercalc Sensoren einschließen",
           "power_sensor_category": "Leistungssensor-Kategorie",
@@ -117,11 +117,11 @@
         },
         "data_description": {
           "create_energy_sensors": "Ob Powercalc kWh Sensoren erstellen soll",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+          "create_standby_group": "Erstellen Sie eine Gruppe, die den gesamten Standby-Stromverbrauch und die Selbstnutzung von IoT-Geräten zusammenfasst",
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten.",
           "disable_extended_attributes": "Deaktivieren Sie alle zusätzlichen Attribute, die Powercalc zu den Status der Leistungs-, Energie- und Gruppeneinheiten hinzufügt. Dies wird helfen, die Größe der Datenbank gering zu halten",
           "disable_library_download": "Deaktiviere die Powercalc Bibliothek Downloadfunktion",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+          "enable_analytics": "Powercalc ermöglicht es, anonyme, aggregierte Nutzungsstatistiken zu senden, um die Integration zu verbessern",
           "ignore_unavailable_state": "Powercalc-Sensoren verfügbar halten, auch wenn die Quell-Entität nicht verfügbar ist",
           "include_non_powercalc_sensors": "Legen Sie fest, ob Sie Nicht-Powercalc Sensoren in Gruppen einschließen möchten"
         }
@@ -228,19 +228,19 @@
           "create_utility_meters": "Verbrauchszähler erstellen"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
+          "main_power_sensor": "Wählen Sie den Stromsensor aus, der Ihren gesamten Stromverbrauch erfasst. Wenn das Feld leer bleibt, wird nur ein verfolgter Leistungssensor erzeugt",
+          "group_tracked_auto": "Powercalc fügt der verfolgten Gruppe automatisch alle Leistungssensoren hinzu und überspringt Powercalc-Gruppen. Deaktivieren Sie dies, wenn Sie die verfolgten Entitäten manuell definieren möchten",
           "create_energy_sensor": "Ob Powercalc einen kWh Sensor erstellen soll",
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten."
         },
-        "description": "Create a group sensor for all tracked and untracked power",
+        "description": "Erstellen Sie einen Gruppensensor für alle verfolgten und nicht verfolgten Leistungen",
         "title": "Create a tracked power sensor"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Geräte überwachen"
         },
-        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
+        "description": "Wählen Sie alle Leistungssensoren aus, die Teil des verfolgten Verbrauchs sind. Es ist bereits automatisch ausgefüllt, aber Sie können es manuell anpassen",
         "title": "Wähle Leistungs-Entitäten"
       },
       "group_tracked_untracked_auto": {
@@ -307,7 +307,7 @@
       },
       "multi_switch": {
         "data": {
-          "entities": "Switch entities",
+          "entities": "Wechsle die Entitäten",
           "power": "Einschalten",
           "power_off": "Ausschalten"
         },
@@ -573,7 +573,7 @@
           "create_utility_meters": "Verbrauchszähler erstellen",
           "disable_extended_attributes": "Erweiterte Attribute deaktivieren",
           "disable_library_download": "Download der Internet-Bibliothek deaktivieren",
-          "enable_analytics": "Enable anonymous analytics",
+          "enable_analytics": "Ermöglichen Sie anonyme Analysen",
           "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
           "include_non_powercalc_sensors": "Schließe Nicht-Powercalc Sensoren ein",
           "power_sensor_category": "Leistungssensor-Kategorie",
@@ -692,20 +692,20 @@
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten."
         },
         "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "title": "Erstellen Sie einen verfolgten Leistungssensor"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Überwachte Geräte"
         },
-        "title": "Select power entities"
+        "title": "Wählen Sie den Verbraucher"
       },
       "init": {
         "menu_options": {
           "advanced_options": "Erweiterte Optionen",
           "basic_options": "Grundeinstellungen",
           "daily_energy": "Tagesenergie-Einstellungen",
-          "energy_options": "Energy options",
+          "energy_options": "Energieoptionen",
           "fixed": "Fixed options",
           "group_custom": "Gruppeneinstellungen",
           "group_subtract": "Gruppeneinstellungen",
@@ -716,8 +716,8 @@
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
-          "utility_meter_options": "Utility meter options",
-          "wled": "WLED options"
+          "utility_meter_options": "Utility meter Einstellung",
+          "wled": "WLED Einstellung"
         }
       },
       "library_options": {
@@ -741,9 +741,9 @@
       "multi_switch": {
         "title": "Multi switch options",
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Schalter Geräte",
+          "power": "Einschalten",
+          "power_off": "Ausschalten"
         },
         "data_description": {
           "entities": "Select all the individual switches that are part of the multi switch",
@@ -754,7 +754,7 @@
       "playbook": {
         "title": "Playbook options",
         "data": {
-          "autostart": "Autostart",
+          "autostart": "Automatisch starten",
           "playbooks": "Playbook",
           "repeat": "Wiederholen",
           "states_trigger": "Status Auslöser"
