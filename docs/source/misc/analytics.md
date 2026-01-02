@@ -155,3 +155,8 @@ Access to the data is restricted to the Powercalc maintainer(s).
 ## Questions or concerns?
 
 If you have questions about what is collected or why, please open a discussion or issue on the Powercalc GitHub repository.
+
+## Insights
+
+There are some nice dashboards available that use the collected analytics data to provide insights into Powercalc usage.
+They can be found on the Powercalc website: https://library.powercalc.nl/analytics/
