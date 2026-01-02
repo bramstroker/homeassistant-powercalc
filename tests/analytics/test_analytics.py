@@ -93,6 +93,7 @@ async def test_send_analytics_success(
     assert len(aioclient_mock.mock_calls) == 1
     mock_call = aioclient_mock.mock_calls[0]
     posted_json = mock_call[2]
+    assert posted_json["language"] == "en"
     assert posted_json["custom_profile_count"] > 50
     assert posted_json["counts"]["by_config_type"] == {"yaml": 2}
     assert posted_json["counts"]["by_sensor_type"] == {SensorType.VIRTUAL_POWER: 2}

@@ -163,6 +163,7 @@ class Analytics:
             "install_date": await self._get_install_date(),
             "powercalc_version": powercalc_integration.version,
             "ha_version": HA_VERSION,
+            "language": self.hass.config.language,
             "config_entry_count": len(get_entries_excluding_global_config(self.hass)),
             "custom_profile_count": await self._get_custom_profile_count(),
             "has_global_gui_config": global_config_entry is not None,

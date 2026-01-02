@@ -87,6 +87,7 @@ No per-device identifiers are included.
       "ha_version": "2025.10.0.dev0",
       "install_id": "081ac191-2667-4242-8226-ecc66b1f7e9e",
       "install_date": "2023-01-15T12:34:56.789012",
+      "language": "en",
       "group_sizes": {
         "2": 1,
         "5": 1
