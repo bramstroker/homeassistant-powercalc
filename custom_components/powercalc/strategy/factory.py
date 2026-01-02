@@ -194,7 +194,7 @@ class PowerCalculatorStrategyFactory:
                 power_profile,
                 source_entity,
             )
-            return SubStrategy(condition_config, condition_instance, strategy_instance)
+            return SubStrategy(condition_config, condition_instance, strategy_instance)  # type: ignore
 
         strategies = [await _create_sub_strategy(config) for config in sub_strategies]
         return CompositeStrategy(self._hass, strategies, mode)
