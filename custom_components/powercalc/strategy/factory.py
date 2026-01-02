@@ -149,7 +149,7 @@ class PowerCalculatorStrategyFactory:
         playbook_config = self._get_strategy_config(CalculationStrategy.PLAYBOOK, config, power_profile)
 
         directory = None
-        if power_profile and power_profile.calculation_strategy == CalculationStrategy.PLAYBOOK:
+        if power_profile:
             directory = power_profile.get_model_directory()
 
         return PlaybookStrategy(self._hass, playbook_config, directory)
