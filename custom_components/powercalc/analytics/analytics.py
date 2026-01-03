@@ -4,7 +4,8 @@ from asyncio import timeout
 from collections import Counter
 from collections.abc import Hashable
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
+from itertools import chain
 import logging
 from typing import Any, Literal, TypedDict
 import uuid
@@ -13,6 +14,7 @@ import aiohttp
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.loader import async_get_integration
@@ -22,15 +24,20 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_ANALYTICS,
     DATA_ANALYTICS,
     DATA_CONFIG_TYPES,
+    DATA_ENTITY_TYPES,
     DATA_GROUP_SIZES,
+    DATA_GROUP_TYPES,
     DATA_HAS_GROUP_INCLUDE,
     DATA_POWER_PROFILES,
     DATA_SENSOR_TYPES,
+    DATA_SOURCE_DOMAINS,
     DATA_STRATEGIES,
     DOMAIN,
     DOMAIN_CONFIG,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     CalculationStrategy,
+    EntityType,
+    GroupType,
     SensorType,
 )
 from custom_components.powercalc.power_profile.library import ProfileLibrary
@@ -52,7 +59,10 @@ class RuntimeAnalyticsData(TypedDict, total=False):
     config_types: Counter[str]
     strategies: Counter[CalculationStrategy]
     power_profiles: list[PowerProfile]
+    source_domains: Counter[str]
+    group_types: Counter[GroupType]
     group_sizes: list[int]
+    entity_types: Counter[EntityType]
     uses_include: bool
     _seen: dict[str, set[str]]
 
@@ -120,9 +130,6 @@ class AnalyticsCollector:
 
     def set_flag(self, key: str) -> None:
         """Set a boolean flag to True"""
-        if self._already_seen(key):
-            return
-
         self._data[key] = True  # type:ignore
 
 
@@ -151,26 +158,45 @@ class Analytics:
             DOMAIN,
             ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
         )
-        payload: dict = {
+        return {
             "install_id": self.install_id,
+            "install_date": await self._get_install_date(),
             "powercalc_version": powercalc_integration.version,
             "ha_version": HA_VERSION,
+            "language": self.hass.config.language,
             "config_entry_count": len(get_entries_excluding_global_config(self.hass)),
             "custom_profile_count": await self._get_custom_profile_count(),
             "has_global_gui_config": global_config_entry is not None,
             "has_group_include": runtime_data.get(DATA_HAS_GROUP_INCLUDE, False),
-            "group_size_min": min(group_sizes, default=0),
-            "group_size_max": max(group_sizes, default=0),
+            "group_sizes": Counter(group_sizes),
             "counts": {
                 "by_config_type": runtime_data.setdefault(DATA_CONFIG_TYPES, Counter()),
+                "by_device_type": Counter(profile.device_type for profile in power_profiles),
                 "by_sensor_type": runtime_data.setdefault(DATA_SENSOR_TYPES, Counter()),
                 "by_manufacturer": Counter(profile.manufacturer for profile in power_profiles),
                 "by_model": Counter(f"{profile.manufacturer}:{profile.model}" for profile in power_profiles),
                 "by_strategy": runtime_data.setdefault(DATA_STRATEGIES, Counter()),
+                "by_source_domain": runtime_data.setdefault(DATA_SOURCE_DOMAINS, Counter()),
+                "by_group_type": runtime_data.setdefault(DATA_GROUP_TYPES, Counter()),
+                "by_entity_type": runtime_data.setdefault(DATA_ENTITY_TYPES, Counter()),
             },
         }
 
-        return payload
+    async def _get_install_date(self) -> str | None:
+        """
+        Get the install date based on the earliest created_at date of config entries and entities.
+        """
+        cutoff = datetime(2000, 1, 1, tzinfo=UTC)
+        dates = chain(
+            (e.created_at for e in self.hass.config_entries.async_entries(DOMAIN) if e.created_at > cutoff),
+            (e.created_at for e in entity_registry.async_get(self.hass).entities.values() if e.domain != DOMAIN and e.created_at > cutoff),
+        )
+
+        try:
+            install_date = min(dates)
+            return install_date.isoformat(timespec="seconds").replace("+00:00", "Z")
+        except ValueError:
+            return None
 
     async def _get_custom_profile_count(self) -> int:
         loader = ProfileLibrary.create_loader(self.hass, True)

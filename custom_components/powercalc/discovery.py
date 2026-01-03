@@ -133,7 +133,7 @@ class DiscoveryManager:
         """Build a list of config entries which are already setup, to prevent duplicate discovery flows"""
         for entry in self.hass.config_entries.async_entries(DOMAIN):
             if not entry.unique_id:
-                continue
+                continue  # pragma: no cover
 
             self.initialized_flows.add(entry.unique_id)
             entity_id = entry.data.get(CONF_ENTITY_ID)

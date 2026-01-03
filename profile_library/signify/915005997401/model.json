@@ -1,4 +1,8 @@
 {
+  "aliases": [
+    "9150059974"
+  ],
+  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>",
   "calculation_strategy": "lut",
   "created_at": "2025-12-10T15:59:58.034640",
   "device_type": "light",
@@ -11,6 +15,5 @@
     "VERSION": "v1.19.2:docker"
   },
   "name": "Phillips Hue Infuse",
-  "standby_power": 0.06,
-  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>"
+  "standby_power": 0.06
 }

@@ -1,6 +1,6 @@
 from datetime import timedelta
 import logging
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from homeassistant.components import light, sensor
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
@@ -59,6 +59,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.errors import SensorConfigurationError
 
 from .common import (
     create_input_boolean,
@@ -193,6 +194,46 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
 
     group2 = hass.states.get("sensor.testgroup2_power")
     assert group2.state == "0.00"
+
+
+async def test_create_nested_without_group(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITIES: [
+                get_simple_fixed_config("switch.test1", 50),
+                {
+                    CONF_ENTITIES: [
+                        get_simple_fixed_config("switch.test2", 50),
+                    ],
+                },
+            ],
+        },
+    )
+    assert hass.states.get("sensor.test1_power")
+    assert hass.states.get("sensor.test2_power")
+
+
+async def test_create_nested_handles_exception(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.ERROR)
+
+    with patch(
+        "custom_components.powercalc.sensor.attach_entities_to_source_device",
+        new=AsyncMock(side_effect=SensorConfigurationError("My custom error message")),
+    ):
+        await run_powercalc_setup(
+            hass,
+            {
+                CONF_ENTITIES: [
+                    get_simple_fixed_config("switch.test1", 50),
+                    get_simple_fixed_config("switch.test2", 50),
+                ],
+            },
+        )
+    assert not hass.states.get("sensor.test1_power")
+    assert not hass.states.get("sensor.test2_power")
+
+    assert "My custom error message" in caplog.text
 
 
 async def test_light_lut_strategy(

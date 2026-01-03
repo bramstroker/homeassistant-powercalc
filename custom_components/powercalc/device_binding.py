@@ -12,8 +12,8 @@ from homeassistant.helpers.device_registry import DeviceEntry, DeviceInfo
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc import CONF_SENSOR_TYPE, SensorType
 from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import CONF_SENSOR_TYPE, SensorType
 from custom_components.powercalc.sensors.abstract import BaseEntity
 
 _LOGGER = logging.getLogger(__name__)

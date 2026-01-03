@@ -28,7 +28,16 @@ The payload only contains **aggregated counts**, for example:
 - total number of Powercalc entities
 - counts per sensor type (e.g. virtual power, group, daily energy)
 - counts per manufacturer and model (aggregated)
+- counts per device type (e.g. light, smart_switch)
+- counts per calculation strategy (e.g. lut, fixed)
+- counts per source domain (e.g. light, switch, input_boolean)
+- counts per group type (e.g. custom, standby)
+- counts per entity type (e.g. power_sensor, energy_sensor, utility_meter)
+- group sizes (number of entities in each group)
+- whether group includes are used
 - Powercalc version and Home Assistant version
+- installation date
+- your country-code (derived server-side from your IP-address), example: "NL" for Netherlands.
 
 No per-device identifiers are included.
 
@@ -53,16 +62,41 @@ No per-device identifiers are included.
         "by_manufacturer": {
           "shelly": 1,
           "signify": 4
+        },
+        "by_device_type": {
+          "light": 4,
+          "plug": 1
+        },
+        "by_strategy": {
+          "lut": 4,
+          "fixed": 1
+        },
+        "by_source_domain": {
+          "light": 4,
+          "switch": 1
+        },
+        "by_group_type": {
+          "custom": 1,
+          "standby": 1
+        },
+        "by_entity_type": {
+          "power_sensor": 5,
+          "energy_sensor": 3
         }
       },
       "ha_version": "2025.10.0.dev0",
       "install_id": "081ac191-2667-4242-8226-ecc66b1f7e9e",
-      "group_size_max": 2,
-      "group_size_min": 2,
+      "install_date": "2023-01-15T12:34:56.789012",
+      "language": "en",
+      "group_sizes": {
+        "2": 1,
+        "5": 1
+      },
       "powercalc_version": "0.1.1",
       "config_entry_count": 8,
       "custom_profile_count": 12,
-      "has_global_gui_config": true
+      "has_global_gui_config": true,
+      "has_group_include": false
     }
     ```
 
@@ -121,3 +155,8 @@ Access to the data is restricted to the Powercalc maintainer(s).
 ## Questions or concerns?
 
 If you have questions about what is collected or why, please open a discussion or issue on the Powercalc GitHub repository.
+
+## Insights
+
+There are some nice dashboards available that use the collected analytics data to provide insights into Powercalc usage.
+They can be found on the Powercalc website: https://library.powercalc.nl/analytics/

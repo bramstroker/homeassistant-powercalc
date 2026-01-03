@@ -1,5 +1,7 @@
 {
-  "aliases": [],
+  "aliases": [
+    "9290019535"
+  ],
   "author": "CM000n <simon.hoerrle@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2021-09-29T18:56:08",

@@ -34,6 +34,9 @@ DATA_ANALYTICS_SEEN_ENTRIES = "analytics_seen_entries"
 DATA_POWER_PROFILES: Literal["power_profiles"] = "power_profiles"
 DATA_SENSOR_TYPES: Literal["sensor_types"] = "sensor_types"
 DATA_CONFIG_TYPES: Literal["config_types"] = "config_types"
+DATA_SOURCE_DOMAINS: Literal["source_domains"] = "source_domains"
+DATA_GROUP_TYPES: Literal["group_types"] = "group_types"
+DATA_ENTITY_TYPES: Literal["entity_types"] = "entity_types"
 DATA_STRATEGIES: Literal["strategies"] = "strategies"
 DATA_GROUP_SIZES: Literal["group_sizes"] = "group_sizes"
 DATA_HAS_GROUP_INCLUDE: Literal["has_group_include"] = "has_group_include"
@@ -281,3 +284,13 @@ class GroupType(StrEnum):
     STANDBY = "standby"
     SUBTRACT = "subtract"
     TRACKED_UNTRACKED = "tracked_untracked"
+
+
+class EntityType(StrEnum):
+    """Possible powercalc entity types."""
+
+    POWER_SENSOR = "power_sensor"
+    ENERGY_SENSOR = "energy_sensor"
+    UTILITY_METER = "utility_meter"
+    TARIFF_SELECT = "tariff_select"
+    UNKNOWN = "unknown"

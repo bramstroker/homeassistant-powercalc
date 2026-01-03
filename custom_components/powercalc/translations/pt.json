@@ -455,7 +455,7 @@
     },
     "legacy_config": {
       "title": "A configuração YAML de descoberta foi alterada",
-      "description": "Sua configuração YAML precisa ser atualizada para a nova estrutura."
+      "description": "Sua configuração YAML para {type} precisa ser atualizada para a nova estrutura."
     },
     "sub_profile": {
       "fix_flow": {

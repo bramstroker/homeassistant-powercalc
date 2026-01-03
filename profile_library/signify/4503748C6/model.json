@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "9150059237"
+  ],
   "author": "Blake Garner  <blake.garner@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-03-29T18:50:54.686203",

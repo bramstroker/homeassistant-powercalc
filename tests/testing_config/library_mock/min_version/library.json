@@ -1,0 +1,22 @@
+{
+    "manufacturers": [
+        {
+            "name": "test_manu",
+            "full_name": "Test manufacturer",
+            "dir_name": "test_manu",
+            "aliases": [],
+            "models": [
+                {
+                    "id": "min_version",
+                    "name": "Test profile",
+                    "device_type": "light",
+                    "updated_at": "2024-07-21T11:13:03+02:00",
+                    "color_modes": [
+                        "color_temp"
+                    ],
+                    "min_version": "v1.20.0"
+                }
+            ]
+        }
+    ]
+}
