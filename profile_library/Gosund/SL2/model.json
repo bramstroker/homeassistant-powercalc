@@ -11,5 +11,6 @@
     "VERSION": "v1.20.1:docker"
   },
   "name": "Gosund SL2",
-  "standby_power": 0.1
+  "standby_power": 0.1,
+  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
 }
