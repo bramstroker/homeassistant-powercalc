@@ -30,7 +30,7 @@ docker run --pull=always --rm --name=measure --env-file=.env -v %CD%/export:/app
 ```
 Note: if you use PowerShell instead of the Windows command line tool, you must use the full paths instead of relative paths.
 
-The script will ask you a few questions, than proceed taking measurements.
+The script will ask you a few questions, then proceed taking measurements.
 
 After the measurements are finished you will find the files in `export` directory.
 
@@ -60,7 +60,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 python -m measure.measure
 ```
 
-The script will ask you a few questions, than proceed taking measurements.
+The script will ask you a few questions, then proceed taking measurements.
 
 After the measurements are finished you will find the files in `export` directory.
 
@@ -69,5 +69,7 @@ After the measurements are finished you will find the files in `export` director
 See the WIKI article for further documentation https://docs.powercalc.nl/contributing/measure/
 
 ## Building and running docker image locally
+```
 docker build -t measure .
 docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it measure
+```
