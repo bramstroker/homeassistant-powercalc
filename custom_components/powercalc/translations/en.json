@@ -276,7 +276,7 @@
           "min_power": "Min power"
         },
         "data_description": {
-          "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
+          "attribute": "Specify the attribute. When left empty will be brightness for lights, volume for speakers, and percentage for fans",
           "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
         },
         "title": "Linear config"
