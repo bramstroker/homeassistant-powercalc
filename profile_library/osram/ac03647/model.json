@@ -11,5 +11,6 @@
     "VERSION": "v1.20.1:docker"
   },
   "name": "Osram AC03647",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
 }
