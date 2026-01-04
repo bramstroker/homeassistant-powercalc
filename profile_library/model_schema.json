@@ -251,6 +251,10 @@
       "type": "object",
       "description": "Settings used for measure script"
     },
+    "min_version": {
+      "type": "string",
+      "description": "Minimum required version of Powercalc for this profile"
+    },
     "linear_config": {
       "type": "object",
       "description": "Configuration for linear calculation strategy",

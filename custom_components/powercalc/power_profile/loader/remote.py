@@ -11,11 +11,13 @@ from typing import Any, NotRequired, TypedDict, cast
 import aiohttp
 from aiohttp import ClientError
 import async_timeout
+from awesomeversion import AwesomeVersion
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import STORAGE_DIR
+from homeassistant.loader import async_get_integration
 
-from custom_components.powercalc.const import API_URL
+from custom_components.powercalc.const import API_URL, DOMAIN
 from custom_components.powercalc.helpers import async_cache
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
@@ -57,6 +59,8 @@ class RemoteLoader(Loader):
     async def initialize(self) -> None:
         """Initialize the loader."""
 
+        powercalc_version = (await async_get_integration(self.hass, DOMAIN)).version
+
         self.library_contents = await self.load_library_json()
 
         self.profile_hashes = await self.hass.async_add_executor_job(self.load_profile_hashes)
@@ -75,10 +79,23 @@ class RemoteLoader(Loader):
 
             # Store model info and group models by manufacturer
             self.model_infos.update({f"{manufacturer_name}/{model.get('id')!s}": model for model in models})
-            self.manufacturer_models[manufacturer_name] = models
+            self.manufacturer_models[manufacturer_name] = []
 
             model_lookup: dict[str, list[LibraryModel]] = {}
             for model in models:
+                min_version = model.get("min_version")
+                if min_version and powercalc_version and powercalc_version < AwesomeVersion(min_version):
+                    _LOGGER.debug(
+                        "Skipping model %s/%s as it requires powercalc version %s (current: %s)",
+                        manufacturer_name,
+                        model.get("id"),
+                        min_version,
+                        powercalc_version,
+                    )
+                    continue
+
+                self.manufacturer_models[manufacturer_name].append(model)
+
                 model_id = str(model.get("id")).lower()
 
                 # Exact match → append first (high priority)

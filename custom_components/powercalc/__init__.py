@@ -232,7 +232,7 @@ async def init_analytics(hass: HomeAssistant) -> None:
         """Start the send schedule after the started event."""
         async_call_later(
             hass,
-            900,
+            10,
             HassJob(
                 analytics.send_analytics,
                 name="powercalc analytics startup",

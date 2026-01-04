@@ -38,10 +38,16 @@ Here we keep a listing of available resources which might help getting started.
 
 ## Blog posts
 
-- <https://www.twoenter.nl/blog/home-assistant-nl/powercalc-inzicht-energieverbruik-home-assistant/> (Dutch)
 - <https://seanblanchfield.com/2022/02/virtual-energy-meters-with-powercalc> (English)
 - <https://roenning.net/?p=654> (English)
+- <https://diiorio.me/posts/ha-powercalc/> (English)
+- <https://sascha-brockel.de/en/smart-power-measurement-with-powercalc-in-home-assistant/> (English)
+- <https://neilturner.me.uk/2025/12/27/powercalc-for-home-assistant/> (English)
+- <https://id.nl/zekerheid-en-gemak/verzekeringen-en-geld/energiecontract/grip-op-je-energieverbruik-houd-bij-wat-al-jouw-apparaten-verbruiken> (Dutch)
+- <https://www.twoenter.nl/blog/home-assistant-nl/powercalc-inzicht-energieverbruik-home-assistant/> (Dutch)
+- <https://erikdevries.com/posts/monitor-energy-consumption-in-home-assistant> (Dutch)
 - <https://www.teknikihemmet.se/2022/04/energiforbrukning-pa-smarta-lampor/> (Swedish)
+- <https://www.teknikihemmet.se/2023/08/anvander-powercalc-i-home-assistant-for-att-mata-energiforbrukning/> (Swedish)
 - <https://indomus.it/progetti/stimare-assorbimenti-e-consumi-elettrici-sulla-domotica-home-assistant-con-powercalc/> (Italian)
 
 !!! note

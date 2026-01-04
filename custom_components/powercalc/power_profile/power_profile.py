@@ -198,6 +198,11 @@ class PowerProfile:
         return config
 
     @property
+    def min_version(self) -> str | None:
+        """Get the minimum required version for this profile."""
+        return self._json_data.get("min_version")
+
+    @property
     def multi_switch_config(self) -> ConfigType | None:
         """Get configuration to set up multi_switch strategy."""
         return self.get_strategy_config(CalculationStrategy.MULTI_SWITCH)

@@ -1,0 +1,9 @@
+{
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": 50
+  },
+  "name": "Fixed mode profile",
+  "standby_power": 0.5,
+  "min_version": "v1.20.0"
+}

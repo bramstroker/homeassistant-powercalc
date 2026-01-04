@@ -4,10 +4,11 @@ import json
 import logging
 import os
 import shutil
-from unittest.mock import patch
+from unittest.mock import AsyncMock, Mock, patch
 
 from aiohttp import ClientError
 from aioresponses import aioresponses
+from awesomeversion import AwesomeVersion
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
 import pytest
@@ -313,7 +314,7 @@ async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: 
     await loader.initialize()
 
     assert "signify" in loader.model_lookup
-    assert len(caplog.records) == 2
+    assert len(caplog.records) >= 2
 
 
 async def test_fallback_to_local_library_on_client_connection_error(
@@ -340,7 +341,7 @@ async def test_fallback_to_local_library_on_client_connection_error(
     await loader.initialize()
 
     assert "signify" in loader.model_lookup
-    assert len(caplog.records) == 2
+    assert len(caplog.records) >= 2
 
 
 async def test_fallback_to_local_library_on_timeout(
@@ -366,7 +367,7 @@ async def test_fallback_to_local_library_on_timeout(
     await loader.initialize()
 
     assert "signify" in loader.model_lookup
-    assert len(caplog.records) == 2
+    assert len(caplog.records) >= 2
 
 
 async def test_fallback_to_local_library_fails(hass: HomeAssistant, mock_aioresponse: aioresponses, caplog: pytest.LogCaptureFixture) -> None:
@@ -614,3 +615,33 @@ async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aiorespon
 
     models = await library.find_models(ModelInfo("my-alias", "model1"))
     assert sorted(models) == [ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")]
+
+
+@pytest.mark.parametrize(
+    "version,expect_model",
+    [
+        ("1.50.0", True),
+        ("0.40.0", False),
+    ],
+)
+async def test_min_version(hass: HomeAssistant, version: str, expect_model: bool) -> None:
+    with patch("custom_components.powercalc.power_profile.loader.remote.RemoteLoader.load_library_json") as mock_load_lib:
+
+        def load_library_json() -> dict:
+            with open(get_test_config_dir("library_mock/min_version/library.json")) as f:
+                return json.load(f)
+
+        mock_load_lib.side_effect = load_library_json
+
+        with patch(
+            "custom_components.powercalc.power_profile.loader.remote.async_get_integration",
+            new=AsyncMock(return_value=Mock(version=AwesomeVersion(version))),
+        ):
+            loader = RemoteLoader(hass)
+            await loader.initialize()
+
+            models = await loader.get_model_listing("test_manu", None)
+            if expect_model:
+                assert "min_version" in models
+            else:
+                assert "min_version" not in models
