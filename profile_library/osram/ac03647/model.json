@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2026-01-04T05:18:43.949758",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Nous A1T",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.1:docker"
+  },
+  "name": "Osram AC03647",
+  "standby_power": 0.35
+}
