@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.1:docker"
   },
-  "name": "Osram AC03647",
+  "name": "SMART+ LED CLASSIC E27 RGBW",
   "standby_power": 0.35,
   "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
 }
