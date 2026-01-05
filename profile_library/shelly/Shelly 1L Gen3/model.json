@@ -20,8 +20,5 @@
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
-  },
-  "sub_profile_select": {
-    "default": "default"
   }
 }
