@@ -1,0 +1,31 @@
+{
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-01-06T15:18:39.968372",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "10 -> 3.51",
+      "20 -> 3.36",
+      "30 -> 3.49",
+      "40 -> 3.77",
+      "50 -> 4.29",
+      "60 -> 4.96",
+      "70 -> 5.27",
+      "80 -> 5.4",
+      "90 -> 5.61",
+      "100 -> 6.24",
+      "0 -> 6.44"
+    ]
+  },
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Nous A1T",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.1:docker"
+  },
+  "name": "Amazon Echo Plus (Gen2)(L9D29R)",
+  "standby_power": 2.0
+}
