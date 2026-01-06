@@ -16,5 +16,5 @@ custom_components/test
 # PyEnv Version File
 .python-version
 
-# Visual Studio settings 
+# Visual Studio settings
 /.vs
