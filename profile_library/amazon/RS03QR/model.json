@@ -27,6 +27,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Amazon Echo Dot Gen 2",
+  "name": "Echo Dot (Gen2)",
   "standby_power": 1.8
 }
