@@ -26,7 +26,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.1:docker"
   },
-  "name": "Amazon Echo Dot (Gen4) with clock",
+  "name": "Echo Dot (Gen4) with clock",
   "standby_power": 1.05,
   "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
 }

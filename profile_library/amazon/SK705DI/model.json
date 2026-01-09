@@ -32,6 +32,6 @@
     "SLEEP_TIME": 2,
     "VERSION": "v1.12.6:docker"
   },
-  "name": "Amazon Echo (1st Generation)",
+  "name": "Echo (Gen1)",
   "standby_power": 3.06
 }
