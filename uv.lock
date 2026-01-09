@@ -1047,7 +1047,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b1/cf/f5c0b23309070ae93de75c90d29300751a5aacefc0a3ed1b1d8edb28f08b/greenlet-3.2.3-cp313-cp313-macosx_11_0_universal2.whl", hash = "sha256:500b8689aa9dd1ab26872a34084503aeddefcb438e2e7317b89b11eaea1901ad", size = 270732, upload-time = "2025-06-05T16:10:08.26Z" },
     { url = "https://files.pythonhosted.org/packages/48/ae/91a957ba60482d3fecf9be49bc3948f341d706b52ddb9d83a70d42abd498/greenlet-3.2.3-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:a07d3472c2a93117af3b0136f246b2833fdc0b542d4a9799ae5f41c28323faef", size = 639033, upload-time = "2025-06-05T16:38:53.983Z" },
     { url = "https://files.pythonhosted.org/packages/6f/df/20ffa66dd5a7a7beffa6451bdb7400d66251374ab40b99981478c69a67a8/greenlet-3.2.3-cp313-cp313-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:8704b3768d2f51150626962f4b9a9e4a17d2e37c8a8d9867bbd9fa4eb938d3b3", size = 652999, upload-time = "2025-06-05T16:41:37.89Z" },
-    { url = "https://files.pythonhosted.org/packages/51/b4/ebb2c8cb41e521f1d72bf0465f2f9a2fd803f674a88db228887e6847077e/greenlet-3.2.3-cp313-cp313-manylinux2014_s390x.manylinux_2_17_s390x.whl", hash = "sha256:5035d77a27b7c62db6cf41cf786cfe2242644a7a337a0e155c80960598baab95", size = 647368, upload-time = "2025-06-05T16:48:21.467Z" },
     { url = "https://files.pythonhosted.org/packages/8e/6a/1e1b5aa10dced4ae876a322155705257748108b7fd2e4fae3f2a091fe81a/greenlet-3.2.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:2d8aa5423cd4a396792f6d4580f88bdc6efcb9205891c9d40d20f6e670992efb", size = 650037, upload-time = "2025-06-05T16:13:06.402Z" },
     { url = "https://files.pythonhosted.org/packages/26/f2/ad51331a157c7015c675702e2d5230c243695c788f8f75feba1af32b3617/greenlet-3.2.3-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:2c724620a101f8170065d7dded3f962a2aea7a7dae133a009cada42847e04a7b", size = 608402, upload-time = "2025-06-05T16:12:51.91Z" },
     { url = "https://files.pythonhosted.org/packages/26/bc/862bd2083e6b3aff23300900a956f4ea9a4059de337f5c8734346b9b34fc/greenlet-3.2.3-cp313-cp313-musllinux_1_1_aarch64.whl", hash = "sha256:873abe55f134c48e1f2a6f53f7d1419192a3d1a4e873bace00499a4e45ea6af0", size = 1119577, upload-time = "2025-06-05T16:36:49.787Z" },
@@ -1056,7 +1055,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d8/ca/accd7aa5280eb92b70ed9e8f7fd79dc50a2c21d8c73b9a0856f5b564e222/greenlet-3.2.3-cp314-cp314-macosx_11_0_universal2.whl", hash = "sha256:3d04332dddb10b4a211b68111dabaee2e1a073663d117dc10247b5b1642bac86", size = 271479, upload-time = "2025-06-05T16:10:47.525Z" },
     { url = "https://files.pythonhosted.org/packages/55/71/01ed9895d9eb49223280ecc98a557585edfa56b3d0e965b9fa9f7f06b6d9/greenlet-3.2.3-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:8186162dffde068a465deab08fc72c767196895c39db26ab1c17c0b77a6d8b97", size = 683952, upload-time = "2025-06-05T16:38:55.125Z" },
     { url = "https://files.pythonhosted.org/packages/ea/61/638c4bdf460c3c678a0a1ef4c200f347dff80719597e53b5edb2fb27ab54/greenlet-3.2.3-cp314-cp314-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:f4bfbaa6096b1b7a200024784217defedf46a07c2eee1a498e94a1b5f8ec5728", size = 696917, upload-time = "2025-06-05T16:41:38.959Z" },
-    { url = "https://files.pythonhosted.org/packages/22/cc/0bd1a7eb759d1f3e3cc2d1bc0f0b487ad3cc9f34d74da4b80f226fde4ec3/greenlet-3.2.3-cp314-cp314-manylinux2014_s390x.manylinux_2_17_s390x.whl", hash = "sha256:ed6cfa9200484d234d8394c70f5492f144b20d4533f69262d530a1a082f6ee9a", size = 692443, upload-time = "2025-06-05T16:48:23.113Z" },
     { url = "https://files.pythonhosted.org/packages/67/10/b2a4b63d3f08362662e89c103f7fe28894a51ae0bc890fabf37d1d780e52/greenlet-3.2.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:02b0df6f63cd15012bed5401b47829cfd2e97052dc89da3cfaf2c779124eb892", size = 692995, upload-time = "2025-06-05T16:13:07.972Z" },
     { url = "https://files.pythonhosted.org/packages/5a/c6/ad82f148a4e3ce9564056453a71529732baf5448ad53fc323e37efe34f66/greenlet-3.2.3-cp314-cp314-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:86c2d68e87107c1792e2e8d5399acec2487a4e993ab76c792408e59394d52141", size = 655320, upload-time = "2025-06-05T16:12:53.453Z" },
     { url = "https://files.pythonhosted.org/packages/5c/4f/aab73ecaa6b3086a4c89863d94cf26fa84cbff63f52ce9bc4342b3087a06/greenlet-3.2.3-cp314-cp314-win_amd64.whl", hash = "sha256:8c47aae8fbbfcf82cc13327ae802ba13c9c36753b67e760023fd116bc124a62a", size = 301236, upload-time = "2025-06-05T16:15:20.111Z" },
@@ -1204,7 +1202,7 @@ wheels = [
 
 [[package]]
 name = "homeassistant"
-version = "2026.1.0b3"
+version = "2026.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiodns" },
@@ -1258,21 +1256,21 @@ dependencies = [
     { name = "yarl" },
     { name = "zeroconf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/02/5e/b189861d87d8e9252849941d54e5df30080023b80df25858224f5ef2e723/homeassistant-2026.1.0b3.tar.gz", hash = "sha256:ca6f6851aaeb5ff56c05ebdd528b7a5b4a767731daf155b1e067e4813be9398a", size = 30153358, upload-time = "2026-01-05T16:03:59.28Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/96/b2ccc2497cda9085f53106a01164da3eed57f6065f05bdcf0a3c0167e1a2/homeassistant-2026.1.0.tar.gz", hash = "sha256:0faa7fa4c37b8ccf1eedc91794c69042f8f8559f2e7c205f1c279068262bdec6", size = 30167957, upload-time = "2026-01-07T18:15:25.208Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b3/02/fc863628f47ac0ef64092d3a3eaee63db70ca07edc7a310f267db8a561f3/homeassistant-2026.1.0b3-py3-none-any.whl", hash = "sha256:8e08b7c6bb5731bfd8912b64121fbad1b5d6a7b4f510186f51713fec54731017", size = 50089112, upload-time = "2026-01-05T16:03:54.344Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/3f/57e3c7e3daf7cc8509eb139f4faca9198474f8c4f50871d8fe9479adf3da/homeassistant-2026.1.0-py3-none-any.whl", hash = "sha256:29148b15f12fdf398ed8290ad1c23e5241011b225d2f96febcc7390855f18061", size = 50115149, upload-time = "2026-01-07T18:15:19.236Z" },
 ]
 
 [[package]]
 name = "homeassistant-stubs"
-version = "2026.1.0b3"
+version = "2026.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "homeassistant" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/85/99/d9be82d9c08be8c0db6f5cee171a0d99abd67b17e9a302a49a4f61f79dfb/homeassistant_stubs-2026.1.0b3.tar.gz", hash = "sha256:e801726cc10cc16a19c9c473b9a618d5cb84f600221102c09088440cbc6933c5", size = 1229213, upload-time = "2026-01-06T02:30:44.514Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/59/48/c2be95b4cff63091ecd131d21d1bef70801c2978668bec795206a4b9a4a2/homeassistant_stubs-2026.1.0.tar.gz", hash = "sha256:3fc6fe4f24a08ed6af1bfb1fc3adcd7dbebe4e78632fbde19643fe24de692f78", size = 1228338, upload-time = "2026-01-08T02:32:11.941Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/bf/679dfb643a3146bc444cc9ad35db0985cb3d443b7beabd3f66e2e993d7ed/homeassistant_stubs-2026.1.0b3-py3-none-any.whl", hash = "sha256:58d892dd928c908b26829b76bbf42a620067039945b2e39527125e83e02055c1", size = 3440496, upload-time = "2026-01-06T02:30:42.628Z" },
+    { url = "https://files.pythonhosted.org/packages/c6/48/3c438e200557521376d0b6e267ba3ed8ecc988aa0b49e88dc5263228bf56/homeassistant_stubs-2026.1.0-py3-none-any.whl", hash = "sha256:72b247941bb65bf1d5ac752b0887df7cf66b1071e0c3a49324222597cc98585e", size = 3440612, upload-time = "2026-01-08T02:32:13.789Z" },
 ]
 
 [[package]]
@@ -2019,7 +2017,7 @@ requires-dist = [
     { name = "homeassistant-stubs", marker = "extra == 'dev'" },
     { name = "mypy", marker = "extra == 'dev'", specifier = "==1.19.1" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.0.0" },
-    { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'", specifier = "==0.13.303" },
+    { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'", specifier = "==0.13.305" },
     { name = "pyturbojpeg", marker = "extra == 'dev'", specifier = ">=1.8.2" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.13.0" },
     { name = "types-croniter", marker = "extra == 'dev'", specifier = ">=2.0" },
@@ -2472,7 +2470,7 @@ wheels = [
 
 [[package]]
 name = "pytest-homeassistant-custom-component"
-version = "0.13.303"
+version = "0.13.305"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coverage" },
@@ -2503,9 +2501,9 @@ dependencies = [
     { name = "syrupy" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3d/ae/614f00e7eed2dff0fb5f5c2b5bd91eab2014c1a6205fe8f42fb4c634bb31/pytest_homeassistant_custom_component-0.13.303.tar.gz", hash = "sha256:89cb87244867c71cd9bcbc8b75a296a0989037debae88c0855c388a61cd3aa45", size = 63927, upload-time = "2026-01-06T05:08:22.472Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/29/b4/2459d9f5a2cd3d4d787f77d335bb3422965bbf4ac7faa826fd729dbeb335/pytest_homeassistant_custom_component-0.13.305.tar.gz", hash = "sha256:d3781985c986b0d1bb534a0cabcffb58eba021deacf40810a43fe3f72f6d5427", size = 63917, upload-time = "2026-01-08T05:08:15.192Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/82/8a/e3eb5e67a53e7a8aefc859eb68f8fcc094ff0f44ec1d6aa67820b4a05db2/pytest_homeassistant_custom_component-0.13.303-py3-none-any.whl", hash = "sha256:473f8e43e8450fbb221b6a4c9c3a74cc2a7934a532b865af89230cead0a98c1b", size = 69783, upload-time = "2026-01-06T05:08:21.079Z" },
+    { url = "https://files.pythonhosted.org/packages/9e/44/1a7395a4a7ebb07fedf20ee8e64c2fab134ff298b96c768c9d46990fd889/pytest_homeassistant_custom_component-0.13.305-py3-none-any.whl", hash = "sha256:96da72b481773e065827a19d78ab85e423df90bcf307f4558157b66d0b3a1409", size = 69780, upload-time = "2026-01-08T05:08:13.994Z" },
 ]
 
 [[package]]
