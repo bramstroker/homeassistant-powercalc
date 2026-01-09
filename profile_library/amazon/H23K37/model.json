@@ -27,5 +27,6 @@
     "VERSION": "v1.20.1:docker"
   },
   "name": "Amazon Echo Show 5 (Gen1)",
-  "standby_power": 2.7
+  "standby_power": 2.7,
+  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
 }
