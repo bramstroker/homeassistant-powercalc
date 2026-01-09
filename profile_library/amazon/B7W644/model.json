@@ -1,0 +1,32 @@
+{
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-01-06T16:03:37.493335",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "10 -> 1.7",
+      "20 -> 1.7",
+      "30 -> 1.7",
+      "40 -> 1.74",
+      "50 -> 1.84",
+      "60 -> 2.2",
+      "70 -> 2.79",
+      "80 -> 3.28",
+      "90 -> 3.63",
+      "100 -> 4.03",
+      "0 -> 1.20"
+    ]
+  },
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Nous A1T",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.1:docker"
+  },
+  "name": "Amazon Echo Dot (Gen4) with clock",
+  "standby_power": 1.05,
+  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
+}

@@ -50,8 +50,8 @@ These profiles are measured and created by Powercalc users. See the [library web
 After installation and restart, Powercalc will automatically:
 
 - Scan your Home Assistant installation
-- Detect supported entities using their *manufacturer* and *model*
-- Offer to create virtual **power (W)** and **energy (kWh)** sensors
+- Detect supported devices using their *manufacturer* and *model*
+- Offer to create virtual **power (W)** and additionally **energy (kWh)** sensors
 
 If devices are found, you will see prompts as shown below. Click `ADD` to create the sensors.
 
