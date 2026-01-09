@@ -11,5 +11,6 @@
     "VERSION": "v1.19.1:docker"
   },
   "name": "Tapo L510 Smart Bulb 806lm (2700K)",
-  "standby_power": 0.45
+  "standby_power": 0.45,
+  "author": "Paul Smith <p.smith@malms.aero>"
 }

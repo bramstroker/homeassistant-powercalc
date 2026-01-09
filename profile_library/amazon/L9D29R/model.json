@@ -27,5 +27,6 @@
     "VERSION": "v1.20.1:docker"
   },
   "name": "Amazon Echo Plus (Gen2)",
-  "standby_power": 2.0
+  "standby_power": 2.0,
+  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
 }
