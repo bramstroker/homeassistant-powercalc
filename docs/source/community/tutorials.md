@@ -19,6 +19,7 @@ Here we keep a listing of available resources which might help getting started.
 ### German:
 
 <div style="display: flex; gap: 10px;">
+    <iframe width="300" height="200" src="https://www.youtube.com/embed/r_RS7qdeAIo?si=WC3Mvn1hwRWUPdZW" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     <iframe width="300" height="200" src="https://www.youtube.com/embed/AATiQd8Snbw?si=HtZgEMumfu1bBV5Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     <iframe width="300" height="200" src="https://www.youtube.com/embed/Anw34kwSo2s?si=NDq3d_z5TWUFSPF4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     <iframe width="300" height="200" src="https://www.youtube.com/embed/lyKJ90tDTWM?si=TYoJkRhWb2zVxbdR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -49,6 +50,7 @@ Here we keep a listing of available resources which might help getting started.
 - <https://www.teknikihemmet.se/2022/04/energiforbrukning-pa-smarta-lampor/> (Swedish)
 - <https://www.teknikihemmet.se/2023/08/anvander-powercalc-i-home-assistant-for-att-mata-energiforbrukning/> (Swedish)
 - <https://indomus.it/progetti/stimare-assorbimenti-e-consumi-elettrici-sulla-domotica-home-assistant-con-powercalc/> (Italian)
+- <https://alles-automatisch.de/stromverbrauch-home-assistant-powercalc/> (German)
 
 !!! note
 
