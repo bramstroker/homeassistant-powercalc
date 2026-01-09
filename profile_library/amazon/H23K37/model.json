@@ -26,6 +26,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.1:docker"
   },
-  "name": "Amazon Echo Show 5 (Gen1) (h23k37)",
+  "name": "Amazon Echo Show 5 (Gen1)",
   "standby_power": 2.7
 }
