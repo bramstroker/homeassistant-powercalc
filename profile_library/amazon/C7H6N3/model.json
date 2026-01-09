@@ -26,6 +26,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.1:docker"
   },
-  "name": "Amazon Echo Show 8 (Gen1) (c7h6n3)",
+  "name": "Amazon Echo Show 8 (Gen1)",
   "standby_power": 3.95
 }
