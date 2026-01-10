@@ -11,6 +11,6 @@
     "SLEEP_TIME": 30,
     "VERSION": "v1.9.8:docker"
   },
-  "name": "Govee RGBICW Smart Corner Floor Lamp",
+  "name": "RGBICW Smart Corner Floor Lamp",
   "standby_power": 2.14
 }

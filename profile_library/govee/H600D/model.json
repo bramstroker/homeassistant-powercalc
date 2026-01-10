@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.5:docker"
   },
-  "name": "Govee H600D Smart Bulb GU10",
+  "name": "Smart Bulb GU10",
   "standby_power": 0.27
 }
