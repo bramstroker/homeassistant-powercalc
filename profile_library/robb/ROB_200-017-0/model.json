@@ -6,7 +6,7 @@
   "measure_description": "Manually measured average of 2 plugs",
   "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",
-  "name": "ROBB Zigbee Smart Plug",
+  "name": "Zigbee Smart Plug",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

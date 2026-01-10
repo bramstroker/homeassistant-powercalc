@@ -6,7 +6,7 @@
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
   "measure_device": "Fibaro FGWP102",
   "measure_method": "manual",
-  "name": "Qubino Smart Plug 16A",
+  "name": "Smart Plug 16A",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
