@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.14:docker"
   },
-  "name": "Kogan SmarterHome 10W White Smart Bulb",
+  "name": "SmarterHome 10W White Smart Bulb",
   "standby_power": 1.0
 }

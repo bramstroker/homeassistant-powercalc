@@ -31,6 +31,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.6:docker"
   },
-  "name": "JBL Link Music",
+  "name": "Link Music",
   "standby_power": 1.7
 }
