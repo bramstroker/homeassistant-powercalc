@@ -9,7 +9,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Shelly Plus Plug S / AVM FRITZ!DECT 200",
   "measure_method": "manual",
-  "name": "Innr Zigbee Smart Plug SP220",
+  "name": "Zigbee Smart Plug",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
