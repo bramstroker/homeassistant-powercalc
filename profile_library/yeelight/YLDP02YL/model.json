@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Yeelight RGBW E27 Smart LED Bulb",
+  "name": "RGBW E27 Smart LED Bulb",
   "standby_power": 1.29
 }

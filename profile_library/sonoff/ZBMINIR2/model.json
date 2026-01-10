@@ -6,7 +6,7 @@
   "measure_description": "Measured manually",
   "measure_device": "PeakTech 4350",
   "measure_method": "manual",
-  "name": "ZBMINIR2",
+  "name": "Zigbee 3.0 Smart Relay Switch",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.6:docker"
   },
-  "name": "Trust ZLED-G2705",
+  "name": "Smart Zigbee Dimmable GU10 LED Spot",
   "standby_power": 0.65
 }

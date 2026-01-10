@@ -27,6 +27,6 @@
     "SLEEP_TIME": 1,
     "VERSION": "v1.3.13:docker"
   },
-  "name": "Sonos Amp",
+  "name": "Amp",
   "standby_power": 6.42
 }

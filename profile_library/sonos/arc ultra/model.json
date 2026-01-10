@@ -27,6 +27,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.19:docker"
   },
-  "name": "Sonos Arc Ultra",
+  "name": "Arc Ultra",
   "standby_power": 4.45
 }

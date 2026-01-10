@@ -11,6 +11,6 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.26.1:docker"
   },
-  "name": "Zipato RGBW Bulb V2",
+  "name": "RGBW Bulb V2",
   "standby_power": 0.3
 }

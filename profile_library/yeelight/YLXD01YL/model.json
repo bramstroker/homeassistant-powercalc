@@ -14,7 +14,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.1:docker"
   },
-  "name": "Yeelight Smart LED Ceiling Light",
+  "name": "Smart LED Ceiling Light",
   "standby_power": 0.9,
   "sub_profile_select": {
     "default": "default",

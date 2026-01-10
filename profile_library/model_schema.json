@@ -335,8 +335,7 @@
       "type": "object",
       "description": "Configuration to automatically select a sub profile",
       "required": [
-        "default",
-        "matchers"
+        "default"
       ],
       "properties": {
         "default": {

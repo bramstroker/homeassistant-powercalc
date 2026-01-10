@@ -15,6 +15,6 @@
     "SLEEP_TIME": 5,
     "VERSION": "v1.14.10:docker"
   },
-  "name": "Yeelight M2 YLDP25YL/YLDP26YL",
+  "name": "Bluetooth Mesh Smart LED Bulb (Dimmable CCT, 4 W)",
   "standby_power": 0.27
 }

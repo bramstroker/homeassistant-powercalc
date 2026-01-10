@@ -27,6 +27,6 @@
     "SLEEP_TIME": 1,
     "VERSION": "v1.3.13:docker"
   },
-  "name": "Sonos Arc",
+  "name": "Arc",
   "standby_power": 4.4
 }

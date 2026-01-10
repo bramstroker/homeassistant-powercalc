@@ -35,6 +35,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.12:docker"
   },
-  "name": "Snooz SNOOZ-US-2",
+  "name": "Smart White Noise Machine",
   "standby_power": 0.31
 }

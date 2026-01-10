@@ -25,6 +25,6 @@
   "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using HAOS; manual mute/zero volume measurement.",
   "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
   "measure_method": "script",
-  "name": "Sonos Play:1",
+  "name": "Play:1",
   "standby_power": 2.1
 }
