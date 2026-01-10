@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.4.0:docker"
   },
-  "name": "Mueller Licht tint LED-Kerzenform white+color",
+  "name": "Tint LED-Kerzenform white+color",
   "standby_power": 0.38
 }
