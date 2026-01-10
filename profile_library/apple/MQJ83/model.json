@@ -30,6 +30,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.14:docker"
   },
-  "name": "Apple HomePod Gen 2",
+  "name": "HomePod Gen 2",
   "standby_power": 1.01
 }

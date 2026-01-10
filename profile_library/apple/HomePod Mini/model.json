@@ -23,6 +23,6 @@
   "measure_description": "Streamed white noise for this test",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
-  "name": "Apple HomePod Mini",
+  "name": "HomePod Mini",
   "standby_power": 0.65
 }

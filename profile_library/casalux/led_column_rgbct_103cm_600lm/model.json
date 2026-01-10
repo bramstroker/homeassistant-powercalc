@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Casalux LED Lichtsäule (103 cm, 600 lm, RGBCT) - ESP8266/ESPHome conversion",
+  "name": "LED Lichtsäule (103 cm, 600 lm, RGBCT) - ESP8266/ESPHome conversion",
   "standby_power": 1.15
 }

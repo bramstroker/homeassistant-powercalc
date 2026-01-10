@@ -15,7 +15,7 @@
   "measure_device": "Tapo P115",
   "measure_device_firmware": "1.3.4 Build 250403 Rel.150504",
   "measure_method": "script",
-  "name": "Bosch Smart Home Controller 1 Gen.",
+  "name": "Smart Home Controller 1 Gen.",
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"

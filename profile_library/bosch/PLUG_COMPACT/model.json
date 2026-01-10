@@ -6,7 +6,7 @@
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/files/11778846/measurements.xlsx",
   "measure_device": "Zhurui PR10-D",
   "measure_method": "manual",
-  "name": "Bosch PLUG_COMPACT",
+  "name": "Smart Home Plug Compact",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
