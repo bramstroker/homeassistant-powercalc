@@ -9,7 +9,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Eve Energy Matter 20EBU4101",
   "measure_method": "manual",
-  "name": "TP-Link Kasa KP125M",
+  "name": "Kasa Smart Wi-Fi Plug Slim with Energy Monitoring",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
