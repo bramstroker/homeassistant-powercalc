@@ -6,7 +6,7 @@
   "measure_description": "Manually measured (Schuko/EU model@230V)",
   "measure_device": "Zhurui PR10-C",
   "measure_method": "manual",
-  "name": "TRETAKT Smart plug",
+  "name": "TRETAKT smart plug",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

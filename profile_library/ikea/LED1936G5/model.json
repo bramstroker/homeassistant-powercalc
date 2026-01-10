@@ -12,6 +12,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.0.3:docker"
   },
-  "name": "TRADFRI LED bulb E27 470 lumen, dimmable, opal white",
+  "name": "TRADFRI bulb E27 470 lumen, dimmable, opal white",
   "standby_power": 0.2
 }

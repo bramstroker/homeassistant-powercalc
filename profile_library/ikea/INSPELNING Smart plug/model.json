@@ -9,7 +9,7 @@
   "measure_description": "Manually measured (Schuko/EU model@230V)",
   "measure_device": "Zhurui PR10-C",
   "measure_method": "manual",
-  "name": "INSPELNING Smart plug",
+  "name": "INSPELNING smart plug",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

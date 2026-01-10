@@ -16,6 +16,6 @@
     "SLEEP_TIME": 6,
     "VERSION": "master"
   },
-  "name": "TRADFRI LED bulb GU10 345 lumen, dimmable, white spectrum",
+  "name": "TRADFRI bulb GU10 345 lumen, dimmable, white spectrum",
   "standby_power": 0.2
 }

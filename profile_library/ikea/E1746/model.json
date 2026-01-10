@@ -10,7 +10,7 @@
   "measure_device": "Nous A1T",
   "measure_device_firmware": "ESPHome 2023.12.5",
   "measure_method": "script",
-  "name": "TRADFRI Signal Repeater",
+  "name": "TRADFRI signal repeater",
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
