@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.14.8:docker"
   },
-  "name": "Paulmann Licht GmbH RGBW Bulb E14 470lm 5W",
+  "name": "RGBW Bulb E14 470lm 5W",
   "standby_power": 0.25
 }

@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.6:docker"
   },
-  "name": "Paulmann Licht GmbH RGBW Base Spot",
+  "name": "RGBW Base Spot",
   "standby_power": 0.2
 }
