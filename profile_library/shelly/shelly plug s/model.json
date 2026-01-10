@@ -11,7 +11,7 @@
   "measure_description": "Manual measurement of single smart plug. Measured values ",
   "measure_device": "Brennenstuhl EM 231-A",
   "measure_method": "manual",
-  "name": "Shelly Plug S",
+  "name": "Plug S",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

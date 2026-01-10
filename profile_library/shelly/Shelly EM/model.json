@@ -15,7 +15,7 @@
     "SAMPLE_COUNT": 200,
     "SLEEP_TIME": 0.5
   },
-  "name": "Shelly EM",
+  "name": "EM",
   "only_self_usage": false,
   "standby_power": 0.598,
   "standby_power_on": 0.923

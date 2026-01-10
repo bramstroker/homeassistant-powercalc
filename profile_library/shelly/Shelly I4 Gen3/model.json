@@ -16,7 +16,7 @@
   "measure_settings": {
     "VERSION": "v1.17.1:docker"
   },
-  "name": "Shelly I4 Gen3",
+  "name": "i4 Gen3",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

@@ -16,7 +16,7 @@
     "SAMPLE_COUNT": 200,
     "SLEEP_TIME": 0.5
   },
-  "name": "Shelly 1PM Mini Gen4",
+  "name": "1PM Mini Gen4",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

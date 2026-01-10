@@ -13,7 +13,7 @@
   "measure_settings": {
     "VERSION": "v1.17.1:docker"
   },
-  "name": "Shelly 1 Mini Gen3",
+  "name": "1 Mini Gen3",
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"

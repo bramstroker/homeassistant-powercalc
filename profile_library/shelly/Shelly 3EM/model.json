@@ -10,7 +10,7 @@
   "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=RlSCe9xaUPE",
   "measure_device": "GW Instek GPM-8310",
   "measure_method": "manual",
-  "name": "Shelly 3EM",
+  "name": "3EM",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

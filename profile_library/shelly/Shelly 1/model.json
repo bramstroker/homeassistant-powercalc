@@ -15,7 +15,7 @@
     "SAMPLE_COUNT": 200,
     "SLEEP_TIME": 0.5
   },
-  "name": "Shelly 1",
+  "name": "1",
   "only_self_usage": false,
   "standby_power": 0.376,
   "standby_power_on": 0.618

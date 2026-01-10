@@ -18,7 +18,7 @@
   "multi_switch_config": {
     "power": 0.356
   },
-  "name": "Shelly Plus 2PM",
+  "name": "Plus 2PM",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

@@ -10,7 +10,7 @@
   "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=ZXC4vft57gU",
   "measure_device": "GW Instek GPM-8310",
   "measure_method": "manual",
-  "name": "Shelly PM Mini Gen3",
+  "name": "PM Mini Gen3",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

@@ -14,7 +14,7 @@
   "measure_settings": {
     "VERSION": "v1.17.11:docker"
   },
-  "name": "Shelly Plug S Gen3",
+  "name": "Plug S Gen3",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

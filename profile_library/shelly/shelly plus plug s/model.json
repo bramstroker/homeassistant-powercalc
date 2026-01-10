@@ -12,7 +12,7 @@
   "measure_description": "Manually measured. (LED off). Transcribed from https://www.youtube.com/watch?v=cLtao6yG7ds. V2 added to V1 since the manufacturer doesn't mention other changes than mechanical",
   "measure_device": "GW Instek GPM-8310",
   "measure_method": "manual",
-  "name": "Shelly Plus Plug S",
+  "name": "Plus Plug S",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
