@@ -10,7 +10,7 @@
   "measure_description": "Measured manually",
   "measure_device": "PeakTech P 4250 (1 mV/10 mA) with VOLTCRAFT VC270",
   "measure_method": "manual",
-  "name": "ZBMINI",
+  "name": "Zigbee Two-Way Smart Switch",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

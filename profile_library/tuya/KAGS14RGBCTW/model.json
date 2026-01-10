@@ -12,6 +12,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.3:docker"
   },
-  "name": "ekobi SMART LED E27 14W 1400Lm RGB CCT",
+  "name": "Ekobi SMART LED E27 14W 1400Lm RGB CCT",
   "standby_power": 0.46
 }

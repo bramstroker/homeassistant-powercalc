@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.4:docker"
   },
-  "name": "Sengled Motion Sensor Bulb PAR38 E13-N11 Zigbee ",
+  "name": "Motion Sensor Bulb PAR38 E13-N11 Zigbee",
   "standby_power": 0.3
 }

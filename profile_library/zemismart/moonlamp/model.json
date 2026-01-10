@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.1.2:docker"
   },
-  "name": "ZemiSmart Moonlamp (esphome)",
+  "name": "Moonlamp (esphome)",
   "standby_power": 0.5
 }

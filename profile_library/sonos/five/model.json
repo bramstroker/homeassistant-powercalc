@@ -27,6 +27,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.19:docker"
   },
-  "name": "Sonos Five",
+  "name": "Five",
   "standby_power": 3.05
 }

@@ -23,6 +23,6 @@
   "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using docker container",
   "measure_device": "Shelly Plug US",
   "measure_method": "script",
-  "name": "Sonos One SL",
+  "name": "One SL",
   "standby_power": 2.83
 }

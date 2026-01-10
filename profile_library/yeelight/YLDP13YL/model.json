@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.20.3:docker"
   },
-  "name": "Yeelight LED Bulb 1S",
+  "name": "LED Bulb 1S",
   "standby_power": 1.22
 }

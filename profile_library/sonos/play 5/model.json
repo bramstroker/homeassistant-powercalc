@@ -31,6 +31,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.11.3:docker"
   },
-  "name": "Sonos Play:5",
+  "name": "Play:5",
   "standby_power": 2.15
 }

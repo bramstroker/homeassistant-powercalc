@@ -27,6 +27,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.12.7:docker"
   },
-  "name": "Sonos Era 100",
+  "name": "Era 100",
   "standby_power": 2.0
 }

@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Philips Wiz bulb TW GU10 (type SHTWC, model 9290024483A, 4.7W 345 lumen 240V)",
+  "name": "Bulb TW GU10 (type SHTWC, model 9290024483A, 4.7W 345 lumen 240V)",
   "standby_power": 0.3
 }

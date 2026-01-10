@@ -10,7 +10,7 @@
   "measure_device": "Nous A1T",
   "measure_device_firmware": "ESPHome 2023.10.3",
   "measure_method": "script",
-  "name": "Sonoff S20",
+  "name": "Smart Wi-Fi Power Plug / Smart Outlet",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

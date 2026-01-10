@@ -15,6 +15,6 @@
     "SLEEP_TIME": 5,
     "VERSION": "v1.14.10:docker"
   },
-  "name": "Mijia MJDP09YL",
+  "name": "Bluetooth Mesh Smart LED Bulb (E27, Tunable White, 5 W)",
   "standby_power": 0.2
 }

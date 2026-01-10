@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.0.3:docker"
   },
-  "name": "Teckin SB50",
+  "name": "Smart Wi-Fi RGB LED Light Bulb",
   "standby_power": 0.81
 }

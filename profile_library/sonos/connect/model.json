@@ -10,6 +10,6 @@
   "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using Docker container.",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",
-  "name": "Sonos Connect",
+  "name": "Connect",
   "standby_power": 5.0
 }
