@@ -27,6 +27,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.12:docker"
   },
-  "name": "Google Nest Hub (2nd Gen)",
+  "name": "Nest Hub (2nd Gen)",
   "standby_power": 0.39
 }

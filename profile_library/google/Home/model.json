@@ -28,6 +28,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.6:docker"
   },
-  "name": "Google Home",
+  "name": "Home",
   "standby_power": 2.0
 }

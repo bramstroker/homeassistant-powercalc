@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.23:docker"
   },
-  "name": "LED Filament Lamp A60 7W",
+  "name": "Filament LED light bulb A60 7W",
   "standby_power": 0.12
 }

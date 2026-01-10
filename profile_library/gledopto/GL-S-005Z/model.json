@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.24.8:docker"
   },
-  "name": "Gledopto 4W MR16 Dual White and Color 120°",
+  "name": "RGB+CCT 4 W MR16 Zigbee Spot Light",
   "standby_power": 0.49
 }

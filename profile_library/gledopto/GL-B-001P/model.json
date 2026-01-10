@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.25.4:docker"
   },
-  "name": "GL-B-001P",
+  "name": "RGB+CCT Zigbee E14 LED Candle Bulb (4 W)",
   "standby_power": 0.31
 }

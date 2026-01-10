@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.24:docker"
   },
-  "name": "GL-D-004P",
+  "name": "RGB+CCT 9 W Zigbee Downlight",
   "standby_power": 0.22
 }

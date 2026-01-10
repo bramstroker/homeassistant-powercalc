@@ -27,6 +27,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.16.7:docker"
   },
-  "name": "Google Nest Hub Max",
+  "name": "Nest Hub Max",
   "standby_power": 2.0
 }
