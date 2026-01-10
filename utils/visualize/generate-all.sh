@@ -33,16 +33,16 @@ process_file() {
   fi
 }
 
-## Find specific .csv.gz files recursively and loop over them
-#for pattern in "color_temp.csv.gz" "brightness.csv.gz" "hs.csv.gz" "effects.csv.gz"; do
-#  find "$SEARCH_DIR" -type f -name "$pattern" | while IFS= read -r file; do
-#    echo "Processing $file"
-#    relative_path=$(echo "$file" | sed "s|$SEARCH_DIR/||" | sed 's/.csv.gz$//')
-#    output="$SEARCH_DIR/$relative_path.png"
-#
-#    process_file "$file" "$output"
-#  done
-#done
+# Find specific .csv.gz files recursively and loop over them
+for pattern in "color_temp.csv.gz" "brightness.csv.gz" "hs.csv.gz" "effects.csv.gz"; do
+  find "$SEARCH_DIR" -type f -name "$pattern" | while IFS= read -r file; do
+    echo "Processing $file"
+    relative_path=$(echo "$file" | sed "s|$SEARCH_DIR/||" | sed 's/.csv.gz$//')
+    output="$SEARCH_DIR/$relative_path.png"
+
+    process_file "$file" "$output"
+  done
+done
 
 # Find all model.json files recursively and check if they have linear_config -> calibrate
 find "$SEARCH_DIR" -type f -name "model.json" | while IFS= read -r file; do
