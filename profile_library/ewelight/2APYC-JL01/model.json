@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.6:docker"
   },
-  "name": "Smart light JL01 (2APYC-JL01)",
+  "name": "Smart light JL01",
   "standby_power": 0.4
 }
