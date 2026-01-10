@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.2.3:docker"
   },
-  "name": "TP-Link Tapo L900-5",
+  "name": "Tapo Smart Wi-Fi Light Strip",
   "standby_power": 0.24
 }

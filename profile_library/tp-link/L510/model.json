@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.1:docker"
   },
-  "name": "Tapo L510 Smart Bulb 806lm (2700K)",
+  "name": "Tapo Smart Wi-Fi Light Bulb, Dimmable 806lm (2700K)",
   "standby_power": 0.45,
   "author": "Paul Smith <p.smith@malms.aero>"
 }
