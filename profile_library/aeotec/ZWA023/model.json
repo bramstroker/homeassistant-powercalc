@@ -11,7 +11,7 @@
   "measure_description": "Measured standby power with LED off using a Shelly Plus Plug US.",
   "measure_device": "Shelly Plus Plug US",
   "measure_method": "script",
-  "name": "ZWA023",
+  "name": "Smart Switch 7 B plug",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

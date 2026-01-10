@@ -6,7 +6,7 @@
   "measure_description": "Manually measured.",
   "measure_device": "Shelly Plus Plug S / AVM FRITZ!DECT 200",
   "measure_method": "manual",
-  "name": "AVM Fritz!DECT 210",
+  "name": "FRITZ!DECT 210",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

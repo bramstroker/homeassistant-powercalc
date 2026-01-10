@@ -9,7 +9,7 @@
   "measure_description": "Manually measured. Pictures in the Pull Request comments.",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
-  "name": "Aqara Smart Plug",
+  "name": "Smart Plug",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

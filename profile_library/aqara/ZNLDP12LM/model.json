@@ -11,6 +11,6 @@
     "SLEEP_TIME": 12,
     "VERSION": "v0.10.4"
   },
-  "name": "Aqara LED light bulb (tunable white)",
+  "name": "LED light bulb (tunable white)",
   "standby_power": 0.41
 }

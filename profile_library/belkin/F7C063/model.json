@@ -9,7 +9,7 @@
   "measure_description": "Manually measured ",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",
-  "name": "Belkin Wemo Mini v2",
+  "name": "Wemo Mini v2",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

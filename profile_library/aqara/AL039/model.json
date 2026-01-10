@@ -14,6 +14,6 @@
     "SLEEP_TIME": 10,
     "VERSION": "v1.19.1:docker"
   },
-  "name": "Aqara LED Light Bulb T1",
+  "name": "LED Light Bulb T1",
   "standby_power": 0.4
 }

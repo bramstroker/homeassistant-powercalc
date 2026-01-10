@@ -6,7 +6,7 @@
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/files/11778846/measurements.xlsx",
   "measure_device": "Zhurui PR10-D",
   "measure_method": "manual",
-  "name": "AVM Fritz!DECT 200",
+  "name": "FRITZ!DECT 200",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
