@@ -11,7 +11,7 @@
   "measure_description": "Measured standby power with using a Shelly Plus Plug US. Standby power was almost too low to capture.",
   "measure_device": "Shelly Plus Plug US",
   "measure_method": "script",
-  "name": "PD-3PCL-WH (PlugInDimmer)",
+  "name": "Plug-In Lamp Dimmer (Wireless Smart Dimmer)",
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"

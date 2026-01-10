@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.14.4:docker"
   },
-  "name": "Kauf A21 RGBWW",
+  "name": "RGBWW Smart LED Bulb A21 (10 W)",
   "standby_power": 0.5
 }

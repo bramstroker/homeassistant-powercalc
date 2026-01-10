@@ -12,6 +12,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.11:docker"
   },
-  "name": "LUEDD Smart GU10 5W 2200-4000K + RGB",
+  "name": "Smart GU10 5W 2200-4000K + RGB",
   "standby_power": 0.8
 }

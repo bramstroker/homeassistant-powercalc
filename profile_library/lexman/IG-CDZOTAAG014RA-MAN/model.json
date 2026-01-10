@@ -11,6 +11,6 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.18.4:docker"
   },
-  "name": "ENKI Lexman E27 14W to 100W LED RGBW v2",
+  "name": "RGBW E27 Smart LED Bulb (14 W to 100 W equivalent)",
   "standby_power": 0.4
 }
