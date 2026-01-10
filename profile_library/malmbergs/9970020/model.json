@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.24.3:docker"
   },
-  "name": "Malmbergs Sirius III",
+  "name": "Sirius III",
   "standby_power": 0.89
 }

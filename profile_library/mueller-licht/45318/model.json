@@ -14,6 +14,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.20.3:docker"
   },
-  "name": "Müller Licht GU10 Spot white+color",
+  "name": "GU10 Spot white+color",
   "standby_power": 0.15
 }
