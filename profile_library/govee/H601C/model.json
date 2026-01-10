@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Govee Smart LED Downlight",
+  "name": "Smart LED Downlight",
   "standby_power": 0.85
 }
