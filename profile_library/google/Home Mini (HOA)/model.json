@@ -25,6 +25,6 @@
   "measure_description": "Streamed 'Armin van Buuren - Come Around Again' using spotify, and took average measurements using the measure.py tool on different volume levels",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
-  "name": "Google Home Mini",
+  "name": "Home Mini",
   "standby_power": 1.65
 }

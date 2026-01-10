@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.1:docker"
   },
-  "name": "Gosund SL2",
+  "name": "Smart Wi-Fi RGB LED Light Strip (5 m)",
   "standby_power": 0.1,
   "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
 }
