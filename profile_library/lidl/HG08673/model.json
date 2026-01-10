@@ -6,7 +6,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Voltcraft VC270 with Voltcraft VC-510 and 20 windings",
   "measure_method": "manual",
-  "name": "Lidl Silvercrest Smart Plug",
+  "name": "Silvercrest Smart Plug",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
