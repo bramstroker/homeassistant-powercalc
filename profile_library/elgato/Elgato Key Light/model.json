@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.24.7:docker"
   },
-  "name": "Elgato Key Light",
+  "name": "Key Light",
   "standby_power": 0.86
 }

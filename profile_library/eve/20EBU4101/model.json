@@ -9,7 +9,7 @@
   "measure_description": "Manually measured",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",
-  "name": "Eve Energy Matter",
+  "name": "Energy (Matter) Smart Plug",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

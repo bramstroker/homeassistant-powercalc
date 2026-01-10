@@ -14,6 +14,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.12.8:docker"
   },
-  "name": "Elgin Smart Color 15W",
+  "name": "Smart Color 15W",
   "standby_power": 0.7
 }

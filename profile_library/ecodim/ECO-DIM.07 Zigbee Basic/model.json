@@ -10,7 +10,7 @@
   "measure_description": "Manually measured with light connected as bypass.",
   "measure_device": "Brennenstuhl EM 231-A",
   "measure_method": "manual",
-  "name": "EcoDim ECO-DIM.07 Zigbee Basic",
+  "name": "ZigBee LED Dimmer",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

@@ -6,7 +6,7 @@
   "measure_description": "measure script recorder over 2 minutes",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "manual",
-  "name": "SA-003-Zigbee",
+  "name": "Zigbee Smart Plug",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
