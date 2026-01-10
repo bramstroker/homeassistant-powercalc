@@ -6,7 +6,7 @@
   "measure_description": "Manually measured, copied from SP 224.",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
-  "name": "Innr Zigbee Smart Plug",
+  "name": "Zigbee Smart Plug",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

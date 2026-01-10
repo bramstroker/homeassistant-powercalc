@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.14.10:docker"
   },
-  "name": "Innr Light Strip Colour",
+  "name": "Light Strip Colour",
   "standby_power": 0.3
 }

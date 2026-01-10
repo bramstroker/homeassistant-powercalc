@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.6:docker"
   },
-  "name": "RF 263-2 Smart Filament Bulb E27 Vintage (2200K)",
+  "name": "Smart Filament Bulb E27 Vintage (2200K)",
   "standby_power": 0.33
 }

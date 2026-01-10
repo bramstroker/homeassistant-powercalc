@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.24.8:docker"
   },
-  "name": "Smart spot comfort",
+  "name": "Smart Spot Comfort",
   "standby_power": 0.33
 }
