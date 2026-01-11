@@ -1,16 +1,16 @@
 {
   "calculation_strategy": "lut",
-  "created_at": "2026-01-10T23:41:45.167570",
+  "created_at": "2026-01-11T14:01:42.490737",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly PlugS",
+  "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,
-    "SLEEP_TIME": 3,
+    "SLEEP_TIME": 2,
     "VERSION": "v1.20.2:docker"
   },
-  "name": "Hifree Bedside RGB Lamp",
-  "standby_power": 0.45,
-  "author": "Pasquale Cuorpo <maverick1982@users.noreply.github.com>"
+  "name": "Strip Light 2 Pro",
+  "standby_power": 1.2,
+  "author": "Jonas Dambacher <mail@jonas-dambacher.de>"
 }
