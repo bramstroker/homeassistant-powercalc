@@ -21,5 +21,6 @@
       }
     ],
     "default": "default"
-  }
+  },
+  "author": "Bram <bgerritsen@emico.nl>"
 }
