@@ -6,7 +6,7 @@
   "measure_description": "Manually measured. Copied from LOM002 as suggested in https://github.com/bramstroker/homeassistant-powercalc/discussions/1093",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
-  "name": "Hue smart plug LOM001",
+  "name": "Hue Smart Plug",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

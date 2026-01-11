@@ -9,6 +9,6 @@
   "measure_description": "Bulbs was measured twice at each dim setting (100 points) and mean value was used when there were differences",
   "measure_device": "Zhurui PR10-D",
   "measure_method": "manual",
-  "name": "Hue White A60 E27 806lm",
+  "name": "Hue White Bulb A60 E27 806lm",
   "standby_power": 0.39
 }

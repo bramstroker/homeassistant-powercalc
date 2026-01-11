@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.12.13:docker"
   },
-  "name": "Hue White Lamp (PAR38)",
+  "name": "Hue White Bulb A60 E27 w/ Bluetooth",
   "standby_power": 0.25
 }

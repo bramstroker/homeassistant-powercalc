@@ -14,6 +14,6 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.20.1:docker"
   },
-  "name": "Philips Hue 800 Lumen White and Color A19",
+  "name": "Hue White and Color Ambiance A19 800lm",
   "standby_power": 0.34
 }

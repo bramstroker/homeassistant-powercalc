@@ -6,7 +6,7 @@
   "measure_description": "Manually measured.",
   "measure_device": "Intertek PM01-US",
   "measure_method": "manual",
-  "name": "Hue Smart Plug LOM010",
+  "name": "Hue Smart Plug",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",

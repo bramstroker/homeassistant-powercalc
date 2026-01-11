@@ -6,6 +6,6 @@
   "measure_description": "Used HASS based script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
-  "name": "Philips Hue White and Color Ambience (1 gen)",
+  "name": "Hue White and Color Ambiance (1 gen)",
   "standby_power": 0.22
 }

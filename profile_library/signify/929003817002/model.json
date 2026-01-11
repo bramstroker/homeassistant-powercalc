@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.14.10:docker"
   },
-  "name": "Hue Solo Lightstrip (5 mtr.)",
+  "name": "Hue Solo Lightstrip (5m)",
   "standby_power": 0.3
 }

@@ -11,6 +11,6 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.20.1:docker"
   },
-  "name": "Philips Hue 840 Lumen White A19",
+  "name": "Hue White Bulb A19 840lm",
   "standby_power": 0.34
 }

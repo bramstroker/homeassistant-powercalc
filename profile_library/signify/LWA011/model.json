@@ -15,6 +15,6 @@
     "SLEEP_TIME": 60,
     "VERSION": "v0.26.1:docker"
   },
-  "name": "Hue White A60 E27 Bluetooth (800 lm)",
+  "name": "Hue White A60 E27 800lm with Bluetooth",
   "standby_power": 0.41
 }

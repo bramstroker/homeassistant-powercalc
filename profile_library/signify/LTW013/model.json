@@ -14,6 +14,6 @@
     "SLEEP_TIME": 5,
     "VERSION": "v0.17.0:docker"
   },
-  "name": "Hue white ambiance GU10",
+  "name": "Hue White Ambiance GU10",
   "standby_power": 0.3
 }

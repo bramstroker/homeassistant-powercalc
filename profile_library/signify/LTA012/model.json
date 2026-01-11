@@ -15,6 +15,6 @@
     "SLEEP_TIME": 5,
     "VERSION": "v1.17.19:docker"
   },
-  "name": "Hue white ambiance E26 1600lm with Bluetooth",
+  "name": "Hue White Ambiance E26 1600lm with Bluetooth",
   "standby_power": 0.22
 }

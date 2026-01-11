@@ -15,6 +15,6 @@
     "SLEEP_TIME": 25,
     "VERSION": "v0.19.7:docker"
   },
-  "name": "Hue White E14 SES Candle 470lm w/ BT (LWE002)",
+  "name": "Hue White E14 SES Candle 470lm w/ BT",
   "standby_power": 0.25
 }

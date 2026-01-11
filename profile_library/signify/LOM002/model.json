@@ -6,7 +6,7 @@
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
   "measure_device": "Zhurui PR10-D",
   "measure_method": "manual",
-  "name": "Hue smart plug LOM002",
+  "name": "Hue Smart Plug",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
