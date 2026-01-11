@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.16.2:docker"
   },
-  "name": "Slim recessed light S",
+  "name": "Hue Slim recessed light S",
   "standby_power": 0.42
 }

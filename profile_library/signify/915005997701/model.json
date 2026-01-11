@@ -14,6 +14,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.2:docker"
   },
-  "name": "Philips Hue Devere",
+  "name": "Hue Devere",
   "standby_power": 0.09
 }
