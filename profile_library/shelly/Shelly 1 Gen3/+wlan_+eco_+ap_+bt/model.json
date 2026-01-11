@@ -1,0 +1,5 @@
+{
+  "name": "WLAN + ECO-mode + Wifi-AP + BT",
+  "standby_power": 0.576,
+  "standby_power_on": 0.864
+}
