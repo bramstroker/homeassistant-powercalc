@@ -32,6 +32,7 @@ Below is a comprehensive table of all fields that can be used in a `model.json` 
 | `created_at`                      | string           | Yes | Creation date of the profile (ISO 8601 format, e.g., `2023-06-19T08:02:31`)                                                             |
 | `author`                          | string           | Yes | Author of the profile                                                                                                                   |
 | `aliases`                         | array of strings | No | Alternative model id's for this model, used for discovery purposes                                                                      |
+| `compatible_integrations`         | array of strings | No | List of compatible integration platforms (e.g., "hue", "lifx"). Only entities from these integrations will be discovered                     |
 | `calculation_enabled_condition`   | string           | No | Template which can be evaluated to determine if calculation is enabled                                                                  |
 | `composite_config`                | object/array     | No | Configuration for [composite](../strategies/composite.md) calculation strategy                                                          |
 | `config_flow_discovery_remarks`   | string           | No | Remarks to show in the GUI config flow on first step of discovery                                                                       |

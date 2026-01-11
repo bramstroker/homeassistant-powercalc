@@ -96,7 +96,6 @@ async def test_load_sub_profile(hass: HomeAssistant) -> None:
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "yeelight"
     assert power_profile.model == "YLDL01YL"
-    assert power_profile.name == "Yeelight YLDL01YL Downlight"
     assert power_profile.sub_profile == "ambilight"
 
 

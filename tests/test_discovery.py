@@ -1022,3 +1022,52 @@ async def test_discovery_process_is_locked(hass: HomeAssistant, caplog: pytest.L
     await discovery_manager.start_discovery()
 
     assert "Discovery already in progress, skipping new discovery run" in caplog.text
+
+
+async def test_discovery_compatible_integrations(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """Test that only entities with compatible integrations are discovered."""
+
+    mock_registry(
+        hass,
+        {
+            "light.hue_light": RegistryEntryWithDefaults(
+                entity_id="light.hue_light",
+                unique_id="1111",
+                platform="hue",
+                device_id="hue-device-id",
+            ),
+            "light.other_light": RegistryEntryWithDefaults(
+                entity_id="light.other_light",
+                unique_id="2222",
+                platform="other",
+                device_id="other-device-id",
+            ),
+        },
+    )
+    mock_device_registry(
+        hass,
+        {
+            "hue-device-id": DeviceEntry(
+                id="hue-device-id",
+                manufacturer="test",
+                model="compatible_integrations",
+            ),
+            "other-device-id": DeviceEntry(
+                id="other-device-id",
+                manufacturer="test",
+                model="compatible_integrations",
+            ),
+        },
+    )
+
+    await run_powercalc_setup(hass)
+
+    # Check that only the hue light has been discovered
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 1
+    assert mock_calls[0][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
+    assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == "light.hue_light"

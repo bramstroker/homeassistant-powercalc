@@ -260,6 +260,14 @@ class DiscoveryManager:
                 continue
             if self._exclude_self_usage_profiles and profile.only_self_usage:
                 continue
+            # Check if the entity's integration is compatible with the profile
+            if (
+                discovery_type == DiscoveryBy.ENTITY
+                and source_entity.entity_entry
+                and profile.compatible_integrations
+                and source_entity.entity_entry.platform not in profile.compatible_integrations
+            ):
+                continue
             power_profiles.append(profile)
 
         return power_profiles

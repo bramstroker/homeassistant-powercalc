@@ -319,6 +319,11 @@ class PowerProfile:
         """Get extra remarks to show at the config flow sub profile step."""
         return self._json_data.get("config_flow_sub_profile_remarks")
 
+    @property
+    def compatible_integrations(self) -> list[str] | None:
+        """Get the list of compatible integrations for this profile."""
+        return self._json_data.get("compatible_integrations")
+
     def get_default_discovery_remarks_translation_key(self) -> str | None:
         """When no remarks are provided in the profile, see if we need to show a default remark."""
         if self.device_type == DeviceType.SMART_SWITCH and self.needs_fixed_config:
