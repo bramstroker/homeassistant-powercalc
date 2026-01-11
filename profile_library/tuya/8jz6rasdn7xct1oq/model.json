@@ -11,5 +11,6 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "Hifree Bedside RGB Lamp",
-  "standby_power": 0.45
+  "standby_power": 0.45,
+  "author": "Pasquale Cuorpo <maverick1982@users.noreply.github.com>"
 }
