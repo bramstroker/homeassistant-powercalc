@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "rgbww-light",
+  "name": "7W Color Bulb for ESPHome",
   "standby_power": 0.47
 }
