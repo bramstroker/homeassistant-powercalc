@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "E1 Pro (E330)"
+  ],
   "calculation_strategy": "fixed",
   "compatible_integrations": [
     "reolink"
