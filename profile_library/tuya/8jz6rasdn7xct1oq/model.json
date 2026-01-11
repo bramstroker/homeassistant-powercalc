@@ -10,6 +10,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.2:docker"
   },
-  "name": "T21",
+  "name": "Hifree Bedside RGB Lamp",
   "standby_power": 0.45
 }
