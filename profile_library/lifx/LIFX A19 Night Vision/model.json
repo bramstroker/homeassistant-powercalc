@@ -11,7 +11,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.19.12:docker"
   },
-  "name": "LIFX A19 Night Vision",
+  "name": "A19 Night Vision",
   "standby_power": 0.47,
   "sub_profile_select": {
     "default": "infrared_off",

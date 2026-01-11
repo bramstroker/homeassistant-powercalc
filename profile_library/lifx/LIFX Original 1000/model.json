@@ -11,6 +11,6 @@
     "SLEEP_TIME": 1,
     "VERSION": "v0.17.0:docker"
   },
-  "name": "LIFX Original 1000",
+  "name": "Original 1000",
   "standby_power": 2.46
 }

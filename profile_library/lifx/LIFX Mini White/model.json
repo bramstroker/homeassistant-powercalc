@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.23.2:docker"
   },
-  "name": "LIFX Mini White",
+  "name": "Mini White",
   "standby_power": 0.74
 }

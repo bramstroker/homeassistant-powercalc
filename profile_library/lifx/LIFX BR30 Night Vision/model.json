@@ -11,7 +11,7 @@
     "SLEEP_TIME": 1,
     "VERSION": "v0.17.0:docker"
   },
-  "name": "LIFX BR30 Night Vision",
+  "name": "BR30 Night Vision",
   "standby_power": 0.72,
   "sub_profile_select": {
     "default": "infrared_off",

@@ -12,6 +12,6 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.19.15:docker"
   },
-  "name": "LIFX A19",
+  "name": "A19",
   "standby_power": 0.5
 }

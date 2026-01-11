@@ -11,6 +11,6 @@
     "SLEEP_TIME": 1,
     "VERSION": "v0.17.0:docker"
   },
-  "name": "LIFX Candle",
+  "name": "Candle",
   "standby_power": 0.56
 }

@@ -11,6 +11,6 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.17.0:docker"
   },
-  "name": "LIFX Z",
+  "name": "Z",
   "standby_power": 0.57
 }
