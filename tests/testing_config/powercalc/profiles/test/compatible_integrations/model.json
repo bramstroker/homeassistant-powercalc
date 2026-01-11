@@ -1,0 +1,10 @@
+{
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": 50
+  },
+  "name": "Test",
+  "compatible_integrations": [
+    "hue"
+  ]
+}

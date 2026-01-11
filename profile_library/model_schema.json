@@ -18,6 +18,13 @@
       },
       "description": "Aliases for this model"
     },
+    "compatible_integrations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of compatible integrations for this model"
+    },
     "author": {
       "type": "string"
     },
