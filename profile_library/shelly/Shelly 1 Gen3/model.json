@@ -15,7 +15,7 @@
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
   "only_self_usage": false,
-  "config_flow_sub_profile_remarks": "You need to select a profile depending on your Shelly configuration.\nIf not sure, select 'Other combinations' which will report the highest possible draw (without addon).",
+  "config_flow_sub_profile_remarks": "Select a profile depending on your Shelly device configuration.",
   "created_at": "2026-01-15T11:15:00 CET",
   "author": "Michal Bartak <maxym.srpl@gmail.com>"
 }
