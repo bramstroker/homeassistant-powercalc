@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.0:docker"
   },
-  "name": "Govee Floor Lamp 2 - H607C (2700)",
+  "name": "Floor Lamp 2",
   "standby_power": 0.7
 }
