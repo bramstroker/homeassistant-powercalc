@@ -2,7 +2,9 @@
   "name": "Plus 2PM",
   "aliases": [
     "SNSW-102P16EU",
-    "Shelly Plus2PM"
+    "Shelly Plus2PM",
+    "Plus 2PM UL",
+    "SNSW-002P15UL"
   ],
   "author": "Michal Bartak <maxym.srpl@gmail.com>",
   "calculation_strategy": "multi_switch",
