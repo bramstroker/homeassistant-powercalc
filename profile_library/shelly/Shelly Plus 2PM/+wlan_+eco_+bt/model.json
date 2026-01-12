@@ -1,0 +1,7 @@
+{
+  "name": "WLAN + ECO-mode + BT",
+  "standby_power": 0.625,
+  "multi_switch_config": {
+    "power": 0.134
+  }
+}
