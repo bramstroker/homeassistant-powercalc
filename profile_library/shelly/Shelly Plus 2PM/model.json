@@ -10,6 +10,7 @@
   "device_type": "smart_switch",
   "discovery_by": "device",
   "measure_description": "The measured device fw: 1.7.1. The result represents the average value of measurements collected from the measuring device API for the following scenarios: dumb device/baseline consumption (~3.8W) and several device configurations. See sub-profiles.",
+  "config_flow_sub_profile_remarks": "Select a profile depending on your Shelly device configuration.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_device_firmware": "20250924-062710/1.7.1-gd336f31",
   "measure_method": "manual",
