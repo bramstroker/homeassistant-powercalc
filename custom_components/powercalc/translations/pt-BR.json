@@ -175,7 +175,7 @@
       "group_custom": {
         "data": {
           "area": "Área",
-          "floor": "Floor",
+          "floor": "Piso",
           "create_energy_sensor": "Criar sensor de consumo",
           "create_utility_meters": "Criar medidores de utilidade",
           "device": "Dispositivo",
@@ -538,10 +538,10 @@
         }
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Opções de energia",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_integration_method": "Método de integração",
+          "energy_sensor_unit_prefix": "Prefixo de unidade",
           "energy_filter_outlier_enabled": "Filter outliers",
           "energy_filter_outlier_max_step": "Outlier filter max step"
         },
@@ -592,11 +592,11 @@
         }
       },
       "global_configuration_discovery": {
-        "title": "Discovery options",
+        "title": "Opções de descoberta",
         "description": "Manage discovery setting. See [documentation](https://docs.powercalc.nl/library/discovery/) for more info",
         "data": {
-          "enabled": "Enable discovery",
-          "exclude_device_types": "Excluded device types",
+          "enabled": "Habilitar descoberta",
+          "exclude_device_types": "Tipos de dispositivos excluídos",
           "exclude_self_usage": "Exclude self-usage"
         },
         "data_description": {
@@ -622,7 +622,7 @@
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval"
+          "energy_update_interval": "Intervalo de atualização de energia"
         },
         "data_description": {
           "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
@@ -643,7 +643,7 @@
         "title": "Opções do grupo",
         "data": {
           "area": "Área",
-          "floor": "Floor",
+          "floor": "Piso",
           "device": "Dispositivo",
           "force_calculate_group_energy": "Forçar cálculo da energia",
           "group_energy_entities": "Entidades de energia adicionais",
@@ -705,7 +705,7 @@
           "advanced_options": "Opções avançadas",
           "basic_options": "Opções básicas",
           "daily_energy": "Opções de consumo diário",
-          "energy_options": "Energy options",
+          "energy_options": "Opções de energia",
           "fixed": "Opções de Fixo",
           "group_custom": "Opções de grupo",
           "group_subtract": "Opções de grupo",
