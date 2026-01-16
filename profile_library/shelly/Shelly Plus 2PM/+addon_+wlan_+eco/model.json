@@ -1,0 +1,7 @@
+{
+  "name": "Add-On + WLAN + ECO-mode",
+  "standby_power": 0.991,
+  "multi_switch_config": {
+    "power": 0.134
+  }
+}
