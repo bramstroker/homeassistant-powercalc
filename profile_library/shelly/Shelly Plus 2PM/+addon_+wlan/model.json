@@ -2,6 +2,6 @@
   "name": "Add-On + WLAN",
   "standby_power": 1.2645,
   "multi_switch_config": {
-    "power": 0.145
+    "power": 0.278
   }
 }
