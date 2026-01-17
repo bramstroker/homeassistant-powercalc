@@ -115,3 +115,17 @@ The profile then calculates the power usage based on the state of the binary sen
 }
 
 ```
+
+### Defining variables for YAML sensors
+
+When defining a profile for YAML sensors, you can pass the required variables this way:
+
+```yaml
+powercalc:
+  sensors:
+    - entity_id: light.your_light_entity
+      manufacturer: "some_manufacturer"
+      model: "some_model"
+      variables:
+        switch_entity: switch.your_switch_entity
+```
