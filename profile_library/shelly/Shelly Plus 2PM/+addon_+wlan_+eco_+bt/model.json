@@ -1,6 +1,6 @@
 {
   "name": "Add-On + WLAN + ECO-mode + BT",
-  "standby_power": 1.1615,
+  "standby_power": 1.091,
   "multi_switch_config": {
     "power": 0.272
   }
