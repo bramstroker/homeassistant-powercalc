@@ -8,7 +8,7 @@
   "measure_device": "Zhurui PR10-D",
   "measure_method": "manual",
   "name": "UltimateSensor Mini",
-  "fixed_power": {
+  "fixed_config": {
     "power": 1.25
   }
 }
