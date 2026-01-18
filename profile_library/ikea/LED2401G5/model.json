@@ -11,5 +11,6 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "KAJPLATS E27 WS G95 clear 806lm",
-  "standby_power": 0.23
+  "standby_power": 0.23,
+  "author": "Linus Nordin <linus.nordin@gmail.com>"
 }
