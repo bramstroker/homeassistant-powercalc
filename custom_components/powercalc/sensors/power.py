@@ -91,7 +91,6 @@ from custom_components.powercalc.errors import (
 from custom_components.powercalc.helpers import evaluate_power
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import (
-    DiscoveryBy,
     PowerProfile,
     SubProfileSelectConfig,
     SubProfileSelector,
@@ -524,9 +523,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self._sleep_power_timer()
             self._sleep_power_timer = None
 
-        discovery_by = self._power_profile.discovery_by if self._power_profile else DiscoveryBy.ENTITY
-        if self.source_entity == DUMMY_ENTITY_ID and discovery_by == DiscoveryBy.ENTITY:
-            state = State(self.source_entity, STATE_ON)
+        if self.source_entity == DUMMY_ENTITY_ID and state is None:
+            state = State(self.source_entity, STATE_UNKNOWN)
 
         if not state or not self._has_valid_state(state):
             _LOGGER.debug(

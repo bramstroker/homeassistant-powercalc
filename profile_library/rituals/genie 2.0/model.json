@@ -1,0 +1,43 @@
+{
+  "aliases": [
+    "The Perfume Genie 2.0"
+  ],
+  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
+  "calculation_enabled_condition": "{{ is_state('[[switch_entity]]', 'on') }}",
+  "calculation_strategy": "fixed",
+  "compatible_integrations": [
+    "rituals_perfume_genie"
+  ],
+  "created_at": "2026-01-18T13:38:00",
+  "device_type": "generic_iot",
+  "discovery_by": "device",
+  "fields": {
+    "switch_entity": {
+      "label": "Switch entity",
+      "description": "The entity which controls the on/off state of the diffuser",
+      "selector": {
+        "entity": {
+          "domain": "switch"
+        }
+      }
+    },
+    "amount_entity": {
+      "label": "Perfume amount entity",
+      "description": "The entity which controls the amount of perfume",
+      "selector": {
+        "entity": {
+          "domain": "number"
+        }
+      }
+    }
+  },
+  "measure_description": "Measured manually taking average power over 1 hour for each perfume amount and the standby state",
+  "measure_device": "Zhurui PR10-D",
+  "measure_method": "manual",
+  "min_version": "1.20.3",
+  "name": "Perfume Genie 2.0",
+  "standby_power": 0.45,
+  "fixed_config": {
+    "power": "{{ {1: '0.53', 2: '0.53', 3: '0.59'}.get(states('[[amount_entity]]')|int(0), '0.45') }}"
+  }
+}
