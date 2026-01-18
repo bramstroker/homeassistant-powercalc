@@ -9,6 +9,6 @@
   "measure_method": "manual",
   "name": "Home Automation Interface",
   "fixed_power": {
-    "power": 2.0
+    "power": 1.65
   }
 }
