@@ -2,6 +2,6 @@
   "name": "WLAN + Wifi-AP",
   "standby_power": 0.795,
   "multi_switch_config": {
-    "power": 0.145
+    "power": 0.278
   }
 }
