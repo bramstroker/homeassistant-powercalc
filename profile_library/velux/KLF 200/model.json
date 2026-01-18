@@ -1,0 +1,14 @@
+{
+  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
+  "calculation_strategy": "fixed",
+  "created_at": "2026-01-18T09:16:00",
+  "device_type": "generic_iot",
+  "discovery_by": "device",
+  "measure_description": "Measured manually taking average power over 1 hour",
+  "measure_device": "Zhurui PR10-D",
+  "measure_method": "manual",
+  "name": "Home Automation Interface",
+  "fixed_power": {
+    "power": 2.0
+  }
+}
