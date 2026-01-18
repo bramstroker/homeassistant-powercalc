@@ -378,6 +378,13 @@
         "description": "Denna modellen har flera underprofiler. Välj en som passar din enhet\n\n\"{entity_id}\"{remarks}",
         "title": "Underprofil konfiguration"
       },
+      "sub_profile_per_device": {
+        "data": {
+          "sub_profile": "Sub profile"
+        },
+        "description": "This device has a model with multiple sub profiles. {remarks}",
+        "title": "Sub profile config"
+      },
       "smart_switch": {
         "data": {
           "power": "Effekt",

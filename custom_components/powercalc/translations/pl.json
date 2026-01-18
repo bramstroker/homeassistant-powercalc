@@ -378,6 +378,13 @@
         "description": "Ten model ma wiele podprofili. Wybierz taki, który pasuje do Twojego urządzenia\n\n\"{entity_id}\"{remarks}",
         "title": "Konfiguracja podprofili"
       },
+      "sub_profile_per_device": {
+        "data": {
+          "sub_profile": "Sub profile"
+        },
+        "description": "This device has a model with multiple sub profiles. {remarks}",
+        "title": "Sub profile config"
+      },
       "smart_switch": {
         "data": {
           "power": "Moc",

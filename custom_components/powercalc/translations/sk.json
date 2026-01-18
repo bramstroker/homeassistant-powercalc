@@ -378,6 +378,13 @@
         "description": "Tento model má viacero podprofilov. Vyberte ten, ktorý vyhovuje vášmu zariadeniu:\n\n\"{entity_id}\"{remarks}",
         "title": "Konfigurácia podprofilu"
       },
+      "sub_profile_per_device": {
+        "data": {
+          "sub_profile": "Sub profile"
+        },
+        "description": "This device has a model with multiple sub profiles. {remarks}",
+        "title": "Sub profile config"
+      },
       "smart_switch": {
         "data": {
           "power": "Výkon",
