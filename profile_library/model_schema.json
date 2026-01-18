@@ -180,7 +180,10 @@
       "description": "Configuration for fixed calculation strategy",
       "properties": {
         "power": {
-          "type": "number"
+          "type": [
+            "number",
+            "string"
+          ]
         },
         "states_power": {
           "type": "object",
