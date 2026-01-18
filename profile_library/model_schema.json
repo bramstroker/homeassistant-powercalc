@@ -133,8 +133,8 @@
       "description": "Whether to discover the profile by device or entity"
     },
     "fields": {
-      "type": "array",
-      "items": {
+      "type": "object",
+      "additionalProperties": {
         "type": "object",
         "properties": {
           "description": {
