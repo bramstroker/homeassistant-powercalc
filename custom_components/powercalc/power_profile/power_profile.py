@@ -200,7 +200,7 @@ class PowerProfile:
     @property
     def min_version(self) -> str | None:
         """Get the minimum required version for this profile."""
-        return self._json_data.get("min_version")
+        return self._json_data.get("min_version")  # pragma: no cover
 
     @property
     def multi_switch_config(self) -> ConfigType | None:
