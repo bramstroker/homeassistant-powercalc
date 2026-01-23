@@ -475,7 +475,8 @@ class GroupedSensor(BaseEntity, SensorEntity):
 
         self.async_on_remove(start.async_at_start(self.hass, self.on_start))
 
-        self._async_hide_members(self._sensor_config.get(CONF_HIDE_MEMBERS) or False)
+        if CONF_HIDE_MEMBERS in self._sensor_config:
+            self._async_hide_members(bool(self._sensor_config.get(CONF_HIDE_MEMBERS)))
 
     async def async_will_remove_from_hass(self) -> None:
         """
