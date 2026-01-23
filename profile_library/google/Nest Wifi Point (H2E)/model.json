@@ -6,7 +6,7 @@
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2026-01-21T21:30:47.471720",
-  "device_type": "smart_speaker",
+  "device_type": "generic_iot",
   "linear_config": {
     "calibrate": [
       "10 -> 4.0",
