@@ -15,5 +15,6 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "KAJPLATS E14 WS globe 806lm",
-  "standby_power": 0.21
+  "standby_power": 0.21,
+  "author": "Linus Nordin <linus.nordin@gmail.com>"
 }
