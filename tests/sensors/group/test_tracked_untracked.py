@@ -1,15 +1,18 @@
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
+    CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TRACKED_AUTO,
     CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_GROUP_TYPE,
+    CONF_HIDE_MEMBERS,
     CONF_MAIN_POWER_SENSOR,
     CONF_POWER,
     CONF_SENSOR_TYPE,
@@ -181,3 +184,39 @@ async def test_entity_registry_updates(hass: HomeAssistant) -> None:
     tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
     assert tracked_power_sensor.entities == {"sensor.test1_power_new", "sensor.test3_power", "sensor.test4_power"}
     assert hass.states.get("sensor.tracked_power").state == "10.00"
+
+
+async def test_member_hidden_property_is_untouched(hass: HomeAssistant) -> None:
+    """
+    Test tracked group does not touch the hidden state of members
+    see: https://github.com/bramstroker/homeassistant-powercalc/issues/3868
+    """
+    power_sensors = ["sensor.test1_power", "sensor.test2_power"]
+    mock_sensors_in_registry(hass, power_sensors)
+    create_mock_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_TYPE: GroupType.CUSTOM,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_POWER_ENTITIES: power_sensors,
+            CONF_HIDE_MEMBERS: True,
+        },
+    )
+    create_mock_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
+            CONF_NAME: "Tracked / Untracked",
+            CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
+            CONF_GROUP_TRACKED_AUTO: True,
+        },
+    )
+    await run_powercalc_setup(hass)
+
+    entity_reg = entity_registry.async_get(hass)
+    for entity_id in power_sensors:
+        entry = entity_reg.async_get(entity_id)
+        assert entry is not None
+        assert entry.hidden_by == entity_registry.RegistryEntryHider.INTEGRATION
