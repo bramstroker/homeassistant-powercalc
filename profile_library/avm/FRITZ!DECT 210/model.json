@@ -4,7 +4,7 @@
   "created_at": "2023-12-31T08:21:16",
   "device_type": "smart_switch",
   "measure_description": "Manually measured.",
-  "measure_device": "Shelly Plus Plug S / AVM FRITZ!DECT 200",
+  "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
   "measure_method": "manual",
   "name": "FRITZ!DECT 210",
   "only_self_usage": true,

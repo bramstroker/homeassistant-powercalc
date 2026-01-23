@@ -5,7 +5,7 @@
   "device_type": "generic_iot",
   "discovery_by": "device",
   "measure_description": "Measured manually taking average power over 1 hour",
-  "measure_device": "Zhurui PR10-D",
+  "measure_device": "Zhurui PR10",
   "measure_method": "manual",
   "name": "UltimateSensor Mini",
   "fixed_config": {

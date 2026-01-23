@@ -8,8 +8,8 @@
   "created_at": "2025-07-16T04:50:00",
   "device_type": "smart_dimmer",
   "discovery_by": "entity",
-  "measure_description": "Measured standby power with using a Shelly Plus Plug US. Standby power was almost too low to capture.",
-  "measure_device": "Shelly Plus Plug US",
+  "measure_description": "Measured standby power with using a Shelly Plus Plug. Standby power was almost too low to capture.",
+  "measure_device": "Shelly Plus Plug",
   "measure_method": "script",
   "name": "Plug-In Lamp Dimmer (Wireless Smart Dimmer)",
   "sensor_config": {

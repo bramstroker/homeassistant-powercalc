@@ -32,7 +32,7 @@
     }
   },
   "measure_description": "Measured manually taking average power over 1 hour for each perfume amount and the standby state",
-  "measure_device": "Zhurui PR10-D",
+  "measure_device": "Zhurui PR10",
   "measure_method": "manual",
   "min_version": "1.20.3",
   "name": "Perfume Genie 2.0",

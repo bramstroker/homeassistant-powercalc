@@ -9,7 +9,7 @@
   "device_type": "smart_switch",
   "discovery_by": "entity",
   "measure_description": "Measured with disconnected load, for about 90 minutes and calculated average from values stored by Home Assistant. Multiple combinations of settings were tested. Firmware version 1.7.1 for the tested Shelly 1L Gen3 device. The power values are long-term averages measured while the device periodically wakes to maintain connectivity. Instantaneous power is higher during wakeups when the relay is off, but the average energy consumption is accurately reflected.",
-  "measure_device": "Shelly Plug S Gen3 (S3PL-00112EU)",
+  "measure_device": "Shelly Plug S Gen3",
   "measure_device_firmware": "20251113-160645/1.7.3-gb71e9ac",
   "measure_method": "manual",
   "measure_settings": {

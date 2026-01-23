@@ -9,7 +9,7 @@
   "device_type": "smart_switch",
   "discovery_by": "device",
   "measure_description": "Measured two units with identical settings over 300s and calculated average for single unit. Multiple combinations of settings were tested. Eco mode only has an effect when WLAN-AP (range extender) is disabled.",
-  "measure_device": "Shelly Plug S (SSHPLG-S)",
+  "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "measure_settings": {
     "VERSION": "v1.17.12:docker"

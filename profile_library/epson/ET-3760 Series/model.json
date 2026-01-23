@@ -10,7 +10,7 @@
     }
   },
   "measure_description": "Printer was measured while idle and while printing",
-  "measure_device": "Shelly Plus Plug US",
+  "measure_device": "Shelly Plus Plug",
   "measure_method": "manual",
   "name": "ET-3760 Series"
 }

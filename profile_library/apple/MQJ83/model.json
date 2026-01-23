@@ -23,7 +23,7 @@
     ]
   },
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly Plus Plug US",
+  "measure_device": "Shelly Plus Plug",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,
