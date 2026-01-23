@@ -10,8 +10,10 @@ key, or configured via the GUI Global Configuration entry.
 ### Individual Power Sensors
 
 -   Update immediately whenever the source entity changes state.
+-   Additionally update on a fixed interval defined by
+    `power_update_interval`, even if power is constant. (default: **disabled**)
 -   A new state is **not** written if the calculated power value hasn't
-    changed from the previously reported value.
+    changed from the previously reported value, unless `power_update_interval` is defined.
 
 ### Individual Energy Sensors
 
@@ -46,6 +48,7 @@ key, or configured via the GUI Global Configuration entry.
 ``` yaml
 powercalc:
   energy_update_interval: 120              # Update every 2 minutes
+  power_update_interval: 600               # Update every 10 minutes
   group_power_update_interval: 30          # Throttle group power updates to 30 seconds
   group_energy_update_interval: 120        # Override default 60 sec group energy updates
 ```

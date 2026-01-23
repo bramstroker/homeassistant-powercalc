@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from copy import copy
+from datetime import datetime, timedelta
 from decimal import Decimal
 import logging
 from typing import Any, cast
@@ -39,6 +40,7 @@ from homeassistant.helpers.event import (
     async_call_later,
     async_track_state_change_event,
     async_track_template_result,
+    async_track_time_interval,
 )
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, StateType
@@ -66,6 +68,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_POWER_UPDATE_INTERVAL,
     CONF_SELF_USAGE_INCLUDED,
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
@@ -473,6 +476,15 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if hasattr(self._strategy_instance, "set_update_callback"):
             self._strategy_instance.set_update_callback(self._update_power_sensor)
+
+        force_update_interval = self._sensor_config.get(CONF_POWER_UPDATE_INTERVAL, 0)
+        if force_update_interval > 0:
+
+            @callback
+            def async_update(__: datetime | None = None) -> None:
+                self.async_schedule_update_ha_state(True)
+
+            async_track_time_interval(self.hass, async_update, timedelta(seconds=force_update_interval))
 
     def _get_tracking_entities(self) -> list[str | TrackTemplate]:
         """Return entities and templates that should be tracked."""
