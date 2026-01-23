@@ -1,0 +1,35 @@
+{
+  "aliases": [
+    "Nest Wifi point"
+  ],
+  "author": "Bob Shaker <bobshaker1@gmail.com>",
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-01-21T21:30:47.471720",
+  "device_type": "generic_iot",
+  "linear_config": {
+    "calibrate": [
+      "10 -> 4.0",
+      "20 -> 3.94",
+      "30 -> 4.06",
+      "40 -> 4.04",
+      "50 -> 4.35",
+      "60 -> 4.54",
+      "70 -> 4.32",
+      "80 -> 5.18",
+      "90 -> 5.1",
+      "100 -> 4.9",
+      "0 -> 4.54"
+    ]
+  },
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Tp-Link Tapo P110M",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.2:docker"
+  },
+  "name": "Nest Wifi Point",
+  "standby_power": 3.71
+}
