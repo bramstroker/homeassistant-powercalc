@@ -7,7 +7,7 @@
   "fixed_config": {
     "power": 2.0
   },
-  "measure_device": "Shelly Plus 1 PM",
+  "measure_device": "Shelly Plus 1PM",
   "measure_description": "Manually measured, took average values from 60 minutes",
   "measure_method": "manual",
   "name": "Presence Sensor FP2",

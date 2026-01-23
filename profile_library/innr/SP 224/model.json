@@ -4,7 +4,7 @@
   "created_at": "2022-09-06T08:26:19",
   "device_type": "smart_switch",
   "measure_description": "Manually measured w/3.65W Incandescent nightlight.",
-  "measure_device": "TP-Link Kasa KP115(US)",
+  "measure_device": "TP-Link Kasa KP115",
   "measure_method": "manual",
   "name": "Zigbee Smart Plug",
   "only_self_usage": false,

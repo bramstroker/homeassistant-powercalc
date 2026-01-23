@@ -7,7 +7,7 @@
     "power": 3.15
   },
   "measure_description": "Manually measured",
-  "measure_device": "Shelly Plus Plug S / AVM FRITZ!DECT 200",
+  "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
   "measure_method": "manual",
   "name": "FRITZ!Repeater 1750E",
   "sensor_config": {
