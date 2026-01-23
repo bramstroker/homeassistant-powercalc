@@ -156,12 +156,14 @@
         "data": {
           "group_energy_update_interval": "Intervalo de atualização de energia do grupo",
           "group_power_update_interval": "Intervalo de atualização de potência do grupo",
-          "energy_update_interval": "Intervalo de atualização de energia"
+          "energy_update_interval": "Intervalo de atualização de energia",
+          "power_update_interval": "Power update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Intervalo em que os sensores de energia do grupo são atualizados. Em segundos. Defina como 0 para desativar",
           "group_power_update_interval": "Intervalo em que os sensores de potência do grupo são atualizados. Em segundos. Defina como 0 para desativar",
-          "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar"
+          "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar",
+          "power_update_interval": "Interval at which energy sensors are force updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
@@ -629,12 +631,14 @@
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Intervalo de atualização de energia"
+          "energy_update_interval": "Intervalo de atualização de energia",
+          "power_update_interval": "Power update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
           "group_power_update_interval": "Intervalo em que os sensores de potência do grupo são atualizados. Em segundos. Defina como 0 para desativar",
-          "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar"
+          "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar",
+          "power_update_interval": "Interval at which power sensors are force updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
