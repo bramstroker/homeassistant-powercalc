@@ -1,4 +1,8 @@
 {
+  "aliases": [
+    "KAJPLATS E27 WS globe 1055lm",
+    "36865"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-01-23T15:38:51.193582",
   "device_type": "light",
