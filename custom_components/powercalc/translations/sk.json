@@ -156,12 +156,14 @@
         "data": {
           "group_energy_update_interval": "Interval aktualizácie skupinovej energie",
           "group_power_update_interval": "Interval aktualizácie skupinového výkonu",
-          "energy_update_interval": "Interval aktualizácie energie"
+          "energy_update_interval": "Interval aktualizácie energie",
+          "power_update_interval": "Power update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Interval, v ktorom sa aktualizujú snímače skupinovej energie. V sekundách. Nastavte na 0 pre vypnutie",
           "group_power_update_interval": "Interval, v ktorom sa aktualizujú snímače skupinového výkonu. V sekundách. Nastavte na 0 pre vypnutie",
-          "energy_update_interval": "Interval, v ktorom sa aktualizujú snímače energie. V sekundách. Nastavte na 0 pre vypnutie"
+          "energy_update_interval": "Interval, v ktorom sa aktualizujú snímače energie. V sekundách. Nastavte na 0 pre vypnutie",
+          "power_update_interval": "Interval at which energy sensors are force updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
@@ -629,12 +631,14 @@
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval"
+          "energy_update_interval": "Energy update interval",
+          "power_update_interval": "Power update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
           "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
+          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
+          "power_update_interval": "Interval at which power sensors are force updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
