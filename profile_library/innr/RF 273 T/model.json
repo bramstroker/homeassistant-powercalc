@@ -11,5 +11,6 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "Smart Filament Bulb E27 Tunable ",
-  "standby_power": 0.18
+  "standby_power": 0.18,
+  "author": "Felix <felixsp@posteo.de>"
 }
