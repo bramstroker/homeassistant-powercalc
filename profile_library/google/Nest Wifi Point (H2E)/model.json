@@ -31,5 +31,5 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "Nest Wifi Point",
-  "standby_power": 3.486
+  "standby_power": 3.71
 }
