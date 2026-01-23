@@ -1,4 +1,8 @@
 {
+  "aliases": [
+    "KAJPLATS E27 WS G95 clear 806lm",
+    "36873"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-01-18T11:46:54.646546",
   "device_type": "light",
