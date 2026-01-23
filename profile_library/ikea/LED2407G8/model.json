@@ -15,5 +15,6 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "KAJPLATS E27 WS globe 1055lm",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author": "Linus Nordin <linus.nordin@gmail.com>"
 }
