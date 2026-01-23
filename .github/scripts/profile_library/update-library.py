@@ -15,6 +15,7 @@ from typing import Mapping
 
 import aiofiles
 import git
+import math
 
 sys.path.insert(
     1,
@@ -287,6 +288,7 @@ async def get_max_power(model_directory: str, model_data: dict) -> float | None:
         ]
         states_power = fixed_config.get("states_power", {})
         power_values.extend(states_power.values())
+        power_values = filter(lambda p: is_number(p), power_values)
 
         return max(power_values) if power_values else 0
 
@@ -440,6 +442,16 @@ async def main_async():
 
     total_time = (datetime.now() - start_time).total_seconds()
     print(f"All operations completed in {total_time:.2f} seconds")
+
+def is_number(value):
+    """Try to convert value to a float."""
+    try:
+        fvalue = float(value)
+    except (ValueError, TypeError):
+        return False
+    if not math.isfinite(fvalue):
+        return False
+    return True
 
 def main():
     """Entry point that runs the async main function"""
