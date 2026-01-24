@@ -324,10 +324,9 @@ async def test_profile_with_custom_fields(
     caplog.set_level(logging.ERROR)
 
     mock_entity_with_model_information(
-        "sensor.test",
+        ["sensor.test", "sensor.foobar"],
         "test",
         "custom_fields",
-        unique_id=DEFAULT_UNIQUE_ID,
     )
 
     result = await select_menu_item(hass, Step.MENU_LIBRARY)

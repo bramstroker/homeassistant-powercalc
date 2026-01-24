@@ -192,7 +192,11 @@ class LibraryFlow:
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.LIBRARY_CUSTOM_FIELDS,
-                schema=build_dynamic_field_schema(self.flow.selected_profile),  # type: ignore
+                schema=build_dynamic_field_schema(
+                    self.flow.hass,
+                    self.flow.selected_profile,  # type: ignore
+                    self.flow.source_entity,
+                ),
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_process_user_input,
             ),
