@@ -433,11 +433,13 @@ async def write_author_to_file(file_path: str, author: Author) -> None:
         content = await file.read()
         json_data = json.loads(content)
 
-    json_data["author_info"] = {
+    author_json = {
         "name": author.name,
-        "email": author.email,
         "github": author.github_username,
     }
+    if author.email:
+        author_json["email"] = author.email
+    json_data["author_info"] = author_json
 
     async with aiofiles.open(file_path, mode='w') as file:
         await file.write(json.dumps(json_data, indent=2))
