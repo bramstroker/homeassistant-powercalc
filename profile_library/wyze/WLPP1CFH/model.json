@@ -7,11 +7,6 @@
   "measure_device": "Shelly EM Mini Gen4",
   "measure_method": "manual",
   "name": "Plug",
-  "only_self_usage": true,
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "standby_power": 1.4,
   "standby_power_on": 1.6
 }
