@@ -28,5 +28,10 @@
     "VERSION": "v1.11.3:docker"
   },
   "name": "SYMFONISK Table lamp",
-  "standby_power": 2.6
+  "standby_power": 2.6,
+  "author_info": {
+    "name": "bragra",
+    "email": "bragragithub@gradussen.com",
+    "github": "bragra"
+  }
 }

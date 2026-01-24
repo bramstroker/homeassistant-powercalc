@@ -12,5 +12,10 @@
     "VERSION": "v0.20.1:docker"
   },
   "name": "Amaris RGBW LED Panels 595x295mm",
-  "standby_power": 1.33
+  "standby_power": 1.33,
+  "author_info": {
+    "name": "Jonas",
+    "email": null,
+    "github": "JonasJoKuJonas"
+  }
 }

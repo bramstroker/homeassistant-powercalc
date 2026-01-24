@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "LED Lichtsäule (103 cm, 600 lm, RGBCT) - ESP8266/ESPHome conversion",
-  "standby_power": 1.15
+  "standby_power": 1.15,
+  "author_info": {
+    "name": "RubenKelevra",
+    "email": "cyrond@gmail.com",
+    "github": "RubenKelevra"
+  }
 }

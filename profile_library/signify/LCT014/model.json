@@ -12,5 +12,10 @@
     "VERSION": "v0.20.1:docker"
   },
   "name": "Hue White and Color Ambiance A19 800lm",
-  "standby_power": 0.34
+  "standby_power": 0.34,
+  "author_info": {
+    "name": "mariwing",
+    "email": "mariwing@gmail.com",
+    "github": "mariwing"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v1.3.13:docker"
   },
   "name": "Round Ceiling Light (Tunable White)",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "vandalon",
+    "email": "joris@vandalon.nl",
+    "github": "vandalon"
+  }
 }

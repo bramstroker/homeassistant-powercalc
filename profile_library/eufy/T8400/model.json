@@ -9,5 +9,10 @@
   "measure_description": "Used measure tool - used average for 2 hours for each state",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",
-  "name": "Indoor Cam C120"
+  "name": "Indoor Cam C120",
+  "author_info": {
+    "name": "dxmnkd316",
+    "email": null,
+    "github": "dxmnkd316"
+  }
 }

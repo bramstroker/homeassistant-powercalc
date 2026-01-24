@@ -8,5 +8,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Hue Disney Story Light",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "CM000n",
+    "email": "simon.hoerrle@gmail.com",
+    "github": "CM000n"
+  }
 }

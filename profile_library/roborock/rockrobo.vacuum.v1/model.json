@@ -126,5 +126,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.5:docker"
   },
-  "name": "Xiaomi Mi Robot Vacuum V1"
+  "name": "Xiaomi Mi Robot Vacuum V1",
+  "author_info": {
+    "name": "Alexandre Bertrand",
+    "email": "alexandre.bertrand@invirtus.io",
+    "github": "trandbert37"
+  }
 }

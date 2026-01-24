@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Hue Cher Suspension Light",
-  "standby_power": 0.53
+  "standby_power": 0.53,
+  "author_info": {
+    "name": "Nicolas L",
+    "email": null,
+    "github": "Loustik"
+  }
 }

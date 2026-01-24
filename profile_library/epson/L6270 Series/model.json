@@ -12,5 +12,10 @@
   "measure_description": "Printer was measured while idle and while printing",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "manual",
-  "name": "L6270 Series"
+  "name": "L6270 Series",
+  "author_info": {
+    "name": "Andrzej Dopierała",
+    "email": "andrzej.dopierala@currency-one.com",
+    "github": "theundefined"
+  }
 }

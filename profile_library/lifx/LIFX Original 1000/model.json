@@ -12,5 +12,10 @@
     "VERSION": "v0.17.0:docker"
   },
   "name": "Original 1000",
-  "standby_power": 2.46
+  "standby_power": 2.46,
+  "author_info": {
+    "name": "Jamie De Vivo",
+    "email": null,
+    "github": "jamiedevivoo"
+  }
 }

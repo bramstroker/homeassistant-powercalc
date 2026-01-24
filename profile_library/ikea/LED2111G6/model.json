@@ -15,5 +15,10 @@
     "VERSION": "v1.19.0:docker"
   },
   "name": "TRADFRI bulb E14 CWS globe 806lm",
-  "standby_power": 0.46
+  "standby_power": 0.46,
+  "author_info": {
+    "name": "LtKowalski",
+    "email": null,
+    "github": "LtKowalski"
+  }
 }

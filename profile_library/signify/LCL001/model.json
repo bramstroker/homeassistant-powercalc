@@ -17,5 +17,10 @@
     "VERSION": "v0.18.4:docker"
   },
   "name": "Hue White and Color Ambiance LightStrip plus",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "KrzysztofHajdamowicz",
+    "email": "uosiumen@gmail.com",
+    "github": "KrzysztofHajdamowicz"
+  }
 }

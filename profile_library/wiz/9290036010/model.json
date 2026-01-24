@@ -12,5 +12,10 @@
     "VERSION": "v1.9.14:docker"
   },
   "name": "Smart Wi-Fi Full-Color RGB + Tunable White LED Light Bulb (A60, E27)",
-  "standby_power": 0.11
+  "standby_power": 0.11,
+  "author_info": {
+    "name": "htlemos",
+    "email": null,
+    "github": "htlemos"
+  }
 }

@@ -11,5 +11,10 @@
   "measure_description": "Measured with an Aeotec ZWA023 and seems to align with (more precise) measurements from Shelly Plus Plug S.",
   "measure_device": "Aeotec ZWA023",
   "measure_method": "script",
-  "name": "Plus Plug US"
+  "name": "Plus Plug US",
+  "author_info": {
+    "name": "Josh Barnard",
+    "email": null,
+    "github": "barndawgie"
+  }
 }

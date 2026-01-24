@@ -12,5 +12,10 @@
   },
   "name": "Hifree Bedside RGB Lamp",
   "standby_power": 0.45,
-  "author": "Pasquale Cuorpo <maverick1982@users.noreply.github.com>"
+  "author": "Pasquale Cuorpo <maverick1982@users.noreply.github.com>",
+  "author_info": {
+    "name": "Pasquale Cuorpo",
+    "email": null,
+    "github": "maverick1982"
+  }
 }

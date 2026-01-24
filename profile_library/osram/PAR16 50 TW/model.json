@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "LIGHTIFY 6W GU10",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "hekm77",
+    "email": "chiki77piki@gmail.com",
+    "github": "hekm77"
+  }
 }

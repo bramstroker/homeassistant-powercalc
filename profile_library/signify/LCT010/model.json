@@ -7,5 +7,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Hue White and Color Ambiance A19 E26 (Gen 3)",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

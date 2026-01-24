@@ -13,5 +13,10 @@
     "VERSION": "v1.9.5:docker"
   },
   "name": "NYMANE pendant lamp",
-  "standby_power": 0.29
+  "standby_power": 0.29,
+  "author_info": {
+    "name": "Mr. Bubbles",
+    "email": "manni@zapto.de",
+    "github": "tr4nt0r"
+  }
 }

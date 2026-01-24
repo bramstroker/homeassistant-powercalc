@@ -15,5 +15,10 @@
     "VERSION": "v1.6.6:docker"
   },
   "name": "B1 Smart WiFi Light LED Bulb",
-  "standby_power": 0.8
+  "standby_power": 0.8,
+  "author_info": {
+    "name": "TyzzyT",
+    "email": null,
+    "github": "TyzzyT"
+  }
 }

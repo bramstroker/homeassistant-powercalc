@@ -12,5 +12,10 @@
     "VERSION": "v1.9.5:docker"
   },
   "name": "Link BR30 Soft White Bulb",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Ross Troha",
+    "email": null,
+    "github": "rosstroha"
+  }
 }

@@ -15,5 +15,10 @@
     "VERSION": "v1.9.5:docker"
   },
   "name": "TRADFRI bulb E14 WS candle 470lm",
-  "standby_power": 0.15
+  "standby_power": 0.15,
+  "author_info": {
+    "name": "dansie",
+    "email": null,
+    "github": "dansie"
+  }
 }

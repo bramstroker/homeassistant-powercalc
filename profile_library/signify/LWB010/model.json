@@ -10,5 +10,10 @@
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
   "name": "Hue White Bulb A60 E27 806lm",
-  "standby_power": 0.39
+  "standby_power": 0.39,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

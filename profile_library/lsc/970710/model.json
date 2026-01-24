@@ -15,5 +15,10 @@
     "VERSION": "v1.17.11:docker"
   },
   "name": "Smart RGB-CCT GU10 LED Reflector Lamp",
-  "standby_power": 1.13
+  "standby_power": 1.13,
+  "author_info": {
+    "name": "Jort",
+    "email": null,
+    "github": "JortvanSchijndel"
+  }
 }

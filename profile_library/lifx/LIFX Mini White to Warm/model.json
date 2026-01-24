@@ -12,5 +12,10 @@
     "VERSION": "v0.25.5:docker"
   },
   "name": "Mini White to Warm",
-  "standby_power": 0.54
+  "standby_power": 0.54,
+  "author_info": {
+    "name": "Joshua Rich",
+    "email": "joshua.rich@gmail.com",
+    "github": "joshuar"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v1.0.3:docker"
   },
   "name": "Smart Zigbee pro 12W A60 bulb",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "gary-oneill82",
+    "email": null,
+    "github": "gary-oneill82"
+  }
 }

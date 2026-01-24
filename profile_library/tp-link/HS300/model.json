@@ -17,5 +17,10 @@
   "only_self_usage": true,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power"
+  },
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
   }
 }

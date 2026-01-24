@@ -15,5 +15,10 @@
     "VERSION": "v1.2.0:docker"
   },
   "name": "Hue White Bulb A19 E26 1100lm with Bluetooth",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Shaun McCloud",
+    "email": "shaun.thomas.mccloud@gmail.com",
+    "github": "smccloud"
+  }
 }

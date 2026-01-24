@@ -16,5 +16,10 @@
     "VERSION": "master"
   },
   "name": "Hue White and Color Ambiance E27 1600lm",
-  "standby_power": 0.27
+  "standby_power": 0.27,
+  "author_info": {
+    "name": "ahartmanns",
+    "email": "a.hartmanns@utwente.nl",
+    "github": "ahartmanns"
+  }
 }

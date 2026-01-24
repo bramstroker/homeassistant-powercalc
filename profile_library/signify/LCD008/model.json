@@ -12,5 +12,10 @@
     "VERSION": "v1.16.2:docker"
   },
   "name": "Hue Slim recessed light S",
-  "standby_power": 0.42
+  "standby_power": 0.42,
+  "author_info": {
+    "name": "buttonger",
+    "email": null,
+    "github": "buttonger"
+  }
 }

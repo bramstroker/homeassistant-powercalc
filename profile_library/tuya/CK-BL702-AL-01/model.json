@@ -12,5 +12,10 @@
     "VERSION": "v1.17.2:docker"
   },
   "name": "CK-BL702-AL-01, E14, 5W",
-  "standby_power": 0.44
+  "standby_power": 0.44,
+  "author_info": {
+    "name": "Dr-Seltsam",
+    "email": null,
+    "github": "Dr-Seltsam"
+  }
 }

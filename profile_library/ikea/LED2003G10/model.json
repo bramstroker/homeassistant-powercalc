@@ -15,5 +15,10 @@
     "VERSION": "master"
   },
   "name": "TRADFRI bulb E27 1055 lumen, dimmable, white spectrum, opal white",
-  "standby_power": 0.17
+  "standby_power": 0.17,
+  "author_info": {
+    "name": "giu889",
+    "email": null,
+    "github": "giu889"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v0.25.5:docker"
   },
   "name": "Smart Nue ZigBee 12W RGBW downlight",
-  "standby_power": 0.72
+  "standby_power": 0.72,
+  "author_info": {
+    "name": "Joshua Rich",
+    "email": "joshua.rich@aiven.io",
+    "github": null
+  }
 }

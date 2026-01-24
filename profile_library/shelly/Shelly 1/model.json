@@ -18,5 +18,10 @@
   "name": "1",
   "only_self_usage": false,
   "standby_power": 0.376,
-  "standby_power_on": 0.618
+  "standby_power_on": 0.618,
+  "author_info": {
+    "name": "Michal Bartak",
+    "email": "maxym.srpl@gmail.com",
+    "github": "michalk-k"
+  }
 }

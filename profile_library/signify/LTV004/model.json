@@ -17,5 +17,10 @@
     "VERSION": "v1.17.14:docker"
   },
   "name": "Hue white filament Edison ST19 E26 LED warm-to-cool",
-  "standby_power": 0.18
+  "standby_power": 0.18,
+  "author_info": {
+    "name": "ltloopy",
+    "email": null,
+    "github": "ltloopy"
+  }
 }

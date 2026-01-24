@@ -19,5 +19,10 @@
   },
   "sub_profile_select": {
     "default": "+wlan"
+  },
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
   }
 }

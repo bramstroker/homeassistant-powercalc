@@ -26,5 +26,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
   "name": "HEOS 1 HS2",
-  "standby_power": 3.99
+  "standby_power": 3.99,
+  "author_info": {
+    "name": "Daniel O'Connor",
+    "email": "daniel.oconnor@gmail.com",
+    "github": "CloCkWeRX"
+  }
 }

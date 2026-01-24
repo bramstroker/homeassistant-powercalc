@@ -28,5 +28,10 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "SYMFONISK Floor lamp",
-  "standby_power": 2.75
+  "standby_power": 2.75,
+  "author_info": {
+    "name": "martinkura-svk",
+    "email": null,
+    "github": "martinkura-svk"
+  }
 }

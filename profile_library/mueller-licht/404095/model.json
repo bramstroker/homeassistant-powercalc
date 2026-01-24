@@ -15,5 +15,10 @@
     "VERSION": "v1.19.0:docker"
   },
   "name": "Tint Amela 50 cm",
-  "standby_power": 0.19
+  "standby_power": 0.19,
+  "author_info": {
+    "name": "LtKowalski",
+    "email": null,
+    "github": "LtKowalski"
+  }
 }

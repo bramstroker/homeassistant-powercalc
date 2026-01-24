@@ -12,5 +12,10 @@
     "VERSION": "v0.24.8:docker"
   },
   "name": "Smart Spot Comfort",
-  "standby_power": 0.33
+  "standby_power": 0.33,
+  "author_info": {
+    "name": "Desaydrone",
+    "email": "tarlak.Desaydrone@gmail.com",
+    "github": "Desaydrone"
+  }
 }

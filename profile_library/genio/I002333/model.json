@@ -12,5 +12,10 @@
     "VERSION": "v0.23.2:docker"
   },
   "name": "Wi-Fi Dimmable Warm White BC 9W LED GLS Bulb",
-  "standby_power": 0.87
+  "standby_power": 0.87,
+  "author_info": {
+    "name": "Daniel O'Connor",
+    "email": "daniel.oconnor@gmail.com",
+    "github": "CloCkWeRX"
+  }
 }

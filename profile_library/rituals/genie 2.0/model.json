@@ -39,5 +39,10 @@
   "standby_power": 0.45,
   "fixed_config": {
     "power": "{{ {1: '0.53', 2: '0.53', 3: '0.59'}.get(states('[[amount_entity]]')|int(0), '0.45') }}"
+  },
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
   }
 }

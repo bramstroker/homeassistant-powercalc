@@ -12,5 +12,10 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "Livarno Lux GU10 4.5W RGBCT Bulb",
-  "standby_power": 0.36
+  "standby_power": 0.36,
+  "author_info": {
+    "name": "bobsbrain",
+    "email": null,
+    "github": "bobsbrain"
+  }
 }

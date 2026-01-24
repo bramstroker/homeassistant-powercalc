@@ -12,5 +12,10 @@
     "VERSION": "v0.19.5:docker"
   },
   "name": "Livarno Lux E27 bulb RGB",
-  "standby_power": 0.36
+  "standby_power": 0.36,
+  "author_info": {
+    "name": "Paul Mc Auley",
+    "email": "dev@roscarraig.com",
+    "github": "roscarraig"
+  }
 }

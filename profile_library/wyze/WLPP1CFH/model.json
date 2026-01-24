@@ -8,5 +8,10 @@
   "measure_method": "manual",
   "name": "Plug",
   "standby_power": 1.4,
-  "standby_power_on": 1.6
+  "standby_power_on": 1.6,
+  "author_info": {
+    "name": "Bob Shaker",
+    "email": "bobshaker1@gmail.com",
+    "github": "EpicBurrito"
+  }
 }

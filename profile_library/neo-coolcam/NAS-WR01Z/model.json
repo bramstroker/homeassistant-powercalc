@@ -13,5 +13,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.31,
-  "standby_power_on": 0.58
+  "standby_power_on": 0.58,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

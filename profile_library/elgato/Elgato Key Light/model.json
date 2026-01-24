@@ -12,5 +12,10 @@
     "VERSION": "v0.24.7:docker"
   },
   "name": "Key Light",
-  "standby_power": 0.86
+  "standby_power": 0.86,
+  "author_info": {
+    "name": "Adam Jacques",
+    "email": null,
+    "github": "ajacques"
+  }
 }

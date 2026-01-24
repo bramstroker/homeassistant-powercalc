@@ -31,5 +31,10 @@
     "VERSION": "v1.9.14:docker"
   },
   "name": "HomePod Gen 2",
-  "standby_power": 1.01
+  "standby_power": 1.01,
+  "author_info": {
+    "name": "laplacacm",
+    "email": null,
+    "github": "laplacacm"
+  }
 }

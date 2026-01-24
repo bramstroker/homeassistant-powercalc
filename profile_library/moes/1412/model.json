@@ -12,5 +12,10 @@
     "VERSION": "v1.17.3:docker"
   },
   "name": "Smart Matter Wi-Fi RGB+CCT LED Bulb (A19, E26)",
-  "standby_power": 0.57
+  "standby_power": 0.57,
+  "author_info": {
+    "name": "Chris Hallgren",
+    "email": "challgren@gmail.com",
+    "github": "challgren"
+  }
 }

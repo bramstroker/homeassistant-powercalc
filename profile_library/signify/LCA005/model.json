@@ -17,5 +17,10 @@
     "VERSION": "v1.17.15:docker"
   },
   "name": "Hue White and Color ambiance A19 800lm",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "ltloopy",
+    "email": null,
+    "github": "ltloopy"
+  }
 }

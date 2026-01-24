@@ -15,5 +15,10 @@
     "VERSION": "v1.12.1:docker"
   },
   "name": "Smart Color 10W",
-  "standby_power": 0.8
+  "standby_power": 0.8,
+  "author_info": {
+    "name": "Diefferson Koderer Môro",
+    "email": "diefferson.moro@gmail.com",
+    "github": "djpremier"
+  }
 }

@@ -15,5 +15,10 @@
     "VERSION": "v1.17.24:docker"
   },
   "name": "FUEVA-Z recessed light",
-  "standby_power": 0.13
+  "standby_power": 0.13,
+  "author_info": {
+    "name": "Tom Frenzel",
+    "email": "admin@tom-frenzel.de",
+    "github": "tomfrenzel"
+  }
 }

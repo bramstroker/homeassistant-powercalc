@@ -12,5 +12,10 @@
     "VERSION": "v1.17.24:docker"
   },
   "name": "Smart Bulb A80 E27 922-65 RGB (type SHRGB, model 8719514554634, 18.5 W, 220-240 V, 50/60 Hz, 2452 lm @ 4000K, CRI: 90, beam angle: 360°)",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author_info": {
+    "name": "schuppan",
+    "email": null,
+    "github": "schuppan"
+  }
 }

@@ -16,5 +16,10 @@
     "VERSION": "v1.6.6:docker"
   },
   "name": "Hue Lucca Outdoor Wall Light",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "TyzzyT",
+    "email": null,
+    "github": "TyzzyT"
+  }
 }

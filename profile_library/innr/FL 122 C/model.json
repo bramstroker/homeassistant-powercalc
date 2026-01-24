@@ -12,5 +12,10 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Light Strip Colour",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Amjad Saadeh",
+    "email": "amjad@saadeh.dev",
+    "github": "amjadsaadeh"
+  }
 }

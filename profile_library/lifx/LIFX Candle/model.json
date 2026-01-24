@@ -12,5 +12,10 @@
     "VERSION": "v0.17.0:docker"
   },
   "name": "Candle",
-  "standby_power": 0.56
+  "standby_power": 0.56,
+  "author_info": {
+    "name": "Jamie De Vivo",
+    "email": null,
+    "github": "jamiedevivoo"
+  }
 }

@@ -15,5 +15,10 @@
     "VERSION": "v1.3.1:docker"
   },
   "name": "Hue Gradient Lightstrip",
-  "standby_power": 0.14
+  "standby_power": 0.14,
+  "author_info": {
+    "name": "AJ Banck",
+    "email": "ajbanck@planet.nl",
+    "github": "ajbanck"
+  }
 }

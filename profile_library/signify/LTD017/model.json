@@ -15,5 +15,10 @@
     "VERSION": "v1.17.22:docker"
   },
   "name": "Hue 5/6″ Retrofit Downlight White",
-  "standby_power": 0.22
+  "standby_power": 0.22,
+  "author_info": {
+    "name": "ltloopy",
+    "email": null,
+    "github": "ltloopy"
+  }
 }

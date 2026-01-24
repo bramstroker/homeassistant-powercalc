@@ -11,5 +11,10 @@
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
   "name": "Hue White A19 E26 Bluetooth",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

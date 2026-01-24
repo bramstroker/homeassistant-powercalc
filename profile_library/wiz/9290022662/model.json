@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Filament ST19 E26 Transparent (3.8W 120V)",
-  "standby_power": 0.38
+  "standby_power": 0.38,
+  "author_info": {
+    "name": "dsolva",
+    "email": "diego_10sv@hotmail.com",
+    "github": "dsolva"
+  }
 }

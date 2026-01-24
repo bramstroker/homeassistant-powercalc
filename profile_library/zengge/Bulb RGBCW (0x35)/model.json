@@ -12,5 +12,10 @@
     "VERSION": "v1.8.1:docker"
   },
   "name": "Bulb RGBCW",
-  "standby_power": 0.56
+  "standby_power": 0.56,
+  "author_info": {
+    "name": "Joseph Livecchi",
+    "email": "joewashear007@gmail.com",
+    "github": "joewashear007"
+  }
 }

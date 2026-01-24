@@ -13,5 +13,10 @@
     "VERSION": "v1.17.11:docker"
   },
   "name": "Smart LED Filament Gold Globe-lamp G95 7W",
-  "standby_power": 0.61
+  "standby_power": 0.61,
+  "author_info": {
+    "name": "Jort",
+    "email": null,
+    "github": "JortvanSchijndel"
+  }
 }

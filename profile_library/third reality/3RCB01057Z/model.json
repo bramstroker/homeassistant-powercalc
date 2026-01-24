@@ -12,5 +12,10 @@
     "VERSION": "v1.17.13:docker"
   },
   "name": "SMART COLOR BULB ZL1",
-  "standby_power": 0.38
+  "standby_power": 0.38,
+  "author_info": {
+    "name": "mdb17",
+    "email": "mdb17@live.com",
+    "github": "mdb17"
+  }
 }

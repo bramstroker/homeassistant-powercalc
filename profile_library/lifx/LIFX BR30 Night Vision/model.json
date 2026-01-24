@@ -27,5 +27,10 @@
         "type": "entity_state"
       }
     ]
+  },
+  "author_info": {
+    "name": "Jamie De Vivo",
+    "email": null,
+    "github": "jamiedevivoo"
   }
 }

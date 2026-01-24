@@ -16,5 +16,10 @@
     "VERSION": "v0.19.15:docker"
   },
   "name": "Hue White Ambiance E14 w/ BT",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "xpenno255",
+    "email": null,
+    "github": "xpenno255"
+  }
 }

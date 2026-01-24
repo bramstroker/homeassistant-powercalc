@@ -12,5 +12,10 @@
     "VERSION": "v0.26.1:docker"
   },
   "name": "RGBW Bulb V2",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "jake404",
+    "email": null,
+    "github": "jake404"
+  }
 }

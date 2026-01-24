@@ -12,5 +12,10 @@
     "VERSION": "v1.1.2:docker"
   },
   "name": "Moonlamp (esphome)",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "Kenneth Fribert",
+    "email": "fribse@gmail.com",
+    "github": "fribse"
+  }
 }

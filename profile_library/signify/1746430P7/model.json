@@ -15,5 +15,10 @@
     "VERSION": "v1.19.2:docker"
   },
   "name": "Hue Resonate",
-  "standby_power": 0.05
+  "standby_power": 0.05,
+  "author_info": {
+    "name": "Thorsten1982",
+    "email": "ThorstenNiemann.TN@googlemail.com",
+    "github": "Thorsten1982"
+  }
 }

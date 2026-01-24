@@ -36,5 +36,10 @@
     "VERSION": "v1.17.12:docker"
   },
   "name": "Smart White Noise Machine",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author_info": {
+    "name": "Thomas R. Novak",
+    "email": "trnovak@illinoisalumni.org",
+    "github": "trnovak"
+  }
 }

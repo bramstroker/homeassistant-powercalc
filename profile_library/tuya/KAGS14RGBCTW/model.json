@@ -13,5 +13,10 @@
     "VERSION": "v1.9.3:docker"
   },
   "name": "Ekobi SMART LED E27 14W 1400Lm RGB CCT",
-  "standby_power": 0.46
+  "standby_power": 0.46,
+  "author_info": {
+    "name": "mariwing",
+    "email": "mariwing@gmail.com",
+    "github": "mariwing"
+  }
 }

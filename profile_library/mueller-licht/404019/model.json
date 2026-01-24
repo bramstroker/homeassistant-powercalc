@@ -12,5 +12,10 @@
     "VERSION": "v1.4.0:docker"
   },
   "name": "Tint LED-Kerzenform white+color",
-  "standby_power": 0.38
+  "standby_power": 0.38,
+  "author_info": {
+    "name": "ffm777",
+    "email": null,
+    "github": "ffm777"
+  }
 }

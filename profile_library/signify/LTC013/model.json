@@ -15,5 +15,10 @@
     "VERSION": "master"
   },
   "name": "Hue Aurelle Square Panel Light 30x30cm",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "matteobreschig",
+    "email": null,
+    "github": "matteobreschig"
+  }
 }

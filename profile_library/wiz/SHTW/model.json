@@ -12,5 +12,10 @@
     "VERSION": "v1.8.1:docker"
   },
   "name": "SHTW",
-  "standby_power": 0.21
+  "standby_power": 0.21,
+  "author_info": {
+    "name": "Joseph Livecchi",
+    "email": "joewashear007@gmail.com",
+    "github": "joewashear007"
+  }
 }

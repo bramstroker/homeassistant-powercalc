@@ -17,5 +17,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.1,
-  "standby_power_on": 0.56
+  "standby_power_on": 0.56,
+  "author_info": {
+    "name": "Josh Barnard",
+    "email": null,
+    "github": "barndawgie"
+  }
 }

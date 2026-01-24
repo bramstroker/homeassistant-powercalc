@@ -12,5 +12,10 @@
     "VERSION": "v1.9.8:docker"
   },
   "name": "RGBICW Smart Corner Floor Lamp",
-  "standby_power": 2.14
+  "standby_power": 2.14,
+  "author_info": {
+    "name": "Sku1ly",
+    "email": null,
+    "github": "Sku1ly"
+  }
 }

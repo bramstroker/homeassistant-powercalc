@@ -13,5 +13,10 @@
   "measure_device": "Zhurui PR10",
   "measure_method": "script",
   "name": "Hue Impress Pedestal Low",
-  "standby_power": 0.17
+  "standby_power": 0.17,
+  "author_info": {
+    "name": "Cafun",
+    "email": null,
+    "github": "Cafun"
+  }
 }

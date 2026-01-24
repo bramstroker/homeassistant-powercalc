@@ -10,5 +10,10 @@
   "name": "Home Automation Interface",
   "fixed_config": {
     "power": 1.65
+  },
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
   }
 }

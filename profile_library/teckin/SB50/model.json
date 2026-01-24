@@ -12,5 +12,10 @@
     "VERSION": "v1.0.3:docker"
   },
   "name": "Smart Wi-Fi RGB LED Light Bulb",
-  "standby_power": 0.81
+  "standby_power": 0.81,
+  "author_info": {
+    "name": "gary-oneill82",
+    "email": null,
+    "github": "gary-oneill82"
+  }
 }

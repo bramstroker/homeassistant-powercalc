@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Dusk-to-Dawn Candelabra LED Bulb",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "DellanX",
+    "email": null,
+    "github": "DellanX"
+  }
 }

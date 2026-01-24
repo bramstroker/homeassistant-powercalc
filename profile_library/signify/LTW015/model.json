@@ -12,5 +12,10 @@
     "VERSION": "v1.12.1:docker"
   },
   "name": "Hue White Ambiance A19 E26 (75W)",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "dxmnkd316",
+    "email": null,
+    "github": "dxmnkd316"
+  }
 }

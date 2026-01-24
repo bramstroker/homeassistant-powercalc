@@ -115,5 +115,10 @@
     "VERSION": "master"
   },
   "name": "S6 MaxV",
-  "standby_power": 0.1
+  "standby_power": 0.1,
+  "author_info": {
+    "name": "RubenKelevra",
+    "email": "cyrond@gmail.com",
+    "github": "RubenKelevra"
+  }
 }

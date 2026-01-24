@@ -12,5 +12,10 @@
   },
   "name": "Smart Outdoor String Lights",
   "standby_power": 2.65,
-  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>"
+  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>",
+  "author_info": {
+    "name": "Thorsten1982",
+    "email": "ThorstenNiemann.TN@googlemail.com",
+    "github": "Thorsten1982"
+  }
 }

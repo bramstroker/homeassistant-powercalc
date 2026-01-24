@@ -12,5 +12,10 @@
     "VERSION": "v1.3.6:docker"
   },
   "name": "Smart Filament Bulb E27 Vintage (2200K)",
-  "standby_power": 0.33
+  "standby_power": 0.33,
+  "author_info": {
+    "name": "flipsa",
+    "email": "n00dl3s@gmx.net",
+    "github": "flipsa"
+  }
 }

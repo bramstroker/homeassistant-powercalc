@@ -28,5 +28,10 @@
     "VERSION": "v1.12.7:docker"
   },
   "name": "Era 100",
-  "standby_power": 2.0
+  "standby_power": 2.0,
+  "author_info": {
+    "name": "Sam Dunne",
+    "email": "sam@sam-dunne.com",
+    "github": "samdunne"
+  }
 }

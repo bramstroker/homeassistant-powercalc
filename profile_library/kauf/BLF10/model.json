@@ -12,5 +12,10 @@
     "VERSION": "v1.14.4:docker"
   },
   "name": "RGBWW Smart LED Bulb A21 (10 W)",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "nwalk7800",
+    "email": null,
+    "github": "nwalk7800"
+  }
 }

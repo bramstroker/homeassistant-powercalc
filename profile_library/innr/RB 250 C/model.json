@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Candle Colour Bulb E14 470lm",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "ahartmanns",
+    "email": "a.hartmanns@utwente.nl",
+    "github": "ahartmanns"
+  }
 }

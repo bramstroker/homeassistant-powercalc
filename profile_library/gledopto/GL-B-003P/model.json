@@ -12,5 +12,10 @@
     "VERSION": "v1.17.23:docker"
   },
   "name": "Filament LED light bulb A60 7W",
-  "standby_power": 0.12
+  "standby_power": 0.12,
+  "author_info": {
+    "name": "Jurjen",
+    "email": null,
+    "github": "Coornh"
+  }
 }

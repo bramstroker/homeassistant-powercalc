@@ -16,5 +16,10 @@
     "VERSION": "v1.9.4:docker"
   },
   "name": "Hue Play Gradient Light Tube Large",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "chpego",
+    "email": null,
+    "github": "chpego"
+  }
 }

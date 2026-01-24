@@ -15,5 +15,10 @@
     "VERSION": "v1.3.10"
   },
   "name": "Hue White A60 bulb E27 1050lm with Bluetooth",
-  "standby_power": 0.8
+  "standby_power": 0.8,
+  "author_info": {
+    "name": "Panagiotis Doulgeris",
+    "email": null,
+    "github": "Pantastisch"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v1.19.5:docker"
   },
   "name": "Smart Bulb GU10",
-  "standby_power": 0.27
+  "standby_power": 0.27,
+  "author_info": {
+    "name": "Benjamin Neff",
+    "email": "benjamin@coding4coffee.ch",
+    "github": "SuperTux88"
+  }
 }

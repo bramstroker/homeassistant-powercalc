@@ -12,5 +12,10 @@
     "VERSION": "v1.14.3:docker"
   },
   "name": "JETSTROM ceiling light panel, white spectrum, 60x60 cm",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Jonathan Wiklund",
+    "email": "jonathan.wiklund@gmail.com",
+    "github": "MaZZly"
+  }
 }

@@ -15,5 +15,10 @@
     "VERSION": "v0.19.7"
   },
   "name": "Hue White Ambiance 1600 E27 w/ BT",
-  "standby_power": 0.21
+  "standby_power": 0.21,
+  "author_info": {
+    "name": "Aetha",
+    "email": "aetha@snuzzle.me",
+    "github": "aetha"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Mi Smart LED Bulb Essential",
-  "standby_power": 1.2
+  "standby_power": 1.2,
+  "author_info": {
+    "name": "Alexandre Bertrand",
+    "email": "alexandre.bertrand@invirtus.io",
+    "github": "trandbert37"
+  }
 }

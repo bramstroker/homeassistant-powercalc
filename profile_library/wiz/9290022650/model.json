@@ -15,5 +15,10 @@
     "VERSION": "v0.24.8:docker"
   },
   "name": "Smart Wi-Fi LED Light Bulb (dimmable, soft white)",
-  "standby_power": 0.42
+  "standby_power": 0.42,
+  "author_info": {
+    "name": "Emory Penney",
+    "email": "emory.j.penney@intel.com",
+    "github": null
+  }
 }

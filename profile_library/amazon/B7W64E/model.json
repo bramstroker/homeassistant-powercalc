@@ -33,5 +33,10 @@
     "VERSION": "master"
   },
   "name": "Echo Dot (Gen4)",
-  "standby_power": 0.9
+  "standby_power": 0.9,
+  "author_info": {
+    "name": "wranglatang",
+    "email": null,
+    "github": "wranglatang"
+  }
 }

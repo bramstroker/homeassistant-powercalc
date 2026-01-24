@@ -16,5 +16,10 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Bluetooth Mesh Smart LED Bulb (E27, Tunable White, 5 W)",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Ed Kutuev",
+    "email": "ed@napych.com",
+    "github": "napych"
+  }
 }

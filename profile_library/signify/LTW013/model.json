@@ -15,5 +15,10 @@
     "VERSION": "v0.17.0:docker"
   },
   "name": "Hue White Ambiance GU10",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "KrzysztofHajdamowicz",
+    "email": "uosiu@uosiu.info",
+    "github": "KrzysztofHajdamowicz"
+  }
 }

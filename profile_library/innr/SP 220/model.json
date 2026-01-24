@@ -16,5 +16,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.5,
-  "standby_power_on": 1.25
+  "standby_power_on": 1.25,
+  "author_info": {
+    "name": "ca-dmin",
+    "email": null,
+    "github": "ca-dmin"
+  }
 }

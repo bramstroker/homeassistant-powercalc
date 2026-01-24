@@ -32,5 +32,10 @@
     "VERSION": "v1.17.6:docker"
   },
   "name": "Link Music",
-  "standby_power": 1.7
+  "standby_power": 1.7,
+  "author_info": {
+    "name": "Marcus Voß",
+    "email": null,
+    "github": "mvoss96"
+  }
 }

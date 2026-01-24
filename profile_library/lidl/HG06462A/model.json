@@ -13,5 +13,10 @@
     "VERSION": "v0.22.0:docker"
   },
   "name": "Livarno Lux E27 filament bulb",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Stefan Gries",
+    "email": null,
+    "github": "stefangries"
+  }
 }

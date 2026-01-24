@@ -15,5 +15,10 @@
     "VERSION": "master"
   },
   "name": "FLOALT panel WS 30x30",
-  "standby_power": 0.08
+  "standby_power": 0.08,
+  "author_info": {
+    "name": "confucius78",
+    "email": "dekker.wj@gmail.com",
+    "github": "confucius78"
+  }
 }

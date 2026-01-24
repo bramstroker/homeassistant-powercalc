@@ -13,5 +13,10 @@
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
+  },
+  "author_info": {
+    "name": "ca-dmin",
+    "email": null,
+    "github": "ca-dmin"
   }
 }

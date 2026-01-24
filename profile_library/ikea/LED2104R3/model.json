@@ -12,5 +12,10 @@
   },
   "name": "TRADFRI bulb GU10 WW 345lm",
   "standby_power": 0.1,
-  "author": "Peklaa <57568760+Peklaa@users.noreply.github.com>"
+  "author": "Peklaa <57568760+Peklaa@users.noreply.github.com>",
+  "author_info": {
+    "name": "Peklaa",
+    "email": null,
+    "github": "Peklaa"
+  }
 }

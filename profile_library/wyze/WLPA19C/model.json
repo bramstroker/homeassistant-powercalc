@@ -12,5 +12,10 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "Bulb Color",
-  "standby_power": 0.92
+  "standby_power": 0.92,
+  "author_info": {
+    "name": "Bob Shaker",
+    "email": "bobshaker1@gmail.com",
+    "github": "EpicBurrito"
+  }
 }

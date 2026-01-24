@@ -17,5 +17,10 @@
     "VERSION": "v0.13.4"
   },
   "name": "TRADFRI bulb E27 CWS opal 600lm",
-  "standby_power": 0.48
+  "standby_power": 0.48,
+  "author_info": {
+    "name": "marthubner",
+    "email": null,
+    "github": "marthubner"
+  }
 }

@@ -10,5 +10,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Tibea Lamp E27 Tuneable White 2000lm",
-  "standby_power": 0.51
+  "standby_power": 0.51,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

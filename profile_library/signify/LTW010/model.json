@@ -11,5 +11,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Hue White Ambiance A60 E27 806lm",
-  "standby_power": 0.39
+  "standby_power": 0.39,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

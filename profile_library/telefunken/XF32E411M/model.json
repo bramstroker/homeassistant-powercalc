@@ -20,5 +20,10 @@
   "standby_power": 0.3,
   "sub_profile_select": {
     "default": "kino - network standby on"
+  },
+  "author_info": {
+    "name": "Justin Hahn",
+    "email": "hahnjustin27@gmail.com",
+    "github": "justinh998"
   }
 }

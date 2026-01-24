@@ -17,5 +17,10 @@
     "VERSION": "v1.14.8:docker"
   },
   "name": "Hue Centura Spot",
-  "standby_power": 0.26
+  "standby_power": 0.26,
+  "author_info": {
+    "name": "Morpheus361",
+    "email": "marco.morpheus@kabelmail.de",
+    "github": "Morpheus361"
+  }
 }

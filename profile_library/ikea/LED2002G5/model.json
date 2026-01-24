@@ -15,5 +15,10 @@
     "VERSION": "v0.13.4"
   },
   "name": "TRADFRI bulb E14 WS globe opal 470lm",
-  "standby_power": 0.23
+  "standby_power": 0.23,
+  "author_info": {
+    "name": "marthubner",
+    "email": null,
+    "github": "marthubner"
+  }
 }

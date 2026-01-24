@@ -17,5 +17,10 @@
     "VERSION": "master"
   },
   "name": "TRADFRI bulb GU10 345 lumen, dimmable, white spectrum",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "giu889",
+    "email": null,
+    "github": "giu889"
+  }
 }

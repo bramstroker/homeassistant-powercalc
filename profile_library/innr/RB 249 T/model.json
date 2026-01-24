@@ -12,5 +12,10 @@
     "VERSION": "v1.17.13:docker"
   },
   "name": "Smart Candle Comfort E14",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "Jarod2801",
+    "email": null,
+    "github": "Jarod2801"
+  }
 }

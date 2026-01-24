@@ -16,5 +16,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.6,
-  "standby_power_on": 1.0
+  "standby_power_on": 1.0,
+  "author_info": {
+    "name": "Al3x Zamponi",
+    "email": null,
+    "github": "alexz707"
+  }
 }

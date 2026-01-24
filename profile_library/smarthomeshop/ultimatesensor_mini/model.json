@@ -10,5 +10,10 @@
   "name": "UltimateSensor Mini",
   "fixed_config": {
     "power": 1.25
+  },
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
   }
 }

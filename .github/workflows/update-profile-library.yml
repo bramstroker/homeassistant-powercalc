@@ -30,6 +30,8 @@ jobs:
       - name: Pull again
         run: git pull || true
       - name: Update library.json, authors and translations
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 ${{ github.workspace }}/.github/scripts/profile_library/update-library.py
       - uses: EndBug/add-and-commit@v9

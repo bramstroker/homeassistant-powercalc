@@ -12,5 +12,10 @@
     "VERSION": "v1.1.1:docker"
   },
   "name": "SMART+ WIFI PLANON FRAMELESS TW RGB 600x600",
-  "standby_power": 1.0
+  "standby_power": 1.0,
+  "author_info": {
+    "name": "Kenneth Fribert",
+    "email": "fribse@gmail.com",
+    "github": "fribse"
+  }
 }

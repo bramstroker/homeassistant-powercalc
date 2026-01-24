@@ -15,5 +15,10 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "Wifi LED Smart Light Bulb, 60W=8.5W, Full Color A19 (2700K - 6500K)",
-  "standby_power": 0.52
+  "standby_power": 0.52,
+  "author_info": {
+    "name": "Ryan Ronnander",
+    "email": "rronnander@gmail.com",
+    "github": "ryan-ronnander"
+  }
 }

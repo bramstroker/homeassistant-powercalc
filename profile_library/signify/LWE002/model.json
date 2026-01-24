@@ -16,5 +16,10 @@
     "VERSION": "v0.19.7:docker"
   },
   "name": "Hue White E14 SES Candle 470lm w/ BT",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "Dan Thompson",
+    "email": "dba@techtree.co.uk",
+    "github": "leedsdata"
+  }
 }

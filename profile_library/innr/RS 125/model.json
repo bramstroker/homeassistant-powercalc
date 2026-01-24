@@ -7,5 +7,10 @@
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
   "name": "Dimmable White Spot GU10 Bulb 350lm",
-  "standby_power": 0.38
+  "standby_power": 0.38,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

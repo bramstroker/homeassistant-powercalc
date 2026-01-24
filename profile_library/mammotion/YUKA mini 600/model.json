@@ -122,5 +122,10 @@
     "VERSION": "master"
   },
   "name": "YUKA mini 600",
-  "standby_power": 2.15
+  "standby_power": 2.15,
+  "author_info": {
+    "name": "Alexandre Bertrand",
+    "email": "alexandre.bertrand@invirtus.io",
+    "github": "trandbert37"
+  }
 }

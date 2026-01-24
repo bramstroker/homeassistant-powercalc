@@ -9,5 +9,10 @@
   "measure_device": "AVM Fritz!DECT 200",
   "measure_method": "script",
   "name": "TRADFRI bulb E27 WS opal 980lm",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Simon Hörrle",
+    "email": "simon.hoerrle@gmail.com",
+    "github": "CM000n"
+  }
 }

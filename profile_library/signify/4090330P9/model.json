@@ -25,5 +25,10 @@
     "VERSION": "master"
   },
   "name": "Hue Ensis Pendant Light",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Matteo VG7",
+    "email": null,
+    "github": "matteovg7"
+  }
 }

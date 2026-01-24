@@ -12,5 +12,10 @@
     "VERSION": "v1.17.9:docker"
   },
   "name": "Hue White and Color Ambiance Perifo cylinder pendant",
-  "standby_power": 0.19
+  "standby_power": 0.19,
+  "author_info": {
+    "name": "dewbot6",
+    "email": "drewsnodgrass@comcast.net",
+    "github": "dewbot6"
+  }
 }

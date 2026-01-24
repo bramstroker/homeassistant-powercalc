@@ -12,5 +12,10 @@
     "VERSION": "v1.17.24:docker"
   },
   "name": "LED Light Bulb T2 (GU10, CCT) (Color: White, SKU: AL230GLW02, model: LB-L03E, 4.9 W, 100-240 V, 50/60 Hz, 450 lm @ 2700K, CRI: 90, beam angle: 50°)",
-  "standby_power": 0.39
+  "standby_power": 0.39,
+  "author_info": {
+    "name": "schuppan",
+    "email": null,
+    "github": "schuppan"
+  }
 }

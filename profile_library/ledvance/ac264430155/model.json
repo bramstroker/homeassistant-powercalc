@@ -12,5 +12,10 @@
     "VERSION": "v1.1.1:docker"
   },
   "name": "SMART+ Wifi Planon 30x30 TW",
-  "standby_power": 0.9
+  "standby_power": 0.9,
+  "author_info": {
+    "name": "Kenneth Fribert",
+    "email": "fribse@gmail.com",
+    "github": "fribse"
+  }
 }

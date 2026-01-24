@@ -12,5 +12,10 @@
     "VERSION": "v1.17.3:docker"
   },
   "name": "Areo VariFit 230mm 2000lm 500.46",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "metzi",
+    "email": null,
+    "github": "mime24"
+  }
 }

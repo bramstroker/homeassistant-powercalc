@@ -12,5 +12,10 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Hue Solo Lightstrip (5m)",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Gerd Rütten",
+    "email": null,
+    "github": "GerdRuetten"
+  }
 }

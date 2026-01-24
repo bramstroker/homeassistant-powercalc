@@ -12,5 +12,10 @@
   "measure_description": "Printer was measured while idle and while printing",
   "measure_device": "Shelly Plus Plug",
   "measure_method": "manual",
-  "name": "ET-3760 Series"
+  "name": "ET-3760 Series",
+  "author_info": {
+    "name": "Brian Egge",
+    "email": "brianegge@gmail.com",
+    "github": "brianegge"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v1.17.2:docker"
   },
   "name": "Tuya Zigbee 3.0 Ceiling Lamp RGB+CW+WW 24W",
-  "standby_power": 0.36
+  "standby_power": 0.36,
+  "author_info": {
+    "name": "Dr-Seltsam",
+    "email": null,
+    "github": "Dr-Seltsam"
+  }
 }

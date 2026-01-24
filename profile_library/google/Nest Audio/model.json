@@ -28,5 +28,10 @@
     "VERSION": "v1.4.0:docker"
   },
   "name": "Nest Audio",
-  "standby_power": 1.8
+  "standby_power": 1.8,
+  "author_info": {
+    "name": "sunjaxx",
+    "email": null,
+    "github": "sunjaxx"
+  }
 }

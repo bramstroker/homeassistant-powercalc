@@ -9,5 +9,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "TRADFRI bulb E27 WW 806lm",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "mariwing",
+    "email": "mariwing@gmail.com",
+    "github": "mariwing"
+  }
 }

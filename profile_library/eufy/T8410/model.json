@@ -6,5 +6,10 @@
   "measure_description": "Used measure tool and took average during 5 minutes",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
-  "name": "Indoor Cam Pan&Tilt"
+  "name": "Indoor Cam Pan&Tilt",
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

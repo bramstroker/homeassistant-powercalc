@@ -7,5 +7,10 @@
   "measure_device": "RRPM02 (Model); 4897037690801 (Barcode); Reduction Revolution Plug-in Power Meter",
   "measure_method": "manual",
   "name": "WeMo smart LED bulb",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "OzGav",
+    "email": "gavnosp@hotmail.com",
+    "github": "OzGav"
+  }
 }

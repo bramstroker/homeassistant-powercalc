@@ -15,5 +15,10 @@
     "VERSION": "master"
   },
   "name": "Livarno outdoor LED light chain",
-  "standby_power": 0.36
+  "standby_power": 0.36,
+  "author_info": {
+    "name": "mariwing",
+    "email": "mariwing@gmail.com",
+    "github": "mariwing"
+  }
 }

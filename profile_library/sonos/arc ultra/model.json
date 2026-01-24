@@ -28,5 +28,10 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Arc Ultra",
-  "standby_power": 4.45
+  "standby_power": 4.45,
+  "author_info": {
+    "name": "Josh Barnard",
+    "email": null,
+    "github": "barndawgie"
+  }
 }

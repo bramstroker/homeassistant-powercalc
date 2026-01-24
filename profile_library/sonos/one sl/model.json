@@ -24,5 +24,10 @@
   "measure_device": "Shelly Plug US",
   "measure_method": "script",
   "name": "One SL",
-  "standby_power": 2.83
+  "standby_power": 2.83,
+  "author_info": {
+    "name": "Chris",
+    "email": null,
+    "github": "darthsebulba04"
+  }
 }

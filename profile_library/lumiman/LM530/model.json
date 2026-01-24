@@ -12,5 +12,10 @@
     "VERSION": "v1.10.4:docker"
   },
   "name": "Smart Color Changing Bulb A19 800LM 2.4Ghz",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "DracoC77",
+    "email": null,
+    "github": "DracoC77"
+  }
 }

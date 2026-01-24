@@ -12,5 +12,10 @@
     "VERSION": "v1.17.9:docker"
   },
   "name": "Xiaomi Mi Bedside Lamp 2",
-  "standby_power": 0.86
+  "standby_power": 0.86,
+  "author_info": {
+    "name": "Pasquale Cuorpo",
+    "email": null,
+    "github": "maverick1982"
+  }
 }

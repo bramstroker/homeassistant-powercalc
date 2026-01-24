@@ -13,5 +13,10 @@
   "name": "Forever Light Smart Plug",
   "only_self_usage": true,
   "standby_power": 0.52,
-  "standby_power_on": 1.06
+  "standby_power_on": 1.06,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

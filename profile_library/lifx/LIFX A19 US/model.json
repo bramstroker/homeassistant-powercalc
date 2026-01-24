@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "A19 US",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Chris",
+    "email": null,
+    "github": "darthsebulba04"
+  }
 }

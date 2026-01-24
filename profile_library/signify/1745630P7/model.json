@@ -15,5 +15,10 @@
     "VERSION": "v1.9.6:docker"
   },
   "name": "Hue Nyro Outdoor Wall",
-  "standby_power": 0.27
+  "standby_power": 0.27,
+  "author_info": {
+    "name": "Imperial-Guard",
+    "email": null,
+    "github": "Imperial-Guard"
+  }
 }

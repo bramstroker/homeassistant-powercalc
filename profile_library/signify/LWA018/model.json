@@ -16,5 +16,10 @@
     "VERSION": "v1.2.0:docker"
   },
   "name": "Hue White Bulb A60 B22 1100lm with Bluetooth",
-  "standby_power": 0.39
+  "standby_power": 0.39,
+  "author_info": {
+    "name": "Paul Nicholls",
+    "email": "paul.n@next.gen.nz",
+    "github": "pauln"
+  }
 }

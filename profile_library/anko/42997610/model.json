@@ -12,5 +12,10 @@
     "VERSION": "v0.23.2:docker"
   },
   "name": "Smart String Lights",
-  "standby_power": 1.09
+  "standby_power": 1.09,
+  "author_info": {
+    "name": "Daniel O'Connor",
+    "email": "daniel.oconnor@gmail.com",
+    "github": "CloCkWeRX"
+  }
 }

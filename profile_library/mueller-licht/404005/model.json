@@ -12,5 +12,10 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Tint GU10 spot white+color",
-  "standby_power": 1.27
+  "standby_power": 1.27,
+  "author_info": {
+    "name": "Amjad Saadeh",
+    "email": "amjad@saadeh.dev",
+    "github": "amjadsaadeh"
+  }
 }

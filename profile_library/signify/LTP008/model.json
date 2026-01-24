@@ -13,5 +13,10 @@
     "VERSION": "v0.18.4:docker"
   },
   "name": "Hue Being Pendant Light",
-  "standby_power": 0.38
+  "standby_power": 0.38,
+  "author_info": {
+    "name": "Stijn Bernards",
+    "email": "stijn@bernards.nl",
+    "github": "stijnbernards"
+  }
 }

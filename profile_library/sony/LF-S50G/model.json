@@ -23,5 +23,10 @@
   "measure_device": "Meross mss305",
   "measure_method": "manual",
   "name": "Smart Wireless Speaker with Google Assistant",
-  "standby_power": 3.28
+  "standby_power": 3.28,
+  "author_info": {
+    "name": "jonathanlflatt",
+    "email": null,
+    "github": "jonathanlflatt"
+  }
 }

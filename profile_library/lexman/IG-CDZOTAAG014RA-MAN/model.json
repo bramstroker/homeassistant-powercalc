@@ -12,5 +12,10 @@
     "VERSION": "v0.18.4:docker"
   },
   "name": "RGBW E27 Smart LED Bulb (14 W to 100 W equivalent)",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "sensei73",
+    "email": "sensei73@gmail.com",
+    "github": "sensei73"
+  }
 }

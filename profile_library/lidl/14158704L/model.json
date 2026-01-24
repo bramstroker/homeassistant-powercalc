@@ -12,5 +12,10 @@
     "VERSION": "v1.11.3:docker"
   },
   "name": "Livarno Home LED floor lamp",
-  "standby_power": 0.6
+  "standby_power": 0.6,
+  "author_info": {
+    "name": "bragra",
+    "email": "bragragithub@gradussen.com",
+    "github": "bragra"
+  }
 }

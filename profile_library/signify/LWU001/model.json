@@ -15,5 +15,10 @@
     "VERSION": "master"
   },
   "name": "Hue P45 light bulb",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Morten Trab",
+    "email": "morten@trab.dk",
+    "github": "MTrab"
+  }
 }

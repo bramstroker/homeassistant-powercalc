@@ -15,5 +15,10 @@
     "VERSION": "v1.9.15:docker"
   },
   "name": "Hue White and Color Ambiance GU10 w/BT",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Emory Penney",
+    "email": "treadstoneit@gmail.com",
+    "github": "ejpenney"
+  }
 }

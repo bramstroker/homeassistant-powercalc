@@ -17,5 +17,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.33,
-  "standby_power_on": 0.49
+  "standby_power_on": 0.49,
+  "author_info": {
+    "name": "TyzzyT",
+    "email": null,
+    "github": "TyzzyT"
+  }
 }

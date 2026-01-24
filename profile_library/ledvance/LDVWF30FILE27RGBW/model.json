@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "SMART+ Wi-Fi RGBW Filament Globe LED Bulb (E27, 4.5 W)",
-  "standby_power": 1.04
+  "standby_power": 1.04,
+  "author_info": {
+    "name": "Morten Trab",
+    "email": "morten@trab.dk",
+    "github": "MTrab"
+  }
 }

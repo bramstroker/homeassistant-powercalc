@@ -12,5 +12,10 @@
     "VERSION": "v1.15.4:docker"
   },
   "name": "JETSTROM ceiling light panel, color/white spectrum, 30x30 cm",
-  "standby_power": 0.32
+  "standby_power": 0.32,
+  "author_info": {
+    "name": "SAF",
+    "email": "andrei.staicu@gmail.com",
+    "github": "smarmie"
+  }
 }

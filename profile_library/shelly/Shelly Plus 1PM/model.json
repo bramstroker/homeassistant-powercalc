@@ -24,5 +24,10 @@
   },
   "sub_profile_select": {
     "default": "default"
+  },
+  "author_info": {
+    "name": "CV",
+    "email": null,
+    "github": "dagobert"
   }
 }

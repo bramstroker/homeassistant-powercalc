@@ -28,5 +28,10 @@
   "standby_power": 0.822,
   "multi_switch_config": {
     "power": 0.145
+  },
+  "author_info": {
+    "name": "Michal Bartak",
+    "email": "maxym.srpl@gmail.com",
+    "github": "michalk-k"
   }
 }

@@ -12,5 +12,10 @@
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",
   "name": "Hue Play",
-  "standby_power": 0.1
+  "standby_power": 0.1,
+  "author_info": {
+    "name": "smonesi",
+    "email": null,
+    "github": "smonesi"
+  }
 }

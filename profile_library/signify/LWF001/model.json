@@ -17,5 +17,10 @@
     "VERSION": "master"
   },
   "name": "Hue White Bulb A60 E27",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Morten Trab",
+    "email": "morten@trab.dk",
+    "github": "MTrab"
+  }
 }

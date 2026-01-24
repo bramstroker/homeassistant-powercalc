@@ -11,5 +11,10 @@
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",
   "name": "Hue Go",
-  "standby_power": 0.29
+  "standby_power": 0.29,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

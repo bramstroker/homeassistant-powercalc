@@ -16,5 +16,10 @@
     "VERSION": "master"
   },
   "name": "Hue White Ambiance Aurelle Square",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "Jari Eskelinen",
+    "email": "jari.eskelinen@iki.fi",
+    "github": "jarpatus"
+  }
 }

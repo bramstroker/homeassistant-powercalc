@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Wi-Fi Smart RGBW/CCT 9 W Downlight (750lm)",
-  "standby_power": 0.24
+  "standby_power": 0.24,
+  "author_info": {
+    "name": "Wolfieeewolf",
+    "email": null,
+    "github": "Wolfieeewolf"
+  }
 }

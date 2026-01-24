@@ -27,5 +27,10 @@
         "type": "entity_state"
       }
     ]
+  },
+  "author_info": {
+    "name": "Jacob Donenfeld",
+    "email": null,
+    "github": "jacobdonenfeld"
   }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v0.19.12:docker"
   },
   "name": "Mini Color",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "Jacob Donenfeld",
+    "email": "jacobdonenfeld@gmail.com",
+    "github": null
+  }
 }

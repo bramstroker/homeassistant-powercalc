@@ -12,5 +12,10 @@
     "VERSION": "v1.9.10:docker"
   },
   "name": "Smart Bulb White E27 780lm (2700K)",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author_info": {
+    "name": "swiggers",
+    "email": "rafael@swiggers.net",
+    "github": "rswiggers"
+  }
 }

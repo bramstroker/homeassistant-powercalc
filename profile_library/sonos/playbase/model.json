@@ -26,5 +26,10 @@
   "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
   "measure_method": "script",
   "name": "Playbase",
-  "standby_power": 2.9
+  "standby_power": 2.9,
+  "author_info": {
+    "name": "alvinchen1",
+    "email": null,
+    "github": "alvinchen1"
+  }
 }

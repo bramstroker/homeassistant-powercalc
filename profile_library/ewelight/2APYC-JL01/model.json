@@ -12,5 +12,10 @@
     "VERSION": "v1.10.6:docker"
   },
   "name": "Smart light JL01",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Nicolas Liaudat",
+    "email": null,
+    "github": "nliaudat"
+  }
 }

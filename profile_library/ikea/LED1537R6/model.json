@@ -10,5 +10,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "TRADFRI bulb GU10 WS 400lm",
-  "standby_power": 0.44
+  "standby_power": 0.44,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

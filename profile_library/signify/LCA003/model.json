@@ -12,5 +12,10 @@
     "VERSION": "v0.24.8:docker"
   },
   "name": "Hue White and Color Ambiance A19 E26",
-  "standby_power": 0.17
+  "standby_power": 0.17,
+  "author_info": {
+    "name": "Emory Penney",
+    "email": "emory.j.penney@intel.com",
+    "github": null
+  }
 }

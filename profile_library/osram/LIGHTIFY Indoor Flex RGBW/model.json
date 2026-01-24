@@ -11,5 +11,10 @@
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
   "name": "LIGHTIFY Indoor Flex RGBW 3P (1.8m)",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Stefan Gries",
+    "email": null,
+    "github": "stefangries"
+  }
 }

@@ -15,5 +15,10 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "Wifi LED Smart A19 RGBW Color (2000K)",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "Ryan Ronnander",
+    "email": "rronnander@gmail.com",
+    "github": "ryan-ronnander"
+  }
 }

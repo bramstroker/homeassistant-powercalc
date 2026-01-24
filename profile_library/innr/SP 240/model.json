@@ -13,5 +13,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.2,
-  "standby_power_on": 0.75
+  "standby_power_on": 0.75,
+  "author_info": {
+    "name": "Tim van Werkhoven",
+    "email": "tim+github.com@vanwerkhoven.org",
+    "github": "tvwerkhoven"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v1.9.8:docker"
   },
   "name": "Smart Nue ZigBee 9W RGBW downlight",
-  "standby_power": 0.64
+  "standby_power": 0.64,
+  "author_info": {
+    "name": "Erhan Cakirman",
+    "email": null,
+    "github": "ecakirman"
+  }
 }
