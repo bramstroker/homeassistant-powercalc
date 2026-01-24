@@ -4,7 +4,7 @@
   ],
   "author": "SBD",
   "calculation_strategy": "fixed",
-  "created_at": "2025-06-09",
+  "created_at": "2025-06-09T00:00:00Z",
   "device_type": "smart_dimmer",
   "discovery_by": "device",
   "measure_description": "Manually measured with light connected as bypass.",

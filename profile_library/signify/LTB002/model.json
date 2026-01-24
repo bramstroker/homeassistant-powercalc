@@ -1,7 +1,7 @@
 {
   "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-04-01T17:53:59",
+  "created_at": "2023-04-01T17:53:59Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug US",

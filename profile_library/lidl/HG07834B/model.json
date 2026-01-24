@@ -1,7 +1,7 @@
 {
   "author": "Morten Trab <morten@trab.dk>",
   "calculation_strategy": "lut",
-  "created_at": "2022-03-10T15:24:31",
+  "created_at": "2022-03-10T15:24:31Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

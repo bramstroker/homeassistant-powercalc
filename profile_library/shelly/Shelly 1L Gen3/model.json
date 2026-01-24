@@ -5,7 +5,7 @@
   "author": "Victor Burlacu-Zane",
   "calculation_strategy": "fixed",
   "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN + BT + ECO\": All three turned on, repeater turned off.\n\"WLAN + ECO\": Both turned on, repeater turned off.\n\"WLAN + BT\": Both turned on, repeater turned on, ECO turned off.\n\"WLAN\": Only WLAN turned on, all others off.\n\"Other combinations\": For all other combinations. Maximum device power draw.",
-  "created_at": "2026-01-05T20:06:00 CET",
+  "created_at": "2026-01-05T20:06:00+01:00",
   "device_type": "smart_switch",
   "discovery_by": "entity",
   "measure_description": "Measured with disconnected load, for about 90 minutes and calculated average from values stored by Home Assistant. Multiple combinations of settings were tested. Firmware version 1.7.1 for the tested Shelly 1L Gen3 device. The power values are long-term averages measured while the device periodically wakes to maintain connectivity. Instantaneous power is higher during wakeups when the relay is off, but the average energy consumption is accurately reflected.",

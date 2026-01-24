@@ -1,7 +1,7 @@
 {
   "author": "nwalk7800 <1247667+nwalk7800@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-09-01T13:39:38.064695",
+  "created_at": "2024-09-01T13:39:38Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug",

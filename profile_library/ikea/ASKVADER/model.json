@@ -5,7 +5,7 @@
   ],
   "author": "confucius78 <dekker.wj@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2023-12-31T20:16:31",
+  "created_at": "2023-12-31T20:16:31Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured.",
   "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",

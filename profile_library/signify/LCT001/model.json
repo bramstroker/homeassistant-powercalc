@@ -1,7 +1,7 @@
 {
   "author": "wormiedk <wormie@alberg.dk>",
   "calculation_strategy": "lut",
-  "created_at": "2021-09-01T18:40:45",
+  "created_at": "2021-09-01T18:40:45Z",
   "device_type": "light",
   "measure_description": "Used HASS based script",
   "measure_device": "Shelly 1PM",

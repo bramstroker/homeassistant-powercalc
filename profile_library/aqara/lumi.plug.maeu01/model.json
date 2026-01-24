@@ -4,7 +4,7 @@
   ],
   "author": "BenRoe",
   "calculation_strategy": "fixed",
-  "created_at": "2023-12-17T16:08:15",
+  "created_at": "2023-12-17T16:08:15Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured. Pictures in the Pull Request comments.",
   "measure_device": "Zhurui PR10",

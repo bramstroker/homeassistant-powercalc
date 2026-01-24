@@ -1,7 +1,7 @@
 {
   "author": "miggi92 <miggi92@users.noreply.github.com>",
   "calculation_strategy": "linear",
-  "created_at": "2025-07-14T10:10:08.375127+02:00",
+  "created_at": "2025-07-14T10:10:08+02:00",
   "device_type": "fan",
   "linear_config": {
     "attribute": "percentage",

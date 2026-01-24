@@ -4,7 +4,7 @@
   ],
   "author": "daloki83",
   "calculation_strategy": "fixed",
-  "created_at": "2023-06-19T08:02:31",
+  "created_at": "2023-06-19T08:02:31Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/files/11778846/measurements.xlsx",
   "measure_device": "Zhurui PR10",

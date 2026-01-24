@@ -4,7 +4,7 @@
   ],
   "author": "Zachery Notz <31785616+TheZackCodec@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-06-28T05:13:51.976848",
+  "created_at": "2024-06-28T05:13:51Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Fluke 87",

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 import json
 import logging
 import os
@@ -206,8 +206,9 @@ class Measure:
         extra_json_data: dict | None = None,
     ) -> None:
         """Write model.json manifest file"""
+        created_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
         json_data = {
-            "created_at": datetime.now().isoformat(),
+            "created_at": created_at,
             "measure_device": measure_device,
             "measure_method": "script",
             "measure_description": "Measured with utils/measure script",

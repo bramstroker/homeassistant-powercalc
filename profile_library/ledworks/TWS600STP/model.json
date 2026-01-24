@@ -1,7 +1,7 @@
 {
   "author": "brianegge <brianegge@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-11-29T00:22:03.005215",
+  "created_at": "2024-11-29T00:22:03Z",
   "device_type": "light",
   "fixed_config": {
     "power": 37.0

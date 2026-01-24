@@ -1,7 +1,7 @@
 {
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2022-11-23T08:42:12",
+  "created_at": "2022-11-23T08:42:12Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
   "measure_device": "Zhurui PR10",
