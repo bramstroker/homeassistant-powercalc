@@ -77,7 +77,7 @@ def mock_flow_init(hass: HomeAssistant) -> Generator:
 class MockEntityWithModel(Protocol):
     def __call__(
         self,
-        entity_id: str,
+        entity_id: str | list[str],
         manufacturer: str = "signify",
         model: str = "LCT010",
         model_id: str | None = None,
@@ -109,18 +109,18 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
             platform = entity_reg_kwargs["platform"]
             del entity_reg_kwargs["platform"]
 
-        mock_registry(
-            hass,
-            {
-                entity_id: RegistryEntryWithDefaults(
-                    entity_id=entity_id,
-                    unique_id=unique_id,
-                    platform=platform,
-                    device_id=device_id,
-                    **entity_reg_kwargs,
-                ),
-            },
-        )
+        mock_entries: dict[str, Any] = {}
+        entity_ids = entity_id if isinstance(entity_id, list) else [entity_id]
+        for entity_id in entity_ids:
+            mock_entries[entity_id] = RegistryEntryWithDefaults(
+                entity_id=entity_id,
+                unique_id=unique_id + "_" + entity_id,
+                platform=platform,
+                device_id=device_id,
+                **entity_reg_kwargs,
+            )
+
+        mock_registry(hass, mock_entries)
         mock_device_registry(
             hass,
             {
