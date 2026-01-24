@@ -1,7 +1,7 @@
 {
   "author": "Jarod2801 <Jarod2801@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2025-05-30T11:16:31.955415",
+  "created_at": "2025-05-30T11:16:31Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1",

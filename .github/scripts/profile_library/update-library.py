@@ -233,7 +233,7 @@ async def process_model_file(json_path: str) -> dict:
             {
                 "manufacturer": os.path.basename(os.path.dirname(model_directory)),
                 "directory": model_directory,
-                "updated_at": updated_at.isoformat(),
+                "updated_at": updated_at.isoformat(timespec="seconds").replace("+00:00", "Z"),
                 "full_path": json_path,
                 "max_power": max_power,
                 "sub_profile_count": sub_profile_count,

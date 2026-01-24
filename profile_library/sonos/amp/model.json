@@ -2,7 +2,7 @@
   "author": "vandalon <joris@vandalon.nl>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
-  "created_at": "2023-04-03T20:55:15",
+  "created_at": "2023-04-03T20:55:15Z",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [

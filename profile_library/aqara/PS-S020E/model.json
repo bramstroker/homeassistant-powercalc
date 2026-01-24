@@ -1,7 +1,7 @@
 {
   "author": "Jonas Dambacher <mail@jonas-dambacher.de>",
   "calculation_strategy": "fixed",
-  "created_at": "2026-01-11T16:22:00 CET",
+  "created_at": "2026-01-11T16:22:00+01:00",
   "device_type": "generic_iot",
   "discovery_by": "device",
   "fixed_config": {

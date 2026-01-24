@@ -5,7 +5,7 @@
   ],
   "author": "Justin Hahn <justin.hahn@live.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2025-04-10T00:41:25 CET",
+  "created_at": "2025-04-10T00:41:25+01:00",
   "description": "The measured Bosch Smart Home Controller had the following devices connected: four Bosch Smart Home Radiator Thermostat II (TRV_GEN2), two Bosch Smart Home Radiator Thermostat I (TRV), and two Bosch Smart Home Door/Window Contact II (SWD2).During the 120-second measurement period, the temperature was adjusted both directly on the device itself and via the Smart Home Controller on one TRV thermostat and on one TRV_GEN2 thermostat. In addition, both window sensors were triggered twice each by opening and closing the windows.",
   "device_type": "generic_iot",
   "discovery_by": "device",

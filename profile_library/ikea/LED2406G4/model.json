@@ -4,7 +4,7 @@
     "36864"
   ],
   "calculation_strategy": "lut",
-  "created_at": "2026-01-21T16:46:43.915675",
+  "created_at": "2026-01-21T16:46:43Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen 3",

@@ -5,7 +5,7 @@
   ],
   "author": "Alexandre Bertrand <alexandrebertrand96@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2025-10-12T09:03:14",
+  "created_at": "2025-10-12T09:03:14Z",
   "device_type": "network",
   "discovery_by": "device",
   "fixed_config": {

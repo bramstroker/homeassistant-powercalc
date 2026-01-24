@@ -1,7 +1,7 @@
 {
   "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2022-09-06T08:26:19",
+  "created_at": "2022-09-06T08:26:19Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured w/3.65W Incandescent nightlight.",
   "measure_device": "TP-Link Kasa KP115",

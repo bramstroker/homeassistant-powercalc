@@ -4,7 +4,7 @@
   ],
   "author": "Hadley Rich <hads@nice.net.nz>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-01-09T21:37:04",
+  "created_at": "2024-01-09T21:37:04Z",
   "device_type": "smart_switch",
   "measure_description": "Measured with Power-Mate Lite.",
   "measure_device": "Hypertec Power-Mate Lite 10A",

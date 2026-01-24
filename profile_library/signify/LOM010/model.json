@@ -1,7 +1,7 @@
 {
   "author": "Keatre",
   "calculation_strategy": "fixed",
-  "created_at": "2025-04-14T10:00:00",
+  "created_at": "2025-04-14T10:00:00Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured.",
   "measure_device": "Intertek PM01-US",

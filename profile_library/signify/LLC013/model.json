@@ -2,7 +2,7 @@
   "aliases": [],
   "author": "CM000n <simon.hoerrle@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-09-02T09:08:23",
+  "created_at": "2023-09-02T09:08:23Z",
   "device_type": "light",
   "linked_profile": "signify/LLC012",
   "measure_device": "Shelly Plug S",

@@ -1,7 +1,7 @@
 {
   "author": "101081kai <152090666+101081kai@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-12-01T09:44:23",
+  "created_at": "2023-12-01T09:44:23Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",

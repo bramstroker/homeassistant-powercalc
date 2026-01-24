@@ -1,7 +1,7 @@
 {
   "author": "SAF <andrei.staicu@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-11-25T16:19:34.226963",
+  "created_at": "2024-11-25T16:19:34Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",

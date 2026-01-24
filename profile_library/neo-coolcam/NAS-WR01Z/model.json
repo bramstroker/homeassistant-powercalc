@@ -1,7 +1,7 @@
 {
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2022-10-04T20:16:59",
+  "created_at": "2022-10-04T20:16:59Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured",
   "measure_device": "Zhurui PR10",

@@ -5,7 +5,7 @@
   "author": "Edouard Kleinhans <edouard@kleinhans.info>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
-  "created_at": "2024-09-13T10:01:18.035778",
+  "created_at": "2024-09-13T10:01:18Z",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [

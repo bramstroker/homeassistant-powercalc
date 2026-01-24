@@ -5,7 +5,7 @@
   ],
   "author": "niggles1973 <95966990+niggles1973@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-07-24T06:28:09.271856",
+  "created_at": "2024-07-24T06:28:09Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script, 2 lights",
   "measure_device": "Shelly 1PM",

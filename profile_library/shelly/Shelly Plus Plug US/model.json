@@ -4,7 +4,7 @@
   ],
   "author": "barndawgie <jbarnard@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2025-07-15T04:34:00",
+  "created_at": "2025-07-15T04:34:00Z",
   "device_type": "smart_switch",
   "discovery_by": "entity",
   "linked_profile": "shelly/shelly plus plug s",

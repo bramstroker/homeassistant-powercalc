@@ -1,7 +1,7 @@
 {
   "author": "Tim van Werkhoven <tim+github.com@vanwerkhoven.org>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-05-07T20:30:00",
+  "created_at": "2024-05-07T20:30:00Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured average of 2 plugs",
   "measure_device": "Brennenstuhl PM 231 E",

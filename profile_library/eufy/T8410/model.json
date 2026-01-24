@@ -1,7 +1,7 @@
 {
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2023-08-12T11:19:44",
+  "created_at": "2023-08-12T11:19:44Z",
   "device_type": "camera",
   "measure_description": "Used measure tool and took average during 5 minutes",
   "measure_device": "Shelly Plug S",

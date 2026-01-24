@@ -1,7 +1,7 @@
 {
   "author": "Benjamin Neff <benjamin@coding4coffee.ch>",
   "calculation_strategy": "lut",
-  "created_at": "2025-12-20T22:56:04.250561",
+  "created_at": "2025-12-20T22:56:04Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

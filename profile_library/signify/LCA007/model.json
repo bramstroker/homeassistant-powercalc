@@ -4,7 +4,7 @@
   ],
   "author": "Thomas-Henning von Kamptz <51594212+tomsoftcom@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-05-29T15:18:24",
+  "created_at": "2022-05-29T15:18:24Z",
   "device_type": "light",
   "linked_profile": "signify/LCA006",
   "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",

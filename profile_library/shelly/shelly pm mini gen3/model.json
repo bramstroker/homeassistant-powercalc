@@ -4,7 +4,7 @@
   ],
   "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-12-01T16:51:00",
+  "created_at": "2024-12-01T16:51:00Z",
   "device_type": "power_meter",
   "discovery_by": "device",
   "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=ZXC4vft57gU",

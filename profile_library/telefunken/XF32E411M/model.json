@@ -3,7 +3,7 @@
   "calculation_enabled_condition": "{{not is_state('[[entity]]', 'unavailable') }}",
   "calculation_strategy": "linear",
   "config_flow_sub_profile_remarks": "Select a profile based on your picture settings. These apply only to picture default profiles, customized profiles may differ.\nSwitching Sat channels lowers power by ~5W for 2-3 seconds, which Powercalc cannot account for.Thus, this profile is not recommended for Sat use. Other tuners were not tested.\nUSB devices can increase TV power consumption by up to 7W.",
-  "created_at": "2025-10-18T23:52:00.905856",
+  "created_at": "2025-10-18T23:52:00Z",
   "device_type": "television",
   "energy_sensor_naming": "{} Device Energy",
   "measure_description": "Measurements were taken in several scenarios with different picture profiles. Tested were: playing this YouTube video via the internal YouTube player and via a connected device over HDMI: https://www.youtube.com/watch?v=6FsYk9GIv2Y&t=1781s, and watching channels via the Sat tuner. The TV is an LCD and shows very consistent power consumption across all profiles, so a calculation is possible.",

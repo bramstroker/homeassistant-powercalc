@@ -1,7 +1,7 @@
 {
   "author": "Mariusthvdb",
   "calculation_strategy": "fixed",
-  "created_at": "2022-09-21T13:45:02",
+  "created_at": "2022-09-21T13:45:02Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured. Copied from LOM002 as suggested in https://github.com/bramstroker/homeassistant-powercalc/discussions/1093",
   "measure_device": "Shelly Plug S",

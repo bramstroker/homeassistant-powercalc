@@ -1,7 +1,7 @@
 {
   "author": "Panagiotis Doulgeris <45369229+Pantastisch@users.noreply.github.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-05-05T22:10:29",
+  "created_at": "2024-05-05T22:10:29Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured",
   "measure_device": "Voltcraft VC270 with Voltcraft VC-510 and 20 windings",

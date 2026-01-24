@@ -1,7 +1,7 @@
 {
   "author": "Jacob Donenfeld <25359163+jacobdonenfeld@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-05-03T22:15:08",
+  "created_at": "2022-05-03T22:15:08Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script. TP-link kp125 was having inconsistent readings towards the 0.52 watt and lower range, so I manually smoothed out some of the outliers",
   "measure_device": "TP-Link Kasa KP125",

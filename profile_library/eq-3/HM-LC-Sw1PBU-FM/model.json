@@ -1,7 +1,7 @@
 {
   "author": "zenzmatz",
   "calculation_strategy": "fixed",
-  "created_at": "2025-04-30T22:41:40",
+  "created_at": "2025-04-30T22:41:40Z",
   "description": "Homematic smart switch. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage must be configured by the user since it is possible to connect anything to it.",
   "device_type": "smart_switch",
   "measure_description": "Manually measured with dummy load attached at 6.06W (average over 600s) in average mode",
