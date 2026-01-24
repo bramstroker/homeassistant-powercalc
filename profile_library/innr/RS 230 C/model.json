@@ -12,5 +12,10 @@
     "VERSION": "v0.25.4:docker"
   },
   "name": "Smart Spot Colour GU10 Bulb",
-  "standby_power": 0.37
+  "standby_power": 0.37,
+  "author_info": {
+    "name": "el97",
+    "email": "erik1337.el@gmail.com",
+    "github": "el97"
+  }
 }

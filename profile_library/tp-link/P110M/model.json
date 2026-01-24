@@ -16,5 +16,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.3,
-  "standby_power_on": 1.2
+  "standby_power_on": 1.2,
+  "author_info": {
+    "name": "Bob Shaker",
+    "email": "bobshaker1@gmail.com",
+    "github": "EpicBurrito"
+  }
 }

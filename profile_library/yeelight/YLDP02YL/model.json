@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "RGBW E27 Smart LED Bulb",
-  "standby_power": 1.29
+  "standby_power": 1.29,
+  "author_info": {
+    "name": "hekm77",
+    "email": "chiki77piki@gmail.com",
+    "github": "hekm77"
+  }
 }

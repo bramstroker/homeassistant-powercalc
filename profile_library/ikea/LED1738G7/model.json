@@ -15,5 +15,9 @@
     "VERSION": "v0.13.1"
   },
   "name": "TRADFRI bulb E14 WS opal 600lm",
-  "standby_power": 0.17
+  "standby_power": 0.17,
+  "author_info": {
+    "name": "Robert",
+    "github": "metbril"
+  }
 }

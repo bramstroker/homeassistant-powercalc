@@ -10,5 +10,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Hue White Bulb A67 E27 1600lm",
-  "standby_power": 0.41
+  "standby_power": 0.41,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

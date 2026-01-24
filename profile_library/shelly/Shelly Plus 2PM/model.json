@@ -28,5 +28,10 @@
   "standby_power": 0.822,
   "multi_switch_config": {
     "power": 0.145
+  },
+  "author_info": {
+    "name": "Michal Bartak",
+    "email": "michal.bartak@betsys.com",
+    "github": "michalk-k"
   }
 }

@@ -12,5 +12,9 @@
     "VERSION": "v1.3.1:docker"
   },
   "name": "Livarno Lux GU10 spot RGB",
-  "standby_power": 0.28
+  "standby_power": 0.28,
+  "author_info": {
+    "name": "aqwserf",
+    "github": "aqwserf"
+  }
 }

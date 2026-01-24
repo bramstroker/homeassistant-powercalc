@@ -16,5 +16,9 @@
     "VERSION": "v0.26.1:docker"
   },
   "name": "Hue Amaze Suspension Light",
-  "standby_power": 0.59
+  "standby_power": 0.59,
+  "author_info": {
+    "name": "Eduard Llull",
+    "github": "ellull"
+  }
 }

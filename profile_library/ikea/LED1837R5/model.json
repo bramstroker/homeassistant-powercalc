@@ -15,5 +15,10 @@
     "VERSION": "v0.13.4"
   },
   "name": "TRADFRI bulb GU10 WW 400lm",
-  "standby_power": 0.21
+  "standby_power": 0.21,
+  "author_info": {
+    "name": "Magnus Øverli",
+    "email": "magnus.overli@gmail.com",
+    "github": "magnusoverli"
+  }
 }

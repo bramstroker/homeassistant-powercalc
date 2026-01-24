@@ -26,5 +26,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
   "name": "Nest Mini",
-  "standby_power": 1.65
+  "standby_power": 1.65,
+  "author_info": {
+    "name": "Daniel O'Connor",
+    "email": "daniel.oconnor@gmail.com",
+    "github": "CloCkWeRX"
+  }
 }

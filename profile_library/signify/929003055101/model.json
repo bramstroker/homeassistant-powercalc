@@ -18,5 +18,9 @@
     "VERSION": "v1.9.5:docker"
   },
   "name": "Hue Being Ceiling Light",
-  "standby_power": 0.47
+  "standby_power": 0.47,
+  "author_info": {
+    "name": "dansie",
+    "github": "dansie"
+  }
 }

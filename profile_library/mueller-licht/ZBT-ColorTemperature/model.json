@@ -7,5 +7,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Tint GU10 Spot 350lm",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

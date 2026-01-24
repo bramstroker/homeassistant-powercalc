@@ -15,5 +15,10 @@
     "VERSION": "master"
   },
   "name": "Hue White Bulb A60 E27/B22",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "OzGav",
+    "email": "gavnosp@hotmail.com",
+    "github": "OzGav"
+  }
 }

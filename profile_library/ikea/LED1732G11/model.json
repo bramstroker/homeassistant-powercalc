@@ -10,5 +10,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "TRADFRI bulb E27 WS opal 1000lm",
-  "standby_power": 0.26
+  "standby_power": 0.26,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

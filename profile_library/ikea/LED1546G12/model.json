@@ -10,5 +10,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "TRADFRI bulb E27 WS clear 950lm",
-  "standby_power": 0.43
+  "standby_power": 0.43,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

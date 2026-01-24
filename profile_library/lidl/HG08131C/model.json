@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Livarno Home E27 9.5W RGB+CCT Bulb",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "RubenKelevra",
+    "email": "cyrond@gmail.com",
+    "github": "RubenKelevra"
+  }
 }

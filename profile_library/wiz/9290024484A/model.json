@@ -12,5 +12,9 @@
     "VERSION": "v1.9.14:docker"
   },
   "name": "Smart Wi-Fi RGB + Tunable White GU10 LED Spotlight Bulb (PAR16)",
-  "standby_power": 0.17
+  "standby_power": 0.17,
+  "author_info": {
+    "name": "htlemos",
+    "github": "htlemos"
+  }
 }

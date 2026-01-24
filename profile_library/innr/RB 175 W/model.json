@@ -7,5 +7,10 @@
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
   "name": "WW Dimmable E27 Bulb 806lm",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

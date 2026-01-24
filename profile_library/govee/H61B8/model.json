@@ -12,5 +12,10 @@
   },
   "name": "Strip Light with Skyline Kit",
   "standby_power": 1.2,
-  "author": "Jonas Dambacher <mail@jonas-dambacher.de>"
+  "author": "Jonas Dambacher <mail@jonas-dambacher.de>",
+  "author_info": {
+    "name": "Jonas Dambacher",
+    "email": "j.dambacher@basecom.de",
+    "github": "jdambacher"
+  }
 }

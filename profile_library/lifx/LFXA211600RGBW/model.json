@@ -15,5 +15,9 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Smart Wi-Fi RGBW LED Bulb (A21, 1600 lm)",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author_info": {
+    "name": "TheRealBernie",
+    "github": "TheRealBernie"
+  }
 }

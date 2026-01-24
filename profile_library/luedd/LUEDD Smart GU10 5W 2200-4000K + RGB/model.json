@@ -13,5 +13,9 @@
     "VERSION": "v1.17.11:docker"
   },
   "name": "Smart GU10 5W 2200-4000K + RGB",
-  "standby_power": 0.8
+  "standby_power": 0.8,
+  "author_info": {
+    "name": "Jort",
+    "github": "JortvanSchijndel"
+  }
 }

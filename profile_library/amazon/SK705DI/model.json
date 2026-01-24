@@ -33,5 +33,9 @@
     "VERSION": "v1.12.6:docker"
   },
   "name": "Echo (Gen1)",
-  "standby_power": 3.06
+  "standby_power": 3.06,
+  "author_info": {
+    "name": "Stuart Pearson",
+    "github": "stuartp44"
+  }
 }

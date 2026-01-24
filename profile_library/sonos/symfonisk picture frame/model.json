@@ -26,5 +26,10 @@
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "manual",
   "name": "SYMFONISK Picture Frame",
-  "standby_power": 2.4
+  "standby_power": 2.4,
+  "author_info": {
+    "name": "sockmonkey0223",
+    "email": "joshua.oswald@gmail.com",
+    "github": "sockmonkey0223"
+  }
 }

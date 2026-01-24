@@ -27,5 +27,10 @@
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "manual",
   "name": "One",
-  "standby_power": 2.92
+  "standby_power": 2.92,
+  "author_info": {
+    "name": "Thorjan Knudsvik",
+    "email": "t@knudsvik.com",
+    "github": "knudsvik"
+  }
 }

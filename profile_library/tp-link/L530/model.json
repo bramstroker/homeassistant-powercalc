@@ -12,5 +12,10 @@
     "VERSION": "v1.6.0:docker"
   },
   "name": "Tapo Smart Wi-Fi Light Bulb, Multicolor",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "naamah75",
+    "email": "webmaster@naamah.it",
+    "github": "naamah75"
+  }
 }

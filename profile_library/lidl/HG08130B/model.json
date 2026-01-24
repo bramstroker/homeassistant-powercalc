@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Livarno Home E14 6W CCT Candle Bulb",
-  "standby_power": 0.29
+  "standby_power": 0.29,
+  "author_info": {
+    "name": "RubenKelevra",
+    "email": "cyrond@gmail.com",
+    "github": "RubenKelevra"
+  }
 }

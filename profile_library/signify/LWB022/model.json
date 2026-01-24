@@ -15,5 +15,9 @@
   },
   "name": "Hue White Bulb BR30",
   "standby_power": 0.25,
-  "author": "Mayu <38099964+MayuCat@users.noreply.github.com>"
+  "author": "Mayu <38099964+MayuCat@users.noreply.github.com>",
+  "author_info": {
+    "name": "Mayu",
+    "github": "MayuCat"
+  }
 }

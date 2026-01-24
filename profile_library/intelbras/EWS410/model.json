@@ -12,5 +12,10 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Smart Wi-Fi RGB LED Light Bulb (10 W, E27)",
-  "standby_power": 0.62
+  "standby_power": 0.62,
+  "author_info": {
+    "name": "Felipe Marinho",
+    "email": "felipe.marinho@ifood.com.br",
+    "github": "felipemarinho97"
+  }
 }

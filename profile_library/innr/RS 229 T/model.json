@@ -12,5 +12,9 @@
     "VERSION": "master"
   },
   "name": "Tunable White Spot Single Lens GU10 Bulb",
-  "standby_power": 0.53
+  "standby_power": 0.53,
+  "author_info": {
+    "name": "Kevin Lemonnier",
+    "github": "Ulrar"
+  }
 }

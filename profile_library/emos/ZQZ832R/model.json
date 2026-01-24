@@ -12,5 +12,9 @@
     "VERSION": "v1.10.6:docker"
   },
   "name": "GOSMART LED MR16 4,8W GU10",
-  "standby_power": 0.24
+  "standby_power": 0.24,
+  "author_info": {
+    "name": "Lacimaci78",
+    "github": "Lacimaci78"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Full-Color Smart Wi-Fi LED Light Bulb (E27, RGB + Tunable White)",
-  "standby_power": 0.96
+  "standby_power": 0.96,
+  "author_info": {
+    "name": "ahartmanns",
+    "email": "a.hartmanns@utwente.nl",
+    "github": "ahartmanns"
+  }
 }

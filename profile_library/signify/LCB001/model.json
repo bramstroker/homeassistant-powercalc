@@ -12,5 +12,10 @@
     "VERSION": "v0.24.8:docker"
   },
   "name": "Hue White and Color Ambiance BR30 Bluetooth",
-  "standby_power": 0.12
+  "standby_power": 0.12,
+  "author_info": {
+    "name": "Emory Penney",
+    "email": "emory.j.penney@intel.com",
+    "github": "ejpenney"
+  }
 }

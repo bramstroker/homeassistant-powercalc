@@ -12,5 +12,10 @@
     "VERSION": "v1.16.2:docker"
   },
   "name": "Philips Smart LED Bulb",
-  "standby_power": 0.9
+  "standby_power": 0.9,
+  "author_info": {
+    "name": "Andrzej Dopierała",
+    "email": "andrzej.dopierala@currency-one.com",
+    "github": "theundefined"
+  }
 }

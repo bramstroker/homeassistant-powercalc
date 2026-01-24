@@ -15,5 +15,10 @@
   "measure_device": "Meross mss310",
   "measure_method": "manual",
   "name": "Mi Smart Standing Fan 2",
-  "standby_power": 1
+  "standby_power": 1,
+  "author_info": {
+    "name": "olivr2s",
+    "email": "olivr2s@users.noreply.github.com",
+    "github": "olivr2s"
+  }
 }

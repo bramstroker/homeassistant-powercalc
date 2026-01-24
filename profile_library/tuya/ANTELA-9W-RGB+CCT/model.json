@@ -13,5 +13,10 @@
     "VERSION": "master"
   },
   "name": "ANTELA-9W-RGB+CCT",
-  "standby_power": 0.46
+  "standby_power": 0.46,
+  "author_info": {
+    "name": "j0nixs",
+    "email": "jtschoche@gmail.com",
+    "github": "j0nxs"
+  }
 }

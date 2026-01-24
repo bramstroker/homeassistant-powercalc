@@ -15,5 +15,10 @@
     "VERSION": "v1.15.5:docker"
   },
   "name": "Twinkly 600 String Lights",
-  "standby_power": 2.2
+  "standby_power": 2.2,
+  "author_info": {
+    "name": "brianegge",
+    "email": "brianegge@gmail.com",
+    "github": "brianegge"
+  }
 }

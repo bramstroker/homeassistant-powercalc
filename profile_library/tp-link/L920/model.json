@@ -12,5 +12,10 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Tapo Smart Wi-Fi Light Strip, Multicolor",
-  "standby_power": 0.53
+  "standby_power": 0.53,
+  "author_info": {
+    "name": "Ed Kutuev",
+    "email": "ed@napych.com",
+    "github": "napych"
+  }
 }

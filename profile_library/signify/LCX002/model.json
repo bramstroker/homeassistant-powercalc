@@ -15,5 +15,10 @@
     "VERSION": "v1.17.7:docker"
   },
   "name": "Hue Play Gradient Lightstrip 65 Inch",
-  "standby_power": 0.07
+  "standby_power": 0.07,
+  "author_info": {
+    "name": "dewbot6",
+    "email": "drewsnodgrass@comcast.net",
+    "github": "dewbot6"
+  }
 }

@@ -16,5 +16,9 @@
     "VERSION": "v1.0.3:docker"
   },
   "name": "TRADFRI LED bulb E27 806 lumen, dimmable, white spectrum, clear",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "marthubner",
+    "github": "marthubner"
+  }
 }

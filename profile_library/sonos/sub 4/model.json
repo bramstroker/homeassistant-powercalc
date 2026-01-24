@@ -28,5 +28,9 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Sub 4",
-  "standby_power": 1.9
+  "standby_power": 1.9,
+  "author_info": {
+    "name": "Josh Barnard",
+    "github": "barndawgie"
+  }
 }

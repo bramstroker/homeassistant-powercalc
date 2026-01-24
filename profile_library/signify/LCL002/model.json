@@ -16,5 +16,9 @@
     "VERSION": "v1.12.6:docker"
   },
   "name": "Hue lightstrip outdoor",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "Stuart Pearson",
+    "github": "stuartp44"
+  }
 }

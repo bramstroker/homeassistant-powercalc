@@ -12,5 +12,9 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "TRADFRI bulb GU10 WS 345 lm, dimmable, white spectrum",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "martinkura-svk",
+    "github": "martinkura-svk"
+  }
 }

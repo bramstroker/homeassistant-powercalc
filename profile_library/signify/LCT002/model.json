@@ -12,5 +12,9 @@
     "VERSION": "v1.3.13:docker"
   },
   "name": "Hue White and Color Ambiance BR30 (1st Gen)",
-  "standby_power": 0.12
+  "standby_power": 0.12,
+  "author_info": {
+    "name": "Ben Brooks",
+    "github": "brooksben11"
+  }
 }

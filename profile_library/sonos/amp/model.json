@@ -28,5 +28,10 @@
     "VERSION": "v1.3.13:docker"
   },
   "name": "Amp",
-  "standby_power": 6.42
+  "standby_power": 6.42,
+  "author_info": {
+    "name": "vandalon",
+    "email": "joris@vandalon.nl",
+    "github": "vandalon"
+  }
 }

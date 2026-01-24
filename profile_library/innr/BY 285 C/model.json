@@ -12,5 +12,9 @@
     "VERSION": "v1.9.0:docker"
   },
   "name": "Smart Bulb B22 Colour 806lm",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Kevin Lemonnier",
+    "github": "Ulrar"
+  }
 }

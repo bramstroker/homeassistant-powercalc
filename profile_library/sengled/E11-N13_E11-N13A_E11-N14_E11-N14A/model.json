@@ -15,5 +15,10 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "Smart LED Extra Bright Soft White A19 Bulb",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "dhedges01",
+    "email": "dhedges01@gmail.com",
+    "github": "dhedges01"
+  }
 }

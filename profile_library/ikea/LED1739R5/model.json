@@ -12,5 +12,9 @@
     "VERSION": "v1.15.4:docker"
   },
   "name": "TRADFRI bulb GU10 WS 400 lm, dimmable, white spectrum",
-  "standby_power": 0.26
+  "standby_power": 0.26,
+  "author_info": {
+    "name": "Bram Eikelboom",
+    "github": "bram96"
+  }
 }

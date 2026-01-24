@@ -28,5 +28,9 @@
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "manual",
   "name": "Echo Show 8 (Gen2)",
-  "standby_power": 4.28
+  "standby_power": 4.28,
+  "author_info": {
+    "name": "Stuart Pearson",
+    "github": "stuartp44"
+  }
 }

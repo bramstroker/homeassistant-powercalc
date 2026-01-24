@@ -11,5 +11,10 @@
   "measure_device": "AVM Fritz!DECT 200",
   "measure_method": "script",
   "name": "Hue White and Color Ambiance A19 E26/E27 (Gen 4)",
-  "standby_power": 0.47
+  "standby_power": 0.47,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

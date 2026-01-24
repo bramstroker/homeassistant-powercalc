@@ -9,5 +9,10 @@
   "measure_description": "Manually measured.",
   "measure_device": "Nous A1Z",
   "measure_method": "manual",
-  "name": "FRITZ!Box 5690 Pro"
+  "name": "FRITZ!Box 5690 Pro",
+  "author_info": {
+    "name": "Robert M. Albrecht",
+    "email": "powercalc@romal.org",
+    "github": "rmalbrecht"
+  }
 }

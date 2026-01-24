@@ -12,5 +12,9 @@
     "VERSION": "v1.17.24:docker"
   },
   "name": "RGB+CCT 9 W Zigbee Downlight",
-  "standby_power": 0.22
+  "standby_power": 0.22,
+  "author_info": {
+    "name": "Peklaa",
+    "github": "Peklaa"
+  }
 }

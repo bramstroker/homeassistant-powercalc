@@ -26,7 +26,30 @@
       "description": "List of compatible integrations for this model"
     },
     "author": {
-      "type": "string"
+      "type": "string",
+      "deprecated": true
+    },
+    "author_info": {
+      "type": "object",
+      "description": "Info about the contributor of the profile",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the contributor"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the contributor"
+        },
+        "github": {
+          "type": "string",
+          "description": "GitHub username of the contributor"
+        }
+      },
+      "required": [
+        "name",
+        "github"
+      ]
     },
     "calculation_enabled_condition": {
       "type": "string",

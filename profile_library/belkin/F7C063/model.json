@@ -16,5 +16,9 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.75,
-  "standby_power_on": 1.3
+  "standby_power_on": 1.3,
+  "author_info": {
+    "name": "dxmnkd316",
+    "github": "dxmnkd316"
+  }
 }

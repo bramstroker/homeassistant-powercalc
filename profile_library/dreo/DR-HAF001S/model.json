@@ -16,5 +16,9 @@
   "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
   "measure_method": "manual",
   "name": "Lynx S Smart desk fan",
-  "standby_power": 0.87
+  "standby_power": 0.87,
+  "author_info": {
+    "name": "Miguel",
+    "github": "miggi92"
+  }
 }

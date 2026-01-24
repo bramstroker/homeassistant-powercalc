@@ -12,5 +12,9 @@
     "VERSION": "v1.10.4:docker"
   },
   "name": "White 5000K A19/E26 Bulb E11-G13 Zigbee",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "DracoC77",
+    "github": "DracoC77"
+  }
 }

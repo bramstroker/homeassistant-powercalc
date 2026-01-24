@@ -16,5 +16,9 @@
     "Essentials A19"
   ],
   "standby_power": 0.14,
-  "author": "David Iwanowitsch <971349+daiw@users.noreply.github.com>"
+  "author": "David Iwanowitsch <971349+daiw@users.noreply.github.com>",
+  "author_info": {
+    "name": "David Iwanowitsch",
+    "github": "daiw"
+  }
 }

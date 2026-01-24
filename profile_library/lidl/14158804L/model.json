@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Livarno home Tischleuchte",
-  "standby_power": 0.7
+  "standby_power": 0.7,
+  "author_info": {
+    "name": "RubenKelevra",
+    "email": "cyrond@gmail.com",
+    "github": "RubenKelevra"
+  }
 }

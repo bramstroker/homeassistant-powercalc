@@ -32,5 +32,10 @@
     "VERSION": "v1.11.3:docker"
   },
   "name": "Play:5",
-  "standby_power": 2.15
+  "standby_power": 2.15,
+  "author_info": {
+    "name": "bragra",
+    "email": "bragragithub@gradussen.com",
+    "github": "bragra"
+  }
 }

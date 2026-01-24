@@ -35,5 +35,9 @@
         "type": "entity_state"
       }
     ]
+  },
+  "author_info": {
+    "name": "CV",
+    "github": "dagobert"
   }
 }

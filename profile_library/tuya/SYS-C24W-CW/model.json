@@ -13,5 +13,10 @@
     "VERSION": "v1.9.3:docker"
   },
   "name": "SYLSTAR LED Ceiling Light 24W",
-  "standby_power": 0.73
+  "standby_power": 0.73,
+  "author_info": {
+    "name": "mariwing",
+    "email": "mariwing@gmail.com",
+    "github": "mariwing"
+  }
 }

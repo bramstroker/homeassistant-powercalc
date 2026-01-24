@@ -15,5 +15,10 @@
     "VERSION": "v0.22.1:docker"
   },
   "name": "TRADFRI bulb E14 WW clear 250lm",
-  "standby_power": 0.1
+  "standby_power": 0.1,
+  "author_info": {
+    "name": "Linus",
+    "email": "linus.nordin@gmail.com",
+    "github": "gribber"
+  }
 }

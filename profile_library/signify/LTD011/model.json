@@ -15,5 +15,10 @@
     "VERSION": "v1.17.9:docker"
   },
   "name": "Hue Garnea Downlight",
-  "standby_power": 0.19
+  "standby_power": 0.19,
+  "author_info": {
+    "name": "James Nobes",
+    "email": "james@Jamess-MacBook-Pro.local",
+    "github": "james-richards-privitar"
+  }
 }

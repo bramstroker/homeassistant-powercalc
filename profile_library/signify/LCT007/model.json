@@ -16,5 +16,9 @@
     "SLEEP_TIME_SAT": 10
   },
   "name": "Hue White and Color Ambiance E27 Gen2 (2015)",
-  "standby_power": 0.33
+  "standby_power": 0.33,
+  "author_info": {
+    "name": "Thomas-Henning von Kamptz",
+    "github": "tomsoftcom"
+  }
 }

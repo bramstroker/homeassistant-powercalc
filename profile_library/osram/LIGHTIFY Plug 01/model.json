@@ -17,5 +17,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.44,
-  "standby_power_on": 1.04
+  "standby_power_on": 1.04,
+  "author_info": {
+    "name": "Daniel O'Connor",
+    "email": "daniel.oconnor@gmail.com",
+    "github": "CloCkWeRX"
+  }
 }

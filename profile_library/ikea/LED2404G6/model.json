@@ -16,5 +16,10 @@
   },
   "name": "KAJPLATS E14 WS globe 806lm",
   "standby_power": 0.21,
-  "author": "Linus Nordin <linus.nordin@gmail.com>"
+  "author": "Linus Nordin <linus.nordin@gmail.com>",
+  "author_info": {
+    "name": "Linus Nordin",
+    "email": "linus.nordin@gmail.com",
+    "github": "gribber"
+  }
 }

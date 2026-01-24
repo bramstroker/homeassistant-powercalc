@@ -21,5 +21,10 @@
     "VERSION": "v1.17.12:docker"
   },
   "name": "Hue Argenta color spot",
-  "standby_power": 0.14
+  "standby_power": 0.14,
+  "author_info": {
+    "name": "Wouter Rutgers",
+    "email": "git@wouterrutgers.nl",
+    "github": "wouterrutgers"
+  }
 }

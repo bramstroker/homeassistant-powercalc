@@ -13,5 +13,10 @@
   "name": "Presence Sensor FP2",
   "aliases": [
     "PS-S02D"
-  ]
+  ],
+  "author_info": {
+    "name": "Jonas Dambacher",
+    "email": "j.dambacher@basecom.de",
+    "github": "jdambacher"
+  }
 }

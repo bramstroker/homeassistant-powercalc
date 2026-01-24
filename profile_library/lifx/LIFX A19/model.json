@@ -13,5 +13,9 @@
     "VERSION": "v0.19.15:docker"
   },
   "name": "A19",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "xpenno255",
+    "github": "xpenno255"
+  }
 }

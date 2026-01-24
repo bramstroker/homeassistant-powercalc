@@ -12,5 +12,9 @@
     "VERSION": "v1.10.4:docker"
   },
   "name": "Motion Sensor Bulb PAR38 E13-N11 Zigbee",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "DracoC77",
+    "github": "DracoC77"
+  }
 }

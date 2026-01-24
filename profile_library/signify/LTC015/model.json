@@ -12,5 +12,9 @@
     "VERSION": "master"
   },
   "name": "Hue Aurelle Rectangle Panel Light 30x120cm",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Nicolas L",
+    "github": "Loustik"
+  }
 }

@@ -9,5 +9,10 @@
   "name": "Kasa Smart WiFi Plug Mini",
   "only_self_usage": false,
   "standby_power": 0.58,
-  "standby_power_on": 1.09
+  "standby_power_on": 1.09,
+  "author_info": {
+    "name": "Thiago Oliveira",
+    "email": "infratl@gmail.com",
+    "github": "chilicheech"
+  }
 }

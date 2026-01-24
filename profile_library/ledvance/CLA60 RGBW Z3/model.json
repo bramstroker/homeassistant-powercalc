@@ -12,5 +12,10 @@
     "VERSION": "v1.9.2:docker"
   },
   "name": "Extended color light RGBW",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "PalminX",
+    "email": "bkuemmer@gmx.net",
+    "github": "PalminX"
+  }
 }

@@ -24,5 +24,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
   "name": "Sub (Gen1)",
-  "standby_power": 5.23
+  "standby_power": 5.23,
+  "author_info": {
+    "name": "vandalon",
+    "email": "joris@vandalon.nl",
+    "github": "vandalon"
+  }
 }

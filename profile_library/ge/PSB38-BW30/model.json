@@ -12,5 +12,9 @@
     "VERSION": "v1.9.5:docker"
   },
   "name": "Link PAR38 Bright White Bulb",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Ross Troha",
+    "github": "rosstroha"
+  }
 }

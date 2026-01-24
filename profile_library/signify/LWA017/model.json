@@ -15,5 +15,10 @@
     "VERSION": "v0.17.0:docker"
   },
   "name": "Hue White Bulb A60 E27 1050lm with Bluetooth",
-  "standby_power": 0.42
+  "standby_power": 0.42,
+  "author_info": {
+    "name": "KrzysztofHajdamowicz",
+    "email": "uosiu@uosiu.info",
+    "github": "KrzysztofHajdamowicz"
+  }
 }

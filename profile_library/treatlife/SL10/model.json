@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Smart Color Changing Light Bulb 9W 800LM",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "Benjamin Pearce",
+    "email": "gitlab@bcpearce.com",
+    "github": "bcpearce"
+  }
 }

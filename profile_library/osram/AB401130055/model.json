@@ -12,5 +12,9 @@
     "VERSION": "v1.9.8:docker"
   },
   "name": "LIGHTIFY Surface Light LED Tunable White",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "101081kai",
+    "github": "101081kai"
+  }
 }

@@ -11,5 +11,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Hue White Bulb A21 E26 1600lm with Bluetooth",
-  "standby_power": 0.41
+  "standby_power": 0.41,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

@@ -12,5 +12,9 @@
     "VERSION": "master"
   },
   "name": "Wi-Fi Dimmable 15W ES Par38 LED Bulb",
-  "standby_power": 0.51
+  "standby_power": 0.51,
+  "author_info": {
+    "name": "Wolfieeewolf",
+    "github": "Wolfieeewolf"
+  }
 }

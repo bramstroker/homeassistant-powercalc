@@ -12,5 +12,10 @@
     "VERSION": "v1.9.2:docker"
   },
   "name": "LIGHTIFY Classic B 40 TW 6W E14",
-  "standby_power": 0.15
+  "standby_power": 0.15,
+  "author_info": {
+    "name": "PalminX",
+    "email": "bkuemmer@gmx.net",
+    "github": "PalminX"
+  }
 }

@@ -15,5 +15,10 @@
     "VERSION": "v0.19.15:docker"
   },
   "name": "Hue Filament E26",
-  "standby_power": 0.11
+  "standby_power": 0.11,
+  "author_info": {
+    "name": "Scott Hoyt",
+    "email": "scottrhoyt@gmail.com",
+    "github": "scottrhoyt"
+  }
 }

@@ -28,5 +28,9 @@
     "VERSION": "v1.3.12:docker"
   },
   "name": "Nest Hub (2nd Gen)",
-  "standby_power": 0.39
+  "standby_power": 0.39,
+  "author_info": {
+    "name": "Patrik Malina",
+    "github": "patrik-malina"
+  }
 }

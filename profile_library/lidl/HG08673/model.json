@@ -13,5 +13,9 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.595,
-  "standby_power_on": 1.071
+  "standby_power_on": 1.071,
+  "author_info": {
+    "name": "Panagiotis Doulgeris",
+    "github": "Pantastisch"
+  }
 }

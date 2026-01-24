@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Smart LED Downlight",
-  "standby_power": 0.85
+  "standby_power": 0.85,
+  "author_info": {
+    "name": "Brian Egge",
+    "email": "brianegge@gmail.com",
+    "github": "brianegge"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v1.1.2:docker"
   },
   "name": "SMART+ WIFI Orbis Cylinder 450 TW",
-  "standby_power": 0.75
+  "standby_power": 0.75,
+  "author_info": {
+    "name": "Kenneth Fribert",
+    "email": "fribse@gmail.com",
+    "github": "fribse"
+  }
 }

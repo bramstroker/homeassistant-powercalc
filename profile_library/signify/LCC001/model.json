@@ -12,5 +12,9 @@
     "VERSION": "v1.16.5:docker"
   },
   "name": "Hue Flourish Ceiling Light",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "deceju",
+    "github": "deceju"
+  }
 }

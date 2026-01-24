@@ -12,5 +12,10 @@
     "VERSION": "v1.12.6:docker"
   },
   "name": "Smart Wi-Fi Full-Color RGB + Tunable White LED Bulb (A80, E27, 18.5 W / 2452 lm)",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Cam Murray",
+    "email": "camurray@microsoft.com",
+    "github": "cammurray"
+  }
 }

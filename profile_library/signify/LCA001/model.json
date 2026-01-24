@@ -15,5 +15,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Hue White and Color Ambiance A19 E26/E27 (Gen 5)",
-  "standby_power": 0.33
+  "standby_power": 0.33,
+  "author_info": {
+    "name": "Simon Hörrle",
+    "email": "simon.hoerrle@gmail.com",
+    "github": "CM000n"
+  }
 }

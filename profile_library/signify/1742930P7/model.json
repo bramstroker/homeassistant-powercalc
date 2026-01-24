@@ -15,5 +15,10 @@
     "VERSION": "master"
   },
   "name": "Hue Impress Outdoor Wall Light Small",
-  "standby_power": 0.17
+  "standby_power": 0.17,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Bulb A67 E27 RGBWW (type SHRGB1W, model 9290024497, 13 W 220-240 V, 1521 lm)",
-  "standby_power": 0.26
+  "standby_power": 0.26,
+  "author_info": {
+    "name": "Jari Eskelinen",
+    "email": "jari.eskelinen@iki.fi",
+    "github": "jarpatus"
+  }
 }

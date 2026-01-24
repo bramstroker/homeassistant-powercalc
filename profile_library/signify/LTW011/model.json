@@ -12,5 +12,9 @@
     "VERSION": "v1.3.13:docker"
   },
   "name": "Hue White Ambiance BR30 680lm",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "Ben Brooks",
+    "github": "brooksben11"
+  }
 }

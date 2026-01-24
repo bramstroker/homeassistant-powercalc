@@ -31,5 +31,9 @@
     "VERSION": "v1.9.6:docker"
   },
   "name": "Citation One MKII",
-  "standby_power": 2.01
+  "standby_power": 2.01,
+  "author_info": {
+    "name": "Imperial-Guard",
+    "github": "Imperial-Guard"
+  }
 }

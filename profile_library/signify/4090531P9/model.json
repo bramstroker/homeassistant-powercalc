@@ -16,5 +16,9 @@
     "VERSION": "master"
   },
   "name": "Hue Flourish Ceiling Light",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "matteobreschig",
+    "github": "matteobreschig"
+  }
 }

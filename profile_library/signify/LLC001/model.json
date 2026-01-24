@@ -7,5 +7,9 @@
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",
   "name": "LivingColors Iris",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "smonesi",
+    "github": "smonesi"
+  }
 }

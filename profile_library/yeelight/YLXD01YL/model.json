@@ -25,5 +25,9 @@
         "type": "entity_id"
       }
     ]
+  },
+  "author_info": {
+    "name": "RaphV90",
+    "github": "RaphV90"
   }
 }

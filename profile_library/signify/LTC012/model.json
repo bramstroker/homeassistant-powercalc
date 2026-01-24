@@ -15,5 +15,10 @@
     "VERSION": "v0.12.2"
   },
   "name": "Hue Struana Ceiling Light",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "mariwing",
+    "email": "mariwing@gmail.com",
+    "github": "mariwing"
+  }
 }

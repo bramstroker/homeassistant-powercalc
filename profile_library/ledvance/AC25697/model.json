@@ -12,5 +12,9 @@
     "VERSION": "v1.0.3:docker"
   },
   "name": "SMART+ Classic Multicolour 60 10W E27",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author_info": {
+    "name": "gary-oneill82",
+    "github": "gary-oneill82"
+  }
 }

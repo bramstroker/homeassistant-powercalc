@@ -12,5 +12,9 @@
     "VERSION": "v1.3.4:docker"
   },
   "name": "Mi LED Desk Lamp 1S",
-  "standby_power": 0.64
+  "standby_power": 0.64,
+  "author_info": {
+    "name": "Pasquale Cuorpo",
+    "github": "maverick1982"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v1.3.5:docker"
   },
   "name": "Livarno Lux LED Deckenleuchte (1400 lm) RGBCT",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "vyruz1986",
+    "email": "alex.goris@fastlikehell.com",
+    "github": "vyruz1986"
+  }
 }

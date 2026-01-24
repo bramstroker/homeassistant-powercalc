@@ -25,5 +25,10 @@
     ],
     "default": "default"
   },
-  "author": "Bram Gerritsen <bgerritsen@gmail.com>"
+  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

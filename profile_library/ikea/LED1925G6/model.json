@@ -15,5 +15,9 @@
     "VERSION": "v0.18.4:docker"
   },
   "name": "TRADFRI bulb E14 CWS 470lm",
-  "standby_power": 0.23
+  "standby_power": 0.23,
+  "author_info": {
+    "name": "kpoos",
+    "github": "kpoos"
+  }
 }

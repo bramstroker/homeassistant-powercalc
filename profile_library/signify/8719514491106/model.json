@@ -12,5 +12,9 @@
     "VERSION": "v1.17.2:docker"
   },
   "name": "Hue White Ambiance E14 Luster/Tropfenform",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Macstar1601",
+    "github": "Macstar1601"
+  }
 }

@@ -12,5 +12,9 @@
     "VERSION": "v1.14.8:docker"
   },
   "name": "RGBW Bulb E27 1055lm 11W",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "71820SM01",
+    "github": "71820SM01"
+  }
 }

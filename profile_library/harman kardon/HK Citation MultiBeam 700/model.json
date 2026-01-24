@@ -30,5 +30,10 @@
       "power": 2.02
     }
   },
-  "standby_power": 7.58
+  "standby_power": 7.58,
+  "author_info": {
+    "name": "Daniel O'Connor",
+    "email": "daniel.oconnor@gmail.com",
+    "github": "CloCkWeRX"
+  }
 }

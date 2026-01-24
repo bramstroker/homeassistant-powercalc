@@ -12,5 +12,9 @@
   "measure_device_firmware": "TASMOTA 9.5.0",
   "measure_method": "script",
   "name": "Hue White and Color Ambiance E27 1100lm with BT",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Thomas-Henning von Kamptz",
+    "github": "tomsoftcom"
+  }
 }

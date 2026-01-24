@@ -16,5 +16,9 @@
     "VERSION": "v1.6.6:docker"
   },
   "name": "Hue Signe Floor Light",
-  "standby_power": 0.6
+  "standby_power": 0.6,
+  "author_info": {
+    "name": "TyzzyT",
+    "github": "TyzzyT"
+  }
 }

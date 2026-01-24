@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Light Strip",
-  "standby_power": 0.55
+  "standby_power": 0.55,
+  "author_info": {
+    "name": "Franck Nijhof",
+    "email": "git@frenck.dev",
+    "github": "frenck"
+  }
 }

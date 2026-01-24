@@ -12,5 +12,9 @@
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
   "name": "Hue White Filament Bulb ST64 E27",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "Stefan Gries",
+    "github": "stefangries"
+  }
 }

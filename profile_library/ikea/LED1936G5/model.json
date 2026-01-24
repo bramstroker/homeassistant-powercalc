@@ -13,5 +13,10 @@
     "VERSION": "v1.0.3:docker"
   },
   "name": "TRADFRI bulb E27 470 lumen, dimmable, opal white",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

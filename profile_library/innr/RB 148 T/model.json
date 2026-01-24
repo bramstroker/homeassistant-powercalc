@@ -12,5 +12,9 @@
     "VERSION": "v1.3.1:docker"
   },
   "name": "Candle Tunable White E14 Bulb",
-  "standby_power": 0.48
+  "standby_power": 0.48,
+  "author_info": {
+    "name": "Florian Mulatz",
+    "github": "florianmulatz"
+  }
 }

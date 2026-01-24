@@ -15,5 +15,9 @@
     "VERSION": "master"
   },
   "name": "Hue Aurelle Round Panel Light",
-  "standby_power": 0.47
+  "standby_power": 0.47,
+  "author_info": {
+    "name": "Nicolas L",
+    "github": "Loustik"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "master"
   },
   "name": "Livarno Lux E14 candle RGB",
-  "standby_power": 0.38
+  "standby_power": 0.38,
+  "author_info": {
+    "name": "Morten Trab",
+    "email": "morten@trab.dk",
+    "github": "MTrab"
+  }
 }

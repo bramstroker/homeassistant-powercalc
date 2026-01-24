@@ -12,5 +12,9 @@
     "VERSION": "v1.17.10:docker"
   },
   "name": "Hue Aphelion Recessed Downlight White Ambiance",
-  "standby_power": 0.45
+  "standby_power": 0.45,
+  "author_info": {
+    "name": "NotSoBrightReally",
+    "github": "NotSoBrightReally"
+  }
 }

@@ -7,5 +7,9 @@
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",
   "name": "Hue Iris",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "smonesi",
+    "github": "smonesi"
+  }
 }

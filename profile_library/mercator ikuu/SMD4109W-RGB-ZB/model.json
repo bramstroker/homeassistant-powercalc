@@ -12,5 +12,10 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "RGB + CCT Zigbee 9 W LED Downlight (92 mm)",
-  "standby_power": 0.43
+  "standby_power": 0.43,
+  "author_info": {
+    "name": "hemiceni",
+    "email": "ivansiegmann@live.com",
+    "github": "hemiceni"
+  }
 }

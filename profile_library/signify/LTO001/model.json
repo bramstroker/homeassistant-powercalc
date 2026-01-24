@@ -15,5 +15,10 @@
     "VERSION": "v0.18.4:docker"
   },
   "name": "Hue G93 E27 Filament Globe Bulb",
-  "standby_power": 0.17
+  "standby_power": 0.17,
+  "author_info": {
+    "name": "Roeland Lutters",
+    "email": "Roeland.lutters@telenet.be",
+    "github": "Roeland54"
+  }
 }

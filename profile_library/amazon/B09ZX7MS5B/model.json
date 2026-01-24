@@ -31,5 +31,10 @@
     "VERSION": "v1.14.4:docker"
   },
   "name": "Echo Pop (Gen1)",
-  "standby_power": 1.3
+  "standby_power": 1.3,
+  "author_info": {
+    "name": "Edouard Kleinhans",
+    "email": "edouard@kleinhans.info",
+    "github": "edouardkleinhans"
+  }
 }

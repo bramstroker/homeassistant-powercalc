@@ -17,5 +17,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.21,
-  "standby_power_on": 0.78
+  "standby_power_on": 0.78,
+  "author_info": {
+    "name": "confucius78",
+    "email": "dekker.wj@gmail.com",
+    "github": "confucius78"
+  }
 }

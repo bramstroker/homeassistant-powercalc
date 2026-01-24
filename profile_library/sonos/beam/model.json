@@ -27,5 +27,9 @@
   "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
   "measure_method": "script",
   "name": "Beam",
-  "standby_power": 6.0
+  "standby_power": 6.0,
+  "author_info": {
+    "name": "alvinchen1",
+    "github": "alvinchen1"
+  }
 }

@@ -12,5 +12,10 @@
   },
   "name": "Smart LED Mood Light",
   "standby_power": 0.05,
-  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>"
+  "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>",
+  "author_info": {
+    "name": "Thorsten1982",
+    "email": "ThorstenNiemann.TN@googlemail.com",
+    "github": "Thorsten1982"
+  }
 }

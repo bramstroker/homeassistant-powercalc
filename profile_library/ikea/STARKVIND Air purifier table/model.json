@@ -23,5 +23,9 @@
   "measure_device": "GreenWave GWPN1",
   "measure_method": "manual",
   "name": "STARKVIND air purifier table",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Marius",
+    "github": "Mariusthvdb"
+  }
 }

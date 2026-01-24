@@ -12,5 +12,10 @@
     "VERSION": "v1.9.15:docker"
   },
   "name": "Hue White and Color Ambiance Downlight 4 inch",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Emory Penney",
+    "email": "emory.j.penney@intel.com",
+    "github": "ejpenney"
+  }
 }

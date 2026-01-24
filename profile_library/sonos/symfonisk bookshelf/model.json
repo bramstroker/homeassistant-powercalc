@@ -26,5 +26,10 @@
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "manual",
   "name": "SYMFONISK Bookshelf",
-  "standby_power": 2.56
+  "standby_power": 2.56,
+  "author_info": {
+    "name": "Thorjan Knudsvik",
+    "email": "t@knudsvik.com",
+    "github": "knudsvik"
+  }
 }

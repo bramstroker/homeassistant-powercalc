@@ -12,5 +12,10 @@
     "VERSION": "v0.24.8:docker"
   },
   "name": "RGB+CCT Zigbee 5 W GU10 Spotlight",
-  "standby_power": 0.7
+  "standby_power": 0.7,
+  "author_info": {
+    "name": "Emory Penney",
+    "email": "emory.j.penney@intel.com",
+    "github": "ejpenney"
+  }
 }

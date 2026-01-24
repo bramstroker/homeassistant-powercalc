@@ -15,5 +15,10 @@
     "VERSION": "v1.19.2:docker"
   },
   "name": "Hue Infuse Ceiling Lamp",
-  "standby_power": 0.06
+  "standby_power": 0.06,
+  "author_info": {
+    "name": "Thorsten1982",
+    "email": "ThorstenNiemann.TN@googlemail.com",
+    "github": "Thorsten1982"
+  }
 }

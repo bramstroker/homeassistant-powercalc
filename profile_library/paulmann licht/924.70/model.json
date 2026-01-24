@@ -12,5 +12,9 @@
     "VERSION": "v1.10.6:docker"
   },
   "name": "RGBW Base Spot",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "evohell",
+    "github": "evohell"
+  }
 }

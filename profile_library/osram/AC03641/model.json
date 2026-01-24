@@ -12,5 +12,9 @@
     "VERSION": "v1.4.0:docker"
   },
   "name": "LIGHTIFY LED Classic A60 clear",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "ffm777",
+    "github": "ffm777"
+  }
 }

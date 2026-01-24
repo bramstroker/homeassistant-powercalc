@@ -18,5 +18,9 @@
     "VERSION": "v1.17.14:docker"
   },
   "name": "Hue White Ambiance E27 with Bluetooth",
-  "standby_power": 0.18
+  "standby_power": 0.18,
+  "author_info": {
+    "name": "ltloopy",
+    "github": "ltloopy"
+  }
 }

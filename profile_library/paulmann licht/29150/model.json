@@ -12,5 +12,9 @@
     "VERSION": "v1.14.8:docker"
   },
   "name": "RGBW Bulb E14 470lm 5W",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "71820SM01",
+    "github": "71820SM01"
+  }
 }

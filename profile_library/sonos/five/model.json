@@ -28,5 +28,9 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Five",
-  "standby_power": 3.05
+  "standby_power": 3.05,
+  "author_info": {
+    "name": "Josh Barnard",
+    "github": "barndawgie"
+  }
 }

@@ -12,5 +12,10 @@
     "VERSION": "v0.25.5:docker"
   },
   "name": "Smart Wi-Fi LED Bulb",
-  "standby_power": 0.56
+  "standby_power": 0.56,
+  "author_info": {
+    "name": "Joshua Rich",
+    "email": "joshua.rich@gmail.com",
+    "github": "joshuar"
+  }
 }

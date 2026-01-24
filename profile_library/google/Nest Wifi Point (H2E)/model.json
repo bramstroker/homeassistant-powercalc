@@ -31,5 +31,10 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "Nest Wifi Point",
-  "standby_power": 3.71
+  "standby_power": 3.71,
+  "author_info": {
+    "name": "Bob Shaker",
+    "email": "bobshaker1@gmail.com",
+    "github": "EpicBurrito"
+  }
 }

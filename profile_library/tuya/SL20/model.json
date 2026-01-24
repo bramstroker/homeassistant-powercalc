@@ -12,5 +12,9 @@
     "VERSION": "master"
   },
   "name": "Treatlife SL20",
-  "standby_power": 0.1
+  "standby_power": 0.1,
+  "author_info": {
+    "name": "Kendell R",
+    "github": "KTibow"
+  }
 }

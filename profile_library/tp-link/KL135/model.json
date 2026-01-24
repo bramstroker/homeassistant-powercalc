@@ -15,5 +15,9 @@
     "VERSION": "v1.3.0:docker"
   },
   "name": "Kasa Smart Wi-Fi Light Bulb, Multicolour",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "xags",
+    "github": "xags"
+  }
 }

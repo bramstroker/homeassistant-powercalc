@@ -22,5 +22,10 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.589,
-  "standby_power_on": 0.85
+  "standby_power_on": 0.85,
+  "author_info": {
+    "name": "Michal Bartak",
+    "email": "michal.bartak@betsys.com",
+    "github": "michalk-k"
+  }
 }

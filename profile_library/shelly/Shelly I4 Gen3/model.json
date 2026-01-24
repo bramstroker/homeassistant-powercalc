@@ -21,5 +21,9 @@
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
+  },
+  "author_info": {
+    "name": "CV",
+    "github": "dagobert"
   }
 }

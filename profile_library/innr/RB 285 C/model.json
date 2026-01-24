@@ -11,5 +11,10 @@
     "SLEEP_TIME": 2
   },
   "name": "Smart Bulb Colour E27 806lm",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "geelenbert",
+    "email": "mail2bert@gmail.com",
+    "github": "geelenbert"
+  }
 }

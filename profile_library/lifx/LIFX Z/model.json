@@ -12,5 +12,9 @@
     "VERSION": "v0.17.0:docker"
   },
   "name": "Z",
-  "standby_power": 0.57
+  "standby_power": 0.57,
+  "author_info": {
+    "name": "Jamie De Vivo",
+    "github": "jamiedevivoo"
+  }
 }

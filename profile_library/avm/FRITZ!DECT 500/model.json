@@ -12,5 +12,9 @@
     "VERSION": "v1.5.1:docker"
   },
   "name": "FRITZ!DECT 500",
-  "standby_power": 0.39
+  "standby_power": 0.39,
+  "author_info": {
+    "name": "NickBaer",
+    "github": "NickBaer"
+  }
 }

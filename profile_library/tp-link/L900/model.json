@@ -12,5 +12,10 @@
     "VERSION": "v1.2.3:docker"
   },
   "name": "Tapo Smart Wi-Fi Light Strip",
-  "standby_power": 0.24
+  "standby_power": 0.24,
+  "author_info": {
+    "name": "Harry W",
+    "email": "hjohnw13@gmail.com",
+    "github": "hwalker928"
+  }
 }

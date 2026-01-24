@@ -15,5 +15,10 @@
     "VERSION": "v0.19.12:docker"
   },
   "name": "Hue White and Color Ambiance E26 1600lm",
-  "standby_power": 0.19
+  "standby_power": 0.19,
+  "author_info": {
+    "name": "Jacob Donenfeld",
+    "email": "jacobdonenfeld@gmail.com",
+    "github": "jacobdonenfeld"
+  }
 }
