@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "TRADFRI control outlet"
+  ],
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2022-11-23T08:42:12Z",
