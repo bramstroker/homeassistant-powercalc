@@ -277,7 +277,7 @@ async def test_profile_redownloaded_when_newer_version_available(
         os.remove(hash_file)
 
     if local_hash:
-        loader.write_profile_hashes({"signify/LCA001": local_hash})
+        loader._write_profile_hashes({"signify/LCA001": local_hash})  # noqa: SLF001
 
     await loader.initialize()
 

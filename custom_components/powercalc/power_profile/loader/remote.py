@@ -36,10 +36,12 @@ class LibraryModel(TypedDict):
     aliases: NotRequired[list[str]]
     hash: str
     device_type: NotRequired[DeviceType]
+    min_version: NotRequired[str]
 
 
 class LibraryManufacturer(TypedDict):
     name: str
+    dir_name: str
     aliases: NotRequired[list[str]]
     models: list[LibraryModel]
 
@@ -59,64 +61,64 @@ class RemoteLoader(Loader):
     async def initialize(self) -> None:
         """Initialize the loader."""
 
-        powercalc_version = (await async_get_integration(self.hass, DOMAIN)).version
+        integration = await async_get_integration(self.hass, DOMAIN)
+        powercalc_version = AwesomeVersion(integration.version)
 
         self.library_contents = await self.load_library_json()
-
-        self.profile_hashes = await self.hass.async_add_executor_job(self.load_profile_hashes)
+        self.profile_hashes = await self.hass.async_add_executor_job(self._load_profile_hashes)
 
         self.model_infos.clear()
         self.model_lookup.clear()
         self.manufacturer_models.clear()
         self.manufacturer_lookup.clear()
 
-        # Load contents of library JSON into several dictionaries for easy access
         manufacturers: list[LibraryManufacturer] = self.library_contents.get("manufacturers", [])
 
         for manufacturer in manufacturers:
             manufacturer_name = str(manufacturer.get("dir_name"))
-            models = manufacturer.get("models", [])
+            models: list[LibraryModel] = manufacturer.get("models", []) or []
 
-            # Store model info and group models by manufacturer
-            self.model_infos.update({f"{manufacturer_name}/{model.get('id')!s}": model for model in models})
-            self.manufacturer_models[manufacturer_name] = []
+            # manufacturer alias map (alias -> {canonical manufacturer_name})
+            self.manufacturer_lookup.setdefault(manufacturer_name.lower(), set()).add(manufacturer_name)
+            for alias in manufacturer.get("aliases", []) or []:
+                self.manufacturer_lookup.setdefault(str(alias).lower(), set()).add(manufacturer_name)
 
-            model_lookup: dict[str, list[LibraryModel]] = {}
+            # per-manufacturer model lookup
+            kept_models: list[LibraryModel] = []
+            lookup: dict[str, list[LibraryModel]] = {}
+
             for model in models:
                 min_version = model.get("min_version")
-                if min_version and powercalc_version and powercalc_version < AwesomeVersion(min_version):
+                model_id = str(model.get("id"))
+                model_id_lower = model_id.lower()
+
+                self.model_infos[f"{manufacturer_name}/{model_id!s}"] = model
+
+                if min_version and powercalc_version < AwesomeVersion(min_version):
                     _LOGGER.debug(
                         "Skipping model %s/%s as it requires powercalc version %s (current: %s)",
                         manufacturer_name,
-                        model.get("id"),
+                        model_id,
                         min_version,
                         powercalc_version,
                     )
                     continue
 
-                self.manufacturer_models[manufacturer_name].append(model)
+                kept_models.append(model)
 
-                model_id = str(model.get("id")).lower()
-
-                # Exact match → append first (high priority)
-                bucket = model_lookup.setdefault(model_id, [])
+                # Exact id bucket first (highest priority)
+                bucket = lookup.setdefault(model_id_lower, [])
                 bucket.append(model)
 
-                # Aliases → append after (lower priority)
-                for alias in model.get("aliases", []):
-                    bucket_alias = model_lookup.setdefault(alias.lower(), [])
-                    # Only append if it's not the exact-id bucket
-                    if bucket_alias is bucket:
-                        # alias == id → ignore, already added
+                # Alias buckets afterwards (lower priority)
+                for alias in model.get("aliases", []) or []:
+                    alias_lower = str(alias).lower()
+                    if alias_lower == model_id_lower:
                         continue
-                    bucket_alias.append(model)
+                    lookup.setdefault(alias_lower, []).append(model)
 
-            self.model_lookup[manufacturer_name] = model_lookup
-
-            # Map manufacturer aliases
-            self.manufacturer_lookup[manufacturer_name.lower()] = {manufacturer_name}
-            for alias in manufacturer.get("aliases", []):
-                self.manufacturer_lookup.setdefault(alias.lower(), set()).add(manufacturer_name)
+            self.manufacturer_models[manufacturer_name] = kept_models
+            self.model_lookup[manufacturer_name] = lookup
 
     async def load_library_json(self) -> dict[str, Any]:
         """Load library.json file"""
@@ -251,7 +253,7 @@ class RemoteLoader(Loader):
             await self.download_with_retry(callback)
             model_info = self._get_library_model(manufacturer, model)
             self.profile_hashes[f"{manufacturer}/{model}"] = str(model_info.get("hash"))
-            await self.hass.async_add_executor_job(self.write_profile_hashes, self.profile_hashes)
+            await self.hass.async_add_executor_job(self._write_profile_hashes, self.profile_hashes)
         except ProfileDownloadError as e:
             if not os.path.exists(model_path):
                 await self.hass.async_add_executor_job(shutil.rmtree, storage_path)
@@ -343,7 +345,7 @@ class RemoteLoader(Loader):
         except (TimeoutError, aiohttp.ClientError) as e:
             raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
 
-    def load_profile_hashes(self) -> dict[str, str]:
+    def _load_profile_hashes(self) -> dict[str, str]:
         """Load profile hashes from local storage"""
 
         path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
@@ -353,7 +355,7 @@ class RemoteLoader(Loader):
         with open(path) as f:
             return json.load(f)  # type: ignore
 
-    def write_profile_hashes(self, hashes: dict[str, str]) -> None:
+    def _write_profile_hashes(self, hashes: dict[str, str]) -> None:
         """Write profile hashes to local storage"""
 
         path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
