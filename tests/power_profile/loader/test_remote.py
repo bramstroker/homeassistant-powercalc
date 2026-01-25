@@ -3,6 +3,7 @@ from functools import partial
 import json
 import logging
 import os
+import re
 import shutil
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -68,7 +69,7 @@ async def mock_download_profile_endpoints(mock_aioresponse: aioresponses) -> lis
     ]
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
+        re.compile(rf"{ENDPOINT_DOWNLOAD}/signify/LCA001.*"),
         status=200,
         payload=remote_files,
         repeat=True,
@@ -90,7 +91,7 @@ async def test_download(mock_aioresponse: aioresponses, remote_loader: RemoteLoa
     remote_files = mock_download_profile_endpoints
 
     storage_dir = get_test_profile_dir("download")
-    await remote_loader.download_profile("signify", "LCA001", storage_dir)
+    await remote_loader.download_profile("signify", "LCA001", storage_dir, "test_download")
 
     for remote_file in remote_files:
         assert os.path.exists(os.path.join(storage_dir, remote_file["path"]))
@@ -105,7 +106,7 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
     ]
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/google/Home Mini (HOA)",
+        f"{ENDPOINT_DOWNLOAD}/google/Home Mini (HOA)?hash=test_download",
         status=200,
         payload=remote_files,
         repeat=True,
@@ -121,7 +122,7 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
             )
 
     storage_dir = get_test_profile_dir("download")
-    await remote_loader.download_profile("google", "Home Mini (HOA)", storage_dir)
+    await remote_loader.download_profile("google", "Home Mini (HOA)", storage_dir, "test_download")
 
     for remote_file in remote_files:
         assert os.path.exists(os.path.join(storage_dir, remote_file["path"]))
@@ -146,20 +147,20 @@ async def test_load_model_raises_library_exception_on_non_existing_model(remote_
 
 async def test_download_profile_exception_unexpected_status_code(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
+        f"{ENDPOINT_DOWNLOAD}/signify/LCA001?hash=test_download",
         status=500,
         repeat=True,
     )
 
     with pytest.raises(ProfileDownloadError):
-        await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"))
+        await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"), "test_download")
 
 
 async def test_exception_is_raised_on_connection_error(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
-    mock_aioresponse.get(f"{ENDPOINT_DOWNLOAD}/signify/LCA001", exception=ClientError("test"))
+    mock_aioresponse.get(f"{ENDPOINT_DOWNLOAD}/signify/LCA001?hash=test_download", exception=ClientError("test"))
 
     with pytest.raises(ProfileDownloadError):
-        await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"))
+        await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"), "test_download")
 
 
 async def test_exception_is_raised_on_github_resource_unavailable(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
@@ -174,7 +175,7 @@ async def test_exception_is_raised_on_github_resource_unavailable(mock_aiorespon
     }
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}",
+        f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}?hash=6288837291e73d208e2d408b6b66c8f0",
         status=200,
         payload=[remote_file],
         repeat=True,
@@ -203,7 +204,7 @@ async def test_eventual_success_after_download_retry(mock_aioresponse: aiorespon
     }
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}",
+        f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}?hash=test_download",
         status=200,
         payload=[remote_file],
         repeat=True,
@@ -212,7 +213,7 @@ async def test_eventual_success_after_download_retry(mock_aioresponse: aiorespon
     mock_aioresponse.get(remote_file["url"], status=500)
     mock_aioresponse.get(remote_file["url"], status=200)
 
-    callback = partial(remote_loader.download_profile, manufacturer, model, storage_path)
+    callback = partial(remote_loader.download_profile, manufacturer, model, storage_path, "test_download")
     await remote_loader.download_with_retry(callback)
 
     assert os.path.exists(storage_path)
@@ -282,7 +283,7 @@ async def test_profile_redownloaded_when_newer_version_available(
     await loader.initialize()
 
     if exists_locally:
-        await loader.download_profile("signify", "LCA001", local_storage_path)
+        await loader.download_profile("signify", "LCA001", local_storage_path, profile_hash)
 
     await loader.load_model("signify", "LCA001")
 
@@ -448,7 +449,6 @@ async def test_profile_redownloaded_when_model_json_missing(
 
 
 async def test_profile_redownloaded_when_model_json_corrupt(
-    hass: HomeAssistant,
     remote_loader: RemoteLoader,
     mock_aioresponse: aioresponses,
     caplog: pytest.LogCaptureFixture,
@@ -466,7 +466,7 @@ async def test_profile_redownloaded_when_model_json_corrupt(
     ]
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini",
+        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini?hash=b1107c61234f582a3c713b0891582e4e",
         status=200,
         payload=remote_files,
         repeat=True,
@@ -512,7 +512,7 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
     ]
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini",
+        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini?hash=b1107c61234f582a3c713b0891582e4e",
         status=200,
         payload=remote_files,
         repeat=True,
