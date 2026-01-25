@@ -249,10 +249,11 @@ class RemoteLoader(Loader):
     async def _download_profile_with_retry(self, manufacturer: str, model: str, storage_path: str, model_path: str) -> None:
         """Attempt to download the profile, with retry logic and error handling."""
         try:
-            callback = partial(self.download_profile, manufacturer, model, storage_path)
-            await self.download_with_retry(callback)
             model_info = self._get_library_model(manufacturer, model)
-            self.profile_hashes[f"{manufacturer}/{model}"] = str(model_info.get("hash"))
+            model_hash = str(model_info.get("hash"))
+            callback = partial(self.download_profile, manufacturer, model, storage_path, model_hash)
+            await self.download_with_retry(callback)
+            self.profile_hashes[f"{manufacturer}/{model}"] = model_hash
             await self.hass.async_add_executor_job(self._write_profile_hashes, self.profile_hashes)
         except ProfileDownloadError as e:
             if not os.path.exists(model_path):
@@ -305,7 +306,7 @@ class RemoteLoader(Loader):
                 _LOGGER.warning("Failed to download, retrying... (Attempt %d of %d)", retry_count + 1, max_retries)
         return None  # pragma: no cover
 
-    async def download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
+    async def download_profile(self, manufacturer: str, model: str, storage_path: str, model_hash: str) -> None:
         """
         Download the profile from Github using the Powercalc download API
         Saves the profile to manufacturer/model directory in .storage/powercalc_profiles folder
@@ -326,7 +327,7 @@ class RemoteLoader(Loader):
 
         try:
             async with async_timeout.timeout(TIMEOUT_SECONDS):
-                async with session.get(endpoint) as resp:
+                async with session.get(endpoint, params={"hash": model_hash}) as resp:
                     if resp.status != 200:
                         raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
                     resources = await resp.json()

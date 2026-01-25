@@ -142,7 +142,7 @@ def mock_remote_loader(request: SubRequest, hass: HomeAssistant) -> Generator:
         yield
         return
 
-    def side_effect(manufacturer: str, model: str, storage_path: str) -> None:
+    def side_effect(manufacturer: str, model: str, storage_path: str, _: str) -> None:
         source_dir = get_library_path(f"{manufacturer}/{model}")
         if os.path.exists(storage_path):
             return
