@@ -15,5 +15,11 @@
     "VERSION": "v1.20.3:docker"
   },
   "name": "KAJPLATS GU10 CWS 470lm",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Linus Nordin",
+    "github": "gribber",
+    "email": "linus.nordin@gmail.com"
+  },
+  "author": "Linus Nordin"
 }
