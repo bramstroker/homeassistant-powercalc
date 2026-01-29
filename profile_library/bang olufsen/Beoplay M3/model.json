@@ -1,0 +1,42 @@
+{
+    "author": "sbrandsborg",
+    "aliases": [
+        "2730 CA17",
+        "2732 CA17",
+        "Beoplay M3"
+    ],
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "created_at": "2026-01-29T10:07:39Z",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 3.3",
+            "10 -> 4.7",
+            "20 -> 5.1",
+            "30 -> 5.07",
+            "40 -> 5.0",
+            "50 -> 5.0",
+            "60 -> 5.0",
+            "70 -> 7.42",
+            "80 -> 10.85",
+            "90 -> 13.8",
+            "100 -> 13.4"
+        ]
+    },
+    "description": "Beoplay M3 - Compact Multiroom Speaker",
+    "measure_description": "Measured with utils/measure script using manual streaming (Pink Noise).",
+    "measure_device": "Shelly Plug S Gen3",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 5,
+        "VERSION": "master"
+    },
+    "name": "Beoplay M3",
+    "standby_power": 3.3,
+    "author_info": {
+        "name": "Steffen Brandsborg",
+        "github": "sbrandsborg"
+    }
+}
