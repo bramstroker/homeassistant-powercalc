@@ -94,14 +94,14 @@
         "data_description": {
           "power": "Ein fester Leistungswert in Watt, wenn die Einheit eingeschaltet ist",
           "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
-          "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben"
+          "states_power": "Ein 'state: power' Paar in jeder Zeile"
         },
         "description": "Definieren Sie einen festen Leistungswert für Ihre Entität. Alternativ können Sie auch einen Leistungswert pro State definieren. Zum Beispiel:\n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Fixed Konfiguration"
       },
       "global_configuration": {
         "title": "Globale Einstellungen",
-        "description": "Globale Konfiguration für Powercalc einrichten. Weitere Informationen hierzu finden Sie in der [Dokumentation](https://docs.powercalc.nl/configuration/global-configuration/). In den nächsten Schritten können weitere Optionen für Energiesensoren und Stromzähler angegeben werden.",
+        "description": "Globale Konfiguration für Powercalc einrichten. Weitere Informationen hierzu finden Sie in der [Dokumentation]({docs_uri}). In den nächsten Schritten können weitere Optionen für Energiesensoren und Stromzähler angegeben werden.",
         "data": {
           "create_energy_sensors": "Energiesensor erstellen",
           "create_standby_group": "Standby-Gruppe erstellen",
@@ -152,7 +152,7 @@
       },
       "global_configuration_throttling": {
         "title": "Drosselungsoptionen",
-        "description": "Legen Sie Aktualisierungsintervalle für die verschiedenen Sensortypen fest. Siehe [Dokumentation](https://docs.powercalc.nl/configuration/update-frequency/) für weitere Informationen",
+        "description": "Legen Sie Aktualisierungsintervalle für die verschiedenen Sensortypen fest. Siehe [Dokumentation]({docs_uri}) für weitere Informationen",
         "data": {
           "group_energy_update_interval": "Gruppenenergie-Aktualisierungsintervall",
           "group_power_update_interval": "Gruppenleistung-Aktualisierungsintervall",
@@ -452,7 +452,7 @@
           "power_factor": "Leistungs-Faktor",
           "voltage": "Volt"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see https://docs.powercalc.nl/strategies/wled/",
+        "description": "Make sure to enable brightness limiter in WLED software. Also see {docs_uri}",
         "title": "WLED Konfiguration"
       }
     }
@@ -602,7 +602,7 @@
       },
       "global_configuration_discovery": {
         "title": "Entdeckungsoptionen",
-        "description": "Verwalten Sie die Entdeckungseinstellung. Siehe [Dokumentation](https://docs.powercalc.nl/library/discovery/) für weitere Informationen",
+        "description": "Verwalten Sie die Entdeckungseinstellung. Siehe [Dokumentation]({docs_uri}) für weitere Informationen",
         "data": {
           "enabled": "Entdeckung aktivieren",
           "exclude_device_types": "Ausgeschlossene Gerätetypen",
@@ -615,7 +615,7 @@
       },
       "global_configuration_energy": {
         "title": "Energieeinstellungen",
-        "description": "Legen Sie hier die Standardeinstellungen für Energiesensoren fest. Siehe [Documentation](https://docs.powercalc.nl/configuration/global-configuration/) für weitere Informationen",
+        "description": "Legen Sie hier die Standardeinstellungen für Energiesensoren fest. Siehe [Documentation]({docs_uri}) für weitere Informationen",
         "data": {
           "energy_integration_method": "Energie-Integrationsmethode",
           "energy_sensor_category": "Energiesensor-Kategorie",
@@ -627,7 +627,7 @@
       },
       "global_configuration_throttling": {
         "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
         "data": {
           "group_energy_update_interval": "Gruppenenergie-Update-Intervall",
           "group_power_update_interval": "Gruppenleistungsaktualisierungsintervall",
@@ -643,7 +643,7 @@
       },
       "global_configuration_utility_meter": {
         "title": "Verbrauchszähler Einstellungen",
-        "description": "Legen Sie hier die Standardeinstellungen für Verbrauchszähler fest. Siehe [Documentation](https://docs.powercalc.nl/configuration/global-configuration/) für weitere Informationen",
+        "description": "Legen Sie hier die Standardeinstellungen für Verbrauchszähler fest. Siehe [Documentation]({docs_uri}) für weitere Informationen",
         "data": {
           "utility_meter_net_consumption": "Verbrauchszähler Nettoverbrauch",
           "utility_meter_tariffs": "Verbrauchszähler Tarife",

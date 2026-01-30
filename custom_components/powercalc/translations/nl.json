@@ -94,14 +94,14 @@
         "data_description": {
           "power": "Een vastgestelde vermogen in Watt wanneer de gekoppelde entiteit AAN is",
           "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
-          "states_power": "Eén 'status: vermogen' paar op elke rij, zie [documentatie](https://docs.powercalc.nl/strategies/fixed/#power-per-state)"
+          "states_power": "Eén 'status: vermogen' paar op elke rij"
         },
         "description": "Definieer een vast vermogen (in W) voor je entiteit. Eventueel kan je ook een vermogen per status instellen. Bijvoorbeeld:\n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Gefixeerde configuratie"
       },
       "global_configuration": {
         "title": "Globale configuratie",
-        "description": "Stel de globale configuratie in voor Powercalc. Voor meer informatie zie de [documentation](https://docs.powercalc. l/configuratie/global-configuration/). Extra opties voor energiesensors en nutsmeters kunnen in de volgende stappen worden geleverd.",
+        "description": "Stel de globale configuratie in voor Powercalc. Voor meer informatie zie de [documentation]({docs_uri}). Extra opties voor energiesensors en nutsmeters kunnen in de volgende stappen worden geleverd.",
         "data": {
           "create_energy_sensors": "Creëer energie sensoren",
           "create_standby_group": "Maak standby-groep",
@@ -152,7 +152,7 @@
       },
       "global_configuration_throttling": {
         "title": "Throttling opties",
-        "description": "Stel update intervallen in voor de verschillende sensor types. Zie [documentatie](https://docs.powercalc.nl/configuration/update-frequency/) voor meer informatie",
+        "description": "Stel update intervallen in voor de verschillende sensor types. Zie [documentatie]({docs_uri}) voor meer informatie",
         "data": {
           "group_energy_update_interval": "Groep energie update interval",
           "group_power_update_interval": "Groep vermogen update interval",
@@ -452,7 +452,7 @@
           "power_factor": "Vermogensfactor",
           "voltage": "Spanning"
         },
-        "description": "Zorg ervoor dat u helderheidsbegrenzer inschakelt in WLED-software. Zie ook https://docs.powercalc.nl/strategies/wled/",
+        "description": "Zorg ervoor dat u helderheidsbegrenzer inschakelt in WLED-software. Zie ook {docs_uri}",
         "title": "WLED configuratie"
       }
     }
@@ -571,7 +571,7 @@
           "power": "Een vastgestelde vermogen in Watt wanneer de gekoppelde entiteit AAN is",
           "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
           "self_usage_included": "Of het opgegeven vermogen ook het energieverbruik omvat dat door de slimme schakelaar zelf wordt verbruikt.",
-          "states_power": "Eén 'status: vermogen' paar op elke rij, zie [documentatie](https://docs.powercalc.nl/strategies/fixed/#power-per-state)"
+          "states_power": "Eén 'status: vermogen' paar op elke rij"
         }
       },
       "global_configuration": {
@@ -602,7 +602,7 @@
       },
       "global_configuration_discovery": {
         "title": "Ontdekkingsopties",
-        "description": "Beheer de ontdekkingsinstelling. Zie [documentatie](https://docs.powercalc.nl/library/discovery/) voor meer informatie",
+        "description": "Beheer de ontdekkingsinstelling. Zie [documentatie]({docs_uri}) voor meer informatie",
         "data": {
           "enabled": "Ontdekking inschakelen",
           "exclude_device_types": "Uitgesloten apparaattypes",
@@ -615,7 +615,7 @@
       },
       "global_configuration_energy": {
         "title": "Energie opties",
-        "description": "Definieer hier de standaard instellingen voor energiesensoren. Zie [documentation](https://docs.powercalc.nl/configuration/global-configuration/) voor meer informatie",
+        "description": "Definieer hier de standaard instellingen voor energiesensoren. Zie [documentation]({docs_uri}) voor meer informatie",
         "data": {
           "energy_integration_method": "Energie integratie methode",
           "energy_sensor_category": "Energie sensor categorie",
@@ -627,7 +627,7 @@
       },
       "global_configuration_throttling": {
         "title": "Throttling opties",
-        "description": "Stel update intervallen in voor de verschillende sensor types. Zie [documentatie](https://docs.powercalc.nl/configuration/update-frequency/) voor meer informatie",
+        "description": "Stel update intervallen in voor de verschillende sensor types. Zie [documentatie]({docs_uri}) voor meer informatie",
         "data": {
           "group_energy_update_interval": "Groep energie update interval",
           "group_power_update_interval": "Groep vermogen update interval",
@@ -643,7 +643,7 @@
       },
       "global_configuration_utility_meter": {
         "title": "Nutsmeter opties",
-        "description": "Definieer hier de standaard instellingen voor nutsmeters. Zie [documentation](https://docs.powercalc.nl/configuration/global-configuration/) voor meer informatie",
+        "description": "Definieer hier de standaard instellingen voor nutsmeters. Zie [documentation]({docs_uri}) voor meer informatie",
         "data": {
           "utility_meter_net_consumption": "Netto verbruik",
           "utility_meter_tariffs": "Nutsmeter tarieven",

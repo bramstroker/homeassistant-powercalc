@@ -94,14 +94,14 @@
         "data_description": {
           "power": "Stała wartość mocy w watach, gdy encja jest WŁĄCZONA",
           "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w watach",
-          "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz [dokumentacja](https://docs.powercalc.nl/strategies/fixed/#power-per-state)"
+          "states_power": "Jedna para 'stan: moc' w każdym rzędzie"
         },
         "description": "Określ stałą wartość mocy dla swojej encji. Alternatywnie możesz zdefiniować wartość mocy dla każdego stanu. Na przykład:\n\n`odtwarzanie: 8.3`\n`pauza: 2.25`",
         "title": "Konfiguracja stała"
       },
       "global_configuration": {
         "title": "Konfiguracja globalna",
-        "description": "Skonfiguruj globalną konfigurację Powercalc. Aby uzyskać więcej informacji zobacz [dokumentację](https://docs.powercalc.nl/configuration/global-configuration/). Dodatkowe opcje dla sensorów energi i liczników można podać w kolejnych krokach.",
+        "description": "Skonfiguruj globalną konfigurację Powercalc. Aby uzyskać więcej informacji zobacz [dokumentację]({docs_uri}). Dodatkowe opcje dla sensorów energi i liczników można podać w kolejnych krokach.",
         "data": {
           "create_energy_sensors": "Utwórz sensory energii",
           "create_standby_group": "Create standby group",
@@ -152,7 +152,7 @@
       },
       "global_configuration_throttling": {
         "title": "Opcje ograniczania",
-        "description": "Ustaw interwały aktualizacji dla różnych typów sensorów. Zobacz [dokumentację](https://docs.powercalc.nl/configuration/update-frequency/) aby uzyskać więcej informacji",
+        "description": "Ustaw interwały aktualizacji dla różnych typów sensorów. Zobacz [dokumentację]({docs_uri}) aby uzyskać więcej informacji",
         "data": {
           "group_energy_update_interval": "Interwał aktualizacji energii grupy",
           "group_power_update_interval": "Interwał aktualizacji mocy grupy",
@@ -452,7 +452,7 @@
           "power_factor": "Współczynnik mocy (cos φ)",
           "voltage": "Napięcie"
         },
-        "description": "Upewnij się, że włączono ogranicznik jasności w oprogramowaniu WLED. Zobacz również https://docs.powercalc.nl/strategies/wled/",
+        "description": "Upewnij się, że włączono ogranicznik jasności w oprogramowaniu WLED. Zobacz również {docs_uri}",
         "title": "Konfiguracja WLED"
       }
     }
@@ -571,7 +571,7 @@
           "power": "Stała wartość mocy w watach, gdy jednostka jest włączona",
           "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w W",
           "self_usage_included": "Czy wartość mocy obejmuje moc zużywaną przez sam inteligentny przełącznik.",
-          "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz przykład powyżej"
+          "states_power": "Jedna para 'stan: moc' w każdym rzędzie"
         }
       },
       "global_configuration": {
@@ -602,7 +602,7 @@
       },
       "global_configuration_discovery": {
         "title": "Opcje wykrywania",
-        "description": "Zarządzaj ustawieniami wykrywania. Zobacz [dokumentację](https://docs.powercalc.nl/library/discovery/) aby uzyskać więcej informacji",
+        "description": "Zarządzaj ustawieniami wykrywania. Zobacz [dokumentację]({docs_uri}) aby uzyskać więcej informacji",
         "data": {
           "enabled": "Włącz wykrywanie",
           "exclude_device_types": "Wykluczone typy urządzeń",
@@ -615,7 +615,7 @@
       },
       "global_configuration_energy": {
         "title": "Opcje dotyczące energii",
-        "description": "Zdefiniuj tutaj domyślne ustawienia sensorów energii. Zobacz [documentację](https://docs.powercalc.nl/configuration/global-configuration/), aby uzyskać więcej informacji",
+        "description": "Zdefiniuj tutaj domyślne ustawienia sensorów energii. Zobacz [documentację]({docs_uri}), aby uzyskać więcej informacji",
         "data": {
           "energy_integration_method": "Metoda całkowania energii",
           "energy_sensor_category": "Kategoria sensorów energii",
@@ -627,7 +627,7 @@
       },
       "global_configuration_throttling": {
         "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
@@ -643,7 +643,7 @@
       },
       "global_configuration_utility_meter": {
         "title": "Opcje licznika mediów",
-        "description": "Zdefiniuj domyślne ustawienia dla liczników mediów. Zobacz [dokumentację](https://docs.powercalc.nl/configuration/global-configuration/) aby uzyskać więcej informacji",
+        "description": "Zdefiniuj domyślne ustawienia dla liczników mediów. Zobacz [dokumentację]({docs_uri}) aby uzyskać więcej informacji",
         "data": {
           "utility_meter_net_consumption": "Zużycie netto licznika zużycia energii",
           "utility_meter_tariffs": "Taryfy licznika mediów",

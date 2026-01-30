@@ -101,7 +101,7 @@
       },
       "global_configuration": {
         "title": "Configuração global",
-        "description": "Configuração global do Powercalc. Para obter mais informações, consulte o [documentation](https://docs.powercalc. l/configuration/global-configuration/). Opções adicionais para sensores de energia e medidores de utilidade podem ser fornecidas nos próximos passos.",
+        "description": "Configuração global do Powercalc. Para obter mais informações, consulte o [documentation]({docs_uri}). Opções adicionais para sensores de energia e medidores de utilidade podem ser fornecidas nos próximos passos.",
         "data": {
           "create_energy_sensors": "Criar sensor de consumo",
           "create_standby_group": "Create standby group",
@@ -152,7 +152,7 @@
       },
       "global_configuration_throttling": {
         "title": "Opções de limitação",
-        "description": "Defina intervalos de atualização para os diferentes tipos de sensores. Veja [documentação](https://docs.powercalc.nl/configuration/update-frequency/) para mais informações",
+        "description": "Defina intervalos de atualização para os diferentes tipos de sensores. Veja [documentação]({docs_uri}) para mais informações",
         "data": {
           "group_energy_update_interval": "Intervalo de atualização de energia do grupo",
           "group_power_update_interval": "Intervalo de atualização de potência do grupo",
@@ -452,7 +452,7 @@
           "power_factor": "Fator de potência",
           "voltage": "Voltagem"
         },
-        "description": "Certifique-se de habilitar o limitador de brilho no software WLED. Veja também https://docs.powercalc.nl/strategies/wled/",
+        "description": "Certifique-se de habilitar o limitador de brilho no software WLED. Veja também {docs_uri}",
         "title": "Configuração WLED"
       }
     }
@@ -602,7 +602,7 @@
       },
       "global_configuration_discovery": {
         "title": "Opções de descoberta",
-        "description": "Gerenciar a configuração da descoberta. Ver [documentation](https://docs.powercalc.nl/library/discovery/) para mais informações",
+        "description": "Gerenciar a configuração da descoberta. Ver [documentation]({docs_uri}) para mais informações",
         "data": {
           "enabled": "Habilitar descoberta",
           "exclude_device_types": "Tipos de dispositivos excluídos",
@@ -615,7 +615,7 @@
       },
       "global_configuration_energy": {
         "title": "Opções de energia",
-        "description": "Defina as configurações padrão para medidores de consumo aqui. Veja [documentação](https://docs.powercalc.nl/configuration/global-configuration/) para mais informações",
+        "description": "Defina as configurações padrão para medidores de consumo aqui. Veja [documentação]({docs_uri}) para mais informações",
         "data": {
           "energy_integration_method": "Método de integração de energia",
           "energy_sensor_category": "Categoria do sensor de energia",
@@ -627,7 +627,7 @@
       },
       "global_configuration_throttling": {
         "title": "Opções de limitação",
-        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
@@ -643,7 +643,7 @@
       },
       "global_configuration_utility_meter": {
         "title": "Opções do medidor de utilidade",
-        "description": "Defina as configurações padrão para medidores de utilidade aqui. Veja [documentation](https://docs.powercalc.nl/configuration/global-configuration/) para mais informações",
+        "description": "Defina as configurações padrão para medidores de utilidade aqui. Veja [documentation]({docs_uri}) para mais informações",
         "data": {
           "utility_meter_net_consumption": "Consumo líquido do medidor de utilidade",
           "utility_meter_tariffs": "Tarifas do medidor de utilidade",

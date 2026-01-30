@@ -157,6 +157,7 @@ class GlobalConfigurationFlow:
                 schema=SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY,
                 next_step=Step.GLOBAL_CONFIGURATION_THROTTLING,
                 form_data=discovery_options,
+                form_kwarg={"description_placeholders": {"docs_uri": "https://docs.powercalc.nl/library/discovery/"}},
             ),
             user_input,
         )
@@ -174,6 +175,11 @@ class GlobalConfigurationFlow:
                 step=Step.GLOBAL_CONFIGURATION_THROTTLING,
                 schema=SCHEMA_GLOBAL_CONFIGURATION_THROTTLING,
                 next_step=Step.GLOBAL_CONFIGURATION_ENERGY,
+                form_kwarg={
+                    "description_placeholders": {
+                        "docs_uri": "https://docs.powercalc.nl/configuration/update-frequency/",
+                    },
+                },
             ),
             user_input,
         )
@@ -193,6 +199,7 @@ class GlobalConfigurationFlow:
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_ENERGY,
                 schema=SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR,
+                form_kwarg={"description_placeholders": {"docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/"}},
             ),
         )
 
@@ -214,6 +221,7 @@ class GlobalConfigurationFlow:
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_UTILITY_METER,
                 schema=SCHEMA_UTILITY_METER_OPTIONS,
+                form_kwarg={"description_placeholders": {"docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/"}},
             ),
         )
 
@@ -237,6 +245,11 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION,
                 schema=SCHEMA_GLOBAL_CONFIGURATION,
+                form_kwarg={
+                    "description_placeholders": {
+                        "doc_uri": "https://docs.powercalc.nl/configuration/global-configuration/",
+                    },
+                },
             ),
         )
 

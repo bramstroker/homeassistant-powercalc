@@ -94,14 +94,14 @@
         "data_description": {
           "power": "Un valor de potencia fijo en Vatios (W) cuando la entidad está ENCENDIDA",
           "power_template": "La plantilla será evaluada para obtener el valor de potencia en Vatios (W)",
-          "states_power": "Un par (\"estado: potencia\") en cada fila. Ver ejemplo arriba"
+          "states_power": "Un par (\"estado: potencia\") en cada fila"
         },
         "description": "Definir un valor de potencia fijo para tu entidad. Alternativamente, puedes definir un valor de potencia por estado. Por ejemplo: \n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Configuración fija"
       },
       "global_configuration": {
         "title": "Configuración global",
-        "description": "Configuración global de Powercalc. Para más información ver la [documentación](https://docs.powercalc.nl/configuration/global-configuration/). Opciones adicionales para sensores de energía y contadores eléctricos pueden ser provistas en los siguientes pasos.",
+        "description": "Configuración global de Powercalc. Para más información ver la [documentación]({docs_uri}). Opciones adicionales para sensores de energía y contadores eléctricos pueden ser provistas en los siguientes pasos.",
         "data": {
           "create_energy_sensors": "Crear sensores de energía",
           "create_standby_group": "Crear grupo de modo de espera",
@@ -152,7 +152,7 @@
       },
       "global_configuration_throttling": {
         "title": "Opciones de limitación",
-        "description": "Establecer intervalos de actualización para los diferentes tipos de sensores. Ver [documentación](https://docs.powercalc.nl/configuration/update-frequency/) para más información",
+        "description": "Establecer intervalos de actualización para los diferentes tipos de sensores. Ver [documentación]({docs_uri}) para más información",
         "data": {
           "group_energy_update_interval": "Intervalo de actualización de energía de grupo",
           "group_power_update_interval": "Intervalo de actualización de potencia de grupo",
@@ -452,7 +452,7 @@
           "power_factor": "Factor de potencia",
           "voltage": "Voltaje"
         },
-        "description": "Asegúrate de habilitar el limitador de brillo en el software WLED. También consulta https://docs.powercalc.nl/strategies/wled/",
+        "description": "Asegúrate de habilitar el limitador de brillo en el software WLED. También consulta {docs_uri}",
         "title": "Configuración WLED"
       }
     }
@@ -571,7 +571,7 @@
           "power": "Un valor de potencia fijo en Vatios (W) cuando la entidad está ENCENDIDA",
           "power_template": "La plantilla será evaluada para obtener el valor de potencia en Vatios (W)",
           "self_usage_included": "Si el valor de potencia incluye la energía consumida por el interruptor inteligente mismo.",
-          "states_power": "Un par \"estado: potencia\" en cada fila. Ver ejemplo arriba"
+          "states_power": "Un par \"estado: potencia\" en cada fila"
         }
       },
       "global_configuration": {
@@ -602,7 +602,7 @@
       },
       "global_configuration_discovery": {
         "title": "Opciones de descubrimiento",
-        "description": "Administre la configuración de descubrimiento. Vea la [documentación](https://docs.powercalc.nl/library/discovery/) para más información",
+        "description": "Administre la configuración de descubrimiento. Vea la [documentación]({docs_uri}) para más información",
         "data": {
           "enabled": "Habilitar descubrimiento",
           "exclude_device_types": "Tipos de dispositivos excluidos",
@@ -615,7 +615,7 @@
       },
       "global_configuration_energy": {
         "title": "Opciones de energía",
-        "description": "Defina la configuración predeterminada de los sensores de energía aquí. Vea la [documentación](https://docs.powercalc.nl/configuration/global-configuration/) para más información",
+        "description": "Defina la configuración predeterminada de los sensores de energía aquí. Vea la [documentación]({docs_uri}) para más información",
         "data": {
           "energy_integration_method": "Método de integración de energía",
           "energy_sensor_category": "Categoría del sensor de energía",
@@ -627,7 +627,7 @@
       },
       "global_configuration_throttling": {
         "title": "Opciones de limitación",
-        "description": "Establecer los intervalos de actualización para los diferentes tipos de sensores. Consulta la [documentación](https://docs.powercalc.nl/configuration/update-frequency/) para más información",
+        "description": "Establecer los intervalos de actualización para los diferentes tipos de sensores. Consulta la [documentación]({docs_uri}) para más información",
         "data": {
           "group_energy_update_interval": "Intervalo de actualización de energía del grupo",
           "group_power_update_interval": "Intervalo de actualización de potencia del grupo",
@@ -643,7 +643,7 @@
       },
       "global_configuration_utility_meter": {
         "title": "Opciones de contador eléctrico",
-        "description": "Defina la configuración predeterminada de los contadores eléctricos aquí. Vea la [documentación](https://docs.powercalc.nl/configuration/global-configuration/) para más información",
+        "description": "Defina la configuración predeterminada de los contadores eléctricos aquí. Vea la [documentación]({docs_uri}) para más información",
         "data": {
           "utility_meter_net_consumption": "Consumo neto del contador eléctrico",
           "utility_meter_tariffs": "Tarifas del contador eléctrico",
