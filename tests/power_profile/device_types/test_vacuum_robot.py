@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from homeassistant.components.vacuum import STATE_CLEANING, STATE_DOCKED
+from homeassistant.components.vacuum import VacuumActivity
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -70,25 +70,25 @@ async def test_vacuum_robot(
     assert power_state.state == "unavailable"
 
     hass.states.async_set(battery_id, 50)
-    hass.states.async_set(vacuum_id, STATE_CLEANING)
+    hass.states.async_set(vacuum_id, VacuumActivity.CLEANING)
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "0.00"
 
     hass.states.async_set(battery_id, 0)
-    hass.states.async_set(vacuum_id, STATE_DOCKED)
+    hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "20.00"
 
     hass.states.async_set(battery_id, 85)
-    hass.states.async_set(vacuum_id, STATE_DOCKED)
+    hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "15.00"
 
     hass.states.async_set(battery_id, 100)
-    hass.states.async_set(vacuum_id, STATE_DOCKED)
+    hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "1.50"
@@ -136,13 +136,13 @@ async def test_with_tapering_playbook(hass: HomeAssistant) -> None:
     )
 
     hass.states.async_set(battery_id, 30)
-    hass.states.async_set(vacuum_id, STATE_DOCKED)
+    hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "20.00"
 
     hass.states.async_set(battery_id, 100)
-    hass.states.async_set(vacuum_id, STATE_DOCKED)
+    hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "0.00"

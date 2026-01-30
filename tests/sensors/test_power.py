@@ -11,9 +11,7 @@ from homeassistant.components.light import (
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
-    STATE_CLEANING,
-    STATE_DOCKED,
-    STATE_RETURNING,
+    VacuumActivity,
 )
 from homeassistant.const import (
     ATTR_ENTITY_ID,
@@ -272,32 +270,32 @@ async def test_strategy_enabled_condition(hass: HomeAssistant) -> None:
 
     assert hass.states.get(power_entity_id)
 
-    hass.states.async_set(vacuum_entity_id, STATE_CLEANING, {ATTR_BATTERY_LEVEL: 40})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.CLEANING, {ATTR_BATTERY_LEVEL: 40})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "0.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_RETURNING, {ATTR_BATTERY_LEVEL: 40})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.RETURNING, {ATTR_BATTERY_LEVEL: 40})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "0.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_DOCKED, {ATTR_BATTERY_LEVEL: 20})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 20})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "20.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_DOCKED, {ATTR_BATTERY_LEVEL: 60})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 60})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "20.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_DOCKED, {ATTR_BATTERY_LEVEL: 80})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 80})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "15.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_DOCKED, {ATTR_BATTERY_LEVEL: 100})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 100})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "1.50"
