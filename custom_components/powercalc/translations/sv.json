@@ -101,7 +101,7 @@
       },
       "global_configuration": {
         "title": "Global konfiguration",
-        "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "description": "Setup global configuration for Powercalc. For more information see the [documentation]({docs_uri}). Additional options for energy sensors and utility meters can be provided in the next steps.",
         "data": {
           "create_energy_sensors": "Create energy sensors",
           "create_standby_group": "Create standby group",
@@ -152,7 +152,7 @@
       },
       "global_configuration_throttling": {
         "title": "Begränsningsalternativ",
-        "description": "Ställ in uppdateringsintervall för de olika sensortyperna. Se [dokumentation](https://docs.powercalc.nl/configuration/update-frequency/) för mer information",
+        "description": "Ställ in uppdateringsintervall för de olika sensortyperna. Se [dokumentation]({docs_uri}) för mer information",
         "data": {
           "group_energy_update_interval": "Uppdateringsintervall för gruppenergi",
           "group_power_update_interval": "Uppdateringsintervall för gruppeffekt",
@@ -452,7 +452,7 @@
           "power_factor": "Effektfaktor",
           "voltage": "Spänning"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see https://docs.powercalc.nl/strategies/wled/",
+        "description": "Make sure to enable brightness limiter in WLED software. Also see {docs_uri}",
         "title": "WLED konfig"
       }
     }
@@ -602,7 +602,7 @@
       },
       "global_configuration_discovery": {
         "title": "Upptäcktsalternativ",
-        "description": "Hantera upptäcktsinställning. Se [dokumentation](https://docs.powercalc.nl/library/discovery/) för mer information",
+        "description": "Hantera upptäcktsinställning. Se [dokumentation]({docs_uri}) för mer information",
         "data": {
           "enabled": "Aktivera upptäckt",
           "exclude_device_types": "Exkluderade enhetstyper",
@@ -615,7 +615,7 @@
       },
       "global_configuration_energy": {
         "title": "Energialternativ",
-        "description": "Define the default settings for energy sensors here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
+        "description": "Define the default settings for energy sensors here. See [documentation]({docs_uri}) for more information",
         "data": {
           "energy_integration_method": "Energy integration method",
           "energy_sensor_category": "Energy sensor category",
@@ -627,7 +627,7 @@
       },
       "global_configuration_throttling": {
         "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
@@ -643,7 +643,7 @@
       },
       "global_configuration_utility_meter": {
         "title": "Utility meter options",
-        "description": "Define the default settings for utility meters here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
+        "description": "Define the default settings for utility meters here. See [documentation]({docs_uri}) for more information",
         "data": {
           "utility_meter_net_consumption": "Utility meter net consumption",
           "utility_meter_tariffs": "Utility meter tariffs",

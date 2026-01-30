@@ -223,12 +223,19 @@ class VirtualPowerFlow:
 
         schema = await self.create_strategy_schema()
 
+        description_placeholders = {}
+        if strategy == CalculationStrategy.WLED:
+            description_placeholders = {
+                "docs_uri": "https://docs.powercalc.nl/strategies/wled/",
+            }
+
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=STRATEGY_STEP_MAPPING[strategy],
                 schema=schema,
                 next_step=Step.ASSIGN_GROUPS,
                 validate_user_input=_validate,
+                form_kwarg={"description_placeholders": description_placeholders},
             ),
             user_input,
         )
@@ -321,6 +328,9 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
         return self.flow.async_show_form(  # type: ignore
             step_id=Step.VIRTUAL_POWER,
             data_schema=self.create_schema_virtual_power(),
+            description_placeholders={
+                "doc_uri_states_power": "https://docs.powercalc.nl/strategies/fixed/#power-per-state",
+            },
             errors=errors,
             last_step=False,
         )

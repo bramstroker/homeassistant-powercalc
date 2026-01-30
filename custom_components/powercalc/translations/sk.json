@@ -101,7 +101,7 @@
       },
       "global_configuration": {
         "title": "Globálna konfigurácia",
-        "description": "Nastavte globálnu konfiguráciu pre Powercalc. Ďalšie informácie nájdete v [dokumentácii](https://docs.powercalc.nl/configuration/global-configuration/). Ďalšie možnosti pre snímače energie a elektromery môžu byť poskytnuté v ďalších krokoch.",
+        "description": "Nastavte globálnu konfiguráciu pre Powercalc. Ďalšie informácie nájdete v [dokumentácii]({docs_uri}). Ďalšie možnosti pre snímače energie a elektromery môžu byť poskytnuté v ďalších krokoch.",
         "data": {
           "create_energy_sensors": "Vytvorte energetické senzory",
           "create_standby_group": "Create standby group",
@@ -152,7 +152,7 @@
       },
       "global_configuration_throttling": {
         "title": "Možnosti obmedzenia",
-        "description": "Nastavte intervaly aktualizácie pre rôzne typy senzorov. Ďalšie informácie nájdete v [dokumentácii](https://docs.powercalc.nl/configuration/update-frequency/)",
+        "description": "Nastavte intervaly aktualizácie pre rôzne typy senzorov. Ďalšie informácie nájdete v [dokumentácii]({docs_uri})",
         "data": {
           "group_energy_update_interval": "Interval aktualizácie skupinovej energie",
           "group_power_update_interval": "Interval aktualizácie skupinového výkonu",
@@ -452,7 +452,7 @@
           "power_factor": "Účinník",
           "voltage": "Napätie"
         },
-        "description": "Uistite sa, že ste povolili obmedzovač jasu v softvéri WLED. Pozri tiež https://docs.powercalc.nl/strategies/wled/",
+        "description": "Uistite sa, že ste povolili obmedzovač jasu v softvéri WLED. Pozri tiež {docs_uri}",
         "title": "WLED konfigurácia"
       }
     }
@@ -602,7 +602,7 @@
       },
       "global_configuration_discovery": {
         "title": "Možnosti objavovania",
-        "description": "Spravujte nastavenie objavovania. Pozri [dokumentáciu](https://docs.powercalc.nl/library/discovery/) pre viac informácií",
+        "description": "Spravujte nastavenie objavovania. Pozri [dokumentáciu]({docs_uri}) pre viac informácií",
         "data": {
           "enabled": "Povoliť objavovanie",
           "exclude_device_types": "Vylúčené typy zariadení",
@@ -615,7 +615,7 @@
       },
       "global_configuration_energy": {
         "title": "Energetické možnosti",
-        "description": "Tu definujte predvolené nastavenia pre snímače energie. Pozri [documentation](https://docs.powercalc.nl/configuration/global-configuration/) pre viac informácií",
+        "description": "Tu definujte predvolené nastavenia pre snímače energie. Pozri [documentation]({docs_uri}) pre viac informácií",
         "data": {
           "energy_integration_method": "Metóda energetickej integrácie",
           "energy_sensor_category": "Kategória snímača energie",
@@ -627,7 +627,7 @@
       },
       "global_configuration_throttling": {
         "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
@@ -643,7 +643,7 @@
       },
       "global_configuration_utility_meter": {
         "title": "Možnosti elektromera",
-        "description": "Tu definujte predvolené nastavenia pre elektromery. Pozri [documentation](https://docs.powercalc.nl/configuration/global-configuration/) pre viac informácií",
+        "description": "Tu definujte predvolené nastavenia pre elektromery. Pozri [documentation]({docs_uri}) pre viac informácií",
         "data": {
           "utility_meter_net_consumption": "Čistá spotreba inžinierskych sietí",
           "utility_meter_tariffs": "Tarify za elektromery",
