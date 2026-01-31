@@ -1,0 +1,40 @@
+{
+  "author": "sbrandsborg",
+  "aliases": [
+    "Beosound Balance"
+  ],
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-01-29T11:32:35Z",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "0 -> 3.8",
+      "10 -> 7.6",
+      "20 -> 11.95",
+      "30 -> 12.1",
+      "40 -> 12.8",
+      "50 -> 21.05",
+      "60 -> 27.55",
+      "70 -> 57.55",
+      "80 -> 90.2",
+      "90 -> 96.8",
+      "100 -> 97.95"
+    ]
+  },
+  "description": "Beosound Balance - Premium Wireless Speaker",
+  "measure_description": "Measured with utils/measure script (full 100% volume) using standard settings (1 sample, 5s sleep).",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 5,
+    "VERSION": "master"
+  },
+  "name": "Beosound Balance",
+  "standby_power": 3.8,
+  "author_info": {
+    "name": "Steffen Brandsborg",
+    "github": "sbrandsborg"
+  }
+}
