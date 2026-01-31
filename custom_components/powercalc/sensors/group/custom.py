@@ -426,6 +426,7 @@ class GroupedSensor(BaseEntity, SensorEntity):
     _attr_should_poll = False
     _unrecorded_attributes = frozenset({ATTR_ENTITIES, ATTR_IS_GROUP})
     _is_energy_sensor = False
+    _attr_force_update = True
 
     def __init__(
         self,
