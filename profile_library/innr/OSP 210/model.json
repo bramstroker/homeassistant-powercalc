@@ -7,11 +7,7 @@
   "measure_device": "TP-Link Tapo P115 / TP-Link Tapo P110",
   "measure_method": "manual",
   "name": "Zigbee Outdoor Smart Plug",
-  "only_self_usage": true,
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
+  "only_self_usage": false,
   "standby_power": 0.3,
   "standby_power_on": 0.8,
   "author_info": {
