@@ -8,6 +8,9 @@
   "measure_device": "Shelly PM Mini Gen3",
   "name": "Smart Indoor Air Quality Monitor",
   "discovery_by": "device",
+  "aliases": [
+    "Smart Indoor Air Quality Monitor"
+  ],
   "device_type": "generic_iot",
   "only_self_usage": true,
   "calculation_strategy": "fixed",
