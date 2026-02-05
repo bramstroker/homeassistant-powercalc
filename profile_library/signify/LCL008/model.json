@@ -11,6 +11,6 @@
     "VERSION": "v1.20.4:docker"
   },
   "name": "Philips Hue Solo Lightstrip 3m",
-  "standby_power": 0.14
+  "standby_power": 0.14,
   "author": "Largelos"
 }
