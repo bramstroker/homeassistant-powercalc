@@ -3,7 +3,7 @@
   "created_at": "2026-02-05T15:41:46Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script with 10kOM dummy load",
-  "measure_device": "Shelly PlugS Gen3 (S3PL-00112EU)",
+  "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 3,
