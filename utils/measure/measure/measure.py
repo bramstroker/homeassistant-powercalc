@@ -163,6 +163,8 @@ class Measure:
         if not os.path.exists(export_directory):
             os.makedirs(export_directory)
 
+        _LOGGER.info("Exporting to %s", export_directory)
+
         if answers.get(QUESTION_DUMMY_LOAD, False):
             input("Please connect the appliance you want to measure in parallel to the dummy load and press enter to start measurement session...")
         try:
