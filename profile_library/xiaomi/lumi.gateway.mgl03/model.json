@@ -1,0 +1,24 @@
+{
+  "created_at": "2025-05-01T21:56:26Z",
+  "measure_description": "Measured with avg caluclation during 600s with dummy load. Samsung USB power adapter used.",
+  "measure_method": "script",
+  "measure_settings": {
+    "VERSION": "v1.17.11:docker"
+  },
+  "measure_device": "Shelly PM Mini Gen3",
+  "name": "lumi.gateway.mgl03",
+  "aliases": [
+    "Gateway: ZNDMWG03LM, ZNDMWG02LM, YTC4044GL, lumi.gateway.mgl03",
+    "gateway ZNDMWG03LM"
+  ],
+  "discovery_by": "device",
+  "device_type": "network",
+  "only_self_usage": true,
+  "calculation_strategy": "fixed",
+  "standby_power": 1.51,
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "author": "Largelos"
+}
