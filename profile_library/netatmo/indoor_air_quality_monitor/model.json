@@ -15,5 +15,9 @@
   "only_self_usage": true,
   "calculation_strategy": "fixed",
   "standby_power": 0.43,
-  "author": "Largelos"
+  "author": "Largelos",
+  "author_info": {
+    "name": "Largelos",
+    "github": "Largelos"
+  }
 }
