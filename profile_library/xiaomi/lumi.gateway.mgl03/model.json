@@ -20,5 +20,9 @@
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
-  "author": "Largelos"
+  "author": "Largelos",
+  "author_info": {
+    "name": "Largelos",
+    "github": "Largelos"
+  }
 }
