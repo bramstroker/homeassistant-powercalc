@@ -39,12 +39,16 @@ jobs:
         with:
           add: 'profile_library'
           message: 'Update profile library'
-      - name: Wait 10 seconds
-        run: sleep 10
+      - name: Wait 5 seconds
+        run: sleep 5
       - name: Purge cloudflare cache
-        uses: jakejarvis/cloudflare-purge-action@master
-        env:
-          CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
-          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
-          CLOUDFLARE_KEY: ${{ secrets.CLOUDFLARE_KEY }}
-          PURGE_URLS: '["https://api.powercalc.nl/library"]'
+        run: |
+          curl --request POST \
+            --url https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE }}/purge_cache \
+            --header 'Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}' \
+            --header 'Content-Type: application/json' \
+            --data '{
+          	"files": [
+          		"https://api.powercalc.nl/library"
+          	]
+          }'
