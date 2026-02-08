@@ -12,5 +12,9 @@
   },
   "name": "Philips Hue Solo Lightstrip 3m",
   "standby_power": 0.14,
-  "author": "Largelos"
+  "author": "Largelos",
+  "author_info": {
+    "name": "Largelos",
+    "github": "Largelos"
+  }
 }
