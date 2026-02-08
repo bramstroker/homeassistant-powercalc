@@ -10,7 +10,7 @@
     "SLEEP_TIME": 1,
     "VERSION": "v1.20.4:docker"
   },
-  "name": "Philips Hue Solo Lightstrip 3m",
+  "name": "Hue Solo Lightstrip 3m",
   "standby_power": 0.14,
   "author": "Largelos",
   "author_info": {
