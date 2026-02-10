@@ -247,7 +247,7 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
                 schema=SCHEMA_GLOBAL_CONFIGURATION,
                 form_kwarg={
                     "description_placeholders": {
-                        "doc_uri": "https://docs.powercalc.nl/configuration/global-configuration/",
+                        "docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/",
                     },
                 },
             ),
