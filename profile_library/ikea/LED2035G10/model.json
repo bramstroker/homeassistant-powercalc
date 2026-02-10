@@ -11,5 +11,10 @@
     "VERSION": "v1.20.4:docker"
   },
   "name": "TRADFRI bulb B22, white spectrum, globe, opal, 1055 lm",
-  "standby_power": 0.06
+  "standby_power": 0.06,
+  "author_info": {
+    "name": "ngengerous",
+    "github": "ngengerous"
+  },
+  "author": "ngengerous"
 }
