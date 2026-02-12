@@ -1,40 +1,40 @@
 {
-    "author": "sbrandsborg",
-    "aliases": [
-        "Beoplay M5"
-    ],
-    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
-    "calculation_strategy": "linear",
-    "created_at": "2026-01-29T12:42:28Z",
-    "device_type": "smart_speaker",
-    "linear_config": {
-        "calibrate": [
-            "0 -> 3.2",
-            "10 -> 5.9",
-            "20 -> 7.0",
-            "30 -> 7.0",
-            "40 -> 6.9",
-            "50 -> 6.6",
-            "60 -> 7.58",
-            "70 -> 9.43",
-            "80 -> 14.88",
-            "90 -> 19.2",
-            "100 -> 20.3"
-        ]
-    },
-    "description": "Beoplay M5 - Powerful Wireless Speaker",
-    "measure_description": "Measured with utils/measure script (full 100% volume) using standard settings (1 sample, 5s sleep).",
-    "measure_device": "Shelly Plug S Gen3",
-    "measure_method": "script",
-    "measure_settings": {
-        "SAMPLE_COUNT": 1,
-        "SLEEP_TIME": 5,
-        "VERSION": "master"
-    },
-    "name": "Beoplay M5",
-    "standby_power": 3.2,
-    "author_info": {
-        "name": "Steffen Brandsborg",
-        "github": "sbrandsborg"
-    }
+  "author": "sbrandsborg",
+  "aliases": [
+    "Beoplay M5"
+  ],
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-01-29T12:42:28Z",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "0 -> 3.2",
+      "10 -> 5.9",
+      "20 -> 7.0",
+      "30 -> 7.0",
+      "40 -> 6.9",
+      "50 -> 6.6",
+      "60 -> 7.58",
+      "70 -> 9.43",
+      "80 -> 14.88",
+      "90 -> 19.2",
+      "100 -> 20.3"
+    ]
+  },
+  "description": "Beoplay M5 - Powerful Wireless Speaker",
+  "measure_description": "Measured with utils/measure script (full 100% volume) using standard settings (1 sample, 5s sleep).",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 5,
+    "VERSION": "master"
+  },
+  "name": "Beoplay M5",
+  "standby_power": 3.2,
+  "author_info": {
+    "name": "Steffen Brandsborg",
+    "github": "sbrandsborg"
+  }
 }
