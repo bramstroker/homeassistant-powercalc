@@ -1,8 +1,7 @@
 {
   "author": "sbrandsborg",
   "aliases": [
-    "6661 S53",
-    "Beosound Edge"
+    "6661 S53"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
