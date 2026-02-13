@@ -892,6 +892,20 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     assert ATTR_IS_GROUP not in energy_state.attributes
 
 
+async def test_associate_entry_to_existing_group(hass: HomeAssistant) -> None:
+    config_entry_group = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "MyGroup",
+        },
+    )
+    config_entry_sensor = await create_mocked_virtual_power_sensor_entry(hass, "MySensor", extra_config={CONF_GROUP: config_entry_group.entry_id})
+
+    assert config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS) == [config_entry_sensor.entry_id]
+    assert CONF_GROUP not in config_entry_sensor.data
+
+
 async def test_config_entry_is_removed_from_associated_groups_on_removal(
     hass: HomeAssistant,
 ) -> None:
