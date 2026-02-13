@@ -13,7 +13,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.4:docker"
   },
-  "name": "Linkind Smart Light Bulb (4120)",
+  "name": "A19 Matter Smart CCT Light Bulb - 800lm",
   "standby_power": 0.91,
   "author_info": {
     "name": "Phil DeMonaco",
