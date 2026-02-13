@@ -76,7 +76,7 @@ exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.lint]
 select = ["A", "ANN", "ASYNC", "B", "BLE", "C", "C4", "COM", "E", "F", "FIX", "FURB", "G", "ICN", "I", "INP", "ISC", "LOG", "N", "NPY", "PERF", "PIE", "PYI", "Q", "RET", "RUF", "S", "SIM", "SLF", "SLOT", "T10", "T20", "TID", "UP", "W"]
-ignore = ["S101", "ASYNC240"]
+ignore = ["S101", "ASYNC240", "COM812"]
 
 [tool.ruff.lint.per-file-ignores]
 "utils/measure/**.py" = ["T201"]
