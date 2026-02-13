@@ -108,13 +108,14 @@ class RemoteLoader(Loader):
 
                 # Exact id bucket first (highest priority)
                 bucket = lookup.setdefault(model_id_lower, [])
-                bucket.append(model)
+                bucket.insert(0, model)
 
                 # Alias buckets afterwards (lower priority)
                 for alias in model.get("aliases", []) or []:
                     alias_lower = str(alias).lower()
                     if alias_lower == model_id_lower:
                         continue
+                    # Append to the end to ensure aliased models are always last
                     lookup.setdefault(alias_lower, []).append(model)
 
             self.manufacturer_models[manufacturer_name] = kept_models
