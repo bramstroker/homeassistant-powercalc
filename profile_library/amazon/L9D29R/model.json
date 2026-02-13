@@ -28,5 +28,9 @@
   },
   "name": "Echo Plus (Gen2)",
   "standby_power": 2.0,
-  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
+  "author": "Jarod2801",
+  "author_info": {
+    "name": "Jarod2801",
+    "github": "Jarod2801"
+  }
 }
