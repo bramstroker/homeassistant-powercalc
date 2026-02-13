@@ -14,5 +14,11 @@
     "VERSION": "v1.20.4:docker"
   },
   "name": "Linkind Smart Light Bulb (4120)",
-  "standby_power": 0.91
+  "standby_power": 0.91,
+  "author_info": {
+    "name": "Phil DeMonaco",
+    "github": "pdemonaco",
+    "email": "phil@demona.co"
+  },
+  "author": "Phil DeMonaco"
 }
