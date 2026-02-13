@@ -71,12 +71,12 @@ source = ["custom_components/powercalc", "utils", "tests"]
 
 [tool.ruff]
 line-length = 150
-target-version = "py314"
+target-version = "py313"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.lint]
 select = ["A", "ANN", "ASYNC", "B", "BLE", "C", "C4", "COM", "E", "F", "FIX", "FURB", "G", "ICN", "I", "INP", "ISC", "LOG", "N", "NPY", "PERF", "PIE", "PYI", "Q", "RET", "RUF", "S", "SIM", "SLF", "SLOT", "T10", "T20", "TID", "UP", "W"]
-ignore = ["S101"]
+ignore = ["S101", "ASYNC240", "COM812"]
 
 [tool.ruff.lint.per-file-ignores]
 "utils/measure/**.py" = ["T201"]
@@ -97,7 +97,7 @@ docs = [
 ]
 dev = [
     "pre-commit>=4.0.0",
-    "ruff>=0.13.0",
+    "ruff>=0.15.0",
     "mypy==1.19.1",
     "voluptuous-stubs>=0.1",
     "homeassistant-stubs",
