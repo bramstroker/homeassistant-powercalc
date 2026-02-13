@@ -11,6 +11,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.0:docker"
   },
-  "name": "Govee Smart Ceiling Light H60A1",
+  "name": "Smart Ceiling Light",
   "standby_power": 0.45
 }
