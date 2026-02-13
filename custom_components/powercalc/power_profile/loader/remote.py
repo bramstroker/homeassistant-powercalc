@@ -258,7 +258,8 @@ class RemoteLoader(Loader):
             await self.hass.async_add_executor_job(self._write_profile_hashes, self.profile_hashes)
         except ProfileDownloadError as e:
             if not os.path.exists(model_path):
-                await self.hass.async_add_executor_job(shutil.rmtree, storage_path)
+                if os.path.exists(storage_path):
+                    await self.hass.async_add_executor_job(shutil.rmtree, storage_path)
                 raise e
             _LOGGER.debug("Failed to download profile, falling back to local profile")
 
