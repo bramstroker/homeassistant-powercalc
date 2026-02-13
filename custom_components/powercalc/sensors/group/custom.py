@@ -456,7 +456,6 @@ class GroupedSensor(BaseEntity, SensorEntity):
         self._attr_suggested_display_precision = self._rounding_digits
         if unique_id:
             self._attr_unique_id = unique_id
-        self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
         self._native_value_exact = Decimal(0)
         self._member_states: dict[str, Decimal] = {}
         self._ignore_unavailable_state = bool(self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE))
@@ -470,7 +469,6 @@ class GroupedSensor(BaseEntity, SensorEntity):
         """Register state listeners."""
         await super().async_added_to_hass()
 
-        self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
         if self._update_interval > 0:
             self.async_on_remove(self._cancel_update_interval_exceeded_callback)
 
@@ -478,6 +476,12 @@ class GroupedSensor(BaseEntity, SensorEntity):
 
         if CONF_HIDE_MEMBERS in self._sensor_config:
             self._async_hide_members(bool(self._sensor_config.get(CONF_HIDE_MEMBERS)))
+
+        if not self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES, False):
+            self._attr_extra_state_attributes = {
+                ATTR_ENTITIES: self._entities,
+                ATTR_IS_GROUP: True,
+            }
 
     async def async_will_remove_from_hass(self) -> None:
         """
@@ -546,12 +550,6 @@ class GroupedSensor(BaseEntity, SensorEntity):
                 self.on_state_change,
             ),
         )
-
-        if not self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES, False):
-            self._attr_extra_state_attributes = {
-                ATTR_ENTITIES: self._entities,
-                ATTR_IS_GROUP: True,
-            }
 
         await self.initial_update()
 
@@ -720,9 +718,15 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
             sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.NONE),
             UnitOfEnergy.WATT_HOUR,
         )
+        self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
+
+        self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
+        # Clean up any entities that are no longer part of the group
+        self._prev_state_store.cleanup_entity_states(self.entity_id, self._entities)
+
         await self.restore_last_state()
 
         await super().async_added_to_hass()
@@ -899,6 +903,20 @@ class PreviousStateStore:
     def set_entity_state(self, group: str, entity_id: str, state: State) -> None:
         """Set the state for an energy sensor."""
         self.states.setdefault(group, {})[entity_id] = state
+
+    def cleanup_entity_states(self, group: str, current_entities: set[str]) -> None:
+        """Remove entity states that are no longer part of the group."""
+        group_states = self.states.get(group)
+        if group_states is None:
+            return
+
+        # Find entities that are in the store but not in the current set
+        entities_to_remove = set(group_states.keys()) - current_entities
+
+        # Remove those entities from the store
+        for entity_id in entities_to_remove:
+            _LOGGER.debug("Removing entity %s from group %s in PreviousStateStore", entity_id, group)
+            group_states.pop(entity_id, None)
 
     async def persist_states(self) -> None:
         """Save the current states to storage."""
