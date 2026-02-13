@@ -49,7 +49,7 @@ class HassChargingController(HassControllerBase, ChargingController):
             raise BatteryLevelRetrievalError(f"Battery level entity {self.battery_level_entity_id} not found")
         try:
             return int(float(entity.state.state))
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             raise BatteryLevelRetrievalError(
                 f"Could not convert battery level entity state '{entity.state.state}' to integer",
             ) from None
