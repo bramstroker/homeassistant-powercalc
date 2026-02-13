@@ -1992,6 +1992,72 @@ async def test_resolve_entity_ids_skips_tasmota_yesterday_and_today(hass: HomeAs
     assert resolved == {"sensor.test_total"}
 
 
+async def test_remove_member_from_group(hass: HomeAssistant) -> None:
+    state_storage: PreviousStateStore = await PreviousStateStore.async_get_instance(hass)
+
+    # Setup 3 powercalc virtual power sensor and one group sensor
+    member_config_entries = []
+    member_entity_ids = []
+    for i in range(3):
+        config_entry = await setup_config_entry(
+            hass,
+            {
+                CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+                CONF_UNIQUE_ID: f"pc{i}",
+                CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+                CONF_NAME: f"VirtualSensor{i}",
+                CONF_MODE: CalculationStrategy.FIXED,
+                CONF_FIXED: {CONF_POWER: 50},
+            },
+        )
+        member_config_entries.append(config_entry)
+        member_entity_ids.append(f"sensor.virtualsensor{i}_energy")
+
+    group_entry = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_MEMBER_SENSORS: [entry.entry_id for entry in member_config_entries],
+        },
+    )
+
+    # Trigger some changes on member power sensor so the group energy sensor integration logic is executed.
+    for i in range(3):
+        hass.states.async_set(f"sensor.virtualsensor{i}_power", "60.00")
+        await hass.async_block_till_done()
+    await hass.async_block_till_done()
+
+    # Assert the group sensor has the correct 3 member sensors added
+    group_state = hass.states.get("sensor.testgroup_energy")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == set(member_entity_ids)
+
+    assert state_storage.get_entity_state("sensor.testgroup_energy", member_entity_ids[0])
+    assert state_storage.get_entity_state("sensor.testgroup_energy", member_entity_ids[1])
+    assert state_storage.get_entity_state("sensor.testgroup_energy", member_entity_ids[2])
+
+    # Remove one powercalc sensor from the group
+    member_config_entries.remove(member_config_entries[1])
+    member_entity_ids.remove(member_entity_ids[1])
+    hass.config_entries.async_update_entry(
+        group_entry,
+        data={
+            **group_entry.data,
+            CONF_GROUP_MEMBER_SENSORS: [entry.entry_id for entry in member_config_entries],
+        },
+    )
+
+    # Assert the group sensor has the correct 2 member sensors added, and the removed sensor is not there anymore
+    group_state = hass.states.get("sensor.testgroup_energy")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == set(member_entity_ids)
+
+    assert state_storage.get_entity_state("sensor.testgroup_energy", member_entity_ids[0])
+    assert not state_storage.get_entity_state("sensor.testgroup_energy", "sensor.virtualsensor1_energy")
+    assert state_storage.get_entity_state("sensor.testgroup_energy", member_entity_ids[1])
+
+
 async def _create_energy_group(
     hass: HomeAssistant,
     name: str,
