@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class PowerMeterType(str, Enum):
+class PowerMeterType(StrEnum):
     DUMMY = "dummy"
     HASS = "hass"
     KASA = "kasa"

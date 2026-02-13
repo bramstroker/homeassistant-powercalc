@@ -1,10 +1,10 @@
-from enum import Enum
+from enum import StrEnum
 
 MIN_MIRED = 150
 MAX_MIRED = 500
 
 
-class LutMode(str, Enum):
+class LutMode(StrEnum):
     HS = "hs"
     COLOR_TEMP = "color_temp"
     BRIGHTNESS = "brightness"
@@ -12,7 +12,7 @@ class LutMode(str, Enum):
     WHITE = "white"
 
 
-class LightControllerType(str, Enum):
+class LightControllerType(StrEnum):
     DUMMY = "dummy"
     HASS = "hass"
     HUE = "hue"
