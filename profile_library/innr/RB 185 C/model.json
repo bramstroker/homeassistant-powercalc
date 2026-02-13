@@ -1,7 +1,7 @@
 {
   "author": "Florian Mulatz <33655308+florianmulatz@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-02-04T11:22:13",
+  "created_at": "2023-02-04T11:22:13Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1T",
@@ -11,6 +11,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.1:docker"
   },
-  "name": "RB 185 C - E27 Smart Color Bulb",
-  "standby_power": 0.4
+  "name": "RGBW Bulb Colour E27",
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Florian Mulatz",
+    "github": "florianmulatz"
+  }
 }

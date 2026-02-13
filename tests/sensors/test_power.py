@@ -11,9 +11,7 @@ from homeassistant.components.light import (
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
-    STATE_CLEANING,
-    STATE_DOCKED,
-    STATE_RETURNING,
+    VacuumActivity,
 )
 from homeassistant.const import (
     ATTR_ENTITY_ID,
@@ -43,6 +41,7 @@ from pytest_homeassistant_custom_component.common import (
     async_fire_time_changed,
 )
 
+from custom_components.powercalc import CONF_IGNORE_UNAVAILABLE_STATE, CONF_POWER_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_SOURCE_DOMAIN,
@@ -271,32 +270,32 @@ async def test_strategy_enabled_condition(hass: HomeAssistant) -> None:
 
     assert hass.states.get(power_entity_id)
 
-    hass.states.async_set(vacuum_entity_id, STATE_CLEANING, {ATTR_BATTERY_LEVEL: 40})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.CLEANING, {ATTR_BATTERY_LEVEL: 40})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "0.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_RETURNING, {ATTR_BATTERY_LEVEL: 40})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.RETURNING, {ATTR_BATTERY_LEVEL: 40})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "0.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_DOCKED, {ATTR_BATTERY_LEVEL: 20})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 20})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "20.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_DOCKED, {ATTR_BATTERY_LEVEL: 60})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 60})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "20.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_DOCKED, {ATTR_BATTERY_LEVEL: 80})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 80})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "15.00"
 
-    hass.states.async_set(vacuum_entity_id, STATE_DOCKED, {ATTR_BATTERY_LEVEL: 100})
+    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 100})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "1.50"
@@ -854,3 +853,32 @@ async def test_cover_entity_standby_power(hass: HomeAssistant) -> None:
     hass.states.async_set("cover.test", STATE_OPENING)
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power").state == "10.00"
+
+
+async def test_force_update_interval(hass: HomeAssistant) -> None:
+    """Test that the power sensor state is forcefully updated at the configured interval"""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+            CONF_FIXED: {CONF_POWER: 10},
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+        {
+            CONF_POWER_UPDATE_INTERVAL: 20,
+        },
+    )
+
+    time = dt.utcnow()
+    prev = hass.states.get("sensor.test_power")
+    assert prev
+
+    for i in range(1, 4):
+        async_fire_time_changed(hass, time + timedelta(seconds=20 * i))
+        await hass.async_block_till_done()
+
+        cur = hass.states.get("sensor.test_power")
+        assert cur
+        assert cur.state == prev.state
+        assert cur.last_updated > prev.last_updated
+        prev = cur

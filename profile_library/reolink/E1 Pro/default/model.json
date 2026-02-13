@@ -1,0 +1,6 @@
+{
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": 2.51
+  }
+}

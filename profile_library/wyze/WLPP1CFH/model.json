@@ -1,0 +1,17 @@
+{
+  "author": "Bob Shaker <bobshaker1@gmail.com>",
+  "calculation_strategy": "fixed",
+  "created_at": "2026-01-21T16:17:00Z",
+  "device_type": "smart_switch",
+  "measure_description": "Manually measured.",
+  "measure_device": "Shelly EM Mini Gen4",
+  "measure_method": "manual",
+  "name": "Plug",
+  "standby_power": 1.4,
+  "standby_power_on": 1.6,
+  "author_info": {
+    "name": "Bob Shaker",
+    "email": "bobshaker1@gmail.com",
+    "github": "EpicBurrito"
+  }
+}

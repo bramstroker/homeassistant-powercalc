@@ -1,7 +1,7 @@
 {
   "author": "el97 <erik1337.el@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-09-06T08:20:35",
+  "created_at": "2022-09-06T08:20:35Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -11,6 +11,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.25.4:docker"
   },
-  "name": "RS 230 C",
-  "standby_power": 0.37
+  "name": "Smart Spot Colour GU10 Bulb",
+  "standby_power": 0.37,
+  "author_info": {
+    "name": "el97",
+    "email": "erik1337.el@gmail.com",
+    "github": "el97"
+  }
 }

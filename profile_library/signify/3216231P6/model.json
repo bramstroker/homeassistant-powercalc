@@ -4,7 +4,7 @@
   ],
   "author": "Jari Eskelinen <jari.eskelinen@iki.fi>",
   "calculation_strategy": "lut",
-  "created_at": "2022-12-25T09:44:08",
+  "created_at": "2022-12-25T09:44:08Z",
   "device_type": "light",
   "linked_profile": "signify/3216331P6",
   "measure_description": "Measured with utils/measure script",
@@ -16,5 +16,10 @@
     "VERSION": "master"
   },
   "name": "Hue White Ambiance Aurelle Square",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "Jari Eskelinen",
+    "email": "jari.eskelinen@iki.fi",
+    "github": "jarpatus"
+  }
 }

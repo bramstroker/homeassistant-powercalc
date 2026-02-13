@@ -4,13 +4,18 @@
   ],
   "author": "201505409",
   "calculation_strategy": "lut",
-  "created_at": "2023-01-19T11:04:29",
+  "created_at": "2023-01-19T11:04:29Z",
   "device_type": "light",
   "linked_profile": "signify/LCG002",
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
-  "name": "Hue White and Colour Ambiance Fugato quadruple spotlight",
-  "standby_power": 0.4
+  "name": "Hue White and Color Ambiance Fugato quadruple spotlight",
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

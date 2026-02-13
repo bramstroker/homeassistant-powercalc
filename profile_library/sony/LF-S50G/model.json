@@ -2,7 +2,7 @@
   "author": "jonathanlflatt <jonathan@flatt.de>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
-  "created_at": "2025-08-27T11:10:15",
+  "created_at": "2025-08-27T11:10:15Z",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -20,8 +20,12 @@
     ]
   },
   "measure_description": "Streamed white noise from Spotify for this test",
-  "measure_device": "Meross Smart Plug mss305 8.0.0",
+  "measure_device": "Meross mss305",
   "measure_method": "manual",
-  "name": "Sony LF-S50G",
-  "standby_power": 3.28
+  "name": "Smart Wireless Speaker with Google Assistant",
+  "standby_power": 3.28,
+  "author_info": {
+    "name": "jonathanlflatt",
+    "github": "jonathanlflatt"
+  }
 }

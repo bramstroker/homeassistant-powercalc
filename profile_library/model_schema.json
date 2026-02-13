@@ -18,8 +18,38 @@
       },
       "description": "Aliases for this model"
     },
+    "compatible_integrations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of compatible integrations for this model"
+    },
     "author": {
-      "type": "string"
+      "type": "string",
+      "deprecated": true
+    },
+    "author_info": {
+      "type": "object",
+      "description": "Info about the contributor of the profile",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the contributor"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the contributor"
+        },
+        "github": {
+          "type": "string",
+          "description": "GitHub username of the contributor"
+        }
+      },
+      "required": [
+        "name",
+        "github"
+      ]
     },
     "calculation_enabled_condition": {
       "type": "string",
@@ -91,6 +121,7 @@
     "created_at": {
       "type": "string",
       "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
       "description": "Creation date of the profile"
     },
     "description": {
@@ -126,8 +157,8 @@
       "description": "Whether to discover the profile by device or entity"
     },
     "fields": {
-      "type": "array",
-      "items": {
+      "type": "object",
+      "additionalProperties": {
         "type": "object",
         "properties": {
           "description": {
@@ -173,7 +204,10 @@
       "description": "Configuration for fixed calculation strategy",
       "properties": {
         "power": {
-          "type": "number"
+          "type": [
+            "number",
+            "string"
+          ]
         },
         "states_power": {
           "type": "object",
@@ -335,8 +369,7 @@
       "type": "object",
       "description": "Configuration to automatically select a sub profile",
       "required": [
-        "default",
-        "matchers"
+        "default"
       ],
       "properties": {
         "default": {

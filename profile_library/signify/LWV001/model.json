@@ -5,12 +5,16 @@
   ],
   "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2021-08-29T23:49:16",
+  "created_at": "2021-08-29T23:49:16Z",
   "device_type": "light",
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
   "name": "Hue White Filament Bulb ST64 E27",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "Stefan Gries",
+    "github": "stefangries"
+  }
 }

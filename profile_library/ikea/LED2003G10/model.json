@@ -4,7 +4,7 @@
   ],
   "author": "giu889 <78928093+giu889@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-01-28T15:48:57",
+  "created_at": "2022-01-28T15:48:57Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -14,6 +14,10 @@
     "SLEEP_TIME": 6,
     "VERSION": "master"
   },
-  "name": "TRADFRI LED bulb E27 1055 lumen, dimmable, white spectrum, opal white",
-  "standby_power": 0.17
+  "name": "TRADFRI bulb E27 1055 lumen, dimmable, white spectrum, opal white",
+  "standby_power": 0.17,
+  "author_info": {
+    "name": "giu889",
+    "github": "giu889"
+  }
 }

@@ -1,3 +1,4 @@
 aiofiles==25.1.0
 gitpython==3.1.46
+httpx==0.28.1
 pytablewriter==1.2.1

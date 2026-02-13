@@ -1,6 +1,6 @@
 {
   "calculation_strategy": "lut",
-  "created_at": "2026-01-03T10:49:39.474180",
+  "created_at": "2026-01-03T10:49:39Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1T",
@@ -10,7 +10,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.1:docker"
   },
-  "name": "Gosund SL2",
+  "name": "Smart Wi-Fi RGB LED Light Strip (5 m)",
   "standby_power": 0.1,
-  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
+  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>",
+  "author_info": {
+    "name": "Jarod2801",
+    "github": "Jarod2801"
+  }
 }

@@ -1,12 +1,16 @@
 {
   "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2021-09-12T16:46:36",
+  "created_at": "2021-09-12T16:46:36Z",
   "device_type": "light",
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
   "name": "Hue White GU10",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Stefan Gries",
+    "github": "stefangries"
+  }
 }

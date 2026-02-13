@@ -1,7 +1,7 @@
 {
   "author": "Thomas R. Novak <trnovak@illinoisalumni.org>",
   "calculation_strategy": "linear",
-  "created_at": "2025-05-10T19:41:31.042803",
+  "created_at": "2025-05-10T19:41:31Z",
   "device_type": "fan",
   "linear_config": {
     "calibrate": [
@@ -35,6 +35,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.12:docker"
   },
-  "name": "Snooz SNOOZ-US-2",
-  "standby_power": 0.31
+  "name": "Smart White Noise Machine",
+  "standby_power": 0.31,
+  "author_info": {
+    "name": "Thomas R. Novak",
+    "email": "trnovak@illinoisalumni.org",
+    "github": "trnovak"
+  }
 }

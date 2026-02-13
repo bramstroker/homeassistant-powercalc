@@ -1,7 +1,7 @@
 {
   "author": "olivr2s <olivr2s@users.noreply.github.com>",
   "calculation_strategy": "linear",
-  "created_at": "2025-08-14T10:10:08.375127+02:00",
+  "created_at": "2025-08-14T10:10:08+02:00",
   "device_type": "fan",
   "linear_config": {
     "attribute": "percentage",
@@ -12,8 +12,13 @@
     ]
   },
   "measure_description": "Manually measured",
-  "measure_device": "Meross MSS310",
+  "measure_device": "Meross mss310",
   "measure_method": "manual",
   "name": "Mi Smart Standing Fan 2",
-  "standby_power": 1
+  "standby_power": 1,
+  "author_info": {
+    "name": "olivr2s",
+    "email": "olivr2s@users.noreply.github.com",
+    "github": "olivr2s"
+  }
 }

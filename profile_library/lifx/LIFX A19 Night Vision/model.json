@@ -1,7 +1,7 @@
 {
   "author": "Jacob Donenfeld <25359163+jacobdonenfeld@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-05-03T22:15:08",
+  "created_at": "2022-05-03T22:15:08Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script. TP-link kp125 was having inconsistent readings towards the 0.52 watt and lower range, so I manually smoothed out some of the outliers",
   "measure_device": "TP-Link Kasa KP125",
@@ -11,7 +11,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.19.12:docker"
   },
-  "name": "LIFX A19 Night Vision",
+  "name": "A19 Night Vision",
   "standby_power": 0.47,
   "sub_profile_select": {
     "default": "infrared_off",
@@ -27,5 +27,10 @@
         "type": "entity_state"
       }
     ]
+  },
+  "author_info": {
+    "name": "Jacob Donenfeld",
+    "email": "jacobdonenfeld@gmail.com",
+    "github": "jacobdonenfeld"
   }
 }

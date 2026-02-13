@@ -1,7 +1,7 @@
 {
   "author": "vyruz1986 <alex.goris@fastlikehell.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-02-18T16:04:50",
+  "created_at": "2023-02-18T16:04:50Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -12,5 +12,10 @@
     "VERSION": "v1.3.5:docker"
   },
   "name": "Livarno Lux LED Deckenleuchte (1400 lm) RGBCT",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "vyruz1986",
+    "email": "alex.goris@fastlikehell.com",
+    "github": "vyruz1986"
+  }
 }

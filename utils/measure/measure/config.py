@@ -206,19 +206,14 @@ class MeasureConfig:
         try:
             return MeasureType(config("SELECTED_MEASURE_TYPE"))
         except UndefinedValueError:
-            try:
-                # Log deprecation warning
-                _LOGGER.warning("'SELECTED_DEVICE_TYPE' is deprecated. Use 'SELECTED_MEASURE_TYPE' instead.")
-                return MeasureType(config("SELECTED_DEVICE_TYPE"))
-            except UndefinedValueError:
-                return None
+            return None
 
     @property
     def resume(self) -> bool:
         try:
-            return config("RESUME", cast=bool)
+            return config("RESUME", default=True, cast=bool)
         except UndefinedValueError:
-            return False
+            return True
 
     @property
     def shelly_ip(self) -> str:

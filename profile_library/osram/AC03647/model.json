@@ -1,6 +1,6 @@
 {
   "calculation_strategy": "lut",
-  "created_at": "2026-01-04T05:18:43.949758",
+  "created_at": "2026-01-04T05:18:43Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1T",
@@ -10,7 +10,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.1:docker"
   },
-  "name": "SMART+ LED CLASSIC E27 RGBW",
+  "name": "SMART+ LED Classic E27 RGBW",
   "standby_power": 0.35,
-  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>"
+  "author": "Jarod2801 <Jarod2801@users.noreply.github.com>",
+  "author_info": {
+    "name": "Jarod2801",
+    "github": "Jarod2801"
+  }
 }

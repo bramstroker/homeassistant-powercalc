@@ -5,7 +5,7 @@
   ],
   "author": "chpego <38792705+chpego@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-10-04T20:29:36",
+  "created_at": "2023-10-04T20:29:36Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -16,5 +16,9 @@
     "VERSION": "v1.9.4:docker"
   },
   "name": "Hue Play Gradient Light Tube Large",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "chpego",
+    "github": "chpego"
+  }
 }

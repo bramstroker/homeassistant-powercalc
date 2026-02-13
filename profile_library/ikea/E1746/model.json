@@ -1,7 +1,7 @@
 {
   "author": "confucius78 <dekker.wj@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-01-13T09:03:27",
+  "created_at": "2024-01-13T09:03:27Z",
   "device_type": "network",
   "fixed_config": {
     "power": 0.26
@@ -10,9 +10,14 @@
   "measure_device": "Nous A1T",
   "measure_device_firmware": "ESPHome 2023.12.5",
   "measure_method": "script",
-  "name": "TRADFRI Signal Repeater",
+  "name": "TRADFRI signal repeater",
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
+  },
+  "author_info": {
+    "name": "confucius78",
+    "email": "dekker.wj@gmail.com",
+    "github": "confucius78"
   }
 }

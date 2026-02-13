@@ -5,7 +5,7 @@
   "author": "Imperial-Guard <33509000+Imperial-Guard@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
-  "created_at": "2023-11-01T15:32:57",
+  "created_at": "2023-11-01T15:32:57Z",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -30,6 +30,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.6:docker"
   },
-  "name": "Harman Kardon Citation One",
-  "standby_power": 2.01
+  "name": "Citation One MKII",
+  "standby_power": 2.01,
+  "author_info": {
+    "name": "Imperial-Guard",
+    "github": "Imperial-Guard"
+  }
 }

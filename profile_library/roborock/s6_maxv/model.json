@@ -5,7 +5,7 @@
   "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
   "calculation_strategy": "linear",
-  "created_at": "2024-11-11T17:19:55.943226",
+  "created_at": "2024-11-11T17:19:55Z",
   "device_type": "vacuum_robot",
   "linear_config": {
     "calibrate": [
@@ -114,6 +114,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Roborock S6 MaxV",
-  "standby_power": 0.1
+  "name": "S6 MaxV",
+  "standby_power": 0.1,
+  "author_info": {
+    "name": "RubenKelevra",
+    "email": "cyrond@gmail.com",
+    "github": "RubenKelevra"
+  }
 }

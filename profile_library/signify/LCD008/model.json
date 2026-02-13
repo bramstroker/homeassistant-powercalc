@@ -1,7 +1,7 @@
 {
   "author": "buttonger <buttonger@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-12-05T07:26:13.311686",
+  "created_at": "2024-12-05T07:26:13Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
@@ -11,6 +11,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.16.2:docker"
   },
-  "name": "Slim recessed light S",
-  "standby_power": 0.42
+  "name": "Hue Slim recessed light S",
+  "standby_power": 0.42,
+  "author_info": {
+    "name": "buttonger",
+    "github": "buttonger"
+  }
 }

@@ -1,7 +1,7 @@
 {
   "author": "brianegge <brianegge@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-09-23T13:40:20",
+  "created_at": "2024-09-23T13:40:20Z",
   "device_type": "printer",
   "fixed_config": {
     "states_power": {
@@ -10,7 +10,12 @@
     }
   },
   "measure_description": "Printer was measured while idle and while printing",
-  "measure_device": "Shelly Plus Plug US",
+  "measure_device": "Shelly Plus Plug",
   "measure_method": "manual",
-  "name": "EPSON ET-3760 Series"
+  "name": "ET-3760 Series",
+  "author_info": {
+    "name": "Brian Egge",
+    "email": "brianegge@gmail.com",
+    "github": "brianegge"
+  }
 }

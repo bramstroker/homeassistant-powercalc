@@ -1,7 +1,7 @@
 {
   "author": "Jonathan Wiklund <jonathan.wiklund@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-08-29T18:59:50.124697",
+  "created_at": "2024-08-29T18:59:50Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -11,6 +11,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.14.3:docker"
   },
-  "name": "JETSTROM ceiling light panel, white spectrum, 60x60 cm (L2207)",
-  "standby_power": 0.3
+  "name": "JETSTROM ceiling light panel, white spectrum, 60x60 cm",
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Jonathan Wiklund",
+    "email": "jonathan.wiklund@gmail.com",
+    "github": "MaZZly"
+  }
 }

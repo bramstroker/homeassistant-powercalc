@@ -4,17 +4,22 @@
   ],
   "author": "roschi02 <roschoschi@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2022-09-06T08:26:19",
+  "created_at": "2022-09-06T08:26:19Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
-  "measure_device": "Zhurui PR10-D",
+  "measure_device": "Zhurui PR10",
   "measure_method": "manual",
-  "name": "HS110",
+  "name": "Kasa Wi-Fi Smart Plug with Energy Monitoring",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 1.54,
-  "standby_power_on": 2.19
+  "standby_power_on": 2.19,
+  "author_info": {
+    "name": "roschi02",
+    "email": "roschoschi@gmail.com",
+    "github": "roschi02"
+  }
 }

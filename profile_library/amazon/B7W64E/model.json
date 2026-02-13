@@ -7,7 +7,7 @@
   "author": "wranglatang <30660751+wranglatang@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
-  "created_at": "2023-03-10T17:16:45",
+  "created_at": "2023-03-10T17:16:45Z",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -32,6 +32,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Amazon Alexa Echo Dot Gen 4",
-  "standby_power": 0.9
+  "name": "Echo Dot (Gen4)",
+  "standby_power": 0.9,
+  "author_info": {
+    "name": "wranglatang",
+    "github": "wranglatang"
+  }
 }

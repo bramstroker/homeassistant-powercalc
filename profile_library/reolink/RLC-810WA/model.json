@@ -1,7 +1,7 @@
 {
   "author": "Robert M. Albrecht <powercalc@romal.org>",
   "calculation_strategy": "fixed",
-  "created_at": "2025-12-14T12:15:00",
+  "created_at": "2025-12-14T12:15:00Z",
   "device_type": "camera",
   "fixed_config": {
     "power": 8
@@ -9,5 +9,10 @@
   "measure_description": "Manually measured",
   "measure_device": "Nous A1T",
   "measure_method": "manual",
-  "name": "4K Wi-Fi 6 Surveillance Camera"
+  "name": "4K Wi-Fi 6 Surveillance Camera",
+  "author_info": {
+    "name": "Robert M. Albrecht",
+    "email": "powercalc@romal.org",
+    "github": "rmalbrecht"
+  }
 }

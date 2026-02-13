@@ -1,13 +1,18 @@
 {
   "author": "Thiago Oliveira <infratl@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2025-01-20T10:00:00",
+  "created_at": "2025-01-20T10:00:00Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured.",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",
-  "name": "TP-Link Kasa Smart WiFi Plug Mini",
+  "name": "Kasa Smart WiFi Plug Mini",
   "only_self_usage": false,
   "standby_power": 0.58,
-  "standby_power_on": 1.09
+  "standby_power_on": 1.09,
+  "author_info": {
+    "name": "Thiago Oliveira",
+    "email": "infratl@gmail.com",
+    "github": "chilicheech"
+  }
 }

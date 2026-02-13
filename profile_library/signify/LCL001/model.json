@@ -6,7 +6,7 @@
   ],
   "author": "KrzysztofHajdamowicz <uosiumen@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-03-29T12:17:41",
+  "created_at": "2022-03-29T12:17:41Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -16,6 +16,11 @@
     "SLEEP_TIME": 5,
     "VERSION": "v0.18.4:docker"
   },
-  "name": "Hue white and color ambiance LightStrip plus",
-  "standby_power": 0.4
+  "name": "Hue White and Color Ambiance LightStrip plus",
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "KrzysztofHajdamowicz",
+    "email": "uosiu@uosiu.info",
+    "github": "KrzysztofHajdamowicz"
+  }
 }

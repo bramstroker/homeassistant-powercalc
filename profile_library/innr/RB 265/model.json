@@ -1,7 +1,7 @@
 {
   "author": "flipsa <n00dl3s@gmx.net>",
   "calculation_strategy": "lut",
-  "created_at": "2023-02-21T20:39:54",
+  "created_at": "2023-02-21T20:39:54Z",
   "device_type": "light",
   "measure_description": "Measured 2 bulbs simultaneously with utils/measure script",
   "measure_device": "Nous A1T",
@@ -11,6 +11,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.6:docker"
   },
-  "name": "RB 265-2 Smart Bulb White E27 (2700K)",
-  "standby_power": 0.5
+  "name": "Smart Bulb White E27 (2700K)",
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "flipsa",
+    "email": "n00dl3s@gmx.net",
+    "github": "flipsa"
+  }
 }

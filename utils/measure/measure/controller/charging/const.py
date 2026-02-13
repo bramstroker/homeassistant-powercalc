@@ -1,17 +1,17 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class ChargingControllerType(str, Enum):
+class ChargingControllerType(StrEnum):
     DUMMY = "dummy"
     HASS = "hass"
 
 
-class ChargingDeviceType(str, Enum):
+class ChargingDeviceType(StrEnum):
     VACUUM_ROBOT = "vacuum_robot"
     LAWN_MOWER_ROBOT = "lawn_mower_robot"
 
 
-class BatteryLevelSourceType(str, Enum):
+class BatteryLevelSourceType(StrEnum):
     ATTRIBUTE = "attribute"
     ENTITY = "entity"
 

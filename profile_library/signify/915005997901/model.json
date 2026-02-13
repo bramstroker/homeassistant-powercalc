@@ -4,7 +4,7 @@
   ],
   "author": "Thorsten1982 <ThorstenNiemann.TN@googlemail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2025-12-11T09:34:01.728982",
+  "created_at": "2025-12-11T09:34:01Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Gen4",
@@ -15,5 +15,10 @@
     "VERSION": "v1.19.2:docker"
   },
   "name": "Hue Xamento",
-  "standby_power": 0.05
+  "standby_power": 0.05,
+  "author_info": {
+    "name": "Thorsten1982",
+    "email": "ThorstenNiemann.TN@googlemail.com",
+    "github": "Thorsten1982"
+  }
 }

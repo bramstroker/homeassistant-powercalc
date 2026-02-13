@@ -4,12 +4,17 @@
   ],
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-05-29T15:18:24",
+  "created_at": "2022-05-29T15:18:24Z",
   "device_type": "light",
   "linked_profile": "signify/LWA001",
   "measure_description": "Used script utils/measure_shelly.py from repository, estimated standby",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
   "name": "Hue White A19 E26 Bluetooth",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

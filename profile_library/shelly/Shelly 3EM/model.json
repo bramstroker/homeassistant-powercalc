@@ -4,18 +4,23 @@
   ],
   "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-12-01T18:27:00",
+  "created_at": "2024-12-01T18:27:00Z",
   "device_type": "smart_switch",
   "discovery_by": "entity",
   "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=RlSCe9xaUPE",
   "measure_device": "GW Instek GPM-8310",
   "measure_method": "manual",
-  "name": "Shelly 3EM",
+  "name": "3EM",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 1.22,
-  "standby_power_on": 1.22
+  "standby_power_on": 1.22,
+  "author_info": {
+    "name": "RubenKelevra",
+    "email": "cyrond@gmail.com",
+    "github": "RubenKelevra"
+  }
 }

@@ -1,0 +1,7 @@
+{
+  "name": "Add-On + WLAN + ECO-mode + Wifi-AP",
+  "standby_power": 1.2705,
+  "multi_switch_config": {
+    "power": 0.272
+  }
+}

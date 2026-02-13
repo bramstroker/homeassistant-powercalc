@@ -101,14 +101,14 @@
       },
       "global_configuration": {
         "title": "Configuração global",
-        "description": "Configuração global do Powercalc. Para obter mais informações, consulte o [documentation](https://docs.powercalc. l/configuration/global-configuration/). Opções adicionais para sensores de energia e medidores de utilidade podem ser fornecidas nos próximos passos.",
+        "description": "Configuração global do Powercalc. Para obter mais informações, consulte o [documentation]({docs_uri}). Opções adicionais para sensores de energia e medidores de utilidade podem ser fornecidas nos próximos passos.",
         "data": {
           "create_energy_sensors": "Criar sensor de consumo",
           "create_standby_group": "Create standby group",
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar download da biblioteca remota",
-          "enable_analytics": "Enable anonymous analytics",
+          "enable_analytics": "Ativar estatísticas anônimas",
           "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
           "power_sensor_category": "Categoria do sensor de energia",
@@ -121,7 +121,7 @@
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados da energia, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+          "enable_analytics": "Permitir que o Powercalc envie estatísticas de uso anônimas e agregadas para ajudar a melhorar a integração",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
         }
@@ -152,16 +152,18 @@
       },
       "global_configuration_throttling": {
         "title": "Opções de limitação",
-        "description": "Defina intervalos de atualização para os diferentes tipos de sensores. Veja [documentação](https://docs.powercalc.nl/configuration/update-frequency/) para mais informações",
+        "description": "Defina intervalos de atualização para os diferentes tipos de sensores. Veja [documentação]({docs_uri}) para mais informações",
         "data": {
           "group_energy_update_interval": "Intervalo de atualização de energia do grupo",
           "group_power_update_interval": "Intervalo de atualização de potência do grupo",
-          "energy_update_interval": "Intervalo de atualização de energia"
+          "energy_update_interval": "Intervalo de atualização de energia",
+          "power_update_interval": "Power update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Intervalo em que os sensores de energia do grupo são atualizados. Em segundos. Defina como 0 para desativar",
           "group_power_update_interval": "Intervalo em que os sensores de potência do grupo são atualizados. Em segundos. Defina como 0 para desativar",
-          "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar"
+          "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar",
+          "power_update_interval": "Interval at which energy sensors are force updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
@@ -175,7 +177,7 @@
       "group_custom": {
         "data": {
           "area": "Área",
-          "floor": "Floor",
+          "floor": "Piso",
           "create_energy_sensor": "Criar sensor de consumo",
           "create_utility_meters": "Criar medidores de utilidade",
           "device": "Dispositivo",
@@ -192,7 +194,7 @@
         },
         "data_description": {
           "area": "Adiciona todos os sensores de potência da área especificada",
-          "floor": "Adds all power sensors from the specified floor",
+          "floor": "Adicionar todos os sensores de potência da área especificada",
           "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
           "device": "Adicionar o grupo de entidades powercalc a um dispositivo existente",
           "force_calculate_group_energy": "Por padrão powercalc soma os sensores de energia dos sensores membros. Ative esta opção para forçar a criação de um sensor de soma Riemann",
@@ -378,6 +380,13 @@
         "description": "Este modelo tem vários subperfis. Selecione um adequado ao seu dispositivo\n\n\"{entity_id}\"{remarks}",
         "title": "Configuração Subperfil"
       },
+      "sub_profile_per_device": {
+        "data": {
+          "sub_profile": "Sub profile"
+        },
+        "description": "This device has a model with multiple sub profiles. {remarks}",
+        "title": "Sub profile config"
+      },
       "smart_switch": {
         "data": {
           "power": "Potência",
@@ -443,7 +452,7 @@
           "power_factor": "Fator de potência",
           "voltage": "Voltagem"
         },
-        "description": "Certifique-se de habilitar o limitador de brilho no software WLED. Veja também https://docs.powercalc.nl/strategies/wled/",
+        "description": "Certifique-se de habilitar o limitador de brilho no software WLED. Veja também {docs_uri}",
         "title": "Configuração WLED"
       }
     }
@@ -538,10 +547,10 @@
         }
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Opções de energia",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
+          "energy_integration_method": "Método de integração",
+          "energy_sensor_unit_prefix": "Prefixo de unidade",
           "energy_filter_outlier_enabled": "Filter outliers",
           "energy_filter_outlier_max_step": "Outlier filter max step"
         },
@@ -569,11 +578,11 @@
         "title": "Opções básicas",
         "data": {
           "create_energy_sensors": "Criar sensor de consumo",
-          "create_standby_group": "Create standby group",
+          "create_standby_group": "Criar grupo de standby",
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar o download da biblioteca remota",
-          "enable_analytics": "Enable anonymous analytics",
+          "enable_analytics": "Habilitar Estatísticas de uso anônimas",
           "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
           "power_sensor_category": "Categoria do sensor de potência",
@@ -592,11 +601,11 @@
         }
       },
       "global_configuration_discovery": {
-        "title": "Discovery options",
-        "description": "Manage discovery setting. See [documentation](https://docs.powercalc.nl/library/discovery/) for more info",
+        "title": "Opções de descoberta",
+        "description": "Gerenciar a configuração da descoberta. Ver [documentation]({docs_uri}) para mais informações",
         "data": {
-          "enabled": "Enable discovery",
-          "exclude_device_types": "Excluded device types",
+          "enabled": "Habilitar descoberta",
+          "exclude_device_types": "Tipos de dispositivos excluídos",
           "exclude_self_usage": "Exclude self-usage"
         },
         "data_description": {
@@ -606,7 +615,7 @@
       },
       "global_configuration_energy": {
         "title": "Opções de energia",
-        "description": "Defina as configurações padrão para medidores de consumo aqui. Veja [documentação](https://docs.powercalc.nl/configuration/global-configuration/) para mais informações",
+        "description": "Defina as configurações padrão para medidores de consumo aqui. Veja [documentação]({docs_uri}) para mais informações",
         "data": {
           "energy_integration_method": "Método de integração de energia",
           "energy_sensor_category": "Categoria do sensor de energia",
@@ -617,22 +626,24 @@
         }
       },
       "global_configuration_throttling": {
-        "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation](https://docs.powercalc.nl/configuration/update-frequency/) for more info",
+        "title": "Opções de limitação",
+        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
         "data": {
           "group_energy_update_interval": "Group energy update interval",
           "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval"
+          "energy_update_interval": "Intervalo de atualização de energia",
+          "power_update_interval": "Power update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
-          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable"
+          "group_power_update_interval": "Intervalo em que os sensores de potência do grupo são atualizados. Em segundos. Defina como 0 para desativar",
+          "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar",
+          "power_update_interval": "Interval at which power sensors are force updated. In seconds. Set to 0 to disable"
         }
       },
       "global_configuration_utility_meter": {
         "title": "Opções do medidor de utilidade",
-        "description": "Defina as configurações padrão para medidores de utilidade aqui. Veja [documentation](https://docs.powercalc.nl/configuration/global-configuration/) para mais informações",
+        "description": "Defina as configurações padrão para medidores de utilidade aqui. Veja [documentation]({docs_uri}) para mais informações",
         "data": {
           "utility_meter_net_consumption": "Consumo líquido do medidor de utilidade",
           "utility_meter_tariffs": "Tarifas do medidor de utilidade",
@@ -643,7 +654,7 @@
         "title": "Opções do grupo",
         "data": {
           "area": "Área",
-          "floor": "Floor",
+          "floor": "Piso",
           "device": "Dispositivo",
           "force_calculate_group_energy": "Forçar cálculo da energia",
           "group_energy_entities": "Entidades de energia adicionais",
@@ -656,7 +667,7 @@
         },
         "data_description": {
           "area": "Adicionar todos os sensores de potência da área especificada",
-          "floor": "Adds all power sensors from the specified floor",
+          "floor": "Adiciona todos os sensores de potência da área especificada",
           "device": "Adicionar o grupo de entidades powercalc a um dispositivo existente",
           "force_calculate_group_energy": "Por padrão powercalc soma os sensores de energia dos sensores membros. Ative esta opção para forçar a criação de um sensor de soma Riemann",
           "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
@@ -705,7 +716,7 @@
           "advanced_options": "Opções avançadas",
           "basic_options": "Opções básicas",
           "daily_energy": "Opções de consumo diário",
-          "energy_options": "Energy options",
+          "energy_options": "Opções de energia",
           "fixed": "Opções de Fixo",
           "group_custom": "Opções de grupo",
           "group_subtract": "Opções de grupo",

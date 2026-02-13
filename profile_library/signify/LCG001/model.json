@@ -4,7 +4,7 @@
   ],
   "author": "Emory Penney <treadstoneit@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-01-08T20:35:25",
+  "created_at": "2024-01-08T20:35:25Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",
@@ -15,5 +15,10 @@
     "VERSION": "v1.9.15:docker"
   },
   "name": "Hue White and Color Ambiance GU10 w/BT",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Emory Penney",
+    "email": "emory.j.penney@intel.com",
+    "github": "ejpenney"
+  }
 }

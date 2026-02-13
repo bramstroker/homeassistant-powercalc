@@ -1,7 +1,7 @@
 {
   "author": "CV",
   "calculation_strategy": "fixed",
-  "created_at": "2024-09-06T18:37:40",
+  "created_at": "2024-09-06T18:37:40Z",
   "description": "HomematicIP DIN rail mount smart switch with power measurement integrated for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device.",
   "device_type": "smart_switch",
   "measure_description": "Manually measured with dummy load attached at 7.7W (average over 300s) multiple times, than calculated average of that.",
@@ -17,5 +17,9 @@
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.37,
-  "standby_power_on": 0.73
+  "standby_power_on": 0.73,
+  "author_info": {
+    "name": "CV",
+    "github": "dagobert"
+  }
 }

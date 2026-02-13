@@ -4,12 +4,16 @@
   ],
   "author": "barndawgie <jbarnard@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2025-07-15T04:34:00",
+  "created_at": "2025-07-15T04:34:00Z",
   "device_type": "smart_switch",
   "discovery_by": "entity",
   "linked_profile": "shelly/shelly plus plug s",
   "measure_description": "Measured with an Aeotec ZWA023 and seems to align with (more precise) measurements from Shelly Plus Plug S.",
   "measure_device": "Aeotec ZWA023",
   "measure_method": "script",
-  "name": "Shelly Plus Plug US"
+  "name": "Plus Plug US",
+  "author_info": {
+    "name": "Josh Barnard",
+    "github": "barndawgie"
+  }
 }

@@ -1,0 +1,25 @@
+{
+  "aliases": [
+    "KAJPLATS E27 WS G95 clear 806lm",
+    "36873"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-01-18T11:46:54Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.2:docker"
+  },
+  "name": "KAJPLATS E27 WS G95 clear 806lm",
+  "standby_power": 0.23,
+  "author": "Linus Nordin <linus.nordin@gmail.com>",
+  "author_info": {
+    "name": "Linus Nordin",
+    "email": "linus.nordin@gmail.com",
+    "github": "gribber"
+  }
+}

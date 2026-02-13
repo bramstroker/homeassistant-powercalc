@@ -4,17 +4,21 @@
   ],
   "author": "dxmnkd316 <46753733+dxmnkd316@users.noreply.github.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2025-01-19T12:28:06",
+  "created_at": "2025-01-19T12:28:06Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured",
   "measure_device": "Eve Energy Matter 20EBU4101",
   "measure_method": "manual",
-  "name": "TP-Link Kasa KP125M",
+  "name": "Kasa Smart Wi-Fi Plug Slim with Energy Monitoring",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.475,
-  "standby_power_on": 0.92
+  "standby_power_on": 0.92,
+  "author_info": {
+    "name": "dxmnkd316",
+    "github": "dxmnkd316"
+  }
 }

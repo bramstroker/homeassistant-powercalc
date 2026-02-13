@@ -4,17 +4,22 @@
   ],
   "author": "roschi02 <roschoschi@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2022-09-06T08:26:19",
+  "created_at": "2022-09-06T08:26:19Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured.",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "manual",
-  "name": "HS100",
+  "name": "Kasa Wi-Fi Smart Plug",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.89,
-  "standby_power_on": 1.461
+  "standby_power_on": 1.461,
+  "author_info": {
+    "name": "roschi02",
+    "email": "roschoschi@gmail.com",
+    "github": "roschi02"
+  }
 }

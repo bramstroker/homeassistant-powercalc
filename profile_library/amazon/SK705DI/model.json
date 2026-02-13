@@ -7,7 +7,7 @@
   "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
-  "created_at": "2024-07-03T17:22:35.339969",
+  "created_at": "2024-07-03T17:22:35Z",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -32,6 +32,10 @@
     "SLEEP_TIME": 2,
     "VERSION": "v1.12.6:docker"
   },
-  "name": "Amazon Echo (1st Generation)",
-  "standby_power": 3.06
+  "name": "Echo (Gen1)",
+  "standby_power": 3.06,
+  "author_info": {
+    "name": "Stuart Pearson",
+    "github": "stuartp44"
+  }
 }

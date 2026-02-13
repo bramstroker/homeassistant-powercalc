@@ -37,6 +37,7 @@ class Step(StrEnum):
     MENU_GROUP = "menu_group"
     MODEL = "model"
     SUB_PROFILE = "sub_profile"
+    SUB_PROFILE_PER_DEVICE = "sub_profile_per_device"
     USER = "user"
     SMART_SWITCH = "smart_switch"
     INIT = "init"

@@ -1,17 +1,21 @@
 {
   "author": "Keatre",
   "calculation_strategy": "fixed",
-  "created_at": "2025-04-14T10:00:00",
+  "created_at": "2025-04-14T10:00:00Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured.",
   "measure_device": "Intertek PM01-US",
   "measure_method": "manual",
-  "name": "Hue Smart Plug LOM010",
+  "name": "Hue Smart Plug",
   "only_self_usage": false,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.2,
-  "standby_power_on": 0.5
+  "standby_power_on": 0.5,
+  "author_info": {
+    "name": "keatre",
+    "github": "keatre"
+  }
 }

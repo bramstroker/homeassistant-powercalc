@@ -4,7 +4,7 @@
   ],
   "author": "Nicolas L <11842340+Loustik@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-08-20T07:30:32",
+  "created_at": "2023-08-20T07:30:32Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
@@ -15,5 +15,9 @@
     "VERSION": "master"
   },
   "name": "Hue Aurelle Round Panel Light",
-  "standby_power": 0.47
+  "standby_power": 0.47,
+  "author_info": {
+    "name": "Nicolas L",
+    "github": "Loustik"
+  }
 }

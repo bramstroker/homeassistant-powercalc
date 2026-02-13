@@ -1,7 +1,7 @@
 {
   "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-06-26T09:59:41",
+  "created_at": "2022-06-26T09:59:41Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Gosund SP111",
@@ -13,5 +13,9 @@
     "VERSION": "v0.22.0:docker"
   },
   "name": "Livarno Lux E27 filament bulb",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Stefan Gries",
+    "github": "stefangries"
+  }
 }

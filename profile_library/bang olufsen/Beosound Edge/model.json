@@ -1,0 +1,40 @@
+{
+  "author": "sbrandsborg",
+  "aliases": [
+    "6661 S53"
+  ],
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-01-29T07:14:10Z",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "0 -> 2.4",
+      "10 -> 23.7",
+      "20 -> 23.8",
+      "30 -> 23.8",
+      "40 -> 23.8",
+      "50 -> 24.25",
+      "60 -> 26.62",
+      "70 -> 26.5",
+      "80 -> 26.4",
+      "90 -> 34.98",
+      "100 -> 36.6"
+    ]
+  },
+  "description": "Beosound Edge - Multiroom speaker",
+  "measure_description": "Measured with utils/measure script using manual streaming (Pink Noise) due to API limitations with automated playback.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 5,
+    "VERSION": "master"
+  },
+  "name": "Beosound Edge",
+  "standby_power": 2.4,
+  "author_info": {
+    "name": "Steffen Brandsborg",
+    "github": "sbrandsborg"
+  }
+}

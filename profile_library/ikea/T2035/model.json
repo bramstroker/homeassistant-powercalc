@@ -1,7 +1,7 @@
 {
   "author": "vyruz1986 <alex.goris@fastlikehell.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-03-04T11:53:20",
+  "created_at": "2023-03-04T11:53:20Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -12,5 +12,10 @@
     "VERSION": "v1.3.5:docker"
   },
   "name": "STOFTMOLN ceiling/wall lamp 24 warm light dimmable",
-  "standby_power": 0.25
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "vyruz1986",
+    "email": "alex.goris@fastlikehell.com",
+    "github": "vyruz1986"
+  }
 }

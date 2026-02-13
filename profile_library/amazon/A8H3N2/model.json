@@ -7,7 +7,7 @@
   "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
-  "created_at": "2024-07-05T16:34:44.695639",
+  "created_at": "2024-07-05T16:34:44Z",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -27,6 +27,10 @@
   "measure_description": "Measured by playing pink noise and increasing volume in 10% steps.",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "manual",
-  "name": "Amazon Echo Show 8 (2nd Generation)",
-  "standby_power": 4.28
+  "name": "Echo Show 8 (Gen2)",
+  "standby_power": 4.28,
+  "author_info": {
+    "name": "Stuart Pearson",
+    "github": "stuartp44"
+  }
 }

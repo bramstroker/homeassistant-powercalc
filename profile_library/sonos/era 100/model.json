@@ -2,7 +2,7 @@
   "author": "Sam Dunne <sam@sam-dunne.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
-  "created_at": "2024-06-07T12:44:29.233247",
+  "created_at": "2024-06-07T12:44:29Z",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -27,6 +27,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.12.7:docker"
   },
-  "name": "Sonos Era 100",
-  "standby_power": 2.0
+  "name": "Era 100",
+  "standby_power": 2.0,
+  "author_info": {
+    "name": "Sam Dunne",
+    "email": "sam@sam-dunne.com",
+    "github": "samdunne"
+  }
 }

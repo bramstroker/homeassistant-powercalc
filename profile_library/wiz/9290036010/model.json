@@ -1,7 +1,7 @@
 {
   "author": "htlemos <150178195+htlemos@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-01-07T13:57:39",
+  "created_at": "2024-01-07T13:57:39Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Meross mss315",
@@ -11,6 +11,10 @@
     "SLEEP_TIME": 4,
     "VERSION": "v1.9.14:docker"
   },
-  "name": "WIZ AMZ WFB60W A60 E27 822-65 RGB",
-  "standby_power": 0.11
+  "name": "Smart Wi-Fi Full-Color RGB + Tunable White LED Light Bulb (A60, E27)",
+  "standby_power": 0.11,
+  "author_info": {
+    "name": "htlemos",
+    "github": "htlemos"
+  }
 }

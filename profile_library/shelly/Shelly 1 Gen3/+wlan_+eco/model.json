@@ -1,0 +1,5 @@
+{
+  "name": "WLAN + ECO-mode",
+  "standby_power": 0.3045,
+  "standby_power_on": 0.5845
+}

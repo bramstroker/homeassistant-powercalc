@@ -1,7 +1,7 @@
 {
   "author": "Mr. Bubbles <manni@zapto.de>",
   "calculation_strategy": "lut",
-  "created_at": "2024-01-13T09:03:27",
+  "created_at": "2024-01-13T09:03:27Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1T",
@@ -12,6 +12,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.5:docker"
   },
-  "name": "NYMANE PENDANT",
-  "standby_power": 0.29
+  "name": "NYMANE pendant lamp",
+  "standby_power": 0.29,
+  "author_info": {
+    "name": "Mr. Bubbles",
+    "email": "manni@zapto.de",
+    "github": "tr4nt0r"
+  }
 }

@@ -1,28 +1,37 @@
 {
+  "name": "Plus 2PM",
   "aliases": [
-    "SNSW-102P16EU"
+    "SNSW-102P16EU",
+    "Shelly Plus2PM",
+    "Plus 2PM UL",
+    "SNSW-002P15UL"
   ],
   "author": "Michal Bartak <maxym.srpl@gmail.com>",
   "calculation_strategy": "multi_switch",
-  "created_at": "2024-01-09T23:38:00 CET",
+  "created_at": "2025-01-12T21:46:00Z",
   "device_type": "smart_switch",
   "discovery_by": "device",
-  "measure_description": "The measured device fw: 1.4.4, Eco Mode enabled, Wifi Client enabled, WiFi AP disabled, BlueTooth disabled. The result represents the average value of measurements collected from the measurement device API for the following scenarios: dumb device/baseline consumption (~4.9W), all relays turned off, one relay turned on",
+  "measure_description": "The measured device fw: 1.7.1. The result represents the average value of measurements collected from the measuring device API for the following scenarios: dumb device/baseline consumption (~3.8W) and several device configurations. See sub-profiles.",
+  "config_flow_sub_profile_remarks": "Select a profile depending on your Shelly device configuration.",
   "measure_device": "Shelly PM Mini Gen3",
-  "measure_device_firmware": "20241011-114503/1.4.4-g6d2a586",
+  "measure_device_firmware": "20250924-062710/1.7.1-gd336f31",
   "measure_method": "manual",
   "measure_settings": {
     "SAMPLE_COUNT": 200,
     "SLEEP_TIME": 0.5
   },
-  "multi_switch_config": {
-    "power": 0.356
-  },
-  "name": "Shelly Plus 2PM",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
-  "standby_power": 0.326
+  "standby_power": 0.822,
+  "multi_switch_config": {
+    "power": 0.145
+  },
+  "author_info": {
+    "name": "Michal Bartak",
+    "email": "michal.bartak@betsys.com",
+    "github": "michalk-k"
+  }
 }

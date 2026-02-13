@@ -1,7 +1,7 @@
 {
   "author": "Jurjen <96632856+Coornh@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2025-10-10T11:44:21.764105",
+  "created_at": "2025-10-10T11:44:21Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen3",
@@ -12,5 +12,9 @@
     "VERSION": "v1.17.22:docker"
   },
   "name": "Filament LED light bulb E27 G95 7W",
-  "standby_power": 0.36
+  "standby_power": 0.36,
+  "author_info": {
+    "name": "Jurjen",
+    "github": "Coornh"
+  }
 }

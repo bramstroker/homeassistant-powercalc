@@ -2,7 +2,7 @@
   "author": "Alexandre Bertrand <alexandrebertrand96@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
   "calculation_strategy": "composite",
-  "created_at": "2025-12-24T11:25:00.849390",
+  "created_at": "2025-12-24T11:25:00Z",
   "device_type": "vacuum_robot",
   "composite_config": [
     {
@@ -126,5 +126,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.5:docker"
   },
-  "name": "Xiaomi Mi Robot Vacuum V1"
+  "name": "Xiaomi Mi Robot Vacuum V1",
+  "author_info": {
+    "name": "Alexandre Bertrand",
+    "email": "alexandre.bertrand@invirtus.io",
+    "github": "trandbert37"
+  }
 }

@@ -9,12 +9,15 @@ import hashlib
 import json
 import os
 import sys
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Mapping
 
 import aiofiles
 import git
+import httpx
+import math
 
 sys.path.insert(
     1,
@@ -25,6 +28,14 @@ sys.path.insert(
 
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
 DATA_DIR = f"{PROJECT_ROOT}/profile_library"
+REPO_OWNER = "bramstroker"
+REPO_NAME = "homeassistant-powercalc"
+
+@dataclass
+class Author:
+    name: str
+    email: str | None
+    github_username: str
 
 def create_model_hash(mapping: Mapping) -> str:
     return hashlib.md5(json.dumps(mapping, sort_keys=True).encode()).hexdigest()
@@ -95,7 +106,7 @@ async def generate_library_json(model_listing: list[dict]) -> None:
 async def update_authors(model_listing: list[dict]) -> None:
     tasks = []
     for model in model_listing:
-        author = model.get("author")
+        author = model.get("author_info")
         model_json_path = model.get("full_path")
         if author:
             continue
@@ -222,7 +233,7 @@ async def process_model_file(json_path: str) -> dict:
             {
                 "manufacturer": os.path.basename(os.path.dirname(model_directory)),
                 "directory": model_directory,
-                "updated_at": updated_at.isoformat(),
+                "updated_at": updated_at.isoformat(timespec="seconds").replace("+00:00", "Z"),
                 "full_path": json_path,
                 "max_power": max_power,
                 "sub_profile_count": sub_profile_count,
@@ -287,6 +298,7 @@ async def get_max_power(model_directory: str, model_data: dict) -> float | None:
         ]
         states_power = fixed_config.get("states_power", {})
         power_values.extend(states_power.values())
+        power_values = filter(lambda p: is_number(p), power_values)
 
         return max(power_values) if power_values else 0
 
@@ -359,14 +371,37 @@ async def get_commits_affected_directory(directory: str) -> list:
     return commits.splitlines()
 
 
-async def get_commit_author(commit_hash: str) -> str:
+async def get_commit_author(commit_hash: str) -> Author | None:
     """Get the author of a given commit."""
-    command = f"git show -s --format='%an <%ae>' {commit_hash}"
-    author = await run_git_command(command)
-    return author
+    headers = {}
+    github_token = os.environ.get("GITHUB_TOKEN")
+    if github_token:
+        headers["Authorization"] = f"Bearer {github_token}"
 
+    async with httpx.AsyncClient() as client:
+        r = await client.get(
+            f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/commits/{commit_hash}",
+            headers=headers,
+        )
+        r.raise_for_status()
+        data = r.json()
 
-async def find_first_commit_author(file: str, check_paths: bool = True) -> str | None:
+    if not "commit" in data and not "author" in data:
+        return None
+
+    commit = data.get("commit")
+    author = data.get("author")
+
+    email = commit["author"]["email"]
+    if email.endswith("@users.noreply.github.com"):
+        email = None
+    return Author(
+        name=commit["author"]["name"].replace("@", ""),
+        email=email,
+        github_username=author["login"] if author else None,
+    )
+
+async def find_first_commit_author(file: str, check_paths: bool = True) -> Author | None:
     """Find the first commit that affected the directory and return the author's name."""
     commits = await get_commits_affected_directory(file)
     for commit in reversed(commits):  # Process commits from the oldest to newest
@@ -391,14 +426,21 @@ async def read_author_from_file(file_path: str) -> str | None:
     return json_data.get("author")
 
 
-async def write_author_to_file(file_path: str, author: str) -> None:
+async def write_author_to_file(file_path: str, author: Author) -> None:
     """Write the author to the model.json file."""
     # Read the existing content
     async with aiofiles.open(file_path, mode='r') as file:
         content = await file.read()
         json_data = json.loads(content)
 
-    json_data["author"] = author
+    author_json = {
+        "name": author.name,
+        "github": author.github_username,
+    }
+    if author.email:
+        author_json["email"] = author.email
+    json_data["author_info"] = author_json
+    json_data["author"] = author.name # For backward compatibility, will be removed later
 
     async with aiofiles.open(file_path, mode='w') as file:
         await file.write(json.dumps(json_data, indent=2))
@@ -440,6 +482,16 @@ async def main_async():
 
     total_time = (datetime.now() - start_time).total_seconds()
     print(f"All operations completed in {total_time:.2f} seconds")
+
+def is_number(value):
+    """Try to convert value to a float."""
+    try:
+        fvalue = float(value)
+    except (ValueError, TypeError):
+        return False
+    if not math.isfinite(fvalue):
+        return False
+    return True
 
 def main():
     """Entry point that runs the async main function"""

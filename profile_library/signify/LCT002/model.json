@@ -1,7 +1,7 @@
 {
   "author": "Ben Brooks <47788519+brooksben11@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-04-01T15:31:41",
+  "created_at": "2023-04-01T15:31:41Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff S31",
@@ -11,6 +11,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.13:docker"
   },
-  "name": "Hue White and Color BR30 (1st Gen)",
-  "standby_power": 0.12
+  "name": "Hue White and Color Ambiance BR30 (1st Gen)",
+  "standby_power": 0.12,
+  "author_info": {
+    "name": "Ben Brooks",
+    "github": "brooksben11"
+  }
 }

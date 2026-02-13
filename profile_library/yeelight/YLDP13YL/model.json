@@ -1,7 +1,7 @@
 {
   "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2021-11-14T19:30:25",
+  "created_at": "2021-11-14T19:30:25Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug",
@@ -11,6 +11,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.20.3:docker"
   },
-  "name": "Yeelight LED Bulb 1S",
-  "standby_power": 1.22
+  "name": "LED Bulb 1S",
+  "standby_power": 1.22,
+  "author_info": {
+    "name": "RubenKelevra",
+    "email": "cyrond@gmail.com",
+    "github": "RubenKelevra"
+  }
 }

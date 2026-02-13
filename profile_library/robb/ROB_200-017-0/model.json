@@ -1,17 +1,22 @@
 {
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-05-07T20:30:00",
+  "created_at": "2024-05-07T20:30:00Z",
   "device_type": "smart_switch",
   "measure_description": "Manually measured average of 2 plugs",
   "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",
-  "name": "ROBB Zigbee Smart Plug",
+  "name": "Zigbee Smart Plug",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
   "standby_power": 0.2,
-  "standby_power_on": 0.65
+  "standby_power_on": 0.65,
+  "author_info": {
+    "name": "Tim van Werkhoven",
+    "email": "tim+github.com@vanwerkhoven.org",
+    "github": "tvwerkhoven"
+  }
 }

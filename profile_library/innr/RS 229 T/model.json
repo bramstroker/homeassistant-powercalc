@@ -1,7 +1,7 @@
 {
   "author": "Kevin Lemonnier <873423+Ulrar@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-06-08T18:15:31",
+  "created_at": "2023-06-08T18:15:31Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
@@ -11,6 +11,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "RS 229 T",
-  "standby_power": 0.53
+  "name": "Tunable White Spot Single Lens GU10 Bulb",
+  "standby_power": 0.53,
+  "author_info": {
+    "name": "Kevin Lemonnier",
+    "github": "Ulrar"
+  }
 }

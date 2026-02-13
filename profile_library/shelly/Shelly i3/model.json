@@ -4,7 +4,7 @@
   ],
   "author": "Michal Bartak <maxym.srpl@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-01-09T22:55:00 CET",
+  "created_at": "2026-01-09T22:55:00Z",
   "device_type": "generic_iot",
   "discovery_by": "device",
   "measure_description": "The measured device fw: 1.14.1-rc1, Eco Mode enabled, Wifi Client enabled, LED disabled. The result represents the average value of measurements collected from the measurement device API for the following scenarios: dumb device/baseline consumption (~4.9W) and the measured device",
@@ -15,11 +15,16 @@
     "SAMPLE_COUNT": 200,
     "SLEEP_TIME": 0.5
   },
-  "name": "Shelly i3",
+  "name": "i3",
   "only_self_usage": true,
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
-  "standby_power": 0.587
+  "standby_power": 0.587,
+  "author_info": {
+    "name": "Michal Bartak",
+    "email": "michal.bartak@betsys.com",
+    "github": "michalk-k"
+  }
 }

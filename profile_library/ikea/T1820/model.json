@@ -4,7 +4,7 @@
   ],
   "author": "marthubner <86839034+marthubner@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2021-12-29T19:34:57",
+  "created_at": "2021-12-29T19:34:57Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
@@ -14,6 +14,10 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.13.4"
   },
-  "name": "LEPTITER Recessed spot light",
-  "standby_power": 0.3
+  "name": "LEPTITER recessed spot light",
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "marthubner",
+    "github": "marthubner"
+  }
 }

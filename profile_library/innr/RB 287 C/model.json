@@ -1,7 +1,7 @@
 {
   "author": "Felix <felixsp@posteo.de>",
   "calculation_strategy": "lut",
-  "created_at": "2025-12-03T15:24:51.201477",
+  "created_at": "2025-12-03T15:24:51Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -12,5 +12,10 @@
     "VERSION": "v1.19.1:docker"
   },
   "name": "Smart Bulb Colour E27 1200lm",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author_info": {
+    "name": "Felix",
+    "email": "felixsp@posteo.de",
+    "github": "felixsp"
+  }
 }

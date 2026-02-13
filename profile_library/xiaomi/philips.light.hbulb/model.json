@@ -1,7 +1,7 @@
 {
   "author": "Andrzej Dopierała <andrzej.dopierala@currency-one.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-12-08T13:31:31.689330",
+  "created_at": "2024-12-08T13:31:31Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
@@ -12,5 +12,10 @@
     "VERSION": "v1.16.2:docker"
   },
   "name": "Philips Smart LED Bulb",
-  "standby_power": 0.9
+  "standby_power": 0.9,
+  "author_info": {
+    "name": "Andrzej Dopierała",
+    "email": "andrzej.dopierala@currency-one.com",
+    "github": "theundefined"
+  }
 }

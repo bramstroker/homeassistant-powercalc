@@ -30,6 +30,8 @@ jobs:
       - name: Pull again
         run: git pull || true
       - name: Update library.json, authors and translations
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 ${{ github.workspace }}/.github/scripts/profile_library/update-library.py
       - uses: EndBug/add-and-commit@v9
@@ -37,19 +39,19 @@ jobs:
         with:
           add: 'profile_library'
           message: 'Update profile library'
-      - name: Wait 10 seconds
-        run: sleep 10
-      - name: Purge powercalc API memory cache
-        env:
-          API_KEY: ${{ secrets.POWERCALC_API_KEY }}
-        run: |
-          curl -X GET "https://api.powercalc.nl/cache/flush" -H "Authorization: Bearer $API_KEY"
-      - name: Wait 10 seconds
-        run: sleep 10
+      - name: Wait 5 seconds
+        run: sleep 5
       - name: Purge cloudflare cache
-        uses: jakejarvis/cloudflare-purge-action@master
         env:
           CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
-          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
-          CLOUDFLARE_KEY: ${{ secrets.CLOUDFLARE_KEY }}
-          PURGE_URLS: '["https://api.powercalc.nl/library"]'
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          curl --request POST \
+            --url https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE}/purge_cache \
+            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            --header 'Content-Type: application/json' \
+            --data '{
+          	"files": [
+          		"https://api.powercalc.nl/library"
+          	]
+          }'

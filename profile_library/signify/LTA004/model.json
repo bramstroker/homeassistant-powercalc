@@ -5,7 +5,7 @@
   ],
   "author": "Steffan <SteffanH@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-01-27T08:48:45",
+  "created_at": "2022-01-27T08:48:45Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Fibaro FGWP102",
@@ -15,6 +15,10 @@
     "SLEEP_TIME": 5,
     "VERSION": "v0.16.0:docker"
   },
-  "name": "Philips Hue White Ambiance 800 E27 Bluetooth",
-  "standby_power": 0.3
+  "name": "Hue White Ambiance 800 E27 Bluetooth",
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Steffan",
+    "github": "SteffanH"
+  }
 }

@@ -1,0 +1,21 @@
+{
+  "author": "Udo Haß <udo.hass@proton.me>",
+  "calculation_strategy": "lut",
+  "created_at": "2025-12-29T22:45:08Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.0:docker"
+  },
+  "name": "Floor Lamp 2",
+  "standby_power": 0.7,
+  "author_info": {
+    "name": "Udo Haß",
+    "email": "udo.hass@proton.me",
+    "github": "gobbli"
+  }
+}

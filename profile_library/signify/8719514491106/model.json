@@ -1,7 +1,7 @@
 {
   "author": "Macstar1601 <97288314+Macstar1601@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2025-11-25T11:51:58.560580",
+  "created_at": "2025-11-25T11:51:58Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
@@ -11,6 +11,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.2:docker"
   },
-  "name": "Philips Hue White Ambiance E14 Luster/Tropfenform LTU001",
-  "standby_power": 0.2
+  "name": "Hue White Ambiance E14 Luster/Tropfenform",
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Macstar1601",
+    "github": "Macstar1601"
+  }
 }

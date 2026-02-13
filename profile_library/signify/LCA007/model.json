@@ -4,7 +4,7 @@
   ],
   "author": "Thomas-Henning von Kamptz <51594212+tomsoftcom@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-05-29T15:18:24",
+  "created_at": "2022-05-29T15:18:24Z",
   "device_type": "light",
   "linked_profile": "signify/LCA006",
   "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",
@@ -12,5 +12,9 @@
   "measure_device_firmware": "TASMOTA 9.5.0",
   "measure_method": "script",
   "name": "Hue White and Color Ambiance A19 E26 1100lm",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Thomas-Henning von Kamptz",
+    "github": "tomsoftcom"
+  }
 }

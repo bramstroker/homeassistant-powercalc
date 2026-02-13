@@ -1,0 +1,22 @@
+{
+  "author": "Thorsten Niemann <ThorstenNiemann.TN@gmail.com>",
+  "calculation_strategy": "fixed",
+  "created_at": "2026-02-12T15:06:00Z",
+  "device_type": "generic_iot",
+  "discovery_by": "device",
+  "fixed_config": {
+    "power": 1.7
+  },
+  "measure_device": "Shelly Plus 1PM Gen24",
+  "measure_description": "Manually measured, took average values from 24 hours",
+  "measure_method": "manual",
+  "name": "Presence Sensor FP2",
+  "aliases": [
+    "PS-S02D"
+  ],
+  "author_info": {
+    "name": "Thorsten Niemann",
+    "email": "ThorstenNiemann.TN@gmail.com",
+    "github": "Thorsten1982"
+  }
+}

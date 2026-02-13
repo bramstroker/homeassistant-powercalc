@@ -4,7 +4,7 @@
   ],
   "author": "nanderson97651 <73798513+nanderson97651@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-12-02T17:29:12",
+  "created_at": "2022-12-02T17:29:12Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script, standby measured with Kill-a-Watt",
   "measure_device": "TP-Link Kasa KP115",
@@ -14,6 +14,10 @@
     "SLEEP_TIME": 5,
     "VERSION": "master"
   },
-  "name": "Hue ambiance lamp",
-  "standby_power": 0.25
+  "name": "Hue White Ambiance 1100 E26 Bluetooth",
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "nanderson97651",
+    "github": "nanderson97651"
+  }
 }

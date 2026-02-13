@@ -5,11 +5,16 @@
   ],
   "author": "nepozs <56661567+nepozs@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2021-06-28T17:41:00",
+  "created_at": "2021-06-28T17:41:00Z",
   "device_type": "light",
   "measure_description": "Bulbs was measured twice at each dim setting (100 points) and mean value was used when there were differences",
-  "measure_device": "Zhurui PR10-D",
+  "measure_device": "Zhurui PR10",
   "measure_method": "manual",
   "name": "TRADFRI bulb E27 opal 1000lm",
-  "standby_power": 0.36
+  "standby_power": 0.36,
+  "author_info": {
+    "name": "nepozs",
+    "email": "szopen@os.pl",
+    "github": "nepozs"
+  }
 }

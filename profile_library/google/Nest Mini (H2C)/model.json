@@ -5,7 +5,7 @@
   "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
-  "created_at": "2022-10-05T10:14:54",
+  "created_at": "2022-10-05T10:14:54Z",
   "device_type": "smart_speaker",
   "linear_config": {
     "calibrate": [
@@ -25,6 +25,11 @@
   "measure_description": "Streamed 'Radiohead - National Anthem' using spotify, and took average measurements using the measure.py tool on different volume levels",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
-  "name": "Google Nest Mini",
-  "standby_power": 1.65
+  "name": "Nest Mini",
+  "standby_power": 1.65,
+  "author_info": {
+    "name": "Daniel O'Connor",
+    "email": "daniel.oconnor@gmail.com",
+    "github": "CloCkWeRX"
+  }
 }

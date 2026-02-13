@@ -1,7 +1,7 @@
 {
   "author": "Perfunctory85 <105150364+Perfunctory85@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-02-10T09:29:19",
+  "created_at": "2023-02-10T09:29:19Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Gosund SP1",
@@ -13,5 +13,9 @@
     "VERSION": "v1.3.3:docker"
   },
   "name": "Livarno Lux E27 bulb CCT",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author_info": {
+    "name": "Perfunctory85",
+    "github": "Perfunctory85"
+  }
 }

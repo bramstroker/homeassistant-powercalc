@@ -192,7 +192,11 @@ class LibraryFlow:
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.LIBRARY_CUSTOM_FIELDS,
-                schema=build_dynamic_field_schema(self.flow.selected_profile),  # type: ignore
+                schema=build_dynamic_field_schema(
+                    self.flow.hass,
+                    self.flow.selected_profile,  # type: ignore
+                    self.flow.source_entity,
+                ),
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_process_user_input,
             ),
@@ -204,6 +208,7 @@ class LibraryFlow:
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle the flow for sub profile selection."""
+        assert self.flow.selected_profile is not None
 
         async def _validate(user_input: dict[str, Any]) -> dict[str, str]:
             return {CONF_MODEL: f"{self.flow.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"}
@@ -221,9 +226,11 @@ class LibraryFlow:
         if remarks:
             remarks = "\n\n" + remarks
 
+        step = Step.SUB_PROFILE_PER_DEVICE if self.flow.selected_profile.discovery_by == DiscoveryBy.DEVICE else Step.SUB_PROFILE
+
         return await self.flow.handle_form_step(
             PowercalcFormStep(
-                step=Step.SUB_PROFILE,
+                step=step,
                 schema=await build_sub_profile_schema(profile, self.flow.selected_sub_profile),
                 next_step=Step.POWER_ADVANCED,
                 validate_user_input=_validate,
@@ -236,6 +243,12 @@ class LibraryFlow:
             ),
             user_input,
         )
+
+    async def async_step_sub_profile_per_device(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        return await self.async_step_sub_profile(user_input)
 
     async def async_step_smart_switch(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Asks the user for the power of connect appliance for the smart switch."""

@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "ASKVADER",
+    "On/Off plug (ASKVADER on/off switch)"
+  ],
+  "author": "confucius78 <dekker.wj@gmail.com>",
+  "calculation_strategy": "fixed",
+  "created_at": "2023-12-31T20:16:31Z",
+  "device_type": "smart_switch",
+  "measure_description": "Manually measured.",
+  "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
+  "measure_method": "manual",
+  "name": "ASKVADER on/off switch",
+  "only_self_usage": false,
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "standby_power": 0.21,
+  "standby_power_on": 0.78,
+  "author_info": {
+    "name": "confucius78",
+    "email": "dekker.wj@gmail.com",
+    "github": "confucius78"
+  }
+}

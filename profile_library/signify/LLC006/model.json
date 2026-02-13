@@ -2,7 +2,7 @@
   "aliases": [],
   "author": "wormiedk <wormie@alberg.dk>",
   "calculation_strategy": "lut",
-  "created_at": "2022-01-15T15:26:20",
+  "created_at": "2022-01-15T15:26:20Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -13,5 +13,10 @@
     "VERSION": "v0.14.1"
   },
   "name": "LivingColors Iris Table Lamp Gen3",
-  "standby_power": 0.37
+  "standby_power": 0.37,
+  "author_info": {
+    "name": "wormiedk",
+    "email": "wormie@alberg.dk",
+    "github": "wormiedk"
+  }
 }

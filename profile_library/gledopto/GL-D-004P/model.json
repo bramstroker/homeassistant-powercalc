@@ -1,7 +1,7 @@
 {
   "author": "Peklaa <57568760+Peklaa@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2025-11-02T07:53:49.775711",
+  "created_at": "2025-11-02T07:53:49Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini",
@@ -11,6 +11,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.24:docker"
   },
-  "name": "GL-D-004P",
-  "standby_power": 0.22
+  "name": "RGB+CCT 9 W Zigbee Downlight",
+  "standby_power": 0.22,
+  "author_info": {
+    "name": "Peklaa",
+    "github": "Peklaa"
+  }
 }

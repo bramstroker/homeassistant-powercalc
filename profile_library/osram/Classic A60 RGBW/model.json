@@ -1,7 +1,7 @@
 {
   "author": "PalminX <bkuemmer@gmx.net>",
   "calculation_strategy": "lut",
-  "created_at": "2023-09-05T19:14:04",
+  "created_at": "2023-09-05T19:14:04Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
@@ -11,6 +11,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.2:docker"
   },
-  "name": "Lightify Classic A60 RGBW",
-  "standby_power": 0.6
+  "name": "LIGHTIFY Classic A60 RGBW",
+  "standby_power": 0.6,
+  "author_info": {
+    "name": "PalminX",
+    "email": "bkuemmer@gmx.net",
+    "github": "PalminX"
+  }
 }

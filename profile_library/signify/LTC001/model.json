@@ -7,11 +7,16 @@
   ],
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2021-06-19T18:55:29",
+  "created_at": "2021-06-19T18:55:29Z",
   "device_type": "light",
   "measure_description": "Used script utils/measure_shelly.py from repository. standby_power is guessed",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Hue Being Ceiling Light",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

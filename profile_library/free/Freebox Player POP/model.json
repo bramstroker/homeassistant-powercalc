@@ -4,7 +4,7 @@
   ],
   "author": "Alexandre Bertrand <alexandrebertrand96@gmail.com>",
   "calculation_strategy": "fixed",
-  "created_at": "2025-10-12T19:03:14",
+  "created_at": "2025-10-12T19:03:14Z",
   "device_type": "generic_iot",
   "fixed_config": {
     "states_power": {
@@ -15,10 +15,15 @@
   "measure_description": "Measured with utils/measure script (5min average)",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",
-  "name": "Freebox Player POP",
+  "name": "Player POP",
   "sensor_config": {
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
-  "standby_power": 1.63
+  "standby_power": 1.63,
+  "author_info": {
+    "name": "Alexandre Bertrand",
+    "email": "alexandre.bertrand@invirtus.io",
+    "github": "trandbert37"
+  }
 }

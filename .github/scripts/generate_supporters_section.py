@@ -6,25 +6,17 @@ using Buy Me a Coffee's supporters + subscriptions APIs.
 Requires:
 - Python 3.13+
 - `requests` installed
-- Environment variables:
-    - BMC_API_TOKEN
-    - BMC_SLUG
 """
 
 from __future__ import annotations
 
-import os
-import sys
 from collections import defaultdict
 from typing import Any
 
-from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
-
 import requests
 
-
-BMC_SUPPORTERS_URL = "https://developers.buymeacoffee.com/api/v1/supporters"
-BMC_SUBSCRIPTIONS_URL = "https://developers.buymeacoffee.com/api/v1/subscriptions"
+SUPPORTERS_API = "https://api.powercalc.nl/supporters/one-time"
+SUBSCRIPTIONS_API = "https://api.powercalc.nl/supporters/subscriptions"
 
 # Beer tiers: exact coffees count → label
 TIERS: list[dict[str, Any]] = [
@@ -38,152 +30,45 @@ TIERS: list[dict[str, Any]] = [
 MAX_NAMES_PER_TIER = 3
 MAX_MONTHLY_NAMES = 5
 
-# Safety cap for pagination; very generous for typical BMC usage
-DEFAULT_MAX_PAGES = 50
-
 
 # ---------- HTTP / pagination helpers ----------
 
-def _auth_headers(token: str) -> dict[str, str]:
-    return {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/json",
-    }
-
-
-def _with_page(url: str, page: int) -> str:
+def _get(url: str) -> list[dict[str, Any]]:
     """
-    Add or replace the `page` query parameter in `url`.
-    Handles URLs that may already have other query params (like status=active).
+    Simple GET request helper.
     """
-    split = urlsplit(url)
-    query_pairs = dict(parse_qsl(split.query, keep_blank_values=True))
-    query_pairs["page"] = str(page)
-    new_query = urlencode(query_pairs)
-    return urlunsplit(
-        (
-            split.scheme,
-            split.netloc,
-            split.path,
-            new_query,
-            split.fragment,
-        )
-    )
+    resp = requests.get(url, timeout=10)
+    resp.raise_for_status()
+    data: list[dict] = resp.json()
+    if not isinstance(data, list):
+        return []
 
+    return data
 
-def _paginated_get(
-    url: str,
-    token: str,
-    max_pages: int | None = None,
-) -> list[dict[str, Any]]:
-    """
-    Generic pagination helper for BMC's Laravel-style responses.
-
-    Expects a response like:
-    {
-      "current_page": 1,
-      "data": [...],
-      "last_page": 2,
-      "next_page_url": "...",
-      ...
-    }
-    """
-    headers = _auth_headers(token)
-    all_items: list[dict[str, Any]] = []
-
-    hard_max_pages = max_pages or DEFAULT_MAX_PAGES
-    page = 1
-
-    while page <= hard_max_pages:
-        page_url = _with_page(url, page)
-        resp = requests.get(page_url, headers=headers, timeout=10)
-        resp.raise_for_status()
-        payload: dict[str, Any] = resp.json()
-
-        data = payload.get("data") or []
-        if not isinstance(data, list):
-            break
-
-        all_items.extend(data)
-
-        current_page = int(payload.get("current_page") or page)
-        last_page = int(payload.get("last_page") or current_page)
-        next_page_url = payload.get("next_page_url")
-
-        if not next_page_url or current_page >= last_page:
-            break
-
-        page += 1
-
-    return all_items
-
-
-# ---------- BMC data fetchers ----------
+# ---------- Data fetchers ----------
 
 def fetch_supporters(
-    token: str,
-    max_pages: int | None = None,
 ) -> list[dict[str, Any]]:
     """
     Fetch supporters from Buy Me a Coffee across pages.
 
     Returns only *public* supporters (support_visibility == 1).
     """
-    raw_items = _paginated_get(BMC_SUPPORTERS_URL, token, max_pages=max_pages)
-
-    supporters: list[dict[str, Any]] = []
-    for item in raw_items:
-        if not isinstance(item, dict):
-            continue
-        if item.get("support_visibility") != 1:
-            continue
-        supporters.append(item)
-
-    return supporters
+    return [s for s in _get(SUPPORTERS_API) if s.get("name") != "Someone"]
 
 
 def fetch_active_subscriptions(
-    token: str,
-    max_pages: int | None = None,
 ) -> list[dict[str, Any]]:
     """
-    Fetch active subscriptions (memberships) from Buy Me a Coffee,
-    across pages.
-
-    Endpoint: /api/v1/subscriptions?status=active
+    Fetch active subscriptions (memberships)
     """
-    base_url = f"{BMC_SUBSCRIPTIONS_URL}?status=active"
-    items = _paginated_get(base_url, token, max_pages=max_pages)
+    base_url = f"{SUBSCRIPTIONS_API}"
+    items = _get(base_url)
 
-    # We don't filter visibility here; subscriptions are typically
-    # already based on members who've opted in.
-    return [item for item in items if isinstance(item, dict)]
+    return [item for item in items if item.get("status") == "active"]
 
 
-# ---------- name / grouping helpers ----------
-
-def name_from_supporter(item: dict[str, Any]) -> str:
-    """
-    Get a display name for a one-off supporter.
-    """
-    return (
-        str(item.get("supporter_name") or "").strip()
-        or str(item.get("payer_name") or "").strip()
-        or "Anonymous legend"
-    )
-
-
-def name_from_subscription(item: dict[str, Any]) -> str:
-    """
-    Get a display name for a monthly supporter.
-    """
-    return (
-        str(item.get("supporter_name") or "").strip()
-        or str(item.get("payer_name") or "").strip()
-        or str(item.get("member_name") or "").strip()
-        or "Anonymous monthly legend"
-    )
-
+# ---------- grouping helpers ----------
 
 def group_supporters_by_tier(
     supporters: list[dict[str, Any]],
@@ -202,7 +87,7 @@ def group_supporters_by_tier(
     by_coffees: dict[int, list[dict[str, Any]]] = defaultdict(list)
 
     for s in supporters:
-        coffees_raw = s.get("support_coffees", 0)
+        coffees_raw = s.get("coffees", 0)
         try:
             coffees = int(coffees_raw)
         except (TypeError, ValueError):
@@ -223,7 +108,7 @@ def group_supporters_by_tier(
             continue
 
         # BMC returns most recent first, so slicing keeps that order
-        names = [name_from_supporter(item) for item in matches[:max_names_per_tier]]
+        names = [item.get("name") for item in matches[:max_names_per_tier]]
         more = len(matches) > max_names_per_tier
 
         tiered[label] = {"names": names, "more": more}
@@ -243,7 +128,7 @@ def build_monthly_supporters_block(
 
     names: list[str] = []
     for item in subs:
-        names.append(name_from_subscription(item))
+        names.append(item.get("name"))
         if len(names) >= max_names:
             break
 
@@ -259,7 +144,7 @@ def build_monthly_supporters_block(
 
 # ---------- main assembly ----------
 
-def build_supporters_section(token: str, slug: str) -> str:
+def build_supporters_section() -> str:
     """
     Build the final markdown section.
 
@@ -280,16 +165,14 @@ def build_supporters_section(token: str, slug: str) -> str:
 
     ...
     """
-    # Walk pages to get a complete view, so you can actually fill
-    # at least ~3 names per tier if they exist at all.
-    supporters = fetch_supporters(token)
-    subs = fetch_active_subscriptions(token)
+    supporters = fetch_supporters()
+    subs = fetch_active_subscriptions()
 
     if not supporters and not subs:
         return (
             "Supporters powering this project ⚡ 👇\n\n"
             "_No public supporters found yet._\n"
-            f"Support the project at https://buymeacoffee.com/{slug}"
+            f"Support the project at https://buymeacoffee.com/bramski"
         )
 
     tiered = group_supporters_by_tier(supporters)
@@ -321,23 +204,13 @@ def build_supporters_section(token: str, slug: str) -> str:
         lines.append("")
 
     lines.append("")
-    lines.append(f"Support the project at https://buymeacoffee.com/{slug}")
+    lines.append(f"Support the project at https://buymeacoffee.com/bramski")
 
     return "\n".join(lines)
 
 
 def main() -> int:
-    token = os.getenv("BMC_API_TOKEN")
-    slug = os.getenv("BMC_SLUG")
-
-    if not token:
-        print("BMC_API_TOKEN is not set", file=sys.stderr)
-        return 1
-    if not slug:
-        print("BMC_SLUG is not set", file=sys.stderr)
-        return 1
-
-    section = build_supporters_section(token=token, slug=slug)
+    section = build_supporters_section()
     print(section)
     return 0
 

@@ -12,6 +12,7 @@ import voluptuous as vol
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
+    CONF_AVAILABILITY_ENTITY,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_FILTER_OUTLIER_ENABLED,
@@ -323,10 +324,9 @@ async def test_profile_with_custom_fields(
     caplog.set_level(logging.ERROR)
 
     mock_entity_with_model_information(
-        "sensor.test",
+        ["sensor.test", "sensor.foobar"],
         "test",
         "custom_fields",
-        unique_id=DEFAULT_UNIQUE_ID,
     )
 
     result = await select_menu_item(hass, Step.MENU_LIBRARY)
@@ -422,6 +422,40 @@ async def test_sub_profile_selection_omitted(hass: HomeAssistant) -> None:
     )
     result = await select_manufacturer_and_model(hass, result, "test", "sub_profile_matchers")
     assert result["step_id"] != Step.SUB_PROFILE
+
+
+async def test_sub_profile_selection_discovery_by_device(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """
+    Test that sub profile selection is available when discovery_by is device
+    Also make sure the step is sub_profile_per_device so the description translation is correct
+    see: https://github.com/bramstroker/homeassistant-powercalc/issues/3866
+    """
+
+    mock_entity_with_model_information("switch.test", "test", "discovery_type_device_sub_profile")
+
+    source_entity = await create_source_entity("switch.test", hass)
+    result = await initialize_discovery_flow(hass, source_entity)
+
+    result = await confirm_auto_discovered_model(hass, result)
+
+    assert result["step_id"] == Step.AVAILABILITY_ENTITY
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_AVAILABILITY_ENTITY: "switch.test"},
+    )
+
+    assert result["step_id"] == Step.SUB_PROFILE_PER_DEVICE
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_SUB_PROFILE: "a"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
 async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:

@@ -2,7 +2,7 @@
   "aliases": [],
   "author": "Morten Trab <morten@trab.dk>",
   "calculation_strategy": "lut",
-  "created_at": "2022-04-04T12:25:47",
+  "created_at": "2022-04-04T12:25:47Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -12,6 +12,11 @@
     "SLEEP_TIME": 2,
     "VERSION": "master"
   },
-  "name": "Hue white A60 bulb E27",
-  "standby_power": 0.3
+  "name": "Hue White Bulb A60 E27",
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Morten Trab",
+    "email": "morten@trab.dk",
+    "github": "MTrab"
+  }
 }

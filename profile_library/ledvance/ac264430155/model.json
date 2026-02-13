@@ -1,7 +1,7 @@
 {
   "author": "Kenneth Fribert <fribse@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-11-16T20:39:28",
+  "created_at": "2022-11-16T20:39:28Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
@@ -11,6 +11,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.1.1:docker"
   },
-  "name": "LEDVANCE SMART+ Wifi Planon 30x30 TW",
-  "standby_power": 0.9
+  "name": "SMART+ Wifi Planon 30x30 TW",
+  "standby_power": 0.9,
+  "author_info": {
+    "name": "Kenneth Fribert",
+    "email": "fribse@gmail.com",
+    "github": "fribse"
+  }
 }

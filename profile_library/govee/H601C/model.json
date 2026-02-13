@@ -1,7 +1,7 @@
 {
   "author": "Brian Egge <brianegge@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-09-29T02:06:51.077345",
+  "created_at": "2024-09-29T02:06:51Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 3",
@@ -11,6 +11,11 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Govee Smart LED Downlight",
-  "standby_power": 0.85
+  "name": "Smart LED Downlight",
+  "standby_power": 0.85,
+  "author_info": {
+    "name": "Brian Egge",
+    "email": "brianegge@gmail.com",
+    "github": "brianegge"
+  }
 }

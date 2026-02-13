@@ -1,7 +1,7 @@
 {
   "author": "Emory Penney <treadstoneit@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2024-01-08T20:35:44",
+  "created_at": "2024-01-08T20:35:44Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",
@@ -12,5 +12,10 @@
     "VERSION": "v1.9.15:docker"
   },
   "name": "Hue White and Color Ambiance Downlight 4 inch",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "Emory Penney",
+    "email": "emory.j.penney@intel.com",
+    "github": "ejpenney"
+  }
 }

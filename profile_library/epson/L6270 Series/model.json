@@ -1,7 +1,7 @@
 {
   "author": "Andrzej Dopierala <undefine@aramin.net>",
   "calculation_strategy": "fixed",
-  "created_at": "2024-12-06T12:00:00",
+  "created_at": "2024-12-06T12:00:00Z",
   "device_type": "printer",
   "fixed_config": {
     "states_power": {
@@ -12,5 +12,10 @@
   "measure_description": "Printer was measured while idle and while printing",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "manual",
-  "name": "EPSON L6270 Series"
+  "name": "L6270 Series",
+  "author_info": {
+    "name": "Andrzej Dopierała",
+    "email": "andrzej.dopierala@currency-one.com",
+    "github": "theundefined"
+  }
 }

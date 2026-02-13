@@ -4,7 +4,7 @@
   ],
   "author": "Paul Bottein",
   "calculation_strategy": "lut",
-  "created_at": "2024-06-13T13:09:23.423201",
+  "created_at": "2024-06-13T13:09:23Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
@@ -15,5 +15,10 @@
     "VERSION": "v1.12.9:docker"
   },
   "name": "Hue Welcome outdoor wall",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "Paul Bottein",
+    "email": "paul.bottein@gmail.com",
+    "github": "piitaya"
+  }
 }

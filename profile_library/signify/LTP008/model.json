@@ -2,7 +2,7 @@
   "aliases": [],
   "author": "Stijn Bernards <stijn@bernards.nl>",
   "calculation_strategy": "lut",
-  "created_at": "2022-06-22T07:54:27",
+  "created_at": "2022-06-22T07:54:27Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -13,5 +13,10 @@
     "VERSION": "v0.18.4:docker"
   },
   "name": "Hue Being Pendant Light",
-  "standby_power": 0.38
+  "standby_power": 0.38,
+  "author_info": {
+    "name": "Stijn Bernards",
+    "email": "stijn@bernards.nl",
+    "github": "stijnbernards"
+  }
 }

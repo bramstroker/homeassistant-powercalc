@@ -200,7 +200,7 @@ class PowerProfile:
     @property
     def min_version(self) -> str | None:
         """Get the minimum required version for this profile."""
-        return self._json_data.get("min_version")
+        return self._json_data.get("min_version")  # pragma: no cover
 
     @property
     def multi_switch_config(self) -> ConfigType | None:
@@ -318,6 +318,11 @@ class PowerProfile:
     def config_flow_sub_profile_remarks(self) -> str | None:
         """Get extra remarks to show at the config flow sub profile step."""
         return self._json_data.get("config_flow_sub_profile_remarks")
+
+    @property
+    def compatible_integrations(self) -> list[str] | None:
+        """Get the list of compatible integrations for this profile."""
+        return self._json_data.get("compatible_integrations")
 
     def get_default_discovery_remarks_translation_key(self) -> str | None:
         """When no remarks are provided in the profile, see if we need to show a default remark."""

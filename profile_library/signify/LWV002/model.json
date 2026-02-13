@@ -5,7 +5,7 @@
   ],
   "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "lut",
-  "created_at": "2022-05-29T15:18:24",
+  "created_at": "2022-05-29T15:18:24Z",
   "device_type": "light",
   "linked_profile": "signify/LWV001",
   "measure_description": "Measure Script for Tasmota",
@@ -13,5 +13,10 @@
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
   "name": "Hue Single Filament Bulb ST19 E26",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "Bram Gerritsen",
+    "email": "bgerritsen@gmail.com",
+    "github": "bramstroker"
+  }
 }

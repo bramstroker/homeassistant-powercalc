@@ -1,7 +1,7 @@
 {
   "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2023-04-01T17:53:59",
+  "created_at": "2023-04-01T17:53:59Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug US",
@@ -11,6 +11,10 @@
     "SLEEP_TIME": 4,
     "VERSION": "v1.3.13:docker"
   },
-  "name": "Signify Philips Hue White Ambiance BR30 (LTB002)",
-  "standby_power": 0.25
+  "name": "Hue White Ambiance BR30",
+  "standby_power": 0.25,
+  "author_info": {
+    "name": "laplacacm",
+    "github": "laplacacm"
+  }
 }

@@ -6,12 +6,16 @@
   ],
   "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
   "calculation_strategy": "lut",
-  "created_at": "2021-08-29T21:30:03",
+  "created_at": "2021-08-29T21:30:03Z",
   "device_type": "light",
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
   "name": "Hue Calla Outdoor Pedestal",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author_info": {
+    "name": "Stefan Gries",
+    "github": "stefangries"
+  }
 }

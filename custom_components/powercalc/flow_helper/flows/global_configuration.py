@@ -33,6 +33,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_POWER_UPDATE_INTERVAL,
     CONF_UTILITY_METER_OFFSET,
     DEFAULT_ENERGY_UPDATE_INTERVAL,
     DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
@@ -88,6 +89,9 @@ SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY = vol.Schema(
 
 SCHEMA_GLOBAL_CONFIGURATION_THROTTLING = vol.Schema(
     {
+        vol.Optional(CONF_POWER_UPDATE_INTERVAL, default=0): selector.NumberSelector(
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
+        ),
         vol.Optional(CONF_ENERGY_UPDATE_INTERVAL, default=DEFAULT_ENERGY_UPDATE_INTERVAL): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
@@ -153,6 +157,7 @@ class GlobalConfigurationFlow:
                 schema=SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY,
                 next_step=Step.GLOBAL_CONFIGURATION_THROTTLING,
                 form_data=discovery_options,
+                form_kwarg={"description_placeholders": {"docs_uri": "https://docs.powercalc.nl/library/discovery/"}},
             ),
             user_input,
         )
@@ -170,6 +175,11 @@ class GlobalConfigurationFlow:
                 step=Step.GLOBAL_CONFIGURATION_THROTTLING,
                 schema=SCHEMA_GLOBAL_CONFIGURATION_THROTTLING,
                 next_step=Step.GLOBAL_CONFIGURATION_ENERGY,
+                form_kwarg={
+                    "description_placeholders": {
+                        "docs_uri": "https://docs.powercalc.nl/configuration/update-frequency/",
+                    },
+                },
             ),
             user_input,
         )
@@ -189,6 +199,7 @@ class GlobalConfigurationFlow:
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_ENERGY,
                 schema=SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR,
+                form_kwarg={"description_placeholders": {"docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/"}},
             ),
         )
 
@@ -210,6 +221,7 @@ class GlobalConfigurationFlow:
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_UTILITY_METER,
                 schema=SCHEMA_UTILITY_METER_OPTIONS,
+                form_kwarg={"description_placeholders": {"docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/"}},
             ),
         )
 
@@ -233,6 +245,11 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION,
                 schema=SCHEMA_GLOBAL_CONFIGURATION,
+                form_kwarg={
+                    "description_placeholders": {
+                        "docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/",
+                    },
+                },
             ),
         )
 
