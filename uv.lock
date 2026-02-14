@@ -1718,7 +1718,7 @@ dependencies = [
     { name = "homeassistant" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "aioresponses" },
     { name = "croniter" },
@@ -1736,30 +1736,23 @@ docs = [
     { name = "zensical" },
 ]
 
-[package.dev-dependencies]
-docs = [
-    { name = "zensical" },
-]
-
 [package.metadata]
-requires-dist = [
-    { name = "aioresponses", marker = "extra == 'dev'", specifier = ">=0.7.6" },
-    { name = "croniter", marker = "extra == 'dev'", specifier = ">=6.0.0" },
-    { name = "homeassistant" },
-    { name = "homeassistant-stubs", marker = "extra == 'dev'" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = "==1.19.1" },
-    { name = "prek", marker = "extra == 'dev'" },
-    { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'", specifier = "==0.13.314" },
-    { name = "pyturbojpeg", marker = "extra == 'dev'", specifier = ">=1.8.2" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.15.0" },
-    { name = "types-croniter", marker = "extra == 'dev'", specifier = ">=2.0" },
-    { name = "types-pytz", marker = "extra == 'dev'", specifier = ">=2024.1" },
-    { name = "voluptuous-stubs", marker = "extra == 'dev'", specifier = ">=0.1" },
-    { name = "zensical", marker = "extra == 'docs'" },
-]
-provides-extras = ["docs", "dev"]
+requires-dist = [{ name = "homeassistant" }]
 
 [package.metadata.requires-dev]
+dev = [
+    { name = "aioresponses", specifier = ">=0.7.6" },
+    { name = "croniter", specifier = ">=6.0.0" },
+    { name = "homeassistant-stubs" },
+    { name = "mypy", specifier = "==1.19.1" },
+    { name = "prek" },
+    { name = "pytest-homeassistant-custom-component", specifier = "==0.13.314" },
+    { name = "pyturbojpeg", specifier = ">=1.8.2" },
+    { name = "ruff", specifier = ">=0.15.0" },
+    { name = "types-croniter", specifier = ">=2.0" },
+    { name = "types-pytz", specifier = ">=2024.1" },
+    { name = "voluptuous-stubs", specifier = ">=0.1" },
+]
 docs = [{ name = "zensical", specifier = ">=0.0.5" }]
 
 [[package]]
