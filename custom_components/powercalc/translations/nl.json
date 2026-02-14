@@ -60,10 +60,10 @@
           "on_time": "Standaard 1 dag indien niet gedefinieerd. altijd aan",
           "update_frequency": "tijd in seconden tussen status updates van de sensor"
         },
-        "title": "Maak een dagelijkse energieverbruik sensor"
+        "title": "Maak een sensor voor vast dagelijks energieverbruik"
       },
       "energy_options": {
-        "title": "Energie opties",
+        "title": "Energieopties",
         "data": {
           "energy_integration_method": "Integratie methode",
           "energy_sensor_unit_prefix": "Eenheid voorvoegsel",
@@ -146,7 +146,7 @@
           "energy_sensor_category": "Energie sensor categorie",
           "energy_sensor_friendly_naming": "Energie sensor vriendelijk naampatroon",
           "energy_sensor_naming": "Energie sensor naampatroon",
-          "energy_sensor_precision": "Energie sensor nauwkeurigheid",
+          "energy_sensor_precision": "Nauwkeurigheid energiesensor",
           "energy_sensor_unit_prefix": "Voorvoegsel van de energiesensor eenheid"
         }
       },
