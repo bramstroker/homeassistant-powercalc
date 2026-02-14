@@ -1,32 +1,21 @@
 name: Lint
 
 on:
-  workflow_dispatch:
   push:
-    paths:
-      - '**.py'
-      - 'uv.lock'
+    branches: [ main ]
   pull_request:
-    paths:
-      - '**.py'
-      - 'uv.lock'
+  workflow_dispatch:
 
 jobs:
-  mypy:
+  pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Powercalc
-        uses: actions/checkout@v6
-      - uses: ./.github/workflows/uv-composite-action
-      - name: Run MyPy
-        run: |
-          uv run mypy ./custom_components/powercalc
-  ruff:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Powercalc
-        uses: actions/checkout@v6
-      - uses: ./.github/workflows/uv-composite-action
-      - name: Run Ruff
-        run: |
-          uv run ruff check .
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+      - uses: astral-sh/setup-uv@v6
+        with:
+          activate-environment: true
+      - run: uv sync
+      - uses: j178/prek-action@v1

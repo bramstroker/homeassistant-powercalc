@@ -91,12 +91,12 @@ override-dependencies = [
   "mashumaro[msgpack]==3.17",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 docs = [
-    "zensical"
+    "zensical>=0.0.5",
 ]
 dev = [
-    "pre-commit>=4.0.0",
+    "prek",
     "ruff>=0.15.0",
     "mypy==1.19.1",
     "voluptuous-stubs>=0.1",
@@ -115,11 +115,6 @@ packages = ["custom_components"]
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
-
-[dependency-groups]
-docs = [
-    "zensical>=0.0.5",
-]
 
 [tool.codespell]
 ignore-words-list = 'hass'
