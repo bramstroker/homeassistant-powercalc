@@ -96,7 +96,7 @@ docs = [
     "zensical"
 ]
 dev = [
-    "pre-commit>=4.0.0",
+    "prek",
     "ruff>=0.15.0",
     "mypy==1.19.1",
     "voluptuous-stubs>=0.1",

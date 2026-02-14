@@ -14,10 +14,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - uses: ./.github/workflows/uv-composite-action
+      - uses: astral-sh/setup-uv@v6
         with:
-          directory: './utils/visualize'
-          cache_dependencies: 'false'
+          working-directory: './utils/visualize'
       - uses: actions/github-script@v8
         name: List changed files from the PR
         id: list-files

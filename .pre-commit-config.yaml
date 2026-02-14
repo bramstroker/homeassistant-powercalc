@@ -55,12 +55,3 @@ repos:
     hooks:
       - id: check-github-workflows
         args: [ "--verbose" ]
-
-ci:
-  autofix_commit_msg: |
-    chore(lint): [pre-commit.ci] auto fixes from pre-commit.com hooks
-
-    for more information, see https://pre-commit.ci
-  autoupdate_commit_msg: "chore(lint): [pre-commit.ci] pre-commit autoupdate"
-  autoupdate_schedule: weekly
-  skip: [ mypy ]
