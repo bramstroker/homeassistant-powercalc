@@ -1,8 +1,5 @@
 {
   "author": "sbrandsborg",
-  "aliases": [
-    "Beosound Balance"
-  ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2026-01-29T11:32:35Z",

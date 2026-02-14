@@ -1,4 +1,4 @@
-from enum import Enum, StrEnum
+from enum import StrEnum
 import os
 from pathlib import Path
 
@@ -13,7 +13,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()
 
 
-class MeasureType(str, Enum):
+class MeasureType(StrEnum):
     """Type of devices to measure power of"""
 
     LIGHT = "Light bulb(s)"

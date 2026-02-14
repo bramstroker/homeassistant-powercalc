@@ -108,13 +108,14 @@ class RemoteLoader(Loader):
 
                 # Exact id bucket first (highest priority)
                 bucket = lookup.setdefault(model_id_lower, [])
-                bucket.append(model)
+                bucket.insert(0, model)
 
                 # Alias buckets afterwards (lower priority)
                 for alias in model.get("aliases", []) or []:
                     alias_lower = str(alias).lower()
                     if alias_lower == model_id_lower:
                         continue
+                    # Append to the end to ensure aliased models are always last
                     lookup.setdefault(alias_lower, []).append(model)
 
             self.manufacturer_models[manufacturer_name] = kept_models
@@ -257,7 +258,8 @@ class RemoteLoader(Loader):
             await self.hass.async_add_executor_job(self._write_profile_hashes, self.profile_hashes)
         except ProfileDownloadError as e:
             if not os.path.exists(model_path):
-                await self.hass.async_add_executor_job(shutil.rmtree, storage_path)
+                if os.path.exists(storage_path):
+                    await self.hass.async_add_executor_job(shutil.rmtree, storage_path)
                 raise e
             _LOGGER.debug("Failed to download profile, falling back to local profile")
 

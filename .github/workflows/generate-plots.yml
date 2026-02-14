@@ -17,10 +17,9 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: ./.github/workflows/uv-composite-action
+      - uses: astral-sh/setup-uv@v7
         with:
-          directory: './utils/visualize'
-          cache_dependencies: 'false'
+          working-directory: './utils.visualize'
       - name: Run visualization tool
         run: |
           cd ./utils/visualize && bash generate-all.sh ../../profile_library

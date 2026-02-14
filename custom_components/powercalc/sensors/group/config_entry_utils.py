@@ -68,14 +68,12 @@ async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigEntr
     if sensor_type not in [SensorType.VIRTUAL_POWER, SensorType.DAILY_ENERGY]:
         return None
 
-    if CONF_GROUP not in config_entry.data or not config_entry.data.get(CONF_GROUP):
+    raw_groups = config_entry.data.get(CONF_GROUP)
+    if not raw_groups:
         return None
 
-    groups: list[str] | str = config_entry.data.get(CONF_GROUP)  # type: ignore
-    if not isinstance(groups, list):
-        groups = [groups]
-
-    for group_entry_id in groups:
+    group_ids = raw_groups if isinstance(raw_groups, list) else [raw_groups]
+    for group_entry_id in group_ids:
         group_entry = await add_to_associated_group(hass, config_entry, group_entry_id)
         if group_entry:
             _LOGGER.debug(
@@ -83,6 +81,10 @@ async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigEntr
                 config_entry.title,
                 group_entry.title,
             )
+
+    # After processed correctly we can want to unset the group, to prevent is being processed again
+    new_data = {k: v for k, v in config_entry.data.items() if k != CONF_GROUP}
+    hass.config_entries.async_update_entry(config_entry, data=new_data)
 
 
 async def add_to_associated_group(

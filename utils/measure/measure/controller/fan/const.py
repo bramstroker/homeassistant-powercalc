@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class FanControllerType(str, Enum):
+class FanControllerType(StrEnum):
     DUMMY = "dummy"
     HASS = "hass"

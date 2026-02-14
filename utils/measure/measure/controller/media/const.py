@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class MediaControllerType(str, Enum):
+class MediaControllerType(StrEnum):
     DUMMY = "dummy"
     HASS = "hass"

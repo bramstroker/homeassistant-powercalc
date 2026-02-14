@@ -101,7 +101,7 @@
       },
       "global_configuration": {
         "title": "Глобальная конфигурация",
-        "description": "Настройка глобальных параметров Powercalc. Подробнее см. [документацию](https://docs.powercalc.nl/configuration/global-configuration/). Дополнительные параметры для сенсоров энергии и счётчиков можно указать на следующих шагах.",
+        "description": "Настройка глобальных параметров Powercalc. Подробнее см. [документацию]({docs_uri}). Дополнительные параметры для сенсоров энергии и счётчиков можно указать на следующих шагах.",
         "data": {
           "create_energy_sensors": "Создавать сенсоры энергии",
           "create_standby_group": "Создать группу ожидания",
@@ -152,22 +152,32 @@
       },
       "global_configuration_throttling": {
         "title": "Параметры ограничения частоты",
-        "description": "Установите интервалы обновления для разных типов сенсоров. См. [документацию](https://docs.powercalc.nl/configuration/update-frequency/) для подробностей",
+        "description": "Установите интервалы обновления для разных типов сенсоров. См. [документацию]({docs_uri}) для подробностей",
         "data": {
           "group_energy_update_interval": "Интервал обновления групповой энергии",
           "group_power_update_interval": "Интервал обновления групповой мощности",
+<<<<<<< HEAD
           "energy_update_interval": "Интервал обновления энергии"
+=======
+          "energy_update_interval": "Интервал обновления энергии",
+          "power_update_interval": "Интервал обновления мощности"
+>>>>>>> upstream/master
         },
         "data_description": {
           "group_energy_update_interval": "Интервал обновления групповых сенсоров энергии. В секундах. Установите 0 для отключения",
           "group_power_update_interval": "Интервал обновления групповых сенсоров мощности. В секундах. Установите 0 для отключения",
+<<<<<<< HEAD
           "energy_update_interval": "Интервал обновления сенсоров энергии. В секундах. Установите 0 для отключения"
+=======
+          "energy_update_interval": "Интервал обновления сенсоров энергии. В секундах. Установите 0 для отключения",
+          "power_update_interval": "Интервал принудительного обновления сенсоров мощности. В секундах. Установите значение 0 для отключения"
+>>>>>>> upstream/master
         }
       },
       "global_configuration_utility_meter": {
         "title": "Параметры счётчиков",
         "data": {
-          "utility_meter_net_consumption": "Нетто-потребление счётчика",
+          "utility_meter_net_consumption": "Потребление по счетчику коммунальных услуг",
           "utility_meter_tariffs": "Тарифы счётчика",
           "utility_meter_types": "Типы счётчиков"
         }
@@ -378,6 +388,16 @@
         "description": "Это устройство имеет модель с несколькими подпрофилями. Выберите соответствующий следующему объекту этого устройства:\n\n\"{entity_id}\"{remarks}",
         "title": "Выбор подпрофиля"
       },
+<<<<<<< HEAD
+=======
+      "sub_profile_per_device": {
+        "data": {
+          "sub_profile": "Дополнительный профиль"
+        },
+        "description": "Эта модель устройства имеет несколько дополнительных профилей. {remarks}",
+        "title": "Конфигурация дополнительного профиля"
+      },
+>>>>>>> upstream/master
       "smart_switch": {
         "data": {
           "power": "Мощность",
@@ -409,12 +429,12 @@
         "title": "Параметры счётчиков",
         "description": "Определите настройки создания счётчиков",
         "data": {
-          "utility_meter_net_consumption": "Нетто-потребление",
+          "utility_meter_net_consumption": "Чистое потребление",
           "utility_meter_types": "Циклы",
           "utility_meter_tariffs": "Тарифы"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Включите, если хотите использовать источник как нетто-счётчик. Это позволит счётчику работать в обоих направлениях",
+          "utility_meter_net_consumption": "Включите этот параметр, если вы хотите использовать источник как счетчик чистой энергии. Это позволит вашему счетчику работать в обоих направлениях",
           "utility_meter_types": "Создавать счётчики для указанных циклов",
           "utility_meter_tariffs": "Список поддерживаемых тарифов. Оставьте пустым, если нужен только один тариф"
         }
@@ -443,7 +463,7 @@
           "power_factor": "Коэффициент мощности",
           "voltage": "Напряжение"
         },
-        "description": "Убедитесь, что ограничитель яркости включён в программе WLED. Также см. https://docs.powercalc.nl/strategies/wled/",
+        "description": "Убедитесь, что ограничитель яркости включён в программе WLED. Также см. [документацию]({docs_uri})",
         "title": "Конфигурация WLED"
       }
     }
@@ -593,7 +613,7 @@
       },
       "global_configuration_discovery": {
         "title": "Параметры обнаружения",
-        "description": "Управление настройками обнаружения. См. [документацию](https://docs.powercalc.nl/library/discovery/) для подробностей",
+        "description": "Управление настройками обнаружения. См. [документацию]({docs_uri}) для подробностей",
         "data": {
           "enabled": "Включить обнаружение",
           "exclude_device_types": "Исключённые типы устройств",
@@ -606,7 +626,7 @@
       },
       "global_configuration_energy": {
         "title": "Параметры энергии",
-        "description": "Определите настройки по умолчанию для сенсоров энергии. См. [документацию](https://docs.powercalc.nl/configuration/global-configuration/) для подробностей",
+        "description": "Определите настройки по умолчанию для сенсоров энергии. См. [документацию]({docs_uri}) для подробностей",
         "data": {
           "energy_integration_method": "Метод интеграции энергии",
           "energy_sensor_category": "Категория сенсора энергии",
@@ -618,23 +638,33 @@
       },
       "global_configuration_throttling": {
         "title": "Параметры ограничения частоты",
-        "description": "Установите интервалы обновления для разных типов сенсоров. См. [документацию](https://docs.powercalc.nl/configuration/update-frequency/) для подробностей",
+        "description": "Установите интервалы обновления для разных типов сенсоров. См. [документацию]({docs_uri}) для подробностей",
         "data": {
           "group_energy_update_interval": "Интервал обновления групповой энергии",
           "group_power_update_interval": "Интервал обновления групповой мощности",
+<<<<<<< HEAD
           "energy_update_interval": "Интервал обновления энергии"
+=======
+          "energy_update_interval": "Интервал обновления энергии",
+          "power_update_interval": "Интервал обновления мощности"
+>>>>>>> upstream/master
         },
         "data_description": {
           "group_energy_update_interval": "Интервал обновления групповых сенсоров энергии. В секундах. Установите 0 для отключения",
           "group_power_update_interval": "Интервал обновления групповых сенсоров мощности. В секундах. Установите 0 для отключения",
+<<<<<<< HEAD
           "energy_update_interval": "Интервал обновления сенсоров энергии. В секундах. Установите 0 для отключения"
+=======
+          "energy_update_interval": "Интервал обновления сенсоров энергии. В секундах. Установите 0 для отключения",
+          "power_update_interval": "Интервал принудительного обновления сенсоров мощности. В секундах. Установите значение 0 для отключения"
+>>>>>>> upstream/master
         }
       },
       "global_configuration_utility_meter": {
         "title": "Параметры счётчиков",
-        "description": "Определите настройки по умолчанию для счётчиков. См. [документацию](https://docs.powercalc.nl/configuration/global-configuration/) для подробностей",
+        "description": "Определите настройки по умолчанию для счётчиков. См. [документацию]({docs_uri}) для подробностей",
         "data": {
-          "utility_meter_net_consumption": "Нетто-потребление счётчика",
+          "utility_meter_net_consumption": "Потребление по счетчику коммунальных услуг",
           "utility_meter_tariffs": "Тарифы счётчика",
           "utility_meter_types": "Типы счётчиков"
         }
@@ -777,12 +807,12 @@
       "utility_meter_options": {
         "title": "Параметры счётчиков",
         "data": {
-          "utility_meter_net_consumption": "Нетто-потребление",
+          "utility_meter_net_consumption": "Чистое потребление счётчика",
           "utility_meter_types": "Циклы",
           "utility_meter_tariffs": "Тарифы"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Включите, если хотите использовать источник как нетто-счётчик. Это позволит счётчику работать в обоих направлениях",
+          "utility_meter_net_consumption": "Включите этот параметр, если вы хотите использовать источник как счетчик чистой энергии. Это позволит вашему счетчику работать в обоих направлениях",
           "utility_meter_types": "Создавать счётчики для указанных циклов",
           "utility_meter_tariffs": "Список поддерживаемых тарифов. Оставьте пустым, если нужен только один тариф"
         }

@@ -16,10 +16,10 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v6
-      - uses: ./.github/workflows/uv-composite-action
+      - uses: astral-sh/setup-uv@v7
         with:
-          directory: './utils/measure'
-          python_version: '3.13'
+          working-directory: './utils/measure'
+          python-version: '3.13'
       - name: Run tests
         run: |
           cd ./utils/measure && uv run pytest \

@@ -42,10 +42,13 @@ jobs:
       - name: Wait 5 seconds
         run: sleep 5
       - name: Purge cloudflare cache
+        env:
+          CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           curl --request POST \
-            --url https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE }}/purge_cache \
-            --header 'Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}' \
+            --url https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE}/purge_cache \
+            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             --header 'Content-Type: application/json' \
             --data '{
           	"files": [
