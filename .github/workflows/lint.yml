@@ -19,3 +19,7 @@ jobs:
           activate-environment: true
       - run: uv sync
       - uses: j178/prek-action@v1
+      - uses: pre-commit-ci/lite-action@v1.1.0
+        if: always()
+        with:
+          msg: 'style: apply pre-commit auto-fixes'
