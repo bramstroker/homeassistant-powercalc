@@ -3,7 +3,7 @@
     "source_entity": "Bron entiteit",
     "source_device": "Bron apparaat",
     "remarks_smart_switch": "Dit profiel biedt alleen stand-by stroomwaarden. \n Wanneer je een apparaat hebt dat een vaste hoeveelheid stroom verbruikt wanneer het is ingeschakeld, kunt u die waarde opgeven in de volgende stap van de configuratie flow",
-    "remarks_smart_dimmer": "Dit profiel biedt alleen stand-by-stroomwaarden. \n In de volgende stap kunt u optioneel de waarden van het aangesloten licht opgeven."
+    "remarks_smart_dimmer": "Dit profiel biedt alleen waarden voor standby vermogen. \n In de volgende stap kunt u optioneel de waarden van het aangesloten licht opgeven"
   },
   "config": {
     "abort": {
@@ -12,16 +12,16 @@
     "error": {
       "daily_energy_mandatory": "Je moet minimaal waarde of waarde template opgeven",
       "entity_mandatory": "Je moet verplicht een entiteit opgeven voor iedere andere strategie dan playbook",
-      "fixed_mandatory": "Je dient minimaal een van de volgende velden te definiëren: vermogen, vermogen template of vermogen per status",
+      "fixed_mandatory": "Je dient minimaal een van de volgende velden te definiëren: Vermogen, Vermogen template of Vermogen per status",
       "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
       "group_mandatory": "Je dient minimaal een van de volgende velden te definiëren: sub groepen, vermogen entiteiten of energie entiteiten",
-      "linear_mandatory": "Je moet mimimaal max vermogen of kalibratie waardes instellen",
+      "linear_mandatory": "Je moet tenminste één van Max vermogen of Kalibratie waardes opgeven",
       "linear_min_higher_as_max": "Maximale vermogen kan niet lager zijn dan minimale vermogen",
-      "linear_unsupported_domain": "Entiteit domein wordt niet ondersteund voor de lineaire modus. Moet een van de volgende zijn: fan, light of mediaplayer zijn. U kunt de kalibratie-optie gebruiken",
+      "linear_unsupported_domain": "Entiteit domein wordt niet ondersteund voor de lineaire modus. Moet een van de volgende zijn: fan, light of mediaplayer. U kunt echter de kalibratie-optie gebruiken",
       "lut_unsupported_color_mode": "Het LUT profiel ondersteund 1 van de kleur modes van je lamp niet. Bekijk de logs voor uitgebreide informatie",
       "lut_wrong_domain": "Alleen lamp entiteiten kunnen de LUT mode gebruiken",
-      "playbook_mandatory": "Je moet minimaal 1 playbook definiëren",
-      "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
+      "playbook_mandatory": "Je moet minimaal één playbook definiëren",
+      "unknown": "Onbekende fout opgetreden, bekijk de logs voor extra informatie"
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -107,18 +107,18 @@
           "create_standby_group": "Maak standby-groep",
           "create_utility_meters": "Creëer utiliteit meters",
           "disable_extended_attributes": "Extra attributen uitschakelen",
-          "disable_library_download": "Uitschakelen van externe bibliotheek download",
-          "enable_analytics": "Anonieme analytics inschakelen",
+          "disable_library_download": "Schakel download van externe bibliotheek uit",
+          "enable_analytics": "Verzend anonieme analytische data",
           "ignore_unavailable_state": "Negeer onbeschikbaar status",
-          "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
+          "include_non_powercalc_sensors": "Neem niet-powercalc sensoren mee",
           "power_sensor_category": "Vermogen sensor categorie",
-          "power_sensor_friendly_naming": "Vermogen sensor vriendelijke naampatroon",
-          "power_sensor_naming": "Vermogen sensor naampatroon"
+          "power_sensor_friendly_naming": "Patroon voor vriendelijke naam vermogenssensor",
+          "power_sensor_naming": "Patroon voor naam vermogenssensor"
         },
         "data_description": {
           "create_energy_sensors": "Of powercalc kWh sensoren moet maken",
-          "create_standby_group": "Maak groep met een totaal van alle stand-by en zelfgebruik van IOT apparaten",
-          "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
+          "create_standby_group": "Maak groep met een totaal van alle standby en eigen gebruik van IOT apparaten",
+          "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, elk uur, etc.",
           "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
           "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
           "enable_analytics": "Sta Powercalc toe om anonieme en geaggregeerde gebruiksstatistieken te verzenden om de integratie te helpen verbeteren",
@@ -157,13 +157,13 @@
           "group_energy_update_interval": "Groep energie update interval",
           "group_power_update_interval": "Groep vermogen update interval",
           "energy_update_interval": "Energie update interval",
-          "power_update_interval": "Power update interval"
+          "power_update_interval": "Vermogen update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Interval waarop groep energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
           "group_power_update_interval": "Interval waarop groep vermogensensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
           "energy_update_interval": "Interval waarop energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
-          "power_update_interval": "Interval at which energy sensors are force updated. In seconds. Set to 0 to disable"
+          "power_update_interval": "Interval waarop energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen"
         }
       },
       "global_configuration_utility_meter": {
@@ -382,10 +382,10 @@
       },
       "sub_profile_per_device": {
         "data": {
-          "sub_profile": "Sub profile"
+          "sub_profile": "Subprofiel"
         },
-        "description": "This device has a model with multiple sub profiles. {remarks}",
-        "title": "Sub profile config"
+        "description": "Dit apparaat heeft een model met meerdere subprofielen. {remarks}",
+        "title": "Subprofiel configuratie"
       },
       "smart_switch": {
         "data": {
@@ -632,13 +632,13 @@
           "group_energy_update_interval": "Groep energie update interval",
           "group_power_update_interval": "Groep vermogen update interval",
           "energy_update_interval": "Energie update interval",
-          "power_update_interval": "Power update interval"
+          "power_update_interval": "Vermogen update interval"
         },
         "data_description": {
           "group_energy_update_interval": "Interval waarop groep energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
           "group_power_update_interval": "Interval waarop groep vermogensensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
           "energy_update_interval": "Interval waarop energiesensoren worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen",
-          "power_update_interval": "Interval at which power sensors are force updated. In seconds. Set to 0 to disable"
+          "power_update_interval": "Interval waarop vermogenssensoren geforceerd worden bijgewerkt. In seconden. Stel in op 0 om uit te schakelen"
         }
       },
       "global_configuration_utility_meter": {
