@@ -9,7 +9,6 @@ on:
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
-#    if: github.event_name == 'pull_request' # pre-commit-ci/lite-action only runs here
     steps:
       - uses: actions/checkout@v6
         with:
@@ -20,5 +19,3 @@ jobs:
           activate-environment: true
       - run: uv sync
       - uses: j178/prek-action@v1
-#      - uses: pre-commit-ci/lite-action@v1.1.0
-#        if: always()
