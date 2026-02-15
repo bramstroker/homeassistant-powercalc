@@ -1,0 +1,32 @@
+{
+  "author": "lkoehl",
+  "calculation_strategy": "lut",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly 1PM Mini Gen4",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.5:docker"
+  },
+  "name": "Hue Datura ceiling light",
+  "sub_profile_select": {
+    "matchers": [
+      {
+        "type": "entity_id",
+        "pattern": "top",
+        "profile": "top"
+      },
+      {
+        "type": "entity_id",
+        "pattern": "bottom",
+        "profile": "bottom"
+      }
+    ]
+  },
+  "author_info": {
+    "name": "Lukas Köhl",
+    "github": "lkoehl"
+  }
+}
