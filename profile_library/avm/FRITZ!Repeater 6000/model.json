@@ -1,0 +1,21 @@
+{
+  "author": "hpuac",
+  "calculation_strategy": "fixed",
+  "created_at": "2026-02-14T19:16:54Z",
+  "device_type": "network",
+  "fixed_config": {
+    "power": 9.73
+  },
+  "measure_description": "Measured with Powercalc measure tool in Average mode (600 seconds)",
+  "measure_device": "Shelly Plug S",
+  "measure_method": "script",
+  "name": "FRITZ!Repeater 6000",
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "author_info": {
+    "name": "hpuac",
+    "github": "hpuac"
+  }
+}
