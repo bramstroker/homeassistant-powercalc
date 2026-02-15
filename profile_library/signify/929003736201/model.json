@@ -12,6 +12,10 @@
     "VERSION": "v1.20.5:docker"
   },
   "name": "Hue Datura ceiling light",
+  "aliases": [
+    "929003736201_01",
+    "929003736201_02"
+  ],
   "sub_profile_select": {
     "default": "top",
     "matchers": [
