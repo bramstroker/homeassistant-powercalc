@@ -104,7 +104,7 @@
         "description": "Configuração global do Powercalc. Para obter mais informações, consulte o [documentation]({docs_uri}). Opções adicionais para sensores de energia e medidores de utilidade podem ser fornecidas nos próximos passos.",
         "data": {
           "create_energy_sensors": "Criar sensor de consumo",
-          "create_standby_group": "Create standby group",
+          "create_standby_group": "Criar grupo de standby",
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar download da biblioteca remota",
@@ -117,7 +117,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Se o powercalc precisa criar um sensor kWh",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+          "create_standby_group": "Criar grupo que soma todo o consumo de energia em standby e auto-uso dos dispositivos IoT",
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados da energia, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
@@ -157,13 +157,13 @@
           "group_energy_update_interval": "Intervalo de atualização de energia do grupo",
           "group_power_update_interval": "Intervalo de atualização de potência do grupo",
           "energy_update_interval": "Intervalo de atualização de energia",
-          "power_update_interval": "Power update interval"
+          "power_update_interval": "Intervalo de atualização de potência"
         },
         "data_description": {
           "group_energy_update_interval": "Intervalo em que os sensores de energia do grupo são atualizados. Em segundos. Defina como 0 para desativar",
           "group_power_update_interval": "Intervalo em que os sensores de potência do grupo são atualizados. Em segundos. Defina como 0 para desativar",
           "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar",
-          "power_update_interval": "Interval at which energy sensors are force updated. In seconds. Set to 0 to disable"
+          "power_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar"
         }
       },
       "global_configuration_utility_meter": {
@@ -348,7 +348,7 @@
         },
         "data_description": {
           "calculation_enabled_condition": "A estratégia de cálculo de energia configurada só será executada quando este modelo for avaliado como verdadeiro ou 1, caso contrário, o sensor de energia exibirá 0",
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
+          "energy_filter_outlier_enabled": "Ativar filtragem de valores atípicos no sensor de energia",
           "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
           "ignore_unavailable_state": "Alternar essa configuração quando quiser que o sensor de energia permaneça disponível, mesmo que a entidade de origem esteja indisponível",
           "multiply_factor": "Multiplica a potência calculada por esta proporção. Pode ser útil para grupos de luzes",
@@ -551,12 +551,12 @@
         "data": {
           "energy_integration_method": "Método de integração",
           "energy_sensor_unit_prefix": "Prefixo de unidade",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_filter_outlier_enabled": "Filtrar valores atípicos",
+          "energy_filter_outlier_max_step": "Passo máximo do filtro de valores atípicos"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "Ativar filtragem de valores atípicos no sensor de energia",
+          "energy_filter_outlier_max_step": "Passo máximo esperado nos valores de potência (em watts) para o filtro de valores atípicos"
         }
       },
       "fixed": {
@@ -591,11 +591,11 @@
         },
         "data_description": {
           "create_energy_sensors": "Se o powercalc precisa criar sensores kWh",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+          "create_standby_group": "Criar grupo que soma todo o consumo de energia em standby e auto-uso dos dispositivos IoT",
           "create_utility_meters": "Deixe que energia crie medidores utilitários, de ciclo diário, horário, etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados de potência, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
           "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+          "enable_analytics": "Permitir que o Powercalc envie estatísticas de uso anônimas e agregadas para ajudar a melhorar a integração",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
         }
@@ -609,7 +609,7 @@
           "exclude_self_usage": "Exclude self-usage"
         },
         "data_description": {
-          "exclude_device_types": "Exclude one or more specific device types from discovery.",
+          "exclude_device_types": "Exclua um ou mais tipos específicos de dispositivos da descoberta.",
           "exclude_self_usage": "Exclude self-usage profiles for smart switches."
         }
       },
@@ -629,16 +629,16 @@
         "title": "Opções de limitação",
         "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
         "data": {
-          "group_energy_update_interval": "Group energy update interval",
-          "group_power_update_interval": "Group power update interval",
+          "group_energy_update_interval": "Intervalo de atualização de energia do grupo",
+          "group_power_update_interval": "Intervalo de atualização de potência do grupo",
           "energy_update_interval": "Intervalo de atualização de energia",
-          "power_update_interval": "Power update interval"
+          "power_update_interval": "Intervalo de atualização de potência"
         },
         "data_description": {
-          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
+          "group_energy_update_interval": "Intervalo em que os sensores de energia do grupo são atualizados. Em segundos. Defina como 0 para desativar",
           "group_power_update_interval": "Intervalo em que os sensores de potência do grupo são atualizados. Em segundos. Defina como 0 para desativar",
           "energy_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar",
-          "power_update_interval": "Interval at which power sensors are force updated. In seconds. Set to 0 to disable"
+          "power_update_interval": "Intervalo em que os sensores de energia são atualizados. Em segundos. Defina como 0 para desativar"
         }
       },
       "global_configuration_utility_meter": {
