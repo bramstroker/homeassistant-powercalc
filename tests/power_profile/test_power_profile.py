@@ -443,3 +443,27 @@ async def test_requires_manual_sub_profile_selection(hass: HomeAssistant, test_p
         custom_directory=get_test_profile_dir(test_profile),
     )
     assert await power_profile.requires_manual_sub_profile_selection == expected_result
+
+
+@pytest.mark.parametrize(
+    "manufacturer,model,custom_dir,expected_result",
+    [
+        ("test", "test", get_test_profile_dir("sub_profile_only_default"), True),
+        (
+            "test",
+            "fixed",
+            None,
+            True,
+        ),
+        (
+            "aeotec",
+            "ZW117",
+            None,
+            False,
+        ),
+    ],
+)
+async def test_is_custom_profile(hass: HomeAssistant, manufacturer: str, model: str, custom_dir: str | None, expected_result: bool) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(ModelInfo(manufacturer, model), custom_directory=custom_dir)
+    assert power_profile.is_custom_profile is expected_result

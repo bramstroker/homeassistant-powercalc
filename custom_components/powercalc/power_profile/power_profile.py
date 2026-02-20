@@ -22,9 +22,10 @@ from homeassistant.components.vacuum import DOMAIN as VACUUM_DOMAIN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import translation
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.helpers.storage import STORAGE_DIR
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.const import CONF_MAX_POWER, CONF_MIN_POWER, CONF_POWER, DOMAIN, CalculationStrategy
+from custom_components.powercalc.const import BUILT_IN_LIBRARY_DIR, CONF_MAX_POWER, CONF_MIN_POWER, CONF_POWER, DOMAIN, CalculationStrategy
 from custom_components.powercalc.errors import (
     ModelNotSupportedError,
     UnsupportedStrategyError,
@@ -431,3 +432,8 @@ class PowerProfile:
             return False
 
         return self.device_type in DOMAIN_DEVICE_TYPE_MAPPING[domain]
+
+    @property
+    def is_custom_profile(self) -> bool:
+        """Whether this profile is a custom profile."""
+        return not self._directory.startswith(self._hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR))

@@ -19,6 +19,8 @@ from homeassistant.const import (
 
 MIN_HA_VERSION = "2025.1"
 
+BUILT_IN_LIBRARY_DIR = "powercalc_profiles"
+
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 
