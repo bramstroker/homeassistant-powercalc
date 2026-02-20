@@ -29,6 +29,8 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_SENSORS,
+    CREATION_MODE_LIBRARY,
+    CREATION_MODE_MANUAL,
     DOMAIN,
     DOMAIN_CONFIG,
     SERVICE_RELOAD,
@@ -332,3 +334,28 @@ async def test_standby_group_sensor_is_not_marked_as_yaml(hass: HomeAssistant) -
     payload = await analytics._prepare_payload()  # noqa: SLF001
 
     assert payload["counts"]["by_config_type"] == {}
+
+
+async def test_creation_modes(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        [
+            get_simple_fixed_config("switch.manual", 50),
+            {
+                CONF_ENTITY_ID: "light.library",
+                CONF_MANUFACTURER: "signify",
+                CONF_MODEL: "LCT010",
+            },
+        ],
+        {
+            CONF_CREATE_STANDBY_GROUP: False,
+        },
+    )
+
+    analytics = Analytics(hass)
+    payload = await analytics._prepare_payload()  # noqa: SLF001
+
+    assert payload["counts"]["by_creation_mode"] == {
+        CREATION_MODE_MANUAL: 1,
+        CREATION_MODE_LIBRARY: 1,
+    }
