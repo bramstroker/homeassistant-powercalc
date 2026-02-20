@@ -170,7 +170,7 @@ async def test_effect_mode_unsupported(hass: HomeAssistant) -> None:
                 ATTR_EFFECT: "Test",
             },
         ),
-        expected_power=9.65,
+        expected_power=None,
     )
 
 

@@ -165,12 +165,18 @@ class LutStrategy(PowerCalculationStrategyInterface):
             )
             return None
 
+        lut_mode = LookupMode.from_color_mode(color_mode)
         effect = attrs.get(ATTR_EFFECT)
-        active_mode = LookupMode.EFFECT if effect and LookupMode.EFFECT in supported_lut_modes else LookupMode.from_color_mode(color_mode)
+        if effect:
+            if LookupMode.EFFECT not in supported_lut_modes:
+                _LOGGER.debug("%s: Effects not supported for this power profile", entity_state.entity_id)
+                return None
+            lut_mode = LookupMode.EFFECT
+
         try:
             lookup_table = await self._lut_registry.get_lookup_dictionary(
                 self._profile,
-                active_mode,
+                lut_mode,
             )
         except LutFileNotFoundError:
             _LOGGER.error(
@@ -191,7 +197,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             {attr: getattr(light_setting, attr) for attr in vars(light_setting)},
         )
 
-        if active_mode == LookupMode.EFFECT:
+        if lut_mode == LookupMode.EFFECT:
             lookup_table = lookup_table.get(effect)  # type: ignore
             if not lookup_table:
                 _LOGGER.warning('%s: Effect "%s" not found in LUT', entity_state.entity_id, effect)
