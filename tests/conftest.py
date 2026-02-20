@@ -137,7 +137,7 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
 
 
 @pytest.fixture(autouse=True)
-def mock_remote_loader(request: SubRequest, hass: HomeAssistant) -> Generator:
+def mock_remote_loader(request: SubRequest) -> Generator:
     if "skip_remote_loader_mocking" in request.keywords:
         yield
         return
