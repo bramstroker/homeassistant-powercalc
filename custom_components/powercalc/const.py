@@ -19,6 +19,8 @@ from homeassistant.const import (
 
 MIN_HA_VERSION = "2025.1"
 
+BUILT_IN_LIBRARY_DIR = "powercalc_profiles"
+
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 
@@ -40,7 +42,7 @@ DATA_ENTITY_TYPES: Literal["entity_types"] = "entity_types"
 DATA_STRATEGIES: Literal["strategies"] = "strategies"
 DATA_GROUP_SIZES: Literal["group_sizes"] = "group_sizes"
 DATA_HAS_GROUP_INCLUDE: Literal["has_group_include"] = "has_group_include"
-DATA_VIRTUAL_POWER_CREATION_MODES: Literal["virtual_power_creation_modes"] = "virtual_power_creation_modes"
+DATA_POWER_PROFILE_SOURCES: Literal["power_profile_sources"] = "power_profile_sources"
 
 ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
 ENTRY_DATA_POWER_ENTITY = "_power_entity"
@@ -216,8 +218,6 @@ LIBRARY_URL = "https://library.powercalc.nl"
 API_URL = "https://api.powercalc.nl"
 
 MANUFACTURER_WLED = "WLED"
-CREATION_MODE_MANUAL = "manual"
-CREATION_MODE_LIBRARY = "library"
 
 ATTR_CALCULATION_MODE = "calculation_mode"
 ATTR_ENERGY_SENSOR_ENTITY_ID = "energy_sensor_entity_id"
@@ -298,3 +298,11 @@ class EntityType(StrEnum):
     UTILITY_METER = "utility_meter"
     TARIFF_SELECT = "tariff_select"
     UNKNOWN = "unknown"
+
+
+class PowerProfileSource(StrEnum):
+    """Possible power profile sources."""
+
+    MANUAL = "manual"
+    LIBRARY_BUILTIN = "library_builtin"
+    LIBRARY_CUSTOM = "library_custom"

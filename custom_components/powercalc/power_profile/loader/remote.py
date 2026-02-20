@@ -17,7 +17,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import STORAGE_DIR
 from homeassistant.loader import async_get_integration
 
-from custom_components.powercalc.const import API_URL, DOMAIN
+from custom_components.powercalc.const import API_URL, BUILT_IN_LIBRARY_DIR, DOMAIN
 from custom_components.powercalc.helpers import async_cache
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
@@ -124,7 +124,7 @@ class RemoteLoader(Loader):
     async def load_library_json(self) -> dict[str, Any]:
         """Load library.json file"""
 
-        local_path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json")
+        local_path = self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, "library.json")
 
         def _load_local_library_json() -> dict[str, Any]:
             """Load library.json file from local storage"""
@@ -288,7 +288,7 @@ class RemoteLoader(Loader):
 
     def get_storage_path(self, manufacturer: str, model: str) -> str:
         """Retrieve the storage path for a given manufacturer and model."""
-        return str(self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model))
+        return str(self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, manufacturer, model))
 
     async def download_with_retry(self, callback: Callable[[], Coroutine[Any, Any, None | dict[str, Any]]]) -> None | dict[str, Any]:
         """Download a file from a remote endpoint with retries"""
@@ -351,7 +351,7 @@ class RemoteLoader(Loader):
     def _load_profile_hashes(self) -> dict[str, str]:
         """Load profile hashes from local storage"""
 
-        path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
+        path = self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, ".profile_hashes")
         if not os.path.exists(path):
             return {}
 
@@ -361,6 +361,6 @@ class RemoteLoader(Loader):
     def _write_profile_hashes(self, hashes: dict[str, str]) -> None:
         """Write profile hashes to local storage"""
 
-        path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
+        path = self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, ".profile_hashes")
         with open(path, "w") as json_file:
             json.dump(hashes, json_file, indent=4)
