@@ -89,3 +89,25 @@ Examples:
     }
 }
 ```
+
+## Model ID
+
+Could be used when a single physical device is represented by multiple devices in Home Assistant.
+For example Hue Datura light has a top and bottom light, these are 2 different devices in HA.
+
+See: [signify/929003736201](https://github.com/bramstroker/homeassistant-powercalc/tree/master/profile_library/signify/929003736201)
+
+```json
+{
+    "sub_profile_select": {
+        "matchers": [
+            {
+                "type": "model_id",
+                "model_id": "929003736201_02",
+                "profile": "bottom"
+            }
+        ],
+        "default": "top"
+    }
+}
+```

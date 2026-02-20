@@ -7,8 +7,7 @@ from enum import StrEnum
 import json
 import logging
 import os
-import re
-from typing import Any, NamedTuple, Protocol, cast
+from typing import Any, cast
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
@@ -20,18 +19,17 @@ from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.vacuum import DOMAIN as VACUUM_DOMAIN
-from homeassistant.core import HomeAssistant, State
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import translation
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_MAX_POWER, CONF_MIN_POWER, CONF_POWER, DOMAIN, CalculationStrategy
 from custom_components.powercalc.errors import (
     ModelNotSupportedError,
-    PowercalcSetupError,
     UnsupportedStrategyError,
 )
+from custom_components.powercalc.power_profile.sub_profile_selector import SubProfileSelectConfig
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,13 +54,6 @@ class DeviceType(StrEnum):
 class DiscoveryBy(StrEnum):
     DEVICE = "device"
     ENTITY = "entity"
-
-
-class SubProfileMatcherType(StrEnum):
-    ATTRIBUTE = "attribute"
-    ENTITY_ID = "entity_id"
-    ENTITY_STATE = "entity_state"
-    INTEGRATION = "integration"
 
 
 @dataclass(frozen=True)
@@ -440,147 +431,3 @@ class PowerProfile:
             return False
 
         return self.device_type in DOMAIN_DEVICE_TYPE_MAPPING[domain]
-
-
-class SubProfileSelector:
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        config: SubProfileSelectConfig,
-        source_entity: SourceEntity,
-    ) -> None:
-        self._hass = hass
-        self._config = config
-        self._source_entity = source_entity
-        self._matchers: list[SubProfileMatcher] = self._build_matchers()
-
-    def _build_matchers(self) -> list[SubProfileMatcher]:
-        """Create matchers from json config."""
-        return [self._create_matcher(matcher_config) for matcher_config in self._config.matchers or []]
-
-    def select_sub_profile(self, entity_state: State) -> str:
-        """Dynamically tries to select a sub profile depending on the entity state.
-        This method always need to return a sub profile, when nothing is matched it will return a default.
-        """
-        for matcher in self._matchers:
-            sub_profile = matcher.match(entity_state, self._source_entity)
-            if sub_profile:
-                return sub_profile
-
-        return self._config.default
-
-    def get_tracking_entities(self) -> list[str]:
-        """Get additional list of entities to track for state changes."""
-        return [entity_id for matcher in self._matchers for entity_id in matcher.get_tracking_entities()]
-
-    def _create_matcher(self, matcher_config: dict) -> SubProfileMatcher:
-        """Create a matcher from json config. Can be extended for more matchers in the future."""
-        matcher_type: SubProfileMatcherType = matcher_config["type"]
-        if matcher_type == SubProfileMatcherType.ATTRIBUTE:
-            return AttributeMatcher(matcher_config["attribute"], matcher_config["map"])
-        if matcher_type == SubProfileMatcherType.ENTITY_STATE:
-            return EntityStateMatcher(
-                self._hass,
-                self._source_entity,
-                matcher_config["entity_id"],
-                matcher_config["map"],
-            )
-        if matcher_type == SubProfileMatcherType.ENTITY_ID:
-            return EntityIdMatcher(matcher_config["pattern"], matcher_config["profile"])
-        if matcher_type == SubProfileMatcherType.INTEGRATION:
-            return IntegrationMatcher(
-                matcher_config["integration"],
-                matcher_config["profile"],
-            )
-        raise PowercalcSetupError(f"Unknown sub profile matcher type: {matcher_type}")
-
-
-class SubProfileSelectConfig(NamedTuple):
-    default: str
-    matchers: list[dict] | None = None
-
-
-class SubProfileMatcher(Protocol):
-    def match(self, entity_state: State, source_entity: SourceEntity) -> str | None:
-        """Returns a sub profile."""
-
-    def get_tracking_entities(self) -> list[str]:
-        """Get extra entities to track for state changes."""
-
-
-class EntityStateMatcher(SubProfileMatcher):
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        source_entity: SourceEntity | None,
-        entity_id: str,
-        mapping: dict[str, str],
-    ) -> None:
-        self._hass = hass
-        if source_entity:
-            entity_id = entity_id.replace(
-                "{{source_object_id}}",
-                source_entity.object_id,
-            )
-        self._entity_id = entity_id
-        self._mapping = mapping
-
-    def match(self, entity_state: State, source_entity: SourceEntity) -> str | None:
-        state = self._hass.states.get(self._entity_id)
-        if state is None:
-            return None
-
-        return self._mapping.get(state.state)
-
-    def get_tracking_entities(self) -> list[str]:
-        return [self._entity_id]
-
-
-class AttributeMatcher(SubProfileMatcher):
-    def __init__(self, attribute: str, mapping: dict[str, str]) -> None:
-        self._attribute = attribute
-        self._mapping = mapping
-
-    def match(self, entity_state: State, source_entity: SourceEntity) -> str | None:
-        val = entity_state.attributes.get(self._attribute)
-        if val is None:
-            return None
-
-        return self._mapping.get(val)
-
-    def get_tracking_entities(self) -> list[str]:
-        return []
-
-
-class EntityIdMatcher(SubProfileMatcher):
-    def __init__(self, pattern: str, profile: str) -> None:
-        self._pattern = pattern
-        self._profile = profile
-
-    def match(self, entity_state: State, source_entity: SourceEntity) -> str | None:
-        if re.search(self._pattern, entity_state.entity_id):
-            return self._profile
-
-        return None
-
-    def get_tracking_entities(self) -> list[str]:
-        return []
-
-
-class IntegrationMatcher(SubProfileMatcher):
-    def __init__(self, integration: str, profile: str) -> None:
-        self._integration = integration
-        self._profile = profile
-
-    def match(self, entity_state: State, source_entity: SourceEntity) -> str | None:
-        registry_entry = source_entity.entity_entry
-        if not registry_entry:
-            return None
-
-        if registry_entry.platform == self._integration:
-            return self._profile
-
-        return None
-
-    def get_tracking_entities(self) -> list[str]:
-        return []

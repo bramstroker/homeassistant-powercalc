@@ -93,11 +93,8 @@ from custom_components.powercalc.errors import (
 )
 from custom_components.powercalc.helpers import evaluate_power
 from custom_components.powercalc.power_profile.factory import get_power_profile
-from custom_components.powercalc.power_profile.power_profile import (
-    PowerProfile,
-    SubProfileSelectConfig,
-    SubProfileSelector,
-)
+from custom_components.powercalc.power_profile.power_profile import PowerProfile
+from custom_components.powercalc.power_profile.sub_profile_selector import SubProfileSelectConfig, SubProfileSelector
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.playbook import PlaybookStrategy
 from custom_components.powercalc.strategy.selector import detect_calculation_strategy
