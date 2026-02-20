@@ -102,7 +102,6 @@ from .sensor import SENSOR_CONFIG
 from .sensors.group.config_entry_utils import (
     get_entries_excluding_global_config,
     get_entries_having_subgroup,
-    remove_group_from_power_sensor_entry,
     remove_power_sensor_from_associated_groups,
 )
 from .service.gui_configuration import SERVICE_SCHEMA, change_gui_configuration
@@ -521,8 +520,6 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
             hass,
             config_entry,
         )
-    if sensor_type == SensorType.GROUP:
-        updated_entries = await remove_group_from_power_sensor_entry(hass, config_entry)
 
     for entry in updated_entries:
         if entry.state == ConfigEntryState.LOADED:

@@ -39,26 +39,6 @@ async def remove_power_sensor_from_associated_groups(
     return group_entries
 
 
-async def remove_group_from_power_sensor_entry(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-) -> list[ConfigEntry]:
-    """When the user removes a group config entry we need to update all the virtual power sensors which reference this group."""
-    entries_to_update = [
-        entry
-        for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER and entry.data.get(CONF_GROUP) == config_entry.entry_id
-    ]
-
-    for group_entry in entries_to_update:
-        hass.config_entries.async_update_entry(
-            group_entry,
-            data={**group_entry.data, CONF_GROUP: None},
-        )
-
-    return entries_to_update
-
-
 async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigEntry) -> ConfigEntry | None:  # type: ignore
     """
     When the user has set a group on a virtual power config entry,
