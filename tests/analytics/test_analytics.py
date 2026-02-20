@@ -198,8 +198,8 @@ async def test_no_duplicate_count_after_entry_reload(hass: HomeAssistant) -> Non
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_ENTITY_ID: "light.test",
-            CONF_MANUFACTURER: "test",
-            CONF_MODEL: "lut_white",
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010",
         },
     )
     await hass.config_entries.async_reload(entry.entry_id)
@@ -209,7 +209,7 @@ async def test_no_duplicate_count_after_entry_reload(hass: HomeAssistant) -> Non
     payload = await analytics._prepare_payload()  # noqa: SLF001
 
     assert payload["counts"]["by_config_type"] == {"gui": 1}
-    assert payload["counts"]["by_manufacturer"] == {"test": 1}
+    assert payload["counts"]["by_manufacturer"] == {"signify": 1}
 
 
 async def test_no_duplicate_count_after_config_reload(hass: HomeAssistant) -> None:
