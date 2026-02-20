@@ -17,13 +17,13 @@
     "default": "bottom",
     "matchers": [
       {
-        "type": "entity_id",
-        "pattern": "top",
+        "type": "model_id",
+        "model_id": "929003736201_02",
         "profile": "top"
       },
       {
-        "type": "entity_id",
-        "pattern": "bottom",
+        "type": "model_id",
+        "model_id": "929003736201_01",
         "profile": "bottom"
       }
     ]
