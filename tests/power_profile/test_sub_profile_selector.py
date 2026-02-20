@@ -9,11 +9,11 @@ from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.errors import PowercalcSetupError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
-from custom_components.powercalc.power_profile.sub_profile_selector import SubProfileSelector
+from custom_components.powercalc.power_profile.sub_profile_selector import ModelIdMatcher, SubProfileSelector
 from tests.common import get_test_profile_dir
 
 
-async def test_sub_profile_matcher_attribute(hass: HomeAssistant) -> None:
+async def test_matcher_attribute(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
@@ -36,7 +36,7 @@ async def test_sub_profile_matcher_attribute(hass: HomeAssistant) -> None:
     assert selector.select_sub_profile(state) == "b"
 
 
-async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
+async def test_matcher_entity_id(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
@@ -78,7 +78,7 @@ async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
         (None, "default"),
     ],
 )
-async def test_sub_profile_matcher_integration(
+async def test_matcher_integration(
     hass: HomeAssistant,
     registry_entry: RegistryEntry,
     expected_profile: str | None,
@@ -115,7 +115,7 @@ async def test_sub_profile_matcher_integration(
         ("other", "default"),
     ],
 )
-async def test_sub_profile_matcher_model_id(
+async def test_matcher_model_id(
     hass: HomeAssistant,
     model_id: str,
     expected_profile: str,
@@ -139,12 +139,19 @@ async def test_sub_profile_matcher_model_id(
         power_profile.sub_profile_select,
         source_entity,
     )
+    assert len(selector.get_tracking_entities()) == 0
+
     state = State("light.test", STATE_ON)
     sub_profile = selector.select_sub_profile(state)
     assert sub_profile == expected_profile
     if sub_profile != "default":
         await power_profile.select_sub_profile(sub_profile)
         assert power_profile.sub_profile == expected_profile
+
+
+async def test_matcher_model_id_no_device_entry() -> None:
+    matcher = ModelIdMatcher("foo", "bar")
+    assert matcher.match(State("light.test", STATE_ON), SourceEntity(entity_id="light.test", domain="light", object_id="test")) is None
 
 
 async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
