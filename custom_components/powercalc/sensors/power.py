@@ -73,13 +73,11 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
-    CREATION_MODE_LIBRARY,
-    CREATION_MODE_MANUAL,
     DATA_DISCOVERY_MANAGER,
+    DATA_POWER_PROFILE_SOURCES,
     DATA_POWER_PROFILES,
     DATA_STANDBY_POWER_SENSORS,
     DATA_STRATEGIES,
-    DATA_VIRTUAL_POWER_CREATION_MODES,
     DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
     DUMMY_ENTITY_ID,
@@ -87,6 +85,7 @@ from custom_components.powercalc.const import (
     OFF_STATES_BY_DOMAIN,
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
     CalculationStrategy,
+    PowerProfileSource,
 )
 from custom_components.powercalc.discovery import DiscoveryManager
 from custom_components.powercalc.errors import (
@@ -182,7 +181,7 @@ async def create_virtual_power_sensor(
         a = collect_analytics(hass, config_entry)
         a.inc(DATA_STRATEGIES, strategy)
         a.add(DATA_POWER_PROFILES, power_profile)
-        a.inc(DATA_VIRTUAL_POWER_CREATION_MODES, CREATION_MODE_LIBRARY if power_profile else CREATION_MODE_MANUAL)
+        a.inc(DATA_POWER_PROFILE_SOURCES, power_profile.configuration_source if power_profile else PowerProfileSource.MANUAL)
 
         _LOGGER.debug(
             "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s unique_id=%s)",

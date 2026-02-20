@@ -29,14 +29,13 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_SENSORS,
-    CREATION_MODE_LIBRARY,
-    CREATION_MODE_MANUAL,
     DOMAIN,
     DOMAIN_CONFIG,
     SERVICE_RELOAD,
     CalculationStrategy,
     EntityType,
     GroupType,
+    PowerProfileSource,
     SensorType,
 )
 from tests.common import get_simple_fixed_config, run_powercalc_setup, setup_config_entry
@@ -105,6 +104,7 @@ async def test_send_analytics_success(
     assert posted_json["counts"]["by_device_type"] == {DeviceType.LIGHT: 1}
     assert posted_json["counts"]["by_source_domain"] == {"light": 1, "switch": 1}
     assert posted_json["counts"]["by_entity_type"] == {EntityType.POWER_SENSOR: 2, EntityType.ENERGY_SENSOR: 2}
+    assert posted_json["counts"]["by_power_profile_source"] == {PowerProfileSource.MANUAL: 1, PowerProfileSource.LIBRARY_BUILTIN: 1}
 
 
 @pytest.mark.usefixtures("payload_mock")
@@ -336,7 +336,7 @@ async def test_standby_group_sensor_is_not_marked_as_yaml(hass: HomeAssistant) -
     assert payload["counts"]["by_config_type"] == {}
 
 
-async def test_creation_modes(hass: HomeAssistant) -> None:
+async def test_power_profile_sources(hass: HomeAssistant) -> None:
     await run_powercalc_setup(
         hass,
         [
@@ -355,7 +355,7 @@ async def test_creation_modes(hass: HomeAssistant) -> None:
     analytics = Analytics(hass)
     payload = await analytics._prepare_payload()  # noqa: SLF001
 
-    assert payload["counts"]["by_creation_mode"] == {
-        CREATION_MODE_MANUAL: 1,
-        CREATION_MODE_LIBRARY: 1,
+    assert payload["counts"]["by_power_profile_source"] == {
+        PowerProfileSource.MANUAL: 1,
+        PowerProfileSource.LIBRARY_BUILTIN: 1,
     }
