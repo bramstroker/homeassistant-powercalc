@@ -386,7 +386,8 @@
                   "attribute",
                   "entity_id",
                   "entity_state",
-                  "integration"
+                  "integration",
+                  "model_id"
                 ]
               },
               "attribute": {
@@ -402,6 +403,9 @@
                 "type": "string"
               },
               "integration": {
+                "type": "string"
+              },
+              "model_id": {
                 "type": "string"
               }
             },
