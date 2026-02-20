@@ -1,5 +1,5 @@
 {
-  "name": "Zigbee Smart Downlight ZB-LZD10-RCW",
+  "name": "Zigbee Smart Downlight",
   "device_type": "light",
   "calculation_strategy": "linear",
   "measure_method": "manual",
