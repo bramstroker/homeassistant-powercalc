@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v7
         with:
-          working-directory: './utils.visualize'
+          working-directory: './utils/visualize'
       - name: Run visualization tool
         run: |
           cd ./utils/visualize && bash generate-all.sh ../../profile_library
