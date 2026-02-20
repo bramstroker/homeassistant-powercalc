@@ -32,6 +32,7 @@ from custom_components.powercalc.const import (
     DATA_SENSOR_TYPES,
     DATA_SOURCE_DOMAINS,
     DATA_STRATEGIES,
+    DATA_VIRTUAL_POWER_CREATION_MODES,
     DOMAIN,
     DOMAIN_CONFIG,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
@@ -62,6 +63,7 @@ class RuntimeAnalyticsData(TypedDict, total=False):
     source_domains: Counter[str]
     group_types: Counter[GroupType]
     group_sizes: list[int]
+    virtual_power_creation_modes: Counter[str]
     entity_types: Counter[EntityType]
     uses_include: bool
     _seen: dict[str, set[str]]
@@ -179,6 +181,7 @@ class Analytics:
                 "by_source_domain": runtime_data.setdefault(DATA_SOURCE_DOMAINS, Counter()),
                 "by_group_type": runtime_data.setdefault(DATA_GROUP_TYPES, Counter()),
                 "by_entity_type": runtime_data.setdefault(DATA_ENTITY_TYPES, Counter()),
+                "by_creation_mode": runtime_data.setdefault(DATA_VIRTUAL_POWER_CREATION_MODES, Counter()),
             },
         }
 

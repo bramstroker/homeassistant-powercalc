@@ -42,6 +42,7 @@ DATA_ENTITY_TYPES: Literal["entity_types"] = "entity_types"
 DATA_STRATEGIES: Literal["strategies"] = "strategies"
 DATA_GROUP_SIZES: Literal["group_sizes"] = "group_sizes"
 DATA_HAS_GROUP_INCLUDE: Literal["has_group_include"] = "has_group_include"
+DATA_VIRTUAL_POWER_CREATION_MODES: Literal["virtual_power_creation_modes"] = "virtual_power_creation_modes"
 
 ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
 ENTRY_DATA_POWER_ENTITY = "_power_entity"
@@ -217,6 +218,8 @@ LIBRARY_URL = "https://library.powercalc.nl"
 API_URL = "https://api.powercalc.nl"
 
 MANUFACTURER_WLED = "WLED"
+CREATION_MODE_MANUAL = "manual"
+CREATION_MODE_LIBRARY = "library"
 
 ATTR_CALCULATION_MODE = "calculation_mode"
 ATTR_ENERGY_SENSOR_ENTITY_ID = "energy_sensor_entity_id"
