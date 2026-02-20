@@ -1,0 +1,18 @@
+{
+  "name": "Sub profile match model_id",
+  "sub_profile_select": {
+    "default": "default",
+    "matchers": [
+      {
+        "type": "model_id",
+        "model_id": "model-123",
+        "profile": "sub1"
+      },
+      {
+        "type": "model_id",
+        "model_id": "model-456",
+        "profile": "sub2"
+      }
+    ]
+  }
+}
