@@ -14,5 +14,11 @@
     "VERSION": "v1.20.5:docker"
   },
   "name": "LED Bulb T2 (E26, RGB, CCT)",
-  "standby_power": 0.14
+  "standby_power": 0.14,
+  "author_info": {
+    "name": "pinkfin",
+    "github": "pinkfin",
+    "email": "hot.wire1618@fastmail.com"
+  },
+  "author": "pinkfin"
 }
