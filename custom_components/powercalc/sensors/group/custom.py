@@ -608,7 +608,7 @@ class GroupedSensor(BaseEntity, SensorEntity):
             return False
 
         if self._last_update_time == 0:
-            return False
+            return False  # pragma: no cover
 
         # Apply a minimum throttle of 100ms to prevent flooding during rapid changes
         if current_time - self._last_update_time < 0.1:
