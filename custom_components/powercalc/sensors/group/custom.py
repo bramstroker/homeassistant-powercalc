@@ -572,22 +572,20 @@ class GroupedSensor(BaseEntity, SensorEntity):
             self.async_write_ha_state()
             return
 
-        current_time = time.time()
-        throttled = self._should_throttle(current_time)
-
         self._attr_available = True
         self._set_native_value(state, write_state=False)
 
-        if throttled:
-            if self._update_interval_exceeded_callback:
-                _LOGGER.debug("Throttling: %s", state)
-                return
+        # Throttled future update pending, return early
+        if self._update_interval_exceeded_callback:
+            return
+
+        current_time = time.time()
+        if self._should_throttle(current_time):
 
             @callback
             def _update_interval_callback(now: datetime) -> None:
                 self._update_interval_exceeded_callback = None
                 self._last_update_time = time.time()
-                _LOGGER.debug("Updating and resetting throttle: %s", state)
                 self.async_write_ha_state()
 
             self._update_interval_exceeded_callback = async_call_later(
@@ -602,21 +600,13 @@ class GroupedSensor(BaseEntity, SensorEntity):
         self.async_write_ha_state()
 
     def _should_throttle(self, current_time: float) -> bool:
-        if self._update_interval_exceeded_callback:
-            return True
-
         if self._update_interval == 0:
-            _LOGGER.debug("Skipping throttle check due to update interval set to 0")
             return False
 
         # Don't throttle initial updates within first 5 seconds after startup
         if current_time - self._start_time < 5:
-            _LOGGER.debug("Skipping throttle check due to startup delay")
             return False
 
-        _LOGGER.debug(
-            "Checking throttle, last update: %s, current time: %s, interval: %s", self._last_update_time, current_time, self._update_interval
-        )
         return current_time - self._last_update_time < self._update_interval
 
     def _cancel_update_interval_exceeded_callback(self) -> None:
