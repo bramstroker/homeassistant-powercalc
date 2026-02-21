@@ -1,5 +1,6 @@
 from collections.abc import Generator
 import json
+import logging
 import os
 import shutil
 from typing import Any, Protocol
@@ -28,6 +29,13 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from tests.common import get_test_config_dir
+
+
+@pytest.fixture(autouse=True)
+def set_logging_levels(caplog: pytest.LogCaptureFixture) -> None:
+    logging.getLogger("homeassistant").setLevel(logging.WARNING)
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
+    caplog.set_level(logging.DEBUG, logger="custom_components.powercalc")
 
 
 @pytest.fixture(autouse=True)
