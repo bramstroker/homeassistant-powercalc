@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 from datetime import timedelta
+from decimal import Decimal
 import logging
 from typing import Any
 from unittest.mock import patch
@@ -76,6 +77,7 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CONF_SUB_GROUPS,
     CONF_UNAVAILABLE_POWER,
+    DATA_GROUP_ENTITIES,
     DEFAULT_ENERGY_UPDATE_INTERVAL,
     DOMAIN,
     DUMMY_ENTITY_ID,
@@ -1803,6 +1805,9 @@ async def test_energy_throttle(hass: HomeAssistant, freezer: FrozenDateTimeFacto
     # This state change should be processed and written to state machine, in addition to previously collected state changes
     hass.states.async_set("sensor.b_energy", "4.25")
     await hass.async_block_till_done()
+
+    advance(DEFAULT_ENERGY_UPDATE_INTERVAL + 2)
+
     assert hass.states.get("sensor.testgroup_energy").state == "7.0000"
 
 
@@ -1833,8 +1838,8 @@ async def test_power_throttle(
     """Test that power sensor updates are throttled."""
 
     group_entity = "sensor.testgroup_power"
-    member_1_entity = "sensor.test_power"
-    member_2_entity = "sensor.test2_power"
+    member1 = "sensor.test_power"
+    member2 = "sensor.test2_power"
 
     async def set_states(states: list[tuple[str, str]]) -> None:
         for entity_id, value in states:
@@ -1844,6 +1849,9 @@ async def test_power_throttle(
     def advance(seconds: int) -> None:
         freezer.tick(timedelta(seconds=seconds))
         async_fire_time_changed(hass)
+
+    def get_group_state() -> str:
+        return hass.states.get(group_entity).state
 
     await run_powercalc_setup(
         hass,
@@ -1860,64 +1868,68 @@ async def test_power_throttle(
                 CONF_CREATE_ENERGY_SENSOR: False,
             },
         ],
-        {
-            CONF_GROUP_POWER_UPDATE_INTERVAL: 2,
-        },
+        {CONF_GROUP_POWER_UPDATE_INTERVAL: 2},
     )
 
-    # Initial member states, spaced so throttling windows don't overlap
-    hass.states.async_set(member_1_entity, "1.00")
+    group_entity_obj = hass.data[DOMAIN][DATA_GROUP_ENTITIES][group_entity]
+
+    # Set initial member states with a gap so their throttle windows don't overlap.
+    hass.states.async_set(member1, "1.00")
     await hass.async_block_till_done()
-    freezer.tick(timedelta(seconds=5))
-    hass.states.async_set(member_2_entity, "1.00")
+    advance(5)
+    hass.states.async_set(member2, "1.00")
     await hass.async_block_till_done()
 
-    # Act & Assert: window #1
-    advance(3)
+    assert get_group_state() == "2.00"
 
-    await set_states(
-        [
-            (member_1_entity, "2.00"),
-            (member_2_entity, "3.00"),
-        ],
-    )
-
-    # Only the first state change in the throttle window should be registered:
-    #  test_power 2.00 + test2_power 1.00 = 3.00
-    assert hass.states.get(group_entity).state == "3.00"
-
-    # Act & Assert: window #2
-    advance(3)
-
-    await set_states(
-        [
-            (member_2_entity, "6.00"),
-            (member_1_entity, "2.00"),
-            (member_1_entity, "3.00"),
-            (member_2_entity, "3.00"),
-        ],
-    )
-
-    # Again, only the first change within the window should register:
-    #  test_power 2.00 + test2_power 6.00 = 8.00
-    assert hass.states.get(group_entity).state == "8.00"
+    # ── Window #1: first update passes, second is throttled ─────────────────
 
     advance(3)
 
-    # After another 3 seconds elapsed and no state changes it should have the last two known state values from last window
-    #  test_power 3.00 + test2_power 3.00 = 6.00
-    assert hass.states.get(group_entity).state == "6.00"
+    with patch.object(
+        group_entity_obj,
+        "async_write_ha_state",
+        wraps=group_entity_obj.async_write_ha_state,
+    ) as mock_write:
+        await set_states([(member1, "2.00"), (member2, "3.00")])
 
-    await set_states(
-        [
-            (member_1_entity, "0.00"),
-            (member_2_entity, "0.00"),
-        ],
-    )
+        # MEMBER_1 → 2.00 triggers an immediate write.
+        # MEMBER_2 → 3.00 is throttled; the internal value is updated but a
+        # timer is scheduled to flush it later.
+        assert mock_write.call_count == 1
+        assert get_group_state() == "3.00"  # last flushed value
+        assert group_entity_obj._attr_native_value == Decimal("5.00")  # noqa: SLF001
 
+    advance(3)  # fires the scheduled timer → flushes 5.00
+
+    assert get_group_state() == "5.00"
+
+    # ── Window #2: all updates are throttled, timer flushes at end ───────────
+
+    with patch.object(
+        group_entity_obj,
+        "async_write_ha_state",
+        wraps=group_entity_obj.async_write_ha_state,
+    ) as mock_write:
+        await set_states([(member2, "6.00"), (member1, "3.00"), (member2, "3.00")])
+
+        # All three updates fall within the throttle window (last write was via
+        # the timer), so no immediate write occurs. Internal value reflects the
+        # latest sum: MEMBER_1=3 + MEMBER_2=3 = 6.
+        assert mock_write.call_count == 0
+        assert get_group_state() == "5.00"  # still the old state
+        assert group_entity_obj._attr_native_value == Decimal("6.00")  # noqa: SLF001
+
+    advance(3)  # fires the scheduled timer → flushes 6.00
+
+    assert get_group_state() == "6.00"
+
+    # ── Teardown: verify the group returns to 0 after members reset ──────────
+
+    await set_states([(member1, "0.00"), (member2, "0.00")])
     advance(3)
 
-    assert hass.states.get(group_entity).state == "0.00"
+    assert get_group_state() == "0.00"
 
 
 async def test_resolve_entity_ids_area(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
