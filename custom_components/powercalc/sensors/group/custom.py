@@ -607,6 +607,13 @@ class GroupedSensor(BaseEntity, SensorEntity):
         if current_time - self._start_time < 5:
             return False
 
+        if self._last_update_time == 0:
+            return False  # pragma: no cover
+
+        # Apply a minimum throttle of 100ms to prevent flooding during rapid changes
+        if current_time - self._last_update_time < 0.1:
+            return True
+
         return current_time - self._last_update_time < self._update_interval
 
     def _cancel_update_interval_exceeded_callback(self) -> None:
