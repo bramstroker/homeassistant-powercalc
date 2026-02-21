@@ -35,5 +35,11 @@
     "VERSION": "v1.20.5:docker"
   },
   "name": "TurboPoly Fan 715S",
-  "standby_power": 0.98
+  "standby_power": 0.98,
+  "author_info": {
+    "name": "pinkfin",
+    "github": "pinkfin",
+    "email": "hot.wire1618@fastmail.com"
+  },
+  "author": "pinkfin"
 }
