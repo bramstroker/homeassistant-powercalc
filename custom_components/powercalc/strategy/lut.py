@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import defaultdict
+from bisect import bisect_left
 from collections.abc import Mapping
 from csv import reader
 from dataclasses import dataclass
@@ -10,7 +10,7 @@ from functools import partial
 import gzip
 import logging
 import os
-from typing import Any, TextIO
+from typing import Any, TextIO, TypeVar, cast
 
 from homeassistant.components import light
 from homeassistant.components.light import (
@@ -24,7 +24,6 @@ from homeassistant.components.light import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.util.color import color_temperature_kelvin_to_mired, color_temperature_to_hs
-import numpy as np
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.errors import (
@@ -41,9 +40,9 @@ BrightnessLutValue = float
 ColorTempLutValue = dict[int, float]
 SatLutValue = dict[int, float]
 HsLutValue = dict[int, SatLutValue]
-EffectLutValue = dict[str, float]
 LookupDictValue = BrightnessLutValue | ColorTempLutValue | HsLutValue
 LookupDictType = dict[int, LookupDictValue]
+EffectTableType = dict[str, dict[int, float]]
 
 
 class LookupMode(StrEnum):
@@ -57,51 +56,123 @@ class LookupMode(StrEnum):
         return LookupMode(color_mode.value)
 
 
+@dataclass
+class _LutEntry:
+    """Holds a lookup dictionary together with its pre-sorted brightness key list."""
+
+    table: LookupDictType
+    sorted_keys: list[int]
+
+
+@dataclass
+class _EffectEntry:
+    """Holds an effect lookup table (str → {brightness: power})."""
+
+    table: EffectTableType
+
+
 class LutRegistry:
     def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
-        self._lookup_dictionaries: dict[str, dict] = {}
-        self.supported_modes: dict[str, set[LookupMode]] = {}
+        self._lut_entries: dict[tuple, _LutEntry] = {}
+        self._effect_entries: dict[tuple, _EffectEntry] = {}
+        self._supported_modes: dict[tuple, set[LookupMode]] = {}
 
-    async def get_lookup_dictionary(
+    async def get_lookup_entry(
         self,
         power_profile: PowerProfile,
         lookup_mode: LookupMode,
-    ) -> LookupDictType:
-        cache_key = f"{power_profile.manufacturer}_{power_profile.model}_{lookup_mode}_{power_profile.sub_profile}"
-        lookup_dict = self._lookup_dictionaries.get(cache_key)
-        if lookup_dict is None:
-            lookup_dict = defaultdict(partial(defaultdict, dict))
+    ) -> _LutEntry:
+        """Return a cached _LutEntry for the given profile and mode."""
+        cache_key = self._cache_key(power_profile, lookup_mode)
+        entry = self._lut_entries.get(cache_key)
+        if entry is None:
+            entry = await self._hass.async_add_executor_job(partial(self._load_lut_entry, power_profile, lookup_mode))
+            self._lut_entries[cache_key] = entry
+        return entry
 
-            csv_file = await self._hass.async_add_executor_job(partial(self.get_lut_file, power_profile, lookup_mode))
-            with csv_file:
-                csv_reader = reader(csv_file)
-                next(csv_reader)  # skip header row
+    async def get_effect_entry(
+        self,
+        power_profile: PowerProfile,
+    ) -> _EffectEntry:
+        """Return a cached _EffectEntry for the given profile."""
+        cache_key = self._cache_key(power_profile, LookupMode.EFFECT)
+        entry = self._effect_entries.get(cache_key)
+        if entry is None:
+            entry = await self._hass.async_add_executor_job(partial(self._load_effect_entry, power_profile))
+            self._effect_entries[cache_key] = entry
+        return entry
 
-                line_count = 0
-                for row in csv_reader:
-                    if lookup_mode == LookupMode.HS:
-                        lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(
-                            row[3],
-                        )
-                    elif lookup_mode == LookupMode.COLOR_TEMP:
-                        lookup_dict[int(row[0])][int(row[1])] = float(row[2])
-                    elif lookup_mode == LookupMode.EFFECT:
-                        lookup_dict[row[0]][int(row[1])] = float(row[2])
-                    else:
-                        lookup_dict[int(row[0])] = float(row[1])
-                    line_count += 1
+    async def get_supported_modes(self, power_profile: PowerProfile) -> set[LookupMode]:
+        """Return the LUT modes supported by the profile."""
+        cache_key = (power_profile.manufacturer, power_profile.model, "supported_modes")
+        supported_modes = self._supported_modes.get(cache_key)
+        if supported_modes is None:
+            supported_modes = set()
+            for filename in await self._hass.async_add_executor_job(os.listdir, power_profile.get_model_directory()):
+                if filename.endswith((".csv.gz", ".csv")):
+                    base_name = filename.split(".", 1)[0]
+                    supported_modes.add(LookupMode(base_name))
+            self._supported_modes[cache_key] = supported_modes
+        return supported_modes
 
-            _LOGGER.debug("LUT file loaded: %d lines", line_count)
+    @staticmethod
+    def _cache_key(power_profile: PowerProfile, lookup_mode: LookupMode) -> tuple:
+        return power_profile.manufacturer, power_profile.model, lookup_mode, power_profile.sub_profile
 
-            lookup_dict = dict(lookup_dict)
-            self._lookup_dictionaries[cache_key] = lookup_dict
+    @classmethod
+    def _load_lut_entry(cls, power_profile: PowerProfile, lookup_mode: LookupMode) -> _LutEntry:
+        """Load a non-effect CSV into a typed _LutEntry."""
+        raw: dict[int, Any] = {}
 
-        return lookup_dict
+        csv_file = cls.get_lut_file(power_profile, lookup_mode)
+        line_count = 0
+        with csv_file:
+            csv_reader = reader(csv_file)
+            next(csv_reader)  # skip header row
+            for row in csv_reader:
+                if lookup_mode == LookupMode.HS:
+                    bri_key = int(row[0])
+                    hue_key = int(row[1])
+                    sat_key = int(row[2])
+                    raw.setdefault(bri_key, {}).setdefault(hue_key, {})[sat_key] = float(row[3])
+                elif lookup_mode == LookupMode.COLOR_TEMP:
+                    bri_key = int(row[0])
+                    ct_key = int(row[1])
+                    raw.setdefault(bri_key, {})[ct_key] = float(row[2])
+                else:
+                    raw[int(row[0])] = float(row[1])
+                line_count += 1
+
+        _LOGGER.debug("LUT file loaded: %d lines", line_count)
+        table = cast(LookupDictType, raw)
+        return _LutEntry(table=table, sorted_keys=sorted(table.keys()))
+
+    @classmethod
+    def _load_effect_entry(cls, power_profile: PowerProfile) -> _EffectEntry:
+        """Load an effect CSV into a typed _EffectEntry."""
+        raw: dict[str, dict[int, float]] = {}
+
+        csv_file = cls.get_lut_file(power_profile, LookupMode.EFFECT)
+        line_count = 0
+        with csv_file:
+            csv_reader = reader(csv_file)
+            next(csv_reader)  # skip header row
+            for row in csv_reader:
+                effect_name: str = row[0]
+                bri_key = int(row[1])
+                raw.setdefault(effect_name, {})[bri_key] = float(row[2])
+                line_count += 1
+
+        _LOGGER.debug("Effect LUT file loaded: %d lines", line_count)
+        return _EffectEntry(table=raw)
 
     @staticmethod
     def get_lut_file(power_profile: PowerProfile, lookup_mode: LookupMode) -> TextIO:
-        """Open the LUT file for the given power profile and color mode. When the file is gzipped, it will be extracted with gzip."""
+        """
+        Open the LUT file for the given power profile and color mode.
+        When the file is gzipped it will be decompressed transparently.
+        """
         path = os.path.join(power_profile.get_model_directory(), f"{lookup_mode}.csv")
 
         gzip_path = f"{path}.gz"
@@ -115,20 +186,6 @@ class LutRegistry:
 
         raise LutFileNotFoundError("Data file not found: %s")
 
-    async def get_supported_modes(self, power_profile: PowerProfile) -> set[LookupMode]:
-        """Return the color modes supported by the Profile."""
-        cache_key = f"{power_profile.manufacturer}_{power_profile.model}_supported_modes"
-        supported_modes = self.supported_modes.get(cache_key)
-        if supported_modes is None:
-            supported_modes = set()
-            for file in await self._hass.async_add_executor_job(os.listdir, power_profile.get_model_directory()):
-                if file.endswith((".csv.gz", ".csv")):
-                    base_name = file.split(".", 1)[0]
-                    lookup_mode = LookupMode(base_name)
-                    supported_modes.add(lookup_mode)
-            self.supported_modes[cache_key] = supported_modes
-        return supported_modes
-
 
 class LutStrategy(PowerCalculationStrategyInterface):
     def __init__(
@@ -140,7 +197,11 @@ class LutStrategy(PowerCalculationStrategyInterface):
         self._source_entity = source_entity
         self._lut_registry = lut_registry
         self._profile = profile
-        self._strategy_color_modes: set[ColorMode] | None = None
+        self._supported_modes: set[LookupMode] = set()
+        self._effect_entry: _EffectEntry | None = None
+
+    async def initialize(self) -> None:
+        self._supported_modes = await self._lut_registry.get_supported_modes(self._profile)
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate the power consumption based on brightness, mired, hsl or effect."""
@@ -156,8 +217,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if brightness > 255:
             brightness = 255
 
-        supported_lut_modes = await self._lut_registry.get_supported_modes(self._profile)
-        color_mode = await self.get_selected_color_mode(attrs, supported_lut_modes)
+        color_mode = await self.get_selected_color_mode(attrs)
         if color_mode == ColorMode.UNKNOWN:
             _LOGGER.warning(
                 "%s: Could not calculate power. color mode unknown",
@@ -165,19 +225,14 @@ class LutStrategy(PowerCalculationStrategyInterface):
             )
             return None
 
-        lut_mode = LookupMode.from_color_mode(color_mode)
         effect = attrs.get(ATTR_EFFECT)
         if effect:
-            if LookupMode.EFFECT not in supported_lut_modes:
-                _LOGGER.debug("%s: Effects not supported for this power profile", entity_state.entity_id)
-                return None
-            lut_mode = LookupMode.EFFECT
+            return await self._calculate_effect_power(entity_state, str(effect), brightness)
+
+        lut_mode = LookupMode.from_color_mode(color_mode)
 
         try:
-            lookup_table = await self._lut_registry.get_lookup_dictionary(
-                self._profile,
-                lut_mode,
-            )
+            lut_entry = await self._lut_registry.get_lookup_entry(self._profile, lut_mode)
         except LutFileNotFoundError:
             _LOGGER.error(
                 "%s: Lookup table not found for color mode (model: %s, color_mode: %s)",
@@ -188,7 +243,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return None
 
         light_setting = self.create_light_setting(entity_state, color_mode, brightness)
-        if not light_setting:
+        if light_setting is None:
             return None
 
         _LOGGER.debug(
@@ -197,16 +252,29 @@ class LutStrategy(PowerCalculationStrategyInterface):
             {attr: getattr(light_setting, attr) for attr in vars(light_setting)},
         )
 
-        if lut_mode == LookupMode.EFFECT:
-            lookup_table = lookup_table.get(effect)  # type: ignore
-            if not lookup_table:
-                _LOGGER.warning('%s: Effect "%s" not found in LUT', entity_state.entity_id, effect)
-                return None
-
-        power = Decimal(self.lookup_power(lookup_table, light_setting))
-
+        power = self.lookup_power(lut_entry, light_setting)
         _LOGGER.debug("%s: Calculated power:%s", entity_state.entity_id, power)
-        return power
+        return Decimal(power)
+
+    async def _calculate_effect_power(
+        self,
+        entity_state: State,
+        effect: str,
+        brightness: int,
+    ) -> Decimal | None:
+        """Look up power for an active light effect."""
+        if LookupMode.EFFECT not in self._supported_modes:
+            _LOGGER.debug("%s: Effects not supported for this power profile", entity_state.entity_id)
+            return None
+
+        effect_entry = await self._lut_registry.get_effect_entry(self._profile)
+        effect_table = effect_entry.table.get(effect)
+        if effect_table is None:
+            _LOGGER.warning('%s: Effect "%s" not found in LUT', entity_state.entity_id, effect)
+            return None
+
+        sorted_keys = sorted(effect_table.keys())
+        return Decimal(self._interpolate(effect_table, sorted_keys, brightness))
 
     def create_light_setting(
         self,
@@ -244,7 +312,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         return light_setting
 
-    async def get_selected_color_mode(self, attrs: Mapping[str, Any], supported_modes: set[LookupMode]) -> ColorMode:
+    async def get_selected_color_mode(self, attrs: Mapping[str, Any]) -> ColorMode:
         """Get the selected color mode for the entity."""
         try:
             color_mode = ColorMode(str(attrs.get(ATTR_COLOR_MODE, ColorMode.UNKNOWN)))
@@ -257,39 +325,66 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if color_mode in COLOR_MODES_COLOR:
             color_mode = ColorMode.HS
         lookup_mode = LookupMode.from_color_mode(color_mode)
-        if lookup_mode not in supported_modes and color_mode == ColorMode.COLOR_TEMP:
+        if lookup_mode not in self._supported_modes and color_mode == ColorMode.COLOR_TEMP:
             _LOGGER.debug("Color mode not natively supported, falling back to HS")
             color_mode = ColorMode.HS
         return color_mode
 
+    @staticmethod
+    def _nearest_key(sorted_keys: list[int], x: int) -> int:
+        """Return the key in sorted_keys nearest to x."""
+        i = bisect_left(sorted_keys, x)
+        if i == 0:
+            return sorted_keys[0]
+        if i >= len(sorted_keys):
+            return sorted_keys[-1]
+        before = sorted_keys[i - 1]
+        after = sorted_keys[i]
+        return before if (x - before) <= (after - x) else after
+
+    @staticmethod
+    def _interpolate(table: dict[int, float], sorted_keys: list[int], brightness: int) -> float:
+        """Linear interpolation over a flat {brightness: power} table."""
+        if brightness in table:
+            return table[brightness]
+
+        i = bisect_left(sorted_keys, brightness)
+        if i == 0:
+            return table[sorted_keys[0]]
+        if i >= len(sorted_keys):
+            return table[sorted_keys[-1]]
+
+        b0 = sorted_keys[i - 1]
+        b1 = sorted_keys[i]
+        p0 = table[b0]
+        p1 = table[b1]
+        return p0 + (p1 - p0) * ((brightness - b0) / (b1 - b0))
+
     def lookup_power(
         self,
-        lookup_table: LookupDictType,
+        lut_entry: _LutEntry,
         light_setting: LightSetting,
     ) -> float:
+        lookup_table = lut_entry.table
+        sorted_keys = lut_entry.sorted_keys
         brightness = light_setting.brightness
-        brightness_table = lookup_table.get(brightness)
 
-        # Check if we have an exact match for the selected brightness level in de LUT
-        if brightness_table:
-            return self.lookup_power_for_brightness(brightness_table, light_setting)
+        # Exact brightness match — skip interpolation entirely.
+        if brightness in lookup_table:
+            return self.lookup_power_for_brightness(lookup_table[brightness], light_setting)
 
-        # We don't have an exact match, use interpolation
-        brightness_range = [
-            self.get_nearest_lower_brightness(lookup_table, brightness),
-            self.get_nearest_higher_brightness(lookup_table, brightness),
-        ]
-        power_range = [
-            self.lookup_power_for_brightness(
-                lookup_table[brightness_range[0]],
-                light_setting,
-            ),
-            self.lookup_power_for_brightness(
-                lookup_table[brightness_range[1]],
-                light_setting,
-            ),
-        ]
-        return float(np.interp(brightness, brightness_range, power_range))
+        i = bisect_left(lut_entry.sorted_keys, brightness)
+
+        if i == 0:
+            return self.lookup_power_for_brightness(lookup_table[sorted_keys[0]], light_setting)
+        if i >= len(sorted_keys):
+            return self.lookup_power_for_brightness(lookup_table[sorted_keys[-1]], light_setting)
+
+        b0 = sorted_keys[i - 1]
+        b1 = sorted_keys[i]
+        p0 = self.lookup_power_for_brightness(lookup_table[b0], light_setting)
+        p1 = self.lookup_power_for_brightness(lookup_table[b1], light_setting)
+        return p0 + (p1 - p0) * ((brightness - b0) / (b1 - b0))
 
     def lookup_power_for_brightness(
         self,
@@ -302,42 +397,21 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if light_setting.color_mode == ColorMode.COLOR_TEMP:
             return self.get_nearest(lut_value, light_setting.color_temp or 0)  # type: ignore
 
-        sat_values = self.get_nearest(lut_value, light_setting.hue or 0)
-        return self.get_nearest(sat_values, light_setting.saturation or 0)  # type: ignore
+        # HS path — outer dict is hue → {saturation → power}
+        hs_table = cast(HsLutValue, lut_value)
+        sat_values = self.get_nearest(hs_table, light_setting.hue or 0)
+        return self.get_nearest(sat_values, light_setting.saturation or 0)
 
-    @staticmethod
-    def get_nearest(
-        lookup_dict: ColorTempLutValue | HsLutValue | SatLutValue,
-        search_key: int,
-    ) -> LookupDictValue:
-        return lookup_dict.get(search_key) or lookup_dict[min(lookup_dict.keys(), key=lambda key: abs(key - search_key))]
+    # Generic nearest lookup for both float values and nested saturation dicts
+    _NearestT = TypeVar("_NearestT", float, dict[int, float])
 
-    @staticmethod
-    def get_nearest_lower_brightness(
-        lookup_dict: LookupDictType,
-        search_key: int,
-    ) -> int:
-        keys = lookup_dict.keys()
-        last_key = [*keys][-1]
-        if last_key < search_key:
-            return int(last_key)
-
-        return max(
-            (k for k in lookup_dict if int(k) <= int(search_key)),
-            default=next(iter(keys)),
-        )
-
-    @staticmethod
-    def get_nearest_higher_brightness(
-        lookup_dict: LookupDictType,
-        search_key: int,
-    ) -> int:
-        keys = lookup_dict.keys()
-        first_key = next(iter(keys))
-        if first_key > search_key:
-            return int(first_key)
-
-        return min((k for k in keys if int(k) >= int(search_key)), default=[*keys][-1])
+    def get_nearest(self, lookup_dict: dict[int, _NearestT], search_key: int) -> _NearestT:
+        """Return the value mapped at search_key or the nearest neighbour key."""
+        value = lookup_dict.get(search_key)
+        if value is not None:
+            return value
+        nearest = self._nearest_key(sorted(lookup_dict.keys()), search_key)
+        return lookup_dict[nearest]
 
     async def validate_config(self) -> None:
         if self._source_entity.domain != light.DOMAIN:
