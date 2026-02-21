@@ -103,6 +103,8 @@ async def test_hs_lut(hass: HomeAssistant) -> None:
         ("Android", 20, 2.08),
         ("Android", 100, 2.73),
         ("Android", 255, 4.00),
+        ("Rainbow", 1, 1.5),
+        ("Rainbow", 255, 4.5),
         ("Wipe Random", 20, 1.98),
         ("Non existing effect", 100, None),
     ],
@@ -172,6 +174,27 @@ async def test_effect_mode_unsupported(hass: HomeAssistant) -> None:
         ),
         expected_power=None,
     )
+
+
+async def test_effect_not_found_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Test error is logged when effect is not found in profile"""
+    caplog.set_level(logging.WARNING)
+    strategy = await _create_lut_strategy(hass, "test", "lut_effect")
+    await _calculate_and_assert_power(
+        strategy,
+        state=State(
+            "light.test",
+            STATE_ON,
+            {
+                ATTR_COLOR_MODE: ColorMode.BRIGHTNESS,
+                ATTR_BRIGHTNESS: 255,
+                ATTR_EFFECT: "NonExistingEffect",
+            },
+        ),
+        expected_power=None,
+    )
+
+    assert 'Effect "NonExistingEffect" not found in LUT' in caplog.text
 
 
 async def test_hs_lut_attribute_none(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:

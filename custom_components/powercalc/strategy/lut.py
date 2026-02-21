@@ -267,16 +267,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             _LOGGER.debug("%s: Effects not supported for this power profile", entity_state.entity_id)
             return None
 
-        try:
-            effect_entry = await self._lut_registry.get_effect_entry(self._profile)
-        except LutFileNotFoundError:
-            _LOGGER.error(
-                "%s: Effect lookup table not found (model: %s)",
-                entity_state.entity_id,
-                self._profile.model,
-            )
-            return None
-
+        effect_entry = await self._lut_registry.get_effect_entry(self._profile)
         effect_table = effect_entry.table.get(effect)
         if effect_table is None:
             _LOGGER.warning('%s: Effect "%s" not found in LUT', entity_state.entity_id, effect)
