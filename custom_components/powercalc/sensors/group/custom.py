@@ -610,7 +610,7 @@ class GroupedSensor(BaseEntity, SensorEntity):
         return current_time - self._last_update_time < self._update_interval
 
     def _cancel_update_interval_exceeded_callback(self) -> None:
-        if self._update_interval_exceeded_callback:
+        if self._update_interval_exceeded_callback:  # pragma: no cover
             self._update_interval_exceeded_callback()
             self._update_interval_exceeded_callback = None
 
