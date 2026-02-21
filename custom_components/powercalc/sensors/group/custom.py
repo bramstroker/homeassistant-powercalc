@@ -462,7 +462,7 @@ class GroupedSensor(BaseEntity, SensorEntity):
         self._group_type = group_type
         self._start_time: float = time.time()
         self._last_update_time: float = 0
-        self._update_interval_exceeded_callback: CALLBACK_TYPE = lambda *args: None
+        self._update_interval_exceeded_callback: CALLBACK_TYPE | None = None
         self._unit_converter_cache: dict[str, Callable[[float], float]] = {}
 
     async def async_added_to_hass(self) -> None:
@@ -576,10 +576,18 @@ class GroupedSensor(BaseEntity, SensorEntity):
         throttled = self._should_throttle(current_time)
 
         self._attr_available = True
+        self._set_native_value(state, write_state=False)
+
         if throttled:
+            if self._update_interval_exceeded_callback:
+                _LOGGER.debug("Throttling: %s", state)
+                return
 
             @callback
             def _update_interval_callback(now: datetime) -> None:
+                self._update_interval_exceeded_callback = None
+                self._last_update_time = time.time()
+                _LOGGER.debug("Updating and resetting throttle: %s", state)
                 self.async_write_ha_state()
 
             self._update_interval_exceeded_callback = async_call_later(
@@ -587,25 +595,34 @@ class GroupedSensor(BaseEntity, SensorEntity):
                 self._update_interval,
                 _update_interval_callback,
             )
-            self._set_native_value(state, write_state=False)
             return
 
         self._cancel_update_interval_exceeded_callback()
-        self._set_native_value(state, write_state=True)
         self._last_update_time = current_time
+        self.async_write_ha_state()
 
     def _should_throttle(self, current_time: float) -> bool:
+        if self._update_interval_exceeded_callback:
+            return True
+
         if self._update_interval == 0:
+            _LOGGER.debug("Skipping throttle check due to update interval set to 0")
             return False
 
         # Don't throttle initial updates within first 5 seconds after startup
         if current_time - self._start_time < 5:
+            _LOGGER.debug("Skipping throttle check due to startup delay")
             return False
 
+        _LOGGER.debug(
+            "Checking throttle, last update: %s, current time: %s, interval: %s", self._last_update_time, current_time, self._update_interval
+        )
         return current_time - self._last_update_time < self._update_interval
 
     def _cancel_update_interval_exceeded_callback(self) -> None:
-        self._update_interval_exceeded_callback()
+        if self._update_interval_exceeded_callback:
+            self._update_interval_exceeded_callback()
+            self._update_interval_exceeded_callback = None
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
         """Convert value of member entity state to match the unit of measurement of the group sensor."""
