@@ -14,5 +14,11 @@
     "VERSION": "v1.20.5:docker"
   },
   "name": "Hue White and color ambiance 75W A19- E26 smart bulb",
-  "standby_power": 0.23
+  "standby_power": 0.23,
+  "author_info": {
+    "name": "pinkfin",
+    "github": "pinkfin",
+    "email": "hot.wire1618@fastmail.com"
+  },
+  "author": "pinkfin"
 }
