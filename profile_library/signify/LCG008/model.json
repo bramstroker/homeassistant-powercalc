@@ -11,5 +11,5 @@
     "VERSION": "v1.20.6:docker"
   },
   "name": "Hue Essential spot GU10 color&ambience",
-  "standby_power": 0
+  "standby_power": 0.2
 }
