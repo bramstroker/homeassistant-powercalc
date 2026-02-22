@@ -11,5 +11,11 @@
     "VERSION": "v1.20.6:docker"
   },
   "name": "Hue Essential spot GU10 color&ambience",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "Alstedt",
+    "github": "Alstedt",
+    "email": "umrechnen-zacke.3w@icloud.com"
+  },
+  "author": "Alstedt"
 }
