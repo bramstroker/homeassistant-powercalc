@@ -95,6 +95,7 @@ nav:
       - 'library/structure.md'
       - 'library/sub-profiles.md'
       - 'library/variables.md'
+      - 'library/matter-limitations.md'
       - 'Device types':
           - 'library/device-types/index.md'
           - 'library/device-types/camera.md'
