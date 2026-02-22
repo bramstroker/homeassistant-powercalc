@@ -3,6 +3,7 @@
   "calculation_strategy": "fixed",
   "created_at": "2023-12-31T08:21:16Z",
   "device_type": "network",
+  "discovery_by": "device",
   "fixed_config": {
     "power": 3.15
   },
