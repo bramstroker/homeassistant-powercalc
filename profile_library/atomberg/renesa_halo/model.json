@@ -1,0 +1,33 @@
+{
+  "name": "Atomberg Ceiling Fan (5 Speed)",
+  "device_type": "fan",
+  "calculation_strategy": "fixed",
+  "measure_method": "manual",
+  "measure_device": "user-manual",
+  "created_at": "2026-02-26T10:30:00Z",
+  "author": "Pranjal Joshi",
+  "description": "Atomberg BLDC ceiling fan with 5 discrete speed levels.",
+  "fixed_config": {
+    "power": 0,
+    "states_power": {
+      "1": 6.0,
+      "2": 10.0,
+      "3": 14.0,
+      "4": 19.0,
+      "5": 28.0
+    }
+  },
+  "standby_power_on": {
+    "type": "number",
+    "minimum": 0.5,
+    "description": "Power draw when fan is on but not spinning."
+  }
+  "sensor_config": {
+    "energy_sensor_naming": "{} Fan Energy",
+    "power_sensor_naming": "{} Fan Power"
+  },
+  "author_info": {
+    "name": "Pranjal Joshi",
+    "github": "pranjal-joshi"
+  }
+}
