@@ -21,7 +21,7 @@
     "type": "number",
     "minimum": 0.5,
     "description": "Power draw when fan is on but not spinning."
-  }
+  },
   "sensor_config": {
     "energy_sensor_naming": "{} Fan Energy",
     "power_sensor_naming": "{} Fan Power"
