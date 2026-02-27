@@ -88,7 +88,7 @@ async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant) 
     assert_default_virtual_power_entry_data(
         CalculationStrategy.FIXED,
         result["data"],
-        {CONF_FIXED: {CONF_STATES_POWER: {"playing": 1.8}}},
+        {CONF_FIXED: {CONF_STATES_POWER: [{"state": "playing", "power": 1.8}]}},
     )
 
     await hass.async_block_till_done()
@@ -138,6 +138,37 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
     assert entry.data[CONF_FIXED][CONF_POWER] == 50
     assert entry.data[CONF_CREATE_UTILITY_METERS]
     assert entry.data[CONF_IGNORE_UNAVAILABLE_STATE]
+
+
+async def test_fixed_states_power_options_flow(hass: HomeAssistant) -> None:
+    """
+    Test that we can configure the states power option.
+    Also make sure conversion from dict to list is done correctly, and the order is preserved.
+    """
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "sensor.test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_IGNORE_UNAVAILABLE_STATE: False,
+            CONF_FIXED: {CONF_STATES_POWER: [{"state": "2", "power": 50}, {"state": "4", "power": 20}]},
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.FIXED)
+
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert schema_keys[schema_keys.index(CONF_STATES_POWER)].description == {"suggested_value": {"2": 50, "4": 20}}
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_STATES_POWER: {"4": 20, "2": 50, "6": 200}},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_FIXED][CONF_STATES_POWER] == [{"state": "4", "power": 20}, {"state": "2", "power": 50}, {"state": "6", "power": 200}]
 
 
 async def test_fixed_options_hidden_from_menu_for_self_usage_profiles(hass: HomeAssistant) -> None:

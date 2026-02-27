@@ -21,12 +21,16 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_UPDATE_INTERVAL,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
+    CONF_FIXED,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_MODE,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
+    CONF_POWER,
     CONF_SENSOR_TYPE,
+    CONF_STATE,
     CONF_STATE_TRIGGER,
+    CONF_STATES_POWER,
     CONF_STATES_TRIGGER,
     DUMMY_ENTITY_ID,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
@@ -160,3 +164,30 @@ async def test_migrate_config_entry_version_5(hass: HomeAssistant) -> None:
             CONF_EXCLUDE_SELF_USAGE: True,
         },
     }
+
+
+async def test_migrate_config_entry_states_power(hass: HomeAssistant) -> None:
+    """Test migration of states_power from dict to list format (version 6 to 7)."""
+    mock_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {
+                CONF_STATES_POWER: {
+                    "playing": 20,
+                    "paused": 5,
+                    "idle": 2,
+                },
+            },
+        },
+        version=6,
+    )
+    mock_entry.add_to_hass(hass)
+    await async_migrate_entry(hass, mock_entry)
+    assert mock_entry.version == PowercalcConfigFlow.VERSION
+    assert mock_entry.data[CONF_FIXED][CONF_STATES_POWER] == [
+        {CONF_STATE: "playing", CONF_POWER: 20},
+        {CONF_STATE: "paused", CONF_POWER: 5},
+        {CONF_STATE: "idle", CONF_POWER: 2},
+    ]
