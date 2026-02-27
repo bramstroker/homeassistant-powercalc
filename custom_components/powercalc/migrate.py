@@ -24,7 +24,9 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
+    CONF_STATE,
     CONF_STATE_TRIGGER,
+    CONF_STATES_POWER,
     CONF_STATES_TRIGGER,
     DOMAIN,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
@@ -67,7 +69,12 @@ async def async_migrate_config_entry(hass: HomeAssistant, config_entry: ConfigEn
         if CONF_PLAYBOOKS in conf_playbook:
             data[CONF_PLAYBOOK][CONF_PLAYBOOKS] = [{CONF_ID: key, CONF_PATH: val} for key, val in conf_playbook.pop(CONF_PLAYBOOKS).items()]
 
-    hass.config_entries.async_update_entry(config_entry, data=data, version=6)
+    if version <= 6:
+        conf_fixed = data.get(CONF_FIXED, {})
+        if CONF_STATES_POWER in conf_fixed and isinstance(conf_fixed[CONF_STATES_POWER], dict):
+            data[CONF_FIXED][CONF_STATES_POWER] = [{CONF_STATE: key, CONF_POWER: val} for key, val in conf_fixed[CONF_STATES_POWER].items()]
+
+    hass.config_entries.async_update_entry(config_entry, data=data, version=7)
 
 
 async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dict, yaml_config: dict) -> None:

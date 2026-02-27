@@ -20,6 +20,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_OFF,
     CONF_POWER_TEMPLATE,
     CONF_STANDBY_POWER,
+    CONF_STATE,
     CONF_STATES_POWER,
     CONF_STRATEGIES,
     CalculationStrategy,
@@ -118,6 +119,9 @@ class PowerCalculatorStrategyFactory:
 
         states_power = fixed_config.get(CONF_STATES_POWER)
         if states_power:
+            # Handle both list format (config flow) and dict format (YAML)
+            if isinstance(states_power, list):
+                states_power = {item[CONF_STATE]: item[CONF_POWER] for item in states_power}
             states_power = {state: self._resolve_template(value) for state, value in states_power.items()}
 
         return FixedStrategy(source_entity, power, states_power)

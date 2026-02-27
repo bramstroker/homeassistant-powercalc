@@ -30,6 +30,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_TEMPLATE,
     CONF_REPEAT,
     CONF_STANDBY_POWER,
+    CONF_STATE,
     CONF_STATE_TRIGGER,
     CONF_STATES_POWER,
     CONF_UNAVAILABLE_POWER,
@@ -218,6 +219,9 @@ class VirtualPowerFlow:
         async def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
             if validate:
                 validate(user_input)
+            # Convert states_power from dict to list to preserve order
+            if CONF_STATES_POWER in user_input and isinstance(user_input[CONF_STATES_POWER], dict):
+                user_input[CONF_STATES_POWER] = [{CONF_STATE: state, CONF_POWER: power} for state, power in user_input[CONF_STATES_POWER].items()]
             await self.flow.validate_strategy_config({strategy: user_input})
             return {strategy: user_input}
 
@@ -385,6 +389,11 @@ class VirtualPowerOptionsFlow(VirtualPowerFlow):
             if user_input.get(key) is None:
                 continue
             strategy_options[str(key)] = user_input.get(key)
+        # Convert states_power from dict to list to preserve order
+        if CONF_STATES_POWER in strategy_options and isinstance(strategy_options[CONF_STATES_POWER], dict):
+            strategy_options[CONF_STATES_POWER] = [
+                {CONF_STATE: state, CONF_POWER: power} for state, power in strategy_options[CONF_STATES_POWER].items()
+            ]
         return strategy_options
 
     async def async_step_fixed(self, user_input: dict[str, Any] | None = None) -> FlowResult:
@@ -420,5 +429,8 @@ class VirtualPowerOptionsFlow(VirtualPowerFlow):
             **self.flow.sensor_config,
             **{k: v for k, v in strategy_options.items() if k not in self.flow.sensor_config},
         }
+        # Convert states_power from list to dict for display in ObjectSelector
+        if CONF_STATES_POWER in merged_options and isinstance(merged_options[CONF_STATES_POWER], list):
+            merged_options[CONF_STATES_POWER] = {item[CONF_STATE]: item[CONF_POWER] for item in merged_options[CONF_STATES_POWER]}
         schema = fill_schema_defaults(schema, merged_options)
         return await self.flow.async_handle_options_step(user_input, schema, step)
