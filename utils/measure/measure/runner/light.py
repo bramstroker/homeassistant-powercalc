@@ -101,7 +101,7 @@ class LightRunner(MeasurementRunner):
         csv_file_path = f"{export_directory}/{mode.value}.csv"
 
         resume_at = None
-        if self.should_resume(csv_file_path) and mode != LutMode.EFFECT:
+        if self.should_resume(csv_file_path):
             resume_at = self.get_resume_variation(csv_file_path, mode)
 
         variations = list(self.get_variations(mode, resume_at))
@@ -606,6 +606,12 @@ class LightRunner(MeasurementRunner):
                 bri=int(last_row[0]),
                 hue=int(last_row[1]),
                 sat=int(last_row[2]),
+            )
+
+        if mode == LutMode.EFFECT:
+            return EffectVariation(
+                effect=last_row[0],
+                bri=int(last_row[1]),
             )
 
         raise RunnerError(f"Mode {mode} not supported")
