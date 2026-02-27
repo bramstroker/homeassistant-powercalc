@@ -304,8 +304,6 @@ async def async_setup_platform(
     if CONF_CREATE_GROUP in config:
         config[CONF_NAME] = config[CONF_CREATE_GROUP]
 
-    register_entity_services()
-
     await _async_setup_entities(
         hass,
         config,
@@ -357,6 +355,9 @@ async def _async_setup_entities(
     discovery_type: PowercalcDiscoveryType | None = None,
 ) -> None:
     """Main routine to setup power/energy sensors from provided configuration."""
+
+    register_entity_services()
+
     try:
         context = CreationContext(
             group=CONF_CREATE_GROUP in config,

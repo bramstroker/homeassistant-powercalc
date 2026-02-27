@@ -56,6 +56,18 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
     ENERGY_INTEGRATION_METHOD_LEFT,
+    SERVICE_ACTIVATE_PLAYBOOK,
+    SERVICE_CALIBRATE_ENERGY,
+    SERVICE_CALIBRATE_UTILITY_METER,
+    SERVICE_CHANGE_GUI_CONFIGURATION,
+    SERVICE_GET_ACTIVE_PLAYBOOK,
+    SERVICE_GET_GROUP_ENTITIES,
+    SERVICE_INCREASE_DAILY_ENERGY,
+    SERVICE_RELOAD,
+    SERVICE_RESET_ENERGY,
+    SERVICE_STOP_PLAYBOOK,
+    SERVICE_SWITCH_SUB_PROFILE,
+    SERVICE_UPDATE_LIBRARY,
     CalculationStrategy,
     SensorType,
 )
@@ -719,3 +731,28 @@ async def test_regression(hass: HomeAssistant) -> None:
 
     assert hass.states.get("sensor.standing_lamp_power")
     assert hass.states.get("sensor.standing_lamp_energy")
+
+
+async def test_entity_services_registered(hass: HomeAssistant) -> None:
+    """Test that the entity services are registered."""
+
+    await setup_config_entry(hass, {CONF_ENTITY_ID: "light.test", CONF_FIXED: {CONF_POWER: 50}})
+
+    services = hass.services.async_services()
+    powercalc_services = services.get(DOMAIN)
+    assert powercalc_services is not None
+    expected_services = [
+        SERVICE_RESET_ENERGY,
+        SERVICE_CALIBRATE_UTILITY_METER,
+        SERVICE_CALIBRATE_ENERGY,
+        SERVICE_INCREASE_DAILY_ENERGY,
+        SERVICE_ACTIVATE_PLAYBOOK,
+        SERVICE_SWITCH_SUB_PROFILE,
+        SERVICE_GET_ACTIVE_PLAYBOOK,
+        SERVICE_STOP_PLAYBOOK,
+        SERVICE_GET_GROUP_ENTITIES,
+        SERVICE_RELOAD,
+        SERVICE_UPDATE_LIBRARY,
+        SERVICE_CHANGE_GUI_CONFIGURATION,
+    ]
+    assert sorted(powercalc_services.keys()) == sorted(expected_services)
