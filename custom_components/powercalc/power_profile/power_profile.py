@@ -58,6 +58,7 @@ class DeviceType(StrEnum):
     NETWORK = "network"
     VACUUM_ROBOT = "vacuum_robot"
     LAWN_MOWER_ROBOT = "lawn_mower_robot"
+    HEATING = "heating"
 
 
 class DiscoveryBy(StrEnum):
