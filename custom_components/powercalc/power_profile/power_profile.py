@@ -90,7 +90,7 @@ DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.PRINTER: SENSOR_DOMAIN,
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
     DeviceType.LAWN_MOWER_ROBOT: LAWN_MOWER_DOMAIN,
-    DeviceType.HEATING: {CLIMATE_DOMAIN},
+    DeviceType.HEATING: CLIMATE_DOMAIN,
 }
 
 SUPPORTED_DOMAINS: set[str] = {domain for domains in DEVICE_TYPE_DOMAIN.values() for domain in (domains if isinstance(domains, set) else {domains})}
