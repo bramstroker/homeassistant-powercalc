@@ -11,6 +11,7 @@ from typing import Any, cast
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
+from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
 from homeassistant.components.cover import DOMAIN as COVER_DOMAIN
 from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
 from homeassistant.components.lawn_mower import DOMAIN as LAWN_MOWER_DOMAIN
@@ -58,6 +59,7 @@ class DeviceType(StrEnum):
     NETWORK = "network"
     VACUUM_ROBOT = "vacuum_robot"
     LAWN_MOWER_ROBOT = "lawn_mower_robot"
+    HEATING = "heating"
 
 
 class DiscoveryBy(StrEnum):
@@ -88,6 +90,7 @@ DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.PRINTER: SENSOR_DOMAIN,
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
     DeviceType.LAWN_MOWER_ROBOT: LAWN_MOWER_DOMAIN,
+    DeviceType.HEATING: CLIMATE_DOMAIN,
 }
 
 SUPPORTED_DOMAINS: set[str] = {domain for domains in DEVICE_TYPE_DOMAIN.values() for domain in (domains if isinstance(domains, set) else {domains})}

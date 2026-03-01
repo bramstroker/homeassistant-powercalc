@@ -144,7 +144,8 @@
         "television",
         "network",
         "vacuum_robot",
-        "lawn_mower_robot"
+        "lawn_mower_robot",
+        "heating"
       ],
       "description": "Type of device"
     },
