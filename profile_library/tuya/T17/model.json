@@ -9,7 +9,6 @@
     "device_type": "heating",
     "calculation_strategy": "fixed",
     "measure_device": "Homewizard Energy socket",
-    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
     "standby_power": 0.1,
     "fixed_config": {
         "states_power": {
