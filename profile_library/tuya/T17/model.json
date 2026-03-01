@@ -11,21 +11,17 @@
     "measure_device": "Homewizard Energy socket",
     "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
     "standby_power": 0.1,
-    "linear_config": {
-        "calibrate": [
-            "10 -> 3.2",
-            "20 -> 4.0",
-            "30 -> 4.0",
-            "40 -> 4.0",
-            "50 -> 4.4",
-            "60 -> 5.4",
-            "70 -> 5.8",
-            "80 -> 7.0",
-            "90 -> 8.2",
-            "100 -> 10.2",
-            "0 -> 5.0"
-        ]
+    "fixed_config": {
+        "states_power": {
+            "fan_mode|1": 430,
+            "fan_mode|2": 860,
+            "fan_mode|3": 1290,
+            "fan_mode|4": 1715,
+            "fan_mode|5": 2145,
+            "fan_mode|6": 2570,
+            "fan_mode|7": 3000
+        }
     },
-    "measure_description": "Measured with homewizard enertgy socket, measured each preset separately for 10 seconds.",
+    "measure_description": "Measured with homewizard energy socket, measured each preset separately for 10 seconds.",
     "measure_method": "manual"
 }
