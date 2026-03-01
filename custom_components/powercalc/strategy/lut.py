@@ -226,7 +226,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return None
 
         effect = attrs.get(ATTR_EFFECT)
-        if effect:
+        if effect and str(effect).lower() != "off":
             return await self._calculate_effect_power(entity_state, str(effect), brightness)
 
         lut_mode = LookupMode.from_color_mode(color_mode)
@@ -264,7 +264,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
     ) -> Decimal | None:
         """Look up power for an active light effect."""
         if LookupMode.EFFECT not in self._supported_modes:
-            _LOGGER.debug("%s: Effects not supported for this power profile", entity_state.entity_id)
+            _LOGGER.warning("%s: Effects not supported for this power profile", entity_state.entity_id)
             return None
 
         effect_entry = await self._lut_registry.get_effect_entry(self._profile)
