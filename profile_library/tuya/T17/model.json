@@ -6,6 +6,7 @@
         "jpiit02hwjtwjxnd"
     ],
     "device_type": "heating",
+    "compatible_integrations": ["tuya"],
     "calculation_strategy": "fixed",
     "measure_device": "Homewizard Energy socket",
     "standby_power": 0.1,
