@@ -197,6 +197,35 @@ async def test_effect_not_found_logs_warning(hass: HomeAssistant, caplog: pytest
     assert 'Effect "NonExistingEffect" not found in LUT' in caplog.text
 
 
+async def test_lut_effect_off_is_ignored(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """
+    Test that 'off' effect is ignored for LUT strategy and it falls back to normal LUT lookup.
+    See issue: https://github.com/bramstroker/homeassistant-powercalc/issues/4028
+    """
+    caplog.set_level(logging.DEBUG)
+
+    strategy = await _create_lut_strategy(hass, "test", "lut_effect")
+    await _calculate_and_assert_power(
+        strategy,
+        state=State(
+            "light.test",
+            STATE_ON,
+            {
+                ATTR_COLOR_MODE: ColorMode.BRIGHTNESS,
+                ATTR_BRIGHTNESS: 255,
+                ATTR_EFFECT: "Off",
+            },
+        ),
+        expected_power=None,
+    )
+
+    assert "Effects not supported for this power profile" not in caplog.text
+    assert 'Effect "off" not found in LUT' not in caplog.text
+
+
 async def test_hs_lut_attribute_none(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """Test error is logged when hs_color attribute is None"""
 
