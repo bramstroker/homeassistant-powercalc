@@ -27,7 +27,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.22:docker"
   },
-  "min_version": "1.20.9",
   "name": "Philips Smart LED A60 E27 RGB 2200K-6500K (type SHRGBC, model 9290023836AA, 8.5 W, 220-240 V, 50/60 Hz, 806 lm, beam angle: 360°)",
   "standby_power": 0.25,
   "author_info": {
