@@ -98,7 +98,7 @@ async def generate_library_json(model_listing: list[dict]) -> None:
         os.path.join(DATA_DIR, "library.json"),
         "w",
     ) as json_file:
-        await json_file.write(json.dumps(json_data))
+        await json_file.write(json.dumps(json_data, indent=2) + "\n")
 
     print("Generated library.json")
 
@@ -156,7 +156,7 @@ async def update_translations(model_listing: list[dict]) -> None:
         deep_update(json_data["config"]["step"][step]["data_description"], description_translations)
 
     async with aiofiles.open(translation_file, mode='w') as file:
-        await file.write(json.dumps(json_data, indent=2))
+        await file.write(json.dumps(json_data, indent=2) + "\n")
 
 
 def deep_update(target: dict, updates: dict) -> None:
@@ -191,7 +191,7 @@ async def get_manufacturer_json(manufacturer: str) -> dict:
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(json_path), exist_ok=True)
         async with aiofiles.open(json_path, mode='w', encoding="utf-8") as json_file:
-            await json_file.write(json.dumps(default_json, ensure_ascii=False, indent=4))
+            await json_file.write(json.dumps(default_json, ensure_ascii=False, indent=4) + "\n")
         git.Repo(PROJECT_ROOT).git.add(json_path)
         print(f"Added {json_path}")
         return default_json
@@ -443,7 +443,7 @@ async def write_author_to_file(file_path: str, author: Author) -> None:
     json_data["author"] = author.name # For backward compatibility, will be removed later
 
     async with aiofiles.open(file_path, mode='w') as file:
-        await file.write(json.dumps(json_data, indent=2))
+        await file.write(json.dumps(json_data, indent=2) + "\n")
 
 async def main_async():
     parser = argparse.ArgumentParser(description="Process profiles JSON files and perform updates.")
