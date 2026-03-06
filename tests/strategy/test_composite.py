@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from homeassistant.components.light import ATTR_BRIGHTNESS
+from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_EFFECT, ColorMode
 from homeassistant.const import (
     CONF_CONDITION,
     CONF_ENTITIES,
@@ -22,9 +22,11 @@ from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_FIXED,
     CONF_LINEAR,
+    CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_MODE,
+    CONF_MODEL,
     CONF_MULTI_SWITCH,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
@@ -563,3 +565,21 @@ async def test_state_attribute_entity_id(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "20.00"
+
+
+async def test_lut(hass: HomeAssistant) -> None:
+    light_entity = "light.test"
+    power_entity = "sensor.test_power"
+    await run_powercalc_setup(hass, {CONF_ENTITY_ID: light_entity, CONF_MANUFACTURER: "test", CONF_MODEL: "composite_lut"})
+
+    assert hass.states.get(power_entity)
+
+    hass.states.async_set(light_entity, STATE_ON, {ATTR_EFFECT: "Night light"})
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity).state == "1.24"
+
+    hass.states.async_set(light_entity, STATE_ON, {ATTR_BRIGHTNESS: 128, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS})
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity).state == "128.00"

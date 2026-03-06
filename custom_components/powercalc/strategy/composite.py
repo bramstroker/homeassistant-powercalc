@@ -15,7 +15,16 @@ from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 import voluptuous as vol
 
-from custom_components.powercalc.const import CONF_FIXED, CONF_LINEAR, CONF_MODE, CONF_MULTI_SWITCH, CONF_PLAYBOOK, CONF_STRATEGIES, CONF_WLED
+from custom_components.powercalc.const import (
+    CONF_FIXED,
+    CONF_LINEAR,
+    CONF_LUT,
+    CONF_MODE,
+    CONF_MULTI_SWITCH,
+    CONF_PLAYBOOK,
+    CONF_STRATEGIES,
+    CONF_WLED,
+)
 from custom_components.powercalc.strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from custom_components.powercalc.strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 from custom_components.powercalc.strategy.multi_switch import CONFIG_SCHEMA as MULTI_SWITCH_SCHEMA
@@ -90,11 +99,15 @@ CONDITION_SCHEMA: vol.Schema = vol.Schema(
     ),
 )
 
+LUT_SCHEMA = vol.Schema({})
+
+
 ITEM_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CONDITION): CONDITION_SCHEMA,
         vol.Optional(CONF_FIXED): FIXED_SCHEMA,
         vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+        vol.Optional(CONF_LUT): LUT_SCHEMA,
         vol.Optional(CONF_WLED): WLED_SCHEMA,
         vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
         vol.Optional(CONF_MULTI_SWITCH): MULTI_SWITCH_SCHEMA,
