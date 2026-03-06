@@ -7,7 +7,7 @@
         "condition": "state",
         "entity_id": "[[entity]]",
         "attribute": "effect",
-        "state": "Night Light"
+        "state": "Night light"
       },
       "fixed": {
         "power": 1.24

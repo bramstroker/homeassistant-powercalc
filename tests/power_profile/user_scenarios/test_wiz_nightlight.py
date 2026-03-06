@@ -16,7 +16,7 @@ async def test_wiz_nightlight(
 
     assert hass.states.get(power_entity)
 
-    hass.states.async_set(light_entity, STATE_ON, {"effect": "Night Light"})
+    hass.states.async_set(light_entity, STATE_ON, {"effect": "Night light"})
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity).state == "1.24"
