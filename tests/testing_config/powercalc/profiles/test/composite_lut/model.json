@@ -1,0 +1,19 @@
+{
+  "calculation_strategy": "composite",
+  "composite_config": [
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity]]",
+        "attribute": "effect",
+        "state": "Night light"
+      },
+      "fixed": {
+        "power": 1.24
+      }
+    },
+    {
+      "lut": {}
+    }
+  ]
+}

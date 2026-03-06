@@ -4,6 +4,7 @@ from custom_components.powercalc.const import (
     CONF_COMPOSITE,
     CONF_FIXED,
     CONF_LINEAR,
+    CONF_LUT,
     CONF_MODE,
     CONF_MULTI_SWITCH,
     CONF_PLAYBOOK,
@@ -19,6 +20,7 @@ STRATEGY_CONFIG_MAP = {
     CONF_MULTI_SWITCH: CalculationStrategy.MULTI_SWITCH,
     CONF_PLAYBOOK: CalculationStrategy.PLAYBOOK,
     CONF_WLED: CalculationStrategy.WLED,
+    CONF_LUT: CalculationStrategy.LUT,
     CONF_COMPOSITE: CalculationStrategy.COMPOSITE,
 }
 
@@ -33,7 +35,7 @@ def detect_calculation_strategy(
         return CalculationStrategy(config_mode)
 
     for config_key, strategy in STRATEGY_CONFIG_MAP.items():
-        if config.get(config_key):
+        if config_key in config:
             return strategy
 
     if power_profile:
