@@ -214,52 +214,57 @@ def test_ask_questions_with_no_predefined_answers(mock_config_factory) -> None: 
     measure = _create_measure_instance(config=mock_config)
 
     questions = [
-        inquirer.Text("question1", message="What is your name?"),
-        inquirer.Confirm("question2", message="Do you agree?"),
+        inquirer.Text("model_id", message="Specify the model identifier"),
+        inquirer.Confirm("gzip", message="Do you want to gzip?"),
     ]
 
-    with patch("inquirer.prompt", return_value={"question1": "Alice", "question2": True}):
+    with patch("inquirer.prompt", return_value={"model_id": "LCT010", "gzip": True}):
         answers = measure.ask_questions(questions)
 
-    assert answers["question1"] == "Alice"
-    assert answers["question2"] is True
+    assert answers["model_id"] == "LCT010"
+    assert answers["gzip"] is True
 
 
 def test_ask_questions_with_all_predefined_answers(mock_config_factory) -> None:  # noqa: ANN001
     """Test asking questions when all answers are predefined in config"""
-    mock_config = mock_config_factory()
+    mock_config = mock_config_factory(
+        config_values={
+            "model_id": "LCT010",
+            "gzip": "true",
+        },
+    )
     measure = _create_measure_instance(config=mock_config)
 
     questions = [
-        inquirer.Text("question1", message="What is your name?"),
-        inquirer.Confirm("question2", message="Do you agree?"),
+        inquirer.Text("model_id", message="Specify the model identifier"),
+        inquirer.Confirm("gzip", message="Do you want to gzip?"),
     ]
-
-    mock_config.get_conf_value = lambda x: "Alice" if x == "QUESTION1" else "true"
 
     answers = measure.ask_questions(questions)
 
-    assert answers["question1"] == "Alice"
-    assert answers["question2"] is True
+    assert answers["model_id"] == "LCT010"
+    assert answers["gzip"] is True
 
 
 def test_ask_questions_with_partial_predefined_answers(mock_config_factory) -> None:  # noqa: ANN001
     """Test asking questions when only some answers are predefined in config"""
-    mock_config = mock_config_factory()
+    mock_config = mock_config_factory(
+        config_values={
+            "model_id": "LCT010",
+        },
+    )
     measure = _create_measure_instance(config=mock_config)
 
     questions = [
-        inquirer.Text("question1", message="What is your name?"),
-        inquirer.Confirm("question2", message="Do you agree?"),
+        inquirer.Text("model_id", message="Specify the model identifier"),
+        inquirer.Confirm("gzip", message="Do you want to gzip?"),
     ]
 
-    mock_config.get_conf_value = lambda x: "Alice" if x == "QUESTION1" else None
-
-    with patch("inquirer.prompt", return_value={"question2": True}):
+    with patch("inquirer.prompt", return_value={"gzip": True}):
         answers = measure.ask_questions(questions)
 
-    assert answers["question1"] == "Alice"
-    assert answers["question2"] is True
+    assert answers["model_id"] == "LCT010"
+    assert answers["gzip"] is True
 
 
 def test_ask_questions_with_list_type(mock_config_factory) -> None:  # noqa: ANN001
@@ -268,17 +273,15 @@ def test_ask_questions_with_list_type(mock_config_factory) -> None:  # noqa: ANN
     measure = _create_measure_instance(config=mock_config)
 
     questions = [
-        inquirer.Text("question1", message="What is your name?"),
-        inquirer.List("question2", message="Choose an option", choices=["Option 1", "Option 2"]),
+        inquirer.Text("model_id", message="Specify the model identifier"),
+        inquirer.List("color_mode", message="Select the color mode", choices=["brightness", "hs"]),
     ]
 
-    mock_config.get_conf_value = lambda x: None
-
-    with patch("inquirer.prompt", return_value={"question1": "Bob", "question2": "Option 1"}):
+    with patch("inquirer.prompt", return_value={"model_id": "LCT010", "color_mode": "brightness"}):
         answers = measure.ask_questions(questions)
 
-    assert answers["question1"] == "Bob"
-    assert answers["question2"] == "Option 1"
+    assert answers["model_id"] == "LCT010"
+    assert answers["color_mode"] == "brightness"
 
 
 def test_ask_questions_with_mode_converts_to_lut_mode_set(mock_config_factory) -> None:  # noqa: ANN001
