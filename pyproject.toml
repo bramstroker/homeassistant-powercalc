@@ -18,7 +18,7 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.14",
 ]
-requires-python = ">=3.13.2,<4.0"
+requires-python = ">=3.14.2,<4.0"
 dependencies = ["homeassistant"]
 license = "MIT"
 
@@ -101,7 +101,7 @@ dev = [
     "mypy==1.19.1",
     "voluptuous-stubs>=0.1",
     "homeassistant-stubs",
-    "pytest-homeassistant-custom-component==0.13.316",
+    "pytest-homeassistant-custom-component==0.13.317",
     "types-pytz>=2024.1",
     "types-croniter>=2.0",
     "croniter>=6.0.0",
