@@ -11,5 +11,5 @@
     "VERSION": "v1.20.4:docker"
   },
   "name": "Philips Hue Essentials E27 8W",
-  "standby_power": 0
+  "standby_power": 0.157
 }
