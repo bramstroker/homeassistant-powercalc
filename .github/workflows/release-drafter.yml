@@ -33,7 +33,7 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
       - name: Create Release
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         with:
           footer: ${{ steps.supporters.outputs.value }}
           config-name: release-drafter.yml
