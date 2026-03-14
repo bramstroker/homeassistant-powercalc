@@ -8,8 +8,17 @@ from unittest.mock import MagicMock, patch
 
 from decouple import UndefinedValueError
 from measure.config import MeasureConfig
-from measure.const import PROJECT_DIR
+from measure.const import (
+    PROJECT_DIR,
+    QUESTION_DUMMY_LOAD,
+    QUESTION_GENERATE_MODEL_JSON,
+    QUESTION_MEASURE_DEVICE,
+    QUESTION_MODEL_ID,
+    QUESTION_MODEL_NAME,
+    QUESTION_SELECTED_MEASURE_TYPE,
+)
 from measure.controller.light.const import LutMode
+from measure.runner.const import QUESTION_GZIP, QUESTION_MODE, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
 import pytest
 
 
@@ -48,16 +57,16 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
         if set_question_defaults:
             default_config_values.update(
                 {
-                    "generate_model_json": True,
-                    "dummy_load": False,
-                    "model_name": "Test model",
-                    "model_id": "LCT010",
-                    "measure_device": "Shelly Plug S",
-                    "gzip": True,
-                    "multiple_lights": False,
-                    "num_lights": 1,
-                    "selected_measure_type": "Light bulb(s)",
-                    "mode": {LutMode.BRIGHTNESS},
+                    QUESTION_GENERATE_MODEL_JSON: True,
+                    QUESTION_DUMMY_LOAD: False,
+                    QUESTION_MODEL_NAME: "Test model",
+                    QUESTION_MODEL_ID: "LCT010",
+                    QUESTION_MEASURE_DEVICE: "Shelly Plug S",
+                    QUESTION_GZIP: True,
+                    QUESTION_MULTIPLE_LIGHTS: False,
+                    QUESTION_NUM_LIGHTS: 1,
+                    QUESTION_SELECTED_MEASURE_TYPE: "Light bulb(s)",
+                    QUESTION_MODE: {LutMode.BRIGHTNESS},
                     **(question_defaults or {}),
                 },
             )
