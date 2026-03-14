@@ -13,6 +13,7 @@ from inquirer.render import ConsoleRender
 from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR, MeasureType
 from measure.controller.charging.const import ChargingDeviceType
+from measure.controller.light.const import LutMode
 from measure.measure import Measure
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.util.measure_util import MeasureUtil
@@ -278,3 +279,18 @@ def test_ask_questions_with_list_type(mock_config_factory) -> None:  # noqa: ANN
 
     assert answers["question1"] == "Bob"
     assert answers["question2"] == "Option 1"
+
+
+def test_ask_questions_with_mode_converts_to_lut_mode_set(mock_config_factory) -> None:  # noqa: ANN001
+    """Test that a mode answer is converted to a set containing a LutMode"""
+    mock_config = mock_config_factory(set_question_defaults=False)
+    measure = _create_measure_instance(config=mock_config)
+
+    questions = [
+        inquirer.Text("mode", message="Select mode"),
+    ]
+
+    with patch("inquirer.prompt", return_value={"mode": "hs"}):
+        answers = measure.ask_questions(questions)
+
+    assert answers["mode"] == {LutMode.HS}
