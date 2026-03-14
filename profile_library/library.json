@@ -4505,16 +4505,22 @@
           },
           "name": "Hue Essentials E27 8W",
           "standby_power": 0.157,
+          "author_info": {
+            "name": "Ikkei Odaira",
+            "github": "Triserden",
+            "email": "git@triserden.dev"
+          },
+          "author": "Ikkei Odaira",
           "id": "LCA016",
           "manufacturer": "signify",
-          "updated_at": "2026-03-14T18:36:53",
+          "updated_at": "2026-03-14T18:37:16",
           "max_power": 7.75,
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
             "color_temp"
           ],
-          "hash": "ff267a939a6cd864e35ef75d3a867815"
+          "hash": "c534ca325baa82fdb7f49e87a499882f"
         },
         {
           "aliases": [
@@ -7975,10 +7981,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hsv"
+            "hsv",
+            "color_temp"
           ],
-          "hash": "3e464c0176ec662f83574fc0a53ed9a7"
+          "hash": "b251dc0be1a14126c86df718939fdab2"
         },
         {
           "aliases": [
@@ -8667,10 +8673,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "effect",
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "95044b79d5af8c9f772224706e31a8fb"
+          "hash": "c587aa4b862dd4931c8e7f863bd6d7b8"
         }
       ],
       "device_types": [
@@ -10223,10 +10229,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "brightness"
+            "brightness",
+            "color_temp"
           ],
-          "hash": "c5ca2ab9fef230d19eb19dbfdb6bbc98"
+          "hash": "a803a0424627baf0efcf5e7c682be4f8"
         },
         {
           "aliases": [
@@ -12809,10 +12815,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
-          "hash": "601aa03751c813e5be58a4bb7f7e6dc4"
+          "hash": "caf8dfd4b1c3b1fe7249fe105af3229a"
         },
         {
           "aliases": [
@@ -12996,11 +13002,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "hs",
-            "color_temp",
-            "brightness"
+            "color_temp"
           ],
-          "hash": "e8b5204c099f9a8935b0a95633865472"
+          "hash": "c9cf5aa69a73b3a6b6a7d4899501ace8"
         },
         {
           "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
@@ -14485,10 +14491,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "effect",
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "b558995e3b047c8d8c5921b74736b8f4"
+          "hash": "4ba1ff3b8dd16bbad33691d017d63e5b"
         },
         {
           "calculation_strategy": "lut",
@@ -14516,10 +14522,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "effect",
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "87712518a23226a5947ad8501a350aed"
+          "hash": "76c87cbf39b8499112a77525311f2b7f"
         },
         {
           "author": "Brian Egge <brianegge@gmail.com>",
@@ -14727,10 +14733,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "effect",
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "c5f06f7ac36512536168a0f496155dfb"
+          "hash": "490ea96b2575de8d2b16b70d69995526"
         },
         {
           "author": "gobbli",
@@ -14757,10 +14763,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "effect",
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "5fd6bf12289b916338b4a7954940dfd9"
+          "hash": "4bf5058fbc6b6012c8fcb7805f1139a0"
         },
         {
           "author": "Sku1ly <45756272+Sku1ly@users.noreply.github.com>",
@@ -14786,11 +14792,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "hs",
-            "color_temp",
-            "brightness"
+            "color_temp"
           ],
-          "hash": "97ddeacae6bac7c7d1c1208e04fbc5ea"
+          "hash": "c5a4aa00980a86307c4756ec23fe2082"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -16738,11 +16744,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "hs",
-            "color_temp",
-            "brightness"
+            "color_temp"
           ],
-          "hash": "bec73b4bee157ea1e51d5ae0df5db9c6"
+          "hash": "7d6df058244cf0fb69cf220a11d00f37"
         }
       ],
       "device_types": [
