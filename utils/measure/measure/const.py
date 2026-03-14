@@ -8,6 +8,7 @@ QUESTION_MODEL_NAME = "model_name"
 QUESTION_MEASURE_DEVICE = "measure_device"
 QUESTION_ENTITY_ID = "entity_id"
 QUESTION_MODEL_ID = "model_id"
+QUESTION_SELECTED_MEASURE_TYPE = "selected_measure_type"
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()
