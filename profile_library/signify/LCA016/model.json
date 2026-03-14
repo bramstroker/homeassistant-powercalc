@@ -11,5 +11,11 @@
     "VERSION": "v1.20.4:docker"
   },
   "name": "Hue Essentials E27 8W",
-  "standby_power": 0.157
+  "standby_power": 0.157,
+  "author_info": {
+    "name": "Ikkei Odaira",
+    "github": "Triserden",
+    "email": "git@triserden.dev"
+  },
+  "author": "Ikkei Odaira"
 }
