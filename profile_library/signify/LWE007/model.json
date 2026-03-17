@@ -14,5 +14,10 @@
     "VERSION": "v1.20.8:docker"
   },
   "name": "Hue White Smart Bulb Candle E14 5.5W ",
-  "standby_power": 0.22
+  "standby_power": 0.22,
+  "author_info": {
+    "name": "sve",
+    "github": "sve007"
+  },
+  "author": "sve"
 }

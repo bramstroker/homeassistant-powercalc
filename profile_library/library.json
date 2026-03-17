@@ -2996,6 +2996,32 @@
         },
         {
           "aliases": [
+            "9290030211"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-03-07T14:48:02Z",
+          "device_type": "light",
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 5,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.20.8:docker"
+          },
+          "name": "Hue White Smart Bulb Candle E14 5.5W ",
+          "standby_power": 0.22,
+          "id": "LWE007",
+          "manufacturer": "signify",
+          "updated_at": "2026-03-17T18:08:01",
+          "max_power": 5.16,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "brightness"
+          ],
+          "hash": "7394168ab3a687f4ee5d666f4573418e"
+        },
+        {
+          "aliases": [
             "929003808201_01",
             "929003808201_02",
             "929003808201_03",
@@ -7981,10 +8007,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hsv"
+            "hsv",
+            "color_temp"
           ],
-          "hash": "3e464c0176ec662f83574fc0a53ed9a7"
+          "hash": "b251dc0be1a14126c86df718939fdab2"
         },
         {
           "aliases": [
@@ -10229,10 +10255,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "a803a0424627baf0efcf5e7c682be4f8"
+          "hash": "c5ca2ab9fef230d19eb19dbfdb6bbc98"
         },
         {
           "aliases": [
@@ -12815,10 +12841,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "caf8dfd4b1c3b1fe7249fe105af3229a"
+          "hash": "601aa03751c813e5be58a4bb7f7e6dc4"
         },
         {
           "aliases": [
@@ -13002,11 +13028,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
+            "hs",
             "color_temp",
-            "hs"
+            "brightness"
           ],
-          "hash": "21e279d64e6840a6f75b4f41fe8ce9c6"
+          "hash": "e8b5204c099f9a8935b0a95633865472"
         },
         {
           "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
@@ -14792,11 +14818,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
+            "hs",
             "color_temp",
-            "hs"
+            "brightness"
           ],
-          "hash": "7a39dbf6da62530b8a004e954f9cfc8d"
+          "hash": "97ddeacae6bac7c7d1c1208e04fbc5ea"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -16744,11 +16770,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
+            "hs",
             "color_temp",
-            "hs"
+            "brightness"
           ],
-          "hash": "ed8c6f8ad83348d686cdce499f97ea56"
+          "hash": "bec73b4bee157ea1e51d5ae0df5db9c6"
         }
       ],
       "device_types": [
