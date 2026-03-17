@@ -1,0 +1,22 @@
+{
+  "aliases": [
+    "HP Color LaserJet Pro MFP 3301"
+  ],
+  "author_info": {
+    "name": "Brian Egge",
+    "email": "brianegge@gmail.com",
+    "github": "brianegge"
+  },
+  "calculation_strategy": "fixed",
+  "created_at": "2026-03-14T00:00:00Z",
+  "device_type": "printer",
+  "fixed_config": {
+    "states_power": {
+      "idle": 2.2
+    }
+  },
+  "measure_description": "Standby power measured at 2.2W via Shelly 4PM. Printing a single page draws 550-670W peak for ~12s (fusing), but HA's IPP integration polls only every 60s so the 'printing' state is never captured. A playbook strategy triggered by a page counter would better model print energy (~0.002 kWh/page), but no page counter entity is currently available. Power readings during a single-page color print:\n\n  Time    Power(W)  State\n  00:00   2.2       idle (baseline)\n  00:24   9.1       warm-up\n  00:30   550.2     fusing\n  00:36   669.5     fusing (peak)\n  00:42   41.6      cool-down\n  00:48   9.6       cool-down\n  01:18   9.0       cool-down\n  01:48   4.5       settling\n  01:54   2.6       returning to idle",
+  "measure_device": "Shelly 4PM",
+  "measure_method": "manual",
+  "name": "Color LaserJet Pro MFP 3301"
+}

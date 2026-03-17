@@ -22,7 +22,7 @@ jobs:
           python-version: '3.13'
       - name: Run tests
         run: |
-          cd ./utils/measure && uv run pytest \
+          cd ./utils/measure && uv run --extra dev pytest \
             -qq \
             --durations=10 \
             -o console_output_style=count \
