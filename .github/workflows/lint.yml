@@ -18,7 +18,7 @@ jobs:
         with:
           activate-environment: true
       - run: uv sync
-      - uses: j178/prek-action@v1
+      - uses: j178/prek-action@v2
       - uses: pre-commit-ci/lite-action@v1.1.0
         if: always()
         with:
