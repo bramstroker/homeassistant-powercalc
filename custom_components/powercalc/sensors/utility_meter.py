@@ -109,7 +109,7 @@ async def create_meters_for_type(
 ) -> list[VirtualUtilityMeter]:
     """Create meters for a specific meter type."""
     name = f"{energy_sensor.name} {meter_type}"
-    entity_id = f"{energy_sensor.entity_id}_{meter_type}"
+    entity_id = f"{energy_sensor.entity_id}_{slugify(meter_type)}"
 
     tariff_sensors = []
     utility_meters = []

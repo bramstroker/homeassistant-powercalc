@@ -5,7 +5,7 @@ from unittest.mock import patch
 from freezegun import freeze_time
 from homeassistant.components import utility_meter
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.components.utility_meter.const import DAILY, HOURLY
+from homeassistant.components.utility_meter.const import DAILY, HOURLY, QUARTER_HOURLY
 from homeassistant.components.utility_meter.sensor import (
     ATTR_STATUS,
     ATTR_TARIFF,
@@ -317,3 +317,28 @@ async def test_net_consumption_option(hass: HomeAssistant) -> None:
 
         _, kwargs = mock_utility_meter.call_args
         assert kwargs["net_consumption"] is True
+
+
+async def test_entity_id_is_slugified(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Test that the entity_id is slugified."""
+
+    caplog.set_level(logging.WARNING)
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.my_switch",
+            CONF_UNIQUE_ID: "1234",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_CREATE_UTILITY_METERS: True,
+        },
+        {
+            CONF_UTILITY_METER_TYPES: [DAILY, QUARTER_HOURLY],
+        },
+    )
+
+    assert hass.states.get("sensor.my_switch_energy_daily")
+    assert hass.states.get("sensor.my_switch_energy_quarter_hourly")
+
+    assert "Detected that custom integration 'powercalc' sets an invalid entity ID" not in caplog.text
