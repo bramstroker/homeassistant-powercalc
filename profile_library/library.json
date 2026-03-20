@@ -3010,15 +3010,20 @@
           },
           "name": "Hue White Smart Bulb Candle E14 5.5W ",
           "standby_power": 0.22,
+          "author_info": {
+            "name": "sve",
+            "github": "sve007"
+          },
+          "author": "sve",
           "id": "LWE007",
           "manufacturer": "signify",
-          "updated_at": "2026-03-17T18:08:01",
+          "updated_at": "2026-03-17T18:08:25",
           "max_power": 5.16,
           "sub_profile_count": 0,
           "color_modes": [
             "brightness"
           ],
-          "hash": "7394168ab3a687f4ee5d666f4573418e"
+          "hash": "13f4bb69146f27d6a268fcf9e7591ddf"
         },
         {
           "aliases": [
@@ -3204,6 +3209,32 @@
             "color_temp"
           ],
           "hash": "ac10e818444b381c5b91dc702616de1b"
+        },
+        {
+          "aliases": [
+            "9290030519"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-03-07T09:25:47Z",
+          "device_type": "light",
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 5,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.20.8:docker"
+          },
+          "name": "Hue smart bulb G93 warm white E27 7,2W ",
+          "standby_power": 0.18,
+          "id": "LWO005",
+          "manufacturer": "signify",
+          "updated_at": "2026-03-20T07:14:22",
+          "max_power": 6.93,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "brightness"
+          ],
+          "hash": "01097d5f519058961e7fa7e8f0f328b4"
         },
         {
           "aliases": [
@@ -8698,11 +8729,11 @@
           "max_power": 8.43,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "7c00c8ef9ea7b444ae877606e245eb04"
+          "hash": "c587aa4b862dd4931c8e7f863bd6d7b8"
         }
       ],
       "device_types": [
@@ -14516,11 +14547,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "4b65e10e693f49107b69ca124b7e566d"
+          "hash": "4ba1ff3b8dd16bbad33691d017d63e5b"
         },
         {
           "calculation_strategy": "lut",
@@ -14547,11 +14578,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "c835365008fd19155e8884933d36a213"
+          "hash": "76c87cbf39b8499112a77525311f2b7f"
         },
         {
           "author": "Brian Egge <brianegge@gmail.com>",
@@ -14758,11 +14789,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "b85db766803a8f6a53d90fd2f034065d"
+          "hash": "490ea96b2575de8d2b16b70d69995526"
         },
         {
           "author": "gobbli",
@@ -14788,11 +14819,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "71fcc13f8e8cd86bc0ad5195a8d3a4fb"
+          "hash": "4bf5058fbc6b6012c8fcb7805f1139a0"
         },
         {
           "author": "Sku1ly <45756272+Sku1ly@users.noreply.github.com>",

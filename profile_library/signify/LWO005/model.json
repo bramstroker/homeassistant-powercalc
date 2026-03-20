@@ -14,5 +14,10 @@
     "VERSION": "v1.20.8:docker"
   },
   "name": "Hue smart bulb G93 warm white E27 7,2W ",
-  "standby_power": 0.18
+  "standby_power": 0.18,
+  "author_info": {
+    "name": "sve",
+    "github": "sve007"
+  },
+  "author": "sve"
 }
