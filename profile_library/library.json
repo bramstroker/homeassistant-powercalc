@@ -204,10 +204,10 @@
           "max_power": 34.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "394117383b10059a12e2b570f430191a"
+          "hash": "e1f98d830fe83753cb9f01c9712934d2"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
@@ -351,10 +351,10 @@
           "max_power": 8.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "c96b6a2a95c59f78a6d2a2557c21f41d"
+          "hash": "337f2eb9a617e82ec0369d975861bc4b"
         },
         {
           "author": "Morten Trab <morten@trab.dk>",
@@ -381,10 +381,10 @@
           "max_power": 4.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d36f45fd55a44335c0e64906d9a79612"
+          "hash": "c37e88b2a9e872f48c044b85e7f0cd7b"
         },
         {
           "author": "gary-oneill82 <57816996+gary-oneill82@users.noreply.github.com>",
@@ -410,10 +410,10 @@
           "max_power": 8.18,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "117646bad58c922d8cab0e045096e052"
+          "hash": "a0a363d09f65159560920562b6f04880"
         },
         {
           "author": "PalminX <bkuemmer@gmx.net>",
@@ -440,10 +440,10 @@
           "max_power": 9.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "c10c36cd4243905483e1b4d80010d3f4"
+          "hash": "e893d7a3209d57030a315e1321f87f47"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
@@ -581,15 +581,20 @@
           },
           "name": "12W 1050Lm CCT Colour Mode LED E27 Globe",
           "standby_power": 0.3,
+          "author_info": {
+            "name": "Mallett",
+            "github": "Ma11ett"
+          },
+          "author": "Mallett",
           "id": "GLD312HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-03-20T07:22:26",
+          "updated_at": "2026-03-20T07:22:50",
           "max_power": 11.0,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp"
           ],
-          "hash": "04d52299563209a4aa529c8e8e6c94d4"
+          "hash": "a1d957ac141d940ce2cf96762260adb9"
         },
         {
           "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
@@ -667,10 +672,10 @@
           "max_power": 8.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "46af5caafc621a57b627741cb04854e3"
+          "hash": "132f1b2e4cd717f94995fca0c514fccf"
         },
         {
           "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
@@ -720,10 +725,10 @@
           "max_power": 12.01,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "606b5a19d3e307619c33a2f2344aba17"
+          "hash": "3d60bd7ab67866e83dbb39368310c201"
         }
       ],
       "device_types": [
@@ -762,10 +767,10 @@
           "max_power": 10.1,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "27de97ea45c5f2239fe9ed53b77a8bdd"
+          "hash": "c03b09fbdc0647ec1ce7b167087abd1e"
         }
       ],
       "device_types": [
@@ -863,10 +868,10 @@
           "max_power": 10.49,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "6e3854eec5aa80f1c8baa190ff5ea7b0"
+          "hash": "24d047e15777b427a546c35eb2c30795"
         },
         {
           "author": "Joshua Rich <joshua.rich@aiven.io>",
@@ -893,10 +898,10 @@
           "max_power": 11.41,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d3ac380b6cbabc3a656593f34e38e712"
+          "hash": "680f136047814797f26fe774ca7f2192"
         },
         {
           "author": "bramstroker <bgerritsen@gmail.com>",
@@ -1078,10 +1083,10 @@
           "max_power": 12.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9baa07190abb32f03143570bd68e72e5"
+          "hash": "cdda8ef9b384304dad4d2b6a02d47888"
         }
       ],
       "device_types": [
@@ -1318,10 +1323,10 @@
           "max_power": 15.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e95e2b9bb7b2eeed45a59e5adbcf7a9b"
+          "hash": "75e2f3f0b88717967b8d7c89c9494f1b"
         },
         {
           "author": "BeardedTinker",
@@ -1376,10 +1381,10 @@
           "max_power": 19.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ffa2e0ae15b5dc859a2abd0f31486b54"
+          "hash": "0621a79cc82e7705a19991e081eb7685"
         },
         {
           "author": "Marc Geurts <geurtsmarc@hotmail.com>",
@@ -1445,10 +1450,10 @@
           "max_power": 9.06,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "beb5b1638ac4adfaf97f3b18ca895ac3"
+          "hash": "4e9e7f94f0712124b245642e0878e7c9"
         }
       ],
       "device_types": [
@@ -2008,10 +2013,10 @@
           "max_power": 11.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "52ff2aca2f358aaa7541aab3821f22ed"
+          "hash": "56bebb17d64a7c5a691aa31380b5bd40"
         },
         {
           "author": "ffm777 <47192860+ffm777@users.noreply.github.com>",
@@ -2093,10 +2098,10 @@
           "max_power": 8.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "0f4e9a05cca9fe1da2154382b8573df9"
+          "hash": "d534abf4b94e051227830b0a2fb5179d"
         },
         {
           "aliases": [
@@ -2205,10 +2210,10 @@
           "max_power": 9.37,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "c8e3d0031473d9fb2447f0387a2b32bc"
+          "hash": "1994901a8018721e82ecc7b95676f967"
         },
         {
           "aliases": [
@@ -2351,10 +2356,10 @@
           "max_power": 8.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e35e07e1f2ba85642166a0ed89f091eb"
+          "hash": "6288837291e73d208e2d408b6b66c8f0"
         },
         {
           "aliases": [
@@ -2507,10 +2512,10 @@
           "max_power": 21.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a121e3afd3a0b0433a42d8b4e0d41fa9"
+          "hash": "609521656e9fb9f0a1c30579e6db9361"
         },
         {
           "aliases": [
@@ -2539,10 +2544,10 @@
           "max_power": 12.1,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a30533112fbef209fa5f8d34026411e7"
+          "hash": "e6e07c34fb8e832413644e2f6030d1b2"
         },
         {
           "aliases": [
@@ -2568,10 +2573,10 @@
           "max_power": 4.72,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "b036edbf94d8051644a9a7ba8b734758"
+          "hash": "a82384b8b1b0fc9c37c7e91185180407"
         },
         {
           "aliases": [
@@ -2600,10 +2605,10 @@
           "max_power": 67.79,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "0e3721495310feb6d25a83adbd9c61e9"
+          "hash": "fabda0316bbdc3a79a876b6204a843b4"
         },
         {
           "author": "matteobreschig <69394134+matteobreschig@users.noreply.github.com>",
@@ -2618,6 +2623,9 @@
             "VERSION": "v1.16.7:docker"
           },
           "name": "Hue White and Color Ambiance GU10 400lm",
+          "aliases": [
+            "929003666501"
+          ],
           "standby_power": 0.2,
           "author_info": {
             "name": "matteobreschig",
@@ -2625,14 +2633,14 @@
           },
           "id": "LCG006",
           "manufacturer": "signify",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-03-20T07:27:15",
           "max_power": 4.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9d54bc643674fa269dc66a0acb7cae66"
+          "hash": "2d3b105ee2617562f8c93837a225f431"
         },
         {
           "aliases": [
@@ -2689,10 +2697,10 @@
           "max_power": 4.47,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "64237f9a358cfa40024a0f2f1a5b8901"
+          "hash": "f9dde2c9185f74c3d6562468d56555aa"
         },
         {
           "author": "Keatre",
@@ -2892,10 +2900,10 @@
           "max_power": 8.03,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "1dd28d0c3270bcd51d70b0131be35142"
+          "hash": "e0b5fec42bc7216f394740452d37d24f"
         },
         {
           "aliases": [
@@ -2926,10 +2934,10 @@
           "max_power": 17.96,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "99dadd964298ce1b77bf99b0707d7641"
+          "hash": "0867f17496972b7c51ef9c760a5c2e01"
         },
         {
           "author": "dewbot6 <drewsnodgrass@comcast.net>",
@@ -2956,10 +2964,10 @@
           "max_power": 16.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "55bc22970a02d33d07129abdc66599c5"
+          "hash": "f9bae06b1e83d2951e34471f3cad7cd0"
         },
         {
           "aliases": [
@@ -3082,10 +3090,10 @@
           "max_power": 4.28,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "0cb6e8b54bb4fdd77fe7eda5be8f054e"
+          "hash": "664af2e04ae9e605574dc2818992e5ed"
         },
         {
           "author": "smonesi <63957397+smonesi@users.noreply.github.com>",
@@ -3292,10 +3300,10 @@
           "max_power": 4.61,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "7e96824f1b7bf5bd1c71b434a32c64b0"
+          "hash": "f63b76398828daa74424d9587b5a36eb"
         },
         {
           "aliases": [
@@ -3435,10 +3443,10 @@
           "max_power": 6.19,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "c2d606fb9a57e4994ab612c4dd8b0603"
+          "hash": "1f6d55111b8c360077d8df2dc173be2b"
         },
         {
           "aliases": [
@@ -3467,10 +3475,10 @@
           "max_power": 44.08,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e3b7a5805720360808521327c6f180ef"
+          "hash": "e27f9085d9d176237f483032a719bbb9"
         },
         {
           "aliases": [
@@ -3500,10 +3508,10 @@
           "max_power": 38.66,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "5ca2f82ff78e6387c16263abb937d827"
+          "hash": "fd2064709138430b05b9161e441fe599"
         },
         {
           "aliases": [
@@ -3625,10 +3633,10 @@
           "max_power": 43.52,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "8a632dbb6d0c32d7e0f5f836eccca21d"
+          "hash": "5dfe1a1d5bd9017bcefebe7c558e06e9"
         },
         {
           "aliases": [
@@ -3744,10 +3752,10 @@
           "max_power": 9.55,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "0c9c7595efb3a37dd3da2fbcfa68ed6c"
+          "hash": "ff2b01a581ace6a052a6c560f5cdbf85"
         },
         {
           "aliases": [
@@ -3774,10 +3782,10 @@
           "max_power": 11.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d1a3e463fafa4c2a7fdc0ad960bda5cb"
+          "hash": "9ee09e3fba57266ff3f5adeacf057e59"
         },
         {
           "aliases": [
@@ -3839,10 +3847,10 @@
           "max_power": 14.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "8a86b98f4cbc958853862558a7aec92e"
+          "hash": "2f53dbde4286124320cb17b42a84d467"
         },
         {
           "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>",
@@ -3902,10 +3910,10 @@
           "max_power": 5.16,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "6b9df63ee5181fd8e44bc848d06153cc"
+          "hash": "098caa02077a1414dd0669cdaa8bd9b4"
         },
         {
           "aliases": [
@@ -3958,10 +3966,10 @@
           "max_power": 5.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "fe4a7a966bdc1fe27dd30550a1da2e3c"
+          "hash": "d4591622a7854b3f51189c5917ab1dee"
         },
         {
           "calculation_strategy": "lut",
@@ -3987,10 +3995,10 @@
           "max_power": 21.64,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "af367e14f61bd1480f2df6665131fb61"
+          "hash": "4f42f1000b271e72bced9749e1bdd4e1"
         },
         {
           "aliases": [
@@ -4053,10 +4061,10 @@
           "max_power": 10.61,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9b06cba34dff1aade00fd4f2e54b519c"
+          "hash": "153f05fd8d270ff381670f51517fdf4b"
         },
         {
           "aliases": [
@@ -4086,10 +4094,10 @@
           "max_power": 12.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a3da297c9c81024f27e6a16c9e7c9e49"
+          "hash": "5f032288b8f91159a2913e76ff354ce8"
         },
         {
           "aliases": [
@@ -4183,10 +4191,10 @@
           "max_power": 36.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "b22b6b1bb83b1ea3a6825d674ac1e730"
+          "hash": "50b338a71989109c5fdb8889bac1555f"
         },
         {
           "aliases": [
@@ -4245,10 +4253,10 @@
           "max_power": 28.69,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "f9a81fa99f46bec0f88d7171642945fb"
+          "hash": "d21bf9817e3448e001e631cc4253301e"
         },
         {
           "author": "deceju <111586992+deceju@users.noreply.github.com>",
@@ -4274,10 +4282,10 @@
           "max_power": 40.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "32b4ca881f2cd40a290cbd561cdd1e09"
+          "hash": "f8ad62453ed349a7ce23eadf8fcf6630"
         },
         {
           "author": "mariwing <mariwing@gmail.com>",
@@ -4304,10 +4312,10 @@
           "max_power": 9.61,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d1e38e06c5f8e90b55b9729e9e00979b"
+          "hash": "cfcc1ce247ebc3324b598f13b83779ec"
         },
         {
           "aliases": [
@@ -4337,10 +4345,10 @@
           "max_power": 28.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e17ec9e39e25dc17aad9c76dfa45e72e"
+          "hash": "f3ef27e468c55a5e8f674950bfe9d919"
         },
         {
           "aliases": [
@@ -4394,10 +4402,10 @@
           "max_power": 9.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "7a36851320d4b9af116054b3db2c1240"
+          "hash": "4990f680ea464972facddbfd66e5549b"
         },
         {
           "aliases": [
@@ -4548,10 +4556,10 @@
           "max_power": 59.37,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "6e97c3650520cadf5d349c0367e50578"
+          "hash": "7ce1065eb4682515cb27cae94167b4c0"
         },
         {
           "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
@@ -4602,10 +4610,10 @@
           "max_power": 7.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ff72b12b85f9a5fad08677a35dfced1b"
+          "hash": "c534ca325baa82fdb7f49e87a499882f"
         },
         {
           "aliases": [
@@ -4634,10 +4642,10 @@
           "max_power": 13.76,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "2e96b2452bb404fbecd4ec3befbd1154"
+          "hash": "6748e2cf49230d779d5ca1e7a8c657e3"
         },
         {
           "aliases": [
@@ -4759,10 +4767,10 @@
           "max_power": 7.81,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "43ceb737ee2eb0fde7a9a2aa0c1c0749"
+          "hash": "3defedf15b3c8291a5eedfbe6a6d381e"
         },
         {
           "aliases": [
@@ -4792,10 +4800,10 @@
           "max_power": 9.81,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "89d45016a9c72882f2f1903759f94e6b"
+          "hash": "4ae50ade0ab549fbd3ae6d439c8baebb"
         },
         {
           "aliases": [
@@ -4913,10 +4921,10 @@
           "max_power": 12.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "4c79d94f241e297a747fb46b6cb18206"
+          "hash": "42c81252bb50a71f5809e3a581dffb33"
         },
         {
           "aliases": [
@@ -4946,10 +4954,10 @@
           "max_power": 8.38,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "47369284f7e0b98563982fd12fed6373"
+          "hash": "d20cfdf8f9eaaad72e01844992a0073d"
         },
         {
           "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>",
@@ -4999,10 +5007,10 @@
           "max_power": 8.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "1dc81e8b78672472f4f5315ecae348f0"
+          "hash": "e9dd4579df7269a8fcea36d57957f662"
         },
         {
           "author": "wormiedk <wormie@alberg.dk>",
@@ -5024,10 +5032,10 @@
           "max_power": 7.6,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "24192b0d04f412f806135a3aca39641f"
+          "hash": "ab07c1dd7c0a3d48b41fc96ce77de50f"
         },
         {
           "aliases": [
@@ -5086,10 +5094,10 @@
           "max_power": 6.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "bc1a68dc86f94c2a228fd09b2a0a3040"
+          "hash": "b45ff99f22fad28b60e0d2c23e9be1ba"
         },
         {
           "aliases": [
@@ -5120,10 +5128,10 @@
           "max_power": 7.13,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "5830898e2a18b0395e057607055fb5c4"
+          "hash": "21a9687fffc1bfd0faf836e14bba5c1d"
         },
         {
           "author": "Bram Gerritsen <bgerritsen@gmail.com>",
@@ -5145,10 +5153,10 @@
           "max_power": 5.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e8ad0372be44006e6bda790a8db58e28"
+          "hash": "9849bf6c4fbb617d02f0c2d577985d64"
         },
         {
           "aliases": [
@@ -5237,10 +5245,10 @@
           "max_power": 4.71,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "cbf2d1148cf00895f67902e01e0640db"
+          "hash": "db8243130f41864fa7c28ed3ffa5f647"
         },
         {
           "aliases": [
@@ -5364,10 +5372,10 @@
           "max_power": 21.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9541f7b6ab1e362bfacfe18eb862d4f4"
+          "hash": "ba8887bb3f9678860920fa0a75375296"
         },
         {
           "aliases": [
@@ -5397,10 +5405,10 @@
           "max_power": 7.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e2040b4a1fd21ae63ef1d403b3e892a4"
+          "hash": "59f83d131ecd279efe3870cfe7b2ad9e"
         },
         {
           "aliases": [
@@ -5427,10 +5435,10 @@
           "max_power": 5.53,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9e9625741e4b182fa04f446886f53702"
+          "hash": "942a2acf554b3a3f3ae44be053bec502"
         },
         {
           "aliases": [
@@ -5469,10 +5477,10 @@
           "max_power": 5.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ea6fd04935909544a6442685c29a9e7d"
+          "hash": "01809e39db1420e8c52f878bf83531f8"
         },
         {
           "aliases": [
@@ -5594,10 +5602,10 @@
           "max_power": 8.58,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "2fa7896a98826187ed14709edfc32182"
+          "hash": "e3d7bd3fa5d9df0e5fb7ec69436d5248"
         },
         {
           "aliases": [
@@ -5653,10 +5661,10 @@
           "max_power": 10.31,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "106700c4995e1670c784a471bb5acaaa"
+          "hash": "bf20cceb5cd26c517b25c68466696e29"
         },
         {
           "author": "Emory Penney <emory.j.penney@intel.com>",
@@ -5683,10 +5691,10 @@
           "max_power": 9.05,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a29fc2951e270fe6cfd934301ee9d7a0"
+          "hash": "1160dc666dc30f1f1677b165a2035581"
         },
         {
           "aliases": [
@@ -5719,10 +5727,10 @@
           "max_power": 33.97,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ad5347f0e0018ccc49fec8fbe88c8c60"
+          "hash": "39238aa6bb549b884c02a73f6e80d4ba"
         },
         {
           "aliases": [],
@@ -5862,10 +5870,10 @@
           "max_power": 11.36,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "23ee3af928411a606cac95dc5383a6a4"
+          "hash": "46803f9401fff7ed334b7e76c2be9c3b"
         },
         {
           "aliases": [
@@ -5984,10 +5992,10 @@
           "max_power": 5.44,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "428b561dbd731779a0c093a1e2995b07"
+          "hash": "44a3f5c59339527e6bf746e4c9548d6f"
         },
         {
           "author": "Ben Brooks <47788519+brooksben11@users.noreply.github.com>",
@@ -6080,10 +6088,10 @@
           "max_power": 7.07,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "23cf4d01706631815ccb700d6dac204d"
+          "hash": "cf6288e12bdbb3293cde51f550a93249"
         },
         {
           "aliases": [
@@ -6113,10 +6121,10 @@
           "max_power": 23.66,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "97412c3fbda0c9ec7bf38c2c0b3bf0c7"
+          "hash": "63115c13498a79e014e76c9b7332e609"
         },
         {
           "aliases": [
@@ -6142,10 +6150,10 @@
           "max_power": 46.16,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "29dba4fc3c3b129c41e6fcced2731386"
+          "hash": "42892d28b574f4edd2adaa796d9063e1"
         },
         {
           "aliases": [
@@ -6175,10 +6183,10 @@
           "max_power": 34.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "45afe25a4d18c02310d5e4c2cb004656"
+          "hash": "2e20cbb334fd038f52b6fc2291ae1aec"
         },
         {
           "aliases": [
@@ -6269,10 +6277,10 @@
           "max_power": 24.1,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "84cb111b9384478327fbdb7eb2981a1a"
+          "hash": "acf9746630545a7e2bf2dc533a3fae3a"
         },
         {
           "author": "msteenhuiz",
@@ -6321,10 +6329,10 @@
           "max_power": 12.59,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "005212253aeec2734f0914caa25f91a7"
+          "hash": "013c159cc472da0449596d9dfa2f8870"
         },
         {
           "aliases": [
@@ -6355,10 +6363,10 @@
           "max_power": 70.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "b11de12f02967cb2a6c1632e6fd25a39"
+          "hash": "69d9514dabb32155dea14321b347b8e3"
         },
         {
           "aliases": [
@@ -6389,10 +6397,10 @@
           "max_power": 23.03,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "7cdeff7e96685ef589f46aa07dbce271"
+          "hash": "c11d429be6c154900c58606535c83361"
         },
         {
           "aliases": [
@@ -6422,10 +6430,10 @@
           "max_power": 44.38,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "6e4e4e4d86f79282728289d41a11205a"
+          "hash": "bc7e9ab032dd01ca3cb827b7b2e00b37"
         },
         {
           "aliases": [
@@ -6510,10 +6518,10 @@
           "max_power": 4.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d91cfb8f0996f86f4347841b07074cde"
+          "hash": "880970ec6522bf89ad9816e720defb58"
         },
         {
           "aliases": [
@@ -6544,10 +6552,10 @@
           "max_power": 33.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "7370b1f0958b52ffb0233c990357bc53"
+          "hash": "1cc97dcc238828d590584a65161fed7e"
         },
         {
           "aliases": [
@@ -6577,10 +6585,10 @@
           "max_power": 18.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "40bf28ebd2e4e63099f6d41b0d5c9113"
+          "hash": "f904e0401ff953e0e166a84262ab4bb5"
         },
         {
           "aliases": [
@@ -6610,10 +6618,10 @@
           "max_power": 7.68,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a3975a42c4e1fdb3668533e81e96bebe"
+          "hash": "29b2953966742a7cd1e402eaef7b9fca"
         },
         {
           "aliases": [
@@ -6756,10 +6764,10 @@
           "max_power": 9.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "6182ecf2f18e6b87761cf676e2744440"
+          "hash": "04bf8a774bf3098b7d241c0e91703544"
         },
         {
           "aliases": [
@@ -6817,10 +6825,10 @@
           "max_power": 49.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "f7f720388d363ba5b4bef5bae287ed53"
+          "hash": "2755fe25641389ab0cf28b6d939f3a07"
         },
         {
           "aliases": [
@@ -6909,10 +6917,10 @@
           "max_power": 9.19,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "47568dde09136a0d5734753bae80cf89"
+          "hash": "7f3fc86af813029431ae7b0ff3b27347"
         },
         {
           "aliases": [
@@ -6942,10 +6950,10 @@
           "max_power": 22.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "b6514a0598d39fee8a02732c25d56d5c"
+          "hash": "9e270af87025aef941999694b34e6c3d"
         },
         {
           "aliases": [],
@@ -6975,10 +6983,10 @@
           "max_power": 10.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e1f85426cf80dfe98c02cca3cba6480e"
+          "hash": "d69de83e83dcfd4cb8ffe2e445b03d5d"
         },
         {
           "aliases": [
@@ -7094,10 +7102,10 @@
           "max_power": 43.37,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a23df6505df15b3beda2b1aa8b9f542b"
+          "hash": "b121a67826a864f30039a28b2f8adbd1"
         },
         {
           "aliases": [
@@ -7156,10 +7164,10 @@
           "max_power": 9.82,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "73ad67c03790d70c99dfcad5554d5166"
+          "hash": "25cc21247299619b4267c005e3f65668"
         },
         {
           "author": "Bram Gerritsen <bgerritsen@gmail.com>",
@@ -7269,10 +7277,10 @@
           "max_power": 59.34,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a2694fbae3c844992fec454e5d8df3e1"
+          "hash": "c0a17f04bc86dd705646b8cd2dd24c16"
         },
         {
           "aliases": [],
@@ -7332,10 +7340,10 @@
           "max_power": 17.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "f7621925282f6c3cde604187d8d395d7"
+          "hash": "857586a2c9dbaa302fca245ce089e659"
         },
         {
           "aliases": [
@@ -7381,10 +7389,10 @@
           "max_power": 5.53,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "73f8704494e7e59f687e1f3bd4b2a152"
+          "hash": "1f042ca19eeedf612dd54c6707a39d05"
         },
         {
           "aliases": [
@@ -7443,10 +7451,10 @@
           "max_power": 9.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "dfe39d83c1b75ff6e83196156f8cf832"
+          "hash": "76b9c428dede9f063b1ed490c9e9ac6e"
         },
         {
           "aliases": [
@@ -7507,10 +7515,10 @@
           "max_power": 40.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "35fd2910419cfe0f59dfe54650051baf"
+          "hash": "3817e4ffe88664806d951652c3a34bff"
         },
         {
           "aliases": [
@@ -7662,10 +7670,10 @@
           "max_power": 9.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "94364e80fdea3378ace04b056cd66e9b"
+          "hash": "a1c04917d071a70cf0e7b954c6cd8b4d"
         },
         {
           "aliases": [
@@ -7789,10 +7797,10 @@
           "max_power": 9.06,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "21401264e12194ce98f077787d13c305"
+          "hash": "f21addb799a2952a6fe719a8f9f5c5bf"
         },
         {
           "aliases": [
@@ -7822,10 +7830,10 @@
           "max_power": 37.67,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "2ee5f7cde4e4f90b074411bc105c2f03"
+          "hash": "c4b9fc9c7a068d1396ed9bfa6de6a922"
         },
         {
           "aliases": [
@@ -7884,10 +7892,10 @@
           "max_power": 49.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "88e0e1503356ec6333ec938b27e399a6"
+          "hash": "7f3cb13dcd7bbdedf760133e05cbdb49"
         },
         {
           "aliases": [
@@ -7976,10 +7984,10 @@
           "max_power": 20.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ecd09c9f7928e6bbe8e69e11cd0097a1"
+          "hash": "f6c7f1dc6ffff5c681009e4d4c367d3a"
         },
         {
           "aliases": [
@@ -8066,10 +8074,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hsv"
+            "hsv",
+            "color_temp"
           ],
-          "hash": "3e464c0176ec662f83574fc0a53ed9a7"
+          "hash": "b251dc0be1a14126c86df718939fdab2"
         },
         {
           "aliases": [
@@ -8099,10 +8107,10 @@
           "max_power": 23.87,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "4eb7bdf99290c444e86e702dce3fac1e"
+          "hash": "ff6546bcddc046ca08a1f5933a1c3297"
         },
         {
           "author": "Ben Brooks <47788519+brooksben11@users.noreply.github.com>",
@@ -8128,10 +8136,10 @@
           "max_power": 6.93,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "5c0e71eeaf7ab57af92d0a98a61c2a48"
+          "hash": "a4900bc69923ce72c9cff93fdde02eb7"
         },
         {
           "aliases": [
@@ -8161,10 +8169,10 @@
           "max_power": 22.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "31b98d18dfe9344641ddeb61690d22d2"
+          "hash": "587753498d63806c6fadc31bf555d374"
         },
         {
           "author": "Bram Gerritsen <bgerritsen@gmail.com>",
@@ -8186,10 +8194,10 @@
           "max_power": 9.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9ccad2f30557d378b176254bbb6312ce"
+          "hash": "541b960dccc343b5b1f2d395077e5234"
         },
         {
           "aliases": [],
@@ -8254,10 +8262,10 @@
           "max_power": 8.07,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "95eef81d612ebe84bd978a0a7dd81ba2"
+          "hash": "ffcbd0b4ee0c46361ce2ef20dedb9963"
         },
         {
           "author": "Joseph Livecchi <joewashear007@gmail.com>",
@@ -8313,10 +8321,10 @@
           "max_power": 7.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "95b93c0699a75aee92fc3427fb9e14e5"
+          "hash": "cffd01dd39a09d03b93917f072dcaee6"
         },
         {
           "author": "Cam Murray <camurray@microsoft.com>",
@@ -8433,10 +8441,10 @@
           "max_power": 7.83,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "86a4c8c32ccdd42b8d1d2ab6e60c6bfd"
+          "hash": "3e638d7d429274723c97ce19a04ee663"
         },
         {
           "author": "Jari Eskelinen <jari.eskelinen@iki.fi>",
@@ -8463,10 +8471,10 @@
           "max_power": 11.97,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "4d55a37091143d50d47df9f51a6a78b6"
+          "hash": "6a075da67becfc7fe98fcdaa0588bb90"
         },
         {
           "author": "Dieter <dieter.kuhn@koeln.de>",
@@ -8522,10 +8530,10 @@
           "max_power": 12.61,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "41469f8813c66e1ade4584326d6b97fd"
+          "hash": "2654a5191b0037bbbd1c2fd5991401d8"
         },
         {
           "author": "Jari Eskelinen <jari.eskelinen@iki.fi>",
@@ -8581,10 +8589,10 @@
           "max_power": 10.48,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "c59a0d90ed68d3caeac9988eca9ad289"
+          "hash": "4a739d550fda0e2e7bc9128c714bd4ad"
         },
         {
           "author": "schuppan <120984051+schuppan@users.noreply.github.com>",
@@ -8638,10 +8646,10 @@
           "max_power": 4.55,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "877027f74374078f3c7f6a8168766fa3"
+          "hash": "078516928f334a20b206a90891c3f2b0"
         },
         {
           "author": "schuppan <120984051+schuppan@users.noreply.github.com>",
@@ -8667,10 +8675,10 @@
           "max_power": 18.02,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "680763d8d9787f12ebe43d38e376c4b8"
+          "hash": "cf5712465e95093226ef86cde8a92668"
         },
         {
           "author": "dsolva <diego_10sv@hotmail.com>",
@@ -8757,11 +8765,11 @@
           "max_power": 8.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "6246abf31e5ae9a2baba8637d3bac312"
+          "hash": "95044b79d5af8c9f772224706e31a8fb"
         }
       ],
       "device_types": [
@@ -9092,10 +9100,10 @@
           "max_power": 5.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "fac3af3fc4c59b26a3005256ccefadeb"
+          "hash": "717cd898b0a5947674aa783b26d94232"
         }
       ],
       "device_types": [
@@ -9303,10 +9311,10 @@
           "max_power": 19.24,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "b23d47baa31593aade1948788a06553c"
+          "hash": "4f5cd7daa0f9551b88c9fc4e04b89d76"
         }
       ],
       "device_types": [
@@ -9866,10 +9874,10 @@
           "max_power": 4.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "0b48194e2db33cb1ebf658847909af3f"
+          "hash": "6fc03bf21ae73f67ab8814d91a9ef415"
         },
         {
           "name": "Plus 2PM",
@@ -10039,10 +10047,10 @@
           "max_power": 8.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "40e093001d96c1fde880c40f8ddc972d"
+          "hash": "719b34149dc54ed54636681c2b9ed221"
         }
       ],
       "device_types": [
@@ -10163,10 +10171,10 @@
           "max_power": 12.38,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "211b7a02a679b09068521dfdae1cb0f1"
+          "hash": "b588cd342a74be27d556354dd35dfe3b"
         },
         {
           "aliases": [
@@ -10226,10 +10234,10 @@
           "max_power": 9.13,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "67e4b77772a6d30fddef23e0bbc635d1"
+          "hash": "f08fb2554cce4eb8e19d5327dbdbb6ca"
         },
         {
           "author": "Bram Gerritsen <bgerritsen@gmail.com>",
@@ -10255,10 +10263,10 @@
           "max_power": 9.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "187cbbae87763a90b7f0fe9e2a135f29"
+          "hash": "8eb4733147ad865100dd69a1f655a680"
         },
         {
           "aliases": [
@@ -10347,10 +10355,10 @@
           "max_power": 29.87,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "0012d75cf3bc4fe26a54128bbb084be4"
+          "hash": "7b44fe4bb41f168f4e803fce38e743d0"
         },
         {
           "author": "hekm77 <chiki77piki@gmail.com>",
@@ -10377,10 +10385,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9953b74dd732d86f8852eb21eedcdc2f"
+          "hash": "a0592da4323f6a221da94c47c4cb88d2"
         },
         {
           "author": "Pasquale Cuorpo <maverick1982@users.noreply.github.com>",
@@ -10438,10 +10446,10 @@
           "max_power": 9.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "0c2368f093dd6c8db3d2f359ef0f775f"
+          "hash": "de900c033813c2e753bf717c46875ee0"
         },
         {
           "author": "ffm777 <47192860+ffm777@users.noreply.github.com>",
@@ -10467,10 +10475,10 @@
           "max_power": 21.23,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "250cbdf212f5a0f58cdbcfe00e9e406e"
+          "hash": "d6d98004f43ffc2f3f369bdc209084c0"
         }
       ],
       "device_types": [
@@ -10588,10 +10596,10 @@
           "max_power": 5.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "4f561a531a7705e3321035492412ec3c"
+          "hash": "3218cd408f8192efd6f9010314f480fb"
         },
         {
           "aliases": [
@@ -10654,10 +10662,10 @@
           "max_power": 8.47,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "c39f8f2eabedfa8ef9635c8f9e7c6dfa"
+          "hash": "b6fc462259156ba402de1301d2ee4811"
         },
         {
           "author": "Mr. Bubbles <manni@zapto.de>",
@@ -10806,10 +10814,10 @@
           "max_power": 6.92,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "5e512a344947a5b2ad6e3ed0b169b1d1"
+          "hash": "b26c233b8c9e4b44d632563a3a55ff62"
         },
         {
           "aliases": [
@@ -10840,10 +10848,10 @@
           "max_power": 7.78,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "6cbc142423f395f744d7dc0eeb380b39"
+          "hash": "1776418f77cfb8e39e041fe1fb0d5376"
         },
         {
           "aliases": [
@@ -10874,10 +10882,10 @@
           "max_power": 4.93,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "3385659036e12f65f39d2acd050253b3"
+          "hash": "49e9d50117974cbb03c93adb978fc09b"
         },
         {
           "aliases": [
@@ -10958,10 +10966,10 @@
           "max_power": 9.89,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "23946e10b3f95189db78c8beb2e8aef6"
+          "hash": "88ff54ab899751cccd4e5b86f36e8e92"
         },
         {
           "aliases": [
@@ -10990,10 +10998,10 @@
           "max_power": 4.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d13250933f0755502761203d0a40d5e8"
+          "hash": "c4488f1321061edba50bdaf74cc92fcb"
         },
         {
           "aliases": [
@@ -11187,10 +11195,10 @@
           "max_power": 5.46,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9c4b79a1c79a69d7175148a883cf6949"
+          "hash": "095ac1a2673b958f8a1ae0e3c4b66eb9"
         },
         {
           "calculation_strategy": "lut",
@@ -11278,10 +11286,10 @@
           "max_power": 9.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "34cf282ce9349e396d9ab0b61d1ab40c"
+          "hash": "1f5109b9fee1ee0a3f2e2f606a2d62a7"
         },
         {
           "aliases": [
@@ -11310,10 +11318,10 @@
           "max_power": 7.18,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9d293c3627decc09ea335b2ee52e428d"
+          "hash": "9d75a5aa37046cb8b8a2eb96ac308bcc"
         },
         {
           "aliases": [
@@ -11434,10 +11442,10 @@
           "max_power": 8.6,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "5f4ec20183df3ba49e3c8fcbf879c494"
+          "hash": "5ad33d8412a1fa9a98ca17d9e70a6c56"
         },
         {
           "aliases": [
@@ -11559,10 +11567,10 @@
           "max_power": 4.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "228aba33a0bedd11f61293e71509283d"
+          "hash": "041a174f5f24f0c32875c603507944ef"
         },
         {
           "aliases": [
@@ -12111,10 +12119,10 @@
           "max_power": 6.29,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e7e35a7ac01a6ee658b89e236311a4ab"
+          "hash": "50633f33b3ec317af3659f221e965804"
         },
         {
           "aliases": [
@@ -12145,10 +12153,10 @@
           "max_power": 10.44,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "f80ed046f8974da4a71d1592a85877d6"
+          "hash": "0e5c0f2b2b4502940b9658dedb6dcd2f"
         },
         {
           "aliases": [
@@ -12390,10 +12398,10 @@
           "max_power": 10.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e7685e22c68df6d50e7f776664b515f5"
+          "hash": "8a302f0da63d39f8b19d6a96597d5d5b"
         },
         {
           "aliases": [
@@ -12470,10 +12478,10 @@
           "max_power": 6.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "678df52dd9770bd7618e4cf2dcef8bb1"
+          "hash": "3f7e0219b735498ea41f475bbd2a3e9f"
         },
         {
           "aliases": [
@@ -12804,10 +12812,10 @@
           "max_power": 4.53,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "48362c3c4835a76c85228bfa9f067c86"
+          "hash": "0075e1d83c7e166f7de734dd1e6d01fd"
         }
       ],
       "device_types": [
@@ -12900,10 +12908,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "caf8dfd4b1c3b1fe7249fe105af3229a"
+          "hash": "601aa03751c813e5be58a4bb7f7e6dc4"
         },
         {
           "aliases": [
@@ -12982,10 +12990,10 @@
           "max_power": 9.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ea8e555188d89c3ae8a576d750727392"
+          "hash": "41609f2132d6cab479fa25e1410bac25"
         },
         {
           "aliases": [
@@ -13087,11 +13095,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
+            "hs",
             "color_temp",
-            "brightness",
-            "hs"
+            "brightness"
           ],
-          "hash": "1e47e11c48244e5b0ba6b285c30fe2f1"
+          "hash": "e8b5204c099f9a8935b0a95633865472"
         },
         {
           "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
@@ -13464,10 +13472,10 @@
           "max_power": 10.82,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "79884530e09d30d0b245756e29ad6bec"
+          "hash": "09befecb32534ecfe3b813852a00c376"
         },
         {
           "author": "daloki83",
@@ -13707,10 +13715,10 @@
           "max_power": 8.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e7066dba8d28253641da0fdb5d58700f"
+          "hash": "16d289afbd345333544cef837dc5e5ef"
         },
         {
           "calculation_strategy": "lut",
@@ -13736,10 +13744,10 @@
           "max_power": 8.05,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "24005b8172d28deb84191dd9644b98a0"
+          "hash": "b632a5a0bbea266d8d13560487a45058"
         },
         {
           "aliases": [
@@ -13796,10 +13804,10 @@
           "max_power": 4.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "272fc9f1f5f0c32e9a564c3e80916500"
+          "hash": "0b65ce95c8c2f23f5dad84e58a4ca047"
         },
         {
           "author": "Rogier Lommers",
@@ -13853,10 +13861,10 @@
           "max_power": 23.91,
           "sub_profile_count": 3,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "de4b2ba6428821788a58fa77ae4324b7"
+          "hash": "c3afc8441391903b393fb21106d74868"
         },
         {
           "aliases": [
@@ -13911,10 +13919,10 @@
           "max_power": 13.23,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "921e7d3c096e587d70ed5b01ce902154"
+          "hash": "73ceb3d4a773d268f0e79b9ba5fab74c"
         },
         {
           "author": "Dr-Seltsam <46630992+Dr-Seltsam@users.noreply.github.com>",
@@ -13941,10 +13949,10 @@
           "max_power": 20.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "6980dfb4ee28a29803e7a3ac66e15ca5"
+          "hash": "129e3667de668129aef09dc1f9aee7e1"
         },
         {
           "author": "Emory Penney <treadstoneit@gmail.com>",
@@ -13971,10 +13979,10 @@
           "max_power": 5.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "66a57cb61c4478d96457902d0cedc7ac"
+          "hash": "c3fa930324cc437b5c6db9b183c3fd3b"
         },
         {
           "author": "Dr-Seltsam <46630992+Dr-Seltsam@users.noreply.github.com>",
@@ -14001,10 +14009,10 @@
           "max_power": 3.46,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d2bcdc525998c6d6969a1dab10ea4eb9"
+          "hash": "6e30ff8a629982818795972dc07fe277"
         },
         {
           "author": "Dr-Seltsam <46630992+Dr-Seltsam@users.noreply.github.com>",
@@ -14031,10 +14039,10 @@
           "max_power": 9.32,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "50f4edceec02d979feaf869df80b8518"
+          "hash": "b41a4768a5c692e917c78f30eea6e598"
         },
         {
           "author": "Kendell R <KTibow@users.noreply.github.com>",
@@ -14298,10 +14306,10 @@
           "max_power": 5.49,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "537d376ab1d8589585525f00f8f97bc6"
+          "hash": "1f49e1bf46038395cfbc424b462d117d"
         }
       ],
       "device_types": [
@@ -14338,10 +14346,10 @@
           "max_power": 9.02,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "6d7f6109835231c9191ab490994642aa"
+          "hash": "ca4dabdcdf03f456ca937184119a52b2"
         },
         {
           "calculation_strategy": "lut",
@@ -14371,10 +14379,10 @@
           "max_power": 8.68,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "481a968db172394f4a33c796fd356fcf"
+          "hash": "3814af1d3ba936a77ef24228b2600be4"
         }
       ],
       "device_types": [
@@ -14412,10 +14420,10 @@
           "max_power": 10.06,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "7ba67fcb83b7d128085de460e7f97191"
+          "hash": "7b87331534e0d2392bf3283c8aca1114"
         }
       ],
       "device_types": [
@@ -14453,10 +14461,10 @@
           "max_power": 6.59,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "28db0a1d374d724d91b9ebbc2bf0eee6"
+          "hash": "3da0f1d052f4f55cae406f3c9d7adcfe"
         }
       ],
       "device_types": [
@@ -14575,11 +14583,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "9ee9d851f62f1483b14ca39f34cefe45"
+          "hash": "b558995e3b047c8d8c5921b74736b8f4"
         },
         {
           "calculation_strategy": "lut",
@@ -14606,11 +14614,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "db0831d14b70b40bd36fea4b21d78f74"
+          "hash": "87712518a23226a5947ad8501a350aed"
         },
         {
           "author": "Brian Egge <brianegge@gmail.com>",
@@ -14637,10 +14645,10 @@
           "max_power": 13.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "bd18180e42a9c2fb08bff91ad891b7b8"
+          "hash": "4f37c1f1011d3a72db3fa80f6358d09f"
         },
         {
           "calculation_strategy": "lut",
@@ -14667,10 +14675,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
+          "hash": "b8ba79c307b90439d3849a26bc5a829e"
         },
         {
           "author": "Benjamin Neff <benjamin@coding4coffee.ch>",
@@ -14697,10 +14705,10 @@
           "max_power": 4.47,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "554617932dc98d5b9cc453a3a137ea78"
+          "hash": "42344980a50494d41de9b5f2c10dcb16"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
@@ -14727,10 +14735,10 @@
           "max_power": 23.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d7076dbd502139e3b897b77e61c4d973"
+          "hash": "5ddbc0e77228fbdbbeb4d8396bee1947"
         },
         {
           "calculation_strategy": "lut",
@@ -14757,10 +14765,10 @@
           "max_power": 35.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "3d215e3be51064ef651da3555db04234"
+          "hash": "8b947a54eb1034b5ca6efd4b46d40ef4"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -14787,10 +14795,10 @@
           "max_power": 6.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "822208db7435993c78977e1f0777a9d7"
+          "hash": "341e3af037d882c7de47f2d4bb920fc4"
         },
         {
           "calculation_strategy": "lut",
@@ -14817,11 +14825,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "d83e25738b3ed996675dabf9b112c0be"
+          "hash": "c5f06f7ac36512536168a0f496155dfb"
         },
         {
           "author": "gobbli",
@@ -14847,11 +14855,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "e51ce873f4958f34050c38778bb55322"
+          "hash": "5fd6bf12289b916338b4a7954940dfd9"
         },
         {
           "author": "Sku1ly <45756272+Sku1ly@users.noreply.github.com>",
@@ -14877,11 +14885,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
+            "hs",
             "color_temp",
-            "brightness",
-            "hs"
+            "brightness"
           ],
-          "hash": "e428a7720168f9b3f09af8f1cf3e83e9"
+          "hash": "97ddeacae6bac7c7d1c1208e04fbc5ea"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -14908,10 +14916,10 @@
           "max_power": 28.07,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "41864cf22ce269128e116a8683edb117"
+          "hash": "dea8ef3bc91409f6ee7baf5d4af29fd6"
         }
       ],
       "device_types": [
@@ -14977,10 +14985,10 @@
           "max_power": 13.85,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "360d3233f8799217f49652252d974a6b"
+          "hash": "b66fbb74d54255aaa7c7518e6aa81a77"
         }
       ],
       "device_types": [
@@ -15018,10 +15026,10 @@
           "max_power": 3.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "887b09f2593ec7e12c61e6728ee51824"
+          "hash": "c603f9d5f7afd445764c3ffa03217685"
         }
       ],
       "device_types": [
@@ -15100,10 +15108,10 @@
           "max_power": 3.38,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a19d6b565e912234ac2b6c83460fb292"
+          "hash": "fec1f98ff13f8ce3319ad6ac5735119c"
         },
         {
           "author": "gary-oneill82 <57816996+gary-oneill82@users.noreply.github.com>",
@@ -15129,10 +15137,10 @@
           "max_power": 10.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "2bec309b7d52982c77285e58276057a4"
+          "hash": "24629211b0bc7163dc198af954823b74"
         }
       ],
       "device_types": [
@@ -15169,10 +15177,10 @@
           "max_power": 4.07,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "69577677a3a67b4acbfcf308e6cbc682"
+          "hash": "bca1dc4048656579f1744f49a6211603"
         }
       ],
       "device_types": [
@@ -15411,10 +15419,10 @@
           "max_power": 6.68,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ced207c0ce4a86c0a79363b5e97c9063"
+          "hash": "8c607cefcbd33fc1a5f05718eeb4a057"
         },
         {
           "author": "RubenKelevra <cyrond@gmail.com>",
@@ -15473,10 +15481,10 @@
           "max_power": 4.56,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "0ddce43e94332ee3f4d6cb70c1b1aa0d"
+          "hash": "aa45a870832f5437cd7cde73c451593b"
         },
         {
           "author": "Amjad Saadeh <amjad@saadeh.dev>",
@@ -15503,10 +15511,10 @@
           "max_power": 6.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "833a27ee2abdec0c09cd81623ddc1501"
+          "hash": "747e03a2d8ed381b0b58edea70e74166"
         },
         {
           "author": "RubenKelevra <cyrond@gmail.com>",
@@ -15533,10 +15541,10 @@
           "max_power": 4.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "6c67399afdcb05c21a3351b5d787a700"
+          "hash": "18f10326a5faf82c512913edda0d548c"
         },
         {
           "author": "nepozs <56661567+nepozs@users.noreply.github.com>",
@@ -15647,10 +15655,10 @@
           "max_power": 9.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "49b599466cd45907a99d28184aa832c1"
+          "hash": "283eb4916086fef7e83e7cdd38092e98"
         }
       ],
       "device_types": [
@@ -15689,10 +15697,10 @@
           "max_power": 9.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "64492287cf9a4e48ffe29adca63d9523"
+          "hash": "b063401db73dd32deacc4c4d16e94980"
         }
       ],
       "device_types": [
@@ -15852,10 +15860,10 @@
           "max_power": 30.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "8f0a9c7b0973278842f34a10e6f13321"
+          "hash": "c55dada3b3842a722f7b82149075fc2b"
         },
         {
           "author": "schuppan <120984051+schuppan@users.noreply.github.com>",
@@ -15938,10 +15946,10 @@
           "max_power": 10.54,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e938d822d1aa0b212e332c739edb936b"
+          "hash": "4bdf67f3a36c283869b04598fd767c6d"
         },
         {
           "author": "RubenKelevra <cyrond@gmail.com>",
@@ -16010,10 +16018,10 @@
           "max_power": 9.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "c2cf2395558f804b0d277cf2e983b030"
+          "hash": "ed4493b1b74de97a2311f0c125bb5347"
         }
       ],
       "device_types": [
@@ -16112,10 +16120,10 @@
           "max_power": 8.83,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "bba233bb8a21c0e99c365c0184d0f0c6"
+          "hash": "da5817c0fe6c607472a1c8f406592c90"
         },
         {
           "aliases": [
@@ -16225,10 +16233,10 @@
           "max_power": 8.09,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a84dcee1a22759f6f6858f456f1192e3"
+          "hash": "1dc70a47277ba3317940e439dfdfce8f"
         }
       ],
       "device_types": [
@@ -16417,10 +16425,10 @@
           "max_power": 9.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "13b485b8b9900cf5799913c9d993dcd8"
+          "hash": "6e1307265d6a9f31a851e81be23f6dc0"
         }
       ],
       "device_types": [
@@ -16568,10 +16576,10 @@
           "max_power": 5.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a808ff5c94151668aae67dfb880cd813"
+          "hash": "77da45e07dd536ad55c57709475edf84"
         },
         {
           "aliases": [
@@ -16726,10 +16734,10 @@
           "max_power": 9.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "55b08aaeb7a1a714d10c4fbfb8b61cc5"
+          "hash": "ed290e5e4e64d88c3f38c764b0aca274"
         },
         {
           "aliases": [
@@ -16759,10 +16767,10 @@
           "max_power": 13.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "950d9a77b72d79e7194ca91c4cf66e2f"
+          "hash": "e7bcb51e96329a7ba5ce87ba9b8dcd42"
         },
         {
           "author": "Felipe Marinho <felipevm97@gmail.com>",
@@ -16789,10 +16797,10 @@
           "max_power": 29.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ef08cea8f874850efc6b476d2ae77e14"
+          "hash": "2c4700e6f0016bbb518daf70fe90263d"
         }
       ],
       "device_types": [
@@ -16829,11 +16837,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
+            "hs",
             "color_temp",
-            "brightness",
-            "hs"
+            "brightness"
           ],
-          "hash": "6dc3690f8a3008d64f9532292562ba8f"
+          "hash": "bec73b4bee157ea1e51d5ae0df5db9c6"
         }
       ],
       "device_types": [
@@ -16873,10 +16881,10 @@
           "max_power": 13.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ad4497b019d9d4e1de04e830103650ec"
+          "hash": "13aaefb9aea2a2fa9c19e7ea22cd22ae"
         }
       ],
       "device_types": [
@@ -16955,10 +16963,10 @@
           "max_power": 16.1,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "79646644cd39c01be9bcbb2274025cab"
+          "hash": "becfc3b6f003aca7f01c790cc93cb953"
         }
       ],
       "device_types": [
@@ -17279,10 +17287,10 @@
           "max_power": 5.08,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "50441e0c3849b2ac4d9ba6cbbd09314c"
+          "hash": "0efd049705a543fb23e0206217956098"
         },
         {
           "calculation_strategy": "lut",
@@ -17347,10 +17355,10 @@
           "max_power": 11.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "f282545d3a64fcaefc1117e77219cc90"
+          "hash": "80342658df7d618759f6209523e15246"
         },
         {
           "author": "Joshua Rich <joshua.rich@gmail.com>",
@@ -17406,10 +17414,10 @@
           "max_power": 11.11,
           "sub_profile_count": 4,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "1c473624c3ad5e1eac848147c0142508"
+          "hash": "95eacb7381dec11e7d0737e9bd70b48e"
         },
         {
           "author": "Jacob Donenfeld <jacobdonenfeld@gmail.com>",
@@ -17436,10 +17444,10 @@
           "max_power": 8.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "8254f83ebc835535b0c0aa7f77df4676"
+          "hash": "0717aa5c065689f79bd44eb847bea4d5"
         },
         {
           "author": "Jamie De Vivo <jamiedevivoo@users.noreply.github.com>",
@@ -17465,10 +17473,10 @@
           "max_power": 11.03,
           "sub_profile_count": 4,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "1b02896f3b640db68598be9aed2cd516"
+          "hash": "b42bca3ee5213b2cb4164d0accd200f4"
         },
         {
           "aliases": [
@@ -17529,10 +17537,10 @@
           "max_power": 12.55,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "981c9debd18b5bc6ed44caba812b0b39"
+          "hash": "d3d0a0d3c07b99de51128a3f95ddfdce"
         },
         {
           "author": "Jamie De Vivo <jamiedevivoo@users.noreply.github.com>",
@@ -17558,10 +17566,10 @@
           "max_power": 17.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "0546033ac7b6784cf25439153c7e0adb"
+          "hash": "f83a3000f3aedd14f9a0093c0832449a"
         },
         {
           "author": "Chris <31055115+darthsebulba04@users.noreply.github.com>",
@@ -17587,10 +17595,10 @@
           "max_power": 10.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "dc3c34630b6bc85fd95dc67a4a3f0e8e"
+          "hash": "bd93d31460d8ac3eed5a218f8592eeda"
         },
         {
           "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
@@ -17645,10 +17653,10 @@
           "max_power": 4.21,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "b606266e3081262663c6769b32787ace"
+          "hash": "8c5757b7eb0eeb5207461fc0a861cb9b"
         },
         {
           "author": "Jamie De Vivo <jamiedevivoo@users.noreply.github.com>",
@@ -17674,10 +17682,10 @@
           "max_power": 37.48,
           "sub_profile_count": 10,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "b03302f641337c17296608bd1b640a87"
+          "hash": "dc2cbe78fe4e4ccc92966c08976a6b36"
         },
         {
           "author": "mlebaugh <mattlebaugh@gmail.com>",
@@ -17704,10 +17712,10 @@
           "max_power": 11.41,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "f45e384d08a5b8059599e6da30769c94"
+          "hash": "a833fd8f28bbf4516279ae7726512f87"
         }
       ],
       "device_types": [
@@ -17772,10 +17780,10 @@
           "max_power": 39.18,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "917869a405a6087794e7bf90b310cb59"
+          "hash": "a16e736eaf45bc9925aaf68f14551bbf"
         },
         {
           "author": "71820SM01 <141442191+71820SM01@users.noreply.github.com>",
@@ -17801,10 +17809,10 @@
           "max_power": 4.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "4edd6906ef2ed686feff52bdfb669451"
+          "hash": "f72107ef25a15128c7308a7391f2249b"
         },
         {
           "author": "71820SM01 <141442191+71820SM01@users.noreply.github.com>",
@@ -17830,10 +17838,10 @@
           "max_power": 4.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "33b1ed3f4402024b16735593c5ccc191"
+          "hash": "e9342981b99fff6836a7632281d686ed"
         },
         {
           "author": "71820SM01 <141442191+71820SM01@users.noreply.github.com>",
@@ -17859,10 +17867,10 @@
           "max_power": 10.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "beac1fc5e630e27b70578cc05c524c9b"
+          "hash": "50ee41e864985d8ac205561b74663642"
         },
         {
           "author": "Bart Kummel <bart@leap.ac>",
@@ -17917,10 +17925,10 @@
           "max_power": 4.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "759fb094d081280927c7f5c272817be6"
+          "hash": "99f8f70a8ec626e6394abb2849187083"
         }
       ],
       "device_types": [
@@ -18032,10 +18040,10 @@
           "max_power": 6.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "2e980a29d1eeb6eef27032fdcade6b87"
+          "hash": "f9f0bbd141d1f5717b969ff6cd1f51fc"
         }
       ],
       "device_types": [
@@ -18315,10 +18323,10 @@
           "max_power": 13.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "daee27805f0a01576540afda17ac51c4"
+          "hash": "28eedddf939af9dbad486fd07202649f"
         },
         {
           "author": "Wolfieeewolf <Wolfieeewolf@users.noreply.github.com>",
@@ -18441,10 +18449,10 @@
           "max_power": 6.58,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d5c01521846a46c0673007249f899952"
+          "hash": "20b8ccd303464365d8fe723e79ab00fc"
         },
         {
           "author": "nepozs <szopen@os.pl>",
@@ -18553,10 +18561,10 @@
           "max_power": 5.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "49195777900483abcfad7ccae0060dd7"
+          "hash": "45f56a98dcaf33932d636a89f119fea3"
         },
         {
           "author": "Tim van Werkhoven <tim+github.com@vanwerkhoven.org>",
@@ -18635,10 +18643,10 @@
           "max_power": 10.77,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "68c2d37bd13d099e98b6776df107ea20"
+          "hash": "6dc9869ff821fbfadd8c86fc3b521b46"
         },
         {
           "author": "Amjad Saadeh <amjad@saadeh.dev>",
@@ -18665,10 +18673,10 @@
           "max_power": 16.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d0839a3295d0cea173bee1cc155ff8bb"
+          "hash": "b762a7dd8a4cd0c693051151ebbbbcd4"
         },
         {
           "author": "Florian Mulatz <33655308+florianmulatz@users.noreply.github.com>",
@@ -18694,10 +18702,10 @@
           "max_power": 12.78,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "2561fb86e06488b3ab65b4b8000e1230"
+          "hash": "0bb047480baba018ddf78ac2392c167e"
         },
         {
           "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
@@ -18774,10 +18782,10 @@
           "max_power": 9.21,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "7dd00dd278150b36e93b488a652de2fb"
+          "hash": "eacfa850b5ea035f5574a5657d3e3657"
         },
         {
           "author": "flipsa <n00dl3s@gmx.net>",
@@ -19098,10 +19106,10 @@
           "max_power": 9.37,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "5e23251835d2e252f37f88e799e44594"
+          "hash": "c9d859463ca775fe6915ad3ae2f149c7"
         },
         {
           "author": "Jamie De Vivo <jamiedevivoo@users.noreply.github.com>",
@@ -19156,10 +19164,10 @@
           "max_power": 9.72,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "1b1efe689770074f5571d27a4f17ac46"
+          "hash": "a64642d707ff80028aa9099c4c2236c6"
         },
         {
           "calculation_strategy": "lut",
@@ -19227,10 +19235,10 @@
           "max_power": 4.85,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "37db3cd01b34e25f420ea202281fa04d"
+          "hash": "36c677ab5d257c5bb75c763857c5e42a"
         }
       ],
       "device_types": [
@@ -19268,10 +19276,10 @@
           "max_power": 14.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "563082cf95906670c8961145ebfd90b7"
+          "hash": "0b3f940a85bbf153d3f837756942c5fc"
         }
       ],
       "device_types": [
@@ -19394,10 +19402,10 @@
           "max_power": 5.08,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "48a8f9e7235c19bd69a0ae74a65a8785"
+          "hash": "8f95944e6c00b083c5019c02fad88c11"
         },
         {
           "author": "Peklaa <57568760+Peklaa@users.noreply.github.com>",
@@ -19423,10 +19431,10 @@
           "max_power": 8.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d0df98d3c510ea7a0b281f40aaf05224"
+          "hash": "3e21869e4a4227739554f1da557d3b8d"
         },
         {
           "author": "Emory Penney <emory.j.penney@intel.com>",
@@ -19453,10 +19461,10 @@
           "max_power": 4.12,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "08f4c1ee977cc1a414d38b89f016b953"
+          "hash": "f7fdb502518d5bd3636dc74cc7a9cca7"
         },
         {
           "author": "el97 <erik1337.el@gmail.com>",
@@ -19483,10 +19491,10 @@
           "max_power": 3.54,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "8abcec1eb3b37335cf5cb3bcbd40f73f"
+          "hash": "6c77fee5f88e16abb1709f4d04171a77"
         },
         {
           "author": "Jurjen <96632856+Coornh@users.noreply.github.com>",
@@ -19622,10 +19630,10 @@
           "max_power": 27.51,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "4c1a46cf7a591cb7d2e2207244539569"
+          "hash": "be41385d13fa15bd9955f625d4c61538"
         },
         {
           "author": "RubenKelevra <cyrond@gmail.com>",
@@ -19652,10 +19660,10 @@
           "max_power": 10.54,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "531f0ff6946e72c4f3214d098ce893e0"
+          "hash": "f88c02a70514cd8f590763f18c5c2730"
         },
         {
           "author": "bragra <bragragithub@gradussen.com>",
@@ -19682,10 +19690,10 @@
           "max_power": 26.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "858fdca20a11f2c176489cd75d2cba2c"
+          "hash": "f09a136c6509746890460a18863fce57"
         },
         {
           "calculation_strategy": "lut",
@@ -19712,10 +19720,10 @@
           "max_power": 8.24,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "1173f9d4fca1602808ba9df39e91be95"
+          "hash": "71deb6d42130fd9de8ed4608ac9d4bfb"
         },
         {
           "author": "aqwserf <29235861+aqwserf@users.noreply.github.com>",
@@ -19741,10 +19749,10 @@
           "max_power": 5.79,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "96773767d701b305bbe2c4c59645cfed"
+          "hash": "5d45cff448bbce244ba4737089e4cf37"
         },
         {
           "author": "RubenKelevra <cyrond@gmail.com>",
@@ -19771,10 +19779,10 @@
           "max_power": 5.96,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "d526df1e88a06252a790dcf94316c7f2"
+          "hash": "6177497e3e8516e257a1828443b083e5"
         },
         {
           "author": "Paul Mc Auley <dev@roscarraig.com>",
@@ -19830,10 +19838,10 @@
           "max_power": 9.55,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "c2ce2fcd63a6ae21376956982ccb8f69"
+          "hash": "724cb79d05e4f25986a5e49c0ac076e1"
         },
         {
           "author": "bobsbrain <46463210+bobsbrain@users.noreply.github.com>",
@@ -19888,10 +19896,10 @@
           "max_power": 18.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "2829c05dad34ad08060a33129e1edfe2"
+          "hash": "d1784643d13f44ef534a4e6162567fe2"
         },
         {
           "aliases": [
@@ -19921,10 +19929,10 @@
           "max_power": 7.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "af50ef8a1d8585a169ef2b8c8b1c3323"
+          "hash": "b9948d1ef7811a962251b56b73a235b2"
         },
         {
           "author": "bragra <bragragithub@gradussen.com>",
@@ -20088,10 +20096,10 @@
           "max_power": 8.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "dc2468407479a0647fc4aad1c5c6a3ff"
+          "hash": "a8327c51362279e41d12d20364a338c3"
         },
         {
           "aliases": [
@@ -20178,10 +20186,10 @@
           "max_power": 19.08,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "783df55cd862b44243cf41886a238e32"
+          "hash": "f87dfa68bebbf93a00225c3fa52df1d7"
         },
         {
           "author": "bobsbrain <46463210+bobsbrain@users.noreply.github.com>",
@@ -20207,10 +20215,10 @@
           "max_power": 5.42,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "ba1ec2457b8397ff8350217404a84d5f"
+          "hash": "57bb8c3a0e4db19ecc1f163294472cb4"
         },
         {
           "author": "Paul Mc Auley <dev@roscarraig.com>",
@@ -20237,10 +20245,10 @@
           "max_power": 6.41,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "dae4630366a2a3d022472236cd090e28"
+          "hash": "f73a3d6dd7392ea30486a94d1f59f180"
         },
         {
           "author": "Paul Mc Auley <dev@roscarraig.com>",
@@ -20267,10 +20275,10 @@
           "max_power": 9.17,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "e3fd10ab10987268cda91308605596fe"
+          "hash": "7e725099fd6cf2e2d0d22cf9dc29b095"
         },
         {
           "author": "Morten Trab <morten@trab.dk>",
@@ -20297,10 +20305,10 @@
           "max_power": 6.51,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "97f12fbd2c1092dedc07b9e1a5d1c1e7"
+          "hash": "7254c662056cf624ca690a55153ad24c"
         },
         {
           "author": "Paul Mc Auley <dev@roscarraig.com>",
@@ -20327,10 +20335,10 @@
           "max_power": 9.41,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "122e97ebafab11fe7ac73f11e62f6928"
+          "hash": "b7b7212c756f123dc76503f39921a7bb"
         },
         {
           "author": "RubenKelevra <cyrond@gmail.com>",
@@ -20357,10 +20365,10 @@
           "max_power": 5.78,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "1bd24a11b0e23793b2c1be0b60e9f77e"
+          "hash": "f0f77293ea68866650ad9bb2a19238d9"
         }
       ],
       "device_types": [
@@ -20399,10 +20407,10 @@
           "max_power": 9.6,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "9f8bd04c2cf42de028880e8bd2437d31"
+          "hash": "e0facc3f80e0728c7d6f36da0b900003"
         },
         {
           "author": "Andrzej Dopiera\u0142a <andrzej.dopierala@currency-one.com>",
@@ -20558,10 +20566,10 @@
           "max_power": 4.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "f9cddf36e79c178d9d4e2449c31302ae"
+          "hash": "c91029d710a817645b8b4a0ae1f96f2e"
         }
       ],
       "device_types": [
@@ -20939,10 +20947,10 @@
           "max_power": 8.05,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "499e884edc8c732082cdb9b7b9abf774"
+          "hash": "d6c9b38949aa36a9a34c7c784ab9c85f"
         },
         {
           "aliases": [
@@ -20972,10 +20980,10 @@
           "max_power": 11.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "a58300ce48c7d827564d8913583e5075"
+          "hash": "159a20a0168b6875dcdbc4389a91a226"
         }
       ],
       "device_types": [
@@ -21013,10 +21021,10 @@
           "max_power": 2.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "fc013bf44254f535a3a96b1623a34a5f"
+          "hash": "f512c87ca75482ac4ecd5ba03aa02f81"
         }
       ],
       "device_types": [
