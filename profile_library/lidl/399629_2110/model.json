@@ -11,5 +11,10 @@
     "VERSION": "v1.20.9:docker"
   },
   "name": "Livarno Lux Ceiling Panel RGB+CCT",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author_info": {
+    "name": "rammstone83",
+    "github": "rammstone83"
+  },
+  "author": "rammstone83"
 }
