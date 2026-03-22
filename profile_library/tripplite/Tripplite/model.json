@@ -1,5 +1,8 @@
 {
   "name": "Tripplite",
+  "aliases": [
+    "Tripp Lite UPS"
+  ],
   "device_type": "ups",
   "calculation_strategy": "fixed",
   "compatible_integrations": [

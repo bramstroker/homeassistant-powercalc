@@ -401,9 +401,9 @@ class DiscoveryManager:
         if device_entry.manufacturer is None or device_entry.model is None:
             return None
 
-        manufacturer = str(device_entry.manufacturer)
-        model = str(device_entry.model)
-        model_id = device_entry.model_id if hasattr(device_entry, "model_id") else None
+        manufacturer = str(device_entry.manufacturer).strip()
+        model = str(device_entry.model).strip()
+        model_id = str(device_entry.model_id).strip() if hasattr(device_entry, "model_id") and device_entry.model_id else None
 
         if len(manufacturer) == 0 or len(model) == 0:
             return None
