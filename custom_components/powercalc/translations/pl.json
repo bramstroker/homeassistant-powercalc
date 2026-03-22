@@ -702,8 +702,7 @@
           "create_energy_sensor": "Czy Powercalc musi utworzyć sensor kWh",
           "create_utility_meters": "Pozwól, aby Powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp."
         },
-        "description": "Utwórz sensor grupy dla wszystkich śledzonych i nieśledzonych mocy",
-        "title": "Utwórz śledzony sensor mocy"
+        "title": "Opcje grupy mocy śledzonej/nieśledzonej"
       },
       "group_tracked_untracked_manual": {
         "data": {

@@ -702,8 +702,7 @@
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "title": "Opções de grupo rastreado/não rastreado"
       },
       "group_tracked_untracked_manual": {
         "data": {

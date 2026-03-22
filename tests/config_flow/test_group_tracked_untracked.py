@@ -175,7 +175,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
             CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
             CONF_NAME: "Tracked / Untracked",
             CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
-            CONF_GROUP_TRACKED_AUTO: True,
+            CONF_GROUP_TRACKED_AUTO: False,
         },
     )
 
@@ -183,18 +183,31 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input={CONF_GROUP_TRACKED_AUTO: False},
-    )
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert not entry.data[CONF_GROUP_TRACKED_AUTO]
-
-    result = await initialize_options_flow(hass, entry, Step.GROUP_TRACKED_UNTRACKED_MANUAL)
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_GROUP_TRACKED_POWER_ENTITIES: ["sensor.1_power", "sensor.2_power"]},
+        user_input={CONF_GROUP_TRACKED_AUTO: True, CONF_GROUP_TRACKED_POWER_ENTITIES: ["sensor.1_power", "sensor.2_power"]},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_GROUP_TRACKED_POWER_ENTITIES] == ["sensor.1_power", "sensor.2_power"]
+
+
+async def test_options_flow_exclude_entities(hass: HomeAssistant) -> None:
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
+            CONF_NAME: "Tracked / Untracked",
+            CONF_GROUP_TRACKED_AUTO: True,
+            CONF_EXCLUDE_ENTITIES: ["sensor.1_power", "sensor.2_power"],
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.GROUP_TRACKED_UNTRACKED)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_GROUP_TRACKED_AUTO: True, CONF_EXCLUDE_ENTITIES: ["sensor.1_power", "sensor.3_power"]},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_EXCLUDE_ENTITIES] == ["sensor.1_power", "sensor.3_power"]
