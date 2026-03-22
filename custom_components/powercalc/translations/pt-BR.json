@@ -702,8 +702,7 @@
           "create_energy_sensor": "Se o powercalc deve criar um sensor kWh",
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc."
         },
-        "description": "Crie um sensor de grupo para toda a potência monitorada e não monitorada",
-        "title": "Criar um sensor de potência monitorada"
+        "title": "Opções de grupo rastreadas/não rastreadas"
       },
       "group_tracked_untracked_manual": {
         "data": {

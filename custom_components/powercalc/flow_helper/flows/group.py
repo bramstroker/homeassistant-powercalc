@@ -470,43 +470,27 @@ class GroupOptionsFlow(GroupFlow):
 
     async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the group options flow."""
-        schema = fill_schema_defaults(
-            create_schema_group_custom(self.flow.hass, self.flow.config_entry, True),
-            self.flow.sensor_config,
+        return await self.flow.async_handle_options_step(
+            user_input, create_schema_group_custom(self.flow.hass, self.flow.config_entry, True), Step.GROUP_CUSTOM
         )
-        return await self.flow.async_handle_options_step(user_input, schema, Step.GROUP_CUSTOM)
 
     async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the group options flow."""
-        schema = fill_schema_defaults(
-            SCHEMA_GROUP_DOMAIN_OPTIONS,
-            self.flow.sensor_config,
-        )
-        return await self.flow.async_handle_options_step(user_input, schema, Step.GROUP_DOMAIN)
+        return await self.flow.async_handle_options_step(user_input, SCHEMA_GROUP_DOMAIN_OPTIONS, Step.GROUP_DOMAIN)
 
     async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the group options flow."""
-        schema = fill_schema_defaults(
-            SCHEMA_GROUP_SUBTRACT_OPTIONS,
-            self.flow.sensor_config,
-        )
-        return await self.flow.async_handle_options_step(user_input, schema, Step.GROUP_SUBTRACT)
+        return await self.flow.async_handle_options_step(user_input, SCHEMA_GROUP_SUBTRACT_OPTIONS, Step.GROUP_SUBTRACT)
 
     async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the group options flow."""
-        schema = fill_schema_defaults(
-            SCHEMA_GROUP_TRACKED_UNTRACKED,
-            self.flow.sensor_config,
-        )
-        return await self.flow.async_handle_options_step(user_input, schema, Step.GROUP_TRACKED_UNTRACKED)
+        schema = SCHEMA_GROUP_TRACKED_UNTRACKED
+        if self.flow.sensor_config.get(CONF_GROUP_TRACKED_AUTO, True):
+            schema = schema.extend((await create_schema_tracked_untracked_auto(self.flow.hass)).schema)
+        else:
+            schema = schema.extend(SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL.schema)
 
-    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the group options flow."""
-        schema = fill_schema_defaults(
-            SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL,
-            self.flow.sensor_config,
-        )
-        return await self.flow.async_handle_options_step(user_input, schema, Step.GROUP_TRACKED_UNTRACKED_MANUAL)
+        return await self.flow.async_handle_options_step(user_input, schema, Step.GROUP_TRACKED_UNTRACKED)
 
     def build_group_menu(self) -> list[Step]:
         """Build the group menu."""
@@ -516,7 +500,5 @@ class GroupOptionsFlow(GroupFlow):
         if group_type == GroupType.SUBTRACT:
             return [Step.GROUP_SUBTRACT]
         if group_type == GroupType.TRACKED_UNTRACKED:
-            return [Step.GROUP_TRACKED_UNTRACKED] + (
-                [Step.GROUP_TRACKED_UNTRACKED_MANUAL] if not self.flow.sensor_config.get("group_tracked_auto", True) else []
-            )
+            return [Step.GROUP_TRACKED_UNTRACKED]
         return [Step.GROUP_CUSTOM]

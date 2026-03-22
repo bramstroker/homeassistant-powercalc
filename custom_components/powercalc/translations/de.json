@@ -702,8 +702,7 @@
           "create_energy_sensor": "Ob Powercalc einen kWh Sensor erstellen soll",
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten."
         },
-        "description": "Erstellen Sie einen Gruppensensor für alle verfolgten und nicht verfolgten Leistungen",
-        "title": "Erstellen Sie einen verfolgten Leistungssensor"
+        "title": "Verfolgte/nicht verfolgte Gruppeneinstellungen"
       },
       "group_tracked_untracked_manual": {
         "data": {

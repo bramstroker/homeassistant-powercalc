@@ -523,27 +523,15 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     async def async_step_basic_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the basic options flow."""
-        schema = fill_schema_defaults(
-            self.build_basic_options_schema(),
-            self.sensor_config,
-        )
-        return await self.async_handle_options_step(user_input, schema, Step.BASIC_OPTIONS)
+        return await self.async_handle_options_step(user_input, self.build_basic_options_schema(), Step.BASIC_OPTIONS)
 
     async def async_step_advanced_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the basic options flow."""
-        schema = fill_schema_defaults(
-            SCHEMA_POWER_ADVANCED,
-            self.sensor_config,
-        )
-        return await self.async_handle_options_step(user_input, schema, Step.ADVANCED_OPTIONS)
+        return await self.async_handle_options_step(user_input, SCHEMA_POWER_ADVANCED, Step.ADVANCED_OPTIONS)
 
     async def async_step_utility_meter_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the basic options flow."""
-        schema = fill_schema_defaults(
-            SCHEMA_UTILITY_METER_OPTIONS,
-            self.sensor_config,
-        )
-        return await self.async_handle_options_step(user_input, schema, Step.UTILITY_METER_OPTIONS)
+        return await self.async_handle_options_step(user_input, SCHEMA_UTILITY_METER_OPTIONS, Step.UTILITY_METER_OPTIONS)
 
     async def async_handle_options_step(self, user_input: dict[str, Any] | None, schema: vol.Schema, step: Step) -> FlowResult:
         """
@@ -553,7 +541,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         """
         errors: dict[str, str] | None = {}
         if user_input is not None:
-            errors = await self.process_all_options(user_input, schema)
+            errors = await self.process_all_options(user_input, fill_schema_defaults(schema, self.sensor_config))
             if not errors:
                 return self.persist_config_entry()
         return self.async_show_form(step_id=step, data_schema=schema, errors=errors)

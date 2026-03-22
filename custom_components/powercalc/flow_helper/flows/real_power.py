@@ -11,7 +11,7 @@ from homeassistant.helpers import selector
 import voluptuous as vol
 
 from custom_components.powercalc import SensorType
-from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
+from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
 from custom_components.powercalc.flow_helper.schema import SCHEMA_UTILITY_METER_TOGGLE
 
 if TYPE_CHECKING:
@@ -59,8 +59,4 @@ class RealPowerOptionsFlow:
 
     async def async_step_real_power(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the real power options flow."""
-        schema = fill_schema_defaults(
-            SCHEMA_REAL_POWER_OPTIONS,
-            self.flow.sensor_config,
-        )
-        return await self.flow.async_handle_options_step(user_input, schema, Step.REAL_POWER)
+        return await self.flow.async_handle_options_step(user_input, SCHEMA_REAL_POWER_OPTIONS, Step.REAL_POWER)

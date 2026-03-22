@@ -702,8 +702,7 @@
           "create_energy_sensor": "Laat Powercalc een kWh meter maken",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc."
         },
-        "description": "Maak een groepssensor aan voor alle bijgehouden en niet bijgehouden energie",
-        "title": "Maak een bijgehouden vermogensensor"
+        "title": "Bijgehouden/niet bijgehouden groep opties"
       },
       "group_tracked_untracked_manual": {
         "data": {

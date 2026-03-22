@@ -702,8 +702,7 @@
           "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh senzor",
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď."
         },
-        "description": "Vytvorte skupinový senzor pre všetku sledovanú a nesledovanú energiu",
-        "title": "Vytvorte sledovaný snímač výkonu"
+        "title": "Možnosti skupiny sledovaných/nesledovaných"
       },
       "group_tracked_untracked_manual": {
         "data": {
