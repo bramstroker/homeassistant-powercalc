@@ -34,7 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 ${{ github.workspace }}/.github/scripts/profile_library/update-library.py
-      - uses: EndBug/add-and-commit@v9
+      - uses: EndBug/add-and-commit@v10
         if: github.ref == 'refs/heads/master'
         with:
           add: 'profile_library'
