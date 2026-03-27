@@ -8,3 +8,4 @@
 - [My device is not supported, what can I do?](faq/device-not-supported.md)
 - [Why does Powercalc create additional power sensor for my smart plug?](faq/smart-plug-additional-sensors.md)
 - [Why is the power of my group sensor too high or lagging?](faq/group-power-too-high.md)
+- [What to do when power sensor is unavailable?](faq/power-sensor-unavailable.md)
