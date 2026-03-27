@@ -14,5 +14,10 @@
     "VERSION": "v1.20.8:docker"
   },
   "name": "Hue Smart Bulb Edison ST72 E27 7W ",
-  "standby_power": 0.05
+  "standby_power": 0.05,
+  "author_info": {
+    "name": "sve",
+    "github": "sve007"
+  },
+  "author": "sve"
 }
