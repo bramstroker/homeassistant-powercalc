@@ -1,5 +1,6 @@
 {
   "name": "Test UPS",
+  "documentation_url": "https://docs.powercalc.nl/cookbook/ups/",
   "device_type": "ups",
   "calculation_strategy": "fixed",
   "measure_method": "manual",

@@ -303,6 +303,11 @@ class PowerProfile:
         return [CustomField(key=key, **field) for key, field in self._json_data.get("fields", {}).items()]
 
     @property
+    def documentation_url(self) -> str | None:
+        """Get the documentation URL for this profile."""
+        return self._json_data.get("documentation_url")
+
+    @property
     def config_flow_discovery_remarks(self) -> str | None:
         """Get remarks to show at the config flow discovery step."""
         remarks = self._json_data.get("config_flow_discovery_remarks")

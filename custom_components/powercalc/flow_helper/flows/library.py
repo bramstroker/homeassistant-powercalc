@@ -189,6 +189,14 @@ class LibraryFlow:
         async def _process_user_input(user_input: dict[str, Any]) -> dict[str, Any]:
             return {CONF_VARIABLES: user_input}
 
+        form_kwarg: dict[str, Any] | None = None
+        if self.flow.selected_profile and self.flow.selected_profile.documentation_url:
+            form_kwarg = {
+                "description_placeholders": {
+                    "documentation_url": self.flow.selected_profile.documentation_url,
+                },
+            }
+
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.LIBRARY_CUSTOM_FIELDS,
@@ -199,6 +207,7 @@ class LibraryFlow:
                 ),
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_process_user_input,
+                form_kwarg=form_kwarg,
             ),
             user_input,
         )
@@ -386,6 +395,10 @@ class LibraryConfigFlow(LibraryFlow):
                 source = f"{translations.get(f'component.{DOMAIN}.common.source_device')}: {self.flow.source_entity.device_entry.name}"
             else:
                 source = f"{translations.get(f'component.{DOMAIN}.common.source_entity')}: {self.flow.source_entity_id}"
+
+            documentation_url = self.flow.selected_profile.documentation_url
+            if documentation_url:
+                remarks = (remarks or "") + f"\n\n[Documentation]({documentation_url})"
 
             return self.flow.async_show_form(
                 step_id=Step.LIBRARY,
