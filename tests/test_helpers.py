@@ -97,7 +97,7 @@ def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, ca
     result = get_related_entity_by_device_class(hass, entity, SensorDeviceClass.BATTERY)
 
     assert result is None
-    assert "Entity light.test has no device_id, cannot find related entity" in caplog.text
+    assert "No device_id available, cannot find related entity" in caplog.text
 
 
 @pytest.mark.parametrize(

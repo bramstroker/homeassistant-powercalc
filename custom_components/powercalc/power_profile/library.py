@@ -12,7 +12,12 @@ from homeassistant.helpers.singleton import singleton
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DOMAIN, DOMAIN_CONFIG
-from custom_components.powercalc.helpers import collect_placeholders, get_related_entity_by_device_class, replace_placeholders
+from custom_components.powercalc.helpers import (
+    collect_placeholders,
+    get_related_entity_by_device_class,
+    get_related_entity_by_translation_key,
+    replace_placeholders,
+)
 
 from .error import LibraryError
 from .loader.composite import CompositeLoader
@@ -164,9 +169,20 @@ class ProfileLibrary:
                     device_class = SensorDeviceClass(device_class)
                 except ValueError:
                     device_class = cast(SensorDeviceClass, BinarySensorDeviceClass(device_class))
-                related_entity = get_related_entity_by_device_class(self._hass, source_entity.entity_entry, device_class)  # type: ignore
+                device_id = source_entity.device_entry.id if source_entity.device_entry else None
+                related_entity = get_related_entity_by_device_class(self._hass, source_entity.entity_entry, device_class, device_id=device_id)
                 if not related_entity:
                     raise LibraryError(f"Could not find related entity for device class {device_class} of entity {source_entity.entity_id}")
+                variables[key] = related_entity
+
+            for key in {p for p in placeholders if p.startswith("entity_by_translation_key:")}:
+                _, translation_key = key.split(":", 1)
+                device_id = source_entity.device_entry.id if source_entity.device_entry else None
+                related_entity = get_related_entity_by_translation_key(
+                    self._hass, translation_key, device_id=device_id, entity=source_entity.entity_entry
+                )
+                if not related_entity:
+                    raise LibraryError(f"Could not find related entity for translation key {translation_key} of entity {source_entity.entity_id}")
                 variables[key] = related_entity
 
         return variables

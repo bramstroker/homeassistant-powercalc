@@ -26,6 +26,7 @@ from homeassistant.const import (
 from homeassistant.core import Event, HomeAssistant, SupportsResponse, callback
 from homeassistant.helpers import entity_platform
 import homeassistant.helpers.config_validation as cv
+import homeassistant.helpers.device_registry as dr
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 import homeassistant.helpers.entity_registry as er
@@ -868,6 +869,13 @@ async def create_individual_sensors(
     """Create entities (power, energy, utility meters) which track the appliance."""
 
     source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
+
+    # For device-based profiles, attach the device entry to the source entity
+    if source_entity.entity_id == DUMMY_ENTITY_ID and "device" in sensor_config:
+        device_registry = dr.async_get(hass)
+        device_entry = device_registry.async_get(sensor_config["device"])
+        if device_entry:
+            source_entity = source_entity._replace(device_entry=device_entry)
 
     if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
         used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []  # pragma: no cover
