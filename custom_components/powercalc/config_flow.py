@@ -540,8 +540,9 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         And finally persist the changes on the config entry
         """
         errors: dict[str, str] | None = {}
+        schema = fill_schema_defaults(schema, self.sensor_config)
         if user_input is not None:
-            errors = await self.process_all_options(user_input, fill_schema_defaults(schema, self.sensor_config))
+            errors = await self.process_all_options(user_input, schema)
             if not errors:
                 return self.persist_config_entry()
         return self.async_show_form(step_id=step, data_schema=schema, errors=errors)
