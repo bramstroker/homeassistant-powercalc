@@ -74,6 +74,7 @@ class CustomField:
     label: str
     selector: dict[str, Any]
     description: str | None = None
+    default: Any = None
 
 
 DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {

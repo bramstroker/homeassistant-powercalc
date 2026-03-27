@@ -1,0 +1,37 @@
+{
+  "name": "Tripp Lite UPS",
+  "aliases": [
+    "Tripplite"
+  ],
+  "device_type": "ups",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "compatible_integrations": [
+    "nut"
+  ],
+  "created_at": "2026-03-20T00:00:00Z",
+  "measure_method": "manual",
+  "measure_device": "N/A",
+  "documentation_url": "https://docs.powercalc.nl/cookbook/ups/",
+  "config_flow_discovery_remarks": "Before setting up, enable the **Nominal Power** entity on your NUT device (Settings → Devices → your UPS → disabled entities). This profile needs it to calculate power output.",
+  "fields": {
+    "power_factor": {
+      "label": "Power Factor",
+      "description": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters. [See docs](https://docs.powercalc.nl/cookbook/ups/)",
+      "default": 0.7,
+      "selector": {
+        "number": {
+          "min": 0.1,
+          "max": 1.0,
+          "step": 0.1
+        }
+      }
+    }
+  },
+  "sensor_config": {
+    "power_sensor_precision": 0
+  },
+  "fixed_config": {
+    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_power_nominal]]') | float(0) * [[power_factor]] | float(0.7) }}"
+  }
+}

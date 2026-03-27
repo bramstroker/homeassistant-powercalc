@@ -157,21 +157,25 @@ def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[s
         for match in matches:
             if match in replacements:
                 # Replace [[variable]] with its value
-                data = data.replace(f"[[{match}]]", replacements[match])
+                data = data.replace(f"[[{match}]]", str(replacements[match]))
     return data
 
 
 def get_related_entity_by_device_class(
     hass: HomeAssistant,
-    entity: RegistryEntry,
+    entity: RegistryEntry | None,
     device_class: SensorDeviceClass | BinarySensorDeviceClass,
+    device_id: str | None = None,
 ) -> str | None:
     """Get related entity from same device by device class."""
 
     entity_reg = entity_registry.async_get(hass)
-    device_id = entity.device_id
     if not device_id:
-        _LOGGER.debug("Entity %s has no device_id, cannot find related entity", entity.entity_id)
+        if not entity:
+            return None
+        device_id = entity.device_id
+    if not device_id:
+        _LOGGER.debug("No device_id available, cannot find related entity")
         return None
 
     related_entities = [
@@ -184,6 +188,38 @@ def get_related_entity_by_device_class(
     ]
     if not related_entities:
         _LOGGER.debug("No related entities found for device %s with device class %s", device_id, device_class)
+        return None
+
+    return related_entities[0]
+
+
+def get_related_entity_by_translation_key(
+    hass: HomeAssistant,
+    translation_key: str,
+    device_id: str | None = None,
+    entity: RegistryEntry | None = None,
+) -> str | None:
+    """Get related entity from same device by translation key."""
+
+    entity_reg = entity_registry.async_get(hass)
+    if not device_id:
+        if not entity:
+            return None
+        device_id = entity.device_id
+    if not device_id:
+        _LOGGER.debug("No device_id available, cannot find related entity")
+        return None
+
+    related_entities = [
+        entity_entry.entity_id
+        for entity_entry in entity_registry.async_entries_for_device(
+            entity_reg,
+            device_id,
+        )
+        if entity_entry.translation_key == translation_key
+    ]
+    if not related_entities:
+        _LOGGER.debug("No related entities found for device %s with translation key %s", device_id, translation_key)
         return None
 
     return related_entities[0]
