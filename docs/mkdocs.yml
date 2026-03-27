@@ -137,6 +137,7 @@ nav:
           - 'My device is not supported, what can I do?': 'troubleshooting/faq/device-not-supported.md'
           - 'Why does Powercalc create additional power sensor for my smart plug?': 'troubleshooting/faq/smart-plug-additional-sensors.md'
           - 'Why is the power of my group sensor too high or lagging?': 'troubleshooting/faq/group-power-too-high.md'
+          - 'What to do when power sensor is unavailable?': 'troubleshooting/faq/power-sensor-unavailable.md'
       - 'troubleshooting/data-correction.md'
       - 'troubleshooting/debug-logging.md'
       - 'troubleshooting/download-diagnostics.md'
