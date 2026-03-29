@@ -458,6 +458,43 @@ async def test_sub_profile_selection_discovery_by_device(
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
+async def test_discovery_flow_documentation_url_in_remarks(hass: HomeAssistant) -> None:
+    """When model.json has documentation_url, it should appear as a link in the discovery remarks."""
+    source_entity = await create_source_entity("sensor.test", hass)
+    power_profile = await get_power_profile(hass, {}, source_entity, ModelInfo("test", "ups"), process_variables=False)
+    result = await initialize_discovery_flow(hass, source_entity, power_profile)
+
+    assert result["step_id"] == Step.LIBRARY
+    remarks = result["description_placeholders"]["remarks"]
+    assert "[Documentation](https://docs.powercalc.nl/cookbook/ups/)" in remarks
+
+
+async def test_custom_fields_documentation_url_placeholder(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """When model.json has documentation_url, the custom fields step should include it in description_placeholders."""
+    mock_entity_with_model_information(
+        ["sensor.test", "sensor.load"],
+        "test",
+        "ups",
+    )
+
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "sensor.test"},
+    )
+    assert result["step_id"] == Step.LIBRARY
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+    )
+    assert result["step_id"] == Step.LIBRARY_CUSTOM_FIELDS
+    assert result["description_placeholders"]["documentation_url"] == "https://docs.powercalc.nl/cookbook/ups/"
+
+
 async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
     mock_device_registry(
         hass,

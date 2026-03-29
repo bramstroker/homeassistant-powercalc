@@ -467,3 +467,18 @@ async def test_is_custom_profile(hass: HomeAssistant, manufacturer: str, model: 
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(ModelInfo(manufacturer, model), custom_directory=custom_dir)
     assert power_profile.is_custom_profile is expected_result
+
+
+async def test_documentation_url(hass: HomeAssistant) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
+        ModelInfo("test", "test"),
+        custom_directory=get_test_profile_dir("ups"),
+        process_variables=False,
+    )
+    assert power_profile.documentation_url == "https://docs.powercalc.nl/cookbook/ups/"
+
+
+async def test_documentation_url_not_set(hass: HomeAssistant) -> None:
+    power_profile = PowerProfile(hass, "test", "test", "", {})
+    assert power_profile.documentation_url is None

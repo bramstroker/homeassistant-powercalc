@@ -28,6 +28,7 @@ from custom_components.powercalc.discovery import get_power_profile_by_source_en
 from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFormStep, Step
 from custom_components.powercalc.flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE, build_sub_profile_schema
+from custom_components.powercalc.helpers import collect_placeholders, get_related_entity_by_device_class, get_related_entity_by_translation_key
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import DEVICE_TYPE_DOMAIN, DOMAIN_DEVICE_TYPE_MAPPING, DiscoveryBy
 
@@ -189,6 +190,14 @@ class LibraryFlow:
         async def _process_user_input(user_input: dict[str, Any]) -> dict[str, Any]:
             return {CONF_VARIABLES: user_input}
 
+        form_kwarg: dict[str, Any] | None = None
+        if self.flow.selected_profile and self.flow.selected_profile.documentation_url:
+            form_kwarg = {
+                "description_placeholders": {
+                    "documentation_url": self.flow.selected_profile.documentation_url,
+                },
+            }
+
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.LIBRARY_CUSTOM_FIELDS,
@@ -199,6 +208,7 @@ class LibraryFlow:
                 ),
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_process_user_input,
+                form_kwarg=form_kwarg,
             ),
             user_input,
         )
@@ -277,6 +287,13 @@ class LibraryFlow:
 
     async def async_step_availability_entity(self, user_input: dict[str, Any] | None = None) -> FlowResult | None:
         """Handle the flow for availability entity."""
+        # Auto-resolve availability entity from profile placeholders
+        auto_entity = self._resolve_availability_entity()
+        if auto_entity:
+            self.flow.sensor_config[CONF_AVAILABILITY_ENTITY] = auto_entity
+            self.flow.handled_steps.append(Step.AVAILABILITY_ENTITY)
+            return None
+
         domains = DEVICE_TYPE_DOMAIN[self.flow.selected_profile.device_type]  # type: ignore
         entity_selector = self.flow.create_device_entity_selector(
             list(domains) if isinstance(domains, set) else [domains],
@@ -299,6 +316,32 @@ class LibraryFlow:
             ),
             user_input,
         )
+
+    def _resolve_availability_entity(self) -> str | None:
+        """Try to auto-resolve an availability entity from profile placeholders."""
+        profile = self.flow.selected_profile
+        device_entry = self.flow.source_entity.device_entry if self.flow.source_entity else None
+        if not profile or not device_entry:
+            return None
+
+        placeholders = collect_placeholders(profile.json_data)
+        for placeholder in placeholders:
+            if placeholder.startswith("entity_by_translation_key:"):
+                _, tk = placeholder.split(":", 1)
+                entity = get_related_entity_by_translation_key(self.flow.hass, tk, device_id=device_entry.id)
+                if entity:
+                    return entity
+            elif placeholder.startswith("entity_by_device_class:"):
+                _, dc = placeholder.split(":", 1)
+                from homeassistant.components.sensor import SensorDeviceClass
+
+                try:
+                    entity = get_related_entity_by_device_class(self.flow.hass, None, SensorDeviceClass(dc), device_id=device_entry.id)
+                    if entity:
+                        return entity
+                except ValueError:
+                    continue
+        return None
 
 
 class LibraryConfigFlow(LibraryFlow):
@@ -377,7 +420,7 @@ class LibraryConfigFlow(LibraryFlow):
         if self.flow.source_entity and self.flow.source_entity.entity_entry and self.flow.selected_profile is None:
             self.flow.selected_profile = await get_power_profile_by_source_entity(self.flow.hass, self.flow.source_entity)
         if self.flow.selected_profile:
-            remarks = self.flow.selected_profile.config_flow_discovery_remarks
+            remarks = self._get_conditional_remarks()
             if remarks:
                 remarks = "\n\n" + remarks
 
@@ -386,6 +429,10 @@ class LibraryConfigFlow(LibraryFlow):
                 source = f"{translations.get(f'component.{DOMAIN}.common.source_device')}: {self.flow.source_entity.device_entry.name}"
             else:
                 source = f"{translations.get(f'component.{DOMAIN}.common.source_entity')}: {self.flow.source_entity_id}"
+
+            documentation_url = self.flow.selected_profile.documentation_url
+            if documentation_url:
+                remarks = (remarks or "") + f"\n\n[Documentation]({documentation_url})"
 
             return self.flow.async_show_form(
                 step_id=Step.LIBRARY,
@@ -401,6 +448,43 @@ class LibraryConfigFlow(LibraryFlow):
             )
 
         return await self.async_step_manufacturer()
+
+    def _get_conditional_remarks(self) -> str | None:
+        """Get discovery remarks, only showing them if required entities are missing."""
+        profile = self.flow.selected_profile
+        if not profile:
+            return None
+
+        remarks = profile.config_flow_discovery_remarks
+        if not remarks:
+            return None
+
+        # Check if all entity_by_* placeholders can be resolved from the device
+        device_entry = self.flow.source_entity.device_entry if self.flow.source_entity else None
+        if not device_entry:
+            return remarks
+
+        placeholders = collect_placeholders(profile.json_data)
+        all_resolved = True
+        for placeholder in placeholders:
+            if placeholder.startswith("entity_by_device_class:"):
+                _, device_class = placeholder.split(":", 1)
+                from homeassistant.components.sensor import SensorDeviceClass
+
+                try:
+                    dc = SensorDeviceClass(device_class)
+                except ValueError:
+                    continue
+                if not get_related_entity_by_device_class(self.flow.hass, None, dc, device_id=device_entry.id):
+                    all_resolved = False
+                    break
+            elif placeholder.startswith("entity_by_translation_key:"):
+                _, translation_key = placeholder.split(":", 1)
+                if not get_related_entity_by_translation_key(self.flow.hass, translation_key, device_id=device_entry.id):
+                    all_resolved = False
+                    break
+
+        return None if all_resolved else remarks
 
 
 class LibraryOptionsFlow(LibraryFlow):

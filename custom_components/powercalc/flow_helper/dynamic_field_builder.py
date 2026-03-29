@@ -13,7 +13,11 @@ def build_dynamic_field_schema(hass: HomeAssistant, profile: PowerProfile, sourc
         field_description = field.description
         if not field_description:
             field_description = field.label
-        key = vol.Required(field.key, description=field_description)
+
+        if field.default is not None:
+            key = vol.Required(field.key, description=field_description, default=field.default)
+        else:
+            key = vol.Required(field.key, description=field_description)
 
         if "entity" in field.selector and source_entity and source_entity.device_entry:
             entity_reg = er.async_get(hass)
