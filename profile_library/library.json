@@ -3206,11 +3206,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "effect",
             "color_temp",
-            "effect"
+            "hs"
           ],
-          "hash": "71fcc13f8e8cd86bc0ad5195a8d3a4fb"
+          "hash": "5fd6bf12289b916338b4a7954940dfd9"
         },
         {
           "author": "Brian Egge <brianegge@gmail.com>",
@@ -3267,10 +3267,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
+          "hash": "b8ba79c307b90439d3849a26bc5a829e"
         },
         {
           "author": "Sku1ly <45756272+Sku1ly@users.noreply.github.com>",
@@ -3327,11 +3327,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "effect",
             "color_temp",
-            "effect"
+            "hs"
           ],
-          "hash": "c835365008fd19155e8884933d36a213"
+          "hash": "87712518a23226a5947ad8501a350aed"
         },
         {
           "calculation_strategy": "lut",
@@ -3358,11 +3358,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "effect",
             "color_temp",
-            "effect"
+            "hs"
           ],
-          "hash": "b85db766803a8f6a53d90fd2f034065d"
+          "hash": "c5f06f7ac36512536168a0f496155dfb"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -3509,11 +3509,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "effect",
             "color_temp",
-            "effect"
+            "hs"
           ],
-          "hash": "4b65e10e693f49107b69ca124b7e566d"
+          "hash": "b558995e3b047c8d8c5921b74736b8f4"
         },
         {
           "author": "Benjamin Neff <benjamin@coding4coffee.ch>",
@@ -6326,11 +6326,11 @@
           "max_power": 8.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "effect",
             "color_temp",
-            "effect"
+            "hs"
           ],
-          "hash": "7c00c8ef9ea7b444ae877606e245eb04"
+          "hash": "95044b79d5af8c9f772224706e31a8fb"
         }
       ],
       "device_types": [
@@ -7164,15 +7164,20 @@
           },
           "name": "Hue Smart Bulb Edison ST72 E27 7W ",
           "standby_power": 0.05,
+          "author_info": {
+            "name": "sve",
+            "github": "sve007"
+          },
+          "author": "sve",
           "id": "LWV007",
           "manufacturer": "signify",
-          "updated_at": "2026-03-27T07:19:58",
+          "updated_at": "2026-03-27T07:20:25",
           "max_power": 6.84,
           "sub_profile_count": 0,
           "color_modes": [
             "brightness"
           ],
-          "hash": "819cf541d0595068bf7bbc20fead9f3c"
+          "hash": "102a57d06d489537248390dfb98cc8b8"
         },
         {
           "aliases": [
@@ -10640,6 +10645,33 @@
             "color_temp"
           ],
           "hash": "9cfd61d916a7ab0aa5e96a5d0316a8a4"
+        },
+        {
+          "calculation_strategy": "lut",
+          "created_at": "2026-03-29T14:47:32Z",
+          "device_type": "light",
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.20.11:docker"
+          },
+          "name": "Hue White G2 400lm GU10",
+          "standby_power": 0.08,
+          "author_info": {
+            "name": "Tim",
+            "github": "EinRainerZufall"
+          },
+          "id": "LWG005",
+          "manufacturer": "signify",
+          "updated_at": "2026-03-29T17:46:12",
+          "max_power": 3.71,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "brightness"
+          ],
+          "hash": "9941685f9f7b88d8627770f5dc197ff8"
         },
         {
           "aliases": [
@@ -16540,15 +16572,20 @@
           },
           "name": "LED light with color temperature",
           "standby_power": 0.05,
+          "author_info": {
+            "name": "rammstone83",
+            "github": "rammstone83"
+          },
+          "author": "rammstone83",
           "id": "33955",
           "manufacturer": "eglo",
-          "updated_at": "2026-03-26T08:19:45",
+          "updated_at": "2026-03-27T07:20:25",
           "max_power": 38.77,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp"
           ],
-          "hash": "71d68852340b1951989cef1545d1ece0"
+          "hash": "42e6b1c06eb1dfb887bd575b7bc847cc"
         }
       ],
       "device_types": [
