@@ -1,5 +1,6 @@
 {
-  "name": "Tripplite",
+  "name": "Tripp Lite UPS",
+  "description": "Generic power profile for Tripp Lite UPS devices. Estimates real-time power consumption from load percentage, nominal VA rating, and power factor.",
   "device_type": "ups",
   "calculation_strategy": "fixed",
   "compatible_integrations": [
