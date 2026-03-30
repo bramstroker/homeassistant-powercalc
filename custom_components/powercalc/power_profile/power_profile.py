@@ -60,6 +60,7 @@ class DeviceType(StrEnum):
     VACUUM_ROBOT = "vacuum_robot"
     LAWN_MOWER_ROBOT = "lawn_mower_robot"
     HEATING = "heating"
+    UPS = "ups"
 
 
 class DiscoveryBy(StrEnum):
@@ -91,6 +92,7 @@ DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
     DeviceType.LAWN_MOWER_ROBOT: LAWN_MOWER_DOMAIN,
     DeviceType.HEATING: CLIMATE_DOMAIN,
+    DeviceType.UPS: SENSOR_DOMAIN,
 }
 
 SUPPORTED_DOMAINS: set[str] = {domain for domains in DEVICE_TYPE_DOMAIN.values() for domain in (domains if isinstance(domains, set) else {domains})}
