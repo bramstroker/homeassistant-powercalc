@@ -1,0 +1,24 @@
+{
+  "aliases": [
+    "929003808901_03",
+    "929003808901_04",
+    "929003808901_05"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-03-30T14:45:01Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script using an additional dummy load (E27 25 W light bulb)",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.11:docker"
+  },
+  "name": "Hue White and Color 400lm GU10",
+  "standby_power": 0.09,
+  "author_info": {
+    "name": "Tim",
+    "github": "EinRainerZufall"
+  }
+}
