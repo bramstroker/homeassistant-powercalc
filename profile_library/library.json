@@ -821,11 +821,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "brightness",
+            "color_temp",
             "hs"
           ],
-          "hash": "6dc3690f8a3008d64f9532292562ba8f"
+          "hash": "ed8c6f8ad83348d686cdce499f97ea56"
         }
       ],
       "device_types": [
@@ -1431,11 +1431,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "brightness",
+            "color_temp",
             "hs"
           ],
-          "hash": "1e47e11c48244e5b0ba6b285c30fe2f1"
+          "hash": "21e279d64e6840a6f75b4f41fe8ce9c6"
         },
         {
           "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
@@ -3207,10 +3207,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "e51ce873f4958f34050c38778bb55322"
+          "hash": "fc32a8e4378dd50d1ba5f7b508e89fb3"
         },
         {
           "author": "Brian Egge <brianegge@gmail.com>",
@@ -3267,10 +3267,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "b8ba79c307b90439d3849a26bc5a829e"
+          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
         },
         {
           "author": "Sku1ly <45756272+Sku1ly@users.noreply.github.com>",
@@ -3296,11 +3296,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "brightness",
+            "color_temp",
             "hs"
           ],
-          "hash": "e428a7720168f9b3f09af8f1cf3e83e9"
+          "hash": "7a39dbf6da62530b8a004e954f9cfc8d"
         },
         {
           "calculation_strategy": "lut",
@@ -3328,10 +3328,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "db0831d14b70b40bd36fea4b21d78f74"
+          "hash": "953b3637b3a77c46dc7513ada8de63cd"
         },
         {
           "calculation_strategy": "lut",
@@ -3359,10 +3359,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "d83e25738b3ed996675dabf9b112c0be"
+          "hash": "2ea3e415936623fe485ee433c5d5a8e3"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -3510,10 +3510,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "9ee9d851f62f1483b14ca39f34cefe45"
+          "hash": "ca835c2c050c377470043f69d75e0e45"
         },
         {
           "author": "Benjamin Neff <benjamin@coding4coffee.ch>",
@@ -6327,10 +6327,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "6246abf31e5ae9a2baba8637d3bac312"
+          "hash": "0fe99fa744a2e295cb5b27223c8fb6b6"
         }
       ],
       "device_types": [
@@ -15891,6 +15891,35 @@
         {
           "author": "sbrandsborg",
           "aliases": [
+            "Beoplay M5"
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2026-01-29T12:42:28Z",
+          "device_type": "smart_speaker",
+          "description": "Beoplay M5 - Powerful Wireless Speaker",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 5,
+            "VERSION": "master"
+          },
+          "name": "Beoplay M5",
+          "standby_power": 3.2,
+          "author_info": {
+            "name": "Steffen Brandsborg",
+            "github": "sbrandsborg"
+          },
+          "id": "Beoplay M5",
+          "manufacturer": "bang olufsen",
+          "updated_at": "2026-03-30T08:13:23",
+          "max_power": 20.3,
+          "sub_profile_count": 0,
+          "hash": "4fcc8ad08d0afdb953d5ece373809252"
+        },
+        {
+          "author": "sbrandsborg",
+          "aliases": [
             "6661 S53"
           ],
           "calculation_strategy": "linear",
@@ -20091,10 +20120,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "brightness"
+            "brightness",
+            "color_temp"
           ],
-          "hash": "c5ca2ab9fef230d19eb19dbfdb6bbc98"
+          "hash": "a803a0424627baf0efcf5e7c682be4f8"
         },
         {
           "aliases": [
