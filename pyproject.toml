@@ -98,10 +98,10 @@ docs = [
 dev = [
     "prek",
     "ruff>=0.15.0",
-    "mypy==1.19.1",
+    "mypy==1.20.0",
     "voluptuous-stubs>=0.1",
     "homeassistant-stubs",
-    "pytest-homeassistant-custom-component==0.13.320",
+    "pytest-homeassistant-custom-component==0.13.322",
     "types-pytz>=2024.1",
     "types-croniter>=2.0",
     "croniter>=6.0.0",
