@@ -1,0 +1,24 @@
+{
+  "aliases": [
+    "INSPELNING Smart plug"
+  ],
+  "author": "Patrick Lehner <lehnerpat@users.noreply.github.com>",
+  "calculation_strategy": "fixed",
+  "created_at": "2026-04-08T10:46:42Z",
+  "device_type": "smart_switch",
+  "measure_description": "Manually measured (Japan model@110V)",
+  "measure_device": "Ketotek KTEM02BL Electricity Monitor",
+  "measure_method": "manual",
+  "name": "INSPELNING smart plug",
+  "only_self_usage": true,
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
+  "standby_power": 0.2,
+  "standby_power_on": 0.7,
+  "author_info": {
+    "name": "Patrick Lehner",
+    "github": "lehnerpat"
+  }
+}
