@@ -17,7 +17,7 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           working-directory: './utils/visualize'
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         name: List changed files from the PR
         id: list-files
         with:
