@@ -175,6 +175,33 @@ async def test_library_options_flow_raises_error_on_non_existing_power_profile(
     assert result["reason"] == "model_not_supported"
 
 
+async def test_composite_library_profile_options_flow_builds_menu(
+    hass: HomeAssistant,
+) -> None:
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "vacuum.robi",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "roborock",
+            CONF_MODEL: "rockrobo.vacuum.v1",
+        },
+    )
+
+    result = await hass.config_entries.options.async_init(
+        entry.entry_id,
+        data=None,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.MENU
+    assert result["step_id"] == Step.INIT
+    assert result["menu_options"] == [
+        Step.BASIC_OPTIONS,
+        Step.LIBRARY_OPTIONS,
+        Step.ADVANCED_OPTIONS,
+    ]
+
+
 async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) -> None:
     entry = create_mock_entry(
         hass,
