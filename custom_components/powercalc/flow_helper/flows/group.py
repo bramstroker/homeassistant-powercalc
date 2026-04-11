@@ -215,7 +215,7 @@ def create_schema_group_custom(
             vol.Optional(CONF_GROUP_MEMBER_DEVICES): selector.DeviceSelector(
                 selector.DeviceSelectorConfig(
                     multiple=True,
-                    entity=selector.EntitySelectorConfig(
+                    entity=selector.EntityFilterSelectorConfig(
                         device_class=[SensorDeviceClass.POWER, SensorDeviceClass.ENERGY],
                     ),
                 ),
