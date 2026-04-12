@@ -444,7 +444,7 @@ class LibraryConfigFlow(LibraryFlow):
         """Get discovery remarks, only showing them if required entities are missing."""
         profile = self.flow.selected_profile
         if not profile:
-            return None
+            return None  # pragma: no cover
 
         remarks = profile.config_flow_discovery_remarks
         if not remarks:

@@ -13,8 +13,9 @@ import pytest
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy
+from custom_components.powercalc.const import DUMMY_ENTITY_ID, PLACEHOLDER_ENTITY_BY_DEVICE_CLASS, CalculationStrategy
 from custom_components.powercalc.helpers import (
+    build_related_entity_placeholder_not_found_message,
     collect_placeholders,
     evaluate_power,
     get_or_create_unique_id,
@@ -22,6 +23,7 @@ from custom_components.powercalc.helpers import (
     get_related_entity_by_translation_key,
     make_hashable,
     replace_placeholders,
+    resolve_related_entity_placeholder,
 )
 from tests.common import get_test_profile_dir
 
@@ -148,3 +150,47 @@ def test_replace_placeholder() -> None:
     placeholders = {"entity_by_device_class:temperature": "sensor.test"}
     replace_placeholders(json_data, placeholders)
     assert json_data["name"] == "Test sensor.test"
+
+
+def test_resolve_related_entity_placeholder_no_source_entity(hass: HomeAssistant) -> None:
+    assert not resolve_related_entity_placeholder(
+        hass,
+        f"{PLACEHOLDER_ENTITY_BY_DEVICE_CLASS}battery",
+        None,
+    )
+
+
+def test_resolve_related_entity_placeholder_unknown_device_class(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "sensor.test_battery": RegistryEntryWithDefaults(
+                entity_id="sensor.test_battery",
+                unique_id="1234",
+                platform="test",
+                device_id="device_1",
+                device_class=SensorDeviceClass.BATTERY,
+            ),
+        },
+    )
+
+    assert not resolve_related_entity_placeholder(
+        hass,
+        f"{PLACEHOLDER_ENTITY_BY_DEVICE_CLASS}foo",
+        SourceEntity("test", "light.test", "light", device_entry=DeviceEntry(id="device_1")),
+    )
+
+
+def test_resolve_related_entity_placeholder_unknown_placeholder(hass: HomeAssistant) -> None:
+    assert not resolve_related_entity_placeholder(
+        hass,
+        "whatever",
+        SourceEntity("test", "light.test", "light", device_entry=DeviceEntry(id="device_1")),
+    )
+
+
+def test_build_related_entity_placeholder_not_found_message_unknown_placeholder() -> None:
+    assert (
+        build_related_entity_placeholder_not_found_message("whatever", "light.test")
+        == "Could not find related entity for placeholder whatever of entity light.test"
+    )

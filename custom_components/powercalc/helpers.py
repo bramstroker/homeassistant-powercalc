@@ -5,7 +5,7 @@ from functools import wraps
 import logging
 import os.path
 import re
-from typing import Any, TypeVar
+from typing import Any, NamedTuple, TypeVar
 import uuid
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
@@ -23,7 +23,6 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     PLACEHOLDER_ENTITY_BY_DEVICE_CLASS,
     PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
-    RELATED_ENTITY_PLACEHOLDER_PREFIXES,
     CalculationStrategy,
 )
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
@@ -95,6 +94,12 @@ def get_or_create_unique_id(
 
 P = TypeVar("P")  # Used for positional and keyword argument types
 R = TypeVar("R")  # Used for return type
+
+
+class RelatedEntityPlaceholderDefinition(NamedTuple):
+    prefix: str
+    lookup_label: str
+    resolver: Callable[[HomeAssistant, SourceEntity, str], str | None]
 
 
 def make_hashable(arg: Any) -> Any:  # noqa: ANN401
@@ -170,7 +175,7 @@ def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[s
 def iter_related_entity_placeholders(placeholders: Iterable[str]) -> Iterator[str]:
     """Yield placeholders that need lookup against entities on the same device."""
     for placeholder in placeholders:
-        if placeholder.startswith(RELATED_ENTITY_PLACEHOLDER_PREFIXES):
+        if parse_related_entity_placeholder(placeholder):
             yield placeholder
 
 
@@ -183,18 +188,61 @@ def resolve_related_entity_placeholder(
     if not source_entity:
         return None
 
-    if placeholder.startswith(PLACEHOLDER_ENTITY_BY_DEVICE_CLASS):
-        _, raw_device_class = placeholder.split(":", 1)
-        device_class = _parse_related_entity_device_class(raw_device_class)
-        if device_class is None:
-            return None
-        return get_related_entity_by_device_class(hass, source_entity, device_class)
+    parsed_placeholder = parse_related_entity_placeholder(placeholder)
+    if not parsed_placeholder:
+        return None
 
-    if placeholder.startswith(PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY):
-        _, translation_key = placeholder.split(":", 1)
-        return get_related_entity_by_translation_key(hass, source_entity, translation_key)
+    definition, lookup_value = parsed_placeholder
+    return definition.resolver(hass, source_entity, lookup_value)
 
+
+def build_related_entity_placeholder_not_found_message(placeholder: str, source_entity_id: str) -> str:
+    parsed_placeholder = parse_related_entity_placeholder(placeholder)
+    if not parsed_placeholder:
+        return f"Could not find related entity for placeholder {placeholder} of entity {source_entity_id}"
+
+    definition, lookup_value = parsed_placeholder
+    return f"Could not find related entity for {definition.lookup_label} {lookup_value} of entity {source_entity_id}"
+
+
+def parse_related_entity_placeholder(placeholder: str) -> tuple[RelatedEntityPlaceholderDefinition, str] | None:
+    for definition in RELATED_ENTITY_PLACEHOLDER_DEFINITIONS:
+        if placeholder.startswith(definition.prefix):
+            return definition, placeholder.removeprefix(definition.prefix)
     return None
+
+
+def _resolve_related_entity_by_device_class(
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    raw_device_class: str,
+) -> str | None:
+    device_class = _parse_related_entity_device_class(raw_device_class)
+    if device_class is None:
+        return None
+    return get_related_entity_by_device_class(hass, source_entity, device_class)
+
+
+def _resolve_related_entity_by_translation_key(
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    translation_key: str,
+) -> str | None:
+    return get_related_entity_by_translation_key(hass, source_entity, translation_key)
+
+
+RELATED_ENTITY_PLACEHOLDER_DEFINITIONS = (
+    RelatedEntityPlaceholderDefinition(
+        PLACEHOLDER_ENTITY_BY_DEVICE_CLASS,
+        "device class",
+        _resolve_related_entity_by_device_class,
+    ),
+    RelatedEntityPlaceholderDefinition(
+        PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
+        "translation key",
+        _resolve_related_entity_by_translation_key,
+    ),
+)
 
 
 def _parse_related_entity_device_class(raw_device_class: str) -> SensorDeviceClass | BinarySensorDeviceClass | None:

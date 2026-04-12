@@ -73,6 +73,33 @@ def test_omit_description(hass: HomeAssistant) -> None:
     assert schema_keys[schema_keys.index("test1")].description == "Test 1"
 
 
+def test_set_default_value(hass: HomeAssistant) -> None:
+    profile = create_power_profile(
+        hass,
+        {
+            "test1": {
+                "label": "Test 1",
+                "description": "Test 1",
+                "default": 15,
+                "selector": {
+                    "number": {
+                        "min": 0,
+                        "max": 60,
+                        "step": 1,
+                        "unit_of_measurement": "minutes",
+                        "mode": "slider",
+                    },
+                },
+            },
+        },
+    )
+
+    schema = build_dynamic_field_schema(hass, profile, SourceEntity("sensor.test", "sensor.test", "sensor"))
+
+    schema_keys = list(schema.schema.keys())
+    assert schema_keys[schema_keys.index("test1")].default() == 15
+
+
 async def test_entity_pick_filter_by_device(hass: HomeAssistant) -> None:
     mock_device_registry(
         hass,

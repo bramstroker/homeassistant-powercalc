@@ -10,6 +10,7 @@ from homeassistant.helpers.singleton import singleton
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DOMAIN, DOMAIN_CONFIG
 from custom_components.powercalc.helpers import (
+    build_related_entity_placeholder_not_found_message,
     collect_placeholders,
     iter_related_entity_placeholders,
     replace_placeholders,
@@ -164,10 +165,7 @@ class ProfileLibrary:
                     source_entity=source_entity,
                 )
                 if not related_entity:
-                    _, lookup_value = placeholder.split(":", 1)
-                    if placeholder.startswith("entity_by_device_class:"):
-                        raise LibraryError(f"Could not find related entity for device class {lookup_value} of entity {source_entity.entity_id}")
-                    raise LibraryError(f"Could not find related entity for translation key {lookup_value} of entity {source_entity.entity_id}")
+                    raise LibraryError(build_related_entity_placeholder_not_found_message(placeholder, source_entity.entity_id))
                 variables[placeholder] = related_entity
 
         return variables
