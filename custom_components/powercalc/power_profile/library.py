@@ -171,9 +171,7 @@ class ProfileLibrary:
                     except ValueError:
                         device_class = cast(SensorDeviceClass, BinarySensorDeviceClass(device_class))
                     device_id = source_entity.device_entry.id if source_entity.device_entry else None
-                    related_entity = get_related_entity_by_device_class(
-                        self._hass, source_entity.entity_entry, device_class, device_id=device_id
-                    )
+                    related_entity = get_related_entity_by_device_class(self._hass, source_entity.entity_entry, device_class, device_id=device_id)
                     if not related_entity:
                         raise LibraryError(f"Could not find related entity for device class {device_class} of entity {source_entity.entity_id}")
                     variables[key] = related_entity
