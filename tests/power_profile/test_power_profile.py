@@ -479,6 +479,6 @@ async def test_documentation_url(hass: HomeAssistant) -> None:
     assert power_profile.documentation_url == "https://docs.powercalc.nl/cookbook/ups/"
 
 
-async def test_documentation_url_not_set(hass: HomeAssistant) -> None:
+def test_documentation_url_not_set(hass: HomeAssistant) -> None:
     power_profile = PowerProfile(hass, "test", "test", "", {})
     assert power_profile.documentation_url is None
