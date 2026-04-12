@@ -1,0 +1,12 @@
+{
+  "name": "Discovery Translation Key Test",
+  "device_type": "ups",
+  "discovery_by": "device",
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": "{{ states('[[entity_by_translation_key:ups_power_nominal]]') | float(0) }}"
+  },
+  "config_flow_discovery_remarks": "Enable the Nominal Power entity first.",
+  "measure_method": "manual",
+  "measure_device": "N/A"
+}

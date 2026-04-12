@@ -28,7 +28,7 @@ from custom_components.powercalc.discovery import get_power_profile_by_source_en
 from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFormStep, Step
 from custom_components.powercalc.flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE, build_sub_profile_schema
-from custom_components.powercalc.helpers import collect_placeholders, get_related_entity_by_device_class, get_related_entity_by_translation_key
+from custom_components.powercalc.helpers import collect_placeholders, iter_related_entity_placeholders, resolve_related_entity_placeholder
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import DEVICE_TYPE_DOMAIN, DOMAIN_DEVICE_TYPE_MAPPING, DiscoveryBy
 
@@ -324,23 +324,14 @@ class LibraryFlow:
         if not profile or not device_entry:
             return None
 
-        placeholders = collect_placeholders(profile.json_data)
-        for placeholder in placeholders:
-            if placeholder.startswith("entity_by_translation_key:"):
-                _, tk = placeholder.split(":", 1)
-                entity = get_related_entity_by_translation_key(self.flow.hass, tk, device_id=device_entry.id)
-                if entity:
-                    return entity
-            elif placeholder.startswith("entity_by_device_class:"):
-                _, dc = placeholder.split(":", 1)
-                from homeassistant.components.sensor import SensorDeviceClass
-
-                try:
-                    entity = get_related_entity_by_device_class(self.flow.hass, None, SensorDeviceClass(dc), device_id=device_entry.id)
-                    if entity:
-                        return entity
-                except ValueError:
-                    continue
+        for placeholder in iter_related_entity_placeholders(collect_placeholders(profile.json_data)):
+            entity = resolve_related_entity_placeholder(
+                self.flow.hass,
+                placeholder,
+                source_entity=self.flow.source_entity,
+            )
+            if entity:
+                return entity
         return None
 
 
@@ -464,26 +455,15 @@ class LibraryConfigFlow(LibraryFlow):
         if not device_entry:
             return remarks
 
-        placeholders = collect_placeholders(profile.json_data)
-        all_resolved = True
-        for placeholder in placeholders:
-            if placeholder.startswith("entity_by_device_class:"):
-                _, device_class = placeholder.split(":", 1)
-                from homeassistant.components.sensor import SensorDeviceClass
-
-                try:
-                    dc = SensorDeviceClass(device_class)
-                except ValueError:
-                    continue
-                if not get_related_entity_by_device_class(self.flow.hass, None, dc, device_id=device_entry.id):
-                    all_resolved = False
-                    break
-            elif placeholder.startswith("entity_by_translation_key:"):
-                _, translation_key = placeholder.split(":", 1)
-                if not get_related_entity_by_translation_key(self.flow.hass, translation_key, device_id=device_entry.id):
-                    all_resolved = False
-                    break
-
+        related_placeholders = iter_related_entity_placeholders(collect_placeholders(profile.json_data))
+        all_resolved = all(
+            resolve_related_entity_placeholder(
+                self.flow.hass,
+                placeholder,
+                source_entity=self.flow.source_entity,
+            )
+            for placeholder in related_placeholders
+        )
         return None if all_resolved else remarks
 
 

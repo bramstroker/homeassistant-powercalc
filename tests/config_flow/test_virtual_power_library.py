@@ -1,12 +1,13 @@
 import logging
 
 from homeassistant import data_entry_flow
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.selector import SelectSelector
 import pytest
-from pytest_homeassistant_custom_component.common import mock_device_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 import voluptuous as vol
 
 from custom_components.powercalc.common import create_source_entity
@@ -178,6 +179,36 @@ async def test_library_options_flow_raises_error_on_non_existing_power_profile(
 async def test_composite_library_profile_options_flow_builds_menu(
     hass: HomeAssistant,
 ) -> None:
+    mock_device_registry(
+        hass,
+        {
+            "vacuum1": DeviceEntry(
+                id="vacuum1",
+                manufacturer="roborock",
+                model="rockrobo.vacuum.v1",
+            ),
+        },
+    )
+
+    mock_registry(
+        hass,
+        {
+            "vacuum.robi": RegistryEntryWithDefaults(
+                entity_id="vacuum.robi",
+                unique_id="1111",
+                device_id="vacuum1",
+                platform="test",
+            ),
+            "sensor.robi_battery": RegistryEntryWithDefaults(
+                entity_id="sensor.robi_battery",
+                unique_id="2222",
+                device_id="vacuum1",
+                device_class=SensorDeviceClass.BATTERY,
+                platform="test",
+            ),
+        },
+    )
+
     entry = create_mock_entry(
         hass,
         {

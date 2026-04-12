@@ -10,6 +10,7 @@ from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.template import Template
 import pytest
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy
@@ -18,6 +19,7 @@ from custom_components.powercalc.helpers import (
     evaluate_power,
     get_or_create_unique_id,
     get_related_entity_by_device_class,
+    get_related_entity_by_translation_key,
     make_hashable,
     replace_placeholders,
 )
@@ -88,16 +90,39 @@ async def test_make_hashable(value: set | list | dict, output: tuple | frozenset
 
 def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """Test get_related_entity_by_device_class when entity has no device_id."""
-    from unittest.mock import MagicMock
-
-    entity = MagicMock()
-    entity.entity_id = "light.test"
-    entity.device_id = None
+    entity = SourceEntity("test", "light.test", "light")
 
     result = get_related_entity_by_device_class(hass, entity, SensorDeviceClass.BATTERY)
 
     assert result is None
     assert "No device_id available, cannot find related entity" in caplog.text
+
+
+def test_get_related_entity_by_translation_key(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "sensor.test_power": RegistryEntryWithDefaults(
+                entity_id="sensor.test_power",
+                unique_id="1234",
+                platform="test",
+                device_id="device_1",
+                translation_key="power",
+            ),
+            "sensor.test_energy": RegistryEntryWithDefaults(
+                entity_id="sensor.test_energy",
+                unique_id="5678",
+                platform="test",
+                device_id="device_1",
+                translation_key="energy",
+            ),
+        },
+    )
+
+    source_entity = SourceEntity("test", "light.test", "light", device_entry=DeviceEntry(id="device_1"))
+    result = get_related_entity_by_translation_key(hass, source_entity, "power")
+
+    assert result == "sensor.test_power"
 
 
 @pytest.mark.parametrize(

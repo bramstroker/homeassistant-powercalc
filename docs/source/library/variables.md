@@ -11,6 +11,24 @@ You can use the following built-in variables in the `model.json` file.
 `[[entity_by_device_class:{device_class}]]`: Finds an entity with the specified device class in the same device as `[[entity]]`.
 For example, `[[entity_by_device_class:temperature]]` will find a temperature sensor in the same device, and `[[entity_by_device_class:battery]]` will find a battery sensor.
 
+`[[entity_by_translation_key:{translation_key}]]`: Finds the first entity with the specified translation key on the same device as `[[entity]]`.
+This is useful when an integration exposes multiple related entities for one device and the profile needs to reference one of them without asking the user to configure an extra entity manually.
+
+For example, NUT UPS entities can expose translation keys such as `ups_load` and `ups_power_nominal`:
+
+```json
+{
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_power_nominal]]') | float(0) * 0.7 }}"
+  }
+}
+```
+
+!!! note
+    `entity_by_translation_key` only works for entities that belong to the same Home Assistant device as `[[entity]]`.
+    When multiple entities on the same device share the same translation key, the first match is used.
+
 ## Custom fields
 
 Sometimes there is a need to ask the user to provide some additional data for a profile.

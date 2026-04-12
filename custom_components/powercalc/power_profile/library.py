@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import logging
 import os
 import re
 from typing import Any, NamedTuple, cast
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.singleton import singleton
 
@@ -14,9 +11,9 @@ from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DOMAIN, DOMAIN_CONFIG
 from custom_components.powercalc.helpers import (
     collect_placeholders,
-    get_related_entity_by_device_class,
-    get_related_entity_by_translation_key,
+    iter_related_entity_placeholders,
     replace_placeholders,
+    resolve_related_entity_placeholder,
 )
 
 from .error import LibraryError
@@ -28,8 +25,6 @@ from .power_profile import DeviceType, PowerProfile
 
 LEGACY_CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 CUSTOM_DATA_DIRECTORY = "powercalc/profiles"
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class ProfileLibrary:
@@ -162,29 +157,18 @@ class ProfileLibrary:
             if "entity" in placeholders:
                 variables["entity"] = source_entity.entity_id
 
-            # If ANY namespaced entity:* placeholder is present, check if the specific one for device_class is needed
-            if source_entity.entity_entry:
-                for key in {p for p in placeholders if p.startswith("entity_by_device_class:")}:
-                    _, device_class = key.split(":", 1)
-                    try:
-                        device_class = SensorDeviceClass(device_class)
-                    except ValueError:
-                        device_class = cast(SensorDeviceClass, BinarySensorDeviceClass(device_class))
-                    device_id = source_entity.device_entry.id if source_entity.device_entry else None
-                    related_entity = get_related_entity_by_device_class(self._hass, source_entity.entity_entry, device_class, device_id=device_id)
-                    if not related_entity:
-                        raise LibraryError(f"Could not find related entity for device class {device_class} of entity {source_entity.entity_id}")
-                    variables[key] = related_entity
-
-            for key in {p for p in placeholders if p.startswith("entity_by_translation_key:")}:
-                _, translation_key = key.split(":", 1)
-                device_id = source_entity.device_entry.id if source_entity.device_entry else None
-                related_entity = get_related_entity_by_translation_key(
-                    self._hass, translation_key, device_id=device_id, entity=source_entity.entity_entry
+            for placeholder in iter_related_entity_placeholders(placeholders):
+                related_entity = resolve_related_entity_placeholder(
+                    self._hass,
+                    placeholder,
+                    source_entity=source_entity,
                 )
                 if not related_entity:
-                    raise LibraryError(f"Could not find related entity for translation key {translation_key} of entity {source_entity.entity_id}")
-                variables[key] = related_entity
+                    _, lookup_value = placeholder.split(":", 1)
+                    if placeholder.startswith("entity_by_device_class:"):
+                        raise LibraryError(f"Could not find related entity for device class {lookup_value} of entity {source_entity.entity_id}")
+                    raise LibraryError(f"Could not find related entity for translation key {lookup_value} of entity {source_entity.entity_id}")
+                variables[placeholder] = related_entity
 
         return variables
 
