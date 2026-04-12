@@ -145,7 +145,8 @@
         "network",
         "vacuum_robot",
         "lawn_mower_robot",
-        "heating"
+        "heating",
+        "ups"
       ],
       "description": "Type of device"
     },

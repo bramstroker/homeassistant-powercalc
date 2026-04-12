@@ -509,7 +509,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     def should_add_strategy_option_to_menu(self) -> bool:
         """Check whether the strategy option should be added to the menu."""
-        if not self.strategy or self.strategy == CalculationStrategy.LUT:
+        if not self.strategy or self.strategy not in STRATEGY_STEP_MAPPING:
             return False
 
         if self.selected_profile:

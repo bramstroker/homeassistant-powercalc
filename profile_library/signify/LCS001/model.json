@@ -2,7 +2,8 @@
   "aliases": [
     "1741430P7",
     "1741530P7",
-    "1741830P7"
+    "1741830P7",
+    "1742830P7"
   ],
   "author": "mariwing <mariwing@gmail.com>",
   "calculation_strategy": "lut",

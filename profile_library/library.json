@@ -2725,6 +2725,7 @@
       "models": [
         {
           "aliases": [
+            "ASQZWP4GPYUT7",
             "ECHO ASQZWP4GPYUT7"
           ],
           "author": "Edouard Kleinhans <edouard@kleinhans.info>",
@@ -2747,10 +2748,10 @@
           },
           "id": "B09ZX7MS5B",
           "manufacturer": "amazon",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-04-10T06:10:25",
           "max_power": 1.87,
           "sub_profile_count": 0,
-          "hash": "c3a35b2b27ee238092ee097b81a8bfdd"
+          "hash": "76f6608db5fea7ab07e5adb7791230a9"
         },
         {
           "aliases": [
@@ -2783,6 +2784,9 @@
           "hash": "95db3ca683031ae78cc50ac4bcf65157"
         },
         {
+          "aliases": [
+            "A2H4LV5GIZ1JFT"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2026-01-06T16:03:37Z",
           "device_type": "smart_speaker",
@@ -2802,10 +2806,10 @@
           },
           "id": "B7W644",
           "manufacturer": "amazon",
-          "updated_at": "2026-02-14T08:19:51",
+          "updated_at": "2026-04-10T06:10:25",
           "max_power": 4.03,
           "sub_profile_count": 0,
-          "hash": "e9f2838132bf9a3117e2a3512d55cc56"
+          "hash": "4a96978b267c42418249c48c614b95b6"
         },
         {
           "aliases": [
@@ -2840,6 +2844,9 @@
           "hash": "0935e04d7965e3fdc9f940315682c475"
         },
         {
+          "aliases": [
+            "G2A0V704840708AP"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2026-01-06T15:18:39Z",
           "device_type": "smart_speaker",
@@ -2859,12 +2866,15 @@
           },
           "id": "L9D29R",
           "manufacturer": "amazon",
-          "updated_at": "2026-02-14T08:19:51",
+          "updated_at": "2026-04-10T06:10:25",
           "max_power": 6.24,
           "sub_profile_count": 0,
-          "hash": "1575cc7df042da78fd6be601fc230e25"
+          "hash": "13b3d548f47341cc5ac04dd26f69e116"
         },
         {
+          "aliases": [
+            "A1Z88NGR2BK6A2"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2026-01-06T16:49:11Z",
           "device_type": "smart_speaker",
@@ -2884,10 +2894,10 @@
           },
           "id": "C7H6N3",
           "manufacturer": "amazon",
-          "updated_at": "2026-02-14T08:19:51",
+          "updated_at": "2026-04-10T06:10:25",
           "max_power": 7.73,
           "sub_profile_count": 0,
-          "hash": "ccf39cc4b943d97085dbb5f0371f0ac2"
+          "hash": "5f467a07109bea32802149d4155c3068"
         },
         {
           "aliases": [
@@ -2920,6 +2930,9 @@
           "hash": "4c9932826ca9e7bb9bce23cc86cc9ab4"
         },
         {
+          "aliases": [
+            "A3S5BH2HU6VAYF"
+          ],
           "author": "zenzmatz <eric.021292@gmail.com>",
           "calculation_strategy": "linear",
           "created_at": "2025-05-06T13:39:22Z",
@@ -2940,12 +2953,15 @@
           },
           "id": "RS03QR",
           "manufacturer": "amazon",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-04-10T06:10:25",
           "max_power": 2.71,
           "sub_profile_count": 0,
-          "hash": "5cccfbb048b2593ccc59ae90c89ae80f"
+          "hash": "59a472e793f89bdc51a959ad996bdecb"
         },
         {
+          "aliases": [
+            "A4ZP7ZC4PI6TO"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2026-01-06T16:14:18Z",
           "device_type": "smart_speaker",
@@ -2965,10 +2981,10 @@
           },
           "id": "H23K37",
           "manufacturer": "amazon",
-          "updated_at": "2026-02-14T08:19:51",
+          "updated_at": "2026-04-10T06:10:25",
           "max_power": 4.36,
           "sub_profile_count": 0,
-          "hash": "e567b36f36c7812fdb4d115f8e9e3524"
+          "hash": "3a34bbfaaf12a59f9bb57ad95a264225"
         },
         {
           "aliases": [
@@ -3648,6 +3664,73 @@
       ],
       "device_types": [
         "smart_switch"
+      ]
+    },
+    {
+      "aliases": [],
+      "name": "tripp_lite",
+      "full_name": "Tripp Lite",
+      "dir_name": "tripp_lite",
+      "models": [
+        {
+          "name": "Tripp Lite UPS",
+          "description": "Generic power profile for Tripp Lite UPS devices. Estimates real-time power consumption from load percentage, nominal VA rating, and power factor.",
+          "device_type": "ups",
+          "calculation_strategy": "fixed",
+          "compatible_integrations": [
+            "nut"
+          ],
+          "created_at": "2026-03-20T00:00:00Z",
+          "measure_method": "manual",
+          "measure_device": "N/A",
+          "fields": {
+            "load_entity": {
+              "label": "Load percentage entity",
+              "description": "The NUT sensor showing UPS load percentage (0-100%)",
+              "selector": {
+                "entity": {
+                  "domain": "sensor"
+                }
+              }
+            },
+            "nominal_va": {
+              "label": "Nominal Power (VA)",
+              "description": "The VA rating of your UPS (found on the label or the Nominal Power entity)",
+              "selector": {
+                "number": {
+                  "min": 100,
+                  "max": 10000
+                }
+              }
+            },
+            "power_factor": {
+              "label": "Power Factor",
+              "description": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 1.0 for resistive loads like heaters. Default: 0.6",
+              "selector": {
+                "number": {
+                  "min": 0.1,
+                  "max": 1.0,
+                  "step": 0.1
+                }
+              }
+            }
+          },
+          "author_info": {
+            "name": "Brian Egge",
+            "github": "brianegge",
+            "email": "brianegge@gmail.com"
+          },
+          "author": "Brian Egge",
+          "id": "Tripplite",
+          "manufacturer": "tripp_lite",
+          "updated_at": "2026-04-10T05:53:40",
+          "max_power": 0,
+          "sub_profile_count": 0,
+          "hash": "26ba073500247c07890028ec5583271b"
+        }
+      ],
+      "device_types": [
+        "ups"
       ]
     },
     {
@@ -4359,13 +4442,13 @@
           },
           "id": "rockrobo.vacuum.v1",
           "manufacturer": "roborock",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-04-11T07:12:15",
           "max_power": null,
           "sub_profile_count": 0,
           "color_modes": [
             "tapering"
           ],
-          "hash": "7a4f7d983cf809c81aed9056489fecbe"
+          "hash": "d7093d518345c9a6268a4034771313ed"
         }
       ],
       "device_types": [
@@ -5437,6 +5520,10 @@
       "models": [
         {
           "aliases": [
+            "20ECF6001",
+            "20EBO8301",
+            "20ECL1301",
+            "20EBT8601",
             "20EBU4101"
           ],
           "author": "dxmnkd316 <46753733+dxmnkd316@users.noreply.github.com>",
@@ -5455,10 +5542,10 @@
           },
           "id": "20EBU4101",
           "manufacturer": "eve",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-04-12T12:10:28",
           "max_power": 0.9,
           "sub_profile_count": 0,
-          "hash": "a48027b031515e3f9c51ed8da2cfaa4b"
+          "hash": "88ae3cb0bd00da4a456370431a8995e4"
         }
       ],
       "device_types": [
@@ -6641,6 +6728,55 @@
       ]
     },
     {
+      "aliases": [
+        "Tripplite"
+      ],
+      "name": "tripp lite",
+      "full_name": "Tripp Lite",
+      "dir_name": "tripp lite",
+      "models": [
+        {
+          "name": "Tripp Lite UPS",
+          "aliases": [
+            "Tripplite"
+          ],
+          "device_type": "ups",
+          "calculation_strategy": "fixed",
+          "discovery_by": "device",
+          "compatible_integrations": [
+            "nut"
+          ],
+          "created_at": "2026-03-20T00:00:00Z",
+          "measure_method": "manual",
+          "measure_device": "N/A",
+          "documentation_url": "https://docs.powercalc.nl/cookbook/ups/",
+          "fields": {
+            "power_factor": {
+              "label": "Power Factor",
+              "description": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters. [See docs](https://docs.powercalc.nl/cookbook/ups/)",
+              "default": 0.7,
+              "selector": {
+                "number": {
+                  "min": 0.1,
+                  "max": 1.0,
+                  "step": 0.1
+                }
+              }
+            }
+          },
+          "id": "Tripp Lite UPS",
+          "manufacturer": "tripp lite",
+          "updated_at": "2026-04-12T13:31:19",
+          "max_power": 0,
+          "sub_profile_count": 0,
+          "hash": "8599881f753f1cb55f834755d4e2b908"
+        }
+      ],
+      "device_types": [
+        "ups"
+      ]
+    },
+    {
       "aliases": [],
       "name": "ecodim",
       "full_name": "Ecodim",
@@ -7539,7 +7675,8 @@
         },
         {
           "aliases": [
-            "261"
+            "261",
+            "262"
           ],
           "author": "Bob Shaker <bobshaker1@gmail.com>",
           "calculation_strategy": "fixed",
@@ -7558,10 +7695,10 @@
           },
           "id": "P110M",
           "manufacturer": "tp-link",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-04-11T06:41:33",
           "max_power": 1.2,
           "sub_profile_count": 0,
-          "hash": "c9668d97d8f64d79cd38ccf6c62f4558"
+          "hash": "407255a463fd09499d936c9693dc4b50"
         },
         {
           "aliases": [
@@ -10373,7 +10510,8 @@
           "aliases": [
             "1741430P7",
             "1741530P7",
-            "1741830P7"
+            "1741830P7",
+            "1742830P7"
           ],
           "author": "mariwing <mariwing@gmail.com>",
           "calculation_strategy": "lut",
@@ -10394,14 +10532,14 @@
           },
           "id": "LCS001",
           "manufacturer": "signify",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-04-10T06:21:42",
           "max_power": 10.61,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "9b06cba34dff1aade00fd4f2e54b519c"
+          "hash": "5be8be73aabdc96e5c684dea8e6b515c"
         },
         {
           "aliases": [
@@ -12328,10 +12466,7 @@
             "929003808201_04",
             "929003808101_01",
             "929003808101_02",
-            "929003808101_03",
-            "929003808901_03",
-            "929003808901_04",
-            "929003808901_05"
+            "929003808101_03"
           ],
           "author": "Wouter Rutgers <git@wouterrutgers.nl>",
           "calculation_strategy": "lut",
@@ -12344,7 +12479,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.12:docker"
           },
-          "name": "Hue white and color GU10 4.2W 400lm",
+          "name": "Hue Argenta color spot",
           "standby_power": 0.14,
           "author_info": {
             "name": "Wouter Rutgers",
@@ -12353,14 +12488,14 @@
           },
           "id": "929003808201",
           "manufacturer": "signify",
-          "updated_at": "2026-04-12T13:40:06",
+          "updated_at": "2026-01-24T15:57:02",
           "max_power": 4.28,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "a192400e7b66b1a69b6beeae1418b809"
+          "hash": "0cb6e8b54bb4fdd77fe7eda5be8f054e"
         },
         {
           "aliases": [
@@ -13246,6 +13381,35 @@
             "hs"
           ],
           "hash": "1dc81e8b78672472f4f5315ecae348f0"
+        },
+        {
+          "calculation_strategy": "lut",
+          "created_at": "2026-04-06T18:05:55Z",
+          "device_type": "light",
+          "measure_device": "TP-Link Kasa KP115",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2,
+            "VERSION": "v1.20.11:docker"
+          },
+          "name": "Hue Festavia Outdoor White & Colour Gradient Globe String Lights, 14m",
+          "standby_power": 0.38,
+          "author_info": {
+            "name": "phoenixxx-1",
+            "github": "phoenixxx-1"
+          },
+          "author": "phoenixxx-1",
+          "id": "LCX028",
+          "manufacturer": "signify",
+          "updated_at": "2026-04-11T19:26:12",
+          "max_power": 19.45,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "hash": "34641a335d1141d120a13b161e6018f9"
         },
         {
           "aliases": [
@@ -17138,6 +17302,31 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "hash": "48feed0a1596a3323dad6660e9a998e3"
+        },
+        {
+          "aliases": [
+            "INSPELNING Smart plug"
+          ],
+          "author": "Patrick Lehner <lehnerpat@users.noreply.github.com>",
+          "calculation_strategy": "fixed",
+          "created_at": "2026-04-08T10:46:42Z",
+          "device_type": "smart_switch",
+          "measure_device": "Ketotek KTEM02BL Electricity Monitor",
+          "measure_method": "manual",
+          "name": "INSPELNING smart plug",
+          "only_self_usage": true,
+          "standby_power": 0.2,
+          "standby_power_on": 0.7,
+          "author_info": {
+            "name": "Patrick Lehner",
+            "github": "lehnerpat"
+          },
+          "id": "E2221",
+          "manufacturer": "ikea",
+          "updated_at": "2026-04-10T06:18:32",
+          "max_power": 0.7,
+          "sub_profile_count": 0,
+          "hash": "b912772b372eb846cf844698f846776d"
         },
         {
           "aliases": [
