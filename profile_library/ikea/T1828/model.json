@@ -1,4 +1,5 @@
 {
+  "aliases": ["GUNNARP panel round"],
   "calculation_strategy": "lut",
   "created_at": "2026-04-06T17:34:33Z",
   "device_type": "light",
