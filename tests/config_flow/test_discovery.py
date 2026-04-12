@@ -118,6 +118,33 @@ async def test_discovery_flow_remarks_are_hidden_when_translation_key_entities_r
     assert result["description_placeholders"]["remarks"] is None
 
 
+async def test_discovery_flow_uses_device_name_as_source_placeholder(hass: HomeAssistant) -> None:
+    device_entry = DeviceEntry(
+        name="FooBar",
+        id="youless-device",
+        manufacturer="test",
+        model="discovery_type_device",
+    )
+    mock_device_registry(
+        hass,
+        {
+            device_entry.id: device_entry,
+        },
+    )
+    source_entity = SourceEntity(
+        object_id=device_entry.name,
+        name=device_entry.name,
+        entity_id=DUMMY_ENTITY_ID,
+        domain="sensor",
+        device_entry=device_entry,
+    )
+    power_profile = await get_power_profile(hass, {}, source_entity, ModelInfo("test", "discovery_type_device"))
+
+    result = await initialize_discovery_flow(hass, source_entity, power_profile)
+
+    assert result["description_placeholders"]["source"].endswith(": FooBar")
+
+
 async def test_discovery_flow_remarks_are_shown_when_translation_key_entity_missing(hass: HomeAssistant) -> None:
     device_entry = DeviceEntry(
         name="UPS",

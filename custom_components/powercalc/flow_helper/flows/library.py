@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.data_entry_flow import FlowResult
@@ -30,7 +30,7 @@ from custom_components.powercalc.flow_helper.dynamic_field_builder import build_
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE, build_sub_profile_schema
 from custom_components.powercalc.helpers import collect_placeholders, iter_related_entity_placeholders, resolve_related_entity_placeholder
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
-from custom_components.powercalc.power_profile.power_profile import DEVICE_TYPE_DOMAIN, DOMAIN_DEVICE_TYPE_MAPPING, DiscoveryBy
+from custom_components.powercalc.power_profile.power_profile import DEVICE_TYPE_DOMAIN, DOMAIN_DEVICE_TYPE_MAPPING, DiscoveryBy, PowerProfile
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
@@ -397,48 +397,77 @@ class LibraryConfigFlow(LibraryFlow):
         Ask the user to confirm this or forward to manual library selection.
         """
         if user_input is not None:
-            if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL) and self.flow.selected_profile:
-                self.flow.sensor_config.update(
-                    {
-                        CONF_MANUFACTURER: self.flow.selected_profile.manufacturer,
-                        CONF_MODEL: self.flow.selected_profile.model,
-                    },
-                )
-                return await self.async_step_post_library(user_input)
+            return await self._handle_library_confirmation(user_input)
 
+        await self._async_autodiscover_profile()
+        if not self.flow.selected_profile:
             return await self.async_step_manufacturer()
 
-        if self.flow.source_entity and self.flow.source_entity.entity_entry and self.flow.selected_profile is None:
-            self.flow.selected_profile = await get_power_profile_by_source_entity(self.flow.hass, self.flow.source_entity)
-        if self.flow.selected_profile:
-            remarks = self._get_conditional_remarks()
-            if remarks:
-                remarks = "\n\n" + remarks
+        return self._show_autodiscovered_profile_form()
 
-            translations = translation.async_get_cached_translations(self.flow.hass, self.flow.hass.config.language, "common", DOMAIN)
-            if self.flow.selected_profile.discovery_by == DiscoveryBy.DEVICE and self.flow.source_entity and self.flow.source_entity.device_entry:
-                source = f"{translations.get(f'component.{DOMAIN}.common.source_device')}: {self.flow.source_entity.device_entry.name}"
-            else:
-                source = f"{translations.get(f'component.{DOMAIN}.common.source_entity')}: {self.flow.source_entity_id}"
+    async def _handle_library_confirmation(self, user_input: dict[str, Any]) -> FlowResult:
+        """Handle the user's response to an autodiscovered library profile."""
+        if not user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL) or not self.flow.selected_profile:
+            return await self.async_step_manufacturer()
 
-            documentation_url = self.flow.selected_profile.documentation_url
-            if documentation_url:
-                remarks = (remarks or "") + f"\n\n[Documentation]({documentation_url})"
+        self.flow.sensor_config.update(
+            {
+                CONF_MANUFACTURER: self.flow.selected_profile.manufacturer,
+                CONF_MODEL: self.flow.selected_profile.model,
+            },
+        )
+        return await self.async_step_post_library(user_input)
 
-            return self.flow.async_show_form(
+    async def _async_autodiscover_profile(self) -> None:
+        """Populate the selected profile from the source entity when possible."""
+        if not self.flow.source_entity or not self.flow.source_entity.entity_entry or self.flow.selected_profile is not None:
+            return
+
+        self.flow.selected_profile = await get_power_profile_by_source_entity(self.flow.hass, self.flow.source_entity)
+
+    def _show_autodiscovered_profile_form(self) -> FlowResult:
+        """Show the confirmation form for an autodiscovered library profile."""
+        profile = self.flow.selected_profile
+        assert profile is not None
+
+        return cast(
+            FlowResult,
+            self.flow.async_show_form(
                 step_id=Step.LIBRARY,
-                description_placeholders={
-                    "remarks": remarks,  # type: ignore
-                    "manufacturer": self.flow.selected_profile.manufacturer,
-                    "model": self.flow.selected_profile.model,
-                    "source": source,
-                },
+                description_placeholders=self._build_library_description_placeholders(profile),
                 data_schema=SCHEMA_POWER_AUTODISCOVERED,
                 errors={},
                 last_step=False,
-            )
+            ),
+        )
 
-        return await self.async_step_manufacturer()
+    def _build_library_description_placeholders(self, profile: PowerProfile) -> dict[str, Any]:
+        """Build the placeholders for the autodiscovered profile confirmation form."""
+        return {
+            "remarks": self._build_library_remarks(profile),
+            "manufacturer": profile.manufacturer,
+            "model": profile.model,
+            "source": self._get_profile_source(profile),
+        }
+
+    def _build_library_remarks(self, profile: PowerProfile) -> str | None:
+        """Build the remarks text for the autodiscovered profile confirmation form."""
+        remarks = self._get_conditional_remarks()
+        if remarks:
+            remarks = "\n\n" + remarks
+
+        if profile.documentation_url:
+            return (remarks or "") + f"\n\n[Documentation]({profile.documentation_url})"
+
+        return remarks
+
+    def _get_profile_source(self, profile: PowerProfile) -> str:
+        """Build the autodiscovery source description."""
+        translations = translation.async_get_cached_translations(self.flow.hass, self.flow.hass.config.language, "common", DOMAIN)
+        if profile.discovery_by == DiscoveryBy.DEVICE and self.flow.source_entity and self.flow.source_entity.device_entry:
+            return f"{translations.get(f'component.{DOMAIN}.common.source_device')}: {self.flow.source_entity.device_entry.name}"
+
+        return f"{translations.get(f'component.{DOMAIN}.common.source_entity')}: {self.flow.source_entity_id}"
 
     def _get_conditional_remarks(self) -> str | None:
         """Get discovery remarks, only showing them if required entities are missing."""
