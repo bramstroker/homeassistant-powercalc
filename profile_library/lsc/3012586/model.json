@@ -1,0 +1,17 @@
+{
+  "manufacturer": "LSC",
+  "model": "3012586",
+  "name": "Frameless Ceiling Light",
+  "created_at": "2026-04-07T11:55:06Z",
+  "calculation_strategy": "lut",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 5,
+    "VERSION": "master"
+  },
+  "standby_power": 0.05
+}
