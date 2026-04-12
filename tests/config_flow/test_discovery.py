@@ -69,7 +69,8 @@ async def test_discovery_flow_remarks_are_shown(hass: HomeAssistant) -> None:
     assert result["description_placeholders"]["remarks"] is not None
 
 
-async def test_discovery_flow_remarks_are_hidden_when_translation_key_entities_resolve(hass: HomeAssistant) -> None:
+async def _setup_ups_discovery_flow(hass: HomeAssistant) -> tuple[SourceEntity, data_entry_flow.FlowResult]:
+    """Set up UPS device with translation key entities and initialize discovery flow."""
     device_entry = DeviceEntry(
         name="UPS",
         id="ups-device",
@@ -114,6 +115,11 @@ async def test_discovery_flow_remarks_are_hidden_when_translation_key_entities_r
     )
 
     result = await initialize_discovery_flow(hass, source_entity, power_profile)
+    return source_entity, result
+
+
+async def test_discovery_flow_remarks_are_hidden_when_translation_key_entities_resolve(hass: HomeAssistant) -> None:
+    _, result = await _setup_ups_discovery_flow(hass)
 
     assert result["description_placeholders"]["remarks"] is None
 
@@ -188,50 +194,7 @@ async def test_discovery_flow_remarks_are_shown_when_translation_key_entity_miss
 
 
 async def test_discovery_flow_auto_resolves_availability_entity_from_translation_key(hass: HomeAssistant) -> None:
-    device_entry = DeviceEntry(
-        name="UPS",
-        id="ups-device",
-        manufacturer="test",
-        model="discovery_translation_key",
-    )
-    mock_device_registry(
-        hass,
-        {
-            device_entry.id: device_entry,
-        },
-    )
-    mock_registry(
-        hass,
-        {
-            "sensor.ups_output": RegistryEntryWithDefaults(
-                entity_id="sensor.ups_output",
-                unique_id="ups_output",
-                device_id=device_entry.id,
-                platform="test",
-            ),
-            "sensor.ups_nominal_power": RegistryEntryWithDefaults(
-                entity_id="sensor.ups_nominal_power",
-                unique_id="ups_nominal_power",
-                device_id=device_entry.id,
-                platform="test",
-                translation_key="ups_power_nominal",
-            ),
-        },
-    )
-
-    source_entity = await create_source_entity("sensor.ups_output", hass)
-    power_profile = await get_power_profile(
-        hass,
-        {
-            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("discovery_translation_key"),
-            CONF_MANUFACTURER: "test",
-            CONF_MODEL: "discovery_translation_key",
-        },
-        source_entity,
-        process_variables=False,
-    )
-
-    result = await initialize_discovery_flow(hass, source_entity, power_profile)
+    _, result = await _setup_ups_discovery_flow(hass)
     result = await confirm_auto_discovered_model(hass, result)
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
