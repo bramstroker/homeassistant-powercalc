@@ -3598,11 +3598,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "color_temp",
-            "hs",
-            "brightness"
+            "hs"
           ],
-          "hash": "093a10a8ca4d44b9fe81dccd4c7ad99d"
+          "hash": "ed8c6f8ad83348d686cdce499f97ea56"
         }
       ],
       "device_types": [
@@ -4166,11 +4166,11 @@
           "max_power": 8.43,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "color_temp",
-            "hs",
-            "effect"
+            "hs"
           ],
-          "hash": "0fe99fa744a2e295cb5b27223c8fb6b6"
+          "hash": "95044b79d5af8c9f772224706e31a8fb"
         },
         {
           "author": "Jari Eskelinen <jari.eskelinen@iki.fi>",
@@ -6764,12 +6764,18 @@
               }
             }
           },
+          "author_info": {
+            "name": "Brian Egge",
+            "github": "brianegge",
+            "email": "brianegge@gmail.com"
+          },
+          "author": "Brian Egge",
           "id": "Tripp Lite UPS",
           "manufacturer": "tripp lite",
-          "updated_at": "2026-04-12T13:31:19",
+          "updated_at": "2026-04-12T13:31:47",
           "max_power": 0,
           "sub_profile_count": 0,
-          "hash": "8599881f753f1cb55f834755d4e2b908"
+          "hash": "09abf6ee449d3947ac9b8285f62a4d73"
         }
       ],
       "device_types": [
@@ -7503,10 +7509,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
-          "hash": "601aa03751c813e5be58a4bb7f7e6dc4"
+          "hash": "caf8dfd4b1c3b1fe7249fe105af3229a"
         },
         {
           "aliases": [
@@ -7827,11 +7833,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "color_temp",
-            "hs",
-            "brightness"
+            "hs"
           ],
-          "hash": "d052fc6af6651711424ee95027cd5ed0"
+          "hash": "21e279d64e6840a6f75b4f41fe8ce9c6"
         },
         {
           "author": "belledesire",
@@ -12466,7 +12472,10 @@
             "929003808201_04",
             "929003808101_01",
             "929003808101_02",
-            "929003808101_03"
+            "929003808101_03",
+            "929003808901_03",
+            "929003808901_04",
+            "929003808901_05"
           ],
           "author": "Wouter Rutgers <git@wouterrutgers.nl>",
           "calculation_strategy": "lut",
@@ -12479,7 +12488,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.12:docker"
           },
-          "name": "Hue Argenta color spot",
+          "name": "Hue white and color GU10 4.2W 400lm",
           "standby_power": 0.14,
           "author_info": {
             "name": "Wouter Rutgers",
@@ -12488,14 +12497,14 @@
           },
           "id": "929003808201",
           "manufacturer": "signify",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-04-12T13:40:06",
           "max_power": 4.28,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "0cb6e8b54bb4fdd77fe7eda5be8f054e"
+          "hash": "a192400e7b66b1a69b6beeae1418b809"
         },
         {
           "aliases": [
@@ -14701,10 +14710,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hsv"
+            "hsv",
+            "color_temp"
           ],
-          "hash": "3e464c0176ec662f83574fc0a53ed9a7"
+          "hash": "b251dc0be1a14126c86df718939fdab2"
         },
         {
           "aliases": [
@@ -18990,10 +18999,10 @@
           "max_power": 30.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "hs",
+            "color_temp"
           ],
-          "hash": "8f0a9c7b0973278842f34a10e6f13321"
+          "hash": "c55dada3b3842a722f7b82149075fc2b"
         },
         {
           "aliases": [
@@ -19377,10 +19386,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "brightness"
+            "brightness",
+            "color_temp"
           ],
-          "hash": "c5ca2ab9fef230d19eb19dbfdb6bbc98"
+          "hash": "a803a0424627baf0efcf5e7c682be4f8"
         },
         {
           "author": "Pasquale Cuorpo <maverick1982@users.noreply.github.com>",
@@ -20552,11 +20561,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "color_temp",
-            "hs",
-            "effect"
+            "hs"
           ],
-          "hash": "953b3637b3a77c46dc7513ada8de63cd"
+          "hash": "87712518a23226a5947ad8501a350aed"
         },
         {
           "author": "Benjamin Neff <benjamin@coding4coffee.ch>",
@@ -20613,11 +20622,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "color_temp",
-            "hs",
-            "effect"
+            "hs"
           ],
-          "hash": "ca835c2c050c377470043f69d75e0e45"
+          "hash": "b558995e3b047c8d8c5921b74736b8f4"
         },
         {
           "author": "gobbli",
@@ -20643,11 +20652,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "color_temp",
-            "hs",
-            "effect"
+            "hs"
           ],
-          "hash": "fc32a8e4378dd50d1ba5f7b508e89fb3"
+          "hash": "5fd6bf12289b916338b4a7954940dfd9"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -20824,10 +20833,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
+          "hash": "b8ba79c307b90439d3849a26bc5a829e"
         },
         {
           "author": "Sku1ly <45756272+Sku1ly@users.noreply.github.com>",
@@ -20853,11 +20862,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "color_temp",
-            "hs",
-            "brightness"
+            "hs"
           ],
-          "hash": "122422e9e192228b497e67739887f350"
+          "hash": "7a39dbf6da62530b8a004e954f9cfc8d"
         },
         {
           "calculation_strategy": "lut",
@@ -20884,11 +20893,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "color_temp",
-            "hs",
-            "effect"
+            "hs"
           ],
-          "hash": "2ea3e415936623fe485ee433c5d5a8e3"
+          "hash": "c5f06f7ac36512536168a0f496155dfb"
         }
       ],
       "device_types": [
