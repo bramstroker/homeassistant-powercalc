@@ -3582,11 +3582,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "color_temp",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "ed8c6f8ad83348d686cdce499f97ea56"
+          "hash": "093a10a8ca4d44b9fe81dccd4c7ad99d"
         }
       ],
       "device_types": [
@@ -4083,11 +4083,11 @@
           "max_power": 8.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "95044b79d5af8c9f772224706e31a8fb"
+          "hash": "0fe99fa744a2e295cb5b27223c8fb6b6"
         },
         {
           "author": "Jari Eskelinen <jari.eskelinen@iki.fi>",
@@ -7367,10 +7367,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "caf8dfd4b1c3b1fe7249fe105af3229a"
+          "hash": "601aa03751c813e5be58a4bb7f7e6dc4"
         },
         {
           "aliases": [
@@ -7690,11 +7690,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "color_temp",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "21e279d64e6840a6f75b4f41fe8ce9c6"
+          "hash": "d052fc6af6651711424ee95027cd5ed0"
         },
         {
           "author": "belledesire",
@@ -12675,39 +12675,6 @@
           "hash": "a1baeee8a13e7159cadd9c8ed78b47a1"
         },
         {
-          "aliases": [
-            "929003808901_03",
-            "929003808901_04",
-            "929003808901_05"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2026-03-30T14:45:01Z",
-          "device_type": "light",
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.20.11:docker"
-          },
-          "name": "Hue White and Color 400lm GU10",
-          "standby_power": 0.09,
-          "author_info": {
-            "name": "Tim",
-            "github": "EinRainerZufall"
-          },
-          "id": "929003808901_02",
-          "manufacturer": "signify",
-          "updated_at": "2026-03-30T16:09:22",
-          "max_power": 4.13,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "hash": "fa5809a3b82200f4e835ec6abd3151e3"
-        },
-        {
           "author": "Bram Gerritsen <bgerritsen@gmail.com>",
           "calculation_strategy": "fixed",
           "created_at": "2026-01-25T11:34:00Z",
@@ -14570,10 +14537,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "hsv",
-            "color_temp"
+            "color_temp",
+            "hsv"
           ],
-          "hash": "b251dc0be1a14126c86df718939fdab2"
+          "hash": "3e464c0176ec662f83574fc0a53ed9a7"
         },
         {
           "aliases": [
@@ -19221,10 +19188,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "a803a0424627baf0efcf5e7c682be4f8"
+          "hash": "c5ca2ab9fef230d19eb19dbfdb6bbc98"
         },
         {
           "author": "Pasquale Cuorpo <maverick1982@users.noreply.github.com>",
@@ -20396,11 +20363,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "87712518a23226a5947ad8501a350aed"
+          "hash": "953b3637b3a77c46dc7513ada8de63cd"
         },
         {
           "author": "Benjamin Neff <benjamin@coding4coffee.ch>",
@@ -20457,11 +20424,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "b558995e3b047c8d8c5921b74736b8f4"
+          "hash": "ca835c2c050c377470043f69d75e0e45"
         },
         {
           "author": "gobbli",
@@ -20487,11 +20454,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "5fd6bf12289b916338b4a7954940dfd9"
+          "hash": "fc32a8e4378dd50d1ba5f7b508e89fb3"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -20668,10 +20635,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "b8ba79c307b90439d3849a26bc5a829e"
+          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
         },
         {
           "author": "Sku1ly <45756272+Sku1ly@users.noreply.github.com>",
@@ -20697,11 +20664,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "color_temp",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "7a39dbf6da62530b8a004e954f9cfc8d"
+          "hash": "122422e9e192228b497e67739887f350"
         },
         {
           "calculation_strategy": "lut",
@@ -20728,11 +20695,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "c5f06f7ac36512536168a0f496155dfb"
+          "hash": "2ea3e415936623fe485ee433c5d5a8e3"
         }
       ],
       "device_types": [
