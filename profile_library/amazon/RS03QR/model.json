@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "A3S5BH2HU6VAYF"
+  ],
   "author": "zenzmatz <eric.021292@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",

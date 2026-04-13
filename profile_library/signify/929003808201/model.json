@@ -6,7 +6,10 @@
     "929003808201_04",
     "929003808101_01",
     "929003808101_02",
-    "929003808101_03"
+    "929003808101_03",
+    "929003808901_03",
+    "929003808901_04",
+    "929003808901_05"
   ],
   "author": "Wouter Rutgers <git@wouterrutgers.nl>",
   "calculation_strategy": "lut",
@@ -20,7 +23,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.12:docker"
   },
-  "name": "Hue Argenta color spot",
+  "name": "Hue white and color GU10 4.2W 400lm",
   "standby_power": 0.14,
   "author_info": {
     "name": "Wouter Rutgers",

@@ -2,6 +2,10 @@ name: Update profile library
 
 on:
   pull_request:
+    types:
+      - closed
+    branches:
+      - master
     paths:
       - '.github/scripts/profile_library/**'
   push:
@@ -14,6 +18,7 @@ on:
 jobs:
   format:
     name: Update profile library
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -82,7 +82,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
             return entry.entity_id
 
         if self._light_entity.entity_entry:
-            entity = get_related_entity_by_device_class(self._hass, self._light_entity.entity_entry, SensorDeviceClass.CURRENT)
+            entity = get_related_entity_by_device_class(self._hass, self._light_entity, SensorDeviceClass.CURRENT)
             if entity:
                 return entity
 

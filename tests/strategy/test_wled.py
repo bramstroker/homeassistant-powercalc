@@ -82,6 +82,17 @@ async def test_find_estimated_current_entity_by_device_class(
     By default we will search for estimated_current entity by naming convention _estimated_current
     When none is found we check for entities on the same WLED device with device_class current
     """
+    mock_device_registry(
+        hass,
+        {
+            "wled-device-id": DeviceEntry(
+                id="wled-device-id",
+                manufacturer="WLED",
+                model="WLED",
+            ),
+        },
+    )
+
     mock_registry(
         hass,
         {
@@ -273,6 +284,18 @@ async def test_estimated_current_sensor_unavailable(hass: HomeAssistant, caplog:
     """Test that a warning is logged when estimated current sensor is unavailable."""
 
     caplog.set_level(logging.WARNING)
+
+    mock_device_registry(
+        hass,
+        {
+            "wled-device-id": DeviceEntry(
+                id="wled-device-id",
+                manufacturer="WLED",
+                model="WLED",
+            ),
+        },
+    )
+
     mock_registry(
         hass,
         {

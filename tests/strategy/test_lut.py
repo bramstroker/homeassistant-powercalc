@@ -197,9 +197,19 @@ async def test_effect_not_found_logs_warning(hass: HomeAssistant, caplog: pytest
     assert 'Effect "NonExistingEffect" not found in LUT' in caplog.text
 
 
-async def test_lut_effect_off_is_ignored(
+@pytest.mark.parametrize(
+    "effect",
+    [
+        "off",
+        "Off",
+        "White",
+        "None",
+    ],
+)
+async def test_lut_effect_is_ignored(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
+    effect: str,
 ) -> None:
     """
     Test that 'off' effect is ignored for LUT strategy and it falls back to normal LUT lookup.
@@ -216,14 +226,14 @@ async def test_lut_effect_off_is_ignored(
             {
                 ATTR_COLOR_MODE: ColorMode.BRIGHTNESS,
                 ATTR_BRIGHTNESS: 255,
-                ATTR_EFFECT: "Off",
+                ATTR_EFFECT: effect,
             },
         ),
         expected_power=None,
     )
 
     assert "Effects not supported for this power profile" not in caplog.text
-    assert 'Effect "off" not found in LUT' not in caplog.text
+    assert f'Effect "{effect.lower()}" not found in LUT' not in caplog.text
 
 
 async def test_hs_lut_attribute_none(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:

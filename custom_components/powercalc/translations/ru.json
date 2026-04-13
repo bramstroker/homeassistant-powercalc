@@ -262,6 +262,15 @@
         "description": "{source}\n\nПроизводитель \"{manufacturer}\" и модель \"{model}\" были автоматически определены для вашего устройства.{remarks}",
         "title": "Библиотека"
       },
+      "library_custom_fields": {
+        "title": "Profile configuration",
+        "data": {
+          "power_factor": "Power Factor"
+        },
+        "data_description": {
+          "power_factor": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters."
+        }
+      },
       "library_multi_profile": {
         "data": {
           "model": "Выберите модель"

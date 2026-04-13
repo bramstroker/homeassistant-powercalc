@@ -1,0 +1,23 @@
+{
+  "aliases": [
+    "GUNNARP panel round"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-04-06T17:34:33Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug S",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.11:docker"
+  },
+  "name": "GUNNARP LED Ceiling / Wall Lamp 40cm",
+  "standby_power": 0.05,
+  "author_info": {
+    "name": "Servox3",
+    "github": "Servox3"
+  },
+  "author": "Servox3"
+}

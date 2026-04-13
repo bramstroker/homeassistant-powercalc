@@ -48,6 +48,9 @@ ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
 ENTRY_DATA_POWER_ENTITY = "_power_entity"
 ENTRY_GLOBAL_CONFIG_UNIQUE_ID = "powercalc_global_configuration"
 
+PLACEHOLDER_ENTITY_BY_DEVICE_CLASS = "entity_by_device_class:"
+PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY = "entity_by_translation_key:"
+
 DUMMY_ENTITY_ID = "sensor.dummy"
 
 CONF_ALL = "all"

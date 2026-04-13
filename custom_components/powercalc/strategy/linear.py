@@ -239,7 +239,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             # For vacuum cleaner and lawn mower, battery level is a separate entity
             related_entity = get_related_entity_by_device_class(
                 self._hass,
-                self._source_entity.entity_entry,
+                self._source_entity,
                 SensorDeviceClass.BATTERY,
             )
             if not related_entity:

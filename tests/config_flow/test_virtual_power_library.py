@@ -1,12 +1,13 @@
 import logging
 
 from homeassistant import data_entry_flow
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.selector import SelectSelector
 import pytest
-from pytest_homeassistant_custom_component.common import mock_device_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 import voluptuous as vol
 
 from custom_components.powercalc.common import create_source_entity
@@ -173,6 +174,63 @@ async def test_library_options_flow_raises_error_on_non_existing_power_profile(
 
     assert result["type"] == data_entry_flow.FlowResultType.ABORT
     assert result["reason"] == "model_not_supported"
+
+
+async def test_composite_library_profile_options_flow_builds_menu(
+    hass: HomeAssistant,
+) -> None:
+    mock_device_registry(
+        hass,
+        {
+            "vacuum1": DeviceEntry(
+                id="vacuum1",
+                manufacturer="roborock",
+                model="rockrobo.vacuum.v1",
+            ),
+        },
+    )
+
+    mock_registry(
+        hass,
+        {
+            "vacuum.robi": RegistryEntryWithDefaults(
+                entity_id="vacuum.robi",
+                unique_id="1111",
+                device_id="vacuum1",
+                platform="test",
+            ),
+            "sensor.robi_battery": RegistryEntryWithDefaults(
+                entity_id="sensor.robi_battery",
+                unique_id="2222",
+                device_id="vacuum1",
+                device_class=SensorDeviceClass.BATTERY,
+                platform="test",
+            ),
+        },
+    )
+
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "vacuum.robi",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "roborock",
+            CONF_MODEL: "rockrobo.vacuum.v1",
+        },
+    )
+
+    result = await hass.config_entries.options.async_init(
+        entry.entry_id,
+        data=None,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.MENU
+    assert result["step_id"] == Step.INIT
+    assert result["menu_options"] == [
+        Step.BASIC_OPTIONS,
+        Step.LIBRARY_OPTIONS,
+        Step.ADVANCED_OPTIONS,
+    ]
 
 
 async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) -> None:
@@ -456,6 +514,43 @@ async def test_sub_profile_selection_discovery_by_device(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+
+async def test_discovery_flow_documentation_url_in_remarks(hass: HomeAssistant) -> None:
+    """When model.json has documentation_url, it should appear as a link in the discovery remarks."""
+    source_entity = await create_source_entity("sensor.test", hass)
+    power_profile = await get_power_profile(hass, {}, source_entity, ModelInfo("test", "ups"), process_variables=False)
+    result = await initialize_discovery_flow(hass, source_entity, power_profile)
+
+    assert result["step_id"] == Step.LIBRARY
+    remarks = result["description_placeholders"]["remarks"]
+    assert "[Documentation](https://docs.powercalc.nl/cookbook/ups/)" in remarks
+
+
+async def test_custom_fields_documentation_url_placeholder(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """When model.json has documentation_url, the custom fields step should include it in description_placeholders."""
+    mock_entity_with_model_information(
+        ["sensor.test", "sensor.load"],
+        "test",
+        "ups",
+    )
+
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "sensor.test"},
+    )
+    assert result["step_id"] == Step.LIBRARY
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+    )
+    assert result["step_id"] == Step.LIBRARY_CUSTOM_FIELDS
+    assert result["description_placeholders"]["documentation_url"] == "https://docs.powercalc.nl/cookbook/ups/"
 
 
 async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:

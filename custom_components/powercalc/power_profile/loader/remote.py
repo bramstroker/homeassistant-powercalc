@@ -10,7 +10,6 @@ from typing import Any, NotRequired, TypedDict, cast
 
 import aiohttp
 from aiohttp import ClientError
-import async_timeout
 from awesomeversion import AwesomeVersion
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -143,7 +142,7 @@ class RemoteLoader(Loader):
             session = async_get_clientsession(self.hass)
 
             try:
-                async with async_timeout.timeout(TIMEOUT_SECONDS), session.get(ENDPOINT_LIBRARY) as resp:
+                async with asyncio.timeout(TIMEOUT_SECONDS), session.get(ENDPOINT_LIBRARY) as resp:
                     if resp.status != 200:
                         raise ProfileDownloadError(
                             f"Failed to download library.json, unexpected status code: {resp.status}",
@@ -328,7 +327,7 @@ class RemoteLoader(Loader):
         session = async_get_clientsession(self.hass)
 
         try:
-            async with async_timeout.timeout(TIMEOUT_SECONDS):
+            async with asyncio.timeout(TIMEOUT_SECONDS):
                 async with session.get(endpoint, params={"hash": model_hash}) as resp:
                     if resp.status != 200:
                         raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")

@@ -76,4 +76,33 @@ powercalc:
           {% endif %}
 ```
 
+## Tripp Lite UPS with NUT
+
+Currently, Tripp Lite UPS models that have a NUT integration may be automatically detected and set up by PowerCalc. Other models may be added in the future.
+
+Tripp Lite UPS devices expose a load percentage and volt-amps (VA) through NUT, but do not expose a watts power sensor — even though some models display watts on the front panel. Note that the watts shown on the panel represent the load power only, not including the idle power consumption of the UPS itself.
+
+Because the UPS does not expose watts directly, you need a **power factor** to convert VA to watts. You can calculate this by comparing the watts displayed on the front panel with the VA reported in Home Assistant at the same time, assuming your UPS load is relatively constant:
+
+```
+power_factor = watts_on_panel / VA_in_home_assistant
+```
+
+Typical power factor values:
+- **Computers and electronics**: 0.6–0.7
+- **Resistive loads (heaters, incandescent lights)**: ~1.0
+
+When you are building a custom library profile instead of writing YAML directly, you can reference the NUT entities on the same device with `[[entity_by_translation_key:...]]` placeholders:
+
+```json
+{
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_power_nominal]]') | float(0) * [[power_factor]] | float(0.7) }}"
+  }
+}
+```
+
+See [Variables](../library/variables.md) for more information about related-entity placeholders in `model.json`.
+
 These examples should provide a good starting point for monitoring the power consumption of various UPS devices. Remember to adjust the power values based on your specific UPS model's specifications or measurements.

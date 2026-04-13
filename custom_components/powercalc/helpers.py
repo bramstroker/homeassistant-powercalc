@@ -1,11 +1,11 @@
-from collections.abc import Callable, Coroutine
+from collections.abc import Callable, Coroutine, Iterable, Iterator
 import decimal
 from decimal import Decimal
 from functools import wraps
 import logging
 import os.path
 import re
-from typing import Any, TypeVar
+from typing import Any, NamedTuple, TypeVar
 import uuid
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
@@ -19,7 +19,12 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy
+from custom_components.powercalc.const import (
+    DUMMY_ENTITY_ID,
+    PLACEHOLDER_ENTITY_BY_DEVICE_CLASS,
+    PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
+    CalculationStrategy,
+)
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
@@ -91,6 +96,12 @@ P = TypeVar("P")  # Used for positional and keyword argument types
 R = TypeVar("R")  # Used for return type
 
 
+class RelatedEntityPlaceholderDefinition(NamedTuple):
+    prefix: str
+    lookup_label: str
+    resolver: Callable[[HomeAssistant, SourceEntity, str], str | None]
+
+
 def make_hashable(arg: Any) -> Any:  # noqa: ANN401
     """Convert unhashable arguments to hashable equivalents."""
     if isinstance(arg, set):
@@ -157,33 +168,143 @@ def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[s
         for match in matches:
             if match in replacements:
                 # Replace [[variable]] with its value
-                data = data.replace(f"[[{match}]]", replacements[match])
+                data = data.replace(f"[[{match}]]", str(replacements[match]))
     return data
+
+
+def iter_related_entity_placeholders(placeholders: Iterable[str]) -> Iterator[str]:
+    """Yield placeholders that need lookup against entities on the same device."""
+    for placeholder in placeholders:
+        if parse_related_entity_placeholder(placeholder):
+            yield placeholder
+
+
+def resolve_related_entity_placeholder(
+    hass: HomeAssistant,
+    placeholder: str,
+    source_entity: SourceEntity | None = None,
+) -> str | None:
+    """Resolve a single related-entity placeholder against the entity registry."""
+    if not source_entity:
+        return None
+
+    parsed_placeholder = parse_related_entity_placeholder(placeholder)
+    if not parsed_placeholder:
+        return None
+
+    definition, lookup_value = parsed_placeholder
+    return definition.resolver(hass, source_entity, lookup_value)
+
+
+def build_related_entity_placeholder_not_found_message(placeholder: str, source_entity_id: str) -> str:
+    parsed_placeholder = parse_related_entity_placeholder(placeholder)
+    if not parsed_placeholder:
+        return f"Could not find related entity for placeholder {placeholder} of entity {source_entity_id}"
+
+    definition, lookup_value = parsed_placeholder
+    return f"Could not find related entity for {definition.lookup_label} {lookup_value} of entity {source_entity_id}"
+
+
+def parse_related_entity_placeholder(placeholder: str) -> tuple[RelatedEntityPlaceholderDefinition, str] | None:
+    for definition in RELATED_ENTITY_PLACEHOLDER_DEFINITIONS:
+        if placeholder.startswith(definition.prefix):
+            return definition, placeholder.removeprefix(definition.prefix)
+    return None
+
+
+def _resolve_related_entity_by_device_class(
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    raw_device_class: str,
+) -> str | None:
+    device_class = _parse_related_entity_device_class(raw_device_class)
+    if device_class is None:
+        return None
+    return get_related_entity_by_device_class(hass, source_entity, device_class)
+
+
+def _resolve_related_entity_by_translation_key(
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    translation_key: str,
+) -> str | None:
+    return get_related_entity_by_translation_key(hass, source_entity, translation_key)
+
+
+RELATED_ENTITY_PLACEHOLDER_DEFINITIONS = (
+    RelatedEntityPlaceholderDefinition(
+        PLACEHOLDER_ENTITY_BY_DEVICE_CLASS,
+        "device class",
+        _resolve_related_entity_by_device_class,
+    ),
+    RelatedEntityPlaceholderDefinition(
+        PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
+        "translation key",
+        _resolve_related_entity_by_translation_key,
+    ),
+)
+
+
+def _parse_related_entity_device_class(raw_device_class: str) -> SensorDeviceClass | BinarySensorDeviceClass | None:
+    try:
+        return SensorDeviceClass(raw_device_class)
+    except ValueError:
+        try:
+            return BinarySensorDeviceClass(raw_device_class)
+        except ValueError:
+            return None
 
 
 def get_related_entity_by_device_class(
     hass: HomeAssistant,
-    entity: RegistryEntry,
+    source_entity: SourceEntity,
     device_class: SensorDeviceClass | BinarySensorDeviceClass,
 ) -> str | None:
     """Get related entity from same device by device class."""
+    return _get_related_entity_for_device(
+        hass,
+        source_entity=source_entity,
+        match_label="device class",
+        match_value=device_class,
+        matcher=lambda entity_entry: (entity_entry.device_class or entity_entry.original_device_class) == device_class,
+    )
 
+
+def get_related_entity_by_translation_key(
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    translation_key: str,
+) -> str | None:
+    """Get related entity from same device by translation key."""
+    return _get_related_entity_for_device(
+        hass,
+        source_entity=source_entity,
+        match_label="translation key",
+        match_value=translation_key,
+        matcher=lambda entity_entry: entity_entry.translation_key == translation_key,
+    )
+
+
+def _get_related_entity_for_device(
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    match_label: str,
+    match_value: SensorDeviceClass | BinarySensorDeviceClass | str,
+    matcher: Callable[[RegistryEntry], bool],
+) -> str | None:
+    """Get the first related entity on the same device matching the given predicate."""
     entity_reg = entity_registry.async_get(hass)
-    device_id = entity.device_id
-    if not device_id:
-        _LOGGER.debug("Entity %s has no device_id, cannot find related entity", entity.entity_id)
+    if not source_entity.device_entry:
+        _LOGGER.debug("No device_id available, cannot find related entity")
         return None
 
     related_entities = [
         entity_entry.entity_id
-        for entity_entry in entity_registry.async_entries_for_device(
-            entity_reg,
-            device_id,
-        )
-        if (entity_entry.device_class or entity_entry.original_device_class) == device_class
+        for entity_entry in entity_registry.async_entries_for_device(entity_reg, source_entity.device_entry.id)
+        if matcher(entity_entry)
     ]
     if not related_entities:
-        _LOGGER.debug("No related entities found for device %s with device class %s", device_id, device_class)
+        _LOGGER.debug("No related entities found for device %s with %s %s", source_entity.device_entry.id, match_label, match_value)
         return None
 
     return related_entities[0]
