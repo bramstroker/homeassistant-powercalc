@@ -13,5 +13,5 @@
     "SLEEP_TIME": 5,
     "VERSION": "master"
   },
-  "standby_power": 0.05
+  "standby_power": 0.41
 }
