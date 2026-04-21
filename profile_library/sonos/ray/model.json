@@ -1,0 +1,35 @@
+{
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-04-17T09:30:48Z",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "10 -> 2.95",
+      "20 -> 3.01",
+      "30 -> 2.99",
+      "40 -> 3.1",
+      "50 -> 3.36",
+      "60 -> 3.76",
+      "70 -> 5.06",
+      "80 -> 6.51",
+      "90 -> 7.59",
+      "100 -> 8.74",
+      "0 -> 4.44"
+    ]
+  },
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.12:docker"
+  },
+  "name": "Ray",
+  "standby_power": 2.92,
+  "author_info": {
+    "name": "Tim",
+    "github": "EinRainerZufall"
+  }
+}
