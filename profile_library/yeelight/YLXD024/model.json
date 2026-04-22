@@ -11,5 +11,15 @@
     "VERSION": "v1.20.13:docker"
   },
   "name": "Yeelight LED Smart Ceiling Light(8-jō size)",
-  "standby_power": 1.15
+  "standby_power": 1.15,
+  "sub_profile_select": {
+    "default": "main_light",
+    "matchers": [
+      {
+        "type": "entity_id",
+        "pattern": "^light\\..*_nightlight$",
+        "profile": "night_light"
+      }
+    ]
+  }
 }

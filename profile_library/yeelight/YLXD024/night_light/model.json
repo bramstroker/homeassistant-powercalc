@@ -1,0 +1,18 @@
+{
+  "name": "Yeelight LED Smart Ceiling Light(8-jō size) night light",
+  "standby_power": 0,
+  "calculation_strategy": "linear",
+  "linear_config": {
+    "calibrate": [
+      "1 -> 1.214",
+      "32 -> 1.310",
+      "64 -> 1.376",
+      "96 -> 1.433",
+      "128 -> 1.484",
+      "160 -> 1.532",
+      "192 -> 1.577",
+      "224 -> 1.619",
+      "255 -> 1.659"
+    ]
+  }
+}
