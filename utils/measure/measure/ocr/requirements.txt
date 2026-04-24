@@ -1,6 +1,6 @@
 numpy==2.4.4
 opencv-python==4.13.0.92
-packaging==26.1
+packaging==26.2
 Pillow==12.2.0
 pyparsing==3.3.2
 pytesseract==0.3.13
