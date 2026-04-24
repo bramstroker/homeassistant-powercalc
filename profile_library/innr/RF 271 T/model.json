@@ -1,0 +1,16 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2026-04-24T14:20:10Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "NOUS A1T",
+  "measure_device_firmware": "ESPHome 2026.4.2",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.13:docker"
+  },
+  "name": "Smart Filament Bulb E27 Tunable Globe",
+  "standby_power": 0.21
+}
