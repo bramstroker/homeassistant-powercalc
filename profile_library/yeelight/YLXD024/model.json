@@ -10,8 +10,9 @@
     "SLEEP_TIME": 5,
     "VERSION": "v1.20.13:docker"
   },
+  "min_version": "v1.20.14",
+  "supported_integrations": ["yeelight"],
   "name": "Yeelight LED Smart Ceiling Light(8-jō size)",
-  "standby_power": 1.15,
   "sub_profile_select": {
     "default": "main_light",
     "matchers": [

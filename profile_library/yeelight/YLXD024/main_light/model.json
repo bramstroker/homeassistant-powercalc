@@ -1,4 +1,4 @@
 {
   "name": "Yeelight LED Smart Ceiling Light(8-jō size) main light",
-  "standby_power": 0
+  "standby_power": "{{ 1.15 if is_state('[[entity_by_translation_key:nightlight]]', 'off') else 0 }}"
 }
