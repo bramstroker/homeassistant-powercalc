@@ -15,12 +15,14 @@
     "yeelight"
   ],
   "name": "Yeelight LED Smart Ceiling Light(8-jō size)",
+  "aliases": ["ceild"],
   "sub_profile_select": {
     "default": "main_light",
     "matchers": [
       {
-        "type": "entity_id",
-        "pattern": "^light\\..*_nightlight$",
+        "type": "entity_registry",
+        "property": "translation_key",
+        "value": "nightlight",
         "profile": "night_light"
       }
     ]
