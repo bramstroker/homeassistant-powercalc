@@ -59,6 +59,8 @@ from custom_components.powercalc.analytics.analytics import collect_analytics
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
+    ATTR_MEMBERS,
+    ATTR_STATE,
     CONF_ALL,
     CONF_AREA,
     CONF_CREATE_ENERGY_SENSOR,
@@ -651,6 +653,37 @@ class GroupedSensor(BaseEntity, SensorEntity):
 
     def get_group_entities(self) -> dict[str, set[str]]:
         return {ATTR_ENTITIES: self._entities}
+
+    def debug_group(self) -> dict[str, Any]:
+        members: dict[str, dict[str, str | None]] = {}
+        for entity_id in sorted(self._entities):
+            members[entity_id] = self._get_member_debug_info(entity_id)
+
+        return {
+            ATTR_STATE: str(self.state),
+            ATTR_UNIT_OF_MEASUREMENT: self.native_unit_of_measurement,
+            ATTR_MEMBERS: members,
+        }
+
+    def _get_member_debug_info(self, entity_id: str) -> dict[str, str | None]:
+        state = self.hass.states.get(entity_id)
+        if state is None:
+            return {
+                ATTR_STATE: None,
+                ATTR_UNIT_OF_MEASUREMENT: None,
+            }
+
+        if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
+            return {
+                ATTR_STATE: str(state.state),
+                ATTR_UNIT_OF_MEASUREMENT: state.attributes.get(ATTR_UNIT_OF_MEASUREMENT),
+            }
+
+        converted_value = round(self._get_state_value_in_native_unit(state), self._rounding_digits)
+        return {
+            ATTR_STATE: str(converted_value),
+            ATTR_UNIT_OF_MEASUREMENT: self.native_unit_of_measurement,
+        }
 
     @abstractmethod
     def calculate_initial_state(

@@ -18,6 +18,9 @@
     "get_group_entities": {
       "service": "mdi:format-list-group"
     },
+    "debug_group": {
+      "service": "mdi:bug-outline"
+    },
     "increase_daily_energy": {
       "service": "mdi:numeric"
     },

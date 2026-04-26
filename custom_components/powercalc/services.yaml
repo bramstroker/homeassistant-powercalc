@@ -70,6 +70,13 @@ get_group_entities:
     entity:
       domain: sensor
       integration: powercalc
+debug_group:
+  name: Debug group
+  description: Get a debug overview of a Powercalc power or energy group including current member values
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
 increase_daily_energy:
   name: Increase daily energy sensor
   description: Increases the sensor with a given amount

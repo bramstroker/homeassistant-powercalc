@@ -46,6 +46,8 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
+    ATTR_MEMBERS,
+    ATTR_STATE,
     CONF_AREA,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
@@ -83,6 +85,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     ENTRY_DATA_ENERGY_ENTITY,
     SERVICE_CALIBRATE_ENERGY,
+    SERVICE_DEBUG_GROUP,
     SERVICE_GET_GROUP_ENTITIES,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
@@ -1728,6 +1731,93 @@ async def test_get_group_entities_action(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
     assert res["sensor.testgroup_energy"][ATTR_ENTITIES] == {"sensor.test1_energy", "sensor.test2_energy", "sensor.test3_energy"}
+
+
+async def test_debug_group_action_for_power_group(hass: HomeAssistant) -> None:
+    hass.states.async_set("sensor.a_power", "50", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT})
+    hass.states.async_set("sensor.b_power", "0.1", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT})
+    await hass.async_block_till_done()
+
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.a_power", "sensor.b_power"],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+    await hass.async_block_till_done()
+
+    res = await hass.services.async_call(
+        DOMAIN,
+        SERVICE_DEBUG_GROUP,
+        {
+            ATTR_ENTITY_ID: "sensor.testgroup_power",
+        },
+        blocking=True,
+        return_response=True,
+    )
+    await hass.async_block_till_done()
+
+    assert res["sensor.testgroup_power"] == {
+        ATTR_STATE: "150.00",
+        ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
+        ATTR_MEMBERS: {
+            "sensor.a_power": {
+                ATTR_STATE: "50.00",
+                ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
+            },
+            "sensor.b_power": {
+                ATTR_STATE: "100.00",
+                ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
+            },
+        },
+    }
+
+
+async def test_debug_group_action_for_energy_group(hass: HomeAssistant) -> None:
+    hass.states.async_set("sensor.a_energy", "2.5", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})
+    hass.states.async_set("sensor.b_energy", "500", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.WATT_HOUR})
+    await hass.async_block_till_done()
+
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a_energy", "sensor.b_energy"],
+            CONF_GROUP_ENERGY_START_AT_ZERO: False,
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+    await hass.async_block_till_done()
+
+    res = await hass.services.async_call(
+        DOMAIN,
+        SERVICE_DEBUG_GROUP,
+        {
+            ATTR_ENTITY_ID: "sensor.testgroup_energy",
+        },
+        blocking=True,
+        return_response=True,
+    )
+    await hass.async_block_till_done()
+
+    assert res["sensor.testgroup_energy"] == {
+        ATTR_STATE: "3.0000",
+        ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
+        ATTR_MEMBERS: {
+            "sensor.a_energy": {
+                ATTR_STATE: "2.5000",
+                ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
+            },
+            "sensor.b_energy": {
+                ATTR_STATE: "0.5000",
+                ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
+            },
+        },
+    }
 
 
 @pytest.mark.parametrize(

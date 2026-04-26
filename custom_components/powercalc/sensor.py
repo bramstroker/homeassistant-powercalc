@@ -130,6 +130,7 @@ from .const import (
     SERVICE_ACTIVATE_PLAYBOOK,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
+    SERVICE_DEBUG_GROUP,
     SERVICE_GET_ACTIVE_PLAYBOOK,
     SERVICE_GET_GROUP_ENTITIES,
     SERVICE_INCREASE_DAILY_ENERGY,
@@ -545,6 +546,13 @@ def register_entity_services() -> None:
         SERVICE_GET_GROUP_ENTITIES,
         {},
         "get_group_entities",
+        supports_response=SupportsResponse.ONLY,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_DEBUG_GROUP,
+        {},
+        "debug_group",
         supports_response=SupportsResponse.ONLY,
     )
 
