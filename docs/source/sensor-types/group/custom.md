@@ -156,3 +156,7 @@ When you are not interested in the individual energy sensors of each light this 
 ## Action get_group_entities
 
 Powercalc provides an action [`Powercalc: get group entities`](../../actions/get-group-entities.md) to get all entity_id's of group members.
+
+## Action debug_group
+
+Powercalc also provides an action [`Powercalc: debug group`](../../actions/debug-group.md) to inspect the current group total and the current value of each member in the group unit.

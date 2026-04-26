@@ -11,4 +11,5 @@ More details on how to configure this can be found here: [Update frequency](../.
 If you feel the group total is too high and doesn't match what you expect, follow these troubleshooting steps:
 
 - Use the action [get_group_entities](../../actions/get-group-entities.md) to verify that all expected member sensors are correctly registered in the group. Might be because of a misconfiguration too many sensors are included in the group.
+- Use the action [debug_group](../../actions/debug-group.md) to inspect the current contribution of each group member. This helps identify which member is causing the group total to be unexpectedly high.
 - To dig deeper, you can [enable debug logging](../debug-logging.md) and look for log lines like: `Group sensor ... State change for ..`. These logs show whenever a member sensor updates and what the new value is. Powercalc keeps track of the latest values internally and calculates the total, then pushes its own state to Home Assistant at the configured interval.
