@@ -860,6 +860,10 @@
       },
       "name": "Zmeniť GUI nastavenie"
     },
+    "debug_group": {
+      "description": "Get a debug overview of a group power or energy sensor including current member values.",
+      "name": "Debug group"
+    },
     "get_active_playbook": {
       "description": "Získajte aktuálny playbook",
       "name": "Získať aktuálny playbook"

@@ -1,7 +1,7 @@
 {
   "common": {
-    "source_entity": "Source entity",
-    "source_device": "Source device",
+    "source_entity": "Zdrojová entita",
+    "source_device": "Zdrojové zařízení",
     "remarks_smart_switch": "Tento profil poskytuje pouze hodnoty napájení v pohotovostním režimu. \n Pokud máte spotřebič, který zapnutí spotřebovává pevně dané množství energie, můžete zadat tuto hodnotu v dalším kroku v nastavení",
     "remarks_smart_dimmer": "Tento profil poskytuje pouze hodnoty spotřeby energie v pohotovostním režimu. \n V dalším kroku můžete volitelně zadat hodnoty připojeného světla"
   },
@@ -10,9 +10,9 @@
       "already_configured": "Senzor je již nastaven, zadejte unikátní ID"
     },
     "error": {
-      "daily_energy_mandatory": "You must supply at least one of Value or Value template",
-      "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
+      "daily_energy_mandatory": "Musíte zadat alespoň jednu z možností „Hodnota“ nebo „Šablona hodnoty“",
+      "entity_mandatory": "Pro všechny strategie kromě playbook je nutné vybrat entitu",
+      "fixed_mandatory": "Musíte zadat alespoň jednu z následujících možností: Power, šablonu Power nebo States power",
       "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
       "group_mandatory": "You must define at least subgroups or power and energy-entities",
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
@@ -859,6 +859,10 @@
         }
       },
       "name": "Change GUI config"
+    },
+    "debug_group": {
+      "description": "Get a debug overview of a group power or energy sensor including current member values.",
+      "name": "Debug group"
     },
     "get_active_playbook": {
       "description": "Get current running playbook",

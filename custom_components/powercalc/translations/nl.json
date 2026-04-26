@@ -860,6 +860,10 @@
       },
       "name": "GUI configuratie wijzigen"
     },
+    "debug_group": {
+      "description": "Get a debug overview of a group power or energy sensor including current member values.",
+      "name": "Debug group"
+    },
     "get_active_playbook": {
       "description": "Laad huidige actieve playbook",
       "name": "Laad actieve playbook"
