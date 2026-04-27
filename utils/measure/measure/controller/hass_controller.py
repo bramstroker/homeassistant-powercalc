@@ -11,7 +11,7 @@ class HassControllerBase:
     def __init__(self, api_url: str, token: str) -> None:
         self.entity_id: str | None = None
         try:
-            self.client = Client(api_url, token, cache_session=False)
+            self.client = Client(api_url, token)
             self.client.get_config()
         except HomeassistantAPIError as e:
             raise ApiConnectionError(f"Failed to connect to HA API: {e}") from e

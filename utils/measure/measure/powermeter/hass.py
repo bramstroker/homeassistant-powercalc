@@ -19,7 +19,7 @@ class HassPowerMeter(PowerMeter):
         self._voltage_entity_id: str | None = None
         self._entities: list[Entity] | None = None
         try:
-            self.client = Client(api_url, token, cache_session=False)
+            self.client = Client(api_url, token)
         except Exception as e:
             raise PowerMeterError(f"Failed to connect to HA API: {e}") from e
 
