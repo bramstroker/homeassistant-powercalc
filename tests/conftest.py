@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import Generator
 import json
 import logging
@@ -46,6 +47,12 @@ def auto_enable_custom_integrations(enable_custom_integrations: bool) -> Generat
 @pytest.fixture(autouse=True)
 def configure_hass_config_dir(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
+
+
+@pytest.fixture(autouse=True)
+async def enable_event_loop_debug() -> None:
+    """Override the plugin default to keep asyncio debug disabled in normal test runs."""
+    asyncio.get_running_loop().set_debug(False)
 
 
 @pytest.fixture
