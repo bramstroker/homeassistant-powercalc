@@ -997,7 +997,9 @@ async def test_discovery_enable_runtime(
 async def test_discovery_disable_runtime(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
+    caplog.set_level(logging.DEBUG)
     mock_entity_with_model_information("light.test", "signify", "LCT010")
 
     entry = create_mock_global_config_entry(
@@ -1017,6 +1019,12 @@ async def test_discovery_disable_runtime(
 
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     assert len(flows) == 0
+
+    caplog.clear()
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=2))
+    await hass.async_block_till_done(True)
+
+    assert "Start auto discovery" not in caplog.text
 
 
 @pytest.mark.parametrize(

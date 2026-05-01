@@ -11,7 +11,7 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER, ConfigEntry
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers import discovery_flow
 import homeassistant.helpers.device_registry as dr
 from homeassistant.helpers.entity import EntityCategory
@@ -102,6 +102,7 @@ class DiscoveryManager:
         self.library: ProfileLibrary | None = None
         self._exclude_device_types = exclude_device_types or []
         self._exclude_self_usage_profiles = exclude_self_usage_profiles or False
+        self._cancel_rediscover_interval: CALLBACK_TYPE | None = None
         self._status = DiscoveryStatus.NOT_STARTED if enabled else DiscoveryStatus.DISABLED
 
     async def setup(self) -> None:
@@ -116,10 +117,14 @@ class DiscoveryManager:
             """Rediscover entities."""
             await self.update_library_and_rediscover()
 
-        async_track_time_interval(
+        if self._cancel_rediscover_interval:
+            self._cancel_rediscover_interval()
+
+        self._cancel_rediscover_interval = async_track_time_interval(
             self.hass,
             _rediscover,
             timedelta(hours=2),
+            cancel_on_shutdown=True,
         )
 
     async def update_library_and_rediscover(self) -> None:
@@ -130,6 +135,9 @@ class DiscoveryManager:
 
     async def start_discovery(self) -> None:
         """Start the discovery procedure."""
+        if self._status == DiscoveryStatus.DISABLED:
+            _LOGGER.debug("Discovery manager is disabled, skipping discovery run")
+            return
         if self._status == DiscoveryStatus.IN_PROGRESS:
             _LOGGER.debug("Discovery already in progress, skipping new discovery run")
             return
@@ -364,6 +372,9 @@ class DiscoveryManager:
 
     async def disable(self) -> None:
         """Disable the discovery."""
+        if self._cancel_rediscover_interval:
+            self._cancel_rediscover_interval()
+            self._cancel_rediscover_interval = None
         self._status = DiscoveryStatus.DISABLED
         self.initialized_flows = set()
         flows = self.hass.config_entries.flow.async_progress_by_handler(DOMAIN)

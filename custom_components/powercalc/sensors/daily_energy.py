@@ -244,7 +244,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             self.hass,
             refresh,
             timedelta(seconds=self._update_frequency),
+            cancel_on_shutdown=True,
         )
+        self.async_on_remove(self._update_timer_removal)
 
     def calculate_delta(self, elapsed_seconds: int = 0) -> Decimal:
         if self._last_delta_calculate is None:

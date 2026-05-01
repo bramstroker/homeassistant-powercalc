@@ -45,7 +45,7 @@ async def test_template_power(hass: HomeAssistant) -> None:
     strategy = await _create_strategy(
         hass,
         {
-            CONF_POWER: Template(template),
+            CONF_POWER: Template(template, hass),
         },
         source_entity,
     )
@@ -92,8 +92,8 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
         hass,
         {
             CONF_STATES_POWER: {
-                "heat": Template("{{states('input_number.test_number42')}}"),
-                "cool": Template("{{states('input_number.test_number60')}}"),
+                "heat": Template("{{states('input_number.test_number42')}}", hass),
+                "cool": Template("{{states('input_number.test_number60')}}", hass),
             },
         },
         source_entity,

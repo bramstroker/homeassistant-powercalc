@@ -49,9 +49,12 @@ async def test_evaluate_power(
 
 
 @patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception()))
-async def test_evaluate_power_template_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    power = Template("{{ 1 + 3 }}")
-    power.hass = hass
+async def test_evaluate_power_template_error(
+    _: object,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    power = Template("{{ 1 + 3 }}", hass)
     await evaluate_power(power)
     assert "Could not render power template" in caplog.text
 
