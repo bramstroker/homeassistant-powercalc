@@ -1,10 +1,11 @@
 import asyncio
 from collections.abc import Generator
+from functools import lru_cache
 import json
 import logging
 import os
 import shutil
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 from unittest.mock import AsyncMock, patch
 import uuid
 
@@ -32,20 +33,33 @@ from custom_components.powercalc.helpers import get_library_json_path, get_libra
 from tests.common import get_test_config_dir
 
 
+@lru_cache(maxsize=1)
+def _load_test_library_json() -> dict[str, Any]:
+    with open(get_library_json_path()) as f:
+        return cast(dict[str, Any], json.load(f))
+
+
 @pytest.fixture(autouse=True)
-def set_logging_levels(caplog: pytest.LogCaptureFixture) -> None:
+def set_logging_levels(request: SubRequest) -> None:
     logging.getLogger("homeassistant").setLevel(logging.WARNING)
     logging.getLogger("asyncio").setLevel(logging.WARNING)
-    caplog.set_level(logging.DEBUG, logger="custom_components.powercalc")
+    if "caplog" in request.fixturenames:
+        caplog = request.getfixturevalue("caplog")
+        caplog.set_level(logging.DEBUG, logger="custom_components.powercalc")
 
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations: bool) -> Generator:
+def auto_enable_custom_integrations(request: SubRequest) -> Generator:
+    if "hass" in request.fixturenames:
+        request.getfixturevalue("enable_custom_integrations")
     yield
 
 
 @pytest.fixture(autouse=True)
-def configure_hass_config_dir(hass: HomeAssistant) -> None:
+def configure_hass_config_dir(request: SubRequest) -> None:
+    if "hass" not in request.fixturenames:
+        return
+    hass = request.getfixturevalue("hass")
     hass.config.config_dir = get_test_config_dir()
 
 
@@ -172,9 +186,5 @@ def mock_remote_loader(request: SubRequest) -> Generator:
     with patch(f"{remote_loader_class}.download_profile") as mock_download, patch(f"{remote_loader_class}.load_library_json") as mock_load_lib:
         mock_download.side_effect = side_effect
 
-        def load_library_json() -> dict:
-            with open(get_library_json_path()) as f:
-                return json.load(f)
-
-        mock_load_lib.side_effect = load_library_json
+        mock_load_lib.side_effect = _load_test_library_json
         yield
