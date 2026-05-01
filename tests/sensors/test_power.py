@@ -663,6 +663,36 @@ async def test_multiply_factor_sleep_power(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == "4.00"
 
 
+async def test_unload_entry_cancels_pending_sleep_power_timer(hass: HomeAssistant) -> None:
+    entry = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: str(uuid.uuid4()),
+            CONF_ENTITY_ID: "switch.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 10},
+            CONF_SLEEP_POWER: {
+                CONF_POWER: 2,
+                CONF_DELAY: 20,
+            },
+        },
+    )
+
+    hass.states.async_set("switch.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "0.00"
+
+    await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=25))
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+
+
 async def test_standby_power_invalid_template(hass: HomeAssistant) -> None:
     """Test when the template does not return a decimal it does not break the powercalc sensor"""
 

@@ -117,7 +117,7 @@ class DiscoveryManager:
             """Rediscover entities."""
             await self.update_library_and_rediscover()
 
-        if self._cancel_rediscover_interval:
+        if self._cancel_rediscover_interval:  # pragma: no cover
             self._cancel_rediscover_interval()
 
         self._cancel_rediscover_interval = async_track_time_interval(

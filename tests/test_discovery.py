@@ -1047,6 +1047,18 @@ async def test_discovery_disabled(
     assert len(flows) == 0
 
 
+async def test_discovery_skips_run_when_disabled(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.DEBUG)
+
+    discovery_manager = DiscoveryManager(hass, {}, enabled=False)
+    await discovery_manager.start_discovery()
+
+    assert "Discovery manager is disabled, skipping discovery run" in caplog.text
+
+
 async def test_discovery_process_is_locked(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     caplog.set_level(logging.DEBUG)
 
