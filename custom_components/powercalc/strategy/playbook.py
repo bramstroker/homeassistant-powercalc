@@ -10,8 +10,8 @@ import gzip
 import logging
 import os
 
-from homeassistant.const import STATE_OFF
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP, STATE_OFF
+from homeassistant.core import CALLBACK_TYPE, HassJob, HomeAssistant, State, callback
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.typing import ConfigType
@@ -64,6 +64,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._update_callback: Callable[[Decimal], None] = lambda power: None
         self._start_time: datetime = dt.utcnow()
         self._cancel_timer: CALLBACK_TYPE | None = None
+        self._cancel_stop_listener: CALLBACK_TYPE | None = None
         self._config = config
         self._repeat: bool = bool(config.get(CONF_REPEAT))
         self._autostart: str | None = config.get(CONF_AUTOSTART)
@@ -116,6 +117,9 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         if self._cancel_timer is not None:
             self._cancel_timer()
             self._cancel_timer = None
+        if self._cancel_stop_listener is not None:
+            self._cancel_stop_listener()
+            self._cancel_stop_listener = None
 
     def get_active_playbook(self) -> Playbook | None:
         """Get running playbook"""
@@ -155,10 +159,31 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             # Schedule next update
             self._execute_playbook_entry()
 
+        @callback
+        def _cancel_pending_updates_on_stop(_: datetime) -> None:
+            if self._cancel_timer is not None:
+                self._cancel_timer()
+                self._cancel_timer = None
+            if self._cancel_stop_listener is not None:
+                self._cancel_stop_listener()
+                self._cancel_stop_listener = None
+            self._active_playbook = None
+
+        if self._cancel_stop_listener is not None:
+            self._cancel_stop_listener()
+        self._cancel_stop_listener = self._hass.bus.async_listen_once(
+            EVENT_HOMEASSISTANT_STOP,
+            _cancel_pending_updates_on_stop,
+        )
+
         # Schedule update in the future
         self._cancel_timer = async_track_point_in_time(
             self._hass,
-            _update_power,
+            HassJob(
+                _update_power,
+                name=f"powercalc playbook {self._active_playbook.key}",
+                cancel_on_shutdown=True,
+            ),
             self._start_time + timedelta(seconds=entry.time),
         )
 

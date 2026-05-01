@@ -25,6 +25,7 @@ from homeassistant.const import (
 from homeassistant.core import (
     CALLBACK_TYPE,
     Event,
+    HassJob,
     HomeAssistant,
     State,
     callback,
@@ -488,7 +489,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         track_templates: list[TrackTemplate] = [e for e in entities_to_track if isinstance(e, TrackTemplate)]
         if track_templates:
-            async_track_template_result(self.hass, track_templates=track_templates, action=template_change_listener)
+            template_tracker = async_track_template_result(
+                self.hass,
+                track_templates=track_templates,
+                action=template_change_listener,
+            )
+            self.async_on_remove(
+                template_tracker.async_remove,
+            )
 
         # Trigger initial update
         self.async_on_remove(start.async_at_start(self.hass, initial_update))
@@ -503,7 +511,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             def async_update(__: datetime | None = None) -> None:
                 self.async_schedule_update_ha_state(True)
 
-            async_track_time_interval(self.hass, async_update, timedelta(seconds=force_update_interval))
+            self.async_on_remove(
+                async_track_time_interval(
+                    self.hass,
+                    async_update,
+                    timedelta(seconds=force_update_interval),
+                    cancel_on_shutdown=True,
+                ),
+            )
 
     def _get_tracking_entities(self) -> list[str | TrackTemplate]:
         """Return entities and templates that should be tracked."""
@@ -707,7 +722,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self._sleep_power_timer = async_call_later(
                 self.hass,
                 delay,
-                _update_sleep_power,
+                HassJob(_update_sleep_power, name=f"{self.entity_id} sleep power", cancel_on_shutdown=True),
             )
 
         standby_power = self._standby_power
@@ -774,6 +789,15 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if not isinstance(self._strategy_instance, PlaybookStrategy):
             raise HomeAssistantError("supported only playbook enabled sensors")
         return self._strategy_instance
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Cancel outstanding timers when the entity is removed."""
+        if self._sleep_power_timer is not None:
+            self._sleep_power_timer()
+            self._sleep_power_timer = None
+        if isinstance(self._strategy_instance, PlaybookStrategy):
+            await self._strategy_instance.stop_playbook()
+        await super().async_will_remove_from_hass()
 
     async def async_switch_sub_profile(self, profile: str) -> None:
         """Switches to a new sub profile"""
