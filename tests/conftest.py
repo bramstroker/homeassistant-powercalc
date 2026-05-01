@@ -54,6 +54,11 @@ def enable_custom_integrations(hass: HomeAssistant) -> None:
     hass.data.pop(loader.DATA_CUSTOM_COMPONENTS)
 
 
+@pytest.fixture(autouse=True)
+def expected_lingering_timers() -> bool:
+    return True
+
+
 @pytest.fixture
 def mock_config_entry() -> MockConfigEntry:
     """Return the default mocked config entry."""
