@@ -94,7 +94,7 @@ def create_filter(
         CONF_LABEL: lambda: LabelFilter(hass, filter_config),  # type: ignore
         CONF_WILDCARD: lambda: WildcardFilter(filter_config),  # type: ignore
         CONF_GROUP: lambda: GroupFilter(hass, filter_config),  # type: ignore
-        CONF_TEMPLATE: lambda: TemplateFilter(hass, filter_config),  # type: ignore
+        CONF_TEMPLATE: lambda: TemplateFilter(filter_config),  # type: ignore
         CONF_ALL: lambda: NullFilter(),
         CONF_OR: lambda: create_composite_filter(filter_config, hass, FilterOperator.OR),  # type: ignore
         CONF_AND: lambda: create_composite_filter(filter_config, hass, FilterOperator.AND),  # type: ignore
@@ -227,8 +227,7 @@ class WildcardFilter(EntityFilter):
 
 
 class TemplateFilter(EntityFilter):
-    def __init__(self, hass: HomeAssistant, template: Template) -> None:
-        template.hass = hass
+    def __init__(self, template: Template) -> None:
         self.entity_ids = template.async_render()
 
     def is_valid(self, entity: RegistryEntry) -> bool:
