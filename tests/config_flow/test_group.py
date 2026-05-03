@@ -59,6 +59,7 @@ from tests.common import (
     create_mock_light_entity,
     create_mocked_virtual_power_sensor_entry,
     run_powercalc_setup,
+    set_states,
     setup_config_entry,
 )
 from tests.config_flow.common import (
@@ -206,10 +207,7 @@ async def test_add_device_members_to_group(hass: HomeAssistant) -> None:
         CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
-    hass.states.async_set("sensor.balcony_power", 5)
-    hass.states.async_set("sensor.balcony_energy", 5)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.balcony_power", 5), ("sensor.balcony_energy", 5)])
     power_state = hass.states.get("sensor.my_group_sensor_power")
     assert power_state
     assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.balcony_power"}
@@ -278,9 +276,7 @@ async def test_group_include_area(
         CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
-    hass.states.async_set("sensor.test_power", 5)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.test_power", 5)])
     power_state = hass.states.get("sensor.my_group_sensor_power")
     assert power_state
     assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
@@ -329,9 +325,7 @@ async def test_group_include_floor(
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_FLOOR] == floor.floor_id
 
-    hass.states.async_set("sensor.test_power", 5)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.test_power", 5)])
     power_state = hass.states.get("sensor.my_floor_group_power")
     assert power_state
     assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
@@ -417,9 +411,7 @@ async def test_include_area_powercalc_only(
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert not result["data"][CONF_INCLUDE_NON_POWERCALC_SENSORS]
 
-    hass.states.async_set("sensor.test_power", 5)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.test_power", 5)])
     power_state = hass.states.get("sensor.my_group_sensor_power")
     assert power_state
     assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
@@ -522,9 +514,7 @@ async def test_real_power_entry_selectable_as_group_member(
         user_input,
     )
 
-    hass.states.async_set("sensor.real_power", "25.00")
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.real_power", "25.00")])
     group_state = hass.states.get("sensor.my_group_sensor_power")
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.virtualpower1_power", "sensor.real_power"}
     assert group_state

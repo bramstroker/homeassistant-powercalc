@@ -8,7 +8,7 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 
 
 async def test_translation_key_standby_sub_profile(
@@ -68,25 +68,17 @@ async def test_translation_key_standby_sub_profile(
         ],
     )
 
-    hass.states.async_set("light.test", STATE_OFF)
-    hass.states.async_set("light.test_nightlight", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_OFF), ("light.test_nightlight", STATE_OFF)])
     assert_entity_state(hass, "sensor.main_power", "0.40")
     assert_entity_state(hass, "sensor.nightlight_power", "0.00")
     assert_entity_state(hass, "sensor.all_standby_power", "0.40")
 
-    hass.states.async_set("light.test_nightlight", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test_nightlight", STATE_ON)])
     assert_entity_state(hass, "sensor.main_power", "0.00")
     assert_entity_state(hass, "sensor.nightlight_power", "1.24")
     assert_entity_state(hass, "sensor.all_standby_power", "0.00")
 
-    hass.states.async_set("light.test_nightlight", STATE_OFF)
-    hass.states.async_set("light.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test_nightlight", STATE_OFF), ("light.test", STATE_ON)])
     assert_entity_state(hass, "sensor.main_power", "5.00")
     assert_entity_state(hass, "sensor.nightlight_power", "0.00")
     assert_entity_state(hass, "sensor.all_standby_power", "0.00")

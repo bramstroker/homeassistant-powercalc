@@ -45,6 +45,7 @@ from custom_components.powercalc.const import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SensorType,
 )
+from tests.common import set_states
 
 from .common import (
     assert_entity_state,
@@ -244,9 +245,7 @@ async def test_reload_service_yaml_sensors(hass: HomeAssistant) -> None:
         },
     }
 
-    hass.states.async_set("light.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_ON)])
     with patch("homeassistant.config.load_yaml_config_file", return_value=new_config):
         await hass.services.async_call(
             DOMAIN,

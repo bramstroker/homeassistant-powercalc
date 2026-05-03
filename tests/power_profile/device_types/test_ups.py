@@ -2,7 +2,7 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_VARIABLES
-from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 
 
 async def test_ups_power_at_various_loads(hass: HomeAssistant) -> None:
@@ -10,10 +10,7 @@ async def test_ups_power_at_various_loads(hass: HomeAssistant) -> None:
     load_entity = "sensor.ups_load"
     entity_id = "sensor.ups_output"
 
-    hass.states.async_set(entity_id, "50")
-    hass.states.async_set(load_entity, "50")
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(entity_id, "50"), (load_entity, "50")])
     await run_powercalc_setup(
         hass,
         {
@@ -32,19 +29,16 @@ async def test_ups_power_at_various_loads(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "sensor.ups_power", "450.00")
 
     # Test 0% load
-    hass.states.async_set(load_entity, "0")
-    await hass.async_block_till_done()
+    await set_states(hass, [(load_entity, "0")])
     assert_entity_state(hass, "sensor.ups_power", "0.00")
 
     # Test 100% load
-    hass.states.async_set(load_entity, "100")
-    await hass.async_block_till_done()
+    await set_states(hass, [(load_entity, "100")])
     # 100% * 1500 * 0.6 / 100 = 900W
     assert_entity_state(hass, "sensor.ups_power", "900.00")
 
     # Test 10% load
-    hass.states.async_set(load_entity, "10")
-    await hass.async_block_till_done()
+    await set_states(hass, [(load_entity, "10")])
     # 10% * 1500 * 0.6 / 100 = 90W
     assert_entity_state(hass, "sensor.ups_power", "90.00")
 
@@ -54,10 +48,7 @@ async def test_ups_with_unity_power_factor(hass: HomeAssistant) -> None:
     load_entity = "sensor.ups_load"
     entity_id = "sensor.ups_output"
 
-    hass.states.async_set(entity_id, "25")
-    hass.states.async_set(load_entity, "25")
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(entity_id, "25"), (load_entity, "25")])
     await run_powercalc_setup(
         hass,
         {

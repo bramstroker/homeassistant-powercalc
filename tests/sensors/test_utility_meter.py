@@ -42,7 +42,14 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import assert_entity_state, create_input_boolean, create_mocked_virtual_power_sensor_entry, run_powercalc_setup, setup_config_entry
+from tests.common import (
+    assert_entity_state,
+    create_input_boolean,
+    create_mocked_virtual_power_sensor_entry,
+    run_powercalc_setup,
+    set_states,
+    setup_config_entry,
+)
 
 
 async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
@@ -84,9 +91,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
 
     assert_entity_state(hass, "select.test_energy_daily", "peak")
 
-    hass.states.async_set("select.test_energy_daily", "offpeak")
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("select.test_energy_daily", "offpeak")])
     peak_sensor = hass.states.get("sensor.test_energy_daily_peak")
     assert peak_sensor.attributes[ATTR_STATUS] == PAUSED
 
@@ -204,19 +209,20 @@ async def test_rounding_digits(hass: HomeAssistant, entity_registry: EntityRegis
         },
     )
 
-    hass.states.async_set("sensor.test_energy", 1, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.test_energy", 1, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})])
     now = dt_util.utcnow() + timedelta(seconds=10)
     with freeze_time(now):
-        hass.states.async_set(
-            "sensor.test_energy",
-            3,
-            {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
-            force_update=True,
+        await set_states(
+            hass,
+            [
+                (
+                    "sensor.test_energy",
+                    3,
+                    {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+                    True,
+                ),
+            ],
         )
-        await hass.async_block_till_done()
-
     registry_entry = entity_registry.async_get("sensor.test_energy_daily")
     assert registry_entry
     assert registry_entry.options == {"sensor": {"suggested_display_precision": 2}}

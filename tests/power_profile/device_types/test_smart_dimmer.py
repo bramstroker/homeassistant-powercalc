@@ -12,7 +12,7 @@ from custom_components.powercalc.const import (
     CONF_MIN_POWER,
     DOMAIN,
 )
-from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 from tests.config_flow.common import confirm_auto_discovered_model, initialize_options_flow
 from tests.conftest import MockEntityWithModel
 
@@ -40,19 +40,13 @@ async def test_smart_dimmer_power_input_yaml(
         },
     )
 
-    hass.states.async_set(switch_id, STATE_ON, {ATTR_BRIGHTNESS: 255})
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(switch_id, STATE_ON, {ATTR_BRIGHTNESS: 255})])
     assert_entity_state(hass, power_sensor_id, "50.50")
 
-    hass.states.async_set(switch_id, STATE_ON, {ATTR_BRIGHTNESS: 10})
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(switch_id, STATE_ON, {ATTR_BRIGHTNESS: 10})])
     assert_entity_state(hass, power_sensor_id, "3.90")
 
-    hass.states.async_set(switch_id, STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(switch_id, STATE_OFF)])
     assert_entity_state(hass, power_sensor_id, "0.30")
 
 
@@ -75,14 +69,10 @@ async def test_smart_dimmer_power_input_yaml_omit_linear_config(
         },
     )
 
-    hass.states.async_set(switch_id, STATE_ON, {ATTR_BRIGHTNESS: 255})
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(switch_id, STATE_ON, {ATTR_BRIGHTNESS: 255})])
     assert_entity_state(hass, power_sensor_id, "0.50")
 
-    hass.states.async_set(switch_id, STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(switch_id, STATE_OFF)])
     assert_entity_state(hass, power_sensor_id, "0.30")
 
 
@@ -132,14 +122,10 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     # Toggle the switch to different states and check for correct power values
     assert_entity_state(hass, power_sensor_id, "unavailable")
 
-    hass.states.async_set(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255})
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255})])
     assert_entity_state(hass, power_sensor_id, "50.50")
 
-    hass.states.async_set(light_entity_id, STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(light_entity_id, STATE_OFF)])
     assert_entity_state(hass, power_sensor_id, "0.30")
 
     # Change the power value via the options
@@ -151,7 +137,5 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
     # Set the switch on again and see if it has the updated power value
-    hass.states.async_set(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255})
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255})])
     assert_entity_state(hass, power_sensor_id, "40.50")

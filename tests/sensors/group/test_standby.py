@@ -21,7 +21,7 @@ from custom_components.powercalc.const import (
     CONF_STATES_POWER,
     CalculationStrategy,
 )
-from tests.common import assert_entity_state, run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup, set_states
 
 
 async def test_standby_group(hass: HomeAssistant) -> None:
@@ -43,24 +43,16 @@ async def test_standby_group(hass: HomeAssistant) -> None:
         ],
     )
 
-    hass.states.async_set("input_boolean.test1", STATE_ON)
-    hass.states.async_set("input_boolean.test2", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("input_boolean.test1", STATE_ON), ("input_boolean.test2", STATE_ON)])
     assert_entity_state(hass, "sensor.all_standby_power", STATE_UNKNOWN)
 
     energy_state = hass.states.get("sensor.all_standby_energy")
     assert energy_state
 
-    hass.states.async_set("input_boolean.test1", STATE_OFF)
-    hass.states.async_set("input_boolean.test2", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("input_boolean.test1", STATE_OFF), ("input_boolean.test2", STATE_OFF)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.50")
 
-    hass.states.async_set("input_boolean.test2", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("input_boolean.test2", STATE_ON)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.20")
 
 
@@ -82,21 +74,13 @@ async def test_self_usage_sensors_included(hass: HomeAssistant) -> None:
         ],
     )
 
-    hass.states.async_set("switch.test1", STATE_ON)
-    hass.states.async_set("switch.test2", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test1", STATE_ON), ("switch.test2", STATE_ON)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.70")
 
-    hass.states.async_set("switch.test1", STATE_OFF)
-    hass.states.async_set("switch.test2", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test1", STATE_OFF), ("switch.test2", STATE_OFF)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.50")
 
-    hass.states.async_set("switch.test1", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test1", STATE_ON)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.30")
 
 
@@ -124,20 +108,13 @@ async def test_cover_and_media_player_entities(hass: HomeAssistant) -> None:
         ],
     )
 
-    hass.states.async_set("cover.test1", CONF_STATE_OPENING)
-    hass.states.async_set("media_player.test2", STATE_PLAYING, {"volume": 20})
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("cover.test1", CONF_STATE_OPENING), ("media_player.test2", STATE_PLAYING, {"volume": 20})])
     assert_entity_state(hass, "sensor.all_standby_power", STATE_UNKNOWN)
 
-    hass.states.async_set("cover.test1", STATE_OPEN)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("cover.test1", STATE_OPEN)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.20")
 
-    hass.states.async_set("media_player.test2", STATE_STANDBY)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.test2", STATE_STANDBY)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.50")
 
 
@@ -155,8 +132,6 @@ async def test_disable_group_creation(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("input_boolean.test1", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("input_boolean.test1", STATE_OFF)])
     power_state = hass.states.get("sensor.all_standby_power")
     assert not power_state

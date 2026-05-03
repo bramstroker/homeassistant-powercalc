@@ -28,7 +28,7 @@ from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor
 from custom_components.powercalc.sensors.group.subtract import SubtractGroupSensor
 from custom_components.powercalc.sensors.group.tracked_untracked import TrackedPowerSensorFactory
 from custom_components.powercalc.sensors.utility_meter import VirtualUtilityMeter
-from tests.common import assert_entity_state, mock_sensors_in_registry, run_powercalc_setup
+from tests.common import assert_entity_state, mock_sensors_in_registry, run_powercalc_setup, set_states
 from tests.config_flow.common import create_mock_entry
 
 
@@ -152,11 +152,7 @@ async def test_entity_registry_updates(hass: HomeAssistant) -> None:
     )
     await run_powercalc_setup(hass)
 
-    hass.states.async_set("sensor.test1_power", "10")
-    hass.states.async_set("sensor.test2_power", "5")
-    hass.states.async_set("sensor.test3_power", "10")
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.test1_power", "10"), ("sensor.test2_power", "5"), ("sensor.test3_power", "10")])
     tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
     assert tracked_power_sensor.entities == {"sensor.test1_power", "sensor.test2_power", "sensor.test3_power"}
     assert_entity_state(hass, "sensor.tracked_power", "25.00")

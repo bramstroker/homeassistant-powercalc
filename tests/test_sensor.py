@@ -73,6 +73,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
+from tests.common import set_states
 
 from .common import (
     assert_entity_state,
@@ -95,10 +96,7 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
 
     assert_entity_state(hass, "sensor.test_power", "0.00")
 
-    hass.states.async_set("input_boolean.test", STATE_ON)
-    await hass.async_block_till_done()
-    await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
-
+    await set_states(hass, [("input_boolean.test", STATE_ON)])
     power_state = hass.states.get("sensor.test_power")
     assert power_state
     assert power_state.state == "50.00"
@@ -174,12 +172,11 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("input_boolean.test", STATE_ON)
-    hass.states.async_set("input_boolean.test1", STATE_ON)
-    hass.states.async_set("input_boolean.test2", STATE_ON)
-
-    await hass.async_block_till_done()
-    await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
+    await set_states(
+        hass,
+        [("input_boolean.test", STATE_ON), ("input_boolean.test1", STATE_ON), ("input_boolean.test2", STATE_ON)],
+        block_count=3,
+    )
 
     group1 = hass.states.get("sensor.testgroup1_power")
     assert group1.attributes[ATTR_ENTITIES] == {
@@ -199,10 +196,7 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
         "homeassistant.util.utcnow",
         return_value=dt.utcnow() + timedelta(seconds=60),
     ):
-        hass.states.async_set("input_boolean.test2", STATE_OFF)
-        await hass.async_block_till_done()
-        await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
-
+        await set_states(hass, [("input_boolean.test2", STATE_OFF)], block_count=3)
     assert_entity_state(hass, "sensor.testgroup1_power", "100.00")
 
     assert_entity_state(hass, "sensor.testgroup2_power", "0.00")
@@ -259,12 +253,16 @@ async def test_light_lut_strategy(
         "LWB010",
         capabilities={ATTR_SUPPORTED_COLOR_MODES: [light.ColorMode.BRIGHTNESS]},
     )
-    hass.states.async_set(
-        light_entity_id,
-        STATE_ON,
-        {ATTR_BRIGHTNESS: 125, ATTR_COLOR_MODE: light.ColorMode.BRIGHTNESS},
+    await set_states(
+        hass,
+        [
+            (
+                light_entity_id,
+                STATE_ON,
+                {ATTR_BRIGHTNESS: 125, ATTR_COLOR_MODE: light.ColorMode.BRIGHTNESS},
+            ),
+        ],
     )
-
     await run_powercalc_setup(
         hass,
         {CONF_ENTITY_ID: light_entity_id},
@@ -370,13 +368,16 @@ async def test_can_include_autodiscovered_entity_in_group(
 
     mock_entity_with_model_information("light.testa", "lidl", "HG06462A")
 
-    hass.states.async_set(
-        "light.testa",
-        STATE_ON,
-        {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS},
+    await set_states(
+        hass,
+        [
+            (
+                "light.testa",
+                STATE_ON,
+                {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS},
+            ),
+        ],
     )
-    await hass.async_block_till_done()
-
     await run_powercalc_setup(
         hass,
         [
@@ -623,9 +624,7 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
     changed_entry = hass.config_entries.async_get_entry(entry.entry_id)
     assert changed_entry.data.get(CONF_ENTITY_ID) == new_light_id
 
-    hass.states.async_set(new_light_id, STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(new_light_id, STATE_ON)])
     power_state = hass.states.get("sensor.testentry_power")
     assert power_state
     assert power_state.state == "50.00"
@@ -676,10 +675,7 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
         {},
     )
 
-    hass.states.async_set(original_light_id, STATE_ON)
-    hass.states.async_set(new_light_id, STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [(original_light_id, STATE_ON), (new_light_id, STATE_ON)])
     power_state = hass.states.get("sensor.testentry_power")
     assert power_state.attributes.get(ATTR_SOURCE_ENTITY) == original_light_id
     assert power_state.state == "50.00"

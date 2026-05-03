@@ -29,7 +29,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.linear import LinearStrategy
-from tests.common import assert_entity_state, setup_config_entry
+from tests.common import assert_entity_state, set_states, setup_config_entry
 from tests.conftest import MockEntityWithModel
 
 
@@ -148,9 +148,7 @@ async def test_vacuum_battery_level(
 ) -> None:
     await _setup_vacuum_test(hass)
 
-    hass.states.async_set("sensor.test_battery", 50)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.test_battery", 50)])
     strategy = await _create_strategy_instance(
         hass,
         await create_source_entity("vacuum.test", hass),
@@ -304,9 +302,7 @@ async def test_config_entry_with_calibrate_list(
         },
     )
 
-    hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 25})
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_ON, {ATTR_BRIGHTNESS: 25})])
     assert_entity_state(hass, "sensor.test_power", "1.20")
 
 

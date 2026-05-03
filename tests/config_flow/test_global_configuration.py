@@ -64,7 +64,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-from tests.common import assert_entity_state, get_simple_fixed_config, run_powercalc_setup
+from tests.common import assert_entity_state, get_simple_fixed_config, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -379,9 +379,7 @@ async def test_throttling_options_flow(hass: HomeAssistant) -> None:
 async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> None:
     """Test entities are reloaded reflecting changes."""
 
-    hass.states.async_set("light.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_ON)])
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data={

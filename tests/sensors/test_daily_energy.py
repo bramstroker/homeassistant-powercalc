@@ -49,6 +49,7 @@ from tests.common import (
     assert_entity_state,
     create_input_boolean,
     run_powercalc_setup,
+    set_states,
     setup_config_entry,
 )
 from tests.config_flow.test_global_configuration import create_mock_global_config_entry
@@ -285,8 +286,7 @@ async def test_calculate_delta_mega_watt_hour(hass: HomeAssistant) -> None:
 
 
 async def test_template_value(hass: HomeAssistant) -> None:
-    hass.states.async_set("input_number.test", 50)
-
+    await set_states(hass, [("input_number.test", 50)])
     update_frequency = 1800
     await run_powercalc_setup(
         hass,
@@ -358,13 +358,16 @@ async def test_reset_service(hass: HomeAssistant) -> None:
     entity_id = "sensor.ip_camera_upstairs_energy"
 
     # Set the individual entities to some initial values
-    hass.states.async_set(
-        entity_id,
-        "0.8",
-        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+    await set_states(
+        hass,
+        [
+            (
+                entity_id,
+                "0.8",
+                {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+            ),
+        ],
     )
-    await hass.async_block_till_done()
-
     assert_entity_state(hass, entity_id, "0.8")
 
     # Reset the group sensor and underlying group members

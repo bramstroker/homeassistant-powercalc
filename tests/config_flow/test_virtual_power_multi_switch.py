@@ -28,7 +28,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.common import assert_entity_state, run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     create_mock_entry,
@@ -102,14 +102,10 @@ async def test_discovery_flow(
 
     assert hass.states.get("sensor.test_power")
 
-    hass.states.async_set("switch.test1", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test1", STATE_ON)])
     assert_entity_state(hass, "sensor.test_power", "1.22")
 
-    hass.states.async_set("switch.test2", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test2", STATE_ON)])
     assert_entity_state(hass, "sensor.test_power", "1.95")
 
 

@@ -27,7 +27,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
 import custom_components.test.sensor as test_sensor_platform
-from tests.common import assert_entity_state, run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -36,9 +36,7 @@ async def test_can_calculate_power(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information("light.test")
-    hass.states.async_set("light.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_ON)])
     light_source_entity = await create_source_entity("light.test", hass)
 
     estimated_current_entity = test_sensor_platform.MockSensor(
@@ -267,16 +265,10 @@ async def test_yaml_configuration(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("light.test", STATE_ON)
-    hass.states.async_set("sensor.test_current", 500)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_ON), ("sensor.test_current", 500)])
     assert_entity_state(hass, "sensor.test_power", "2.50")
 
-    hass.states.async_set("light.test", STATE_OFF)
-    hass.states.async_set("sensor.test_current", 50)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_OFF), ("sensor.test_current", 50)])
     assert_entity_state(hass, "sensor.test_power", "0.25")
 
 
@@ -327,10 +319,7 @@ async def test_estimated_current_sensor_unavailable(hass: HomeAssistant, caplog:
         },
     )
 
-    hass.states.async_set("sensor.test_current", STATE_UNAVAILABLE)
-    hass.states.async_set("light.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.test_current", STATE_UNAVAILABLE), ("light.test", STATE_ON)])
     assert "light.test: Estimated current entity sensor.test_current is not available" in caplog.text
 
     assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)

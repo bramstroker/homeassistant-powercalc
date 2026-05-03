@@ -48,6 +48,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.discovery import DiscoveryStatus, get_power_profile_by_source_device, get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
+from tests.common import set_states
 
 from .common import assert_entity_state, create_mock_light_entity, run_powercalc_setup, setup_config_entry
 from .config_flow.test_global_configuration import create_mock_global_config_entry
@@ -160,9 +161,7 @@ async def test_manually_configured_light_overrides_autodiscovered(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information("light.testing", "signify", "LCA001")
-    hass.states.async_set("light.testing", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.testing", STATE_ON)])
     await run_powercalc_setup(
         hass,
         {CONF_ENTITY_ID: "light.testing", CONF_FIXED: {CONF_POWER: 25}},
@@ -188,12 +187,16 @@ async def test_config_entry_overrides_autodiscovered(
         unique_id="abcdef",
     )
 
-    hass.states.async_set(
-        "light.testing",
-        STATE_ON,
-        {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS},
+    await set_states(
+        hass,
+        [
+            (
+                "light.testing",
+                STATE_ON,
+                {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS},
+            ),
+        ],
     )
-
     await run_powercalc_setup(hass)
 
     await setup_config_entry(

@@ -39,6 +39,7 @@ from tests.common import (
     get_simple_fixed_config,
     get_test_profile_dir,
     run_powercalc_setup,
+    set_states,
 )
 
 POWER_SENSOR_ID = "sensor.test_power"
@@ -139,14 +140,10 @@ async def test_turn_off_stops_running_playbook(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     await _activate_playbook(hass, "playbook1")
 
-    hass.states.async_set("switch.test", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_OFF)])
     await elapse_and_assert_power(hass, 3, "0.50")
 
 
@@ -157,9 +154,7 @@ async def test_services_raises_error_on_non_playbook_sensor(
         hass,
         get_simple_fixed_config("switch.test"),
     )
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     with pytest.raises(HomeAssistantError):
         await _activate_playbook(hass, "playbook1")
 
@@ -171,9 +166,7 @@ async def test_stop_service_raises_error_on_non_playbook_sensor(
         hass,
         get_simple_fixed_config("switch.test"),
     )
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     with pytest.raises(HomeAssistantError):
         await _stop_playbook(hass)
 
@@ -185,9 +178,7 @@ async def test_get_active_playbook_raises_error_on_non_playbook_sensor(
         hass,
         get_simple_fixed_config("switch.test"),
     )
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     with pytest.raises(HomeAssistantError):
         await _get_active_playbook(hass)
 
@@ -326,21 +317,15 @@ async def test_source_entity_trigger(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     assert_entity_state(hass, POWER_SENSOR_ID, "0.00")
     await elapse_and_assert_power(hass, 2, "20.00")
 
-    hass.states.async_set("switch.test", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_OFF)])
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=60))
     await hass.async_block_till_done()
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     assert_entity_state(hass, POWER_SENSOR_ID, "0.00")
     await elapse_and_assert_power(hass, 2, "20.00")
 
@@ -366,34 +351,22 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("media_player.sonos", STATE_PAUSED)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_PAUSED)])
     await elapse_and_assert_power(hass, 2, "2.00")
 
-    hass.states.async_set("media_player.sonos", STATE_IDLE)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_IDLE)])
     await elapse_and_assert_power(hass, 2, "5.00")
 
-    hass.states.async_set("media_player.sonos", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_OFF)])
     await elapse_and_assert_power(hass, 1, "0.10")
 
-    hass.states.async_set("media_player.sonos", STATE_IDLE)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_IDLE)])
     await elapse_and_assert_power(hass, 2, "5.00")
 
-    hass.states.async_set("media_player.sonos", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_OFF)])
     await elapse_and_assert_power(hass, 1, "0.10")
 
-    hass.states.async_set("media_player.sonos", STATE_PLAYING)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_PLAYING)])
     assert_entity_state(hass, POWER_SENSOR_ID, "0.00")
 
 

@@ -21,14 +21,12 @@ from custom_components.powercalc.sensors.group.subtract import validate_config
 from tests.common import (
     assert_entity_state,
     run_powercalc_setup,
+    set_states,
 )
 
 
 async def test_subtract_sensor(hass: HomeAssistant) -> None:
-    hass.states.async_set("sensor.a_power", 100)
-    hass.states.async_set("sensor.b_power", 20)
-    hass.states.async_set("sensor.c_power", 25)
-
+    await set_states(hass, [("sensor.a_power", 100), ("sensor.b_power", 20), ("sensor.c_power", 25)])
     await run_powercalc_setup(
         hass,
         {
@@ -45,17 +43,14 @@ async def test_subtract_sensor(hass: HomeAssistant) -> None:
 
     assert_entity_state(hass, "sensor.test_power", "55.00")
 
-    hass.states.async_set("sensor.b_power", 22.45)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.b_power", 22.45)])
     assert_entity_state(hass, "sensor.test_power", "52.55")
 
     assert hass.states.get("sensor.test_energy_daily")
 
 
 async def test_base_sensor_state_none(hass: HomeAssistant) -> None:
-    hass.states.async_set("sensor.b_power", 20)
-
+    await set_states(hass, [("sensor.b_power", 20)])
     await run_powercalc_setup(
         hass,
         {
