@@ -1015,7 +1015,6 @@ async def test_discovery_disable_runtime(
     new_data = entry.data.copy()
     new_data[CONF_DISCOVERY] = {CONF_ENABLED: False}
     hass.config_entries.async_update_entry(entry, data=new_data)
-    await hass.async_block_till_done()
 
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     assert len(flows) == 0

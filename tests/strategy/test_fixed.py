@@ -82,8 +82,6 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
         },
     )
 
-    await hass.async_block_till_done()
-
     source_entity = await create_source_entity("climate.test", hass)
     strategy = await _create_strategy(
         hass,

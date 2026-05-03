@@ -57,7 +57,6 @@ async def test_create_entry(hass: HomeAssistant) -> None:
         },
     )
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 

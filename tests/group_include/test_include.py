@@ -142,7 +142,6 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
             },
         },
     )
-    await hass.async_block_till_done()
 
     await run_powercalc_setup(
         hass,
@@ -153,7 +152,6 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
     )
 
     await hass.async_start()
-    await hass.async_block_till_done()
 
     group_state = hass.states.get("sensor.test_include_lightgroup_power")
     assert group_state

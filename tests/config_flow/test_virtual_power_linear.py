@@ -40,7 +40,6 @@ async def test_create_linear_sensor_entry(hass: HomeAssistant) -> None:
         {CONF_LINEAR: {CONF_MIN_POWER: 1, CONF_MAX_POWER: 40}},
     )
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 

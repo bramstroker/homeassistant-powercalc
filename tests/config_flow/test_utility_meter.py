@@ -41,8 +41,6 @@ async def test_utility_meter_tariffs(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
-    await hass.async_block_till_done()
-
     assert_entity_state(hass, "select.test_energy_daily", "peak")
 
     assert hass.states.get("sensor.test_energy_daily_peak")

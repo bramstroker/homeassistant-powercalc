@@ -26,7 +26,6 @@ async def test_create_multiple_entries_using_dummy(hass: HomeAssistant) -> None:
     )
     await set_virtual_power_configuration(hass, result, {CONF_POWER: 20})
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.mysensor1_power")
     assert hass.states.get("sensor.mysensor1_energy")
 
@@ -41,6 +40,5 @@ async def test_create_multiple_entries_using_dummy(hass: HomeAssistant) -> None:
     )
     await set_virtual_power_configuration(hass, result, {CONF_POWER: 20})
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.mysensor2_power")
     assert hass.states.get("sensor.mysensor2_energy")

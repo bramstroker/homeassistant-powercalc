@@ -49,7 +49,6 @@ async def test_create_fixed_sensor_entry(hass: HomeAssistant) -> None:
         {CONF_FIXED: {CONF_POWER: 20}},
     )
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 

@@ -54,7 +54,6 @@ async def test_create_multi_switch_sensor_entry(hass: HomeAssistant, entity_regi
     assert entry_data[CONF_MODE] == CalculationStrategy.MULTI_SWITCH
     assert entry_data[CONF_MULTI_SWITCH] == {CONF_ENTITIES: ["switch.a", "switch.b"], CONF_POWER: 0.8, CONF_POWER_OFF: 0.5}
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 

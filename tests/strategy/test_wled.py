@@ -52,7 +52,6 @@ async def test_can_calculate_power(
         sensor.DOMAIN,
         {sensor.DOMAIN: {CONF_PLATFORM: "test"}},
     )
-    await hass.async_block_till_done()
 
     strategy = WledStrategy(
         config={CONF_VOLTAGE: 5, CONF_POWER_FACTOR: 0.9},

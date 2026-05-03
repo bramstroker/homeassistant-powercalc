@@ -47,7 +47,6 @@ async def test_create_wled_sensor_entry(hass: HomeAssistant) -> None:
         {CONF_WLED: {CONF_VOLTAGE: 12, CONF_POWER_FACTOR: 0.8}},
     )
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 

@@ -95,7 +95,6 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
         CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
 
 

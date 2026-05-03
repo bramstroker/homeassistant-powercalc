@@ -450,7 +450,6 @@ async def test_setup_multiple_entities_in_single_platform_config(
     )
 
     await hass.async_start()
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test1_power")
     assert hass.states.get("sensor.test2_power")
@@ -480,7 +479,6 @@ async def test_change_options_of_renamed_sensor(
         name="Renamed daily utility meter",
     )
     await hass.async_block_till_done()
-
     assert hass.states.get("sensor.test_energy_daily").name == "Renamed daily utility meter"
 
     result = await initialize_options_flow(hass, entry, Step.FIXED)
@@ -489,7 +487,6 @@ async def test_change_options_of_renamed_sensor(
         user_input={CONF_POWER: 100},
     )
     await hass.async_block_till_done()
-
     assert hass.states.get("sensor.test_energy_daily").name == "Renamed daily utility meter"
 
 
@@ -506,7 +503,6 @@ async def test_renaming_sensor_is_retained_after_startup(
     await hass.async_block_till_done()
     entity_registry.async_update_entity(entity_id="sensor.test_power", name="Renamed power")
     await hass.async_block_till_done()
-
     await setup_config_entry(
         hass,
         {
@@ -619,7 +615,6 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
 
     changed_entry = hass.config_entries.async_get_entry(entry.entry_id)
     assert changed_entry.data.get(CONF_ENTITY_ID) == new_light_id
-
     await set_states(hass, [(new_light_id, STATE_ON)])
     power_state = hass.states.get("sensor.testentry_power")
     assert power_state
@@ -694,7 +689,6 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
     changed_entry = hass.config_entries.async_get_entry(entry.entry_id)
     assert changed_entry.data.get(CONF_ENTITY_ID) == new_light_id
     assert changed_entry.unique_id == original_unique_id
-
     power_state = hass.states.get("sensor.testentry_power")
     assert power_state.attributes.get(ATTR_SOURCE_ENTITY) == new_light_id
     assert power_state.state == "100.00"

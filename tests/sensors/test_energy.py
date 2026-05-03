@@ -108,8 +108,6 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(
         },
     )
 
-    await hass.async_block_till_done()
-
     power_state = hass.states.get("sensor.testgroup_power")
     assert power_state
     assert power_state.attributes.get(ATTR_ENTITIES) == {
@@ -274,7 +272,6 @@ async def test_real_energy_sensor(hass: HomeAssistant) -> None:
     )
 
     await hass.async_block_till_done()
-
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert energy_state
     assert energy_state.attributes.get(ATTR_ENTITIES) == {

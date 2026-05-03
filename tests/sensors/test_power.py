@@ -205,7 +205,6 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant) ->
 
     await set_states(hass, [("input_number.test", 30)])
     hass.bus.async_fire(EVENT_HOMEASSISTANT_START)
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.henkie_power", "30.00")
 
@@ -705,7 +704,6 @@ async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
     )
 
     await hass.async_block_till_done()
-
     assert_entity_state(hass, "sensor.test_power", "2.35")
 
     config_entry = hass.config_entries.async_get_entry(entry.entry_id)

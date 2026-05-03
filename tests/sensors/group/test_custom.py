@@ -126,8 +126,6 @@ async def test_grouped_power_sensor(hass: HomeAssistant, entity_registry: Entity
         },
     )
 
-    await hass.async_block_till_done()
-
     power_state = hass.states.get("sensor.test1_power")
     assert power_state
 
@@ -560,7 +558,6 @@ async def test_unhide_members(hass: HomeAssistant, entity_registry: EntityRegist
         hidden_by=er.RegistryEntryHider.INTEGRATION,
     )
     await hass.async_block_till_done()
-
     await run_powercalc_setup(
         hass,
         {

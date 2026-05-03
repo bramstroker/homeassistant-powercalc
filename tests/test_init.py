@@ -105,7 +105,6 @@ async def test_unload_entry(hass: HomeAssistant, entity_registry: EntityRegistry
     assert entity_registry.async_get("sensor.testentry_power")
 
     await hass.config_entries.async_unload(entry.entry_id)
-    await hass.async_block_till_done()
     assert entry.state is ConfigEntryState.NOT_LOADED
 
 
@@ -254,7 +253,6 @@ async def test_reload_service_yaml_sensors(hass: HomeAssistant) -> None:
         )
 
         await hass.async_block_till_done()
-
         assert_entity_state(hass, "sensor.test_power", "100.00")
 
         assert hass.states.get("sensor.new_power")

@@ -88,7 +88,6 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
             },
         },
     )
-    await hass.async_block_till_done()
 
     await set_states(hass, [("switch.test1", STATE_ON)])
     power_sensor = hass.states.get("sensor.outlet_self_usage_power")
