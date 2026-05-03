@@ -11,9 +11,9 @@
 
 **PowerCalc** brings energy monitoring to devices that normally *don’t support it*.
 
-- Lights, fans, media devices, and more  
-- No extra hardware needed  
-- Works seamlessly inside Home Assistant  
+- Lights, fans, media devices, and more
+- No extra hardware needed
+- Works seamlessly inside Home Assistant
 
 Instead of measuring power directly, PowerCalc **accurately estimates consumption** using smart models based on real measurements.
 
@@ -27,11 +27,11 @@ Instead of measuring power directly, PowerCalc **accurately estimates consumptio
 
 ## Why use PowerCalc?
 
-- 💰 **Save money** - no need to buy smart plugs for every device  
-- 🔍 **Full visibility** - track energy usage across your entire home  
-- ⚡ **Accurate estimates** - based on real device measurements  
-- 🔌 **Works out of the box** - huge built-in profile library  
-- 🧠 **Advanced modeling** - brightness, color, fan speed, and more  
+- 💰 **Save money** - no need to buy smart plugs for every device
+- 🔍 **Full visibility** - track energy usage across your entire home
+- ⚡ **Accurate estimates** - based on real device measurements
+- 🔌 **Works out of the box** - huge built-in profile library
+- 🧠 **Advanced modeling** - brightness, color, fan speed, and more
 
 ---
 
@@ -40,9 +40,9 @@ Instead of measuring power directly, PowerCalc **accurately estimates consumptio
 PowerCalc creates **virtual power sensors** in Home Assistant.
 
 For example:
-- 💡 Lights → power based on brightness, color, temperature  
-- 🌀 Fans → power based on speed  
-- 📺 Other devices → configurable strategies or measured profiles  
+- 💡 Lights → power based on brightness, color, temperature
+- 🌀 Fans → power based on speed
+- 📺 Other devices → configurable strategies or measured profiles
 
 You get realistic energy data — without physically measuring every device.
 
@@ -60,9 +60,9 @@ You get realistic energy data — without physically measuring every device.
 
 PowerCalc is powered by a growing community:
 
-- Contribute new device profiles  
-- Share measurements  
-- Improve accuracy for everyone  
+- Contribute new device profiles
+- Share measurements
+- Improve accuracy for everyone
 
 ---
 
