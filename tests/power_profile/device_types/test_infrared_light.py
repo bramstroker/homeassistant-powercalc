@@ -14,6 +14,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
 )
 from tests.common import (
+    assert_entity_state,
     get_test_profile_dir,
     run_powercalc_setup,
 )
@@ -65,12 +66,12 @@ async def test_infrared_light(
     hass.states.async_set(infrared_brightness_select_id, "50%")
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "4.37"
+    assert_entity_state(hass, power_sensor_id, "4.37")
 
     hass.states.async_set(infrared_brightness_select_id, "25%")
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "2.59"
+    assert_entity_state(hass, power_sensor_id, "2.59")
 
     hass.states.async_set(
         light_id,
@@ -79,4 +80,4 @@ async def test_infrared_light(
     hass.states.async_set(infrared_brightness_select_id, "50%")
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "4.36"
+    assert_entity_state(hass, power_sensor_id, "4.36")

@@ -26,7 +26,7 @@ from custom_components.powercalc.power_profile.power_profile import (
     DeviceType,
     PowerProfile,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup
 
 
 async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> None:
@@ -430,8 +430,8 @@ async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) 
     hass.states.async_set("media_player.b", STATE_PAUSED)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.a_power").state == "26.90"
-    assert hass.states.get("sensor.b_power").state == "5.20"
+    assert_entity_state(hass, "sensor.a_power", "26.90")
+    assert_entity_state(hass, "sensor.b_power", "5.20")
 
 
 @pytest.mark.parametrize(

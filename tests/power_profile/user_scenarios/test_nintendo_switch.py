@@ -12,7 +12,7 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
 )
-from tests.common import run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup
 
 
 async def test_nintendo_switch(hass: HomeAssistant) -> None:
@@ -41,27 +41,25 @@ async def test_nintendo_switch(hass: HomeAssistant) -> None:
     hass.states.async_set(media_player_device_id, STATE_ON, {"source": "Game"})
     await hass.async_block_till_done()
 
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "unavailable"
+    assert_entity_state(hass, power_sensor_id, "unavailable")
 
     hass.states.async_set(device_tracker_id, STATE_HOME)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "8.00"
+    assert_entity_state(hass, power_sensor_id, "8.00")
 
     hass.states.async_set(media_player_device_id, STATE_ON, {"source": "TV"})
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "0.00"
+    assert_entity_state(hass, power_sensor_id, "0.00")
 
     hass.states.async_set(device_tracker_id, STATE_NOT_HOME)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "12.00"
+    assert_entity_state(hass, power_sensor_id, "12.00")
 
     # After 10 seconds the device goes into sleep mode, check the sleep power is set on the power sensor
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=3000))
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "0.00"
+    assert_entity_state(hass, power_sensor_id, "0.00")

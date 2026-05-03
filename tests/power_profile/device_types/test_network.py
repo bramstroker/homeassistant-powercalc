@@ -5,7 +5,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, DUMMY_ENTITY_ID
-from tests.common import run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup
 from tests.conftest import MockEntityWithModel
 
 
@@ -28,19 +28,17 @@ async def test_network_device(hass: HomeAssistant) -> None:
         },
     )
 
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "unavailable"
+    assert_entity_state(hass, power_sensor_id, "unavailable")
 
     hass.states.async_set(binary_sensor_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "3.00"
+    assert_entity_state(hass, power_sensor_id, "3.00")
 
     hass.states.async_set(binary_sensor_id, STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "0.00"
+    assert_entity_state(hass, power_sensor_id, "0.00")
 
 
 async def test_router_discovery_by_device(

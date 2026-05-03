@@ -48,7 +48,6 @@ from custom_components.powercalc.sensors.daily_energy import (
 from tests.common import (
     assert_entity_state,
     create_input_boolean,
-    create_input_number,
     run_powercalc_setup,
     setup_config_entry,
 )
@@ -168,10 +167,10 @@ async def test_daily_energy_sensor_also_creates_power_sensor(
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
 
-    state = hass.states.get("sensor.ip_camera_upstairs_power")
-    assert state
-    assert state.state == "15.00"
-    assert state.name == "IP camera upstairs power"
+    power_state = hass.states.get("sensor.ip_camera_upstairs_power")
+    assert power_state
+    assert power_state.state == "15.00"
+    assert power_state.name == "IP camera upstairs power"
 
 
 async def test_daily_energy_sensor_kwh_also_creates_power_sensor(
@@ -286,7 +285,7 @@ async def test_calculate_delta_mega_watt_hour(hass: HomeAssistant) -> None:
 
 
 async def test_template_value(hass: HomeAssistant) -> None:
-    await create_input_number(hass, "test", 50)
+    hass.states.async_set("input_number.test", 50)
 
     update_frequency = 1800
     await run_powercalc_setup(
@@ -305,8 +304,7 @@ async def test_template_value(hass: HomeAssistant) -> None:
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=43200))
     await hass.async_block_till_done()
 
-    state = hass.states.get("sensor.router_energy")
-    assert state.state == "0.0250"
+    assert_entity_state(hass, "sensor.router_energy", "0.0250")
 
 
 async def test_config_flow_template_value(hass: HomeAssistant) -> None:
@@ -326,9 +324,7 @@ async def test_config_flow_template_value(hass: HomeAssistant) -> None:
         },
     )
 
-    power_state = hass.states.get("sensor.my_daily_power")
-    assert power_state
-    assert power_state.state == "2.50"
+    assert_entity_state(hass, "sensor.my_daily_power", "2.50")
 
 
 async def test_config_flow_decimal_value(hass: HomeAssistant) -> None:
@@ -344,9 +340,7 @@ async def test_config_flow_decimal_value(hass: HomeAssistant) -> None:
         },
     )
 
-    power_state = hass.states.get("sensor.my_daily_power")
-    assert power_state
-    assert power_state.state == "0.30"
+    assert_entity_state(hass, "sensor.my_daily_power", "0.30")
 
 
 async def test_reset_service(hass: HomeAssistant) -> None:
@@ -371,7 +365,7 @@ async def test_reset_service(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get(entity_id).state == "0.8"
+    assert_entity_state(hass, entity_id, "0.8")
 
     # Reset the group sensor and underlying group members
     await hass.services.async_call(
@@ -384,7 +378,7 @@ async def test_reset_service(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get(entity_id).state == "0.0000"
+    assert_entity_state(hass, entity_id, "0.0000")
 
 
 async def test_increase_service(hass: HomeAssistant) -> None:
@@ -408,7 +402,7 @@ async def test_increase_service(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get(entity_id).state == "1.2000"
+    assert_entity_state(hass, entity_id, "1.2000")
 
     await hass.services.async_call(
         DOMAIN,
@@ -418,7 +412,7 @@ async def test_increase_service(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get(entity_id).state == "2.7000"
+    assert_entity_state(hass, entity_id, "2.7000")
 
 
 async def test_calibrate_service(hass: HomeAssistant) -> None:
@@ -444,7 +438,7 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get(entity_id).state == "100.0000"
+    assert_entity_state(hass, entity_id, "100.0000")
 
 
 async def test_restore_state(hass: HomeAssistant) -> None:
@@ -468,7 +462,7 @@ async def test_restore_state(hass: HomeAssistant) -> None:
         },
     )
 
-    assert hass.states.get("sensor.my_daily_energy").state == "0.5000"
+    assert_entity_state(hass, "sensor.my_daily_energy", "0.5000")
 
 
 async def test_restore_state_catches_decimal_conversion_exception(
@@ -494,7 +488,7 @@ async def test_restore_state_catches_decimal_conversion_exception(
         },
     )
 
-    assert hass.states.get("sensor.my_daily_energy").state == "0.0000"
+    assert_entity_state(hass, "sensor.my_daily_energy", "0.0000")
 
 
 async def test_small_update_frequency_updates_correctly(hass: HomeAssistant) -> None:

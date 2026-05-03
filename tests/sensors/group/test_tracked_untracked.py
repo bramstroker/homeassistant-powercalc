@@ -28,7 +28,7 @@ from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor
 from custom_components.powercalc.sensors.group.subtract import SubtractGroupSensor
 from custom_components.powercalc.sensors.group.tracked_untracked import TrackedPowerSensorFactory
 from custom_components.powercalc.sensors.utility_meter import VirtualUtilityMeter
-from tests.common import mock_sensors_in_registry, run_powercalc_setup
+from tests.common import assert_entity_state, mock_sensors_in_registry, run_powercalc_setup
 from tests.config_flow.common import create_mock_entry
 
 
@@ -159,7 +159,7 @@ async def test_entity_registry_updates(hass: HomeAssistant) -> None:
 
     tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
     assert tracked_power_sensor.entities == {"sensor.test1_power", "sensor.test2_power", "sensor.test3_power"}
-    assert hass.states.get("sensor.tracked_power").state == "25.00"
+    assert_entity_state(hass, "sensor.tracked_power", "25.00")
 
     # Remove one of the tracked entities from registry
     entity_registry.async_remove("sensor.test2_power")
@@ -170,7 +170,7 @@ async def test_entity_registry_updates(hass: HomeAssistant) -> None:
 
     tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
     assert tracked_power_sensor.entities == {"sensor.test1_power_new", "sensor.test3_power"}
-    assert hass.states.get("sensor.tracked_power").state == "10.00"
+    assert_entity_state(hass, "sensor.tracked_power", "10.00")
 
     # Add a new power entity to registry
     entity_registry.async_get_or_create(
@@ -183,7 +183,7 @@ async def test_entity_registry_updates(hass: HomeAssistant) -> None:
 
     tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
     assert tracked_power_sensor.entities == {"sensor.test1_power_new", "sensor.test3_power", "sensor.test4_power"}
-    assert hass.states.get("sensor.tracked_power").state == "10.00"
+    assert_entity_state(hass, "sensor.tracked_power", "10.00")
 
 
 async def test_member_hidden_property_is_untouched(hass: HomeAssistant) -> None:

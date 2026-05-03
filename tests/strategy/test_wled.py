@@ -27,7 +27,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
 import custom_components.test.sensor as test_sensor_platform
-from tests.common import run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup
 from tests.conftest import MockEntityWithModel
 
 
@@ -271,13 +271,13 @@ async def test_yaml_configuration(hass: HomeAssistant) -> None:
     hass.states.async_set("sensor.test_current", 500)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "2.50"
+    assert_entity_state(hass, "sensor.test_power", "2.50")
 
     hass.states.async_set("light.test", STATE_OFF)
     hass.states.async_set("sensor.test_current", 50)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "0.25"
+    assert_entity_state(hass, "sensor.test_power", "0.25")
 
 
 async def test_estimated_current_sensor_unavailable(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
@@ -333,4 +333,4 @@ async def test_estimated_current_sensor_unavailable(hass: HomeAssistant, caplog:
 
     assert "light.test: Estimated current entity sensor.test_current is not available" in caplog.text
 
-    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)

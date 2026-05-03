@@ -19,6 +19,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.sensors.group.subtract import validate_config
 from tests.common import (
+    assert_entity_state,
     run_powercalc_setup,
 )
 
@@ -42,15 +43,12 @@ async def test_subtract_sensor(hass: HomeAssistant) -> None:
         },
     )
 
-    state = hass.states.get("sensor.test_power")
-    assert state
-    assert state.state == "55.00"
+    assert_entity_state(hass, "sensor.test_power", "55.00")
 
     hass.states.async_set("sensor.b_power", 22.45)
     await hass.async_block_till_done()
 
-    state = hass.states.get("sensor.test_power")
-    assert state.state == "52.55"
+    assert_entity_state(hass, "sensor.test_power", "52.55")
 
     assert hass.states.get("sensor.test_energy_daily")
 
@@ -70,9 +68,7 @@ async def test_base_sensor_state_none(hass: HomeAssistant) -> None:
         },
     )
 
-    state = hass.states.get("sensor.test_power")
-    assert state
-    assert state.state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
 
 @pytest.mark.parametrize(

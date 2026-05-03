@@ -95,6 +95,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.sensors.group.custom import PreviousStateStore, resolve_entity_ids_recursively
 from tests.common import (
+    assert_entity_state,
     create_input_booleans,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
@@ -167,8 +168,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant, entity_registry: Entity
 
     hass.states.async_set("input_boolean.test1", STATE_OFF)
 
-    power_state = hass.states.get("sensor.test1_power")
-    assert power_state.state == "10.50"
+    assert_entity_state(hass, "sensor.test1_power", "10.50")
 
 
 async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
@@ -322,7 +322,7 @@ async def test_reset_service(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "2.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "2.0000")
 
     # Reset the group sensor and underlying group members
     with patch(
@@ -339,9 +339,9 @@ async def test_reset_service(hass: HomeAssistant) -> None:
         )
         await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "0.0000"
-    assert hass.states.get("sensor.test1_energy").state == "0.0000"
-    assert hass.states.get("sensor.test2_energy").state == "0.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "0.0000")
+    assert_entity_state(hass, "sensor.test1_energy", "0.0000")
+    assert_entity_state(hass, "sensor.test2_energy", "0.0000")
 
     with patch(
         "homeassistant.util.utcnow",
@@ -354,7 +354,7 @@ async def test_reset_service(hass: HomeAssistant) -> None:
         )
         await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "0.5000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "0.5000")
 
 
 async def test_calibrate_service(hass: HomeAssistant) -> None:
@@ -383,7 +383,7 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "100.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "100.0000")
 
 
 @pytest.mark.parametrize(
@@ -442,7 +442,7 @@ async def test_restore_state(
     if expect_warning:
         assert "Could not restore last state" in caplog.text
 
-    assert hass.states.get("sensor.testgroup_energy").state == expected_state
+    assert_entity_state(hass, "sensor.testgroup_energy", expected_state)
 
 
 async def test_mega_watt_hour(hass: HomeAssistant) -> None:
@@ -482,11 +482,9 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant) -
         },
     )
 
-    power_state = hass.states.get("sensor.testgroup_power")
-    assert power_state.state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.testgroup_power", STATE_UNAVAILABLE)
 
-    energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state.state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.testgroup_energy", STATE_UNAVAILABLE)
 
     with patch(
         "homeassistant.util.utcnow",
@@ -499,8 +497,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant) -
         power_state = hass.states.get("sensor.testgroup_power")
         assert power_state.state != STATE_UNAVAILABLE
 
-        energy_state = hass.states.get("sensor.testgroup_energy")
-        assert energy_state.state == STATE_UNAVAILABLE
+        assert_entity_state(hass, "sensor.testgroup_energy", STATE_UNAVAILABLE)
 
 
 async def test_energy_group_available_when_members_temporarily_unavailable(
@@ -526,8 +523,7 @@ async def test_energy_group_available_when_members_temporarily_unavailable(
     hass.states.async_set("sensor.test2_energy", "2.0")
     await hass.async_block_till_done()
 
-    energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state.state == "3.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "3.0000")
 
     with patch(
         "homeassistant.util.utcnow",
@@ -536,8 +532,7 @@ async def test_energy_group_available_when_members_temporarily_unavailable(
         hass.states.async_set("sensor.test1_energy", STATE_UNAVAILABLE)
         await hass.async_block_till_done()
 
-        energy_state = hass.states.get("sensor.testgroup_energy")
-        assert energy_state.state == "3.0000"
+        assert_entity_state(hass, "sensor.testgroup_energy", "3.0000")
 
     with patch(
         "homeassistant.util.utcnow",
@@ -546,8 +541,7 @@ async def test_energy_group_available_when_members_temporarily_unavailable(
         hass.states.async_set("sensor.test2_energy", "2.2")
         await hass.async_block_till_done()
 
-        energy_state = hass.states.get("sensor.testgroup_energy")
-        assert energy_state.state == "3.2000"
+        assert_entity_state(hass, "sensor.testgroup_energy", "3.2000")
 
 
 async def test_hide_members(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
@@ -1025,8 +1019,7 @@ async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
 
     await hass.async_block_till_done()
 
-    energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state.state == "10.3000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "10.3000")
 
 
 async def test_power_unit_conversions(hass: HomeAssistant) -> None:
@@ -1055,6 +1048,7 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.testgroup_power")
+    assert power_state
     assert power_state.state == "200.00"
     assert power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
 
@@ -1125,7 +1119,7 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
 
-    assert hass.states.get("sensor.testgroup_power").state == "0.00"
+    assert_entity_state(hass, "sensor.testgroup_power", "0.00")
 
 
 async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> None:
@@ -1139,7 +1133,7 @@ async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> No
         ["sensor.a_energy", "sensor.b_energy"],
     )
 
-    assert hass.states.get("sensor.testgroup_energy").state == "5.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "5.0000")
 
     with patch(
         "homeassistant.util.utcnow",
@@ -1148,7 +1142,7 @@ async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> No
         hass.states.async_set("sensor.a_energy", "2.10")
         await hass.async_block_till_done()
 
-        assert hass.states.get("sensor.testgroup_energy").state == "5.1000"
+        assert_entity_state(hass, "sensor.testgroup_energy", "5.1000")
 
     # Simulate a reset, this should just be ignored.
     with patch(
@@ -1158,7 +1152,7 @@ async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> No
         hass.states.async_set("sensor.a_energy", "0.00")
         await hass.async_block_till_done()
 
-        assert hass.states.get("sensor.testgroup_energy").state == "5.1000"
+        assert_entity_state(hass, "sensor.testgroup_energy", "5.1000")
 
     with patch(
         "homeassistant.util.utcnow",
@@ -1167,7 +1161,7 @@ async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> No
         hass.states.async_set("sensor.a_energy", "0.20")
         await hass.async_block_till_done()
 
-        assert hass.states.get("sensor.testgroup_energy").state == "5.3000"
+        assert_entity_state(hass, "sensor.testgroup_energy", "5.3000")
 
 
 async def test_delta_calculation_precision(hass: HomeAssistant) -> None:
@@ -1198,7 +1192,7 @@ async def test_delta_calculation_precision(hass: HomeAssistant) -> None:
     for energy_state, expected_group_state in test_values:
         hass.states.async_set("sensor.a_energy", energy_state, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})
         await hass.async_block_till_done()
-        assert hass.states.get("sensor.testgroup_energy").state == expected_group_state
+        assert_entity_state(hass, "sensor.testgroup_energy", expected_group_state)
 
 
 async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) -> None:
@@ -1215,7 +1209,7 @@ async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) 
     hass.states.async_set("sensor.b_energy", "3.00")
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "5.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "5.0000")
 
     with patch(
         "homeassistant.util.utcnow",
@@ -1224,7 +1218,7 @@ async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) 
         hass.states.async_set("sensor.a_energy", "2.50")
         await hass.async_block_till_done()
 
-        assert hass.states.get("sensor.testgroup_energy").state == "5.5000"
+        assert_entity_state(hass, "sensor.testgroup_energy", "5.5000")
 
 
 async def test_energy_sensor_in_multiple_groups_calculates_correctly(
@@ -1254,9 +1248,9 @@ async def test_energy_sensor_in_multiple_groups_calculates_correctly(
     hass.states.async_set("sensor.b_energy", "3.00")
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroupa_energy").state == "5.0000"
-    assert hass.states.get("sensor.testgroupb_energy").state == "2.0000"
-    assert hass.states.get("sensor.testgroupc_energy").state == "2.0000"
+    assert_entity_state(hass, "sensor.testgroupa_energy", "5.0000")
+    assert_entity_state(hass, "sensor.testgroupb_energy", "2.0000")
+    assert_entity_state(hass, "sensor.testgroupc_energy", "2.0000")
 
     with patch(
         "homeassistant.util.utcnow",
@@ -1265,9 +1259,9 @@ async def test_energy_sensor_in_multiple_groups_calculates_correctly(
         hass.states.async_set("sensor.a_energy", "3.21")
         await hass.async_block_till_done()
 
-        assert hass.states.get("sensor.testgroupa_energy").state == "6.2100"
-        assert hass.states.get("sensor.testgroupb_energy").state == "3.2100"
-        assert hass.states.get("sensor.testgroupc_energy").state == "3.2100"
+        assert_entity_state(hass, "sensor.testgroupa_energy", "6.2100")
+        assert_entity_state(hass, "sensor.testgroupb_energy", "3.2100")
+        assert_entity_state(hass, "sensor.testgroupc_energy", "3.2100")
 
 
 async def test_storage(hass: HomeAssistant) -> None:
@@ -1500,9 +1494,7 @@ async def test_inital_group_sum_calculated(hass: HomeAssistant) -> None:
         ],
     )
 
-    group_state = hass.states.get("sensor.testgroup_power")
-    assert group_state
-    assert group_state.state == "0.00"
+    assert_entity_state(hass, "sensor.testgroup_power", "0.00")
 
 
 async def test_additional_energy_sensors(hass: HomeAssistant) -> None:
@@ -1631,7 +1623,7 @@ async def test_decimal_conversion_error_is_logged(hass: HomeAssistant, caplog: p
     await hass.async_block_till_done()
 
     assert "Error converting state value" in caplog.text
-    assert hass.states.get("sensor.testgroup_power").state == "0.00"
+    assert_entity_state(hass, "sensor.testgroup_power", "0.00")
 
 
 async def test_force_calculate_energy(hass: HomeAssistant) -> None:
@@ -1928,7 +1920,7 @@ async def test_start_at_zero(hass: HomeAssistant, entry_data: dict[str, Any]) ->
 
     await setup_config_entry(hass, entry_data)
 
-    assert hass.states.get("sensor.testgroup_energy").state == "0.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "0.0000")
 
     with patch(
         "homeassistant.util.utcnow",
@@ -1937,7 +1929,7 @@ async def test_start_at_zero(hass: HomeAssistant, entry_data: dict[str, Any]) ->
         hass.states.async_set("sensor.a_energy", "2.10")
         await hass.async_block_till_done()
 
-        assert hass.states.get("sensor.testgroup_energy").state == "0.1000"
+        assert_entity_state(hass, "sensor.testgroup_energy", "0.1000")
 
 
 async def test_energy_throttle(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
@@ -1956,14 +1948,14 @@ async def test_energy_throttle(hass: HomeAssistant, freezer: FrozenDateTimeFacto
         ["sensor.a_energy", "sensor.b_energy"],
     )
 
-    assert hass.states.get("sensor.testgroup_energy").state == "5.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "5.0000")
 
     # Do a state change directly after group energy sensor is created
     # These state changes should not be throttled
     hass.states.async_set("sensor.a_energy", "2.50")
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "5.5000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "5.5000")
 
     advance(DEFAULT_ENERGY_UPDATE_INTERVAL + 2)
     # Do 3 state changes after startup period has expired and throttling is activated
@@ -1973,7 +1965,7 @@ async def test_energy_throttle(hass: HomeAssistant, freezer: FrozenDateTimeFacto
     hass.states.async_set("sensor.a_energy", "2.75")
     hass.states.async_set("sensor.b_energy", "4.00")
     await hass.async_block_till_done()
-    assert hass.states.get("sensor.testgroup_energy").state == "6.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "6.0000")
 
     advance(DEFAULT_ENERGY_UPDATE_INTERVAL + 2)
     # Do another state change after the throttle period has expired
@@ -1983,7 +1975,7 @@ async def test_energy_throttle(hass: HomeAssistant, freezer: FrozenDateTimeFacto
 
     advance(DEFAULT_ENERGY_UPDATE_INTERVAL + 2)
 
-    assert hass.states.get("sensor.testgroup_energy").state == "7.0000"
+    assert_entity_state(hass, "sensor.testgroup_energy", "7.0000")
 
 
 async def test_energy_throttle_disabled(hass: HomeAssistant) -> None:
@@ -2003,7 +1995,7 @@ async def test_energy_throttle_disabled(hass: HomeAssistant) -> None:
         hass.states.async_set("sensor.b_energy", "4.00")
         hass.states.async_set("sensor.b_energy", "5.00")
         await hass.async_block_till_done()
-        assert hass.states.get("sensor.testgroup_energy").state == "9.0000"
+        assert_entity_state(hass, "sensor.testgroup_energy", "9.0000")
 
 
 async def test_power_throttle(

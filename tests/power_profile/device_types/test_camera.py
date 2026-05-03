@@ -1,6 +1,6 @@
 from homeassistant.core import HomeAssistant
 
-from tests.common import run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup
 from tests.conftest import MockEntityWithModel
 
 
@@ -23,9 +23,7 @@ async def test_reolink_e1_pro(hass: HomeAssistant, mock_entity_with_model_inform
         },
     )
 
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "2.51"
+    assert_entity_state(hass, power_sensor_id, "2.51")
 
     # Switch to night mode
     hass.states.async_set(
@@ -34,6 +32,4 @@ async def test_reolink_e1_pro(hass: HomeAssistant, mock_entity_with_model_inform
     )
 
     await hass.async_block_till_done()
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "4.08"
+    assert_entity_state(hass, power_sensor_id, "4.08")

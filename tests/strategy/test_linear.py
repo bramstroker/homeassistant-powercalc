@@ -29,7 +29,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.linear import LinearStrategy
-from tests.common import setup_config_entry
+from tests.common import assert_entity_state, setup_config_entry
 from tests.conftest import MockEntityWithModel
 
 
@@ -307,9 +307,7 @@ async def test_config_entry_with_calibrate_list(
     hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 25})
     await hass.async_block_till_done()
 
-    state = hass.states.get("sensor.test_power")
-    assert state
-    assert state.state == "1.20"
+    assert_entity_state(hass, "sensor.test_power", "1.20")
 
 
 async def test_media_player_volume_level(hass: HomeAssistant) -> None:

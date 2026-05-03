@@ -20,7 +20,7 @@ from custom_components.powercalc.const import (
     GroupType,
 )
 from custom_components.powercalc.flow_helper.flows.group import UNIQUE_ID_TRACKED_UNTRACKED
-from tests.common import mock_sensors_in_registry, run_powercalc_setup
+from tests.common import assert_entity_state, mock_sensors_in_registry, run_powercalc_setup
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -74,13 +74,9 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     await hass.async_block_till_done()
 
-    tracked_power_state = hass.states.get("sensor.tracked_power")
-    assert tracked_power_state
-    assert tracked_power_state.state == "30.00"
+    assert_entity_state(hass, "sensor.tracked_power", "30.00")
 
-    untracked_power_state = hass.states.get("sensor.untracked_power")
-    assert untracked_power_state
-    assert untracked_power_state.state == "70.00"
+    assert_entity_state(hass, "sensor.untracked_power", "70.00")
 
 
 async def test_config_flow_manual(hass: HomeAssistant) -> None:
@@ -130,13 +126,9 @@ async def test_config_flow_manual(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     await hass.async_block_till_done()
 
-    tracked_power_state = hass.states.get("sensor.tracked_power")
-    assert tracked_power_state
-    assert tracked_power_state.state == "30.00"
+    assert_entity_state(hass, "sensor.tracked_power", "30.00")
 
-    untracked_power_state = hass.states.get("sensor.untracked_power")
-    assert untracked_power_state
-    assert untracked_power_state.state == "70.00"
+    assert_entity_state(hass, "sensor.untracked_power", "70.00")
 
 
 async def test_only_single_instance(hass: HomeAssistant) -> None:

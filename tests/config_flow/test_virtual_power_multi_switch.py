@@ -28,7 +28,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.common import run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     create_mock_entry,
@@ -105,12 +105,12 @@ async def test_discovery_flow(
     hass.states.async_set("switch.test1", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "1.22"
+    assert_entity_state(hass, "sensor.test_power", "1.22")
 
     hass.states.async_set("switch.test2", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "1.95"
+    assert_entity_state(hass, "sensor.test_power", "1.95")
 
 
 async def test_switch_entities_automatically_populated_from_device(hass: HomeAssistant) -> None:
@@ -225,9 +225,7 @@ async def test_setup_without_switches(hass: HomeAssistant, mock_entity_with_mode
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
-    state = hass.states.get("sensor.test_power")
-    assert state
-    assert state.state == "0.50"
+    assert_entity_state(hass, "sensor.test_power", "0.50")
 
 
 async def test_light_switches_selectable(hass: HomeAssistant) -> None:

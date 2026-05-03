@@ -15,7 +15,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup
 
 
 async def test_vacuum_robot(
@@ -65,33 +65,31 @@ async def test_vacuum_robot(
         },
     )
 
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "unavailable"
+    assert_entity_state(hass, power_sensor_id, "unavailable")
 
     hass.states.async_set(battery_id, 50)
     hass.states.async_set(vacuum_id, VacuumActivity.CLEANING)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "0.00"
+    assert_entity_state(hass, power_sensor_id, "0.00")
 
     hass.states.async_set(battery_id, 0)
     hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "20.00"
+    assert_entity_state(hass, power_sensor_id, "20.00")
 
     hass.states.async_set(battery_id, 85)
     hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "15.00"
+    assert_entity_state(hass, power_sensor_id, "15.00")
 
     hass.states.async_set(battery_id, 100)
     hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.50"
+    assert_entity_state(hass, power_sensor_id, "1.50")
 
 
 async def test_with_tapering_playbook(hass: HomeAssistant) -> None:
@@ -139,30 +137,30 @@ async def test_with_tapering_playbook(hass: HomeAssistant) -> None:
     hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "20.00"
+    assert_entity_state(hass, power_sensor_id, "20.00")
 
     hass.states.async_set(battery_id, 100)
     hass.states.async_set(vacuum_id, VacuumActivity.DOCKED)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "0.00"
+    assert_entity_state(hass, power_sensor_id, "0.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=1))
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "9.00"
+    assert_entity_state(hass, power_sensor_id, "9.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=3))
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "5.00"
+    assert_entity_state(hass, power_sensor_id, "5.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=5))
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "3.00"
+    assert_entity_state(hass, power_sensor_id, "3.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=60))
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "3.00"
+    assert_entity_state(hass, power_sensor_id, "3.00")

@@ -14,6 +14,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
     CalculationStrategy,
 )
+from tests.common import assert_entity_state
 from tests.config_flow.common import DEFAULT_ENTITY_ID, goto_virtual_power_strategy_step, set_virtual_power_configuration
 
 
@@ -42,9 +43,7 @@ async def test_utility_meter_tariffs(hass: HomeAssistant) -> None:
 
     await hass.async_block_till_done()
 
-    tariff_select = hass.states.get("select.test_energy_daily")
-    assert tariff_select
-    assert tariff_select.state == "peak"
+    assert_entity_state(hass, "select.test_energy_daily", "peak")
 
     assert hass.states.get("sensor.test_energy_daily_peak")
     assert hass.states.get("sensor.test_energy_daily_offpeak")

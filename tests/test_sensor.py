@@ -75,6 +75,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import SensorConfigurationError
 
 from .common import (
+    assert_entity_state,
     create_input_boolean,
     get_simple_fixed_config,
     run_powercalc_setup,
@@ -92,14 +93,14 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
         get_simple_fixed_config("input_boolean.test"),
     )
 
-    state = hass.states.get("sensor.test_power")
-    assert state.state == "0.00"
+    assert_entity_state(hass, "sensor.test_power", "0.00")
 
     hass.states.async_set("input_boolean.test", STATE_ON)
     await hass.async_block_till_done()
     await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
 
     power_state = hass.states.get("sensor.test_power")
+    assert power_state
     assert power_state.state == "50.00"
     assert power_state.attributes.get(ATTR_CALCULATION_MODE) == CalculationStrategy.FIXED
     assert power_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
@@ -202,11 +203,9 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
         await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
 
-    group1 = hass.states.get("sensor.testgroup1_power")
-    assert group1.state == "100.00"
+    assert_entity_state(hass, "sensor.testgroup1_power", "100.00")
 
-    group2 = hass.states.get("sensor.testgroup2_power")
-    assert group2.state == "0.00"
+    assert_entity_state(hass, "sensor.testgroup2_power", "0.00")
 
 
 async def test_create_nested_without_group(hass: HomeAssistant) -> None:
@@ -628,6 +627,7 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.testentry_power")
+    assert power_state
     assert power_state.state == "50.00"
     assert power_state.attributes.get(ATTR_SOURCE_ENTITY) == new_light_id
 

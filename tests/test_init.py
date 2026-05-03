@@ -47,6 +47,7 @@ from custom_components.powercalc.const import (
 )
 
 from .common import (
+    assert_entity_state,
     create_input_boolean,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
@@ -79,7 +80,7 @@ async def test_domain_groups(hass: HomeAssistant, entity_registry: EntityRegistr
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_power"}
 
-    assert hass.states.get("sensor.all_light_power").state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.all_light_power", STATE_UNAVAILABLE)
 
     entity_entry = entity_registry.async_get("sensor.all_input_boolean_power")
     assert entity_entry
@@ -254,9 +255,7 @@ async def test_reload_service_yaml_sensors(hass: HomeAssistant) -> None:
         )
         await hass.async_block_till_done()
 
-        power_state = hass.states.get("sensor.test_power")
-        assert power_state
-        assert power_state.state == "100.00"
+        assert_entity_state(hass, "sensor.test_power", "100.00")
 
         assert hass.states.get("sensor.new_power")
 
@@ -307,7 +306,7 @@ async def test_reload_service_config_entries(hass: HomeAssistant) -> None:
         )
         await hass.async_block_till_done()
 
-        assert hass.states.get("sensor.test_power").state == "100.00"
+        assert_entity_state(hass, "sensor.test_power", "100.00")
 
 
 async def test_reload_service_powercalc_removed(hass: HomeAssistant) -> None:

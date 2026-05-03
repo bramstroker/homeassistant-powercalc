@@ -64,7 +64,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-from tests.common import get_simple_fixed_config, run_powercalc_setup
+from tests.common import assert_entity_state, get_simple_fixed_config, run_powercalc_setup
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -409,7 +409,7 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
 
     await run_powercalc_setup(hass)
 
-    assert hass.states.get("sensor.test_power").state == "50.00"
+    assert_entity_state(hass, "sensor.test_power", "50.00")
 
     result = await initialize_options_flow(hass, global_config_entry, Step.GLOBAL_CONFIGURATION)
 
@@ -422,7 +422,7 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
     )
     await asyncio.sleep(0.1)
 
-    assert hass.states.get("sensor.test_power").state == "50.0000"
+    assert_entity_state(hass, "sensor.test_power", "50.0000")
 
 
 def create_mock_global_config_entry(hass: HomeAssistant, data: dict[str, Any], add: bool = True) -> MockConfigEntry:

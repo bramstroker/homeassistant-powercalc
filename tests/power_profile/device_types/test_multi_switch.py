@@ -6,7 +6,7 @@ from custom_components.powercalc.const import (
     CONF_MULTI_SWITCH,
     DUMMY_ENTITY_ID,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup
 
 
 async def test_multi_switch(hass: HomeAssistant) -> None:
@@ -33,9 +33,7 @@ async def test_multi_switch(hass: HomeAssistant) -> None:
         },
     )
 
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "0.25"
+    assert_entity_state(hass, power_sensor_id, "0.25")
 
     await set_state_and_assert_power(hass, switch1_id, STATE_ON, "0.95")
     await set_state_and_assert_power(hass, switch2_id, STATE_ON, "1.65")
@@ -74,4 +72,4 @@ async def test_multi_switch_legacy(hass: HomeAssistant) -> None:
 async def set_state_and_assert_power(hass: HomeAssistant, entity_id: str, state: str, expected_power: str) -> None:
     hass.states.async_set(entity_id, state)
     await hass.async_block_till_done()
-    assert hass.states.get("sensor.outlet_device_power").state == expected_power
+    assert_entity_state(hass, "sensor.outlet_device_power", expected_power)

@@ -37,6 +37,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.strategy.composite import CompositeMode
 from tests.common import (
+    assert_entity_state,
     get_test_profile_dir,
     run_powercalc_setup,
 )
@@ -101,7 +102,7 @@ async def test_composite(hass: HomeAssistant) -> None:
     hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 200})
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "17.84"
+    assert_entity_state(hass, "sensor.test_power", "17.84")
 
 
 async def test_template_condition(hass: HomeAssistant) -> None:
@@ -133,12 +134,12 @@ async def test_template_condition(hass: HomeAssistant) -> None:
     hass.states.async_set("light.test", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "10.00"
+    assert_entity_state(hass, "sensor.test_power", "10.00")
 
     hass.states.async_set("device_tracker.iphone", STATE_ON, {"battery_level": "40"})
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "20.00"
+    assert_entity_state(hass, "sensor.test_power", "20.00")
 
 
 async def test_power_sensor_unavailable_when_no_condition_matches(
@@ -165,7 +166,7 @@ async def test_power_sensor_unavailable_when_no_condition_matches(
     hass.states.async_set("light.test", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
 
 async def test_nested_conditions(hass: HomeAssistant) -> None:
@@ -220,21 +221,21 @@ async def test_nested_conditions(hass: HomeAssistant) -> None:
     hass.states.async_set("binary_sensor.test3", STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "10.00"
+    assert_entity_state(hass, "sensor.test_power", "10.00")
 
     hass.states.async_set("binary_sensor.test1", STATE_OFF)
     hass.states.async_set("binary_sensor.test2", STATE_OFF)
     hass.states.async_set("binary_sensor.test3", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "10.00"
+    assert_entity_state(hass, "sensor.test_power", "10.00")
 
     hass.states.async_set("binary_sensor.test1", STATE_ON)
     hass.states.async_set("binary_sensor.test2", STATE_OFF)
     hass.states.async_set("binary_sensor.test3", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
 
 async def test_playbook(hass: HomeAssistant) -> None:
@@ -282,12 +283,12 @@ async def test_playbook(hass: HomeAssistant) -> None:
     hass.states.async_set(dishwasher_mode_entity, "Cycle Complete")
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.dishwasher_power").state == "9.60"
+    assert_entity_state(hass, "sensor.dishwasher_power", "9.60")
 
     hass.states.async_set(dishwasher_mode_entity, "Cycle Paused")
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.dishwasher_power").state == "1.60"
+    assert_entity_state(hass, "sensor.dishwasher_power", "1.60")
 
     hass.states.async_set(dishwasher_mode_entity, "Cycle Active")
     await hass.async_block_till_done()
@@ -295,22 +296,22 @@ async def test_playbook(hass: HomeAssistant) -> None:
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=3))
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.dishwasher_power").state == "20.00"
+    assert_entity_state(hass, "sensor.dishwasher_power", "20.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=5))
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.dishwasher_power").state == "40.00"
+    assert_entity_state(hass, "sensor.dishwasher_power", "40.00")
 
     hass.states.async_set(dishwasher_mode_entity, "Cycle Complete")
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.dishwasher_power").state == "9.60"
+    assert_entity_state(hass, "sensor.dishwasher_power", "9.60")
 
     hass.states.async_set(dishwasher_mode_entity, STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.dishwasher_power").state == "0.00"
+    assert_entity_state(hass, "sensor.dishwasher_power", "0.00")
 
 
 async def test_calculate_standby_power(hass: HomeAssistant) -> None:
@@ -348,12 +349,12 @@ async def test_calculate_standby_power(hass: HomeAssistant) -> None:
     hass.states.async_set("switch.test", STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "4.00"
+    assert_entity_state(hass, "sensor.test_power", "4.00")
 
     hass.states.async_set("switch.test", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "10.00"
+    assert_entity_state(hass, "sensor.test_power", "10.00")
 
 
 async def test_calculate_standby_power2(hass: HomeAssistant) -> None:
@@ -389,7 +390,7 @@ async def test_calculate_standby_power2(hass: HomeAssistant) -> None:
     hass.states.async_set("switch.test", STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "1.00"
+    assert_entity_state(hass, "sensor.test_power", "1.00")
 
 
 async def test_composite_strategy_from_library_profile(hass: HomeAssistant) -> None:
@@ -404,7 +405,7 @@ async def test_composite_strategy_from_library_profile(hass: HomeAssistant) -> N
     hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 200})
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "0.82"
+    assert_entity_state(hass, "sensor.test_power", "0.82")
 
 
 async def test_composite_mode_sum(hass: HomeAssistant) -> None:
@@ -444,7 +445,7 @@ async def test_composite_mode_sum(hass: HomeAssistant) -> None:
     hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 200})
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "30.00"
+    assert_entity_state(hass, "sensor.test_power", "30.00")
 
 
 async def test_sum_mode_from_library_profile(hass: HomeAssistant) -> None:
@@ -459,12 +460,12 @@ async def test_sum_mode_from_library_profile(hass: HomeAssistant) -> None:
     hass.states.async_set("sensor.test", "100")
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "22.00"
+    assert_entity_state(hass, "sensor.test_power", "22.00")
 
     hass.states.async_set("sensor.test", "20")
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "2.00"
+    assert_entity_state(hass, "sensor.test_power", "2.00")
 
 
 async def test_numeric_state_omit_entity_id(hass: HomeAssistant) -> None:
@@ -492,12 +493,12 @@ async def test_numeric_state_omit_entity_id(hass: HomeAssistant) -> None:
 
     await run_powercalc_setup(hass, sensor_config, {})
 
-    assert hass.states.get("sensor.test_power").state == "1000.00"
+    assert_entity_state(hass, "sensor.test_power", "1000.00")
 
     hass.states.async_set("sensor.test", 100)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "500.00"
+    assert_entity_state(hass, "sensor.test_power", "500.00")
 
 
 async def test_state_omit_entity_id(hass: HomeAssistant) -> None:
@@ -525,12 +526,12 @@ async def test_state_omit_entity_id(hass: HomeAssistant) -> None:
 
     await run_powercalc_setup(hass, sensor_config, {})
 
-    assert hass.states.get("sensor.test_power").state == "500.00"
+    assert_entity_state(hass, "sensor.test_power", "500.00")
 
     hass.states.async_set("media_player.test", STATE_PLAYING)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "1000.00"
+    assert_entity_state(hass, "sensor.test_power", "1000.00")
 
 
 async def test_state_attribute_entity_id(hass: HomeAssistant) -> None:
@@ -559,12 +560,12 @@ async def test_state_attribute_entity_id(hass: HomeAssistant) -> None:
 
     await run_powercalc_setup(hass, sensor_config, {})
 
-    assert hass.states.get("sensor.test_power").state == "2.00"
+    assert_entity_state(hass, "sensor.test_power", "2.00")
 
     hass.states.async_set("media_player.test", STATE_PLAYING, {"source": "HDMI1"})
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "20.00"
+    assert_entity_state(hass, "sensor.test_power", "20.00")
 
 
 async def test_lut(hass: HomeAssistant) -> None:
@@ -577,9 +578,9 @@ async def test_lut(hass: HomeAssistant) -> None:
     hass.states.async_set(light_entity, STATE_ON, {ATTR_EFFECT: "Night light"})
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_entity).state == "1.24"
+    assert_entity_state(hass, power_entity, "1.24")
 
     hass.states.async_set(light_entity, STATE_ON, {ATTR_BRIGHTNESS: 128, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS})
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_entity).state == "128.00"
+    assert_entity_state(hass, power_entity, "128.00")

@@ -51,6 +51,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.sensors.energy import VirtualEnergySensor
 from tests.common import (
+    assert_entity_state,
     create_input_boolean,
     get_simple_fixed_config,
     mock_sensors_in_registry,
@@ -180,8 +181,6 @@ async def test_force_create_energy_sensor_for_existing_power_sensor(
         },
     )
 
-    await hass.async_block_till_done()
-
     power_state = hass.states.get("sensor.testgroup_power")
     assert power_state
     assert power_state.attributes.get(ATTR_ENTITIES) == {
@@ -224,7 +223,6 @@ async def test_force_create_energy_sensor_overrides_create_energy_sensors_option
             CONF_CREATE_ENERGY_SENSORS: False,
         },
     )
-    await hass.async_block_till_done()
 
     energy_state = hass.states.get("sensor.bedroom_airco_energy")
     assert energy_state
@@ -313,8 +311,6 @@ async def test_real_energy_sensor_error_on_non_existing_entity(
         },
     )
 
-    await hass.async_block_till_done()
-
     assert "No energy sensor with id" in caplog.text
 
 
@@ -399,7 +395,7 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get(entity_id).state == "100.0000"
+    assert_entity_state(hass, entity_id, "100.0000")
 
 
 async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
@@ -503,10 +499,10 @@ async def test_force_updated_at_interval(hass: HomeAssistant) -> None:
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(minutes=60))
     await hass.async_block_till_done()
-    assert hass.states.get(energy_sensor_id).state == "0.1000"
+    assert_entity_state(hass, energy_sensor_id, "0.1000")
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=40))
     await hass.async_block_till_done()
-    assert hass.states.get(energy_sensor_id).state == "0.1011"
+    assert_entity_state(hass, energy_sensor_id, "0.1011")
 
 
 async def test_outlier_filtering(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:

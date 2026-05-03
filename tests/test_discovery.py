@@ -49,7 +49,7 @@ from custom_components.powercalc.discovery import DiscoveryStatus, get_power_pro
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 
-from .common import create_mock_light_entity, run_powercalc_setup, setup_config_entry
+from .common import assert_entity_state, create_mock_light_entity, run_powercalc_setup, setup_config_entry
 from .config_flow.test_global_configuration import create_mock_global_config_entry
 from .conftest import MockEntityWithModel
 
@@ -171,9 +171,7 @@ async def test_manually_configured_light_overrides_autodiscovered(
 
     assert len(mock_flow_init.mock_calls) == 0
 
-    state = hass.states.get("sensor.testing_power")
-    assert state
-    assert state.state == "25.00"
+    assert_entity_state(hass, "sensor.testing_power", "25.00")
 
 
 async def test_config_entry_overrides_autodiscovered(

@@ -2,7 +2,7 @@ import os
 import uuid
 
 from homeassistant import config_entries
-from homeassistant.components import input_boolean, input_number, light
+from homeassistant.components import input_boolean, light
 from homeassistant.components.light import ColorMode
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -134,19 +134,6 @@ async def create_input_booleans(hass: HomeAssistant, names: list[str]) -> None:
         hass,
         input_boolean.DOMAIN,
         config,
-    )
-    await hass.async_block_till_done()
-
-
-async def create_input_number(
-    hass: HomeAssistant,
-    name: str,
-    initial_value: int,
-) -> None:
-    assert await async_setup_component(
-        hass,
-        input_number.DOMAIN,
-        {"input_number": {name: {"min": 0, "max": 99999, "initial": initial_value}}},
     )
     await hass.async_block_till_done()
 

@@ -42,7 +42,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import create_input_boolean, create_mocked_virtual_power_sensor_entry, run_powercalc_setup, setup_config_entry
+from tests.common import assert_entity_state, create_input_boolean, create_mocked_virtual_power_sensor_entry, run_powercalc_setup, setup_config_entry
 
 
 async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
@@ -64,9 +64,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
         },
     )
 
-    tariff_select = hass.states.get("select.test_energy_daily")
-    assert tariff_select
-    assert tariff_select.state == "peak"
+    assert_entity_state(hass, "select.test_energy_daily", "peak")
 
     peak_sensor = hass.states.get("sensor.test_energy_daily_peak")
     assert peak_sensor
@@ -84,9 +82,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     general_sensor_hourly = hass.states.get("sensor.test_energy_hourly")
     assert general_sensor_hourly
 
-    tariff_select = hass.states.get("select.test_energy_daily")
-    assert tariff_select
-    assert tariff_select.state == "peak"
+    assert_entity_state(hass, "select.test_energy_daily", "peak")
 
     hass.states.async_set("select.test_energy_daily", "offpeak")
     await hass.async_block_till_done()
@@ -125,9 +121,7 @@ async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entit
         title="Entry2",
     )
 
-    tariff_select = hass.states.get("select.test_energy_daily")
-    assert tariff_select
-    assert tariff_select.state == "peak"
+    assert_entity_state(hass, "select.test_energy_daily", "peak")
 
     registry_entry = entity_registry.async_get("select.test_energy_daily")
     assert registry_entry
