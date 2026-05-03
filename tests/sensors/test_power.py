@@ -38,9 +38,9 @@ from homeassistant.helpers.template import Template
 from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import (
-    MockEntity,
-    MockEntityPlatform,
+    RegistryEntryWithDefaults,
     async_fire_time_changed,
+    mock_registry,
 )
 
 from custom_components.powercalc import CONF_IGNORE_UNAVAILABLE_STATE, CONF_POWER_UPDATE_INTERVAL
@@ -130,15 +130,17 @@ async def test_resolve_standby_power_value(
 async def test_use_real_power_sensor_in_group(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
-    platform = MockEntityPlatform(hass)
-    entity = MockEntity(
-        name="existing_power",
-        unique_id="1234",
-        device_class=SensorDeviceClass.POWER,
+    mock_registry(
+        hass,
+        {
+            "sensor.existing_power": RegistryEntryWithDefaults(
+                entity_id="sensor.existing_power",
+                unique_id="1234",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            )
+        },
     )
-    await platform.async_add_entities([entity])
-
-    await hass.async_block_till_done()
 
     await run_powercalc_setup(
         hass,

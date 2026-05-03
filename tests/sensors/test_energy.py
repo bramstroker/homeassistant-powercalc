@@ -94,8 +94,6 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(
         },
     )
 
-    await hass.async_block_till_done()
-
     await run_powercalc_setup(
         hass,
         {
@@ -164,8 +162,6 @@ async def test_force_create_energy_sensor_for_existing_power_sensor(
             ),
         },
     )
-
-    await hass.async_block_till_done()
 
     await run_powercalc_setup(
         hass,
@@ -261,8 +257,6 @@ async def test_real_energy_sensor(hass: HomeAssistant) -> None:
     """Test user can refer an existing real energy sensor to create utility meters for it or add to group with YAML"""
 
     mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
-
-    await hass.async_block_till_done()
 
     await run_powercalc_setup(
         hass,
