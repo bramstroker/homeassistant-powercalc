@@ -323,7 +323,6 @@ async def test_source_entity_trigger(hass: HomeAssistant) -> None:
 
     await set_states(hass, [("switch.test", STATE_OFF)])
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=60))
-    await hass.async_block_till_done()
 
     await set_states(hass, [("switch.test", STATE_ON)])
     assert_entity_state(hass, POWER_SENSOR_ID, "0.00")
@@ -389,7 +388,6 @@ async def elapse_and_assert_power(
     expected_power: str,
 ) -> None:
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=seconds))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, POWER_SENSOR_ID, expected_power)
 
@@ -401,7 +399,6 @@ async def _activate_playbook(hass: HomeAssistant, playbook_id: str) -> None:
         {ATTR_ENTITY_ID: POWER_SENSOR_ID, "playbook_id": playbook_id},
         blocking=True,
     )
-    await hass.async_block_till_done()
 
 
 async def _stop_playbook(hass: HomeAssistant) -> None:
@@ -411,7 +408,6 @@ async def _stop_playbook(hass: HomeAssistant) -> None:
         {ATTR_ENTITY_ID: POWER_SENSOR_ID},
         blocking=True,
     )
-    await hass.async_block_till_done()
 
 
 async def _get_active_playbook(hass: HomeAssistant) -> str | None:

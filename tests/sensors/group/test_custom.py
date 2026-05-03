@@ -278,7 +278,6 @@ async def test_parent_group_reloaded_on_subgroup_update(hass: HomeAssistant) -> 
             CONF_GROUP_POWER_ENTITIES: ["sensor.test1_power", "sensor.test3_power"],
         },
     )
-    await hass.async_block_till_done()
 
     main_group_state = hass.states.get("sensor.groupmain_power")
     assert main_group_state
@@ -335,7 +334,6 @@ async def test_reset_service(hass: HomeAssistant) -> None:
             },
             blocking=True,
         )
-        await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.testgroup_energy", "0.0000")
     assert_entity_state(hass, "sensor.test1_energy", "0.0000")
@@ -380,7 +378,6 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
         },
         blocking=True,
     )
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.testgroup_energy", "100.0000")
 
@@ -821,7 +818,6 @@ async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(
             CONF_GROUP_MEMBER_SENSORS: [config_entry_sensor.entry_id],
         },
     )
-    await hass.async_block_till_done()
     assert await hass.config_entries.async_setup(config_entry_sensor.entry_id)
 
     # Trigger a reload
@@ -1678,7 +1674,6 @@ async def test_get_group_entities_action(hass: HomeAssistant) -> None:
         blocking=True,
         return_response=True,
     )
-    await hass.async_block_till_done()
     assert res["sensor.testgroup_energy"][ATTR_ENTITIES] == {"sensor.test1_energy", "sensor.test2_energy", "sensor.test3_energy"}
 
 
@@ -1710,7 +1705,6 @@ async def test_debug_group_action_for_power_group(hass: HomeAssistant) -> None:
         blocking=True,
         return_response=True,
     )
-    await hass.async_block_till_done()
 
     assert res["sensor.testgroup_power"] == {
         ATTR_STATE: "150.00",
@@ -1756,7 +1750,6 @@ async def test_debug_group_action_for_power_group_with_unavailable_member(hass: 
         blocking=True,
         return_response=True,
     )
-    await hass.async_block_till_done()
 
     assert res["sensor.testgroup_power"] == {
         ATTR_STATE: "50.00",
@@ -1796,7 +1789,6 @@ async def test_debug_group_action_for_power_group_with_missing_member_state(hass
         blocking=True,
         return_response=True,
     )
-    await hass.async_block_till_done()
 
     assert res["sensor.testgroup_power"] == {
         ATTR_STATE: "50.00",
@@ -1843,7 +1835,6 @@ async def test_debug_group_action_for_energy_group(hass: HomeAssistant) -> None:
         blocking=True,
         return_response=True,
     )
-    await hass.async_block_till_done()
 
     assert res["sensor.testgroup_energy"] == {
         ATTR_STATE: "3.0000",

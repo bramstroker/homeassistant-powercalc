@@ -128,21 +128,17 @@ async def test_with_tapering_playbook(hass: HomeAssistant) -> None:
     assert_entity_state(hass, power_sensor_id, "0.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=1))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, power_sensor_id, "9.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=3))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, power_sensor_id, "5.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=5))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, power_sensor_id, "3.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=60))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, power_sensor_id, "3.00")

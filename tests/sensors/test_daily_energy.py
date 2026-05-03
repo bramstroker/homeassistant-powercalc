@@ -302,7 +302,6 @@ async def test_template_value(hass: HomeAssistant) -> None:
 
     # Trigger calculation in the future
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=43200))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.router_energy", "0.0250")
 
@@ -379,7 +378,6 @@ async def test_reset_service(hass: HomeAssistant) -> None:
         },
         blocking=True,
     )
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, entity_id, "0.0000")
 
@@ -403,7 +401,6 @@ async def test_increase_service(hass: HomeAssistant) -> None:
         {ATTR_ENTITY_ID: entity_id, "value": 1.2},
         blocking=True,
     )
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, entity_id, "1.2000")
 
@@ -413,7 +410,6 @@ async def test_increase_service(hass: HomeAssistant) -> None:
         {ATTR_ENTITY_ID: entity_id, "value": 1.5},
         blocking=True,
     )
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, entity_id, "2.7000")
 
@@ -439,7 +435,6 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
         },
         blocking=True,
     )
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, entity_id, "100.0000")
 

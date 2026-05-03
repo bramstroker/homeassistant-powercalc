@@ -269,7 +269,6 @@ async def test_change_device(hass: HomeAssistant) -> None:
     assert device1.config_entries == {config_entry.entry_id}
 
     hass.config_entries.async_update_entry(config_entry, data={**entry_data, CONF_DEVICE: "device2"})
-    await hass.async_block_till_done()
 
     device1 = device_registry.async_get("device1")
     assert not device1
@@ -313,7 +312,6 @@ async def test_remove_device_from_config_entry(hass: HomeAssistant) -> None:
 
     # Remove device from config entry data
     hass.config_entries.async_update_entry(config_entry, data={**entry_data})
-    await hass.async_block_till_done()
 
     device1 = device_registry.async_get("device1")
     assert not device1

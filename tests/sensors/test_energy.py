@@ -296,8 +296,6 @@ async def test_real_energy_sensor_error_on_non_existing_entity(
 
     caplog.set_level(logging.ERROR)
 
-    await hass.async_block_till_done()
-
     await run_powercalc_setup(
         hass,
         {
@@ -388,7 +386,6 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
         },
         blocking=True,
     )
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, entity_id, "100.0000")
 
@@ -497,10 +494,8 @@ async def test_force_updated_at_interval(hass: HomeAssistant) -> None:
 
     await set_states(hass, [(power_sensor_id, "100", {ATTR_UNIT_OF_MEASUREMENT: "W"})])
     async_fire_time_changed(hass, dt.utcnow() + timedelta(minutes=60))
-    await hass.async_block_till_done()
     assert_entity_state(hass, energy_sensor_id, "0.1000")
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=40))
-    await hass.async_block_till_done()
     assert_entity_state(hass, energy_sensor_id, "0.1011")
 
 

@@ -426,7 +426,6 @@ async def test_sleep_power(hass: HomeAssistant) -> None:
 
     # After 10 seconds the device goes into sleep mode, check the sleep power is set on the power sensor
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=10))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, power_entity_id, "5.00")
 
@@ -439,7 +438,6 @@ async def test_sleep_power(hass: HomeAssistant) -> None:
     # Check that the sleepmode timer is reset correctly when the device goes to a non OFF state again
     await set_states(hass, [(entity_id, STATE_ON)])
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=20))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, power_entity_id, "100.00")
 
@@ -591,7 +589,6 @@ async def test_multiply_factor_sleep_power(hass: HomeAssistant) -> None:
 
     await set_states(hass, [("switch.test", STATE_OFF)])
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=25))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.test_power", "4.00")
 
@@ -619,7 +616,6 @@ async def test_unload_entry_cancels_pending_sleep_power_timer(hass: HomeAssistan
     await hass.async_block_till_done()
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=25))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
@@ -879,7 +875,6 @@ async def test_force_update_interval(hass: HomeAssistant) -> None:
 
     for i in range(1, 4):
         async_fire_time_changed(hass, time + timedelta(seconds=20 * i))
-        await hass.async_block_till_done()
 
         cur = hass.states.get("sensor.test_power")
         assert cur

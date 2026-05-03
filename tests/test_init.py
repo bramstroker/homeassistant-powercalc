@@ -252,6 +252,7 @@ async def test_reload_service_yaml_sensors(hass: HomeAssistant) -> None:
             SERVICE_RELOAD,
             blocking=True,
         )
+
         await hass.async_block_till_done()
 
         assert_entity_state(hass, "sensor.test_power", "100.00")
@@ -277,7 +278,6 @@ async def test_reload_service_global_configuration(hass: HomeAssistant) -> None:
             SERVICE_RELOAD,
             blocking=True,
         )
-        await hass.async_block_till_done()
 
         domain_config = hass.data[DOMAIN][DOMAIN_CONFIG]
         assert not domain_config[CONF_DISCOVERY][CONF_ENABLED]
@@ -303,6 +303,7 @@ async def test_reload_service_config_entries(hass: HomeAssistant) -> None:
             SERVICE_RELOAD,
             blocking=True,
         )
+
         await hass.async_block_till_done()
 
         assert_entity_state(hass, "sensor.test_power", "100.00")
@@ -321,6 +322,5 @@ async def test_reload_service_powercalc_removed(hass: HomeAssistant) -> None:
             SERVICE_RELOAD,
             blocking=True,
         )
-        await hass.async_block_till_done()
 
         assert not hass.states.get("sensor.test_power")

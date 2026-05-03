@@ -271,12 +271,10 @@ async def test_playbook(hass: HomeAssistant) -> None:
 
     await set_states(hass, [(dishwasher_mode_entity, "Cycle Active")])
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=3))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.dishwasher_power", "20.00")
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=5))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.dishwasher_power", "40.00")
 

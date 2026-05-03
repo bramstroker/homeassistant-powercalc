@@ -825,7 +825,6 @@ async def test_update_profile_service(
         SERVICE_UPDATE_LIBRARY,
         blocking=True,
     )
-    await hass.async_block_till_done()
 
     assert len([record for record in caplog.records if "Start auto discovery" in record.message]) == 2
 

@@ -52,6 +52,5 @@ async def test_nintendo_switch(hass: HomeAssistant) -> None:
 
     # After 10 seconds the device goes into sleep mode, check the sleep power is set on the power sensor
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=3000))
-    await hass.async_block_till_done()
 
     assert_entity_state(hass, power_sensor_id, "0.00")
