@@ -658,10 +658,7 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
         unique_id=original_unique_id,
     )
 
-    await run_powercalc_setup(
-        hass,
-        {},
-    )
+    await run_powercalc_setup(hass)
 
     await set_states(hass, [(original_light_id, STATE_ON), (new_light_id, STATE_ON)])
     power_state = hass.states.get("sensor.testentry_power")
@@ -708,10 +705,7 @@ async def test_regression(hass: HomeAssistant) -> None:
         unique_id="pc_91b5b2b04e889549cb19effa3dea97e1",
     )
 
-    await run_powercalc_setup(
-        hass,
-        {},
-    )
+    await run_powercalc_setup(hass)
 
     assert hass.states.get("sensor.standing_lamp_power")
     assert hass.states.get("sensor.standing_lamp_energy")
