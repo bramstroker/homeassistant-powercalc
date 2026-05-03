@@ -615,7 +615,6 @@ async def test_unload_entry_cancels_pending_sleep_power_timer(hass: HomeAssistan
     assert_entity_state(hass, "sensor.test_power", "0.00")
 
     await hass.config_entries.async_unload(entry.entry_id)
-    await hass.async_block_till_done()
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=25))
 

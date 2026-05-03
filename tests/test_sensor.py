@@ -309,7 +309,6 @@ async def test_alternate_naming_strategy(hass: HomeAssistant) -> None:
             CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
         },
     )
-    await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.test_power_consumption")
     assert power_state
@@ -415,7 +414,6 @@ async def test_user_can_rename_entity_id(
         "abcdef_energy",
         suggested_object_id="my_renamed_energy",
     )
-    await hass.async_block_till_done()
 
     await create_input_boolean(hass)
 
@@ -428,7 +426,6 @@ async def test_user_can_rename_entity_id(
             CONF_FIXED: {CONF_POWER: 40},
         },
     )
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.my_renamed_power")
     assert not hass.states.get("sensor.test_power")
@@ -561,7 +558,6 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
             },
         ],
     )
-    await hass.async_block_till_done()
 
     assert len(caplog.records) == 2
     assert "Skipping sensor setup" in caplog.text

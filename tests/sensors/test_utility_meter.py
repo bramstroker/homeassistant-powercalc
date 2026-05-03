@@ -57,8 +57,6 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
 
     assert await async_setup_component(hass, utility_meter.DOMAIN, {})
 
-    await hass.async_block_till_done()
-
     await run_powercalc_setup(
         hass,
         {

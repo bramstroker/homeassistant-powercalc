@@ -51,7 +51,6 @@ async def test_entities_are_bound_to_source_device(
         suggested_object_id="google_home",
         device_id=device_entry.id,
     )
-    await hass.async_block_till_done()
 
     # Create powercalc sensors
     await setup_config_entry(
@@ -117,8 +116,6 @@ async def test_entities_are_bound_to_source_device2(
         },
     )
 
-    await hass.async_block_till_done()
-
     await run_powercalc_setup(
         hass,
         {CONF_ENTITY_ID: "switch.shelly", CONF_POWER_SENSOR_ID: "sensor.shelly_power"},
@@ -171,12 +168,9 @@ async def test_entities_are_bound_to_disabled_source_device(
         },
     )
 
-    await hass.async_block_till_done()
-
     await run_powercalc_setup(
         hass,
         {CONF_ENTITY_ID: light_id},
-        {},
     )
 
     energy_entity_entry = entity_reg.async_get(power_sensor_id)
