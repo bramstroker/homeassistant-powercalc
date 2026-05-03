@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from homeassistant.const import CONF_ENTITY_ID, STATE_HOME, STATE_NOT_HOME, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, STATE_HOME, STATE_NOT_HOME, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
@@ -39,7 +39,7 @@ async def test_nintendo_switch(hass: HomeAssistant) -> None:
     )
 
     await set_states(hass, [(media_player_device_id, STATE_ON, {"source": "Game"})])
-    assert_entity_state(hass, power_sensor_id, "unavailable")
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
     await set_states(hass, [(device_tracker_id, STATE_HOME)])
     assert_entity_state(hass, power_sensor_id, "8.00")

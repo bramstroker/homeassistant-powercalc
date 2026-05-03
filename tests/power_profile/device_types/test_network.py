@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock
 
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, DUMMY_ENTITY_ID
@@ -28,7 +28,7 @@ async def test_network_device(hass: HomeAssistant) -> None:
         },
     )
 
-    assert_entity_state(hass, power_sensor_id, "unavailable")
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
     await set_states(hass, [(binary_sensor_id, STATE_ON)])
     assert_entity_state(hass, power_sensor_id, "3.00")

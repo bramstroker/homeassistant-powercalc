@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from homeassistant.components.vacuum import VacuumActivity
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITY_ID, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt
@@ -65,7 +65,7 @@ async def test_vacuum_robot(
         },
     )
 
-    assert_entity_state(hass, power_sensor_id, "unavailable")
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
     await set_states(hass, [(battery_id, 50), (vacuum_id, VacuumActivity.CLEANING)])
     assert_entity_state(hass, power_sensor_id, "0.00")

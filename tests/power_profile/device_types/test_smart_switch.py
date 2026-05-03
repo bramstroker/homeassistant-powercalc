@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock
 
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult, FlowResultType
 
@@ -49,7 +49,7 @@ async def test_smart_switch_with_yaml(
         },
     )
 
-    assert_entity_state(hass, power_sensor_id, "unavailable")
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
     await set_states(hass, [(switch_id, STATE_ON)])
     assert_entity_state(hass, power_sensor_id, "0.82")
@@ -90,7 +90,7 @@ async def test_smart_switch_power_input_yaml(
         },
     )
 
-    assert_entity_state(hass, power_sensor_id, "unavailable")
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
     await set_states(hass, [(switch_id, STATE_ON)])
     assert_entity_state(hass, power_sensor_id, "50.82")

@@ -1,4 +1,4 @@
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_PAUSED, STATE_PLAYING
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_PAUSED, STATE_PLAYING, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
@@ -43,7 +43,7 @@ async def test_media_player(
         },
     )
 
-    assert_entity_state(hass, power_sensor_id, "unavailable")
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
     await set_states(
         hass,

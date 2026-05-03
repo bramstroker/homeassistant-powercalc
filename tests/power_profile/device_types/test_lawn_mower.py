@@ -1,7 +1,7 @@
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.lawn_mower import LawnMowerActivity
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from pytest_homeassistant_custom_component.common import (
@@ -70,7 +70,7 @@ async def test_lawn_mower(
         },
     )
 
-    assert_entity_state(hass, power_sensor_id, "unavailable")
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
     await set_states(hass, [(battery_id, 50), (mower_id, LawnMowerActivity.MOWING), (charging_id, STATE_OFF)])
     assert_entity_state(hass, power_sensor_id, "11.55")

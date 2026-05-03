@@ -1,5 +1,5 @@
 from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
@@ -120,7 +120,7 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     config_entry = result["result"]
 
     # Toggle the switch to different states and check for correct power values
-    assert_entity_state(hass, power_sensor_id, "unavailable")
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
     await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255})])
     assert_entity_state(hass, power_sensor_id, "50.50")
