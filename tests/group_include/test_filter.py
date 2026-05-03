@@ -29,6 +29,7 @@ from custom_components.powercalc.group_include.filter import (
     create_composite_filter,
     create_filter,
 )
+from tests.common import set_states
 
 
 @pytest.mark.parametrize(
@@ -409,18 +410,21 @@ async def test_group_filter(
         },
     )
 
-    hass.states.async_set(
-        "group.some_group",
-        STATE_ON,
-        {"entity_id": ["light.test_light"]},
+    await set_states(
+        hass,
+        [
+            (
+                "group.some_group",
+                STATE_ON,
+                {"entity_id": ["light.test_light"]},
+            ),
+            (
+                "group.other_group",
+                STATE_ON,
+                {"entity_id": ["light.other_light"]},
+            ),
+        ],
     )
-    hass.states.async_set(
-        "group.other_group",
-        "on",
-        {"entity_id": ["light.other_light"]},
-    )
-    await hass.async_block_till_done()
-
     entry = RegistryEntryWithDefaults(entity_id=entity_id, unique_id="abc", platform="test")
 
     assert GroupFilter(hass, group_id).is_valid(entry) == expected_result

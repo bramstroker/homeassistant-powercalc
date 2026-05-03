@@ -10,7 +10,7 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -32,12 +32,8 @@ async def test_power_meter(
         },
     )
 
-    hass.states.async_set(sensor_id, "50.00")
-    await hass.async_block_till_done()
-
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "0.30"
+    await set_states(hass, [(sensor_id, "50.00")])
+    assert_entity_state(hass, power_sensor_id, "0.30")
 
 
 async def test_power_meter_legacy(
@@ -58,12 +54,8 @@ async def test_power_meter_legacy(
         },
     )
 
-    hass.states.async_set(sensor_id, "50.00")
-    await hass.async_block_till_done()
-
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "0.30"
+    await set_states(hass, [(sensor_id, "50.00")])
+    assert_entity_state(hass, power_sensor_id, "0.30")
 
 
 async def test_per_device_discovery_from_gui(hass: HomeAssistant) -> None:
@@ -94,10 +86,7 @@ async def test_per_device_discovery_from_gui(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
 
-    hass.states.async_set("sensor.some_entity", "50.00")
-
+    await set_states(hass, [("sensor.some_entity", "50.00")])
     await run_powercalc_setup(hass)
 
-    power_state = hass.states.get("sensor.test_device_power")
-    assert power_state
-    assert power_state.state == "0.64"
+    assert_entity_state(hass, "sensor.test_device_power", "0.64")

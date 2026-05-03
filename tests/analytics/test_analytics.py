@@ -234,7 +234,6 @@ async def test_no_duplicate_count_after_config_reload(hass: HomeAssistant) -> No
             SERVICE_RELOAD,
             blocking=True,
         )
-        await hass.async_block_till_done()
 
     analytics = Analytics(hass)
     payload = await analytics._prepare_payload()  # noqa: SLF001

@@ -1,7 +1,7 @@
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.lawn_mower import LawnMowerActivity
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from pytest_homeassistant_custom_component.common import (
@@ -13,7 +13,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 
 
 async def test_lawn_mower(
@@ -70,48 +70,22 @@ async def test_lawn_mower(
         },
     )
 
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "unavailable"
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
-    hass.states.async_set(battery_id, 50)
-    hass.states.async_set(mower_id, LawnMowerActivity.MOWING)
-    hass.states.async_set(charging_id, STATE_OFF)
-    await hass.async_block_till_done()
+    await set_states(hass, [(battery_id, 50), (mower_id, LawnMowerActivity.MOWING), (charging_id, STATE_OFF)])
+    assert_entity_state(hass, power_sensor_id, "11.55")
 
-    assert hass.states.get(power_sensor_id).state == "11.55"
+    await set_states(hass, [(battery_id, 0), (mower_id, LawnMowerActivity.RETURNING), (charging_id, STATE_OFF)])
+    assert_entity_state(hass, power_sensor_id, "11.55")
 
-    hass.states.async_set(battery_id, 0)
-    hass.states.async_set(mower_id, LawnMowerActivity.RETURNING)
-    hass.states.async_set(charging_id, STATE_OFF)
-    await hass.async_block_till_done()
+    await set_states(hass, [(battery_id, 85), (mower_id, LawnMowerActivity.DOCKED), (charging_id, STATE_ON)])
+    assert_entity_state(hass, power_sensor_id, "63.35")
 
-    assert hass.states.get(power_sensor_id).state == "11.55"
+    await set_states(hass, [(battery_id, 100), (mower_id, LawnMowerActivity.DOCKED), (charging_id, STATE_ON)])
+    assert_entity_state(hass, power_sensor_id, "2.12")
 
-    hass.states.async_set(battery_id, 85)
-    hass.states.async_set(mower_id, LawnMowerActivity.DOCKED)
-    hass.states.async_set(charging_id, STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [(battery_id, 100), (mower_id, LawnMowerActivity.PAUSED), (charging_id, STATE_ON)])
+    assert_entity_state(hass, power_sensor_id, "2.12")
 
-    assert hass.states.get(power_sensor_id).state == "63.35"
-
-    hass.states.async_set(battery_id, 100)
-    hass.states.async_set(mower_id, LawnMowerActivity.DOCKED)
-    hass.states.async_set(charging_id, STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "2.12"
-
-    hass.states.async_set(battery_id, 100)
-    hass.states.async_set(mower_id, LawnMowerActivity.PAUSED)
-    hass.states.async_set(charging_id, STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "2.12"
-
-    hass.states.async_set(battery_id, 100)
-    hass.states.async_set(mower_id, LawnMowerActivity.MOWING)
-    hass.states.async_set(charging_id, STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "11.55"
+    await set_states(hass, [(battery_id, 100), (mower_id, LawnMowerActivity.MOWING), (charging_id, STATE_OFF)])
+    assert_entity_state(hass, power_sensor_id, "11.55")

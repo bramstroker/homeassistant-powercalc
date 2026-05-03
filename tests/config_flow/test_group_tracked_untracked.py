@@ -20,7 +20,7 @@ from custom_components.powercalc.const import (
     GroupType,
 )
 from custom_components.powercalc.flow_helper.flows.group import UNIQUE_ID_TRACKED_UNTRACKED
-from tests.common import mock_sensors_in_registry, run_powercalc_setup
+from tests.common import assert_entity_state, mock_sensors_in_registry, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -66,21 +66,14 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_GROUP_TRACKED_AUTO: True,
     }
 
-    hass.states.async_set("sensor.mains_power", "100")
-    await hass.async_block_till_done()
-    hass.states.async_set("sensor.1_power", "10")
-    hass.states.async_set("sensor.2_power", "20")
-    hass.states.async_set("sensor.3_power", "30")
-    await hass.async_block_till_done()
-    await hass.async_block_till_done()
+    await set_states(
+        hass,
+        [("sensor.mains_power", "100"), ("sensor.1_power", "10"), ("sensor.2_power", "20"), ("sensor.3_power", "30")],
+        block_count=2,
+    )
+    assert_entity_state(hass, "sensor.tracked_power", "30.00")
 
-    tracked_power_state = hass.states.get("sensor.tracked_power")
-    assert tracked_power_state
-    assert tracked_power_state.state == "30.00"
-
-    untracked_power_state = hass.states.get("sensor.untracked_power")
-    assert untracked_power_state
-    assert untracked_power_state.state == "70.00"
+    assert_entity_state(hass, "sensor.untracked_power", "70.00")
 
 
 async def test_config_flow_manual(hass: HomeAssistant) -> None:
@@ -123,20 +116,10 @@ async def test_config_flow_manual(hass: HomeAssistant) -> None:
         CONF_GROUP_TRACKED_POWER_ENTITIES: ["sensor.1_power", "sensor.2_power"],
     }
 
-    hass.states.async_set("sensor.mains_power", "100")
-    await hass.async_block_till_done()
-    hass.states.async_set("sensor.1_power", "10")
-    hass.states.async_set("sensor.2_power", "20")
-    await hass.async_block_till_done()
-    await hass.async_block_till_done()
+    await set_states(hass, [("sensor.mains_power", "100"), ("sensor.1_power", "10"), ("sensor.2_power", "20")], block_count=2)
+    assert_entity_state(hass, "sensor.tracked_power", "30.00")
 
-    tracked_power_state = hass.states.get("sensor.tracked_power")
-    assert tracked_power_state
-    assert tracked_power_state.state == "30.00"
-
-    untracked_power_state = hass.states.get("sensor.untracked_power")
-    assert untracked_power_state
-    assert untracked_power_state.state == "70.00"
+    assert_entity_state(hass, "sensor.untracked_power", "70.00")
 
 
 async def test_only_single_instance(hass: HomeAssistant) -> None:

@@ -45,8 +45,10 @@ from custom_components.powercalc.const import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SensorType,
 )
+from tests.common import set_states
 
 from .common import (
+    assert_entity_state,
     create_input_boolean,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
@@ -79,7 +81,7 @@ async def test_domain_groups(hass: HomeAssistant, entity_registry: EntityRegistr
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_power"}
 
-    assert hass.states.get("sensor.all_light_power").state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.all_light_power", STATE_UNAVAILABLE)
 
     entity_entry = entity_registry.async_get("sensor.all_input_boolean_power")
     assert entity_entry
@@ -103,7 +105,6 @@ async def test_unload_entry(hass: HomeAssistant, entity_registry: EntityRegistry
     assert entity_registry.async_get("sensor.testentry_power")
 
     await hass.config_entries.async_unload(entry.entry_id)
-    await hass.async_block_till_done()
     assert entry.state is ConfigEntryState.NOT_LOADED
 
 
@@ -243,20 +244,16 @@ async def test_reload_service_yaml_sensors(hass: HomeAssistant) -> None:
         },
     }
 
-    hass.states.async_set("light.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_ON)])
     with patch("homeassistant.config.load_yaml_config_file", return_value=new_config):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_RELOAD,
             blocking=True,
         )
-        await hass.async_block_till_done()
 
-        power_state = hass.states.get("sensor.test_power")
-        assert power_state
-        assert power_state.state == "100.00"
+        await hass.async_block_till_done()
+        assert_entity_state(hass, "sensor.test_power", "100.00")
 
         assert hass.states.get("sensor.new_power")
 
@@ -279,7 +276,6 @@ async def test_reload_service_global_configuration(hass: HomeAssistant) -> None:
             SERVICE_RELOAD,
             blocking=True,
         )
-        await hass.async_block_till_done()
 
         domain_config = hass.data[DOMAIN][DOMAIN_CONFIG]
         assert not domain_config[CONF_DISCOVERY][CONF_ENABLED]
@@ -305,9 +301,10 @@ async def test_reload_service_config_entries(hass: HomeAssistant) -> None:
             SERVICE_RELOAD,
             blocking=True,
         )
+
         await hass.async_block_till_done()
 
-        assert hass.states.get("sensor.test_power").state == "100.00"
+        assert_entity_state(hass, "sensor.test_power", "100.00")
 
 
 async def test_reload_service_powercalc_removed(hass: HomeAssistant) -> None:
@@ -323,6 +320,5 @@ async def test_reload_service_powercalc_removed(hass: HomeAssistant) -> None:
             SERVICE_RELOAD,
             blocking=True,
         )
-        await hass.async_block_till_done()
 
         assert not hass.states.get("sensor.test_power")

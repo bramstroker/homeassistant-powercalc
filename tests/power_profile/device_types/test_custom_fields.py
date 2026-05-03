@@ -7,16 +7,14 @@ import pytest
 from custom_components.powercalc.const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL, CONF_VARIABLES, DUMMY_ENTITY_ID
 from custom_components.powercalc.power_profile.error import LibraryError
 from custom_components.powercalc.power_profile.library import ProfileLibrary
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 
 
 async def test_custom_field_variables_from_yaml_config(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """Test custom field variables can be passed from YAML configuration"""
     caplog.set_level(logging.ERROR)
 
-    hass.states.async_set("sensor.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("sensor.test", STATE_ON)])
     await run_powercalc_setup(
         hass,
         {
@@ -32,7 +30,7 @@ async def test_custom_field_variables_from_yaml_config(hass: HomeAssistant, capl
 
     assert not caplog.records
 
-    assert hass.states.get("sensor.test_power").state == "20.00"
+    assert_entity_state(hass, "sensor.test_power", "20.00")
 
 
 async def test_validation_fails_when_not_all_variables_passed(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
@@ -90,8 +88,7 @@ async def test_validate_variables(
 
 async def test_custom_fields_with_template(hass: HomeAssistant) -> None:
     """Test custom field variables can be passed from YAML configuration"""
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [("switch.test", STATE_ON)])
     await run_powercalc_setup(
         hass,
         {
@@ -103,4 +100,4 @@ async def test_custom_fields_with_template(hass: HomeAssistant) -> None:
         },
     )
 
-    assert hass.states.get("sensor.test_power").state == "0.80"
+    assert_entity_state(hass, "sensor.test_power", "0.80")

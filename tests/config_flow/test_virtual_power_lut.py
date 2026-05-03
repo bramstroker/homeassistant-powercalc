@@ -77,7 +77,6 @@ async def test_lut_manual_flow(hass: HomeAssistant) -> None:
         {CONF_MANUFACTURER: "signify", CONF_MODEL: "LCT010"},
     )
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 

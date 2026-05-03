@@ -64,7 +64,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-from tests.common import get_simple_fixed_config, run_powercalc_setup
+from tests.common import assert_entity_state, get_simple_fixed_config, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -379,9 +379,7 @@ async def test_throttling_options_flow(hass: HomeAssistant) -> None:
 async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> None:
     """Test entities are reloaded reflecting changes."""
 
-    hass.states.async_set("light.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_ON)])
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data={
@@ -409,7 +407,7 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
 
     await run_powercalc_setup(hass)
 
-    assert hass.states.get("sensor.test_power").state == "50.00"
+    assert_entity_state(hass, "sensor.test_power", "50.00")
 
     result = await initialize_options_flow(hass, global_config_entry, Step.GLOBAL_CONFIGURATION)
 
@@ -422,7 +420,7 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
     )
     await asyncio.sleep(0.1)
 
-    assert hass.states.get("sensor.test_power").state == "50.0000"
+    assert_entity_state(hass, "sensor.test_power", "50.0000")
 
 
 def create_mock_global_config_entry(hass: HomeAssistant, data: dict[str, Any], add: bool = True) -> MockConfigEntry:

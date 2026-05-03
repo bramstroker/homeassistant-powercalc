@@ -1,7 +1,7 @@
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 
-from tests.common import run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -26,7 +26,5 @@ async def test_shelly_plug_auto_sub_profile(
         },
     )
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_device_power").state == "0.80"
+    await set_states(hass, [("switch.test", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_device_power", "0.80")

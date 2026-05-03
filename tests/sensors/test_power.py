@@ -38,9 +38,9 @@ from homeassistant.helpers.template import Template
 from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import (
-    MockEntity,
-    MockEntityPlatform,
+    RegistryEntryWithDefaults,
     async_fire_time_changed,
+    mock_registry,
 )
 
 from custom_components.powercalc import CONF_IGNORE_UNAVAILABLE_STATE, CONF_POWER_UPDATE_INTERVAL
@@ -79,10 +79,10 @@ from custom_components.powercalc.const import (
 from tests.common import (
     assert_entity_state,
     create_input_boolean,
-    create_input_number,
     get_simple_fixed_config,
     get_test_profile_dir,
     run_powercalc_setup,
+    set_states,
     setup_config_entry,
 )
 from tests.conftest import MockEntityWithModel
@@ -130,15 +130,17 @@ async def test_resolve_standby_power_value(
 async def test_use_real_power_sensor_in_group(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
-    platform = MockEntityPlatform(hass)
-    entity = MockEntity(
-        name="existing_power",
-        unique_id="1234",
-        device_class=SensorDeviceClass.POWER,
+    mock_registry(
+        hass,
+        {
+            "sensor.existing_power": RegistryEntryWithDefaults(
+                entity_id="sensor.existing_power",
+                unique_id="1234",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            )
+        },
     )
-    await platform.async_add_entities([entity])
-
-    await hass.async_block_till_done()
 
     await run_powercalc_setup(
         hass,
@@ -157,8 +159,6 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant) -> None:
             ],
         },
     )
-
-    await hass.async_block_till_done()
 
     group_state = hass.states.get("sensor.testgroup_power")
     assert group_state
@@ -181,14 +181,10 @@ async def test_rounding_precision(hass: HomeAssistant, entity_registry: EntityRe
     assert power_entry
     assert power_entry.options == {"sensor": {"suggested_display_precision": 4}}
 
-    state = hass.states.get("sensor.test_power")
-    assert state.state == "0.0000"
+    assert_entity_state(hass, "sensor.test_power", "0.0000")
 
-    hass.states.async_set("input_boolean.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    power_state = hass.states.get("sensor.test_power")
-    assert power_state.state == "50.0000"
+    await set_states(hass, [("input_boolean.test", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_power", "50.0000")
 
 
 async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant) -> None:
@@ -207,12 +203,10 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant) ->
         },
     )
 
-    await create_input_number(hass, "test", 30)
-
+    await set_states(hass, [("input_number.test", 30)])
     hass.bus.async_fire(EVENT_HOMEASSISTANT_START)
-    await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.henkie_power").state == "30.00"
+    assert_entity_state(hass, "sensor.henkie_power", "30.00")
 
 
 async def test_standby_power(hass: HomeAssistant) -> None:
@@ -225,17 +219,11 @@ async def test_standby_power(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("input_boolean.test", STATE_OFF)
-    await hass.async_block_till_done()
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
+    assert_entity_state(hass, "sensor.test_power", "0.50")
 
-    power_state = hass.states.get("sensor.test_power")
-    assert power_state.state == "0.50"
-
-    hass.states.async_set("input_boolean.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    power_state = hass.states.get("sensor.test_power")
-    assert power_state.state == "15.00"
+    await set_states(hass, [("input_boolean.test", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_power", "15.00")
 
 
 async def test_multiply_factor(hass: HomeAssistant) -> None:
@@ -252,14 +240,10 @@ async def test_multiply_factor(hass: HomeAssistant) -> None:
         },
     )
 
-    power_state = hass.states.get("sensor.test_power")
-    assert power_state.state == "0.60"
+    assert_entity_state(hass, "sensor.test_power", "0.60")
 
-    hass.states.async_set("input_boolean.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    power_state = hass.states.get("sensor.test_power")
-    assert power_state.state == "15.00"
+    await set_states(hass, [("input_boolean.test", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_power", "15.00")
 
 
 async def test_error_when_no_strategy_has_been_configured(
@@ -311,35 +295,23 @@ async def test_strategy_enabled_condition(hass: HomeAssistant) -> None:
 
     assert hass.states.get(power_entity_id)
 
-    hass.states.async_set(vacuum_entity_id, VacuumActivity.CLEANING, {ATTR_BATTERY_LEVEL: 40})
-    await hass.async_block_till_done()
+    await set_states(hass, [(vacuum_entity_id, VacuumActivity.CLEANING, {ATTR_BATTERY_LEVEL: 40})])
+    assert_entity_state(hass, power_entity_id, "0.00")
 
-    assert hass.states.get(power_entity_id).state == "0.00"
+    await set_states(hass, [(vacuum_entity_id, VacuumActivity.RETURNING, {ATTR_BATTERY_LEVEL: 40})])
+    assert_entity_state(hass, power_entity_id, "0.00")
 
-    hass.states.async_set(vacuum_entity_id, VacuumActivity.RETURNING, {ATTR_BATTERY_LEVEL: 40})
-    await hass.async_block_till_done()
+    await set_states(hass, [(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 20})])
+    assert_entity_state(hass, power_entity_id, "20.00")
 
-    assert hass.states.get(power_entity_id).state == "0.00"
+    await set_states(hass, [(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 60})])
+    assert_entity_state(hass, power_entity_id, "20.00")
 
-    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 20})
-    await hass.async_block_till_done()
+    await set_states(hass, [(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 80})])
+    assert_entity_state(hass, power_entity_id, "15.00")
 
-    assert hass.states.get(power_entity_id).state == "20.00"
-
-    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 60})
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_entity_id).state == "20.00"
-
-    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 80})
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_entity_id).state == "15.00"
-
-    hass.states.async_set(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 100})
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_entity_id).state == "1.50"
+    await set_states(hass, [(vacuum_entity_id, VacuumActivity.DOCKED, {ATTR_BATTERY_LEVEL: 100})])
+    assert_entity_state(hass, power_entity_id, "1.50")
 
 
 async def test_strategy_enabled_condition_template_tracking(
@@ -356,20 +328,14 @@ async def test_strategy_enabled_condition_template_tracking(
         },
     )
 
-    hass.states.async_set("sensor.my_entity", STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [("sensor.my_entity", STATE_ON)])
+    assert_entity_state(hass, "sensor.my_entity_power", "0.00")
 
-    assert hass.states.get("sensor.my_entity_power").state == "0.00"
+    await set_states(hass, [("sensor.other_entity", "foo")])
+    assert_entity_state(hass, "sensor.my_entity_power", "5.00")
 
-    hass.states.async_set("sensor.other_entity", "foo")
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.my_entity_power").state == "5.00"
-
-    hass.states.async_set("sensor.other_entity", "bar")
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.my_entity_power").state == "0.00"
+    await set_states(hass, [("sensor.other_entity", "bar")])
+    assert_entity_state(hass, "sensor.my_entity_power", "0.00")
 
 
 async def test_template_entity_tracking(hass: HomeAssistant) -> None:
@@ -381,15 +347,11 @@ async def test_template_entity_tracking(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("input_number.test", 0)
-    await hass.async_block_till_done()
+    await set_states(hass, [("input_number.test", 0)])
+    assert_entity_state(hass, "sensor.test_power", "0.00")
 
-    assert hass.states.get("sensor.test_power").state == "0.00"
-
-    hass.states.async_set("input_number.test", 15)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "15.00"
+    await set_states(hass, [("input_number.test", 15)])
+    assert_entity_state(hass, "sensor.test_power", "15.00")
 
 
 async def test_template_entity_not_double_tracked(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
@@ -421,10 +383,8 @@ async def test_unknown_source_entity_state(hass: HomeAssistant) -> None:
             CONF_FIXED: {CONF_POWER: 20},
         },
     )
-    hass.states.async_set("input_boolean.test", STATE_UNKNOWN)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+    await set_states(hass, [("input_boolean.test", STATE_UNKNOWN)])
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
 
 async def test_error_when_model_not_supported(
@@ -462,34 +422,25 @@ async def test_sleep_power(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set(entity_id, STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_entity_id).state == "20.00"
+    await set_states(hass, [(entity_id, STATE_OFF)])
+    assert_entity_state(hass, power_entity_id, "20.00")
 
     # After 10 seconds the device goes into sleep mode, check the sleep power is set on the power sensor
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=10))
-    await hass.async_block_till_done()
 
-    assert hass.states.get(power_entity_id).state == "5.00"
+    assert_entity_state(hass, power_entity_id, "5.00")
 
-    hass.states.async_set(entity_id, STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [(entity_id, STATE_ON)])
+    assert_entity_state(hass, power_entity_id, "100.00")
 
-    assert hass.states.get(power_entity_id).state == "100.00"
-
-    hass.states.async_set(entity_id, STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_entity_id).state == "20.00"
+    await set_states(hass, [(entity_id, STATE_OFF)])
+    assert_entity_state(hass, power_entity_id, "20.00")
 
     # Check that the sleepmode timer is reset correctly when the device goes to a non OFF state again
-    hass.states.async_set(entity_id, STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [(entity_id, STATE_ON)])
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=20))
-    await hass.async_block_till_done()
 
-    assert hass.states.get(power_entity_id).state == "100.00"
+    assert_entity_state(hass, power_entity_id, "100.00")
 
 
 async def test_unavailable_power(hass: HomeAssistant) -> None:
@@ -506,10 +457,8 @@ async def test_unavailable_power(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("input_boolean.test", STATE_UNAVAILABLE)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "0.00"
+    await set_states(hass, [("input_boolean.test", STATE_UNAVAILABLE)])
+    assert_entity_state(hass, "sensor.test_power", "0.00")
 
 
 async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
@@ -546,19 +495,14 @@ async def test_manually_configured_sensor_overrides_profile(
         },
     )
 
-    hass.states.async_set("light.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_ON)])
     assert_entity_state(hass, "sensor.test_123_power", "6.00")
 
-    hass.states.async_set("light.test", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.test", STATE_OFF)])
     assert_entity_state(hass, "sensor.test_123_power", "0.00")
 
 
 async def test_standby_power_template(hass: HomeAssistant) -> None:
-    await create_input_number(hass, "test", 0)
     await create_input_boolean(hass)
 
     await run_powercalc_setup(
@@ -571,15 +515,11 @@ async def test_standby_power_template(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("input_number.test", 20)
-    await hass.async_block_till_done()
+    await set_states(hass, [("input_number.test", 20)])
+    assert_entity_state(hass, "sensor.test_power", "20.00")
 
-    assert hass.states.get("sensor.test_power").state == "20.00"
-
-    hass.states.async_set("input_number.test", 60)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "60.00"
+    await set_states(hass, [("input_number.test", 60)])
+    assert_entity_state(hass, "sensor.test_power", "60.00")
 
 
 async def test_power_state_unavailable_when_source_entity_has_no_state(
@@ -593,7 +533,7 @@ async def test_power_state_unavailable_when_source_entity_has_no_state(
             CONF_FIXED: {CONF_POWER: 40},
         },
     )
-    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
 
 async def test_multiply_factor_standby(hass: HomeAssistant) -> None:
@@ -608,15 +548,11 @@ async def test_multiply_factor_standby(hass: HomeAssistant) -> None:
             CONF_MULTIPLY_FACTOR_STANDBY: True,
         },
     )
-    hass.states.async_set("switch.test", STATE_OFF)
-    await hass.async_block_till_done()
+    await set_states(hass, [("switch.test", STATE_OFF)])
+    assert_entity_state(hass, "sensor.test_power", "8.00")
 
-    assert hass.states.get("sensor.test_power").state == "8.00"
-
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "40.00"
+    await set_states(hass, [("switch.test", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_power", "40.00")
 
 
 async def test_multiply_factor_standby_power_on(hass: HomeAssistant) -> None:
@@ -632,10 +568,8 @@ async def test_multiply_factor_standby_power_on(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "1.64"
+    await set_states(hass, [("switch.test", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_power", "1.64")
 
 
 async def test_multiply_factor_sleep_power(hass: HomeAssistant) -> None:
@@ -654,13 +588,10 @@ async def test_multiply_factor_sleep_power(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("switch.test", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_OFF)])
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=25))
-    await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "4.00"
+    assert_entity_state(hass, "sensor.test_power", "4.00")
 
 
 async def test_unload_entry_cancels_pending_sleep_power_timer(hass: HomeAssistant) -> None:
@@ -679,18 +610,14 @@ async def test_unload_entry_cancels_pending_sleep_power_timer(hass: HomeAssistan
         },
     )
 
-    hass.states.async_set("switch.test", STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "0.00"
+    await set_states(hass, [("switch.test", STATE_OFF)])
+    assert_entity_state(hass, "sensor.test_power", "0.00")
 
     await hass.config_entries.async_unload(entry.entry_id)
-    await hass.async_block_till_done()
 
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=25))
-    await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
 
 async def test_standby_power_invalid_template(hass: HomeAssistant) -> None:
@@ -706,16 +633,11 @@ async def test_standby_power_invalid_template(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("switch.test", STATE_OFF)
-    hass.states.async_set("sensor.foo", "bla")
-    await hass.async_block_till_done()
+    await set_states(hass, [("switch.test", STATE_OFF), ("sensor.foo", "bla")])
+    assert_entity_state(hass, "sensor.test_power", "0.00")
 
-    assert hass.states.get("sensor.test_power").state == "0.00"
-
-    hass.states.async_set("sensor.foo", "20")
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "20.00"
+    await set_states(hass, [("sensor.foo", "20")])
+    assert_entity_state(hass, "sensor.test_power", "20.00")
 
 
 async def test_entity_category(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
@@ -747,10 +669,8 @@ async def test_sub_profile_default_select(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_device_power").state == "0.80"
+    await set_states(hass, [("switch.test", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_device_power", "0.80")
 
 
 async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
@@ -768,13 +688,10 @@ async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
         unique_id,
     )
 
-    hass.states.async_set("camera.test", STATE_IDLE)
-
+    await set_states(hass, [("camera.test", STATE_IDLE)])
     await run_powercalc_setup(hass)
 
-    power_state = hass.states.get("sensor.test_power")
-    assert power_state
-    assert power_state.state == "1.32"
+    assert_entity_state(hass, "sensor.test_power", "1.32")
 
     await hass.services.async_call(
         DOMAIN,
@@ -787,10 +704,7 @@ async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
     )
 
     await hass.async_block_till_done()
-
-    power_state = hass.states.get("sensor.test_power")
-    assert power_state
-    assert power_state.state == "2.35"
+    assert_entity_state(hass, "sensor.test_power", "2.35")
 
     config_entry = hass.config_entries.async_get_entry(entry.entry_id)
     assert config_entry.data.get(CONF_MODEL) == "sub_profile_camera/night_vision"
@@ -824,8 +738,7 @@ async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profi
         unique_id,
     )
 
-    hass.states.async_set("light.test", STATE_ON)
-
+    await set_states(hass, [("light.test", STATE_ON)])
     await run_powercalc_setup(hass)
 
     with pytest.raises(HomeAssistantError):
@@ -857,16 +770,20 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
         unique_id,
     )
 
-    hass.states.async_set(
-        "light.test",
-        STATE_ON,
-        {
-            ATTR_BRIGHTNESS: 20,
-            ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
-            ATTR_COLOR_TEMP_KELVIN: 50000,
-        },
+    await set_states(
+        hass,
+        [
+            (
+                "light.test",
+                STATE_ON,
+                {
+                    ATTR_BRIGHTNESS: 20,
+                    ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
+                    ATTR_COLOR_TEMP_KELVIN: 50000,
+                },
+            ),
+        ],
     )
-
     await run_powercalc_setup(hass)
 
     with pytest.raises(HomeAssistantError):
@@ -892,15 +809,11 @@ async def test_availability_entity(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("sensor.availability", STATE_UNAVAILABLE)
-    await hass.async_block_till_done()
+    await set_states(hass, [("sensor.availability", STATE_UNAVAILABLE)])
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
-    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
-
-    hass.states.async_set("sensor.availability", STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "10.00"
+    await set_states(hass, [("sensor.availability", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_power", "10.00")
 
 
 async def test_dummy_source_ignores_availability_entity_state_for_power_calculation(hass: HomeAssistant) -> None:
@@ -914,15 +827,11 @@ async def test_dummy_source_ignores_availability_entity_state_for_power_calculat
         },
     )
 
-    hass.states.async_set("binary_sensor.availability", STATE_OFF)
-    await hass.async_block_till_done()
+    await set_states(hass, [("binary_sensor.availability", STATE_OFF)])
+    assert_entity_state(hass, "sensor.test_power", "10.00")
 
-    assert hass.states.get("sensor.test_power").state == "10.00"
-
-    hass.states.async_set("binary_sensor.availability", STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "10.00"
+    await set_states(hass, [("binary_sensor.availability", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_power", "10.00")
 
 
 async def test_cover_entity_standby_power(hass: HomeAssistant) -> None:
@@ -935,17 +844,14 @@ async def test_cover_entity_standby_power(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("cover.test", STATE_CLOSED)
-    await hass.async_block_till_done()
-    assert hass.states.get("sensor.test_power").state == "1.50"
+    await set_states(hass, [("cover.test", STATE_CLOSED)])
+    assert_entity_state(hass, "sensor.test_power", "1.50")
 
-    hass.states.async_set("cover.test", STATE_OPEN)
-    await hass.async_block_till_done()
-    assert hass.states.get("sensor.test_power").state == "1.50"
+    await set_states(hass, [("cover.test", STATE_OPEN)])
+    assert_entity_state(hass, "sensor.test_power", "1.50")
 
-    hass.states.async_set("cover.test", STATE_OPENING)
-    await hass.async_block_till_done()
-    assert hass.states.get("sensor.test_power").state == "10.00"
+    await set_states(hass, [("cover.test", STATE_OPENING)])
+    assert_entity_state(hass, "sensor.test_power", "10.00")
 
 
 async def test_force_update_interval(hass: HomeAssistant) -> None:
@@ -968,7 +874,6 @@ async def test_force_update_interval(hass: HomeAssistant) -> None:
 
     for i in range(1, 4):
         async_fire_time_changed(hass, time + timedelta(seconds=20 * i))
-        await hass.async_block_till_done()
 
         cur = hass.states.get("sensor.test_power")
         assert cur

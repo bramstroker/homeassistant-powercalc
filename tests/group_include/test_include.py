@@ -12,6 +12,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     STATE_OFF,
+    STATE_ON,
 )
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.area_registry import AreaRegistry
@@ -62,6 +63,7 @@ from tests.common import (
     create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup,
+    set_states,
 )
 from tests.config_flow.common import initialize_discovery_flow
 from tests.conftest import MockEntityWithModel
@@ -140,7 +142,6 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
             },
         },
     )
-    await hass.async_block_till_done()
 
     await run_powercalc_setup(
         hass,
@@ -151,7 +152,6 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
     )
 
     await hass.async_start()
-    await hass.async_block_till_done()
 
     group_state = hass.states.get("sensor.test_include_lightgroup_power")
     assert group_state
@@ -279,8 +279,7 @@ async def test_include_template(hass: HomeAssistant) -> None:
 
 
 async def test_include_group(hass: HomeAssistant) -> None:
-    hass.states.async_set("switch.tv", "on")
-
+    await set_states(hass, [("switch.tv", STATE_ON)])
     mock_registry(
         hass,
         {
@@ -548,10 +547,7 @@ async def test_include_filter_domain(
         },
     )
 
-    hass.states.async_set("light.test_light", STATE_OFF)
-    await hass.async_block_till_done()
-    await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
-
+    await set_states(hass, [("light.test_light", STATE_OFF)], block_count=2)
     group_state = hass.states.get("sensor.test_include_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_light_power"}

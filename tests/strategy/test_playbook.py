@@ -35,9 +35,11 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.playbook import PlaybookStrategy
 from tests.common import (
+    assert_entity_state,
     get_simple_fixed_config,
     get_test_profile_dir,
     run_powercalc_setup,
+    set_states,
 )
 
 POWER_SENSOR_ID = "sensor.test_power"
@@ -57,7 +59,7 @@ async def test_activate_playbook_service(hass: HomeAssistant) -> None:
         },
     )
 
-    assert hass.states.get("sensor.test_power").state == "0.00"
+    assert_entity_state(hass, "sensor.test_power", "0.00")
 
     await _activate_playbook(hass, "playbook1")
 
@@ -138,14 +140,10 @@ async def test_turn_off_stops_running_playbook(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     await _activate_playbook(hass, "playbook1")
 
-    hass.states.async_set("switch.test", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_OFF)])
     await elapse_and_assert_power(hass, 3, "0.50")
 
 
@@ -156,9 +154,7 @@ async def test_services_raises_error_on_non_playbook_sensor(
         hass,
         get_simple_fixed_config("switch.test"),
     )
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     with pytest.raises(HomeAssistantError):
         await _activate_playbook(hass, "playbook1")
 
@@ -170,9 +166,7 @@ async def test_stop_service_raises_error_on_non_playbook_sensor(
         hass,
         get_simple_fixed_config("switch.test"),
     )
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     with pytest.raises(HomeAssistantError):
         await _stop_playbook(hass)
 
@@ -184,9 +178,7 @@ async def test_get_active_playbook_raises_error_on_non_playbook_sensor(
         hass,
         get_simple_fixed_config("switch.test"),
     )
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_ON)])
     with pytest.raises(HomeAssistantError):
         await _get_active_playbook(hass)
 
@@ -208,7 +200,7 @@ async def test_repeat(hass: HomeAssistant) -> None:
 
     await _activate_playbook(hass, "playbook")
 
-    assert hass.states.get("sensor.test_power").state == "0.00"
+    assert_entity_state(hass, "sensor.test_power", "0.00")
 
     await elapse_and_assert_power(hass, 2, "20.00")
     await elapse_and_assert_power(hass, 4, "40.00")
@@ -325,22 +317,15 @@ async def test_source_entity_trigger(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(POWER_SENSOR_ID).state == "0.00"
+    await set_states(hass, [("switch.test", STATE_ON)])
+    assert_entity_state(hass, POWER_SENSOR_ID, "0.00")
     await elapse_and_assert_power(hass, 2, "20.00")
 
-    hass.states.async_set("switch.test", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test", STATE_OFF)])
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=60))
-    await hass.async_block_till_done()
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(POWER_SENSOR_ID).state == "0.00"
+    await set_states(hass, [("switch.test", STATE_ON)])
+    assert_entity_state(hass, POWER_SENSOR_ID, "0.00")
     await elapse_and_assert_power(hass, 2, "20.00")
 
 
@@ -365,35 +350,23 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("media_player.sonos", STATE_PAUSED)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_PAUSED)])
     await elapse_and_assert_power(hass, 2, "2.00")
 
-    hass.states.async_set("media_player.sonos", STATE_IDLE)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_IDLE)])
     await elapse_and_assert_power(hass, 2, "5.00")
 
-    hass.states.async_set("media_player.sonos", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_OFF)])
     await elapse_and_assert_power(hass, 1, "0.10")
 
-    hass.states.async_set("media_player.sonos", STATE_IDLE)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_IDLE)])
     await elapse_and_assert_power(hass, 2, "5.00")
 
-    hass.states.async_set("media_player.sonos", STATE_OFF)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("media_player.sonos", STATE_OFF)])
     await elapse_and_assert_power(hass, 1, "0.10")
 
-    hass.states.async_set("media_player.sonos", STATE_PLAYING)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(POWER_SENSOR_ID).state == "0.00"
+    await set_states(hass, [("media_player.sonos", STATE_PLAYING)])
+    assert_entity_state(hass, POWER_SENSOR_ID, "0.00")
 
 
 async def test_playbook_strategy_from_library_profile(hass: HomeAssistant) -> None:
@@ -415,9 +388,8 @@ async def elapse_and_assert_power(
     expected_power: str,
 ) -> None:
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=seconds))
-    await hass.async_block_till_done()
 
-    assert hass.states.get(POWER_SENSOR_ID).state == expected_power
+    assert_entity_state(hass, POWER_SENSOR_ID, expected_power)
 
 
 async def _activate_playbook(hass: HomeAssistant, playbook_id: str) -> None:
@@ -427,7 +399,6 @@ async def _activate_playbook(hass: HomeAssistant, playbook_id: str) -> None:
         {ATTR_ENTITY_ID: POWER_SENSOR_ID, "playbook_id": playbook_id},
         blocking=True,
     )
-    await hass.async_block_till_done()
 
 
 async def _stop_playbook(hass: HomeAssistant) -> None:
@@ -437,7 +408,6 @@ async def _stop_playbook(hass: HomeAssistant) -> None:
         {ATTR_ENTITY_ID: POWER_SENSOR_ID},
         blocking=True,
     )
-    await hass.async_block_till_done()
 
 
 async def _get_active_playbook(hass: HomeAssistant) -> str | None:

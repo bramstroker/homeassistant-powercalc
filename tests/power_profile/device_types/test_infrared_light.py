@@ -14,8 +14,10 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
 )
 from tests.common import (
+    assert_entity_state,
     get_test_profile_dir,
     run_powercalc_setup,
+    set_states,
 )
 from tests.conftest import MockEntityWithModel
 
@@ -53,30 +55,34 @@ async def test_infrared_light(
     power_state = hass.states.get(power_sensor_id)
     assert power_state
 
-    hass.states.async_set(
-        light_id,
-        STATE_ON,
-        {
-            ATTR_BRIGHTNESS: 11,
-            ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
-            ATTR_COLOR_TEMP_KELVIN: 1663,
-        },
+    await set_states(
+        hass,
+        [
+            (
+                light_id,
+                STATE_ON,
+                {
+                    ATTR_BRIGHTNESS: 11,
+                    ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
+                    ATTR_COLOR_TEMP_KELVIN: 1663,
+                },
+            ),
+            (infrared_brightness_select_id, "50%"),
+        ],
     )
-    hass.states.async_set(infrared_brightness_select_id, "50%")
-    await hass.async_block_till_done()
+    assert_entity_state(hass, power_sensor_id, "4.37")
 
-    assert hass.states.get(power_sensor_id).state == "4.37"
+    await set_states(hass, [(infrared_brightness_select_id, "25%")])
+    assert_entity_state(hass, power_sensor_id, "2.59")
 
-    hass.states.async_set(infrared_brightness_select_id, "25%")
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "2.59"
-
-    hass.states.async_set(
-        light_id,
-        STATE_OFF,
+    await set_states(
+        hass,
+        [
+            (
+                light_id,
+                STATE_OFF,
+            ),
+            (infrared_brightness_select_id, "50%"),
+        ],
     )
-    hass.states.async_set(infrared_brightness_select_id, "50%")
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "4.36"
+    assert_entity_state(hass, power_sensor_id, "4.36")

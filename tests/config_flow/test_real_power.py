@@ -59,7 +59,6 @@ async def test_real_power(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.washing_machine_energy")
     assert hass.states.get("sensor.washing_machine_energy_daily")
 
@@ -110,7 +109,6 @@ async def test_energy_sensor_is_bound_to_power_device(hass: HomeAssistant) -> No
     config_entry: ConfigEntry = result["result"]
 
     await hass.async_block_till_done()
-
     energy_sensor_entry = entity_registry.async_get("sensor.test_energy")
     assert energy_sensor_entry
     assert energy_sensor_entry.unique_id == f"{config_entry.unique_id}_energy"

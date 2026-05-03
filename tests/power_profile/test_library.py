@@ -14,7 +14,7 @@ from custom_components.powercalc.power_profile.library import ModelInfo, Profile
 from custom_components.powercalc.power_profile.loader.composite import CompositeLoader
 from custom_components.powercalc.power_profile.loader.local import LocalLoader
 from custom_components.powercalc.power_profile.loader.remote import RemoteLoader
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -288,10 +288,10 @@ async def test_autodiscover_model_with_default_sub_profile(
         "Shelly Plus 1PM",
     )
 
-    hass.states.async_set("switch.test", STATE_ON)
+    await set_states(hass, [("switch.test", STATE_ON)])
     await run_powercalc_setup(hass, {CONF_ENTITY_ID: "switch.test"})
 
-    assert hass.states.get("sensor.test_device_power").state == "1.00"
+    assert_entity_state(hass, "sensor.test_device_power", "1.00")
 
 
 async def test_linked_profile_fixed(
@@ -315,7 +315,5 @@ async def test_linked_profile_fixed(
         },
     )
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_device_power").state == "1.01"
+    await set_states(hass, [("switch.test", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_device_power", "1.01")

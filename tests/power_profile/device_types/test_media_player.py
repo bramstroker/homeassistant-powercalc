@@ -1,4 +1,4 @@
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_PAUSED, STATE_PLAYING
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_PAUSED, STATE_PLAYING, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
@@ -10,7 +10,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_STANDBY_POWER,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -43,41 +43,46 @@ async def test_media_player(
         },
     )
 
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "unavailable"
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
-    hass.states.async_set(
-        entity_id,
-        STATE_PLAYING,
-        {"volume_level": 0.20, "is_volume_muted": False},
+    await set_states(
+        hass,
+        [
+            (
+                entity_id,
+                STATE_PLAYING,
+                {"volume_level": 0.20, "is_volume_muted": False},
+            ),
+        ],
     )
-    await hass.async_block_till_done()
+    assert_entity_state(hass, power_sensor_id, "2.04")
 
-    assert hass.states.get(power_sensor_id).state == "2.04"
-
-    hass.states.async_set(
-        entity_id,
-        STATE_PAUSED,
-        {"volume_level": 0.20, "is_volume_muted": False},
+    await set_states(
+        hass,
+        [
+            (
+                entity_id,
+                STATE_PAUSED,
+                {"volume_level": 0.20, "is_volume_muted": False},
+            ),
+        ],
     )
-    await hass.async_block_till_done()
+    assert_entity_state(hass, power_sensor_id, "1.65")
 
-    assert hass.states.get(power_sensor_id).state == "1.65"
-
-    hass.states.async_set(
-        entity_id,
-        STATE_PLAYING,
-        {"volume_level": 0.20, "is_volume_muted": True},
+    await set_states(
+        hass,
+        [
+            (
+                entity_id,
+                STATE_PLAYING,
+                {"volume_level": 0.20, "is_volume_muted": True},
+            ),
+        ],
     )
-    await hass.async_block_till_done()
+    assert_entity_state(hass, power_sensor_id, "2.01")
 
-    assert hass.states.get(power_sensor_id).state == "2.01"
-
-    hass.states.async_set(entity_id, STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "1.65"
+    await set_states(hass, [(entity_id, STATE_OFF)])
+    assert_entity_state(hass, power_sensor_id, "1.65")
 
 
 async def test_media_player_manual_configuration(hass: HomeAssistant) -> None:
@@ -96,21 +101,25 @@ async def test_media_player_manual_configuration(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set(
-        entity_id,
-        STATE_PLAYING,
-        {"volume_level": 0.20, "is_volume_muted": False},
+    await set_states(
+        hass,
+        [
+            (
+                entity_id,
+                STATE_PLAYING,
+                {"volume_level": 0.20, "is_volume_muted": False},
+            ),
+        ],
     )
+    assert_entity_state(hass, power_sensor_id, "14.00")
 
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "14.00"
-
-    hass.states.async_set(
-        entity_id,
-        STATE_PAUSED,
+    await set_states(
+        hass,
+        [
+            (
+                entity_id,
+                STATE_PAUSED,
+            ),
+        ],
     )
-
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "2.00"
+    assert_entity_state(hass, power_sensor_id, "2.00")

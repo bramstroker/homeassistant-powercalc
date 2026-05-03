@@ -70,7 +70,6 @@ async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
         CONF_CREATE_UTILITY_METERS: False,
     }
 
-    await hass.async_block_till_done()
     assert hass.states.get("sensor.my_daily_energy_sensor_energy")
 
 

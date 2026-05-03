@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock
 
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult, FlowResultType
 
@@ -15,7 +15,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     DOMAIN,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 from tests.config_flow.common import confirm_auto_discovered_model, initialize_options_flow
 from tests.conftest import MockEntityWithModel
 
@@ -49,19 +49,13 @@ async def test_smart_switch_with_yaml(
         },
     )
 
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "unavailable"
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
-    hass.states.async_set(switch_id, STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [(switch_id, STATE_ON)])
+    assert_entity_state(hass, power_sensor_id, "0.82")
 
-    assert hass.states.get(power_sensor_id).state == "0.82"
-
-    hass.states.async_set(switch_id, STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "0.52"
+    await set_states(hass, [(switch_id, STATE_OFF)])
+    assert_entity_state(hass, power_sensor_id, "0.52")
 
 
 async def test_smart_switch_power_input_yaml(
@@ -96,19 +90,13 @@ async def test_smart_switch_power_input_yaml(
         },
     )
 
-    power_state = hass.states.get(power_sensor_id)
-    assert power_state
-    assert power_state.state == "unavailable"
+    assert_entity_state(hass, power_sensor_id, STATE_UNAVAILABLE)
 
-    hass.states.async_set(switch_id, STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [(switch_id, STATE_ON)])
+    assert_entity_state(hass, power_sensor_id, "50.82")
 
-    assert hass.states.get(power_sensor_id).state == "50.82"
-
-    hass.states.async_set(switch_id, STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "0.52"
+    await set_states(hass, [(switch_id, STATE_OFF)])
+    assert_entity_state(hass, power_sensor_id, "0.52")
 
 
 async def test_gui_smart_switch_without_builtin_powermeter(
@@ -141,15 +129,11 @@ async def test_gui_smart_switch_without_builtin_powermeter(
 
     config_entry = result["result"]
 
-    hass.states.async_set(switch_id, STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [(switch_id, STATE_ON)])
+    assert_entity_state(hass, power_sensor_id, "50.70")
 
-    assert hass.states.get(power_sensor_id).state == "50.70"
-
-    hass.states.async_set(switch_id, STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "0.30"
+    await set_states(hass, [(switch_id, STATE_OFF)])
+    assert_entity_state(hass, power_sensor_id, "0.30")
 
     # Change the power value via the options
     result = await initialize_options_flow(hass, config_entry, Step.FIXED)
@@ -160,10 +144,8 @@ async def test_gui_smart_switch_without_builtin_powermeter(
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
     # Set the switch on again and see if it has the updated power value
-    hass.states.async_set(switch_id, STATE_ON)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "100.70"
+    await set_states(hass, [(switch_id, STATE_ON)])
+    assert_entity_state(hass, power_sensor_id, "100.70")
 
 
 async def test_gui_smart_switch_with_builtin_powermeter(
@@ -189,15 +171,11 @@ async def test_gui_smart_switch_with_builtin_powermeter(
 
     await async_setup_entry(hass, result["result"])
 
-    hass.states.async_set(switch_id, STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [(switch_id, STATE_ON)])
+    assert_entity_state(hass, power_sensor_id, "0.70")
 
-    assert hass.states.get(power_sensor_id).state == "0.70"
-
-    hass.states.async_set(switch_id, STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "0.30"
+    await set_states(hass, [(switch_id, STATE_OFF)])
+    assert_entity_state(hass, power_sensor_id, "0.30")
 
 
 async def test_hue_smart_plug_is_discovered(

@@ -25,7 +25,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.fixed import FixedStrategy
-from tests.common import run_powercalc_setup, setup_config_entry
+from tests.common import assert_entity_state, run_powercalc_setup, set_states, setup_config_entry
 
 
 async def test_simple_power(hass: HomeAssistant) -> None:
@@ -35,10 +35,7 @@ async def test_simple_power(hass: HomeAssistant) -> None:
 
 
 async def test_template_power(hass: HomeAssistant) -> None:
-    hass.states.async_set("input_number.test", "42")
-
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("input_number.test", "42")])
     template = "{{states('input_number.test')}}"
 
     source_entity = await create_source_entity("switch.test", hass)
@@ -84,8 +81,6 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
             },
         },
     )
-
-    await hass.async_block_till_done()
 
     source_entity = await create_source_entity("climate.test", hass)
     strategy = await _create_strategy(
@@ -182,13 +177,8 @@ async def test_config_entry_with_template_rendered_correctly(
         },
     )
 
-    hass.states.async_set("input_boolean.test", STATE_ON)
-    hass.states.async_set("input_number.test", 40)
-    await hass.async_block_till_done()
-
-    state = hass.states.get("sensor.test_power")
-    assert state
-    assert state.state == "40.00"
+    await set_states(hass, [("input_boolean.test", STATE_ON), ("input_number.test", 40)])
+    assert_entity_state(hass, "sensor.test_power", "40.00")
 
 
 @pytest.mark.parametrize(
@@ -235,9 +225,8 @@ async def test_config_entry_with_states_power(
     )
 
     for state, expected in expected_power.items():
-        hass.states.async_set(entity_id, state)
-        await hass.async_block_till_done()
-        assert hass.states.get(f"sensor.{entity_id.split('.')[1]}_power").state == expected
+        await set_states(hass, [(entity_id, state)])
+        assert_entity_state(hass, f"sensor.{entity_id.split('.')[1]}_power", expected)
 
 
 async def test_config_entry_with_states_power_template(hass: HomeAssistant) -> None:
@@ -254,13 +243,8 @@ async def test_config_entry_with_states_power_template(hass: HomeAssistant) -> N
         },
     )
 
-    hass.states.async_set("media_player.test", "playing")
-    hass.states.async_set("input_number.test", 40)
-    await hass.async_block_till_done()
-
-    state = hass.states.get("sensor.test_power")
-    assert state
-    assert state.state == "40.00"
+    await set_states(hass, [("media_player.test", "playing"), ("input_number.test", 40)])
+    assert_entity_state(hass, "sensor.test_power", "40.00")
 
 
 async def test_template_power_combined_with_multiply_factor(
@@ -279,18 +263,12 @@ async def test_template_power_combined_with_multiply_factor(
         },
     )
 
-    hass.states.async_set("input_boolean.test", STATE_ON)
-    hass.states.async_set("input_number.test", "20.5")
-    await hass.async_block_till_done()
-
-    state = hass.states.get("sensor.test_power")
-    assert state
-    assert state.state == "2050.00"
+    await set_states(hass, [("input_boolean.test", STATE_ON), ("input_number.test", "20.5")])
+    assert_entity_state(hass, "sensor.test_power", "2050.00")
 
 
 async def test_template_power_initial_value_after_startup(hass: HomeAssistant) -> None:
-    hass.states.async_set("input_number.test", "30")
-
+    await set_states(hass, [("input_number.test", "30")])
     await run_powercalc_setup(
         hass,
         {
@@ -299,9 +277,7 @@ async def test_template_power_initial_value_after_startup(hass: HomeAssistant) -
         },
     )
 
-    state = hass.states.get("sensor.test_power")
-    assert state
-    assert state.state == "30.00"
+    assert_entity_state(hass, "sensor.test_power", "30.00")
 
 
 async def test_duplicate_tracking_is_prevented(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
@@ -330,10 +306,8 @@ async def test_duplicate_tracking_is_prevented(hass: HomeAssistant, caplog: pyte
         },
     )
 
-    hass.states.async_set("remote.harmony57", STATE_ON, {"current_activity": "PowerOff"})
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.harmony57_power").state == "12.00"
+    await set_states(hass, [("remote.harmony57", STATE_ON, {"current_activity": "PowerOff"})])
+    assert_entity_state(hass, "sensor.harmony57_power", "12.00")
 
     state_change_logs = [record for record in caplog.records if 'State changed to "on". Power:12.00' in record.message]
     assert len(state_change_logs) == 1, "Expected only one state change log"
@@ -355,15 +329,11 @@ async def test_climate_entity_on_off(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set("climate.main_thermostat", STATE_ON)
-    await hass.async_block_till_done()
+    await set_states(hass, [("climate.main_thermostat", STATE_ON)])
+    assert_entity_state(hass, "sensor.main_thermostat_power", "100.00")
 
-    assert hass.states.get("sensor.main_thermostat_power").state == "100.00"
-
-    hass.states.async_set("climate.main_thermostat", STATE_OFF)
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.main_thermostat_power").state == "5.00"
+    await set_states(hass, [("climate.main_thermostat", STATE_OFF)])
+    assert_entity_state(hass, "sensor.main_thermostat_power", "5.00")
 
 
 async def test_state_power_mixed_with_power_template(hass: HomeAssistant) -> None:
@@ -397,32 +367,41 @@ async def test_state_power_mixed_with_power_template(hass: HomeAssistant) -> Non
         },
     )
 
-    hass.states.async_set(
-        climate_entity,
-        HVACAction.HEATING,
-        {ATTR_FAN_MODE: "Low", ATTR_HVAC_ACTION: HVACAction.HEATING},
+    await set_states(
+        hass,
+        [
+            (
+                climate_entity,
+                HVACAction.HEATING,
+                {ATTR_FAN_MODE: "Low", ATTR_HVAC_ACTION: HVACAction.HEATING},
+            ),
+        ],
     )
-    await hass.async_block_till_done()
+    assert_entity_state(hass, power_entity, "461.70")
 
-    assert hass.states.get(power_entity).state == "461.70"
-
-    hass.states.async_set(
-        climate_entity,
-        HVACAction.COOLING,
-        {ATTR_FAN_MODE: "Low", ATTR_HVAC_ACTION: HVACAction.COOLING},
+    await set_states(
+        hass,
+        [
+            (
+                climate_entity,
+                HVACAction.COOLING,
+                {ATTR_FAN_MODE: "Low", ATTR_HVAC_ACTION: HVACAction.COOLING},
+            ),
+        ],
     )
-    await hass.async_block_till_done()
+    assert_entity_state(hass, power_entity, "439.70")
 
-    assert hass.states.get(power_entity).state == "439.70"
-
-    hass.states.async_set(
-        climate_entity,
-        HVACAction.FAN,
-        {ATTR_FAN_MODE: "Low", ATTR_HVAC_ACTION: HVACAction.FAN},
+    await set_states(
+        hass,
+        [
+            (
+                climate_entity,
+                HVACAction.FAN,
+                {ATTR_FAN_MODE: "Low", ATTR_HVAC_ACTION: HVACAction.FAN},
+            ),
+        ],
     )
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_entity).state == "97.60"
+    assert_entity_state(hass, power_entity, "97.60")
 
 
 async def _create_strategy(

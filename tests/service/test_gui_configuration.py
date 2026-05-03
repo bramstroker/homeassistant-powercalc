@@ -84,7 +84,6 @@ async def call_service(hass: HomeAssistant, field: str, value: str) -> None:
         },
         blocking=True,
     )
-    await hass.async_block_till_done()
 
 
 def create_config_entry(

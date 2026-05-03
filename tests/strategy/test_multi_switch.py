@@ -18,7 +18,7 @@ from custom_components.powercalc.const import CONF_MULTI_SWITCH, CONF_POWER, CON
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.multi_switch import MultiSwitchStrategy
-from tests.common import run_powercalc_setup
+from tests.common import run_powercalc_setup, set_states
 
 
 async def test_calculate_sum(hass: HomeAssistant) -> None:
@@ -88,11 +88,8 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
             },
         },
     )
-    await hass.async_block_till_done()
 
-    hass.states.async_set("switch.test1", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("switch.test1", STATE_ON)])
     power_sensor = hass.states.get("sensor.outlet_self_usage_power")
     assert power_sensor
 

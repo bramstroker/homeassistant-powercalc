@@ -23,7 +23,7 @@ from custom_components.powercalc.strategy.factory import PowerCalculatorStrategy
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 from tests.strategy.common import create_source_entity
 
 
@@ -371,15 +371,11 @@ async def test_sensor_unavailable_for_unsupported_color_mode(hass: HomeAssistant
         },
     )
 
-    hass.states.async_set("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.BRIGHTNESS, ATTR_BRIGHTNESS: 100})
-    await hass.async_block_till_done()
+    await set_states(hass, [("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.BRIGHTNESS, ATTR_BRIGHTNESS: 100})])
+    assert_entity_state(hass, "sensor.test_power", "3.48")
 
-    assert hass.states.get("sensor.test_power").state == "3.48"
-
-    hass.states.async_set("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100})
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+    await set_states(hass, [("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100})])
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
     assert "Lookup table not found for color mode" in caplog.text
 
@@ -400,14 +396,17 @@ async def test_fallback_color_temp_to_hs(hass: HomeAssistant) -> None:
         },
     )
 
-    hass.states.async_set(
-        "light.test",
-        STATE_ON,
-        {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100, ATTR_COLOR_TEMP_KELVIN: 500},
+    await set_states(
+        hass,
+        [
+            (
+                "light.test",
+                STATE_ON,
+                {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100, ATTR_COLOR_TEMP_KELVIN: 500},
+            ),
+        ],
     )
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "1.42"
+    assert_entity_state(hass, "sensor.test_power", "1.42")
 
 
 async def test_warning_is_logged_when_color_mode_is_missing(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:

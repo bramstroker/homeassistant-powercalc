@@ -48,8 +48,9 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.discovery import DiscoveryStatus, get_power_profile_by_source_device, get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
+from tests.common import set_states
 
-from .common import create_mock_light_entity, run_powercalc_setup, setup_config_entry
+from .common import assert_entity_state, create_mock_light_entity, run_powercalc_setup, setup_config_entry
 from .config_flow.test_global_configuration import create_mock_global_config_entry
 from .conftest import MockEntityWithModel
 
@@ -160,9 +161,7 @@ async def test_manually_configured_light_overrides_autodiscovered(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information("light.testing", "signify", "LCA001")
-    hass.states.async_set("light.testing", STATE_ON)
-    await hass.async_block_till_done()
-
+    await set_states(hass, [("light.testing", STATE_ON)])
     await run_powercalc_setup(
         hass,
         {CONF_ENTITY_ID: "light.testing", CONF_FIXED: {CONF_POWER: 25}},
@@ -171,9 +170,7 @@ async def test_manually_configured_light_overrides_autodiscovered(
 
     assert len(mock_flow_init.mock_calls) == 0
 
-    state = hass.states.get("sensor.testing_power")
-    assert state
-    assert state.state == "25.00"
+    assert_entity_state(hass, "sensor.testing_power", "25.00")
 
 
 async def test_config_entry_overrides_autodiscovered(
@@ -190,12 +187,16 @@ async def test_config_entry_overrides_autodiscovered(
         unique_id="abcdef",
     )
 
-    hass.states.async_set(
-        "light.testing",
-        STATE_ON,
-        {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS},
+    await set_states(
+        hass,
+        [
+            (
+                "light.testing",
+                STATE_ON,
+                {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS},
+            ),
+        ],
     )
-
     await run_powercalc_setup(hass)
 
     await setup_config_entry(
@@ -824,7 +825,6 @@ async def test_update_profile_service(
         SERVICE_UPDATE_LIBRARY,
         blocking=True,
     )
-    await hass.async_block_till_done()
 
     assert len([record for record in caplog.records if "Start auto discovery" in record.message]) == 2
 
@@ -1015,7 +1015,6 @@ async def test_discovery_disable_runtime(
     new_data = entry.data.copy()
     new_data[CONF_DISCOVERY] = {CONF_ENABLED: False}
     hass.config_entries.async_update_entry(entry, data=new_data)
-    await hass.async_block_till_done()
 
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     assert len(flows) == 0

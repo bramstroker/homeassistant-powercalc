@@ -20,7 +20,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
@@ -90,11 +90,8 @@ async def test_smart_switch_flow(
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_MODE] == CalculationStrategy.FIXED
 
-    hass.states.async_set("switch.test", STATE_ON)
-    await hass.async_block_till_done()
-
-    power_state = hass.states.get("sensor.test_power")
-    assert power_state.state == f"{expected_fixed_power:.2f}"
+    await set_states(hass, [("switch.test", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_power", f"{expected_fixed_power:.2f}")
 
 
 async def test_smart_switch_options(hass: HomeAssistant) -> None:

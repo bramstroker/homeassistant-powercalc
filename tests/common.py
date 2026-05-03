@@ -1,8 +1,10 @@
+from collections.abc import Mapping
 import os
+from typing import Any
 import uuid
 
 from homeassistant import config_entries
-from homeassistant.components import input_boolean, input_number, light
+from homeassistant.components import input_boolean, light
 from homeassistant.components.light import ColorMode
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -36,6 +38,8 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 import custom_components.test.light as test_light_platform
+
+type StateDefinition = tuple[str, StateType] | tuple[str, StateType, Mapping[str, Any]] | tuple[str, StateType, Mapping[str, Any], bool]
 
 
 async def create_mock_light_entity(
@@ -134,19 +138,6 @@ async def create_input_booleans(hass: HomeAssistant, names: list[str]) -> None:
         hass,
         input_boolean.DOMAIN,
         config,
-    )
-    await hass.async_block_till_done()
-
-
-async def create_input_number(
-    hass: HomeAssistant,
-    name: str,
-    initial_value: int,
-) -> None:
-    assert await async_setup_component(
-        hass,
-        input_number.DOMAIN,
-        {"input_number": {name: {"min": 0, "max": 99999, "initial": initial_value}}},
     )
     await hass.async_block_till_done()
 
@@ -298,6 +289,21 @@ def mock_sensors_in_registry(
             device_class=SensorDeviceClass.ENERGY,
         )
     return mock_registry(hass, entries)
+
+
+async def set_states(hass: HomeAssistant, states: list[StateDefinition], block_count: int = 1) -> None:
+    for state_definition in states:
+        force_update = False
+        if len(state_definition) == 2:
+            entity_id, value = state_definition
+            attributes = None
+        elif len(state_definition) == 3:
+            entity_id, value, attributes = state_definition
+        else:
+            entity_id, value, attributes, force_update = state_definition
+        hass.states.async_set(entity_id, value, attributes, force_update=force_update)
+    for _ in range(block_count):
+        await hass.async_block_till_done()
 
 
 def assert_entity_state(

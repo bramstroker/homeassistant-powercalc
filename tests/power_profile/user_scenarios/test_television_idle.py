@@ -2,7 +2,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_IDLE, STATE_PLAYING
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import CONF_CALCULATION_ENABLED_CONDITION, CONF_LINEAR, CONF_MAX_POWER, CONF_MODE, CalculationStrategy
-from tests.common import run_powercalc_setup
+from tests.common import assert_entity_state, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -26,12 +26,8 @@ async def test_media_player_idle(
         },
     )
 
-    hass.states.async_set("media_player.test", STATE_PLAYING, {"volume_level": 0.16})
-    await hass.async_block_till_done()
+    await set_states(hass, [("media_player.test", STATE_PLAYING, {"volume_level": 0.16})])
+    assert_entity_state(hass, "sensor.test_power", "0.80")
 
-    assert hass.states.get("sensor.test_power").state == "0.80"
-
-    hass.states.async_set("media_player.test", STATE_IDLE, {"volume_level": 0.16})
-    await hass.async_block_till_done()
-
-    assert hass.states.get("sensor.test_power").state == "0.80"
+    await set_states(hass, [("media_player.test", STATE_IDLE, {"volume_level": 0.16})])
+    assert_entity_state(hass, "sensor.test_power", "0.80")
