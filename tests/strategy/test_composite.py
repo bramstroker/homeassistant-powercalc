@@ -86,7 +86,7 @@ async def test_composite(hass: HomeAssistant) -> None:
                 CONF_CONDITION: {
                     "condition": "state",
                     "entity_id": "light.test",
-                    "state": "on",
+                    "state": STATE_ON,
                 },
                 CONF_LINEAR: {
                     CONF_MIN_POWER: 10,

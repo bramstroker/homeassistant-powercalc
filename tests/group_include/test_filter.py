@@ -420,7 +420,7 @@ async def test_group_filter(
             ),
             (
                 "group.other_group",
-                "on",
+                STATE_ON,
                 {"entity_id": ["light.other_light"]},
             ),
         ],

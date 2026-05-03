@@ -12,6 +12,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     STATE_OFF,
+    STATE_ON,
 )
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.area_registry import AreaRegistry
@@ -280,7 +281,7 @@ async def test_include_template(hass: HomeAssistant) -> None:
 
 
 async def test_include_group(hass: HomeAssistant) -> None:
-    await set_states(hass, [("switch.tv", "on")])
+    await set_states(hass, [("switch.tv", STATE_ON)])
     mock_registry(
         hass,
         {
