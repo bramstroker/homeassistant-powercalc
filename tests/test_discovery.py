@@ -165,7 +165,6 @@ async def test_manually_configured_light_overrides_autodiscovered(
     await run_powercalc_setup(
         hass,
         {CONF_ENTITY_ID: "light.testing", CONF_FIXED: {CONF_POWER: 25}},
-        {},
     )
 
     assert len(mock_flow_init.mock_calls) == 0

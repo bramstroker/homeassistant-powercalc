@@ -119,7 +119,6 @@ async def test_entities_are_bound_to_source_device2(
     await run_powercalc_setup(
         hass,
         {CONF_ENTITY_ID: "switch.shelly", CONF_POWER_SENSOR_ID: "sensor.shelly_power"},
-        {},
     )
 
     energy_entity_entry = entity_reg.async_get("sensor.shelly_energy")

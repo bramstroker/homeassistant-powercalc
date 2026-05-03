@@ -209,7 +209,7 @@ async def test_initialize_options_succeeds_with_yaml_sensors_in_config(hass: Hom
     """Test options flow is initialized when sensors are defined in YAML configuration."""
     entry = create_mock_global_config_entry(hass, {})
 
-    await run_powercalc_setup(hass, get_simple_fixed_config("input_boolean.test", 50), {})
+    await run_powercalc_setup(hass, get_simple_fixed_config("input_boolean.test", 50))
 
     result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION)
     assert result["type"] == data_entry_flow.FlowResultType.FORM

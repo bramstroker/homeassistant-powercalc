@@ -604,10 +604,7 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
         unique_id="abcd",
     )
 
-    await run_powercalc_setup(
-        hass,
-        {},
-    )
+    await run_powercalc_setup(hass)
 
     new_light_id = "sensor.my_light_new"
     entity_reg.async_update_entity(entity_id=light_id, new_entity_id=new_light_id)
