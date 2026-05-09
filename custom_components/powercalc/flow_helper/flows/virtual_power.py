@@ -41,6 +41,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults
 from custom_components.powercalc.flow_helper.flows.global_configuration import get_global_powercalc_config
 from custom_components.powercalc.flow_helper.flows.library import SCHEMA_POWER_OPTIONS_LIBRARY, SCHEMA_POWER_SMART_SWITCH
+from custom_components.powercalc.flow_helper.profile_preview import PREVIEW_NAME
 from custom_components.powercalc.flow_helper.schema import (
     SCHEMA_ENERGY_SENSOR_TOGGLE,
     SCHEMA_SENSOR_ENERGY_OPTIONS,
@@ -229,9 +230,7 @@ class VirtualPowerFlow:
 
         description_placeholders = {}
         if strategy == CalculationStrategy.WLED:
-            description_placeholders = {
-                "docs_uri": "https://docs.powercalc.nl/strategies/wled/",
-            }
+            description_placeholders["docs_uri"] = "https://docs.powercalc.nl/strategies/wled/"
 
         return await self.flow.handle_form_step(
             PowercalcFormStep(
@@ -239,7 +238,10 @@ class VirtualPowerFlow:
                 schema=schema,
                 next_step=Step.ASSIGN_GROUPS,
                 validate_user_input=_validate,
-                form_kwarg={"description_placeholders": description_placeholders},
+                form_kwarg={
+                    "description_placeholders": description_placeholders,
+                    "preview": PREVIEW_NAME,
+                },
             ),
             user_input,
         )
@@ -433,4 +435,9 @@ class VirtualPowerOptionsFlow(VirtualPowerFlow):
         if CONF_STATES_POWER in merged_options and isinstance(merged_options[CONF_STATES_POWER], list):
             merged_options[CONF_STATES_POWER] = {item[CONF_STATE]: item[CONF_POWER] for item in merged_options[CONF_STATES_POWER]}
         schema = fill_schema_defaults(schema, merged_options)
-        return await self.flow.async_handle_options_step(user_input, schema, step)
+        return await self.flow.async_handle_options_step(
+            user_input,
+            schema,
+            step,
+            form_kwarg={"preview": PREVIEW_NAME},
+        )
