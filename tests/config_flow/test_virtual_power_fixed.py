@@ -1,7 +1,7 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from homeassistant import data_entry_flow
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
+from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_ICON, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 import voluptuous as vol
 
@@ -26,6 +26,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.flow_helper.profile_preview import ws_start_preview
 from tests.common import run_powercalc_setup, setup_config_entry
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
@@ -40,6 +41,8 @@ from tests.config_flow.common import (
 
 async def test_create_fixed_sensor_entry(hass: HomeAssistant) -> None:
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
+    assert result["preview"] == "powercalc"
+
     result = await set_virtual_power_configuration(hass, result, {CONF_POWER: 20})
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -51,6 +54,34 @@ async def test_create_fixed_sensor_entry(hass: HomeAssistant) -> None:
 
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
+
+async def test_fixed_strategy_preview_websocket(hass: HomeAssistant) -> None:
+    result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
+    hass.states.async_set("light.test", STATE_ON)
+
+    connection = MagicMock()
+    connection.subscriptions = {}
+    ws_start_preview(
+        hass,
+        connection,
+        {
+            "id": 1,
+            "type": "powercalc/start_preview",
+            "flow_id": result["flow_id"],
+            "flow_type": "config_flow",
+            "user_input": {CONF_POWER: 20},
+        },
+    )
+    await hass.async_block_till_done()
+
+    connection.send_result.assert_called_once_with(1)
+
+    event = connection.send_message.call_args.args[0]
+    assert event["type"] == "event"
+    assert event["event"]["attributes"][ATTR_FRIENDLY_NAME] == "Preview power"
+    assert event["event"]["attributes"][ATTR_ICON] == "mdi:flash"
+    assert event["event"]["state"] == "20 W"
 
 
 async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant) -> None:

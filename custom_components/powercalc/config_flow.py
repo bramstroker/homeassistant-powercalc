@@ -21,7 +21,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
 )
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import entity_registry as er, selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
@@ -65,6 +65,7 @@ from .flow_helper.flows.virtual_power import (
     VirtualPowerConfigFlow,
     VirtualPowerOptionsFlow,
 )
+from .flow_helper.profile_preview import async_setup_preview as async_setup_powercalc_preview
 from .flow_helper.schema import (
     SCHEMA_ENERGY_SENSOR_TOGGLE,
     SCHEMA_SENSOR_ENERGY_OPTIONS,
@@ -157,6 +158,11 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             setattr(self, step_method, self._async_step(step))
 
         super().__init__()
+
+    @staticmethod
+    async def async_setup_preview(hass: HomeAssistant) -> None:
+        """Set up the config flow preview websocket command."""
+        await async_setup_powercalc_preview(hass)
 
     @abstractmethod
     @callback
@@ -531,7 +537,13 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         """Handle the basic options flow."""
         return await self.async_handle_options_step(user_input, SCHEMA_UTILITY_METER_OPTIONS, Step.UTILITY_METER_OPTIONS)
 
-    async def async_handle_options_step(self, user_input: dict[str, Any] | None, schema: vol.Schema, step: Step) -> FlowResult:
+    async def async_handle_options_step(
+        self,
+        user_input: dict[str, Any] | None,
+        schema: vol.Schema,
+        step: Step,
+        form_kwarg: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """
         Generic handler for all the option steps.
         processes user input against the select schema.
@@ -543,7 +555,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             errors = await self.process_all_options(user_input, schema)
             if not errors:
                 return self.persist_config_entry()
-        return self.async_show_form(step_id=step, data_schema=schema, errors=errors)
+        return self.async_show_form(step_id=step, data_schema=schema, errors=errors, **(form_kwarg or {}))
 
     def persist_config_entry(self) -> FlowResult:
         """Persist changed options on the config entry."""
