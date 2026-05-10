@@ -8,6 +8,7 @@ from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_ICON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import UnknownFlow
 from homeassistant.exceptions import HomeAssistantError
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
@@ -152,6 +153,11 @@ async def _calculate_current_power(
 ) -> Decimal | None:
     current_state = hass.states.get(source_entity.entity_id)
     if current_state is None:
+        return None
+
+    try:
+        cv.template_complex(sensor_config)
+    except vol.Invalid:
         return None
 
     strategy = detect_calculation_strategy(sensor_config, power_profile)

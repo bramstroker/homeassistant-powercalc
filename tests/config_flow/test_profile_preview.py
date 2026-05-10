@@ -19,6 +19,7 @@ from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_MODE,
     CONF_POWER,
+    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CalculationStrategy,
     SensorType,
@@ -109,6 +110,28 @@ async def test_build_profile_preview_returns_unavailable_when_strategy_cannot_be
         )
 
     assert preview["state"] == STATE_UNAVAILABLE
+
+
+async def test_build_profile_preview_returns_unavailable_for_invalid_template(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Mid-typing templates (e.g. '{{') should silently render as unavailable.
+
+    Mirrors HA core's behavior of suppressing template render errors during preview
+    so the log doesn't get flooded with TemplateSyntaxError per keystroke.
+    """
+    hass.states.async_set(SOURCE_ENTITY.entity_id, STATE_ON)
+
+    preview = await build_profile_preview(
+        hass,
+        {CalculationStrategy.FIXED: {CONF_POWER_TEMPLATE: "{{"}},
+        SOURCE_ENTITY,
+        None,
+    )
+
+    assert preview["state"] == STATE_UNAVAILABLE
+    assert "Could not render power template" not in caplog.text
 
 
 async def test_build_profile_preview_returns_unavailable_when_calculation_fails(hass: HomeAssistant) -> None:
