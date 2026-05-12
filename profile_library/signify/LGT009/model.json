@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2026-05-12T13:39:38Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Hue Play wall washer",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2,
+    "VERSION": "v1.20.11:docker"
+  },
+  "name": "Hue Play wall washer",
+  "standby_power": 0.3
+}
