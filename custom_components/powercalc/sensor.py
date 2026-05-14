@@ -879,14 +879,9 @@ async def create_individual_sensors(
     source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     # For device-based profiles, attach the device entry to the source entity
-    if source_entity.entity_id == DUMMY_ENTITY_ID and "device" in sensor_config:
-        device_registry = dr.async_get(hass)
-        device_entry = device_registry.async_get(sensor_config["device"])
-        if device_entry:
-            source_entity = source_entity._replace(device_entry=device_entry)
+    source_entity = _attach_configured_device_entry(hass, sensor_config, source_entity)
 
-    if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
-        used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []  # pragma: no cover
+    used_unique_ids = _get_used_unique_ids(hass)
 
     try:
         await check_entity_not_already_configured(
@@ -921,16 +916,45 @@ async def create_individual_sensors(
     if energy_sensor:
         entities_to_add.extend(await create_utility_meters(hass, energy_sensor, sensor_config, config_entry))
 
-    await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
+    await _finalize_individual_sensors(hass, config_entry, sensor_config, source_entity, entities_to_add, context, used_unique_ids)
 
+    return EntitiesBucket(new=entities_to_add, existing=[])
+
+
+def _attach_configured_device_entry(hass: HomeAssistant, sensor_config: dict, source_entity: SourceEntity) -> SourceEntity:
+    if source_entity.entity_id != DUMMY_ENTITY_ID or "device" not in sensor_config:
+        return source_entity
+
+    device_registry = dr.async_get(hass)
+    device_entry = device_registry.async_get(sensor_config["device"])
+    if device_entry:
+        return source_entity._replace(device_entry=device_entry)
+    return source_entity
+
+
+def _get_used_unique_ids(hass: HomeAssistant) -> list[str]:
+    if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
+        used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []  # pragma: no cover
+    return cast(list[str], used_unique_ids)
+
+
+async def _finalize_individual_sensors(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry | None,
+    sensor_config: dict,
+    source_entity: SourceEntity,
+    entities_to_add: list[Entity],
+    context: CreationContext,
+    used_unique_ids: list[str],
+) -> None:
+    await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
     update_registries(hass, source_entity, entities_to_add, context)
+
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
     if unique_id:
         used_unique_ids.append(unique_id)
 
     collect_analytics(hass, config_entry).inc(DATA_SOURCE_DOMAINS, source_entity.domain)
-
-    return EntitiesBucket(new=entities_to_add, existing=[])
 
 
 async def handle_energy_sensor_creation(

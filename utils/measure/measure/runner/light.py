@@ -133,14 +133,7 @@ class LightRunner(MeasurementRunner):
             )
             mode = LutMode.BRIGHTNESS
 
-        file_write_mode = "w"
-        write_header_row = True
-        if measurement_info.is_resuming:
-            _LOGGER.info("Resuming measurements")
-            file_write_mode = "a"
-            write_header_row = False
-
-        variations = measurement_info.variations
+        file_write_mode, write_header_row = self._get_csv_write_options(measurement_info)
 
         _LOGGER.info(
             "Starting measurements. Estimated duration: %s",
@@ -166,31 +159,11 @@ class LightRunner(MeasurementRunner):
             time.sleep(self.config.sleep_initial)
 
             previous_variation = None
-            for count, variation in enumerate(variations):
-                if count % 10 == 0:
-                    time_left = self.calculate_time_left(mode, all_variations, left_variations, variation)
-                    progress_percentage = ((len(all_variations) - len(left_variations)) / len(all_variations)) * 100
-                    _LOGGER.info(
-                        "Progress: %d%%, Estimated time left: %s",
-                        progress_percentage,
-                        time_left,
-                    )
+            for count, variation in enumerate(measurement_info.variations):
+                self._log_progress(mode, count, variation, all_variations, left_variations)
                 _LOGGER.info("Changing light to: %s", variation)
                 variation_start_time = time.time()
-                for _ in range(5):
-                    try:
-                        self.light_controller.change_light_state(
-                            mode,
-                            on=True,
-                            **asdict(variation),
-                        )
-                        break
-                    except ApiConnectionError as e:
-                        _LOGGER.warning("Failed to change light state: %s. Retrying...", e)
-                        time.sleep(5)
-                else:
-                    raise RunnerError("Failed to change light state after 5 retries")
-
+                self._change_light_with_retry(mode, variation)
                 self.wait(variation, previous_variation)
 
                 previous_variation = variation
@@ -226,6 +199,42 @@ class LightRunner(MeasurementRunner):
 
         if bool(answers.get(QUESTION_GZIP, True)):
             self.gzip_csv(measurement_info.csv_file)
+
+    def _get_csv_write_options(self, measurement_info: MeasurementRunInput) -> tuple[str, bool]:
+        if not measurement_info.is_resuming:
+            return "w", True
+
+        _LOGGER.info("Resuming measurements")
+        return "a", False
+
+    def _log_progress(
+        self,
+        mode: LutMode,
+        count: int,
+        variation: Variation,
+        all_variations: list[Variation],
+        left_variations: list[Variation],
+    ) -> None:
+        if count % 10 != 0:
+            return
+
+        time_left = self.calculate_time_left(mode, all_variations, left_variations, variation)
+        progress_percentage = ((len(all_variations) - len(left_variations)) / len(all_variations)) * 100
+        _LOGGER.info("Progress: %d%%, Estimated time left: %s", progress_percentage, time_left)
+
+    def _change_light_with_retry(self, mode: LutMode, variation: Variation) -> None:
+        for _ in range(5):
+            try:
+                self.light_controller.change_light_state(
+                    mode,
+                    on=True,
+                    **asdict(variation),
+                )
+                return
+            except ApiConnectionError as error:
+                _LOGGER.warning("Failed to change light state: %s. Retrying...", error)
+                time.sleep(5)
+        raise RunnerError("Failed to change light state after 5 retries")
 
     def wait(self, variation: Variation, previous_variation: Variation | None) -> None:
         """Wait for the light to process the change"""

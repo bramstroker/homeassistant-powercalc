@@ -83,7 +83,7 @@ ignore = ["S101", "ASYNC240", "COM812"]
 "tests/**.py" = ["ASYNC230"]
 
 [tool.ruff.lint.mccabe]
-max-complexity = 15
+max-complexity = 10
 
 [tool.uv]
 prerelease = "allow"

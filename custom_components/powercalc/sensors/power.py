@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Awaitable, Callable, Coroutine
 from copy import copy
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -38,6 +39,7 @@ import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import (
     EventStateChangedData,
     TrackTemplate,
+    TrackTemplateResult,
     async_call_later,
     async_track_state_change_event,
     async_track_template_result,
@@ -481,12 +483,29 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         # Add listeners for all tracking entities and templates.
         entities_to_track = self._get_tracking_entities()
+        self._register_tracking_listeners(entities_to_track, appliance_state_listener, template_change_listener)
 
+        # Trigger initial update
+        self.async_on_remove(start.async_at_start(self.hass, initial_update))
+
+        if hasattr(self._strategy_instance, "set_update_callback"):
+            self._strategy_instance.set_update_callback(self._update_power_sensor)
+
+        self._register_force_update_interval()
+
+    def _register_tracking_listeners(
+        self,
+        entities_to_track: list[str | TrackTemplate],
+        appliance_state_listener: Callable[[Event[EventStateChangedData]], Awaitable[None]],
+        template_change_listener: Callable[
+            [Event[EventStateChangedData] | None, list[TrackTemplateResult]],
+            Coroutine[Any, Any, None] | None,
+        ],
+    ) -> None:
         self._track_entities = {e for e in entities_to_track if isinstance(e, str)}
         self.async_on_remove(
             async_track_state_change_event(self.hass, self._track_entities, appliance_state_listener),
         )
-
         track_templates: list[TrackTemplate] = [e for e in entities_to_track if isinstance(e, TrackTemplate)]
         if track_templates:
             template_tracker = async_track_template_result(
@@ -498,27 +517,23 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 template_tracker.async_remove,
             )
 
-        # Trigger initial update
-        self.async_on_remove(start.async_at_start(self.hass, initial_update))
-
-        if hasattr(self._strategy_instance, "set_update_callback"):
-            self._strategy_instance.set_update_callback(self._update_power_sensor)
-
+    def _register_force_update_interval(self) -> None:
         force_update_interval = self._sensor_config.get(CONF_POWER_UPDATE_INTERVAL, 0)
-        if force_update_interval > 0:
+        if force_update_interval <= 0:
+            return
 
-            @callback
-            def async_update(__: datetime | None = None) -> None:
-                self.async_schedule_update_ha_state(True)
+        @callback
+        def async_update(__: datetime | None = None) -> None:
+            self.async_schedule_update_ha_state(True)
 
-            self.async_on_remove(
-                async_track_time_interval(
-                    self.hass,
-                    async_update,
-                    timedelta(seconds=force_update_interval),
-                    cancel_on_shutdown=True,
-                ),
-            )
+        self.async_on_remove(
+            async_track_time_interval(
+                self.hass,
+                async_update,
+                timedelta(seconds=force_update_interval),
+                cancel_on_shutdown=True,
+            ),
+        )
 
     def _get_tracking_entities(self) -> list[str | TrackTemplate]:
         """Return entities and templates that should be tracked."""
@@ -631,16 +646,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Calculate power consumption using configured strategy."""
         assert self._strategy_instance is not None
 
-        # Resolve the relevant entity state
-        entity_state = state
-        if self._source_entity.entity_id == DUMMY_ENTITY_ID and self._calculation_strategy != CalculationStrategy.MULTI_SWITCH:
-            if self._availability_entity and state.entity_id == self._availability_entity:
-                entity_state = State(DUMMY_ENTITY_ID, STATE_ON)
-        elif (
-            self._calculation_strategy != CalculationStrategy.MULTI_SWITCH
-            and state.entity_id != self._source_entity.entity_id
-            and (entity_state := self.hass.states.get(self._source_entity.entity_id)) is None
-        ):
+        entity_state = self._resolve_calculation_state(state)
+        if entity_state is None:
             return None
 
         # Handle unavailable power
@@ -648,31 +655,49 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if entity_state.state == STATE_UNAVAILABLE and unavailable_power is not None:
             return Decimal(unavailable_power)
 
-        # Handle standby power
-        standby_power = None
-        if entity_state.state in self._off_states or not await self.is_calculation_enabled(entity_state):
-            if isinstance(self._strategy_instance, PlaybookStrategy):
-                await self._strategy_instance.stop_playbook()
-            standby_power = await self.calculate_standby_power(entity_state)
-            self._standby_sensors[self.entity_id] = standby_power
-
-            if self._strategy_instance.can_calculate_standby() or self._calculation_strategy != CalculationStrategy.MULTI_SWITCH:
-                return standby_power
+        standby_power = await self._calculate_state_standby_power(entity_state)
+        if standby_power is not None and (
+            self._strategy_instance.can_calculate_standby() or self._calculation_strategy != CalculationStrategy.MULTI_SWITCH
+        ):
+            return standby_power
 
         # Calculate actual power using configured strategy
         power = await self._strategy_instance.calculate(entity_state)
         if power is None:
             return None
 
-        # Add standby power if available
+        return Decimal(self._apply_power_adjustments(power, standby_power))
+
+    def _resolve_calculation_state(self, state: State) -> State | None:
+        if self._source_entity.entity_id == DUMMY_ENTITY_ID and self._calculation_strategy != CalculationStrategy.MULTI_SWITCH:
+            if self._availability_entity and state.entity_id == self._availability_entity:
+                return State(DUMMY_ENTITY_ID, STATE_ON)
+            return state
+
+        if self._calculation_strategy == CalculationStrategy.MULTI_SWITCH or state.entity_id == self._source_entity.entity_id:
+            return state
+
+        return cast(State | None, self.hass.states.get(self._source_entity.entity_id))
+
+    async def _calculate_state_standby_power(self, entity_state: State) -> Decimal | None:
+        if entity_state.state not in self._off_states and await self.is_calculation_enabled(entity_state):
+            return None
+
+        assert self._strategy_instance is not None
+        if isinstance(self._strategy_instance, PlaybookStrategy):
+            await self._strategy_instance.stop_playbook()
+
+        standby_power = await self.calculate_standby_power(entity_state)
+        self._standby_sensors[self.entity_id] = standby_power
+        return standby_power
+
+    def _apply_power_adjustments(self, power: Decimal, standby_power: Decimal | None) -> Decimal:
         if standby_power:
             power += standby_power
 
-        # Apply multiply factor to power
         if self._multiply_factor:
             power *= Decimal(self._multiply_factor)
 
-        # Add standby power-on adjustments if applicable
         if self._standby_power_on and not standby_power:
             additional_standby_power = self._standby_power_on
             self._standby_sensors[self.entity_id] = self._standby_power_on
@@ -680,7 +705,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 additional_standby_power *= Decimal(self._multiply_factor)
             power += additional_standby_power
 
-        return Decimal(power)
+        return power
 
     async def _switch_sub_profile_dynamically(self, state: State) -> None:
         """Dynamically select a different sub profile depending on the entity state or attributes

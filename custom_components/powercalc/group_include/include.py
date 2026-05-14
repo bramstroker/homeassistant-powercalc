@@ -5,6 +5,7 @@ from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity_registry import RegistryEntry
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
@@ -70,29 +71,12 @@ async def find_entities(
             resolved_entities.append(existing)
             continue
 
-        is_real_sensor = False
-
-        if source_entity.domain == sensor.DOMAIN:
-            if source_entity.platform != DOMAIN and not include_non_powercalc:
-                continue
-
-            device_class = source_entity.device_class or source_entity.original_device_class
-            if device_class == SensorDeviceClass.POWER:
-                resolved_entities.append(RealPowerSensor(entity_id, source_entity.unit_of_measurement))
-                is_real_sensor = True
-            elif device_class == SensorDeviceClass.ENERGY:
-                resolved_entities.append(RealEnergySensor(entity_id))
-                is_real_sensor = True
-
-        # No need to discover a profile for something we already resolved as a real sensor
-        if is_real_sensor:
+        real_sensor = _create_real_sensor(source_entity, include_non_powercalc)
+        if real_sensor:
+            resolved_entities.append(real_sensor)
             continue
 
-        power_profile = await get_power_profile_by_source_entity(
-            hass,
-            await create_source_entity(entity_id, hass),
-        )
-        if power_profile and not await power_profile.needs_user_configuration and power_profile.is_entity_domain_supported(source_entity):
+        if await _is_discoverable_source_entity(hass, source_entity):
             discoverable_entities.append(entity_id)
 
     if exclude_utility_meters:
@@ -103,6 +87,29 @@ async def find_entities(
         _LOGGER.debug("Discoverable entities: %s", discoverable_entities)
 
     return FindEntitiesResult(resolved_entities, discoverable_entities)
+
+
+def _create_real_sensor(source_entity: RegistryEntry, include_non_powercalc: bool) -> Entity | None:
+    if source_entity.domain != sensor.DOMAIN:
+        return None
+
+    if source_entity.platform != DOMAIN and not include_non_powercalc:
+        return None
+
+    device_class = source_entity.device_class or source_entity.original_device_class
+    if device_class == SensorDeviceClass.POWER:
+        return RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement)
+    if device_class == SensorDeviceClass.ENERGY:
+        return RealEnergySensor(source_entity.entity_id)
+    return None
+
+
+async def _is_discoverable_source_entity(hass: HomeAssistant, source_entity: RegistryEntry) -> bool:
+    power_profile = await get_power_profile_by_source_entity(
+        hass,
+        await create_source_entity(source_entity.entity_id, hass),
+    )
+    return bool(power_profile and not await power_profile.needs_user_configuration and power_profile.is_entity_domain_supported(source_entity))
 
 
 def _build_filter(entity_filter: EntityFilter | None) -> EntityFilter:
