@@ -37,6 +37,7 @@ from tests.config_flow.common import (
     create_mock_entry,
     fixed_value_choice,
     goto_virtual_power_strategy_step,
+    handle_options_flow_update,
     initialize_options_flow,
     process_config_flow,
     select_menu_item,
@@ -154,20 +155,9 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
         user_input={CONF_ENTITY_ID: "light.test", CONF_CREATE_UTILITY_METERS: True},
     )
 
-    result = await initialize_options_flow(hass, entry, Step.FIXED)
+    await handle_options_flow_update(hass, entry, Step.FIXED, fixed_value_choice(CONF_POWER, 50))
 
-    user_input = fixed_value_choice(CONF_POWER, 50)
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
-    )
-
-    result = await initialize_options_flow(hass, entry, Step.ADVANCED_OPTIONS)
-    user_input = {CONF_IGNORE_UNAVAILABLE_STATE: True}
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
-    )
+    result = await handle_options_flow_update(hass, entry, Step.ADVANCED_OPTIONS, {CONF_IGNORE_UNAVAILABLE_STATE: True})
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_FIXED][CONF_POWER] == 50
@@ -226,7 +216,7 @@ async def test_fixed_states_power_options_flow_reconstructs_existing_config(hass
     entry = create_mock_entry(
         hass,
         {
-            CONF_ENTITY_ID: "light.ambient_gordijn",
+            CONF_ENTITY_ID: "light.test",
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_CREATE_UTILITY_METERS: True,

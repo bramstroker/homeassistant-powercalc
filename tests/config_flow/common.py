@@ -110,6 +110,7 @@ async def initialize_options_flow(
     entry: config_entries.ConfigEntry,
     selected_menu_item: Step,
 ) -> FlowResult:
+    """Initialize the options flow for a given config entry."""
     if entry.state != config_entries.ConfigEntryState.LOADED:
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
@@ -134,12 +135,14 @@ async def handle_options_flow_update(
     selected_menu_item: Step,
     user_input: dict[str, Any],
 ) -> FlowResult:
+    """Open the options flow, select a menu item, and handle user input."""
     result = await initialize_options_flow(hass, entry, selected_menu_item)
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input,
     )
     await hass.async_block_till_done()
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     return result
 
 
@@ -229,6 +232,7 @@ async def process_config_flow(
     result: FlowResult | None,
     user_inputs: dict[Step, dict],
 ) -> FlowResult | None:
+    """Process a configuration flow with multiple steps and user inputs."""
     if not result:
         result = await hass.config_entries.flow.async_init(
             DOMAIN,

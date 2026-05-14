@@ -28,6 +28,7 @@ from custom_components.powercalc.const import (
 )
 from tests.config_flow.common import (
     create_mock_entry,
+    handle_options_flow_update,
     initialize_options_flow,
     process_config_flow,
     select_menu_item,
@@ -88,15 +89,10 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.DAILY_ENERGY)
-
-    user_input = {**_daily_energy_value_choice(CONF_VALUE, 75), CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT}
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
+    await handle_options_flow_update(
+        hass, entry, Step.DAILY_ENERGY, {**_daily_energy_value_choice(CONF_VALUE, 75), CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT}
     )
 
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT] == UnitOfPower.WATT
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 75
 
@@ -147,15 +143,14 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
     config_entry: ConfigEntry = result["result"]
     assert config_entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 10
 
-    result = await initialize_options_flow(hass, config_entry, Step.UTILITY_METER_OPTIONS)
-
-    user_input = {
-        CONF_UTILITY_METER_TARIFFS: ["peak"],
-        CONF_UTILITY_METER_TYPES: [DAILY],
-    }
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
+    result = await handle_options_flow_update(
+        hass,
+        config_entry,
+        Step.UTILITY_METER_OPTIONS,
+        {
+            CONF_UTILITY_METER_TARIFFS: ["peak"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
