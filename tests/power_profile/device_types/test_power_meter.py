@@ -1,16 +1,16 @@
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_device_registry
+from pytest_homeassistant_custom_component.common import mock_device_registry
 
-from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN
+from custom_components.powercalc import CONF_SENSOR_TYPE
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
+from tests.common import assert_entity_state, create_mock_config_entry, get_test_profile_dir, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -70,9 +70,9 @@ async def test_per_device_discovery_from_gui(hass: HomeAssistant) -> None:
         },
     )
 
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await create_mock_config_entry(
+        hass,
+        {
             CONF_ENTITY_ID: "sensor.dummy",
             CONF_UNIQUE_ID: "pc_f52deed323f1ca5c11d90486e55b6eff",
             CONF_MANUFACTURER: "shelly",
@@ -82,9 +82,8 @@ async def test_per_device_discovery_from_gui(hass: HomeAssistant) -> None:
             CONF_NAME: "Test",
             CONF_DEVICE: "f52deed323f1ca5c11d90486e55b6eff",
         },
-        unique_id="pc_f52deed323f1ca5c11d90486e55b6eff",
+        setup=False,
     )
-    entry.add_to_hass(hass)
 
     await set_states(hass, [("sensor.some_entity", "50.00")])
     await run_powercalc_setup(hass)

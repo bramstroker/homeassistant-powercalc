@@ -18,10 +18,9 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import setup_config_entry
+from tests.common import create_mock_config_entry
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
-    create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
     set_virtual_power_configuration,
@@ -71,7 +70,7 @@ async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant) 
 
 
 async def test_linear_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.test",
@@ -103,7 +102,7 @@ async def test_linear_options_hidden_from_menu_for_self_usage_profiles(hass: Hom
     Fixed options should be hidden from the menu for self usage profiles
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2935
     """
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "sensor.dummy",
@@ -126,7 +125,7 @@ async def test_linear_options_hidden_from_menu_for_self_usage_profiles(hass: Hom
 
 
 async def test_linear_options_flow_error(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.test",

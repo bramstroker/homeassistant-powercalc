@@ -19,8 +19,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SensorType,
 )
-from tests.common import run_powercalc_setup, setup_config_entry
-from tests.config_flow.common import create_mock_entry
+from tests.common import create_mock_config_entry, run_powercalc_setup
 
 
 async def test_entities_are_bound_to_source_device(
@@ -53,7 +52,7 @@ async def test_entities_are_bound_to_source_device(
     )
 
     # Create powercalc sensors
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -187,7 +186,7 @@ async def test_entities_are_bound_to_source_device3(
         {device_id: DeviceEntry(id=device_id, manufacturer="test", model="test")},
     )
 
-    create_mock_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
@@ -249,13 +248,12 @@ async def test_change_device(hass: HomeAssistant) -> None:
         CONF_NAME: "Test",
         CONF_ENTITY_ID: "sensor.entity1",
     }
-    config_entry = await setup_config_entry(
+    config_entry = await create_mock_config_entry(
         hass,
         {
             **entry_data,
             CONF_DEVICE: "device1",
         },
-        unique_id="5345435",
     )
 
     device1 = device_registry.async_get("device1")
@@ -291,13 +289,12 @@ async def test_remove_device_from_config_entry(hass: HomeAssistant) -> None:
         CONF_NAME: "Test",
         CONF_GROUP_POWER_ENTITIES: ["sensor.test_power"],
     }
-    config_entry = await setup_config_entry(
+    config_entry = await create_mock_config_entry(
         hass,
         {
             **entry_data,
             CONF_DEVICE: "device1",
         },
-        unique_id="5345435",
     )
 
     device1 = device_registry.async_get("device1")

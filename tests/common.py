@@ -17,10 +17,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
-import homeassistant.helpers.area_registry as ar
 from homeassistant.helpers.entity_registry import EntityRegistry
-from homeassistant.helpers.floor_registry import FloorEntry, FloorRegistry, FloorRegistryItems
-from homeassistant.helpers.normalized_name_base_registry import NormalizedNameBaseRegistryItems
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_registry, setup_test_component_platform
@@ -166,25 +163,31 @@ def get_test_config_dir(append_path: str = "") -> str:
     )
 
 
-async def setup_config_entry(
+async def create_mock_config_entry(
     hass: HomeAssistant,
     entry_data: dict,
     unique_id: str | None = None,
-    title: str = "Mock Title",
+    title: str | None = None,
+    source: str = config_entries.SOURCE_USER,
+    setup: bool = True,
 ) -> MockConfigEntry:
-    """Setup and add a Powercalc config entry"""
+    """Add a Powercalc config entry, optionally running its setup."""
     if unique_id is None:
         unique_id = str(uuid.uuid4())
+    if title is None:
+        title = entry_data.get(CONF_NAME, "Mock Title")
 
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data=entry_data,
         unique_id=unique_id,
         title=title,
+        source=source,
     )
     config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
+    if setup:
+        assert await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
     return config_entry
 
 
@@ -194,7 +197,7 @@ async def create_mocked_virtual_power_sensor_entry(
     unique_id: str | None = None,
     extra_config: dict | None = None,
 ) -> config_entries.ConfigEntry:
-    return await setup_config_entry(
+    return await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -208,62 +211,6 @@ async def create_mocked_virtual_power_sensor_entry(
         unique_id,
         name,
     )
-
-
-def mock_area_registry(
-    hass: HomeAssistant,
-    mock_entries: dict[str, ar.AreaEntry] | None = None,
-) -> ar.AreaRegistry:
-    """Mock the Area Registry.
-
-    This should only be used if you need to mock/re-stage a clean mocked
-    area registry in your current hass object. It can be useful to,
-    for example, pre-load the registry with items.
-
-    This mock will thus replace the existing registry in the running hass.
-
-    If you just need to access the existing registry, use the `area_registry`
-    fixture instead.
-    """
-    registry = ar.AreaRegistry(hass)
-    registry.areas = NormalizedNameBaseRegistryItems[ar.AreaEntry]()
-    if mock_entries:
-        for key, entry in mock_entries.items():
-            registry.areas[key] = entry
-
-    registry._area_data = registry.areas.data  # noqa: SLF001
-
-    hass.data[ar.DATA_REGISTRY] = registry
-    return registry
-
-
-def mock_floor_registry(
-    hass: HomeAssistant,
-    mock_entries: dict[str, FloorEntry] | None = None,
-) -> FloorRegistry:
-    """Mock the Floor Registry.
-
-    This should only be used if you need to mock/re-stage a clean mocked
-    floor registry in your current hass object. It can be useful to,
-    for example, pre-load the registry with items.
-
-    This mock will thus replace the existing registry in the running hass.
-
-    If you just need to access the existing registry, use the `floor_registry`
-    fixture instead.
-    """
-    from homeassistant.helpers.floor_registry import DATA_REGISTRY
-
-    registry = FloorRegistry(hass)
-    registry.floors = FloorRegistryItems()
-    if mock_entries:
-        for key, entry in mock_entries.items():
-            registry.floors[key] = entry
-
-    registry._floor_data = registry.floors.data  # noqa: SLF001
-
-    hass.data[DATA_REGISTRY] = registry
-    return registry
 
 
 def mock_sensors_in_registry(

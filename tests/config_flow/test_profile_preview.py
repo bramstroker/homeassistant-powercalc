@@ -33,8 +33,8 @@ from custom_components.powercalc.flow_helper.profile_preview import (
     build_profile_preview,
     ws_start_preview,
 )
+from tests.common import create_mock_config_entry
 from tests.config_flow.common import (
-    create_mock_entry,
     fixed_value_choice,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
@@ -253,7 +253,7 @@ async def test_preview_websocket_sends_invalid_user_input_error(hass: HomeAssist
 
 
 async def test_preview_websocket_for_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.test",

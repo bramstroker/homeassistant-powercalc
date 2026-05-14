@@ -1,15 +1,12 @@
 from collections.abc import Mapping
 import json
 from typing import Any
-import uuid
 
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers.typing import ConfigType
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.common import SourceEntity
@@ -274,20 +271,6 @@ async def set_virtual_power_configuration(
         result["flow_id"],
         advanced_options or {},
     )
-
-
-def create_mock_entry(
-    hass: HomeAssistant,
-    entry_data: ConfigType,
-    source: str = config_entries.SOURCE_USER,
-    unique_id: str | None = None,
-) -> MockConfigEntry:
-    title = entry_data.get(CONF_NAME, "test")
-    entry = MockConfigEntry(domain=DOMAIN, title=title, data=entry_data, source=source, unique_id=unique_id or str(uuid.uuid4()))
-    entry.add_to_hass(hass)
-
-    assert not entry.options
-    return entry
 
 
 def assert_default_virtual_power_entry_data(

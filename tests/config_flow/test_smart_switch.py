@@ -20,11 +20,10 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import assert_entity_state, run_powercalc_setup, set_states
+from tests.common import assert_entity_state, create_mock_config_entry, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
-    create_mock_entry,
     handle_options_flow_update,
     initialize_options_flow,
     select_menu_item,
@@ -96,7 +95,7 @@ async def test_smart_switch_flow(
 
 
 async def test_smart_switch_options(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "switch.test",
@@ -115,7 +114,7 @@ async def test_smart_switch_options(hass: HomeAssistant) -> None:
 
 
 async def test_smart_switch_options_correctly_loaded(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "switch.test",

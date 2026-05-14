@@ -97,11 +97,11 @@ from custom_components.powercalc.sensors.group.custom import PreviousStateStore,
 from tests.common import (
     assert_entity_state,
     create_input_booleans,
+    create_mock_config_entry,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
     run_powercalc_setup,
     set_states,
-    setup_config_entry,
 )
 
 
@@ -165,7 +165,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant, entity_registry: Entity
 
 
 async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
-    config_entry_group_a = await setup_config_entry(
+    config_entry_group_a = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -176,7 +176,7 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
         },
     )
 
-    config_entry_group_b = await setup_config_entry(
+    config_entry_group_b = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -191,7 +191,7 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
         },
     )
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -239,7 +239,7 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
 async def test_parent_group_reloaded_on_subgroup_update(hass: HomeAssistant) -> None:
     """When an entity is added to a subgroup all the groups referring this subgroup should be reloaded"""
 
-    config_entry_group_sub = await setup_config_entry(
+    config_entry_group_sub = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -249,7 +249,7 @@ async def test_parent_group_reloaded_on_subgroup_update(hass: HomeAssistant) -> 
         },
     )
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -613,7 +613,7 @@ async def test_members_are_unhiden_after_group_removed(
         suggested_object_id="test_power",
     )
 
-    config_entry = await setup_config_entry(
+    config_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -671,7 +671,7 @@ async def test_group_utility_meter(
 
 
 async def test_include_config_entries_in_group(hass: HomeAssistant) -> None:
-    config_entry = await setup_config_entry(
+    config_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -684,7 +684,7 @@ async def test_include_config_entries_in_group(hass: HomeAssistant) -> None:
         },
     )
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -723,7 +723,7 @@ async def test_add_virtual_power_sensor_to_group_on_creation(
         "xyz",
     )
 
-    config_entry_group = await setup_config_entry(
+    config_entry_group = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -732,7 +732,7 @@ async def test_add_virtual_power_sensor_to_group_on_creation(
         },
     )
 
-    config_entry_sensor2 = await setup_config_entry(
+    config_entry_sensor2 = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -784,7 +784,7 @@ async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(
 ) -> None:
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/1298"""
 
-    config_entry_group = await setup_config_entry(
+    config_entry_group = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -792,10 +792,9 @@ async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(
         },
     )
 
-    config_entry_sensor = MockConfigEntry(
-        domain=DOMAIN,
-        unique_id="xyz",
-        data={
+    config_entry_sensor = await create_mock_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_UNIQUE_ID: "xyz",
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
@@ -804,10 +803,9 @@ async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(
             CONF_FIXED: {CONF_POWER: 50},
             CONF_GROUP: config_entry_group.entry_id,
         },
-        title="Test",
+        setup=False,
     )
 
-    config_entry_sensor.add_to_hass(hass)
     hass.config_entries.async_update_entry(
         config_entry_group,
         data={
@@ -870,7 +868,7 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
 
 
 async def test_associate_entry_to_existing_group(hass: HomeAssistant) -> None:
-    config_entry_group = await setup_config_entry(
+    config_entry_group = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -895,7 +893,7 @@ async def test_config_entry_is_removed_from_associated_groups_on_removal(
     groups: list[str] = ["GroupA", "GroupB", "GroupC"]
     group_entry_ids: list[str] = []
     for group in groups:
-        config_entry_group = await setup_config_entry(
+        config_entry_group = await create_mock_config_entry(
             hass,
             {
                 CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -916,7 +914,7 @@ async def test_config_entry_is_removed_from_associated_groups_on_removal(
 async def test_group_is_removed_from_virtual_power_entry_on_removal(
     hass: HomeAssistant,
 ) -> None:
-    config_entry_group = await setup_config_entry(
+    config_entry_group = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -924,7 +922,7 @@ async def test_group_is_removed_from_virtual_power_entry_on_removal(
         },
     )
 
-    config_entry_sensor = await setup_config_entry(
+    config_entry_sensor = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -950,7 +948,7 @@ async def test_error_is_logged_when_config_entry_associated_to_non_existing_grou
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.WARNING)
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -965,7 +963,7 @@ async def test_error_is_logged_when_config_entry_associated_to_non_existing_grou
 
 
 async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1003,7 +1001,7 @@ async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
 
 
 async def test_power_unit_conversions(hass: HomeAssistant) -> None:
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1048,7 +1046,7 @@ async def test_gui_discovered_entity_in_yaml_group(
 
     caplog.set_level(logging.ERROR)
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -1259,7 +1257,7 @@ async def test_storage_version_1(hass: HomeAssistant) -> None:
 async def test_unknown_member_config_entry_is_skipped_from_group(
     hass: HomeAssistant,
 ) -> None:
-    member_entry = await setup_config_entry(
+    member_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -1269,7 +1267,7 @@ async def test_unknown_member_config_entry_is_skipped_from_group(
         },
     )
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1370,7 +1368,7 @@ async def test_bind_to_configured_device(
     )
 
     # Create powercalc sensors
-    member_entry = await setup_config_entry(
+    member_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -1380,7 +1378,7 @@ async def test_bind_to_configured_device(
         },
     )
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1415,7 +1413,7 @@ async def test_disable_energy_sensor_creation(hass: HomeAssistant) -> None:
 
 async def test_disable_energy_sensor_creation_gui(hass: HomeAssistant) -> None:
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/2143"""
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1581,7 +1579,7 @@ async def test_force_calculate_energy(hass: HomeAssistant) -> None:
     See https://github.com/bramstroker/homeassistant-powercalc/issues/2476
     Test force_calculation_group_energy toggle in config flow applied correctly
     """
-    member_entry = await setup_config_entry(
+    member_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -1592,7 +1590,7 @@ async def test_force_calculate_energy(hass: HomeAssistant) -> None:
         },
     )
 
-    group_entry = await setup_config_entry(
+    group_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1614,7 +1612,7 @@ async def test_energy_entity_attribute_is_unset_correctly(hass: HomeAssistant) -
     See https://github.com/bramstroker/homeassistant-powercalc/issues/2476
     When `create_energy_sensor` is set to false the `_energy_entity` property in config entry must also be unset.
     """
-    member_entry = await setup_config_entry(
+    member_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -1682,7 +1680,7 @@ async def test_debug_group_action_for_power_group(hass: HomeAssistant) -> None:
             ("sensor.b_power", "0.1", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT}),
         ],
     )
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1727,7 +1725,7 @@ async def test_debug_group_action_for_power_group_with_unavailable_member(hass: 
             ("sensor.b_power", STATE_UNAVAILABLE, {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT}),
         ],
     )
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1766,7 +1764,7 @@ async def test_debug_group_action_for_power_group_with_unavailable_member(hass: 
 
 async def test_debug_group_action_for_power_group_with_missing_member_state(hass: HomeAssistant) -> None:
     await set_states(hass, [("sensor.a_power", "50", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT})])
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1811,7 +1809,7 @@ async def test_debug_group_action_for_energy_group(hass: HomeAssistant) -> None:
             ("sensor.b_energy", "500", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.WATT_HOUR}),
         ],
     )
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -1867,7 +1865,7 @@ async def test_debug_group_action_for_energy_group(hass: HomeAssistant) -> None:
 )
 async def test_start_at_zero(hass: HomeAssistant, entry_data: dict[str, Any]) -> None:
     await set_states(hass, [("sensor.a_energy", "2.00"), ("sensor.b_energy", "3.00")])
-    await setup_config_entry(hass, entry_data)
+    await create_mock_config_entry(hass, entry_data)
 
     assert_entity_state(hass, "sensor.testgroup_energy", "0.0000")
 
@@ -2124,7 +2122,7 @@ async def test_remove_member_from_group(hass: HomeAssistant) -> None:
     member_config_entries = []
     member_entity_ids = []
     for i in range(3):
-        config_entry = await setup_config_entry(
+        config_entry = await create_mock_config_entry(
             hass,
             {
                 CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -2138,7 +2136,7 @@ async def test_remove_member_from_group(hass: HomeAssistant) -> None:
         member_config_entries.append(config_entry)
         member_entity_ids.append(f"sensor.virtualsensor{i}_energy")
 
-    group_entry = await setup_config_entry(
+    group_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -2187,7 +2185,7 @@ async def _create_energy_group(
     member_entities: list[str],
 ) -> None:
     """Create a group energy sensor for testing purposes"""
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,

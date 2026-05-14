@@ -11,12 +11,12 @@ from custom_components.powercalc.const import (
     GroupType,
     SensorType,
 )
-from tests.config_flow.common import create_mock_entry
+from tests.common import create_mock_config_entry
 
 
 async def test_domain_group_option_menu(hass: HomeAssistant) -> None:
     """Test the domain group option menu."""
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,

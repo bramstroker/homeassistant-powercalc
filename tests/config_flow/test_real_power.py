@@ -25,8 +25,8 @@ from custom_components.powercalc.const import (
     ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
     UnitPrefix,
 )
+from tests.common import create_mock_config_entry
 from tests.config_flow.common import (
-    create_mock_entry,
     handle_options_flow_update,
     select_menu_item,
 )
@@ -116,7 +116,7 @@ async def test_energy_sensor_is_bound_to_power_device(hass: HomeAssistant) -> No
 
 
 async def test_real_power_options(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "Some name",
@@ -140,7 +140,7 @@ async def test_real_power_options(hass: HomeAssistant) -> None:
 
 async def test_energy_options_flow(hass: HomeAssistant) -> None:
     """Test energy options flow."""
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "Some name",

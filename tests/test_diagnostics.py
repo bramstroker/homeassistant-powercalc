@@ -5,7 +5,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.powercalc import CONF_DISCOVERY, CONF_SENSOR_TYPE, SensorType
 from custom_components.powercalc.const import CONF_FIXED, CONF_GROUP_MEMBER_SENSORS, CONF_MODE, CONF_POWER, CalculationStrategy
 from custom_components.powercalc.diagnostics import async_get_config_entry_diagnostics
-from tests.common import setup_config_entry
+from tests.common import create_mock_config_entry
 
 
 async def test_diagnostics(
@@ -28,7 +28,7 @@ async def test_diagnostics(
 
 
 async def test_group_entities_are_included_in_diagnostics(hass: HomeAssistant) -> None:
-    member_entry = await setup_config_entry(
+    member_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -38,7 +38,7 @@ async def test_group_entities_are_included_in_diagnostics(hass: HomeAssistant) -
             CONF_FIXED: {CONF_POWER: 50},
         },
     )
-    group_entry = await setup_config_entry(
+    group_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,

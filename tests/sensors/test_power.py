@@ -79,11 +79,11 @@ from custom_components.powercalc.const import (
 from tests.common import (
     assert_entity_state,
     create_input_boolean,
+    create_mock_config_entry,
     get_simple_fixed_config,
     get_test_profile_dir,
     run_powercalc_setup,
     set_states,
-    setup_config_entry,
 )
 from tests.conftest import MockEntityWithModel
 
@@ -595,7 +595,7 @@ async def test_multiply_factor_sleep_power(hass: HomeAssistant) -> None:
 
 
 async def test_unload_entry_cancels_pending_sleep_power_timer(hass: HomeAssistant) -> None:
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -675,7 +675,7 @@ async def test_sub_profile_default_select(hass: HomeAssistant) -> None:
 
 async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
     unique_id = str(uuid.uuid4())
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -725,7 +725,7 @@ async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profi
     hass: HomeAssistant,
 ) -> None:
     unique_id = str(uuid.uuid4())
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -757,7 +757,7 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
     hass: HomeAssistant,
 ) -> None:
     unique_id = str(uuid.uuid4())
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,

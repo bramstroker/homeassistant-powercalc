@@ -13,7 +13,6 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
     CONF_DISCOVERY,
@@ -50,10 +49,10 @@ from tests.common import set_states
 from .common import (
     assert_entity_state,
     create_input_boolean,
+    create_mock_config_entry,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
     run_powercalc_setup,
-    setup_config_entry,
 )
 from .conftest import MockEntityWithModel
 
@@ -90,7 +89,7 @@ async def test_domain_groups(hass: HomeAssistant, entity_registry: EntityRegistr
 
 async def test_unload_entry(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     unique_id = "98493943242"
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -117,18 +116,17 @@ async def test_domain_group_with_utility_meter(
     """
     mock_entity_with_model_information("light.testb", "signify", "LCA001")
 
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await create_mock_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MANUFACTURER: "signify",
             CONF_MODEL: "LCA001",
             CONF_UNIQUE_ID: "1234",
             CONF_ENTITY_ID: "light.testb",
         },
-        unique_id="1234",
+        setup=False,
     )
-    entry.add_to_hass(hass)
 
     domain_config = {
         CONF_CREATE_DOMAIN_GROUPS: [light.DOMAIN],
@@ -152,7 +150,7 @@ async def test_create_config_entry_without_energy_sensor(
     """
     template = "{{ 100 * 20 | float}}"
 
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -185,7 +183,7 @@ async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
     power_entry = await create_mocked_virtual_power_sensor_entry(hass, "Power")
 
     none_entries = [
-        await setup_config_entry(
+        await create_mock_config_entry(
             hass,
             {
                 CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -212,7 +210,7 @@ async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
 
 
 async def test_powercalc_initialized_on_global_config_entry(hass: HomeAssistant) -> None:
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_UNIQUE_ID: ENTRY_GLOBAL_CONFIG_UNIQUE_ID,

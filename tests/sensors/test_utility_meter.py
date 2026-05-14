@@ -45,10 +45,10 @@ from custom_components.powercalc.const import (
 from tests.common import (
     assert_entity_state,
     create_input_boolean,
+    create_mock_config_entry,
     create_mocked_virtual_power_sensor_entry,
     run_powercalc_setup,
     set_states,
-    setup_config_entry,
 )
 
 
@@ -98,7 +98,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
 
 
 async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
-    entry1 = await setup_config_entry(
+    entry1 = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -111,7 +111,7 @@ async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entit
         title="Entry1",
     )
 
-    entry2 = await setup_config_entry(
+    entry2 = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,

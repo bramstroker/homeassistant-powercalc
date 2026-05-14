@@ -56,14 +56,13 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.sensors.group.config_entry_utils import add_to_associated_groups
 from custom_components.test.light import MockLight
 from tests.common import (
+    create_mock_config_entry,
     create_mock_light_entity,
     create_mocked_virtual_power_sensor_entry,
     run_powercalc_setup,
     set_states,
-    setup_config_entry,
 )
 from tests.config_flow.common import (
-    create_mock_entry,
     fixed_value_choice,
     goto_virtual_power_strategy_step,
     handle_options_flow_update,
@@ -334,17 +333,15 @@ async def test_group_include_floor(
 
 async def test_can_unset_area(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
     area_registry.async_get_or_create("My area")
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        unique_id="abcdefg",
-        data={
+    config_entry = await create_mock_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_NAME: "TestArea",
             CONF_AREA: "My area",
         },
-        title="TestArea",
+        setup=False,
     )
-    config_entry.add_to_hass(hass)
 
     updated_entry = hass.config_entries.async_get_entry(config_entry.entry_id)
     assert updated_entry.data == {
@@ -390,7 +387,7 @@ async def test_include_area_powercalc_only(
         },
     )
 
-    await setup_config_entry(hass, {CONF_ENTITY_ID: "switch.switch", CONF_NAME: "Test", CONF_FIXED: {CONF_POWER: 5}})
+    await create_mock_config_entry(hass, {CONF_ENTITY_ID: "switch.switch", CONF_NAME: "Test", CONF_FIXED: {CONF_POWER: 5}})
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
     user_input = {
@@ -482,7 +479,7 @@ async def test_real_power_entry_selectable_as_group_member(
         "VirtualPower1",
         "abcdef",
     )
-    config_entry_2 = await setup_config_entry(
+    config_entry_2 = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.REAL_POWER,
@@ -530,7 +527,7 @@ async def test_group_error_mandatory(hass: HomeAssistant) -> None:
 
 async def test_subgroup_selector(hass: HomeAssistant) -> None:
     # Create two existing group config entries
-    group1_entry = create_mock_entry(
+    group1_entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "Group1",
@@ -538,14 +535,14 @@ async def test_subgroup_selector(hass: HomeAssistant) -> None:
             CONF_GROUP_TYPE: GroupType.CUSTOM,
         },
     )
-    group2_entry = create_mock_entry(
+    group2_entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "Group2",
             CONF_SENSOR_TYPE: SensorType.GROUP,
         },
     )
-    create_mock_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "Group3",
@@ -590,7 +587,7 @@ async def test_subgroup_selector(hass: HomeAssistant) -> None:
 
 
 async def test_group_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "Kitchen",
@@ -631,17 +628,15 @@ async def test_migrate_config_entry_from_version_2(hass: HomeAssistant) -> None:
 
 
 async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistant) -> None:
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        unique_id="abcdefg",
-        data={
+    await create_mock_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_NAME: "TestGroup",
             CONF_GROUP_TYPE: GroupType.CUSTOM,
         },
-        title="TestGroup",
+        setup=False,
     )
-    config_entry.add_to_hass(hass)
 
     result = await goto_virtual_power_strategy_step(
         hass,
@@ -677,7 +672,7 @@ async def test_no_group_created_when_group_null(hass: HomeAssistant) -> None:
     Prevent regression by checking if the group field is null and not creating a group in that case.
     See https://github.com/bramstroker/homeassistant-powercalc/issues/2281
     """
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,

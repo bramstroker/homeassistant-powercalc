@@ -25,7 +25,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.fixed import FixedStrategy
-from tests.common import assert_entity_state, run_powercalc_setup, set_states, setup_config_entry
+from tests.common import assert_entity_state, create_mock_config_entry, run_powercalc_setup, set_states
 
 
 async def test_simple_power(hass: HomeAssistant) -> None:
@@ -165,7 +165,7 @@ async def test_config_entry_with_template_rendered_correctly(
 ) -> None:
     template = "{{states('input_number.test')|float}}"
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -214,7 +214,7 @@ async def test_config_entry_with_states_power(
     states_power: dict[str, float],
     expected_power: dict[str, str],
 ) -> None:
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: entity_id,
@@ -230,7 +230,7 @@ async def test_config_entry_with_states_power(
 
 
 async def test_config_entry_with_states_power_template(hass: HomeAssistant) -> None:
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "media_player.test",

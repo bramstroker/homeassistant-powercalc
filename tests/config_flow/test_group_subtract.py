@@ -16,8 +16,8 @@ from custom_components.powercalc.const import (
     CONF_SUBTRACT_ENTITIES,
     GroupType,
 )
+from tests.common import create_mock_config_entry
 from tests.config_flow.common import (
-    create_mock_entry,
     handle_options_flow_update,
     select_menu_item,
 )
@@ -65,7 +65,7 @@ async def test_subtract_group_flow(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "My group sensor",

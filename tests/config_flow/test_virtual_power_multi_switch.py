@@ -28,10 +28,9 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.common import assert_entity_state, run_powercalc_setup, set_states
+from tests.common import assert_entity_state, create_mock_config_entry, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
-    create_mock_entry,
     goto_virtual_power_strategy_step,
     handle_options_flow_update,
     initialize_discovery_flow,
@@ -147,7 +146,7 @@ async def test_discovery_flow_once_per_unique_device(
 
 
 async def test_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "switch.test",
@@ -184,7 +183,7 @@ async def test_regression_2612(hass: HomeAssistant, mock_entity_with_model_infor
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
-    create_mock_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "switch.test",

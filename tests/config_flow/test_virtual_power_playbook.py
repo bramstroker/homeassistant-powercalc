@@ -16,10 +16,9 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import run_powercalc_setup, set_states
+from tests.common import create_mock_config_entry, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
-    create_mock_entry,
     goto_virtual_power_strategy_step,
     handle_options_flow_update,
     initialize_options_flow,
@@ -64,7 +63,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.test",
@@ -79,6 +78,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
                 CONF_AUTOSTART: "playbook1",
             },
         },
+        setup=False,
     )
 
     result = await initialize_options_flow(hass, entry, Step.PLAYBOOK)

@@ -29,7 +29,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.linear import LinearStrategy
-from tests.common import assert_entity_state, set_states, setup_config_entry
+from tests.common import assert_entity_state, create_mock_config_entry, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -293,7 +293,7 @@ async def test_config_entry_with_calibrate_list(
 ) -> None:
     mock_entity_with_model_information("light.test")
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,

@@ -51,7 +51,6 @@ from custom_components.powercalc.const import (
     CONF_SUB_GROUPS,
     CONF_TEMPLATE,
     CONF_WILDCARD,
-    DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
     SensorType,
@@ -60,6 +59,7 @@ from custom_components.powercalc.group_include.include import find_entities
 from custom_components.test.light import MockLight
 from tests.common import (
     create_discoverable_light,
+    create_mock_config_entry,
     create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup,
@@ -87,7 +87,7 @@ async def test_include_area(
     area = area_registry.async_get_or_create("Bathroom 1")
     entity_registry.async_update_entity("light.bathroom_mirror", area_id=area.id)
 
-    _create_powercalc_config_entry(hass, "light.bathroom_mirror")
+    await _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
     await run_powercalc_setup(
         hass,
@@ -116,7 +116,7 @@ async def test_include_area_not_found(
 
 async def test_include_light_group(hass: HomeAssistant) -> None:
     discoverable_light = create_discoverable_light("bathroom_mirror")
-    _create_powercalc_config_entry(hass, "light.bathroom_mirror")
+    await _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
     non_discoverable_light = MockLight("bathroom_spots")
 
@@ -185,8 +185,8 @@ async def test_include_domain(hass: HomeAssistant) -> None:
         ],
     )
 
-    _create_powercalc_config_entry(hass, "light.bathroom_spots")
-    _create_powercalc_config_entry(hass, "light.kitchen")
+    await _create_powercalc_config_entry(hass, "light.bathroom_spots")
+    await _create_powercalc_config_entry(hass, "light.kitchen")
 
     await run_powercalc_setup(
         hass,
@@ -227,9 +227,9 @@ async def test_include_domain_list(hass: HomeAssistant) -> None:
             ),
         },
     )
-    _create_powercalc_config_entry(hass, "switch.test")
-    _create_powercalc_config_entry(hass, "light.test2")
-    _create_powercalc_config_entry(hass, "sensor.test3")
+    await _create_powercalc_config_entry(hass, "switch.test")
+    await _create_powercalc_config_entry(hass, "light.test2")
+    await _create_powercalc_config_entry(hass, "sensor.test3")
 
     await run_powercalc_setup(
         hass,
@@ -259,8 +259,8 @@ async def test_include_template(hass: HomeAssistant) -> None:
         ],
     )
 
-    _create_powercalc_config_entry(hass, "light.bathroom_spots")
-    _create_powercalc_config_entry(hass, "light.kitchen")
+    await _create_powercalc_config_entry(hass, "light.bathroom_spots")
+    await _create_powercalc_config_entry(hass, "light.kitchen")
 
     template = "{{ states|selectattr('entity_id', 'eq', 'light.bathroom_spots')|map(attribute='entity_id')|list}}"
     await run_powercalc_setup(
@@ -415,9 +415,9 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
         [light_a, light_b, light_c, light_d, light_e, light_f],
     )
 
-    _create_powercalc_config_entry(hass, "light.light_a", light_a.unique_id)
-    _create_powercalc_config_entry(hass, "light.light_e", light_e.unique_id)
-    _create_powercalc_config_entry(hass, "light.light_f", light_f.unique_id)
+    await _create_powercalc_config_entry(hass, "light.light_a", light_a.unique_id)
+    await _create_powercalc_config_entry(hass, "light.light_e", light_e.unique_id)
+    await _create_powercalc_config_entry(hass, "light.light_f", light_f.unique_id)
 
     # Ugly hack, maybe I can figure out something better in the future.
     # Light domain is already setup for platform test, remove the component so we can setup light group
@@ -533,8 +533,8 @@ async def test_include_filter_domain(
         },
     )
 
-    _create_powercalc_config_entry(hass, "light.test_light")
-    _create_powercalc_config_entry(hass, "switch.test_switch")
+    await _create_powercalc_config_entry(hass, "light.test_light")
+    await _create_powercalc_config_entry(hass, "switch.test_switch")
 
     await run_powercalc_setup(
         hass,
@@ -574,7 +574,7 @@ async def test_include_yaml_configured_entity(
     entity_registry.async_update_entity(light_b.entity_id, area_id=area.id)
     entity_registry.async_update_entity(light_c.entity_id, area_id=area.id)
 
-    _create_powercalc_config_entry(hass, light_a.entity_id)
+    await _create_powercalc_config_entry(hass, light_a.entity_id)
 
     await run_powercalc_setup(
         hass,
@@ -614,7 +614,7 @@ async def test_include_non_powercalc_entities_in_group(
     area = area_registry.async_get_or_create("bedroom")
     await hass.async_block_till_done()
 
-    _create_powercalc_config_entry(hass, "light.test")
+    await _create_powercalc_config_entry(hass, "light.test")
 
     shelly_power_sensor = "sensor.shelly_power"
     shelly_energy_sensor = "sensor.shelly_energy"
@@ -682,7 +682,7 @@ async def test_group_setup_continues_when_subgroup_has_no_include_entities(
     area_registry.async_get_or_create("Bedroom")
     entity_registry.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
 
-    _create_powercalc_config_entry(hass, "light.bathroom_mirror")
+    await _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
     await run_powercalc_setup(
         hass,
@@ -717,29 +717,27 @@ async def test_area_groups_as_subgroups(
     area_registry.async_get_or_create("Bedroom")
     entity_registry.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
 
-    _create_powercalc_config_entry(hass, "light.bathroom_mirror")
+    await _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
-    group_a_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    group_a_entry = await create_mock_config_entry(
+        hass,
+        {
             CONF_NAME: "GroupA",
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_AREA: area_bathroom.name,
         },
-        unique_id="groupA",
+        setup=False,
     )
-    group_a_entry.add_to_hass(hass)
 
-    group_b_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await create_mock_config_entry(
+        hass,
+        {
             CONF_NAME: "GroupB",
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_SUB_GROUPS: [group_a_entry.entry_id],
         },
-        unique_id="groupB",
+        setup=False,
     )
-    group_b_entry.add_to_hass(hass)
 
     await run_powercalc_setup(hass)
 
@@ -1440,9 +1438,9 @@ async def test_include_with_gui_and_yaml_entry(
 
     mock_entity_with_model_information("light.test", "signify", "LCT010")
 
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    await create_mock_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_UNIQUE_ID: "pc_68291146-1592-4cfa-b5fb-bfeefcf9c691",
             CONF_ENTITY_ID: "light.test",
@@ -1452,9 +1450,8 @@ async def test_include_with_gui_and_yaml_entry(
             ENTRY_DATA_POWER_ENTITY: "sensor.test_power",
             ENTRY_DATA_ENERGY_ENTITY: "sensor.test_energy",
         },
-        unique_id="pc_68291146-1592-4cfa-b5fb-bfeefcf9c691",
+        setup=False,
     )
-    entry.add_to_hass(hass)
 
     await run_powercalc_setup(
         hass,
@@ -1478,7 +1475,7 @@ async def test_include_with_gui_and_yaml_entry(
     assert not hass.states.get("sensor.test_power2")
 
 
-def _create_powercalc_config_entry(
+async def _create_powercalc_config_entry(
     hass: HomeAssistant,
     source_entity_id: str,
     unique_id: str | None = None,
@@ -1487,9 +1484,9 @@ def _create_powercalc_config_entry(
 
     if unique_id is None:
         unique_id = str(uuid.uuid4())
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    return await create_mock_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_UNIQUE_ID: unique_id,
             CONF_ENTITY_ID: source_entity_id,
@@ -1498,6 +1495,5 @@ def _create_powercalc_config_entry(
             ENTRY_DATA_ENERGY_ENTITY: f"sensor.{object_id}_energy",
         },
         unique_id=unique_id,
+        setup=False,
     )
-    entry.add_to_hass(hass)
-    return entry

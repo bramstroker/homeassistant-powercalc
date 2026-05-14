@@ -32,11 +32,10 @@ from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_A
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
-from tests.common import create_mock_light_entity
+from tests.common import create_mock_config_entry, create_mock_light_entity
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
-    create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_discovery_flow,
     initialize_options_flow,
@@ -175,7 +174,7 @@ async def test_fixed_power_is_skipped_when_only_self_usage_true(hass: HomeAssist
 async def test_library_options_flow_raises_error_on_non_existing_power_profile(
     hass: HomeAssistant,
 ) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.spots_kitchen",
@@ -227,7 +226,7 @@ async def test_composite_library_profile_options_flow_builds_menu(
         },
     )
 
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "vacuum.robi",
@@ -252,7 +251,7 @@ async def test_composite_library_profile_options_flow_builds_menu(
 
 
 async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.spots_kitchen",
@@ -291,7 +290,7 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
 
 
 async def test_device_discovered_entry_keeps_device_type_filter_in_library_options(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
@@ -330,7 +329,7 @@ async def test_device_discovered_entry_keeps_device_type_filter_in_library_optio
 
 
 async def test_change_sub_profile_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.spots_kitchen",
@@ -368,7 +367,7 @@ async def test_change_sub_profile_options_flow(hass: HomeAssistant) -> None:
 
 
 async def test_configured_model_populated_in_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.spots_kitchen",
@@ -420,7 +419,7 @@ async def test_configured_model_populated_in_options_flow(hass: HomeAssistant) -
 
 async def test_source_entity_not_visible_in_options_when_discovery_by_device(hass: HomeAssistant) -> None:
     """When discovery mode was by device, source entity should not be visible in options."""
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
@@ -731,7 +730,7 @@ async def test_options_flow_initializes_profile_with_custom_fields(
         },
     )
 
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "switch.test_device",
