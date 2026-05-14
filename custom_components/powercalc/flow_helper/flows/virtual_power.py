@@ -367,16 +367,17 @@ class VirtualPowerFlow:
         if strategy == CalculationStrategy.WLED:
             description_placeholders["docs_uri"] = "https://docs.powercalc.nl/strategies/wled/"
 
+        form_kwarg: dict[str, Any] = {"description_placeholders": description_placeholders}
+        if strategy != CalculationStrategy.PLAYBOOK:
+            form_kwarg["preview"] = PREVIEW_NAME
+
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=STRATEGY_STEP_MAPPING[strategy],
                 schema=schema,
                 next_step=Step.ASSIGN_GROUPS,
                 validate_user_input=_validate,
-                form_kwarg={
-                    "description_placeholders": description_placeholders,
-                    "preview": PREVIEW_NAME,
-                },
+                form_kwarg=form_kwarg,
             ),
             user_input,
         )
@@ -581,9 +582,10 @@ class VirtualPowerOptionsFlow(VirtualPowerFlow):
         if self.flow.strategy:
             merged_options = wrap_strategy_form_data(self.flow.strategy, merged_options)
         schema = fill_schema_defaults(schema, merged_options)
+        form_kwarg = {"preview": PREVIEW_NAME} if self.flow.strategy != CalculationStrategy.PLAYBOOK else None
         return await self.flow.async_handle_options_step(
             user_input,
             schema,
             step,
-            form_kwarg={"preview": PREVIEW_NAME},
+            form_kwarg=form_kwarg,
         )
