@@ -71,6 +71,9 @@ async def find_entities(
             resolved_entities.append(existing)
             continue
 
+        if _should_skip_source_entity(source_entity, include_non_powercalc):
+            continue
+
         real_sensor = _create_real_sensor(source_entity, include_non_powercalc)
         if real_sensor:
             resolved_entities.append(real_sensor)
@@ -87,6 +90,10 @@ async def find_entities(
         _LOGGER.debug("Discoverable entities: %s", discoverable_entities)
 
     return FindEntitiesResult(resolved_entities, discoverable_entities)
+
+
+def _should_skip_source_entity(source_entity: RegistryEntry, include_non_powercalc: bool) -> bool:
+    return source_entity.domain == sensor.DOMAIN and source_entity.platform != DOMAIN and not include_non_powercalc
 
 
 def _create_real_sensor(source_entity: RegistryEntry, include_non_powercalc: bool) -> Entity | None:
