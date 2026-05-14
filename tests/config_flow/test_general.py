@@ -2,7 +2,6 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
-    CONF_MODE,
     CONF_POWER,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
@@ -34,7 +33,6 @@ async def test_create_multiple_entries_using_dummy(hass: HomeAssistant) -> None:
         user_input={
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: "mysensor2",
-            CONF_MODE: CalculationStrategy.FIXED,
         },
     )
     await set_virtual_power_configuration(hass, result, {CONF_POWER: 20})

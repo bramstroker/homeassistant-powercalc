@@ -7,7 +7,6 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
-    CONF_MODE,
     CONF_POWER,
     CONF_UTILITY_METER_NET_CONSUMPTION,
     CONF_UTILITY_METER_TARIFFS,
@@ -24,7 +23,6 @@ async def test_utility_meter_tariffs(hass: HomeAssistant) -> None:
         CalculationStrategy.FIXED,
         {
             CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
-            CONF_MODE: CalculationStrategy.FIXED,
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
@@ -53,7 +51,6 @@ async def test_utility_meter_net_consumption(hass: HomeAssistant) -> None:
         CalculationStrategy.FIXED,
         {
             CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
-            CONF_MODE: CalculationStrategy.FIXED,
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
