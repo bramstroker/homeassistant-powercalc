@@ -79,9 +79,7 @@ SCHEMA_DAILY_ENERGY = vol.Schema(
 
 def daily_energy_choice_key_from_validated_value(value: object) -> str:
     """Infer the daily energy config key from a validated ChooseSelector value."""
-    if isinstance(value, str):
-        return CONF_VALUE_TEMPLATE
-    return CONF_VALUE
+    return CONF_VALUE_TEMPLATE if isinstance(value, str) else CONF_VALUE
 
 
 def build_daily_energy_config(user_input: dict[str, Any], schema: vol.Schema) -> dict[str, Any]:
