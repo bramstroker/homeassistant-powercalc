@@ -21,7 +21,6 @@ async def test_create_multiple_entries_using_dummy(hass: HomeAssistant) -> None:
         user_input={
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: "mysensor1",
-            CONF_MODE: CalculationStrategy.FIXED,
         },
     )
     await set_virtual_power_configuration(hass, result, {CONF_POWER: 20})

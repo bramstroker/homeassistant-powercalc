@@ -130,7 +130,7 @@ async def initialize_options_flow(
 async def initialize_discovery_flow(
     hass: HomeAssistant,
     source_entity: SourceEntity,
-    power_profiles: PowerProfile | list[PowerProfile] | None = None,
+    power_profiles: PowerProfile | list[PowerProfile | None] | None = None,
     confirm_autodiscovered_model: bool = False,
 ) -> FlowResult:
     discovery_manager: DiscoveryManager = DiscoveryManager(hass, {})
@@ -212,7 +212,7 @@ async def process_config_flow(
     hass: HomeAssistant,
     result: FlowResult | None,
     user_inputs: dict[Step, dict],
-) -> dict:
+) -> FlowResult | None:
     if not result:
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -236,11 +236,9 @@ async def set_virtual_power_configuration(
     advanced_options: dict[str, Any] | None = None,
     group_options: dict[str, Any] | None = None,
 ) -> FlowResult:
-    if basic_options is None:
-        basic_options = {}
     result = await hass.config_entries.flow.async_configure(
         previous_result["flow_id"],
-        basic_options,
+        basic_options or {},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
