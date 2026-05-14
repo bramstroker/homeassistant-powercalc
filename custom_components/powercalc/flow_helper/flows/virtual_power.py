@@ -100,16 +100,6 @@ STATES_POWER_SELECTOR = selector.ObjectSelector(
     ),
 )
 
-CALIBRATE_SELECTOR = selector.ObjectSelector(
-    selector.ObjectSelectorConfig(
-        fields={
-            CONF_VALUE: {"required": True, "selector": {"number": {"mode": "box", "step": 1}}},
-            CONF_POWER: {"required": True, "selector": {"number": {"mode": "box", "step": "any"}}},
-        },
-        multiple=True,
-    ),
-)
-
 FIXED_CHOICE_SELECTORS: dict[str, selector.ChooseSelectorChoiceConfig] = {
     CONF_POWER: {"selector": {"number": {"mode": "box", "step": "any"}}},
     CONF_POWER_TEMPLATE: {"selector": {"template": {}}},
@@ -155,7 +145,15 @@ SCHEMA_POWER_LINEAR = vol.Schema(
         vol.Optional(CONF_MIN_POWER): selector.NumberSelector(selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step="any")),
         vol.Optional(CONF_MAX_POWER): selector.NumberSelector(selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step="any")),
         vol.Optional(CONF_GAMMA_CURVE): selector.NumberSelector(selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step="any")),
-        vol.Optional(CONF_CALIBRATE): CALIBRATE_SELECTOR,
+        vol.Optional(CONF_CALIBRATE): selector.ObjectSelector(
+            selector.ObjectSelectorConfig(
+                fields={
+                    CONF_VALUE: {"required": True, "selector": {"number": {"mode": "box", "step": 1}}},
+                    CONF_POWER: {"required": True, "selector": {"number": {"mode": "box", "step": "any"}}},
+                },
+                multiple=True,
+            ),
+        ),
     },
 )
 
