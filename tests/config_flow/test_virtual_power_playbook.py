@@ -16,6 +16,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.flow_helper.flows.virtual_power import wrap_strategy_form_data
 from tests.common import create_mock_config_entry, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
@@ -114,6 +115,23 @@ async def test_playbooks_mandatory(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"] == {"base": "playbook_mandatory"}
+
+
+def test_wrap_strategy_form_data_converts_state_trigger_dict_to_list() -> None:
+    """State trigger is stored as a state→playbook dict, but the form expects a list of dicts."""
+
+    result = wrap_strategy_form_data(
+        CalculationStrategy.PLAYBOOK,
+        {
+            CONF_PLAYBOOKS: [{"id": "playbook1", "path": "test.csv"}],
+            CONF_STATE_TRIGGER: {STATE_IDLE: "playbook1", STATE_PLAYING: "playbook2"},
+        },
+    )
+
+    assert result[CONF_STATE_TRIGGER] == [
+        {"state": STATE_IDLE, "playbook_id": "playbook1"},
+        {"state": STATE_PLAYING, "playbook_id": "playbook2"},
+    ]
 
 
 async def test_state_trigger(hass: HomeAssistant) -> None:

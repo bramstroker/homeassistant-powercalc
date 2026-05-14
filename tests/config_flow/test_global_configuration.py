@@ -429,4 +429,5 @@ async def create_mock_global_config_entry(hass: HomeAssistant, data: dict[str, A
             **data,
         },
         unique_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        setup=False,
     )
