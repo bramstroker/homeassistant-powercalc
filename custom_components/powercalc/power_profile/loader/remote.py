@@ -279,7 +279,7 @@ class RemoteLoader(Loader):
         if force_update:
             return True
 
-        path_exists = os.path.exists(model_path)
+        path_exists = await self.hass.async_add_executor_job(os.path.exists, model_path)
         if not path_exists:
             return True
 
@@ -297,11 +297,17 @@ class RemoteLoader(Loader):
             self.profile_hashes[f"{manufacturer}/{model}"] = model_hash
             await self.hass.async_add_executor_job(self._write_profile_hashes, self.profile_hashes)
         except ProfileDownloadError as e:
-            if not os.path.exists(model_path):
-                if os.path.exists(storage_path):
+            path_exists, storage_path_exists = await self.hass.async_add_executor_job(self._profile_paths_exist, model_path, storage_path)
+            if not path_exists:
+                if storage_path_exists:
                     await self.hass.async_add_executor_job(shutil.rmtree, storage_path)  # pragma: no cover
                 raise e
             _LOGGER.debug("Failed to download profile, falling back to local profile")
+
+    @staticmethod
+    def _profile_paths_exist(model_path: str, storage_path: str) -> tuple[bool, bool]:
+        """Check profile paths from the executor."""
+        return os.path.exists(model_path), os.path.exists(storage_path)
 
     async def _load_model_json(self, model_path: str) -> dict:
         """Load the JSON data from the model file."""

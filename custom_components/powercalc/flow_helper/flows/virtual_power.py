@@ -300,8 +300,12 @@ class VirtualPowerFlow:
 
     async def create_schema_playbook(self) -> vol.Schema:
         """Create the config schema for playbook strategy."""
-        base_path = Path(self.flow.hass.config.path("powercalc/playbooks"))
-        playbook_files = [str(p.relative_to(base_path)) for p in base_path.rglob("*") if p.is_file()]
+
+        def _find_playbook_files() -> list[str]:
+            base_path = Path(self.flow.hass.config.path("powercalc/playbooks"))
+            return [str(p.relative_to(base_path)) for p in base_path.rglob("*") if p.is_file()]
+
+        playbook_files = await self.flow.hass.async_add_executor_job(_find_playbook_files)
 
         state_trigger_state_selector: dict[str, Any] = {"text": None}
         if self.flow.source_entity_id and self.flow.source_entity_id != DUMMY_ENTITY_ID:
