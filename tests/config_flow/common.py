@@ -111,7 +111,7 @@ async def initialize_options_flow(
     selected_menu_item: Step,
 ) -> FlowResult:
     """Initialize the options flow for a given config entry."""
-    if entry.state != config_entries.ConfigEntryState.LOADED:
+    if entry.state == config_entries.ConfigEntryState.NOT_LOADED:
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
     result = await hass.config_entries.options.async_init(

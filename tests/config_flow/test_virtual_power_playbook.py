@@ -29,7 +29,7 @@ from tests.config_flow.common import (
 
 async def test_create_entry(hass: HomeAssistant) -> None:
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.PLAYBOOK)
-    assert "preview" not in result
+    assert result.get("preview") is None
     result = await set_virtual_power_configuration(
         hass,
         result,
@@ -82,7 +82,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     )
 
     result = await initialize_options_flow(hass, entry, Step.PLAYBOOK)
-    assert "preview" not in result
+    assert result.get("preview") is None
 
     await handle_options_flow_update(
         hass,
