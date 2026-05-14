@@ -11,7 +11,8 @@ class CompositeLoader(Loader):
         self.loaders = loaders
 
     async def initialize(self) -> None:
-        [await loader.initialize() for loader in self.loaders]  # type: ignore[func-returns-value]
+        for loader in self.loaders:
+            await loader.initialize()
 
     async def get_manufacturer_listing(
         self,

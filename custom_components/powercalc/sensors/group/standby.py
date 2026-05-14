@@ -80,8 +80,8 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
         """Calculate sum of all power sensors in standby, and update the state of the sensor."""
         if self.standby_sensors:
             self._attr_native_value = Decimal(
-                round(  # type: ignore
-                    sum(self.standby_sensors.values()),
+                round(
+                    sum(self.standby_sensors.values(), Decimal(0)),
                     self._rounding_digits,
                 ),
             )

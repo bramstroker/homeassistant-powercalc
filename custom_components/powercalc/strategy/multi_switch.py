@@ -60,7 +60,7 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
         return Decimal(sum(_get_power(state) for state in self.known_states.values()))
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
-        return self.switch_entities  # type: ignore
+        return [*self.switch_entities]
 
     def can_calculate_standby(self) -> bool:
         return self.off_power is not None

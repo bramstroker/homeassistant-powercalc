@@ -153,8 +153,11 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
         @callback
         def _update_power(date_time: datetime) -> None:
+            active_playbook = self._active_playbook
+            if active_playbook is None:
+                return
             self._power = entry.power
-            _LOGGER.debug("playbook %s: Update power %.2f", self._active_playbook.key, self._power)  # type: ignore
+            _LOGGER.debug("playbook %s: Update power %.2f", active_playbook.key, self._power)
             self._update_callback(self._power)
             # Schedule next update
             self._execute_playbook_entry()
@@ -192,7 +195,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         if playbook_id in self._loaded_playbooks:
             return self._loaded_playbooks[playbook_id]
 
-        playbooks: dict[str, str] = self._config.get(CONF_PLAYBOOKS)  # type: ignore
+        playbooks: dict[str, str] = dict(self._config.get(CONF_PLAYBOOKS) or {})
         if playbook_id not in playbooks:
             raise StrategyConfigurationError(
                 f"Playbook with id {playbook_id} not defined in playbooks config",
