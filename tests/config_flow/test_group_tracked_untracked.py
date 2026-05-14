@@ -23,7 +23,7 @@ from custom_components.powercalc.flow_helper.flows.group import UNIQUE_ID_TRACKE
 from tests.common import assert_entity_state, mock_sensors_in_registry, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     create_mock_entry,
-    initialize_options_flow,
+    handle_options_flow_update,
     select_menu_item,
 )
 
@@ -162,14 +162,13 @@ async def test_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.GROUP_TRACKED_UNTRACKED)
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_GROUP_TRACKED_AUTO: True, CONF_GROUP_TRACKED_POWER_ENTITIES: ["sensor.1_power", "sensor.2_power"]},
+    await handle_options_flow_update(
+        hass,
+        entry,
+        Step.GROUP_TRACKED_UNTRACKED,
+        {CONF_GROUP_TRACKED_AUTO: True, CONF_GROUP_TRACKED_POWER_ENTITIES: ["sensor.1_power", "sensor.2_power"]},
     )
 
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_GROUP_TRACKED_POWER_ENTITIES] == ["sensor.1_power", "sensor.2_power"]
 
 
@@ -185,12 +184,11 @@ async def test_options_flow_exclude_entities(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.GROUP_TRACKED_UNTRACKED)
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_GROUP_TRACKED_AUTO: True, CONF_EXCLUDE_ENTITIES: ["sensor.1_power", "sensor.3_power"]},
+    await handle_options_flow_update(
+        hass,
+        entry,
+        Step.GROUP_TRACKED_UNTRACKED,
+        {CONF_GROUP_TRACKED_AUTO: True, CONF_EXCLUDE_ENTITIES: ["sensor.1_power", "sensor.3_power"]},
     )
 
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_EXCLUDE_ENTITIES] == ["sensor.1_power", "sensor.3_power"]

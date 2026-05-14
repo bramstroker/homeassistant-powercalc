@@ -25,7 +25,7 @@ from tests.config_flow.common import (
     confirm_auto_discovered_model,
     create_mock_entry,
     goto_virtual_power_strategy_step,
-    initialize_options_flow,
+    handle_options_flow_update,
     set_virtual_power_configuration,
 )
 from tests.conftest import MockEntityWithModel
@@ -220,14 +220,6 @@ async def test_lut_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
+    await handle_options_flow_update(hass, entry, Step.BASIC_OPTIONS, {CONF_CREATE_ENERGY_SENSOR: False})
 
-    user_input = {CONF_CREATE_ENERGY_SENSOR: False}
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
-    )
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert not entry.data[CONF_CREATE_ENERGY_SENSOR]

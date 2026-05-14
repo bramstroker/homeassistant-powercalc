@@ -28,8 +28,8 @@ from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
     create_mock_entry,
+    handle_options_flow_update,
     initialize_discovery_flow,
-    initialize_options_flow,
 )
 from tests.conftest import MockEntityWithModel
 
@@ -296,17 +296,8 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
         config_entries.SOURCE_INTEGRATION_DISCOVERY,
     )
 
-    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    await handle_options_flow_update(hass, entry, Step.BASIC_OPTIONS, {CONF_CREATE_ENERGY_SENSOR: False})
 
-    user_input = {CONF_CREATE_ENERGY_SENSOR: False}
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
-    )
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
 
 

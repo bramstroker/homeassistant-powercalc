@@ -25,6 +25,7 @@ from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
     create_mock_entry,
+    handle_options_flow_update,
     initialize_options_flow,
     select_menu_item,
 )
@@ -108,15 +109,8 @@ async def test_smart_switch_options(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.FIXED)
+    await handle_options_flow_update(hass, entry, Step.FIXED, {CONF_SELF_USAGE_INCLUDED: True})
 
-    user_input = {CONF_SELF_USAGE_INCLUDED: True}
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
-    )
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_SELF_USAGE_INCLUDED] is True
 
 

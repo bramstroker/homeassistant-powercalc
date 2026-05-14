@@ -29,7 +29,6 @@ from custom_components.powercalc.const import (
 from tests.config_flow.common import (
     create_mock_entry,
     handle_options_flow_update,
-    initialize_options_flow,
     process_config_flow,
     select_menu_item,
 )
@@ -203,19 +202,9 @@ async def test_can_set_basic_options(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_CREATE_UTILITY_METERS: True},
-    )
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    await handle_options_flow_update(hass, entry, Step.BASIC_OPTIONS, {CONF_CREATE_UTILITY_METERS: True})
     assert entry.data[CONF_CREATE_UTILITY_METERS]
 
     # Make sure the value is not overwritten when using other option dialog
-    result = await initialize_options_flow(hass, entry, Step.DAILY_ENERGY)
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=_daily_energy_value_choice(CONF_VALUE, 75),
-    )
+    await handle_options_flow_update(hass, entry, Step.DAILY_ENERGY, _daily_energy_value_choice(CONF_VALUE, 75))
     assert entry.data[CONF_CREATE_UTILITY_METERS]

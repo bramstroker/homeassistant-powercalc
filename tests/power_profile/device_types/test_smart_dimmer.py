@@ -13,7 +13,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
-from tests.config_flow.common import confirm_auto_discovered_model, initialize_options_flow
+from tests.config_flow.common import confirm_auto_discovered_model, handle_options_flow_update
 from tests.conftest import MockEntityWithModel
 
 
@@ -129,12 +129,7 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     assert_entity_state(hass, power_sensor_id, "0.30")
 
     # Change the power value via the options
-    result = await initialize_options_flow(hass, config_entry, Step.LINEAR)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_MIN_POWER: 4, CONF_MAX_POWER: 40},
-    )
-    assert result["type"] == FlowResultType.CREATE_ENTRY
+    await handle_options_flow_update(hass, config_entry, Step.LINEAR, {CONF_MIN_POWER: 4, CONF_MAX_POWER: 40})
 
     # Set the switch on again and see if it has the updated power value
     await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255})])

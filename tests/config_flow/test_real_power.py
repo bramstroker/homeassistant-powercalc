@@ -27,7 +27,7 @@ from custom_components.powercalc.const import (
 )
 from tests.config_flow.common import (
     create_mock_entry,
-    initialize_options_flow,
+    handle_options_flow_update,
     select_menu_item,
 )
 
@@ -126,21 +126,10 @@ async def test_real_power_options(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_CREATE_UTILITY_METERS: True},
-    )
+    await handle_options_flow_update(hass, entry, Step.BASIC_OPTIONS, {CONF_CREATE_UTILITY_METERS: True})
 
-    result = await initialize_options_flow(hass, entry, Step.REAL_POWER)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_ENTITY_ID: "sensor.my_new_real_power"},
-    )
+    await handle_options_flow_update(hass, entry, Step.REAL_POWER, {CONF_ENTITY_ID: "sensor.my_new_real_power"})
 
-    await hass.async_block_till_done()
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_ENTITY_ID] == "sensor.my_new_real_power"
     assert entry.data[CONF_CREATE_UTILITY_METERS]
 
@@ -161,11 +150,11 @@ async def test_energy_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.ENERGY_OPTIONS)
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={
+    await handle_options_flow_update(
+        hass,
+        entry,
+        Step.ENERGY_OPTIONS,
+        {
             CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
             CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
             CONF_ENERGY_FILTER_OUTLIER_ENABLED: True,
@@ -173,7 +162,6 @@ async def test_energy_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_ENERGY_INTEGRATION_METHOD] == ENERGY_INTEGRATION_METHOD_TRAPEZODIAL
     assert entry.data[CONF_ENERGY_SENSOR_UNIT_PREFIX] == UnitPrefix.KILO
     assert entry.data[CONF_ENERGY_FILTER_OUTLIER_ENABLED]

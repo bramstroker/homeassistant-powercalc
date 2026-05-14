@@ -18,7 +18,7 @@ from custom_components.powercalc.const import (
 )
 from tests.config_flow.common import (
     create_mock_entry,
-    initialize_options_flow,
+    handle_options_flow_update,
     select_menu_item,
 )
 
@@ -76,17 +76,15 @@ async def test_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.GROUP_SUBTRACT)
-
-    user_input = {
-        CONF_ENTITY_ID: "sensor.outlet2",
-        CONF_SUBTRACT_ENTITIES: ["sensor.light_power", "sensor.light_power2"],
-    }
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
+    await handle_options_flow_update(
+        hass,
+        entry,
+        Step.GROUP_SUBTRACT,
+        {
+            CONF_ENTITY_ID: "sensor.outlet2",
+            CONF_SUBTRACT_ENTITIES: ["sensor.light_power", "sensor.light_power2"],
+        },
     )
 
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_SUBTRACT_ENTITIES] == ["sensor.light_power", "sensor.light_power2"]
     assert entry.data[CONF_ENTITY_ID] == "sensor.outlet2"
