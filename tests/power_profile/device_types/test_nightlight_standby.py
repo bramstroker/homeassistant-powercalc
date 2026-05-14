@@ -1,14 +1,13 @@
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
+from tests.common import assert_entity_state, get_test_profile_dir, mock_device, run_powercalc_setup, set_states
 
 
 async def test_translation_key_standby_sub_profile(
@@ -37,16 +36,7 @@ async def test_translation_key_standby_sub_profile(
             ),
         },
     )
-    mock_device_registry(
-        hass,
-        {
-            device_id: DeviceEntry(
-                id=device_id,
-                manufacturer="test",
-                model="translation_key_standby_sub_profile",
-            ),
-        },
-    )
+    mock_device(hass, device_id, "test", "translation_key_standby_sub_profile")
 
     await run_powercalc_setup(
         hass,

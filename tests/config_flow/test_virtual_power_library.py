@@ -32,7 +32,7 @@ from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_A
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
-from tests.common import create_mock_config_entry, create_mock_light_entity
+from tests.common import create_mock_config_entry, create_mock_light_entity, mock_device
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
@@ -196,16 +196,7 @@ async def test_library_options_flow_raises_error_on_non_existing_power_profile(
 async def test_composite_library_profile_options_flow_builds_menu(
     hass: HomeAssistant,
 ) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "vacuum1": DeviceEntry(
-                id="vacuum1",
-                manufacturer="roborock",
-                model="rockrobo.vacuum.v1",
-            ),
-        },
-    )
+    mock_device(hass, "vacuum1", "roborock", "rockrobo.vacuum.v1")
 
     mock_registry(
         hass,
@@ -487,16 +478,7 @@ async def test_profile_with_custom_fields(
 async def test_manual_library_flow_autodiscovers_device_profile_with_custom_fields(
     hass: HomeAssistant,
 ) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "test-device": DeviceEntry(
-                id="test-device",
-                manufacturer="test",
-                model="device_custom_fields",
-            ),
-        },
-    )
+    mock_device(hass, "test-device", "test", "device_custom_fields")
     mock_registry(
         hass,
         {
@@ -528,16 +510,7 @@ async def test_manual_library_flow_autodiscovers_device_profile_with_custom_fiel
 async def test_manual_library_flow_defers_device_profile_custom_field_validation(
     hass: HomeAssistant,
 ) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "test-device": DeviceEntry(
-                id="test-device",
-                manufacturer="test",
-                model="device_custom_fields",
-            ),
-        },
-    )
+    mock_device(hass, "test-device", "test", "device_custom_fields")
     mock_registry(
         hass,
         {
@@ -702,16 +675,7 @@ async def test_custom_fields_documentation_url_placeholder(
 async def test_options_flow_initializes_profile_with_custom_fields(
     hass: HomeAssistant,
 ) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "test-device": DeviceEntry(
-                id="test-device",
-                manufacturer="test",
-                model="device_custom_fields",
-            ),
-        },
-    )
+    mock_device(hass, "test-device", "test", "device_custom_fields")
     mock_registry(
         hass,
         {

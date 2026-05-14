@@ -17,14 +17,12 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import (
     RegistryEntryWithDefaults,
     async_fire_time_changed,
-    mock_device_registry,
     mock_registry,
 )
 
@@ -54,6 +52,7 @@ from tests.common import (
     assert_entity_state,
     create_input_boolean,
     get_simple_fixed_config,
+    mock_device,
     mock_sensors_in_registry,
     run_powercalc_setup,
     set_states,
@@ -63,16 +62,7 @@ from tests.common import (
 async def test_related_energy_sensor_is_used_for_existing_power_sensor(
     hass: HomeAssistant,
 ) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "shelly-device": DeviceEntry(
-                id="shelly-device-id",
-                manufacturer="Shelly",
-                model="Plug S",
-            ),
-        },
-    )
+    mock_device(hass, "shelly-device-id", "Shelly", "Plug S")
 
     mock_registry(
         hass,
@@ -130,16 +120,7 @@ async def test_force_create_energy_sensor_for_existing_power_sensor(
     """
     await create_input_boolean(hass)
 
-    mock_device_registry(
-        hass,
-        {
-            "shelly-device": DeviceEntry(
-                id="shelly-device-id",
-                manufacturer="Shelly",
-                model="Plug S",
-            ),
-        },
-    )
+    mock_device(hass, "shelly-device-id", "Shelly", "Plug S")
 
     mock_registry(
         hass,

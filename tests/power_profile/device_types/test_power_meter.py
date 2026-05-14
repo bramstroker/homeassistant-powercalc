@@ -1,7 +1,5 @@
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
-from pytest_homeassistant_custom_component.common import mock_device_registry
 
 from custom_components.powercalc import CONF_SENSOR_TYPE
 from custom_components.powercalc.const import (
@@ -10,7 +8,7 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import assert_entity_state, create_mock_config_entry, get_test_profile_dir, run_powercalc_setup, set_states
+from tests.common import assert_entity_state, create_mock_config_entry, get_test_profile_dir, mock_device, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -59,16 +57,7 @@ async def test_power_meter_legacy(
 
 
 async def test_per_device_discovery_from_gui(hass: HomeAssistant) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "f52deed323f1ca5c11d90486e55b6eff": DeviceEntry(
-                id="f52deed323f1ca5c11d90486e55b6eff",
-                manufacturer="shelly",
-                model="shelly pm mini gen3",
-            ),
-        },
-    )
+    mock_device(hass, "f52deed323f1ca5c11d90486e55b6eff", "shelly", "shelly pm mini gen3")
 
     await create_mock_config_entry(
         hass,

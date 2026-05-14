@@ -61,6 +61,7 @@ from tests.common import (
     create_mock_config_entry,
     create_mock_light_entity,
     get_simple_fixed_config,
+    mock_device,
     run_powercalc_setup,
     set_states,
 )
@@ -1225,17 +1226,7 @@ async def test_include_by_label_filter_other_label(hass: HomeAssistant, label_re
     label_registry.async_create("my_label")
     label_registry.async_create("exclude_powercalc")
 
-    mock_device_registry(
-        hass,
-        {
-            "device-a": DeviceEntry(
-                id="device-a",
-                manufacturer="Signify",
-                model="LCT012",
-                labels=["my_label"],
-            ),
-        },
-    )
+    mock_device(hass, "device-a", "Signify", "LCT012", labels=["my_label"])
 
     mock_registry(
         hass,
@@ -1362,16 +1353,7 @@ async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptu
 async def test_irrelevant_entity_domains_are_skipped(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     caplog.set_level(logging.DEBUG)
 
-    mock_device_registry(
-        hass,
-        {
-            "device-a": DeviceEntry(
-                id="device-a",
-                manufacturer="Signify",
-                model="LCT012",
-            ),
-        },
-    )
+    mock_device(hass, "device-a", "Signify", "LCT012")
     mock_registry(
         hass,
         {

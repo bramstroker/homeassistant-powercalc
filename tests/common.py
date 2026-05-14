@@ -17,12 +17,25 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_registry, setup_test_component_platform
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    RegistryEntryWithDefaults,
+    mock_device_registry,
+    mock_registry,
+    setup_test_component_platform,
+)
 
-from custom_components.powercalc import CONF_ENERGY_UPDATE_INTERVAL, CONF_GROUP_ENERGY_UPDATE_INTERVAL, CONF_GROUP_POWER_UPDATE_INTERVAL
+from custom_components.powercalc import (
+    CONF_ENERGY_UPDATE_INTERVAL,
+    CONF_GROUP_ENERGY_UPDATE_INTERVAL,
+    CONF_GROUP_POWER_UPDATE_INTERVAL,
+    async_migrate_entry,
+)
+from custom_components.powercalc.config_flow import PowercalcConfigFlow
 from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_MODE,
@@ -189,6 +202,33 @@ async def create_mock_config_entry(
         assert await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()
     return config_entry
+
+
+def mock_device(
+    hass: HomeAssistant,
+    device_id: str = "test-device",
+    manufacturer: str = "test",
+    model: str = "test",
+    **kwargs: Any,  # noqa: ANN401
+) -> DeviceEntry:
+    """Register a single mocked device, replacing any prior mocked registry."""
+    entry = DeviceEntry(id=device_id, manufacturer=manufacturer, model=model, **kwargs)
+    mock_device_registry(hass, {device_id: entry})
+    return entry
+
+
+async def migrate_legacy_entry(
+    hass: HomeAssistant,
+    entry_data: dict,
+    version: int,
+    **kwargs: Any,  # noqa: ANN401
+) -> MockConfigEntry:
+    """Add an entry pinned to a legacy version, run migration, and assert the version was bumped."""
+    entry = MockConfigEntry(domain=DOMAIN, data=entry_data, version=version, **kwargs)
+    entry.add_to_hass(hass)
+    await async_migrate_entry(hass, entry)
+    assert entry.version == PowercalcConfigFlow.VERSION
+    return entry
 
 
 async def create_mocked_virtual_power_sensor_entry(

@@ -19,7 +19,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SensorType,
 )
-from tests.common import create_mock_config_entry, run_powercalc_setup
+from tests.common import create_mock_config_entry, mock_device, run_powercalc_setup
 
 
 async def test_entities_are_bound_to_source_device(
@@ -92,10 +92,7 @@ async def test_entities_are_bound_to_source_device2(
     switch_id = "switch.shelly"
     power_sensor_id = "sensor.shelly_power"
 
-    mock_device_registry(
-        hass,
-        {device_id: DeviceEntry(id=device_id, manufacturer="shelly", model="Plug S")},
-    )
+    mock_device(hass, device_id, "shelly", "Plug S")
 
     entity_reg = mock_registry(
         hass,
@@ -134,17 +131,7 @@ async def test_entities_are_bound_to_disabled_source_device(
     power_sensor_id = "sensor.test_power"
     light_id = "light.test"
 
-    mock_device_registry(
-        hass,
-        {
-            device_id: DeviceEntry(
-                id=device_id,
-                manufacturer="signify",
-                model="LCA001",
-                disabled_by=DeviceEntryDisabler.USER,
-            ),
-        },
-    )
+    mock_device(hass, device_id, "signify", "LCA001", disabled_by=DeviceEntryDisabler.USER)
 
     entity_reg = mock_registry(
         hass,
@@ -181,10 +168,7 @@ async def test_entities_are_bound_to_source_device3(
     entity_registry: er.EntityRegistry,
 ) -> None:
     device_id = "abc"
-    mock_device_registry(
-        hass,
-        {device_id: DeviceEntry(id=device_id, manufacturer="test", model="test")},
-    )
+    mock_device(hass, device_id, "test", "test")
 
     await create_mock_config_entry(
         hass,

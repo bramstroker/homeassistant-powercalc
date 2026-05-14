@@ -14,7 +14,6 @@ from custom_components.powercalc import (
     DOMAIN,
     DeviceType,
     async_fix_legacy_profile_config_entry,
-    async_migrate_entry,
 )
 from custom_components.powercalc.config_flow import PowercalcConfigFlow
 from custom_components.powercalc.const import (
@@ -43,7 +42,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.common import run_powercalc_setup
+from tests.common import migrate_legacy_entry, run_powercalc_setup
 
 
 async def test_legacy_discovery_config_raises_issue(hass: HomeAssistant, issue_registry: IssueRegistry) -> None:
@@ -85,9 +84,9 @@ async def test_legacy_update_interval_config_issue_not_raised(hass: HomeAssistan
 
 async def test_migrate_config_entry_playbooks(hass: HomeAssistant) -> None:
     """Test migration of a config entry to version 6"""
-    mock_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    mock_entry = await migrate_legacy_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.PLAYBOOK,
             CONF_PLAYBOOK: {
@@ -99,10 +98,6 @@ async def test_migrate_config_entry_playbooks(hass: HomeAssistant) -> None:
         },
         version=5,
     )
-    mock_entry.add_to_hass(hass)
-    await async_migrate_entry(hass, mock_entry)
-    hass.config_entries.async_get_entry(mock_entry.entry_id)
-    assert mock_entry.version == PowercalcConfigFlow.VERSION
     assert mock_entry.data[CONF_PLAYBOOK][CONF_PLAYBOOKS] == [
         {"id": "evening_playbook", "path": "evening_playbook.yaml"},
         {"id": "morning_playbook", "path": "morning_playbook.yaml"},
@@ -113,9 +108,9 @@ async def test_migrate_config_entry_version_4(hass: HomeAssistant) -> None:
     """
     Test that a config entry is migrated from version 3 to version 4.
     """
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    entry = await migrate_legacy_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_NAME: "testentry",
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
@@ -127,11 +122,6 @@ async def test_migrate_config_entry_version_4(hass: HomeAssistant) -> None:
         },
         version=3,
     )
-    entry.add_to_hass(hass)
-
-    await async_migrate_entry(hass, entry)
-
-    assert entry.version == PowercalcConfigFlow.VERSION
     assert entry.data == {
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_NAME: "testentry",
@@ -148,21 +138,16 @@ async def test_migrate_config_entry_version_5(hass: HomeAssistant) -> None:
     """
     Test that a config entry is migrated from version 4 to version 5.
     """
-    entry = MockConfigEntry(
-        entry_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
-        domain=DOMAIN,
-        data={
+    entry = await migrate_legacy_entry(
+        hass,
+        {
             CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED: True,
             CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED: [DeviceType.COVER],
             CONF_ENABLE_AUTODISCOVERY_DEPRECATED: False,
         },
         version=4,
+        entry_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     )
-    entry.add_to_hass(hass)
-
-    await async_migrate_entry(hass, entry)
-
-    assert entry.version == PowercalcConfigFlow.VERSION
     assert entry.data == {
         CONF_DISCOVERY: {
             CONF_ENABLED: False,
@@ -174,9 +159,9 @@ async def test_migrate_config_entry_version_5(hass: HomeAssistant) -> None:
 
 async def test_migrate_config_entry_states_power(hass: HomeAssistant) -> None:
     """Test migration of states_power from dict to list format (version 6 to 7)."""
-    mock_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={
+    mock_entry = await migrate_legacy_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {
@@ -189,9 +174,6 @@ async def test_migrate_config_entry_states_power(hass: HomeAssistant) -> None:
         },
         version=6,
     )
-    mock_entry.add_to_hass(hass)
-    await async_migrate_entry(hass, mock_entry)
-    assert mock_entry.version == PowercalcConfigFlow.VERSION
     assert mock_entry.data[CONF_FIXED][CONF_STATES_POWER] == [
         {CONF_STATE: "playing", CONF_POWER: 20},
         {CONF_STATE: "paused", CONF_POWER: 5},

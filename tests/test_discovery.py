@@ -47,7 +47,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.discovery import DiscoveryStatus, get_power_profile_by_source_device, get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
-from tests.common import set_states
+from tests.common import mock_device, set_states
 
 from .common import assert_entity_state, create_mock_config_entry, create_mock_light_entity, run_powercalc_setup
 from .config_flow.test_global_configuration import create_mock_global_config_entry
@@ -290,16 +290,7 @@ async def test_autodiscover_continues_when_one_entity_fails(
 
     caplog.set_level(logging.ERROR)
 
-    mock_device_registry(
-        hass,
-        {
-            "signify-device": DeviceEntry(
-                id="signify-device",
-                manufacturer="signify",
-                model="LCT010",
-            ),
-        },
-    )
+    mock_device(hass, "signify-device", "signify", "LCT010")
     mock_registry(
         hass,
         {
@@ -630,16 +621,7 @@ async def test_govee_segment_lights_skipped(
     Govee segment lights should be skipped
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2834
     """
-    mock_device_registry(
-        hass,
-        {
-            "govee-device": DeviceEntry(
-                id="govee-device",
-                manufacturer="Govee",
-                model="H6076",
-            ),
-        },
-    )
+    mock_device(hass, "govee-device", "Govee", "H6076")
 
     mock_registry(
         hass,
@@ -830,16 +812,7 @@ async def test_discovery_by_device(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "youless-device": DeviceEntry(
-                id="ABC123",
-                manufacturer="test",
-                model="discovery_type_device",
-            ),
-        },
-    )
+    mock_device(hass, "ABC123", "test", "discovery_type_device")
 
     await run_powercalc_setup(hass)
 
@@ -858,16 +831,7 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
     mock_flow_init: AsyncMock,
 ) -> None:
     """Powercalc sensors should not be considered for discovery"""
-    mock_device_registry(
-        hass,
-        {
-            "my-device": DeviceEntry(
-                id="my-device",
-                manufacturer="test",
-                model="generic-iot",
-            ),
-        },
-    )
+    mock_device(hass, "my-device", "test", "generic-iot")
     mock_registry(
         hass,
         {

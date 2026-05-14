@@ -3,12 +3,11 @@ from unittest.mock import MagicMock
 from homeassistant.const import CONF_DOMAIN, STATE_ON, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.label_registry import LabelRegistry
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
 from custom_components.powercalc.errors import SensorConfigurationError
@@ -29,7 +28,7 @@ from custom_components.powercalc.group_include.filter import (
     create_composite_filter,
     create_filter,
 )
-from tests.common import set_states
+from tests.common import mock_device, set_states
 
 
 @pytest.mark.parametrize(
@@ -103,18 +102,7 @@ async def test_label_filter(
     expected_result: bool,
     expect_exception: bool,
 ) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "my-device": DeviceEntry(
-                id="my-device",
-                name="My device",
-                manufacturer="Mock",
-                model="Device",
-                labels=["device_label"],
-            ),
-        },
-    )
+    mock_device(hass, "my-device", "Mock", "Device", name="My device", labels=["device_label"])
 
     for label_name in ["test", "test2", "test3", "device-label", "My Label with Spaces"]:
         label_registry.async_create(label_name)
@@ -171,18 +159,7 @@ async def test_floor_filter(
     area_entry4 = area_registry.async_get_or_create("Bedroom1")
     area_registry.async_update(area_id=area_entry4.id, floor_id=floor_entry2.floor_id)
 
-    mock_device_registry(
-        hass,
-        {
-            "my-device": DeviceEntry(
-                id="my-device",
-                name="My device",
-                manufacturer="Mock",
-                model="Device",
-                area_id="kitchen",
-            ),
-        },
-    )
+    mock_device(hass, "my-device", "Mock", "Device", name="My device", area_id="kitchen")
 
     entry = RegistryEntryWithDefaults(
         entity_id="switch.test",
@@ -350,18 +327,7 @@ async def test_area_filter(
     area_registry.async_get_or_create("Kitchen")
     area_registry.async_get_or_create("Bathroom")
 
-    mock_device_registry(
-        hass,
-        {
-            "my-device": DeviceEntry(
-                id="my-device",
-                name="My device",
-                manufacturer="Mock",
-                model="Device",
-                area_id="kitchen",
-            ),
-        },
-    )
+    mock_device(hass, "my-device", "Mock", "Device", name="My device", area_id="kitchen")
 
     entry = RegistryEntryWithDefaults(
         entity_id="switch.test",

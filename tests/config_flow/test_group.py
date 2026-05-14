@@ -12,15 +12,14 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.selector import SelectSelector
-from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_registry
 import voluptuous as vol
 
-from custom_components.powercalc import SensorType, async_migrate_entry
-from custom_components.powercalc.config_flow import PowercalcConfigFlow, Step
+from custom_components.powercalc import SensorType
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_AREA,
@@ -59,6 +58,8 @@ from tests.common import (
     create_mock_config_entry,
     create_mock_light_entity,
     create_mocked_virtual_power_sensor_entry,
+    migrate_legacy_entry,
+    mock_device,
     run_powercalc_setup,
     set_states,
 )
@@ -152,17 +153,7 @@ async def test_create_energy_sensor_enabled(hass: HomeAssistant) -> None:
 
 
 async def test_add_device_members_to_group(hass: HomeAssistant) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "my-device": DeviceEntry(
-                id="my-device",
-                name="My device",
-                manufacturer="Mock",
-                model="Device",
-            ),
-        },
-    )
+    mock_device(hass, "my-device", "Mock", "Device", name="My device")
 
     mock_registry(
         hass,
@@ -619,11 +610,7 @@ async def test_field_defaults_from_global_powercalc_config(hass: HomeAssistant) 
 
 async def test_migrate_config_entry_from_version_2(hass: HomeAssistant) -> None:
     """Test migration of a group sensor entry to version 3. Should add `create_energy_sensor` field."""
-    mock_entry = MockConfigEntry(domain=DOMAIN, data={CONF_SENSOR_TYPE: SensorType.GROUP}, version=2)
-    mock_entry.add_to_hass(hass)
-    await async_migrate_entry(hass, mock_entry)
-    hass.config_entries.async_get_entry(mock_entry.entry_id)
-    assert mock_entry.version == PowercalcConfigFlow.VERSION
+    mock_entry = await migrate_legacy_entry(hass, {CONF_SENSOR_TYPE: SensorType.GROUP}, version=2)
     assert mock_entry.data.get(CONF_CREATE_ENERGY_SENSOR)
 
 

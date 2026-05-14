@@ -30,7 +30,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
+from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.util import dt
 import pytest
@@ -38,7 +38,6 @@ from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
     async_fire_time_changed,
-    mock_device_registry,
     mock_registry,
     mock_restore_cache_with_extra_data,
 )
@@ -100,6 +99,7 @@ from tests.common import (
     create_mock_config_entry,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
+    mock_device,
     run_powercalc_setup,
     set_states,
 )
@@ -2092,16 +2092,7 @@ async def test_resolve_entity_ids_skips_tasmota_yesterday_and_today(hass: HomeAs
         },
     )
 
-    mock_device_registry(
-        hass,
-        {
-            "device_1": DeviceEntry(
-                id="device_1",
-                manufacturer="Tasmota",
-                model="Generic",
-            ),
-        },
-    )
+    mock_device(hass, "device_1", "Tasmota", "Generic")
 
     group_entry = MockConfigEntry(
         data={
