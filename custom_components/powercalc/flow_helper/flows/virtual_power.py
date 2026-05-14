@@ -230,6 +230,8 @@ STRATEGY_STEP_MAPPING: dict[CalculationStrategy, Step] = {
     CalculationStrategy.WLED: Step.WLED,
 }
 
+STRATEGIES_WITHOUT_PREVIEW = {CalculationStrategy.PLAYBOOK, CalculationStrategy.MULTI_SWITCH}
+
 
 class VirtualPowerFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
@@ -368,7 +370,7 @@ class VirtualPowerFlow:
         }
 
         form_kwarg: dict[str, Any] = {"description_placeholders": description_placeholders}
-        if strategy != CalculationStrategy.PLAYBOOK:
+        if strategy not in STRATEGIES_WITHOUT_PREVIEW:
             form_kwarg["preview"] = PREVIEW_NAME
 
         return await self.flow.handle_form_step(
@@ -579,7 +581,7 @@ class VirtualPowerOptionsFlow(VirtualPowerFlow):
         if self.flow.strategy:
             merged_options = wrap_strategy_form_data(self.flow.strategy, merged_options)
         schema = fill_schema_defaults(schema, merged_options)
-        form_kwarg = {"preview": PREVIEW_NAME} if self.flow.strategy != CalculationStrategy.PLAYBOOK else None
+        form_kwarg = {"preview": PREVIEW_NAME} if self.flow.strategy not in STRATEGIES_WITHOUT_PREVIEW else None
         return await self.flow.async_handle_options_step(
             user_input,
             schema,
