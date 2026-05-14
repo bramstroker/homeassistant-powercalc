@@ -366,7 +366,7 @@ class VirtualPowerFlow:
         schema = await self.create_strategy_schema()
 
         description_placeholders = {
-            "docs_uri": f"https://docs.powercalc.nl/strategies/{strategy}/",
+            "docs_uri": f"https://docs.powercalc.nl/strategies/{strategy.value.replace('_', '-')}/",
         }
 
         form_kwarg: dict[str, Any] = {"description_placeholders": description_placeholders}
