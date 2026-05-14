@@ -88,16 +88,10 @@
       },
       "fixed": {
         "data": {
-          "fixed_value": "Fixed value",
-          "power": "Power",
-          "power_template": "Power template",
-          "states_power": "States power"
+          "fixed_value": "Power value"
         },
         "data_description": {
-          "fixed_value": "Fixed value in Watts when the entity is ON",
-          "power": "A fixed power value in Watts when the entity is ON",
-          "power_template": "Template will be evaluated to get the power value in W",
-          "states_power": "One 'state: power' pair on each row"
+          "fixed_value": "Power value in Watts when the entity is ON"
         },
         "description": "Define a fixed power value for your entity. See the [documentation]({docs_uri}) for more info",
         "title": "Fixed config"
@@ -579,16 +573,10 @@
         "title": "Fixed options",
         "data": {
           "fixed_value": "Fixed value",
-          "power": "Power",
-          "power_template": "Power template",
-          "self_usage_included": "Self usage included",
-          "states_power": "States power"
+          "self_usage_included": "Self usage included"
         },
         "data_description": {
-          "power": "A fixed power value in Watts when the entity is ON",
-          "power_template": "Template will be evaluated to get the power value in W",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
-          "states_power": "One 'state: power' pair on each row"
+          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself."
         }
       },
       "global_configuration": {
@@ -826,15 +814,15 @@
   "selector": {
     "daily_energy_value": {
       "choices": {
-        "value": "Value",
-        "value_template": "Value template"
+        "value": "Fixed value",
+        "value_template": "Template"
       }
     },
     "fixed_value": {
       "choices": {
-        "power": "Power",
-        "power_template": "Power template",
-        "states_power": "States power"
+        "power": "Fixed value",
+        "power_template": "Template",
+        "states_power": "State mapping"
       }
     }
   },
