@@ -138,7 +138,7 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant) -> None:
                 unique_id="1234",
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
-            )
+            ),
         },
     )
 

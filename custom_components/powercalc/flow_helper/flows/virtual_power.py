@@ -324,7 +324,7 @@ class VirtualPowerFlow:
                         multiple=True,
                         description_field=CONF_PATH,
                         label_field=CONF_ID,
-                    )
+                    ),
                 ),
                 vol.Optional(CONF_REPEAT): selector.BooleanSelector(),
                 vol.Optional(CONF_AUTOSTART): selector.TextSelector(),
@@ -343,7 +343,7 @@ class VirtualPowerFlow:
                         multiple=True,
                         description_field=CONF_PLAYBOOK_ID,
                         label_field=CONF_STATE,
-                    )
+                    ),
                 ),
             },
         )
