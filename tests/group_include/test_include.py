@@ -1,5 +1,4 @@
 import logging
-import uuid
 
 from homeassistant.components import light
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
@@ -1482,13 +1481,10 @@ async def _create_powercalc_config_entry(
 ) -> MockConfigEntry:
     __, object_id = split_entity_id(source_entity_id)
 
-    if unique_id is None:
-        unique_id = str(uuid.uuid4())
     return await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-            CONF_UNIQUE_ID: unique_id,
             CONF_ENTITY_ID: source_entity_id,
             CONF_FIXED: {CONF_POWER: 50},
             ENTRY_DATA_POWER_ENTITY: f"sensor.{object_id}_power",
