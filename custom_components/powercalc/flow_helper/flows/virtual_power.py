@@ -152,6 +152,8 @@ SCHEMA_POWER_LINEAR = vol.Schema(
                     CONF_POWER: {"required": True, "selector": {"number": {"mode": "box", "step": "any"}}},
                 },
                 multiple=True,
+                label_field=CONF_VALUE,
+                description_field=CONF_POWER,
             ),
         ),
     },
@@ -361,9 +363,9 @@ class VirtualPowerFlow:
 
         schema = await self.create_strategy_schema()
 
-        description_placeholders = {}
-        if strategy == CalculationStrategy.WLED:
-            description_placeholders["docs_uri"] = "https://docs.powercalc.nl/strategies/wled/"
+        description_placeholders = {
+            "docs_uri": f"https://docs.powercalc.nl/strategies/{strategy}/",
+        }
 
         form_kwarg: dict[str, Any] = {"description_placeholders": description_placeholders}
         if strategy != CalculationStrategy.PLAYBOOK:
@@ -468,9 +470,6 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
         return self.flow.async_show_form(  # type: ignore
             step_id=Step.VIRTUAL_POWER,
             data_schema=self.create_schema_virtual_power(),
-            description_placeholders={
-                "doc_uri_states_power": "https://docs.powercalc.nl/strategies/fixed/#power-per-state",
-            },
             errors=errors,
             last_step=False,
         )
