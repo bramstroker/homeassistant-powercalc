@@ -6,12 +6,10 @@ from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, ConfigEnt
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
 from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.setup import async_setup_component
 import pytest
 from pytest_homeassistant_custom_component.common import (
     RegistryEntryWithDefaults,
-    mock_device_registry,
     mock_registry,
     setup_test_component_platform,
 )
@@ -27,7 +25,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
 import custom_components.test.sensor as test_sensor_platform
-from tests.common import assert_entity_state, run_powercalc_setup, set_states
+from tests.common import assert_entity_state, mock_device, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -79,16 +77,7 @@ async def test_find_estimated_current_entity_by_device_class(
     By default we will search for estimated_current entity by naming convention _estimated_current
     When none is found we check for entities on the same WLED device with device_class current
     """
-    mock_device_registry(
-        hass,
-        {
-            "wled-device-id": DeviceEntry(
-                id="wled-device-id",
-                manufacturer="WLED",
-                model="WLED",
-            ),
-        },
-    )
+    mock_device(hass, "wled-device-id", "WLED", "WLED")
 
     mock_registry(
         hass,
@@ -147,16 +136,7 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
 
 async def test_wled_autodiscovery_flow(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     caplog.set_level(logging.ERROR)
-    mock_device_registry(
-        hass,
-        {
-            "wled-device": DeviceEntry(
-                id="wled-device",
-                manufacturer="WLED",
-                model="FOSS",
-            ),
-        },
-    )
+    mock_device(hass, "wled-device", "WLED", "FOSS")
     mock_registry(
         hass,
         {
@@ -223,16 +203,7 @@ async def test_yaml_configuration(hass: HomeAssistant) -> None:
     Full functional test for YAML configuration setup.
     Also check standby power can be calculated by the WLED strategy
     """
-    mock_device_registry(
-        hass,
-        {
-            "wled-device": DeviceEntry(
-                id="wled-device",
-                manufacturer="WLED",
-                model="FOSS",
-            ),
-        },
-    )
+    mock_device(hass, "wled-device", "WLED", "FOSS")
     mock_registry(
         hass,
         {
@@ -276,16 +247,7 @@ async def test_estimated_current_sensor_unavailable(hass: HomeAssistant, caplog:
 
     caplog.set_level(logging.WARNING)
 
-    mock_device_registry(
-        hass,
-        {
-            "wled-device-id": DeviceEntry(
-                id="wled-device-id",
-                manufacturer="WLED",
-                model="WLED",
-            ),
-        },
-    )
+    mock_device(hass, "wled-device-id", "WLED", "WLED")
 
     mock_registry(
         hass,

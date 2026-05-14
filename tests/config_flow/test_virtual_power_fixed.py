@@ -31,10 +31,9 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.flow_helper.profile_preview import ws_start_preview
-from tests.common import run_powercalc_setup, setup_config_entry
+from tests.common import create_mock_config_entry, run_powercalc_setup
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
-    create_mock_entry,
     fixed_value_choice,
     goto_virtual_power_strategy_step,
     handle_options_flow_update,
@@ -133,7 +132,7 @@ async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant) 
 
 
 async def test_fixed_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.test",
@@ -170,7 +169,7 @@ async def test_fixed_states_power_options_flow(hass: HomeAssistant) -> None:
     Test that we can configure the states power option.
     Also make sure conversion from dict to list is done correctly, and the order is preserved.
     """
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "sensor.test",
@@ -213,7 +212,7 @@ async def test_fixed_states_power_options_flow_reconstructs_existing_config(hass
         {"power": 0, "state": "hvac_action|idle"},
         {"power": 0, "state": "hvac_action|off"},
     ]
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.test",
@@ -248,7 +247,7 @@ async def test_fixed_options_hidden_from_menu_for_self_usage_profiles(hass: Home
     Fixed options should be hidden from the menu for self usage profiles
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2935
     """
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "sensor.dummy",

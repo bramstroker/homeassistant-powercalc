@@ -19,11 +19,10 @@ from custom_components.powercalc.const import (
 )
 from custom_components.test.light import MockLight
 import custom_components.test.sensor as test_sensor_platform
-from tests.common import create_mock_light_entity
+from tests.common import create_mock_config_entry, create_mock_light_entity
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     assert_default_virtual_power_entry_data,
-    create_mock_entry,
     goto_virtual_power_strategy_step,
     handle_options_flow_update,
     set_virtual_power_configuration,
@@ -54,7 +53,7 @@ async def test_create_wled_sensor_entry(hass: HomeAssistant) -> None:
 async def test_wled_options_flow(hass: HomeAssistant) -> None:
     await _create_wled_entities(hass)
 
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.test",

@@ -1,13 +1,13 @@
 from typing import Any
 
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.selector import EntitySelector, NumberSelector
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
+from tests.common import mock_device
 
 
 def test_build_schema(hass: HomeAssistant) -> None:
@@ -101,18 +101,14 @@ def test_set_default_value(hass: HomeAssistant) -> None:
 
 
 async def test_entity_pick_filter_by_device(hass: HomeAssistant) -> None:
-    mock_device_registry(
+    mock_device(
         hass,
-        {
-            "device_123": DeviceEntry(
-                id="device_123",
-                config_entries=set(),
-                identifiers={("powercalc", "device_123")},
-                manufacturer="Test Manufacturer",
-                name="Test Device",
-                model="Test Model",
-            ),
-        },
+        "device_123",
+        "Test Manufacturer",
+        "Test Model",
+        config_entries=set(),
+        identifiers={("powercalc", "device_123")},
+        name="Test Device",
     )
 
     mock_registry(

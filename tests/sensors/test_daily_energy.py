@@ -48,9 +48,9 @@ from custom_components.powercalc.sensors.daily_energy import (
 from tests.common import (
     assert_entity_state,
     create_input_boolean,
+    create_mock_config_entry,
     run_powercalc_setup,
     set_states,
-    setup_config_entry,
 )
 from tests.config_flow.test_global_configuration import create_mock_global_config_entry
 
@@ -311,7 +311,7 @@ async def test_config_flow_template_value(hass: HomeAssistant) -> None:
     Test that power sensor is correctly created when a template is used as the value
     See https://github.com/bramstroker/homeassistant-powercalc/issues/980
     """
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "My daily",
@@ -327,7 +327,7 @@ async def test_config_flow_template_value(hass: HomeAssistant) -> None:
 
 
 async def test_config_flow_decimal_value(hass: HomeAssistant) -> None:
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "My daily",
@@ -528,7 +528,7 @@ async def test_name_and_entity_id_can_be_inherited_from_source_entity(
 async def test_create_daily_energy_sensor_using_config_entry(
     hass: HomeAssistant,
 ) -> None:
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
@@ -564,16 +564,14 @@ async def test_template_error_catched(hass: HomeAssistant, caplog: pytest.LogCap
 
 
 async def test_entity_category(hass: HomeAssistant) -> None:
-    global_config_entry = create_mock_global_config_entry(
+    await create_mock_global_config_entry(
         hass,
         {
             CONF_ENERGY_SENSOR_CATEGORY: EntityCategory.DIAGNOSTIC,
         },
     )
-    global_config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(global_config_entry.entry_id)
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,

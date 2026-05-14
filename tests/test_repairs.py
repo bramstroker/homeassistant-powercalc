@@ -6,12 +6,12 @@ from homeassistant.setup import async_setup_component
 
 from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, SensorType
 from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL
-from tests.common import setup_config_entry
+from tests.common import create_mock_config_entry
 
 
 async def test_sub_profile_repair(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
     """Test sub profile repair"""
-    config_entry = await setup_config_entry(
+    config_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -39,7 +39,7 @@ async def test_sub_profile_repair(hass: HomeAssistant, issue_registry: ir.IssueR
 
 
 async def test_no_sub_profile_repair_raised(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
-    config_entry = await setup_config_entry(
+    config_entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,

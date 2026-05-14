@@ -13,10 +13,9 @@ from homeassistant.const import (
     STATE_PLAYING,
 )
 from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.typing import ConfigType
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
@@ -29,7 +28,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.linear import LinearStrategy
-from tests.common import assert_entity_state, set_states, setup_config_entry
+from tests.common import assert_entity_state, create_mock_config_entry, mock_device, set_states
 from tests.conftest import MockEntityWithModel
 
 
@@ -113,16 +112,7 @@ async def test_light_calibrate(hass: HomeAssistant) -> None:
 
 async def _setup_vacuum_test(hass: HomeAssistant) -> None:
     """Set up the vacuum device and entities for testing."""
-    mock_device_registry(
-        hass,
-        {
-            "vacuum-device": DeviceEntry(
-                id="vacuum-device",
-                manufacturer="test",
-                model="test",
-            ),
-        },
-    )
+    mock_device(hass, "vacuum-device", "test", "test")
     mock_registry(
         hass,
         {
@@ -163,16 +153,7 @@ async def test_no_battery_entity_for_vacuum(
     hass: HomeAssistant,
 ) -> None:
     # Use a modified setup without the battery entity
-    mock_device_registry(
-        hass,
-        {
-            "vacuum-device": DeviceEntry(
-                id="vacuum-device",
-                manufacturer="test",
-                model="test",
-            ),
-        },
-    )
+    mock_device(hass, "vacuum-device", "test", "test")
     mock_registry(
         hass,
         {
@@ -293,7 +274,7 @@ async def test_config_entry_with_calibrate_list(
 ) -> None:
     mock_entity_with_model_information("light.test")
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,

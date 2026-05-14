@@ -3,10 +3,8 @@ from homeassistant.components.utility_meter.const import DAILY, WEEKLY
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
 from pytest_homeassistant_custom_component.common import (
     RegistryEntryWithDefaults,
-    mock_device_registry,
     mock_registry,
 )
 
@@ -25,8 +23,8 @@ from custom_components.powercalc.const import (
     ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
     UnitPrefix,
 )
+from tests.common import create_mock_config_entry, mock_device
 from tests.config_flow.common import (
-    create_mock_entry,
     handle_options_flow_update,
     select_menu_item,
 )
@@ -78,16 +76,7 @@ async def test_energy_sensor_is_bound_to_power_device(hass: HomeAssistant) -> No
             ),
         },
     )
-    mock_device_registry(
-        hass,
-        {
-            device_id: DeviceEntry(
-                id=device_id,
-                manufacturer="foo",
-                model="bar",
-            ),
-        },
-    )
+    mock_device(hass, device_id, "foo", "bar")
 
     result = await select_menu_item(hass, Step.REAL_POWER)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -116,7 +105,7 @@ async def test_energy_sensor_is_bound_to_power_device(hass: HomeAssistant) -> No
 
 
 async def test_real_power_options(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "Some name",
@@ -140,7 +129,7 @@ async def test_real_power_options(hass: HomeAssistant) -> None:
 
 async def test_energy_options_flow(hass: HomeAssistant) -> None:
     """Test energy options flow."""
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "Some name",
@@ -184,18 +173,7 @@ async def test_attach_to_custom_device(hass: HomeAssistant) -> None:
             ),
         },
     )
-    mock_device_registry(
-        hass,
-        {
-            device_id: DeviceEntry(
-                id=device_id,
-                manufacturer="foo",
-                model="bar",
-                identifiers={("sensor", "identifier_test")},
-                connections={("mac", "30:31:32:33:34:35")},
-            ),
-        },
-    )
+    mock_device(hass, device_id, "foo", "bar", identifiers={("sensor", "identifier_test")}, connections={("mac", "30:31:32:33:34:35")})
 
     result = await select_menu_item(hass, Step.REAL_POWER)
     assert result["type"] == data_entry_flow.FlowResultType.FORM

@@ -21,7 +21,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from tests.common import (
-    setup_config_entry,
+    create_mock_config_entry,
 )
 
 
@@ -68,7 +68,7 @@ async def test_domain_group_all(hass: HomeAssistant) -> None:
         },
     )
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_DOMAIN: "all",

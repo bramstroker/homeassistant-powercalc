@@ -13,12 +13,10 @@ from _pytest.fixtures import SubRequest
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
 import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
-    mock_device_registry,
     mock_registry,
 )
 
@@ -30,7 +28,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
-from tests.common import get_test_config_dir
+from tests.common import get_test_config_dir, mock_device
 
 
 @lru_cache(maxsize=1)
@@ -155,17 +153,7 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
             )
 
         mock_registry(hass, mock_entries)
-        mock_device_registry(
-            hass,
-            {
-                device_id: DeviceEntry(
-                    id=device_id,
-                    manufacturer=manufacturer,
-                    model=model,
-                    model_id=model_id,
-                ),
-            },
-        )
+        mock_device(hass, device_id, manufacturer, model, model_id=model_id)
 
     return _mock_entity_with_model_information
 

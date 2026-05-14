@@ -26,8 +26,8 @@ from custom_components.powercalc.const import (
     CONF_VALUE,
     GroupType,
 )
+from tests.common import create_mock_config_entry
 from tests.config_flow.common import (
-    create_mock_entry,
     handle_options_flow_update,
     process_config_flow,
     select_menu_item,
@@ -41,10 +41,9 @@ def _daily_energy_value_choice(choice: str, value: object) -> dict[str, object]:
 async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant) -> None:
     result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
-    user_input = {CONF_NAME: "My daily energy sensor"}
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        user_input,
+        {CONF_NAME: "My daily energy sensor"},
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"]
@@ -79,7 +78,7 @@ async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
 
 
 async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "My daily energy sensor",
@@ -158,7 +157,7 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
 
 
 async def test_add_to_group(hass: HomeAssistant) -> None:
-    group_entry = create_mock_entry(
+    group_entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "My group",
@@ -192,7 +191,7 @@ async def test_add_to_group(hass: HomeAssistant) -> None:
 
 
 async def test_can_set_basic_options(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,

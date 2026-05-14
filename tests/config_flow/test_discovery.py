@@ -22,12 +22,11 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.common import get_test_profile_dir
+from tests.common import create_mock_config_entry, get_test_profile_dir
 from tests.config_flow.common import (
     DEFAULT_ENTITY_ID,
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
-    create_mock_entry,
     handle_options_flow_update,
     initialize_discovery_flow,
 )
@@ -284,7 +283,7 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
     """
     Test that we can open an option flow for an auto discovered config entry
     """
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.test",
@@ -293,7 +292,7 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
             CONF_MANUFACTURER: "signify",
             CONF_MODEL: "LCT010",
         },
-        config_entries.SOURCE_INTEGRATION_DISCOVERY,
+        source=config_entries.SOURCE_INTEGRATION_DISCOVERY,
     )
 
     await handle_options_flow_update(hass, entry, Step.BASIC_OPTIONS, {CONF_CREATE_ENERGY_SENSOR: False})

@@ -78,9 +78,9 @@ from tests.common import set_states
 from .common import (
     assert_entity_state,
     create_input_boolean,
+    create_mock_config_entry,
     get_simple_fixed_config,
     run_powercalc_setup,
-    setup_config_entry,
 )
 from .config_flow.common import fixed_value_choice, handle_options_flow_update
 from .conftest import MockEntityWithModel
@@ -460,7 +460,7 @@ async def test_change_options_of_renamed_sensor(
     hass: HomeAssistant,
     entity_registry: er.EntityRegistry,
 ) -> None:
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -499,7 +499,7 @@ async def test_renaming_sensor_is_retained_after_startup(
     await hass.async_block_till_done()
     entity_registry.async_update_entity(entity_id="sensor.test_power", name="Renamed power")
     await hass.async_block_till_done()
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -558,7 +558,7 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
 async def test_create_config_entry_without_energy_sensor(
     hass: HomeAssistant,
 ) -> None:
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -567,7 +567,6 @@ async def test_create_config_entry_without_energy_sensor(
             CONF_ENTITY_ID: "light.test",
             CONF_FIXED: {CONF_POWER: 50},
         },
-        unique_id="abcd",
     )
 
     assert hass.states.get("sensor.testentry_power")
@@ -588,7 +587,7 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
         },
     )
 
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -597,7 +596,6 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
             CONF_ENTITY_ID: light_id,
             CONF_FIXED: {CONF_POWER: 50},
         },
-        unique_id="abcd",
     )
 
     await run_powercalc_setup(hass)
@@ -639,7 +637,7 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
     )
 
     # Create an existing config entry referencing the original source entity
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -674,7 +672,7 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
 
 
 async def test_regression(hass: HomeAssistant) -> None:
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -687,7 +685,6 @@ async def test_regression(hass: HomeAssistant) -> None:
             CONF_FIXED: {CONF_POWER: 11},
             CONF_UNIQUE_ID: "pc_91b5b2b04e889549cb19effa3dea97e1",
         },
-        unique_id="pc_91b5b2b04e889549cb19effa3dea97e1",
     )
 
     await run_powercalc_setup(hass)
@@ -699,7 +696,7 @@ async def test_regression(hass: HomeAssistant) -> None:
 async def test_entity_services_registered(hass: HomeAssistant) -> None:
     """Test that the entity services are registered."""
 
-    await setup_config_entry(hass, {CONF_ENTITY_ID: "light.test", CONF_FIXED: {CONF_POWER: 50}})
+    await create_mock_config_entry(hass, {CONF_ENTITY_ID: "light.test", CONF_FIXED: {CONF_POWER: 50}})
 
     services = hass.services.async_services()
     powercalc_services = services.get(DOMAIN)

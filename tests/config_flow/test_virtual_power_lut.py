@@ -18,12 +18,11 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.test.light import MockLight
-from tests.common import create_mock_light_entity
+from tests.common import create_mock_config_entry, create_mock_light_entity
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     assert_default_virtual_power_entry_data,
     confirm_auto_discovered_model,
-    create_mock_entry,
     goto_virtual_power_strategy_step,
     handle_options_flow_update,
     set_virtual_power_configuration,
@@ -208,7 +207,7 @@ async def test_lut_flow_with_sub_profiles(
 
 
 async def test_lut_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_ENTITY_ID: "light.spots_kitchen",

@@ -13,9 +13,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.util import dt
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, async_fire_time_changed, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, async_fire_time_changed, mock_registry
 
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
@@ -39,22 +38,14 @@ from custom_components.powercalc.strategy.composite import CompositeMode
 from tests.common import (
     assert_entity_state,
     get_test_profile_dir,
+    mock_device,
     run_powercalc_setup,
     set_states,
 )
 
 
 async def test_composite(hass: HomeAssistant) -> None:
-    mock_device_registry(
-        hass,
-        {
-            "my-device-id": DeviceEntry(
-                id="my-device-id",
-                manufacturer="foo",
-                model="bar",
-            ),
-        },
-    )
+    mock_device(hass, "my-device-id", "foo", "bar")
 
     mock_registry(
         hass,

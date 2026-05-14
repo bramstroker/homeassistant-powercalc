@@ -38,7 +38,7 @@ from custom_components.powercalc.const import (
     PowerProfileSource,
     SensorType,
 )
-from tests.common import get_simple_fixed_config, run_powercalc_setup, setup_config_entry
+from tests.common import create_mock_config_entry, get_simple_fixed_config, run_powercalc_setup
 
 MOCK_PAYLOAD = {
     "test": "data",
@@ -193,7 +193,7 @@ async def test_send_analytics_disabled(
 
 
 async def test_no_duplicate_count_after_entry_reload(hass: HomeAssistant) -> None:
-    entry = await setup_config_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -296,7 +296,7 @@ async def test_entity_types(hass: HomeAssistant) -> None:
 async def test_install_date(hass: HomeAssistant) -> None:
     past_date = dt.parse_date("2023-01-15")
     with freeze_time(past_date):
-        await setup_config_entry(
+        await create_mock_config_entry(
             hass,
             {
                 CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -306,7 +306,7 @@ async def test_install_date(hass: HomeAssistant) -> None:
             },
         )
 
-    await setup_config_entry(
+    await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,

@@ -15,14 +15,12 @@ from homeassistant.components.utility_meter.sensor import (
 )
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_ENTITY_ID, CONF_NAME, UnitOfEnergy
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.setup import async_setup_component
 import homeassistant.util.dt as dt_util
 import pytest
 from pytest_homeassistant_custom_component.common import (
     RegistryEntryWithDefaults,
-    mock_device_registry,
     mock_registry,
 )
 
@@ -45,10 +43,11 @@ from custom_components.powercalc.const import (
 from tests.common import (
     assert_entity_state,
     create_input_boolean,
+    create_mock_config_entry,
     create_mocked_virtual_power_sensor_entry,
+    mock_device,
     run_powercalc_setup,
     set_states,
-    setup_config_entry,
 )
 
 
@@ -98,7 +97,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
 
 
 async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
-    entry1 = await setup_config_entry(
+    entry1 = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -111,7 +110,7 @@ async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entit
         title="Entry1",
     )
 
-    entry2 = await setup_config_entry(
+    entry2 = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
@@ -270,16 +269,7 @@ async def test_regression(hass: HomeAssistant) -> None:
         },
     )
 
-    mock_device_registry(
-        hass,
-        {
-            device_id: DeviceEntry(
-                id=device_id,
-                manufacturer="foo",
-                model="bar",
-            ),
-        },
-    )
+    mock_device(hass, device_id, "foo", "bar")
 
     await run_powercalc_setup(
         hass,

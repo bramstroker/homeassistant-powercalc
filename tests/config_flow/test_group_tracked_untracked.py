@@ -20,9 +20,8 @@ from custom_components.powercalc.const import (
     GroupType,
 )
 from custom_components.powercalc.flow_helper.flows.group import UNIQUE_ID_TRACKED_UNTRACKED
-from tests.common import assert_entity_state, mock_sensors_in_registry, run_powercalc_setup, set_states
+from tests.common import assert_entity_state, create_mock_config_entry, mock_sensors_in_registry, run_powercalc_setup, set_states
 from tests.config_flow.common import (
-    create_mock_entry,
     handle_options_flow_update,
     select_menu_item,
 )
@@ -124,7 +123,7 @@ async def test_config_flow_manual(hass: HomeAssistant) -> None:
 
 async def test_only_single_instance(hass: HomeAssistant) -> None:
     """Only one instance of tracked/untracked allowed. Check if it is removed from the menu"""
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -151,7 +150,7 @@ async def test_only_single_instance(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -173,7 +172,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_exclude_entities(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
+    entry = await create_mock_config_entry(
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.GROUP,
