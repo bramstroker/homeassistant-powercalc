@@ -17,6 +17,7 @@ from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_FIXED,
+    CONF_FIXED_VALUE,
     CONF_MODE,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
@@ -56,6 +57,10 @@ def _make_ws_connection() -> MagicMock:
     connection = MagicMock()
     connection.subscriptions = {}
     return connection
+
+
+def _fixed_value_choice(choice: str, value: object) -> dict[str, object]:
+    return {CONF_FIXED_VALUE: {"active_choice": choice, choice: value}}
 
 
 async def test_async_setup_preview_registers_websocket_command(hass: HomeAssistant) -> None:
@@ -192,7 +197,7 @@ def test_build_preview_sensor_config_merges_strategy_options() -> None:
     flow = MagicMock()
     flow.sensor_config = {CONF_ENTITY_ID: "light.test"}
 
-    config = profile_preview._build_preview_sensor_config(flow, Step.FIXED, {CONF_POWER: 20})
+    config = profile_preview._build_preview_sensor_config(flow, Step.FIXED, _fixed_value_choice(CONF_POWER, 20))
 
     assert config == {CONF_ENTITY_ID: "light.test", CalculationStrategy.FIXED: {CONF_POWER: 20}}
 
@@ -212,7 +217,7 @@ async def test_preview_websocket_returns_state_for_config_flow(hass: HomeAssista
     hass.states.async_set("light.test", STATE_ON)
 
     connection = _make_ws_connection()
-    ws_start_preview(hass, connection, _build_ws_message(result["flow_id"], {CONF_POWER: 42}))
+    ws_start_preview(hass, connection, _build_ws_message(result["flow_id"], _fixed_value_choice(CONF_POWER, 42)))
     await hass.async_block_till_done()
 
     connection.send_result.assert_called_once_with(1)
@@ -268,7 +273,7 @@ async def test_preview_websocket_for_options_flow(hass: HomeAssistant) -> None:
     ws_start_preview(
         hass,
         connection,
-        _build_ws_message(result["flow_id"], {CONF_POWER: 25}, flow_type="options_flow"),
+        _build_ws_message(result["flow_id"], _fixed_value_choice(CONF_POWER, 25), flow_type="options_flow"),
     )
     await hass.async_block_till_done()
 

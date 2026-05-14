@@ -48,6 +48,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Create utility meters",
+          "daily_energy_value": "Daily energy value",
           "name": "Name",
           "on_time": "On time",
           "start_time": "Start time",
@@ -87,6 +88,7 @@
       },
       "fixed": {
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Power",
           "power_template": "Power template",
           "states_power": "States power"
@@ -542,6 +544,7 @@
       "daily_energy": {
         "title": "Daily energy options",
         "data": {
+          "daily_energy_value": "Daily energy value",
           "name": "Name",
           "on_time": "On time",
           "start_time": "Start time",
@@ -571,6 +574,7 @@
       "fixed": {
         "title": "Fixed options",
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Power",
           "power_template": "Power template",
           "self_usage_included": "Self usage included",
@@ -812,6 +816,21 @@
           "power_factor": "Power factor",
           "voltage": "Voltage"
         }
+      }
+    }
+  },
+  "selector": {
+    "daily_energy_value": {
+      "choices": {
+        "value": "Value",
+        "value_template": "Value template"
+      }
+    },
+    "fixed_value": {
+      "choices": {
+        "power": "Power",
+        "power_template": "Power template",
+        "states_power": "States power"
       }
     }
   },
