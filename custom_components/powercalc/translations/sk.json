@@ -88,16 +88,10 @@
       },
       "fixed": {
         "data": {
-          "fixed_value": "Fixed value",
-          "power": "Výkon",
-          "power_template": "Šablóna výkonu",
-          "states_power": "Stavy výkonu"
+          "fixed_value": "Fixed value"
         },
         "data_description": {
-          "fixed_value": "Fixed value in Watts when the entity is ON",
-          "power": "Pevná hodnota výkonu vo wattoch, keď je entita ZAPNUTÁ",
-          "power_template": "Šablóna sa vyhodnotí, aby sa získala hodnota výkonu vo W",
-          "states_power": "Jeden pár „stav: výkon“ v každom riadku, pozri príklad vyššie"
+          "fixed_value": "Fixed value in Watts when the entity is ON"
         },
         "description": "Definujte pevnú hodnotu výkonu pre vašu entitu. Prípadne môžete definovať hodnotu výkonu pre každý stav. Napríklad:\n\n`prehrávanie: 8.3`\n`pozastavené: 2.25`",
         "title": "Opravená konfigurácia"
@@ -579,16 +573,10 @@
         "title": "Pevné možnosti",
         "data": {
           "fixed_value": "Fixed value",
-          "power": "Výkon",
-          "power_template": "Výkon šablóna",
-          "self_usage_included": "Samostatné použitie v cene",
-          "states_power": "Výkonové stavy"
+          "self_usage_included": "Samostatné použitie v cene"
         },
         "data_description": {
-          "power": "Pevná hodnota výkonu vo wattoch, keď je entita ZAPNUTÁ",
-          "power_template": "Šablóna sa vyhodnotí, aby sa získala hodnota výkonu vo W",
-          "self_usage_included": "Či hodnota výkonu zahŕňa výkon spotrebovaný samotným inteligentným prepínačom.",
-          "states_power": "Jeden pár „stav: výkon“ v každom riadku, pozri príklad vyššie"
+          "self_usage_included": "Či hodnota výkonu zahŕňa výkon spotrebovaný samotným inteligentným prepínačom."
         }
       },
       "global_configuration": {

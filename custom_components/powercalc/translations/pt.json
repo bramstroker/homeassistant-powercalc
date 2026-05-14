@@ -88,16 +88,10 @@
       },
       "fixed": {
         "data": {
-          "fixed_value": "Fixed value",
-          "power": "Potência",
-          "power_template": "Modelo de potência",
-          "states_power": "Potência dos Estados"
+          "fixed_value": "Fixed value"
         },
         "data_description": {
-          "fixed_value": "Fixed value in Watts when the entity is ON",
-          "power": "Um valor de potência fixo em Watts quando a entidade está LIGADA",
-          "power_template": "O modelo será avaliado para obter o valor da potência em W",
-          "states_power": "Um par 'estado: potência' em cada linha, veja o exemplo acima"
+          "fixed_value": "Fixed value in Watts when the entity is ON"
         },
         "description": "Defina um valor de potência fixo para sua entidade. Alternativamente, você pode definir um valor de energia por estado. Por exemplo:\n\n`reproduzindo: 8.3`\n`pausado: 2.25`",
         "title": "Configuração fixa"
@@ -579,16 +573,10 @@
         "title": "Fixed options",
         "data": {
           "fixed_value": "Fixed value",
-          "power": "Potência",
-          "power_template": "Modelo de energia",
-          "self_usage_included": "Self usage included",
-          "states_power": "Potência dos Estados"
+          "self_usage_included": "Self usage included"
         },
         "data_description": {
-          "power": "A fixed power value in Watts when the entity is ON",
-          "power_template": "O modelo será avaliado para obter o valor da potência em W",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
-          "states_power": "Um par 'estado: ptência' em cada linha, veja o exemplo acima"
+          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself."
         }
       },
       "global_configuration": {

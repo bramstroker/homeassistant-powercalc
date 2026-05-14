@@ -88,16 +88,10 @@
       },
       "fixed": {
         "data": {
-          "fixed_value": "Fixed value",
-          "power": "Potencia",
-          "power_template": "Plantilla de potencia",
-          "states_power": "Estados de potencia"
+          "fixed_value": "Fixed value"
         },
         "data_description": {
-          "fixed_value": "Fixed value in Watts when the entity is ON",
-          "power": "Un valor de potencia fijo en Vatios (W) cuando la entidad está ENCENDIDA",
-          "power_template": "La plantilla será evaluada para obtener el valor de potencia en Vatios (W)",
-          "states_power": "Un par (\"estado: potencia\") en cada fila"
+          "fixed_value": "Fixed value in Watts when the entity is ON"
         },
         "description": "Definir un valor de potencia fijo para tu entidad. Alternativamente, puedes definir un valor de potencia por estado. Por ejemplo: \n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Configuración fija"
@@ -579,16 +573,10 @@
         "title": "Opciones fijas",
         "data": {
           "fixed_value": "Fixed value",
-          "power": "Potencia",
-          "power_template": "Plantilla de potencia",
-          "self_usage_included": "Uso propio incluido",
-          "states_power": "Estados de potencia"
+          "self_usage_included": "Uso propio incluido"
         },
         "data_description": {
-          "power": "Un valor de potencia fijo en Vatios (W) cuando la entidad está ENCENDIDA",
-          "power_template": "La plantilla será evaluada para obtener el valor de potencia en Vatios (W)",
-          "self_usage_included": "Si el valor de potencia incluye la energía consumida por el interruptor inteligente mismo.",
-          "states_power": "Un par \"estado: potencia\" en cada fila"
+          "self_usage_included": "Si el valor de potencia incluye la energía consumida por el interruptor inteligente mismo."
         }
       },
       "global_configuration": {
