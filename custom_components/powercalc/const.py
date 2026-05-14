@@ -170,6 +170,11 @@ CONF_UTILITY_METER_TARIFFS = "utility_meter_tariffs"
 CONF_UTILITY_METER_TYPES = "utility_meter_types"
 CONF_VALUE = "value"
 CONF_VALUE_TEMPLATE = "value_template"
+
+# Wrapper keys for ChooseSelector config flow forms (not stored in config entries).
+CONF_FIXED_VALUE = "fixed_value"
+CONF_DAILY_ENERGY_VALUE = "daily_energy_value"
+CONF_PLAYBOOK_ID = "playbook_id"
 CONF_VARIABLES = "variables"
 CONF_VOLTAGE = "voltage"
 CONF_WILDCARD = "wildcard"

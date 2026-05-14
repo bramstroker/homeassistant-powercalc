@@ -22,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_FILTER_OUTLIER_ENABLED,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_FIXED_VALUE,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -109,7 +110,8 @@ async def initialize_options_flow(
     entry: config_entries.ConfigEntry,
     selected_menu_item: Step,
 ) -> FlowResult:
-    if entry.state != config_entries.ConfigEntryState.LOADED:
+    """Initialize the options flow for a given config entry."""
+    if entry.state == config_entries.ConfigEntryState.NOT_LOADED:
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
     result = await hass.config_entries.options.async_init(
@@ -127,10 +129,27 @@ async def initialize_options_flow(
     )
 
 
+async def handle_options_flow_update(
+    hass: HomeAssistant,
+    entry: config_entries.ConfigEntry,
+    selected_menu_item: Step,
+    user_input: dict[str, Any],
+) -> FlowResult:
+    """Open the options flow, select a menu item, and handle user input."""
+    result = await initialize_options_flow(hass, entry, selected_menu_item)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+    await hass.async_block_till_done()
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    return result
+
+
 async def initialize_discovery_flow(
     hass: HomeAssistant,
     source_entity: SourceEntity,
-    power_profiles: PowerProfile | list[PowerProfile] | None = None,
+    power_profiles: PowerProfile | list[PowerProfile | None] | None = None,
     confirm_autodiscovered_model: bool = False,
 ) -> FlowResult:
     discovery_manager: DiscoveryManager = DiscoveryManager(hass, {})
@@ -212,7 +231,8 @@ async def process_config_flow(
     hass: HomeAssistant,
     result: FlowResult | None,
     user_inputs: dict[Step, dict],
-) -> dict:
+) -> FlowResult | None:
+    """Process a configuration flow with multiple steps and user inputs."""
     if not result:
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -236,11 +256,9 @@ async def set_virtual_power_configuration(
     advanced_options: dict[str, Any] | None = None,
     group_options: dict[str, Any] | None = None,
 ) -> FlowResult:
-    if basic_options is None:
-        basic_options = {}
     result = await hass.config_entries.flow.async_configure(
         previous_result["flow_id"],
-        basic_options,
+        basic_options or {},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -291,3 +309,7 @@ def assert_default_virtual_power_entry_data(
         }
         | expected_strategy_options
     )
+
+
+def fixed_value_choice(choice: str, value: object) -> dict[str, object]:
+    return {CONF_FIXED_VALUE: {"active_choice": choice, choice: value}}

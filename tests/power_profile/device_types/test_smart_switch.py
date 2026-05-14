@@ -16,7 +16,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
-from tests.config_flow.common import confirm_auto_discovered_model, initialize_options_flow
+from tests.config_flow.common import confirm_auto_discovered_model, handle_options_flow_update
 from tests.conftest import MockEntityWithModel
 
 
@@ -136,12 +136,7 @@ async def test_gui_smart_switch_without_builtin_powermeter(
     assert_entity_state(hass, power_sensor_id, "0.30")
 
     # Change the power value via the options
-    result = await initialize_options_flow(hass, config_entry, Step.FIXED)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_POWER: 100},
-    )
-    assert result["type"] == FlowResultType.CREATE_ENTRY
+    await handle_options_flow_update(hass, config_entry, Step.FIXED, {CONF_POWER: 100})
 
     # Set the switch on again and see if it has the updated power value
     await set_states(hass, [(switch_id, STATE_ON)])

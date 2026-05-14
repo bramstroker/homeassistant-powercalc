@@ -25,7 +25,7 @@ from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
     goto_virtual_power_strategy_step,
-    initialize_options_flow,
+    handle_options_flow_update,
     set_virtual_power_configuration,
 )
 
@@ -66,15 +66,8 @@ async def test_wled_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.WLED)
+    await handle_options_flow_update(hass, entry, Step.WLED, {CONF_VOLTAGE: 12})
 
-    user_input = {CONF_VOLTAGE: 12}
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
-    )
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_WLED][CONF_VOLTAGE] == 12
 
 

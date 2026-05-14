@@ -2,12 +2,12 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
-    CONF_MODE,
     CONF_POWER,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
 )
 from tests.config_flow.common import (
+    fixed_value_choice,
     goto_virtual_power_strategy_step,
     set_virtual_power_configuration,
 )
@@ -21,10 +21,9 @@ async def test_create_multiple_entries_using_dummy(hass: HomeAssistant) -> None:
         user_input={
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: "mysensor1",
-            CONF_MODE: CalculationStrategy.FIXED,
         },
     )
-    await set_virtual_power_configuration(hass, result, {CONF_POWER: 20})
+    await set_virtual_power_configuration(hass, result, fixed_value_choice(CONF_POWER, 20))
 
     assert hass.states.get("sensor.mysensor1_power")
     assert hass.states.get("sensor.mysensor1_energy")
@@ -35,10 +34,9 @@ async def test_create_multiple_entries_using_dummy(hass: HomeAssistant) -> None:
         user_input={
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: "mysensor2",
-            CONF_MODE: CalculationStrategy.FIXED,
         },
     )
-    await set_virtual_power_configuration(hass, result, {CONF_POWER: 20})
+    await set_virtual_power_configuration(hass, result, fixed_value_choice(CONF_POWER, 20))
 
     assert hass.states.get("sensor.mysensor2_power")
     assert hass.states.get("sensor.mysensor2_energy")

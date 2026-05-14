@@ -19,7 +19,6 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_FILTER_OUTLIER_ENABLED,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_MANUFACTURER,
-    CONF_MODE,
     CONF_MODEL,
     CONF_SENSOR_TYPE,
     CONF_SUB_PROFILE,
@@ -131,7 +130,6 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain2(
         CalculationStrategy.LUT,
         {
             CONF_ENTITY_ID: "switch.test",
-            CONF_MODE: CalculationStrategy.LUT,
         },
     )
 

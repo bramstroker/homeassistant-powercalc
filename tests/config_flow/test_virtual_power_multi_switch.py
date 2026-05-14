@@ -33,6 +33,7 @@ from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     create_mock_entry,
     goto_virtual_power_strategy_step,
+    handle_options_flow_update,
     initialize_discovery_flow,
     initialize_options_flow,
     set_virtual_power_configuration,
@@ -42,6 +43,7 @@ from tests.conftest import MockEntityWithModel
 
 async def test_create_multi_switch_sensor_entry(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.MULTI_SWITCH, {CONF_NAME: "test"})
+    assert result.get("preview") is None
     result = await set_virtual_power_configuration(
         hass,
         result,
@@ -156,14 +158,15 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     )
 
     result = await initialize_options_flow(hass, entry, Step.MULTI_SWITCH)
+    assert result.get("preview") is None
 
-    user_input = {CONF_POWER_OFF: 20, CONF_POWER: 5, CONF_ENTITIES: ["switch.a", "switch.c"]}
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
+    await handle_options_flow_update(
+        hass,
+        entry,
+        Step.MULTI_SWITCH,
+        {CONF_POWER_OFF: 20, CONF_POWER: 5, CONF_ENTITIES: ["switch.a", "switch.c"]},
     )
 
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_MULTI_SWITCH] == {CONF_POWER: 5, CONF_POWER_OFF: 20, CONF_ENTITIES: ["switch.a", "switch.c"]}
 
 

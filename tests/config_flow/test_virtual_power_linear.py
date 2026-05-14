@@ -5,13 +5,16 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CALIBRATE,
+    CONF_GAMMA_CURVE,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_MODE,
     CONF_MODEL,
+    CONF_POWER,
     CONF_SENSOR_TYPE,
+    CONF_VALUE,
     CalculationStrategy,
     SensorType,
 )
@@ -49,7 +52,7 @@ async def test_calibrate_list(hass: HomeAssistant) -> None:
     result = await set_virtual_power_configuration(
         hass,
         result,
-        {CONF_CALIBRATE: {"1": 10, "20": 25, "40": 50}},
+        {CONF_CALIBRATE: [{CONF_VALUE: 1, CONF_POWER: 10}, {CONF_VALUE: 20, CONF_POWER: 25}, {CONF_VALUE: 40, CONF_POWER: 50}]},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -79,6 +82,11 @@ async def test_linear_options_flow(hass: HomeAssistant) -> None:
     )
 
     result = await initialize_options_flow(hass, entry, Step.LINEAR)
+    schema_keys = [key.schema for key in result["data_schema"].schema]
+    assert CONF_MIN_POWER in schema_keys
+    assert CONF_MAX_POWER in schema_keys
+    assert CONF_GAMMA_CURVE in schema_keys
+    assert CONF_CALIBRATE in schema_keys
 
     user_input = {CONF_MAX_POWER: 50}
     result = await hass.config_entries.options.async_configure(

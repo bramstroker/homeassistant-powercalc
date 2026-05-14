@@ -25,6 +25,8 @@ from custom_components.powercalc.const import (
     CONF_GAMMA_CURVE,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_POWER,
+    CONF_VALUE,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.helpers import get_related_entity_by_device_class
@@ -134,6 +136,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         calibrate = self._config.get(CONF_CALIBRATE)
         if isinstance(calibrate, dict):
             calibrate = [f"{key} -> {value}" for key, value in calibrate.items()]
+        elif isinstance(calibrate, list) and calibrate and isinstance(calibrate[0], dict):
+            calibrate = [f"{item[CONF_VALUE]} -> {item[CONF_POWER]}" for item in calibrate]
 
         if calibrate is None or len(calibrate) == 0:
             full_range = self.get_entity_value_range()

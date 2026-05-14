@@ -21,6 +21,7 @@ from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
     goto_virtual_power_strategy_step,
+    handle_options_flow_update,
     initialize_options_flow,
     set_virtual_power_configuration,
 )
@@ -28,6 +29,7 @@ from tests.config_flow.common import (
 
 async def test_create_entry(hass: HomeAssistant) -> None:
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.PLAYBOOK)
+    assert result.get("preview") is None
     result = await set_virtual_power_configuration(
         hass,
         result,
@@ -80,21 +82,22 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     )
 
     result = await initialize_options_flow(hass, entry, Step.PLAYBOOK)
+    assert result.get("preview") is None
 
-    user_input = {
-        CONF_PLAYBOOKS: [
-            {"id": "playbook1", "path": "test.csv"},
-            {"id": "playbook2", "path": "test2.csv"},
-        ],
-        CONF_REPEAT: True,
-        CONF_AUTOSTART: "playbook2",
-    }
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
+    await handle_options_flow_update(
+        hass,
+        entry,
+        Step.PLAYBOOK,
+        {
+            CONF_PLAYBOOKS: [
+                {"id": "playbook1", "path": "test.csv"},
+                {"id": "playbook2", "path": "test2.csv"},
+            ],
+            CONF_REPEAT: True,
+            CONF_AUTOSTART: "playbook2",
+        },
     )
 
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_PLAYBOOK][CONF_REPEAT]
     assert entry.data[CONF_PLAYBOOK][CONF_AUTOSTART] == "playbook2"
 
@@ -127,10 +130,10 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
                 {"id": "playbook1", "path": "test.csv"},
                 {"id": "playbook2", "path": "test2.csv"},
             ],
-            CONF_STATE_TRIGGER: {
-                STATE_IDLE: "playbook1",
-                STATE_PLAYING: "playbook2",
-            },
+            CONF_STATE_TRIGGER: [
+                {"state": STATE_IDLE, "playbook_id": "playbook1"},
+                {"state": STATE_PLAYING, "playbook_id": "playbook2"},
+            ],
         },
     )
 

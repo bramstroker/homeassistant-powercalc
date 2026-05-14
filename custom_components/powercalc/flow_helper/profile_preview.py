@@ -13,8 +13,9 @@ from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CalculationStrategy
+from custom_components.powercalc.const import CONF_FIXED_VALUE, CalculationStrategy
 from custom_components.powercalc.errors import StrategyConfigurationError, UnsupportedStrategyError
+from custom_components.powercalc.flow_helper.common import unwrap_choose_selector
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.selector import detect_calculation_strategy
@@ -124,8 +125,16 @@ def _build_preview_sensor_config(flow: PreviewFlowProtocol, step_id: str, user_i
     except ValueError:
         return sensor_config
 
-    sensor_config[strategy] = dict(user_input)
+    sensor_config[strategy] = _unwrap_preview_strategy_input(strategy, user_input)
     return sensor_config
+
+
+def _unwrap_preview_strategy_input(strategy: CalculationStrategy, user_input: dict[str, Any]) -> dict[str, Any]:
+    """Unwrap form-only selector wrappers before building a preview strategy config."""
+    unwrapped = dict(user_input)
+    if strategy == CalculationStrategy.FIXED:
+        unwrap_choose_selector(unwrapped, CONF_FIXED_VALUE)
+    return unwrapped
 
 
 async def build_profile_preview(

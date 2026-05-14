@@ -64,7 +64,9 @@ from tests.common import (
 )
 from tests.config_flow.common import (
     create_mock_entry,
+    fixed_value_choice,
     goto_virtual_power_strategy_step,
+    handle_options_flow_update,
     initialize_options_flow,
     select_menu_item,
     set_virtual_power_configuration,
@@ -235,7 +237,7 @@ async def test_group_include_area(
     await set_virtual_power_configuration(
         hass,
         result,
-        {CONF_STATES_POWER: {"playing": 1.8}},
+        fixed_value_choice(CONF_STATES_POWER, [{"state": "playing", "power": 1.8}]),
     )
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
@@ -351,13 +353,7 @@ async def test_can_unset_area(hass: HomeAssistant, area_registry: AreaRegistry) 
         CONF_AREA: "My area",
     }
 
-    result = await initialize_options_flow(hass, config_entry, Step.GROUP_CUSTOM)
-
-    user_input = {}
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
-    )
+    await handle_options_flow_update(hass, config_entry, Step.GROUP_CUSTOM, {})
     updated_entry = hass.config_entries.async_get_entry(config_entry.entry_id)
     assert updated_entry.data == {
         ENTRY_DATA_ENERGY_ENTITY: "sensor.testarea_energy",
@@ -604,24 +600,11 @@ async def test_group_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_CREATE_UTILITY_METERS: True},
-    )
-
-    result = await initialize_options_flow(hass, entry, Step.GROUP_CUSTOM)
+    await handle_options_flow_update(hass, entry, Step.BASIC_OPTIONS, {CONF_CREATE_UTILITY_METERS: True})
 
     new_entities = ["sensor.fridge_power", "sensor.kitchen_lights_power"]
-    user_input = {CONF_GROUP_POWER_ENTITIES: new_entities}
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=user_input,
-    )
+    await handle_options_flow_update(hass, entry, Step.GROUP_CUSTOM, {CONF_GROUP_POWER_ENTITIES: new_entities})
 
-    await hass.async_block_till_done()
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_GROUP_POWER_ENTITIES] == new_entities
     assert entry.data[CONF_CREATE_UTILITY_METERS]
 
@@ -671,7 +654,7 @@ async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistan
     result = await set_virtual_power_configuration(
         hass,
         result,
-        {CONF_POWER: 20},
+        fixed_value_choice(CONF_POWER, 20),
         group_options={CONF_NEW_GROUP: "New group"},
     )
 

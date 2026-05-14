@@ -35,6 +35,7 @@ from custom_components.powercalc.flow_helper.profile_preview import (
 )
 from tests.config_flow.common import (
     create_mock_entry,
+    fixed_value_choice,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
 )
@@ -192,7 +193,7 @@ def test_build_preview_sensor_config_merges_strategy_options() -> None:
     flow = MagicMock()
     flow.sensor_config = {CONF_ENTITY_ID: "light.test"}
 
-    config = profile_preview._build_preview_sensor_config(flow, Step.FIXED, {CONF_POWER: 20})
+    config = profile_preview._build_preview_sensor_config(flow, Step.FIXED, fixed_value_choice(CONF_POWER, 20))
 
     assert config == {CONF_ENTITY_ID: "light.test", CalculationStrategy.FIXED: {CONF_POWER: 20}}
 
@@ -212,7 +213,7 @@ async def test_preview_websocket_returns_state_for_config_flow(hass: HomeAssista
     hass.states.async_set("light.test", STATE_ON)
 
     connection = _make_ws_connection()
-    ws_start_preview(hass, connection, _build_ws_message(result["flow_id"], {CONF_POWER: 42}))
+    ws_start_preview(hass, connection, _build_ws_message(result["flow_id"], fixed_value_choice(CONF_POWER, 42)))
     await hass.async_block_till_done()
 
     connection.send_result.assert_called_once_with(1)
@@ -268,7 +269,7 @@ async def test_preview_websocket_for_options_flow(hass: HomeAssistant) -> None:
     ws_start_preview(
         hass,
         connection,
-        _build_ws_message(result["flow_id"], {CONF_POWER: 25}, flow_type="options_flow"),
+        _build_ws_message(result["flow_id"], fixed_value_choice(CONF_POWER, 25), flow_type="options_flow"),
     )
     await hass.async_block_till_done()
 
