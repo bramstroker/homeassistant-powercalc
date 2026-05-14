@@ -39,18 +39,18 @@ async def remove_power_sensor_from_associated_groups(
     return group_entries
 
 
-async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigEntry) -> ConfigEntry | None:
+async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
     """
     When the user has set a group on a virtual power config entry,
     we need to add this config entry to the group members sensors and update the group.
     """
     sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type not in [SensorType.VIRTUAL_POWER, SensorType.DAILY_ENERGY]:
-        return None
+        return
 
     raw_groups = config_entry.data.get(CONF_GROUP)
     if not raw_groups:
-        return None
+        return
 
     group_ids = raw_groups if isinstance(raw_groups, list) else [raw_groups]
     for group_entry_id in group_ids:
@@ -65,7 +65,6 @@ async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigEntr
     # After processed correctly we can want to unset the group, to prevent is being processed again
     new_data = {k: v for k, v in config_entry.data.items() if k != CONF_GROUP}
     hass.config_entries.async_update_entry(config_entry, data=new_data)
-    return None
 
 
 async def add_to_associated_group(
