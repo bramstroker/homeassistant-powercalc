@@ -11,5 +11,10 @@
     "VERSION": "v1.20.11:docker"
   },
   "name": "Hue Play wall washer",
-  "standby_power": 0.3
+  "standby_power": 0.3,
+  "author_info": {
+    "name": "phoenixxx-1",
+    "github": "phoenixxx-1"
+  },
+  "author": "phoenixxx-1"
 }
