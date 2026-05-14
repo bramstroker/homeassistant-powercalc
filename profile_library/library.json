@@ -13300,6 +13300,31 @@
           "hash": "01809e39db1420e8c52f878bf83531f8"
         },
         {
+          "calculation_strategy": "lut",
+          "created_at": "2026-05-12T08:02:32Z",
+          "device_type": "light",
+          "measure_device": "TP-Link Kasa KP115",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2,
+            "VERSION": "v1.20.11:docker"
+          },
+          "name": "Hue OmniGlow striplight 3m",
+          "standby_power": 0.28,
+          "id": "929004608002",
+          "manufacturer": "signify",
+          "updated_at": "2026-05-14T06:51:17",
+          "max_power": 41.45,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "hs",
+            "color_temp",
+            "effect"
+          ],
+          "hash": "2408946c377ea8143ca6d9061085cf0a"
+        },
+        {
           "aliases": [
             "4080248P9",
             "9150058716"
@@ -13628,10 +13653,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "effect"
+            "effect",
+            "brightness"
           ],
-          "hash": "a3332c8e530d5681ac2319f7dcad807f"
+          "hash": "f11e61658021e57c881a6766b6bab27e"
         },
         {
           "aliases": [
@@ -19709,10 +19734,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "a803a0424627baf0efcf5e7c682be4f8"
+          "hash": "c5ca2ab9fef230d19eb19dbfdb6bbc98"
         },
         {
           "author": "Pasquale Cuorpo <maverick1982@users.noreply.github.com>",
