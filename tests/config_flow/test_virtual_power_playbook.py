@@ -127,10 +127,10 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
                 {"id": "playbook1", "path": "test.csv"},
                 {"id": "playbook2", "path": "test2.csv"},
             ],
-            CONF_STATE_TRIGGER: {
-                STATE_IDLE: "playbook1",
-                STATE_PLAYING: "playbook2",
-            },
+            CONF_STATE_TRIGGER: [
+                {"state": STATE_IDLE, "playbook_id": "playbook1"},
+                {"state": STATE_PLAYING, "playbook_id": "playbook2"},
+            ],
         },
     )
 

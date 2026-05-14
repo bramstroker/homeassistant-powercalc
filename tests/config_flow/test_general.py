@@ -7,6 +7,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from tests.config_flow.common import (
+    fixed_value_choice,
     goto_virtual_power_strategy_step,
     set_virtual_power_configuration,
 )
@@ -22,7 +23,7 @@ async def test_create_multiple_entries_using_dummy(hass: HomeAssistant) -> None:
             CONF_NAME: "mysensor1",
         },
     )
-    await set_virtual_power_configuration(hass, result, {CONF_POWER: 20})
+    await set_virtual_power_configuration(hass, result, fixed_value_choice(CONF_POWER, 20))
 
     assert hass.states.get("sensor.mysensor1_power")
     assert hass.states.get("sensor.mysensor1_energy")
@@ -35,7 +36,7 @@ async def test_create_multiple_entries_using_dummy(hass: HomeAssistant) -> None:
             CONF_NAME: "mysensor2",
         },
     )
-    await set_virtual_power_configuration(hass, result, {CONF_POWER: 20})
+    await set_virtual_power_configuration(hass, result, fixed_value_choice(CONF_POWER, 20))
 
     assert hass.states.get("sensor.mysensor2_power")
     assert hass.states.get("sensor.mysensor2_energy")

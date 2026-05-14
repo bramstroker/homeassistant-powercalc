@@ -35,6 +35,7 @@ from tests.common import run_powercalc_setup, setup_config_entry
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
+    fixed_value_choice,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
     process_config_flow,
@@ -43,15 +44,11 @@ from tests.config_flow.common import (
 )
 
 
-def _fixed_value_choice(choice: str, value: object) -> dict[str, object]:
-    return {CONF_FIXED_VALUE: {"active_choice": choice, choice: value}}
-
-
 async def test_create_fixed_sensor_entry(hass: HomeAssistant) -> None:
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
     assert result["preview"] == "powercalc"
 
-    result = await set_virtual_power_configuration(hass, result, _fixed_value_choice(CONF_POWER, 20))
+    result = await set_virtual_power_configuration(hass, result, fixed_value_choice(CONF_POWER, 20))
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert_default_virtual_power_entry_data(
@@ -78,7 +75,7 @@ async def test_fixed_strategy_preview_websocket(hass: HomeAssistant) -> None:
             "type": "powercalc/start_preview",
             "flow_id": result["flow_id"],
             "flow_type": "config_flow",
-            "user_input": _fixed_value_choice(CONF_POWER, 20),
+            "user_input": fixed_value_choice(CONF_POWER, 20),
         },
     )
     await hass.async_block_till_done()
@@ -99,7 +96,7 @@ async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant) -> N
     result = await set_virtual_power_configuration(
         hass,
         result,
-        _fixed_value_choice(CONF_POWER_TEMPLATE, template),
+        fixed_value_choice(CONF_POWER_TEMPLATE, template),
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -119,7 +116,7 @@ async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant) 
     result = await set_virtual_power_configuration(
         hass,
         result,
-        _fixed_value_choice(CONF_STATES_POWER, [{"state": "playing", "power": 1.8}]),
+        fixed_value_choice(CONF_STATES_POWER, [{"state": "playing", "power": 1.8}]),
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -159,7 +156,7 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
 
     result = await initialize_options_flow(hass, entry, Step.FIXED)
 
-    user_input = _fixed_value_choice(CONF_POWER, 50)
+    user_input = fixed_value_choice(CONF_POWER, 50)
     await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -208,7 +205,7 @@ async def test_fixed_states_power_options_flow(hass: HomeAssistant) -> None:
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input=_fixed_value_choice(
+        user_input=fixed_value_choice(
             CONF_STATES_POWER,
             [{"state": "4", "power": 20}, {"state": "2", "power": 50}, {"state": "6", "power": 200}],
         ),
@@ -249,7 +246,7 @@ async def test_fixed_states_power_options_flow_reconstructs_existing_config(hass
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input=_fixed_value_choice(CONF_STATES_POWER, states_power),
+        user_input=fixed_value_choice(CONF_STATES_POWER, states_power),
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -295,7 +292,7 @@ async def test_strategy_raises_unknown_error(hass: HomeAssistant) -> None:
 
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
-            _fixed_value_choice(CONF_POWER, 20),
+            fixed_value_choice(CONF_POWER, 20),
         )
 
         assert result["errors"]
@@ -312,7 +309,7 @@ async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant) -> N
     result = await set_virtual_power_configuration(
         hass,
         result,
-        _fixed_value_choice(CONF_POWER, 20),
+        fixed_value_choice(CONF_POWER, 20),
         advanced_options,
     )
 
@@ -367,7 +364,7 @@ async def test_global_configuration_is_applied_to_field_default(
                 CONF_ENTITY_ID: "light.test",
             },
             Step.FIXED: {
-                **_fixed_value_choice(CONF_POWER, 20),
+                **fixed_value_choice(CONF_POWER, 20),
             },
         },
     )
@@ -391,7 +388,7 @@ async def test_sensor_is_created_without_providing_source_entity(hass: HomeAssis
     result = await set_virtual_power_configuration(
         hass,
         result,
-        _fixed_value_choice(CONF_POWER, 20),
+        fixed_value_choice(CONF_POWER, 20),
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -414,7 +411,7 @@ async def test_setup_twice_for_same_entity(hass: HomeAssistant) -> None:
     await set_virtual_power_configuration(
         hass,
         result,
-        _fixed_value_choice(CONF_POWER, 20),
+        fixed_value_choice(CONF_POWER, 20),
     )
 
     result = await goto_virtual_power_strategy_step(
@@ -425,7 +422,7 @@ async def test_setup_twice_for_same_entity(hass: HomeAssistant) -> None:
     await set_virtual_power_configuration(
         hass,
         result,
-        _fixed_value_choice(CONF_POWER, 20),
+        fixed_value_choice(CONF_POWER, 20),
     )
 
     await hass.async_block_till_done()

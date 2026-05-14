@@ -64,6 +64,7 @@ from tests.common import (
 )
 from tests.config_flow.common import (
     create_mock_entry,
+    fixed_value_choice,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
     select_menu_item,
@@ -235,7 +236,7 @@ async def test_group_include_area(
     await set_virtual_power_configuration(
         hass,
         result,
-        {CONF_STATES_POWER: {"playing": 1.8}},
+        fixed_value_choice(CONF_STATES_POWER, [{"state": "playing", "power": 1.8}]),
     )
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
@@ -671,7 +672,7 @@ async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistan
     result = await set_virtual_power_configuration(
         hass,
         result,
-        {CONF_POWER: 20},
+        fixed_value_choice(CONF_POWER, 20),
         group_options={CONF_NEW_GROUP: "New group"},
     )
 

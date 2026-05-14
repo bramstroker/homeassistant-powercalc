@@ -82,7 +82,7 @@ from .common import (
     run_powercalc_setup,
     setup_config_entry,
 )
-from .config_flow.common import initialize_options_flow
+from .config_flow.common import fixed_value_choice, handle_options_flow_update
 from .conftest import MockEntityWithModel
 
 
@@ -481,12 +481,8 @@ async def test_change_options_of_renamed_sensor(
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_energy_daily").name == "Renamed daily utility meter"
 
-    result = await initialize_options_flow(hass, entry, Step.FIXED)
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_POWER: 100},
-    )
-    await hass.async_block_till_done()
+    await handle_options_flow_update(hass, entry, Step.FIXED, fixed_value_choice(CONF_POWER, 100))
+
     assert hass.states.get("sensor.test_energy_daily").name == "Renamed daily utility meter"
 
 
@@ -665,20 +661,9 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
     assert power_state.attributes.get(ATTR_SOURCE_ENTITY) == original_light_id
     assert power_state.state == "50.00"
 
-    # Change the entity_id using the options flow
-    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_ENTITY_ID: new_light_id},
-    )
-    await hass.async_block_till_done()
-
-    result = await initialize_options_flow(hass, entry, Step.FIXED)
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_POWER: 100},
-    )
-    await hass.async_block_till_done()
+    # Change the entity_id and power using the options flow
+    await handle_options_flow_update(hass, entry, Step.BASIC_OPTIONS, {CONF_ENTITY_ID: new_light_id})
+    await handle_options_flow_update(hass, entry, Step.FIXED, fixed_value_choice(CONF_POWER, 100))
 
     changed_entry = hass.config_entries.async_get_entry(entry.entry_id)
     assert changed_entry.data.get(CONF_ENTITY_ID) == new_light_id

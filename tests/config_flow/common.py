@@ -22,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_FILTER_OUTLIER_ENABLED,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_FIXED_VALUE,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -125,6 +126,21 @@ async def initialize_options_flow(
         result["flow_id"],
         {"next_step_id": selected_menu_item},
     )
+
+
+async def handle_options_flow_update(
+    hass: HomeAssistant,
+    entry: config_entries.ConfigEntry,
+    selected_menu_item: Step,
+    user_input: dict[str, Any],
+) -> FlowResult:
+    result = await initialize_options_flow(hass, entry, selected_menu_item)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+    await hass.async_block_till_done()
+    return result
 
 
 async def initialize_discovery_flow(
@@ -289,3 +305,7 @@ def assert_default_virtual_power_entry_data(
         }
         | expected_strategy_options
     )
+
+
+def fixed_value_choice(choice: str, value: object) -> dict[str, object]:
+    return {CONF_FIXED_VALUE: {"active_choice": choice, choice: value}}
