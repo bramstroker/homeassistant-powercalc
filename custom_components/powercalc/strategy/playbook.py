@@ -199,13 +199,13 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             )
 
         file_path = os.path.join(self._playbook_directory, playbooks[playbook_id])
-        if not (os.path.exists(file_path) or os.path.exists(f"{file_path}.gz")):
-            raise StrategyConfigurationError(
-                f"Playbook file '{file_path}' does not exist",
-            )
 
         def _load_playbook_entries() -> list[PlaybookEntry]:
             """Load playbook entries from a CSV file, with support for gzipped files"""
+            if not (os.path.exists(file_path) or os.path.exists(f"{file_path}.gz")):
+                raise StrategyConfigurationError(
+                    f"Playbook file '{file_path}' does not exist",
+                )
             actual_path = file_path if os.path.exists(file_path) else f"{file_path}.gz"
             open_func = gzip.open if actual_path.endswith(".gz") else open
             with open_func(actual_path, mode="rt") as csv_file:

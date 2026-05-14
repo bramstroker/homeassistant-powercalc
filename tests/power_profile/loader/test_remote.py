@@ -94,7 +94,7 @@ async def test_download(mock_aioresponse: aioresponses, remote_loader: RemoteLoa
     await remote_loader.download_profile("signify", "LCA001", storage_dir, "test_download")
 
     for remote_file in remote_files:
-        assert os.path.exists(os.path.join(storage_dir, remote_file["path"]))
+        assert await remote_loader.hass.async_add_executor_job(os.path.exists, os.path.join(storage_dir, remote_file["path"]))
 
 
 async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aioresponse: aioresponses) -> None:
@@ -125,7 +125,7 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
     await remote_loader.download_profile("google", "Home Mini (HOA)", storage_dir, "test_download")
 
     for remote_file in remote_files:
-        assert os.path.exists(os.path.join(storage_dir, remote_file["path"]))
+        assert await remote_loader.hass.async_add_executor_job(os.path.exists, os.path.join(storage_dir, remote_file["path"]))
 
 
 async def test_get_manufacturer_listing(remote_loader: RemoteLoader) -> None:
@@ -250,7 +250,7 @@ async def test_eventual_success_after_download_retry(mock_aioresponse: aiorespon
     callback = partial(remote_loader.download_profile, manufacturer, model, storage_path, "test_download")
     await remote_loader.download_with_retry(callback)
 
-    assert os.path.exists(storage_path)
+    assert await remote_loader.hass.async_add_executor_job(os.path.exists, storage_path)
 
 
 @pytest.mark.parametrize(
@@ -308,8 +308,8 @@ async def test_profile_redownloaded_when_newer_version_available(
     local_storage_path = loader.get_storage_path("signify", "LCA001")
     clear_storage_dir(local_storage_path)
     hash_file = hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
-    if os.path.exists(hash_file):
-        os.remove(hash_file)
+    if await hass.async_add_executor_job(os.path.exists, hash_file):
+        await hass.async_add_executor_job(os.remove, hash_file)
 
     if local_hash:
         loader._write_profile_hashes({"signify/LCA001": local_hash})  # noqa: SLF001
