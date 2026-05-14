@@ -308,11 +308,8 @@ class VirtualPowerFlow:
         return vol.Schema(
             {
                 vol.Optional(CONF_PLAYBOOKS): selector.ObjectSelector(
-                    {
-                        "multiple": True,
-                        "description_field": CONF_PATH,
-                        "label_field": CONF_ID,
-                        "fields": {
+                    selector.ObjectSelectorConfig(
+                        fields={
                             CONF_ID: {
                                 "required": True,
                                 "selector": {"text": None},
@@ -322,15 +319,16 @@ class VirtualPowerFlow:
                                 "selector": {"select": {"options": playbook_files, "mode": "dropdown", "custom_value": True}},
                             },
                         },
-                    },
+                        multiple=True,
+                        description_field=CONF_PATH,
+                        label_field=CONF_ID,
+                    )
                 ),
                 vol.Optional(CONF_REPEAT): selector.BooleanSelector(),
                 vol.Optional(CONF_AUTOSTART): selector.TextSelector(),
                 vol.Optional(CONF_STATE_TRIGGER): selector.ObjectSelector(
-                    {
-                        "multiple": True,
-                        "label_field": CONF_STATE,
-                        "fields": {
+                    selector.ObjectSelectorConfig(
+                        fields={
                             CONF_STATE: {
                                 "required": True,
                                 "selector": state_trigger_state_selector,
@@ -340,7 +338,10 @@ class VirtualPowerFlow:
                                 "selector": {"text": None},
                             },
                         },
-                    },
+                        multiple=True,
+                        description_field=CONF_PLAYBOOK_ID,
+                        label_field=CONF_STATE,
+                    )
                 ),
             },
         )
