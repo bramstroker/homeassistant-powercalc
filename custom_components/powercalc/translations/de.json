@@ -48,6 +48,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Utilitymeter erstellen",
+          "daily_energy_value": "Daily energy value",
           "name": "Name",
           "on_time": "Dauer",
           "start_time": "Startzeit",
@@ -87,11 +88,13 @@
       },
       "fixed": {
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Leistung",
           "power_template": "Leistung-Template",
           "states_power": "Leistung je Zustand"
         },
         "data_description": {
+          "fixed_value": "Fixed value in Watts when the entity is ON",
           "power": "Ein fester Leistungswert in Watt, wenn die Einheit eingeschaltet ist",
           "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
           "states_power": "Ein 'state: power' Paar in jeder Zeile"
@@ -290,6 +293,7 @@
           "attribute": "Geben Sie das Attribut an. Wenn es leer gelassen wird, wird Helligkeit für Lichter und Prozentsatz für Ventilatoren verwendet",
           "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20"
         },
+        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
         "title": "Linear Konfiguration"
       },
       "manufacturer": {
@@ -327,6 +331,7 @@
           "power": "Power for a single switch when turned on",
           "power_off": "Power for a single switch when turned off"
         },
+        "description": "Define the Multi switch power calculation options. See the [documentation]({docs_uri}) for more information.",
         "title": "Multi switch config"
       },
       "playbook": {
@@ -341,6 +346,7 @@
           "repeat": "Umschalten, wenn Sie das Playbook nach Abschluss wiederholen möchten",
           "states_trigger": "Auslösen eines Playbooks auf der Grundlage einer Zustandsänderung. Beispiel"
         },
+        "description": "Define the playbook options. See the [documentation]({docs_uri}) for more information.",
         "title": "Playbook-Konfiguration"
       },
       "power_advanced": {
@@ -542,6 +548,7 @@
       "daily_energy": {
         "title": "Tägliche Energieeinstellungen",
         "data": {
+          "daily_energy_value": "Daily energy value",
           "name": "Name",
           "on_time": "Dauer",
           "start_time": "Startzeit",
@@ -571,6 +578,7 @@
       "fixed": {
         "title": "Feste Einstellungen",
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Leistung",
           "power_template": "Leistung-Template",
           "self_usage_included": "Eigenverbrauch inklusive",
@@ -812,6 +820,21 @@
           "power_factor": "Leistungsfaktor",
           "voltage": "Spannung"
         }
+      }
+    }
+  },
+  "selector": {
+    "daily_energy_value": {
+      "choices": {
+        "value": "Value",
+        "value_template": "Value template"
+      }
+    },
+    "fixed_value": {
+      "choices": {
+        "power": "Power",
+        "power_template": "Power template",
+        "states_power": "States power"
       }
     }
   },

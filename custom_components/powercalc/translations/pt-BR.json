@@ -48,6 +48,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Criar medidores de utilidade",
+          "daily_energy_value": "Daily energy value",
           "name": "Nome",
           "on_time": "Na hora",
           "start_time": "Hora de início",
@@ -87,11 +88,13 @@
       },
       "fixed": {
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Potência",
           "power_template": "Modelo de potência",
           "states_power": "Potência dos estados"
         },
         "data_description": {
+          "fixed_value": "Fixed value in Watts when the entity is ON",
           "power": "Um valor de potência fixo em Watts quando a entidade está LIGADA",
           "power_template": "O modelo será avaliado para obter o valor da potência em W",
           "states_power": "Um par 'estado: poder' em cada linha, veja o exemplo acima"
@@ -290,6 +293,7 @@
           "attribute": "Especifique o atributo. Quando deixado vazio, haverá brilho para luzes e porcentagem para ventiladores",
           "calibrate": "Coloque um valor de calibração em cada linha. Exemplo\n\n1: 20"
         },
+        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
         "title": "Configuração linear"
       },
       "manufacturer": {
@@ -327,6 +331,7 @@
           "power": "Potência para um único interruptor quando ligado",
           "power_off": "Potência para um único interruptor quando desligado"
         },
+        "description": "Define the Multi switch power calculation options. See the [documentation]({docs_uri}) for more information.",
         "title": "Opções de multi-interruptor"
       },
       "playbook": {
@@ -341,6 +346,7 @@
           "repeat": "Alterar quando você quiser continuar repetindo o playbook após ele terminar",
           "states_trigger": "Alterar o playbook de acordo com o estado. Exemplo\n\nplaying: program1"
         },
+        "description": "Define the playbook options. See the [documentation]({docs_uri}) for more information.",
         "title": "Configuração do Playbook"
       },
       "power_advanced": {
@@ -542,6 +548,7 @@
       "daily_energy": {
         "title": "Opções de consumo diário",
         "data": {
+          "daily_energy_value": "Daily energy value",
           "name": "Nome",
           "on_time": "Na hora",
           "start_time": "Hora de início",
@@ -571,6 +578,7 @@
       "fixed": {
         "title": "Opções de Fixo",
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Potência",
           "power_template": "Modelo de potência",
           "self_usage_included": "Auto uso incluído",
@@ -812,6 +820,21 @@
           "power_factor": "Fator de potência",
           "voltage": "Voltagem"
         }
+      }
+    }
+  },
+  "selector": {
+    "daily_energy_value": {
+      "choices": {
+        "value": "Value",
+        "value_template": "Value template"
+      }
+    },
+    "fixed_value": {
+      "choices": {
+        "power": "Power",
+        "power_template": "Power template",
+        "states_power": "States power"
       }
     }
   },

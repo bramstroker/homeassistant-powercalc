@@ -48,6 +48,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+          "daily_energy_value": "Daily energy value",
           "name": "Nazwa",
           "on_time": "Sumaryczny czas włączenia",
           "start_time": "Moment uruchomienia",
@@ -87,11 +88,13 @@
       },
       "fixed": {
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Moc",
           "power_template": "Szablon mocy",
           "states_power": "Moce stanów"
         },
         "data_description": {
+          "fixed_value": "Fixed value in Watts when the entity is ON",
           "power": "Stała wartość mocy w watach, gdy encja jest WŁĄCZONA",
           "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w watach",
           "states_power": "Jedna para 'stan: moc' w każdym rzędzie"
@@ -290,6 +293,7 @@
           "attribute": "Określ Atrybut. Gdy pole pozostanie puste, będzie to jasność dla świateł i procent dla wentylatorów",
           "calibrate": "Umieść wartość kalibracji w każdym wierszu. Przykład\n\n1: 20"
         },
+        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
         "title": "Konfiguracja liniowa"
       },
       "manufacturer": {
@@ -327,6 +331,7 @@
           "power": "Moc dla pojedynczego przełącznika, kiedy włączony",
           "power_off": "Moc dla pojedynczego przełącznika, kiedy wyłączony"
         },
+        "description": "Define the Multi switch power calculation options. See the [documentation]({docs_uri}) for more information.",
         "title": "Konfiguracja wieloprzełącznika"
       },
       "playbook": {
@@ -341,6 +346,7 @@
           "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
           "states_trigger": "Wywołaj playbook na podstawie zmiany stanu. Przykład\n\nodtwarzanie: program1"
         },
+        "description": "Define the playbook options. See the [documentation]({docs_uri}) for more information.",
         "title": "Konfiguracja Playbook'ów"
       },
       "power_advanced": {
@@ -542,6 +548,7 @@
       "daily_energy": {
         "title": "Dzienne opcje energii",
         "data": {
+          "daily_energy_value": "Daily energy value",
           "name": "Nazwa",
           "on_time": "Sumaryczny czas włączenia",
           "start_time": "Czas rozpoczęcia",
@@ -571,6 +578,7 @@
       "fixed": {
         "title": "Opcje stałe",
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Moc",
           "power_template": "Szablon mocy",
           "self_usage_included": "Zawarte własne użycie",
@@ -812,6 +820,21 @@
           "power_factor": "Współczynnik mocy (cos φ)",
           "voltage": "Napięcie"
         }
+      }
+    }
+  },
+  "selector": {
+    "daily_energy_value": {
+      "choices": {
+        "value": "Value",
+        "value_template": "Value template"
+      }
+    },
+    "fixed_value": {
+      "choices": {
+        "power": "Power",
+        "power_template": "Power template",
+        "states_power": "States power"
       }
     }
   },
