@@ -48,6 +48,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Creați contoare",
+          "daily_energy_value": "Daily energy value",
           "name": "Nume",
           "on_time": "Timp pornit",
           "start_time": "Timpul de pornire",
@@ -87,11 +88,13 @@
       },
       "fixed": {
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Putere",
           "power_template": "Sablon de putere",
           "states_power": "Puterea starilor"
         },
         "data_description": {
+          "fixed_value": "Fixed value in Watts when the entity is ON",
           "power": "O valoare fixă a puterii în wați când entitatea este PORNITĂ",
           "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
           "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus"
@@ -290,6 +293,7 @@
           "attribute": "Specificați atributul. Când este lăsat gol, va fi luminozitate pentru lumini și procent pentru ventilatoare",
           "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20"
         },
+        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
         "title": "Configurație liniară"
       },
       "manufacturer": {
@@ -327,6 +331,7 @@
           "power": "Power for a single switch when turned on",
           "power_off": "Power for a single switch when turned off"
         },
+        "description": "Define the Multi switch power calculation options. See the [documentation]({docs_uri}) for more information.",
         "title": "Multi switch config"
       },
       "playbook": {
@@ -341,6 +346,7 @@
           "repeat": "Comutați când doriți să continuați să repetați manualul după finalizarea acestuia",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
         },
+        "description": "Define the playbook options. See the [documentation]({docs_uri}) for more information.",
         "title": "Configurare Playbook"
       },
       "power_advanced": {
@@ -542,6 +548,7 @@
       "daily_energy": {
         "title": "Daily energy options",
         "data": {
+          "daily_energy_value": "Daily energy value",
           "name": "Nume",
           "on_time": "Timp pornit",
           "start_time": "Start time",
@@ -571,6 +578,7 @@
       "fixed": {
         "title": "Fixed options",
         "data": {
+          "fixed_value": "Fixed value",
           "power": "Putere",
           "power_template": "Șablon de putere",
           "self_usage_included": "Self usage included",
@@ -812,6 +820,21 @@
           "power_factor": "Power factor",
           "voltage": "Voltage"
         }
+      }
+    }
+  },
+  "selector": {
+    "daily_energy_value": {
+      "choices": {
+        "value": "Value",
+        "value_template": "Value template"
+      }
+    },
+    "fixed_value": {
+      "choices": {
+        "power": "Power",
+        "power_template": "Power template",
+        "states_power": "States power"
       }
     }
   },
