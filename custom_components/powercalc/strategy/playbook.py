@@ -128,42 +128,56 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
     @callback
     def _execute_playbook_entry(self) -> None:
         """Execute one step of the playbook"""
-        if self._cancel_timer is not None:
-            self._cancel_timer()
-            self._cancel_timer = None
+        self._cancel_pending_timer()
 
         if not self._active_playbook:  # pragma: no cover
             _LOGGER.error("Could not execute next playbook entry. No active playbook")
             return
 
-        queue = self._active_playbook.queue
-        if len(queue) == 0:
-            if self._repeat:
-                _LOGGER.debug("Playbook %s repeating", self._active_playbook.key)
-                self._start_time = dt.utcnow()
-                queue.reset()
-                self._execute_playbook_entry()
-                return
-
-            _LOGGER.debug("Playbook %s completed", self._active_playbook.key)
-            self._active_playbook = None
+        playbook = self._active_playbook
+        if self._complete_or_repeat_playbook(playbook):
             return
 
-        entry = queue.dequeue()
+        entry = playbook.queue.dequeue()
+        self._schedule_playbook_entry_update(playbook, entry)
+
+    @callback
+    def _cancel_pending_timer(self) -> None:
+        if self._cancel_timer is not None:
+            self._cancel_timer()
+            self._cancel_timer = None
+
+    @callback
+    def _complete_or_repeat_playbook(self, playbook: Playbook) -> bool:
+        queue = playbook.queue
+        if len(queue) != 0:
+            return False
+
+        if self._repeat:
+            _LOGGER.debug("Playbook %s repeating", playbook.key)
+            self._start_time = dt.utcnow()
+            queue.reset()
+            self._execute_playbook_entry()
+            return True
+
+        _LOGGER.debug("Playbook %s completed", playbook.key)
+        self._active_playbook = None
+        return True
+
+    @callback
+    def _schedule_playbook_entry_update(self, playbook: Playbook, entry: PlaybookEntry) -> None:
+        """Schedule the next playbook power update."""
 
         @callback
         def _update_power(date_time: datetime) -> None:
             self._power = entry.power
-            _LOGGER.debug("playbook %s: Update power %.2f", self._active_playbook.key, self._power)  # type: ignore
+            _LOGGER.debug("playbook %s: Update power %.2f", playbook.key, self._power)
             self._update_callback(self._power)
-            # Schedule next update
             self._execute_playbook_entry()
 
         @callback
         def _cancel_pending_updates_on_stop(_: datetime) -> None:
-            if self._cancel_timer is not None:
-                self._cancel_timer()
-                self._cancel_timer = None
+            self._cancel_pending_timer()
             if self._cancel_stop_listener is not None:
                 self._cancel_stop_listener()
                 self._cancel_stop_listener = None
@@ -181,7 +195,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             self._hass,
             HassJob(
                 _update_power,
-                name=f"powercalc playbook {self._active_playbook.key}",
+                name=f"powercalc playbook {playbook.key}",
                 cancel_on_shutdown=True,
             ),
             self._start_time + timedelta(seconds=entry.time),
