@@ -55,17 +55,17 @@ def get_numeric_state_schema() -> vol.Schema:
     return make_entity_id_optional(cv.NUMERIC_STATE_CONDITION_SCHEMA.validators[0])
 
 
-def get_state_condition_attribute_schema(value: Any) -> dict[str, Any]:  # noqa: ANN401
+def get_state_condition_attribute_schema(value: object) -> dict[str, Any]:
     """Return the state attribute condition schema. We need to modify it to make entity_id optional."""
     return make_entity_id_optional(cv.STATE_CONDITION_ATTRIBUTE_SCHEMA)(value)  # type: ignore
 
 
-def get_state_condition_state_schema(value: Any) -> dict[str, Any]:  # noqa: ANN401
+def get_state_condition_state_schema(value: object) -> dict[str, Any]:
     """Return the state condition schema. We need to modify it to make entity_id optional."""
     return make_entity_id_optional(cv.STATE_CONDITION_STATE_SCHEMA)(value)  # type: ignore
 
 
-def get_state_schema(value: Any) -> dict[str, Any]:  # noqa: ANN401
+def get_state_schema(value: object) -> dict[str, Any]:
     """Validate a state condition."""
     if not isinstance(value, dict):
         raise vol.Invalid("Expected a dictionary")  # pragma: no cover

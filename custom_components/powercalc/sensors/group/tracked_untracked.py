@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from enum import StrEnum
 import logging
-from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
@@ -124,7 +123,7 @@ class TrackedPowerSensorFactory:
         # For auto mode, we also want to listen for any changes in the entity registry
         # Dynamically add/remove power sensors from the tracked group
         @callback
-        def _start_entity_registry_listener(_: Any) -> None:  # noqa ANN401
+        def _start_entity_registry_listener(_: Event) -> None:
             self.hass.bus.async_listen(EVENT_ENTITY_REGISTRY_UPDATED, self._handle_entity_registry_updated)
 
         self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _start_entity_registry_listener)

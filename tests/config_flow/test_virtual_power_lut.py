@@ -134,7 +134,7 @@ async def test_lut_not_autodiscovered_model_unsupported(
 
 async def test_lut_not_autodiscovered(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON)
-    light_entity._attr_unique_id = None  # noqa
+    light_entity._attr_unique_id = None  # noqa: SLF001
     await create_mock_light_entity(hass, light_entity)
 
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)

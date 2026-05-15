@@ -303,7 +303,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 hs = color_temperature_to_hs(attrs[ATTR_COLOR_TEMP_KELVIN]) if original_color_mode == ColorMode.COLOR_TEMP else attrs[ATTR_HS_COLOR]
                 light_setting.hue = int(hs[0] / 360 * 65535)
                 light_setting.saturation = int(hs[1] / 100 * 255)
-            except Exception:  # noqa: BLE001
+            except (KeyError, TypeError, ValueError):
                 _LOGGER.error(
                     "%s: Could not calculate power. no hue/sat set. Please check the attributes of your light in the developer tools.",
                     entity_state.entity_id,

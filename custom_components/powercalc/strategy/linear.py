@@ -119,9 +119,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def is_enabled(self, entity_state: State) -> bool:
         """Return if this strategy is enabled based on entity state."""
-        if self._source_entity.domain == media_player.DOMAIN and entity_state.state is not STATE_PLAYING:  # noqa: SIM103
-            return False
-        return True
+        return not (self._source_entity.domain == media_player.DOMAIN and entity_state.state is not STATE_PLAYING)
 
     def get_min_calibrate(self, value: int) -> tuple[int, float]:
         """Get closest lower value from calibration table."""

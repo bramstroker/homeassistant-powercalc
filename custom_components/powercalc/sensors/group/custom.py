@@ -554,7 +554,7 @@ class GroupedSensor(BaseEntity, SensorEntity):
         excluded_entities = self._sensor_config.get(CONF_EXCLUDE_ENTITIES) or []
         self._entities = set({entity for entity in entities if entity not in excluded_entities})
 
-    async def on_start(self, _: Any) -> None:  # noqa
+    async def on_start(self, _: HomeAssistant) -> None:
         """Initialize group sensor when HA is starting."""
         await self.init_domain_group()
 
@@ -882,10 +882,7 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
         )
 
         start_at_zero = self._sensor_config.get(CONF_GROUP_ENERGY_START_AT_ZERO, True)
-        if prev_state is None and start_at_zero:  # noqa: SIM108
-            delta = Decimal(0)
-        else:
-            delta = cur_value - prev_value
+        delta = Decimal(0) if prev_state is None and start_at_zero else cur_value - prev_value
 
         if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
             _LOGGER.debug(
@@ -995,7 +992,7 @@ class PreviousStateStore:
     def async_setup_dump(self) -> None:
         """Set up the listeners for persistence."""
 
-        async def _async_dump_states(*_: Any) -> None:  # noqa: ANN401
+        async def _async_dump_states(*_: object) -> None:
             await self.persist_states()
 
         # Dump states periodically
@@ -1006,7 +1003,7 @@ class PreviousStateStore:
             cancel_on_shutdown=True,
         )
 
-        async def _async_dump_states_at_stop(*_: Any) -> None:  # noqa: ANN401
+        async def _async_dump_states_at_stop(*_: object) -> None:
             cancel_interval()
             await self.persist_states()
 
