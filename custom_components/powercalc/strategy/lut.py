@@ -290,7 +290,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
             color_temp = attrs.get(ATTR_COLOR_TEMP_KELVIN)
             if color_temp is None:
                 _LOGGER.error(
-                    "%s: Could not calculate power. no color temp set. Please check the attributes of your light in the developer tools.",
+                    "%s: Could not calculate power. no color temp set. "
+                    "Please check the attributes of your light in the developer tools.",
                     entity_state.entity_id,
                 )
                 return None
@@ -300,12 +301,17 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if color_mode == ColorMode.HS:
             try:
                 original_color_mode = attrs.get(ATTR_COLOR_MODE)
-                hs = color_temperature_to_hs(attrs[ATTR_COLOR_TEMP_KELVIN]) if original_color_mode == ColorMode.COLOR_TEMP else attrs[ATTR_HS_COLOR]
+                hs = (
+                    color_temperature_to_hs(attrs[ATTR_COLOR_TEMP_KELVIN])
+                    if original_color_mode == ColorMode.COLOR_TEMP
+                    else attrs[ATTR_HS_COLOR]
+                )
                 light_setting.hue = int(hs[0] / 360 * 65535)
                 light_setting.saturation = int(hs[1] / 100 * 255)
             except (KeyError, TypeError, ValueError):
                 _LOGGER.error(
-                    "%s: Could not calculate power. no hue/sat set. Please check the attributes of your light in the developer tools.",
+                    "%s: Could not calculate power. no hue/sat set. "
+                    "Please check the attributes of your light in the developer tools.",
                     entity_state.entity_id,
                 )
                 return None

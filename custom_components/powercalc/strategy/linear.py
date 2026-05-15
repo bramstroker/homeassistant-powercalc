@@ -231,9 +231,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if not self._config.get(CONF_CALIBRATE):
             if self._source_entity.domain not in ALLOWED_DOMAINS:
                 raise StrategyConfigurationError(
-                    "Entity domain not supported for linear mode. Must be one of: {}, or use the calibrate option".format(
-                        ",".join(ALLOWED_DOMAINS),
-                    ),
+                    "Entity domain not supported for linear mode. "
+                    f"Must be one of: {','.join(ALLOWED_DOMAINS)}, or use the calibrate option",
                     "linear_unsupported_domain",
                 )
             if CONF_MAX_POWER not in self._config:
@@ -252,7 +251,11 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     async def get_value_entity(self) -> SourceEntity:
         """Set the value entity based on the current state."""
-        if self._source_entity.domain in (vacuum.DOMAIN, lawn_mower.DOMAIN) and self._attribute is None and self._source_entity.entity_entry:
+        if (
+            self._source_entity.domain in (vacuum.DOMAIN, lawn_mower.DOMAIN)
+            and self._attribute is None
+            and self._source_entity.entity_entry
+        ):
             # For vacuum cleaner and lawn mower, battery level is a separate entity
             related_entity = get_related_entity_by_device_class(
                 self._hass,

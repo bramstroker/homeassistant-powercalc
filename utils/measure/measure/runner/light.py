@@ -43,14 +43,15 @@ _LOGGER = logging.getLogger("measure")
 
 
 class LightRunner(MeasurementRunner):
-    """
-    This class is responsible for measuring the power usage of a light. It uses a LightController to control the light, and a PowerMeter
-    to measure the power usage. The measurements are exported as CSV files in export/<model_id>/<color_mode>.csv (or .csv.gz). The
-    model_id is retrieved from the LightController and color mode can be selected by user input or self.config.file (.env). The CSV files
-    contain one row per variation, where each column represents one property of that variation (e.g., brightness, hue, saturation). The last
-    column contains the measured power value in watt.
-    If you want to generate model JSON files for the LUT model, you can do so by answering yes to the question "Do you want to generate
-    model.json?".
+    """Measure the power usage of a light.
+
+    Uses a LightController to control the light, and a PowerMeter to measure the power usage.
+    The measurements are exported as CSV files in export/<model_id>/<color_mode>.csv (or .csv.gz).
+    The model_id is retrieved from the LightController and color mode can be selected by user
+    input or self.config.file (.env). The CSV files contain one row per variation, where each
+    column represents one property of that variation (e.g., brightness, hue, saturation). The
+    last column contains the measured power value in watt. If you want to generate model JSON
+    files for the LUT model, answer yes to the question "Do you want to generate model.json?".
 
     # CSV file export/<model-id>/hs.csv will be created with measurements for HS
     color mode (e.g., hue and saturation). The last column contains the measured
@@ -86,7 +87,10 @@ class LightRunner(MeasurementRunner):
         _LOGGER.info("Total number of variations: %d", len(all_variations))
         left_variations = all_variations.copy()
 
-        [self.run_mode(answers, measurement_info, all_variations, left_variations) for measurement_info in measurements_to_run]
+        [
+            self.run_mode(answers, measurement_info, all_variations, left_variations)
+            for measurement_info in measurements_to_run
+        ]
 
         return RunnerResult(
             model_json_data={
@@ -243,7 +247,11 @@ class LightRunner(MeasurementRunner):
         if not previous_variation:
             return
 
-        if isinstance(variation, ColorTempVariation) and isinstance(previous_variation, ColorTempVariation) and variation.ct < previous_variation.ct:
+        if (
+            isinstance(variation, ColorTempVariation)
+            and isinstance(previous_variation, ColorTempVariation)
+            and variation.ct < previous_variation.ct
+        ):
             _LOGGER.info("Extra waiting for significant CT change...")
             time.sleep(self.config.sleep_time_ct)
             return
@@ -599,8 +607,8 @@ class LightRunner(MeasurementRunner):
 
         Notes
         -------
-        This method will raise an exception when something goes wrong while reading or parsing the CSV file or when an unsupported color
-        mode is used in the CSV file.
+        This method will raise an exception when something goes wrong while reading or parsing
+        the CSV file or when an unsupported color mode is used in the CSV file.
         """
 
         with open(csv_file_path) as csv_file:

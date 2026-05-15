@@ -138,7 +138,7 @@ class RemoteLoader(Loader):
         async def _download_remote_library_json() -> dict[str, Any] | None:
             """
             Download library.json from Github.
-            If download is successful, save it to local storage to use as fallback in case of internet connection issues.
+            On success, save it to local storage as a fallback for internet connection issues.
             """
             _LOGGER.debug("Loading library.json from github")
 
@@ -182,7 +182,10 @@ class RemoteLoader(Loader):
         return {
             (manufacturer["dir_name"], manufacturer["full_name"])
             for manufacturer in self.library_contents.get("manufacturers", [])
-            if any(self._model_matches_filters(model, device_types, discovery_by) for model in manufacturer.get("models", []))
+            if any(
+                self._model_matches_filters(model, device_types, discovery_by)
+                for model in manufacturer.get("models", [])
+            )
         }
 
     @async_cache
@@ -225,7 +228,12 @@ class RemoteLoader(Loader):
     async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
         """Find matching model IDs in the library."""
         models = self.model_lookup.get(manufacturer, {})
-        return [model["id"] for phrase in search if (phrase_lower := phrase.lower()) in models for model in models[phrase_lower]]
+        return [
+            model["id"]
+            for phrase in search
+            if (phrase_lower := phrase.lower()) in models
+            for model in models[phrase_lower]
+        ]
 
     @async_cache
     async def find_model_migration(self, manufacturer: str, model: str) -> str | None:
@@ -274,7 +282,14 @@ class RemoteLoader(Loader):
             raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
         return model_info
 
-    async def _needs_update(self, model_info: LibraryModel, manufacturer: str, model: str, model_path: str, force_update: bool) -> bool:
+    async def _needs_update(
+        self,
+        model_info: LibraryModel,
+        manufacturer: str,
+        model: str,
+        model_path: str,
+        force_update: bool,
+    ) -> bool:
         """Check if the model needs to be updated."""
         if force_update:
             return True
@@ -287,7 +302,13 @@ class RemoteLoader(Loader):
         new_hash = model_info.get("hash")
         return existing_hash != new_hash
 
-    async def _download_profile_with_retry(self, manufacturer: str, model: str, storage_path: str, model_path: str) -> None:
+    async def _download_profile_with_retry(
+        self,
+        manufacturer: str,
+        model: str,
+        storage_path: str,
+        model_path: str,
+    ) -> None:
         """Attempt to download the profile, with retry logic and error handling."""
         try:
             model_info = self._get_library_model(manufacturer, model)
@@ -297,7 +318,11 @@ class RemoteLoader(Loader):
             self.profile_hashes[f"{manufacturer}/{model}"] = model_hash
             await self.hass.async_add_executor_job(self._write_profile_hashes, self.profile_hashes)
         except ProfileDownloadError as e:
-            path_exists, storage_path_exists = await self.hass.async_add_executor_job(self._profile_paths_exist, model_path, storage_path)
+            path_exists, storage_path_exists = await self.hass.async_add_executor_job(
+                self._profile_paths_exist,
+                model_path,
+                storage_path,
+            )
             if not path_exists:
                 if storage_path_exists:
                     await self.hass.async_add_executor_job(shutil.rmtree, storage_path)  # pragma: no cover
@@ -336,7 +361,10 @@ class RemoteLoader(Loader):
         """Retrieve the storage path for a given manufacturer and model."""
         return str(self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, manufacturer, model))
 
-    async def download_with_retry(self, callback: Callable[[], Coroutine[Any, Any, None | dict[str, Any]]]) -> None | dict[str, Any]:
+    async def download_with_retry(
+        self,
+        callback: Callable[[], Coroutine[Any, Any, None | dict[str, Any]]],
+    ) -> None | dict[str, Any]:
         """Download a file from a remote endpoint with retries"""
         max_retries = 3
         retry_count = 0
@@ -348,7 +376,9 @@ class RemoteLoader(Loader):
                 _LOGGER.debug(e)
                 retry_count += 1
                 if retry_count == max_retries:
-                    raise ProfileDownloadError(f"Failed to download even after {max_retries} retries, falling back to local copy") from e
+                    raise ProfileDownloadError(
+                        f"Failed to download even after {max_retries} retries, falling back to local copy",
+                    ) from e
 
                 await asyncio.sleep(self.retry_timeout)
                 _LOGGER.warning("Failed to download, retrying... (Attempt %d of %d)", retry_count + 1, max_retries)

@@ -101,7 +101,14 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from custom_components.powercalc.device_binding import get_device_info
-from custom_components.powercalc.group_include.filter import AreaFilter, CompositeFilter, DeviceFilter, EntityFilter, FilterOperator, FloorFilter
+from custom_components.powercalc.group_include.filter import (
+    AreaFilter,
+    CompositeFilter,
+    DeviceFilter,
+    EntityFilter,
+    FilterOperator,
+    FloorFilter,
+)
 from custom_components.powercalc.group_include.include import find_entities
 from custom_components.powercalc.helpers import async_cache
 from custom_components.powercalc.sensors.abstract import (
@@ -469,11 +476,17 @@ class GroupedSensor(BaseEntity, SensorEntity):
         self._entities = entities
         self._sensor_config = sensor_config
         if self._is_energy_sensor:
-            self._rounding_digits = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
-            self._update_interval: int = int(sensor_config.get(CONF_GROUP_ENERGY_UPDATE_INTERVAL, DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL))
+            self._rounding_digits = int(
+                sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION),
+            )
+            self._update_interval: int = int(
+                sensor_config.get(CONF_GROUP_ENERGY_UPDATE_INTERVAL, DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL),
+            )
         else:
             self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
-            self._update_interval = int(sensor_config.get(CONF_GROUP_POWER_UPDATE_INTERVAL, DEFAULT_GROUP_POWER_UPDATE_INTERVAL))
+            self._update_interval = int(
+                sensor_config.get(CONF_GROUP_POWER_UPDATE_INTERVAL, DEFAULT_GROUP_POWER_UPDATE_INTERVAL),
+            )
         self._attr_suggested_display_precision = self._rounding_digits
         if unique_id:
             self._attr_unique_id = unique_id
@@ -544,7 +557,11 @@ class GroupedSensor(BaseEntity, SensorEntity):
         domain = self._sensor_config.get(CONF_DOMAIN)
         if domain == CONF_ALL:
             entity_registry = er.async_get(self.hass)
-            entities = {entity.entity_id for entity in entity_registry.entities.values() if entity.device_class == self.device_class}
+            entities = {
+                entity.entity_id
+                for entity in entity_registry.entities.values()
+                if entity.device_class == self.device_class
+            }
         else:
             entities = self.hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES).get(domain, [])
             entities = filter_entity_list_by_class(
@@ -578,7 +595,9 @@ class GroupedSensor(BaseEntity, SensorEntity):
         """Initial update for the group sensor state."""
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
-        available_states = [state for state in states if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]]
+        available_states = [
+            state for state in states if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
+        ]
         if not available_states and not self._ignore_unavailable_state:
             new_state: Decimal | str = STATE_UNAVAILABLE
         else:
@@ -733,7 +752,9 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
         member_available_states: list[State],
         member_states: list[State],
     ) -> Decimal | str:
-        self._member_states = {state.entity_id: self._get_state_value_in_native_unit(state) for state in member_available_states}
+        self._member_states = {
+            state.entity_id: self._get_state_value_in_native_unit(state) for state in member_available_states
+        }
         return self.get_summed_state()
 
     def calculate_new_state(self, state: State) -> Decimal | str:
@@ -828,8 +849,9 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
         member_available_states: list[State],
         member_states: list[State],
     ) -> Decimal:
-        """Calculate the new group energy sensor state
-        For each member sensor we calculate the delta by looking at the previous known state and compare it to the current.
+        """Calculate the new group energy sensor state.
+
+        For each member, calculate the delta between the previous known state and the current.
         """
         group_sum = Decimal(self._native_value_exact) if self._native_value_exact else Decimal(0)
         _LOGGER.debug("%s: Recalculate, current value: %s", self.entity_id, group_sum)
@@ -939,7 +961,9 @@ class PreviousStateStore:
             _LOGGER.debug("Load previous energy sensor states from store")
             stored_states = await instance.store.async_load() or {}
             for group, entities in stored_states.items():
-                instance.states[group] = {entity_id: State.from_dict(json_state) for (entity_id, json_state) in entities.items()}
+                instance.states[group] = {
+                    entity_id: State.from_dict(json_state) for (entity_id, json_state) in entities.items()
+                }
         except HomeAssistantError as exc:  # pragma: no cover
             _LOGGER.error("Error loading previous energy sensor states", exc_info=exc)
 

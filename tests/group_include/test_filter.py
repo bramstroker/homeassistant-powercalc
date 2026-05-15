@@ -224,7 +224,12 @@ async def test_category_filter(
     expected_result: bool,
     expect_exception: bool,
 ) -> None:
-    entry = RegistryEntryWithDefaults(entity_id="sensor.test", unique_id="abc", platform="test", entity_category=category)
+    entry = RegistryEntryWithDefaults(
+        entity_id="sensor.test",
+        unique_id="abc",
+        platform="test",
+        entity_category=category,
+    )
 
     if expect_exception:
         with pytest.raises(SensorConfigurationError):

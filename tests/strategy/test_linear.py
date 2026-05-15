@@ -359,7 +359,12 @@ async def test_value_entity_state_not_found(
         ),
     ],
 )
-async def test_is_enabled(hass: HomeAssistant, source_entity: SourceEntity, state: State, expected_result: bool) -> None:
+async def test_is_enabled(
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    state: State,
+    expected_result: bool,
+) -> None:
     strategy = await _create_strategy_instance(
         hass,
         source_entity,

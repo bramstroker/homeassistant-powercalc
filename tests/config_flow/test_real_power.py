@@ -173,7 +173,14 @@ async def test_attach_to_custom_device(hass: HomeAssistant) -> None:
             ),
         },
     )
-    mock_device(hass, device_id, "foo", "bar", identifiers={("sensor", "identifier_test")}, connections={("mac", "30:31:32:33:34:35")})
+    mock_device(
+        hass,
+        device_id,
+        "foo",
+        "bar",
+        identifiers={("sensor", "identifier_test")},
+        connections={("mac", "30:31:32:33:34:35")},
+    )
 
     result = await select_menu_item(hass, Step.REAL_POWER)
     assert result["type"] == data_entry_flow.FlowResultType.FORM

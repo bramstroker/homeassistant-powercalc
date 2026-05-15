@@ -52,7 +52,11 @@ async def find_auto_tracked_power_entities(hass: HomeAssistant, exclude_entities
     if exclude_entities:
         entity_filter = LambdaFilter(lambda entity: entity.entity_id not in exclude_entities)
     result = await find_entities(hass, entity_filter)
-    return {entity.entity_id for entity in result.resolved if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)}
+    return {
+        entity.entity_id
+        for entity in result.resolved
+        if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)
+    }
 
 
 class TrackedPowerSensorFactory:
@@ -66,7 +70,9 @@ class TrackedPowerSensorFactory:
         """Create tracked/untracked group sensors."""
 
         unique_id = str(self.config.get(CONF_UNIQUE_ID))
-        main_power_sensor = str(self.config.get(CONF_MAIN_POWER_SENSOR)) if self.config.get(CONF_MAIN_POWER_SENSOR) else None
+        main_power_sensor = (
+            str(self.config.get(CONF_MAIN_POWER_SENSOR)) if self.config.get(CONF_MAIN_POWER_SENSOR) else None
+        )
         self.config[CONF_DISABLE_EXTENDED_ATTRIBUTES] = True  # prevent adding all entities in the state attributes
 
         self.tracked_entities = await self.get_tracked_power_entities()

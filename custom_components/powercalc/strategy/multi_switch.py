@@ -44,7 +44,8 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
     async def calculate(self, entity_state: State) -> Decimal | None:
         if self.known_states is None:
             self.known_states = {
-                entity_id: (state.state if (state := self.hass.states.get(entity_id)) else STATE_UNAVAILABLE) for entity_id in self.switch_entities
+                entity_id: (state.state if (state := self.hass.states.get(entity_id)) else STATE_UNAVAILABLE)
+                for entity_id in self.switch_entities
             }
 
         if entity_state.entity_id != DUMMY_ENTITY_ID and entity_state.entity_id in self.switch_entities:

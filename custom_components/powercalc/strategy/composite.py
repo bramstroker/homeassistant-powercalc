@@ -158,7 +158,9 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
             if isinstance(strategy, PlaybookStrategy):
                 await self.activate_playbook(strategy)
 
-            if (entity_state.state == STATE_OFF and strategy.can_calculate_standby()) or entity_state.state != STATE_OFF:
+            if (
+                entity_state.state == STATE_OFF and strategy.can_calculate_standby()
+            ) or entity_state.state != STATE_OFF:
                 value = await strategy.calculate(entity_state)
                 if value is not None:
                     if self.mode == CompositeMode.STOP_AT_FIRST:
@@ -204,7 +206,9 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
                     track_templates,
                 )
 
-        track_entities = [entity for sub_strategy in self.strategies for entity in sub_strategy.strategy.get_entities_to_track()]
+        track_entities = [
+            entity for sub_strategy in self.strategies for entity in sub_strategy.strategy.get_entities_to_track()
+        ]
         return track_templates + track_entities
 
     def can_calculate_standby(self) -> bool:

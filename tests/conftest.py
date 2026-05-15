@@ -171,7 +171,10 @@ def mock_remote_loader(request: SubRequest) -> Generator:
         shutil.copytree(source_dir, storage_path)
 
     remote_loader_class = "custom_components.powercalc.power_profile.loader.remote.RemoteLoader"
-    with patch(f"{remote_loader_class}.download_profile") as mock_download, patch(f"{remote_loader_class}.load_library_json") as mock_load_lib:
+    with (
+        patch(f"{remote_loader_class}.download_profile") as mock_download,
+        patch(f"{remote_loader_class}.load_library_json") as mock_load_lib,
+    ):
         mock_download.side_effect = side_effect
 
         mock_load_lib.side_effect = _load_test_library_json

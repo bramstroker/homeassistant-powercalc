@@ -95,7 +95,9 @@ DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.UPS: SENSOR_DOMAIN,
 }
 
-SUPPORTED_DOMAINS: set[str] = {domain for domains in DEVICE_TYPE_DOMAIN.values() for domain in (domains if isinstance(domains, set) else {domains})}
+SUPPORTED_DOMAINS: set[str] = {
+    domain for domains in DEVICE_TYPE_DOMAIN.values() for domain in (domains if isinstance(domains, set) else {domains})
+}
 
 
 def _build_domain_device_type_mapping() -> Mapping[str, set[DeviceType]]:
@@ -393,7 +395,8 @@ class PowerProfile:
 
         if found_profile is None:
             raise ModelNotSupportedError(
-                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, sub_profile: {sub_profile})",
+                f"Sub profile not found (manufacturer: {self._manufacturer}, "
+                f"model: {self._model}, sub_profile: {sub_profile})",
             )
 
         self._sub_profile_dir = os.path.join(self._directory, sub_profile)

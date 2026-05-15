@@ -28,7 +28,13 @@ from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor
 from custom_components.powercalc.sensors.group.subtract import SubtractGroupSensor
 from custom_components.powercalc.sensors.group.tracked_untracked import TrackedPowerSensorFactory
 from custom_components.powercalc.sensors.utility_meter import VirtualUtilityMeter
-from tests.common import assert_entity_state, create_mock_config_entry, mock_sensors_in_registry, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    create_mock_config_entry,
+    mock_sensors_in_registry,
+    run_powercalc_setup,
+    set_states,
+)
 
 
 async def test_main_power_is_removed_from_tracked_entities(hass: HomeAssistant) -> None:

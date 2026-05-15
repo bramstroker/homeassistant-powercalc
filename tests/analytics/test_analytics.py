@@ -104,7 +104,10 @@ async def test_send_analytics_success(
     assert posted_json["counts"]["by_device_type"] == {DeviceType.LIGHT: 1}
     assert posted_json["counts"]["by_source_domain"] == {"light": 1, "switch": 1}
     assert posted_json["counts"]["by_entity_type"] == {EntityType.POWER_SENSOR: 2, EntityType.ENERGY_SENSOR: 2}
-    assert posted_json["counts"]["by_power_profile_source"] == {PowerProfileSource.MANUAL: 1, PowerProfileSource.LIBRARY_BUILTIN: 1}
+    assert posted_json["counts"]["by_power_profile_source"] == {
+        PowerProfileSource.MANUAL: 1,
+        PowerProfileSource.LIBRARY_BUILTIN: 1,
+    }
 
 
 @pytest.mark.usefixtures("payload_mock")

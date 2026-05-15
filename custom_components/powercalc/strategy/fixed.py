@@ -84,6 +84,10 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             track_templates.append(TrackTemplate(self._power, None, None))
 
         if self._per_state_power:
-            track_templates.extend(TrackTemplate(power, None, None) for power in self._per_state_power.values() if isinstance(power, Template))
+            track_templates.extend(
+                TrackTemplate(power, None, None)
+                for power in self._per_state_power.values()
+                if isinstance(power, Template)
+            )
 
         return track_templates

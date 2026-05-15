@@ -3,7 +3,11 @@ from typing import Any
 import pytest
 import voluptuous as vol
 
-from custom_components.powercalc.flow_helper.common import fill_schema_defaults, unwrap_choose_selector, wrap_choose_selector
+from custom_components.powercalc.flow_helper.common import (
+    fill_schema_defaults,
+    unwrap_choose_selector,
+    wrap_choose_selector,
+)
 
 
 @pytest.mark.parametrize(

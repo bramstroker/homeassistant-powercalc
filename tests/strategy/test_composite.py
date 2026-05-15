@@ -14,7 +14,11 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, async_fire_time_changed, mock_registry
+from pytest_homeassistant_custom_component.common import (
+    RegistryEntryWithDefaults,
+    async_fire_time_changed,
+    mock_registry,
+)
 
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
@@ -207,10 +211,16 @@ async def test_nested_conditions(hass: HomeAssistant) -> None:
     )
     assert_entity_state(hass, "sensor.test_power", "10.00")
 
-    await set_states(hass, [("binary_sensor.test1", STATE_OFF), ("binary_sensor.test2", STATE_OFF), ("binary_sensor.test3", STATE_ON)])
+    await set_states(
+        hass,
+        [("binary_sensor.test1", STATE_OFF), ("binary_sensor.test2", STATE_OFF), ("binary_sensor.test3", STATE_ON)],
+    )
     assert_entity_state(hass, "sensor.test_power", "10.00")
 
-    await set_states(hass, [("binary_sensor.test1", STATE_ON), ("binary_sensor.test2", STATE_OFF), ("binary_sensor.test3", STATE_ON)])
+    await set_states(
+        hass,
+        [("binary_sensor.test1", STATE_ON), ("binary_sensor.test2", STATE_OFF), ("binary_sensor.test3", STATE_ON)],
+    )
     assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
 
 
@@ -507,7 +517,10 @@ async def test_state_attribute_entity_id(hass: HomeAssistant) -> None:
 async def test_lut(hass: HomeAssistant) -> None:
     light_entity = "light.test"
     power_entity = "sensor.test_power"
-    await run_powercalc_setup(hass, {CONF_ENTITY_ID: light_entity, CONF_MANUFACTURER: "test", CONF_MODEL: "composite_lut"})
+    await run_powercalc_setup(
+        hass,
+        {CONF_ENTITY_ID: light_entity, CONF_MANUFACTURER: "test", CONF_MODEL: "composite_lut"},
+    )
 
     assert hass.states.get(power_entity)
 

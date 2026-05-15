@@ -1,7 +1,13 @@
 from homeassistant.const import CONF_ENTITY_ID, STATE_IDLE, STATE_PLAYING
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc.const import CONF_CALCULATION_ENABLED_CONDITION, CONF_LINEAR, CONF_MAX_POWER, CONF_MODE, CalculationStrategy
+from custom_components.powercalc.const import (
+    CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_LINEAR,
+    CONF_MAX_POWER,
+    CONF_MODE,
+    CalculationStrategy,
+)
 from tests.common import assert_entity_state, run_powercalc_setup, set_states
 from tests.conftest import MockEntityWithModel
 

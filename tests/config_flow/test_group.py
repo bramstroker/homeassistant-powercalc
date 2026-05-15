@@ -378,7 +378,10 @@ async def test_include_area_powercalc_only(
         },
     )
 
-    await create_mock_config_entry(hass, {CONF_ENTITY_ID: "switch.switch", CONF_NAME: "Test", CONF_FIXED: {CONF_POWER: 5}})
+    await create_mock_config_entry(
+        hass,
+        {CONF_ENTITY_ID: "switch.switch", CONF_NAME: "Test", CONF_FIXED: {CONF_POWER: 5}},
+    )
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
     user_input = {

@@ -875,7 +875,11 @@ async def test_associate_entry_to_existing_group(hass: HomeAssistant) -> None:
             CONF_NAME: "MyGroup",
         },
     )
-    config_entry_sensor = await create_mocked_virtual_power_sensor_entry(hass, "MySensor", extra_config={CONF_GROUP: config_entry_group.entry_id})
+    config_entry_sensor = await create_mocked_virtual_power_sensor_entry(
+        hass,
+        "MySensor",
+        extra_config={CONF_GROUP: config_entry_group.entry_id},
+    )
 
     assert config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS) == [config_entry_sensor.entry_id]
     assert CONF_GROUP not in config_entry_sensor.data
@@ -959,7 +963,10 @@ async def test_error_is_logged_when_config_entry_associated_to_non_existing_grou
         },
     )
 
-    assert "ConfigEntry Mock Title: Cannot add/remove to group 1l3b47ropjnksgkd1rh30e8opvqwnngt. It does not exist" in caplog.text
+    assert (
+        "ConfigEntry Mock Title: Cannot add/remove to group 1l3b47ropjnksgkd1rh30e8opvqwnngt. It does not exist"
+        in caplog.text
+    )
 
 
 async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
@@ -1156,7 +1163,10 @@ async def test_delta_calculation_precision(hass: HomeAssistant) -> None:
     ]
 
     for energy_state, expected_group_state in test_values:
-        await set_states(hass, [("sensor.a_energy", energy_state, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})])
+        await set_states(
+            hass,
+            [("sensor.a_energy", energy_state, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})],
+        )
         assert_entity_state(hass, "sensor.testgroup_energy", expected_group_state)
 
 
@@ -1167,7 +1177,10 @@ async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) 
         ["sensor.a_energy", "sensor.b_energy"],
     )
 
-    await set_states(hass, [("sensor.testgroup_energy", "5.00"), ("sensor.a_energy", "2.00"), ("sensor.b_energy", "3.00")])
+    await set_states(
+        hass,
+        [("sensor.testgroup_energy", "5.00"), ("sensor.a_energy", "2.00"), ("sensor.b_energy", "3.00")],
+    )
     assert_entity_state(hass, "sensor.testgroup_energy", "5.0000")
 
     with patch(
@@ -1669,7 +1682,11 @@ async def test_get_group_entities_action(hass: HomeAssistant) -> None:
         blocking=True,
         return_response=True,
     )
-    assert res["sensor.testgroup_energy"][ATTR_ENTITIES] == {"sensor.test1_energy", "sensor.test2_energy", "sensor.test3_energy"}
+    assert res["sensor.testgroup_energy"][ATTR_ENTITIES] == {
+        "sensor.test1_energy",
+        "sensor.test2_energy",
+        "sensor.test3_energy",
+    }
 
 
 async def test_debug_group_action_for_power_group(hass: HomeAssistant) -> None:
@@ -1907,7 +1924,8 @@ async def test_energy_throttle(hass: HomeAssistant, freezer: FrozenDateTimeFacto
 
     advance(DEFAULT_ENERGY_UPDATE_INTERVAL + 2)
     # Do another state change after the throttle period has expired
-    # This state change should be processed and written to state machine, in addition to previously collected state changes
+    # This state change should be processed and written to state machine,
+    # in addition to previously collected state changes
     await set_states(hass, [("sensor.b_energy", "4.25")])
     advance(DEFAULT_ENERGY_UPDATE_INTERVAL + 2)
 

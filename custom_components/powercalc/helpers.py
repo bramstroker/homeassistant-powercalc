@@ -154,7 +154,10 @@ def collect_placeholders(data: list | str | dict[str, Any]) -> set[str]:
     return found
 
 
-def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[str, str]) -> list | str | dict[str, Any]:
+def replace_placeholders(
+    data: list | str | dict[str, Any],
+    replacements: dict[str, str],
+) -> list | str | dict[str, Any]:
     """Replace placeholders in a dictionary with values from a replacement dictionary."""
     if isinstance(data, dict):
         for key, value in data.items():
@@ -304,7 +307,12 @@ def _get_related_entity_for_device(
         if matcher(entity_entry)
     ]
     if not related_entities:
-        _LOGGER.debug("No related entities found for device %s with %s %s", source_entity.device_entry.id, match_label, match_value)
+        _LOGGER.debug(
+            "No related entities found for device %s with %s %s",
+            source_entity.device_entry.id,
+            match_label,
+            match_value,
+        )
         return None
 
     return related_entities[0]

@@ -51,7 +51,10 @@ from custom_components.powercalc.flow_helper.common import (
     wrap_choose_selector,
 )
 from custom_components.powercalc.flow_helper.flows.global_configuration import get_global_powercalc_config
-from custom_components.powercalc.flow_helper.flows.library import SCHEMA_POWER_OPTIONS_LIBRARY, SCHEMA_POWER_SMART_SWITCH
+from custom_components.powercalc.flow_helper.flows.library import (
+    SCHEMA_POWER_OPTIONS_LIBRARY,
+    SCHEMA_POWER_SMART_SWITCH,
+)
 from custom_components.powercalc.flow_helper.profile_preview import PREVIEW_NAME
 from custom_components.powercalc.flow_helper.schema import (
     SCHEMA_ENERGY_SENSOR_TOGGLE,
@@ -142,9 +145,15 @@ SCHEMA_POWER_FIXED = vol.Schema(
 
 SCHEMA_POWER_LINEAR = vol.Schema(
     {
-        vol.Optional(CONF_MIN_POWER): selector.NumberSelector(selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step="any")),
-        vol.Optional(CONF_MAX_POWER): selector.NumberSelector(selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step="any")),
-        vol.Optional(CONF_GAMMA_CURVE): selector.NumberSelector(selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step="any")),
+        vol.Optional(CONF_MIN_POWER): selector.NumberSelector(
+            selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step="any"),
+        ),
+        vol.Optional(CONF_MAX_POWER): selector.NumberSelector(
+            selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step="any"),
+        ),
+        vol.Optional(CONF_GAMMA_CURVE): selector.NumberSelector(
+            selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step="any"),
+        ),
         vol.Optional(CONF_CALIBRATE): selector.ObjectSelector(
             selector.ObjectSelectorConfig(
                 fields={
@@ -180,7 +189,9 @@ def unwrap_strategy_user_input(strategy: CalculationStrategy, user_input: dict[s
     if strategy == CalculationStrategy.FIXED:
         unwrap_choose_selector(user_input, CONF_FIXED_VALUE, fixed_choice_key_from_validated_value)
     if CONF_STATE_TRIGGER in user_input and isinstance(user_input[CONF_STATE_TRIGGER], list):
-        user_input[CONF_STATE_TRIGGER] = {item[CONF_STATE]: item[CONF_PLAYBOOK_ID] for item in user_input[CONF_STATE_TRIGGER]}
+        user_input[CONF_STATE_TRIGGER] = {
+            item[CONF_STATE]: item[CONF_PLAYBOOK_ID] for item in user_input[CONF_STATE_TRIGGER]
+        }
     return user_input
 
 
@@ -191,7 +202,10 @@ def wrap_strategy_form_data(strategy: CalculationStrategy, form_data: dict[str, 
     if CONF_STATE_TRIGGER in form_data and isinstance(form_data[CONF_STATE_TRIGGER], dict):
         form_data = {
             **form_data,
-            CONF_STATE_TRIGGER: [{CONF_STATE: state, CONF_PLAYBOOK_ID: playbook_id} for state, playbook_id in form_data[CONF_STATE_TRIGGER].items()],
+            CONF_STATE_TRIGGER: [
+                {CONF_STATE: state, CONF_PLAYBOOK_ID: playbook_id}
+                for state, playbook_id in form_data[CONF_STATE_TRIGGER].items()
+            ],
         }
     return form_data
 
@@ -322,7 +336,9 @@ class VirtualPowerFlow:
                             },
                             CONF_PATH: {
                                 "required": True,
-                                "selector": {"select": {"options": playbook_files, "mode": "dropdown", "custom_value": True}},
+                                "selector": {
+                                    "select": {"options": playbook_files, "mode": "dropdown", "custom_value": True},
+                                },
                             },
                         },
                         multiple=True,
@@ -457,7 +473,11 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
                 user_input.get(CONF_MODE) or CalculationStrategy.LUT,
             )
             entity_id = user_input.get(CONF_ENTITY_ID)
-            if selected_strategy is not CalculationStrategy.PLAYBOOK and user_input.get(CONF_NAME) is None and entity_id is None:
+            if (
+                selected_strategy is not CalculationStrategy.PLAYBOOK
+                and user_input.get(CONF_NAME) is None
+                and entity_id is None
+            ):
                 errors[CONF_ENTITY_ID] = "entity_mandatory"
 
             if not errors:

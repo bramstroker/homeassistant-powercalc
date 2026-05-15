@@ -24,7 +24,7 @@ async def remove_power_sensor_from_associated_groups(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
 ) -> list[ConfigEntry]:
-    """When the user remove a virtual power config entry we need to update all the groups which this sensor belongs to."""
+    """When the user removes a virtual power config entry, update all groups this sensor belongs to."""
     group_entries = get_groups_having_member(hass, config_entry)
 
     for group_entry in group_entries:
@@ -130,7 +130,9 @@ async def add_to_associated_group(
 
 def get_entries_having_subgroup(hass: HomeAssistant, subgroup_entry: ConfigEntry) -> list[ConfigEntry]:
     """Get all virtual power entries which have the subgroup in their subgroups list."""
-    return [entry for entry in get_group_entries(hass) if subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])]
+    return [
+        entry for entry in get_group_entries(hass) if subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])
+    ]
 
 
 def get_groups_having_member(hass: HomeAssistant, member_entry: ConfigEntry) -> list[ConfigEntry]:
@@ -138,7 +140,8 @@ def get_groups_having_member(hass: HomeAssistant, member_entry: ConfigEntry) -> 
     return [
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and member_entry.entry_id in (entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
+        and member_entry.entry_id in (entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
     ]
 
 
@@ -154,4 +157,6 @@ def get_group_entries(hass: HomeAssistant, group_type: GroupType | None = None) 
 
 @callback
 def get_entries_excluding_global_config(hass: HomeAssistant) -> list[ConfigEntry]:
-    return [entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.unique_id != ENTRY_GLOBAL_CONFIG_UNIQUE_ID]
+    return [
+        entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.unique_id != ENTRY_GLOBAL_CONFIG_UNIQUE_ID
+    ]

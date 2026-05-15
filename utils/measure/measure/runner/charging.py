@@ -125,7 +125,9 @@ class ChargingRunner(MeasurementRunner):
             inquirer.List(
                 name=QUESTION_CHARGING_DEVICE_TYPE,
                 message="Select the charging device type",
-                choices=[(charging_device_type.value, charging_device_type) for charging_device_type in ChargingDeviceType],
+                choices=[
+                    (charging_device_type.value, charging_device_type) for charging_device_type in ChargingDeviceType
+                ],
             ),
         ]
         questions.extend(self.controller.get_questions())

@@ -51,7 +51,13 @@ async def test_calibrate_list(hass: HomeAssistant) -> None:
     result = await set_virtual_power_configuration(
         hass,
         result,
-        {CONF_CALIBRATE: [{CONF_VALUE: 1, CONF_POWER: 10}, {CONF_VALUE: 20, CONF_POWER: 25}, {CONF_VALUE: 40, CONF_POWER: 50}]},
+        {
+            CONF_CALIBRATE: [
+                {CONF_VALUE: 1, CONF_POWER: 10},
+                {CONF_VALUE: 20, CONF_POWER: 25},
+                {CONF_VALUE: 40, CONF_POWER: 50},
+            ],
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY

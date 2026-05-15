@@ -90,7 +90,11 @@ def remove_stale_devices(
         )
 
 
-def get_device_info(hass: HomeAssistant, sensor_config: ConfigType, source_entity: SourceEntity | None) -> DeviceInfo | None:
+def get_device_info(
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    source_entity: SourceEntity | None,
+) -> DeviceInfo | None:
     """
     Get device info for a given powercalc entity configuration.
     Prefer user configured device, when it is not set fallback to the same device as the source entity

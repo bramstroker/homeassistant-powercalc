@@ -21,7 +21,11 @@ class CompositeLoader(Loader):
     ) -> set[tuple[str, str]]:
         """Get listing of available manufacturers."""
 
-        return {manufacturer for loader in self.loaders for manufacturer in await loader.get_manufacturer_listing(device_types, discovery_by)}
+        return {
+            manufacturer
+            for loader in self.loaders
+            for manufacturer in await loader.get_manufacturer_listing(device_types, discovery_by)
+        }
 
     async def find_manufacturers(self, search: str) -> set[str]:
         """Check if a manufacturer is available. Also must check aliases."""
@@ -43,7 +47,11 @@ class CompositeLoader(Loader):
     ) -> set[tuple[str, str]]:
         """Get listing of available models and display names for a given manufacturer."""
 
-        return {model for loader in self.loaders for model in await loader.get_model_listing(manufacturer, device_types, discovery_by)}
+        return {
+            model
+            for loader in self.loaders
+            for model in await loader.get_model_listing(manufacturer, device_types, discovery_by)
+        }
 
     async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
         for loader in self.loaders:

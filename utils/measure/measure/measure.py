@@ -107,8 +107,8 @@ class Measure:
     def start(self) -> None:
         """Starts the measurement session.
 
-        This method asks the user for the required information, sets up the runner and power meter and starts the measurement
-        session.
+        This method asks the user for the required information, sets up the runner and power meter,
+        and starts the measurement session.
 
         Notes
         -----
@@ -139,7 +139,10 @@ class Measure:
         export_directory = self._prepare_export_directory(answers, generate_model_json)
 
         if answers.get(QUESTION_DUMMY_LOAD, False):
-            input("Please connect the appliance you want to measure in parallel to the dummy load and press enter to start measurement session...")
+            input(
+                "Please connect the appliance you want to measure in parallel to the dummy load "
+                "and press enter to start measurement session...",
+            )
         runner_result = self._run_measurement(answers, export_directory)
 
         generate_model_json = generate_model_json and bool(export_directory)
@@ -261,7 +264,10 @@ class Measure:
                 ),
                 inquirer.Confirm(
                     name=QUESTION_DUMMY_LOAD,
-                    message="Do you want to use a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
+                    message=(
+                        "Do you want to use a dummy load? This can help to be able to measure "
+                        "standby power and low brightness levels correctly"
+                    ),
                     default=False,
                 ),
                 inquirer.Text(

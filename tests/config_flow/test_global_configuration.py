@@ -64,7 +64,13 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-from tests.common import assert_entity_state, create_mock_config_entry, get_simple_fixed_config, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    create_mock_config_entry,
+    get_simple_fixed_config,
+    run_powercalc_setup,
+    set_states,
+)
 from tests.config_flow.common import (
     handle_options_flow_update,
     initialize_options_flow,
@@ -171,13 +177,20 @@ async def test_config_flow(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "user_input,expected_step",
     [
-        ({CONF_CREATE_ENERGY_SENSORS: False, CONF_CREATE_UTILITY_METERS: True}, Step.GLOBAL_CONFIGURATION_UTILITY_METER),
+        (
+            {CONF_CREATE_ENERGY_SENSORS: False, CONF_CREATE_UTILITY_METERS: True},
+            Step.GLOBAL_CONFIGURATION_UTILITY_METER,
+        ),
         ({CONF_CREATE_ENERGY_SENSORS: True, CONF_CREATE_UTILITY_METERS: True}, Step.GLOBAL_CONFIGURATION_ENERGY),
         ({CONF_CREATE_ENERGY_SENSORS: True, CONF_CREATE_UTILITY_METERS: False}, Step.GLOBAL_CONFIGURATION_ENERGY),
         ({CONF_CREATE_ENERGY_SENSORS: False, CONF_CREATE_UTILITY_METERS: False}, None),
     ],
 )
-async def test_energy_and_utility_options_skipped(hass: HomeAssistant, user_input: dict[str, Any], expected_step: Step | None) -> None:
+async def test_energy_and_utility_options_skipped(
+    hass: HomeAssistant,
+    user_input: dict[str, Any],
+    expected_step: Step | None,
+) -> None:
     """Test the energy and utility_meter options are only shown when relevant."""
     result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
 
@@ -397,7 +410,12 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
 
     assert_entity_state(hass, "sensor.test_power", "50.00")
 
-    await handle_options_flow_update(hass, global_config_entry, Step.GLOBAL_CONFIGURATION, {CONF_POWER_SENSOR_PRECISION: 4})
+    await handle_options_flow_update(
+        hass,
+        global_config_entry,
+        Step.GLOBAL_CONFIGURATION,
+        {CONF_POWER_SENSOR_PRECISION: 4},
+    )
     await asyncio.sleep(0.1)
 
     assert_entity_state(hass, "sensor.test_power", "50.0000")

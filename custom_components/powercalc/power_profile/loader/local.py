@@ -102,7 +102,9 @@ class LocalLoader(Loader):
         _model = model.lower()
 
         if self._is_custom_directory:
-            model_path, model_json = await self._hass.async_add_executor_job(partial(self._load_custom_model, _manufacturer, _model))
+            model_path, model_json = await self._hass.async_add_executor_job(
+                partial(self._load_custom_model, _manufacturer, _model),
+            )
             return model_json, model_path
 
         lib_models = self._manufacturer_model_listing.get(_manufacturer)
@@ -206,7 +208,9 @@ class LocalLoader(Loader):
         model_path = os.path.join(self._data_directory)
         model_json_path = os.path.join(model_path, "model.json")
         if not os.path.exists(model_json_path):
-            raise LibraryLoadingError(f"model.json not found for manufacturer {manufacturer} and model {model} in path {model_json_path}")
+            raise LibraryLoadingError(
+                f"model.json not found for manufacturer {manufacturer} and model {model} in path {model_json_path}",
+            )
 
         return model_path, self._load_json(model_json_path)
 

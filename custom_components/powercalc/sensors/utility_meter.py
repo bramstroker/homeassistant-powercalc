@@ -258,7 +258,9 @@ async def create_utility_meter(
     params = {key: value for key, value in params.items() if key in signature.parameters}
 
     utility_meter = VirtualUtilityMeter(**params)  # type: ignore[no-untyped-call]
-    utility_meter.rounding_digits = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
+    utility_meter.rounding_digits = int(
+        sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION),
+    )
     utility_meter.entity_id = entity_id
 
     return utility_meter
@@ -280,7 +282,9 @@ class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
     @property
     def native_value(self) -> StateType | Decimal:
         """Return the state of the sensor."""
-        value = self._state if hasattr(self, "_state") else self._attr_native_value  # pre HA 2024.12 value was stored in _state
+        value = (
+            self._state if hasattr(self, "_state") else self._attr_native_value
+        )  # pre HA 2024.12 value was stored in _state
         if self.rounding_digits and value is not None:
             return Decimal(round(value, self.rounding_digits))  # type: ignore
 

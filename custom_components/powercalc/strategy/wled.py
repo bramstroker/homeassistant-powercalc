@@ -48,7 +48,11 @@ class WledStrategy(PowerCalculationStrategyInterface):
         self._estimated_current_entity: str | None = None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
-        light_state = entity_state if entity_state.entity_id == self._light_entity.entity_id else self._hass.states.get(self._light_entity.entity_id)
+        light_state = (
+            entity_state
+            if entity_state.entity_id == self._light_entity.entity_id
+            else self._hass.states.get(self._light_entity.entity_id)
+        )
 
         if light_state.state in OFF_STATES and self._standby_power:
             return self._standby_power
@@ -86,7 +90,9 @@ class WledStrategy(PowerCalculationStrategyInterface):
             if entity:
                 return entity
 
-        raise StrategyConfigurationError("No estimated current entity found. Probably brightness limiter not enabled. See documentation")
+        raise StrategyConfigurationError(
+            "No estimated current entity found. Probably brightness limiter not enabled. See documentation",
+        )
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
         if self._estimated_current_entity:

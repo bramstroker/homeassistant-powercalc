@@ -268,7 +268,10 @@ async def test_reload_service_global_configuration(hass: HomeAssistant) -> None:
 
     await run_powercalc_setup(hass, sensor_config, initial_config)
     assert not hass.states.get("sensor.test_energy_daily")
-    with patch("homeassistant.config.load_yaml_config_file", return_value={DOMAIN: {**new_config, CONF_SENSORS: [sensor_config]}}):
+    with patch(
+        "homeassistant.config.load_yaml_config_file",
+        return_value={DOMAIN: {**new_config, CONF_SENSORS: [sensor_config]}},
+    ):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_RELOAD,

@@ -429,7 +429,11 @@ class GroupConfigFlow(GroupFlow):
             user_input[CONF_NAME] = "Tracked / Untracked"
 
         async def _next(ui: dict[str, Any]) -> Step | None:
-            return Step.GROUP_TRACKED_UNTRACKED_AUTO if bool(ui.get("group_tracked_auto", True)) else Step.GROUP_TRACKED_UNTRACKED_MANUAL
+            return (
+                Step.GROUP_TRACKED_UNTRACKED_AUTO
+                if bool(ui.get("group_tracked_auto", True))
+                else Step.GROUP_TRACKED_UNTRACKED_MANUAL
+            )
 
         return await self.handle_group_step(
             GroupType.TRACKED_UNTRACKED,
