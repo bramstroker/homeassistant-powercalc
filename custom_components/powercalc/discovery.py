@@ -5,7 +5,7 @@ from datetime import timedelta
 from enum import StrEnum
 import logging
 import re
-from typing import Any
+from typing import Any, TypeVar
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -40,6 +40,7 @@ from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import SUPPORTED_DOMAINS, DeviceType, DiscoveryBy, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
+_DiscoverySourceT = TypeVar("_DiscoverySourceT", er.RegistryEntry, dr.DeviceEntry)
 
 
 async def get_power_profile_by_source_entity(hass: HomeAssistant, source_entity: SourceEntity) -> PowerProfile | None:
@@ -147,10 +148,10 @@ class DiscoveryManager:
         _LOGGER.debug("Start auto discovery")
 
         _LOGGER.debug("Start entity discovery")
-        await self.perform_discovery(self.get_entities, self.create_entity_source, DiscoveryBy.ENTITY)  # type: ignore[arg-type]
+        await self.perform_discovery(self.get_entities, self.create_entity_source, DiscoveryBy.ENTITY)
 
         _LOGGER.debug("Start device discovery")
-        await self.perform_discovery(self.get_devices, self.create_device_source, DiscoveryBy.DEVICE)  # type: ignore[arg-type]
+        await self.perform_discovery(self.get_devices, self.create_device_source, DiscoveryBy.DEVICE)
 
         _LOGGER.debug("Done auto discovery")
         self._status = DiscoveryStatus.FINISHED
@@ -181,13 +182,13 @@ class DiscoveryManager:
 
     async def perform_discovery(
         self,
-        source_provider: Callable[[], Awaitable[list]],
-        source_creator: Callable[[er.RegistryEntry | dr.DeviceEntry], Awaitable[SourceEntity]],
+        source_provider: Callable[[], Awaitable[list[_DiscoverySourceT]]],
+        source_creator: Callable[[_DiscoverySourceT], Awaitable[SourceEntity]],
         discovery_type: DiscoveryBy,
     ) -> None:
         """Generalized discovery procedure for entities and devices."""
         for source in await source_provider():
-            log_identifier = source.entity_id if discovery_type == DiscoveryBy.ENTITY else source.id
+            log_identifier = str(getattr(source, "entity_id", getattr(source, "id", "unknown")))
             try:
                 model_info = await self.extract_model_info_from_device_info(source)
                 if not model_info:
@@ -278,10 +279,10 @@ class DiscoveryManager:
             profile = await get_power_profile(self.hass, {}, source_entity, model_info=model_info, process_variables=False)
             if not profile or profile.discovery_by != discovery_type:  # pragma: no cover
                 continue
-            if discovery_type == DiscoveryBy.ENTITY and not profile.is_entity_domain_supported(
-                source_entity.entity_entry,  # type: ignore[arg-type]
-            ):
-                continue
+            if discovery_type == DiscoveryBy.ENTITY:
+                entity_entry = source_entity.entity_entry
+                if entity_entry is not None and not profile.is_entity_domain_supported(entity_entry):
+                    continue
             if profile.device_type in self._exclude_device_types:
                 continue
             if self._exclude_self_usage_profiles and profile.only_self_usage:
@@ -362,7 +363,7 @@ class DiscoveryManager:
         )
         return await get_filtered_entity_list(self.hass, NotFilter(entity_filter))
 
-    async def get_devices(self) -> list:
+    async def get_devices(self) -> list[dr.DeviceEntry]:
         """Fetch device entries."""
         return list(dr.async_get(self.hass).devices.values())
 

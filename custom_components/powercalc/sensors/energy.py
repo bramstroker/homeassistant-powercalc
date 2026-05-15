@@ -188,10 +188,13 @@ def get_unit_prefix(
 ) -> str | None:
     unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
 
-    power_unit = UnitOfPower(power_sensor.unit_of_measurement)  # type: ignore
+    try:
+        power_unit: UnitOfPower | str | None = UnitOfPower(power_sensor.unit_of_measurement) if power_sensor.unit_of_measurement else None
+    except ValueError:
+        power_unit = None
     power_state = hass.states.get(power_sensor.entity_id)
-    if power_unit is None and power_state:  # type: ignore
-        power_unit = power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)  # type: ignore  # pragma: no cover
+    if power_unit is None and power_state:
+        power_unit = power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)  # pragma: no cover
 
     # When the power sensor is in kW, we don't want to add an extra k prefix.
     # As this would result in an energy sensor having kkWh unit, which is obviously invalid

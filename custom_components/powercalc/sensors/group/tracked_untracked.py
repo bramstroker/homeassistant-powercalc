@@ -116,7 +116,10 @@ class TrackedPowerSensorFactory:
         Get all power entities which are part of the tracked sensor group
         """
         if not bool(self.config.get(CONF_GROUP_TRACKED_AUTO, False)):
-            return set(self.config.get(CONF_GROUP_TRACKED_POWER_ENTITIES))  # type: ignore
+            tracked_entities = self.config.get(CONF_GROUP_TRACKED_POWER_ENTITIES)
+            if not isinstance(tracked_entities, list):
+                return set()
+            return set(tracked_entities)
 
         # For auto mode, we also want to listen for any changes in the entity registry
         # Dynamically add/remove power sensors from the tracked group
@@ -137,8 +140,9 @@ class TrackedPowerSensorFactory:
         entity_id = event.data["entity_id"]
         action = event.data["action"]
 
-        if action == "update" and "old_entity_id" in event.data:
-            if event.data["old_entity_id"] in self.tracked_entities:  # type: ignore
+        old_entity_id = event.data.get("old_entity_id")
+        if action == "update" and old_entity_id is not None:
+            if old_entity_id in self.tracked_entities:
                 return await self.reload()
             return None  # pragma: no cover
 

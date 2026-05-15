@@ -430,13 +430,8 @@ def _register_entity_id_change_listener(
         """Only dispatch the listener for update events concerning the source entity"""
 
         # Breaking change in 2024.4.0, check for Event for versions prior to this
-        if type(event) is Event:  # Intentionally avoid `isinstance` because it's slow and we trust `Event` is not subclassed
-            event = event.data  # pragma: no cover
-        return (
-            event["action"] == "update"  # type: ignore
-            and "old_entity_id" in event  # type: ignore
-            and event["old_entity_id"] == source_entity_id  # type: ignore
-        )
+        event_data = event.data if isinstance(event, Event) else event
+        return event_data["action"] == "update" and "old_entity_id" in event_data and event_data["old_entity_id"] == source_entity_id
 
     hass.bus.async_listen(
         EVENT_ENTITY_REGISTRY_UPDATED,
