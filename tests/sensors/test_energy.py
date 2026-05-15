@@ -428,6 +428,34 @@ async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
 
 
+async def test_real_power_sensor_invalid_unit(hass: HomeAssistant) -> None:
+    """Test that an invalid unit on the source power sensor falls back gracefully."""
+    mock_registry(
+        hass,
+        {
+            "sensor.test_power": RegistryEntryWithDefaults(
+                entity_id="sensor.test_power",
+                unique_id="12345",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                unit_of_measurement="bogus_unit",
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_UNIQUE_ID: "1234353",
+            CONF_POWER_SENSOR_ID: "sensor.test_power",
+        },
+    )
+
+    state = hass.states.get("sensor.test_energy")
+    assert state
+
+
 async def test_device_class_is_set_after_startup(hass: HomeAssistant) -> None:
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/1887"""
     await run_powercalc_setup(

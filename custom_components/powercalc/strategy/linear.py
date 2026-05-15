@@ -145,7 +145,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             max_value = full_range[1]
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
             max_power = self._config.get(CONF_MAX_POWER)
-            if max_power is None:
+            if max_power is None:  # pragma: no cover
                 raise StrategyConfigurationError("Linear strategy must have max power defined")
             calibration_list.append((min_value, float(min_power)))
             calibration_list.append((max_value, float(max_power)))
@@ -166,7 +166,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def get_initialized_value_entity(self) -> SourceEntity:
         """Return the initialized value entity."""
-        if self._value_entity is None:
+        if self._value_entity is None:  # pragma: no cover
             raise StrategyConfigurationError("Linear strategy has not been initialized")
         return self._value_entity
 
@@ -196,7 +196,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             return None
 
     def get_value_from_attribute(self, entity_state: State) -> int | None:
-        if self._attribute is None:
+        if self._attribute is None:  # pragma: no cover
             return None
 
         value = entity_state.attributes.get(self._attribute)

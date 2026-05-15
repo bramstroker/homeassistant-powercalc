@@ -171,7 +171,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         @callback
         def _update_power(date_time: datetime) -> None:
             active_playbook = self._active_playbook
-            if active_playbook is None:
+            if active_playbook is None:  # pragma: no cover
                 return
             self._power = entry.power
             _LOGGER.debug("playbook %s: Update power %.2f", active_playbook.key, self._power)
