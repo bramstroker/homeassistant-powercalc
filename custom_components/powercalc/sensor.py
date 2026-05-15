@@ -916,7 +916,14 @@ async def create_individual_sensors(
     if energy_sensor:
         entities_to_add.extend(await create_utility_meters(hass, energy_sensor, sensor_config, config_entry))
 
-    await _finalize_individual_sensors(hass, config_entry, sensor_config, source_entity, entities_to_add, context, used_unique_ids)
+    await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
+    update_registries(hass, source_entity, entities_to_add, context)
+
+    unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
+    if unique_id:
+        used_unique_ids.append(unique_id)
+
+    collect_analytics(hass, config_entry).inc(DATA_SOURCE_DOMAINS, source_entity.domain)
 
     return EntitiesBucket(new=entities_to_add, existing=[])
 
@@ -936,25 +943,6 @@ def _get_used_unique_ids(hass: HomeAssistant) -> list[str]:
     if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
         used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []  # pragma: no cover
     return cast(list[str], used_unique_ids)
-
-
-async def _finalize_individual_sensors(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry | None,
-    sensor_config: dict,
-    source_entity: SourceEntity,
-    entities_to_add: list[Entity],
-    context: CreationContext,
-    used_unique_ids: list[str],
-) -> None:
-    await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
-    update_registries(hass, source_entity, entities_to_add, context)
-
-    unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
-    if unique_id:
-        used_unique_ids.append(unique_id)
-
-    collect_analytics(hass, config_entry).inc(DATA_SOURCE_DOMAINS, source_entity.domain)
 
 
 async def handle_energy_sensor_creation(
