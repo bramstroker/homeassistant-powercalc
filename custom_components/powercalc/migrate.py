@@ -41,43 +41,62 @@ async def async_migrate_config_entry(hass: HomeAssistant, config_entry: ConfigEn
     data = {**config_entry.data}
 
     if version <= 1:
-        conf_fixed = data.get(CONF_FIXED, {})
-        if CONF_POWER in conf_fixed and CONF_POWER_TEMPLATE in conf_fixed:
-            conf_fixed.pop(CONF_POWER, None)
+        _migrate_power_template(data)
 
     if version <= 2 and data.get(CONF_SENSOR_TYPE) and CONF_CREATE_ENERGY_SENSOR not in data:
         data[CONF_CREATE_ENERGY_SENSOR] = True
 
     if version <= 3:
-        conf_playbook = data.get(CONF_PLAYBOOK, {})
-        if CONF_STATES_TRIGGER in conf_playbook:
-            data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
+        _migrate_playbook_trigger(data)
 
     if version <= 4 and config_entry.entry_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-        discovery_config = {
-            CONF_ENABLED: data.get(CONF_ENABLE_AUTODISCOVERY_DEPRECATED, True),
-            CONF_EXCLUDE_DEVICE_TYPES: data.get(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED, []),
-            CONF_EXCLUDE_SELF_USAGE: data.get(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED, False),
-        }
-        data[CONF_DISCOVERY] = discovery_config
-        for key in [
-            CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
-            CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
-            CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
-        ]:
-            data.pop(key, None)
+        _migrate_global_discovery_config(data)
 
     if version <= 5:
-        conf_playbook = data.get(CONF_PLAYBOOK, {})
-        if CONF_PLAYBOOKS in conf_playbook:
-            data[CONF_PLAYBOOK][CONF_PLAYBOOKS] = [{CONF_ID: key, CONF_PATH: val} for key, val in conf_playbook.pop(CONF_PLAYBOOKS).items()]
+        _migrate_playbooks(data)
 
     if version <= 6:
-        conf_fixed = data.get(CONF_FIXED, {})
-        if CONF_STATES_POWER in conf_fixed and isinstance(conf_fixed[CONF_STATES_POWER], dict):
-            data[CONF_FIXED][CONF_STATES_POWER] = [{CONF_STATE: key, CONF_POWER: val} for key, val in conf_fixed[CONF_STATES_POWER].items()]
+        _migrate_states_power(data)
 
     hass.config_entries.async_update_entry(config_entry, data=data, version=7)
+
+
+def _migrate_power_template(data: dict) -> None:
+    conf_fixed = data.get(CONF_FIXED, {})
+    if CONF_POWER in conf_fixed and CONF_POWER_TEMPLATE in conf_fixed:
+        conf_fixed.pop(CONF_POWER, None)
+
+
+def _migrate_playbook_trigger(data: dict) -> None:
+    conf_playbook = data.get(CONF_PLAYBOOK, {})
+    if CONF_STATES_TRIGGER in conf_playbook:
+        data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
+
+
+def _migrate_global_discovery_config(data: dict) -> None:
+    data[CONF_DISCOVERY] = {
+        CONF_ENABLED: data.get(CONF_ENABLE_AUTODISCOVERY_DEPRECATED, True),
+        CONF_EXCLUDE_DEVICE_TYPES: data.get(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED, []),
+        CONF_EXCLUDE_SELF_USAGE: data.get(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED, False),
+    }
+    for key in [
+        CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+        CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
+        CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
+    ]:
+        data.pop(key, None)
+
+
+def _migrate_playbooks(data: dict) -> None:
+    conf_playbook = data.get(CONF_PLAYBOOK, {})
+    if CONF_PLAYBOOKS in conf_playbook:
+        data[CONF_PLAYBOOK][CONF_PLAYBOOKS] = [{CONF_ID: key, CONF_PATH: val} for key, val in conf_playbook.pop(CONF_PLAYBOOKS).items()]
+
+
+def _migrate_states_power(data: dict) -> None:
+    conf_fixed = data.get(CONF_FIXED, {})
+    if CONF_STATES_POWER in conf_fixed and isinstance(conf_fixed[CONF_STATES_POWER], dict):
+        data[CONF_FIXED][CONF_STATES_POWER] = [{CONF_STATE: key, CONF_POWER: val} for key, val in conf_fixed[CONF_STATES_POWER].items()]
 
 
 async def async_fix_legacy_profile_config_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:

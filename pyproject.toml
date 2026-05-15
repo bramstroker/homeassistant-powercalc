@@ -76,14 +76,14 @@ exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.lint]
 select = ["A", "ANN", "ASYNC", "B", "BLE", "C", "C4", "COM", "E", "F", "FIX", "FURB", "G", "ICN", "I", "INP", "ISC", "LOG", "N", "NPY", "PERF", "PIE", "PYI", "Q", "RET", "RUF", "S", "SIM", "SLF", "SLOT", "T10", "T20", "TID", "UP", "W"]
-ignore = ["S101", "COM812"]
+ignore = ["S101"]
 
 [tool.ruff.lint.per-file-ignores]
 "utils/measure/**.py" = ["T201"]
 "tests/**.py" = ["ASYNC230"]
 
 [tool.ruff.lint.mccabe]
-max-complexity = 15
+max-complexity = 10
 
 [tool.uv]
 prerelease = "allow"

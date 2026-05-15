@@ -275,62 +275,81 @@ async def resolve_entity_ids_recursively(
     if resolved_ids is None:
         resolved_ids = set()
 
-    def add_member_entry_ids() -> None:
-        """Add power/energy sensors from the group member entries."""
-        member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
-        for member_entry_id in member_entry_ids:
-            member_entry = hass.config_entries.async_get_entry(member_entry_id)
-            if member_entry is None:
-                continue
-
-            key = resolve_key_based_on_device_class(member_entry)
-            if key and key in member_entry.data:
-                resolved_ids.add(str(member_entry.data.get(key)))
-
-    def resolve_key_based_on_device_class(member_entry: ConfigEntry) -> str | None:
-        """Resolve the correct key for power/energy sensor based on device class."""
-        if member_entry.data.get(CONF_SENSOR_TYPE) == SensorType.REAL_POWER:
-            return CONF_ENTITY_ID if device_class == SensorDeviceClass.POWER else ENTRY_DATA_ENERGY_ENTITY
-        return ENTRY_DATA_POWER_ENTITY if device_class == SensorDeviceClass.POWER else ENTRY_DATA_ENERGY_ENTITY
-
-    def add_specified_sensors() -> None:
-        """Add additional power/energy sensors specified by the user."""
-        conf_key = CONF_GROUP_POWER_ENTITIES if device_class == SensorDeviceClass.POWER else CONF_GROUP_ENERGY_ENTITIES
-        resolved_ids.update(entry.data.get(conf_key) or [])
-
-    async def add_include_based_sensors() -> None:
-        """Add entities from the defined areas, devices and floors."""
-        if all(k not in entry.data for k in (CONF_AREA, CONF_FLOOR, CONF_GROUP_MEMBER_DEVICES)):
-            return
-
-        result = await find_entities(
-            hass,
-            await build_entity_include_filter(hass, entry),
-            bool(entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS)),
-        )
-        resolved_ids.update(filter_entity_list_by_class(result.resolved, device_class))
-
-    async def add_subgroup_entities() -> None:
-        """Recursively add entities from subgroups."""
-        subgroups = entry.data.get(CONF_SUB_GROUPS)
-        if not subgroups:
-            return
-
-        for subgroup_entry_id in subgroups:
-            subgroup_entry = hass.config_entries.async_get_entry(subgroup_entry_id)
-            if subgroup_entry is None:
-                _LOGGER.error("Subgroup config entry not found: %s", subgroup_entry_id)
-                continue
-
-            await resolve_entity_ids_recursively(hass, subgroup_entry, device_class, resolved_ids)
-
-    # Process the main logic
-    add_member_entry_ids()
-    add_specified_sensors()
-    await add_include_based_sensors()
-    await add_subgroup_entities()
+    _add_member_entry_ids(hass, entry, device_class, resolved_ids)
+    _add_specified_sensors(entry, device_class, resolved_ids)
+    await _add_include_based_sensors(hass, entry, device_class, resolved_ids)
+    await _add_subgroup_entities(hass, entry, device_class, resolved_ids)
 
     return resolved_ids
+
+
+def _add_member_entry_ids(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    device_class: SensorDeviceClass,
+    resolved_ids: set[str],
+) -> None:
+    """Add power/energy sensors from the group member entries."""
+    member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
+    for member_entry_id in member_entry_ids:
+        member_entry = hass.config_entries.async_get_entry(member_entry_id)
+        if member_entry is None:
+            continue
+
+        key = _resolve_key_based_on_device_class(member_entry, device_class)
+        if key and key in member_entry.data:
+            resolved_ids.add(str(member_entry.data.get(key)))
+
+
+def _resolve_key_based_on_device_class(member_entry: ConfigEntry, device_class: SensorDeviceClass) -> str | None:
+    """Resolve the correct key for power/energy sensor based on device class."""
+    if member_entry.data.get(CONF_SENSOR_TYPE) == SensorType.REAL_POWER:
+        return CONF_ENTITY_ID if device_class == SensorDeviceClass.POWER else ENTRY_DATA_ENERGY_ENTITY
+    return ENTRY_DATA_POWER_ENTITY if device_class == SensorDeviceClass.POWER else ENTRY_DATA_ENERGY_ENTITY
+
+
+def _add_specified_sensors(entry: ConfigEntry, device_class: SensorDeviceClass, resolved_ids: set[str]) -> None:
+    """Add additional power/energy sensors specified by the user."""
+    conf_key = CONF_GROUP_POWER_ENTITIES if device_class == SensorDeviceClass.POWER else CONF_GROUP_ENERGY_ENTITIES
+    resolved_ids.update(entry.data.get(conf_key) or [])
+
+
+async def _add_include_based_sensors(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    device_class: SensorDeviceClass,
+    resolved_ids: set[str],
+) -> None:
+    """Add entities from the defined areas, devices and floors."""
+    if all(k not in entry.data for k in (CONF_AREA, CONF_FLOOR, CONF_GROUP_MEMBER_DEVICES)):
+        return
+
+    result = await find_entities(
+        hass,
+        await build_entity_include_filter(hass, entry),
+        bool(entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS)),
+    )
+    resolved_ids.update(filter_entity_list_by_class(result.resolved, device_class))
+
+
+async def _add_subgroup_entities(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    device_class: SensorDeviceClass,
+    resolved_ids: set[str],
+) -> None:
+    """Recursively add entities from subgroups."""
+    subgroups = entry.data.get(CONF_SUB_GROUPS)
+    if not subgroups:
+        return
+
+    for subgroup_entry_id in subgroups:
+        subgroup_entry = hass.config_entries.async_get_entry(subgroup_entry_id)
+        if subgroup_entry is None:
+            _LOGGER.error("Subgroup config entry not found: %s", subgroup_entry_id)
+            continue
+
+        await resolve_entity_ids_recursively(hass, subgroup_entry, device_class, resolved_ids)
 
 
 @callback

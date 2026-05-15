@@ -37,7 +37,7 @@ from measure.runner.errors import RunnerError
 from measure.runner.fan import FanRunner
 from measure.runner.light import LightRunner
 from measure.runner.recorder import RecorderRunner
-from measure.runner.runner import MeasurementRunner
+from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.runner.speaker import SpeakerRunner
 from measure.util.measure_util import MeasureUtil
 
@@ -123,32 +123,8 @@ class Measure:
         >>> measure.start()
         """
 
-        _LOGGER.info("Selected powermeter: %s", self.config.selected_power_meter)
-        if self.measure_type == MeasureType.LIGHT:
-            _LOGGER.info(
-                "Selected light controller: %s",
-                self.config.selected_light_controller,
-            )
-        if self.measure_type == MeasureType.SPEAKER:
-            _LOGGER.info(
-                "Selected media controller: %s",
-                self.config.selected_media_controller,
-            )
-        if self.measure_type == MeasureType.FAN:
-            _LOGGER.info(
-                "Selected fan controller: %s",
-                self.config.selected_fan_controller,
-            )
-
-        if self.config.selected_measure_type:
-            self.measure_type = MeasureType(self.config.selected_measure_type)
-        else:
-            self.measure_type = inquirer.list_input(
-                "What kind of measurement session do you want to run?",
-                choices=[cls.value for cls in MeasureType],
-                render=self.console_render,
-            )
-
+        self._select_measure_type()
+        self._log_selected_controllers()
         measure_util = MeasureUtil(self.power_meter, self.config)
         self.runner = MEASURE_TYPE_RUNNER[self.measure_type](measure_util, self.config)
 
@@ -160,35 +136,16 @@ class Measure:
             measure_util.initialize_dummy_load()
 
         generate_model_json = bool(answers.get(QUESTION_GENERATE_MODEL_JSON, False))
-        should_export_files = generate_model_json or self.runner.writes_export_files()
-        export_directory = ""
-        if should_export_files:
-            export_directory = str(os.path.join(PROJECT_DIR, "export", answers.get(QUESTION_MODEL_ID, "generic")))
-            if not os.path.exists(export_directory):
-                os.makedirs(export_directory)
-
-            _LOGGER.info("Exporting to %s", export_directory)
+        export_directory = self._prepare_export_directory(answers, generate_model_json)
 
         if answers.get(QUESTION_DUMMY_LOAD, False):
             input("Please connect the appliance you want to measure in parallel to the dummy load and press enter to start measurement session...")
-        try:
-            runner_result = self.runner.run(answers, export_directory)
-        except RunnerError as error:
-            _LOGGER.error("Aborting: %s", error)
-            exit(1)
-        if not runner_result:
-            _LOGGER.error("Some error occurred during the measurement session")
-            exit(1)
+        runner_result = self._run_measurement(answers, export_directory)
 
         generate_model_json = generate_model_json and bool(export_directory)
 
         if generate_model_json:
-            try:
-                standby_power = self.runner.measure_standby_power()
-            except PowerMeterError as error:
-                _LOGGER.error("Aborting: %s", error)
-                exit(1)
-
+            standby_power = self._measure_standby_power()
             self.write_model_json(
                 directory=export_directory,
                 standby_power=standby_power,
@@ -202,6 +159,58 @@ class Measure:
                 "Measurement session finished. Files exported to %s",
                 export_directory,
             )
+
+    def _select_measure_type(self) -> None:
+        if self.config.selected_measure_type:
+            self.measure_type = MeasureType(self.config.selected_measure_type)
+            return
+
+        self.measure_type = inquirer.list_input(
+            "What kind of measurement session do you want to run?",
+            choices=[cls.value for cls in MeasureType],
+            render=self.console_render,
+        )
+
+    def _log_selected_controllers(self) -> None:
+        _LOGGER.info("Selected powermeter: %s", self.config.selected_power_meter)
+        if self.measure_type == MeasureType.LIGHT:
+            _LOGGER.info("Selected light controller: %s", self.config.selected_light_controller)
+        if self.measure_type == MeasureType.SPEAKER:
+            _LOGGER.info("Selected media controller: %s", self.config.selected_media_controller)
+        if self.measure_type == MeasureType.FAN:
+            _LOGGER.info("Selected fan controller: %s", self.config.selected_fan_controller)
+
+    def _prepare_export_directory(self, answers: dict[str, Any], generate_model_json: bool) -> str:
+        assert self.runner is not None
+        if not generate_model_json and not self.runner.writes_export_files():
+            return ""
+
+        export_directory = str(os.path.join(PROJECT_DIR, "export", answers.get(QUESTION_MODEL_ID, "generic")))
+        if not os.path.exists(export_directory):
+            os.makedirs(export_directory)
+
+        _LOGGER.info("Exporting to %s", export_directory)
+        return export_directory
+
+    def _run_measurement(self, answers: dict[str, Any], export_directory: str) -> RunnerResult:
+        assert self.runner is not None
+        try:
+            runner_result = self.runner.run(answers, export_directory)
+        except RunnerError as error:
+            _LOGGER.error("Aborting: %s", error)
+            exit(1)
+        if not runner_result:
+            _LOGGER.error("Some error occurred during the measurement session")
+            exit(1)
+        return runner_result
+
+    def _measure_standby_power(self) -> float:
+        assert self.runner is not None
+        try:
+            return self.runner.measure_standby_power()
+        except PowerMeterError as error:
+            _LOGGER.error("Aborting: %s", error)
+            exit(1)
 
     def write_model_json(
         self,

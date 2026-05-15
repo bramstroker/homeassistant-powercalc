@@ -471,7 +471,9 @@ class GroupOptionsFlow(GroupFlow):
     async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the group options flow."""
         return await self.flow.async_handle_options_step(
-            user_input, create_schema_group_custom(self.flow.hass, self.flow.config_entry, True), Step.GROUP_CUSTOM
+            user_input,
+            create_schema_group_custom(self.flow.hass, self.flow.config_entry, True),
+            Step.GROUP_CUSTOM,
         )
 
     async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> FlowResult:

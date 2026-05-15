@@ -88,7 +88,10 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
     )
 
     await handle_options_flow_update(
-        hass, entry, Step.DAILY_ENERGY, {**_daily_energy_value_choice(CONF_VALUE, 75), CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT}
+        hass,
+        entry,
+        Step.DAILY_ENERGY,
+        {**_daily_energy_value_choice(CONF_VALUE, 75), CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
     )
 
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT] == UnitOfPower.WATT
