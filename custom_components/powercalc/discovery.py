@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from datetime import timedelta
+from datetime import datetime, timedelta
 from enum import StrEnum
 import logging
 import re
@@ -114,7 +114,7 @@ class DiscoveryManager:
 
         await self.start_discovery()
 
-        async def _rediscover(_: Any) -> None:  # noqa: ANN401
+        async def _rediscover(_: datetime) -> None:
             """Rediscover entities."""
             await self.update_library_and_rediscover()
 

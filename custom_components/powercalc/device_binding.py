@@ -4,7 +4,7 @@ from awesomeversion import AwesomeVersion
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_DEVICE,
-    __version__ as HA_VERSION,  # noqa
+    __version__ as HA_VERSION,  # noqa: N812
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry

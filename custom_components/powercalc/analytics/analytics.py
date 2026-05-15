@@ -12,7 +12,7 @@ import uuid
 
 import aiohttp
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import __version__ as HA_VERSION  # noqa
+from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -123,7 +123,7 @@ class AnalyticsCollector:
         counter: Counter[Hashable] = self._data.setdefault(key, Counter())  # type:ignore
         counter[value] += 1
 
-    def add(self, key: str, value: Any) -> None:  # noqa: ANN401
+    def add(self, key: str, value: object) -> None:
         """Add value to listing"""
         if self._already_seen(key) or value is None:
             return

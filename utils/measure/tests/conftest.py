@@ -100,7 +100,7 @@ def mock_requests_get_factory() -> MockRequestsGetFactory:
     """
 
     def factory(responses: dict[str, tuple[dict, int]]) -> patch:
-        def mock_requests_get(url: str, *args, **kwargs):  # noqa
+        def mock_requests_get(url: str, *args, **kwargs):  # noqa: ANN002, ANN003, ANN202
             response_data, status_code = responses.get(url, ({"error": "Unknown endpoint"}, 404))
 
             # Create a mock response object

@@ -5,7 +5,7 @@ from measure.powermeter.shelly import ShellyPowerMeter
 import pytest
 from requests import RequestException
 
-from ..conftest import MockRequestsGetFactory  # noqa
+from ..conftest import MockRequestsGetFactory  # noqa: TID252
 
 DEFAULT_SHELLY_IP = "192.168.1.200"
 SHELLY_ENDPOINT = f"http://{DEFAULT_SHELLY_IP}/shelly"

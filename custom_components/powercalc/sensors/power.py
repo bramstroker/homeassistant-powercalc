@@ -453,7 +453,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 new_state,
             )
 
-        async def template_change_listener(*_: Any) -> None:  # noqa: ANN401
+        async def template_change_listener(*_: object) -> None:
             """Handle for state changes for referenced templates."""
             state = self.hass.states.get(self._source_entity.entity_id)
             await self._handle_source_entity_state_change(
@@ -738,7 +738,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             delay = sleep_power.get(CONF_DELAY) or 0
 
             @callback
-            def _update_sleep_power(*_: Any) -> None:  # noqa: ANN401
+            def _update_sleep_power(*_: object) -> None:
                 power = Decimal(sleep_power.get(CONF_POWER) or 0)
                 if self._multiply_factor_standby and self._multiply_factor:
                     power *= Decimal(self._multiply_factor)
