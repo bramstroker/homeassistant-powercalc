@@ -38,10 +38,12 @@ class SpeakerRunner(MeasurementRunner):
         duration = DURATION_PER_VOLUME_LEVEL
 
         print(
-            f"Prepare to start measuring the power for {duration} seconds on each volume level starting with 10 until 100 (with steps of 10 between)",
+            f"Prepare to start measuring the power for {duration} seconds on each volume level "
+            "starting with 10 until 100 (with steps of 10 between)",
         )
         print(
-            "WARNING: during the measurement session the volume will be increased to the maximum, which can be harmful for your ears",
+            "WARNING: during the measurement session the volume will be increased to the maximum, "
+            "which can be harmful for your ears",
         )
         input("Hit enter when you are ready to start..")
 

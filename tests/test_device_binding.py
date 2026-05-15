@@ -5,7 +5,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceEntryDisabler, DeviceRegistry
 import homeassistant.helpers.entity_registry as er
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    RegistryEntryWithDefaults,
+    mock_device_registry,
+    mock_registry,
+)
 
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,

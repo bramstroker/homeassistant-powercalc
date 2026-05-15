@@ -113,7 +113,11 @@ async def _is_discoverable_source_entity(hass: HomeAssistant, source_entity: Reg
         hass,
         await create_source_entity(source_entity.entity_id, hass),
     )
-    return bool(power_profile and not await power_profile.needs_user_configuration and power_profile.is_entity_domain_supported(source_entity))
+    return bool(
+        power_profile
+        and not await power_profile.needs_user_configuration
+        and power_profile.is_entity_domain_supported(source_entity),
+    )
 
 
 def _build_filter(entity_filter: EntityFilter | None) -> EntityFilter:
@@ -123,7 +127,11 @@ def _build_filter(entity_filter: EntityFilter | None) -> EntityFilter:
             LambdaFilter(lambda entity: entity.platform != "utility_meter"),
             LambdaFilter(lambda entity: not str(entity.unique_id).startswith("powercalc_standby_group")),
             LambdaFilter(lambda entity: "tracked_" not in str(entity.unique_id)),
-            LambdaFilter(lambda entity: entity.platform != "tasmota" or not str(entity.entity_id).endswith(("_yesterday", "_today"))),
+            LambdaFilter(
+                lambda entity: (
+                    entity.platform != "tasmota" or not str(entity.entity_id).endswith(("_yesterday", "_today"))
+                ),
+            ),
         ],
     )
     if not entity_filter:

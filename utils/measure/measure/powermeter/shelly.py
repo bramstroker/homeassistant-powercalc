@@ -44,17 +44,22 @@ class ShellyApiGen2Plus(ShellyApi):
 
     def parse_json(self, json: dict, include_voltage: bool = False) -> PowerMeasurementResult:
         if include_voltage:
-            return PowerMeasurementResult(power=float(json["apower"]), voltage=float(json["voltage"]), updated=time.time())
+            return PowerMeasurementResult(
+                power=float(json["apower"]),
+                voltage=float(json["voltage"]),
+                updated=time.time(),
+            )
         return PowerMeasurementResult(power=float(json["apower"]), updated=time.time())
 
     def check_gen2_plus_endpoints(self) -> None:
-        """
-        Checking the endpoint for Gen2+ devices.
+        """Check the endpoint for Gen2+ devices.
 
-        Shelly Gen2+ devices come with different capabilities, and depending on the device type, they may have different API endpoints.
-        By default, we try to use the "/rpc/Switch.GetStatus?id=0" endpoint, which is suitable for devices that support switching.
-        However, some Gen2+ devices are designed purely for power measurement without any relay (so they can't act as a switch).
-        For those devices, the endpoint "/rpc/PM1.GetStatus?id=0" is used instead.
+        Shelly Gen2+ devices come with different capabilities, and depending on the device type,
+        they may have different API endpoints. By default, we try to use the
+        "/rpc/Switch.GetStatus?id=0" endpoint, which is suitable for devices that support
+        switching. However, some Gen2+ devices are designed purely for power measurement without
+        any relay (so they can't act as a switch). For those devices, the endpoint
+        "/rpc/PM1.GetStatus?id=0" is used instead.
         """
         endpoints = ["/rpc/Switch.GetStatus?id=0", "/rpc/PM1.GetStatus?id=0"]
         for endpoint in endpoints:

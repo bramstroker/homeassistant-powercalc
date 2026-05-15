@@ -26,7 +26,13 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc import CONF_DISCOVERY, CONF_ENABLE_AUTODISCOVERY_DEPRECATED, SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
+from custom_components.powercalc import (
+    CONF_DISCOVERY,
+    CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+    SERVICE_UPDATE_LIBRARY,
+    DeviceType,
+    DiscoveryManager,
+)
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     CONF_EXCLUDE_DEVICE_TYPES,
@@ -44,7 +50,11 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SensorType,
 )
-from custom_components.powercalc.discovery import DiscoveryStatus, get_power_profile_by_source_device, get_power_profile_by_source_entity
+from custom_components.powercalc.discovery import (
+    DiscoveryStatus,
+    get_power_profile_by_source_device,
+    get_power_profile_by_source_entity,
+)
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 from tests.common import mock_device, set_states
@@ -308,7 +318,10 @@ async def test_autodiscover_continues_when_one_entity_fails(
             ),
         },
     )
-    with patch("custom_components.powercalc.power_profile.library.ProfileLibrary.find_models", new_callable=AsyncMock) as mock_find_models:
+    with patch(
+        "custom_components.powercalc.power_profile.library.ProfileLibrary.find_models",
+        new_callable=AsyncMock,
+    ) as mock_find_models:
         mock_find_models.side_effect = [Exception("Test exception"), {ModelInfo("signify", "LCT010")}]
         await run_powercalc_setup(hass)
         assert "Error during entity discovery" in caplog.text
@@ -920,7 +933,11 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
         ),
     ],
 )
-async def test_get_entities(hass: HomeAssistant, entity_entries: list[RegistryEntry], expected_entities: list[str]) -> None:
+async def test_get_entities(
+    hass: HomeAssistant,
+    entity_entries: list[RegistryEntry],
+    expected_entities: list[str],
+) -> None:
     mock_registry(hass, {entity_entry.entity_id: entity_entry for entity_entry in entity_entries})
     discovery_manager = DiscoveryManager(hass, {})
     entity_ids = [entity.entity_id for entity in await discovery_manager.get_entities()]

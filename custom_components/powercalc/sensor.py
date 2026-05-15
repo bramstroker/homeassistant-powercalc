@@ -431,7 +431,11 @@ def _register_entity_id_change_listener(
 
         # Breaking change in 2024.4.0, check for Event for versions prior to this
         event_data = event.data if isinstance(event, Event) else event
-        return event_data["action"] == "update" and "old_entity_id" in event_data and event_data["old_entity_id"] == source_entity_id
+        return (
+            event_data["action"] == "update"
+            and "old_entity_id" in event_data
+            and event_data["old_entity_id"] == source_entity_id
+        )
 
     hass.bus.async_listen(
         EVENT_ENTITY_REGISTRY_UPDATED,
@@ -575,7 +579,9 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
         """Convert on_time dictionary to timedelta."""
         on_time = config.get(CONF_ON_TIME)
         config[CONF_ON_TIME] = (
-            timedelta(hours=on_time["hours"], minutes=on_time["minutes"], seconds=on_time["seconds"]) if on_time else timedelta(days=1)
+            timedelta(hours=on_time["hours"], minutes=on_time["minutes"], seconds=on_time["seconds"])
+            if on_time
+            else timedelta(days=1)
         )
 
     def process_states_power(states_power: dict | list) -> dict:
@@ -585,7 +591,10 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
         """
         if isinstance(states_power, list):
             states_power = {item[CONF_STATE]: item[CONF_POWER] for item in states_power}
-        return {key: Template(value, hass) if isinstance(value, str) and "{{" in value else value for key, value in states_power.items()}
+        return {
+            key: Template(value, hass) if isinstance(value, str) and "{{" in value else value
+            for key, value in states_power.items()
+        }
 
     def process_daily_fixed_energy() -> None:
         """Process daily fixed energy configuration."""
@@ -923,7 +932,11 @@ async def create_individual_sensors(
     return EntitiesBucket(new=entities_to_add, existing=[])
 
 
-def _attach_configured_device_entry(hass: HomeAssistant, sensor_config: dict, source_entity: SourceEntity) -> SourceEntity:
+def _attach_configured_device_entry(
+    hass: HomeAssistant,
+    sensor_config: dict,
+    source_entity: SourceEntity,
+) -> SourceEntity:
     if source_entity.entity_id != DUMMY_ENTITY_ID or "device" not in sensor_config:
         return source_entity
 
@@ -959,7 +972,11 @@ async def create_energy_sensor_if_needed(
     source_entity: SourceEntity,
 ) -> EnergySensor | None:
     """Create an energy sensor if it is needed."""
-    if sensor_config.get(CONF_CREATE_ENERGY_SENSOR) or sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION) or CONF_ENERGY_SENSOR_ID in sensor_config:
+    if (
+        sensor_config.get(CONF_CREATE_ENERGY_SENSOR)
+        or sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION)
+        or CONF_ENERGY_SENSOR_ID in sensor_config
+    ):
         return await create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
     return None
 

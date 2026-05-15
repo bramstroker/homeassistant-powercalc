@@ -150,7 +150,11 @@ async def create_virtual_power_sensor(
             if CONF_CALCULATION_ENABLED_CONDITION not in sensor_config and power_profile.calculation_enabled_condition:
                 sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = power_profile.calculation_enabled_condition
 
-            if config_entry and await power_profile.requires_manual_sub_profile_selection and "/" not in sensor_config.get(CONF_MODEL, ""):
+            if (
+                config_entry
+                and await power_profile.requires_manual_sub_profile_selection
+                and "/" not in sensor_config.get(CONF_MODEL, "")
+            ):
                 ir.async_create_issue(
                     hass,
                     DOMAIN,
@@ -184,10 +188,14 @@ async def create_virtual_power_sensor(
         a = collect_analytics(hass, config_entry)
         a.inc(DATA_STRATEGIES, strategy)
         a.add(DATA_POWER_PROFILES, power_profile)
-        a.inc(DATA_POWER_PROFILE_SOURCES, power_profile.configuration_source if power_profile else PowerProfileSource.MANUAL)
+        a.inc(
+            DATA_POWER_PROFILE_SOURCES,
+            power_profile.configuration_source if power_profile else PowerProfileSource.MANUAL,
+        )
 
         _LOGGER.debug(
-            "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s unique_id=%s)",
+            "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s "
+            "manufacturer=%s model=%s unique_id=%s)",
             source_entity.entity_id,
             entity_category,
             name,
@@ -464,9 +472,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async def initial_update(hass: HomeAssistant) -> None:
             """Calculate initial value and push state"""
 
-            # When using reload service energy sensor became unavailable
-            # This is caused because state change listener of energy sensor is registered before power sensor pushes initial update
-            # Adding sleep 0 fixes this issue.
+            # When using reload service the energy sensor became unavailable.
+            # This is caused because the state change listener of the energy sensor is registered
+            # before the power sensor pushes its initial update. Adding sleep 0 fixes this issue.
             await asyncio.sleep(0)
             if self._strategy_instance:
                 await self._strategy_instance.on_start(hass)
@@ -475,7 +483,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             if (not entities and self._source_entity.entity_id == DUMMY_ENTITY_ID) or not entities:
                 entities.add(DUMMY_ENTITY_ID)
             for entity_id in entities:
-                new_state = self.hass.states.get(entity_id) if entity_id != DUMMY_ENTITY_ID else State(entity_id, STATE_ON)
+                new_state = (
+                    self.hass.states.get(entity_id) if entity_id != DUMMY_ENTITY_ID else State(entity_id, STATE_ON)
+                )
                 await self._handle_source_entity_state_change(
                     entity_id,
                     new_state,
@@ -657,7 +667,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         standby_power = await self._calculate_state_standby_power(entity_state)
         if standby_power is not None and (
-            self._strategy_instance.can_calculate_standby() or self._calculation_strategy != CalculationStrategy.MULTI_SWITCH
+            self._strategy_instance.can_calculate_standby()
+            or self._calculation_strategy != CalculationStrategy.MULTI_SWITCH
         ):
             return standby_power
 
@@ -669,12 +680,18 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return Decimal(self._apply_power_adjustments(power, standby_power))
 
     def _resolve_calculation_state(self, state: State) -> State | None:
-        if self._source_entity.entity_id == DUMMY_ENTITY_ID and self._calculation_strategy != CalculationStrategy.MULTI_SWITCH:
+        if (
+            self._source_entity.entity_id == DUMMY_ENTITY_ID
+            and self._calculation_strategy != CalculationStrategy.MULTI_SWITCH
+        ):
             if self._availability_entity and state.entity_id == self._availability_entity:
                 return State(DUMMY_ENTITY_ID, STATE_ON)
             return state
 
-        if self._calculation_strategy == CalculationStrategy.MULTI_SWITCH or state.entity_id == self._source_entity.entity_id:
+        if (
+            self._calculation_strategy == CalculationStrategy.MULTI_SWITCH
+            or state.entity_id == self._source_entity.entity_id
+        ):
             return state
 
         return cast(State | None, self.hass.states.get(self._source_entity.entity_id))
@@ -826,7 +843,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def async_switch_sub_profile(self, profile: str) -> None:
         """Switches to a new sub profile"""
-        if not self._power_profile or not await self._power_profile.has_sub_profiles or self._power_profile.sub_profile_select:
+        if (
+            not self._power_profile
+            or not await self._power_profile.has_sub_profiles
+            or self._power_profile.sub_profile_select
+        ):
             raise HomeAssistantError(
                 "This is only supported for sensors having sub profiles, and no automatic profile selection",
             )

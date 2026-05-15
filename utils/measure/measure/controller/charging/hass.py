@@ -39,7 +39,9 @@ class HassChargingController(HassControllerBase, ChargingController):
         if self.battery_level_source_type == BatteryLevelSourceType.ATTRIBUTE:
             state = self.get_entity_state()
             if self.battery_level_attribute not in state.attributes:
-                raise BatteryLevelRetrievalError(f"Attribute {self.battery_level_attribute} not found in entity {self.entity_id}")
+                raise BatteryLevelRetrievalError(
+                    f"Attribute {self.battery_level_attribute} not found in entity {self.entity_id}",
+                )
             return int(state.attributes[self.battery_level_attribute])
 
         if not self.battery_level_entity_id:
@@ -96,7 +98,10 @@ class HassChargingController(HassControllerBase, ChargingController):
                 choices=get_attribute_list,
                 ignore=lambda x: (
                     x.get(QUESTION_BATTERY_LEVEL_SOURCE_TYPE) == BatteryLevelSourceType.ENTITY
-                    or (ATTR_BATTERY_LEVEL in get_attribute_list(x) and x.get(QUESTION_BATTERY_LEVEL_SOURCE_TYPE) == BatteryLevelSourceType.ATTRIBUTE)
+                    or (
+                        ATTR_BATTERY_LEVEL in get_attribute_list(x)
+                        and x.get(QUESTION_BATTERY_LEVEL_SOURCE_TYPE) == BatteryLevelSourceType.ATTRIBUTE
+                    )
                 ),
             ),
             inquirer.List(

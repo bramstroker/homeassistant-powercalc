@@ -3,7 +3,13 @@ from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import CONF_DISCOVERY, CONF_SENSOR_TYPE, SensorType
-from custom_components.powercalc.const import CONF_FIXED, CONF_GROUP_MEMBER_SENSORS, CONF_MODE, CONF_POWER, CalculationStrategy
+from custom_components.powercalc.const import (
+    CONF_FIXED,
+    CONF_GROUP_MEMBER_SENSORS,
+    CONF_MODE,
+    CONF_POWER,
+    CalculationStrategy,
+)
 from custom_components.powercalc.diagnostics import async_get_config_entry_diagnostics
 from tests.common import create_mock_config_entry
 

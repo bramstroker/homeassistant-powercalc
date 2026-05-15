@@ -14,7 +14,12 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from tests.common import assert_entity_state
-from tests.config_flow.common import DEFAULT_ENTITY_ID, fixed_value_choice, goto_virtual_power_strategy_step, set_virtual_power_configuration
+from tests.config_flow.common import (
+    DEFAULT_ENTITY_ID,
+    fixed_value_choice,
+    goto_virtual_power_strategy_step,
+    set_virtual_power_configuration,
+)
 
 
 async def test_utility_meter_tariffs(hass: HomeAssistant) -> None:

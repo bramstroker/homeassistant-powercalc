@@ -381,7 +381,11 @@ async def test_needs_fixed_power(hass: HomeAssistant, json_data: dict[str, Any],
         ),
     ],
 )
-async def test_discovery_flow_remarks(hass: HomeAssistant, test_profile: str, expected_translation_key: str | None) -> None:
+async def test_discovery_flow_remarks(
+    hass: HomeAssistant,
+    test_profile: str,
+    expected_translation_key: str | None,
+) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
@@ -400,10 +404,11 @@ async def test_discovery_flow_remarks(hass: HomeAssistant, test_profile: str, ex
 
 
 async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) -> None:
-    """
-    JSON data is cached for the same model. This caused the replaced `calculation_enabled_condition` to be replaced with the first entity.
-    On consequent retrievals of the same model the same condition was used, because it did not contain [[entity]] placeholder anymore.
-    See https://github.com/bramstroker/homeassistant-powercalc/issues/3118
+    """JSON data is cached per model.
+
+    Previously this caused the `calculation_enabled_condition` placeholder to be replaced with
+    the first entity, after which the same condition was reused for subsequent retrievals because
+    the [[entity]] placeholder was gone. See https://github.com/bramstroker/homeassistant-powercalc/issues/3118
     """
     await run_powercalc_setup(hass)
 
@@ -426,7 +431,10 @@ async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) 
     await hass.config_entries.async_add(entry_a)
     await hass.config_entries.async_add(entry_b)
 
-    await set_states(hass, [("media_player.a", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 1}), ("media_player.b", STATE_PAUSED)])
+    await set_states(
+        hass,
+        [("media_player.a", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 1}), ("media_player.b", STATE_PAUSED)],
+    )
     assert_entity_state(hass, "sensor.a_power", "26.90")
     assert_entity_state(hass, "sensor.b_power", "5.20")
 
@@ -444,7 +452,11 @@ async def test_calculation_enabled_condition_is_not_cached(hass: HomeAssistant) 
         ),
     ],
 )
-async def test_requires_manual_sub_profile_selection(hass: HomeAssistant, test_profile: str, expected_result: bool) -> None:
+async def test_requires_manual_sub_profile_selection(
+    hass: HomeAssistant,
+    test_profile: str,
+    expected_result: bool,
+) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
@@ -471,7 +483,13 @@ async def test_requires_manual_sub_profile_selection(hass: HomeAssistant, test_p
         ),
     ],
 )
-async def test_is_custom_profile(hass: HomeAssistant, manufacturer: str, model: str, custom_dir: str | None, expected_result: bool) -> None:
+async def test_is_custom_profile(
+    hass: HomeAssistant,
+    manufacturer: str,
+    model: str,
+    custom_dir: str | None,
+    expected_result: bool,
+) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(ModelInfo(manufacturer, model), custom_directory=custom_dir)
     assert power_profile.is_custom_profile is expected_result

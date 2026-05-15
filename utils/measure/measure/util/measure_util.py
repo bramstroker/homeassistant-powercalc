@@ -9,7 +9,13 @@ import time
 import numpy as np
 
 from measure.config import MeasureConfig
-from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION, PROJECT_DIR, RETRY_COUNT_LIMIT, Trend
+from measure.const import (
+    DUMMY_LOAD_MEASUREMENT_COUNT,
+    DUMMY_LOAD_MEASUREMENTS_DURATION,
+    PROJECT_DIR,
+    RETRY_COUNT_LIMIT,
+    Trend,
+)
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
@@ -123,7 +129,11 @@ class MeasureUtil:
         assert self.dummy_load_value is not None
         power -= (voltage**2) / self.dummy_load_value
         if round(power, 2) <= 0:
-            _LOGGER.warning("Invalid measurement after subtracting dummy load consumption. Calculated consumption: %.2f W; ignoring", power)
+            _LOGGER.warning(
+                "Invalid measurement after subtracting dummy load consumption. "
+                "Calculated consumption: %.2f W; ignoring",
+                power,
+            )
             return None
 
         _LOGGER.info("Measured power: %.2f W", power)
@@ -241,7 +251,9 @@ class MeasureUtil:
             _LOGGER.info("Dummy load was already measured before, value: %s Ω", value)
 
             print("You need to preheat the dummy load, so it's consumption can stabilize.")
-            print("If you're unsure the dummy load is sufficiently preheated or you're using a different one, remeasure.")
+            print(
+                "If you're unsure the dummy load is sufficiently preheated or you're using a different one, remeasure.",
+            )
             print()
             inquirer = input("Do you want to measure the dummy load again? (y/n): ")
             if inquirer.lower() == "n":
@@ -273,7 +285,8 @@ class MeasureUtil:
 
         while True:
             averages = [
-                self.take_average_measurement(DUMMY_LOAD_MEASUREMENTS_DURATION, measure_resistance=True) for _ in range(DUMMY_LOAD_MEASUREMENT_COUNT)
+                self.take_average_measurement(DUMMY_LOAD_MEASUREMENTS_DURATION, measure_resistance=True)
+                for _ in range(DUMMY_LOAD_MEASUREMENT_COUNT)
             ]
 
             trend = self._check_trend(averages)

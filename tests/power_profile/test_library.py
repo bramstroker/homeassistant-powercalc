@@ -29,7 +29,13 @@ async def test_manufacturer_listing(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "manufacturer,expected_models",
     [
-        ("signify", [("LCT010", "Hue White and Color Ambiance A19 E26 (Gen 3)"), ("LCA007", "Hue White and Color Ambiance A19 E26 1100lm")]),
+        (
+            "signify",
+            [
+                ("LCT010", "Hue White and Color Ambiance A19 E26 (Gen 3)"),
+                ("LCA007", "Hue White and Color Ambiance A19 E26 1100lm"),
+            ],
+        ),
         ("Signify Netherlands B.V.", [("LCT010", "Hue White and Color Ambiance A19 E26 (Gen 3)")]),
     ],
 )
@@ -252,7 +258,10 @@ async def test_linked_profile_loading(hass: HomeAssistant) -> None:
 
     assert profile.get_model_directory().endswith("signify/LCA006")
 
-    assert await hass.async_add_executor_job(os.path.exists, os.path.join(profile.get_model_directory(), "color_temp.csv.gz"))
+    assert await hass.async_add_executor_job(
+        os.path.exists,
+        os.path.join(profile.get_model_directory(), "color_temp.csv.gz"),
+    )
 
 
 async def test_linked_profile_loading_failed(hass: HomeAssistant) -> None:

@@ -74,7 +74,10 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
         real_config = MeasureConfig()
         mock_instance = mock.return_value
         mock_instance.get_conf_value = MagicMock()
-        mock_instance.get_conf_value.side_effect = lambda k: default_config_values.get(k.lower(), real_config.get_conf_value(k))
+        mock_instance.get_conf_value.side_effect = lambda k: default_config_values.get(
+            k.lower(),
+            real_config.get_conf_value(k),
+        )
 
         properties = {prop for prop in dir(MeasureConfig) if isinstance(getattr(MeasureConfig, prop, None), property)}
         for prop in properties:

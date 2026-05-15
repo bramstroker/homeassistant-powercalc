@@ -106,7 +106,11 @@ class HassPowerMeter(PowerMeter):
 
     def get_entities_by_unit_of_measurement(self, unit_of_measurement: str) -> list[str]:
         return sorted(
-            [entity.entity_id for entity in self.get_entities() if entity.state.attributes.get("unit_of_measurement") == unit_of_measurement],
+            [
+                entity.entity_id
+                for entity in self.get_entities()
+                if entity.state.attributes.get("unit_of_measurement") == unit_of_measurement
+            ],
         )
 
     def get_entities(self) -> list[Entity]:

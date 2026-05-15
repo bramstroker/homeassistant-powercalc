@@ -184,7 +184,10 @@ async def test_fixed_states_power_options_flow(hass: HomeAssistant) -> None:
     result = await initialize_options_flow(hass, entry, Step.FIXED)
 
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
-    assert schema_keys[schema_keys.index(CONF_FIXED_VALUE)].default() == [{"state": "2", "power": 50}, {"state": "4", "power": 20}]
+    assert schema_keys[schema_keys.index(CONF_FIXED_VALUE)].default() == [
+        {"state": "2", "power": 50},
+        {"state": "4", "power": 20},
+    ]
     fixed_schema = convert(result["data_schema"], custom_serializer=cv.custom_serializer)[0]
     assert next(iter(fixed_schema["selector"]["choose"]["choices"])) == CONF_STATES_POWER
     states_power_selector = fixed_schema["selector"]["choose"]["choices"][CONF_STATES_POWER]["selector"]["object"]
@@ -201,7 +204,11 @@ async def test_fixed_states_power_options_flow(hass: HomeAssistant) -> None:
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert entry.data[CONF_FIXED][CONF_STATES_POWER] == [{"state": "4", "power": 20}, {"state": "2", "power": 50}, {"state": "6", "power": 200}]
+    assert entry.data[CONF_FIXED][CONF_STATES_POWER] == [
+        {"state": "4", "power": 20},
+        {"state": "2", "power": 50},
+        {"state": "6", "power": 200},
+    ]
 
 
 async def test_fixed_states_power_options_flow_reconstructs_existing_config(hass: HomeAssistant) -> None:

@@ -49,7 +49,9 @@ from custom_components.powercalc.const import (
 )
 import custom_components.test.light as test_light_platform
 
-type StateDefinition = tuple[str, StateType] | tuple[str, StateType, Mapping[str, Any]] | tuple[str, StateType, Mapping[str, Any], bool]
+type StateDefinition = (
+    tuple[str, StateType] | tuple[str, StateType, Mapping[str, Any]] | tuple[str, StateType, Mapping[str, Any], bool]
+)
 
 
 async def create_mock_light_entity(

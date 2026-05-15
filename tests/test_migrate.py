@@ -76,7 +76,10 @@ async def test_legacy_update_interval_config_issue_raised(hass: HomeAssistant, i
     assert CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED not in global_config
 
 
-async def test_legacy_update_interval_config_issue_not_raised(hass: HomeAssistant, issue_registry: IssueRegistry) -> None:
+async def test_legacy_update_interval_config_issue_not_raised(
+    hass: HomeAssistant,
+    issue_registry: IssueRegistry,
+) -> None:
     await run_powercalc_setup(hass)
 
     assert not issue_registry.async_get_issue(DOMAIN, "legacy_update_interval_config")
@@ -214,7 +217,11 @@ async def test_fix_legacy_library_model_reference(
 
     with (
         patch("custom_components.powercalc.migrate.ProfileLibrary.factory", AsyncMock(return_value=library)),
-        patch.object(hass.config_entries, "async_update_entry", wraps=hass.config_entries.async_update_entry) as mock_update_entry,
+        patch.object(
+            hass.config_entries,
+            "async_update_entry",
+            wraps=hass.config_entries.async_update_entry,
+        ) as mock_update_entry,
     ):
         await async_fix_legacy_profile_config_entry(hass, mock_entry)
 

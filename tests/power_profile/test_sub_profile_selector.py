@@ -9,7 +9,11 @@ from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.errors import PowercalcSetupError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
-from custom_components.powercalc.power_profile.sub_profile_selector import EntityRegistryMatcher, ModelIdMatcher, SubProfileSelector
+from custom_components.powercalc.power_profile.sub_profile_selector import (
+    EntityRegistryMatcher,
+    ModelIdMatcher,
+    SubProfileSelector,
+)
 from tests.common import get_test_profile_dir
 
 
@@ -161,7 +165,13 @@ async def test_matcher_entity_registry_property(
 
 
 def test_matcher_entity_registry_list_value() -> None:
-    entry = RegistryEntryWithDefaults(entity_id="switch.test", unique_id="1111", platform="test", aliases=["abc", "def"], suggested_object_id="test")
+    entry = RegistryEntryWithDefaults(
+        entity_id="switch.test",
+        unique_id="1111",
+        platform="test",
+        aliases=["abc", "def"],
+        suggested_object_id="test",
+    )
 
     matcher = EntityRegistryMatcher("aliases", "abc", "my_profile")
     result = matcher.match(
@@ -172,7 +182,13 @@ def test_matcher_entity_registry_list_value() -> None:
 
 
 def test_matcher_entity_registry_no_value() -> None:
-    entry = RegistryEntryWithDefaults(entity_id="switch.test", unique_id="1111", platform="test", entity_category=None, suggested_object_id="test")
+    entry = RegistryEntryWithDefaults(
+        entity_id="switch.test",
+        unique_id="1111",
+        platform="test",
+        entity_category=None,
+        suggested_object_id="test",
+    )
 
     matcher = EntityRegistryMatcher("entity_category", "abc", "my_profile")
     result = matcher.match(
@@ -226,7 +242,13 @@ async def test_matcher_model_id(
 
 async def test_matcher_model_id_no_device_entry() -> None:
     matcher = ModelIdMatcher("foo", "bar")
-    assert matcher.match(State("light.test", STATE_ON), SourceEntity(entity_id="light.test", domain="light", object_id="test")) is None
+    assert (
+        matcher.match(
+            State("light.test", STATE_ON),
+            SourceEntity(entity_id="light.test", domain="light", object_id="test"),
+        )
+        is None
+    )
 
 
 async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(

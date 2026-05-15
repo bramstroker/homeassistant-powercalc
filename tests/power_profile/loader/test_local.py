@@ -108,7 +108,10 @@ async def test_get_manufacturer_listing(hass: HomeAssistant) -> None:
 async def test_get_model_listing(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
     assert ("HS300", "IKEA Control outlet") in await loader.get_model_listing("tp-link", {DeviceType.SMART_SWITCH})
-    assert ("light20", "IKEA Control outlet") not in await loader.get_model_listing("tp-link", {DeviceType.SMART_SWITCH})
+    assert ("light20", "IKEA Control outlet") not in await loader.get_model_listing(
+        "tp-link",
+        {DeviceType.SMART_SWITCH},
+    )
     assert ("light20", "IKEA Control outlet") in await loader.get_model_listing("tp-link", {DeviceType.LIGHT})
     assert {
         ("HS300", "IKEA Control outlet"),

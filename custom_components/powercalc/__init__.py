@@ -33,7 +33,11 @@ import voluptuous as vol
 
 from .analytics.analytics import ANALYTICS_INTERVAL, Analytics
 from .common import validate_name_pattern
-from .configuration.global_config import FLAG_HAS_GLOBAL_GUI_CONFIG, get_global_configuration, get_global_gui_configuration
+from .configuration.global_config import (
+    FLAG_HAS_GLOBAL_GUI_CONFIG,
+    get_global_configuration,
+    get_global_gui_configuration,
+)
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -258,7 +262,9 @@ async def create_discovery_manager_instance(
     global_powercalc_config: ConfigType,
 ) -> DiscoveryManager:
     discovery_config = global_powercalc_config.get(CONF_DISCOVERY, {})
-    exclude_device_types = [DeviceType(device_type) for device_type in discovery_config.get(CONF_EXCLUDE_DEVICE_TYPES, [])]
+    exclude_device_types = [
+        DeviceType(device_type) for device_type in discovery_config.get(CONF_EXCLUDE_DEVICE_TYPES, [])
+    ]
     exclude_self_usage = discovery_config.get(CONF_EXCLUDE_SELF_USAGE, False)
     enable_autodiscovery = discovery_config.get(CONF_ENABLED, True)
 

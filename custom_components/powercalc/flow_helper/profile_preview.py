@@ -171,7 +171,12 @@ async def _calculate_current_power(
 
     strategy = detect_calculation_strategy(sensor_config, power_profile)
     try:
-        calculation_strategy = await PowerCalculatorStrategyFactory(hass).create(sensor_config, strategy, power_profile, source_entity)
+        calculation_strategy = await PowerCalculatorStrategyFactory(hass).create(
+            sensor_config,
+            strategy,
+            power_profile,
+            source_entity,
+        )
     except (StrategyConfigurationError, UnsupportedStrategyError):
         return None
 

@@ -8,7 +8,14 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import assert_entity_state, create_mock_config_entry, get_test_profile_dir, mock_device, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    create_mock_config_entry,
+    get_test_profile_dir,
+    mock_device,
+    run_powercalc_setup,
+    set_states,
+)
 from tests.conftest import MockEntityWithModel
 
 

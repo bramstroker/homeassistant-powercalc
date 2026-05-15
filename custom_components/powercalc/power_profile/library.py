@@ -141,7 +141,13 @@ class ProfileLibrary:
                 raise LibraryError(f"Model {model_info.manufacturer} {model_info.model} not found")
             model_info = next(iter(models))
 
-        profile = await self.create_power_profile(model_info, source_entity, custom_directory, variables, process_variables)
+        profile = await self.create_power_profile(
+            model_info,
+            source_entity,
+            custom_directory,
+            variables,
+            process_variables,
+        )
 
         if sub_profile:
             await profile.select_sub_profile(sub_profile)
@@ -163,7 +169,11 @@ class ProfileLibrary:
 
         if linked_profile := json_data.get("linked_profile", json_data.get("linked_lut")):
             linked_manufacturer, linked_model = linked_profile.split("/")
-            linked_json_data, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
+            linked_json_data, directory = await self._load_model_data(
+                linked_manufacturer,
+                linked_model,
+                custom_directory,
+            )
             json_data.update(linked_json_data)
 
         raw_sub_profiles = await self._hass.async_add_executor_job(load_sub_profile_data, directory)
@@ -202,7 +212,12 @@ class ProfileLibrary:
         replacements = self.compute_replacement_variables(placeholders, variables.copy(), source_entity)
         return cast(dict[str, Any], replace_placeholders(json_data, replacements))
 
-    def compute_replacement_variables(self, placeholders: set[str], variables: dict[str, str], source_entity: SourceEntity | None) -> dict[str, str]:
+    def compute_replacement_variables(
+        self,
+        placeholders: set[str],
+        variables: dict[str, str],
+        source_entity: SourceEntity | None,
+    ) -> dict[str, str]:
         variables = variables or {}
 
         if source_entity:
@@ -216,7 +231,9 @@ class ProfileLibrary:
                     source_entity=source_entity,
                 )
                 if not related_entity:
-                    raise LibraryError(build_related_entity_placeholder_not_found_message(placeholder, source_entity.entity_id))
+                    raise LibraryError(
+                        build_related_entity_placeholder_not_found_message(placeholder, source_entity.entity_id),
+                    )
                 variables[placeholder] = related_entity
 
         return variables
@@ -286,7 +303,9 @@ class ProfileLibrary:
 
     async def _load_model_data(self, manufacturer: str, model: str, custom_directory: str | None) -> tuple[dict, str]:
         """Load the model data from the appropriate directory."""
-        loader = LocalLoader(self._hass, custom_directory, is_custom_directory=True) if custom_directory else self._loader
+        loader = (
+            LocalLoader(self._hass, custom_directory, is_custom_directory=True) if custom_directory else self._loader
+        )
         result = await loader.load_model(manufacturer, model)
         if not result:
             raise LibraryError(f"Model {manufacturer} {model} not found")

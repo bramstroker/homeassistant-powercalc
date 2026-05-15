@@ -44,7 +44,11 @@ from custom_components.powercalc.const import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
 )
 from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
-from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_OPTIONS, SCHEMA_UTILITY_METER_OPTIONS, SCHEMA_UTILITY_METER_TOGGLE
+from custom_components.powercalc.flow_helper.schema import (
+    SCHEMA_ENERGY_OPTIONS,
+    SCHEMA_UTILITY_METER_OPTIONS,
+    SCHEMA_UTILITY_METER_TOGGLE,
+)
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
@@ -95,10 +99,16 @@ SCHEMA_GLOBAL_CONFIGURATION_THROTTLING = vol.Schema(
         vol.Optional(CONF_ENERGY_UPDATE_INTERVAL, default=DEFAULT_ENERGY_UPDATE_INTERVAL): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
-        vol.Optional(CONF_GROUP_POWER_UPDATE_INTERVAL, default=DEFAULT_GROUP_POWER_UPDATE_INTERVAL): selector.NumberSelector(
+        vol.Optional(
+            CONF_GROUP_POWER_UPDATE_INTERVAL,
+            default=DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
+        ): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
-        vol.Optional(CONF_GROUP_ENERGY_UPDATE_INTERVAL, default=DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL): selector.NumberSelector(
+        vol.Optional(
+            CONF_GROUP_ENERGY_UPDATE_INTERVAL,
+            default=DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
+        ): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
     },
@@ -199,11 +209,18 @@ class GlobalConfigurationFlow:
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_ENERGY,
                 schema=SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR,
-                form_kwarg={"description_placeholders": {"docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/"}},
+                form_kwarg={
+                    "description_placeholders": {
+                        "docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/",
+                    },
+                },
             ),
         )
 
-    async def async_step_global_configuration_utility_meter(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_global_configuration_utility_meter(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Handle the global configuration step."""
 
         if user_input is not None:
@@ -221,7 +238,11 @@ class GlobalConfigurationFlow:
             PowercalcFormStep(
                 step=Step.GLOBAL_CONFIGURATION_UTILITY_METER,
                 schema=SCHEMA_UTILITY_METER_OPTIONS,
-                form_kwarg={"description_placeholders": {"docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/"}},
+                form_kwarg={
+                    "description_placeholders": {
+                        "docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/",
+                    },
+                },
             ),
         )
 

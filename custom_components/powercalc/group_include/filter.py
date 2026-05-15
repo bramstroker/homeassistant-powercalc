@@ -133,7 +133,11 @@ class GroupFilter(EntityFilter):
         filters = []
         for single_group_id in group_ids:
             domain = split_entity_id(single_group_id)[0]
-            filter_instance = LightGroupFilter(hass, single_group_id) if domain == LIGHT_DOMAIN else StandardGroupFilter(hass, single_group_id)
+            filter_instance = (
+                LightGroupFilter(hass, single_group_id)
+                if domain == LIGHT_DOMAIN
+                else StandardGroupFilter(hass, single_group_id)
+            )
             filters.append(filter_instance)
 
         self.filter = CompositeFilter(filters, FilterOperator.OR) if len(filters) > 1 else filters[0]
@@ -310,7 +314,9 @@ class AreaFilter(EntityFilter):
                 )
 
             self.area_ids.append(area.id)
-            self.area_devices.update([device.id for device in device_registry.async_entries_for_area(device_reg, area.id)])
+            self.area_devices.update(
+                [device.id for device in device_registry.async_entries_for_area(device_reg, area.id)],
+            )
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.area_id in self.area_ids or entity.device_id in self.area_devices
@@ -349,7 +355,9 @@ class FloorFilter(EntityFilter):
             self.area_ids.extend([area.id for area in areas if area.id is not None])
 
             for area in areas:
-                self.devices.extend([device.id for device in device_registry.async_entries_for_area(device_reg, area.id)])
+                self.devices.extend(
+                    [device.id for device in device_registry.async_entries_for_area(device_reg, area.id)],
+                )
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.area_id in self.area_ids or entity.device_id in self.devices

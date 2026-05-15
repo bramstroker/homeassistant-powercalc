@@ -43,7 +43,12 @@ from tests.config_flow.common import (
 SOURCE_ENTITY = SourceEntity("test", "light.test", "light")
 
 
-def _build_ws_message(flow_id: str, user_input: dict[str, Any], flow_type: str = "config_flow", msg_id: int = 1) -> dict[str, Any]:
+def _build_ws_message(
+    flow_id: str,
+    user_input: dict[str, Any],
+    flow_type: str = "config_flow",
+    msg_id: int = 1,
+) -> dict[str, Any]:
     return {
         "id": msg_id,
         "type": "powercalc/start_preview",

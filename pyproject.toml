@@ -70,7 +70,7 @@ disable_error_code = "return-value"
 source = ["custom_components/powercalc", "utils", "tests"]
 
 [tool.ruff]
-line-length = 150
+line-length = 120
 target-version = "py313"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 

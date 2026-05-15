@@ -33,7 +33,15 @@ from .const import (
     MANUFACTURER_WLED,
     CalculationStrategy,
 )
-from .group_include.filter import CategoryFilter, CompositeFilter, DomainFilter, FilterOperator, LambdaFilter, NotFilter, get_filtered_entity_list
+from .group_include.filter import (
+    CategoryFilter,
+    CompositeFilter,
+    DomainFilter,
+    FilterOperator,
+    LambdaFilter,
+    NotFilter,
+    get_filtered_entity_list,
+)
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
@@ -276,7 +284,13 @@ class DiscoveryManager:
 
         power_profiles = []
         for model_info in models:
-            profile = await get_power_profile(self.hass, {}, source_entity, model_info=model_info, process_variables=False)
+            profile = await get_power_profile(
+                self.hass,
+                {},
+                source_entity,
+                model_info=model_info,
+                process_variables=False,
+            )
             if not profile or profile.discovery_by != discovery_type:  # pragma: no cover
                 continue
             if discovery_type == DiscoveryBy.ENTITY:
@@ -303,7 +317,11 @@ class DiscoveryManager:
         """Initialize the discovery flow for a WLED light."""
         if DeviceType.LIGHT in self._exclude_device_types:
             return
-        unique_id = f"pc_{source_entity.device_entry.id}" if source_entity.device_entry else get_or_create_unique_id({}, source_entity, None)
+        unique_id = (
+            f"pc_{source_entity.device_entry.id}"
+            if source_entity.device_entry
+            else get_or_create_unique_id({}, source_entity, None)
+        )
         if self._is_already_discovered(source_entity, unique_id):
             _LOGGER.debug(
                 "%s: Already setup with discovery, skipping new discovery (unique_id=%s)",
@@ -435,7 +453,9 @@ class DiscoveryManager:
         # see https://github.com/home-assistant/core/pull/166187
         manufacturer = str(device_entry.manufacturer).strip()
         model = str(device_entry.model).strip()
-        model_id = str(device_entry.model_id).strip() if hasattr(device_entry, "model_id") and device_entry.model_id else None
+        model_id = (
+            str(device_entry.model_id).strip() if hasattr(device_entry, "model_id") and device_entry.model_id else None
+        )
 
         if len(manufacturer) == 0 or len(model) == 0:
             return None
@@ -520,7 +540,9 @@ class DiscoveryManager:
         # Find entity ids in yaml config (Legacy)
         if SENSOR_DOMAIN in self.ha_config:  # pragma: no cover
             sensor_config = self.ha_config.get(SENSOR_DOMAIN)
-            platform_entries = [item for item in sensor_config or {} if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN]
+            platform_entries = [
+                item for item in sensor_config or {} if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN
+            ]
             for entry in platform_entries:
                 entities.extend(self._find_entity_ids_in_yaml_config(entry))
 
@@ -533,7 +555,11 @@ class DiscoveryManager:
 
         # Add entities from existing config entries
         entities.extend(
-            [str(entry.data.get(CONF_ENTITY_ID)) for entry in self.hass.config_entries.async_entries(DOMAIN) if entry.source == SOURCE_USER],
+            [
+                str(entry.data.get(CONF_ENTITY_ID))
+                for entry in self.hass.config_entries.async_entries(DOMAIN)
+                if entry.source == SOURCE_USER
+            ],
         )
 
         return entities

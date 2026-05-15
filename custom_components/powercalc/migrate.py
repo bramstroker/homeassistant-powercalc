@@ -90,13 +90,17 @@ def _migrate_global_discovery_config(data: dict) -> None:
 def _migrate_playbooks(data: dict) -> None:
     conf_playbook = data.get(CONF_PLAYBOOK, {})
     if CONF_PLAYBOOKS in conf_playbook:
-        data[CONF_PLAYBOOK][CONF_PLAYBOOKS] = [{CONF_ID: key, CONF_PATH: val} for key, val in conf_playbook.pop(CONF_PLAYBOOKS).items()]
+        data[CONF_PLAYBOOK][CONF_PLAYBOOKS] = [
+            {CONF_ID: key, CONF_PATH: val} for key, val in conf_playbook.pop(CONF_PLAYBOOKS).items()
+        ]
 
 
 def _migrate_states_power(data: dict) -> None:
     conf_fixed = data.get(CONF_FIXED, {})
     if CONF_STATES_POWER in conf_fixed and isinstance(conf_fixed[CONF_STATES_POWER], dict):
-        data[CONF_FIXED][CONF_STATES_POWER] = [{CONF_STATE: key, CONF_POWER: val} for key, val in conf_fixed[CONF_STATES_POWER].items()]
+        data[CONF_FIXED][CONF_STATES_POWER] = [
+            {CONF_STATE: key, CONF_POWER: val} for key, val in conf_fixed[CONF_STATES_POWER].items()
+        ]
 
 
 async def async_fix_legacy_profile_config_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:

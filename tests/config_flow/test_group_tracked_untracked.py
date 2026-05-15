@@ -20,7 +20,13 @@ from custom_components.powercalc.const import (
     GroupType,
 )
 from custom_components.powercalc.flow_helper.flows.group import UNIQUE_ID_TRACKED_UNTRACKED
-from tests.common import assert_entity_state, create_mock_config_entry, mock_sensors_in_registry, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    create_mock_config_entry,
+    mock_sensors_in_registry,
+    run_powercalc_setup,
+    set_states,
+)
 from tests.config_flow.common import (
     handle_options_flow_update,
     select_menu_item,
@@ -94,7 +100,9 @@ async def test_config_flow_manual(hass: HomeAssistant) -> None:
     assert result["step_id"] == Step.GROUP_TRACKED_UNTRACKED_MANUAL
 
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
-    assert schema_keys[schema_keys.index(CONF_GROUP_TRACKED_POWER_ENTITIES)].description == {"suggested_value": ["sensor.1_power", "sensor.2_power"]}
+    assert schema_keys[schema_keys.index(CONF_GROUP_TRACKED_POWER_ENTITIES)].description == {
+        "suggested_value": ["sensor.1_power", "sensor.2_power"],
+    }
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -115,7 +123,11 @@ async def test_config_flow_manual(hass: HomeAssistant) -> None:
         CONF_GROUP_TRACKED_POWER_ENTITIES: ["sensor.1_power", "sensor.2_power"],
     }
 
-    await set_states(hass, [("sensor.mains_power", "100"), ("sensor.1_power", "10"), ("sensor.2_power", "20")], block_count=2)
+    await set_states(
+        hass,
+        [("sensor.mains_power", "100"), ("sensor.1_power", "10"), ("sensor.2_power", "20")],
+        block_count=2,
+    )
     assert_entity_state(hass, "sensor.tracked_power", "30.00")
 
     assert_entity_state(hass, "sensor.untracked_power", "70.00")

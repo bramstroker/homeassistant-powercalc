@@ -53,7 +53,11 @@ async def test_create_multi_switch_sensor_entry(hass: HomeAssistant, entity_regi
     entry_data = result["data"]
     assert entry_data[CONF_SENSOR_TYPE] == SensorType.VIRTUAL_POWER
     assert entry_data[CONF_MODE] == CalculationStrategy.MULTI_SWITCH
-    assert entry_data[CONF_MULTI_SWITCH] == {CONF_ENTITIES: ["switch.a", "switch.b"], CONF_POWER: 0.8, CONF_POWER_OFF: 0.5}
+    assert entry_data[CONF_MULTI_SWITCH] == {
+        CONF_ENTITIES: ["switch.a", "switch.b"],
+        CONF_POWER: 0.8,
+        CONF_POWER_OFF: 0.5,
+    }
 
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
@@ -204,7 +208,10 @@ async def test_regression_2612(hass: HomeAssistant, mock_entity_with_model_infor
     assert hass.states.get("sensor.foo_bar_energy")
 
 
-async def test_setup_without_switches(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+async def test_setup_without_switches(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/3218
 
@@ -307,7 +314,12 @@ async def initialize_device_discovery_flow(hass: HomeAssistant, device_entry: De
     )
 
 
-def mock_device_with_switches(hass: HomeAssistant, num_switches: int = 2, manufacturer: str = "test", model: str = "multi_switch") -> DeviceEntry:
+def mock_device_with_switches(
+    hass: HomeAssistant,
+    num_switches: int = 2,
+    manufacturer: str = "test",
+    model: str = "multi_switch",
+) -> DeviceEntry:
     device_id = "abcdef"
     device_entry = DeviceEntry(
         id=device_id,

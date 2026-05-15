@@ -95,7 +95,8 @@ async def _get_existing_energy_sensor(
     entity_entry = ent_reg.async_get(energy_sensor_id)
     if entity_entry is None:
         raise SensorConfigurationError(
-            f"No energy sensor with id {energy_sensor_id} found in your HA instance. Double check `energy_sensor_id` setting",
+            f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
+            "Double check `energy_sensor_id` setting",
         )
     return RealEnergySensor(
         entity_entry.entity_id,
@@ -189,7 +190,9 @@ def get_unit_prefix(
     unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
 
     try:
-        power_unit: UnitOfPower | str | None = UnitOfPower(power_sensor.unit_of_measurement) if power_sensor.unit_of_measurement else None
+        power_unit: UnitOfPower | str | None = (
+            UnitOfPower(power_sensor.unit_of_measurement) if power_sensor.unit_of_measurement else None
+        )
     except ValueError:
         power_unit = None
     power_state = hass.states.get(power_sensor.entity_id)
@@ -272,7 +275,9 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             "integration_method": integration_method,
             "unique_id": unique_id,
             "device_info": device_info,
-            "max_sub_interval": timedelta(seconds=sensor_config.get(CONF_ENERGY_UPDATE_INTERVAL, DEFAULT_ENERGY_UPDATE_INTERVAL)),
+            "max_sub_interval": timedelta(
+                seconds=sensor_config.get(CONF_ENERGY_UPDATE_INTERVAL, DEFAULT_ENERGY_UPDATE_INTERVAL),
+            ),
         }
 
         signature = inspect.signature(IntegrationSensor.__init__)

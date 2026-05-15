@@ -194,7 +194,11 @@ class Analytics:
         cutoff = datetime(2000, 1, 1, tzinfo=UTC)
         dates = chain(
             (e.created_at for e in self.hass.config_entries.async_entries(DOMAIN) if e.created_at > cutoff),
-            (e.created_at for e in entity_registry.async_get(self.hass).entities.values() if e.domain != DOMAIN and e.created_at > cutoff),
+            (
+                e.created_at
+                for e in entity_registry.async_get(self.hass).entities.values()
+                if e.domain != DOMAIN and e.created_at > cutoff
+            ),
         )
 
         try:
