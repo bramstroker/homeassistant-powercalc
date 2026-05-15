@@ -74,7 +74,7 @@ async def find_entities(
         if _should_skip_source_entity(source_entity, include_non_powercalc):
             continue
 
-        real_sensor = _create_real_sensor(source_entity, include_non_powercalc)
+        real_sensor = _create_real_sensor(source_entity)
         if real_sensor:
             resolved_entities.append(real_sensor)
             continue
@@ -96,11 +96,8 @@ def _should_skip_source_entity(source_entity: RegistryEntry, include_non_powerca
     return source_entity.domain == sensor.DOMAIN and source_entity.platform != DOMAIN and not include_non_powercalc
 
 
-def _create_real_sensor(source_entity: RegistryEntry, include_non_powercalc: bool) -> Entity | None:
+def _create_real_sensor(source_entity: RegistryEntry) -> Entity | None:
     if source_entity.domain != sensor.DOMAIN:
-        return None
-
-    if source_entity.platform != DOMAIN and not include_non_powercalc:
         return None
 
     device_class = source_entity.device_class or source_entity.original_device_class
@@ -108,7 +105,7 @@ def _create_real_sensor(source_entity: RegistryEntry, include_non_powercalc: boo
         return RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement)
     if device_class == SensorDeviceClass.ENERGY:
         return RealEnergySensor(source_entity.entity_id)
-    return None
+    return None  # pragma: no cover
 
 
 async def _is_discoverable_source_entity(hass: HomeAssistant, source_entity: RegistryEntry) -> bool:
