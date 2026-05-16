@@ -9,6 +9,9 @@ on:
     paths:
       - 'utils/measure/**'
 
+permissions:
+  contents: read
+
 jobs:
   tests:
     runs-on: "ubuntu-latest"

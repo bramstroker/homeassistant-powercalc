@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+
 jobs:
   release_zip_file:
     name: Prepare release asset
@@ -11,6 +14,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+      - name: Get version
+        id: version
+        uses: home-assistant/actions/helpers/version@master
       - name: "Set manifest version number"
         run: |
           python3 ${{ github.workspace }}/.github/scripts/update_hacs_manifest.py --version ${{ github.ref_name }}

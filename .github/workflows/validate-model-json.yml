@@ -7,6 +7,7 @@ on:
        - 'profile_library/model_schema.json'
 
 permissions:
+  contents: read
   issues: write
   pull-requests: write
 
