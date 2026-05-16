@@ -8,6 +8,9 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   format:
     name: Generate plots

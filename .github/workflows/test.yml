@@ -10,6 +10,9 @@ on:
       - '**.py'
       - 'uv.lock'
 
+permissions:
+  contents: read
+
 jobs:
   tests:
     runs-on: "ubuntu-latest"

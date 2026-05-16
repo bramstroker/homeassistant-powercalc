@@ -5,6 +5,9 @@ on:
     paths:
        - '**/*.csv.gz'
 
+permissions:
+  contents: read
+
 jobs:
   generate-plots:
     name: Generate plots

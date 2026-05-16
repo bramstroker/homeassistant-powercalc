@@ -5,6 +5,9 @@ on:
     paths:
        - '**/*.csv.gz'
 
+permissions:
+  contents: read
+
 jobs:
   validate-lut:
     name: Validate LUT CSV files
