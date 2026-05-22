@@ -23,9 +23,10 @@ class KasaPowerMeter(PowerMeter):
         return PowerMeasurementResult(power=power, updated=time.time())
 
     async def async_read_power_meter(self) -> tuple[float, float | None]:
+        from kasa import Module
         await self._smartplug.update()
-        emeter = self._smartplug.modules["emeter"]
-        return float(emeter.realtime.power), float(emeter.realtime.voltage)
+        energy = self._smartplug.modules[Module.Energy]
+        return float(energy.current_consumption), float(energy.voltage)
 
     def has_voltage_support(self) -> bool:
         return True
