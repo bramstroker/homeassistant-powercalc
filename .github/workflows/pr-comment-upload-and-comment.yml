@@ -32,14 +32,16 @@ jobs:
       - name: Build PR message
         id: build-pr-message
         run: |
-          echo 'PR_MESSAGE<<EOF' >> $GITHUB_OUTPUT
-          echo "Thank you for submitting light measurements!" >> $GITHUB_OUTPUT
-          echo -e "Here are some visualizations for the CSV files.\n" >> $GITHUB_OUTPUT
+          {
+            echo 'PR_MESSAGE<<EOF'
+            echo "Thank you for submitting light measurements!"
+            echo -e "Here are some visualizations for the CSV files.\n"
+          } >> "$GITHUB_OUTPUT"
           for url in ${{ join(fromJSON(steps.imgur_step.outputs.imgur_urls), ' ') }}
           do
-            echo "![Image](${url})" >> $GITHUB_OUTPUT
+            echo "![Image](${url})" >> "$GITHUB_OUTPUT"
           done
-          echo 'EOF' >> $GITHUB_OUTPUT
+          echo 'EOF' >> "$GITHUB_OUTPUT"
       - name: Post Comment on PR
         uses: actions/github-script@v9
         with:
