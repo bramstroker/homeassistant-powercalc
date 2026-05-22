@@ -203,7 +203,6 @@ class UnitPrefix(StrEnum):
 
 
 ENTITY_CATEGORIES = [
-    EntityCategory.CONFIG,
     EntityCategory.DIAGNOSTIC,
     None,
 ]

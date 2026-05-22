@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_ENABLED, CONF_ID, CONF_PATH
+from homeassistant.const import CONF_ENABLED, CONF_ID, CONF_PATH, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.issue_registry import async_create_issue
@@ -24,6 +24,7 @@ from custom_components.powercalc.const import (
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_POWER,
+    CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_STATE,
@@ -58,7 +59,10 @@ async def async_migrate_config_entry(hass: HomeAssistant, config_entry: ConfigEn
     if version <= 6:
         _migrate_states_power(data)
 
-    hass.config_entries.async_update_entry(config_entry, data=data, version=7)
+    if version <= 7:
+        _migrate_invalid_power_sensor_category(data)
+
+    hass.config_entries.async_update_entry(config_entry, data=data, version=8)
 
 
 def _migrate_power_template(data: dict) -> None:
@@ -101,6 +105,11 @@ def _migrate_states_power(data: dict) -> None:
         data[CONF_FIXED][CONF_STATES_POWER] = [
             {CONF_STATE: key, CONF_POWER: val} for key, val in conf_fixed[CONF_STATES_POWER].items()
         ]
+
+
+def _migrate_invalid_power_sensor_category(data: dict) -> None:
+    if data.get(CONF_POWER_SENSOR_CATEGORY) == EntityCategory.CONFIG:
+        data.pop(CONF_POWER_SENSOR_CATEGORY)
 
 
 async def async_fix_legacy_profile_config_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:

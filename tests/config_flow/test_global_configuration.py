@@ -251,7 +251,7 @@ async def test_basic_options_flow(hass: HomeAssistant) -> None:
             CONF_POWER_SENSOR_PRECISION: 4,
             CONF_POWER_SENSOR_NAMING: "{} power_watt",
             CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} friendly",
-            CONF_POWER_SENSOR_CATEGORY: EntityCategory.CONFIG,
+            CONF_POWER_SENSOR_CATEGORY: EntityCategory.DIAGNOSTIC,
             CONF_IGNORE_UNAVAILABLE_STATE: True,
             CONF_INCLUDE_NON_POWERCALC_SENSORS: False,
             CONF_DISABLE_EXTENDED_ATTRIBUTES: True,
@@ -264,7 +264,7 @@ async def test_basic_options_flow(hass: HomeAssistant) -> None:
     assert entry.data[CONF_POWER_SENSOR_PRECISION] == 4
     assert entry.data[CONF_POWER_SENSOR_NAMING] == "{} power_watt"
     assert entry.data[CONF_POWER_SENSOR_FRIENDLY_NAMING] == "{} friendly"
-    assert entry.data[CONF_POWER_SENSOR_CATEGORY] == EntityCategory.CONFIG
+    assert entry.data[CONF_POWER_SENSOR_CATEGORY] == EntityCategory.DIAGNOSTIC
     assert entry.data[CONF_IGNORE_UNAVAILABLE_STATE]
     assert not entry.data[CONF_INCLUDE_NON_POWERCALC_SENSORS]
     assert entry.data[CONF_DISABLE_EXTENDED_ATTRIBUTES]

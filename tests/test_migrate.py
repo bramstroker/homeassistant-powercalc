@@ -1,7 +1,7 @@
 from datetime import timedelta
 from unittest.mock import AsyncMock, Mock, patch
 
-from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME
+from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.issue_registry import IssueRegistry
 import pytest
@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_POWER,
+    CONF_POWER_SENSOR_CATEGORY,
     CONF_SENSOR_TYPE,
     CONF_STATE,
     CONF_STATE_TRIGGER,
@@ -184,6 +185,32 @@ async def test_migrate_config_entry_states_power(hass: HomeAssistant) -> None:
     ]
 
 
+async def test_migrate_config_entry_removes_invalid_power_sensor_category(hass: HomeAssistant) -> None:
+    """Test migration removes the no longer valid config entity category from power sensors."""
+    mock_entry = await migrate_legacy_entry(
+        hass,
+        {
+            CONF_POWER_SENSOR_CATEGORY: EntityCategory.CONFIG,
+        },
+        version=7,
+    )
+
+    assert CONF_POWER_SENSOR_CATEGORY not in mock_entry.data
+
+
+async def test_migrate_config_entry_keeps_diagnostic_power_sensor_category(hass: HomeAssistant) -> None:
+    """Test migration keeps still valid power sensor categories."""
+    mock_entry = await migrate_legacy_entry(
+        hass,
+        {
+            CONF_POWER_SENSOR_CATEGORY: EntityCategory.DIAGNOSTIC,
+        },
+        version=7,
+    )
+
+    assert mock_entry.data[CONF_POWER_SENSOR_CATEGORY] == EntityCategory.DIAGNOSTIC
+
+
 @pytest.mark.parametrize(
     ("input_model", "migrated_profile", "expected_model", "expect_update"),
     [
@@ -208,7 +235,7 @@ async def test_fix_legacy_library_model_reference(
             CONF_MANUFACTURER: "eglo",
             CONF_MODEL: input_model,
         },
-        version=7,
+        version=PowercalcConfigFlow.VERSION,
     )
     mock_entry.add_to_hass(hass)
 
