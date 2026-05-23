@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from decimal import Decimal
 
 from homeassistant.core import HomeAssistant, State
@@ -27,6 +28,9 @@ class PowerCalculationStrategyInterface:
     def is_enabled(self, entity_state: State) -> bool:
         """Return if this strategy is enabled based on entity state."""
         return True
+
+    def set_update_callback(self, update_callback: Callable[[Decimal], None]) -> None:
+        """Register update callback to allow strategy to push power updates."""
 
     async def on_start(self, hass: HomeAssistant) -> None:
         """Called after HA has started"""

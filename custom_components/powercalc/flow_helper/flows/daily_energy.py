@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
@@ -10,7 +11,6 @@ from homeassistant.const import (
     UnitOfPower,
     UnitOfTime,
 )
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 import voluptuous as vol
@@ -119,7 +119,7 @@ class DailyEnergyConfigFlow:
     async def async_step_daily_energy(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the flow for daily energy sensor."""
         self.flow.selected_sensor_type = SensorType.DAILY_ENERGY
 
@@ -148,7 +148,7 @@ class DailyEnergyOptionsFlow:
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
         self.flow: PowercalcOptionsFlow = flow
 
-    async def async_step_daily_energy(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_daily_energy(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the daily energy options flow."""
         form_data = wrap_choose_selector(
             dict(self.flow.sensor_config[CONF_DAILY_FIXED_ENERGY]),

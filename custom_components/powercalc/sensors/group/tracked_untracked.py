@@ -121,7 +121,7 @@ class TrackedPowerSensorFactory:
         Get all power entities which are part of the tracked sensor group
         """
         if not bool(self.config.get(CONF_GROUP_TRACKED_AUTO, False)):
-            tracked_entities = self.config.get(CONF_GROUP_TRACKED_POWER_ENTITIES)
+            tracked_entities: list[str] | None = self.config.get(CONF_GROUP_TRACKED_POWER_ENTITIES)
             if not isinstance(tracked_entities, list):
                 return set()
             return set(tracked_entities)

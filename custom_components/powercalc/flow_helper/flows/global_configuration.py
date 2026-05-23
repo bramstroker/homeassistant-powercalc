@@ -3,8 +3,8 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_ENABLED, CONF_SENSORS, UnitOfTime
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
@@ -151,7 +151,10 @@ class GlobalConfigurationFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
 
-    async def async_step_global_configuration_discovery(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_global_configuration_discovery(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
         """Handle the discovery configuration step."""
 
         if user_input is not None:
@@ -172,7 +175,10 @@ class GlobalConfigurationFlow:
             user_input,
         )
 
-    async def async_step_global_configuration_throttling(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_global_configuration_throttling(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
         """Handle the throttling related options."""
 
         if user_input is not None:
@@ -194,7 +200,10 @@ class GlobalConfigurationFlow:
             user_input,
         )
 
-    async def async_step_global_configuration_energy(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_global_configuration_energy(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
         """Handle the global configuration step."""
 
         if user_input is not None:
@@ -220,7 +229,7 @@ class GlobalConfigurationFlow:
     async def async_step_global_configuration_utility_meter(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the global configuration step."""
 
         if user_input is not None:
@@ -229,7 +238,7 @@ class GlobalConfigurationFlow:
                 return self.flow.persist_config_entry()
 
         if not bool(self.flow.global_config.get(CONF_CREATE_UTILITY_METERS)) or user_input is not None:
-            return self.flow.async_create_entry(  # type: ignore
+            return self.flow.async_create_entry(
                 title="Global Configuration",
                 data=self.flow.global_config,
             )
@@ -252,7 +261,7 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
         super().__init__(flow)
         self.flow: PowercalcConfigFlow = flow
 
-    async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the global configuration step."""
         get_global_powercalc_config(self.flow)
         await self.flow.async_set_unique_id(ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
@@ -293,7 +302,7 @@ class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
             menu[Step.GLOBAL_CONFIGURATION_UTILITY_METER] = "Utility meter options"
         return menu
 
-    async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the global configuration step."""
 
         if user_input is not None:

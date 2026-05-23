@@ -64,7 +64,7 @@ class RemoteLoader(Loader):
         """Initialize the loader."""
 
         integration = await async_get_integration(self.hass, DOMAIN)
-        powercalc_version = AwesomeVersion(integration.version)
+        powercalc_version = AwesomeVersion(str(integration.version))
 
         self.library_contents = await self.load_library_json()
         self.profile_hashes = await self.hass.async_add_executor_job(self._load_profile_hashes)
@@ -432,7 +432,7 @@ class RemoteLoader(Loader):
             return {}
 
         with open(path) as f:
-            return json.load(f)  # type: ignore
+            return json.load(f)  # type: ignore[no-any-return]
 
     def _write_profile_hashes(self, hashes: dict[str, str]) -> None:
         """Write profile hashes to local storage"""

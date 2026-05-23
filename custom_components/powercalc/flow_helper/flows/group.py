@@ -15,7 +15,6 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.selector import TextSelector
@@ -318,7 +317,7 @@ class GroupFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
 
-    async def async_step_assign_groups(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_assign_groups(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the flow for assigning groups."""
         group_entries = get_group_entries(self.flow.hass, GroupType.CUSTOM)
         if not group_entries:
@@ -360,7 +359,7 @@ class GroupConfigFlow(GroupFlow):
       - name: str | None
       - selected_sensor_type: str | None
       - async_set_unique_id(), _abort_if_unique_id_configured()
-      - handle_form_step(PowercalcFormStep, user_input) -> FlowResult
+      - handle_form_step(PowercalcFormStep, user_input) -> ConfigFlowResult
       - async_show_menu(...), fill_schema_defaults(...),
       - create_group_selector(...), create_schema_group_custom(...)
 
@@ -388,7 +387,7 @@ class GroupConfigFlow(GroupFlow):
         user_input: dict[str, Any] | None = None,
         schema: vol.Schema | None = None,
         next_step: Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None,
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         async def _validate(ui: dict[str, Any]) -> dict[str, Any]:
             if group_type == GroupType.CUSTOM:
                 validate_group_input(ui)
@@ -412,17 +411,17 @@ class GroupConfigFlow(GroupFlow):
             user_input,
         )
 
-    async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         schema = SCHEMA_GROUP.extend(create_schema_group_custom(self.flow.hass).schema)
         return await self.handle_group_step(GroupType.CUSTOM, user_input, schema)
 
-    async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         return await self.handle_group_step(GroupType.DOMAIN, user_input)
 
-    async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         return await self.handle_group_step(GroupType.SUBTRACT, user_input)
 
-    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         await self.flow.async_set_unique_id(UNIQUE_ID_TRACKED_UNTRACKED)
         self.flow.abort_if_unique_id_configured()
         if user_input is not None:
@@ -442,7 +441,10 @@ class GroupConfigFlow(GroupFlow):
             next_step=_next,
         )
 
-    async def async_step_group_tracked_untracked_auto(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_tracked_untracked_auto(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
         schema = await create_schema_tracked_untracked_auto(self.flow.hass)
         return await self.flow.handle_form_step(
             PowercalcFormStep(
@@ -453,7 +455,10 @@ class GroupConfigFlow(GroupFlow):
             user_input,
         )
 
-    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_tracked_untracked_manual(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
         schema = await create_schema_group_tracked_untracked_manual(self.flow.hass, user_input)
         return await self.flow.handle_form_step(
             PowercalcFormStep(
@@ -472,7 +477,7 @@ class GroupOptionsFlow(GroupFlow):
         super().__init__(flow)
         self.flow: PowercalcOptionsFlow = flow
 
-    async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the group options flow."""
         return await self.flow.async_handle_options_step(
             user_input,
@@ -480,15 +485,15 @@ class GroupOptionsFlow(GroupFlow):
             Step.GROUP_CUSTOM,
         )
 
-    async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the group options flow."""
         return await self.flow.async_handle_options_step(user_input, SCHEMA_GROUP_DOMAIN_OPTIONS, Step.GROUP_DOMAIN)
 
-    async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the group options flow."""
         return await self.flow.async_handle_options_step(user_input, SCHEMA_GROUP_SUBTRACT_OPTIONS, Step.GROUP_SUBTRACT)
 
-    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the group options flow."""
         schema = SCHEMA_GROUP_TRACKED_UNTRACKED
         if self.flow.sensor_config.get(CONF_GROUP_TRACKED_AUTO, True):

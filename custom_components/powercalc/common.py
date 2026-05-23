@@ -71,13 +71,14 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
         source_entity_domain = entity_entry.domain
         unique_id = entity_entry.unique_id
         if entity_entry.capabilities:
-            supported_color_modes = entity_entry.capabilities.get(  # type: ignore[assignment]
+            supported_color_modes = entity_entry.capabilities.get(
                 ATTR_SUPPORTED_COLOR_MODES,
+                [],
             )
 
     entity_state = hass.states.get(entity_id)
     if entity_state:
-        supported_color_modes = entity_state.attributes.get(ATTR_SUPPORTED_COLOR_MODES)
+        supported_color_modes = entity_state.attributes.get(ATTR_SUPPORTED_COLOR_MODES, [])
 
     return SourceEntity(
         source_object_id,

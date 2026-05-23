@@ -88,13 +88,13 @@ def fill_schema_defaults(
         new_key = key
         if key in options and isinstance(key, vol.Marker):
             if isinstance(key, vol.Optional) and callable(key.default) and key.default():
-                new_key = vol.Optional(key.schema, default=options.get(key))  # type: ignore
+                new_key = vol.Optional(key.schema, default=options.get(key))  # type: ignore[call-overload]
             elif isinstance(key, vol.Required):
-                new_key = vol.Required(key.schema, default=options.get(key))  # type: ignore
-                new_key.description = {"suggested_value": options.get(key)}  # type: ignore
+                new_key = vol.Required(key.schema, default=options.get(key))  # type: ignore[call-overload]
+                new_key.description = {"suggested_value": options.get(key)}  # type: ignore[call-overload]
             elif "suggested_value" not in (new_key.description or {}):
                 new_key = copy.copy(key)
-                new_key.description = {"suggested_value": options.get(key)}  # type: ignore
+                new_key.description = {"suggested_value": options.get(key)}  # type: ignore[call-overload]
         schema[new_key] = val
     return vol.Schema(schema)
 
@@ -117,9 +117,10 @@ def unwrap_choose_selector(
 
     raw = user_input.pop(wrapper_key)
     if not isinstance(raw, dict):
-        if value_key is not None:
-            key = value_key(raw) if callable(value_key) else value_key
-            user_input[key] = raw
+        if isinstance(value_key, str):
+            user_input[value_key] = raw
+        elif value_key is not None:
+            user_input[value_key(raw)] = raw
         return user_input
 
     if "active_choice" not in raw:

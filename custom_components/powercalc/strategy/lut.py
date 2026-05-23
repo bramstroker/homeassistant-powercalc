@@ -109,7 +109,11 @@ class LutRegistry:
         supported_modes = self._supported_modes.get(cache_key)
         if supported_modes is None:
             supported_modes = set()
-            for filename in await self._hass.async_add_executor_job(os.listdir, power_profile.get_model_directory()):
+            filenames = cast(
+                list[str],
+                await self._hass.async_add_executor_job(os.listdir, power_profile.get_model_directory()),
+            )
+            for filename in filenames:
                 if filename.endswith((".csv.gz", ".csv")):
                     base_name = filename.split(".", 1)[0]
                     supported_modes.add(LookupMode(base_name))

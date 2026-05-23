@@ -498,8 +498,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         # Trigger initial update
         self.async_on_remove(start.async_at_start(self.hass, initial_update))
 
-        if hasattr(self._strategy_instance, "set_update_callback"):
-            self._strategy_instance.set_update_callback(self._update_power_sensor)
+        self._strategy_instance.set_update_callback(self._update_power_sensor)
 
         self._register_force_update_interval()
 
