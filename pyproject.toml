@@ -38,6 +38,11 @@ known-third-party = ["homeassistant"]
 force-sort-within-sections = true
 combine-as-imports = true
 
+[tool.ty.analysis]
+allowed-unresolved-imports = [
+    "homeassistant.components.**",
+]
+
 [tool.mypy]
 python_version = "3.14"
 show_error_codes = true
@@ -106,7 +111,8 @@ dev = [
     "types-croniter>=2.0",
     "croniter>=6.0.0",
     "aioresponses>=0.7.6",
-    "pyturbojpeg>=1.8.2"
+    "pyturbojpeg>=1.8.2",
+    "ty>=0.0.39",
 ]
 
 [tool.setuptools]

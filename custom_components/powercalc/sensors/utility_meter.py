@@ -286,6 +286,6 @@ class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
             self._state if hasattr(self, "_state") else self._attr_native_value
         )  # pre HA 2024.12 value was stored in _state
         if self.rounding_digits and value is not None:
-            return Decimal(round(value, self.rounding_digits))  # type: ignore
+            return Decimal(round(value, self.rounding_digits))  # type: ignore[arg-type]
 
-        return value  # type: ignore
+        return value  # type: ignore[return-value]

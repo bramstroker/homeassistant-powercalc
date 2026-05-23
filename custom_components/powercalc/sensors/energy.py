@@ -284,7 +284,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
         params = {key: val for key, val in params.items() if key in signature.parameters}
 
-        super().__init__(**params)  # type: ignore[arg-type]
+        super().__init__(**params)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
 
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain

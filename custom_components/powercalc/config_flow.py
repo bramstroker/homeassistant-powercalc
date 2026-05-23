@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 import logging
-from typing import Any, cast
+from typing import Any
 import uuid
 
 from homeassistant.config_entries import (
@@ -22,7 +22,6 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import entity_registry as er, selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -171,7 +170,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
     @abstractmethod
     @callback
-    def persist_config_entry(self) -> FlowResult:
+    def persist_config_entry(self) -> ConfigFlowResult:
         pass  # pragma: no cover
 
     def _async_step(self, step: Step) -> Callable:
@@ -185,12 +184,12 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
         return _async_step
 
-    async def async_step(self, step: Step, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step(self, step: Step, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle a config flow step by delegating to specific handler."""
         step_method = f"async_step_{step}"
         for handler in self.flow_handlers.values():
             if hasattr(handler, step_method):
-                return await getattr(handler, step_method)(user_input)  # type:ignore
+                return await getattr(handler, step_method)(user_input)  # type: ignore[no-any-return]
         raise SchemaFlowError("No handler defined")  # pragma: nocover
 
     async def validate_strategy_config(self, user_input: dict[str, Any] | None = None) -> None:
@@ -199,12 +198,13 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             self.sensor_config.get(CONF_MODE) or self.selected_profile.calculation_strategy,  # type: ignore
         )
         factory = PowerCalculatorStrategyFactory(self.hass)
+        assert self.source_entity is not None
         try:
             await factory.create(
                 user_input or self.sensor_config,
                 strategy_name,
                 self.selected_profile,
-                self.source_entity,  # type: ignore[arg-type]
+                self.source_entity,
             )
         except StrategyConfigurationError as error:
             _LOGGER.error(str(error))
@@ -243,7 +243,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self,
         form_step: PowercalcFormStep,
         user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the current step."""
         if user_input is not None:
             if form_step.validate_user_input is not None:
@@ -266,7 +266,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                     skip_utility_meter_options=not form_step.continue_utility_meter_options_step,
                 )
 
-            return await getattr(self, f"async_step_{next_step}")()  # type: ignore
+            return await getattr(self, f"async_step_{next_step}")()  # type: ignore[no-any-return]
 
         return await self._show_form(form_step)
 
@@ -274,15 +274,15 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self,
         skip_advanced: bool = False,
         skip_utility_meter_options: bool = False,
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the final steps of the flow if needed and persist the config entry."""
         if not skip_advanced and self.selected_sensor_type == SensorType.VIRTUAL_POWER:
-            return await self.flow_handlers[FlowType.VIRTUAL_POWER].async_step_power_advanced()  # type:ignore
+            return await self.flow_handlers[FlowType.VIRTUAL_POWER].async_step_power_advanced()  # type: ignore[no-any-return]
         if not skip_utility_meter_options and self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             return await self.async_step_utility_meter_options()
         return self.persist_config_entry()
 
-    async def _show_form(self, form_step: PowercalcFormStep, error: SchemaFlowError | None = None) -> FlowResult:
+    async def _show_form(self, form_step: PowercalcFormStep, error: SchemaFlowError | None = None) -> ConfigFlowResult:
         # Show form for next step
         last_step = None
         if not callable(form_step.next_step):
@@ -304,9 +304,12 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     async def _get_schema(self, form_step: PowercalcFormStep) -> vol.Schema:
         if isinstance(form_step.schema, vol.Schema):
             return form_step.schema
-        return await form_step.schema()
+        schema = await form_step.schema()
+        if schema is None:
+            return vol.Schema({})
+        return schema
 
-    async def async_step_utility_meter_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_utility_meter_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the flow for utility meter options."""
         return await self.handle_form_step(
             PowercalcFormStep(
@@ -316,7 +319,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             user_input,
         )
 
-    async def async_step_energy_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_energy_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the flow for utility meter options."""
         return await self.handle_form_step(
             PowercalcFormStep(
@@ -383,13 +386,13 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         self.is_library_flow = True
 
         if discovery_info.get(CONF_MODE) == CalculationStrategy.WLED:
-            return await self.flow_handlers[FlowType.VIRTUAL_POWER].async_step_wled()  # type:ignore
+            return await self.flow_handlers[FlowType.VIRTUAL_POWER].async_step_wled()  # type: ignore[no-any-return]
 
         if len(power_profiles) > 1:
-            return cast(ConfigFlowResult, await self.flow_handlers[FlowType.LIBRARY].async_step_library_multi_profile())
+            return await self.flow_handlers[FlowType.LIBRARY].async_step_library_multi_profile()  # type: ignore[no-any-return]
 
         self.selected_profile = power_profiles[0]
-        return cast(ConfigFlowResult, await self.flow_handlers[FlowType.LIBRARY].async_step_library())
+        return await self.flow_handlers[FlowType.LIBRARY].async_step_library()  # type: ignore[no-any-return]
 
     async def async_step_user(
         self,
@@ -410,15 +413,15 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         return self.async_show_menu(step_id=Step.USER, menu_options=menu)
 
-    async def async_step_menu_library(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_menu_library(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the Virtual power (library) step.
         We forward to the virtual_power step, but without the strategy selector displayed.
         """
         self.is_library_flow = True
-        return await self.flow_handlers[FlowType.VIRTUAL_POWER].async_step_virtual_power(user_input)  # type:ignore
+        return await self.flow_handlers[FlowType.VIRTUAL_POWER].async_step_virtual_power(user_input)  # type: ignore[no-any-return]
 
     @callback
-    def persist_config_entry(self) -> FlowResult:
+    def persist_config_entry(self) -> ConfigFlowResult:
         """Create the config entry."""
         self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
         self.sensor_config.update({CONF_NAME: self.name})
@@ -458,7 +461,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     async def async_step_init(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle options flow."""
         self.selected_sensor_type = self.sensor_config.get(CONF_SENSOR_TYPE) or SensorType.VIRTUAL_POWER
         self.source_entity_id = self.sensor_config.get(CONF_ENTITY_ID)
@@ -482,7 +485,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
         return self.async_show_menu(step_id=Step.INIT, menu_options=self.build_menu())
 
-    async def initialize_library_profile(self) -> FlowResult | None:
+    async def initialize_library_profile(self) -> ConfigFlowResult | None:
         """Initialize the library profile, when manufacturer and model are set."""
         manufacturer: str | None = self.sensor_config.get(CONF_MANUFACTURER)
         model: str | None = self.sensor_config.get(CONF_MODEL)
@@ -538,15 +541,15 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
         return True
 
-    async def async_step_basic_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_basic_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the basic options flow."""
         return await self.async_handle_options_step(user_input, self.build_basic_options_schema(), Step.BASIC_OPTIONS)
 
-    async def async_step_advanced_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_advanced_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the basic options flow."""
         return await self.async_handle_options_step(user_input, SCHEMA_POWER_ADVANCED, Step.ADVANCED_OPTIONS)
 
-    async def async_step_utility_meter_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_utility_meter_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the basic options flow."""
         return await self.async_handle_options_step(
             user_input,
@@ -560,7 +563,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         schema: vol.Schema,
         step: Step,
         form_kwarg: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """
         Generic handler for all the option steps.
         processes user input against the select schema.
@@ -574,7 +577,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 return self.persist_config_entry()
         return self.async_show_form(step_id=step, data_schema=schema, errors=errors, **(form_kwarg or {}))
 
-    def persist_config_entry(self) -> FlowResult:
+    def persist_config_entry(self) -> ConfigFlowResult:
         """Persist changed options on the config entry."""
         data = (
             self.config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID and self.global_config
@@ -663,7 +666,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 {vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float)},
             )
 
-        return schema.extend(  # type: ignore
+        return schema.extend(  # type: ignore[no-any-return]
             {
                 **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
