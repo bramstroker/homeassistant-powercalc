@@ -6,7 +6,6 @@ from typing import Any
 
 from kasa import SmartPlug
 
-from measure.powermeter.errors import UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 
@@ -15,22 +14,22 @@ class KasaPowerMeter(PowerMeter):
         self._smartplug = SmartPlug(device_ip)
 
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
-        """Get a new power reading from the Kasa device. Optionally include voltage (FIXME: not yet implemented)."""
-        if include_voltage:
-            # FIXME: Not yet implemented # noqa: FIX001
-            raise UnsupportedFeatureError("Voltage measurement is not yet implemented for Kasa devices.")
-
+        """Get a new power reading from the Kasa device. Optionally include voltage."""
         loop = asyncio.get_event_loop()
-        power = loop.run_until_complete(self.async_read_power_meter())
+        power, voltage = loop.run_until_complete(self.async_read_power_meter())
 
+        if include_voltage:
+            return PowerMeasurementResult(power=power, voltage=voltage, updated=time.time())
         return PowerMeasurementResult(power=power, updated=time.time())
 
-    async def async_read_power_meter(self) -> None:
+    async def async_read_power_meter(self) -> tuple[float, float | None]:
+        from kasa import Module
         await self._smartplug.update()
-        return self._smartplug.emeter_realtime["power"]
+        energy = self._smartplug.modules[Module.Energy]
+        return float(energy.current_consumption), float(energy.voltage)
 
     def has_voltage_support(self) -> bool:
-        return False
+        return True
 
     def process_answers(self, answers: dict[str, Any]) -> None:
         pass
