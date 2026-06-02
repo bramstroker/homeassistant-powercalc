@@ -24,6 +24,7 @@ class KasaPowerMeter(PowerMeter):
 
     async def async_read_power_meter(self) -> tuple[float, float | None]:
         from kasa import Module
+
         await self._smartplug.update()
         energy = self._smartplug.modules[Module.Energy]
         return float(energy.current_consumption), float(energy.voltage)
