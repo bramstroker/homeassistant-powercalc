@@ -75,3 +75,17 @@ def test_resume_effect(mock_config_factory, tmp_path: str) -> None:  # noqa: ANN
     assert isinstance(resume_variation, EffectVariation)
     assert resume_variation.effect == "nightlight"
     assert resume_variation.bri == 200
+
+
+def test_get_questions(mock_config_factory) -> None:  # noqa: ANN001
+    """Test get_questions contains the new triple mode choice when effects are supported."""
+    mock_config = mock_config_factory()
+    measure_util_mock = MagicMock(MeasureUtil)
+    runner = LightRunner(measure_util_mock, mock_config)
+
+    questions = runner.get_questions()
+    mode_question = next(q for q in questions if q.name == QUESTION_MODE)
+    choices = mode_question.choices
+
+    assert ("hs + color_temp + effect", {LutMode.HS, LutMode.COLOR_TEMP, LutMode.EFFECT}) in choices
+

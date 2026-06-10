@@ -696,6 +696,7 @@ class LightRunner(MeasurementRunner):
         ]
         if self.light_controller.has_effect_support():
             modes.append((LutMode.EFFECT, {LutMode.EFFECT}))
+            modes.append(("hs + color_temp + effect", {LutMode.HS, LutMode.COLOR_TEMP, LutMode.EFFECT}))
 
         questions = [
             inquirer.List(
