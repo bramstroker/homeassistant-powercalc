@@ -88,4 +88,3 @@ def test_get_questions(mock_config_factory) -> None:  # noqa: ANN001
     choices = mode_question.choices
 
     assert ("hs + color_temp + effect", {LutMode.HS, LutMode.COLOR_TEMP, LutMode.EFFECT}) in choices
-
