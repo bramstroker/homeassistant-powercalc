@@ -2195,11 +2195,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
+            "hs",
             "brightness",
-            "hs"
+            "color_temp"
           ],
-          "hash": "6dc3690f8a3008d64f9532292562ba8f"
+          "hash": "594b9d5f9fb1dfa92fa29f984aa58332"
         }
       ],
       "device_types": [
@@ -7340,10 +7340,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "7e79c9742578ea6b1498721f745f9aac"
+          "hash": "b93ec50c3aafd9bfd485bd7caefe51fc"
         },
         {
           "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
@@ -7585,10 +7585,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "a781e436ef377ce6bb9fe9256d83db88"
+          "hash": "f38b519ba69e4d2d1d4b3129bdf482c9"
         },
         {
           "aliases": [
@@ -7732,10 +7732,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "8c623ae9ee55327fc40cf32cf9fc0ce5"
+          "hash": "9bd95756f7b4f45abd7c25e356fc218f"
         },
         {
           "aliases": [
@@ -7873,10 +7873,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "effect"
+            "effect",
+            "brightness"
           ],
-          "hash": "a3332c8e530d5681ac2319f7dcad807f"
+          "hash": "f11e61658021e57c881a6766b6bab27e"
         },
         {
           "aliases": [
@@ -11317,10 +11317,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hsv"
+            "hsv",
+            "color_temp"
           ],
-          "hash": "3e464c0176ec662f83574fc0a53ed9a7"
+          "hash": "b251dc0be1a14126c86df718939fdab2"
         },
         {
           "aliases": [
@@ -12074,10 +12074,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "3f032a07dd0a285850d3b74c66e81c3e"
+          "hash": "093c457770e21a420b1b458e51eb462a"
         },
         {
           "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>",
@@ -12993,11 +12993,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
+            "hs",
             "brightness",
-            "hs"
+            "color_temp"
           ],
-          "hash": "1e47e11c48244e5b0ba6b285c30fe2f1"
+          "hash": "7a9e12b9cee1380a419bdc1e032430f4"
         },
         {
           "calculation_strategy": "lut",
@@ -15907,6 +15907,33 @@
         },
         {
           "aliases": [
+            "36886"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-06-08T22:49:32Z",
+          "device_type": "light",
+          "measure_device": "Shelly, PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.20.14:docker"
+          },
+          "name": "KAJPLATS E26 CWS globe 1100lm",
+          "standby_power": 0.05,
+          "id": "LED2405G8NA",
+          "manufacturer": "ikea",
+          "updated_at": "2026-06-12T12:47:48",
+          "max_power": 7.65,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "hs",
+            "color_temp"
+          ],
+          "hash": "19361abddeef67e7bed5e516ee8e6557"
+        },
+        {
+          "aliases": [
             "TRADFRI bulb GU10 WS 345lm",
             "TRADFRIbulbGU10WS345lm"
           ],
@@ -17944,10 +17971,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "e3198eec5cadab0a61d9196de9c1065f"
+          "hash": "bf03eaaeca20ecc2e1287c381078c0fc"
         },
         {
           "author": "dsolva <diego_10sv@hotmail.com>",
@@ -18800,10 +18827,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "c835365008fd19155e8884933d36a213"
+          "hash": "a5c6eba98484c0d0e80abf7ece57775c"
         },
         {
           "author": "Udo Ha\u00df <udo.hass@proton.me>",
@@ -18831,10 +18858,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "4b65e10e693f49107b69ca124b7e566d"
+          "hash": "adeed99661a7df5505181e398612a632"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -18890,11 +18917,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
+            "hs",
             "brightness",
-            "hs"
+            "color_temp"
           ],
-          "hash": "e428a7720168f9b3f09af8f1cf3e83e9"
+          "hash": "eeae56542e64a5be400868d36acec9ee"
         },
         {
           "author": "gobbli",
@@ -18921,10 +18948,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "71fcc13f8e8cd86bc0ad5195a8d3a4fb"
+          "hash": "f37a7dfbce76801a9228ffd96c12ef87"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -19042,10 +19069,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "b85db766803a8f6a53d90fd2f034065d"
+          "hash": "6ccfe83c3b4364ec7e8c218945242848"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
@@ -21864,15 +21891,20 @@
           },
           "name": "connect.z Smart Home E27 LED filament light bulb, G125",
           "standby_power": 0.33,
+          "author_info": {
+            "name": "phoenixxx-1",
+            "github": "phoenixxx-1"
+          },
+          "author": "phoenixxx-1",
           "id": "110288",
           "manufacturer": "eglo",
-          "updated_at": "2026-06-12T12:29:11",
+          "updated_at": "2026-06-12T12:29:36",
           "max_power": 4.22,
           "sub_profile_count": 0,
           "color_modes": [
             "brightness"
           ],
-          "hash": "d57160081c64b5a072dbfecd7e523207"
+          "hash": "502251e44b4f41f34d3da5511aefdb33"
         },
         {
           "aliases": [
