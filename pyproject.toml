@@ -94,6 +94,7 @@ max-complexity = 10
 prerelease = "allow"
 override-dependencies = [
   "mashumaro[msgpack]==3.17",
+  "habluetooth>=6.8.1",
 ]
 
 [dependency-groups]
