@@ -1,0 +1,18 @@
+{
+  "aliases": [
+    "ESMLFzm_w6_Dimm"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-06-01T19:22:09Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "TP-Link Kasa KP115",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 5,
+    "SLEEP_TIME": 3,
+    "VERSION": "master"
+  },
+  "name": "connect.z Smart Home E27 LED filament light bulb, G125",
+  "standby_power": 0.33
+}
