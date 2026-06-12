@@ -32,7 +32,7 @@ class SubProfileRepairFlow(RepairsFlow):
             new_data = self._config_entry.data.copy()
             new_data[CONF_MODEL] = f"{new_data[CONF_MODEL]}/{user_input[CONF_SUB_PROFILE]}"
             self._hass.config_entries.async_update_entry(self._config_entry, data=new_data)
-            return self.async_create_entry(title="", data={})
+            return self.async_create_entry(title="", data={})  # type: ignore[no-any-return]
 
         source_entity = await create_source_entity(self._config_entry.data[CONF_ENTITY_ID], self._hass)
         profile = await get_power_profile(self.hass, dict(self._config_entry.data), source_entity)
@@ -43,7 +43,7 @@ class SubProfileRepairFlow(RepairsFlow):
         if remarks:
             remarks = "\n\n" + remarks
 
-        return self.async_show_form(
+        return self.async_show_form(  # type: ignore[no-any-return]
             step_id="sub_profile",
             data_schema=sub_profile_schema,
             description_placeholders={
