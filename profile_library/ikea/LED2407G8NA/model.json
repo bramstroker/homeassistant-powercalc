@@ -14,5 +14,10 @@
     "VERSION": "v1.20.14:docker"
   },
   "name": "KAJPLATS E26 WS 1100lm",
-  "standby_power": 0.07
+  "standby_power": 0.07,
+  "author_info": {
+    "name": "wombat94",
+    "github": "wombat94"
+  },
+  "author": "wombat94"
 }
