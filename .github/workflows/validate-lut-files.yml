@@ -3,7 +3,9 @@ name: Validate LUT files
 on:
   pull_request:
     paths:
-       - '**/*.csv.gz'
+      - '**/*.csv.gz'
+      - '.github/workflows/validate-lut-files.yml'
+      - 'utils/library/scan_lut_quality.py'
 
 permissions:
   contents: read
@@ -14,10 +16,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-    - uses: actions/checkout@v6
-    - name: Install dependencies
-      run: |
-        cd .github/scripts/lut_validator
-        npm install
-    - name: Validate LUT CSV files
-      run: node .github/scripts/lut_validator/validate.js
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Install dependencies
+        run: |
+          cd .github/scripts/lut_validator
+          npm install
+      - name: Validate LUT CSV files
+        run: node .github/scripts/lut_validator/validate.js
+      - name: Validate LUT quality
+        run: python -m utils.library.scan_lut_quality profile_library --severity error --fail-on-issues
