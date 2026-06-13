@@ -294,9 +294,17 @@
       "type": "object",
       "description": "Settings used for measure script"
     },
+    "max_voltage": {
+      "type": "number",
+      "description": "Maximum voltage observed during measurement"
+    },
     "min_version": {
       "type": "string",
       "description": "Minimum required version of Powercalc for this profile"
+    },
+    "min_voltage": {
+      "type": "number",
+      "description": "Minimum voltage observed during measurement"
     },
     "linear_config": {
       "type": "object",

@@ -8,7 +8,7 @@ import inquirer
 from measure.config import MeasureConfig
 from measure.runner.const import QUESTION_EXPORT_FILENAME
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasureUtil
+from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 INTERVAL = 2
 
@@ -39,19 +39,21 @@ class RecorderRunner(MeasurementRunner):
         try:
             csv_filepath = f"{export_directory}/{self.filename}"
             start_time = time.time()
+            voltages: list[float] = []
             with open(csv_filepath, "w", newline="") as csv_file:
                 writer = csv.writer(csv_file)
                 while True:
                     timestamp = time.time()
                     print("Measurement")
                     measurement = self.measure_util.take_measurement(timestamp)
-                    _LOGGER.info("Measurement %.2f", measurement)
-                    writer.writerow([timestamp - start_time, measurement])
+                    _LOGGER.info("Measurement %.2f", measurement.power)
+                    writer.writerow([timestamp - start_time, measurement.power])
+                    voltages.extend(measurement.voltages)
                     time.sleep(INTERVAL)
         except KeyboardInterrupt:
             _LOGGER.info("Stopped recording")
 
-        return RunnerResult(model_json_data={})
+        return RunnerResult(model_json_data={}, voltages=voltages)
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         return [
@@ -62,5 +64,5 @@ class RecorderRunner(MeasurementRunner):
             ),
         ]
 
-    def measure_standby_power(self) -> float:
-        return 0
+    def measure_standby_power(self) -> MeasurementResult:
+        return MeasurementResult(power=0, voltages=[])

@@ -17,6 +17,8 @@ from inquirer.render import ConsoleRender
 
 from measure.config import MeasureConfig
 from measure.const import (
+    MODEL_JSON_MAX_VOLTAGE,
+    MODEL_JSON_MIN_VOLTAGE,
     PROJECT_DIR,
     QUESTION_DUMMY_LOAD,
     QUESTION_GENERATE_MODEL_JSON,
@@ -39,7 +41,7 @@ from measure.runner.light import LightRunner
 from measure.runner.recorder import RecorderRunner
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.runner.speaker import SpeakerRunner
-from measure.util.measure_util import MeasureUtil
+from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
@@ -103,6 +105,8 @@ class Measure:
         self.measure_type: MeasureType = MeasureType.LIGHT
         self.console_render = console_render
         self.config = config
+        self._track_voltage = False
+        self._voltage_readings: list[float] = []
 
     def start(self) -> None:
         """Starts the measurement session.
@@ -125,15 +129,21 @@ class Measure:
 
         self._select_measure_type()
         self._log_selected_controllers()
-        measure_util = MeasureUtil(self.power_meter, self.config)
+        measure_util = MeasureUtil(
+            self.power_meter,
+            self.config,
+            include_voltage=lambda: self._track_voltage,
+        )
         self.runner = MEASURE_TYPE_RUNNER[self.measure_type](measure_util, self.config)
 
         answers = self.ask_questions(self.get_questions())
         self.power_meter.process_answers(answers)
+        self._track_voltage = self._should_track_voltage()
         self.runner.prepare(answers)
 
         if answers.get(QUESTION_DUMMY_LOAD, False):
             measure_util.initialize_dummy_load()
+            self._reset_voltage_readings()
 
         generate_model_json = bool(answers.get(QUESTION_GENERATE_MODEL_JSON, False))
         export_directory = self._prepare_export_directory(answers, generate_model_json)
@@ -144,17 +154,20 @@ class Measure:
                 "and press enter to start measurement session...",
             )
         runner_result = self._run_measurement(answers, export_directory)
+        self._record_voltages(runner_result.voltages or [])
 
         generate_model_json = generate_model_json and bool(export_directory)
 
         if generate_model_json:
-            standby_power = self._measure_standby_power()
+            standby_result = self._measure_standby_power()
+            self._record_voltages(standby_result.voltages)
             self.write_model_json(
                 directory=export_directory,
-                standby_power=standby_power,
+                standby_power=standby_result.power,
                 name=answers[QUESTION_MODEL_NAME],
                 measure_device=answers[QUESTION_MEASURE_DEVICE],
                 extra_json_data=runner_result.model_json_data,
+                voltage_json_data=self._get_voltage_json_data(),
             )
 
         if export_directory and (generate_model_json or self.runner.writes_export_files()):
@@ -207,13 +220,34 @@ class Measure:
             exit(1)
         return runner_result
 
-    def _measure_standby_power(self) -> float:
+    def _measure_standby_power(self) -> MeasurementResult:
         assert self.runner is not None
         try:
             return self.runner.measure_standby_power()
         except PowerMeterError as error:
             _LOGGER.error("Aborting: %s", error)
             exit(1)
+
+    def _should_track_voltage(self) -> bool:
+        try:
+            return self.power_meter.has_voltage_support()
+        except PowerMeterError as error:
+            _LOGGER.debug("Voltage readings are not available: %s", error)
+            return False
+
+    def _reset_voltage_readings(self) -> None:
+        self._voltage_readings = []
+
+    def _record_voltages(self, voltages: list[float]) -> None:
+        self._voltage_readings.extend(voltages)
+
+    def _get_voltage_json_data(self) -> dict[str, float]:
+        if not self._voltage_readings:
+            return {}
+        return {
+            MODEL_JSON_MIN_VOLTAGE: round(min(self._voltage_readings), 2),
+            MODEL_JSON_MAX_VOLTAGE: round(max(self._voltage_readings), 2),
+        }
 
     def write_model_json(
         self,
@@ -222,6 +256,7 @@ class Measure:
         name: str,
         measure_device: str,
         extra_json_data: dict | None = None,
+        voltage_json_data: dict | None = None,
     ) -> None:
         """Write model.json manifest file"""
         created_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
@@ -238,6 +273,8 @@ class Measure:
             "name": name,
             "standby_power": standby_power,
         }
+        if voltage_json_data:
+            json_data.update(voltage_json_data)
         if extra_json_data:
             json_data.update(extra_json_data)
 

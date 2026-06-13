@@ -6,6 +6,8 @@ from typing import Any
 
 from inquirer.questions import Question
 
+from measure.util.measure_util import MeasurementResult
+
 
 class MeasurementRunner(ABC):
     @abstractmethod
@@ -24,10 +26,11 @@ class MeasurementRunner(ABC):
     def writes_export_files(self) -> bool:
         return False
 
-    def measure_standby_power(self) -> float:
-        return 0
+    def measure_standby_power(self) -> MeasurementResult:
+        return MeasurementResult(power=0, voltages=[])
 
 
 @dataclass
 class RunnerResult:
     model_json_data: dict
+    voltages: list[float] | None = None

@@ -8,7 +8,7 @@ from measure.config import MeasureConfig
 from measure.controller.fan.controller import FanController
 from measure.controller.fan.factory import FanControllerFactory
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasureUtil
+from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 _LOGGER = logging.getLogger("measure")
 
@@ -30,14 +30,17 @@ class FanRunner(MeasurementRunner):
         export_directory: str,
     ) -> RunnerResult | None:
         measurements: dict[int, float] = {}
+        voltages: list[float] = []
         for percentage in range(5, 101, 5):
             _LOGGER.info("Setting percentage to %d", percentage)
             self.fan_controller.set_percentage(percentage)
             _LOGGER.info("Waiting %d seconds to measure power", SLEEP_TIME_PERCENTAGE_CHANGE)
             time.sleep(SLEEP_TIME_PERCENTAGE_CHANGE)
-            measurements[percentage] = self.measure_util.take_average_measurement(20)
+            result = self.measure_util.take_average_measurement(20)
+            measurements[percentage] = result.power
+            voltages.extend(result.voltages)
 
-        return RunnerResult(model_json_data=self._build_model_json_data(measurements))
+        return RunnerResult(model_json_data=self._build_model_json_data(measurements), voltages=voltages)
 
     @staticmethod
     def _build_model_json_data(measurements: dict) -> dict:
@@ -52,7 +55,7 @@ class FanRunner(MeasurementRunner):
     def get_questions(self) -> list[inquirer.questions.Question]:
         return self.fan_controller.get_questions()
 
-    def measure_standby_power(self) -> float:
+    def measure_standby_power(self) -> MeasurementResult:
         _LOGGER.info("Turning off fan to start measuring standby power")
         self.fan_controller.turn_off()
         _LOGGER.info("Waiting %d seconds to measure power", SLEEP_TIME_PERCENTAGE_CHANGE)

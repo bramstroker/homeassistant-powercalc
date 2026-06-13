@@ -3,7 +3,7 @@ from typing import Any
 
 import inquirer
 
-from measure.util.measure_util import MeasureUtil
+from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 from .const import QUESTION_DURATION
 from .runner import MeasurementRunner, RunnerResult
@@ -28,9 +28,9 @@ class AverageRunner(MeasurementRunner):
     ) -> RunnerResult | None:
         input("Press enter to start")
 
-        self.measure_util.take_average_measurement(self.duration)
+        result = self.measure_util.take_average_measurement(self.duration)
 
-        return RunnerResult(model_json_data={})
+        return RunnerResult(model_json_data={}, voltages=result.voltages)
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         return [
@@ -40,5 +40,5 @@ class AverageRunner(MeasurementRunner):
             ),
         ]
 
-    def measure_standby_power(self) -> float:
-        return 0
+    def measure_standby_power(self) -> MeasurementResult:
+        return MeasurementResult(power=0, voltages=[])

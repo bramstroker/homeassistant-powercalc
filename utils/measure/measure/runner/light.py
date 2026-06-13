@@ -27,7 +27,7 @@ from measure.powermeter.errors import (
 from measure.runner.const import QUESTION_GZIP, QUESTION_MODE, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
 from measure.runner.errors import RunnerError
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasureUtil
+from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 CSV_HEADERS = {
     LutMode.HS: ["bri", "hue", "sat", "watt"],
@@ -86,17 +86,17 @@ class LightRunner(MeasurementRunner):
             all_variations.extend(measurement.variations)
         _LOGGER.info("Total number of variations: %d", len(all_variations))
         left_variations = all_variations.copy()
+        voltages: list[float] = []
 
-        [
-            self.run_mode(answers, measurement_info, all_variations, left_variations)
-            for measurement_info in measurements_to_run
-        ]
+        for measurement_info in measurements_to_run:
+            voltages.extend(self.run_mode(answers, measurement_info, all_variations, left_variations))
 
         return RunnerResult(
             model_json_data={
                 "device_type": "light",
                 "calculation_strategy": "lut",
             },
+            voltages=voltages,
         )
 
     def prepare_measurements_for_mode(self, export_directory: str, mode: LutMode) -> MeasurementRunInput:
@@ -125,10 +125,11 @@ class LightRunner(MeasurementRunner):
         measurement_info: MeasurementRunInput,
         all_variations: list[Variation],
         left_variations: list[Variation],
-    ) -> None:
+    ) -> list[float]:
         """Run the measurement session for lights"""
 
         mode = measurement_info.mode
+        voltages: list[float] = []
         if mode == LutMode.WHITE:
             self.light_controller.change_light_state(
                 mode,
@@ -173,9 +174,9 @@ class LightRunner(MeasurementRunner):
                 previous_variation = variation
 
                 try:
-                    power = self.take_power_measurement(mode, variation_start_time)
+                    measurement_result = self.take_power_measurement(mode, variation_start_time)
                 except OutdatedMeasurementError:
-                    power = self.nudge_and_remeasure(mode, variation)
+                    measurement_result = self.nudge_and_remeasure(mode, variation)
                 except ZeroReadingError as error:
                     self.num_0_readings += 1
                     _LOGGER.warning("Discarding measurement: %s", error)
@@ -183,13 +184,16 @@ class LightRunner(MeasurementRunner):
                         _LOGGER.error(
                             "Aborting measurement session. Received too many 0 readings",
                         )
-                        return
+                        return voltages
                     continue
                 except PowerMeterError as error:
                     _LOGGER.error("Aborting: %s", error)
-                    return
-                _LOGGER.info("Measured power: %.2f", power)
-                csv_writer.write_measurement(variation, power)
+                    return voltages
+                if measurement_result is None:
+                    continue
+                _LOGGER.info("Measured power: %.2f", measurement_result.power)
+                csv_writer.write_measurement(variation, measurement_result.power)
+                voltages.extend(measurement_result.voltages)
                 left_variations.remove(variation)
 
             csv_file.close()
@@ -203,6 +207,7 @@ class LightRunner(MeasurementRunner):
 
         if bool(answers.get(QUESTION_GZIP, True)):
             self.gzip_csv(measurement_info.csv_file)
+        return voltages
 
     def _get_csv_write_options(self, measurement_info: MeasurementRunInput) -> tuple[str, bool]:
         if not measurement_info.is_resuming:
@@ -494,7 +499,7 @@ class LightRunner(MeasurementRunner):
         self,
         mode: LutMode,
         variation: Variation,
-    ) -> float | None:
+    ) -> MeasurementResult | None:
         nudge_count = 0
         for nudge_count in range(self.config.max_nudges):  # noqa: B007
             try:
@@ -641,17 +646,17 @@ class LightRunner(MeasurementRunner):
         mode: LutMode,
         start_timestamp: float,
         retry_count: int = 0,
-    ) -> float:
+    ) -> MeasurementResult:
         """Request a power reading from the configured power_meter"""
         if mode == LutMode.EFFECT:
-            value = self.measure_util.take_average_measurement(self.config.measure_time_effect)
+            result = self.measure_util.take_average_measurement(self.config.measure_time_effect)
         else:
-            value = self.measure_util.take_measurement(start_timestamp, retry_count)
+            result = self.measure_util.take_measurement(start_timestamp, retry_count)
 
         # Determine per load power consumption
-        value /= self.num_lights
+        power = result.power / self.num_lights
 
-        return round(value, 2)
+        return MeasurementResult(power=round(power, 2), voltages=result.voltages)
 
     @staticmethod
     def gzip_csv(csv_file_path: str) -> None:
@@ -665,7 +670,7 @@ class LightRunner(MeasurementRunner):
         ):
             shutil.copyfileobj(csv_file, gzip_file)
 
-    def measure_standby_power(self) -> float:
+    def measure_standby_power(self) -> MeasurementResult:
         """Measures the standby power (when the light is OFF)"""
         self.light_controller.change_light_state(LutMode.BRIGHTNESS, on=False)
         start_time = time.time()
@@ -677,14 +682,14 @@ class LightRunner(MeasurementRunner):
         try:
             return self.take_power_measurement(LutMode.BRIGHTNESS, start_time)
         except OutdatedMeasurementError:
-            self.nudge_and_remeasure(LutMode.BRIGHTNESS, Variation(0))
+            return self.nudge_and_remeasure(LutMode.BRIGHTNESS, Variation(0)) or MeasurementResult(power=0, voltages=[])
         except ZeroReadingError:
             _LOGGER.error(
                 "Measured 0 watt as standby usage, continuing now, "
                 "but you probably need to have a look into measuring multiple lights at the same time "
                 "or using a dummy load.",
             )
-            return 0
+            return MeasurementResult(power=0, voltages=[])
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         """Get questions to ask for the light runner"""

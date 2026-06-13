@@ -6,7 +6,7 @@ from typing import Any
 from homeassistant_api import Client, Entity
 import inquirer
 
-from measure.const import QUESTION_DUMMY_LOAD
+from measure.const import QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON
 from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
@@ -79,9 +79,12 @@ class HassPowerMeter(PowerMeter):
     def get_questions(self) -> list[inquirer.questions.Question]:
         def _should_skip_voltage_sensor_question(answers: dict[str, Any]) -> bool:
             """Determine if the voltage sensor question should be asked."""
-            if not answers.get(QUESTION_DUMMY_LOAD, False):
+            if not answers.get(QUESTION_DUMMY_LOAD, False) and not answers.get(QUESTION_GENERATE_MODEL_JSON, False):
                 return True
-            return self.autodetect_voltage_entity(answers.get(QUESTION_POWERMETER_ENTITY_ID))
+            power_entity = answers.get(QUESTION_POWERMETER_ENTITY_ID)
+            if power_entity and self.autodetect_voltage_entity(power_entity):
+                return True
+            return not self.get_voltage_sensors()
 
         power_sensor_list = self.get_power_sensors()
         return [
