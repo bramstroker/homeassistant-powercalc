@@ -9,6 +9,8 @@ QUESTION_MEASURE_DEVICE = "measure_device"
 QUESTION_ENTITY_ID = "entity_id"
 QUESTION_MODEL_ID = "model_id"
 QUESTION_SELECTED_MEASURE_TYPE = "selected_measure_type"
+MODEL_JSON_MAX_VOLTAGE = "max_voltage"
+MODEL_JSON_MIN_VOLTAGE = "min_voltage"
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()

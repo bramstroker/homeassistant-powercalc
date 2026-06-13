@@ -13,7 +13,7 @@ from measure.controller.charging.hass import ATTR_BATTERY_LEVEL
 from measure.runner.const import QUESTION_CHARGING_DEVICE_TYPE
 from measure.runner.errors import RunnerError
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasureUtil
+from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 _LOGGER = logging.getLogger("measure")
 
@@ -50,6 +50,7 @@ class ChargingRunner(MeasurementRunner):
 
         battery_level = self.controller.get_battery_level()
         measurements: dict[int, list[float]] = {}
+        voltages: list[float] = []
 
         if battery_level < 100:
             self.wait_for_vacuum_to_start_charging()
@@ -64,9 +65,10 @@ class ChargingRunner(MeasurementRunner):
                 _LOGGER.info("Battery level: %d%%", battery_level)
                 if battery_level not in measurements:
                     measurements[battery_level] = []
-                power = self.measure_util.take_measurement(time.time())
-                _LOGGER.info("Measured power: %.2f W", power)
-                measurements[battery_level].append(power)
+                result = self.measure_util.take_measurement(time.time())
+                _LOGGER.info("Measured power: %.2f W", result.power)
+                measurements[battery_level].append(result.power)
+                voltages.extend(result.voltages)
                 time.sleep(self.config.sleep_time)
                 error_count = 0
             except ChargingControllerError as e:
@@ -78,10 +80,11 @@ class ChargingRunner(MeasurementRunner):
 
         print("Done charging, start measurements for trickle charging..")
 
-        trickle_power = self.measure_util.take_average_measurement(TRICKLE_CHARGING_TIME)
-        measurements[100] = [trickle_power]
+        trickle_result = self.measure_util.take_average_measurement(TRICKLE_CHARGING_TIME)
+        measurements[100] = [trickle_result.power]
+        voltages.extend(trickle_result.voltages)
 
-        return RunnerResult(model_json_data=self._build_model_json_data(measurements))
+        return RunnerResult(model_json_data=self._build_model_json_data(measurements), voltages=voltages)
 
     def wait_for_vacuum_to_start_charging(self) -> None:
         is_charging = self.controller.is_charging()
@@ -133,5 +136,5 @@ class ChargingRunner(MeasurementRunner):
         questions.extend(self.controller.get_questions())
         return questions
 
-    def measure_standby_power(self) -> float:
-        return 0
+    def measure_standby_power(self) -> MeasurementResult:
+        return MeasurementResult(power=0, voltages=[])

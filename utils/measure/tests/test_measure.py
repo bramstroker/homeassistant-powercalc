@@ -1,6 +1,7 @@
 from collections.abc import Iterator
 import csv
 from io import StringIO
+import json
 import logging
 import os
 import sys
@@ -11,11 +12,19 @@ import inquirer
 from inquirer import events
 from inquirer.render import ConsoleRender
 from measure.config import MeasureConfig
-from measure.const import PROJECT_DIR, QUESTION_MODEL_ID, QUESTION_SELECTED_MEASURE_TYPE, MeasureType
+from measure.const import (
+    MODEL_JSON_MAX_VOLTAGE,
+    MODEL_JSON_MIN_VOLTAGE,
+    PROJECT_DIR,
+    QUESTION_MODEL_ID,
+    QUESTION_SELECTED_MEASURE_TYPE,
+    MeasureType,
+)
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.light.const import LutMode
 from measure.measure import Measure
 from measure.powermeter.dummy import DummyPowerMeter
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.runner.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
     QUESTION_COLOR_MODE,
@@ -25,7 +34,7 @@ from measure.runner.const import (
     QUESTION_MODE,
 )
 from measure.runner.speaker import QUESTION_DISABLE_STREAMING
-from measure.util.measure_util import MeasureUtil
+from measure.util.measure_util import MeasurementResult, MeasureUtil
 import pytest
 from readchar import key
 
@@ -92,7 +101,33 @@ def test_run_light(mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
     measure.start()
 
     assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/brightness.csv.gz"))
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/model.json"))
+    model_json_path = os.path.join(PROJECT_DIR, "export/LCT010/model.json")
+    assert os.path.exists(model_json_path)
+    with open(model_json_path) as model_json_file:
+        model_json = json.load(model_json_file)
+    assert model_json[MODEL_JSON_MIN_VOLTAGE] == 233.0
+    assert model_json[MODEL_JSON_MAX_VOLTAGE] == 233.0
+
+
+@patch("time.sleep", return_value=None)
+def test_take_measurement_tracks_voltage_range(mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
+    mock_config = mock_config_factory(config_values={"sample_count": 3})
+    power_meter = SequencePowerMeter(
+        [
+            PowerMeasurementResult(power=1.0, updated=1.0, voltage=231.2),
+            PowerMeasurementResult(power=2.0, updated=2.0, voltage=229.9),
+            PowerMeasurementResult(power=3.0, updated=3.0, voltage=230.4),
+        ],
+    )
+    measure_util = MeasureUtil(
+        power_meter,
+        mock_config,
+        include_voltage=lambda: True,
+    )
+
+    result = measure_util.take_measurement()
+    assert result.power == 2.0
+    assert result.voltages == [231.2, 229.9, 230.4]
 
 
 @patch("builtins.input", return_value="")
@@ -109,7 +144,7 @@ def test_run_smart_speaker(mock_input, mock_sleep, mock_config_factory) -> None:
     with (
         patch("measure.runner.speaker.SLEEP_PRE_MEASURE", 0),
         patch("measure.runner.speaker.SLEEP_MUTE", 0),
-        patch.object(MeasureUtil, "take_average_measurement", return_value=1.5),
+        patch.object(MeasureUtil, "take_average_measurement", return_value=MeasurementResult(power=1.5, voltages=[])),
     ):
         measure = _create_measure_instance(config=mock_config)
         measure.start()
@@ -128,7 +163,7 @@ def test_run_charging(mock_input, mock_sleep, mock_config_factory) -> None:  # n
         },
     )
 
-    with patch.object(MeasureUtil, "take_average_measurement", return_value=1.5):
+    with patch.object(MeasureUtil, "take_average_measurement", return_value=MeasurementResult(power=1.5, voltages=[])):
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 
@@ -145,7 +180,7 @@ def test_run_fan(mock_input, mock_sleep, mock_config_factory) -> None:  # noqa: 
         },
     )
 
-    with patch.object(MeasureUtil, "take_average_measurement", return_value=1.5):
+    with patch.object(MeasureUtil, "take_average_measurement", return_value=MeasurementResult(power=1.5, voltages=[])):
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 
@@ -163,10 +198,11 @@ def test_run_recorder(mock_input, mock_sleep, mock_config_factory) -> None:  # n
         },
     )
 
-    def side_effect(_: Any) -> None:  # noqa: ANN401
+    def side_effect(_: Any) -> MeasurementResult:  # noqa: ANN401
         if side_effect.counter >= 5:
             raise KeyboardInterrupt
         side_effect.counter += 1
+        return MeasurementResult(power=1.5, voltages=[])
 
     side_effect.counter = 0
 
@@ -196,7 +232,11 @@ def test_run_average(mock_input, mock_config_factory, caplog: pytest.LogCaptureF
         },
     )
 
-    with patch.object(MeasureUtil, "take_average_measurement", return_value=1.5) as mock_take_measurement:
+    with patch.object(
+        MeasureUtil,
+        "take_average_measurement",
+        return_value=MeasurementResult(power=1.5, voltages=[]),
+    ) as mock_take_measurement:
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 
@@ -219,6 +259,25 @@ def _create_measure_instance(config: MeasureConfig, console_events: EventGenerat
 
     power_meter = DummyPowerMeter()
     return Measure(power_meter, config, render)
+
+
+class SequencePowerMeter(PowerMeter):
+    def __init__(self, measurements: list[PowerMeasurementResult]) -> None:
+        self.measurements = measurements
+        self.index = 0
+
+    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
+        measurement = self.measurements[self.index]
+        self.index += 1
+        if include_voltage:
+            return measurement
+        return PowerMeasurementResult(power=measurement.power, updated=measurement.updated)
+
+    def has_voltage_support(self) -> bool:
+        return True
+
+    def process_answers(self, answers: dict[str, Any]) -> None:
+        pass
 
 
 def test_ask_questions_with_no_predefined_answers(mock_config_factory) -> None:  # noqa: ANN001

@@ -46,10 +46,36 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
             "selected_media_controller": "dummy",
             "selected_charging_controller": "dummy",
             "selected_fan_controller": "dummy",
+            "selected_measure_type": None,
+            "min_brightness": 1,
+            "max_brightness": 255,
+            "min_sat": 1,
+            "max_sat": 255,
+            "min_hue": 1,
+            "max_hue": 65535,
+            "ct_bri_steps": 5,
+            "ct_mired_steps": 10,
+            "bri_bri_steps": 1,
+            "hs_bri_precision": 1,
+            "hs_bri_steps": 32,
+            "hs_hue_precision": 1,
+            "hs_hue_steps": 2731,
+            "hs_sat_precision": 1,
+            "hs_sat_steps": 32,
+            "effect_bri_steps": 40,
+            "measure_time_effect": 10,
             "sleep_time": 0,
             "sleep_initial": 0,
             "sleep_standby": 0,
             "sleep_time_sample": 0,
+            "sleep_time_hue": 0,
+            "sleep_time_sat": 0,
+            "sleep_time_ct": 0,
+            "sleep_time_effect_change": 0,
+            "sleep_time_nudge": 0,
+            "pulse_time_nudge": 0,
+            "max_retries": 5,
+            "max_nudges": 0,
             "resume": False,
         }
         if config_values is not None:
@@ -74,10 +100,7 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
         real_config = MeasureConfig()
         mock_instance = mock.return_value
         mock_instance.get_conf_value = MagicMock()
-        mock_instance.get_conf_value.side_effect = lambda k: default_config_values.get(
-            k.lower(),
-            real_config.get_conf_value(k),
-        )
+        mock_instance.get_conf_value.side_effect = lambda k: default_config_values.get(k.lower())
 
         properties = {prop for prop in dir(MeasureConfig) if isinstance(getattr(MeasureConfig, prop, None), property)}
         for prop in properties:
