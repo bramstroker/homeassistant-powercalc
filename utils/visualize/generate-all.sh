@@ -1,10 +1,12 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # Get the directory where the script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Check if a directory argument is provided
-if [ -z "$1" ]; then
+if [ -z "${1:-}" ]; then
   echo "Usage: $0 <directory>"
   exit 1
 fi
@@ -22,15 +24,8 @@ process_file() {
     return
   fi
 
-  # Call plot.py using the absolute path
-  # Activate the virtual environment if it exists, otherwise run directly
-  if [ -f "$SCRIPT_DIR/.venv/bin/activate" ]; then
-    source "$SCRIPT_DIR/.venv/bin/activate"
-    python "$SCRIPT_DIR/plot.py" "$file" --output="$output"
-    deactivate
-  else
-    python "$SCRIPT_DIR/plot.py" "$file" --output="$output"
-  fi
+  # Run from the visualize project so uv uses its pyproject.toml and lockfile.
+  uv --project "$SCRIPT_DIR" run "$SCRIPT_DIR/plot.py" "$file" --output="$output"
 }
 
 # Find specific .csv.gz files recursively and loop over them
