@@ -58,6 +58,7 @@ MANUALLY_VERIFIED_MODELS = (
     "signify/1746230P7",
     "signify/1743730P7",
     "signify/1743530P7",
+    "zipato/RGBWE2",
 )
 
 
@@ -681,6 +682,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--fail-under", type=float, help="Exit with status 1 when any LUT scores below this value.")
     parser.add_argument(
+        "--fail-on-issues",
+        action="store_true",
+        help="Exit with status 1 when any reported issues remain.",
+    )
+    parser.add_argument(
         "--fix",
         choices=FIX_MODES,
         help="Automatically fix detected points by removing them or setting watt to the expected value.",
@@ -768,6 +774,9 @@ def main() -> None:
     print(report)  # noqa: T201
 
     if args.fail_under is not None and any(result.score < args.fail_under for result in results):
+        raise SystemExit(1)
+
+    if args.fail_on_issues and any(result.has_issues for result in report_results):
         raise SystemExit(1)
 
 
