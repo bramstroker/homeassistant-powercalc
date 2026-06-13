@@ -1,12 +1,17 @@
 {
   "author": "Martin Emde <me@martinemde.com>",
-  "calculation_strategy": "linear",
+  "calculation_strategy": "fixed",
   "created_at": "2026-06-12T21:42:00Z",
   "device_type": "smart_dimmer",
-  "measure_description": "Measured device standby power with a smart plug. 1.54 W off, 1.59 W on (no load connected); mmWave radar keeps the device drawing power continuously.",
+  "measure_description": "Measured device standby power with a smart plug. 1.54 W off, 1.59 W on; mmWave radar keeps the device drawing power continuously. The device meters its own load energy, so this profile reports only the device's own consumption.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
   "name": "2-in-1 mmWave Dimmer Switch (VZM32-SN)",
+  "only_self_usage": true,
+  "sensor_config": {
+    "energy_sensor_naming": "{} Device Energy",
+    "power_sensor_naming": "{} Device Power"
+  },
   "standby_power": 1.54,
   "standby_power_on": 1.59,
   "author_info": {
