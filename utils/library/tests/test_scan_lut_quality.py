@@ -5,8 +5,11 @@ import gzip
 from pathlib import Path
 
 from utils.library.scan_lut_quality import (
+    LutQualityIssue,
+    LutQualityResult,
     analyze_color_temp_lut,
     analyze_lut,
+    filter_results_by_severity,
     find_lut_files,
     fix_lut_issues,
     format_text_report,
@@ -14,7 +17,7 @@ from utils.library.scan_lut_quality import (
     scan_library,
 )
 
-PROJECT_DIR = Path(__file__).parents[3]
+FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 def test_smooth_lut_scores_cleanly(tmp_path: Path) -> None:
@@ -41,20 +44,29 @@ def test_smooth_lut_scores_cleanly(tmp_path: Path) -> None:
 
 
 def test_innr_rb_287_c_color_temp_scans_cleanly() -> None:
-    lut_path = PROJECT_DIR / "profile_library/innr/RB 287 C/color_temp.csv.gz"
+    lut_path = FIXTURES_DIR / "innr_rb_287_c" / "color_temp.csv"
 
-    result = analyze_color_temp_lut(lut_path, root=PROJECT_DIR / "profile_library")
+    result = analyze_color_temp_lut(lut_path, root=lut_path.parent)
 
-    assert result.path == "innr/RB 287 C/color_temp.csv.gz"
+    assert result.path == "color_temp.csv"
     assert result.issues == []
 
 
 def test_ikea_led2408g10_color_temp_scans_cleanly() -> None:
-    lut_path = PROJECT_DIR / "profile_library/ikea/LED2408G10/color_temp.csv.gz"
+    lut_path = FIXTURES_DIR / "ikea_led2408g10" / "color_temp.csv"
 
-    result = analyze_color_temp_lut(lut_path, root=PROJECT_DIR / "profile_library")
+    result = analyze_color_temp_lut(lut_path, root=lut_path.parent)
 
-    assert result.path == "ikea/LED2408G10/color_temp.csv.gz"
+    assert result.path == "color_temp.csv"
+    assert result.issues == []
+
+
+def test_emos_zqw516r_color_temp_scans_cleanly() -> None:
+    lut_path = FIXTURES_DIR / "emos_zqw516r" / "color_temp.csv"
+
+    result = analyze_color_temp_lut(lut_path, root=lut_path.parent)
+
+    assert result.path == "color_temp.csv"
     assert result.issues == []
 
 
@@ -244,6 +256,46 @@ def test_scan_library_finds_supported_gzipped_luts(tmp_path: Path) -> None:
     assert [result.path for result in brightness_results] == ["manufacturer/model/brightness.csv.gz"]
 
 
+def test_scan_library_skips_manually_verified_models(tmp_path: Path) -> None:
+    verified_paths = [
+        tmp_path / "lifx" / "LIFX BR30 Night Vision" / "brightness.csv.gz",
+        tmp_path / "lifx" / "LIFX A19 Night Vision" / "infrared_100" / "color_temp.csv.gz",
+    ]
+    scanned_path = tmp_path / "lifx" / "Other Model" / "brightness.csv.gz"
+    scanned_path.parent.mkdir(parents=True)
+    for verified_path in verified_paths:
+        verified_path.parent.mkdir(parents=True)
+        write_lut(
+            verified_path,
+            [
+                (1, 150, 1.0),
+                (128, 150, 3.0),
+                (255, 150, 5.0),
+            ]
+            if verified_path.name.startswith("color_temp")
+            else [
+                (1, None, 1.0),
+                (128, None, 3.0),
+                (255, None, 5.0),
+            ],
+            gzipped=True,
+        )
+    write_lut(
+        scanned_path,
+        [
+            (1, None, 1.0),
+            (128, None, 3.0),
+            (255, None, 5.0),
+        ],
+        gzipped=True,
+    )
+
+    assert find_lut_files(tmp_path, mode="brightness") == [scanned_path]
+    assert [result.path for result in scan_library(tmp_path, mode="brightness")] == [
+        "lifx/Other Model/brightness.csv.gz",
+    ]
+
+
 def test_text_report_hides_clean_results_by_default(tmp_path: Path) -> None:
     lut_path = tmp_path / "color_temp.csv"
     write_lut(
@@ -258,6 +310,77 @@ def test_text_report_hides_clean_results_by_default(tmp_path: Path) -> None:
     result = analyze_color_temp_lut(lut_path, root=tmp_path)
 
     assert format_text_report([result], show_ok=False, min_score=80.0) == "No LUT quality issues found."
+
+
+def test_filter_results_by_severity_reports_only_errors() -> None:
+    result = LutQualityResult(
+        path="brightness.csv",
+        score=40.0,
+        rows=3,
+        brightness_curves=1,
+        max_deviation=2.0,
+        mean_deviation=1.0,
+        issues=[
+            LutQualityIssue(
+                severity="warning",
+                mode="brightness",
+                bri=10,
+                mired=None,
+                watt=1.0,
+                expected_watt=1.8,
+                deviation=0.8,
+                threshold=0.75,
+                message="brightness 10: warning",
+            ),
+            LutQualityIssue(
+                severity="error",
+                mode="brightness",
+                bri=20,
+                mired=None,
+                watt=4.0,
+                expected_watt=2.0,
+                deviation=2.0,
+                threshold=0.75,
+                message="brightness 20: error",
+            ),
+        ],
+    )
+
+    filtered_results = filter_results_by_severity([result], "error")
+    report = format_text_report(filtered_results, show_ok=False, min_score=0.0)
+
+    assert [issue.severity for issue in filtered_results[0].issues] == ["error"]
+    assert "brightness 20: error" in report
+    assert "brightness 10: warning" not in report
+    assert "issues=1" in report
+
+
+def test_error_severity_filter_hides_warning_only_results() -> None:
+    result = LutQualityResult(
+        path="brightness.csv",
+        score=40.0,
+        rows=3,
+        brightness_curves=1,
+        max_deviation=0.8,
+        mean_deviation=0.5,
+        issues=[
+            LutQualityIssue(
+                severity="warning",
+                mode="brightness",
+                bri=10,
+                mired=None,
+                watt=1.0,
+                expected_watt=1.8,
+                deviation=0.8,
+                threshold=0.75,
+                message="brightness 10: warning",
+            ),
+        ],
+    )
+
+    filtered_results = filter_results_by_severity([result], "error")
+
+    assert format_text_report(filtered_results, show_ok=False, min_score=0.0) == "No LUT quality issues found."
 
 
 def write_lut(path: Path, rows: list[tuple[int, int | None, float]], *, gzipped: bool = False) -> None:

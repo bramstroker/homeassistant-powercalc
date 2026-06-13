@@ -4,7 +4,7 @@ import argparse
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
 import csv
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 import gzip
 import json
 from pathlib import Path
@@ -23,6 +23,42 @@ SUPPORTED_LUT_FILES = ("brightness.csv", "brightness.csv.gz", "color_temp.csv", 
 SUPPORTED_LUT_MODES = ("all", "brightness", "color_temp")
 SCAN_LUT_MODES = ("brightness", "color_temp")
 FIX_MODES = ("remove", "expected")
+REPORT_SEVERITIES = ("all", "warning", "error")
+MANUALLY_VERIFIED_MODELS = (
+    "govee/H6076",
+    "govee/H61B8",
+    "govee/H7020",  # double check
+    "ikea/LED2111G6",  # messy LUT, might need remeasurement
+    "innr/RB 285 C",
+    "innr/RS 229 T",  # multiple error points in the middle of the curve, might need remeasurement
+    "kauf/BLF10",
+    "ledvance/4058075208339",
+    "lidl/HG07834A",
+    "lidl/HG08131B",
+    "lifx/LIFX A19 Night Vision",  # could be firmware bugs, there are outliers in lowest brightness levels
+    "lifx/LIFX BR30 Night Vision",
+    "lifx/LIFX Original 1000",
+    "lifx/LIFX Downlight Color",
+    "lifx/LIFX Candle",
+    "osram/Classic A60 RGBW",
+    "signify/1742930P7",
+    "signify/5060730P7",
+    "signify/5060830P7",
+    "signify/LTW001",  # not really clean, could have remeasure
+    "signify/LCG008",  # plots missing, check later
+    "signify/LCT012",
+    "signify/LTG005",  # very messy LUT, needs remeasure
+    "signify/LTC001",
+    "signify/LST002",
+    "signify/LCT015",
+    "signify/LCD002",
+    "signify/929003598001",
+    "signify/929003526101",  # messy LUT, bumpy, needs remeasure
+    "signify/915005997801",
+    "signify/1746230P7",
+    "signify/1743730P7",
+    "signify/1743530P7",
+)
 
 
 @dataclass(frozen=True)
@@ -100,11 +136,27 @@ def find_lut_files(root: Path, *, mode: str = "all") -> list[Path]:
     if mode != "all":
         validate_lut_mode(mode)
 
-    paths = [path for file_name in SUPPORTED_LUT_FILES for path in root.rglob(file_name)]
+    paths = [
+        path
+        for file_name in SUPPORTED_LUT_FILES
+        for path in root.rglob(file_name)
+        if not is_manually_verified_model_path(path, root)
+    ]
     if mode != "all":
         paths = [path for path in paths if get_lut_mode(path) == mode]
 
     return sorted(paths, key=lambda path: path.as_posix())
+
+
+def is_manually_verified_model_path(path: Path, root: Path) -> bool:
+    if not path.is_relative_to(root):
+        return False
+
+    relative_parent = path.parent.relative_to(root).as_posix()
+    return any(
+        relative_parent == model_path or relative_parent.startswith(f"{model_path}/")
+        for model_path in MANUALLY_VERIFIED_MODELS
+    )
 
 
 def find_color_temp_lut_files(root: Path) -> list[Path]:
@@ -362,10 +414,35 @@ def calculate_curve_deviations(curve: Sequence[LutPoint]) -> list[CurveDeviation
 
 
 def calculate_detection_curve_deviations(mode: str, curve: Sequence[LutPoint]) -> list[CurveDeviation]:
-    if mode == "color_temp" or len(curve) < SMOOTHING_MIN_POINTS:
+    if mode == "color_temp":
+        return calculate_color_temp_curve_deviations(curve)
+
+    if len(curve) < SMOOTHING_MIN_POINTS:
         return calculate_curve_deviations(curve)
 
     return calculate_smoothed_curve_deviations(curve)
+
+
+def calculate_color_temp_curve_deviations(curve: Sequence[LutPoint]) -> list[CurveDeviation]:
+    return [calculate_color_temp_curve_deviation(curve, index) for index in range(1, len(curve) - 1)]
+
+
+def calculate_color_temp_curve_deviation(curve: Sequence[LutPoint], index: int) -> CurveDeviation:
+    point = curve[index]
+    expected_watt = calculate_color_temp_expected_watt(curve, index)
+    return CurveDeviation(
+        index=index,
+        point=point,
+        expected_watt=expected_watt,
+        deviation=abs(point.watt - expected_watt),
+    )
+
+
+def calculate_color_temp_expected_watt(curve: Sequence[LutPoint], index: int) -> float:
+    if index == 1 and len(curve) >= SMOOTHING_MIN_POINTS:
+        return interpolate_watt(curve[2], curve[3], get_axis_value(curve[index]))
+
+    return interpolate_watt(curve[index - 1], curve[index + 1], get_axis_value(curve[index]))
 
 
 def calculate_smoothed_curve_deviations(curve: Sequence[LutPoint]) -> list[CurveDeviation]:
@@ -492,7 +569,7 @@ def create_issue(
         expected_watt=round(expected_watt, 3),
         deviation=round(deviation, 3),
         threshold=round(threshold, 3),
-        message=(f"{location}: {point.watt:.3f} W deviates {deviation:.3f} W from smooth curve"),
+        message=f"{location}: {point.watt:.3f} W deviates {deviation:.3f} W from smooth curve",
     )
 
 
@@ -533,10 +610,14 @@ def format_text_report(results: Sequence[LutQualityResult], *, show_ok: bool, mi
         if not show_ok and result.score >= min_score and not result.has_issues:
             continue
 
-        lines.append(
-            f"{result.path}: score={result.score:.1f} rows={result.rows} curves={result.brightness_curves} "
-            f"issues={len(result.issues)} max_deviation={result.max_deviation:.3f}W",
-        )
+        summary_parts = [
+            f"{result.path}: score={result.score:.1f}",
+            f"rows={result.rows}",
+            f"curves={result.brightness_curves}",
+            f"issues={len(result.issues)}",
+            f"max_deviation={result.max_deviation:.3f}W",
+        ]
+        lines.append(" ".join(summary_parts))
         lines.extend(
             f"  {issue.severity}: {issue.message} (expected {issue.expected_watt:.3f} W)" for issue in result.issues[:5]
         )
@@ -551,6 +632,23 @@ def format_text_report(results: Sequence[LutQualityResult], *, show_ok: bool, mi
 
 def format_json_report(results: Sequence[LutQualityResult]) -> str:
     return json.dumps([asdict(result) for result in results], indent=2)
+
+
+def filter_results_by_severity(results: Sequence[LutQualityResult], severity: str) -> list[LutQualityResult]:
+    if severity not in REPORT_SEVERITIES:
+        supported_severities = ", ".join(REPORT_SEVERITIES)
+        raise ValueError(f"Unsupported report severity: {severity}. Expected one of: {supported_severities}")
+
+    if severity == "all":
+        return list(results)
+
+    return [
+        replace(
+            result,
+            issues=[issue for issue in result.issues if issue.severity == severity],
+        )
+        for result in results
+    ]
 
 
 def parse_args() -> argparse.Namespace:
@@ -568,6 +666,12 @@ def parse_args() -> argparse.Namespace:
         help="Only scan LUT files for a specific color mode.",
     )
     parser.add_argument("--format", choices=("text", "json"), default="text", help="Report output format.")
+    parser.add_argument(
+        "--severity",
+        choices=REPORT_SEVERITIES,
+        default="all",
+        help="Only include issues with this severity in the report.",
+    )
     parser.add_argument("--show-ok", action="store_true", help="Show LUT files without issues.")
     parser.add_argument(
         "--min-score",
@@ -654,10 +758,12 @@ def main() -> None:
                     z_score=args.z_score,
                 )
 
+    report_results = filter_results_by_severity(results, args.severity)
+    report_min_score = 0.0 if args.severity != "all" else args.min_score
     report = (
-        format_json_report(results)
+        format_json_report(report_results)
         if args.format == "json"
-        else format_text_report(results, show_ok=args.show_ok, min_score=args.min_score)
+        else format_text_report(report_results, show_ok=args.show_ok, min_score=report_min_score)
     )
     print(report)  # noqa: T201
 
