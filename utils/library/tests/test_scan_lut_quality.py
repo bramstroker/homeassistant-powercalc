@@ -4,6 +4,8 @@ import csv
 import gzip
 from pathlib import Path
 
+import pytest
+
 from utils.library.scan_lut_quality import (
     LutQualityIssue,
     LutQualityResult,
@@ -39,7 +41,7 @@ def test_smooth_lut_scores_cleanly(tmp_path: Path) -> None:
     result = analyze_color_temp_lut(lut_path, root=tmp_path)
 
     assert result.path == "color_temp.csv"
-    assert result.score == 100.0
+    assert result.score == pytest.approx(100.0)
     assert result.issues == []
 
 
@@ -135,7 +137,7 @@ def test_brightness_lut_filters_single_outlier_without_neighbor_cascade(tmp_path
     result = analyze_lut(lut_path, root=tmp_path)
 
     assert [issue.bri for issue in result.issues] == [208]
-    assert result.issues[0].expected_watt == 8.05
+    assert result.issues[0].expected_watt == pytest.approx(8.05)
 
 
 def test_brightness_lut_reports_two_low_points_in_alternating_psb30_case(tmp_path: Path) -> None:
