@@ -23,7 +23,10 @@ dependencies = ["homeassistant"]
 license = "MIT"
 
 [tool.pytest.ini_options]
-testpaths = "tests"
+testpaths = [
+    "tests",
+    "utils/library/tests",
+]
 norecursedirs = ".git"
 asyncio_mode = "auto"
 markers = [
