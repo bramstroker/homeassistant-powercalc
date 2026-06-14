@@ -111,7 +111,7 @@ async def test_base_sensor_state_none(hass: HomeAssistant) -> None:
         ),
     ],
 )
-async def test_validate(config: ConfigType, valid: bool) -> None:
+def test_validate(config: ConfigType, valid: bool) -> None:
     if not valid:
         with pytest.raises(SensorConfigurationError):
             validate_config(config)

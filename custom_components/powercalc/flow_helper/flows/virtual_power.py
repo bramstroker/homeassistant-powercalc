@@ -482,7 +482,7 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
 
             if not errors:
                 self.flow.source_entity_id = str(entity_id or DUMMY_ENTITY_ID)
-                self.flow.source_entity = await create_source_entity(
+                self.flow.source_entity = create_source_entity(
                     self.flow.source_entity_id,
                     self.flow.hass,
                 )

@@ -120,5 +120,5 @@ async def test_strategy_configuration_error(hass: HomeAssistant, config: ConfigT
             config,
             CalculationStrategy.MULTI_SWITCH,
             None,
-            await create_source_entity("switch.test1", hass),
+            create_source_entity("switch.test1", hass),
         )

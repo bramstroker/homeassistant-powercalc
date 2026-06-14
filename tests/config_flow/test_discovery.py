@@ -44,7 +44,7 @@ async def test_discovery_flow(
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
-    source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
+    source_entity = create_source_entity(DEFAULT_ENTITY_ID, hass)
     result = await initialize_discovery_flow(hass, source_entity)
 
     # Confirm selected manufacturer/model
@@ -62,7 +62,7 @@ async def test_discovery_flow(
 
 async def test_discovery_flow_remarks_are_shown(hass: HomeAssistant) -> None:
     """Model.json can provide remarks to show in the discovery flow. Check if these are displayed correctly"""
-    source_entity = await create_source_entity("media_player.test", hass)
+    source_entity = create_source_entity("media_player.test", hass)
     power_profile = await get_power_profile(hass, {}, source_entity, ModelInfo("sonos", "one"))
     result = await initialize_discovery_flow(hass, source_entity, power_profile)
     assert result["description_placeholders"]["remarks"] is not None
@@ -101,7 +101,7 @@ async def _setup_ups_discovery_flow(hass: HomeAssistant) -> tuple[SourceEntity, 
         },
     )
 
-    source_entity = await create_source_entity("sensor.ups_output", hass)
+    source_entity = create_source_entity("sensor.ups_output", hass)
     power_profile = await get_power_profile(
         hass,
         {
@@ -175,7 +175,7 @@ async def test_discovery_flow_remarks_are_shown_when_translation_key_entity_miss
         },
     )
 
-    source_entity = await create_source_entity("sensor.ups_output", hass)
+    source_entity = create_source_entity("sensor.ups_output", hass)
     power_profile = await get_power_profile(
         hass,
         {
@@ -211,7 +211,7 @@ async def test_discovery_flow_with_subprofile_selection(
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
-    source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
+    source_entity = create_source_entity(DEFAULT_ENTITY_ID, hass)
     power_profile = await get_power_profile_by_source_entity(hass, source_entity)
 
     result = await initialize_discovery_flow(hass, source_entity, power_profile)
@@ -247,7 +247,7 @@ async def test_discovery_flow_multi_profiles(
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
-    source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
+    source_entity = create_source_entity(DEFAULT_ENTITY_ID, hass)
     power_profiles = [
         await get_power_profile(hass, {}, source_entity, ModelInfo("signify", "LCT010")),
         await get_power_profile(hass, {}, source_entity, ModelInfo("signify", "LCT012")),

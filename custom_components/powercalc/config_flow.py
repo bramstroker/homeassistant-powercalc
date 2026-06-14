@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+from inspect import isawaitable
 import logging
 from typing import Any
 import uuid
@@ -248,7 +249,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if user_input is not None:
             if form_step.validate_user_input is not None:
                 try:
-                    user_input = await form_step.validate_user_input(user_input)
+                    validated_input = form_step.validate_user_input(user_input)
+                    user_input = await validated_input if isawaitable(validated_input) else validated_input
                 except SchemaFlowError as exc:
                     return await self._show_form(form_step, exc)
 
@@ -259,7 +261,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             self.handled_steps.append(form_step.step)
             next_step = form_step.next_step
             if callable(form_step.next_step):
-                next_step = await form_step.next_step(user_input)
+                resolved_next_step = form_step.next_step(user_input)
+                next_step = await resolved_next_step if isawaitable(resolved_next_step) else resolved_next_step
             if not next_step:
                 return await self.handle_final_steps(
                     skip_advanced=not form_step.continue_advanced_step,
@@ -475,7 +478,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
         self.sensor_config = dict(self.config_entry.data)
         if self.source_entity_id:
-            self.source_entity = await create_source_entity(
+            self.source_entity = create_source_entity(
                 self.source_entity_id,
                 self.hass,
             )

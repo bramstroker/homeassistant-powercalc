@@ -175,7 +175,7 @@ class DiscoveryManager:
             if not entity_id or entity_id == DUMMY_ENTITY_ID:
                 continue
 
-            entity = await create_source_entity(str(entity_id), self.hass)
+            entity = create_source_entity(str(entity_id), self.hass)
             if entity and entity.device_entry:
                 self.initialized_flows.add(f"pc_{entity.device_entry.id}")
             self.initialized_flows.add(entity_id)
@@ -246,7 +246,7 @@ class DiscoveryManager:
 
     async def create_entity_source(self, entity_entry: er.RegistryEntry) -> SourceEntity:
         """Create SourceEntity for an entity."""
-        return await create_source_entity(entity_entry.entity_id, self.hass)
+        return create_source_entity(entity_entry.entity_id, self.hass)
 
     @staticmethod
     async def create_device_source(device_entry: dr.DeviceEntry) -> SourceEntity:
@@ -379,7 +379,7 @@ class DiscoveryManager:
             ],
             FilterOperator.OR,
         )
-        return await get_filtered_entity_list(self.hass, NotFilter(entity_filter))
+        return get_filtered_entity_list(self.hass, NotFilter(entity_filter))
 
     async def get_devices(self) -> list[dr.DeviceEntry]:
         """Fetch device entries."""

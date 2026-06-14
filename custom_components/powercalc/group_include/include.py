@@ -53,7 +53,7 @@ async def find_entities(
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
 
-    source_entities = await get_filtered_entity_list(hass, _build_filter(entity_filter))
+    source_entities = get_filtered_entity_list(hass, _build_filter(entity_filter))
 
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug("Source entities: %s", [entity.entity_id for entity in source_entities])
@@ -111,7 +111,7 @@ def _create_real_sensor(source_entity: RegistryEntry) -> Entity | None:
 async def _is_discoverable_source_entity(hass: HomeAssistant, source_entity: RegistryEntry) -> bool:
     power_profile = await get_power_profile_by_source_entity(
         hass,
-        await create_source_entity(source_entity.entity_id, hass),
+        create_source_entity(source_entity.entity_id, hass),
     )
     return bool(
         power_profile

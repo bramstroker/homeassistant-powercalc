@@ -60,7 +60,7 @@ ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 _LOGGER = logging.getLogger(__name__)
 
 
-async def create_energy_sensor(
+def create_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
     power_sensor: PowerSensor,
@@ -69,20 +69,20 @@ async def create_energy_sensor(
     """Create the energy sensor entity."""
 
     # Check for existing energy sensor
-    energy_sensor = await _get_existing_energy_sensor(hass, sensor_config)
+    energy_sensor = _get_existing_energy_sensor(hass, sensor_config)
     if energy_sensor:
         return energy_sensor
 
     # Check if we should find or create a related energy sensor
-    energy_sensor = await _get_related_energy_sensor(hass, sensor_config, power_sensor)
+    energy_sensor = _get_related_energy_sensor(hass, sensor_config, power_sensor)
     if energy_sensor:
         return energy_sensor
 
     # Create a new virtual energy sensor based on the virtual power sensor
-    return await _create_virtual_energy_sensor(hass, sensor_config, power_sensor, source_entity)
+    return _create_virtual_energy_sensor(hass, sensor_config, power_sensor, source_entity)
 
 
-async def _get_existing_energy_sensor(
+def _get_existing_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
 ) -> EnergySensor | None:
@@ -105,7 +105,7 @@ async def _get_existing_energy_sensor(
     )
 
 
-async def _get_related_energy_sensor(
+def _get_related_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
     power_sensor: PowerSensor,
@@ -138,7 +138,7 @@ async def _get_related_energy_sensor(
     return None
 
 
-async def _create_virtual_energy_sensor(
+def _create_virtual_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
     power_sensor: PowerSensor,

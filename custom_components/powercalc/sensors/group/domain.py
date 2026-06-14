@@ -7,7 +7,7 @@ from custom_components.powercalc.const import CONF_GROUP_TYPE, GroupType
 from custom_components.powercalc.sensors.group.custom import create_group_sensors_custom
 
 
-async def create_domain_group_sensor(
+def create_domain_group_sensor(
     hass: HomeAssistant,
     config: ConfigType,
 ) -> list[Entity]:
@@ -16,7 +16,7 @@ async def create_domain_group_sensor(
     if CONF_UNIQUE_ID not in config:
         config[CONF_UNIQUE_ID] = generate_unique_id(config)
     config[CONF_GROUP_TYPE] = GroupType.DOMAIN
-    return await create_group_sensors_custom(
+    return create_group_sensors_custom(
         hass,
         name,
         config,

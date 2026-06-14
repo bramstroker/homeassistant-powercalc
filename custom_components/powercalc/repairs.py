@@ -34,7 +34,7 @@ class SubProfileRepairFlow(RepairsFlow):
             self._hass.config_entries.async_update_entry(self._config_entry, data=new_data)
             return self.async_create_entry(title="", data={})  # type: ignore[no-any-return]
 
-        source_entity = await create_source_entity(self._config_entry.data[CONF_ENTITY_ID], self._hass)
+        source_entity = create_source_entity(self._config_entry.data[CONF_ENTITY_ID], self._hass)
         profile = await get_power_profile(self.hass, dict(self._config_entry.data), source_entity)
         assert profile
         sub_profile_schema = await build_sub_profile_schema(profile, None)

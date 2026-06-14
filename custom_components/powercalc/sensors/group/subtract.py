@@ -24,7 +24,7 @@ from custom_components.powercalc.sensors.utility_meter import create_utility_met
 _LOGGER = logging.getLogger(__name__)
 
 
-async def create_subtract_group_sensors(
+def create_subtract_group_sensors(
     hass: HomeAssistant,
     config: ConfigType,
 ) -> list[Entity]:
@@ -58,7 +58,7 @@ async def create_subtract_group_sensors(
     )
     sensors.append(power_sensor)
     if config.get(CONF_CREATE_ENERGY_SENSORS):
-        energy_sensor = await create_energy_sensor(
+        energy_sensor = create_energy_sensor(
             hass,
             config,
             power_sensor,
@@ -67,7 +67,7 @@ async def create_subtract_group_sensors(
 
         config[CONF_UTILITY_METER_NET_CONSUMPTION] = True
         sensors.extend(
-            await create_utility_meters(
+            create_utility_meters(
                 hass,
                 energy_sensor,
                 config,

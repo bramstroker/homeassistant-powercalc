@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Coroutine
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.sensor import SensorDeviceClass
@@ -330,7 +330,7 @@ class GroupFlow:
             },
         )
 
-        async def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
+        def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
             groups = user_input.get(CONF_GROUP) or []
             new_group = user_input.get(CONF_NEW_GROUP)
             if new_group:
@@ -386,9 +386,9 @@ class GroupConfigFlow(GroupFlow):
         group_type: GroupType,
         user_input: dict[str, Any] | None = None,
         schema: vol.Schema | None = None,
-        next_step: Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None,
+        next_step: Callable[[dict[str, Any]], Step | None] | None = None,
     ) -> ConfigFlowResult:
-        async def _validate(ui: dict[str, Any]) -> dict[str, Any]:
+        def _validate(ui: dict[str, Any]) -> dict[str, Any]:
             if group_type == GroupType.CUSTOM:
                 validate_group_input(ui)
 
@@ -427,7 +427,7 @@ class GroupConfigFlow(GroupFlow):
         if user_input is not None:
             user_input[CONF_NAME] = "Tracked / Untracked"
 
-        async def _next(ui: dict[str, Any]) -> Step | None:
+        def _next(ui: dict[str, Any]) -> Step | None:
             return (
                 Step.GROUP_TRACKED_UNTRACKED_AUTO
                 if bool(ui.get("group_tracked_auto", True))

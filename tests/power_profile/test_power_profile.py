@@ -121,7 +121,7 @@ async def test_get_model_directory_root_only_ignores_selected_sub_profile(hass: 
     assert power_profile.get_model_directory() == get_test_profile_dir("sub_profile2/a")
 
 
-async def test_default_calculation_strategy_lut(hass: HomeAssistant) -> None:
+def test_default_calculation_strategy_lut(hass: HomeAssistant) -> None:
     """By default the calculation strategy must be LUT when no strategy is configured"""
     power_profile = PowerProfile(hass, "signify", "LCT010", "", {})
     assert power_profile.calculation_strategy == CalculationStrategy.LUT

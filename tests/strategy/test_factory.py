@@ -17,7 +17,7 @@ async def test_exception_raised_on_not_supported_strategy(hass: HomeAssistant) -
             {},
             "NonExistingStrategy",
             power_profile=None,
-            source_entity=await create_source_entity("light.test", hass),
+            source_entity=create_source_entity("light.test", hass),
         )
 
 
@@ -30,7 +30,7 @@ async def test_exception_raised_when_no_power_profile_passed_lut_strategy(
             {},
             CalculationStrategy.LUT,
             power_profile=None,
-            source_entity=await create_source_entity("light.test", hass),
+            source_entity=create_source_entity("light.test", hass),
         )
 
 
@@ -54,5 +54,5 @@ async def test_exception_raised_when_strategy_config_not_provided(
             {},
             strategy,
             power_profile=None,
-            source_entity=await create_source_entity("light.test", hass),
+            source_entity=create_source_entity("light.test", hass),
         )

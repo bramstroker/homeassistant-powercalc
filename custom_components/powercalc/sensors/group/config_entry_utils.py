@@ -20,7 +20,7 @@ from custom_components.powercalc.const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-async def remove_power_sensor_from_associated_groups(
+def remove_power_sensor_from_associated_groups(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
 ) -> list[ConfigEntry]:

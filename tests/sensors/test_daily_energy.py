@@ -55,13 +55,13 @@ from tests.common import (
 from tests.config_flow.test_global_configuration import create_mock_global_config_entry
 
 
-async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant) -> None:
+def test_create_daily_energy_sensor_default_options(hass: HomeAssistant) -> None:
     sensor_config = {
         CONF_ENERGY_SENSOR_NAMING: "{} Energy",
         CONF_NAME: "My sensor",
         CONF_DAILY_FIXED_ENERGY: {},
     }
-    sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
+    sensor = create_daily_fixed_energy_sensor(hass, sensor_config)
     assert sensor
     assert sensor.name == "My sensor Energy"
     assert sensor.entity_id == "sensor.my_sensor_energy"
@@ -78,7 +78,7 @@ async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant) -
         (UnitPrefix.MEGA, UnitOfEnergy.MEGA_WATT_HOUR),
     ],
 )
-async def test_create_daily_energy_sensor_unit_prefix_watt(
+def test_create_daily_energy_sensor_unit_prefix_watt(
     hass: HomeAssistant,
     unit_prefix: str,
     unit_of_measurement: str,
@@ -90,7 +90,7 @@ async def test_create_daily_energy_sensor_unit_prefix_watt(
         CONF_ENERGY_SENSOR_UNIT_PREFIX: unit_prefix,
         CONF_DAILY_FIXED_ENERGY: {},
     }
-    sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
+    sensor = create_daily_fixed_energy_sensor(hass, sensor_config)
     assert sensor
     assert sensor.name == "My sensor Energy"
     assert sensor.native_unit_of_measurement == unit_of_measurement
@@ -250,7 +250,7 @@ async def test_power_sensor_not_created_when_not_on_whole_day(
         ),
     ],
 )
-async def test_calculate_delta(
+def test_calculate_delta(
     hass: HomeAssistant,
     daily_fixed_options: ConfigType,
     elapsed_seconds: int,
@@ -261,13 +261,13 @@ async def test_calculate_delta(
         CONF_NAME: "My sensor",
         CONF_DAILY_FIXED_ENERGY: daily_fixed_options,
     }
-    sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
+    sensor = create_daily_fixed_energy_sensor(hass, sensor_config)
 
     delta = sensor.calculate_delta(elapsed_seconds)
     assert expected_delta == pytest.approx(float(delta), 0.001)
 
 
-async def test_calculate_delta_mega_watt_hour(hass: HomeAssistant) -> None:
+def test_calculate_delta_mega_watt_hour(hass: HomeAssistant) -> None:
     sensor_config = {
         CONF_ENERGY_SENSOR_NAMING: "{} Energy",
         CONF_NAME: "My sensor",
@@ -278,7 +278,7 @@ async def test_calculate_delta_mega_watt_hour(hass: HomeAssistant) -> None:
             CONF_VALUE: 12,
         },
     }
-    sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
+    sensor = create_daily_fixed_energy_sensor(hass, sensor_config)
 
     # Calculate delta after 1 hour
     delta = sensor.calculate_delta(3600)

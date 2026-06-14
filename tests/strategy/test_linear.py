@@ -35,7 +35,7 @@ from tests.conftest import MockEntityWithModel
 async def test_light_max_power_only(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("light.test", hass),
+        create_source_entity("light.test", hass),
         {CONF_MAX_POWER: 255},
     )
 
@@ -46,7 +46,7 @@ async def test_light_max_power_only(hass: HomeAssistant) -> None:
 async def test_fan_min_and_max_power(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("fan.test", hass),
+        create_source_entity("fan.test", hass),
         {CONF_MIN_POWER: 10, CONF_MAX_POWER: 100},
     )
 
@@ -57,7 +57,7 @@ async def test_fan_min_and_max_power(hass: HomeAssistant) -> None:
 async def test_light_calibrate(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("light.test", hass),
+        create_source_entity("light.test", hass),
         {
             CONF_CALIBRATE: [
                 "1 -> 0.3",
@@ -110,7 +110,7 @@ async def test_light_calibrate(hass: HomeAssistant) -> None:
     )
 
 
-async def _setup_vacuum_test(hass: HomeAssistant) -> None:
+def _setup_vacuum_test(hass: HomeAssistant) -> None:
     """Set up the vacuum device and entities for testing."""
     mock_device(hass, "vacuum-device", "test", "test")
     mock_registry(
@@ -136,12 +136,12 @@ async def _setup_vacuum_test(hass: HomeAssistant) -> None:
 async def test_vacuum_battery_level(
     hass: HomeAssistant,
 ) -> None:
-    await _setup_vacuum_test(hass)
+    _setup_vacuum_test(hass)
 
     await set_states(hass, [("sensor.test_battery", 50)])
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("vacuum.test", hass),
+        create_source_entity("vacuum.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -169,7 +169,7 @@ async def test_no_battery_entity_for_vacuum(
     with pytest.raises(StrategyConfigurationError, match="No battery entity found for vacuum cleaner"):
         await _create_strategy_instance(
             hass,
-            await create_source_entity("vacuum.test", hass),
+            create_source_entity("vacuum.test", hass),
             {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
         )
 
@@ -177,7 +177,7 @@ async def test_no_battery_entity_for_vacuum(
 async def test_custom_attribute(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("fan.test", hass),
+        create_source_entity("fan.test", hass),
         {CONF_ATTRIBUTE: "my_attribute", CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -188,7 +188,7 @@ async def test_custom_attribute(hass: HomeAssistant) -> None:
 async def test_power_is_none_when_state_is_none(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("light.test", hass),
+        create_source_entity("light.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -203,7 +203,7 @@ async def test_error_on_non_number_state(
     caplog.set_level(logging.ERROR)
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("sensor.test", hass),
+        create_source_entity("sensor.test", hass),
         {CONF_CALIBRATE: ["1 -> 0.3", "10 -> 1.25"]},
     )
 
@@ -218,7 +218,7 @@ async def test_validate_raises_exception_not_allowed_domain(
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,
-            await create_source_entity("sensor.test", hass),
+            create_source_entity("sensor.test", hass),
             {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
         )
 
@@ -229,7 +229,7 @@ async def test_validate_raises_exception_when_min_power_higher_than_max(
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,
-            await create_source_entity("light.test", hass),
+            create_source_entity("light.test", hass),
             {CONF_MIN_POWER: 150, CONF_MAX_POWER: 100},
         )
 
@@ -237,7 +237,7 @@ async def test_validate_raises_exception_when_min_power_higher_than_max(
 async def test_lower_value_than_calibration_table_defines(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("light.test", hass),
+        create_source_entity("light.test", hass),
         {
             CONF_CALIBRATE: [
                 "50 -> 5",
@@ -290,7 +290,7 @@ async def test_config_entry_with_calibrate_list(
 async def test_media_player_volume_level(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("media_player.test", hass),
+        create_source_entity("media_player.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -304,7 +304,7 @@ async def test_error_is_raised_on_unsupported_entity_domain(
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,
-            await create_source_entity("input_boolean.test", hass),
+            create_source_entity("input_boolean.test", hass),
             {CONF_MAX_POWER: 255},
         )
 
@@ -313,11 +313,11 @@ async def test_value_entity_not_found(
     hass: HomeAssistant,
 ) -> None:
     """Test that None is returned when the value entity is not found."""
-    await _setup_vacuum_test(hass)
+    _setup_vacuum_test(hass)
 
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("vacuum.test", hass),
+        create_source_entity("vacuum.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
@@ -330,11 +330,11 @@ async def test_value_entity_state_not_found(
 ) -> None:
     """Test that None is returned when the value entity state is not found in Home Assistant."""
     caplog.set_level(logging.ERROR)
-    await _setup_vacuum_test(hass)
+    _setup_vacuum_test(hass)
 
     strategy = await _create_strategy_instance(
         hass,
-        await create_source_entity("vacuum.test", hass),
+        create_source_entity("vacuum.test", hass),
         {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 

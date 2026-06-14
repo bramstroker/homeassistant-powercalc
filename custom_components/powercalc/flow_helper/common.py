@@ -1,4 +1,4 @@
-from collections.abc import Callable, Coroutine
+from collections.abc import Awaitable, Callable, Coroutine
 import copy
 from dataclasses import dataclass
 from enum import StrEnum
@@ -59,6 +59,9 @@ class FlowType(StrEnum):
     GLOBAL_CONFIGURATION = "global_configuration"
 
 
+type MaybeAwaitable[R] = R | Awaitable[R]
+
+
 @dataclass(slots=True)
 class PowercalcFormStep:
     schema: vol.Schema | Callable[[], Coroutine[Any, Any, vol.Schema | None]]
@@ -66,12 +69,12 @@ class PowercalcFormStep:
     validate_user_input: (
         Callable[
             [dict[str, Any]],
-            Coroutine[Any, Any, dict[str, Any]],
+            MaybeAwaitable[dict[str, Any]],
         ]
         | None
     ) = None
 
-    next_step: Step | Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None
+    next_step: Step | Callable[[dict[str, Any]], MaybeAwaitable[Step | None]] | None = None
     continue_utility_meter_options_step: bool = False
     continue_advanced_step: bool = False
     form_kwarg: dict[str, Any] | None = None

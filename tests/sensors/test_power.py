@@ -99,7 +99,7 @@ from tests.conftest import MockEntityWithModel
         (3, Decimal, Decimal(3)),
     ],
 )
-async def test_resolve_standby_power_value(
+def test_resolve_standby_power_value(
     hass: HomeAssistant,
     case: Template | Decimal | str | float | None,
     expected_type: type[Template] | type[Decimal],

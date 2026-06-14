@@ -35,7 +35,7 @@ async def test_can_calculate_power(
 ) -> None:
     mock_entity_with_model_information("light.test")
     await set_states(hass, [("light.test", STATE_ON)])
-    light_source_entity = await create_source_entity("light.test", hass)
+    light_source_entity = create_source_entity("light.test", hass)
 
     estimated_current_entity = test_sensor_platform.MockSensor(
         name="test_estimated_current",
@@ -101,7 +101,7 @@ async def test_find_estimated_current_entity_by_device_class(
 
     strategy = WledStrategy(
         config={CONF_VOLTAGE: 5, CONF_POWER_FACTOR: 0.9},
-        light_entity=await create_source_entity("light.test", hass),
+        light_entity=create_source_entity("light.test", hass),
         hass=hass,
         standby_power=0.1,
     )
@@ -127,7 +127,7 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
 
         strategy = WledStrategy(
             config={CONF_VOLTAGE: 5, CONF_POWER_FACTOR: 0.9},
-            light_entity=await create_source_entity("light.test", hass),
+            light_entity=create_source_entity("light.test", hass),
             hass=hass,
             standby_power=0.1,
         )

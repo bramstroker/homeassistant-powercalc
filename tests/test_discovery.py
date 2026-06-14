@@ -432,7 +432,7 @@ async def test_load_model_with_slashes(
         "TRADFRI bulb E14 W op/ch 400lm",
     )
 
-    source_entity = await create_source_entity("light.testa", hass)
+    source_entity = create_source_entity("light.testa", hass)
     profile = await get_power_profile_by_source_entity(hass, source_entity)
     assert profile
     assert profile.manufacturer == "ikea"
@@ -458,7 +458,7 @@ async def test_get_power_profile_by_source_device_returns_none_without_required_
         },
     )
 
-    source_entity = await create_source_entity("sensor.test", hass)
+    source_entity = create_source_entity("sensor.test", hass)
 
     assert await get_power_profile_by_source_device(hass, source_entity._replace(device_entry=None)) is None
     assert await get_power_profile_by_source_device(hass, source_entity._replace(entity_entry=None)) is None
@@ -537,7 +537,7 @@ async def test_discover_entity(
     """
     mock_entity_with_model_information(entity_id, model_info.manufacturer, model_info.model, model_info.model_id)
 
-    source_entity = await create_source_entity(entity_id, hass)
+    source_entity = create_source_entity(entity_id, hass)
     power_profile = await get_power_profile_by_source_entity(hass, source_entity)
 
     if not expected_manufacturer:
@@ -681,7 +681,7 @@ async def test_get_power_profile_empty_manufacturer(
 
     mock_entity_with_model_information("light.test", "", "some model")
 
-    source_entity = await create_source_entity("light.test", hass)
+    source_entity = create_source_entity("light.test", hass)
     profile = await get_power_profile_by_source_entity(hass, source_entity)
 
     assert not profile

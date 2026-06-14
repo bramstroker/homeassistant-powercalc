@@ -104,7 +104,7 @@ def create_filter(
     return filter_mapping.get(filter_type, lambda: NullFilter())()
 
 
-async def get_filtered_entity_list(
+def get_filtered_entity_list(
     hass: HomeAssistant,
     entity_filter: EntityFilter,
 ) -> list[entity_registry.RegistryEntry]:

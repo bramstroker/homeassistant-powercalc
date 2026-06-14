@@ -165,7 +165,7 @@ async def test_exception_is_raised_when_no_model_json_present(
     with pytest.raises(LibraryLoadingError):
         await library.create_power_profile(
             ModelInfo("foo", "bar"),
-            await create_source_entity("light.test", hass),
+            create_source_entity("light.test", hass),
             get_test_profile_dir("no_model_json"),
         )
 
@@ -193,7 +193,7 @@ async def test_create_power_raise_library_error_when_model_not_found(hass: HomeA
     with pytest.raises(LibraryError):
         await library.create_power_profile(
             ModelInfo("signify", "LCT010"),
-            await create_source_entity("light.test", hass),
+            create_source_entity("light.test", hass),
         )
 
 
@@ -207,7 +207,7 @@ async def test_create_power_raise_library_error_when_manufacturer_not_found(hass
     with pytest.raises(LibraryError):
         await library.create_power_profile(
             ModelInfo("signify", "LCT010"),
-            await create_source_entity("light.test", hass),
+            create_source_entity("light.test", hass),
         )
 
 
@@ -270,7 +270,7 @@ async def test_linked_profile_loading_failed(hass: HomeAssistant) -> None:
     remote_loader_class = "custom_components.powercalc.power_profile.loader.remote.RemoteLoader"
     with patch(f"{remote_loader_class}.load_model") as mock_load_model:
 
-        async def async_load_model_patch(manufacturer: str, __: str) -> tuple[dict, str] | None:
+        def async_load_model_patch(manufacturer: str, __: str) -> tuple[dict, str] | None:
             if manufacturer == "foo":
                 return None
 

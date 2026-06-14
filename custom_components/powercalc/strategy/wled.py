@@ -76,7 +76,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
             self._power_factor,
         )
         power = float(entity_state.state) / 1000 * self._voltage * self._power_factor
-        return await evaluate_power(power)
+        return evaluate_power(power)
 
     async def find_estimated_current_entity(self) -> str:
         entity_reg = entity_registry.async_get(self._hass)

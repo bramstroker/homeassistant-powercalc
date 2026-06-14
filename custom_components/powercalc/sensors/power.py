@@ -125,7 +125,7 @@ async def create_power_sensor(
     """Create the power sensor based on powercalc sensor configuration."""
     if CONF_POWER_SENSOR_ID in sensor_config:
         # Use an existing power sensor, only create energy sensors / utility meters
-        return await create_real_power_sensor(hass, sensor_config)
+        return create_real_power_sensor(hass, sensor_config)
 
     return await create_virtual_power_sensor(
         hass,
@@ -324,7 +324,7 @@ def _get_standby_power(
     return standby_power, standby_power_on
 
 
-async def create_real_power_sensor(
+def create_real_power_sensor(
     hass: HomeAssistant,
     sensor_config: dict,
 ) -> RealPowerSensor:
@@ -770,7 +770,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self._strategy_instance.can_calculate_standby():
             standby_power = await self._strategy_instance.calculate(state) or self._standby_power
 
-        evaluated = await evaluate_power(standby_power)
+        evaluated = evaluate_power(standby_power)
         if evaluated is None:
             evaluated = Decimal(0)
         standby_power = evaluated
