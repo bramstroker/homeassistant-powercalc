@@ -19,10 +19,7 @@ class SubProfileRepairFlow(RepairsFlow):
         self._config_entry = config_entry
         self._hass = hass
 
-    async def async_step_init(
-        self,
-        user_input: dict[str, str] | None = None,
-    ) -> data_entry_flow.FlowResult:
+    async def async_step_init(self, _: dict[str, str] | None = None) -> data_entry_flow.FlowResult:
         """Handle the first step of a fix flow."""
 
         return await self.async_step_sub_profile()
@@ -57,7 +54,7 @@ class SubProfileRepairFlow(RepairsFlow):
 
 async def async_create_fix_flow(
     hass: HomeAssistant,
-    issue_id: str,
+    _: str,
     data: dict[str, str | int | float | None] | None,
 ) -> RepairsFlow:
     """Create flow."""

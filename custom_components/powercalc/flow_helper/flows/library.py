@@ -185,10 +185,7 @@ class LibraryFlow:
             user_input,
         )
 
-    async def async_step_post_library(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    async def async_step_post_library(self, _: dict[str, Any] | None = None) -> ConfigFlowResult:
         """
         Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered.
         Forwards to the next step in the flow.
