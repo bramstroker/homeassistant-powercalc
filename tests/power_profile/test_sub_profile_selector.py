@@ -240,7 +240,7 @@ async def test_matcher_model_id(
         assert power_profile.sub_profile == expected_profile
 
 
-async def test_matcher_model_id_no_device_entry() -> None:
+def test_matcher_model_id_no_device_entry() -> None:
     matcher = ModelIdMatcher("foo", "bar")
     assert (
         matcher.match(
@@ -251,7 +251,7 @@ async def test_matcher_model_id_no_device_entry() -> None:
     )
 
 
-async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
+def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
     hass: HomeAssistant,
 ) -> None:
     with pytest.raises(PowercalcSetupError):

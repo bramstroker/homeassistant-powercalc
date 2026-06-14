@@ -100,7 +100,7 @@ def test_set_default_value(hass: HomeAssistant) -> None:
     assert schema_keys[schema_keys.index("test1")].default() == 15
 
 
-async def test_entity_pick_filter_by_device(hass: HomeAssistant) -> None:
+def test_entity_pick_filter_by_device(hass: HomeAssistant) -> None:
     mock_device(
         hass,
         "device_123",
@@ -144,7 +144,7 @@ async def test_entity_pick_filter_by_device(hass: HomeAssistant) -> None:
         },
     )
 
-    source_entity = await create_source_entity("sensor.test1", hass)
+    source_entity = create_source_entity("sensor.test1", hass)
 
     schema = build_dynamic_field_schema(hass, profile, source_entity)
     assert len(schema.schema) == 1

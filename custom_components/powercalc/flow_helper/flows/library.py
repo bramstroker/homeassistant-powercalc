@@ -239,7 +239,7 @@ class LibraryFlow:
     async def async_step_library_custom_fields(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the flow for custom fields."""
 
-        async def _process_user_input(user_input: dict[str, Any]) -> dict[str, Any]:
+        def _process_user_input(user_input: dict[str, Any]) -> dict[str, Any]:
             return {CONF_VARIABLES: user_input}
 
         form_kwarg: dict[str, Any] | None = None
@@ -272,7 +272,7 @@ class LibraryFlow:
         """Handle the flow for sub profile selection."""
         assert self.flow.selected_profile is not None
 
-        async def _validate(user_input: dict[str, Any]) -> dict[str, str]:
+        def _validate(user_input: dict[str, Any]) -> dict[str, str]:
             return {CONF_MODEL: f"{self.flow.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"}
 
         library = await ProfileLibrary.factory(self.flow.hass)
@@ -322,7 +322,7 @@ class LibraryFlow:
         if self.flow.selected_profile and not self.flow.selected_profile.needs_fixed_config:
             return self.flow.persist_config_entry()
 
-        async def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
+        def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
             return {
                 CONF_SELF_USAGE_INCLUDED: user_input.get(CONF_SELF_USAGE_INCLUDED),
                 CONF_MODE: CalculationStrategy.FIXED,

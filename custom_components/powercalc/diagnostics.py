@@ -20,7 +20,7 @@ async def async_get_config_entry_diagnostics(
 
     data: dict = {
         "entry": entry.as_dict(),
-        "config_entry_count_per_type": await get_count_by_sensor_type(hass),
+        "config_entry_count_per_type": get_count_by_sensor_type(hass),
         "yaml_config": await get_yaml_configuration(hass),
     }
 
@@ -31,7 +31,7 @@ async def async_get_config_entry_diagnostics(
     return data
 
 
-async def get_count_by_sensor_type(hass: HomeAssistant) -> dict[SensorType, int]:
+def get_count_by_sensor_type(hass: HomeAssistant) -> dict[SensorType, int]:
     count_per_type = {}
     entries = get_entries_excluding_global_config(hass)
     for e in entries:

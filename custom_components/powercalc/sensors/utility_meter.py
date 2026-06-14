@@ -41,7 +41,7 @@ _LOGGER = logging.getLogger(__name__)
 GENERAL_TARIFF = "general"
 
 
-async def create_utility_meters(
+def create_utility_meters(
     hass: HomeAssistant,
     energy_sensor: EnergySensor,
     sensor_config: dict,
@@ -62,7 +62,7 @@ async def create_utility_meters(
         unique_id = f"{energy_sensor.unique_id}_{meter_type}" if energy_sensor.unique_id else None
         if should_create_utility_meter(hass, unique_id, energy_sensor):
             utility_meters.extend(
-                await create_meters_for_type(
+                create_meters_for_type(
                     hass,
                     energy_sensor,
                     sensor_config,
@@ -98,7 +98,7 @@ def should_create_utility_meter(
     return not (existing_entity_id and hass.states.get(existing_entity_id))  # pragma: no cover
 
 
-async def create_meters_for_type(
+def create_meters_for_type(
     hass: HomeAssistant,
     energy_sensor: EnergySensor,
     sensor_config: dict,
@@ -116,7 +116,7 @@ async def create_meters_for_type(
 
     # Create generic utility meter
     if not tariffs or GENERAL_TARIFF in tariffs:
-        utility_meter = await create_utility_meter(
+        utility_meter = create_utility_meter(
             hass,
             energy_sensor.entity_id,
             entity_id,
@@ -130,7 +130,7 @@ async def create_meters_for_type(
 
     # Create tariff-specific utility meters
     if tariffs:
-        new_tariff_sensors = await create_tariff_meters(
+        new_tariff_sensors = create_tariff_meters(
             hass,
             energy_sensor,
             entity_id,
@@ -148,7 +148,7 @@ async def create_meters_for_type(
     return utility_meters
 
 
-async def create_tariff_meters(
+def create_tariff_meters(
     hass: HomeAssistant,
     energy_sensor: EnergySensor,
     entity_id: str,
@@ -161,11 +161,11 @@ async def create_tariff_meters(
 ) -> list[VirtualUtilityMeter]:
     """Create utility meters for specific tariffs."""
     filtered_tariffs = [t for t in tariffs if t != GENERAL_TARIFF]
-    tariff_select = await create_tariff_select(config_entry, filtered_tariffs, hass, name, unique_id)
+    tariff_select = create_tariff_select(config_entry, filtered_tariffs, hass, name, unique_id)
 
     tariff_sensors = []
     for tariff in filtered_tariffs:
-        utility_meter = await create_utility_meter(
+        utility_meter = create_utility_meter(
             hass,
             energy_sensor.entity_id,
             entity_id,
@@ -181,7 +181,7 @@ async def create_tariff_meters(
     return tariff_sensors
 
 
-async def create_tariff_select(
+def create_tariff_select(
     config_entry: ConfigEntry | None,
     tariffs: list,
     hass: HomeAssistant,
@@ -215,7 +215,7 @@ async def create_tariff_select(
     return tariff_select
 
 
-async def create_utility_meter(
+def create_utility_meter(
     hass: HomeAssistant,
     source_entity: str,
     entity_id: str,

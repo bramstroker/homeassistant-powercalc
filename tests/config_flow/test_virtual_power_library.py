@@ -613,7 +613,7 @@ async def test_sub_profile_selection_discovery_by_device(
 
     mock_entity_with_model_information("switch.test", "test", "discovery_type_device_sub_profile")
 
-    source_entity = await create_source_entity("switch.test", hass)
+    source_entity = create_source_entity("switch.test", hass)
     result = await initialize_discovery_flow(hass, source_entity)
 
     result = await confirm_auto_discovered_model(hass, result)
@@ -637,7 +637,7 @@ async def test_sub_profile_selection_discovery_by_device(
 
 async def test_discovery_flow_documentation_url_in_remarks(hass: HomeAssistant) -> None:
     """When model.json has documentation_url, it should appear as a link in the discovery remarks."""
-    source_entity = await create_source_entity("sensor.test", hass)
+    source_entity = create_source_entity("sensor.test", hass)
     power_profile = await get_power_profile(hass, {}, source_entity, ModelInfo("test", "ups"), process_variables=False)
     result = await initialize_discovery_flow(hass, source_entity, power_profile)
 
@@ -725,7 +725,7 @@ async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
         },
     )
 
-    source_entity = await create_source_entity(DUMMY_ENTITY_ID, hass)
+    source_entity = create_source_entity(DUMMY_ENTITY_ID, hass)
     power_profiles = [
         await get_power_profile(hass, {}, source_entity, ModelInfo("test", "discovery_type_device")),
     ]

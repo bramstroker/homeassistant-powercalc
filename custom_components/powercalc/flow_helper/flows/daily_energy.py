@@ -123,7 +123,7 @@ class DailyEnergyConfigFlow:
         """Handle the flow for daily energy sensor."""
         self.flow.selected_sensor_type = SensorType.DAILY_ENERGY
 
-        async def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
+        def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
             unwrapped = unwrap_choose_selector(
                 dict(user_input),
                 CONF_DAILY_ENERGY_VALUE,

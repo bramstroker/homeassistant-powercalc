@@ -29,7 +29,7 @@ from tests.common import assert_entity_state, create_mock_config_entry, run_powe
 
 
 async def test_simple_power(hass: HomeAssistant) -> None:
-    source_entity = await create_source_entity("switch.test", hass)
+    source_entity = create_source_entity("switch.test", hass)
     strategy = FixedStrategy(source_entity, power=50, per_state_power=None)
     assert await strategy.calculate(State(source_entity.entity_id, STATE_ON)) == 50
 
@@ -38,7 +38,7 @@ async def test_template_power(hass: HomeAssistant) -> None:
     await set_states(hass, [("input_number.test", "42")])
     template = "{{states('input_number.test')}}"
 
-    source_entity = await create_source_entity("switch.test", hass)
+    source_entity = create_source_entity("switch.test", hass)
     strategy = await _create_strategy(
         hass,
         {
@@ -55,7 +55,7 @@ async def test_template_power(hass: HomeAssistant) -> None:
 
 
 async def test_states_power(hass: HomeAssistant) -> None:
-    source_entity = await create_source_entity("media_player.test", hass)
+    source_entity = create_source_entity("media_player.test", hass)
     strategy = await _create_strategy(
         hass,
         {
@@ -82,7 +82,7 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
         },
     )
 
-    source_entity = await create_source_entity("climate.test", hass)
+    source_entity = create_source_entity("climate.test", hass)
     strategy = await _create_strategy(
         hass,
         {
@@ -106,7 +106,7 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
 
 
 async def test_states_power_with_attributes(hass: HomeAssistant) -> None:
-    source_entity = await create_source_entity("media_player.test", hass)
+    source_entity = create_source_entity("media_player.test", hass)
 
     strategy = await _create_strategy(
         hass,
@@ -145,7 +145,7 @@ async def test_validation_error_when_no_power_supplied(hass: HomeAssistant) -> N
         strategy = FixedStrategy(
             power=None,
             per_state_power=None,
-            source_entity=await create_source_entity("media_player.test", hass),
+            source_entity=create_source_entity("media_player.test", hass),
         )
         await strategy.validate_config()
 
@@ -155,7 +155,7 @@ async def test_validation_error_state_power_only_entity_domain(hass: HomeAssista
         strategy = FixedStrategy(
             power=20,
             per_state_power=None,
-            source_entity=await create_source_entity("vacuum.test", hass),
+            source_entity=create_source_entity("vacuum.test", hass),
         )
         await strategy.validate_config()
 

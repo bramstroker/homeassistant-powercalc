@@ -24,12 +24,12 @@ async def create_group_sensors(
     collect_analytics(hass, config_entry).inc(DATA_GROUP_TYPES, group_type)
 
     if group_type == GroupType.DOMAIN:
-        return await domain_group.create_domain_group_sensor(
+        return domain_group.create_domain_group_sensor(
             hass,
             sensor_config,
         )
     if group_type == GroupType.STANDBY:
-        return await standby_group.create_general_standby_sensors(hass, sensor_config)
+        return standby_group.create_general_standby_sensors(hass, sensor_config)
 
     if group_type == GroupType.CUSTOM:
         if config_entry:
@@ -38,14 +38,14 @@ async def create_group_sensors(
                 entry=config_entry,
                 sensor_config=sensor_config,
             )
-        return await custom_group.create_group_sensors_yaml(
+        return custom_group.create_group_sensors_yaml(
             hass=hass,
             sensor_config=sensor_config,
             entities=entities or [],
         )
 
     if group_type == GroupType.SUBTRACT:
-        return await subtract_group.create_subtract_group_sensors(
+        return subtract_group.create_subtract_group_sensors(
             hass=hass,
             config=sensor_config,
         )

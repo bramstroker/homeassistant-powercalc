@@ -46,7 +46,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         if self._per_state_power is not None:
             # Lookup by state
             if entity_state.state in self._per_state_power:
-                return await evaluate_power(
+                return evaluate_power(
                     self._per_state_power.get(entity_state.state) or 0,
                 )
 
@@ -55,12 +55,12 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 if "|" in state_key:
                     attribute, value = state_key.split("|", 2)
                     if str(entity_state.attributes.get(attribute)) == value:
-                        return await evaluate_power(power)
+                        return evaluate_power(power)
 
         if self._power is None:
             return None
 
-        return await evaluate_power(self._power)
+        return evaluate_power(self._power)
 
     async def validate_config(self) -> None:
         """Validate correct setup of the strategy."""

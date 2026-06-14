@@ -41,7 +41,7 @@ from tests.common import mock_device, set_states
         ([False, False], FilterOperator.OR, False),
     ],
 )
-async def test_composite_filter(
+def test_composite_filter(
     filter_return_values: list,
     operator: FilterOperator,
     expected_result: bool,
@@ -64,7 +64,7 @@ async def test_composite_filter(
         (["switch", "light"], True),
     ],
 )
-async def test_domain_filter(domain: str | list, expected_result: bool) -> None:
+def test_domain_filter(domain: str | list, expected_result: bool) -> None:
     assert DomainFilter(domain).is_valid(_create_registry_entry()) is expected_result
 
 
@@ -77,7 +77,7 @@ async def test_domain_filter(domain: str | list, expected_result: bool) -> None:
         ("switch.t??st", False),
     ],
 )
-async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
+def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
     assert WildcardFilter(pattern).is_valid(_create_registry_entry()) == expected_result
 
 
@@ -95,7 +95,7 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
         ("unknown", False, True),
     ],
 )
-async def test_label_filter(
+def test_label_filter(
     hass: HomeAssistant,
     label_registry: LabelRegistry,
     label: str | list[str],
@@ -137,7 +137,7 @@ async def test_label_filter(
         ("my_device", None, ["floor2", "another_floor"], False, True),
     ],
 )
-async def test_floor_filter(
+def test_floor_filter(
     hass: HomeAssistant,
     floor_registry: FloorRegistry,
     area_registry: AreaRegistry,
@@ -185,11 +185,11 @@ async def test_floor_filter(
         ({"my-device2", "other-device"}, False),
     ],
 )
-async def test_device_filter(device: str | set[str], expected_result: bool) -> None:
+def test_device_filter(device: str | set[str], expected_result: bool) -> None:
     assert DeviceFilter(device).is_valid(_create_registry_entry()) == expected_result
 
 
-async def test_null_filter() -> None:
+def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True
 
 
@@ -218,7 +218,7 @@ async def test_null_filter() -> None:
         (EntityCategory.DIAGNOSTIC, "invalid_category", False, True),
     ],
 )
-async def test_category_filter(
+def test_category_filter(
     category: EntityCategory,
     filter_categories: EntityCategory | str | list[EntityCategory | str],
     expected_result: bool,
@@ -239,7 +239,7 @@ async def test_category_filter(
     assert CategoryFilter(filter_categories).is_valid(entry) == expected_result
 
 
-async def test_lambda_filter() -> None:
+def test_lambda_filter() -> None:
     entity_filter = LambdaFilter(lambda entity: entity.entity_id == "sensor.test")
 
     entry = RegistryEntryWithDefaults(entity_id="sensor.test", unique_id="abc", platform="test")
@@ -249,7 +249,7 @@ async def test_lambda_filter() -> None:
     assert entity_filter.is_valid(entry) is False
 
 
-async def test_not_filter() -> None:
+def test_not_filter() -> None:
     assert NotFilter(NullFilter()).is_valid(_create_registry_entry()) is False
 
 
@@ -260,12 +260,12 @@ async def test_not_filter() -> None:
         (CONF_DOMAIN, {}, DomainFilter),
     ],
 )
-async def test_create_filter(hass: HomeAssistant, filter_type: str, filter_config: dict, expected_type: type) -> None:
+def test_create_filter(hass: HomeAssistant, filter_type: str, filter_config: dict, expected_type: type) -> None:
     filter_instance = create_filter(filter_type, filter_config, hass)
     assert isinstance(filter_instance, expected_type)
 
 
-async def test_create_composite_filter(hass: HomeAssistant) -> None:
+def test_create_composite_filter(hass: HomeAssistant) -> None:
     entity_filter = create_composite_filter(
         {
             CONF_DOMAIN: "switch",
@@ -288,7 +288,7 @@ async def test_create_composite_filter(hass: HomeAssistant) -> None:
     assert not entity_filter.is_valid(_create_registry_entry("switch.some1"))
 
 
-async def test_create_composite_filter2(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+def test_create_composite_filter2(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
     area_registry.async_get_or_create("kitchen")
     entity_filter = create_composite_filter(
         {
@@ -320,7 +320,7 @@ async def test_create_composite_filter2(hass: HomeAssistant, area_registry: Area
         ("my_device", None, ["nonexistent_area", "another_nonexistent"], False, True),
     ],
 )
-async def test_area_filter(
+def test_area_filter(
     hass: HomeAssistant,
     area_registry: AreaRegistry,
     entity_device: str | None,

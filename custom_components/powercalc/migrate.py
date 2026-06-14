@@ -145,7 +145,7 @@ async def async_fix_legacy_profile_config_entry(hass: HomeAssistant, config_entr
     )
 
 
-async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dict, yaml_config: dict) -> None:
+def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dict, yaml_config: dict) -> None:
     """Handle legacy discovery config. Might be removed in future Powercalc version"""
     discovery_options = global_config.setdefault(CONF_DISCOVERY, {})
     deprecated_map = {
@@ -182,7 +182,7 @@ async def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dic
     )
 
 
-async def handle_legacy_update_interval_config(hass: HomeAssistant, global_config: dict, yaml_config: dict) -> None:
+def handle_legacy_update_interval_config(hass: HomeAssistant, global_config: dict, yaml_config: dict) -> None:
     """Handle legacy group update interval config. Might be removed in future Powercalc version"""
 
     has_legacy_config = False

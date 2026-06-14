@@ -75,7 +75,7 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
 _LOGGER = logging.getLogger(__name__)
 
 
-async def create_daily_fixed_energy_sensor(
+def create_daily_fixed_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
     source_entity: SourceEntity | None = None,

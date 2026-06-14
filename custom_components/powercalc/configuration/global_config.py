@@ -53,7 +53,7 @@ FLAG_HAS_GLOBAL_GUI_CONFIG = "has_global_gui_config"
 _LOGGER = logging.getLogger(__name__)
 
 
-async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
+def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
     # Default configuration values
     default_config = {
         CONF_ENABLE_ANALYTICS: False,
@@ -96,8 +96,8 @@ async def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> C
     if yaml_config:
         global_config.update(yaml_config)
 
-    await handle_legacy_discovery_config(hass, global_config, yaml_config)
-    await handle_legacy_update_interval_config(hass, global_config, yaml_config)
+    handle_legacy_discovery_config(hass, global_config, yaml_config)
+    handle_legacy_update_interval_config(hass, global_config, yaml_config)
 
     return global_config
 

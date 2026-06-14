@@ -323,7 +323,7 @@ async def test_unit_prefix_kwh_default(hass: HomeAssistant) -> None:
     assert state_attributes.get("unit_of_measurement") == UnitOfEnergy.KILO_WATT_HOUR
 
 
-async def test_set_entity_category(hass: HomeAssistant) -> None:
+def test_set_entity_category(hass: HomeAssistant) -> None:
     energy_sensor = VirtualEnergySensor(
         hass=hass,
         source_entity="sensor.test_power",

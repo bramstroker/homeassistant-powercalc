@@ -53,7 +53,7 @@ from custom_components.powercalc.const import CONF_CREATE_ENERGY_SENSOR
         ),
     ],
 )
-async def test_merge_configuration(
+def test_merge_configuration(
     configs: list[dict],
     output_config: dict,
 ) -> None:
@@ -111,7 +111,7 @@ async def test_merge_configuration(
         ),
     ],
 )
-async def test_get_wrapped_entity_name(
+def test_get_wrapped_entity_name(
     hass: HomeAssistant,
     entity_id: str,
     entity_entry: RegistryEntry | None,

@@ -52,7 +52,7 @@ async def remote_loader(hass: HomeAssistant, mock_library_json_response: None) -
 
 
 @pytest.fixture
-async def mock_download_profile_endpoints(mock_aioresponse: aioresponses) -> list[dict]:
+def mock_download_profile_endpoints(mock_aioresponse: aioresponses) -> list[dict]:
     remote_files = [
         {
             "path": "color_temp.csv.gz",

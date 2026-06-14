@@ -88,7 +88,7 @@ class TrackedPowerSensorFactory:
             energy_sensor = await self.create_energy_sensor(SensorType.TRACKED, tracked_sensor)
             entities.append(energy_sensor)
             entities.extend(
-                await create_utility_meters(
+                create_utility_meters(
                     self.hass,
                     energy_sensor,
                     {CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
@@ -107,7 +107,7 @@ class TrackedPowerSensorFactory:
                 energy_sensor = await self.create_energy_sensor(SensorType.UNTRACKED, untracked_sensor)
                 entities.append(energy_sensor)
                 entities.extend(
-                    await create_utility_meters(
+                    create_utility_meters(
                         self.hass,
                         energy_sensor,
                         {CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},

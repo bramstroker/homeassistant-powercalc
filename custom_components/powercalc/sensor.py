@@ -411,7 +411,7 @@ def _register_entity_id_change_listener(
     """
 
     @callback
-    async def _entity_rename_listener(event: Event) -> None:
+    def _entity_rename_listener(event: Event) -> None:
         """Handle renaming of the entity"""
         old_entity_id = event.data["old_entity_id"]
         new_entity_id = event.data[CONF_ENTITY_ID]
@@ -880,7 +880,7 @@ async def create_individual_sensors(
 ) -> EntitiesBucket:
     """Create entities (power, energy, utility meters) which track the appliance."""
 
-    source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
+    source_entity = create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     # For device-based profiles, attach the device entry to the source entity
     source_entity = _attach_configured_device_entry(hass, sensor_config, source_entity)
@@ -888,7 +888,7 @@ async def create_individual_sensors(
     used_unique_ids = hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS, [])
 
     try:
-        await check_entity_not_already_configured(
+        check_entity_not_already_configured(
             sensor_config,
             source_entity,
             hass,
@@ -912,13 +912,13 @@ async def create_individual_sensors(
         except PowercalcSetupError:
             return EntitiesBucket()
         entities_to_add.append(power_sensor)
-        energy_sensor = await create_energy_sensor_if_needed(hass, sensor_config, power_sensor, source_entity)
+        energy_sensor = create_energy_sensor_if_needed(hass, sensor_config, power_sensor, source_entity)
         if energy_sensor:
             entities_to_add.append(energy_sensor)
             attach_energy_sensor_to_power_sensor(power_sensor, energy_sensor)
 
     if energy_sensor:
-        entities_to_add.extend(await create_utility_meters(hass, energy_sensor, sensor_config, config_entry))
+        entities_to_add.extend(create_utility_meters(hass, energy_sensor, sensor_config, config_entry))
 
     await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
     update_registries(hass, source_entity, entities_to_add, context)
@@ -955,7 +955,7 @@ async def handle_energy_sensor_creation(
 ) -> EnergySensor | None:
     """Handle the creation of an energy sensor if needed."""
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
-        energy_sensor = await create_daily_fixed_energy_sensor(hass, sensor_config, source_entity)
+        energy_sensor = create_daily_fixed_energy_sensor(hass, sensor_config, source_entity)
         entities_to_add.append(energy_sensor)
         if source_entity:
             daily_fixed_power_sensor = await create_daily_fixed_energy_power_sensor(hass, sensor_config, source_entity)
@@ -965,7 +965,7 @@ async def handle_energy_sensor_creation(
     return None
 
 
-async def create_energy_sensor_if_needed(
+def create_energy_sensor_if_needed(
     hass: HomeAssistant,
     sensor_config: dict,
     power_sensor: PowerSensor,
@@ -977,7 +977,7 @@ async def create_energy_sensor_if_needed(
         or sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION)
         or CONF_ENERGY_SENSOR_ID in sensor_config
     ):
-        return await create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
+        return create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
     return None
 
 
@@ -1002,7 +1002,7 @@ def update_registries(
     domain_entities.extend(entities_to_add)
 
 
-async def check_entity_not_already_configured(
+def check_entity_not_already_configured(
     sensor_config: dict,
     source_entity: SourceEntity,
     hass: HomeAssistant,

@@ -1404,7 +1404,7 @@ async def test_prevent_duplicate_entities_when_using_include_all(
         ],
     )
 
-    source_entity = await create_source_entity("light.test", hass)
+    source_entity = create_source_entity("light.test", hass)
     await initialize_discovery_flow(hass, source_entity, confirm_autodiscovered_model=True)
 
     assert hass.states.get("sensor.test_power")

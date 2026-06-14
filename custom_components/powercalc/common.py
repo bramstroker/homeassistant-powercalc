@@ -46,7 +46,7 @@ def is_number(value: str) -> bool:
     return math.isfinite(fvalue)
 
 
-async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
+def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
     """Create object containing all information about the source entity."""
 
     source_entity_domain, source_object_id = split_entity_id(entity_id)

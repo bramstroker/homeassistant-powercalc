@@ -267,7 +267,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                     "No battery entity found for vacuum cleaner",
                     "linear_no_battery_entity",
                 )
-            return await create_source_entity(related_entity, self._hass)
+            return create_source_entity(related_entity, self._hass)
 
         return self._value_entity or self._source_entity
 

@@ -32,7 +32,7 @@ _LOGGER = logging.getLogger(__name__)
 PLACEHOLDER_REGEX = re.compile(r"\[\[\s*([A-Za-z_]\w*(?::[A-Za-z_]\w*)*)\s*\]\]")
 
 
-async def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
+def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
     """When power is a template render it."""
 
     if isinstance(power, Decimal):

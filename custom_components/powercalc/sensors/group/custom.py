@@ -142,7 +142,7 @@ UNIT_CONVERTERS: dict[str | None, type[BaseUnitConverter]] = {
 }
 
 
-async def create_group_sensors_yaml(
+def create_group_sensors_yaml(
     hass: HomeAssistant,
     sensor_config: dict[str, Any],
     entities: list[Entity],
@@ -161,7 +161,7 @@ async def create_group_sensors_yaml(
         )
 
     group_name = str(sensor_config.get(CONF_CREATE_GROUP))
-    return await create_group_sensors_custom(hass, group_name, sensor_config, power_sensor_ids, energy_sensor_ids)
+    return create_group_sensors_custom(hass, group_name, sensor_config, power_sensor_ids, energy_sensor_ids)
 
 
 async def create_group_sensors_gui(
@@ -180,10 +180,10 @@ async def create_group_sensors_gui(
 
     energy_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)
 
-    return await create_group_sensors_custom(hass, group_name, sensor_config, power_sensor_ids, energy_sensor_ids)
+    return create_group_sensors_custom(hass, group_name, sensor_config, power_sensor_ids, energy_sensor_ids)
 
 
-async def create_group_sensors_custom(
+def create_group_sensors_custom(
     hass: HomeAssistant,
     group_name: str,
     sensor_config: dict[str, Any],
@@ -225,7 +225,7 @@ async def create_group_sensors_custom(
 
         sensor_config[CONF_UTILITY_METER_NET_CONSUMPTION] = True
         group_sensors.extend(
-            await create_utility_meters(
+            create_utility_meters(
                 hass,
                 energy_sensor,
                 sensor_config,

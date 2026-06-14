@@ -39,37 +39,37 @@ from tests.common import get_test_profile_dir
         (lambda hass: (1, 2), None),
     ],
 )
-async def test_evaluate_power(
+def test_evaluate_power(
     hass: HomeAssistant,
     power_factory: Callable[[HomeAssistant], Template | Decimal | float],
     expected_output: Decimal | None,
 ) -> None:
     power = power_factory(hass)
-    assert await evaluate_power(power) == expected_output
+    assert evaluate_power(power) == expected_output
 
 
 @patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception()))
-async def test_evaluate_power_template_error(
+def test_evaluate_power_template_error(
     _: object,
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     power = Template("{{ 1 + 3 }}", hass)
-    await evaluate_power(power)
+    evaluate_power(power)
     assert "Could not render power template" in caplog.text
 
 
-async def test_get_unique_id_from_config() -> None:
+def test_get_unique_id_from_config() -> None:
     config = {CONF_UNIQUE_ID: "1234"}
     assert get_or_create_unique_id(config, SourceEntity("test", "light.test", "light"), None) == "1234"
 
 
-async def test_get_unique_id_generated() -> None:
+def test_get_unique_id_generated() -> None:
     unique_id = get_or_create_unique_id({}, SourceEntity("dummy", DUMMY_ENTITY_ID, "sensor"), None)
     assert len(unique_id) == 36
 
 
-async def test_wled_unique_id() -> None:
+def test_wled_unique_id() -> None:
     """Device id should be used as unique id for wled strategy."""
     with patch("custom_components.powercalc.power_profile.power_profile.PowerProfile") as power_profile_mock:
         mock_instance = power_profile_mock.return_value
@@ -89,7 +89,7 @@ async def test_wled_unique_id() -> None:
         ({"a": 1, "b": 2}, frozenset([("a", 1), ("b", 2)])),
     ],
 )
-async def test_make_hashable(value: set | list | dict, output: tuple | frozenset) -> None:
+def test_make_hashable(value: set | list | dict, output: tuple | frozenset) -> None:
     assert make_hashable(value) == output
 
 
