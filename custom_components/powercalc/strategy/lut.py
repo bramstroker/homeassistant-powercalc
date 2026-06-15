@@ -213,7 +213,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         brightness = attrs.get(ATTR_BRIGHTNESS)
         if brightness is None:
-            _LOGGER.error(
+            # Brightness can be briefly absent while a light is 'on' during state
+            # restoration; warning (not error) matches the other missing-attribute branches.
+            _LOGGER.warning(
                 "%s: Could not calculate power. no brightness set",
                 entity_state.entity_id,
             )
