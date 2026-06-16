@@ -11,5 +11,10 @@
     "VERSION": "v1.20.14:docker"
   },
   "name": "Hue Go Table Lamp",
-  "standby_power": 0.45
+  "standby_power": 0.45,
+  "author_info": {
+    "name": "phoenixxx-1",
+    "github": "phoenixxx-1"
+  },
+  "author": "phoenixxx-1"
 }
