@@ -1,15 +1,17 @@
 {
   "calculation_strategy": "lut",
-  "created_at": "2026-06-10T02:37:11Z",
+  "created_at": "2026-06-18T00:07:18Z",
   "device_type": "light",
+  "max_voltage": 235.6,
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,
-    "VERSION": "v1.20.14:docker"
+    "VERSION": "v1.21.0:docker"
   },
+  "min_voltage": 231.3,
   "name": "KAJPLATS E14 WS B38 CL 470lm",
-  "standby_power": 0.1
+  "standby_power": 0.2
 }
