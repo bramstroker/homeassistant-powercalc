@@ -303,7 +303,8 @@ async def test_no_power_when_no_brightness_available(
     state = State("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.BRIGHTNESS})
     assert not await strategy.calculate(state)
     assert "no brightness set" in caplog.text
-    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
+    record = next(record for record in caplog.records if "no brightness set" in record.getMessage())
+    assert record.levelno == logging.WARNING
 
 
 async def test_color_mode_unknown_is_handled_gracefully(
