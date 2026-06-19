@@ -7371,10 +7371,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "c34caadbf951200d0de868c446a98aa8"
+          "hash": "95a7bbf61c9a3ef1a371fb053e9f73e5"
         },
         {
           "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
@@ -7616,10 +7616,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "51d5604db5bcc0cfe27d387cb02d4279"
+          "hash": "758f8e15877c02a17d1cddd1b33c3eeb"
         },
         {
           "aliases": [
@@ -7763,10 +7763,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "1ff6a702a7a874b460c91d8928583ee4"
+          "hash": "2ae12e0d5a18a515556c27f9e9778cd7"
         },
         {
           "aliases": [
@@ -7904,10 +7904,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "effect"
+            "effect",
+            "brightness"
           ],
-          "hash": "3377ec8d3229ca92e74192be0c086001"
+          "hash": "6f2e1bc6071fea8f39976d7446c00abc"
         },
         {
           "aliases": [
@@ -9206,17 +9206,22 @@
           },
           "name": "Hue Go Table Lamp",
           "standby_power": 0.45,
+          "author_info": {
+            "name": "phoenixxx-1",
+            "github": "phoenixxx-1"
+          },
+          "author": "phoenixxx-1",
           "id": "929003521501",
           "manufacturer": "signify",
-          "updated_at": "2026-06-16T17:56:40",
+          "updated_at": "2026-06-16T17:57:25",
           "max_power": 7.25,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "d2ec9f6fe854dc96ed32411252140bfd"
+          "hash": "36c33360d2d09b944d362960140acda7"
         },
         {
           "aliases": [
@@ -12130,10 +12135,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "afbbde565fb290d3032408e1589bdcbb"
+          "hash": "8036aa7ef0ea31f5439fa76159fb938c"
         },
         {
           "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>",
@@ -17160,6 +17165,32 @@
           "hash": "b912772b372eb846cf844698f846776d"
         },
         {
+          "calculation_strategy": "lut",
+          "created_at": "2026-06-18T00:07:18Z",
+          "device_type": "light",
+          "max_voltage": 235.6,
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.21.0:docker"
+          },
+          "min_voltage": 231.3,
+          "name": "KAJPLATS E14 WS B38 CL 470lm",
+          "standby_power": 0.2,
+          "id": "LED2402C3",
+          "manufacturer": "ikea",
+          "updated_at": "2026-06-19T06:13:16",
+          "max_power": 3.57,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "hash": "9d049a080c0216546a5d31026ae137db"
+        },
+        {
           "aliases": [
             "TRADFRI bulb E27 WW clear 250lm"
           ],
@@ -18097,10 +18128,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "2a0902ba71dad533840978d9ac24e2ca"
+          "hash": "a28d2fb500e7b8129553eb92959ad787"
         },
         {
           "author": "dsolva <diego_10sv@hotmail.com>",
@@ -18953,10 +18984,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "953b3637b3a77c46dc7513ada8de63cd"
+          "hash": "db0831d14b70b40bd36fea4b21d78f74"
         },
         {
           "author": "Udo Ha\u00df <udo.hass@proton.me>",
@@ -18984,10 +19015,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "ca835c2c050c377470043f69d75e0e45"
+          "hash": "9ee9d851f62f1483b14ca39f34cefe45"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -19074,10 +19105,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "fc32a8e4378dd50d1ba5f7b508e89fb3"
+          "hash": "e51ce873f4958f34050c38778bb55322"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -19164,10 +19195,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
+          "hash": "b8ba79c307b90439d3849a26bc5a829e"
         },
         {
           "calculation_strategy": "lut",
@@ -19195,10 +19226,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "2ea3e415936623fe485ee433c5d5a8e3"
+          "hash": "d83e25738b3ed996675dabf9b112c0be"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
