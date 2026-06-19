@@ -93,7 +93,7 @@
         "data_description": {
           "fixed_value": "Fixed value in Watts when the entity is ON"
         },
-        "description": "Definujte pevnú hodnotu výkonu pre vašu entitu. Prípadne môžete definovať hodnotu výkonu pre každý stav. Napríklad:\n\n`prehrávanie: 8.3`\n`pozastavené: 2.25`",
+        "description": "Definujte pevnú hodnotu výkonu pre vašu entitu. Ďalšie informácie nájdete v [dokumentácii]({docs_uri}). Prípadne môžete definovať hodnotu výkonu pre každý stav. Napríklad:\n\n`prehrávanie: 8.3`\n`pozastavené: 2.25`",
         "title": "Opravená konfigurácia"
       },
       "global_configuration": {

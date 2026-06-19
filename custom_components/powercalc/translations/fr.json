@@ -93,7 +93,7 @@
         "data_description": {
           "fixed_value": "Fixed value in Watts when the entity is ON"
         },
-        "description": "Définissez une valeur de puissance fixe pour votre entité. Vous pouvez également définir une valeur de puissance par état. Par exemple :\n\n`lecture : 8.3`\n`pause : 2.25`",
+        "description": "Définissez une valeur de puissance fixe pour votre entité. Voir [documentation]({docs_uri}) pour plus d'informations. Vous pouvez également définir une valeur de puissance par état. Par exemple :\n\n`lecture : 8.3`\n`pause : 2.25`",
         "title": "Configuration fixe"
       },
       "global_configuration": {
