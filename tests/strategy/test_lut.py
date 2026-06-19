@@ -292,12 +292,19 @@ async def test_linked_profile_loaded(hass: HomeAssistant) -> None:
     )
 
 
-async def test_no_power_when_no_brightness_available(hass: HomeAssistant) -> None:
-    """When brightness attribute is not available on state return no power"""
+async def test_no_power_when_no_brightness_available(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """When brightness attribute is not available on state return no power, logged at warning"""
+    caplog.set_level(logging.WARNING)
     strategy = await _create_lut_strategy(hass, "signify", "LCT010")
 
     state = State("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.BRIGHTNESS})
     assert not await strategy.calculate(state)
+    assert "no brightness set" in caplog.text
+    record = next(record for record in caplog.records if "no brightness set" in record.getMessage())
+    assert record.levelno == logging.WARNING
 
 
 async def test_color_mode_unknown_is_handled_gracefully(
