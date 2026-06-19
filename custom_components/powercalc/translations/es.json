@@ -93,7 +93,7 @@
         "data_description": {
           "fixed_value": "Fixed value in Watts when the entity is ON"
         },
-        "description": "Definir un valor de potencia fijo para tu entidad. Alternativamente, puedes definir un valor de potencia por estado. Por ejemplo: \n\n`playing: 8.3`\n`paused: 2.25`",
+        "description": "Definir un valor de potencia fijo para tu entidad. Vea la [documentación]({docs_uri}) para más información. Alternativamente, puedes definir un valor de potencia por estado. Por ejemplo: \n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Configuración fija"
       },
       "global_configuration": {

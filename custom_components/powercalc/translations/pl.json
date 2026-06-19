@@ -93,7 +93,7 @@
         "data_description": {
           "fixed_value": "Fixed value in Watts when the entity is ON"
         },
-        "description": "Określ stałą wartość mocy dla swojej encji. Alternatywnie możesz zdefiniować wartość mocy dla każdego stanu. Na przykład:\n\n`odtwarzanie: 8.3`\n`pauza: 2.25`",
+        "description": "Określ stałą wartość mocy dla swojej encji. Zobacz [dokumentację]({docs_uri}) aby uzyskać więcej informacji. Alternatywnie możesz zdefiniować wartość mocy dla każdego stanu. Na przykład:\n\n`odtwarzanie: 8.3`\n`pauza: 2.25`",
         "title": "Konfiguracja stała"
       },
       "global_configuration": {

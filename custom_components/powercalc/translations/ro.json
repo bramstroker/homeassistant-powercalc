@@ -93,7 +93,7 @@
         "data_description": {
           "fixed_value": "Fixed value in Watts when the entity is ON"
         },
-        "description": "Definiți o valoare fixă a puterii pentru entitatea dvs. Alternativ, puteți defini o valoare de putere per stare. De exemplu:\n\n`redare: 8,3`\n`în pauză: 2,25`",
+        "description": "Definiți o valoare fixă a puterii pentru entitatea dvs. Consultați [documentația]({docs_uri}) pentru mai multe informații. Alternativ, puteți defini o valoare de putere per stare. De exemplu:\n\n`redare: 8,3`\n`în pauză: 2,25`",
         "title": "Configurație fixă"
       },
       "global_configuration": {
