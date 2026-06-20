@@ -27,7 +27,7 @@ from measure.powermeter.errors import (
 from measure.runner.const import QUESTION_GZIP, QUESTION_MODE, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
 from measure.runner.errors import RunnerError
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.util.measure_util import AverageMeasurementConvergence, MeasurementResult, MeasureUtil
 
 CSV_HEADERS = {
     LutMode.HS: ["bri", "hue", "sat", "watt"],
@@ -649,7 +649,15 @@ class LightRunner(MeasurementRunner):
     ) -> MeasurementResult:
         """Request a power reading from the configured power_meter"""
         if mode == LutMode.EFFECT:
-            result = self.measure_util.take_average_measurement(self.config.measure_time_effect)
+            result = self.measure_util.take_average_measurement(
+                self.config.measure_time_effect,
+                convergence=AverageMeasurementConvergence(
+                    min_duration=self.config.measure_time_effect_min,
+                    window_duration=self.config.measure_time_effect_convergence_window,
+                    absolute_threshold=self.config.measure_time_effect_convergence_abs,
+                    relative_threshold=self.config.measure_time_effect_convergence_rel,
+                ),
+            )
         else:
             result = self.measure_util.take_measurement(start_timestamp, retry_count)
 

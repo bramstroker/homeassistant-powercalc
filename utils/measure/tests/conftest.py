@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 import os
 import shutil
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 from unittest.mock import MagicMock, patch
 
 from decouple import UndefinedValueError
@@ -22,6 +21,16 @@ from measure.runner.const import QUESTION_GZIP, QUESTION_MODE, QUESTION_MULTIPLE
 import pytest
 
 
+class MockConfigFactory(Protocol):
+    def __call__(
+        self,
+        config_values: dict[str, Any] | None = None,
+        *,
+        set_question_defaults: bool = True,
+        question_defaults: dict[str, Any] | None = None,
+    ) -> MagicMock: ...
+
+
 @pytest.fixture(autouse=True)
 def clean_export_directory() -> None:
     export_dir = os.path.join(PROJECT_DIR, "export")
@@ -32,13 +41,13 @@ def clean_export_directory() -> None:
 
 
 @pytest.fixture
-def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
+def mock_config_factory() -> MockConfigFactory:
     @patch("measure.config.MeasureConfig", autospec=True)
     def _mock_config(
         mock: MagicMock,
-        config_values: dict | None = None,
+        config_values: dict[str, Any] | None = None,
         set_question_defaults: bool = True,
-        question_defaults: dict | None = None,
+        question_defaults: dict[str, Any] | None = None,
     ) -> MagicMock:
         default_config_values = {
             "selected_light_controller": "dummy",
@@ -64,6 +73,10 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
             "hs_sat_steps": 32,
             "effect_bri_steps": 40,
             "measure_time_effect": 10,
+            "measure_time_effect_min": 10,
+            "measure_time_effect_convergence_window": 10,
+            "measure_time_effect_convergence_abs": 0.1,
+            "measure_time_effect_convergence_rel": 0.01,
             "sleep_time": 0,
             "sleep_initial": 0,
             "sleep_standby": 0,
@@ -112,7 +125,7 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
 
         return mock_instance
 
-    return _mock_config
+    return cast(MockConfigFactory, _mock_config)
 
 
 class MockRequestsGetFactory(Protocol):

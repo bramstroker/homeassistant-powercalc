@@ -1,12 +1,15 @@
 import csv
 import os.path
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from measure.controller.light.const import LutMode
 from measure.runner.const import QUESTION_MODE
 from measure.runner.light import EffectVariation, LightRunner
-from measure.util.measure_util import MeasureUtil
+from measure.util.measure_util import AverageMeasurementConvergence, MeasurementResult, MeasureUtil
 import pytest
+
+from tests.conftest import MockConfigFactory
 
 
 @pytest.mark.parametrize(
@@ -30,7 +33,7 @@ import pytest
         ),
     ],
 )
-def test_get_variations(mock_config_factory, mode: LutMode, expected_count: int) -> None:  # noqa: ANN001
+def test_get_variations(mock_config_factory: MockConfigFactory, mode: LutMode, expected_count: int) -> None:
     mock_config = mock_config_factory()
 
     measure_util_mock = MagicMock(MeasureUtil)
@@ -42,7 +45,7 @@ def test_get_variations(mock_config_factory, mode: LutMode, expected_count: int)
 
 
 @patch("time.sleep", return_value=None)
-def test_run(mock_sleep, mock_config_factory, export_path: str) -> None:  # noqa: ANN001
+def test_run(mock_sleep, mock_config_factory: MockConfigFactory, export_path: str) -> None:  # noqa: ANN001
     mock_config = mock_config_factory()
 
     measure_util_mock = MagicMock(MeasureUtil)
@@ -58,7 +61,7 @@ def test_run(mock_sleep, mock_config_factory, export_path: str) -> None:  # noqa
     assert os.path.exists(os.path.join(export_path, "brightness.csv.gz"))
 
 
-def test_resume_effect(mock_config_factory, tmp_path: str) -> None:  # noqa: ANN001
+def test_resume_effect(mock_config_factory: MockConfigFactory, tmp_path: Path) -> None:
     """Test resume point is detected correctly for effect mode."""
     csv_file = tmp_path / "effect.csv"
     with open(csv_file, "w", newline="") as f:
@@ -77,7 +80,34 @@ def test_resume_effect(mock_config_factory, tmp_path: str) -> None:  # noqa: ANN
     assert resume_variation.bri == 200
 
 
-def test_get_questions(mock_config_factory) -> None:  # noqa: ANN001
+def test_effect_measurement_uses_convergence_settings(mock_config_factory: MockConfigFactory) -> None:
+    mock_config = mock_config_factory(
+        config_values={
+            "measure_time_effect": 180,
+            "measure_time_effect_min": 20,
+            "measure_time_effect_convergence_window": 15,
+            "measure_time_effect_convergence_abs": 0.1,
+            "measure_time_effect_convergence_rel": 0.01,
+        },
+    )
+    measure_util_mock = MagicMock(MeasureUtil)
+    measure_util_mock.take_average_measurement.return_value = MeasurementResult(power=10, voltages=[])
+    runner = LightRunner(measure_util_mock, mock_config)
+
+    runner.take_power_measurement(LutMode.EFFECT, start_timestamp=0)
+
+    measure_util_mock.take_average_measurement.assert_called_once_with(
+        180,
+        convergence=AverageMeasurementConvergence(
+            min_duration=20,
+            window_duration=15,
+            absolute_threshold=0.1,
+            relative_threshold=0.01,
+        ),
+    )
+
+
+def test_get_questions(mock_config_factory: MockConfigFactory) -> None:
     """Test get_questions contains the new triple mode choice when effects are supported."""
     mock_config = mock_config_factory()
     measure_util_mock = MagicMock(MeasureUtil)
