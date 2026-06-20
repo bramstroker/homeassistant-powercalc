@@ -173,7 +173,31 @@ class MeasureConfig:
 
     @property
     def measure_time_effect(self) -> int:
-        return config("MEASURE_TIME_EFFECT", default=10, cast=int)
+        """Maximum seconds to measure each effect/brightness combination."""
+        return config("MEASURE_TIME_EFFECT", default=180, cast=int)
+
+    @property
+    def measure_time_effect_min(self) -> int:
+        """Minimum seconds before effect measurement can stop on convergence."""
+        return min(config("MEASURE_TIME_EFFECT_MIN", default=20, cast=int), self.measure_time_effect)
+
+    @property
+    def measure_time_effect_convergence_window(self) -> int:
+        """Seconds between cumulative-average snapshots used for convergence checks."""
+        return min(
+            config("MEASURE_TIME_EFFECT_CONVERGENCE_WINDOW", default=15, cast=int),
+            self.measure_time_effect_min,
+        )
+
+    @property
+    def measure_time_effect_convergence_abs(self) -> float:
+        """Maximum watt change allowed for effect average convergence."""
+        return config("MEASURE_TIME_EFFECT_CONVERGENCE_ABS", default=0.1, cast=float)
+
+    @property
+    def measure_time_effect_convergence_rel(self) -> float:
+        """Maximum percentage change allowed for effect average convergence."""
+        return config("MEASURE_TIME_EFFECT_CONVERGENCE_REL", default=1.0, cast=float) / 100
 
     @property
     def sleep_time_effect_change(self) -> int:
