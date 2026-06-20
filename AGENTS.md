@@ -10,6 +10,15 @@ Instructions for AI coding agents working on this project.
 - `tests/` — pytest test suite mirroring source structure
 - `docs/source/` — documentation (Zensical)
 
+## Documentation
+
+Documentation is built with **Zensical**, not raw MkDocs.
+
+- Source files live in `docs/source/`
+- Navigation is configured in `docs/mkdocs.yml`
+- Verify docs changes from the `docs/` directory with `uv run --group docs zensical build --clean`
+- If sandboxing blocks `uv` cache access, rerun the same Zensical command with the required approval rather than switching to `mkdocs build`
+
 ## Profile Library
 
 ### library.json is auto-generated

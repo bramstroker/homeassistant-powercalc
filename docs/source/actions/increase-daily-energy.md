@@ -1,5 +1,7 @@
 # Increase daily energy
 
+[![Open your Home Assistant instance and show your service developer tools with a specific action selected.](https://my.home-assistant.io/badges/developer_call_service.svg)](https://my.home-assistant.io/redirect/developer_call_service/?service=powercalc.increase_daily_energy)
+
 To increase the sensor with a given value use the `powercalc.increase_daily_energy` action.
 
 !!! tip

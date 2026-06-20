@@ -111,6 +111,7 @@ nav:
           - 'library/device-types/network.md'
           #- 'library/device-types/vacuum-robot.md'
   - 'Actions':
+      - 'actions/index.md'
       - 'actions/activate-playbook.md'
       - 'actions/calibrate-energy.md'
       - 'actions/calibrate-utility-meter.md'
