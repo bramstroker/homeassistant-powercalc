@@ -34,9 +34,16 @@ from measure.runner.const import (
     QUESTION_MODE,
 )
 from measure.runner.speaker import QUESTION_DISABLE_STREAMING
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.util.measure_util import (
+    AverageMeasurementConvergence,
+    AverageMeasurementSnapshot,
+    MeasurementResult,
+    MeasureUtil,
+)
 import pytest
 from readchar import key
+
+from tests.conftest import MockConfigFactory
 
 
 class EventGenerator:
@@ -51,7 +58,7 @@ def event_factory(*args: str) -> EventGenerator:
     return EventGenerator(*args)
 
 
-def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
+def test_wizard(mock_config_factory: MockConfigFactory) -> None:
     """Test the CLI wizard, can we actually select certain options"""
     mock_config = mock_config_factory(
         set_question_defaults=False,
@@ -93,7 +100,7 @@ def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
 
 
 @patch("time.sleep", return_value=None)
-def test_run_light(mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
+def test_run_light(mock_sleep, mock_config_factory: MockConfigFactory) -> None:  # noqa: ANN001
     """Simulate a full run of the light measure using brightness mode"""
     mock_config = mock_config_factory()
 
@@ -110,7 +117,7 @@ def test_run_light(mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
 
 
 @patch("time.sleep", return_value=None)
-def test_take_measurement_tracks_voltage_range(mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
+def test_take_measurement_tracks_voltage_range(mock_sleep, mock_config_factory: MockConfigFactory) -> None:  # noqa: ANN001
     mock_config = mock_config_factory(config_values={"sample_count": 3})
     power_meter = SequencePowerMeter(
         [
@@ -130,9 +137,35 @@ def test_take_measurement_tracks_voltage_range(mock_sleep, mock_config_factory) 
     assert result.voltages == [231.2, 229.9, 230.4]
 
 
+@pytest.mark.parametrize(
+    ("absolute_threshold", "relative_threshold", "snapshots", "expected"),
+    [
+        pytest.param(0.1, 0.01, [(0, 10.0), (19, 10.0)], False, id="before-min"),
+        pytest.param(0.1, 0.01, [(5, 10.0), (20, 10.09)], True, id="abs-stable"),
+        pytest.param(0.01, 0.01, [(5, 100.0), (20, 100.5)], True, id="rel-stable"),
+        pytest.param(0.1, 0.01, [(5, 10.0), (20, 11.0)], False, id="unstable"),
+    ],
+)
+def test_average_convergence(
+    absolute_threshold: float,
+    relative_threshold: float,
+    snapshots: list[tuple[float, float]],
+    expected: bool,
+) -> None:
+    convergence = AverageMeasurementConvergence(
+        min_duration=20,
+        window_duration=15,
+        absolute_threshold=absolute_threshold,
+        relative_threshold=relative_threshold,
+    )
+    average_snapshots = [AverageMeasurementSnapshot(elapsed=elapsed, average=average) for elapsed, average in snapshots]
+
+    assert MeasureUtil.average_has_converged(average_snapshots, convergence) is expected
+
+
 @patch("builtins.input", return_value="")
 @patch("time.sleep", return_value=None)
-def test_run_smart_speaker(mock_input, mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
+def test_run_smart_speaker(mock_input, mock_sleep, mock_config_factory: MockConfigFactory) -> None:  # noqa: ANN001
     """Simulate a full run of the speaker measure"""
     mock_config = mock_config_factory(
         question_defaults={
@@ -154,7 +187,7 @@ def test_run_smart_speaker(mock_input, mock_sleep, mock_config_factory) -> None:
 
 @patch("builtins.input", return_value="")
 @patch("time.sleep", return_value=None)
-def test_run_charging(mock_input, mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
+def test_run_charging(mock_input, mock_sleep, mock_config_factory: MockConfigFactory) -> None:  # noqa: ANN001
     """Simulate a full run of the charging measure"""
     mock_config = mock_config_factory(
         question_defaults={
@@ -172,7 +205,7 @@ def test_run_charging(mock_input, mock_sleep, mock_config_factory) -> None:  # n
 
 @patch("builtins.input", return_value="")
 @patch("time.sleep", return_value=None)
-def test_run_fan(mock_input, mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
+def test_run_fan(mock_input, mock_sleep, mock_config_factory: MockConfigFactory) -> None:  # noqa: ANN001
     """Simulate a full run of the fan measure"""
     mock_config = mock_config_factory(
         question_defaults={
@@ -189,7 +222,7 @@ def test_run_fan(mock_input, mock_sleep, mock_config_factory) -> None:  # noqa: 
 
 @patch("builtins.input", return_value="")
 @patch("time.sleep", return_value=None)
-def test_run_recorder(mock_input, mock_sleep, mock_config_factory) -> None:  # noqa: ANN001
+def test_run_recorder(mock_input, mock_sleep, mock_config_factory: MockConfigFactory) -> None:  # noqa: ANN001
     """Simulate a full run of the recorder measure"""
     mock_config = mock_config_factory(
         question_defaults={
@@ -222,7 +255,7 @@ def test_run_recorder(mock_input, mock_sleep, mock_config_factory) -> None:  # n
 
 
 @patch("builtins.input", return_value="")
-def test_run_average(mock_input, mock_config_factory, caplog: pytest.LogCaptureFixture) -> None:  # noqa: ANN001
+def test_run_average(mock_input, mock_config_factory: MockConfigFactory, caplog: pytest.LogCaptureFixture) -> None:  # noqa: ANN001
     """Simulate a full run of the average measure"""
     caplog.set_level(logging.INFO)
     mock_config = mock_config_factory(
@@ -280,7 +313,7 @@ class SequencePowerMeter(PowerMeter):
         pass
 
 
-def test_ask_questions_with_no_predefined_answers(mock_config_factory) -> None:  # noqa: ANN001
+def test_ask_questions_with_no_predefined_answers(mock_config_factory: MockConfigFactory) -> None:
     """Test asking questions when no answers are predefined in config"""
     mock_config = mock_config_factory()
     measure = _create_measure_instance(config=mock_config)
@@ -297,7 +330,7 @@ def test_ask_questions_with_no_predefined_answers(mock_config_factory) -> None: 
     assert answers[QUESTION_GZIP] is True
 
 
-def test_ask_questions_with_all_predefined_answers(mock_config_factory) -> None:  # noqa: ANN001
+def test_ask_questions_with_all_predefined_answers(mock_config_factory: MockConfigFactory) -> None:
     """Test asking questions when all answers are predefined in config"""
     mock_config = mock_config_factory(
         config_values={
@@ -318,7 +351,7 @@ def test_ask_questions_with_all_predefined_answers(mock_config_factory) -> None:
     assert answers[QUESTION_GZIP] is True
 
 
-def test_ask_questions_with_partial_predefined_answers(mock_config_factory) -> None:  # noqa: ANN001
+def test_ask_questions_with_partial_predefined_answers(mock_config_factory: MockConfigFactory) -> None:
     """Test asking questions when only some answers are predefined in config"""
     mock_config = mock_config_factory(
         config_values={
@@ -339,7 +372,7 @@ def test_ask_questions_with_partial_predefined_answers(mock_config_factory) -> N
     assert answers[QUESTION_GZIP] is True
 
 
-def test_ask_questions_with_list_type(mock_config_factory) -> None:  # noqa: ANN001
+def test_ask_questions_with_list_type(mock_config_factory: MockConfigFactory) -> None:
     """Test asking questions that include a List question type"""
     mock_config = mock_config_factory()
     measure = _create_measure_instance(config=mock_config)
@@ -356,7 +389,7 @@ def test_ask_questions_with_list_type(mock_config_factory) -> None:  # noqa: ANN
     assert answers[QUESTION_COLOR_MODE] == "brightness"
 
 
-def test_ask_questions_with_mode_converts_to_lut_mode_set(mock_config_factory) -> None:  # noqa: ANN001
+def test_ask_questions_with_mode_converts_to_lut_mode_set(mock_config_factory: MockConfigFactory) -> None:
     """Test that a mode answer is converted to a set containing a LutMode"""
     mock_config = mock_config_factory(set_question_defaults=False)
     measure = _create_measure_instance(config=mock_config)

@@ -34,6 +34,20 @@ class MeasurementResult:
     voltages: list[float]
 
 
+@dataclass(frozen=True)
+class AverageMeasurementConvergence:
+    min_duration: int
+    window_duration: int
+    absolute_threshold: float
+    relative_threshold: float
+
+
+@dataclass(frozen=True)
+class AverageMeasurementSnapshot:
+    elapsed: float
+    average: float
+
+
 class MeasureUtil:
     def __init__(
         self,
@@ -46,7 +60,12 @@ class MeasureUtil:
         self.config = config
         self._include_voltage = include_voltage or (lambda: False)
 
-    def take_average_measurement(self, duration: int, measure_resistance: bool = False) -> MeasurementResult:
+    def take_average_measurement(
+        self,
+        duration: int,
+        measure_resistance: bool = False,
+        convergence: AverageMeasurementConvergence | None = None,
+    ) -> MeasurementResult:
         """
         Measure the average power consumption or resistance for a given time period in seconds.
 
@@ -60,6 +79,7 @@ class MeasureUtil:
         Args:
             duration (int): The time duration (in seconds) over which to take measurements.
             measure_resistance (bool): Whether to measure resistance instead of power. Defaults to False.
+            convergence (AverageMeasurementConvergence | None): Stop early when the cumulative average has stabilized.
 
         Returns:
             float: The average resistance (in Ω) or power (in W) over the measurement duration.
@@ -78,6 +98,7 @@ class MeasureUtil:
         _LOGGER.info("Measuring average %s over %s seconds", "resistance" if measure_resistance else "power", duration)
         start_time = time.time()
         readings: list[float] = []
+        snapshots: list[AverageMeasurementSnapshot] = []
         voltages: list[float] = []
 
         first_measurement = True
@@ -87,22 +108,15 @@ class MeasureUtil:
                 break
             first_measurement = False
 
-            if measure_resistance:
-                if (result := self._take_resistance_reading()) is not None:
-                    readings.append(result.power)
-                    voltages.extend(result.voltages)
+            result = self._take_average_measurement_reading(measure_resistance)
+            if result is None:
                 continue
 
-            if self.dummy_load_value:  # measurement with dummy load
-                if (result := self._take_dummy_load_power_reading()) is not None:
-                    readings.append(result.power)
-                    voltages.extend(result.voltages)
-                continue
-
-            # measurement without dummy load
-            if (result := self._take_power_reading()) is not None:
-                readings.append(result.power)
-                voltages.extend(result.voltages)
+            readings.append(result.power)
+            voltages.extend(result.voltages)
+            self._append_average_snapshot(start_time, readings, snapshots)
+            if convergence and self.average_has_converged(snapshots, convergence):
+                break
 
         if not readings:
             _LOGGER.error("No valid readings were recorded.")
@@ -111,6 +125,75 @@ class MeasureUtil:
         average = round(mean(readings), 2)
         _LOGGER.info("Average of %d measurements: %.2f %s", len(readings), average, "Ω" if measure_resistance else "W")
         return MeasurementResult(power=average, voltages=voltages)
+
+    @staticmethod
+    def _append_average_snapshot(
+        start_time: float,
+        readings: list[float],
+        snapshots: list[AverageMeasurementSnapshot],
+    ) -> None:
+        """Record the cumulative average at the current elapsed measurement time."""
+        snapshots.append(
+            AverageMeasurementSnapshot(
+                elapsed=time.time() - start_time,
+                average=mean(readings),
+            ),
+        )
+
+    @staticmethod
+    def average_has_converged(
+        snapshots: list[AverageMeasurementSnapshot],
+        convergence: AverageMeasurementConvergence,
+    ) -> bool:
+        """Check whether the cumulative average is stable over the configured lookback window."""
+        current = snapshots[-1]
+        if current.elapsed < convergence.min_duration:
+            return False
+
+        comparison_elapsed = current.elapsed - convergence.window_duration
+        comparison = next(
+            (snapshot for snapshot in reversed(snapshots[:-1]) if snapshot.elapsed <= comparison_elapsed),
+            None,
+        )
+        if comparison is None:
+            return False
+
+        delta = abs(current.average - comparison.average)
+        if delta <= convergence.absolute_threshold:
+            _LOGGER.info(
+                "Average converged after %.1f seconds: %.2f W changed %.2f W over %.1f seconds",
+                current.elapsed,
+                current.average,
+                delta,
+                convergence.window_duration,
+            )
+            return True
+
+        if comparison.average == 0:
+            return False
+
+        relative_delta = delta / abs(comparison.average)
+        if relative_delta <= convergence.relative_threshold:
+            _LOGGER.info(
+                "Average converged after %.1f seconds: %.2f W changed %.2f%% over %.1f seconds",
+                current.elapsed,
+                current.average,
+                relative_delta * 100,
+                convergence.window_duration,
+            )
+            return True
+
+        return False
+
+    def _take_average_measurement_reading(self, measure_resistance: bool) -> MeasurementResult | None:
+        """Take one reading using the average-measurement mode selected for this run."""
+        if measure_resistance:
+            return self._take_resistance_reading()
+
+        if self.dummy_load_value:
+            return self._take_dummy_load_power_reading()
+
+        return self._take_power_reading()
 
     def _sleep_before_next_average_reading(self, start_time: float, duration: int) -> bool:
         if not ((time.time() - start_time + self.config.sleep_time) < duration):

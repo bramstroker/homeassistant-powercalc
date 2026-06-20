@@ -41,6 +41,20 @@ The script will ask you a few questions and will start switching your light to a
 Depending on the selected color mode and sleep settings this will take a while. This will take 1 hour to a few hours to complete.
 Time to take a cup of coffee.
 
+### Effect measurements
+
+For light effects, the measure script uses `MEASURE_TIME_EFFECT` as the maximum measurement time for each effect/brightness combination. It can stop earlier when the cumulative average has stabilized.
+
+The following `.env` settings control this:
+
+- `MEASURE_TIME_EFFECT`: maximum effect measurement time in seconds.
+- `MEASURE_TIME_EFFECT_MIN`: minimum time before early stopping is allowed.
+- `MEASURE_TIME_EFFECT_CONVERGENCE_WINDOW`: compare the current cumulative average with the cumulative average this many seconds earlier.
+- `MEASURE_TIME_EFFECT_CONVERGENCE_ABS`: stop when the average changed by at most this many watts.
+- `MEASURE_TIME_EFFECT_CONVERGENCE_REL`: stop when the average changed by at most this percentage.
+
+Use a longer `MEASURE_TIME_EFFECT` for random effects such as sparkle or candle flicker. Stable effects will finish earlier when the average converges.
+
 ## Prepare / finalize the files
 
 When the script has finished you can find the actual files in `/utils/measure/export` directory.
