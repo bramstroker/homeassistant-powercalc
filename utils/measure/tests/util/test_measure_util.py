@@ -30,7 +30,7 @@ class _ErrorThenSuccessPowerMeter(PowerMeter):
         return False
 
     def process_answers(self, answers: dict[str, Any]) -> None:
-        pass
+        """No-op: not needed for test power meters."""
 
     @property
     def call_count(self) -> int:
@@ -51,7 +51,7 @@ class _AlwaysFailPowerMeter(PowerMeter):
         return False
 
     def process_answers(self, answers: dict[str, Any]) -> None:
-        pass
+        """No-op: not needed for test power meters."""
 
     @property
     def call_count(self) -> int:
@@ -144,7 +144,7 @@ def test_average_measurement_resets_error_count_on_success(
             return False
 
         def process_answers(self, answers: dict[str, Any]) -> None:
-            pass
+            """No-op: not needed for test power meters."""
 
     power_meter = _IntermittentPowerMeter()
     measure_util = MeasureUtil(power_meter, mock_config)
@@ -178,8 +178,8 @@ def test_average_measurement_logs_warnings_on_retry(
     result = measure_util.take_average_measurement(duration=10)
 
     assert result.power > 0
-    assert "Error during average measurement (attempt 1/3)" in caplog.text
-    assert "Error during average measurement (attempt 2/3)" in caplog.text
+    assert "Connection error while taking reading (retry 1/3)" in caplog.text
+    assert "Connection error while taking reading (retry 2/3)" in caplog.text
 
 
 @patch("time.time")
