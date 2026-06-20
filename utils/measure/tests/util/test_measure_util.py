@@ -58,9 +58,11 @@ class _AlwaysFailPowerMeter(PowerMeter):
         return self._call_count
 
 
+@patch("time.time")
 @patch("time.sleep", return_value=None)
 def test_average_measurement_retries_on_transient_error(
     mock_sleep: MagicMock,
+    mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
 ) -> None:
     """A single transient error should be retried and the measurement should complete."""
@@ -68,15 +70,19 @@ def test_average_measurement_retries_on_transient_error(
     power_meter = _ErrorThenSuccessPowerMeter(error_count=1, success_power=5.0)
     measure_util = MeasureUtil(power_meter, mock_config)
 
+    mock_time.side_effect = lambda: 100.0 if power_meter.call_count > 1 else 0.0
+
     result = measure_util.take_average_measurement(duration=10)
 
     assert result.power > 0
-    assert power_meter.call_count > 1
+    assert power_meter.call_count == 2
 
 
+@patch("time.time")
 @patch("time.sleep", return_value=None)
 def test_average_measurement_retries_multiple_consecutive_errors(
     mock_sleep: MagicMock,
+    mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
 ) -> None:
     """Multiple consecutive errors within max_retries should be tolerated."""
@@ -84,15 +90,19 @@ def test_average_measurement_retries_multiple_consecutive_errors(
     power_meter = _ErrorThenSuccessPowerMeter(error_count=3, success_power=4.0)
     measure_util = MeasureUtil(power_meter, mock_config)
 
+    mock_time.side_effect = lambda: 100.0 if power_meter.call_count > 3 else 0.0
+
     result = measure_util.take_average_measurement(duration=10)
 
     assert result.power == 4.0
-    assert power_meter.call_count > 3
+    assert power_meter.call_count == 4
 
 
+@patch("time.time", return_value=0.0)
 @patch("time.sleep", return_value=None)
 def test_average_measurement_raises_after_max_retries_exceeded(
     mock_sleep: MagicMock,
+    mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
 ) -> None:
     """Consecutive errors exceeding max_retries should re-raise the error."""
@@ -107,9 +117,11 @@ def test_average_measurement_raises_after_max_retries_exceeded(
     assert power_meter.call_count == 3
 
 
+@patch("time.time")
 @patch("time.sleep", return_value=None)
 def test_average_measurement_resets_error_count_on_success(
     mock_sleep: MagicMock,
+    mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
 ) -> None:
     """After a successful reading, the consecutive error counter should reset."""
@@ -137,15 +149,19 @@ def test_average_measurement_resets_error_count_on_success(
     power_meter = _IntermittentPowerMeter()
     measure_util = MeasureUtil(power_meter, mock_config)
 
+    mock_time.side_effect = lambda: 100.0 if call_count >= 4 else 0.0
+
     result = measure_util.take_average_measurement(duration=10)
 
     assert result.power == 3.0
-    assert call_count >= 4
+    assert call_count == 4
 
 
+@patch("time.time")
 @patch("time.sleep", return_value=None)
 def test_average_measurement_logs_warnings_on_retry(
     mock_sleep: MagicMock,
+    mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -157,6 +173,8 @@ def test_average_measurement_logs_warnings_on_retry(
     power_meter = _ErrorThenSuccessPowerMeter(error_count=2, success_power=5.0)
     measure_util = MeasureUtil(power_meter, mock_config)
 
+    mock_time.side_effect = lambda: 100.0 if power_meter.call_count > 2 else 0.0
+
     result = measure_util.take_average_measurement(duration=10)
 
     assert result.power > 0
@@ -164,9 +182,11 @@ def test_average_measurement_logs_warnings_on_retry(
     assert "Error during average measurement (attempt 2/3)" in caplog.text
 
 
+@patch("time.time")
 @patch("time.sleep", return_value=None)
 def test_average_measurement_excludes_failed_readings_from_average(
     mock_sleep: MagicMock,
+    mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
 ) -> None:
     """The average should only include successful readings, not be affected by errors."""
@@ -174,6 +194,8 @@ def test_average_measurement_excludes_failed_readings_from_average(
     # First call fails, subsequent calls return exactly 7.0
     power_meter = _ErrorThenSuccessPowerMeter(error_count=1, success_power=7.0)
     measure_util = MeasureUtil(power_meter, mock_config)
+
+    mock_time.side_effect = lambda: 100.0 if power_meter.call_count >= 3 else 0.0
 
     result = measure_util.take_average_measurement(duration=10)
 
