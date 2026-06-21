@@ -36,7 +36,6 @@ from .common import validate_name_pattern
 from .configuration.global_config import (
     FLAG_HAS_GLOBAL_GUI_CONFIG,
     get_global_configuration,
-    get_global_gui_configuration,
 )
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
@@ -458,7 +457,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
         global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
         if global_config.get(FLAG_HAS_GLOBAL_GUI_CONFIG, False) is False:
-            await apply_global_gui_configuration_changes(hass, entry)
+            await apply_global_gui_configuration_changes(hass)
 
         discovery_enabled = bool(entry.data.get(CONF_DISCOVERY, {}).get(CONF_ENABLED, False))
         discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
@@ -477,7 +476,7 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
 
     if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-        await apply_global_gui_configuration_changes(hass, entry)
+        await apply_global_gui_configuration_changes(hass)
 
     await hass.config_entries.async_reload(entry.entry_id)
 
@@ -486,10 +485,11 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
         await hass.config_entries.async_reload(related_entry.entry_id)
 
 
-async def apply_global_gui_configuration_changes(hass: HomeAssistant, entry: ConfigEntry) -> None:
+async def apply_global_gui_configuration_changes(hass: HomeAssistant) -> None:
     """Apply global configuration changes to all entities."""
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
-    global_config.update(get_global_gui_configuration(entry))
+    global_config.clear()
+    global_config.update(get_global_configuration(hass, {}))
     for entry in get_entries_excluding_global_config(hass):
         if entry.state != ConfigEntryState.LOADED:  # pragma: no cover
             continue

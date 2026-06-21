@@ -304,6 +304,33 @@ async def test_energy_options_flow(hass: HomeAssistant) -> None:
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_ENERGY_SENSOR_PRECISION] == 5
 
 
+async def test_clear_energy_sensor_category(hass: HomeAssistant) -> None:
+    """Test clearing a previously set energy sensor category is persisted.
+
+    Regression test for https://github.com/bramstroker/homeassistant-powercalc/issues/4228
+    """
+    entry = await create_mock_global_config_entry(
+        hass,
+        {
+            CONF_CREATE_ENERGY_SENSORS: True,
+            CONF_ENERGY_SENSOR_CATEGORY: EntityCategory.DIAGNOSTIC,
+        },
+    )
+
+    await handle_options_flow_update(
+        hass,
+        entry,
+        Step.GLOBAL_CONFIGURATION_ENERGY,
+        {
+            CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
+        },
+    )
+
+    # The category should no longer be set, both on the config entry and in the runtime config.
+    assert CONF_ENERGY_SENSOR_CATEGORY not in entry.data
+    assert not hass.data[DOMAIN][DOMAIN_CONFIG].get(CONF_ENERGY_SENSOR_CATEGORY)
+
+
 async def test_utility_meter_options_flow(hass: HomeAssistant) -> None:
     """Test utility meter options flow."""
     entry = await create_mock_global_config_entry(
