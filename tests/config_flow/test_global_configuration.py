@@ -317,7 +317,6 @@ async def test_clear_energy_sensor_category(hass: HomeAssistant) -> None:
         },
     )
 
-    # Submit the energy step without the category, simulating the user clearing the dropdown.
     await handle_options_flow_update(
         hass,
         entry,

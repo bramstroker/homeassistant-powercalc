@@ -457,7 +457,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
         global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
         if global_config.get(FLAG_HAS_GLOBAL_GUI_CONFIG, False) is False:
-            await apply_global_gui_configuration_changes(hass, entry)
+            await apply_global_gui_configuration_changes(hass)
 
         discovery_enabled = bool(entry.data.get(CONF_DISCOVERY, {}).get(CONF_ENABLED, False))
         discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
@@ -476,7 +476,7 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
 
     if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-        await apply_global_gui_configuration_changes(hass, entry)
+        await apply_global_gui_configuration_changes(hass)
 
     await hass.config_entries.async_reload(entry.entry_id)
 
@@ -485,11 +485,8 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
         await hass.config_entries.async_reload(related_entry.entry_id)
 
 
-async def apply_global_gui_configuration_changes(hass: HomeAssistant, entry: ConfigEntry) -> None:
+async def apply_global_gui_configuration_changes(hass: HomeAssistant) -> None:
     """Apply global configuration changes to all entities."""
-    # Rebuild the runtime config from scratch instead of merging the entry data on top of it.
-    # A plain update() can never remove keys that were cleared in the GUI, which would cause
-    # the old value to linger in the runtime config (see issue #4228).
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
     global_config.clear()
     global_config.update(get_global_configuration(hass, {}))
