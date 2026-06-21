@@ -9,12 +9,14 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry, Regist
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_MODEL,
     CONF_POWER,
     CONF_POWER_SENSOR_NAMING,
+    DEFAULT_SELF_USAGE_ENERGY_NAME_PATTERN,
     DEFAULT_SELF_USAGE_POWER_NAME_PATTERN,
     DOMAIN,
     CalculationStrategy,
@@ -363,11 +365,24 @@ async def test_needs_fixed_power(hass: HomeAssistant, json_data: dict[str, Any],
     [
         (
             {"only_self_usage": True},
-            {CONF_POWER_SENSOR_NAMING: DEFAULT_SELF_USAGE_POWER_NAME_PATTERN},
+            {
+                CONF_ENERGY_SENSOR_NAMING: DEFAULT_SELF_USAGE_ENERGY_NAME_PATTERN,
+                CONF_POWER_SENSOR_NAMING: DEFAULT_SELF_USAGE_POWER_NAME_PATTERN,
+            },
         ),
         (
             {"only_self_usage": True, "sensor_config": {CONF_POWER_SENSOR_NAMING: "{} Custom Power"}},
-            {CONF_POWER_SENSOR_NAMING: "{} Custom Power"},
+            {
+                CONF_ENERGY_SENSOR_NAMING: DEFAULT_SELF_USAGE_ENERGY_NAME_PATTERN,
+                CONF_POWER_SENSOR_NAMING: "{} Custom Power",
+            },
+        ),
+        (
+            {"only_self_usage": True, "sensor_config": {CONF_ENERGY_SENSOR_NAMING: "{} Custom Energy"}},
+            {
+                CONF_ENERGY_SENSOR_NAMING: "{} Custom Energy",
+                CONF_POWER_SENSOR_NAMING: DEFAULT_SELF_USAGE_POWER_NAME_PATTERN,
+            },
         ),
         (
             {"sensor_config": {CONF_POWER_SENSOR_NAMING: "{} Custom Power"}},
