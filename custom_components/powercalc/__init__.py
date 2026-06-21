@@ -36,7 +36,6 @@ from .common import validate_name_pattern
 from .configuration.global_config import (
     FLAG_HAS_GLOBAL_GUI_CONFIG,
     get_global_configuration,
-    get_global_gui_configuration,
 )
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
@@ -488,8 +487,12 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
 
 async def apply_global_gui_configuration_changes(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Apply global configuration changes to all entities."""
+    # Rebuild the runtime config from scratch instead of merging the entry data on top of it.
+    # A plain update() can never remove keys that were cleared in the GUI, which would cause
+    # the old value to linger in the runtime config (see issue #4228).
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
-    global_config.update(get_global_gui_configuration(entry))
+    global_config.clear()
+    global_config.update(get_global_configuration(hass, {}))
     for entry in get_entries_excluding_global_config(hass):
         if entry.state != ConfigEntryState.LOADED:  # pragma: no cover
             continue
