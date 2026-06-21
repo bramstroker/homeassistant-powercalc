@@ -154,17 +154,16 @@ def mock_requests_get_factory() -> Iterator[MockRequestsGetFactory]:
     mock_requests_get_patchers: list[Any] = []
 
     def factory(responses: dict[str, tuple[dict, int]]) -> patch:
-        def mock_requests_get(url: str, *args, **kwargs):  # noqa: ANN002, ANN003, ANN202
+        class MockResponse:
+            def __init__(self, json_data: dict, status_code: int) -> None:
+                self.json_data = json_data
+                self.status_code = status_code
+
+            def json(self) -> dict:
+                return self.json_data
+
+        def mock_requests_get(url: str, *args: object, **kwargs: object) -> MockResponse:
             response_data, status_code = responses.get(url, ({"error": "Unknown endpoint"}, 404))
-
-            # Create a mock response object
-            class MockResponse:
-                def __init__(self, json_data: dict, status_code: int) -> None:
-                    self.json_data = json_data
-                    self.status_code = status_code
-
-                def json(self) -> dict:
-                    return self.json_data
 
             return MockResponse(response_data, status_code)
 

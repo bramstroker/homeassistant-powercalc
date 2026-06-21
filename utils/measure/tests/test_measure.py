@@ -233,7 +233,7 @@ def test_run_recorder(mock_config_factory: MockConfigFactory) -> None:
         },
     )
 
-    def side_effect(_: Any) -> MeasurementResult:  # noqa: ANN401
+    def side_effect(_: object) -> MeasurementResult:
         if side_effect.counter >= 5:
             raise KeyboardInterrupt
         side_effect.counter += 1
@@ -280,7 +280,7 @@ def test_run_average(
     assert "Files exported to" not in caplog.text
 
 
-def _create_measure_instance(config: MeasureConfig, console_events: EventGenerator | None = None):  # noqa: ANN202
+def _create_measure_instance(config: MeasureConfig, console_events: EventGenerator | None = None) -> Measure:
     """Create instance of the Measure class"""
 
     sys.stdin = StringIO()
