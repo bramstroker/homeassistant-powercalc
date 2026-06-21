@@ -32,6 +32,12 @@ class MockConfigFactory(Protocol):
 
 
 @pytest.fixture(autouse=True)
+def _mock_sleep() -> None:
+    with patch("time.sleep", return_value=None):
+        yield
+
+
+@pytest.fixture(autouse=True)
 def clean_export_directory() -> None:
     export_dir = os.path.join(PROJECT_DIR, "export")
     if not os.path.exists(export_dir):
