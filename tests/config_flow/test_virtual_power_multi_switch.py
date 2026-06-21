@@ -104,13 +104,13 @@ async def test_discovery_flow(
         },
     }
 
-    assert hass.states.get("sensor.test_power")
+    assert hass.states.get("sensor.test_device_power")
 
     await set_states(hass, [("switch.test1", STATE_ON)])
-    assert_entity_state(hass, "sensor.test_power", "1.22")
+    assert_entity_state(hass, "sensor.test_device_power", "1.22")
 
     await set_states(hass, [("switch.test2", STATE_ON)])
-    assert_entity_state(hass, "sensor.test_power", "1.95")
+    assert_entity_state(hass, "sensor.test_device_power", "1.95")
 
 
 async def test_switch_entities_automatically_populated_from_device(hass: HomeAssistant) -> None:
@@ -229,7 +229,7 @@ async def test_setup_without_switches(
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
-    assert_entity_state(hass, "sensor.test_power", "0.50")
+    assert_entity_state(hass, "sensor.test_device_power", "0.50")
 
 
 async def test_light_switches_selectable(hass: HomeAssistant) -> None:
