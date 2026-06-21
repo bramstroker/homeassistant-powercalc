@@ -39,6 +39,12 @@ def _mock_sleep() -> None:
 
 
 @pytest.fixture(autouse=True)
+def _mock_hass_config() -> Iterator[None]:
+    with patch("homeassistant_api.Client.get_config", return_value={}):
+        yield
+
+
+@pytest.fixture(autouse=True)
 def clean_export_directory() -> None:
     export_dir = os.path.join(PROJECT_DIR, "export")
     if not os.path.exists(export_dir):

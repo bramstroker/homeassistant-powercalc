@@ -30,10 +30,7 @@ def test_get_light_info(attributes: dict[str, int], min_mired: int, max_mired: i
         state="on",
         attributes=attributes,
     )
-    with patch.multiple(
-        "homeassistant_api.Client",
-        get_state=MagicMock(return_value=mocked_state),
-    ):
+    with patch.object(Client, "get_state", return_value=mocked_state):
         hass_controller = _get_instance()
         light_info = hass_controller.get_light_info()
         assert light_info.get_min_mired() == min_mired
@@ -46,10 +43,7 @@ def test_effect_list() -> None:
         state="on",
         attributes={"effect_list": ["A", "B", "C"]},
     )
-    with patch.multiple(
-        "homeassistant_api.Client",
-        get_state=MagicMock(return_value=mocked_state),
-    ):
+    with patch.object(Client, "get_state", return_value=mocked_state):
         hass_controller = _get_instance()
         assert hass_controller.get_effect_list() == ["A", "B", "C"]
 

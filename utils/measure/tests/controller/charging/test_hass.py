@@ -25,10 +25,7 @@ def test_get_battery_level_attribute() -> None:
         attributes={ATTR_BATTERY_LEVEL: 75},
     )
 
-    with patch.multiple(
-        "homeassistant_api.Client",
-        get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-    ):
+    with patch.object(Client, "get_entity", return_value=MagicMock(state=mocked_state)):
         hass_controller = _get_instance()
         hass_controller.process_answers(
             {
@@ -51,10 +48,7 @@ def test_get_battery_level_entity() -> None:
         attributes={},
     )
 
-    with patch.multiple(
-        "homeassistant_api.Client",
-        get_entity=MagicMock(return_value=mocked_entity),
-    ):
+    with patch.object(Client, "get_entity", return_value=mocked_entity):
         hass_controller = _get_instance()
         hass_controller.process_answers(
             {
@@ -77,10 +71,7 @@ def test_get_battery_level_attribute_error() -> None:
     )
 
     with (
-        patch.multiple(
-            "homeassistant_api.Client",
-            get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-        ),
+        patch.object(Client, "get_entity", return_value=MagicMock(state=mocked_state)),
         pytest.raises(BatteryLevelRetrievalError),
     ):
         hass_controller = _get_instance()
@@ -99,10 +90,7 @@ def test_get_battery_level_attribute_error() -> None:
 def test_get_battery_level_entity_error() -> None:
     """Test error when entity is not found."""
     with (
-        patch.multiple(
-            "homeassistant_api.Client",
-            get_entity=MagicMock(return_value=None),
-        ),
+        patch.object(Client, "get_entity", return_value=None),
         pytest.raises(BatteryLevelRetrievalError),
     ):
         hass_controller = _get_instance()
@@ -128,10 +116,7 @@ def test_get_battery_level_entity_invalid_state() -> None:
     )
 
     with (
-        patch.multiple(
-            "homeassistant_api.Client",
-            get_entity=MagicMock(return_value=mocked_entity),
-        ),
+        patch.object(Client, "get_entity", return_value=mocked_entity),
         pytest.raises(BatteryLevelRetrievalError),
     ):
         hass_controller = _get_instance()
@@ -155,10 +140,7 @@ def test_is_charging() -> None:
         attributes={},
     )
 
-    with patch.multiple(
-        "homeassistant_api.Client",
-        get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-    ):
+    with patch.object(Client, "get_entity", return_value=MagicMock(state=mocked_state)):
         hass_controller = _get_instance()
         hass_controller.process_answers(
             {
@@ -178,10 +160,7 @@ def test_is_not_charging() -> None:
         attributes={},
     )
 
-    with patch.multiple(
-        "homeassistant_api.Client",
-        get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-    ):
+    with patch.object(Client, "get_entity", return_value=MagicMock(state=mocked_state)):
         hass_controller = _get_instance()
         hass_controller.process_answers(
             {
@@ -202,10 +181,7 @@ def test_is_valid_state() -> None:
             attributes={},
         )
 
-        with patch.multiple(
-            "homeassistant_api.Client",
-            get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-        ):
+        with patch.object(Client, "get_entity", return_value=MagicMock(state=mocked_state)):
             hass_controller = _get_instance()
             hass_controller.process_answers(
                 {
@@ -225,10 +201,7 @@ def test_is_invalid_state() -> None:
         attributes={},
     )
 
-    with patch.multiple(
-        "homeassistant_api.Client",
-        get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-    ):
+    with patch.object(Client, "get_entity", return_value=MagicMock(state=mocked_state)):
         hass_controller = _get_instance()
         hass_controller.process_answers(
             {
