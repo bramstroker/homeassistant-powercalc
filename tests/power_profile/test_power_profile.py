@@ -14,6 +14,8 @@ from custom_components.powercalc.const import (
     CONF_MIN_POWER,
     CONF_MODEL,
     CONF_POWER,
+    CONF_POWER_SENSOR_NAMING,
+    DEFAULT_SELF_USAGE_POWER_NAME_PATTERN,
     DOMAIN,
     CalculationStrategy,
 )
@@ -354,6 +356,43 @@ async def test_needs_fixed_power(hass: HomeAssistant, json_data: dict[str, Any],
     )
 
     assert await power_profile.needs_user_configuration == expected_result
+
+
+@pytest.mark.parametrize(
+    ("json_data", "expected_sensor_config"),
+    [
+        (
+            {"only_self_usage": True},
+            {CONF_POWER_SENSOR_NAMING: DEFAULT_SELF_USAGE_POWER_NAME_PATTERN},
+        ),
+        (
+            {"only_self_usage": True, "sensor_config": {CONF_POWER_SENSOR_NAMING: "{} Custom Power"}},
+            {CONF_POWER_SENSOR_NAMING: "{} Custom Power"},
+        ),
+        (
+            {"sensor_config": {CONF_POWER_SENSOR_NAMING: "{} Custom Power"}},
+            {CONF_POWER_SENSOR_NAMING: "{} Custom Power"},
+        ),
+        (
+            {},
+            {},
+        ),
+    ],
+)
+async def test_sensor_config_defaults_power_sensor_naming_for_self_usage_profiles(
+    hass: HomeAssistant,
+    json_data: dict[str, Any],
+    expected_sensor_config: dict[str, Any],
+) -> None:
+    power_profile = PowerProfile(
+        hass,
+        manufacturer="test",
+        model="test",
+        directory=get_test_profile_dir("smart_switch"),
+        json_data=json_data,
+    )
+
+    assert power_profile.sensor_config == expected_sensor_config
 
 
 @pytest.mark.parametrize(
