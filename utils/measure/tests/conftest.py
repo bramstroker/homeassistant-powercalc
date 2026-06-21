@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 import os
 import shutil
 from typing import Any, Protocol, cast
@@ -139,10 +140,12 @@ class MockRequestsGetFactory(Protocol):
 
 
 @pytest.fixture
-def mock_requests_get_factory() -> MockRequestsGetFactory:
+def mock_requests_get_factory() -> Iterator[MockRequestsGetFactory]:
     """
     Mock the requests.get function to return the specified responses.
     """
+
+    mock_requests_get_patchers: list[Any] = []
 
     def factory(responses: dict[str, tuple[dict, int]]) -> patch:
         def mock_requests_get(url: str, *args, **kwargs):  # noqa: ANN002, ANN003, ANN202
@@ -161,9 +164,13 @@ def mock_requests_get_factory() -> MockRequestsGetFactory:
 
         mock_request = patch("requests.get", side_effect=mock_requests_get)
         mock_request.start()
+        mock_requests_get_patchers.append(mock_request)
         return mock_request
 
-    return factory
+    yield factory
+
+    for mock_request in mock_requests_get_patchers:
+        mock_request.stop()
 
 
 @pytest.fixture()

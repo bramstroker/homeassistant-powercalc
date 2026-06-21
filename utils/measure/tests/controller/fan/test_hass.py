@@ -80,8 +80,4 @@ def test_get_questions() -> None:
 
 
 def _get_instance() -> HassFanController:
-    with patch.multiple(
-        "homeassistant_api.Client",
-        get_config=MagicMock(return_value={}),
-    ):
-        return HassFanController("http://localhost:812", "abc")
+    return HassFanController("http://localhost:812", "abc")

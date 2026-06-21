@@ -28,7 +28,6 @@ def test_get_battery_level_attribute() -> None:
     with patch.multiple(
         "homeassistant_api.Client",
         get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-        get_config=MagicMock(return_value={}),
     ):
         hass_controller = _get_instance()
         hass_controller.process_answers(
@@ -55,7 +54,6 @@ def test_get_battery_level_entity() -> None:
     with patch.multiple(
         "homeassistant_api.Client",
         get_entity=MagicMock(return_value=mocked_entity),
-        get_config=MagicMock(return_value={}),
     ):
         hass_controller = _get_instance()
         hass_controller.process_answers(
@@ -82,7 +80,6 @@ def test_get_battery_level_attribute_error() -> None:
         patch.multiple(
             "homeassistant_api.Client",
             get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-            get_config=MagicMock(return_value={}),
         ),
         pytest.raises(BatteryLevelRetrievalError),
     ):
@@ -105,7 +102,6 @@ def test_get_battery_level_entity_error() -> None:
         patch.multiple(
             "homeassistant_api.Client",
             get_entity=MagicMock(return_value=None),
-            get_config=MagicMock(return_value={}),
         ),
         pytest.raises(BatteryLevelRetrievalError),
     ):
@@ -135,7 +131,6 @@ def test_get_battery_level_entity_invalid_state() -> None:
         patch.multiple(
             "homeassistant_api.Client",
             get_entity=MagicMock(return_value=mocked_entity),
-            get_config=MagicMock(return_value={}),
         ),
         pytest.raises(BatteryLevelRetrievalError),
     ):
@@ -163,7 +158,6 @@ def test_is_charging() -> None:
     with patch.multiple(
         "homeassistant_api.Client",
         get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-        get_config=MagicMock(return_value={}),
     ):
         hass_controller = _get_instance()
         hass_controller.process_answers(
@@ -187,7 +181,6 @@ def test_is_not_charging() -> None:
     with patch.multiple(
         "homeassistant_api.Client",
         get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-        get_config=MagicMock(return_value={}),
     ):
         hass_controller = _get_instance()
         hass_controller.process_answers(
@@ -212,7 +205,6 @@ def test_is_valid_state() -> None:
         with patch.multiple(
             "homeassistant_api.Client",
             get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-            get_config=MagicMock(return_value={}),
         ):
             hass_controller = _get_instance()
             hass_controller.process_answers(
@@ -236,7 +228,6 @@ def test_is_invalid_state() -> None:
     with patch.multiple(
         "homeassistant_api.Client",
         get_entity=MagicMock(return_value=MagicMock(state=mocked_state)),
-        get_config=MagicMock(return_value={}),
     ):
         hass_controller = _get_instance()
         hass_controller.process_answers(
@@ -288,8 +279,4 @@ def test_get_questions() -> None:
 
 def _get_instance() -> HassChargingController:
     """Get a mocked instance of HassChargingController."""
-    with patch.multiple(
-        "homeassistant_api.Client",
-        get_config=MagicMock(return_value={}),
-    ):
-        return HassChargingController("http://localhost:812", "abc")
+    return HassChargingController("http://localhost:812", "abc")

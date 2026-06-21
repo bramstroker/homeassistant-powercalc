@@ -1,7 +1,7 @@
 import csv
 import os.path
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from measure.controller.light.const import LutMode
 from measure.runner.const import QUESTION_MODE
@@ -44,8 +44,7 @@ def test_get_variations(mock_config_factory: MockConfigFactory, mode: LutMode, e
     assert len(list(variations)) == expected_count
 
 
-@patch("time.sleep", return_value=None)
-def test_run(mock_sleep, mock_config_factory: MockConfigFactory, export_path: str) -> None:  # noqa: ANN001
+def test_run(mock_config_factory: MockConfigFactory, export_path: str) -> None:
     mock_config = mock_config_factory()
 
     measure_util_mock = MagicMock(MeasureUtil)
