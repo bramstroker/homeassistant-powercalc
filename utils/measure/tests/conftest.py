@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 import os
 import shutil
 from typing import Any, Protocol, cast
@@ -34,6 +35,12 @@ class MockConfigFactory(Protocol):
 @pytest.fixture(autouse=True)
 def _mock_sleep() -> None:
     with patch("time.sleep", return_value=None):
+        yield
+
+
+@pytest.fixture(autouse=True)
+def _mock_hass_config() -> Iterator[None]:
+    with patch("homeassistant_api.Client.get_config", return_value={}):
         yield
 
 
@@ -139,31 +146,36 @@ class MockRequestsGetFactory(Protocol):
 
 
 @pytest.fixture
-def mock_requests_get_factory() -> MockRequestsGetFactory:
+def mock_requests_get_factory() -> Iterator[MockRequestsGetFactory]:
     """
     Mock the requests.get function to return the specified responses.
     """
 
+    mock_requests_get_patchers: list[Any] = []
+
     def factory(responses: dict[str, tuple[dict, int]]) -> patch:
-        def mock_requests_get(url: str, *args, **kwargs):  # noqa: ANN002, ANN003, ANN202
+        class MockResponse:
+            def __init__(self, json_data: dict, status_code: int) -> None:
+                self.json_data = json_data
+                self.status_code = status_code
+
+            def json(self) -> dict:
+                return self.json_data
+
+        def mock_requests_get(url: str, *args: object, **kwargs: object) -> MockResponse:
             response_data, status_code = responses.get(url, ({"error": "Unknown endpoint"}, 404))
-
-            # Create a mock response object
-            class MockResponse:
-                def __init__(self, json_data: dict, status_code: int) -> None:
-                    self.json_data = json_data
-                    self.status_code = status_code
-
-                def json(self) -> dict:
-                    return self.json_data
 
             return MockResponse(response_data, status_code)
 
         mock_request = patch("requests.get", side_effect=mock_requests_get)
         mock_request.start()
+        mock_requests_get_patchers.append(mock_request)
         return mock_request
 
-    return factory
+    yield factory
+
+    for mock_request in mock_requests_get_patchers:
+        mock_request.stop()
 
 
 @pytest.fixture()

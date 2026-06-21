@@ -1,11 +1,12 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from measure.runner.fan import FanRunner
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
+from tests.conftest import MockConfigFactory
 
-@patch("time.sleep", return_value=None)
-def test_run(mock_sleep, mock_config_factory, export_path: str) -> None:  # noqa: ANN001
+
+def test_run(mock_config_factory: MockConfigFactory, export_path: str) -> None:
     mock_config = mock_config_factory()
 
     measure_util_mock = MagicMock(MeasureUtil)
