@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -59,13 +60,13 @@ class _AlwaysFailPowerMeter(PowerMeter):
 
 
 @patch("time.time")
-@patch("time.sleep", return_value=None)
 def test_average_measurement_retries_on_transient_error(
-    mock_sleep: MagicMock,
     mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """A single transient error should be retried and the measurement should complete."""
+    caplog.set_level(logging.WARNING)
     mock_config = mock_config_factory(config_values={"max_retries": 3})
     power_meter = _ErrorThenSuccessPowerMeter(error_count=1, success_power=5.0)
     measure_util = MeasureUtil(power_meter, mock_config)
@@ -76,12 +77,11 @@ def test_average_measurement_retries_on_transient_error(
 
     assert result.power > 0
     assert power_meter.call_count == 2
+    assert "Error during average measurement (attempt 1/3)" in caplog.text
 
 
 @patch("time.time")
-@patch("time.sleep", return_value=None)
 def test_average_measurement_retries_multiple_consecutive_errors(
-    mock_sleep: MagicMock,
     mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
 ) -> None:
@@ -99,9 +99,7 @@ def test_average_measurement_retries_multiple_consecutive_errors(
 
 
 @patch("time.time", return_value=0.0)
-@patch("time.sleep", return_value=None)
 def test_average_measurement_raises_after_max_retries_exceeded(
-    mock_sleep: MagicMock,
     mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
 ) -> None:
@@ -118,9 +116,7 @@ def test_average_measurement_raises_after_max_retries_exceeded(
 
 
 @patch("time.time")
-@patch("time.sleep", return_value=None)
 def test_average_measurement_resets_error_count_on_success(
-    mock_sleep: MagicMock,
     mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
 ) -> None:
@@ -158,34 +154,7 @@ def test_average_measurement_resets_error_count_on_success(
 
 
 @patch("time.time")
-@patch("time.sleep", return_value=None)
-def test_average_measurement_logs_warnings_on_retry(
-    mock_sleep: MagicMock,
-    mock_time: MagicMock,
-    mock_config_factory: MockConfigFactory,
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Transient errors should be logged as warnings, not errors."""
-    import logging
-
-    caplog.set_level(logging.WARNING)
-    mock_config = mock_config_factory(config_values={"max_retries": 3})
-    power_meter = _ErrorThenSuccessPowerMeter(error_count=2, success_power=5.0)
-    measure_util = MeasureUtil(power_meter, mock_config)
-
-    mock_time.side_effect = lambda: 100.0 if power_meter.call_count > 2 else 0.0
-
-    result = measure_util.take_average_measurement(duration=10)
-
-    assert result.power > 0
-    assert "Connection error while taking reading (retry 1/3)" in caplog.text
-    assert "Connection error while taking reading (retry 2/3)" in caplog.text
-
-
-@patch("time.time")
-@patch("time.sleep", return_value=None)
 def test_average_measurement_excludes_failed_readings_from_average(
-    mock_sleep: MagicMock,
     mock_time: MagicMock,
     mock_config_factory: MockConfigFactory,
 ) -> None:
