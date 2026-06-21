@@ -12,10 +12,6 @@
   "measure_method": "manual",
   "name": "Zigbee Two-Way Smart Switch",
   "only_self_usage": false,
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "standby_power": 0.33,
   "standby_power_on": 0.49,
   "author_info": {
