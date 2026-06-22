@@ -1,4 +1,4 @@
-numpy==2.4.6
+numpy==2.5.0
 opencv-python==4.13.0.92
 packaging==26.2
 Pillow==12.2.0
