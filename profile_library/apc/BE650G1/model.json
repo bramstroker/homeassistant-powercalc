@@ -13,7 +13,7 @@
   "created_at": "2026-04-28T00:00:00Z",
   "measure_method": "manual",
   "measure_device": "N/A",
-  "config_flow_discovery_remarks": "The Back-UPS ES 650G1 reports load in 10% increments and does not provide ups.realpower. Defaults of 650 VA and 0.7 power factor approximate watts for typical mixed loads; use 0.6 for computers/electronics or 1.0 for resistive loads.",
+  "config_flow_discovery_remarks": "The Back-UPS ES 650G1 reports load in 10% increments and does not provide ups.realpower. The 650 VA and 0.7 power factor defaults approximate watts for typical mixed loads; use 0.6 for computers/electronics, 0.7 for mixed loads, or 1.0 for resistive loads like heaters.",
   "fields": {
     "nominal_va": {
       "label": "Nominal Power (VA)",
