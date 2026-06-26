@@ -11,5 +11,10 @@
     "VERSION": "v1.20.14:docker"
   },
   "name": "Hue White and Colour Ambiance E14 Lustre",
-  "standby_power": 0.26
+  "standby_power": 0.26,
+  "author_info": {
+    "name": "Stuart Pearson",
+    "github": "stuartp44"
+  },
+  "author": "Stuart Pearson"
 }

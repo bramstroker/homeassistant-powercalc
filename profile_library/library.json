@@ -2195,11 +2195,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "brightness",
+            "color_temp",
             "hs"
           ],
-          "hash": "6dc3690f8a3008d64f9532292562ba8f"
+          "hash": "ed8c6f8ad83348d686cdce499f97ea56"
         }
       ],
       "device_types": [
@@ -7370,11 +7370,11 @@
           "max_power": 11.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "95a7bbf61c9a3ef1a371fb053e9f73e5"
+          "hash": "3ab9d110d179f440fd4cd2a8068a57b4"
         },
         {
           "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
@@ -7615,11 +7615,11 @@
           "max_power": 41.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "758f8e15877c02a17d1cddd1b33c3eeb"
+          "hash": "b44188f629f5a170ffc0a49fe1435e72"
         },
         {
           "aliases": [
@@ -7762,11 +7762,11 @@
           "max_power": 11.63,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "2ae12e0d5a18a515556c27f9e9778cd7"
+          "hash": "fcd96acbd9a8acf497368c82c9dd4c78"
         },
         {
           "aliases": [
@@ -9217,11 +9217,11 @@
           "max_power": 7.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "36c33360d2d09b944d362960140acda7"
+          "hash": "04e66afcf2684a88ae23d9359513516c"
         },
         {
           "aliases": [
@@ -9795,33 +9795,29 @@
           "hash": "ad182a21166be3e593fd2e4a89d48da0"
         },
         {
-          "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>",
           "calculation_strategy": "lut",
-          "created_at": "2024-06-15T10:54:11Z",
+          "created_at": "2026-06-16T17:53:14Z",
           "device_type": "light",
-          "measure_device": "Shelly Plus Plug S",
+          "measure_device": "Shelly 1PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
-            "SAMPLE_COUNT": 2,
+            "SAMPLE_COUNT": 10,
             "SLEEP_TIME": 3,
-            "VERSION": "v1.12.6:docker"
+            "VERSION": "v1.20.14:docker"
           },
-          "name": "Hue color luster",
-          "standby_power": 0.22,
-          "author_info": {
-            "name": "Stuart Pearson",
-            "github": "stuartp44"
-          },
+          "name": "Hue White and Colour Ambiance E14 Lustre",
+          "standby_power": 0.26,
           "id": "LCU001",
           "manufacturer": "signify",
-          "updated_at": "2026-01-24T15:57:02",
-          "max_power": 4.88,
+          "updated_at": "2026-06-26T06:18:32",
+          "max_power": 4.81,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "color_temp",
             "hs"
           ],
-          "hash": "d91cfb8f0996f86f4347841b07074cde"
+          "hash": "f36aab2f66f69f5a2a46d51c6005c387"
         },
         {
           "aliases": [],
@@ -10046,11 +10042,11 @@
           "max_power": 5.16,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "823658863038110c6a9fa3eb67c2e657"
+          "hash": "74bf0992ae48c4d92267c5d97bc85482"
         },
         {
           "aliases": [
@@ -11380,10 +11376,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hsv"
+            "hsv",
+            "color_temp"
           ],
-          "hash": "588f2b004db57a238645d53eb907732d"
+          "hash": "9d1982351c156dc4410c730b85fd510e"
         },
         {
           "aliases": [
@@ -12136,11 +12132,11 @@
           "max_power": 29.03,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "8036aa7ef0ea31f5439fa76159fb938c"
+          "hash": "7c7fba40219c355e32a24846c727d7fe"
         },
         {
           "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>",
@@ -13056,11 +13052,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "brightness",
+            "color_temp",
             "hs"
           ],
-          "hash": "1e47e11c48244e5b0ba6b285c30fe2f1"
+          "hash": "21e279d64e6840a6f75b4f41fe8ce9c6"
         },
         {
           "calculation_strategy": "lut",
@@ -18134,11 +18130,11 @@
           "max_power": null,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "a28d2fb500e7b8129553eb92959ad787"
+          "hash": "e01eed2f66179f6bf45d6bd6fdc6d3ec"
         },
         {
           "author": "dsolva <diego_10sv@hotmail.com>",
@@ -18853,10 +18849,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "brightness"
+            "brightness",
+            "color_temp"
           ],
-          "hash": "d3054757f6774f18127eb48811377341"
+          "hash": "56ef2a75161d4bf73767a7d7b68b879a"
         }
       ],
       "device_types": [
@@ -18990,11 +18986,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "db0831d14b70b40bd36fea4b21d78f74"
+          "hash": "87712518a23226a5947ad8501a350aed"
         },
         {
           "author": "Udo Ha\u00df <udo.hass@proton.me>",
@@ -19021,11 +19017,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "9ee9d851f62f1483b14ca39f34cefe45"
+          "hash": "b558995e3b047c8d8c5921b74736b8f4"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -19081,11 +19077,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "brightness",
+            "color_temp",
             "hs"
           ],
-          "hash": "e428a7720168f9b3f09af8f1cf3e83e9"
+          "hash": "7a39dbf6da62530b8a004e954f9cfc8d"
         },
         {
           "author": "gobbli",
@@ -19111,11 +19107,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "e51ce873f4958f34050c38778bb55322"
+          "hash": "5fd6bf12289b916338b4a7954940dfd9"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -19232,11 +19228,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
             "effect",
+            "color_temp",
             "hs"
           ],
-          "hash": "d83e25738b3ed996675dabf9b112c0be"
+          "hash": "c5f06f7ac36512536168a0f496155dfb"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
