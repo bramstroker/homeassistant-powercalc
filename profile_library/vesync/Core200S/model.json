@@ -1,0 +1,18 @@
+{
+  "author": "SH1FT-W",
+  "calculation_strategy": "fixed",
+  "created_at": "2026-06-01T00:00:00Z",
+  "device_type": "fan",
+  "measure_device": "SONOFF S60ZBTPF",
+  "measure_method": "manual",
+  "name": "Core 200S Series Air Purifier",
+  "standby_power": 0.6,
+  "fixed_config": {
+    "states_power": {
+      "preset_mode|sleep": 17,
+      "percentage|33": 21,
+      "percentage|66": 27,
+      "percentage|100": 39
+    }
+  }
+}
