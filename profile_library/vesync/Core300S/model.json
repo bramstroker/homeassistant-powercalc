@@ -1,0 +1,19 @@
+{
+  "author": "SH1FT-W",
+  "calculation_strategy": "fixed",
+  "created_at": "2026-06-01T00:00:00Z",
+  "device_type": "fan",
+  "measure_device": "Power meter",
+  "measure_method": "manual",
+  "name": "Core 300S Series Air Purifier",
+  "standby_power": 0.5,
+  "fixed_config": {
+    "states_power": {
+      "preset_mode|sleep": 3,
+      "preset_mode|auto": 5,
+      "percentage|33": 5,
+      "percentage|66": 9,
+      "percentage|100": 37
+    }
+  }
+}
