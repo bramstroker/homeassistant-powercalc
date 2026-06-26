@@ -2195,11 +2195,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "color_temp",
+            "brightness",
             "hs"
           ],
-          "hash": "ed8c6f8ad83348d686cdce499f97ea56"
+          "hash": "6dc3690f8a3008d64f9532292562ba8f"
         }
       ],
       "device_types": [
@@ -7370,11 +7370,11 @@
           "max_power": 11.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "3ab9d110d179f440fd4cd2a8068a57b4"
+          "hash": "c34caadbf951200d0de868c446a98aa8"
         },
         {
           "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
@@ -7615,11 +7615,11 @@
           "max_power": 41.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "b44188f629f5a170ffc0a49fe1435e72"
+          "hash": "51d5604db5bcc0cfe27d387cb02d4279"
         },
         {
           "aliases": [
@@ -7762,11 +7762,11 @@
           "max_power": 11.63,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "fcd96acbd9a8acf497368c82c9dd4c78"
+          "hash": "1ff6a702a7a874b460c91d8928583ee4"
         },
         {
           "aliases": [
@@ -9217,11 +9217,11 @@
           "max_power": 7.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "04e66afcf2684a88ae23d9359513516c"
+          "hash": "a12e0dc5b993953d8ea52016dac393b1"
         },
         {
           "aliases": [
@@ -9807,17 +9807,22 @@
           },
           "name": "Hue White and Colour Ambiance E14 Lustre",
           "standby_power": 0.26,
+          "author_info": {
+            "name": "Stuart Pearson",
+            "github": "stuartp44"
+          },
+          "author": "Stuart Pearson",
           "id": "LCU001",
           "manufacturer": "signify",
-          "updated_at": "2026-06-26T06:18:32",
+          "updated_at": "2026-06-26T06:19:11",
           "max_power": 4.81,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "f36aab2f66f69f5a2a46d51c6005c387"
+          "hash": "9340a4f180443bbb316ddbb5690b7ba3"
         },
         {
           "aliases": [],
@@ -10042,11 +10047,11 @@
           "max_power": 5.16,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "74bf0992ae48c4d92267c5d97bc85482"
+          "hash": "bf84bd664c38e25ebb9190f427ea7030"
         },
         {
           "aliases": [
@@ -11376,10 +11381,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "hsv",
-            "color_temp"
+            "color_temp",
+            "hsv"
           ],
-          "hash": "9d1982351c156dc4410c730b85fd510e"
+          "hash": "588f2b004db57a238645d53eb907732d"
         },
         {
           "aliases": [
@@ -12132,11 +12137,11 @@
           "max_power": 29.03,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "7c7fba40219c355e32a24846c727d7fe"
+          "hash": "afbbde565fb290d3032408e1589bdcbb"
         },
         {
           "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>",
@@ -13052,11 +13057,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "color_temp",
+            "brightness",
             "hs"
           ],
-          "hash": "21e279d64e6840a6f75b4f41fe8ce9c6"
+          "hash": "1e47e11c48244e5b0ba6b285c30fe2f1"
         },
         {
           "calculation_strategy": "lut",
@@ -17184,14 +17189,14 @@
           "author": "Keysie",
           "id": "LED2402C3",
           "manufacturer": "ikea",
-          "updated_at": "2026-06-19T06:13:47",
+          "updated_at": "2026-06-26T06:19:11",
           "max_power": 3.57,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "c845ee953e1e51690e958099986c7919"
+          "hash": "cc7674b9eef6507d2adec06cc80d9650"
         },
         {
           "aliases": [
@@ -18130,11 +18135,11 @@
           "max_power": null,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "e01eed2f66179f6bf45d6bd6fdc6d3ec"
+          "hash": "2a0902ba71dad533840978d9ac24e2ca"
         },
         {
           "author": "dsolva <diego_10sv@hotmail.com>",
@@ -18849,10 +18854,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "56ef2a75161d4bf73767a7d7b68b879a"
+          "hash": "d3054757f6774f18127eb48811377341"
         }
       ],
       "device_types": [
@@ -18986,11 +18991,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "87712518a23226a5947ad8501a350aed"
+          "hash": "953b3637b3a77c46dc7513ada8de63cd"
         },
         {
           "author": "Udo Ha\u00df <udo.hass@proton.me>",
@@ -19017,11 +19022,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "b558995e3b047c8d8c5921b74736b8f4"
+          "hash": "ca835c2c050c377470043f69d75e0e45"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -19077,11 +19082,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "color_temp",
+            "brightness",
             "hs"
           ],
-          "hash": "7a39dbf6da62530b8a004e954f9cfc8d"
+          "hash": "e428a7720168f9b3f09af8f1cf3e83e9"
         },
         {
           "author": "gobbli",
@@ -19107,11 +19112,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "5fd6bf12289b916338b4a7954940dfd9"
+          "hash": "fc32a8e4378dd50d1ba5f7b508e89fb3"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -19198,10 +19203,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "b8ba79c307b90439d3849a26bc5a829e"
+          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
         },
         {
           "calculation_strategy": "lut",
@@ -19228,11 +19233,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "c5f06f7ac36512536168a0f496155dfb"
+          "hash": "2ea3e415936623fe485ee433c5d5a8e3"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
@@ -21814,6 +21819,7 @@
           "description": "Power profile for the APC Back-UPS ES 650G1 (650 VA / 390 W). Estimates real-time output power from NUT load percentage.",
           "device_type": "ups",
           "calculation_strategy": "fixed",
+          "discovery_by": "device",
           "compatible_integrations": [
             "nut"
           ],
@@ -21821,18 +21827,10 @@
           "measure_method": "manual",
           "measure_device": "N/A",
           "fields": {
-            "load_entity": {
-              "label": "Load percentage entity",
-              "description": "The NUT sensor showing UPS load percentage (0-100%)",
-              "selector": {
-                "entity": {
-                  "domain": "sensor"
-                }
-              }
-            },
             "nominal_va": {
               "label": "Nominal Power (VA)",
               "description": "The VA rating of your UPS. Default: 650",
+              "default": 650,
               "selector": {
                 "number": {
                   "min": 100,
@@ -21842,7 +21840,8 @@
             },
             "power_factor": {
               "label": "Power Factor",
-              "description": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 1.0 for resistive loads like heaters. Default: 0.6",
+              "description": "Ratio of real power to apparent power. Default: 0.7 for typical mixed loads.",
+              "default": 0.7,
               "selector": {
                 "number": {
                   "min": 0.1,
@@ -21860,10 +21859,10 @@
           "author": "Brian Egge",
           "id": "BE650G1",
           "manufacturer": "apc",
-          "updated_at": "2026-05-01T07:59:37",
+          "updated_at": "2026-06-26T06:19:23",
           "max_power": 0,
           "sub_profile_count": 0,
-          "hash": "1858365605475a72147f05be9bab31bc"
+          "hash": "da81cb5a044609b4ef307e5974b3363b"
         }
       ],
       "device_types": [
