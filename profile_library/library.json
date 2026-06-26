@@ -7371,10 +7371,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "c34caadbf951200d0de868c446a98aa8"
+          "hash": "95a7bbf61c9a3ef1a371fb053e9f73e5"
         },
         {
           "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
@@ -7616,10 +7616,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "51d5604db5bcc0cfe27d387cb02d4279"
+          "hash": "758f8e15877c02a17d1cddd1b33c3eeb"
         },
         {
           "aliases": [
@@ -7763,10 +7763,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "1ff6a702a7a874b460c91d8928583ee4"
+          "hash": "2ae12e0d5a18a515556c27f9e9778cd7"
         },
         {
           "aliases": [
@@ -9218,10 +9218,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "a12e0dc5b993953d8ea52016dac393b1"
+          "hash": "36c33360d2d09b944d362960140acda7"
         },
         {
           "aliases": [
@@ -9819,10 +9819,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "9340a4f180443bbb316ddbb5690b7ba3"
+          "hash": "464fd382058d7e9be65a1ea0e60fbf80"
         },
         {
           "aliases": [],
@@ -10048,10 +10048,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "bf84bd664c38e25ebb9190f427ea7030"
+          "hash": "823658863038110c6a9fa3eb67c2e657"
         },
         {
           "aliases": [
@@ -12138,10 +12138,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "afbbde565fb290d3032408e1589bdcbb"
+          "hash": "8036aa7ef0ea31f5439fa76159fb938c"
         },
         {
           "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>",
@@ -18136,10 +18136,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "2a0902ba71dad533840978d9ac24e2ca"
+          "hash": "a28d2fb500e7b8129553eb92959ad787"
         },
         {
           "author": "dsolva <diego_10sv@hotmail.com>",
@@ -18992,10 +18992,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "953b3637b3a77c46dc7513ada8de63cd"
+          "hash": "db0831d14b70b40bd36fea4b21d78f74"
         },
         {
           "author": "Udo Ha\u00df <udo.hass@proton.me>",
@@ -19023,10 +19023,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "ca835c2c050c377470043f69d75e0e45"
+          "hash": "9ee9d851f62f1483b14ca39f34cefe45"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -19113,10 +19113,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "fc32a8e4378dd50d1ba5f7b508e89fb3"
+          "hash": "e51ce873f4958f34050c38778bb55322"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -19203,10 +19203,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
+          "hash": "b8ba79c307b90439d3849a26bc5a829e"
         },
         {
           "calculation_strategy": "lut",
@@ -19234,10 +19234,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "2ea3e415936623fe485ee433c5d5a8e3"
+          "hash": "d83e25738b3ed996675dabf9b112c0be"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
@@ -21693,6 +21693,49 @@
       ],
       "device_types": [
         "camera"
+      ]
+    },
+    {
+      "aliases": [],
+      "name": "vesync",
+      "full_name": "VeSync",
+      "dir_name": "vesync",
+      "models": [
+        {
+          "author": "SH1FT-W",
+          "calculation_strategy": "fixed",
+          "created_at": "2026-06-01T00:00:00Z",
+          "device_type": "fan",
+          "measure_device": "SONOFF S60ZBTPF",
+          "measure_method": "manual",
+          "name": "Core 200S Series Air Purifier",
+          "standby_power": 0.6,
+          "id": "Core200S",
+          "manufacturer": "vesync",
+          "updated_at": "2026-06-26T21:22:00",
+          "max_power": 39,
+          "sub_profile_count": 0,
+          "hash": "cb8482fa32af3ef7f7613609c50d0a4e"
+        },
+        {
+          "author": "SH1FT-W",
+          "calculation_strategy": "fixed",
+          "created_at": "2026-06-01T00:00:00Z",
+          "device_type": "fan",
+          "measure_device": "SONOFF S60ZBTPF",
+          "measure_method": "manual",
+          "name": "Core 300S Series Air Purifier",
+          "standby_power": 0.5,
+          "id": "Core300S",
+          "manufacturer": "vesync",
+          "updated_at": "2026-06-26T21:22:00",
+          "max_power": 37,
+          "sub_profile_count": 0,
+          "hash": "8bd60da070a8d0a1b1d2e4137d94d3c5"
+        }
+      ],
+      "device_types": [
+        "fan"
       ]
     },
     {
