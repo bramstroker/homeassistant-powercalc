@@ -7370,11 +7370,11 @@
           "max_power": 11.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "3ab9d110d179f440fd4cd2a8068a57b4"
+          "hash": "95a7bbf61c9a3ef1a371fb053e9f73e5"
         },
         {
           "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
@@ -7615,11 +7615,11 @@
           "max_power": 41.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "b44188f629f5a170ffc0a49fe1435e72"
+          "hash": "758f8e15877c02a17d1cddd1b33c3eeb"
         },
         {
           "aliases": [
@@ -7762,11 +7762,11 @@
           "max_power": 11.63,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "fcd96acbd9a8acf497368c82c9dd4c78"
+          "hash": "2ae12e0d5a18a515556c27f9e9778cd7"
         },
         {
           "aliases": [
@@ -7904,10 +7904,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "brightness"
+            "brightness",
+            "effect"
           ],
-          "hash": "6f2e1bc6071fea8f39976d7446c00abc"
+          "hash": "3377ec8d3229ca92e74192be0c086001"
         },
         {
           "aliases": [
@@ -9217,11 +9217,11 @@
           "max_power": 7.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "04e66afcf2684a88ae23d9359513516c"
+          "hash": "36c33360d2d09b944d362960140acda7"
         },
         {
           "aliases": [
@@ -10019,7 +10019,8 @@
           "aliases": [
             "929003045201_01",
             "929003045201_02",
-            "929003045201_03"
+            "929003045201_03",
+            "929003809501_02"
           ],
           "author": "Morpheus361 <marco.morpheus@kabelmail.de>",
           "calculation_strategy": "lut",
@@ -10041,14 +10042,15 @@
           },
           "id": "929003045201",
           "manufacturer": "signify",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-26T06:14:38",
           "max_power": 5.16,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "6b9df63ee5181fd8e44bc848d06153cc"
+          "hash": "823658863038110c6a9fa3eb67c2e657"
         },
         {
           "aliases": [
@@ -11378,10 +11380,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "hsv",
-            "color_temp"
+            "color_temp",
+            "hsv"
           ],
-          "hash": "9d1982351c156dc4410c730b85fd510e"
+          "hash": "588f2b004db57a238645d53eb907732d"
         },
         {
           "aliases": [
@@ -12134,11 +12136,11 @@
           "max_power": 29.03,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "7c7fba40219c355e32a24846c727d7fe"
+          "hash": "8036aa7ef0ea31f5439fa76159fb938c"
         },
         {
           "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>",
@@ -18132,11 +18134,11 @@
           "max_power": null,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "e01eed2f66179f6bf45d6bd6fdc6d3ec"
+          "hash": "a28d2fb500e7b8129553eb92959ad787"
         },
         {
           "author": "dsolva <diego_10sv@hotmail.com>",
@@ -18988,11 +18990,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "87712518a23226a5947ad8501a350aed"
+          "hash": "db0831d14b70b40bd36fea4b21d78f74"
         },
         {
           "author": "Udo Ha\u00df <udo.hass@proton.me>",
@@ -19019,11 +19021,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "b558995e3b047c8d8c5921b74736b8f4"
+          "hash": "9ee9d851f62f1483b14ca39f34cefe45"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -19109,11 +19111,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "5fd6bf12289b916338b4a7954940dfd9"
+          "hash": "e51ce873f4958f34050c38778bb55322"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -19230,11 +19232,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "color_temp",
+            "effect",
             "hs"
           ],
-          "hash": "c5f06f7ac36512536168a0f496155dfb"
+          "hash": "d83e25738b3ed996675dabf9b112c0be"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
