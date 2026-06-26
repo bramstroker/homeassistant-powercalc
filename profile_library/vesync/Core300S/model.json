@@ -3,7 +3,7 @@
   "calculation_strategy": "fixed",
   "created_at": "2026-06-01T00:00:00Z",
   "device_type": "fan",
-  "measure_device": "SONOFF S60ZBTPF"
+  "measure_device": "SONOFF S60ZBTPF",
   "measure_method": "manual",
   "name": "Core 300S Series Air Purifier",
   "standby_power": 0.5,
