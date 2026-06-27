@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: crowdin action
+      - name: Download from Crowdin
         uses: crowdin/github-action@v2
         with:
           upload_sources: false

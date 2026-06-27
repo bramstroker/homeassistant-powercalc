@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd .github/scripts/lut_validator
-          npm install
+          npm ci
       - name: Validate LUT CSV files
         run: node .github/scripts/lut_validator/validate.js
       - name: Validate LUT quality
