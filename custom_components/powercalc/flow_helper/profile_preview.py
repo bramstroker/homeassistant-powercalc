@@ -177,7 +177,7 @@ async def _calculate_current_power(
             power_profile,
             source_entity,
         )
-    except (StrategyConfigurationError, UnsupportedStrategyError):
+    except StrategyConfigurationError, UnsupportedStrategyError:
         return None
 
     try:
