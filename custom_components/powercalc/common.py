@@ -41,7 +41,7 @@ def is_number(value: str) -> bool:
     """Return whether the value can be converted to a finite float."""
     try:
         fvalue = float(value)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return False
     return math.isfinite(fvalue)
 

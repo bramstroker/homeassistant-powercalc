@@ -39,7 +39,7 @@ After the measurements are finished you will find the files in `export` director
 Use this installation method when the docker method is not working for you or you want to do any development on the script.
 
 **Prerequisites:**
-- Make sure you have Python 3 running on your system. Version 3.13 is recommended.
+- Make sure you have Python 3 running on your system. Version 3.14 is recommended.
 - Install uv. `curl -LsSf https://astral.sh/uv/install.sh | sh` or see https://github.com/astral-sh/uv
 
 uv manages the virtual environment and installs all dependencies declared by the project.
