@@ -1,0 +1,7 @@
+rules:
+  dangerous-triggers:
+    ignore:
+      # These workflows intentionally use workflow_run to keep untrusted PR jobs
+      # read-only, then perform privileged PR commenting from trusted workflow code.
+      - pr-comment-upload-and-comment.yml
+      - validate-model-json-comment.yml
