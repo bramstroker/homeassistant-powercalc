@@ -1,0 +1,48 @@
+name: Development release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  release_zip_file:
+    name: Prepare development release asset
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set manifest version number
+        run: |
+          python3 "${{ github.workspace }}/.github/scripts/update_hacs_manifest.py" --version "dev"
+
+      - name: Create zip
+        run: |
+          cd custom_components/powercalc
+          zip powercalc.zip -r ./
+
+      - name: Move dev tag
+        run: |
+          git tag --force dev "${GITHUB_SHA}"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" refs/tags/dev --force
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create dev release
+        run: |
+          gh release view dev || gh release create dev --title "Development build" --notes "Moving development build from master." --prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload zip to dev release
+        run: gh release upload dev ./custom_components/powercalc/powercalc.zip#powercalc.zip --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
