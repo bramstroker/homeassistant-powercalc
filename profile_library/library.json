@@ -1713,7 +1713,7 @@
           ],
           "author": "Justin Hahn <justin.hahn@live.com>",
           "calculation_strategy": "fixed",
-          "created_at": "2025-04-10T00:41:25+01:00",
+          "created_at": "2025-04-09T23:41:25Z",
           "description": "The measured Bosch Smart Home Controller had the following devices connected: four Bosch Smart Home Radiator Thermostat II (TRV_GEN2), two Bosch Smart Home Radiator Thermostat I (TRV), and two Bosch Smart Home Door/Window Contact II (SWD2).During the 120-second measurement period, the temperature was adjusted both directly on the device itself and via the Smart Home Controller on one TRV thermostat and on one TRV_GEN2 thermostat. In addition, both window sensors were triggered twice each by opening and closing the windows.",
           "device_type": "generic_iot",
           "discovery_by": "device",
@@ -1728,10 +1728,10 @@
           },
           "id": "Smart Home Controller 1 Gen",
           "manufacturer": "bosch",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 1.78,
           "sub_profile_count": 0,
-          "hash": "fa095e2b60f79ad8161b09aa7d8eb714"
+          "hash": "d122ad7c6984514c9d9804b056e0b4b7"
         }
       ],
       "device_types": [
@@ -2196,10 +2196,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "6dc3690f8a3008d64f9532292562ba8f"
+          "hash": "093a10a8ca4d44b9fe81dccd4c7ad99d"
         }
       ],
       "device_types": [
@@ -4375,7 +4375,7 @@
         {
           "author": "olivr2s <olivr2s@users.noreply.github.com>",
           "calculation_strategy": "linear",
-          "created_at": "2025-08-14T10:10:08+02:00",
+          "created_at": "2025-08-14T08:10:08Z",
           "device_type": "fan",
           "measure_device": "Meross mss310",
           "measure_method": "manual",
@@ -4388,10 +4388,10 @@
           },
           "id": "Mi Smart Standing Fan 2",
           "manufacturer": "xiaomi",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 34.0,
           "sub_profile_count": 0,
-          "hash": "a4f74923d862271511ea2a9a33ea9795"
+          "hash": "f293f6c83c98aa153676bcc4b64bfb99"
         }
       ],
       "device_types": [
@@ -7371,10 +7371,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "95a7bbf61c9a3ef1a371fb053e9f73e5"
+          "hash": "c34caadbf951200d0de868c446a98aa8"
         },
         {
           "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
@@ -7616,10 +7616,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "758f8e15877c02a17d1cddd1b33c3eeb"
+          "hash": "51d5604db5bcc0cfe27d387cb02d4279"
         },
         {
           "aliases": [
@@ -7763,10 +7763,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "2ae12e0d5a18a515556c27f9e9778cd7"
+          "hash": "1ff6a702a7a874b460c91d8928583ee4"
         },
         {
           "aliases": [
@@ -7904,10 +7904,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "effect"
+            "effect",
+            "brightness"
           ],
-          "hash": "3377ec8d3229ca92e74192be0c086001"
+          "hash": "6f2e1bc6071fea8f39976d7446c00abc"
         },
         {
           "aliases": [
@@ -9218,10 +9218,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "36c33360d2d09b944d362960140acda7"
+          "hash": "a12e0dc5b993953d8ea52016dac393b1"
         },
         {
           "aliases": [
@@ -9819,10 +9819,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "464fd382058d7e9be65a1ea0e60fbf80"
+          "hash": "9340a4f180443bbb316ddbb5690b7ba3"
         },
         {
           "aliases": [],
@@ -10048,10 +10048,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "823658863038110c6a9fa3eb67c2e657"
+          "hash": "bf84bd664c38e25ebb9190f427ea7030"
         },
         {
           "aliases": [
@@ -11381,10 +11381,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "hsv"
+            "hsv",
+            "color_temp"
           ],
-          "hash": "588f2b004db57a238645d53eb907732d"
+          "hash": "9d1982351c156dc4410c730b85fd510e"
         },
         {
           "aliases": [
@@ -12138,10 +12138,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "8036aa7ef0ea31f5439fa76159fb938c"
+          "hash": "afbbde565fb290d3032408e1589bdcbb"
         },
         {
           "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>",
@@ -12778,7 +12778,7 @@
         {
           "author": "miggi92 <miggi92@users.noreply.github.com>",
           "calculation_strategy": "linear",
-          "created_at": "2025-07-14T10:15:08+02:00",
+          "created_at": "2025-07-14T08:15:08Z",
           "device_type": "fan",
           "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
           "measure_method": "manual",
@@ -12790,15 +12790,15 @@
           },
           "id": "DR-HTF001S",
           "manufacturer": "dreo",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 46.82,
           "sub_profile_count": 0,
-          "hash": "05f75aced9363ccd256773bacb12033d"
+          "hash": "a2f767927a0fd5e0e058851f09892453"
         },
         {
           "author": "miggi92 <miggi92@users.noreply.github.com>",
           "calculation_strategy": "linear",
-          "created_at": "2025-07-14T09:52:08+02:00",
+          "created_at": "2025-07-14T07:52:08Z",
           "device_type": "fan",
           "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
           "measure_method": "manual",
@@ -12810,15 +12810,15 @@
           },
           "id": "DR-HAF001S",
           "manufacturer": "dreo",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 39.62,
           "sub_profile_count": 0,
-          "hash": "f1a575122ef57c443fbd6cb4bfc7b341"
+          "hash": "8957ab96238ed14933f43f82b79b7f5c"
         },
         {
           "author": "miggi92 <miggi92@users.noreply.github.com>",
           "calculation_strategy": "linear",
-          "created_at": "2025-07-14T10:10:08+02:00",
+          "created_at": "2025-07-14T08:10:08Z",
           "device_type": "fan",
           "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
           "measure_method": "manual",
@@ -12830,10 +12830,10 @@
           },
           "id": "DR-HTF002S",
           "manufacturer": "dreo",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 39.62,
           "sub_profile_count": 0,
-          "hash": "f852032aeb155e753740fdb68aaa6cd4"
+          "hash": "cc698cddb700e456ed2a2125dfc122b3"
         }
       ],
       "device_types": [
@@ -12976,10 +12976,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "caf8dfd4b1c3b1fe7249fe105af3229a"
+          "hash": "601aa03751c813e5be58a4bb7f7e6dc4"
         },
         {
           "aliases": [
@@ -13058,10 +13058,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "1e47e11c48244e5b0ba6b285c30fe2f1"
+          "hash": "d052fc6af6651711424ee95027cd5ed0"
         },
         {
           "calculation_strategy": "lut",
@@ -14661,7 +14661,7 @@
           ],
           "author": "Michal Bartak <maxym.srpl@gmail.com>",
           "calculation_strategy": "fixed",
-          "created_at": "2025-11-29T10:48:00+01:00",
+          "created_at": "2025-11-29T09:48:00Z",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_device_firmware": "20250520-083712/1.6.2-gc8a76e2",
@@ -14679,10 +14679,10 @@
           },
           "id": "Shelly 1PM Mini Gen4",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 0,
           "sub_profile_count": 4,
-          "hash": "792cab49adc63cb9f38ef9f8437703b6"
+          "hash": "4d66c87c59cd10ac22ed9440df4c3853"
         },
         {
           "measure_method": "manual",
@@ -14700,7 +14700,7 @@
           "device_type": "smart_switch",
           "calculation_strategy": "fixed",
           "only_self_usage": false,
-          "created_at": "2026-01-15T11:15:00+01:00",
+          "created_at": "2026-01-15T10:15:00Z",
           "author": "Michal Bartak <maxym.srpl@gmail.com>",
           "author_info": {
             "name": "Michal Bartak",
@@ -14709,10 +14709,10 @@
           },
           "id": "Shelly 1 Gen3",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 0,
           "sub_profile_count": 16,
-          "hash": "8371bff172a294d034f8f4cf51aa26ab"
+          "hash": "eb23070d2a1616b4fa10865adfef8f51"
         },
         {
           "aliases": [
@@ -14720,7 +14720,7 @@
           ],
           "author": "Michal Bartak <maxym.srpl@gmail.com>",
           "calculation_strategy": "fixed",
-          "created_at": "2024-01-06T22:34:00+01:00",
+          "created_at": "2024-01-06T21:34:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
           "measure_device": "Shelly PM Mini Gen3",
@@ -14741,10 +14741,10 @@
           },
           "id": "Shelly EM",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 0.923,
           "sub_profile_count": 0,
-          "hash": "c30ad2004ca5030eda05efffb6497f0f"
+          "hash": "87a6cdc0830cf24c4145d44fa60a86d4"
         },
         {
           "aliases": [
@@ -14809,7 +14809,7 @@
           ],
           "author": "Michal Bartak <maxym.srpl@gmail.com>",
           "calculation_strategy": "multi_switch",
-          "created_at": "2024-01-02T23:39:00+01:00",
+          "created_at": "2024-01-02T22:39:00Z",
           "device_type": "smart_switch",
           "discovery_by": "device",
           "measure_device": "Shelly PM Mini Gen3",
@@ -14832,10 +14832,10 @@
           },
           "id": "Shelly 2.5",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "4a22154bc0705be184775ffef8d9c5a3"
+          "hash": "c5f8d090981d9ae8c9d978d4ecc48ee9"
         },
         {
           "aliases": [
@@ -14871,7 +14871,7 @@
           ],
           "author": "Michal Bartak <maxym.srpl@gmail.com>",
           "calculation_strategy": "fixed",
-          "created_at": "2024-01-03T20:07:00+01:00",
+          "created_at": "2024-01-03T19:07:00Z",
           "device_type": "power_meter",
           "discovery_by": "device",
           "measure_device": "Shelly PM Mini Gen3",
@@ -14890,10 +14890,10 @@
           },
           "id": "Shelly Pro 3EM 3CT63",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 0,
           "sub_profile_count": 6,
-          "hash": "397c58792e31d268540f86030fd6da44"
+          "hash": "7c86a30b34cd7ea61935588f7ecc0c0f"
         },
         {
           "aliases": [
@@ -14979,7 +14979,7 @@
           ],
           "author": "Michal Bartak <maxym.srpl@gmail.com>",
           "calculation_strategy": "fixed",
-          "created_at": "2024-01-05T13:55:00+01:00",
+          "created_at": "2024-01-05T12:55:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
           "measure_device": "Shelly PM Mini Gen3",
@@ -15000,10 +15000,10 @@
           },
           "id": "Shelly 1",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 0.618,
           "sub_profile_count": 0,
-          "hash": "07ec3d8335021a3f90b2d4aa925f9514"
+          "hash": "bdd03dd2d6c9d5a495eae300db839a03"
         },
         {
           "aliases": [
@@ -15011,7 +15011,7 @@
           ],
           "author": "Victor Burlacu-Zane",
           "calculation_strategy": "fixed",
-          "created_at": "2026-01-05T20:06:00+01:00",
+          "created_at": "2026-01-05T19:06:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
           "measure_device": "Shelly Plug S Gen3",
@@ -15029,10 +15029,10 @@
           },
           "id": "Shelly 1L Gen3",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 0,
           "sub_profile_count": 5,
-          "hash": "265a894786b6861f06a394f43cc64d46"
+          "hash": "0276ebdd0e9b61a9985636bfdf274235"
         },
         {
           "aliases": [
@@ -15040,7 +15040,7 @@
           ],
           "author": "Michal Bartak <maxym.srpl@gmail.com>",
           "calculation_strategy": "lut",
-          "created_at": "2025-01-20T23:38:52+01:00",
+          "created_at": "2025-01-20T22:38:52Z",
           "device_type": "light",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
@@ -15058,14 +15058,14 @@
           },
           "id": "Shelly Bulb RGBW",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 4.9,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "0b48194e2db33cb1ebf658847909af3f"
+          "hash": "90a75f998b06bd069a8e46f297e0bddb"
         },
         {
           "aliases": [
@@ -15101,7 +15101,7 @@
           ],
           "author": "Michal Bartak <maxym.srpl@gmail.com>",
           "calculation_strategy": "fixed",
-          "created_at": "2024-01-09T22:22:00+01:00",
+          "created_at": "2024-01-09T21:22:00Z",
           "device_type": "smart_dimmer",
           "discovery_by": "entity",
           "measure_device": "Shelly PM Mini Gen3",
@@ -15121,10 +15121,10 @@
           },
           "id": "Shelly Dimmer",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 0,
           "sub_profile_count": 0,
-          "hash": "9f930e706cf0fd6cc82357fc801c0451"
+          "hash": "8f6369cb369129ff44875cb8d94c06e8"
         },
         {
           "aliases": [
@@ -15132,7 +15132,7 @@
           ],
           "author": "CV",
           "calculation_strategy": "fixed",
-          "created_at": "2024-01-09T20:21:00+01:00",
+          "created_at": "2024-01-09T19:21:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
           "measure_device": "Shelly PM Mini Gen3",
@@ -15150,10 +15150,10 @@
           },
           "id": "Shelly Plus 1PM",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 0,
           "sub_profile_count": 3,
-          "hash": "b86fb830abf8cff6178f5c6d883de953"
+          "hash": "7625542c09b2051c46b058591e0d7d0f"
         },
         {
           "aliases": [
@@ -15161,7 +15161,7 @@
           ],
           "author": "Michal Bartak <maxym.srpl@gmail.com>",
           "calculation_strategy": "fixed",
-          "created_at": "2024-01-09T20:21:00+01:00",
+          "created_at": "2024-01-09T19:21:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
           "measure_device": "Shelly PM Mini Gen3",
@@ -15182,10 +15182,10 @@
           },
           "id": "Shelly 1PM",
           "manufacturer": "shelly",
-          "updated_at": "2026-01-24T15:57:02",
+          "updated_at": "2026-06-27T18:12:38",
           "max_power": 0.85,
           "sub_profile_count": 0,
-          "hash": "1b0d77796d584365588e7977f930c3b6"
+          "hash": "9c1cc38a65360e4eb33e59c6a21eab73"
         }
       ],
       "device_types": [
@@ -18136,10 +18136,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "a28d2fb500e7b8129553eb92959ad787"
+          "hash": "2a0902ba71dad533840978d9ac24e2ca"
         },
         {
           "author": "dsolva <diego_10sv@hotmail.com>",
@@ -18992,10 +18992,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "db0831d14b70b40bd36fea4b21d78f74"
+          "hash": "953b3637b3a77c46dc7513ada8de63cd"
         },
         {
           "author": "Udo Ha\u00df <udo.hass@proton.me>",
@@ -19023,10 +19023,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "9ee9d851f62f1483b14ca39f34cefe45"
+          "hash": "ca835c2c050c377470043f69d75e0e45"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -19083,10 +19083,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "e428a7720168f9b3f09af8f1cf3e83e9"
+          "hash": "122422e9e192228b497e67739887f350"
         },
         {
           "author": "gobbli",
@@ -19113,10 +19113,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "e51ce873f4958f34050c38778bb55322"
+          "hash": "fc32a8e4378dd50d1ba5f7b508e89fb3"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -19203,10 +19203,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "b8ba79c307b90439d3849a26bc5a829e"
+          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
         },
         {
           "calculation_strategy": "lut",
@@ -19234,10 +19234,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "d83e25738b3ed996675dabf9b112c0be"
+          "hash": "2ea3e415936623fe485ee433c5d5a8e3"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",
@@ -21710,12 +21710,17 @@
           "measure_method": "manual",
           "name": "Core 200S Series Air Purifier",
           "standby_power": 0.6,
+          "author_info": {
+            "name": "SH1FT-W",
+            "github": "SH1FT-W",
+            "email": "danielvizzino@outlook.com"
+          },
           "id": "Core200S",
           "manufacturer": "vesync",
-          "updated_at": "2026-06-26T21:22:00",
+          "updated_at": "2026-06-26T21:22:29",
           "max_power": 39,
           "sub_profile_count": 0,
-          "hash": "cb8482fa32af3ef7f7613609c50d0a4e"
+          "hash": "1427b3b0e8da11ccf44e9b49ed78fd11"
         },
         {
           "author": "SH1FT-W",
@@ -21726,12 +21731,17 @@
           "measure_method": "manual",
           "name": "Core 300S Series Air Purifier",
           "standby_power": 0.5,
+          "author_info": {
+            "name": "SH1FT-W",
+            "github": "SH1FT-W",
+            "email": "danielvizzino@outlook.com"
+          },
           "id": "Core300S",
           "manufacturer": "vesync",
-          "updated_at": "2026-06-26T21:22:00",
+          "updated_at": "2026-06-26T21:22:29",
           "max_power": 37,
           "sub_profile_count": 0,
-          "hash": "8bd60da070a8d0a1b1d2e4137d94d3c5"
+          "hash": "d24f8a5e7d03d5229190c079772bff04"
         }
       ],
       "device_types": [
