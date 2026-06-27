@@ -26,6 +26,8 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
       - name: Checkout comment action
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Upload the plots to Imgur
         uses: devicons/public-upload-to-imgur@v2
         id: imgur_step

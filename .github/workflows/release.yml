@@ -14,23 +14,23 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Get version
         id: version
         uses: home-assistant/actions/helpers/version@master
       - name: "Set manifest version number"
         run: |
-          python3 ${{ github.workspace }}/.github/scripts/update_hacs_manifest.py --version ${{ github.ref_name }}
+          python3 ${{ github.workspace }}/.github/scripts/update_hacs_manifest.py --version ${GITHUB_REF_NAME}
       - name: Set measure tool version number
-        run: 'echo ${{ steps.version.outputs.version }} > utils/measure/.VERSION'
+        run: 'echo ${STEPS_VERSION_OUTPUTS_VERSION} > utils/measure/.VERSION'
+        env:
+          STEPS_VERSION_OUTPUTS_VERSION: ${{ steps.version.outputs.version }}
       - name: Create zip
         run: |
           cd custom_components/powercalc
           zip powercalc.zip -r ./
       - name: Upload zip to release
-        uses: svenstaro/upload-release-action@v1-release
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./custom_components/powercalc/powercalc.zip
-          asset_name: powercalc.zip
-          tag: ${{ github.ref }}
-          overwrite: true
+        run: gh release upload "${GITHUB_REF_NAME}" ./custom_components/powercalc/powercalc.zip#powercalc.zip --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

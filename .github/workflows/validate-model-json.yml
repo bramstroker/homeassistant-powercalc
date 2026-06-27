@@ -21,11 +21,13 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           path: base
+          persist-credentials: false
       - name: Checkout PR files
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           path: pr
+          persist-credentials: false
       - uses: actions/setup-python@v6
         with:
           python-version: "3.x"

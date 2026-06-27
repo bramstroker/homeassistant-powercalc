@@ -17,6 +17,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v8.2.0
         with:
           working-directory: './utils/visualize'
@@ -33,12 +34,14 @@ jobs:
       - name: Run visualization tool
         run: |
           cd ./utils/visualize
-          for file in ${{ steps.list-files.outputs.changedFiles }}; do
+          for file in ${STEPS_LIST_FILES_OUTPUTS_CHANGEDFILES}; do
             echo "Generating plot for - ${file}."
             if [ -f "${{ github.workspace }}/${file}" ]; then
               uv run python plot.py "${{ github.workspace }}/${file}" --output=auto
             fi
           done
+        env:
+          STEPS_LIST_FILES_OUTPUTS_CHANGEDFILES: ${{ steps.list-files.outputs.changedFiles }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:

@@ -26,6 +26,8 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
       - name: Checkout comment action
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Read validation result
         id: validation-result
         run: |

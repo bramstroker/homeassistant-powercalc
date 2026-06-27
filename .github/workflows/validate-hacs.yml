@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: validation
         uses: home-assistant/actions/hassfest@master
 
@@ -25,6 +27,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: validation
         uses: "hacs/action@main"
         with:
