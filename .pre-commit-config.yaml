@@ -44,6 +44,30 @@ repos:
         types: [python]
         require_serial: true
         files: ^custom_components/powercalc
+      - id: ty
+        name: ty
+        entry: uv run ty check custom_components/powercalc
+        language: system
+        pass_filenames: false
+        files: ^custom_components/powercalc/.*\.py$
+      - id: uv-lock
+        name: uv lock --check
+        entry: uv lock --check
+        language: system
+        pass_filenames: false
+        files: ^(pyproject\.toml|uv\.lock)$
+      - id: uv-lock-measure
+        name: uv lock --check (utils/measure)
+        entry: uv --directory utils/measure lock --check
+        language: system
+        pass_filenames: false
+        files: ^utils/measure/(pyproject\.toml|uv\.lock)$
+      - id: uv-lock-visualize
+        name: uv lock --check (utils/visualize)
+        entry: uv --directory utils/visualize lock --check
+        language: system
+        pass_filenames: false
+        files: ^utils/visualize/(pyproject\.toml|uv\.lock)$
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
@@ -55,6 +79,14 @@ repos:
     hooks:
       - id: check-github-workflows
         args: [ "--verbose" ]
+      - id: check-jsonschema
+        name: validate power profile model.json
+        args: [--schemafile, profile_library/model_schema.json]
+        files: ^profile_library/[^/]+/[^/]+/model\.json$
+      - id: check-jsonschema
+        name: validate power profile manufacturer.json
+        args: [ --schemafile, profile_library/manufacturer_schema.json ]
+        files: ^profile_library/[^/]+/manufacturer\.json$
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.10
@@ -66,3 +98,9 @@ repos:
     hooks:
       - id: zizmor
         args: [--no-progress, --fix]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        files: \.sh$
