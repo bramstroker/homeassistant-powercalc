@@ -84,6 +84,10 @@ repos:
         name: validate power profile model.json
         args: [--schemafile, profile_library/model_schema.json]
         files: ^profile_library/[^/]+/[^/]+/model\.json$
+      - id: check-jsonschema
+        name: validate power profile manufacturer.json
+        args: [ --schemafile, profile_library/manufacturer_schema.json ]
+        files: ^profile_library/[^/]+/manufacturer\.json$
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.10
