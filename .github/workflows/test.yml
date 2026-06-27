@@ -19,10 +19,10 @@ jobs:
     name: Run tests
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v8.2.0
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
       - name: Install dependencies
         run: uv sync --group dev
       - name: Prepare test env
@@ -40,7 +40,7 @@ jobs:
             tests
           uv run coverage lcov
       - name: Upload Coverage Results
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
         with:
           github-token: ${{ secrets.github_token }}
           path-to-lcov: coverage.lcov

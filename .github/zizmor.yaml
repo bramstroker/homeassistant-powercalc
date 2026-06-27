@@ -5,7 +5,3 @@ rules:
       # read-only, then perform privileged PR commenting from trusted workflow code.
       - pr-comment-upload-and-comment.yml
       - validate-model-json-comment.yml
-  unpinned-uses:
-    config:
-      policies:
-        "*": ref-pin
