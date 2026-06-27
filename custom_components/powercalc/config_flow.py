@@ -273,7 +273,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             return user_input
 
         validated_input = form_step.validate_user_input(user_input)
-        return await validated_input if isawaitable(validated_input) else validated_input
+        return await validated_input if isawaitable(validated_input) else validated_input  # ty: ignore[invalid-return-type]
 
     def _store_form_step_input(
         self,

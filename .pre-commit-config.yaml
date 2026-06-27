@@ -49,7 +49,6 @@ repos:
         entry: uv run ty check custom_components/powercalc
         language: system
         pass_filenames: false
-        stages: [ manual ]
         files: ^custom_components/powercalc/.*\.py$
       - id: uv-lock
         name: uv lock --check
