@@ -27,7 +27,7 @@ jobs:
         uses: home-assistant/actions/helpers/version@f4ca6f671bd429efb108c0f2fa0ae8af0215986c # master
       - if: github.event.action == 'published'
         name: Write version file
-        run: 'echo ${STEPS_VERSION_OUTPUTS_VERSION}:docker > utils/measure/.VERSION'
+        run: 'echo "${STEPS_VERSION_OUTPUTS_VERSION}:docker" > utils/measure/.VERSION'
         env:
           STEPS_VERSION_OUTPUTS_VERSION: ${{ steps.version.outputs.version }}
       - name: Docker meta
