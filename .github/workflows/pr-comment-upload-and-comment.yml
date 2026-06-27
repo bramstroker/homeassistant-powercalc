@@ -48,7 +48,6 @@ jobs:
       - name: Post Comment on PR
         uses: ./.github/actions/upsert-pr-comment
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           pr-number: ${{ github.event.workflow_run.pull_requests[0].number }}
           body: ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
           match-text: Thank you for submitting

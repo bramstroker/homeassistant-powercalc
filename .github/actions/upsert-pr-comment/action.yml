@@ -2,9 +2,6 @@ name: Upsert PR comment
 description: Create, update, or delete a bot-authored pull request comment matched by body text.
 
 inputs:
-  github-token:
-    description: GitHub token used to manage the PR comment.
-    required: true
   pr-number:
     description: Pull request number.
     required: true
@@ -36,7 +33,7 @@ runs:
         COMMENT_PR_NUMBER: ${{ inputs.pr-number }}
         COMMENT_STATE: ${{ inputs.state }}
       with:
-        github-token: ${{ inputs.github-token }}
+        github-token: ${{ github.token }}
         script: |
           const fs = require('fs');
           const prNumber = Number(process.env.COMMENT_PR_NUMBER);

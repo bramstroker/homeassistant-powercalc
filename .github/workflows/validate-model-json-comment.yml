@@ -34,7 +34,6 @@ jobs:
         if: steps.validation-result.outputs.status != 'success'
         uses: ./.github/actions/upsert-pr-comment
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           pr-number: ${{ github.event.workflow_run.pull_requests[0].number }}
           body-file: artifacts/model_json_validation_report.md
           match-text: |
@@ -44,7 +43,6 @@ jobs:
         if: steps.validation-result.outputs.status == 'success'
         uses: ./.github/actions/upsert-pr-comment
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           pr-number: ${{ github.event.workflow_run.pull_requests[0].number }}
           state: absent
           match-text: |
