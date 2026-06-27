@@ -10,7 +10,7 @@ from functools import partial
 import gzip
 import logging
 import os
-from typing import Any, TextIO, TypeVar, cast
+from typing import Any, TextIO, cast
 
 from homeassistant.components import light
 from homeassistant.components.light import (
@@ -412,10 +412,11 @@ class LutStrategy(PowerCalculationStrategyInterface):
         sat_values = self.get_nearest(hs_table, light_setting.hue or 0)
         return self.get_nearest(sat_values, light_setting.saturation or 0)
 
-    # Generic nearest lookup for both float values and nested saturation dicts
-    _NearestT = TypeVar("_NearestT", float, dict[int, float])
-
-    def get_nearest(self, lookup_dict: dict[int, _NearestT], search_key: int) -> _NearestT:
+    def get_nearest[NearestT: (float, dict[int, float])](
+        self,
+        lookup_dict: dict[int, NearestT],
+        search_key: int,
+    ) -> NearestT:
         """Return the value mapped at search_key or the nearest neighbour key."""
         value = lookup_dict.get(search_key)
         if value is not None:

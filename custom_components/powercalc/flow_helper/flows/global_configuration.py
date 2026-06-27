@@ -38,6 +38,7 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_UPDATE_INTERVAL,
     DEFAULT_GROUP_ENERGY_UPDATE_INTERVAL,
     DEFAULT_GROUP_POWER_UPDATE_INTERVAL,
+    DOCS_URI,
     DOMAIN,
     DOMAIN_CONFIG,
     ENTITY_CATEGORIES,
@@ -237,7 +238,7 @@ class GlobalConfigurationFlow:
                 schema=SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR,
                 form_kwarg={
                     "description_placeholders": {
-                        "docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/",
+                        "docs_uri": DOCS_URI,
                     },
                 },
             ),
@@ -267,7 +268,7 @@ class GlobalConfigurationFlow:
                 schema=SCHEMA_UTILITY_METER_OPTIONS,
                 form_kwarg={
                     "description_placeholders": {
-                        "docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/",
+                        "docs_uri": DOCS_URI,
                     },
                 },
             ),
@@ -295,7 +296,7 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
                 schema=SCHEMA_GLOBAL_CONFIGURATION,
                 form_kwarg={
                     "description_placeholders": {
-                        "docs_uri": "https://docs.powercalc.nl/configuration/global-configuration/",
+                        "docs_uri": DOCS_URI,
                     },
                 },
             ),

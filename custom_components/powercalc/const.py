@@ -262,6 +262,8 @@ OFF_STATES_BY_DOMAIN: dict[str, set[str]] = {
     device_tracker.DOMAIN: {STATE_NOT_HOME},
 }
 
+DOCS_URI = "https://docs.powercalc.nl/configuration/global-configuration/"
+
 
 class CalculationStrategy(StrEnum):
     """Possible virtual power calculation strategies."""

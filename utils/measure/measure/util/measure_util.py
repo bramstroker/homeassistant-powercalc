@@ -48,6 +48,15 @@ class AverageMeasurementSnapshot:
     average: float
 
 
+@dataclass
+class AverageMeasurementState:
+    start_time: float
+    readings: list[float]
+    snapshots: list[AverageMeasurementSnapshot]
+    voltages: list[float]
+    consecutive_errors: int = 0
+
+
 class MeasureUtil:
     def __init__(
         self,
@@ -96,13 +105,30 @@ class MeasureUtil:
             - Ignores single measurements of <= 0 W.
         """
         _LOGGER.info("Measuring average %s over %s seconds", "resistance" if measure_resistance else "power", duration)
-        start_time = time.time()
-        readings: list[float] = []
-        snapshots: list[AverageMeasurementSnapshot] = []
-        voltages: list[float] = []
+        state = self._collect_average_measurements(duration, measure_resistance, convergence)
 
+        if not state.readings:
+            _LOGGER.error("No valid readings were recorded.")
+            exit(1)
+
+        average = round(mean(state.readings), 2)
+        _LOGGER.info(
+            "Average of %d measurements: %.2f %s",
+            len(state.readings),
+            average,
+            "Ω" if measure_resistance else "W",
+        )
+        return MeasurementResult(power=average, voltages=state.voltages)
+
+    def _collect_average_measurements(
+        self,
+        duration: int,
+        measure_resistance: bool,
+        convergence: AverageMeasurementConvergence | None,
+    ) -> AverageMeasurementState:
+        start_time = time.time()
+        state = AverageMeasurementState(start_time, [], [], [])
         first_measurement = True
-        consecutive_errors = 0
 
         while (time.time() - start_time) < duration:
             if not first_measurement and not self._sleep_before_next_average_reading(start_time, duration):
@@ -112,34 +138,39 @@ class MeasureUtil:
             try:
                 result = self._take_average_measurement_reading(measure_resistance)
             except PowerMeterError as error:
-                consecutive_errors += 1
-                _LOGGER.warning(
-                    "Error during average measurement (attempt %d/%d): %s",
-                    consecutive_errors,
-                    self.config.max_retries,
-                    error,
-                )
-                if consecutive_errors > self.config.max_retries:
+                if self._average_measurement_retry_limit_reached(state, error):
                     raise
                 continue
 
-            if result is None:
-                continue
-
-            consecutive_errors = 0
-            readings.append(result.power)
-            voltages.extend(result.voltages)
-            self._append_average_snapshot(start_time, readings, snapshots)
-            if convergence and self.average_has_converged(snapshots, convergence):
+            if self._record_average_measurement_result(state, result, convergence):
                 break
 
-        if not readings:
-            _LOGGER.error("No valid readings were recorded.")
-            exit(1)
+        return state
 
-        average = round(mean(readings), 2)
-        _LOGGER.info("Average of %d measurements: %.2f %s", len(readings), average, "Ω" if measure_resistance else "W")
-        return MeasurementResult(power=average, voltages=voltages)
+    def _average_measurement_retry_limit_reached(self, state: AverageMeasurementState, error: PowerMeterError) -> bool:
+        state.consecutive_errors += 1
+        _LOGGER.warning(
+            "Error during average measurement (attempt %d/%d): %s",
+            state.consecutive_errors,
+            self.config.max_retries,
+            error,
+        )
+        return state.consecutive_errors > self.config.max_retries
+
+    def _record_average_measurement_result(
+        self,
+        state: AverageMeasurementState,
+        result: MeasurementResult | None,
+        convergence: AverageMeasurementConvergence | None,
+    ) -> bool:
+        if result is None:
+            return False
+
+        state.consecutive_errors = 0
+        state.readings.append(result.power)
+        state.voltages.extend(result.voltages)
+        self._append_average_snapshot(state.start_time, state.readings, state.snapshots)
+        return bool(convergence and self.average_has_converged(state.snapshots, convergence))
 
     @staticmethod
     def _append_average_snapshot(

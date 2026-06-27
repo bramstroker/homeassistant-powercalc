@@ -246,32 +246,56 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         user_input: dict[str, Any] | None = None,
     ) -> ConfigFlowResult:
         """Handle the current step."""
-        if user_input is not None:
-            if form_step.validate_user_input is not None:
-                try:
-                    validated_input = form_step.validate_user_input(user_input)
-                    user_input = await validated_input if isawaitable(validated_input) else validated_input
-                except SchemaFlowError as exc:
-                    return await self._show_form(form_step, exc)
+        if user_input is None:
+            return await self._show_form(form_step)
 
-            if CONF_NAME in user_input:
-                self.name = user_input[CONF_NAME]
-            self.sensor_config.update(user_input)
+        try:
+            user_input = await self._validate_form_step_input(form_step, user_input)
+        except SchemaFlowError as exc:
+            return await self._show_form(form_step, exc)
 
-            self.handled_steps.append(form_step.step)
-            next_step = form_step.next_step
-            if callable(form_step.next_step):
-                resolved_next_step = form_step.next_step(user_input)
-                next_step = await resolved_next_step if isawaitable(resolved_next_step) else resolved_next_step
-            if not next_step:
-                return await self.handle_final_steps(
-                    skip_advanced=not form_step.continue_advanced_step,
-                    skip_utility_meter_options=not form_step.continue_utility_meter_options_step,
-                )
+        self._store_form_step_input(form_step, user_input)
+        next_step = await self._resolve_next_step(form_step, user_input)
+        if next_step is None:
+            return await self.handle_final_steps(
+                skip_advanced=not form_step.continue_advanced_step,
+                skip_utility_meter_options=not form_step.continue_utility_meter_options_step,
+            )
 
-            return await getattr(self, f"async_step_{next_step}")()  # type: ignore[no-any-return]
+        return await getattr(self, f"async_step_{next_step}")()  # type: ignore[no-any-return]
 
-        return await self._show_form(form_step)
+    @staticmethod
+    async def _validate_form_step_input(
+        form_step: PowercalcFormStep,
+        user_input: dict[str, Any],
+    ) -> dict[str, Any]:
+        if form_step.validate_user_input is None:
+            return user_input
+
+        validated_input = form_step.validate_user_input(user_input)
+        return await validated_input if isawaitable(validated_input) else validated_input
+
+    def _store_form_step_input(
+        self,
+        form_step: PowercalcFormStep,
+        user_input: dict[str, Any],
+    ) -> None:
+        if CONF_NAME in user_input:
+            self.name = user_input[CONF_NAME]
+
+        self.sensor_config.update(user_input)
+        self.handled_steps.append(form_step.step)
+
+    @staticmethod
+    async def _resolve_next_step(
+        form_step: PowercalcFormStep,
+        user_input: dict[str, Any],
+    ) -> Step | None:
+        if not callable(form_step.next_step):
+            return form_step.next_step
+
+        next_step = form_step.next_step(user_input)
+        return await next_step if isawaitable(next_step) else next_step
 
     async def handle_final_steps(
         self,

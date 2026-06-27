@@ -401,7 +401,6 @@ class DiscoveryManager:
             if flow["context"]["source"] != SOURCE_INTEGRATION_DISCOVERY:
                 continue  # pragma: no cover
             self.hass.config_entries.flow.async_abort(flow["flow_id"])
-        return
 
     async def extract_model_info_from_device_info(
         self,

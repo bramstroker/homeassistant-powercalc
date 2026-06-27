@@ -106,21 +106,39 @@ def get_wrapped_entity_name(
     device_entry: dr.DeviceEntry | None,
 ) -> str:
     """Construct entity name based on the wrapped entity"""
-    if entity_entry:
-        if entity_entry.name:
-            return entity_entry.name
-        if entity_entry.has_entity_name and device_entry:
-            device_name = device_entry.name_by_user or device_entry.name
-            if device_name:
-                return f"{device_name} {entity_entry.original_name}" if entity_entry.original_name else device_name
+    if entity_entry is None:
+        return _get_state_name(hass, entity_id) or object_id
 
-        return entity_entry.original_name or object_id
+    if entity_entry.name:
+        return entity_entry.name
 
+    device_entity_name = _get_device_entity_name(entity_entry, device_entry)
+    if device_entity_name:
+        return device_entity_name
+
+    return entity_entry.original_name or object_id
+
+
+def _get_device_entity_name(
+    entity_entry: er.RegistryEntry,
+    device_entry: dr.DeviceEntry | None,
+) -> str | None:
+    if not entity_entry.has_entity_name or device_entry is None:
+        return None
+
+    device_name = device_entry.name_by_user or device_entry.name
+    if not device_name:
+        return None
+
+    if entity_entry.original_name:
+        return f"{device_name} {entity_entry.original_name}"
+
+    return device_name
+
+
+def _get_state_name(hass: HomeAssistant, entity_id: str) -> str | None:
     entity_state = hass.states.get(entity_id)
-    if entity_state:
-        return str(entity_state.name)
-
-    return object_id
+    return str(entity_state.name) if entity_state else None
 
 
 def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
