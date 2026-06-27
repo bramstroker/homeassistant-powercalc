@@ -49,6 +49,7 @@ jobs:
         with:
           add: 'profile_library'
           message: 'Update profile library'
+          push: 'origin HEAD:master --force'
       - name: Wait 5 seconds
         run: sleep 5
       - name: Purge cloudflare cache
