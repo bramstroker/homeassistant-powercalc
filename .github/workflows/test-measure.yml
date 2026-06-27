@@ -33,3 +33,14 @@ jobs:
             -o console_output_style=count \
             -p no:sugar \
             tests
+
+  docker:
+    runs-on: "ubuntu-latest"
+    name: Build Docker image
+    steps:
+      - name: Check out code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - name: Build Docker image
+        uses: ./.github/actions/build-measure-docker
