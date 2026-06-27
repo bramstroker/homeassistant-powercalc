@@ -6,7 +6,7 @@ authors = [
     {name = "Bram Gerritsen", email = "bgerritsen@emico.nl"}
 ]
 readme = "README.md"
-requires-python = ">=3.13.0,<3.14"
+requires-python = ">=3.14,<4.0"
 dependencies = [
     "colour-science==0.4.7",
     "contourpy>=1.0",

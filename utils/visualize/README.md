@@ -4,7 +4,7 @@ This directory contains tools for visualizing power consumption data for the Pow
 
 ## Installation
 
-The visualization tools require Python 3.13 and several dependencies. We recommend using [uv](https://github.com/astral-sh/uv) for dependency management.
+The visualization tools require Python 3.14 and several dependencies. We recommend using [uv](https://github.com/astral-sh/uv) for dependency management.
 
 ### Installing with uv
 
