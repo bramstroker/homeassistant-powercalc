@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: crowdin action
+      - name: Upload to Crowdin
         uses: crowdin/github-action@v2
         with:
           upload_sources: true

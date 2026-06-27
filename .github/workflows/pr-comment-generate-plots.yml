@@ -1,9 +1,9 @@
-name: PR comment - Generate plots
+name: Generate PR plots
 
 on:
   pull_request:
     paths:
-       - '**/*.csv.gz'
+      - '**/*.csv.gz'
 
 permissions:
   contents: read
@@ -39,15 +39,8 @@ jobs:
               uv run python plot.py "${{ github.workspace }}/${file}" --output=auto
             fi
           done
-      - name: Save PR number
-        env:
-          PR_NUMBER: ${{ github.event.number }}
-        run: |
-          echo "$PR_NUMBER" > pr_number.txt
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
           name: plots
-          path: |
-            ./pr_number.txt
-            ./utils/visualize/*.png
+          path: ./utils/visualize/*.png

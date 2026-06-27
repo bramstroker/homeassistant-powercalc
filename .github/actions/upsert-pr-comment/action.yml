@@ -1,0 +1,97 @@
+name: Upsert PR comment
+description: Create, update, or delete a bot-authored pull request comment matched by body text.
+
+inputs:
+  pr-number:
+    description: Pull request number.
+    required: true
+  state:
+    description: Whether the matched comment should be present or absent.
+    required: false
+    default: present
+  body:
+    description: Comment body to create or update when state is present.
+    required: false
+    default: ""
+  body-file:
+    description: Path to a file containing the comment body. Takes precedence over body.
+    required: false
+    default: ""
+  match-text:
+    description: Newline-separated text fragments used to find an existing comment.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Manage PR comment
+      uses: actions/github-script@v9
+      env:
+        COMMENT_BODY: ${{ inputs.body }}
+        COMMENT_BODY_FILE: ${{ inputs.body-file }}
+        COMMENT_MATCH_TEXT: ${{ inputs.match-text }}
+        COMMENT_PR_NUMBER: ${{ inputs.pr-number }}
+        COMMENT_STATE: ${{ inputs.state }}
+      with:
+        github-token: ${{ github.token }}
+        script: |
+          const fs = require('fs');
+          const prNumber = Number(process.env.COMMENT_PR_NUMBER);
+          const state = process.env.COMMENT_STATE;
+          const bodyFile = process.env.COMMENT_BODY_FILE;
+          const body = bodyFile ? fs.readFileSync(bodyFile, 'utf8') : process.env.COMMENT_BODY;
+          const matchText = process.env.COMMENT_MATCH_TEXT
+            .split('\n')
+            .map(text => text.trim())
+            .filter(Boolean);
+          const repo = context.repo;
+
+          if (!Number.isInteger(prNumber) || prNumber <= 0) {
+            throw new Error(`Invalid PR number: ${process.env.COMMENT_PR_NUMBER}`);
+          }
+          if (!['present', 'absent'].includes(state)) {
+            throw new Error(`Invalid state: ${state}`);
+          }
+          if (state === 'present' && !body) {
+            throw new Error('Comment body is required when state is present');
+          }
+          if (!matchText.length) {
+            throw new Error('At least one match-text entry is required');
+          }
+
+          const comments = await github.paginate(github.rest.issues.listComments, {
+            owner: repo.owner,
+            repo: repo.repo,
+            issue_number: prNumber
+          });
+          const existingComment = comments.find(comment => {
+            return comment.user.login === 'github-actions[bot]' &&
+              matchText.some(text => comment.body.includes(text));
+          });
+
+          if (state === 'absent') {
+            if (existingComment) {
+              await github.rest.issues.deleteComment({
+                owner: repo.owner,
+                repo: repo.repo,
+                comment_id: existingComment.id
+              });
+            }
+            return;
+          }
+
+          if (existingComment) {
+            await github.rest.issues.updateComment({
+              owner: repo.owner,
+              repo: repo.repo,
+              comment_id: existingComment.id,
+              body
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: repo.owner,
+              repo: repo.repo,
+              issue_number: prNumber,
+              body
+            });
+          }
