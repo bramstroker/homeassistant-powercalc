@@ -79,7 +79,7 @@ source = ["custom_components/powercalc", "utils", "tests"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py313"
+target-version = "py314"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.lint]

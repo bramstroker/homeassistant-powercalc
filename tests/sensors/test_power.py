@@ -102,7 +102,7 @@ from tests.conftest import MockEntityWithModel
 def test_resolve_standby_power_value(
     hass: HomeAssistant,
     case: Template | Decimal | str | float | None,
-    expected_type: type[Template] | type[Decimal],
+    expected_type: type[Template | Decimal],
     expected_value: Decimal | None,
 ) -> None:
     from custom_components.powercalc.sensors.power import _resolve_standby_power_value
