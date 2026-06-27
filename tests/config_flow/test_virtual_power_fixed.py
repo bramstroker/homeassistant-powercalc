@@ -164,6 +164,41 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
     assert entry.data[CONF_IGNORE_UNAVAILABLE_STATE]
 
 
+async def test_fixed_options_flow_ignores_empty_states_power_when_power_is_set(hass: HomeAssistant) -> None:
+    """Regression for issue #4239: stale empty states_power should not drive the fixed choice."""
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.luz_exterior_foco_switch",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+            CONF_FIXED: {
+                CONF_POWER: 47.0,
+                CONF_STATES_POWER: [],
+            },
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.FIXED)
+
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert schema_keys[schema_keys.index(CONF_FIXED_VALUE)].default() == 47.0
+    assert schema_keys[schema_keys.index(CONF_FIXED_VALUE)].description == {"suggested_value": 47.0}
+    fixed_schema = convert(result["data_schema"], custom_serializer=cv.custom_serializer)[0]
+    assert next(iter(fixed_schema["selector"]["choose"]["choices"])) == CONF_POWER
+    assert fixed_schema["default"] == 47.0
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=fixed_value_choice(CONF_POWER, 50),
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_FIXED] == {CONF_POWER: 50}
+
+
 async def test_fixed_states_power_options_flow(hass: HomeAssistant) -> None:
     """
     Test that we can configure the states power option.
