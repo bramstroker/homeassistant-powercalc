@@ -26,7 +26,7 @@ jobs:
             pyproject.toml
             uv.lock
       - run: uv sync
-      - uses: j178/prek-action@bdca6f102f98e2b4c7029491a53dfd366469e33d # v2
+      - uses: j178/prek-action@e98a699c41eb69ab013a45817a0406469a748f8d # v2
         with:
           cache: true
       - uses: pre-commit-ci/lite-action@5d6cc0eb514c891a40562a58a8e71576c5c7fb43 # v1.1.0
