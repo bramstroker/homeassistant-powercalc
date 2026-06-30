@@ -11,5 +11,5 @@
     "VERSION": "v1.21.2:docker"
   },
   "name": "Govee ST19 Smart Edison Light Bulb E26",
-  "standby_power": 0
+  "standby_power": 0.5
 }
