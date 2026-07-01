@@ -47,6 +47,7 @@ jobs:
       - name: Initialize validation result
         run: |
           mkdir -p validation-result
+          echo "${{ github.event.pull_request.number }}" > validation-result/pr_number.txt
           echo "failure" > validation-result/model_json_validation_status.txt
           {
             echo "<!-- model.json validate action comment -->"
@@ -67,5 +68,6 @@ jobs:
         with:
           name: model-json-validation
           path: |
+            ./validation-result/pr_number.txt
             ./validation-result/model_json_validation_report.md
             ./validation-result/model_json_validation_status.txt
