@@ -42,8 +42,13 @@ jobs:
           done
         env:
           STEPS_LIST_FILES_OUTPUTS_CHANGEDFILES: ${{ steps.list-files.outputs.changedFiles }}
+      - name: Write PR number
+        run: |
+          echo "${{ github.event.pull_request.number }}" > ./utils/visualize/pr_number.txt
       - name: Upload Artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: plots
-          path: ./utils/visualize/*.png
+          path: |
+            ./utils/visualize/*.png
+            ./utils/visualize/pr_number.txt
