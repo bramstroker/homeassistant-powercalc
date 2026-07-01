@@ -26,6 +26,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
+        id: download-artifact
+        continue-on-error: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: plots
@@ -36,6 +38,51 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        if: github.event_name == 'workflow_dispatch' && steps.download-artifact.outcome != 'success'
+        with:
+          working-directory: './utils/visualize'
+      - name: Download PR measurement files
+        if: github.event_name == 'workflow_dispatch' && steps.download-artifact.outcome != 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PR_NUMBER: ${{ github.event.inputs.pr_number }}
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const prNumber = Number(process.env.PR_NUMBER);
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            const measurementFiles = files.filter(file => {
+              return /(brightness|color_temp|hs|effect)\.csv\.gz$/.test(file.filename);
+            });
+            if (!measurementFiles.length) {
+              throw new Error(`No measurement CSV files found for PR ${prNumber}`);
+            }
+            fs.mkdirSync('artifacts', { recursive: true });
+            for (const file of measurementFiles) {
+              const response = await fetch(file.raw_url);
+              if (!response.ok) {
+                throw new Error(`Unable to download ${file.filename}: ${response.status} ${response.statusText}`);
+              }
+              const target = path.join('manual-pr-files', file.filename);
+              fs.mkdirSync(path.dirname(target), { recursive: true });
+              fs.writeFileSync(target, Buffer.from(await response.arrayBuffer()));
+            }
+            fs.writeFileSync('manual-pr-files/changed_files.txt', measurementFiles.map(file => file.filename).join('\n'));
+      - name: Generate plots from PR files
+        if: github.event_name == 'workflow_dispatch' && steps.download-artifact.outcome != 'success'
+        run: |
+          cd ./utils/visualize
+          while IFS= read -r file; do
+            echo "Generating plot for - ${file}."
+            uv run python plot.py "${{ github.workspace }}/manual-pr-files/${file}" --output=auto
+          done < "${{ github.workspace }}/manual-pr-files/changed_files.txt"
+          cp ./*.png "${{ github.workspace }}/artifacts/"
       - name: Read PR number
         id: pr
         env:
