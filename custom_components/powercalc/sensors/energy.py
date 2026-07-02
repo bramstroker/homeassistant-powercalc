@@ -49,6 +49,7 @@ from custom_components.powercalc.filter.outlier import OutlierFilter
 
 from .abstract import (
     BaseEntity,
+    bind_entity_to_area,
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
 )
@@ -301,6 +302,11 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             max_z_score=3.5,
             max_expected_step=sensor_config.get(CONF_ENERGY_FILTER_OUTLIER_MAX, 1000),
         )
+
+    async def async_added_to_hass(self) -> None:
+        """Bind the generated energy sensor to configured registry metadata."""
+        await super().async_added_to_hass()
+        bind_entity_to_area(self.hass, self.entity_id, self._sensor_config)
 
     def _integrate_on_state_change(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Override to add outlier filtering."""

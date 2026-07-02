@@ -12,6 +12,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_AREA,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
@@ -32,16 +33,45 @@ class BaseEntity(Entity):
 
         entity_reg = er.async_get(self.hass)
         entity_entry = entity_reg.async_get(self.entity_id)
-        if entity_entry is None or not hasattr(self, "source_device_id"):
+        if entity_entry is None:
             return
 
-        device_id: str = getattr(self, "source_device_id")  # noqa: B009
-        device_reg = dr.async_get(self.hass)
-        device_entry = device_reg.async_get(device_id)
-        if not device_entry or device_entry.id == entity_entry.device_id:  # pragma: no cover
+        if hasattr(self, "source_device_id"):
+            device_id: str | None = getattr(self, "source_device_id")  # noqa: B009
+            device_reg = dr.async_get(self.hass)
+            device_entry = device_reg.async_get(device_id) if device_id else None
+            if device_entry and device_entry.id != entity_entry.device_id:
+                _LOGGER.debug("Binding %s to device %s", self.entity_id, device_id)
+                entity_reg.async_update_entity(self.entity_id, device_id=device_id)
+
+        if not hasattr(self, "_sensor_config"):
             return
-        _LOGGER.debug("Binding %s to device %s", self.entity_id, device_id)
-        entity_reg.async_update_entity(self.entity_id, device_id=device_id)
+
+        sensor_config = getattr(self, "_sensor_config")  # noqa: B009
+        bind_entity_to_area(self.hass, self.entity_id, sensor_config)
+
+
+@callback
+def bind_entity_to_area(
+    hass: HomeAssistant,
+    entity_id: str | None,
+    sensor_config: ConfigType,
+) -> None:
+    """Bind a Powercalc entity to the configured area."""
+    if entity_id is None:
+        return
+
+    area_id = sensor_config.get(CONF_AREA)
+    if not area_id:
+        return
+
+    entity_reg = er.async_get(hass)
+    entity_entry = entity_reg.async_get(entity_id)
+    if entity_entry is None or entity_entry.area_id == area_id:
+        return
+
+    _LOGGER.debug("Binding %s to area %s", entity_id, area_id)
+    entity_reg.async_update_entity(entity_id, area_id=area_id)
 
 
 def generate_power_sensor_name(
