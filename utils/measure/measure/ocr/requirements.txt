@@ -1,5 +1,5 @@
 numpy==2.5.0
-opencv-python==4.13.0.92
+opencv-python==5.0.0.93
 packaging==26.2
 Pillow==12.2.0
 pyparsing==3.3.2
