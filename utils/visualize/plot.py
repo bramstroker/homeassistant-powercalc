@@ -4,19 +4,36 @@ from __future__ import annotations
 
 import argparse
 import colorsys
+from enum import StrEnum
 import gzip
 import json
 import math
 import os
-from enum import StrEnum
 from pathlib import Path
+from typing import TextIO
 
-import colour
+from matplotlib.path import Path as MatplotlibPath
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas
 import pandas as pd
 import seaborn as sns
+
+
+def patch_matplotlib_path_deepcopy() -> None:
+    def _deepcopy_path(self: MatplotlibPath, memo: dict[int, object] | None = None) -> MatplotlibPath:
+        copied_path = MatplotlibPath(
+            self.vertices.copy(),
+            None if self.codes is None else self.codes.copy(),
+            self._interpolation_steps,
+            readonly=False,
+        )
+        if memo is not None:
+            memo[id(self)] = copied_path
+        return copied_path
+
+    MatplotlibPath.__deepcopy__ = _deepcopy_path  # type: ignore[method-assign]
+
+
+patch_matplotlib_path_deepcopy()
 
 
 class LutMode(StrEnum):
@@ -26,15 +43,15 @@ class LutMode(StrEnum):
     HS = "hs"
 
 
-def create_color_mode_plot(df: pandas.DataFrame, color_mode: LutMode) -> None:
+def create_color_mode_plot(df: pd.DataFrame, color_mode: LutMode) -> None:
     bri = df["bri"]
     watt = df["watt"]
     if color_mode == LutMode.BRIGHTNESS:
-        df["color"] = "#1f77b4"
+        colors = "#1f77b4"
     elif color_mode == LutMode.COLOR_TEMP:
-        df["color"] = df["mired"].apply(convert_mired_to_rgb)
+        colors = df["mired"].apply(convert_mired_to_rgb)
     else:
-        df["color"] = df.apply(
+        colors = df.apply(
             lambda row: colorsys.hls_to_rgb(
                 row.hue / 65535,
                 row.bri / 255,
@@ -43,34 +60,25 @@ def create_color_mode_plot(df: pandas.DataFrame, color_mode: LutMode) -> None:
             axis=1,
         )
 
-    plt.scatter(bri, watt, color=df["color"], marker=".", s=10)
+    plt.scatter(bri, watt, color=colors, marker=".", s=10)
     plt.xlabel("brightness")
 
 
-def create_effect_plot(df: pandas.DataFrame) -> None:
+def create_effect_plot(df: pd.DataFrame) -> None:
     sns.lineplot(data=df, x="bri", y="watt", hue="effect", marker="o")
-    plt.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+    plt.legend(loc="upper left", bbox_to_anchor=(1.05, 1), borderaxespad=0.0)
     plt.xlabel("brightness")
     plt.tight_layout()
 
-def create_linear_calibration_plot(df: pandas.DataFrame) -> None:
+
+def create_linear_calibration_plot(df: pd.DataFrame) -> None:
     plt.plot(df["volume"], df["watt"], marker="o", linestyle="-")
     plt.xlabel("volume")
     plt.title("Calibration Curve")
     plt.grid(True)
 
-def mired_to_rgb(mired):
-    kelvin = 1000000 / mired
-    xy = colour.CCT_to_xy(kelvin, method="Kang 2002")
-    xys = colour.xy_to_XYZ(xy)
-    rgb = colour.XYZ_to_sRGB(xys)
-    # Note that the colours are overflowing 8-bit, thus a normalisation
-    # process must be used.
-    rgb /= np.max(rgb, axis=1)[..., np.newaxis]
-    return rgb
 
-
-def convert_mired_to_rgb(mired):
+def convert_mired_to_rgb(mired: float) -> list[float]:  # noqa: C901
     """
     Converts from K to RGB, algorithm courtesy of
     http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
@@ -141,15 +149,12 @@ def create_plot(file_path: str, output: str, color_mode: str | None) -> None:
     if not is_json_file and not color_mode:
         color_mode = LutMode(file_name_without_suffix)
 
-    if file_path.endswith(".gz"):
-        csv_file = gzip.open(file_path, "rt")
-    else:
-        csv_file = open(file_path, "rt")
-
     if is_json_file:
         dataframe = create_dataframe_for_json_file(file_path)
     else:
-        dataframe = pd.read_csv(csv_file)
+        csv_file: TextIO
+        with gzip.open(file_path, "rt") if file_path.endswith(".gz") else open(file_path) as csv_file:
+            dataframe = pd.read_csv(csv_file)
 
     plt.figure(figsize=(10, 6))
     plt.ylabel("watt")
@@ -166,19 +171,20 @@ def create_plot(file_path: str, output: str, color_mode: str | None) -> None:
         output_path = Path(output)
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(output_path)
-        print(f"Save plot to {output}")
+        print(f"Save plot to {output}")  # noqa: T201
         return
 
     plt.show()
 
-def create_dataframe_for_json_file(file_path: str) -> pandas.DataFrame:
-    json_file = open(file_path, "r")
-    json_data = json.load(json_file)
+
+def create_dataframe_for_json_file(file_path: str) -> pd.DataFrame:
+    with open(file_path) as json_file:
+        json_data = json.load(json_file)
     strategy = json_data.get("calculation_strategy")
     if strategy != "linear":
         raise ValueError(f"Unsupported calculation strategy: {strategy}")
     linear_config = json_data.get("linear_config")
-    if not "calibrate" in linear_config:
+    if "calibrate" not in linear_config:
         raise ValueError("No calibration data found in JSON file")
     calibration_data: list[str] = linear_config.get("calibrate")
     rows = []
@@ -193,12 +199,11 @@ def create_dataframe_for_json_file(file_path: str) -> pandas.DataFrame:
             {
                 label: val,
                 "watt": watt,
-            }
+            },
         )
     df = pd.DataFrame(rows)
     # Sort by volume to ensure points are plotted in the correct order
-    df = df.sort_values(by=label)
-    return df
+    return df.sort_values(by=label)
 
 
 def main() -> None:
@@ -221,7 +226,7 @@ def resolve_absolute_file_path(file_path: str) -> str:
     library_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "../../profile_library",
-        file_path
+        file_path,
     )
     if os.path.exists(library_path):
         return library_path
@@ -234,9 +239,9 @@ def get_base_filename(path: str | Path) -> str:
     name = p.name
     # Strip multiple known suffixes in order
     for ext in (".gz", ".csv", ".json"):
-        if name.endswith(ext):
-            name = name[: -len(ext)]
+        name = name.removesuffix(ext)
     return name
+
 
 if __name__ == "__main__":
     main()
