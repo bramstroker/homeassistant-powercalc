@@ -26,8 +26,8 @@ jobs:
           working-directory: './utils/visualize'
           enable-cache: true
           cache-dependency-glob: |
-            utils/visualize/pyproject.toml
-            utils/visualize/uv.lock
+            pyproject.toml
+            uv.lock
       - name: Run visualization tool
         run: bash ./utils/visualize/generate-all.sh ./profile_library
       - uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10
