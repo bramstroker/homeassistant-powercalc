@@ -5,12 +5,11 @@ from homeassistant.const import CONF_DEVICE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry
 from homeassistant.helpers.device import async_entity_id_to_device
-from homeassistant.helpers.device_registry import DeviceEntry, DeviceInfo
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_SENSOR_TYPE, SensorType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,15 +31,11 @@ async def attach_entities_to_source_device(
         if device_id:
             device_entry = device_registry.async_get(hass).async_get(device_id)
 
-    if not device_entry:
-        if config_entry:
-            sensor_type = SensorType(config_entry.data.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER))
-            if sensor_type == SensorType.GROUP:
-                remove_stale_devices(hass, config_entry, None)
-        return
-
     if config_entry:
-        bind_config_entry_to_device(hass, config_entry, device_entry)
+        remove_config_entry_from_devices(hass, config_entry)
+
+    if not device_entry:
+        return
 
     for entity in entities_to_add:
         try:
@@ -49,37 +44,21 @@ async def attach_entities_to_source_device(
             _LOGGER.error("%s: Cannot set device id on entity", entity.entity_id)
 
 
-def bind_config_entry_to_device(hass: HomeAssistant, config_entry: ConfigEntry, device_entry: DeviceEntry) -> None:
-    """
-    When the user selected a specific device in the config flow, bind the config entry to that device
-    This will let HA bind all the powercalc entities for that config entry to the concerning device
-    """
-
-    if config_entry.entry_id not in device_entry.config_entries:
-        device_reg = device_registry.async_get(hass)
-        device_reg.async_update_device(
-            device_entry.id,
-            add_config_entry_id=config_entry.entry_id,
-        )
-
-    remove_stale_devices(hass, config_entry, device_entry.id)
-
-
-def remove_stale_devices(
+def remove_config_entry_from_devices(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
-    device_id: str | None,
 ) -> None:
-    """Remove powercalc config entries from old devices."""
+    """
+    Remove powercalc config entry from all devices.
+    See: https://developers.home-assistant.io/blog/2025/07/18/updated-pattern-for-helpers-linking-to-devices/
+    """
     device_reg = device_registry.async_get(hass)
     device_entries = device_registry.async_entries_for_config_entry(
         device_reg,
         config_entry.entry_id,
     )
 
-    stale_devices = [device_entry for device_entry in device_entries if device_entry.id != device_id]
-
-    for device_entry in stale_devices:
+    for device_entry in device_entries:
         device_reg.async_update_device(
             device_entry.id,
             remove_config_entry_id=config_entry.entry_id,

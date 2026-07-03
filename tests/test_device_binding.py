@@ -2,7 +2,7 @@ import logging
 
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry, DeviceEntryDisabler, DeviceRegistry
+from homeassistant.helpers.device_registry import DeviceEntryDisabler, DeviceRegistry
 import homeassistant.helpers.entity_registry as er
 import pytest
 from pytest_homeassistant_custom_component.common import (
@@ -16,7 +16,6 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
-    CONF_GROUP_POWER_ENTITIES,
     CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_POWER,
@@ -193,104 +192,40 @@ async def test_entities_are_bound_to_source_device3(
     assert power_entity_entry.device_id == device_id
 
 
-async def test_change_device(hass: HomeAssistant) -> None:
-    """
-    Test that changing the device in the configuration updates the device registry
-    See: https://github.com/bramstroker/homeassistant-powercalc/issues/3123
-    """
-    device_registry = mock_device_registry(
-        hass,
-        {
-            "device1": DeviceEntry(
-                id="device1",
-                manufacturer="shelly",
-                model="PlugS",
-            ),
-            "device2": DeviceEntry(
-                id="device2",
-                manufacturer="shelly",
-                model="PlugS",
-            ),
-        },
-    )
-
-    mock_registry(
-        hass,
-        {
-            "entity1": RegistryEntryWithDefaults(
-                entity_id="sensor.entity1",
-                unique_id="1111",
-                platform="shelly",
-                device_id="device1",
-            ),
-            "entity2": RegistryEntryWithDefaults(
-                entity_id="sensor.entity2",
-                unique_id="2222",
-                platform="shelly",
-                device_id="device2",
-            ),
-        },
+async def test_powercalc_config_entry_is_removed_from_device_on_setup(hass: HomeAssistant) -> None:
+    device_registry = mock_device_registry(hass, {})
+    device_owner_config_entry = MockConfigEntry(domain="test")
+    device_owner_config_entry.add_to_hass(hass)
+    device_entry = device_registry.async_get_or_create(
+        config_entry_id=device_owner_config_entry.entry_id,
+        identifiers={("shelly", "PlugS")},
+        manufacturer="shelly",
+        model="PlugS",
     )
 
     entry_data = {
-        CONF_SENSOR_TYPE: SensorType.REAL_POWER,
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_NAME: "Test",
-        CONF_ENTITY_ID: "sensor.entity1",
+        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+        CONF_FIXED: {CONF_POWER: 50},
     }
     config_entry = await create_mock_config_entry(
         hass,
         {
             **entry_data,
-            CONF_DEVICE: "device1",
+            CONF_DEVICE: device_entry.id,
         },
+        setup=False,
     )
+    device_registry.async_update_device(device_entry.id, add_config_entry_id=config_entry.entry_id)
 
-    device1 = device_registry.async_get("device1")
-    assert device1.config_entries == {config_entry.entry_id}
+    device1 = device_registry.async_get(device_entry.id)
+    assert device1
+    assert config_entry.entry_id in device1.config_entries
 
-    hass.config_entries.async_update_entry(config_entry, data={**entry_data, CONF_DEVICE: "device2"})
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
 
-    device1 = device_registry.async_get("device1")
-    assert not device1
-
-    device2 = device_registry.async_get("device2")
-    assert device2.config_entries == {config_entry.entry_id}
-
-
-async def test_remove_device_from_config_entry(hass: HomeAssistant) -> None:
-    """
-    Test that config_entry is removed from device when device is removed from config entry data
-    See: https://github.com/bramstroker/homeassistant-powercalc/discussions/3476
-    """
-    device_registry = mock_device_registry(
-        hass,
-        {
-            "device1": DeviceEntry(
-                id="device1",
-                manufacturer="shelly",
-                model="PlugS",
-            ),
-        },
-    )
-
-    entry_data = {
-        CONF_SENSOR_TYPE: SensorType.GROUP,
-        CONF_NAME: "Test",
-        CONF_GROUP_POWER_ENTITIES: ["sensor.test_power"],
-    }
-    config_entry = await create_mock_config_entry(
-        hass,
-        {
-            **entry_data,
-            CONF_DEVICE: "device1",
-        },
-    )
-
-    device1 = device_registry.async_get("device1")
-    assert device1.config_entries == {config_entry.entry_id}
-
-    # Remove device from config entry data
-    hass.config_entries.async_update_entry(config_entry, data={**entry_data})
-
-    device1 = device_registry.async_get("device1")
-    assert not device1
+    device1 = device_registry.async_get(device_entry.id)
+    assert device1
+    assert config_entry.entry_id not in device1.config_entries
