@@ -8,7 +8,6 @@ import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
-    mock_device_registry,
     mock_registry,
 )
 
@@ -190,42 +189,3 @@ async def test_entities_are_bound_to_source_device3(
     power_entity_entry = entity_registry.async_get("sensor.test_device_power")
     assert power_entity_entry
     assert power_entity_entry.device_id == device_id
-
-
-async def test_powercalc_config_entry_is_removed_from_device_on_setup(hass: HomeAssistant) -> None:
-    device_registry = mock_device_registry(hass, {})
-    device_owner_config_entry = MockConfigEntry(domain="test")
-    device_owner_config_entry.add_to_hass(hass)
-    device_entry = device_registry.async_get_or_create(
-        config_entry_id=device_owner_config_entry.entry_id,
-        identifiers={("shelly", "PlugS")},
-        manufacturer="shelly",
-        model="PlugS",
-    )
-
-    entry_data = {
-        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-        CONF_NAME: "Test",
-        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
-        CONF_FIXED: {CONF_POWER: 50},
-    }
-    config_entry = await create_mock_config_entry(
-        hass,
-        {
-            **entry_data,
-            CONF_DEVICE: device_entry.id,
-        },
-        setup=False,
-    )
-    device_registry.async_update_device(device_entry.id, add_config_entry_id=config_entry.entry_id)
-
-    device1 = device_registry.async_get(device_entry.id)
-    assert device1
-    assert config_entry.entry_id in device1.config_entries
-
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
-
-    device1 = device_registry.async_get(device_entry.id)
-    assert device1
-    assert config_entry.entry_id not in device1.config_entries

@@ -31,9 +31,6 @@ async def attach_entities_to_source_device(
         if device_id:
             device_entry = device_registry.async_get(hass).async_get(device_id)
 
-    if config_entry:
-        remove_config_entry_from_devices(hass, config_entry)
-
     if not device_entry:
         return
 
@@ -42,27 +39,6 @@ async def attach_entities_to_source_device(
             entity.device_entry = device_entry
         except AttributeError:  # pragma: no cover
             _LOGGER.error("%s: Cannot set device id on entity", entity.entity_id)
-
-
-def remove_config_entry_from_devices(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-) -> None:
-    """
-    Remove powercalc config entry from all devices.
-    See: https://developers.home-assistant.io/blog/2025/07/18/updated-pattern-for-helpers-linking-to-devices/
-    """
-    device_reg = device_registry.async_get(hass)
-    device_entries = device_registry.async_entries_for_config_entry(
-        device_reg,
-        config_entry.entry_id,
-    )
-
-    for device_entry in device_entries:
-        device_reg.async_update_device(
-            device_entry.id,
-            remove_config_entry_id=config_entry.entry_id,
-        )
 
 
 def get_device_info(

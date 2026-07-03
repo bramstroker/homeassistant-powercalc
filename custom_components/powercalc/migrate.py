@@ -3,7 +3,8 @@ from datetime import timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ENABLED, CONF_ID, CONF_PATH, EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers import device_registry, issue_registry as ir
+from homeassistant.helpers.helper_integration import async_remove_helper_config_entry_from_source_device
 from homeassistant.helpers.issue_registry import async_create_issue
 
 from custom_components.powercalc.const import (
@@ -62,7 +63,24 @@ async def async_migrate_config_entry(hass: HomeAssistant, config_entry: ConfigEn
     if version <= 7:
         _migrate_invalid_power_sensor_category(data)
 
-    hass.config_entries.async_update_entry(config_entry, data=data, version=8)
+    if version <= 8:
+        _remove_config_entry_from_devices(hass, config_entry)
+
+    hass.config_entries.async_update_entry(config_entry, data=data, version=9)
+
+
+def _remove_config_entry_from_devices(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
+    """
+    Remove powercalc config entry from devices.
+    See: https://developers.home-assistant.io/blog/2025/07/18/updated-pattern-for-helpers-linking-to-devices/
+    """
+    device_reg = device_registry.async_get(hass)
+    for device_entry in device_registry.async_entries_for_config_entry(device_reg, config_entry.entry_id):
+        async_remove_helper_config_entry_from_source_device(
+            hass,
+            helper_config_entry_id=config_entry.entry_id,
+            source_device_id=device_entry.id,
+        )
 
 
 def _migrate_power_template(data: dict) -> None:
