@@ -1,20 +1,16 @@
 import logging
 
-from awesomeversion import AwesomeVersion
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    CONF_DEVICE,
-    __version__ as HA_VERSION,  # noqa: N812
-)
+from homeassistant.const import CONF_DEVICE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry
+from homeassistant.helpers.device import async_entity_id_to_device
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceInfo
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_SENSOR_TYPE, SensorType
-from custom_components.powercalc.sensors.abstract import BaseEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,7 +23,10 @@ async def attach_entities_to_source_device(
 ) -> None:
     """Set the entity to same device as the source entity, if any available."""
 
-    device_entry = source_entity.device_entry if source_entity else None
+    device_entry = None
+    if source_entity:
+        device_entry = async_entity_id_to_device(hass, source_entity.entity_id) or source_entity.device_entry
+
     if not device_entry and config_entry:
         device_id = config_entry.data.get(CONF_DEVICE)
         if device_id:
@@ -43,12 +42,9 @@ async def attach_entities_to_source_device(
     if config_entry:
         bind_config_entry_to_device(hass, config_entry, device_entry)
 
-    for entity in (entity for entity in entities_to_add if isinstance(entity, BaseEntity)):
+    for entity in entities_to_add:
         try:
-            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2025.8.0") and config_entry:
-                entity.device_entry = device_entry
-            else:
-                entity.source_device_id = device_entry.id  # type: ignore
+            entity.device_entry = device_entry
         except AttributeError:  # pragma: no cover
             _LOGGER.error("%s: Cannot set device id on entity", entity.entity_id)
 

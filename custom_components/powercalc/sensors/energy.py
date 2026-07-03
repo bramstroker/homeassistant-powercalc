@@ -18,6 +18,7 @@ from homeassistant.const import (
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, State, callback
+from homeassistant.helpers.device import async_entity_id_to_device
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
@@ -50,6 +51,7 @@ from custom_components.powercalc.filter.outlier import OutlierFilter
 from .abstract import (
     BaseEntity,
     bind_entity_to_area,
+    bind_entity_to_device,
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
 )
@@ -289,6 +291,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
+        self.device_entry = async_entity_id_to_device(hass, source_entity)
         self._sensor_config = sensor_config
         self.entity_id = entity_id
         self._attr_device_class = SensorDeviceClass.ENERGY
@@ -306,6 +309,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     async def async_added_to_hass(self) -> None:
         """Bind the generated energy sensor to configured registry metadata."""
         await super().async_added_to_hass()
+        bind_entity_to_device(self.hass, self.entity_id, self.device_entry)
         bind_entity_to_area(self.hass, self.entity_id, self._sensor_config)
 
     def _integrate_on_state_change(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401

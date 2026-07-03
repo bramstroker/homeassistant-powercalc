@@ -5,7 +5,7 @@ import logging
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, callback
-import homeassistant.helpers.device_registry as dr
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
@@ -29,26 +29,37 @@ _LOGGER = logging.getLogger(__name__)
 
 class BaseEntity(Entity):
     async def async_added_to_hass(self) -> None:
-        """Attach the entity to same device as the source entity."""
+        """Bind configured registry metadata."""
 
-        entity_reg = er.async_get(self.hass)
-        entity_entry = entity_reg.async_get(self.entity_id)
-        if entity_entry is None:
-            return
-
-        if hasattr(self, "source_device_id"):
-            device_id: str | None = getattr(self, "source_device_id")  # noqa: B009
-            device_reg = dr.async_get(self.hass)
-            device_entry = device_reg.async_get(device_id) if device_id else None
-            if device_entry and device_entry.id != entity_entry.device_id:
-                _LOGGER.debug("Binding %s to device %s", self.entity_id, device_id)
-                entity_reg.async_update_entity(self.entity_id, device_id=device_id)
+        bind_entity_to_device(self.hass, self.entity_id, self.device_entry)
 
         if not hasattr(self, "_sensor_config"):
             return
 
         sensor_config = getattr(self, "_sensor_config")  # noqa: B009
         bind_entity_to_area(self.hass, self.entity_id, sensor_config)
+
+
+@callback
+def bind_entity_to_device(
+    hass: HomeAssistant,
+    entity_id: str | None,
+    device_entry: DeviceEntry | None,
+) -> None:
+    """Bind a Powercalc entity to the resolved device."""
+    # Home Assistant only consumes entity.device_entry while creating registry
+    # entries for config-entry platforms. Only YAML/platform entities need this
+    # explicit registry update after they have been added.
+    if entity_id is None or device_entry is None:
+        return
+
+    entity_reg = er.async_get(hass)
+    entity_entry = entity_reg.async_get(entity_id)
+    if entity_entry is None or entity_entry.config_entry_id is not None or entity_entry.device_id == device_entry.id:
+        return
+
+    _LOGGER.debug("Binding %s to device %s", entity_id, device_entry.id)
+    entity_reg.async_update_entity(entity_id, device_id=device_entry.id)
 
 
 @callback

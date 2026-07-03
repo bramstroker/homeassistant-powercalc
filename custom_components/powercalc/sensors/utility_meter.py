@@ -17,7 +17,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import async_generate_entity_id
 import homeassistant.helpers.entity_registry as er
-from homeassistant.helpers.typing import StateType
+from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.util import slugify
 
 from custom_components.powercalc.const import (
@@ -33,7 +33,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.select import DATA_PENDING_SELECT_ENTITIES, SIGNAL_CREATE_SELECT_ENTITIES
 
-from .abstract import BaseEntity
+from .abstract import BaseEntity, bind_entity_to_area, bind_entity_to_device
 from .energy import EnergySensor, RealEnergySensor
 
 _LOGGER = logging.getLogger(__name__)
@@ -261,6 +261,7 @@ def create_utility_meter(
     utility_meter.rounding_digits = int(
         sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION),
     )
+    utility_meter._sensor_config = sensor_config  # noqa: SLF001
     utility_meter.entity_id = entity_id
 
     return utility_meter
@@ -268,6 +269,13 @@ def create_utility_meter(
 
 class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
+    _sensor_config: ConfigType
+
+    async def async_added_to_hass(self) -> None:
+        """Bind the generated utility meter to configured registry metadata."""
+        await super().async_added_to_hass()
+        bind_entity_to_device(self.hass, self.entity_id, self.device_entry)
+        bind_entity_to_area(self.hass, self.entity_id, self._sensor_config)
 
     @property
     def unique_id(self) -> str | None:

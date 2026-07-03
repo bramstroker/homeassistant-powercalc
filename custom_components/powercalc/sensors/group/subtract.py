@@ -115,7 +115,6 @@ class SubtractGroupSensor(GroupedPowerSensor):
             sensor_config=sensor_config,
             group_type=GroupType.SUBTRACT,
             unique_id=unique_id,
-            device_id=None,
         )
 
         self._base_entity_id = base_entity_id
