@@ -17,7 +17,6 @@
     "utility_meter"
   ],
   "documentation": "https://docs.powercalc.nl",
-  "homeassistant": "2026.1.0",
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
   "requirements": [
