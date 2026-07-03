@@ -78,6 +78,7 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CONF_SUB_GROUPS,
     CONF_UNAVAILABLE_POWER,
+    CONF_UTILITY_METER_TYPES,
     DATA_GROUP_ENTITIES,
     DEFAULT_ENERGY_UPDATE_INTERVAL,
     DOMAIN,
@@ -1405,6 +1406,87 @@ async def test_bind_to_configured_device(
     group_entity = entity_registry.async_get("sensor.mygroup_power")
     assert group_entity
     assert group_entity.device_id == device_entry.id
+
+
+async def test_bind_to_configured_area_for_group_entities(
+    hass: HomeAssistant,
+    entity_registry: er.EntityRegistry,
+    area_registry: AreaRegistry,
+) -> None:
+    area = area_registry.async_get_or_create("Living room")
+    await set_states(
+        hass,
+        [
+            (
+                "sensor.member_power",
+                "10",
+                {ATTR_DEVICE_CLASS: SensorDeviceClass.POWER, ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
+            ),
+            (
+                "sensor.member_energy",
+                "1",
+                {ATTR_DEVICE_CLASS: SensorDeviceClass.ENERGY, ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+            ),
+        ],
+    )
+
+    await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "Living Room Ceiling",
+            CONF_AREA: area.id,
+            CONF_GROUP_POWER_ENTITIES: ["sensor.member_power"],
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.member_energy"],
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TYPES: ["daily"],
+        },
+    )
+
+    power_entry = entity_registry.async_get("sensor.living_room_ceiling_power")
+    assert power_entry
+    assert power_entry.area_id == area.id
+
+    energy_entry = entity_registry.async_get("sensor.living_room_ceiling_energy")
+    assert energy_entry
+    assert energy_entry.area_id == area.id
+
+    utility_meter_entry = entity_registry.async_get("sensor.living_room_ceiling_energy_daily")
+    assert utility_meter_entry
+    assert utility_meter_entry.area_id == area.id
+
+
+async def test_bind_to_configured_area_for_calculated_group_energy_sensor(
+    hass: HomeAssistant,
+    entity_registry: er.EntityRegistry,
+    area_registry: AreaRegistry,
+) -> None:
+    area = area_registry.async_get_or_create("Bedroom")
+    await set_states(
+        hass,
+        [
+            (
+                "sensor.member_power",
+                "10",
+                {ATTR_DEVICE_CLASS: SensorDeviceClass.POWER, ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
+            ),
+        ],
+    )
+
+    await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "Bedroom Ceiling",
+            CONF_AREA: area.id,
+            CONF_GROUP_POWER_ENTITIES: ["sensor.member_power"],
+            CONF_CREATE_UTILITY_METERS: False,
+        },
+    )
+
+    energy_entry = entity_registry.async_get("sensor.bedroom_ceiling_energy")
+    assert energy_entry
+    assert energy_entry.area_id == area.id
 
 
 async def test_disable_energy_sensor_creation(hass: HomeAssistant) -> None:

@@ -38,7 +38,7 @@ from homeassistant.core import (
     callback,
 )
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er, start
+from homeassistant.helpers import device_registry, entity_registry as er, start
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
     EventStateChangedData,
@@ -380,7 +380,7 @@ def create_grouped_power_sensor(
 
     _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s, unique_id=%s)", name, entity_id, unique_id)
 
-    return GroupedPowerSensor(
+    sensor = GroupedPowerSensor(
         hass=hass,
         name=name,
         entities=power_sensor_ids,
@@ -388,8 +388,9 @@ def create_grouped_power_sensor(
         sensor_config=sensor_config,
         group_type=group_type,
         entity_id=entity_id,
-        device_id=sensor_config.get(CONF_DEVICE),
     )
+    bind_to_configured_device(hass, sensor, sensor_config)
+    return sensor
 
 
 @callback
@@ -432,7 +433,7 @@ def create_grouped_energy_sensor(
             unit_prefix=sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.NONE),
         )
 
-    return GroupedEnergySensor(
+    sensor = GroupedEnergySensor(
         hass=hass,
         name=name,
         entities=energy_sensor_ids,
@@ -440,8 +441,19 @@ def create_grouped_energy_sensor(
         sensor_config=sensor_config,
         group_type=group_type,
         entity_id=entity_id,
-        device_id=sensor_config.get(CONF_DEVICE),
     )
+    bind_to_configured_device(hass, sensor, sensor_config)
+    return sensor
+
+
+def bind_to_configured_device(hass: HomeAssistant, sensor: Entity, sensor_config: dict[str, Any]) -> None:
+    device_id = sensor_config.get(CONF_DEVICE)
+    if not device_id:
+        return
+
+    device_entry = device_registry.async_get(hass).async_get(device_id)
+    if device_entry:
+        sensor.device_entry = device_entry
 
 
 def generate_unique_id(sensor_config: dict[str, Any]) -> str:
@@ -465,10 +477,8 @@ class GroupedSensor(BaseEntity, SensorEntity):
         sensor_config: dict[str, Any],
         group_type: GroupType,
         unique_id: str | None = None,
-        device_id: str | None = None,
     ) -> None:
         self.entity_id = entity_id
-        self.source_device_id = device_id
 
         self._attr_name = name
         # Remove own entity from entities, when it happens to be there. To prevent recursion
@@ -788,7 +798,6 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
         sensor_config: dict[str, Any],
         group_type: GroupType,
         unique_id: str | None = None,
-        device_id: str | None = None,
     ) -> None:
         super().__init__(
             hass,
@@ -798,7 +807,6 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
             sensor_config,
             group_type,
             unique_id,
-            device_id,
         )
 
         self._attr_native_unit_of_measurement = ENERGY_UNIT_PREFIX_MAPPING.get(
