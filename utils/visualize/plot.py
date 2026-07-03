@@ -12,28 +12,9 @@ import os
 from pathlib import Path
 from typing import TextIO
 
-from matplotlib.path import Path as MatplotlibPath
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-
-
-def patch_matplotlib_path_deepcopy() -> None:
-    def _deepcopy_path(self: MatplotlibPath, memo: dict[int, object] | None = None) -> MatplotlibPath:
-        copied_path = MatplotlibPath(
-            self.vertices.copy(),
-            None if self.codes is None else self.codes.copy(),
-            self._interpolation_steps,
-            readonly=False,
-        )
-        if memo is not None:
-            memo[id(self)] = copied_path
-        return copied_path
-
-    MatplotlibPath.__deepcopy__ = _deepcopy_path  # type: ignore[method-assign]
-
-
-patch_matplotlib_path_deepcopy()
 
 
 class LutMode(StrEnum):

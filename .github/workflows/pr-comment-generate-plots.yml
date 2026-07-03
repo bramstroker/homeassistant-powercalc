@@ -21,6 +21,7 @@ jobs:
       - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
           working-directory: './utils/visualize'
+          enable-cache: true
       - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         name: List changed files from the PR
         id: list-files
