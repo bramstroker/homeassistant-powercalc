@@ -24,6 +24,10 @@ jobs:
       - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
           working-directory: './utils/visualize'
+          enable-cache: true
+          cache-dependency-glob: |
+            utils/visualize/pyproject.toml
+            utils/visualize/uv.lock
       - name: Run visualization tool
         run: bash ./utils/visualize/generate-all.sh ./profile_library
       - uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10

@@ -21,6 +21,7 @@ jobs:
       - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
           working-directory: './utils/visualize'
+          enable-cache: true
       - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         name: List changed files from the PR
         id: list-files
@@ -30,18 +31,30 @@ jobs:
             const { commits } = context.payload.pull_request
             const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits} | grep -E '(brightness|color_temp|hs|effect)\\.csv\\.gz$'`).toString()
             const files = rawFiles.split('\n').filter(Boolean)
-            core.setOutput('changedFiles', "\"" + files.join("\" \"") + "\"")
+            core.setOutput('changedFiles', files.join('\n'))
       - name: Run visualization tool
         run: |
           cd ./utils/visualize
-          for file in ${STEPS_LIST_FILES_OUTPUTS_CHANGEDFILES}; do
+          while IFS= read -r file; do
+            if [ -z "${file}" ]; then
+              continue
+            fi
             echo "Generating plot for - ${file}."
             if [ -f "${{ github.workspace }}/${file}" ]; then
               uv run python plot.py "${{ github.workspace }}/${file}" --output=auto
+            else
+              echo "::error::Changed file is missing from checkout: ${file}"
+              exit 1
             fi
-          done
+          done <<< "${STEPS_LIST_FILES_OUTPUTS_CHANGEDFILES}"
         env:
           STEPS_LIST_FILES_OUTPUTS_CHANGEDFILES: ${{ steps.list-files.outputs.changedFiles }}
+      - name: Verify plots generated
+        run: |
+          if ! compgen -G "./utils/visualize/*.png" > /dev/null; then
+            echo "::error::No plot PNG files were generated"
+            exit 1
+          fi
       - name: Write PR number
         run: |
           echo "${{ github.event.pull_request.number }}" > ./utils/visualize/pr_number.txt
@@ -49,6 +62,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: plots
+          if-no-files-found: error
           path: |
             ./utils/visualize/*.png
             ./utils/visualize/pr_number.txt
