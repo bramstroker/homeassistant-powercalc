@@ -91,7 +91,7 @@ async def test_cost_sensor_fixed_price(hass: HomeAssistant) -> None:
 
     cost_state = hass.states.get("sensor.test_cost")
     assert cost_state
-    assert cost_state.attributes[ATTR_DEVICE_CLASS] == "monetary"
+    assert cost_state.attributes[ATTR_DEVICE_CLASS] == SensorDeviceClass.MONETARY
     assert cost_state.attributes[ATTR_STATE_CLASS] == SensorStateClass.TOTAL
     assert cost_state.attributes[ATTR_UNIT_OF_MEASUREMENT] == "EUR"
 
