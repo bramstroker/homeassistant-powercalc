@@ -3,6 +3,7 @@ import logging
 from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
+    ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
@@ -38,6 +39,8 @@ from custom_components.powercalc.const import (
     CONF_SUBTRACT_ENTITIES,
     DOMAIN,
     DOMAIN_CONFIG,
+    SERVICE_CALIBRATE_COST,
+    SERVICE_RESET_COST,
     CalculationStrategy,
     GroupType,
 )
@@ -259,6 +262,61 @@ async def test_cost_sensor_handles_energy_reset(hass: HomeAssistant) -> None:
 
     await set_states(hass, [("sensor.existing_energy", "5", _KWH)])  # reset -> 5 kWh * 0.25
     _assert_cost(hass, 3.75)
+
+
+async def test_reset_cost_service(hass: HomeAssistant) -> None:
+    """The cost reset service resets accumulated cost and starts from the current energy baseline."""
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])
+    _assert_cost(hass, 2.5)
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_RESET_COST,
+        {ATTR_ENTITY_ID: "sensor.test_cost"},
+        blocking=True,
+    )
+
+    _assert_cost(hass, 0)
+    cost_state = hass.states.get("sensor.test_cost")
+    assert cost_state
+    assert cost_state.attributes["last_energy"] == "10"
+
+    await set_states(hass, [("sensor.existing_energy", "12", _KWH)])
+    _assert_cost(hass, 0.5)
+
+
+async def test_calibrate_cost_service(hass: HomeAssistant) -> None:
+    """The cost calibrate service sets accumulated cost and starts from the current energy baseline."""
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_CALIBRATE_COST,
+        {ATTR_ENTITY_ID: "sensor.test_cost", "value": "7"},
+        blocking=True,
+    )
+
+    _assert_cost(hass, 7)
+    cost_state = hass.states.get("sensor.test_cost")
+    assert cost_state
+    assert cost_state.attributes["last_energy"] == "10"
+
+    await set_states(hass, [("sensor.existing_energy", "12", _KWH)])
+    _assert_cost(hass, 7.5)
 
 
 async def test_cost_sensor_ignores_invalid_energy_states(hass: HomeAssistant) -> None:

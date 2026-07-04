@@ -114,6 +114,7 @@ nav:
   - 'Actions':
       - 'actions/index.md'
       - 'actions/activate-playbook.md'
+      - 'actions/calibrate-cost.md'
       - 'actions/calibrate-energy.md'
       - 'actions/calibrate-utility-meter.md'
       - 'actions/change-gui-configuration.md'
@@ -121,6 +122,7 @@ nav:
       - 'actions/get-group-entities.md'
       - 'actions/increase-daily-energy.md'
       - 'actions/reload.md'
+      - 'actions/reset-cost.md'
       - 'actions/reset-energy.md'
       - 'actions/stop-playbook.md'
       - 'actions/switch-sub-profile.md'
