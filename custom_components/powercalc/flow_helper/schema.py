@@ -1,7 +1,8 @@
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
 from homeassistant.const import UnitOfPower
 from homeassistant.helpers import selector
-from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig, NumberSelectorMode
+from homeassistant.helpers.selector import NumberSelector, NumberSelectorMode
 import voluptuous as vol
 
 from custom_components.powercalc.const import (
@@ -46,10 +47,10 @@ SCHEMA_COST_SENSOR_TOGGLE = vol.Schema(
 SCHEMA_GLOBAL_COST = vol.Schema(
     {
         vol.Optional(CONF_ENERGY_PRICE): NumberSelector(
-            NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
+            selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
         ),
         vol.Optional(CONF_ENERGY_PRICE_SENSOR): selector.EntitySelector(
-            selector.EntitySelectorConfig(domain="sensor"),
+            selector.EntitySelectorConfig(domain="sensor", device_class=SensorDeviceClass.MONETARY),
         ),
     },
 )
@@ -84,7 +85,7 @@ SCHEMA_SENSOR_ENERGY_OPTIONS = SCHEMA_ENERGY_OPTIONS.extend(
         {
             vol.Optional(CONF_ENERGY_FILTER_OUTLIER_ENABLED, default=False): selector.BooleanSelector(),
             vol.Optional(CONF_ENERGY_FILTER_OUTLIER_MAX): NumberSelector(
-                NumberSelectorConfig(mode=NumberSelectorMode.BOX, unit_of_measurement=UnitOfPower.WATT),
+                selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, unit_of_measurement=UnitOfPower.WATT),
             ),
         },
     ).schema,
