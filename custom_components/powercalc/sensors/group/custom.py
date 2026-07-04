@@ -63,6 +63,7 @@ from custom_components.powercalc.const import (
     ATTR_STATE,
     CONF_ALL,
     CONF_AREA,
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
@@ -118,6 +119,7 @@ from custom_components.powercalc.sensors.abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
+from custom_components.powercalc.sensors.cost import create_cost_sensor
 from custom_components.powercalc.sensors.energy import EnergySensor, VirtualEnergySensor
 from custom_components.powercalc.sensors.power import PowerSensor
 from custom_components.powercalc.sensors.utility_meter import create_utility_meters
@@ -231,6 +233,11 @@ def create_group_sensors_custom(
                 sensor_config,
             ),
         )
+
+        if sensor_config.get(CONF_CREATE_COST_SENSOR):
+            cost_sensor = create_cost_sensor(hass, sensor_config, energy_sensor)
+            if cost_sensor:
+                group_sensors.append(cost_sensor)
 
     collect_analytics(hass, None).add(DATA_GROUP_SIZES, len(power_sensor_ids) + len(energy_sensor_ids))
 

@@ -16,6 +16,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_POWER_SENSOR_PRECISION,
     DATA_STANDBY_POWER_SENSORS,
@@ -24,6 +25,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
 )
+from custom_components.powercalc.sensors.cost import create_cost_sensor
 from custom_components.powercalc.sensors.energy import create_energy_sensor
 from custom_components.powercalc.sensors.power import PowerSensor
 
@@ -52,6 +54,10 @@ def create_general_standby_sensors(
             source_entity,
         )
         sensors.append(energy_sensor)
+        if sensor_config.get(CONF_CREATE_COST_SENSOR):
+            cost_sensor = create_cost_sensor(hass, sensor_config, energy_sensor, source_entity)
+            if cost_sensor:
+                sensors.append(cost_sensor)
     return sensors
 
 

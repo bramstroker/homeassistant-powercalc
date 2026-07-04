@@ -13,7 +13,7 @@ from custom_components.powercalc.common import (
     get_merged_sensor_configuration,
     get_wrapped_entity_name,
 )
-from custom_components.powercalc.const import CONF_CREATE_ENERGY_SENSOR
+from custom_components.powercalc.const import CONF_CREATE_COST_SENSOR, CONF_CREATE_ENERGY_SENSOR
 
 
 @pytest.mark.parametrize(
@@ -34,6 +34,7 @@ from custom_components.powercalc.const import CONF_CREATE_ENERGY_SENSOR
                 CONF_ENTITY_ID: "switch.test",
                 CONF_CREATE_ENERGY_SENSORS: False,
                 CONF_CREATE_ENERGY_SENSOR: False,
+                CONF_CREATE_COST_SENSOR: None,
                 CONF_CREATE_UTILITY_METERS: False,
             },
         ),
@@ -49,6 +50,7 @@ from custom_components.powercalc.const import CONF_CREATE_ENERGY_SENSOR
             {
                 CONF_ENTITY_ID: "switch.test",
                 CONF_CREATE_ENERGY_SENSOR: None,
+                CONF_CREATE_COST_SENSOR: None,
             },
         ),
     ],

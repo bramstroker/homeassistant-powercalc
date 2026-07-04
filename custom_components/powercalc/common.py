@@ -12,6 +12,8 @@ import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 
 from .const import (
+    CONF_CREATE_COST_SENSOR,
+    CONF_CREATE_COST_SENSORS,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
@@ -166,6 +168,11 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
     if CONF_CREATE_ENERGY_SENSOR not in merged_config:
         merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
             CONF_CREATE_ENERGY_SENSORS,
+        )
+
+    if CONF_CREATE_COST_SENSOR not in merged_config:
+        merged_config[CONF_CREATE_COST_SENSOR] = merged_config.get(
+            CONF_CREATE_COST_SENSORS,
         )
 
     is_entity_id_required = not any(

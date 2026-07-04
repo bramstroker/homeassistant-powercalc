@@ -63,6 +63,11 @@ CONF_CALCULATION_ENABLED_CONDITION = "calculation_enabled_condition"
 CONF_CALIBRATE = "calibrate"
 CONF_CATEGORY = "category"
 CONF_COMPOSITE = "composite"
+CONF_COST_SENSOR_FRIENDLY_NAMING = "cost_sensor_friendly_naming"
+CONF_COST_SENSOR_NAMING = "cost_sensor_naming"
+CONF_COST_SENSOR_PRECISION = "cost_sensor_precision"
+CONF_CREATE_COST_SENSOR = "create_cost_sensor"
+CONF_CREATE_COST_SENSORS = "create_cost_sensors"
 CONF_CREATE_DOMAIN_GROUPS = "create_domain_groups"
 CONF_CREATE_ENERGY_SENSOR = "create_energy_sensor"
 CONF_CREATE_ENERGY_SENSORS = "create_energy_sensors"
@@ -87,6 +92,8 @@ CONF_GROUP_UPDATE_INTERVAL_DEPRECATED = "group_update_interval"
 CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED = "force_update_frequency"
 
 CONF_ENERGY_INTEGRATION_METHOD = "energy_integration_method"
+CONF_ENERGY_PRICE = "energy_price"
+CONF_ENERGY_PRICE_SENSOR = "energy_price_sensor"
 CONF_ENERGY_SENSOR_CATEGORY = "energy_sensor_category"
 CONF_ENERGY_SENSOR_FRIENDLY_NAMING = "energy_sensor_friendly_naming"
 CONF_ENERGY_SENSOR_ID = "energy_sensor_id"
@@ -218,6 +225,8 @@ DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 DEFAULT_SELF_USAGE_ENERGY_NAME_PATTERN = "{} Device Energy"
 DEFAULT_ENERGY_SENSOR_PRECISION = 4
 DEFAULT_ENERGY_UNIT_PREFIX = UnitPrefix.KILO
+DEFAULT_COST_NAME_PATTERN = "{} cost"
+DEFAULT_COST_SENSOR_PRECISION = 4
 DEFAULT_ENTITY_CATEGORY: str | None = None
 DEFAULT_UTILITY_METER_TYPES = [DAILY, WEEKLY, MONTHLY]
 
@@ -311,6 +320,7 @@ class EntityType(StrEnum):
 
     POWER_SENSOR = "power_sensor"
     ENERGY_SENSOR = "energy_sensor"
+    COST_SENSOR = "cost_sensor"
     UTILITY_METER = "utility_meter"
     TARIFF_SELECT = "tariff_select"
     UNKNOWN = "unknown"
