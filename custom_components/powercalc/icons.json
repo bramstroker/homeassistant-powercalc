@@ -9,6 +9,9 @@
     "calibrate_energy": {
       "service": "mdi:wrench"
     },
+    "calibrate_cost": {
+      "service": "mdi:wrench"
+    },
     "change_gui_config": {
       "service": "mdi:cogs"
     },
@@ -28,6 +31,9 @@
       "service": "mdi:reload"
     },
     "reset_energy": {
+      "service": "mdi:restore"
+    },
+    "reset_cost": {
       "service": "mdi:restore"
     },
     "stop_playbook": {

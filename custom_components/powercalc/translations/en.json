@@ -882,6 +882,16 @@
       },
       "name": "Calibrate energy sensor"
     },
+    "calibrate_cost": {
+      "description": "Sets the cost sensor to a given monetary value.",
+      "fields": {
+        "value": {
+          "description": "The value to set.",
+          "name": "Value"
+        }
+      },
+      "name": "Calibrate cost sensor"
+    },
     "calibrate_utility_meter": {
       "description": "Calibrates a utility meter sensor.",
       "fields": {
@@ -935,6 +945,10 @@
     "reset_energy": {
       "description": "Reset an energy sensor to zero kWh.",
       "name": "Reset energy sensor"
+    },
+    "reset_cost": {
+      "description": "Reset a cost sensor to zero.",
+      "name": "Reset cost sensor"
     },
     "stop_playbook": {
       "description": "Stop currently active playbook.",

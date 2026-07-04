@@ -59,6 +59,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHOD_LEFT,
     SERVICE_ACTIVATE_PLAYBOOK,
+    SERVICE_CALIBRATE_COST,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_CHANGE_GUI_CONFIGURATION,
@@ -67,6 +68,7 @@ from custom_components.powercalc.const import (
     SERVICE_GET_GROUP_ENTITIES,
     SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RELOAD,
+    SERVICE_RESET_COST,
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
     SERVICE_SWITCH_SUB_PROFILE,
@@ -706,8 +708,10 @@ async def test_entity_services_registered(hass: HomeAssistant) -> None:
     assert powercalc_services is not None
     expected_services = [
         SERVICE_RESET_ENERGY,
+        SERVICE_RESET_COST,
         SERVICE_CALIBRATE_UTILITY_METER,
         SERVICE_CALIBRATE_ENERGY,
+        SERVICE_CALIBRATE_COST,
         SERVICE_INCREASE_DAILY_ENERGY,
         SERVICE_ACTIVATE_PLAYBOOK,
         SERVICE_SWITCH_SUB_PROFILE,

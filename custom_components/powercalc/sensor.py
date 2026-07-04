@@ -129,12 +129,14 @@ from .const import (
     ENTRY_DATA_POWER_ENTITY,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SERVICE_ACTIVATE_PLAYBOOK,
+    SERVICE_CALIBRATE_COST,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_DEBUG_GROUP,
     SERVICE_GET_ACTIVE_PLAYBOOK,
     SERVICE_GET_GROUP_ENTITIES,
     SERVICE_INCREASE_DAILY_ENERGY,
+    SERVICE_RESET_COST,
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
     SERVICE_SWITCH_SUB_PROFILE,
@@ -504,7 +506,19 @@ def register_entity_services() -> None:
     )
 
     platform.async_register_entity_service(
+        SERVICE_RESET_COST,
+        {},
+        "async_reset",
+    )
+
+    platform.async_register_entity_service(
         SERVICE_CALIBRATE_UTILITY_METER,
+        {vol.Required(CONF_VALUE): validate_is_number},
+        "async_calibrate",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_CALIBRATE_COST,
         {vol.Required(CONF_VALUE): validate_is_number},
         "async_calibrate",
     )
