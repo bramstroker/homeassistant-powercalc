@@ -93,7 +93,7 @@ def create_cost_sensor(
         price_entity_id,
     )
 
-    return VirtualCostSensor(
+    return CostSensor(
         hass=hass,
         source_energy_entity=energy_sensor.entity_id,
         entity_id=entity_id,
@@ -108,11 +108,7 @@ def create_cost_sensor(
     )
 
 
-class CostSensor(BaseEntity):
-    """Class which all cost sensors should extend from."""
-
-
-class VirtualCostSensor(RestoreEntity, SensorEntity, CostSensor):
+class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
     """Cost sensor, accumulating the cost of the energy consumed at price-at-consumption."""
 
     _attr_device_class = SensorDeviceClass.MONETARY
