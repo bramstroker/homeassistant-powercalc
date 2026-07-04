@@ -111,6 +111,18 @@ def test_merge_configuration(
             ),
             "Livingroom-SmartPlug Television",
         ),
+        (
+            "switch.my_switch",
+            RegistryEntryWithDefaults(
+                entity_id="switch.my_switch",
+                unique_id="abc",
+                platform="switch",
+                has_entity_name=True,
+                name=None,
+            ),
+            DeviceEntry(),
+            "my_switch",
+        ),
     ],
 )
 def test_get_wrapped_entity_name(

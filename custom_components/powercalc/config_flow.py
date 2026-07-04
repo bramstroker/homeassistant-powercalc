@@ -333,7 +333,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if isinstance(form_step.schema, vol.Schema):
             return form_step.schema
         schema = await form_step.schema()
-        if schema is None:
+        if schema is None:  # pragma: no cover
             return vol.Schema({})
         return schema
 
