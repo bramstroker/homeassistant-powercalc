@@ -231,6 +231,26 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
         self._last_energy = new_energy
         self.async_write_ha_state()
 
+    @callback
+    def async_reset(self) -> None:
+        """Reset the cost sensor to zero from the current source energy reading."""
+        _LOGGER.debug("%s: Reset cost sensor", self.entity_id)
+        self._state = Decimal(0)
+        self._set_current_energy_baseline()
+        self.async_write_ha_state()
+
+    async def async_calibrate(self, value: str) -> None:
+        """Set the cost sensor to the given value from the current source energy reading."""
+        _LOGGER.debug("%s: Calibrate cost sensor to: %s", self.entity_id, value)
+        self._state = Decimal(value)
+        self._set_current_energy_baseline()
+        self.async_write_ha_state()
+
+    def _set_current_energy_baseline(self) -> None:
+        current_energy = _parse_decimal(self.hass.states.get(self._source_energy_entity))
+        if current_energy is not None:
+            self._last_energy = current_energy
+
     @property
     def native_value(self) -> Decimal:
         """Return the accumulated cost."""
