@@ -153,19 +153,19 @@ from .errors import (
 )
 from .group_include.filter import FILTER_CONFIG, FilterOperator, create_composite_filter
 from .group_include.include import find_entities
-from .sensors.cost import CostSensor, create_cost_sensor
+from .sensors.cost import CostSensor
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
+from .sensors.energy_related import create_energy_related_sensors
 from .sensors.group.config_entry_utils import add_to_associated_groups
 from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
 from .sensors.group.standby import StandbyPowerSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
-from .sensors.utility_meter import create_utility_meters
 from .strategy.composite import CONFIG_SCHEMA as COMPOSITE_SCHEMA
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -923,10 +923,9 @@ async def create_individual_sensors(
             attach_energy_sensor_to_power_sensor(power_sensor, energy_sensor)
 
     if energy_sensor:
-        entities_to_add.extend(create_utility_meters(hass, energy_sensor, sensor_config, config_entry))
-        cost_sensor = create_cost_sensor_if_needed(hass, sensor_config, energy_sensor, source_entity)
-        if cost_sensor:
-            entities_to_add.append(cost_sensor)
+        entities_to_add.extend(
+            create_energy_related_sensors(hass, sensor_config, energy_sensor, source_entity, config_entry),
+        )
 
     await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
     update_registries(hass, source_entity, entities_to_add, context)
@@ -986,18 +985,6 @@ def create_energy_sensor_if_needed(
         or CONF_ENERGY_SENSOR_ID in sensor_config
     ):
         return create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
-    return None
-
-
-def create_cost_sensor_if_needed(
-    hass: HomeAssistant,
-    sensor_config: dict,
-    energy_sensor: EnergySensor,
-    source_entity: SourceEntity | None = None,
-) -> Entity | None:
-    """Create a cost sensor if it is needed."""
-    if sensor_config.get(CONF_CREATE_COST_SENSOR):
-        return create_cost_sensor(hass, sensor_config, energy_sensor, source_entity)
     return None
 
 

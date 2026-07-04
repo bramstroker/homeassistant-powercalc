@@ -13,7 +13,6 @@ from homeassistant.helpers.entity_registry import EVENT_ENTITY_REGISTRY_UPDATED,
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
-    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
@@ -33,12 +32,11 @@ from custom_components.powercalc.sensors.abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from custom_components.powercalc.sensors.cost import create_cost_sensor
-from custom_components.powercalc.sensors.energy import EnergySensor, VirtualEnergySensor
+from custom_components.powercalc.sensors.energy import VirtualEnergySensor
+from custom_components.powercalc.sensors.energy_related import create_energy_related_sensors
 from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor, GroupedSensor
 from custom_components.powercalc.sensors.group.subtract import SubtractGroupSensor
 from custom_components.powercalc.sensors.power import PowerSensor
-from custom_components.powercalc.sensors.utility_meter import create_utility_meters
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -90,13 +88,14 @@ class TrackedPowerSensorFactory:
             energy_sensor = await self.create_energy_sensor(SensorType.TRACKED, tracked_sensor)
             entities.append(energy_sensor)
             entities.extend(
-                create_utility_meters(
+                create_energy_related_sensors(
                     self.hass,
+                    self.config,
                     energy_sensor,
-                    {CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
+                    utility_meter_config={CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
+                    cost_name=str(SensorType.TRACKED),
                 ),
             )
-            self._append_cost_sensor(entities, energy_sensor, SensorType.TRACKED)
 
         if main_power_sensor:
             untracked_sensor = await self.create_untracked_power_sensor(
@@ -110,28 +109,16 @@ class TrackedPowerSensorFactory:
                 energy_sensor = await self.create_energy_sensor(SensorType.UNTRACKED, untracked_sensor)
                 entities.append(energy_sensor)
                 entities.extend(
-                    create_utility_meters(
+                    create_energy_related_sensors(
                         self.hass,
+                        self.config,
                         energy_sensor,
-                        {CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
+                        utility_meter_config={CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
+                        cost_name=str(SensorType.UNTRACKED),
                     ),
                 )
-                self._append_cost_sensor(entities, energy_sensor, SensorType.UNTRACKED)
 
         return entities
-
-    def _append_cost_sensor(
-        self,
-        entities: list[Entity],
-        energy_sensor: EnergySensor,
-        sensor_type: SensorType,
-    ) -> None:
-        """Create a cost sensor for the given grouped energy sensor when enabled."""
-        if not self.config.get(CONF_CREATE_COST_SENSOR):
-            return
-        cost_sensor = create_cost_sensor(self.hass, self.config, energy_sensor, name=str(sensor_type))
-        if cost_sensor:
-            entities.append(cost_sensor)
 
     async def get_tracked_power_entities(self) -> set[str]:
         """

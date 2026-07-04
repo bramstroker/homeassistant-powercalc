@@ -10,7 +10,6 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
-    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_SUBTRACT_ENTITIES,
     CONF_UTILITY_METER_NET_CONSUMPTION,
@@ -18,10 +17,9 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.sensors.abstract import generate_power_sensor_entity_id, generate_power_sensor_name
-from custom_components.powercalc.sensors.cost import create_cost_sensor
 from custom_components.powercalc.sensors.energy import create_energy_sensor
+from custom_components.powercalc.sensors.energy_related import create_energy_related_sensors
 from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor
-from custom_components.powercalc.sensors.utility_meter import create_utility_meters
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -68,18 +66,7 @@ def create_subtract_group_sensors(
         sensors.append(energy_sensor)
 
         config[CONF_UTILITY_METER_NET_CONSUMPTION] = True
-        sensors.extend(
-            create_utility_meters(
-                hass,
-                energy_sensor,
-                config,
-            ),
-        )
-
-        if config.get(CONF_CREATE_COST_SENSOR):
-            cost_sensor = create_cost_sensor(hass, config, energy_sensor)
-            if cost_sensor:
-                sensors.append(cost_sensor)
+        sensors.extend(create_energy_related_sensors(hass, config, energy_sensor))
     return sensors
 
 
