@@ -1,7 +1,7 @@
 {
   "common": {
-    "source_entity": "Source entity",
-    "source_device": "Source device",
+    "source_entity": "Zdrojová entita",
+    "source_device": "Zdrojové zariadenie",
     "remarks_smart_switch": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n Keď máte spotrebič, ktorý po zapnutí spotrebúva pevné množstvo energie, môžete túto hodnotu zadať v ďalšom kroku konfiguračného postupu",
     "remarks_smart_dimmer": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n V ďalšom kroku môžete voliteľne zadať hodnoty pripojeného svetla"
   },
@@ -48,7 +48,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Vytvorenie meracích prístrojov",
-          "daily_energy_value": "Daily energy value",
+          "daily_energy_value": "Denná hodnota energie",
           "name": "Názov",
           "on_time": "V čase",
           "start_time": "Štart čas",
@@ -105,7 +105,7 @@
           "create_utility_meters": "Vytvorte merače spotreby",
           "disable_extended_attributes": "Zakázať rozšírené atribúty",
           "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
-          "enable_analytics": "Enable anonymous analytics",
+          "enable_analytics": "Povoliť anonymnú analýzu",
           "ignore_unavailable_state": "Ignorovať nedostupný stav",
           "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
           "power_sensor_category": "Kategória snímača výkonu",
@@ -174,14 +174,14 @@
       "group_custom": {
         "data": {
           "area": "Oblasť",
-          "floor": "Floor",
+          "floor": "Poschodie",
           "create_energy_sensor": "Vytvoriť snímač energie",
           "create_utility_meters": "Vytvorte merače spotreby",
           "device": "Zariadenie",
           "force_calculate_group_energy": "Sila vypočítať energiu",
           "group_energy_entities": "Ďlšie energetické entity",
           "group_energy_start_at_zero": "Začať v nule",
-          "group_member_devices": "Member devices",
+          "group_member_devices": "Zariadenia užívateľa",
           "group_member_sensors": "Členské snímače powercalc",
           "group_power_entities": "Ďalšie výkonové entity",
           "hide_members": "Skrytý členovania",
@@ -260,9 +260,9 @@
         "title": "Knižnica"
       },
       "library_custom_fields": {
-        "title": "Profile configuration",
+        "title": "Konfigurácia profilu",
         "data": {
-          "power_factor": "Power Factor"
+          "power_factor": "Účinník"
         },
         "data_description": {
           "power_factor": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters."
@@ -542,7 +542,7 @@
       "daily_energy": {
         "title": "Denné energetické možnosti",
         "data": {
-          "daily_energy_value": "Daily energy value",
+          "daily_energy_value": "Denná hodnota energie",
           "name": "Názov",
           "on_time": "V čase",
           "start_time": "Čas začiatku",
@@ -557,7 +557,7 @@
         }
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Vlastnosti energie",
         "data": {
           "energy_integration_method": "Integration method",
           "energy_sensor_unit_prefix": "Unit prefix",
@@ -572,7 +572,7 @@
       "fixed": {
         "title": "Pevné možnosti",
         "data": {
-          "fixed_value": "Fixed value",
+          "fixed_value": "Fixná hodnota",
           "self_usage_included": "Samostatné použitie v cene"
         },
         "data_description": {
@@ -634,8 +634,8 @@
         "title": "Throttling options",
         "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
         "data": {
-          "group_energy_update_interval": "Group energy update interval",
-          "group_power_update_interval": "Group power update interval",
+          "group_energy_update_interval": "Energetická skupina interval obnovy",
+          "group_power_update_interval": "Výkonová skupina interval obnovy",
           "energy_update_interval": "Energy update interval",
           "power_update_interval": "Power update interval"
         },
@@ -659,11 +659,11 @@
         "title": "Možnosti skupiny",
         "data": {
           "area": "Oblasť",
-          "floor": "Floor",
+          "floor": "Poschodie",
           "device": "Zariadenie",
           "force_calculate_group_energy": "Sila vypočítať energiu",
           "group_energy_entities": "Ďalšie energetické entity",
-          "group_member_devices": "Member devices",
+          "group_member_devices": "Zariadenia užívateľa",
           "group_member_sensors": "Členské snímače powercalc",
           "group_power_entities": "Ďalšie výkonové entity",
           "hide_members": "Skrytí členovia",
@@ -720,7 +720,7 @@
           "advanced_options": "Pokročilé možnosti",
           "basic_options": "Základné možnosti",
           "daily_energy": "Denné energetické možnosti",
-          "energy_options": "Energy options",
+          "energy_options": "Vlastnosti energie",
           "fixed": "Pevné možnosti",
           "group_custom": "Možnosti skupiny",
           "group_subtract": "Možnosti skupiny",
@@ -873,7 +873,7 @@
     },
     "debug_group": {
       "description": "Get a debug overview of a group power or energy sensor including current member values.",
-      "name": "Debug group"
+      "name": "Ladiť skupinu"
     },
     "get_active_playbook": {
       "description": "Získajte aktuálny playbook",
