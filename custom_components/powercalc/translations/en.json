@@ -131,11 +131,15 @@
         "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh.",
         "data": {
           "energy_price": "Fixed energy price",
-          "energy_price_sensor": "Energy price sensor"
+          "energy_price_multiplier": "Energy price multiplier",
+          "energy_price_sensor": "Energy price sensor",
+          "energy_price_surcharge": "Energy price surcharge"
         },
         "data_description": {
           "energy_price": "A fixed price per kWh in your local currency",
-          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor"
+          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
         }
       },
       "global_configuration_discovery": {
@@ -632,11 +636,15 @@
         "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh.",
         "data": {
           "energy_price": "Fixed energy price",
-          "energy_price_sensor": "Energy price sensor"
+          "energy_price_multiplier": "Energy price multiplier",
+          "energy_price_sensor": "Energy price sensor",
+          "energy_price_surcharge": "Energy price surcharge"
         },
         "data_description": {
           "energy_price": "A fixed price per kWh in your local currency",
-          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor"
+          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
         }
       },
       "global_configuration_discovery": {

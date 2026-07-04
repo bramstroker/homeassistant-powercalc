@@ -31,6 +31,35 @@ powercalc:
 
 When both are set, the fixed price is ignored and the price sensor is used.
 
+You can also add a fixed per-kWh surcharge to either price source. This is useful for
+taxes, grid fees, provider markup, or other usage-based charges that should be added
+to the base energy price:
+
+```yaml
+powercalc:
+  energy_price: 0.25
+  energy_price_surcharge: 0.05
+```
+
+With this configuration, each consumed kWh is charged at `0.30` in your Home Assistant
+currency.
+
+For percentage-based taxes or fees, use `energy_price_multiplier`. For example, use
+`1.21` to add 21% tax:
+
+```yaml
+powercalc:
+  energy_price: 0.25
+  energy_price_surcharge: 0.05
+  energy_price_multiplier: 1.21
+```
+
+The effective price is calculated as:
+
+```text
+(energy_price or energy_price_sensor + energy_price_surcharge) * energy_price_multiplier
+```
+
 ## Enabling cost sensors
 
 Similar to energy sensors and utility meters, cost sensor creation can be toggled
@@ -69,10 +98,13 @@ in the global configuration and on a per sensor basis.
 
 The cost sensor reacts to changes of the energy sensor. On every update it takes the
 amount of energy consumed since the previous update and multiplies it by the price that
-is valid **at that moment**. When you use a dynamic price sensor, a price change settles
-the energy consumed up to that point at the **previous** price before the new price takes
-effect. This way energy is always priced against the tariff that was active while it was
-consumed, and the accumulated cost stays correct even when the price changes over time.
+is valid **at that moment**. When `energy_price_surcharge` is configured, it is added to
+the fixed price or dynamic price sensor value. When `energy_price_multiplier` is
+configured, it is applied after the surcharge. When you use a dynamic price sensor, a
+price change settles the energy consumed up to that point at the **previous** price
+before the new price takes effect. This way energy is always priced against the tariff
+that was active while it was consumed, and the accumulated cost stays correct even when
+the price changes over time.
 
 ## Limitations / tariffs
 

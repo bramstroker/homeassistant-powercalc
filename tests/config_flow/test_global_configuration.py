@@ -30,7 +30,9 @@ from custom_components.powercalc.const import (
     CONF_DISABLE_LIBRARY_DOWNLOAD,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_MULTIPLIER,
     CONF_ENERGY_PRICE_SENSOR,
+    CONF_ENERGY_PRICE_SURCHARGE,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
@@ -396,12 +398,18 @@ async def test_cost_options_step_in_config_flow(hass: HomeAssistant) -> None:
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_ENERGY_PRICE: 0.30},
+        {
+            CONF_ENERGY_PRICE: 0.30,
+            CONF_ENERGY_PRICE_SURCHARGE: 0.05,
+            CONF_ENERGY_PRICE_MULTIPLIER: 1.21,
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_CREATE_COST_SENSORS] is True
     assert result["data"][CONF_ENERGY_PRICE] == pytest.approx(0.30)
+    assert result["data"][CONF_ENERGY_PRICE_SURCHARGE] == pytest.approx(0.05)
+    assert result["data"][CONF_ENERGY_PRICE_MULTIPLIER] == pytest.approx(1.21)
 
 
 async def test_cost_options_step_skipped_when_disabled(hass: HomeAssistant) -> None:
@@ -437,14 +445,20 @@ async def test_cost_options_flow(hass: HomeAssistant) -> None:
         Step.GLOBAL_CONFIGURATION_COST,
         {
             CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price",
+            CONF_ENERGY_PRICE_SURCHARGE: 0.05,
+            CONF_ENERGY_PRICE_MULTIPLIER: 1.21,
         },
     )
 
     # Check if config entry data is updated.
     assert entry.data[CONF_ENERGY_PRICE_SENSOR] == "sensor.energy_price"
+    assert entry.data[CONF_ENERGY_PRICE_SURCHARGE] == pytest.approx(0.05)
+    assert entry.data[CONF_ENERGY_PRICE_MULTIPLIER] == pytest.approx(1.21)
 
     # Check if global config in hass object is updated.
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_ENERGY_PRICE_SENSOR] == "sensor.energy_price"
+    assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_ENERGY_PRICE_SURCHARGE] == pytest.approx(0.05)
+    assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_ENERGY_PRICE_MULTIPLIER] == pytest.approx(1.21)
 
 
 async def test_discovery_options_flow(hass: HomeAssistant) -> None:
