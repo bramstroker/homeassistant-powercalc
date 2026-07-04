@@ -401,7 +401,7 @@ async def test_cost_options_step_in_config_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_CREATE_COST_SENSORS] is True
-    assert result["data"][CONF_ENERGY_PRICE] == 0.30
+    assert result["data"][CONF_ENERGY_PRICE] == pytest.approx(0.30)
 
 
 async def test_cost_options_step_skipped_when_disabled(hass: HomeAssistant) -> None:
