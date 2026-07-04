@@ -19,7 +19,9 @@ from custom_components.powercalc.const import (
     CONF_COST_SENSOR_PRECISION,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_MULTIPLIER,
     CONF_ENERGY_PRICE_SENSOR,
+    CONF_ENERGY_PRICE_SURCHARGE,
     DEFAULT_COST_SENSOR_PRECISION,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -66,6 +68,8 @@ def create_cost_sensor(
     global_config: ConfigType = hass.data[DOMAIN].get(DOMAIN_CONFIG, {})
     fixed_price = global_config.get(CONF_ENERGY_PRICE)
     price_entity_id = global_config.get(CONF_ENERGY_PRICE_SENSOR)
+    price_surcharge = Decimal(str(global_config.get(CONF_ENERGY_PRICE_SURCHARGE, 0) or 0))
+    price_multiplier = Decimal(str(global_config.get(CONF_ENERGY_PRICE_MULTIPLIER, 1) or 1))
 
     if fixed_price is None and not price_entity_id:
         _LOGGER.warning(
@@ -86,11 +90,16 @@ def create_cost_sensor(
     )
 
     _LOGGER.debug(
-        "Creating cost sensor (entity_id=%s, source_entity=%s, fixed_price=%s, price_entity=%s)",
+        (
+            "Creating cost sensor (entity_id=%s, source_entity=%s, fixed_price=%s, "
+            "price_entity=%s, price_surcharge=%s, price_multiplier=%s)"
+        ),
         entity_id,
         energy_sensor.entity_id,
         fixed_price,
         price_entity_id,
+        price_surcharge,
+        price_multiplier,
     )
 
     return CostSensor(
@@ -102,6 +111,8 @@ def create_cost_sensor(
         sensor_config=sensor_config,
         fixed_price=Decimal(str(fixed_price)) if fixed_price is not None else None,
         price_entity_id=price_entity_id,
+        price_surcharge=price_surcharge,
+        price_multiplier=price_multiplier,
         powercalc_source_entity=source_entity.entity_id if source_entity else None,
         powercalc_source_domain=source_entity.domain if source_entity else None,
         device_info=get_device_info(hass, sensor_config, source_entity),
@@ -127,6 +138,8 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
         unique_id: str | None = None,
         fixed_price: Decimal | None = None,
         price_entity_id: str | None = None,
+        price_surcharge: Decimal = Decimal(0),
+        price_multiplier: Decimal = Decimal(1),
         powercalc_source_entity: str | None = None,
         powercalc_source_domain: str | None = None,
         device_info: DeviceInfo | None = None,
@@ -139,13 +152,15 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
         self._attr_device_info = device_info
         self._fixed_price = fixed_price
         self._price_entity_id = price_entity_id
+        self._price_surcharge = price_surcharge
+        self._price_multiplier = price_multiplier
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
         self._rounding_digits = int(sensor_config.get(CONF_COST_SENSOR_PRECISION, DEFAULT_COST_SENSOR_PRECISION))
         self._attr_suggested_display_precision = self._rounding_digits
         self._state: Decimal = Decimal(0)
         self._last_energy: Decimal | None = None
-        self._current_price: Decimal | None = fixed_price
+        self._current_price: Decimal | None = self._effective_price(fixed_price)
         self.device_entry = async_entity_id_to_device(hass, source_energy_entity)
         self.entity_id = entity_id
 
@@ -171,7 +186,7 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
         # Seed the current price and, for a price sensor, track its changes so consumption
         # is always settled at the price that was in effect when it was consumed.
         if self._price_entity_id is not None:
-            self._current_price = _parse_decimal(self.hass.states.get(self._price_entity_id))
+            self._current_price = self._effective_price(_parse_decimal(self.hass.states.get(self._price_entity_id)))
             self.async_on_remove(
                 async_track_state_change_event(
                     self.hass,
@@ -211,7 +226,12 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
             if current_energy is not None:
                 self._accumulate(current_energy, self._current_price)
 
-        self._current_price = _parse_decimal(event.data["new_state"])
+        self._current_price = self._effective_price(_parse_decimal(event.data["new_state"]))
+
+    def _effective_price(self, price: Decimal | None) -> Decimal | None:
+        if price is None:
+            return None
+        return (price + self._price_surcharge) * self._price_multiplier
 
     def _accumulate(self, new_energy: Decimal, price: Decimal | None) -> None:
         """Add the cost of the consumed energy at the given price and advance the baseline."""

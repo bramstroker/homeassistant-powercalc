@@ -27,7 +27,9 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_MULTIPLIER,
     CONF_ENERGY_PRICE_SENSOR,
+    CONF_ENERGY_PRICE_SURCHARGE,
     CONF_ENERGY_SENSOR_ID,
     CONF_FIXED,
     CONF_GROUP_TRACKED_POWER_ENTITIES,
@@ -108,6 +110,38 @@ async def test_cost_sensor_fixed_price(hass: HomeAssistant) -> None:
     _assert_cost(hass, 2.5)
 
 
+async def test_cost_sensor_fixed_price_with_surcharge(hass: HomeAssistant) -> None:
+    """Cost uses the configured fixed price plus surcharge."""
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {CONF_ENERGY_PRICE: 0.25, CONF_ENERGY_PRICE_SURCHARGE: 0.05},
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])
+
+    _assert_cost(hass, 3.0)
+
+
+async def test_cost_sensor_fixed_price_with_surcharge_and_multiplier(hass: HomeAssistant) -> None:
+    """Cost applies surcharge before the multiplier."""
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {
+            CONF_ENERGY_PRICE: 0.25,
+            CONF_ENERGY_PRICE_SURCHARGE: 0.05,
+            CONF_ENERGY_PRICE_MULTIPLIER: 1.2,
+        },
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])
+
+    _assert_cost(hass, 3.6)
+
+
 async def test_cost_sensor_price_at_consumption(hass: HomeAssistant) -> None:
     """A dynamic price sensor prices energy at the price valid when it was consumed."""
     await set_states(hass, [("sensor.energy_price", "0.20")])
@@ -126,6 +160,46 @@ async def test_cost_sensor_price_at_consumption(hass: HomeAssistant) -> None:
 
     await set_states(hass, [("sensor.existing_energy", "20", _KWH)])  # +10 kWh * 0.40
     _assert_cost(hass, 6.0)
+
+
+async def test_cost_sensor_price_sensor_with_surcharge(hass: HomeAssistant) -> None:
+    """Cost uses the dynamic price sensor value plus surcharge."""
+    await set_states(hass, [("sensor.energy_price", "0.20")])
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price", CONF_ENERGY_PRICE_SURCHARGE: 0.05},
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])
+    _assert_cost(hass, 2.5)
+
+    await set_states(hass, [("sensor.energy_price", "0.40")])
+    await set_states(hass, [("sensor.existing_energy", "20", _KWH)])
+    _assert_cost(hass, 7.0)
+
+
+async def test_cost_sensor_price_sensor_with_surcharge_and_multiplier(hass: HomeAssistant) -> None:
+    """Cost applies surcharge and multiplier to dynamic price sensor values."""
+    await set_states(hass, [("sensor.energy_price", "0.20")])
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {
+            CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price",
+            CONF_ENERGY_PRICE_SURCHARGE: 0.05,
+            CONF_ENERGY_PRICE_MULTIPLIER: 1.2,
+        },
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])
+    _assert_cost(hass, 3.0)
+
+    await set_states(hass, [("sensor.energy_price", "0.40")])
+    await set_states(hass, [("sensor.existing_energy", "20", _KWH)])
+    _assert_cost(hass, 8.4)
 
 
 async def test_price_change_settles_pending_energy_at_previous_price(hass: HomeAssistant) -> None:

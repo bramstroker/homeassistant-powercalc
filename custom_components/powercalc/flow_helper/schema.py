@@ -13,7 +13,9 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_FILTER_OUTLIER_MAX,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_MULTIPLIER,
     CONF_ENERGY_PRICE_SENSOR,
+    CONF_ENERGY_PRICE_SURCHARGE,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_SUB_PROFILE,
     CONF_UTILITY_METER_NET_CONSUMPTION,
@@ -51,6 +53,12 @@ SCHEMA_GLOBAL_COST = vol.Schema(
         ),
         vol.Optional(CONF_ENERGY_PRICE_SENSOR): selector.EntitySelector(
             selector.EntitySelectorConfig(domain="sensor", device_class=SensorDeviceClass.MONETARY),
+        ),
+        vol.Optional(CONF_ENERGY_PRICE_SURCHARGE): NumberSelector(
+            selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
+        ),
+        vol.Optional(CONF_ENERGY_PRICE_MULTIPLIER): NumberSelector(
+            selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
         ),
     },
 )
