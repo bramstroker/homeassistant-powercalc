@@ -69,9 +69,10 @@ in the global configuration and on a per sensor basis.
 
 The cost sensor reacts to changes of the energy sensor. On every update it takes the
 amount of energy consumed since the previous update and multiplies it by the price that
-is valid **at that moment**. This means that when you use a dynamic price sensor, energy
-is priced against the tariff that was active while it was consumed, and the accumulated
-cost stays correct even when the price changes over time.
+is valid **at that moment**. When you use a dynamic price sensor, a price change settles
+the energy consumed up to that point at the **previous** price before the new price takes
+effect. This way energy is always priced against the tariff that was active while it was
+consumed, and the accumulated cost stays correct even when the price changes over time.
 
 ## Limitations / tariffs
 
