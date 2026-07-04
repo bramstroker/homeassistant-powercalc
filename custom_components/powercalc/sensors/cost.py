@@ -5,7 +5,7 @@ import logging
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.const import CONF_NAME, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
 from homeassistant.helpers.device import async_entity_id_to_device
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.event import async_track_state_change_event
@@ -39,6 +39,16 @@ COST_ICON = "mdi:cash"
 ATTR_LAST_ENERGY = "last_energy"
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _parse_decimal(state: State | None) -> Decimal | None:
+    """Parse a numeric state into a Decimal, returning None when it is not a usable number."""
+    if state is None or state.state in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+        return None
+    try:
+        return Decimal(state.state)
+    except DecimalException, ValueError:
+        return None
 
 
 def create_cost_sensor(
@@ -139,11 +149,12 @@ class VirtualCostSensor(RestoreEntity, SensorEntity, CostSensor):
         self._attr_suggested_display_precision = self._rounding_digits
         self._state: Decimal = Decimal(0)
         self._last_energy: Decimal | None = None
+        self._current_price: Decimal | None = fixed_price
         self.device_entry = async_entity_id_to_device(hass, source_energy_entity)
         self.entity_id = entity_id
 
     async def async_added_to_hass(self) -> None:
-        """Restore state and start tracking the source energy sensor."""
+        """Restore state and start tracking the source energy and price sensors."""
         if (state := await self.async_get_last_state()) is not None:
             try:
                 self._state = Decimal(state.state)
@@ -161,6 +172,18 @@ class VirtualCostSensor(RestoreEntity, SensorEntity, CostSensor):
         bind_entity_to_device(self.hass, self.entity_id, self.device_entry)
         bind_entity_to_area(self.hass, self.entity_id, self._sensor_config)
 
+        # Seed the current price and, for a price sensor, track its changes so consumption
+        # is always settled at the price that was in effect when it was consumed.
+        if self._price_entity_id is not None:
+            self._current_price = _parse_decimal(self.hass.states.get(self._price_entity_id))
+            self.async_on_remove(
+                async_track_state_change_event(
+                    self.hass,
+                    [self._price_entity_id],
+                    self._handle_price_state_change,
+                ),
+            )
+
         self.async_on_remove(
             async_track_state_change_event(
                 self.hass,
@@ -172,13 +195,8 @@ class VirtualCostSensor(RestoreEntity, SensorEntity, CostSensor):
     @callback
     def _handle_energy_state_change(self, event: Event[EventStateChangedData]) -> None:
         """Accumulate cost based on the delta of the energy sensor and the current price."""
-        new_state = event.data["new_state"]
-        if new_state is None or new_state.state in (STATE_UNKNOWN, STATE_UNAVAILABLE):
-            return
-
-        try:
-            new_energy = Decimal(new_state.state)
-        except DecimalException, ValueError:
+        new_energy = _parse_decimal(event.data["new_state"])
+        if new_energy is None:
             return
 
         # First reading only establishes a baseline to measure deltas from.
@@ -186,34 +204,36 @@ class VirtualCostSensor(RestoreEntity, SensorEntity, CostSensor):
             self._last_energy = new_energy
             return
 
+        self._accumulate(new_energy, self._current_price)
+
+    @callback
+    def _handle_price_state_change(self, event: Event[EventStateChangedData]) -> None:
+        """Settle the energy consumed so far at the previous price, then adopt the new price."""
+        # Recalculate the outstanding energy delta with the previously known price before switching.
+        if self._last_energy is not None and self._current_price is not None:
+            current_energy = _parse_decimal(self.hass.states.get(self._source_energy_entity))
+            if current_energy is not None:
+                self._accumulate(current_energy, self._current_price)
+
+        self._current_price = _parse_decimal(event.data["new_state"])
+
+    def _accumulate(self, new_energy: Decimal, price: Decimal | None) -> None:
+        """Add the cost of the consumed energy at the given price and advance the baseline."""
+        # Leave _last_energy untouched when no price is known, so the consumption is
+        # priced once a price becomes available again.
+        if price is None or self._last_energy is None:
+            return
+
         delta = new_energy - self._last_energy
         # The energy sensor got reset (e.g. restart or calibrate), treat the new value as the delta.
         if delta < 0:
             delta = new_energy
-
-        price = self._get_price()
-        # Leave _last_energy untouched so the consumption is priced once the price is available again.
-        if price is None:
+        if delta == 0:
             return
 
         self._state += delta * price
         self._last_energy = new_energy
         self.async_write_ha_state()
-
-    def _get_price(self) -> Decimal | None:
-        """Resolve the current energy price."""
-        if self._fixed_price is not None:
-            return self._fixed_price
-
-        if self._price_entity_id is None:  # pragma: no cover
-            return None
-        price_state = self.hass.states.get(self._price_entity_id)
-        if price_state is None or price_state.state in (STATE_UNKNOWN, STATE_UNAVAILABLE):
-            return None
-        try:
-            return Decimal(price_state.state)
-        except DecimalException, ValueError:
-            return None
 
     @property
     def native_value(self) -> Decimal:

@@ -125,6 +125,66 @@ async def test_cost_sensor_price_at_consumption(hass: HomeAssistant) -> None:
     _assert_cost(hass, 6.0)
 
 
+async def test_price_change_settles_pending_energy_at_previous_price(hass: HomeAssistant) -> None:
+    """A price change settles the energy consumed so far at the previous price."""
+    await set_states(hass, [("sensor.energy_price", "0.20")])
+    mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
+    hass.config.currency = "EUR"
+
+    # Restore a baseline of 100 kWh and pre-set the energy sensor to 110 kWh so 10 kWh is
+    # pending (not yet settled by an energy event) when the price changes.
+    mock_restore_cache(hass, [State("sensor.test_cost", "0", {"last_energy": "100"})])
+    await set_states(hass, [("sensor.existing_energy", "110", _KWH)])
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_ENTITY_ID: "sensor.dummy",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
+            CONF_CREATE_COST_SENSOR: True,
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+        {CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price"},
+    )
+    _assert_cost(hass, 0)
+
+    # Changing the price settles the pending 10 kWh at the previous price (0.20), not the new one.
+    await set_states(hass, [("sensor.energy_price", "0.40")])
+    _assert_cost(hass, 2.0)
+
+    # Further consumption uses the new price.
+    await set_states(hass, [("sensor.existing_energy", "120", _KWH)])  # +10 kWh * 0.40
+    _assert_cost(hass, 6.0)
+
+
+async def test_price_change_ignored_when_energy_unavailable(hass: HomeAssistant) -> None:
+    """A price change with an unavailable energy sensor does not settle anything."""
+    await set_states(hass, [("sensor.energy_price", "0.20"), ("sensor.existing_energy", "unavailable")])
+    mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
+    hass.config.currency = "EUR"
+    mock_restore_cache(hass, [State("sensor.test_cost", "0", {"last_energy": "100"})])
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_ENTITY_ID: "sensor.dummy",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
+            CONF_CREATE_COST_SENSOR: True,
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+        {CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price"},
+    )
+
+    await set_states(hass, [("sensor.energy_price", "0.40")])  # energy unavailable -> nothing to settle
+    _assert_cost(hass, 0)
+
+
 async def test_price_sensor_unavailable_defers_cost(hass: HomeAssistant) -> None:
     """When the price sensor is unavailable the consumption is priced once it returns."""
     await set_states(hass, [("sensor.energy_price", "unavailable")])
