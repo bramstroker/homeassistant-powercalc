@@ -13,10 +13,13 @@ from homeassistant.helpers.typing import ConfigType
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_AREA,
+    CONF_COST_SENSOR_FRIENDLY_NAMING,
+    CONF_COST_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
+    DEFAULT_COST_NAME_PATTERN,
     DEFAULT_ENERGY_NAME_PATTERN,
     DEFAULT_POWER_NAME_PATTERN,
     DOMAIN,
@@ -95,6 +98,7 @@ def generate_power_sensor_name(
         sensor_config,
         CONF_POWER_SENSOR_NAMING,
         CONF_POWER_SENSOR_FRIENDLY_NAMING,
+        DEFAULT_POWER_NAME_PATTERN,
         name,
         source_entity,
     )
@@ -110,6 +114,23 @@ def generate_energy_sensor_name(
         sensor_config,
         CONF_ENERGY_SENSOR_NAMING,
         CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+        DEFAULT_ENERGY_NAME_PATTERN,
+        name,
+        source_entity,
+    )
+
+
+def generate_cost_sensor_name(
+    sensor_config: ConfigType,
+    name: str | None = None,
+    source_entity: SourceEntity | None = None,
+) -> str:
+    """Generates the name to use for a cost sensor."""
+    return _generate_sensor_name(
+        sensor_config,
+        CONF_COST_SENSOR_NAMING,
+        CONF_COST_SENSOR_FRIENDLY_NAMING,
+        DEFAULT_COST_NAME_PATTERN,
         name,
         source_entity,
     )
@@ -119,6 +140,7 @@ def _generate_sensor_name(
     sensor_config: ConfigType,
     naming_conf_key: str,
     friendly_naming_conf_key: str,
+    default_pattern: str,
     name: str | None = None,
     source_entity: SourceEntity | None = None,
 ) -> str:
@@ -130,12 +152,7 @@ def _generate_sensor_name(
         friendly_name_pattern = str(sensor_config.get(friendly_naming_conf_key))
         return friendly_name_pattern.format(name)
 
-    name_pattern = str(
-        sensor_config.get(
-            naming_conf_key,
-            DEFAULT_POWER_NAME_PATTERN if naming_conf_key == CONF_POWER_SENSOR_NAMING else DEFAULT_ENERGY_NAME_PATTERN,
-        ),
-    )
+    name_pattern = str(sensor_config.get(naming_conf_key, default_pattern))
     return name_pattern.format(name)
 
 
@@ -173,6 +190,28 @@ def generate_energy_sensor_entity_id(
     if entity_id := get_entity_id_by_unique_id(hass, unique_id):
         return entity_id
     name_pattern = str(sensor_config.get(CONF_ENERGY_SENSOR_NAMING, DEFAULT_ENERGY_NAME_PATTERN))
+    object_id = name or sensor_config.get(CONF_NAME)
+    if object_id is None and source_entity:
+        object_id = source_entity.object_id
+    return async_generate_entity_id(
+        ENTITY_ID_FORMAT,
+        name_pattern.format(object_id),
+        hass=hass,
+    )
+
+
+@callback
+def generate_cost_sensor_entity_id(
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    source_entity: SourceEntity | None = None,
+    name: str | None = None,
+    unique_id: str | None = None,
+) -> str:
+    """Generates the entity_id to use for a cost sensor."""
+    if entity_id := get_entity_id_by_unique_id(hass, unique_id):
+        return entity_id
+    name_pattern = str(sensor_config.get(CONF_COST_SENSOR_NAMING, DEFAULT_COST_NAME_PATTERN))
     object_id = name or sensor_config.get(CONF_NAME)
     if object_id is None and source_entity:
         object_id = source_entity.object_id

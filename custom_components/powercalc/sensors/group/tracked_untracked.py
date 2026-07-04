@@ -33,10 +33,10 @@ from custom_components.powercalc.sensors.abstract import (
     generate_power_sensor_name,
 )
 from custom_components.powercalc.sensors.energy import VirtualEnergySensor
+from custom_components.powercalc.sensors.energy_related import create_energy_related_sensors
 from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor, GroupedSensor
 from custom_components.powercalc.sensors.group.subtract import SubtractGroupSensor
 from custom_components.powercalc.sensors.power import PowerSensor
-from custom_components.powercalc.sensors.utility_meter import create_utility_meters
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -88,10 +88,12 @@ class TrackedPowerSensorFactory:
             energy_sensor = await self.create_energy_sensor(SensorType.TRACKED, tracked_sensor)
             entities.append(energy_sensor)
             entities.extend(
-                create_utility_meters(
+                create_energy_related_sensors(
                     self.hass,
+                    self.config,
                     energy_sensor,
-                    {CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
+                    utility_meter_config={CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
+                    cost_name=str(SensorType.TRACKED),
                 ),
             )
 
@@ -107,10 +109,12 @@ class TrackedPowerSensorFactory:
                 energy_sensor = await self.create_energy_sensor(SensorType.UNTRACKED, untracked_sensor)
                 entities.append(energy_sensor)
                 entities.extend(
-                    create_utility_meters(
+                    create_energy_related_sensors(
                         self.hass,
+                        self.config,
                         energy_sensor,
-                        {CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
+                        utility_meter_config={CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
+                        cost_name=str(SensorType.UNTRACKED),
                     ),
                 )
 

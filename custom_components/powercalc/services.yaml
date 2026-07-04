@@ -55,6 +55,7 @@ change_gui_config:
           mode: dropdown
           options:
             - "create_energy_sensor"
+            - "create_cost_sensor"
             - "create_utility_meters"
             - "ignore_unavailable_state"
             - "energy_integration_method"

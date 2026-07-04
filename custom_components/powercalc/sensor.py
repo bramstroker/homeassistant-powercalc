@@ -53,6 +53,7 @@ from .const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_COMPOSITE,
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
@@ -152,18 +153,19 @@ from .errors import (
 )
 from .group_include.filter import FILTER_CONFIG, FilterOperator, create_composite_filter
 from .group_include.include import find_entities
+from .sensors.cost import CostSensor
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
+from .sensors.energy_related import create_energy_related_sensors
 from .sensors.group.config_entry_utils import add_to_associated_groups
 from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
 from .sensors.group.standby import StandbyPowerSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
-from .sensors.utility_meter import create_utility_meters
 from .strategy.composite import CONFIG_SCHEMA as COMPOSITE_SCHEMA
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -196,6 +198,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
     vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
+    vol.Optional(CONF_CREATE_COST_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_TARIFFS): vol.All(cv.ensure_list, [cv.string]),
@@ -447,6 +450,8 @@ def _register_entity_id_change_listener(
 def _resolve_entity_type(entity: Entity) -> EntityType:
     if isinstance(entity, UtilityMeterSensor):
         return EntityType.UTILITY_METER
+    if isinstance(entity, CostSensor):
+        return EntityType.COST_SENSOR
     if isinstance(entity, EnergySensor):
         return EntityType.ENERGY_SENSOR
     if isinstance(entity, PowerSensor):
@@ -918,7 +923,9 @@ async def create_individual_sensors(
             attach_energy_sensor_to_power_sensor(power_sensor, energy_sensor)
 
     if energy_sensor:
-        entities_to_add.extend(create_utility_meters(hass, energy_sensor, sensor_config, config_entry))
+        entities_to_add.extend(
+            create_energy_related_sensors(hass, sensor_config, energy_sensor, source_entity, config_entry),
+        )
 
     await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
     update_registries(hass, source_entity, entities_to_add, context)

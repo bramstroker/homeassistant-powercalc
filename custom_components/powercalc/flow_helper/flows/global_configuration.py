@@ -11,6 +11,7 @@ import voluptuous as vol
 
 from custom_components.powercalc import DeviceType
 from custom_components.powercalc.const import (
+    CONF_CREATE_COST_SENSORS,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_STANDBY_GROUP,
     CONF_CREATE_UTILITY_METERS,
@@ -47,6 +48,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
 from custom_components.powercalc.flow_helper.schema import (
     SCHEMA_ENERGY_OPTIONS,
+    SCHEMA_GLOBAL_COST,
     SCHEMA_UTILITY_METER_OPTIONS,
     SCHEMA_UTILITY_METER_TOGGLE,
 )
@@ -74,6 +76,7 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_DISABLE_LIBRARY_DOWNLOAD, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_CREATE_STANDBY_GROUP, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_CREATE_COST_SENSORS, default=False): selector.BooleanSelector(),
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 )
@@ -257,6 +260,33 @@ class GlobalConfigurationFlow:
             self.flow.global_config.update(user_input)
 
         if not bool(self.flow.global_config.get(CONF_CREATE_UTILITY_METERS)) or user_input is not None:
+            return await self.async_step_global_configuration_cost()
+
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GLOBAL_CONFIGURATION_UTILITY_METER,
+                schema=SCHEMA_UTILITY_METER_OPTIONS,
+                form_kwarg={
+                    "description_placeholders": {
+                        "docs_uri": DOCS_URI,
+                    },
+                },
+            ),
+        )
+
+    async def async_step_global_configuration_cost(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
+        """Handle the global cost sensor configuration step (energy price)."""
+
+        if user_input is not None:
+            if self.flow.is_options_flow:
+                merge_global_config(self.flow.global_config, user_input, SCHEMA_GLOBAL_COST)
+                return self.flow.persist_config_entry()
+            self.flow.global_config.update(user_input)
+
+        if not bool(self.flow.global_config.get(CONF_CREATE_COST_SENSORS)) or user_input is not None:
             return self.flow.async_create_entry(
                 title="Global Configuration",
                 data=self.flow.global_config,
@@ -264,8 +294,8 @@ class GlobalConfigurationFlow:
 
         return await self.flow.handle_form_step(
             PowercalcFormStep(
-                step=Step.GLOBAL_CONFIGURATION_UTILITY_METER,
-                schema=SCHEMA_UTILITY_METER_OPTIONS,
+                step=Step.GLOBAL_CONFIGURATION_COST,
+                schema=SCHEMA_GLOBAL_COST,
                 form_kwarg={
                     "description_placeholders": {
                         "docs_uri": DOCS_URI,
@@ -317,6 +347,8 @@ class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
         }
         if self.flow.global_config.get(CONF_CREATE_ENERGY_SENSORS):
             menu[Step.GLOBAL_CONFIGURATION_ENERGY] = "Energy options"
+        if self.flow.global_config.get(CONF_CREATE_COST_SENSORS):
+            menu[Step.GLOBAL_CONFIGURATION_COST] = "Cost options"
         if self.flow.global_config.get(CONF_CREATE_UTILITY_METERS):
             menu[Step.GLOBAL_CONFIGURATION_UTILITY_METER] = "Utility meter options"
         return menu

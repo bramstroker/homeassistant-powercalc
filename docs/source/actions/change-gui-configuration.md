@@ -6,6 +6,7 @@ To change the configuration options for all Powercalc GUI config entries at once
 You can use it to change the configuration for the following options
 
 - create_energy_sensor
+- create_cost_sensor
 - create_utility_meters
 - ignore_unavailable_state
 - energy_integration_method

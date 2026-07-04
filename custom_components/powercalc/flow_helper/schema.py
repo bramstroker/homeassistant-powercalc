@@ -1,15 +1,19 @@
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
 from homeassistant.const import UnitOfPower
 from homeassistant.helpers import selector
-from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig, NumberSelectorMode
+from homeassistant.helpers.selector import NumberSelector, NumberSelectorMode
 import voluptuous as vol
 
 from custom_components.powercalc.const import (
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_FILTER_OUTLIER_ENABLED,
     CONF_ENERGY_FILTER_OUTLIER_MAX,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_SENSOR,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_SUB_PROFILE,
     CONF_UTILITY_METER_NET_CONSUMPTION,
@@ -31,6 +35,23 @@ SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
 SCHEMA_ENERGY_SENSOR_TOGGLE = vol.Schema(
     {
         vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): selector.BooleanSelector(),
+    },
+)
+
+SCHEMA_COST_SENSOR_TOGGLE = vol.Schema(
+    {
+        vol.Optional(CONF_CREATE_COST_SENSOR, default=False): selector.BooleanSelector(),
+    },
+)
+
+SCHEMA_GLOBAL_COST = vol.Schema(
+    {
+        vol.Optional(CONF_ENERGY_PRICE): NumberSelector(
+            selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
+        ),
+        vol.Optional(CONF_ENERGY_PRICE_SENSOR): selector.EntitySelector(
+            selector.EntitySelectorConfig(domain="sensor", device_class=SensorDeviceClass.MONETARY),
+        ),
     },
 )
 
@@ -64,7 +85,7 @@ SCHEMA_SENSOR_ENERGY_OPTIONS = SCHEMA_ENERGY_OPTIONS.extend(
         {
             vol.Optional(CONF_ENERGY_FILTER_OUTLIER_ENABLED, default=False): selector.BooleanSelector(),
             vol.Optional(CONF_ENERGY_FILTER_OUTLIER_MAX): NumberSelector(
-                NumberSelectorConfig(mode=NumberSelectorMode.BOX, unit_of_measurement=UnitOfPower.WATT),
+                selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, unit_of_measurement=UnitOfPower.WATT),
             ),
         },
     ).schema,

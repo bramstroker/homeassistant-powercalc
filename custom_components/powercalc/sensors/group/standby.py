@@ -25,6 +25,7 @@ from custom_components.powercalc.const import (
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
 )
 from custom_components.powercalc.sensors.energy import create_energy_sensor
+from custom_components.powercalc.sensors.energy_related import create_energy_related_sensors
 from custom_components.powercalc.sensors.power import PowerSensor
 
 _LOGGER = logging.getLogger(__name__)
@@ -52,6 +53,7 @@ def create_general_standby_sensors(
             source_entity,
         )
         sensors.append(energy_sensor)
+        sensors.extend(create_energy_related_sensors(hass, sensor_config, energy_sensor, source_entity))
     return sensors
 
 

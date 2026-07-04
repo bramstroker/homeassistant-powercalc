@@ -22,12 +22,15 @@ from custom_components.powercalc import (
 )
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
+    CONF_CREATE_COST_SENSORS,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_SENSOR,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
@@ -138,6 +141,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_STANDBY_GROUP: True,
         CONF_CREATE_ENERGY_SENSORS: True,
+        CONF_CREATE_COST_SENSORS: False,
         CONF_CREATE_UTILITY_METERS: True,
         CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
         CONF_DISABLE_LIBRARY_DOWNLOAD: True,
@@ -363,6 +367,84 @@ async def test_utility_meter_options_flow(hass: HomeAssistant) -> None:
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_TARIFFS] == ["peak", "off_peak"]
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_OFFSET] == timedelta(days=1)
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_NET_CONSUMPTION]
+
+
+async def test_cost_options_step_in_config_flow(hass: HomeAssistant) -> None:
+    """The cost options step is shown in the wizard and the price is stored."""
+    result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_CREATE_ENERGY_SENSORS: False,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_CREATE_COST_SENSORS: True,
+        },
+    )
+
+    # Submit discovery step
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_DISCOVERY
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
+    # Submit throttling step
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_THROTTLING
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
+    # Energy and utility meter steps are skipped, cost step is shown
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENERGY_PRICE: 0.30},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_CREATE_COST_SENSORS] is True
+    assert result["data"][CONF_ENERGY_PRICE] == pytest.approx(0.30)
+
+
+async def test_cost_options_step_skipped_when_disabled(hass: HomeAssistant) -> None:
+    """The cost options step is skipped when cost sensors are disabled."""
+    result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_CREATE_ENERGY_SENSORS: False,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_CREATE_COST_SENSORS: False,
+        },
+    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+
+async def test_cost_options_flow(hass: HomeAssistant) -> None:
+    """Test cost options flow (options flow menu + price entity)."""
+    entry = await create_mock_global_config_entry(
+        hass,
+        {
+            CONF_CREATE_COST_SENSORS: True,
+        },
+    )
+
+    await handle_options_flow_update(
+        hass,
+        entry,
+        Step.GLOBAL_CONFIGURATION_COST,
+        {
+            CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price",
+        },
+    )
+
+    # Check if config entry data is updated.
+    assert entry.data[CONF_ENERGY_PRICE_SENSOR] == "sensor.energy_price"
+
+    # Check if global config in hass object is updated.
+    assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_ENERGY_PRICE_SENSOR] == "sensor.energy_price"
 
 
 async def test_discovery_options_flow(hass: HomeAssistant) -> None:
