@@ -118,6 +118,7 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
 SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY = vol.Schema(
     {
         vol.Optional(CONF_ENABLED, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_EXCLUDE_DEVICE_TYPES): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=[cls.value for cls in DeviceType],
@@ -125,7 +126,6 @@ SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY = vol.Schema(
                 multiple=True,
             ),
         ),
-        vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): selector.BooleanSelector(),
     },
 )
 
