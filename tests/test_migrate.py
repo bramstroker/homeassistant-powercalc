@@ -3,9 +3,10 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, EntityCategory
 from homeassistant.core import HomeAssistant
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.issue_registry import IssueRegistry
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_device_registry
 
 from custom_components.powercalc import (
     CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
@@ -14,6 +15,7 @@ from custom_components.powercalc import (
     DOMAIN,
     DeviceType,
     async_fix_legacy_profile_config_entry,
+    async_migrate_entry,
 )
 from custom_components.powercalc.config_flow import PowercalcConfigFlow
 from custom_components.powercalc.const import (
@@ -209,6 +211,64 @@ async def test_migrate_config_entry_keeps_diagnostic_power_sensor_category(hass:
     )
 
     assert mock_entry.data[CONF_POWER_SENSOR_CATEGORY] == EntityCategory.DIAGNOSTIC
+
+
+async def test_migrate_config_entry_removes_config_entry_from_device(
+    hass: HomeAssistant,
+    entity_registry: er.EntityRegistry,
+) -> None:
+    """Test migration removes the Powercalc config entry from devices."""
+    device_registry = mock_device_registry(hass, {})
+    device_owner_config_entry = MockConfigEntry(domain="test")
+    device_owner_config_entry.add_to_hass(hass)
+    device_entry = device_registry.async_get_or_create(
+        config_entry_id=device_owner_config_entry.entry_id,
+        identifiers={("shelly", "PlugS")},
+        manufacturer="shelly",
+        model="PlugS",
+    )
+    entity_registry.async_get_or_create(
+        "switch",
+        "test",
+        "source_switch",
+        suggested_object_id="source_switch",
+        device_id=device_entry.id,
+    )
+
+    mock_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_NAME: "Test",
+            CONF_ENTITY_ID: "switch.source_switch",
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        version=8,
+    )
+    mock_entry.add_to_hass(hass)
+    device_registry.async_update_device(device_entry.id, add_config_entry_id=mock_entry.entry_id)
+    entity_entry = entity_registry.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        "test_power",
+        config_entry=mock_entry,
+        device_id=device_entry.id,
+    )
+
+    device = device_registry.async_get(device_entry.id)
+    assert device
+    assert mock_entry.entry_id in device.config_entries
+    assert entity_entry.device_id == device_entry.id
+
+    await async_migrate_entry(hass, mock_entry)
+
+    device = device_registry.async_get(device_entry.id)
+    assert device
+    assert mock_entry.entry_id not in device.config_entries
+    entity_entry = entity_registry.async_get(entity_entry.entity_id)
+    assert entity_entry
+    assert entity_entry.device_id == device_entry.id
+    assert mock_entry.version == PowercalcConfigFlow.VERSION
 
 
 @pytest.mark.parametrize(

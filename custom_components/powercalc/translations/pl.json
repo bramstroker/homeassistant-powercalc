@@ -10,6 +10,7 @@
       "already_configured": "Czujnik jest już skonfigurowany, podaj unikatowy identyfikator"
     },
     "error": {
+      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
       "daily_energy_mandatory": "Musisz podać co najmniej jedną Wartość lub Szablon wartości",
       "entity_mandatory": "Wybranie encji jest wymagane w przypadku każdej strategii innej niż playbook",
       "fixed_mandatory": "Musisz podać co najmniej jedno z: Moc, Szablon mocy lub Moce stanów",
@@ -129,17 +130,43 @@
       "global_configuration_cost": {
         "title": "Cost options",
         "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Więcej informacji znajdziesz w [dokumentacji]({docs_uri})",
+        "sections": {
+          "cost_pricing": {
+            "name": "Pricing",
+            "data": {
+              "energy_price": "Fixed energy price",
+              "energy_price_multiplier": "Energy price multiplier",
+              "energy_price_sensor": "Energy price sensor",
+              "energy_price_surcharge": "Energy price surcharge"
+            },
+            "data_description": {
+              "energy_price": "A fixed price per kWh in your local currency",
+              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+            }
+          },
+          "cost_naming": {
+            "name": "Naming",
+            "data": {
+              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
+              "cost_sensor_naming": "Cost sensor name pattern"
+            },
+            "data_description": {
+              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
+              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+            }
+          }
+        }
+      },
+      "global_configuration_cost_apply": {
+        "title": "Apply cost sensors",
+        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
         "data": {
-          "energy_price": "Fixed energy price",
-          "energy_price_multiplier": "Energy price multiplier",
-          "energy_price_sensor": "Energy price sensor",
-          "energy_price_surcharge": "Energy price surcharge"
+          "apply_to_all": "Apply to existing sensors"
         },
         "data_description": {
-          "energy_price": "A fixed price per kWh in your local currency",
-          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
         }
       },
       "global_configuration_discovery": {
@@ -518,6 +545,7 @@
       "model_not_support": "Model nie jest wspierany"
     },
     "error": {
+      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
       "fixed_mandatory": "Musisz podać co najmniej jedno z: Moc, Szablon mocy lub Moce stanów",
       "fixed_states_power_only": "Ta encja może działać tylko ze 'states_power', a nie z 'power'",
       "group_mandatory": "Musisz zdefiniować przynajmniej podgrupy lub encje mocy i energii",
@@ -634,17 +662,43 @@
       "global_configuration_cost": {
         "title": "Cost options",
         "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Więcej informacji znajdziesz w [dokumentacji]({docs_uri})",
+        "sections": {
+          "cost_pricing": {
+            "name": "Pricing",
+            "data": {
+              "energy_price": "Fixed energy price",
+              "energy_price_multiplier": "Energy price multiplier",
+              "energy_price_sensor": "Energy price sensor",
+              "energy_price_surcharge": "Energy price surcharge"
+            },
+            "data_description": {
+              "energy_price": "A fixed price per kWh in your local currency",
+              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+            }
+          },
+          "cost_naming": {
+            "name": "Naming",
+            "data": {
+              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
+              "cost_sensor_naming": "Cost sensor name pattern"
+            },
+            "data_description": {
+              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
+              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+            }
+          }
+        }
+      },
+      "global_configuration_cost_apply": {
+        "title": "Apply cost sensors",
+        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
         "data": {
-          "energy_price": "Fixed energy price",
-          "energy_price_multiplier": "Energy price multiplier",
-          "energy_price_sensor": "Energy price sensor",
-          "energy_price_surcharge": "Energy price surcharge"
+          "apply_to_all": "Apply to existing sensors"
         },
         "data_description": {
-          "energy_price": "A fixed price per kWh in your local currency",
-          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
         }
       },
       "global_configuration_discovery": {
