@@ -18,8 +18,6 @@ from homeassistant.const import (
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, State, callback
-from homeassistant.helpers.device import async_entity_id_to_device
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
@@ -44,14 +42,11 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_UPDATE_INTERVAL,
     UnitPrefix,
 )
-from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.filter.outlier import OutlierFilter
 
 from .abstract import (
     BaseEntity,
-    bind_entity_to_area,
-    bind_entity_to_device,
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
 )
@@ -181,7 +176,6 @@ def _create_virtual_energy_sensor(
         powercalc_source_entity=source_entity.entity_id if source_entity else None,
         powercalc_source_domain=source_entity.domain if source_entity else None,
         sensor_config=sensor_config,
-        device_info=get_device_info(hass, sensor_config, source_entity),
     )
 
 
@@ -263,7 +257,6 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         entity_category: EntityCategory | None = None,
         name: str | None = None,
         unit_prefix: str | None = None,
-        device_info: DeviceInfo | None = None,
     ) -> None:
         round_digits: int = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
         integration_method: str = sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD, DEFAULT_ENERGY_INTEGRATION_METHOD)
@@ -277,7 +270,6 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             "unit_time": UnitOfTime.HOURS,
             "integration_method": integration_method,
             "unique_id": unique_id,
-            "device_info": device_info,
             "max_sub_interval": timedelta(
                 seconds=sensor_config.get(CONF_ENERGY_UPDATE_INTERVAL, DEFAULT_ENERGY_UPDATE_INTERVAL),
             ),
@@ -291,7 +283,6 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
-        self.device_entry = async_entity_id_to_device(hass, source_entity)
         self._sensor_config = sensor_config
         self.entity_id = entity_id
         self._attr_device_class = SensorDeviceClass.ENERGY
@@ -305,12 +296,6 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             max_z_score=3.5,
             max_expected_step=sensor_config.get(CONF_ENERGY_FILTER_OUTLIER_MAX, 1000),
         )
-
-    async def async_added_to_hass(self) -> None:
-        """Bind the generated energy sensor to configured registry metadata."""
-        await super().async_added_to_hass()
-        bind_entity_to_device(self.hass, self.entity_id, self.device_entry)
-        bind_entity_to_area(self.hass, self.entity_id, self._sensor_config)
 
     def _integrate_on_state_change(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Override to add outlier filtering."""
