@@ -7,7 +7,8 @@
   },
   "config": {
     "abort": {
-      "already_configured": "Sensor är redan konfigurerad, specificera ett unikt ID"
+      "already_configured": "Sensor är redan konfigurerad, specificera ett unikt ID",
+      "cost_no_global_price": "Det finns ännu inget elpris konfigurerat. Ställ in ett elpris i den globala Powercalc-konfigurationen innan du skapar en kostnadssensor. Se [dokumentationen]({url})."
     },
     "error": {
       "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
@@ -431,6 +432,18 @@
         "description": "Nuvarande specifik inställning kan bara konfigureras globalt",
         "title": "Skapa en energisensor för en befintlig effektsensor"
       },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "Energisensor",
+          "name": "Namn"
+        },
+        "data_description": {
+          "energy_sensor_id": "Den befintliga energisensorn (kWh) som kostnaden ska beräknas för. Det kan vara en sensor från vilken integration som helst, inte bara Powercalc",
+          "name": "Grundnamn för kostnadssensorn. Det fullständiga entitetsnamnet sätts enligt inställningen cost_sensor_naming"
+        },
+        "description": "Skapa en kostnadssensor för en befintlig energisensor. Elpriset hämtas från den globala Powercalc-konfigurationen.",
+        "title": "Skapa kostnadssensor"
+      },
       "sub_profile": {
         "data": {
           "sub_profile": "Underprofil"
@@ -462,6 +475,7 @@
           "sensor_type": "Sensortyp"
         },
         "menu_options": {
+          "cost": "Kostnadssensor (från befintlig energisensor)",
           "daily_energy": "Daglig energi",
           "group": "Grupp",
           "global_configuration": "Global configuration",
@@ -816,6 +830,7 @@
         "menu_options": {
           "advanced_options": "Avancerade inställningar",
           "basic_options": "Grundläggande inställningar",
+          "cost": "Kostnadsalternativ",
           "daily_energy": "Daily energy options",
           "energy_options": "Energy options",
           "fixed": "Fixed options",
@@ -884,6 +899,15 @@
         },
         "data_description": {
           "device": "Add the created energy sensor to an specific device"
+        }
+      },
+      "cost": {
+        "title": "Kostnadsalternativ",
+        "data": {
+          "energy_sensor_id": "Energisensor"
+        },
+        "data_description": {
+          "energy_sensor_id": "Den befintliga energisensorn (kWh) som kostnaden ska beräknas för"
         }
       },
       "utility_meter_options": {

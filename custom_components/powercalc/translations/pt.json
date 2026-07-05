@@ -7,7 +7,8 @@
   },
   "config": {
     "abort": {
-      "already_configured": "O sensor já está configurado, especifique um unique_id"
+      "already_configured": "O sensor já está configurado, especifique um unique_id",
+      "cost_no_global_price": "Ainda não há um preço de energia configurado. Defina um preço de energia na configuração global do Powercalc antes de criar um sensor de custo. Consulte a [documentação]({url})."
     },
     "error": {
       "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
@@ -431,6 +432,18 @@
         "description": "As definições especificadas só podem ser configuradas globalmente",
         "title": "Criar um sensor de energia a partir de um sensor de potência existente"
       },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "Sensor de energia",
+          "name": "Nome"
+        },
+        "data_description": {
+          "energy_sensor_id": "O sensor de energia existente (kWh) para o qual o custo será calculado. Pode ser um sensor de qualquer integração, não apenas do Powercalc",
+          "name": "Nome base do sensor de custo. O nome completo da entidade é definido de acordo com a configuração cost_sensor_naming"
+        },
+        "description": "Criar um sensor de custo para um sensor de energia existente. O preço da energia é obtido da configuração global do Powercalc.",
+        "title": "Criar sensor de custo"
+      },
       "sub_profile": {
         "data": {
           "sub_profile": "Sub-perfil"
@@ -462,6 +475,7 @@
           "sensor_type": "Tipo de sensor"
         },
         "menu_options": {
+          "cost": "Sensor de custo (de um sensor de energia existente)",
           "daily_energy": "Energia diáriay",
           "group": "Grupo",
           "global_configuration": "Global configuration",
@@ -816,6 +830,7 @@
         "menu_options": {
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
+          "cost": "Opções de custo",
           "daily_energy": "Daily energy options",
           "energy_options": "Energy options",
           "fixed": "Fixed options",
@@ -884,6 +899,15 @@
         },
         "data_description": {
           "device": "Add the created energy sensor to an specific device"
+        }
+      },
+      "cost": {
+        "title": "Opções de custo",
+        "data": {
+          "energy_sensor_id": "Sensor de energia"
+        },
+        "data_description": {
+          "energy_sensor_id": "O sensor de energia existente (kWh) para o qual o custo será calculado"
         }
       },
       "utility_meter_options": {
