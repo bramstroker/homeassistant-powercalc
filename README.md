@@ -9,13 +9,9 @@
 
 ## ⚡ Turn any device into an energy monitor, no smart plug required
 
-**PowerCalc** brings energy monitoring to devices that normally *don’t support it*.
+**PowerCalc** estimates energy consumption for devices that can't measure it themselves, like lights, fans and media players, with no extra hardware. Instead of measuring power directly, it **accurately estimates consumption** using smart models based on real measurements, all inside Home Assistant.
 
-- Lights, fans, media devices, and more
-- No extra hardware needed
-- Works seamlessly inside Home Assistant
-
-Instead of measuring power directly, PowerCalc **accurately estimates consumption** using smart models based on real measurements.
+On top of power and energy sensors, PowerCalc also creates **cost sensors** to track spending, **utility meters** to break usage down by day, week or month, and **group sensors** to combine devices, rooms or your whole home into a single total.
 
 ---
 
