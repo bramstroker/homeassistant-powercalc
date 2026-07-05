@@ -1,6 +1,6 @@
 import logging
 
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorDeviceClass, SensorStateClass
+from homeassistant.components.sensor import ATTR_LAST_RESET, ATTR_STATE_CLASS, SensorDeviceClass, SensorStateClass
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
@@ -15,6 +15,7 @@ from homeassistant.const import (
     UnitOfEnergy,
 )
 from homeassistant.core import HomeAssistant, State
+from homeassistant.util import dt as dt_util
 import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -551,6 +552,86 @@ async def test_utility_meter_cost_sensor_accumulates(hass: HomeAssistant) -> Non
     _assert_cost(hass, 2.0, meter_cost_id)
 
 
+async def test_utility_meter_cost_sensor_exposes_last_reset(hass: HomeAssistant) -> None:
+    """A resetting per-meter cost sensor exposes last_reset, advancing it on each cycle reset."""
+    mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_ENTITY_ID: "sensor.dummy",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+            CONF_CREATE_COST_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    meter_cost_id = "sensor.sensor_existing_energy_daily_cost"
+    meter_id = "sensor.existing_energy_daily"
+
+    # A freshly created resetting cost sensor initializes last_reset immediately.
+    initial = dt_util.parse_datetime(hass.states.get(meter_cost_id).attributes[ATTR_LAST_RESET])
+    assert initial is not None
+
+    # Drive some consumption so the cost sensor has a baseline before the cycle reset.
+    for value in ("10", "20"):
+        await set_states(hass, [("sensor.existing_energy", value, _KWH)])
+
+    hass.states.async_set(meter_id, "0", _KWH)  # meter reset -> new cycle
+    await hass.async_block_till_done()
+
+    after_reset = dt_util.parse_datetime(hass.states.get(meter_cost_id).attributes[ATTR_LAST_RESET])
+    assert after_reset is not None
+    assert after_reset >= initial
+
+
+async def test_lifetime_cost_sensor_has_no_last_reset(hass: HomeAssistant) -> None:
+    """A lifetime (non-resetting) cost sensor accumulates monotonically and sets no last_reset."""
+    await _setup_cost_sensor(hass, {CONF_CREATE_COST_SENSOR: True}, {CONF_ENERGY_PRICE: 0.25})
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])
+
+    cost_state = hass.states.get("sensor.test_cost")
+    assert cost_state
+    assert ATTR_LAST_RESET not in cost_state.attributes
+
+
+async def test_utility_meter_cost_sensor_restores_last_reset(hass: HomeAssistant) -> None:
+    """A restarted per-meter cost sensor restores its previous last_reset instead of resetting it."""
+    restored_reset = "2024-01-01T00:00:00+00:00"
+    mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
+    restored_attrs = {"last_energy": "10", ATTR_LAST_RESET: restored_reset}
+    mock_restore_cache(
+        hass,
+        [State("sensor.sensor_existing_energy_daily_cost", "3.0", restored_attrs)],
+    )
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_ENTITY_ID: "sensor.dummy",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+            CONF_CREATE_COST_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    cost_state = hass.states.get("sensor.sensor_existing_energy_daily_cost")
+    assert cost_state
+    assert cost_state.attributes[ATTR_LAST_RESET] == restored_reset
+
+
 async def test_restore_state(hass: HomeAssistant) -> None:
     """The accumulated cost and last energy baseline are restored across restarts."""
     mock_restore_cache(
@@ -612,6 +693,8 @@ async def test_reset_cost_service(hass: HomeAssistant) -> None:
     cost_state = hass.states.get("sensor.test_cost")
     assert cost_state
     assert cost_state.attributes["last_energy"] == "10"
+    # Resetting to zero stamps last_reset so long-term statistics don't read a negative drop.
+    assert cost_state.attributes.get(ATTR_LAST_RESET) is not None
 
     await set_states(hass, [("sensor.existing_energy", "12", _KWH)])
     _assert_cost(hass, 0.5)

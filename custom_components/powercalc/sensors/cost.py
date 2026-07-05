@@ -5,7 +5,7 @@ from decimal import Decimal, DecimalException
 import logging
 from typing import TYPE_CHECKING
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
+from homeassistant.components.sensor import ATTR_LAST_RESET, SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
@@ -20,6 +20,7 @@ import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.util import dt as dt_util
 from homeassistant.util.unit_conversion import EnergyConverter
 
 from custom_components.powercalc.common import SourceEntity
@@ -45,6 +46,8 @@ from .abstract import (
 from .energy import EnergySensor, RealEnergySensor
 
 if TYPE_CHECKING:
+    from datetime import datetime
+
     from .utility_meter import VirtualUtilityMeter
 
 COST_ICON = "mdi:cash"
@@ -266,6 +269,9 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
         self._state: Decimal = Decimal(0)
         self._last_energy: Decimal | None = None
         self._current_price: Decimal | None = self._effective_price(fixed_price)
+        # Only a resetting (per utility meter cycle) sensor uses last_reset; a lifetime cost
+        # sensor accumulates monotonically and leaves it None.
+        self._attr_last_reset: datetime | None = None
         self.entity_id = entity_id
 
     async def async_added_to_hass(self) -> None:
@@ -283,6 +289,13 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
                     self._last_energy = Decimal(str(last_energy))
                 except DecimalException, ValueError:  # pragma: no cover
                     self._last_energy = None
+
+        # A resetting (per utility meter cycle) cost sensor exposes last_reset so long-term
+        # statistics treat each cycle reset as a new cycle rather than negative consumption.
+        # Restore it across restarts, falling back to now for a freshly created sensor.
+        if self._reset_on_source_reset:
+            restored = dt_util.parse_datetime(state.attributes.get(ATTR_LAST_RESET, "")) if state else None
+            self._attr_last_reset = restored or dt_util.utcnow()
 
         _LOGGER.debug("%s: Restoring cost sensor state: %s", self.entity_id, self._state)
 
@@ -354,6 +367,7 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
                 # The source (utility meter) reset for a new cycle, start the cost cycle over.
                 self._state = Decimal(0)
                 self._last_energy = new_energy
+                self._attr_last_reset = dt_util.utcnow()
                 self.async_write_ha_state()
                 return
             # The energy sensor got reset (e.g. restart or calibrate), treat the new value as the delta.
@@ -370,6 +384,7 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
         """Reset the cost sensor to zero from the current source energy reading."""
         _LOGGER.debug("%s: Reset cost sensor", self.entity_id)
         self._state = Decimal(0)
+        self._attr_last_reset = dt_util.utcnow()
         self._set_current_energy_baseline()
         self.async_write_ha_state()
 
