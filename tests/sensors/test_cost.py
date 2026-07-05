@@ -24,6 +24,7 @@ from pytest_homeassistant_custom_component.common import (
 )
 
 from custom_components.powercalc.const import (
+    CONF_COST,
     CONF_COST_SENSOR_FRIENDLY_NAMING,
     CONF_COST_SENSOR_NAMING,
     CONF_CREATE_COST_SENSOR,
@@ -306,6 +307,50 @@ async def test_global_toggle_creates_cost_sensor(hass: HomeAssistant) -> None:
         {CONF_ENERGY_PRICE: 0.25, CONF_CREATE_COST_SENSORS: True},
     )
     assert hass.states.get("sensor.test_cost") is not None
+
+
+async def test_yaml_standalone_cost_sensor(hass: HomeAssistant) -> None:
+    """A YAML config with a cost block creates a standalone cost sensor."""
+    mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Fridge",
+            CONF_COST: {CONF_ENERGY_SENSOR_ID: "sensor.existing_energy"},
+        },
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    cost_state = hass.states.get("sensor.fridge_cost")
+    assert cost_state
+    assert cost_state.attributes[ATTR_DEVICE_CLASS] == SensorDeviceClass.MONETARY
+
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])  # baseline
+    await set_states(hass, [("sensor.existing_energy", "20", _KWH)])  # +10 kWh * 0.25
+    _assert_cost(hass, 2.5, "sensor.fridge_cost")
+
+
+async def test_yaml_standalone_cost_sensor_name_derived_from_energy_sensor(hass: HomeAssistant) -> None:
+    """When no name is given the cost sensor name is derived from the tracked energy sensor."""
+    mock_registry(
+        hass,
+        {
+            "sensor.existing_energy": RegistryEntryWithDefaults(
+                entity_id="sensor.existing_energy",
+                name="Fridge energy",
+                unique_id="1234",
+                platform="sensor",
+            ),
+        },
+    )
+    await run_powercalc_setup(
+        hass,
+        {CONF_COST: {CONF_ENERGY_SENSOR_ID: "sensor.existing_energy"}},
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    # The cost sensor name is derived from the energy sensor name "Fridge energy".
+    assert hass.states.get("sensor.fridge_energy_cost") is not None
 
 
 async def test_cost_sensor_naming_pattern(hass: HomeAssistant) -> None:

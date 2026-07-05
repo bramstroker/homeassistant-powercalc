@@ -104,6 +104,17 @@ This requires an energy price to be configured in the [global
 configuration](../configuration/global-configuration.md) first. When no price is
 configured yet, the flow will point you to set one up before continuing.
 
+The same can be configured in YAML with a `cost` block. The `name` is optional; when
+omitted it is derived from the tracked energy sensor:
+
+```yaml
+powercalc:
+  sensors:
+    - name: Fridge
+      cost:
+        energy_sensor_id: sensor.fridge_energy
+```
+
 ## Naming
 
 By default a cost sensor is named `{appliance} cost` (for example `Floorlamp cost`). You

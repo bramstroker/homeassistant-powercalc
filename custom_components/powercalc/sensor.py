@@ -53,6 +53,7 @@ from .const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_COMPOSITE,
+    CONF_COST,
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
@@ -191,6 +192,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_DISABLE_STANDBY_POWER): cv.boolean,
     vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
     vol.Optional(CONF_POWER_SENSOR_ID): cv.entity_id,
+    vol.Optional(CONF_COST): vol.Schema({vol.Required(CONF_ENERGY_SENSOR_ID): cv.entity_id}),
     vol.Optional(CONF_FORCE_ENERGY_SENSOR_CREATION): cv.boolean,
     vol.Optional(CONF_FORCE_CALCULATE_GROUP_ENERGY): cv.boolean,
     vol.Optional(CONF_FIXED): FIXED_SCHEMA,
@@ -274,6 +276,7 @@ PLATFORM_SCHEMA = vol.All(
         CONF_ENTITIES,
         CONF_INCLUDE,
         CONF_DAILY_FIXED_ENERGY,
+        CONF_COST,
     ),
     PLATFORM_SCHEMA.extend(SENSOR_CONFIG),
 )
@@ -742,8 +745,11 @@ async def setup_individual_sensors(
     context: CreationContext,
 ) -> EntitiesBucket:
     """Set up an individual sensor."""
+    if CONF_COST in config:
+        config[CONF_SENSOR_TYPE] = SensorType.COST
+
+    sensor_type = resolve_sensor_type(config)
     merged_sensor_config = get_merged_sensor_configuration(global_config, config)
-    sensor_type = SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
 
     if sensor_type == SensorType.GROUP:
         collect_sensor_analytics(hass, sensor_type, context.discovery_type, config_entry)
@@ -756,6 +762,11 @@ async def setup_individual_sensors(
 
     return await create_individual_sensors(hass, merged_sensor_config, context, sensor_type, config_entry)
 
+def resolve_sensor_type(config: ConfigType) -> SensorType:
+    """Resolve the sensor type based on the configuration."""
+    if CONF_COST in config:
+        return SensorType.COST
+    return SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
 
 def collect_sensor_analytics(
     hass: HomeAssistant,

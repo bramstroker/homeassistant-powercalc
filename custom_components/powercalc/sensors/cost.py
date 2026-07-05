@@ -14,6 +14,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_COST,
     CONF_COST_SENSOR_PRECISION,
     CONF_ENERGY_PRICE,
     CONF_ENERGY_PRICE_MULTIPLIER,
@@ -122,8 +123,13 @@ def create_cost_sensor(
 
 
 def create_cost_sensor_for_energy_entity(hass: HomeAssistant, sensor_config: ConfigType) -> CostSensor | None:
-    """Create a standalone cost sensor tracking an existing (non-powercalc) energy sensor."""
-    energy_sensor_id = sensor_config[CONF_ENERGY_SENSOR_ID]
+    """Create a standalone cost sensor tracking an existing (non-powercalc) energy sensor.
+
+    The tracked energy sensor is read from the ``cost`` block (YAML) or the flat
+    ``energy_sensor_id`` key (GUI config entry).
+    """
+    cost_config = sensor_config.get(CONF_COST, {})
+    energy_sensor_id = cost_config.get(CONF_ENERGY_SENSOR_ID) or sensor_config[CONF_ENERGY_SENSOR_ID]
     entity_entry = er.async_get(hass).async_get(energy_sensor_id)
     if entity_entry is None:
         raise SensorConfigurationError(
@@ -135,7 +141,15 @@ def create_cost_sensor_for_energy_entity(hass: HomeAssistant, sensor_config: Con
         entity_entry.name or entity_entry.original_name,
         entity_entry.unique_id,
     )
-    return create_cost_sensor(hass, sensor_config, energy_sensor, unique_id=sensor_config.get(CONF_UNIQUE_ID))
+    # In YAML the name is optional, fall back to the name of the tracked energy sensor.
+    name = sensor_config.get(CONF_NAME) or energy_sensor.name
+    return create_cost_sensor(
+        hass,
+        sensor_config,
+        energy_sensor,
+        name=name,
+        unique_id=sensor_config.get(CONF_UNIQUE_ID),
+    )
 
 
 class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
