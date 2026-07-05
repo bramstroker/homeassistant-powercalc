@@ -258,8 +258,6 @@ class DailyEnergySensor(EnergySensor, RestoreEntity, SensorEntity):
         elapsed_seconds = (int(self._last_delta_calculate) - int(self._last_updated)) + elapsed_seconds
         self._last_delta_calculate = dt_util.utcnow().timestamp()
 
-        if isinstance(self._value, Template):
-            self._value.hass = self.hass
         rendered = evaluate_to_decimal(self._value)
         if rendered is None:
             return Decimal(0)
