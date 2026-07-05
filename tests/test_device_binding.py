@@ -193,6 +193,55 @@ async def test_entities_are_bound_to_source_device3(
     assert power_entity_entry.device_id == device_id
 
 
+async def test_configured_device_takes_precedence_over_source_device(
+    hass: HomeAssistant,
+    entity_registry: er.EntityRegistry,
+    device_registry: DeviceRegistry,
+) -> None:
+    source_config_entry = MockConfigEntry(domain="source")
+    source_config_entry.add_to_hass(hass)
+    configured_config_entry = MockConfigEntry(domain="configured")
+    configured_config_entry.add_to_hass(hass)
+
+    source_device = device_registry.async_get_or_create(
+        config_entry_id=source_config_entry.entry_id,
+        connections={("source", "device")},
+    )
+    configured_device = device_registry.async_get_or_create(
+        config_entry_id=configured_config_entry.entry_id,
+        connections={("configured", "device")},
+    )
+
+    entity_registry.async_get_or_create(
+        "switch",
+        "switch",
+        "configured-precedence-source",
+        suggested_object_id="configured_precedence",
+        device_id=source_device.id,
+    )
+
+    await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "switch.configured_precedence",
+            CONF_DEVICE: configured_device.id,
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+    )
+
+    for entity_id in (
+        "sensor.configured_precedence_power",
+        "sensor.configured_precedence_energy",
+        "sensor.configured_precedence_energy_daily",
+    ):
+        entity_entry = entity_registry.async_get(entity_id)
+        assert entity_entry
+        assert entity_entry.device_id == configured_device.id
+
+
 async def test_change_device(hass: HomeAssistant) -> None:
     """
     Test that changing the device in the configuration updates the device registry

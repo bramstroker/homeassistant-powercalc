@@ -33,7 +33,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.select import DATA_PENDING_SELECT_ENTITIES, SIGNAL_CREATE_SELECT_ENTITIES
 
-from .abstract import BaseEntity, bind_entity_to_area, bind_entity_to_device
+from .abstract import BaseEntity
 from .energy import EnergySensor, RealEnergySensor
 
 _LOGGER = logging.getLogger(__name__)
@@ -257,7 +257,7 @@ def create_utility_meter(
 
     params = {key: value for key, value in params.items() if key in signature.parameters}
 
-    utility_meter = VirtualUtilityMeter(**params)  # type: ignore[no-untyped-call]
+    utility_meter = VirtualUtilityMeter(**params)
     utility_meter.rounding_digits = int(
         sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION),
     )
@@ -267,15 +267,9 @@ def create_utility_meter(
     return utility_meter
 
 
-class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
+class VirtualUtilityMeter(BaseEntity, UtilityMeterSensor):
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
     _sensor_config: ConfigType
-
-    async def async_added_to_hass(self) -> None:
-        """Bind the generated utility meter to configured registry metadata."""
-        await super().async_added_to_hass()
-        bind_entity_to_device(self.hass, self.entity_id, self.device_entry)
-        bind_entity_to_area(self.hass, self.entity_id, self._sensor_config)
 
     @property
     def unique_id(self) -> str | None:

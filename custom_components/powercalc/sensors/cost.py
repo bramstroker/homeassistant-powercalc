@@ -7,8 +7,6 @@ from typing import TYPE_CHECKING
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.const import CONF_NAME, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
-from homeassistant.helpers.device import async_entity_id_to_device
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import ConfigType
@@ -24,12 +22,9 @@ from custom_components.powercalc.const import (
     DOMAIN,
     DOMAIN_CONFIG,
 )
-from custom_components.powercalc.device_binding import get_device_info
 
 from .abstract import (
     BaseEntity,
-    bind_entity_to_area,
-    bind_entity_to_device,
     generate_cost_sensor_entity_id,
     generate_cost_sensor_name,
 )
@@ -117,11 +112,10 @@ def create_cost_sensor(
         price_surcharge=price_surcharge,
         price_multiplier=price_multiplier,
         reset_on_source_reset=reset_on_source_reset,
-        device_info=get_device_info(hass, sensor_config, source_entity),
     )
 
 
-class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
+class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
     """Cost sensor, accumulating the cost of the energy consumed at price-at-consumption."""
 
     _attr_device_class = SensorDeviceClass.MONETARY
@@ -143,7 +137,6 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
         price_surcharge: Decimal = Decimal(0),
         price_multiplier: Decimal = Decimal(1),
         reset_on_source_reset: bool = False,
-        device_info: DeviceInfo | None = None,
     ) -> None:
         self._source_energy_entity = source_energy_entity
         self._sensor_config = sensor_config
@@ -151,7 +144,6 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
         self._attr_name = name
         self._attr_unique_id = unique_id
         self._attr_native_unit_of_measurement = hass.config.currency
-        self._attr_device_info = device_info
         self._fixed_price = fixed_price
         self._price_entity_id = price_entity_id
         self._price_surcharge = price_surcharge
@@ -161,11 +153,12 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
         self._state: Decimal = Decimal(0)
         self._last_energy: Decimal | None = None
         self._current_price: Decimal | None = self._effective_price(fixed_price)
-        self.device_entry = async_entity_id_to_device(hass, source_energy_entity)
         self.entity_id = entity_id
 
     async def async_added_to_hass(self) -> None:
         """Restore state and start tracking the source energy and price sensors."""
+        await super().async_added_to_hass()
+
         if (state := await self.async_get_last_state()) is not None:
             try:
                 self._state = Decimal(state.state)
@@ -179,9 +172,6 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
                     self._last_energy = None
 
         _LOGGER.debug("%s: Restoring cost sensor state: %s", self.entity_id, self._state)
-
-        bind_entity_to_device(self.hass, self.entity_id, self.device_entry)
-        bind_entity_to_area(self.hass, self.entity_id, self._sensor_config)
 
         # Seed the current price and, for a price sensor, track its changes so consumption
         # is always settled at the price that was in effect when it was consumed.
