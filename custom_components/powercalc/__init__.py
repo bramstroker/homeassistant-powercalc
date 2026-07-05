@@ -38,6 +38,8 @@ from .configuration.global_config import (
     get_global_configuration,
 )
 from .const import (
+    CONF_COST_SENSOR_FRIENDLY_NAMING,
+    CONF_COST_SENSOR_NAMING,
     CONF_CREATE_COST_SENSORS,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -166,6 +168,8 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(CONF_ENERGY_PRICE_SENSOR): cv.entity_id,
                     vol.Optional(CONF_ENERGY_PRICE_SURCHARGE): vol.Coerce(float),
                     vol.Optional(CONF_ENERGY_PRICE_MULTIPLIER): vol.Coerce(float),
+                    vol.Optional(CONF_COST_SENSOR_NAMING): validate_name_pattern,
+                    vol.Optional(CONF_COST_SENSOR_FRIENDLY_NAMING): validate_name_pattern,
                     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
                     vol.Optional(CONF_UTILITY_METER_TARIFFS): vol.All(cv.ensure_list, [cv.string]),
                     vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),

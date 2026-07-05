@@ -87,12 +87,63 @@ in the global configuration and on a per sensor basis.
 
 !!! note
 
+    Toggling `create_cost_sensors` in the global GUI configuration does not automatically
+    change the per-sensor toggle for sensors you already created through the GUI.
+    Therefore, whenever you flip this toggle (on or off), an extra step is shown that lets
+    you enable the **Apply to existing sensors** option. When enabled, every existing GUI
+    powercalc sensor is updated to match the new setting.
+
+## Naming
+
+By default a cost sensor is named `{appliance} cost` (for example `Floorlamp cost`). You
+can change this globally with `cost_sensor_naming`, similar to `energy_sensor_naming` and
+`power_sensor_naming`. Use the `{}` placeholder for the name of your appliance. This also
+changes the entity id of the sensor.
+
+```yaml
+powercalc:
+  energy_price: 0.25
+  cost_sensor_naming: "{} energy costs"
+```
+
+To only change the friendly name (and keep the entity id), use
+`cost_sensor_friendly_naming`:
+
+```yaml
+powercalc:
+  energy_price: 0.25
+  cost_sensor_friendly_naming: "Costs of {}"
+```
+
+Both settings can also be configured in the GUI under the cost options step of the global
+configuration.
+
+!!! note
+
     A cost sensor is derived from the energy sensor, so an energy sensor must be created
     as well. Assume you have a light `light.floorlamp_livingroom`, then you would get:
 
     - `sensor.floorlamp_livingroom_power`
     - `sensor.floorlamp_livingroom_energy`
     - `sensor.floorlamp_livingroom_cost`
+
+## Cost per utility meter
+
+When you also enable [utility meters](utility-meter.md), Powercalc creates an additional
+cost sensor for **every** utility meter, next to the cost sensor for the energy sensor.
+This lets you track the cost per cycle (daily, weekly, monthly, ...) just like the energy
+utility meters track consumption per cycle.
+
+For example, with `create_cost_sensors`, `create_utility_meters` and a `daily` and
+`monthly` meter enabled, a light `light.floorlamp_livingroom` would get:
+
+- `sensor.floorlamp_livingroom_cost` (total cost)
+- `sensor.floorlamp_livingroom_energy_daily_cost`
+- `sensor.floorlamp_livingroom_energy_monthly_cost`
+
+The per-meter cost sensors reset together with their utility meter, so they always
+reflect the cost accumulated during the current cycle. They are only created when both
+cost sensors and utility meters are enabled.
 
 ## How the cost is calculated
 

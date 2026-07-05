@@ -1,9 +1,11 @@
 import logging
 
 from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorDeviceClass, SensorStateClass
+from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
+    ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
@@ -22,10 +24,13 @@ from pytest_homeassistant_custom_component.common import (
 )
 
 from custom_components.powercalc.const import (
+    CONF_COST_SENSOR_FRIENDLY_NAMING,
+    CONF_COST_SENSOR_NAMING,
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_COST_SENSORS,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
+    CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_PRICE,
     CONF_ENERGY_PRICE_MULTIPLIER,
     CONF_ENERGY_PRICE_SENSOR,
@@ -39,6 +44,7 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_POWER,
     CONF_SUBTRACT_ENTITIES,
+    CONF_UTILITY_METER_TYPES,
     DOMAIN,
     DOMAIN_CONFIG,
     SERVICE_CALIBRATE_COST,
@@ -58,6 +64,12 @@ from tests.common import (
 _KWH = {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR}
 
 
+@pytest.fixture(autouse=True)
+def set_currency(hass: HomeAssistant) -> None:
+    """Set the Home Assistant currency for all cost sensor tests."""
+    hass.config.currency = "EUR"
+
+
 def _assert_cost(hass: HomeAssistant, expected: float, entity_id: str = "sensor.test_cost") -> None:
     state = hass.states.get(entity_id)
     assert state
@@ -70,7 +82,6 @@ async def _setup_cost_sensor(
     domain_config: dict,
 ) -> None:
     mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
-    hass.config.currency = "EUR"
     await run_powercalc_setup(
         hass,
         {
@@ -206,8 +217,6 @@ async def test_price_change_settles_pending_energy_at_previous_price(hass: HomeA
     """A price change settles the energy consumed so far at the previous price."""
     await set_states(hass, [("sensor.energy_price", "0.20")])
     mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
-    hass.config.currency = "EUR"
-
     # Restore a baseline of 100 kWh and pre-set the energy sensor to 110 kWh so 10 kWh is
     # pending (not yet settled by an energy event) when the price changes.
     mock_restore_cache(hass, [State("sensor.test_cost", "0", {"last_energy": "100"})])
@@ -241,7 +250,6 @@ async def test_price_change_ignored_when_energy_unavailable(hass: HomeAssistant)
     """A price change with an unavailable energy sensor does not settle anything."""
     await set_states(hass, [("sensor.energy_price", "0.20"), ("sensor.existing_energy", "unavailable")])
     mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
-    hass.config.currency = "EUR"
     mock_restore_cache(hass, [State("sensor.test_cost", "0", {"last_energy": "100"})])
 
     await run_powercalc_setup(
@@ -298,6 +306,118 @@ async def test_global_toggle_creates_cost_sensor(hass: HomeAssistant) -> None:
         {CONF_ENERGY_PRICE: 0.25, CONF_CREATE_COST_SENSORS: True},
     )
     assert hass.states.get("sensor.test_cost") is not None
+
+
+async def test_cost_sensor_naming_pattern(hass: HomeAssistant) -> None:
+    """A global cost_sensor_naming pattern drives the cost sensor name and entity id."""
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {CONF_ENERGY_PRICE: 0.25, CONF_COST_SENSOR_NAMING: "{} energy costs"},
+    )
+
+    assert hass.states.get("sensor.test_cost") is None
+    state = hass.states.get("sensor.test_energy_costs")
+    assert state
+    assert state.attributes[ATTR_FRIENDLY_NAME] == "Test energy costs"
+
+
+async def test_cost_sensor_friendly_naming_pattern(hass: HomeAssistant) -> None:
+    """A global cost_sensor_friendly_naming pattern only changes the friendly name."""
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {CONF_ENERGY_PRICE: 0.25, CONF_COST_SENSOR_FRIENDLY_NAMING: "Costs of {}"},
+    )
+
+    # Entity id keeps the default naming, only the friendly name follows the pattern.
+    state = hass.states.get("sensor.test_cost")
+    assert state
+    assert state.attributes[ATTR_FRIENDLY_NAME] == "Costs of Test"
+
+
+async def test_cost_sensor_created_per_utility_meter(hass: HomeAssistant) -> None:
+    """A cost sensor is created for the energy sensor and for each utility meter."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_CREATE_COST_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    # Cost sensor for the energy sensor itself.
+    assert hass.states.get("sensor.test_cost") is not None
+
+    # Cost sensor for the daily utility meter.
+    meter_cost = hass.states.get("sensor.test_energy_daily_cost")
+    assert meter_cost
+    assert meter_cost.attributes[ATTR_DEVICE_CLASS] == SensorDeviceClass.MONETARY
+    assert meter_cost.attributes[ATTR_STATE_CLASS] == SensorStateClass.TOTAL
+    assert meter_cost.attributes[ATTR_UNIT_OF_MEASUREMENT] == "EUR"
+
+
+async def test_no_utility_meter_cost_sensor_when_meters_disabled(hass: HomeAssistant) -> None:
+    """No per-meter cost sensor is created when utility meters are disabled."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_CREATE_COST_SENSOR: True,
+        },
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    assert hass.states.get("sensor.test_cost") is not None
+    assert hass.states.get("sensor.test_energy_daily") is None
+    assert hass.states.get("sensor.test_energy_daily_cost") is None
+
+
+async def test_utility_meter_cost_sensor_accumulates(hass: HomeAssistant) -> None:
+    """The per-meter cost sensor accumulates the cost of the energy the meter tracks."""
+    mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_ENTITY_ID: "sensor.dummy",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+            CONF_CREATE_COST_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    meter_cost_id = "sensor.sensor_existing_energy_daily_cost"
+    meter_id = "sensor.existing_energy_daily"
+    for value in ("10", "20", "30", "40"):
+        await set_states(hass, [("sensor.existing_energy", value, _KWH)])
+
+    # The meter tracked 30 kWh (10 -> 40); its cost sensor prices the deltas seen after
+    # its first (baseline) reading: (20 kWh) * 0.25 = 5.0.
+    assert hass.states.get(meter_id).state == "30.0000"
+    _assert_cost(hass, 5.0, meter_cost_id)
+
+    # When the utility meter resets for a new cycle, its cost sensor resets to zero too.
+    hass.states.async_set(meter_id, "0", _KWH)
+    await hass.async_block_till_done()
+    _assert_cost(hass, 0.0, meter_cost_id)
+
+    # A new cycle accumulates from zero again.
+    hass.states.async_set(meter_id, "8", _KWH)
+    await hass.async_block_till_done()
+    _assert_cost(hass, 2.0, meter_cost_id)
 
 
 async def test_restore_state(hass: HomeAssistant) -> None:
@@ -465,7 +585,6 @@ async def test_no_cost_sensor_without_price(
 async def test_cost_sensor_name_derived_from_source(hass: HomeAssistant) -> None:
     """When no name is configured the cost sensor name is derived from the source entity."""
     mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
-    hass.config.currency = "EUR"
     await run_powercalc_setup(
         hass,
         {
@@ -499,7 +618,6 @@ async def test_cost_sensor_reuses_existing_entity_id(hass: HomeAssistant) -> Non
             ),
         },
     )
-    hass.config.currency = "EUR"
     await run_powercalc_setup(
         hass,
         {
@@ -518,7 +636,6 @@ async def test_cost_sensor_reuses_existing_entity_id(hass: HomeAssistant) -> Non
 
 async def test_cost_sensor_for_custom_group(hass: HomeAssistant) -> None:
     """A cost sensor is created for a custom group energy sensor."""
-    hass.config.currency = "EUR"
     await set_states(hass, [("input_boolean.test1", STATE_ON), ("input_boolean.test2", STATE_ON)])
     await run_powercalc_setup(
         hass,
@@ -537,7 +654,6 @@ async def test_cost_sensor_for_custom_group(hass: HomeAssistant) -> None:
 
 async def test_cost_sensor_for_subtract_group(hass: HomeAssistant) -> None:
     """A cost sensor is created for a subtract group energy sensor."""
-    hass.config.currency = "EUR"
     await set_states(hass, [("sensor.a_power", 100), ("sensor.b_power", 20)])
     await run_powercalc_setup(
         hass,
@@ -555,7 +671,6 @@ async def test_cost_sensor_for_subtract_group(hass: HomeAssistant) -> None:
 
 async def test_cost_sensors_for_tracked_untracked_group(hass: HomeAssistant) -> None:
     """Cost sensors are created for both the tracked and untracked energy sensors."""
-    hass.config.currency = "EUR"
     hass.data[DOMAIN] = {DOMAIN_CONFIG: {CONF_ENERGY_PRICE: 0.25}}
     factory = TrackedPowerSensorFactory(
         hass,

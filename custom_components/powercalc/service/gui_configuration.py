@@ -3,14 +3,15 @@ from homeassistant.exceptions import HomeAssistantError
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 
-from custom_components.powercalc import (
+from custom_components.powercalc.const import (
+    CONF_CREATE_COST_SENSOR,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_IGNORE_UNAVAILABLE_STATE,
     DOMAIN,
     ENERGY_INTEGRATION_METHODS,
 )
-from custom_components.powercalc.const import CONF_CREATE_COST_SENSOR, CONF_CREATE_ENERGY_SENSOR
 
 ALLOWED_CONFIG_KEYS = [
     CONF_CREATE_ENERGY_SENSOR,
@@ -43,6 +44,11 @@ async def change_gui_configuration(hass: HomeAssistant, call: ServiceCall) -> No
     if field == CONF_ENERGY_INTEGRATION_METHOD and value not in ENERGY_INTEGRATION_METHODS:
         raise HomeAssistantError(f"Invalid integration method {value}")
 
+    apply_field_to_config_entries(hass, field, value)
+
+
+def apply_field_to_config_entries(hass: HomeAssistant, field: str, value: object) -> None:
+    """Apply a single config field/value to all existing powercalc config entries that use it."""
     for entry in hass.config_entries.async_entries(DOMAIN):
         if field not in entry.data:
             continue

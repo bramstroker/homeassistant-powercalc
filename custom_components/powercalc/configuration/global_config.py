@@ -8,6 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
+    CONF_COST_SENSOR_NAMING,
     CONF_CREATE_COST_SENSORS,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -33,6 +34,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
+    DEFAULT_COST_NAME_PATTERN,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_NAME_PATTERN,
     DEFAULT_ENERGY_SENSOR_PRECISION,
@@ -74,6 +76,7 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_COST_SENSORS: False,
+        CONF_COST_SENSOR_NAMING: DEFAULT_COST_NAME_PATTERN,
         CONF_CREATE_STANDBY_GROUP: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_DISCOVERY: {
