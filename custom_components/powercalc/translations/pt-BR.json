@@ -80,6 +80,7 @@
         "data": {
           "name": "Nome",
           "create_energy_sensor": "Criar sensor de consumo",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Criar medidores de utilidade",
           "domain": "Domínio da entidade",
           "exclude_entities": "Excluir entidades"
@@ -101,6 +102,7 @@
         "description": "Configuração global do Powercalc. Para obter mais informações, consulte o [documentation]({docs_uri}). Opções adicionais para sensores de energia e medidores de utilidade podem ser fornecidas nos próximos passos.",
         "data": {
           "create_energy_sensors": "Criar sensor de consumo",
+          "create_cost_sensors": "Create cost sensors",
           "create_standby_group": "Criar grupo de standby",
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
@@ -114,6 +116,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Se o powercalc precisa criar um sensor kWh",
+          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
           "create_standby_group": "Criar grupo que soma todo o consumo de energia em standby e auto-uso dos dispositivos IoT",
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados da energia, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
@@ -121,6 +124,22 @@
           "enable_analytics": "Permitir que o Powercalc envie estatísticas de uso anônimas e agregadas para ajudar a melhorar a integração",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Cost options",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh.",
+        "data": {
+          "energy_price": "Fixed energy price",
+          "energy_price_multiplier": "Energy price multiplier",
+          "energy_price_sensor": "Energy price sensor",
+          "energy_price_surcharge": "Energy price surcharge"
+        },
+        "data_description": {
+          "energy_price": "A fixed price per kWh in your local currency",
+          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
         }
       },
       "global_configuration_discovery": {
@@ -176,6 +195,7 @@
           "area": "Área",
           "floor": "Piso",
           "create_energy_sensor": "Criar sensor de consumo",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Criar medidores de utilidade",
           "device": "Dispositivo",
           "force_calculate_group_energy": "Forçar cálculo da energia",
@@ -208,6 +228,7 @@
       "group_subtract": {
         "data": {
           "create_energy_sensor": "Criar sensor de consumo",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Criar medidores de utilidade",
           "entity_id": "Entidade base",
           "name": "Nome",
@@ -224,6 +245,7 @@
           "main_power_sensor": "Sensor de energia principal",
           "group_tracked_auto": "Entidades adicionadas automaticamente",
           "create_energy_sensor": "Criar sensor de consumo",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Criar medidores de utilidade"
         },
         "data_description": {
@@ -440,6 +462,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Criar sensor de consumo",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Criar medidores de utilidade",
           "entity_id": "Entidade de origem",
           "mode": "Estratégia de cálculo",
@@ -526,6 +549,7 @@
         "title": "Opções básicas",
         "data": {
           "create_energy_sensor": "Criar sensor de consumo",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Criar medidores de utilidade",
           "entity_id": "Entidade de origem",
           "name": "Nome",
@@ -583,6 +607,7 @@
         "title": "Opções básicas",
         "data": {
           "create_energy_sensors": "Criar sensor de consumo",
+          "create_cost_sensors": "Create cost sensors",
           "create_standby_group": "Criar grupo de standby",
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
@@ -596,6 +621,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Se o powercalc precisa criar sensores kWh",
+          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
           "create_standby_group": "Criar grupo que soma todo o consumo de energia em standby e auto-uso dos dispositivos IoT",
           "create_utility_meters": "Deixe que energia crie medidores utilitários, de ciclo diário, horário, etc.",
           "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados de potência, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
@@ -603,6 +629,22 @@
           "enable_analytics": "Permitir que o Powercalc envie estatísticas de uso anônimas e agregadas para ajudar a melhorar a integração",
           "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
           "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Cost options",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh.",
+        "data": {
+          "energy_price": "Fixed energy price",
+          "energy_price_multiplier": "Energy price multiplier",
+          "energy_price_sensor": "Energy price sensor",
+          "energy_price_surcharge": "Energy price surcharge"
+        },
+        "data_description": {
+          "energy_price": "A fixed price per kWh in your local currency",
+          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
         }
       },
       "global_configuration_discovery": {
@@ -699,6 +741,7 @@
           "main_power_sensor": "Sensor de potência principal",
           "group_tracked_auto": "Entidades adicionadas automaticamente",
           "create_energy_sensor": "Criar sensor de energia",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Criar medidores de utilidade"
         },
         "data_description": {
@@ -847,6 +890,16 @@
       },
       "name": "Calibrar sensor de consumo"
     },
+    "calibrate_cost": {
+      "description": "Sets the cost sensor to a given monetary value.",
+      "fields": {
+        "value": {
+          "description": "The value to set.",
+          "name": "Value"
+        }
+      },
+      "name": "Calibrate cost sensor"
+    },
     "calibrate_utility_meter": {
       "description": "Calibra um sensor de medidor de utilidade.",
       "fields": {
@@ -900,6 +953,10 @@
     "reset_energy": {
       "description": "Redefinir um sensor de consumo para zero kWh.",
       "name": "Redefinir o sensor de consumo"
+    },
+    "reset_cost": {
+      "description": "Reset a cost sensor to zero.",
+      "name": "Reset cost sensor"
     },
     "stop_playbook": {
       "description": "Parar o playbook ativo atual.",
