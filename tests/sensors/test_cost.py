@@ -200,6 +200,66 @@ async def test_cost_sensor_price_at_consumption(hass: HomeAssistant) -> None:
     _assert_cost(hass, 6.0)
 
 
+@pytest.mark.parametrize(
+    "price_unit,expected_unit",
+    [
+        ("€/kWh", "€"),
+        ("EUR/kWh", "EUR"),
+        ("USD/kWh", "USD"),
+        (None, "EUR"),  # no unit on price sensor -> fall back to HA currency
+    ],
+)
+async def test_cost_sensor_unit_derived_from_price_sensor(
+    hass: HomeAssistant,
+    price_unit: str | None,
+    expected_unit: str,
+) -> None:
+    """The cost sensor's unit is taken from the price sensor's currency when available."""
+    attributes = {ATTR_UNIT_OF_MEASUREMENT: price_unit} if price_unit is not None else None
+    await set_states(hass, [("sensor.energy_price", "0.20", attributes)])
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price"},
+    )
+
+    cost_state = hass.states.get("sensor.test_cost")
+    assert cost_state
+    assert cost_state.attributes[ATTR_UNIT_OF_MEASUREMENT] == expected_unit
+
+
+@pytest.mark.parametrize(
+    "price_unit,price_value",
+    [
+        ("EUR/kWh", "0.20"),  # already per kWh
+        ("EUR/MWh", "200"),  # 200 EUR/MWh = 0.20 EUR/kWh
+        ("EUR/Wh", "0.0002"),  # 0.0002 EUR/Wh = 0.20 EUR/kWh
+        ("EUR/GWh", "200000"),  # 200000 EUR/GWh = 0.20 EUR/kWh
+        ("EUR", "0.20"),  # no denominator, assumed per kWh
+        (None, "0.20"),  # no unit, assumed per kWh
+        ("EUR/foo", "0.20"),  # unrecognized denominator, assumed per kWh
+    ],
+)
+async def test_cost_sensor_converts_price_unit_to_per_kwh(
+    hass: HomeAssistant,
+    price_unit: str | None,
+    price_value: str,
+) -> None:
+    """A price reported per another energy unit (e.g. EUR/MWh) is converted to per kWh."""
+    attributes = {ATTR_UNIT_OF_MEASUREMENT: price_unit} if price_unit is not None else None
+    price_sensor_id = "sensor.energy_price"
+    await set_states(hass, [(price_sensor_id, price_value, attributes)])
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {CONF_ENERGY_PRICE_SENSOR: price_sensor_id},
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])  # baseline
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])  # +10 kWh * 0.20
+    _assert_cost(hass, 2.0)
+
+
 async def test_cost_sensor_price_sensor_with_surcharge(hass: HomeAssistant) -> None:
     """Cost uses the dynamic price sensor value plus surcharge."""
     await set_states(hass, [("sensor.energy_price", "0.20")])
