@@ -96,7 +96,6 @@ from custom_components.powercalc.errors import (
     StrategyConfigurationError,
     UnsupportedStrategyError,
 )
-from custom_components.powercalc.helpers import evaluate_power
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.power_profile.sub_profile_selector import SubProfileSelectConfig, SubProfileSelector
@@ -106,6 +105,7 @@ from custom_components.powercalc.strategy.selector import detect_calculation_str
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
+from custom_components.powercalc.unit import evaluate_to_decimal
 
 from .abstract import (
     BaseEntity,
@@ -770,7 +770,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         if self._strategy_instance.can_calculate_standby():
             standby_power = await self._strategy_instance.calculate(state) or self._standby_power
 
-        evaluated = evaluate_power(standby_power)
+        evaluated = evaluate_to_decimal(standby_power)
         if evaluated is None:
             evaluated = Decimal(0)
         standby_power = evaluated

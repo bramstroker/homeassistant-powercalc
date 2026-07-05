@@ -137,7 +137,7 @@ async def test_build_profile_preview_returns_unavailable_for_invalid_template(
     )
 
     assert preview["state"] == STATE_UNAVAILABLE
-    assert "Could not render power template" not in caplog.text
+    assert "Could not render template" not in caplog.text
 
 
 async def test_build_profile_preview_returns_unavailable_when_calculation_fails(hass: HomeAssistant) -> None:

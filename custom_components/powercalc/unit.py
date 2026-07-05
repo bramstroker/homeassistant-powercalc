@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from decimal import Decimal, DecimalException
+import logging
 
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, UnitOfEnergy
 from homeassistant.core import State
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import HomeAssistantError, TemplateError
+from homeassistant.helpers.template import Template
 from homeassistant.util.unit_conversion import (
     BaseUnitConverter,
     EnergyConverter,
@@ -14,6 +16,8 @@ from homeassistant.util.unit_conversion import (
 )
 
 from custom_components.powercalc.const import UnitPrefix
+
+_LOGGER = logging.getLogger(__name__)
 
 # Maps a configured energy unit prefix to the resulting energy unit of measurement.
 ENERGY_UNIT_PREFIX_MAPPING: dict[str, str] = {
@@ -47,6 +51,28 @@ def parse_decimal(value: object) -> Decimal | None:
         return Decimal(value)
     except DecimalException, ValueError:
         return None
+
+
+def evaluate_to_decimal(value: object) -> Decimal | None:
+    """Evaluate a value into a Decimal, rendering it first when it is a template.
+
+    Non-template values (strings, numbers) are parsed directly. Returns None when a template
+    fails to render, or when the (rendered) value is not a usable number. Unknown/unavailable
+    renders yield None silently; any other failure is logged.
+    """
+    if isinstance(value, Template):
+        try:
+            value = value.async_render()
+        except TemplateError as ex:
+            _LOGGER.error("Could not render template %s: %s", value, ex)
+            return None
+        if value in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+            return None
+
+    result = parse_decimal(value)
+    if result is None:
+        _LOGGER.error("Could not convert value %s to a decimal", value)
+    return result
 
 
 def convert_to_decimal(

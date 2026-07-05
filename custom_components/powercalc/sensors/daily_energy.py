@@ -20,13 +20,13 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import TemplateError
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 import homeassistant.util.dt as dt_util
+from homeassistant.util.unit_conversion import EnergyConverter
 import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
@@ -44,7 +44,7 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_SENSOR_PRECISION,
     UnitPrefix,
 )
-from custom_components.powercalc.unit import ENERGY_UNIT_PREFIX_MAPPING, parse_decimal
+from custom_components.powercalc.unit import ENERGY_UNIT_PREFIX_MAPPING, evaluate_to_decimal, parse_decimal
 
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from .energy import EnergySensor
@@ -258,32 +258,25 @@ class DailyEnergySensor(EnergySensor, RestoreEntity, SensorEntity):
         elapsed_seconds = (int(self._last_delta_calculate) - int(self._last_updated)) + elapsed_seconds
         self._last_delta_calculate = dt_util.utcnow().timestamp()
 
-        value = self._value
-        if isinstance(value, Template):
-            value.hass = self.hass
-            try:
-                value = float(value.async_render())
-            except TemplateError as ex:
-                _LOGGER.error(
-                    "%s: Could not render value template %s: %s",
-                    self.entity_id,
-                    value,
-                    ex,
-                )
-                return Decimal(0)
+        if isinstance(self._value, Template):
+            self._value.hass = self.hass
+        rendered = evaluate_to_decimal(self._value)
+        if rendered is None:
+            return Decimal(0)
+        value = float(rendered)
 
         wh_per_day = (
             value * (self._on_time.total_seconds() / 3600)
             if self._user_unit_of_measurement == UnitOfPower.WATT
-            else value * 1000
+            else EnergyConverter.convert(value, UnitOfEnergy.KILO_WATT_HOUR, UnitOfEnergy.WATT_HOUR)
         )
 
-        # Convert Wh to the native measurement unit
-        energy_per_day = wh_per_day
-        if self._attr_native_unit_of_measurement == UnitOfEnergy.KILO_WATT_HOUR:
-            energy_per_day = wh_per_day / 1000
-        elif self._attr_native_unit_of_measurement == UnitOfEnergy.MEGA_WATT_HOUR:
-            energy_per_day = wh_per_day / 1000000
+        # Convert Wh/day to the sensor's native energy unit
+        energy_per_day = EnergyConverter.convert(
+            wh_per_day,
+            UnitOfEnergy.WATT_HOUR,
+            self._attr_native_unit_of_measurement,
+        )
 
         return Decimal((energy_per_day / 86400) * elapsed_seconds)
 
