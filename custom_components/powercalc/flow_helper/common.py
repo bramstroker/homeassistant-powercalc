@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
 
+from homeassistant.data_entry_flow import section
 import voluptuous as vol
 
 
@@ -46,6 +47,8 @@ class Step(StrEnum):
     GLOBAL_CONFIGURATION = "global_configuration"
     GLOBAL_CONFIGURATION_DISCOVERY = "global_configuration_discovery"
     GLOBAL_CONFIGURATION_ENERGY = "global_configuration_energy"
+    GLOBAL_CONFIGURATION_COST = "global_configuration_cost"
+    GLOBAL_CONFIGURATION_COST_APPLY = "global_configuration_cost_apply"
     GLOBAL_CONFIGURATION_THROTTLING = "global_configuration_throttling"
     GLOBAL_CONFIGURATION_UTILITY_METER = "global_configuration_utility_meter"
 
@@ -89,7 +92,10 @@ def fill_schema_defaults(
     schema = {}
     for key, val in data_schema.schema.items():
         new_key = key
-        if key in options and isinstance(key, vol.Marker):
+        if isinstance(val, section):
+            # Recurse into collapsible sections, filling their fields from the flat options.
+            val = section(fill_schema_defaults(val.schema, options), val.options)
+        elif key in options and isinstance(key, vol.Marker):
             if isinstance(key, vol.Optional) and callable(key.default) and key.default():
                 new_key = vol.Optional(key.schema, default=options.get(key))  # type: ignore[call-overload]
             elif isinstance(key, vol.Required):

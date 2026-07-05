@@ -2,20 +2,20 @@ import logging
 
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntryDisabler, DeviceRegistry
+from homeassistant.helpers.device_registry import DeviceEntry, DeviceEntryDisabler, DeviceRegistry
 import homeassistant.helpers.entity_registry as er
 import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
-    mock_registry,
+    mock_device_registry, mock_registry,
 )
 
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
-    CONF_MANUFACTURER,
+    CONF_GROUP_POWER_ENTITIES, CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
@@ -189,3 +189,50 @@ async def test_entities_are_bound_to_source_device3(
     power_entity_entry = entity_registry.async_get("sensor.test_device_power")
     assert power_entity_entry
     assert power_entity_entry.device_id == device_id
+
+
+async def test_configured_device_takes_precedence_over_source_device(
+    hass: HomeAssistant,
+) -> None:
+    source_device = DeviceEntry(id="source-device", manufacturer="source", model="Source Device")
+    configured_device = DeviceEntry(id="configured-device", manufacturer="configured", model="Configured Device")
+    mock_device_registry(
+        hass,
+        {
+            source_device.id: source_device,
+            configured_device.id: configured_device,
+        },
+    )
+
+    entity_registry = mock_registry(
+        hass,
+        {
+            "switch.configured_precedence": RegistryEntryWithDefaults(
+                entity_id="switch.configured_precedence",
+                unique_id="configured-precedence-source",
+                platform="switch",
+                device_id=source_device.id,
+            ),
+        },
+    )
+
+    await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "switch.configured_precedence",
+            CONF_DEVICE: configured_device.id,
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+    )
+
+    for entity_id in (
+        "sensor.configured_precedence_power",
+        "sensor.configured_precedence_energy",
+        "sensor.configured_precedence_energy_daily",
+    ):
+        entity_entry = entity_registry.async_get(entity_id)
+        assert entity_entry
+        assert entity_entry.device_id == configured_device.id

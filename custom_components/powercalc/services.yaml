@@ -29,6 +29,21 @@ calibrate_energy:
       required: true
       selector:
         text:
+calibrate_cost:
+  name: Calibrate cost sensor
+  description: Sets the cost sensor to a given monetary value.
+  target:
+    entity:
+      domain: sensor
+      device_class: monetary
+  fields:
+    value:
+      name: Value
+      description: Value to which set the cost sensor
+      example: "100"
+      required: true
+      selector:
+        text:
 calibrate_utility_meter:
   name: Calibrate utility meter
   description: Calibrates a utility meter sensor.
@@ -55,6 +70,7 @@ change_gui_config:
           mode: dropdown
           options:
             - "create_energy_sensor"
+            - "create_cost_sensor"
             - "create_utility_meters"
             - "ignore_unavailable_state"
             - "energy_integration_method"
@@ -103,6 +119,13 @@ reset_energy:
     entity:
       domain: sensor
       device_class: energy
+reset_cost:
+  name: Reset cost sensor
+  description: Reset a cost sensor to zero
+  target:
+    entity:
+      domain: sensor
+      device_class: monetary
 stop_playbook:
   name: Stop playbook
   description: Stop active playbook

@@ -2,35 +2,31 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry
 from homeassistant.helpers.device import async_entity_id_to_device
-from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity import Entity
+import homeassistant.helpers.entity_registry as er
+from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import CONF_AREA
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def attach_entities_to_source_device(
+async def attach_entities_to_resolved_device(
     config_entry: ConfigEntry | None,
     entities_to_add: list[Entity],
     hass: HomeAssistant,
     source_entity: SourceEntity | None,
+    sensor_config: ConfigType | None = None,
 ) -> None:
-    """Set the entity to same device as the source entity, if any available."""
+    """Set entities to the configured or source device, if any available."""
 
-    device_entry = None
-    if source_entity:
-        device_entry = async_entity_id_to_device(hass, source_entity.entity_id) or source_entity.device_entry
-
-    if not device_entry and config_entry:
-        device_id = config_entry.data.get(CONF_DEVICE)
-        if device_id:
-            device_entry = device_registry.async_get(hass).async_get(device_id)
-
+    device_entry = get_device_entry(hass, sensor_config, source_entity, config_entry)
     if not device_entry:
         return
 
@@ -41,30 +37,82 @@ async def attach_entities_to_source_device(
             _LOGGER.error("%s: Cannot set device id on entity", entity.entity_id)
 
 
-def get_device_info(
+def get_device_entry(
     hass: HomeAssistant,
-    sensor_config: ConfigType,
-    source_entity: SourceEntity | None,
-) -> DeviceInfo | None:
+    sensor_config: ConfigType | None = None,
+    source_entity: SourceEntity | None = None,
+    config_entry: ConfigEntry | None = None,
+) -> DeviceEntry | None:
     """
-    Get device info for a given powercalc entity configuration.
+    Get device entry for a given powercalc entity configuration.
     Prefer user configured device, when it is not set fallback to the same device as the source entity
     """
-    device_id = sensor_config.get(CONF_DEVICE)
-    device = None
+    device_id = None
+    if sensor_config is not None:
+        device_id = sensor_config.get(CONF_DEVICE)
+    if device_id is None and config_entry is not None:
+        device_id = config_entry.data.get(CONF_DEVICE)
     if device_id is not None:
-        device_reg = device_registry.async_get(hass)
-        device = device_reg.async_get(device_id)
-    elif source_entity:
-        device = source_entity.device_entry
+        return device_registry.async_get(hass).async_get(device_id)
 
-    if device is None:
-        return None
+    if source_entity:
+        return source_entity.device_entry or async_entity_id_to_device(hass, source_entity.entity_id)
 
-    if not device.identifiers and not device.connections:
-        return None
+    return None
 
-    return DeviceInfo(
-        identifiers=device.identifiers,
-        connections=device.connections,
-    )
+
+@callback
+def bind_entity_to_registry_metadata(
+    hass: HomeAssistant,
+    entity_id: str | None,
+    device_entry: DeviceEntry | None,
+    sensor_config: ConfigType | None,
+) -> None:
+    """Bind a Powercalc entity to configured registry metadata."""
+    if entity_id is None:
+        return
+
+    entity_reg = er.async_get(hass)
+    entity_entry = entity_reg.async_get(entity_id)
+    if entity_entry is None:
+        return
+
+    bind_entity_to_device(entity_reg, entity_entry, device_entry)
+    bind_entity_to_area(entity_reg, entity_entry, sensor_config.get(CONF_AREA) if sensor_config else None)
+
+
+@callback
+def bind_entity_to_device(
+    entity_reg: er.EntityRegistry,
+    entity_entry: RegistryEntry,
+    device_entry: DeviceEntry | None,
+) -> None:
+    """Bind a Powercalc entity to the resolved device."""
+    # Home Assistant only consumes entity.device_entry while creating registry
+    # entries for config-entry platforms. YAML/platform entities need this
+    # registry update after they have been added.
+    if device_entry is None:
+        return
+
+    if entity_entry.config_entry_id is not None or entity_entry.device_id == device_entry.id:
+        return
+
+    _LOGGER.debug("Binding %s to device %s", entity_entry.entity_id, device_entry.id)
+    entity_reg.async_update_entity(entity_entry.entity_id, device_id=device_entry.id)
+
+
+@callback
+def bind_entity_to_area(
+    entity_reg: er.EntityRegistry,
+    entity_entry: RegistryEntry,
+    area_id: str | None,
+) -> None:
+    """Bind a Powercalc entity to the configured area."""
+    if not area_id:
+        return
+
+    if entity_entry.area_id == area_id:
+        return
+
+    _LOGGER.debug("Binding %s to area %s", entity_entry.entity_id, area_id)
+    entity_reg.async_update_entity(entity_entry.entity_id, area_id=area_id)

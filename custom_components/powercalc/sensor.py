@@ -53,6 +53,7 @@ from .const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_COMPOSITE,
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
@@ -128,12 +129,14 @@ from .const import (
     ENTRY_DATA_POWER_ENTITY,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SERVICE_ACTIVATE_PLAYBOOK,
+    SERVICE_CALIBRATE_COST,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_DEBUG_GROUP,
     SERVICE_GET_ACTIVE_PLAYBOOK,
     SERVICE_GET_GROUP_ENTITIES,
     SERVICE_INCREASE_DAILY_ENERGY,
+    SERVICE_RESET_COST,
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
     SERVICE_SWITCH_SUB_PROFILE,
@@ -144,7 +147,7 @@ from .const import (
     SensorType,
     UnitPrefix,
 )
-from .device_binding import attach_entities_to_source_device
+from .device_binding import attach_entities_to_resolved_device
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
@@ -152,18 +155,19 @@ from .errors import (
 )
 from .group_include.filter import FILTER_CONFIG, FilterOperator, create_composite_filter
 from .group_include.include import find_entities
+from .sensors.cost import CostSensor
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
+from .sensors.energy_related import create_energy_related_sensors
 from .sensors.group.config_entry_utils import add_to_associated_groups
 from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
 from .sensors.group.standby import StandbyPowerSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
-from .sensors.utility_meter import create_utility_meters
 from .strategy.composite import CONFIG_SCHEMA as COMPOSITE_SCHEMA
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -196,6 +200,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
     vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
+    vol.Optional(CONF_CREATE_COST_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_TARIFFS): vol.All(cv.ensure_list, [cv.string]),
@@ -375,7 +380,7 @@ async def _async_setup_entities(
         _LOGGER.error(err)
         return
 
-    await attach_entities_to_source_device(config_entry, entities.new, hass, None)
+    await attach_entities_to_resolved_device(config_entry, entities.new, hass, None, config)
 
     entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
     for entity in entities_to_add:
@@ -388,8 +393,8 @@ async def _async_setup_entities(
     # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
     # Remove entities which are disabled because of a disabled device from the list of entities to add
     # When we add nevertheless the entity_platform code will set device_id to None and abort entity addition.
-    # `async_added_to_hass` hook will not be called, which powercalc uses to bind the entity to device again
-    # This causes the powercalc entity to never be bound to the device again and be disabled forever.
+    # `async_added_to_hass` will not be called, so BaseEntity cannot repair registry metadata.
+    # This causes the powercalc entity to never be rebound and to stay disabled.
     entity_reg = er.async_get(hass)
     for entity in entities_to_add:
         existing_entry = entity_reg.async_get(entity.entity_id)
@@ -447,6 +452,8 @@ def _register_entity_id_change_listener(
 def _resolve_entity_type(entity: Entity) -> EntityType:
     if isinstance(entity, UtilityMeterSensor):
         return EntityType.UTILITY_METER
+    if isinstance(entity, CostSensor):
+        return EntityType.COST_SENSOR
     if isinstance(entity, EnergySensor):
         return EntityType.ENERGY_SENSOR
     if isinstance(entity, PowerSensor):
@@ -499,7 +506,19 @@ def register_entity_services() -> None:
     )
 
     platform.async_register_entity_service(
+        SERVICE_RESET_COST,
+        {},
+        "async_reset",
+    )
+
+    platform.async_register_entity_service(
         SERVICE_CALIBRATE_UTILITY_METER,
+        {vol.Required(CONF_VALUE): validate_is_number},
+        "async_calibrate",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_CALIBRATE_COST,
         {vol.Required(CONF_VALUE): validate_is_number},
         "async_calibrate",
     )
@@ -918,9 +937,11 @@ async def create_individual_sensors(
             attach_energy_sensor_to_power_sensor(power_sensor, energy_sensor)
 
     if energy_sensor:
-        entities_to_add.extend(create_utility_meters(hass, energy_sensor, sensor_config, config_entry))
+        entities_to_add.extend(
+            create_energy_related_sensors(hass, sensor_config, energy_sensor, source_entity, config_entry),
+        )
 
-    await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
+    await attach_entities_to_resolved_device(config_entry, entities_to_add, hass, source_entity, sensor_config)
     update_registries(hass, source_entity, entities_to_add, context)
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id

@@ -19,7 +19,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
-    CONF_DEVICE,
     CONF_DOMAIN,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -38,7 +37,7 @@ from homeassistant.core import (
     callback,
 )
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry, entity_registry as er, start
+from homeassistant.helpers import entity_registry as er, start
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
     EventStateChangedData,
@@ -100,7 +99,6 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.group_include.filter import (
     AreaFilter,
     CompositeFilter,
@@ -119,8 +117,8 @@ from custom_components.powercalc.sensors.abstract import (
     generate_power_sensor_name,
 )
 from custom_components.powercalc.sensors.energy import EnergySensor, VirtualEnergySensor
+from custom_components.powercalc.sensors.energy_related import create_energy_related_sensors
 from custom_components.powercalc.sensors.power import PowerSensor
-from custom_components.powercalc.sensors.utility_meter import create_utility_meters
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -224,13 +222,7 @@ def create_group_sensors_custom(
         group_sensors.append(energy_sensor)
 
         sensor_config[CONF_UTILITY_METER_NET_CONSUMPTION] = True
-        group_sensors.extend(
-            create_utility_meters(
-                hass,
-                energy_sensor,
-                sensor_config,
-            ),
-        )
+        group_sensors.extend(create_energy_related_sensors(hass, sensor_config, energy_sensor))
 
     collect_analytics(hass, None).add(DATA_GROUP_SIZES, len(power_sensor_ids) + len(energy_sensor_ids))
 
@@ -380,7 +372,7 @@ def create_grouped_power_sensor(
 
     _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s, unique_id=%s)", name, entity_id, unique_id)
 
-    sensor = GroupedPowerSensor(
+    return GroupedPowerSensor(
         hass=hass,
         name=name,
         entities=power_sensor_ids,
@@ -389,8 +381,6 @@ def create_grouped_power_sensor(
         group_type=group_type,
         entity_id=entity_id,
     )
-    bind_to_configured_device(hass, sensor, sensor_config)
-    return sensor
 
 
 @callback
@@ -429,11 +419,10 @@ def create_grouped_energy_sensor(
             name=name,
             unique_id=energy_unique_id,
             sensor_config=sensor_config,
-            device_info=get_device_info(hass, sensor_config, None),
             unit_prefix=sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.NONE),
         )
 
-    sensor = GroupedEnergySensor(
+    return GroupedEnergySensor(
         hass=hass,
         name=name,
         entities=energy_sensor_ids,
@@ -442,18 +431,6 @@ def create_grouped_energy_sensor(
         group_type=group_type,
         entity_id=entity_id,
     )
-    bind_to_configured_device(hass, sensor, sensor_config)
-    return sensor
-
-
-def bind_to_configured_device(hass: HomeAssistant, sensor: Entity, sensor_config: dict[str, Any]) -> None:
-    device_id = sensor_config.get(CONF_DEVICE)
-    if not device_id:
-        return
-
-    device_entry = device_registry.async_get(hass).async_get(device_id)
-    if device_entry:
-        sensor.device_entry = device_entry
 
 
 def generate_unique_id(sensor_config: dict[str, Any]) -> str:

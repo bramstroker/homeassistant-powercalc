@@ -72,6 +72,7 @@ from .flow_helper.flows.virtual_power import (
 )
 from .flow_helper.profile_preview import async_setup_preview as async_setup_powercalc_preview
 from .flow_helper.schema import (
+    SCHEMA_COST_SENSOR_TOGGLE,
     SCHEMA_ENERGY_SENSOR_TOGGLE,
     SCHEMA_SENSOR_ENERGY_OPTIONS,
     SCHEMA_UTILITY_METER_OPTIONS,
@@ -332,7 +333,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if isinstance(form_step.schema, vol.Schema):
             return form_step.schema
         schema = await form_step.schema()
-        if schema is None:
+        if schema is None:  # pragma: no cover
             return vol.Schema({})
         return schema
 
@@ -671,12 +672,18 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     def build_basic_options_schema(self) -> vol.Schema:
         """Build the basic options schema. depending on the selected sensor type."""
         if self.selected_sensor_type in [SensorType.REAL_POWER, SensorType.DAILY_ENERGY]:
-            return SCHEMA_UTILITY_METER_TOGGLE
+            return vol.Schema(
+                {
+                    **SCHEMA_COST_SENSOR_TOGGLE.schema,
+                    **SCHEMA_UTILITY_METER_TOGGLE.schema,
+                },
+            )
 
         if self.selected_sensor_type == SensorType.GROUP:
             return vol.Schema(
                 {
                     **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+                    **SCHEMA_COST_SENSOR_TOGGLE.schema,
                     **SCHEMA_UTILITY_METER_TOGGLE.schema,
                 },
             )
@@ -696,6 +703,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         return schema.extend(  # type: ignore[no-any-return]
             {
                 **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+                **SCHEMA_COST_SENSOR_TOGGLE.schema,
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
             },
         )

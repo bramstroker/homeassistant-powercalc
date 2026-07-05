@@ -10,6 +10,7 @@ from voluptuous_serialize import convert
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_INTEGRATION_METHOD,
@@ -147,7 +148,13 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
     result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
 
     schema_keys = list(result["data_schema"].schema.keys())
-    assert schema_keys == [CONF_ENTITY_ID, CONF_STANDBY_POWER, CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS]
+    assert schema_keys == [
+        CONF_ENTITY_ID,
+        CONF_STANDBY_POWER,
+        CONF_CREATE_ENERGY_SENSOR,
+        CONF_CREATE_COST_SENSOR,
+        CONF_CREATE_UTILITY_METERS,
+    ]
 
     await hass.config_entries.options.async_configure(
         result["flow_id"],

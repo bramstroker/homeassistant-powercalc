@@ -80,6 +80,7 @@
         "data": {
           "name": "Название",
           "create_energy_sensor": "Создать сенсор энергии",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Создать счётчики",
           "domain": "Домен объекта",
           "exclude_entities": "Исключить объекты"
@@ -101,6 +102,7 @@
         "description": "Настройка глобальных параметров Powercalc. Подробнее см. [документацию]({docs_uri}). Дополнительные параметры для сенсоров энергии и счётчиков можно указать на следующих шагах.",
         "data": {
           "create_energy_sensors": "Создавать сенсоры энергии",
+          "create_cost_sensors": "Create cost sensors",
           "create_standby_group": "Создать группу ожидания",
           "create_utility_meters": "Создавать счётчики",
           "disable_extended_attributes": "Отключить расширенные атрибуты",
@@ -114,6 +116,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
+          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
           "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
           "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами",
           "disable_extended_attributes": "Отключить дополнительные атрибуты для сенсоров мощности, энергии и групп. Это поможет уменьшить размер базы данных",
@@ -121,6 +124,22 @@
           "enable_analytics": "Разрешить Powercalc отправлять анонимную статистику для улучшения интеграции",
           "ignore_unavailable_state": "Сохранять сенсоры Powercalc доступными, даже когда исходный объект недоступен",
           "include_non_powercalc_sensors": "Включать ли сторонние сенсоры в группы"
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Cost options",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Дополнительные сведения см. в [документации]({docs_uri})",
+        "data": {
+          "energy_price": "Fixed energy price",
+          "energy_price_multiplier": "Energy price multiplier",
+          "energy_price_sensor": "Energy price sensor",
+          "energy_price_surcharge": "Energy price surcharge"
+        },
+        "data_description": {
+          "energy_price": "A fixed price per kWh in your local currency",
+          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
         }
       },
       "global_configuration_discovery": {
@@ -176,6 +195,7 @@
           "area": "Зона",
           "floor": "Этаж",
           "create_energy_sensor": "Создать сенсор энергии",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Создать счётчики",
           "device": "Устройство",
           "force_calculate_group_energy": "Принудительно вычислять энергию",
@@ -208,6 +228,7 @@
       "group_subtract": {
         "data": {
           "create_energy_sensor": "Создать сенсор энергии",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Создать счётчики",
           "entity_id": "Базовый объект",
           "name": "Название",
@@ -224,6 +245,7 @@
           "main_power_sensor": "Сенсор общей мощности",
           "group_tracked_auto": "Автоматическое добавление объектов",
           "create_energy_sensor": "Создать сенсор энергии",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Создать счётчики"
         },
         "data_description": {
@@ -440,6 +462,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Создать сенсор энергии",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Создать счётчики",
           "entity_id": "Исходный объект",
           "mode": "Стратегия расчёта",
@@ -526,6 +549,7 @@
         "title": "Основные параметры",
         "data": {
           "create_energy_sensor": "Создать сенсор энергии",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Создать счётчики",
           "entity_id": "Исходный объект",
           "name": "Название",
@@ -583,6 +607,7 @@
         "title": "Основные параметры",
         "data": {
           "create_energy_sensors": "Создавать сенсоры энергии",
+          "create_cost_sensors": "Create cost sensors",
           "create_standby_group": "Создать группу ожидания",
           "create_utility_meters": "Создавать счётчики",
           "disable_extended_attributes": "Отключить расширенные атрибуты",
@@ -596,6 +621,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
+          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
           "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
           "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами",
           "disable_extended_attributes": "Отключить дополнительные атрибуты для сенсоров мощности, энергии и групп. Это поможет уменьшить размер базы данных",
@@ -603,6 +629,22 @@
           "enable_analytics": "Разрешить Powercalc отправлять анонимную статистику для улучшения интеграции",
           "ignore_unavailable_state": "Сохранять сенсоры Powercalc доступными, даже когда исходный объект недоступен",
           "include_non_powercalc_sensors": "Включать ли сторонние сенсоры в группы"
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Cost options",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Дополнительные сведения см. в [документации]({docs_uri})",
+        "data": {
+          "energy_price": "Fixed energy price",
+          "energy_price_multiplier": "Energy price multiplier",
+          "energy_price_sensor": "Energy price sensor",
+          "energy_price_surcharge": "Energy price surcharge"
+        },
+        "data_description": {
+          "energy_price": "A fixed price per kWh in your local currency",
+          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
         }
       },
       "global_configuration_discovery": {
@@ -699,6 +741,7 @@
           "main_power_sensor": "Сенсор общей мощности",
           "group_tracked_auto": "Автоматическое добавление объектов",
           "create_energy_sensor": "Создать сенсор энергии",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Создать счётчики"
         },
         "data_description": {
@@ -847,6 +890,16 @@
       },
       "name": "Калибровать сенсор энергии"
     },
+    "calibrate_cost": {
+      "description": "Sets the cost sensor to a given monetary value.",
+      "fields": {
+        "value": {
+          "description": "The value to set.",
+          "name": "Value"
+        }
+      },
+      "name": "Calibrate cost sensor"
+    },
     "calibrate_utility_meter": {
       "description": "Калибровать сенсор счётчика.",
       "fields": {
@@ -900,6 +953,10 @@
     "reset_energy": {
       "description": "Сбросить сенсор энергии до нуля кВт·ч.",
       "name": "Сбросить сенсор энергии"
+    },
+    "reset_cost": {
+      "description": "Reset a cost sensor to zero.",
+      "name": "Reset cost sensor"
     },
     "stop_playbook": {
       "description": "Остановить текущий активный сценарий.",
