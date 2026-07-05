@@ -110,6 +110,29 @@ def fill_schema_defaults(
     return vol.Schema(schema)
 
 
+def flatten_sections(user_input: dict[str, Any], schema: vol.Schema) -> dict[str, Any]:
+    """Flatten values nested under `section` wrappers back into a flat dict.
+
+    Fields presented inside collapsible sections are returned by Home Assistant as a nested
+    dict keyed by the section name. This merges them back to the top level so the rest of the
+    flow can keep treating the user input as flat.
+    """
+    if not user_input:
+        return user_input
+    section_keys = {
+        (key.schema if isinstance(key, vol.Marker) else key)
+        for key, val in schema.schema.items()
+        if isinstance(val, section)
+    }
+    flat: dict[str, Any] = {}
+    for key, value in user_input.items():
+        if key in section_keys and isinstance(value, dict):
+            flat.update(value)
+        else:
+            flat[key] = value
+    return flat
+
+
 def unwrap_choose_selector(
     user_input: dict[str, Any],
     wrapper_key: str,

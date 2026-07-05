@@ -23,6 +23,7 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
 )
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers import entity_registry as er, selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -671,13 +672,16 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         Process the provided user input against the schema.
         Update current_config with the new options. Used to save the data to the config entry later.
         """
-        for key in schema.schema:
-            if isinstance(key, vol.Marker):
-                key = key.schema
-            if key in user_input:
-                self.sensor_config[key] = user_input.get(key)
-            elif key in self.sensor_config:
-                self.sensor_config.pop(key)
+        for key, val in schema.schema.items():
+            base_key = key.schema if isinstance(key, vol.Marker) else key
+            if isinstance(val, section):
+                # Recurse into collapsible sections, whose values are nested under the section key.
+                self._process_user_input(user_input.get(base_key) or {}, val.schema)
+                continue
+            if base_key in user_input:
+                self.sensor_config[base_key] = user_input.get(base_key)
+            elif base_key in self.sensor_config:
+                self.sensor_config.pop(base_key)
 
     def build_basic_options_schema(self) -> vol.Schema:
         """Build the basic options schema. depending on the selected sensor type."""
