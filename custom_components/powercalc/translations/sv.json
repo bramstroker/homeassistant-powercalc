@@ -102,30 +102,48 @@
       "global_configuration": {
         "title": "Global konfiguration",
         "description": "Setup global configuration for Powercalc. For more information see the [documentation]({docs_uri}). Additional options for energy sensors and utility meters can be provided in the next steps.",
-        "data": {
-          "create_energy_sensors": "Create energy sensors",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Create standby group",
-          "create_utility_meters": "Skapa bruksmätare",
-          "disable_extended_attributes": "Inaktivera utökade attribut",
-          "disable_library_download": "Disable remote library download",
-          "enable_analytics": "Enable anonymous analytics",
-          "ignore_unavailable_state": "Ignorera ej tillgängligt tillstånd",
-          "include_non_powercalc_sensors": "Inkludera icke-powercalc sensorer",
-          "power_sensor_category": "Kategori för strömsensor",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
-        },
-        "data_description": {
-          "create_energy_sensors": "Huruvida powercalc behöver skapa kWh sensorer",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-          "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykler dag, timme etc.",
-          "disable_extended_attributes": "Inaktivera alla extra attribut powercalc bidrar till effekt, energi och grupp enhet stater. Detta kommer att bidra till att hålla databasen storlek liten",
-          "disable_library_download": "Inaktivera nedladdningsfunktionen för Powercalc-biblioteket",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-          "ignore_unavailable_state": "Håll Powercalc-sensorer tillgängliga, även när källenheten inte är tillgänglig",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        "sections": {
+          "power_options": {
+            "name": "Effektsensor",
+            "data": {
+              "power_sensor_naming": "Power sensor name pattern",
+              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
+              "power_sensor_category": "Kategori för strömsensor",
+              "power_sensor_precision": "Effektsensorns precision"
+            }
+          },
+          "features": {
+            "name": "Skapa sensorer",
+            "data": {
+              "create_energy_sensors": "Create energy sensors",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Create standby group",
+              "create_utility_meters": "Skapa bruksmätare"
+            },
+            "data_description": {
+              "create_energy_sensors": "Huruvida powercalc behöver skapa kWh sensorer",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+              "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykler dag, timme etc."
+            }
+          },
+          "advanced": {
+            "name": "Avancerat",
+            "data": {
+              "enable_analytics": "Enable anonymous analytics",
+              "ignore_unavailable_state": "Ignorera ej tillgängligt tillstånd",
+              "include_non_powercalc_sensors": "Inkludera icke-powercalc sensorer",
+              "disable_extended_attributes": "Inaktivera utökade attribut",
+              "disable_library_download": "Disable remote library download"
+            },
+            "data_description": {
+              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "ignore_unavailable_state": "Håll Powercalc-sensorer tillgängliga, även när källenheten inte är tillgänglig",
+              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
+              "disable_extended_attributes": "Inaktivera alla extra attribut powercalc bidrar till effekt, energi och grupp enhet stater. Detta kommer att bidra till att hålla databasen storlek liten",
+              "disable_library_download": "Inaktivera nedladdningsfunktionen för Powercalc-biblioteket"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -220,36 +238,49 @@
       },
       "group_custom": {
         "data": {
-          "area": "Område",
-          "floor": "Floor",
-          "create_energy_sensor": "Skapa energisensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Skapa bruksmätare",
-          "device": "Enhet",
-          "force_calculate_group_energy": "Force calculate energy",
-          "group_energy_entities": "Medlem energi entiteter",
-          "group_energy_start_at_zero": "Start at zero",
-          "group_member_devices": "Member devices",
-          "group_member_sensors": "Medlem powercalc sensorer",
-          "group_power_entities": "Medlem effekt entiteter",
-          "hide_members": "Dölj medlemmar",
-          "include_non_powercalc_sensors": "Inkludera icke-powercalc sensorer",
-          "name": "Namn",
-          "sub_groups": "Undergrupper"
+          "name": "Namn"
         },
-        "data_description": {
-          "area": "Lägg till alla powercalc sensorer från det specifierade området",
-          "floor": "Adds all power sensors from the specified floor",
-          "create_energy_sensor": "Om powercalc ska skapa en kWh sensor",
-          "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-          "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
-          "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
-          "group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
-          "group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
-          "include_non_powercalc_sensors": "Ange huruvida icke-powercalc-sensorer ska inkluderas när områdesalternativet används",
-          "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen"
+        "sections": {
+          "members": {
+            "name": "Medlemmar",
+            "data": {
+              "group_member_sensors": "Medlem powercalc sensorer",
+              "group_member_devices": "Member devices",
+              "group_power_entities": "Medlem effekt entiteter",
+              "group_energy_entities": "Medlem energi entiteter",
+              "sub_groups": "Undergrupper",
+              "area": "Område",
+              "floor": "Floor"
+            },
+            "data_description": {
+              "group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
+              "group_member_devices": "Add power and energy entities from the selected devices to the group",
+              "group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
+              "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
+              "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen",
+              "area": "Lägg till alla powercalc sensorer från det specifierade området",
+              "floor": "Adds all power sensors from the specified floor"
+            }
+          },
+          "options": {
+            "name": "Alternativ",
+            "data": {
+              "device": "Enhet",
+              "hide_members": "Dölj medlemmar",
+              "include_non_powercalc_sensors": "Inkludera icke-powercalc sensorer",
+              "force_calculate_group_energy": "Force calculate energy",
+              "group_energy_start_at_zero": "Start at zero",
+              "create_energy_sensor": "Skapa energisensor",
+              "create_utility_meters": "Skapa bruksmätare"
+            },
+            "data_description": {
+              "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
+              "include_non_powercalc_sensors": "Ange huruvida icke-powercalc-sensorer ska inkluderas när områdesalternativet används",
+              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
+              "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
+              "create_energy_sensor": "Om powercalc ska skapa en kWh sensor"
+            }
+          }
         },
         "title": "Skapa en gruppsensor"
       },
@@ -647,30 +678,48 @@
       },
       "global_configuration": {
         "title": "Grundläggande alternativ",
-        "data": {
-          "create_energy_sensors": "Skapa energisensor",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Create standby group",
-          "create_utility_meters": "Create utility meters",
-          "disable_extended_attributes": "Inaktivera utökade attribut",
-          "disable_library_download": "Disable remote library download",
-          "enable_analytics": "Enable anonymous analytics",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
-        },
-        "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        "sections": {
+          "power_options": {
+            "name": "Effektsensor",
+            "data": {
+              "power_sensor_naming": "Power sensor name pattern",
+              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
+              "power_sensor_category": "Power sensor category",
+              "power_sensor_precision": "Effektsensorns precision"
+            }
+          },
+          "features": {
+            "name": "Skapa sensorer",
+            "data": {
+              "create_energy_sensors": "Skapa energisensor",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Create standby group",
+              "create_utility_meters": "Create utility meters"
+            },
+            "data_description": {
+              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+            }
+          },
+          "advanced": {
+            "name": "Avancerat",
+            "data": {
+              "enable_analytics": "Enable anonymous analytics",
+              "ignore_unavailable_state": "Ignore unavailable state",
+              "include_non_powercalc_sensors": "Include non powercalc sensors",
+              "disable_extended_attributes": "Inaktivera utökade attribut",
+              "disable_library_download": "Disable remote library download"
+            },
+            "data_description": {
+              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
+              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
+              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
+              "disable_library_download": "Disable the Powercalc library download feature"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -767,30 +816,42 @@
       },
       "group_custom": {
         "title": "Group options",
-        "data": {
-          "area": "Område",
-          "floor": "Floor",
-          "device": "Enhet",
-          "force_calculate_group_energy": "Force calculate energy",
-          "group_energy_entities": "Medlem energi entiteter",
-          "group_member_devices": "Member devices",
-          "group_member_sensors": "Medlem powercalc sensorer",
-          "group_power_entities": "Medlem effekt entiteter",
-          "hide_members": "Dölj medlemmar",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "sub_groups": "Undergrupper"
-        },
-        "data_description": {
-          "area": "Lägg till alla powercalc sensorer från det specifierade området",
-          "floor": "Adds all power sensors from the specified floor",
-          "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-          "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
-          "group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
-          "group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
-          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-          "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen"
+        "sections": {
+          "members": {
+            "name": "Medlemmar",
+            "data": {
+              "group_member_sensors": "Medlem powercalc sensorer",
+              "group_member_devices": "Member devices",
+              "group_power_entities": "Medlem effekt entiteter",
+              "group_energy_entities": "Medlem energi entiteter",
+              "sub_groups": "Undergrupper",
+              "area": "Område",
+              "floor": "Floor"
+            },
+            "data_description": {
+              "group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
+              "group_member_devices": "Add power and energy entities from the selected devices to the group",
+              "group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
+              "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
+              "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen",
+              "area": "Lägg till alla powercalc sensorer från det specifierade området",
+              "floor": "Adds all power sensors from the specified floor"
+            }
+          },
+          "options": {
+            "name": "Alternativ",
+            "data": {
+              "device": "Enhet",
+              "hide_members": "Dölj medlemmar",
+              "include_non_powercalc_sensors": "Include non powercalc sensors",
+              "force_calculate_group_energy": "Force calculate energy"
+            },
+            "data_description": {
+              "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
+              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor"
+            }
+          }
         }
       },
       "group_subtract": {

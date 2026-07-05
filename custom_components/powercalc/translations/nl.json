@@ -102,30 +102,48 @@
       "global_configuration": {
         "title": "Globale configuratie",
         "description": "Stel de globale configuratie in voor Powercalc. Voor meer informatie zie de [documentation]({docs_uri}). Extra opties voor energiesensors en nutsmeters kunnen in de volgende stappen worden geleverd.",
-        "data": {
-          "create_energy_sensors": "Creëer energie sensoren",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Maak standby-groep",
-          "create_utility_meters": "Creëer utiliteit meters",
-          "disable_extended_attributes": "Extra attributen uitschakelen",
-          "disable_library_download": "Schakel download van externe bibliotheek uit",
-          "enable_analytics": "Verzend anonieme analytische data",
-          "ignore_unavailable_state": "Negeer onbeschikbaar status",
-          "include_non_powercalc_sensors": "Neem niet-powercalc sensoren mee",
-          "power_sensor_category": "Vermogen sensor categorie",
-          "power_sensor_friendly_naming": "Patroon voor vriendelijke naam vermogenssensor",
-          "power_sensor_naming": "Patroon voor naam vermogenssensor"
-        },
-        "data_description": {
-          "create_energy_sensors": "Of powercalc kWh sensoren moet maken",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Maak groep met een totaal van alle standby en eigen gebruik van IOT apparaten",
-          "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, elk uur, etc.",
-          "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
-          "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
-          "enable_analytics": "Sta Powercalc toe om anonieme en geaggregeerde gebruiksstatistieken te verzenden om de integratie te helpen verbeteren",
-          "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
-          "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen"
+        "sections": {
+          "power_options": {
+            "name": "Vermogenssensor",
+            "data": {
+              "power_sensor_naming": "Patroon voor naam vermogenssensor",
+              "power_sensor_friendly_naming": "Patroon voor vriendelijke naam vermogenssensor",
+              "power_sensor_category": "Vermogen sensor categorie",
+              "power_sensor_precision": "Precisie van vermogenssensor"
+            }
+          },
+          "features": {
+            "name": "Sensoren aanmaken",
+            "data": {
+              "create_energy_sensors": "Creëer energie sensoren",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Maak standby-groep",
+              "create_utility_meters": "Creëer utiliteit meters"
+            },
+            "data_description": {
+              "create_energy_sensors": "Of powercalc kWh sensoren moet maken",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Maak groep met een totaal van alle standby en eigen gebruik van IOT apparaten",
+              "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, elk uur, etc."
+            }
+          },
+          "advanced": {
+            "name": "Geavanceerd",
+            "data": {
+              "enable_analytics": "Verzend anonieme analytische data",
+              "ignore_unavailable_state": "Negeer onbeschikbaar status",
+              "include_non_powercalc_sensors": "Neem niet-powercalc sensoren mee",
+              "disable_extended_attributes": "Extra attributen uitschakelen",
+              "disable_library_download": "Schakel download van externe bibliotheek uit"
+            },
+            "data_description": {
+              "enable_analytics": "Sta Powercalc toe om anonieme en geaggregeerde gebruiksstatistieken te verzenden om de integratie te helpen verbeteren",
+              "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
+              "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen",
+              "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
+              "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -220,36 +238,49 @@
       },
       "group_custom": {
         "data": {
-          "area": "Ruimte",
-          "floor": "Verdieping",
-          "create_energy_sensor": "Creëer energie sensoren",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Creëer utiliteit meters",
-          "device": "Apparaat",
-          "force_calculate_group_energy": "Forceer berekenen energie",
-          "group_energy_entities": "Additionele energie entiteiten",
-          "group_energy_start_at_zero": "Start op nul",
-          "group_member_devices": "Apparaten",
-          "group_member_sensors": "Individuele Powercalc sensoren",
-          "group_power_entities": "Additionele vermogen entiteiten",
-          "hide_members": "Verberg onderliggende sensoren",
-          "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
-          "name": "Naam",
-          "sub_groups": "Sub groepen"
+          "name": "Naam"
         },
-        "data_description": {
-          "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
-          "floor": "Voeg alle powercalc sensoren van de gespecificeerde verdieping toe",
-          "create_energy_sensor": "Laat powercalc een kWh meter maken",
-          "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
-          "force_calculate_group_energy": "Standaard worden de energiesensoren van de individuele sensoren opgeteld. Schakel deze optie in om een Riemann Sum sensor te forceren",
-          "group_energy_entities": "Additionele energie entiteiten (kWh)",
-          "group_energy_start_at_zero": "Wanneer ingeschakeld, start de energiesensor bij nul wanneer de sensor is aangemaakt. Anders worden alle huidige onderliggende energiesensor waarden opgeteld.",
-          "group_member_devices": "Energie- en stroomentiteiten van de geselecteerde apparaten toevoegen aan de groep",
-          "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
-          "group_power_entities": "Additionele vermogen entiteiten (W)",
-          "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
-          "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
+        "sections": {
+          "members": {
+            "name": "Leden",
+            "data": {
+              "group_member_sensors": "Individuele Powercalc sensoren",
+              "group_member_devices": "Apparaten",
+              "group_power_entities": "Additionele vermogen entiteiten",
+              "group_energy_entities": "Additionele energie entiteiten",
+              "sub_groups": "Sub groepen",
+              "area": "Ruimte",
+              "floor": "Verdieping"
+            },
+            "data_description": {
+              "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
+              "group_member_devices": "Energie- en stroomentiteiten van de geselecteerde apparaten toevoegen aan de groep",
+              "group_power_entities": "Additionele vermogen entiteiten (W)",
+              "group_energy_entities": "Additionele energie entiteiten (kWh)",
+              "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
+              "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
+              "floor": "Voeg alle powercalc sensoren van de gespecificeerde verdieping toe"
+            }
+          },
+          "options": {
+            "name": "Opties",
+            "data": {
+              "device": "Apparaat",
+              "hide_members": "Verberg onderliggende sensoren",
+              "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
+              "force_calculate_group_energy": "Forceer berekenen energie",
+              "group_energy_start_at_zero": "Start op nul",
+              "create_energy_sensor": "Creëer energie sensoren",
+              "create_utility_meters": "Creëer utiliteit meters"
+            },
+            "data_description": {
+              "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
+              "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
+              "force_calculate_group_energy": "Standaard worden de energiesensoren van de individuele sensoren opgeteld. Schakel deze optie in om een Riemann Sum sensor te forceren",
+              "group_energy_start_at_zero": "Wanneer ingeschakeld, start de energiesensor bij nul wanneer de sensor is aangemaakt. Anders worden alle huidige onderliggende energiesensor waarden opgeteld.",
+              "create_energy_sensor": "Laat powercalc een kWh meter maken"
+            }
+          }
         },
         "title": "Creëer een groep sensor"
       },
@@ -647,30 +678,48 @@
       },
       "global_configuration": {
         "title": "Basisopties",
-        "data": {
-          "create_energy_sensors": "Creëer energie sensoren",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Maak standby-groep",
-          "create_utility_meters": "Creëer utiliteit meters",
-          "disable_extended_attributes": "Extra attributen uitschakelen",
-          "disable_library_download": "Uitschakelen van externe bibliotheek download",
-          "enable_analytics": "Anonieme analytics inschakelen",
-          "ignore_unavailable_state": "Negeer onbeschikbaar status",
-          "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
-          "power_sensor_category": "Vermogen sensor categorie",
-          "power_sensor_friendly_naming": "Vermogen sensor vriendelijke naampatroon",
-          "power_sensor_naming": "Vermogen sensor naampatroon"
-        },
-        "data_description": {
-          "create_energy_sensors": "Of powercalc kWh sensoren moet maken",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Maak groep met een totaal van alle stand-by en zelfgebruik van IOT apparaten",
-          "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
-          "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
-          "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie",
-          "enable_analytics": "Sta Powercalc toe om anonieme en geaggregeerde gebruiksstatistieken te verzenden om de integratie te helpen verbeteren",
-          "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
-          "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen"
+        "sections": {
+          "power_options": {
+            "name": "Vermogenssensor",
+            "data": {
+              "power_sensor_naming": "Vermogen sensor naampatroon",
+              "power_sensor_friendly_naming": "Vermogen sensor vriendelijke naampatroon",
+              "power_sensor_category": "Vermogen sensor categorie",
+              "power_sensor_precision": "Precisie van vermogenssensor"
+            }
+          },
+          "features": {
+            "name": "Sensoren aanmaken",
+            "data": {
+              "create_energy_sensors": "Creëer energie sensoren",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Maak standby-groep",
+              "create_utility_meters": "Creëer utiliteit meters"
+            },
+            "data_description": {
+              "create_energy_sensors": "Of powercalc kWh sensoren moet maken",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Maak groep met een totaal van alle stand-by en zelfgebruik van IOT apparaten",
+              "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc."
+            }
+          },
+          "advanced": {
+            "name": "Geavanceerd",
+            "data": {
+              "enable_analytics": "Anonieme analytics inschakelen",
+              "ignore_unavailable_state": "Negeer onbeschikbaar status",
+              "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
+              "disable_extended_attributes": "Extra attributen uitschakelen",
+              "disable_library_download": "Uitschakelen van externe bibliotheek download"
+            },
+            "data_description": {
+              "enable_analytics": "Sta Powercalc toe om anonieme en geaggregeerde gebruiksstatistieken te verzenden om de integratie te helpen verbeteren",
+              "ignore_unavailable_state": "Houd Powercalc sensoren beschikbaar, zelfs als de bron entiteit niet beschikbaar is",
+              "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen in groepen",
+              "disable_extended_attributes": "Schakel alle extra attributen uit die Powercalc aan de energie, energie en groepsentiteit states toevoegt. Dit helpt de grootte van de database klein te houden",
+              "disable_library_download": "Uitschakelen van de Powercalc bibliotheek download functie"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -767,30 +816,42 @@
       },
       "group_custom": {
         "title": "Groep opties",
-        "data": {
-          "area": "Ruimte",
-          "floor": "Verdieping",
-          "device": "Apparaat",
-          "force_calculate_group_energy": "Forceer berekenen energie",
-          "group_energy_entities": "Additionele energie entiteiten",
-          "group_member_devices": "Apparaten",
-          "group_member_sensors": "Individuele Powercalc sensoren",
-          "group_power_entities": "Additionele vermogen entiteiten",
-          "hide_members": "Verberg onderliggende sensoren",
-          "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
-          "sub_groups": "Sub groepen"
-        },
-        "data_description": {
-          "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
-          "floor": "Voeg alle powercalc sensoren van de gespecificeerde verdieping toe",
-          "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
-          "force_calculate_group_energy": "Standaard worden de energiesensoren van de individuele sensoren opgeteld. Schakel deze optie in om een Riemann Sum sensor te forceren",
-          "group_energy_entities": "Additionele energie entiteiten (kWh)",
-          "group_member_devices": "Energie- en stroomentiteiten van de geselecteerde apparaten toevoegen aan de groep",
-          "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
-          "group_power_entities": "Additionele vermogen entiteiten (W)",
-          "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
-          "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
+        "sections": {
+          "members": {
+            "name": "Leden",
+            "data": {
+              "group_member_sensors": "Individuele Powercalc sensoren",
+              "group_member_devices": "Apparaten",
+              "group_power_entities": "Additionele vermogen entiteiten",
+              "group_energy_entities": "Additionele energie entiteiten",
+              "sub_groups": "Sub groepen",
+              "area": "Ruimte",
+              "floor": "Verdieping"
+            },
+            "data_description": {
+              "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
+              "group_member_devices": "Energie- en stroomentiteiten van de geselecteerde apparaten toevoegen aan de groep",
+              "group_power_entities": "Additionele vermogen entiteiten (W)",
+              "group_energy_entities": "Additionele energie entiteiten (kWh)",
+              "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
+              "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
+              "floor": "Voeg alle powercalc sensoren van de gespecificeerde verdieping toe"
+            }
+          },
+          "options": {
+            "name": "Opties",
+            "data": {
+              "device": "Apparaat",
+              "hide_members": "Verberg onderliggende sensoren",
+              "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
+              "force_calculate_group_energy": "Forceer berekenen energie"
+            },
+            "data_description": {
+              "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
+              "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
+              "force_calculate_group_energy": "Standaard worden de energiesensoren van de individuele sensoren opgeteld. Schakel deze optie in om een Riemann Sum sensor te forceren"
+            }
+          }
         }
       },
       "group_subtract": {

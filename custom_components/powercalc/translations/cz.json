@@ -102,30 +102,48 @@
       "global_configuration": {
         "title": "Globální konfigurace",
         "description": "Setup global configuration for Powercalc. For more information see the [documentation]({docs_uri}). Additional options for energy sensors and utility meters can be provided in the next steps.",
-        "data": {
-          "create_energy_sensors": "Create energy sensors",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Create standby group",
-          "create_utility_meters": "Vytvořit senzor spotřeby",
-          "disable_extended_attributes": "Disable extended attributes",
-          "disable_library_download": "Disable remote library download",
-          "enable_analytics": "Enable anonymous analytics",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Zahrnout ne-powercalc senzory",
-          "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
-        },
-        "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        "sections": {
+          "power_options": {
+            "name": "Senzor výkonu",
+            "data": {
+              "power_sensor_naming": "Power sensor name pattern",
+              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
+              "power_sensor_category": "Power sensor category",
+              "power_sensor_precision": "Přesnost senzoru výkonu"
+            }
+          },
+          "features": {
+            "name": "Vytvořit senzory",
+            "data": {
+              "create_energy_sensors": "Create energy sensors",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Create standby group",
+              "create_utility_meters": "Vytvořit senzor spotřeby"
+            },
+            "data_description": {
+              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+            }
+          },
+          "advanced": {
+            "name": "Pokročilé",
+            "data": {
+              "enable_analytics": "Enable anonymous analytics",
+              "ignore_unavailable_state": "Ignore unavailable state",
+              "include_non_powercalc_sensors": "Zahrnout ne-powercalc senzory",
+              "disable_extended_attributes": "Disable extended attributes",
+              "disable_library_download": "Disable remote library download"
+            },
+            "data_description": {
+              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
+              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
+              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
+              "disable_library_download": "Disable the Powercalc library download feature"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -220,36 +238,49 @@
       },
       "group_custom": {
         "data": {
-          "area": "Oblast",
-          "floor": "Floor",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "device": "Zařízení",
-          "force_calculate_group_energy": "Force calculate energy",
-          "group_energy_entities": "Additional energy entities",
-          "group_energy_start_at_zero": "Začít na nule",
-          "group_member_devices": "Member devices",
-          "group_member_sensors": "Member powercalc sensors",
-          "group_power_entities": "Additional power entities",
-          "hide_members": "Skrýt členy",
-          "include_non_powercalc_sensors": "Zahrnout ne-powercalc senzory",
-          "name": "Název",
-          "sub_groups": "Podskupiny"
+          "name": "Název"
         },
-        "data_description": {
-          "area": "Přidá všechny energetické senzory z určené oblasti",
-          "floor": "Adds all power sensors from the specified floor",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "device": "Add the group entities powercalc creates to an existing device",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-          "group_energy_entities": "Další senzory energie (kWh) z vaší instalace HA k přidání",
-          "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
-          "group_member_sensors": "Powercalc sensors to include in the group",
-          "group_power_entities": "Další senzory energie (W) z vaší instalace HA k přidání",
-          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-          "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
+        "sections": {
+          "members": {
+            "name": "Členové",
+            "data": {
+              "group_member_sensors": "Member powercalc sensors",
+              "group_member_devices": "Member devices",
+              "group_power_entities": "Additional power entities",
+              "group_energy_entities": "Additional energy entities",
+              "sub_groups": "Podskupiny",
+              "area": "Oblast",
+              "floor": "Floor"
+            },
+            "data_description": {
+              "group_member_sensors": "Powercalc sensors to include in the group",
+              "group_member_devices": "Add power and energy entities from the selected devices to the group",
+              "group_power_entities": "Další senzory energie (W) z vaší instalace HA k přidání",
+              "group_energy_entities": "Další senzory energie (kWh) z vaší instalace HA k přidání",
+              "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
+              "area": "Přidá všechny energetické senzory z určené oblasti",
+              "floor": "Adds all power sensors from the specified floor"
+            }
+          },
+          "options": {
+            "name": "Možnosti",
+            "data": {
+              "device": "Zařízení",
+              "hide_members": "Skrýt členy",
+              "include_non_powercalc_sensors": "Zahrnout ne-powercalc senzory",
+              "force_calculate_group_energy": "Force calculate energy",
+              "group_energy_start_at_zero": "Začít na nule",
+              "create_energy_sensor": "Create energy sensor",
+              "create_utility_meters": "Create utility meters"
+            },
+            "data_description": {
+              "device": "Add the group entities powercalc creates to an existing device",
+              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
+              "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
+              "create_energy_sensor": "Whether powercalc needs to create a kWh sensor"
+            }
+          }
         },
         "title": "Create a group sensor"
       },
@@ -647,30 +678,48 @@
       },
       "global_configuration": {
         "title": "Basic options",
-        "data": {
-          "create_energy_sensors": "Create energy sensors",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Create standby group",
-          "create_utility_meters": "Create utility meters",
-          "disable_extended_attributes": "Disable extended attributes",
-          "disable_library_download": "Disable remote library download",
-          "enable_analytics": "Enable anonymous analytics",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
-        },
-        "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        "sections": {
+          "power_options": {
+            "name": "Senzor výkonu",
+            "data": {
+              "power_sensor_naming": "Power sensor name pattern",
+              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
+              "power_sensor_category": "Power sensor category",
+              "power_sensor_precision": "Přesnost senzoru výkonu"
+            }
+          },
+          "features": {
+            "name": "Vytvořit senzory",
+            "data": {
+              "create_energy_sensors": "Create energy sensors",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Create standby group",
+              "create_utility_meters": "Create utility meters"
+            },
+            "data_description": {
+              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+            }
+          },
+          "advanced": {
+            "name": "Pokročilé",
+            "data": {
+              "enable_analytics": "Enable anonymous analytics",
+              "ignore_unavailable_state": "Ignore unavailable state",
+              "include_non_powercalc_sensors": "Include non powercalc sensors",
+              "disable_extended_attributes": "Disable extended attributes",
+              "disable_library_download": "Disable remote library download"
+            },
+            "data_description": {
+              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
+              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
+              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
+              "disable_library_download": "Disable the Powercalc library download feature"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -767,30 +816,42 @@
       },
       "group_custom": {
         "title": "Group options",
-        "data": {
-          "area": "Oblast",
-          "floor": "Floor",
-          "device": "Zařízení",
-          "force_calculate_group_energy": "Force calculate energy",
-          "group_energy_entities": "Additional energy entities",
-          "group_member_devices": "Member devices",
-          "group_member_sensors": "Member powercalc sensors",
-          "group_power_entities": "Additional power entities",
-          "hide_members": "Hide members",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "sub_groups": "Podskupiny"
-        },
-        "data_description": {
-          "area": "Přidá všechny powercalc senzory z určené oblasti",
-          "floor": "Adds all power sensors from the specified floor",
-          "device": "Add the group entities powercalc creates to an existing device",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-          "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
-          "group_member_sensors": "Powercalc sensors to include in the group",
-          "group_power_entities": "Additional power sensors (W) from your HA installation to include",
-          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-          "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
+        "sections": {
+          "members": {
+            "name": "Členové",
+            "data": {
+              "group_member_sensors": "Member powercalc sensors",
+              "group_member_devices": "Member devices",
+              "group_power_entities": "Additional power entities",
+              "group_energy_entities": "Additional energy entities",
+              "sub_groups": "Podskupiny",
+              "area": "Oblast",
+              "floor": "Floor"
+            },
+            "data_description": {
+              "group_member_sensors": "Powercalc sensors to include in the group",
+              "group_member_devices": "Add power and energy entities from the selected devices to the group",
+              "group_power_entities": "Additional power sensors (W) from your HA installation to include",
+              "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
+              "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
+              "area": "Přidá všechny powercalc senzory z určené oblasti",
+              "floor": "Adds all power sensors from the specified floor"
+            }
+          },
+          "options": {
+            "name": "Možnosti",
+            "data": {
+              "device": "Zařízení",
+              "hide_members": "Hide members",
+              "include_non_powercalc_sensors": "Include non powercalc sensors",
+              "force_calculate_group_energy": "Force calculate energy"
+            },
+            "data_description": {
+              "device": "Add the group entities powercalc creates to an existing device",
+              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor"
+            }
+          }
         }
       },
       "group_subtract": {

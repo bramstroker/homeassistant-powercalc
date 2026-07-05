@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_ENABLED, CONF_SENSORS, UnitOfTime
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType
@@ -50,7 +51,7 @@ from custom_components.powercalc.const import (
     ENTITY_CATEGORIES,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
 )
-from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
+from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, flatten_sections
 from custom_components.powercalc.flow_helper.schema import (
     SCHEMA_COST_APPLY,
     SCHEMA_ENERGY_OPTIONS,
@@ -66,7 +67,11 @@ from custom_components.powercalc.service.gui_configuration import apply_field_to
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
 
-SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
+SECTION_GLOBAL_POWER = "power_options"
+SECTION_GLOBAL_FEATURES = "features"
+SECTION_GLOBAL_ADVANCED = "advanced"
+
+SCHEMA_GLOBAL_CONFIGURATION_POWER = vol.Schema(
     {
         vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
@@ -79,15 +84,34 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
             selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
         ),
+    },
+)
+
+SCHEMA_GLOBAL_CONFIGURATION_FEATURES = vol.Schema(
+    {
+        vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_CREATE_COST_SENSORS, default=False): selector.BooleanSelector(),
+        vol.Optional(CONF_CREATE_STANDBY_GROUP, default=True): selector.BooleanSelector(),
+        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+    },
+)
+
+SCHEMA_GLOBAL_CONFIGURATION_ADVANCED = vol.Schema(
+    {
         vol.Optional(CONF_ENABLE_ANALYTICS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_LIBRARY_DOWNLOAD, default=False): selector.BooleanSelector(),
-        vol.Optional(CONF_CREATE_STANDBY_GROUP, default=True): selector.BooleanSelector(),
-        vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
-        vol.Optional(CONF_CREATE_COST_SENSORS, default=False): selector.BooleanSelector(),
-        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+    },
+)
+
+# Presented in the GUI as three collapsible sections (power sensor, features, advanced).
+SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
+    {
+        vol.Required(SECTION_GLOBAL_POWER): section(SCHEMA_GLOBAL_CONFIGURATION_POWER),
+        vol.Required(SECTION_GLOBAL_FEATURES): section(SCHEMA_GLOBAL_CONFIGURATION_FEATURES),
+        vol.Required(SECTION_GLOBAL_ADVANCED): section(SCHEMA_GLOBAL_CONFIGURATION_ADVANCED, {"collapsed": True}),
     },
 )
 
@@ -152,13 +176,16 @@ def merge_global_config(global_config: ConfigType, user_input: dict[str, Any], s
     Keys present in the schema but absent from the user input were cleared in the form
     and must be removed, otherwise a previously saved value would incorrectly persist.
     """
-    for key in schema.schema:
-        if isinstance(key, vol.Marker):
-            key = key.schema
-        if key in user_input:
-            global_config[key] = user_input[key]
-        elif key in global_config:
-            global_config.pop(key)
+    for key, val in schema.schema.items():
+        base_key = key.schema if isinstance(key, vol.Marker) else key
+        if isinstance(val, section):
+            # Recurse into collapsible sections, whose values are nested under the section key.
+            merge_global_config(global_config, user_input.get(base_key) or {}, val.schema)
+            continue
+        if base_key in user_input:
+            global_config[base_key] = user_input[base_key]
+        elif base_key in global_config:
+            global_config.pop(base_key)
 
 
 def get_global_powercalc_config(flow: PowercalcCommonFlow) -> ConfigType:
@@ -361,7 +388,7 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
         self.flow.abort_if_unique_id_configured()
 
         if user_input is not None:
-            self.flow.global_config.update(user_input)
+            self.flow.global_config.update(flatten_sections(user_input, SCHEMA_GLOBAL_CONFIGURATION))
             return await self.async_step_global_configuration_discovery()
 
         return await self.flow.handle_form_step(

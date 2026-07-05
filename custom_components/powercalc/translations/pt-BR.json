@@ -102,30 +102,48 @@
       "global_configuration": {
         "title": "Configuração global",
         "description": "Configuração global do Powercalc. Para obter mais informações, consulte o [documentation]({docs_uri}). Opções adicionais para sensores de energia e medidores de utilidade podem ser fornecidas nos próximos passos.",
-        "data": {
-          "create_energy_sensors": "Criar sensor de consumo",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Criar grupo de standby",
-          "create_utility_meters": "Criar medidores de utilidade",
-          "disable_extended_attributes": "Desativar atributos estendidos",
-          "disable_library_download": "Desativar download da biblioteca remota",
-          "enable_analytics": "Ativar estatísticas anônimas",
-          "ignore_unavailable_state": "Ignorar estado indisponível",
-          "include_non_powercalc_sensors": "Incluir sensores não powercalc",
-          "power_sensor_category": "Categoria do sensor de energia",
-          "power_sensor_friendly_naming": "Padrão de nome amigável para sensor de potência",
-          "power_sensor_naming": "Padrão de nome do sensor de energia"
-        },
-        "data_description": {
-          "create_energy_sensors": "Se o powercalc precisa criar um sensor kWh",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Criar grupo que soma todo o consumo de energia em standby e auto-uso dos dispositivos IoT",
-          "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
-          "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados da energia, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
-          "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
-          "enable_analytics": "Permitir que o Powercalc envie estatísticas de uso anônimas e agregadas para ajudar a melhorar a integração",
-          "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
-          "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
+        "sections": {
+          "power_options": {
+            "name": "Sensor de potência",
+            "data": {
+              "power_sensor_naming": "Padrão de nome do sensor de energia",
+              "power_sensor_friendly_naming": "Padrão de nome amigável para sensor de potência",
+              "power_sensor_category": "Categoria do sensor de energia",
+              "power_sensor_precision": "Precisão do sensor de potência"
+            }
+          },
+          "features": {
+            "name": "Criar sensores",
+            "data": {
+              "create_energy_sensors": "Criar sensor de consumo",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Criar grupo de standby",
+              "create_utility_meters": "Criar medidores de utilidade"
+            },
+            "data_description": {
+              "create_energy_sensors": "Se o powercalc precisa criar um sensor kWh",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Criar grupo que soma todo o consumo de energia em standby e auto-uso dos dispositivos IoT",
+              "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc."
+            }
+          },
+          "advanced": {
+            "name": "Avançado",
+            "data": {
+              "enable_analytics": "Ativar estatísticas anônimas",
+              "ignore_unavailable_state": "Ignorar estado indisponível",
+              "include_non_powercalc_sensors": "Incluir sensores não powercalc",
+              "disable_extended_attributes": "Desativar atributos estendidos",
+              "disable_library_download": "Desativar download da biblioteca remota"
+            },
+            "data_description": {
+              "enable_analytics": "Permitir que o Powercalc envie estatísticas de uso anônimas e agregadas para ajudar a melhorar a integração",
+              "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
+              "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos",
+              "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados da energia, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
+              "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -220,36 +238,49 @@
       },
       "group_custom": {
         "data": {
-          "area": "Área",
-          "floor": "Piso",
-          "create_energy_sensor": "Criar sensor de consumo",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Criar medidores de utilidade",
-          "device": "Dispositivo",
-          "force_calculate_group_energy": "Forçar cálculo da energia",
-          "group_energy_entities": "Entidades de energia adicionais",
-          "group_energy_start_at_zero": "Iniciar com zero",
-          "group_member_devices": "Dispositivos membros",
-          "group_member_sensors": "Sensores powercalc membros",
-          "group_power_entities": "Entidades de potência adicionais",
-          "hide_members": "Ocultar membros",
-          "include_non_powercalc_sensors": "Incluir sensores não powercalc",
-          "name": "Nome",
-          "sub_groups": "Subgrupos"
+          "name": "Nome"
         },
-        "data_description": {
-          "area": "Adiciona todos os sensores de potência da área especificada",
-          "floor": "Adicionar todos os sensores de potência da área especificada",
-          "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
-          "device": "Adicionar o grupo de entidades powercalc a um dispositivo existente",
-          "force_calculate_group_energy": "Por padrão powercalc soma os sensores de energia dos sensores membros. Ative esta opção para forçar a criação de um sensor de soma Riemann",
-          "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
-          "group_energy_start_at_zero": "Quando ativado, o sensor de energia iniciará em zero quando o sensor é criado. Caso contrário, ele soma todos os estados do sensor de energia dos membros atual",
-          "group_member_devices": "Adicionar entidades de potência e consumo dos dispositivos selecionados ao grupo",
-          "group_member_sensors": "Sensores powercalc para incluir no grupo",
-          "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
-          "include_non_powercalc_sensors": "Controle se deve incluir sensores não powercalc ao usar a opção de área",
-          "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
+        "sections": {
+          "members": {
+            "name": "Membros",
+            "data": {
+              "group_member_sensors": "Sensores powercalc membros",
+              "group_member_devices": "Dispositivos membros",
+              "group_power_entities": "Entidades de potência adicionais",
+              "group_energy_entities": "Entidades de energia adicionais",
+              "sub_groups": "Subgrupos",
+              "area": "Área",
+              "floor": "Piso"
+            },
+            "data_description": {
+              "group_member_sensors": "Sensores powercalc para incluir no grupo",
+              "group_member_devices": "Adicionar entidades de potência e consumo dos dispositivos selecionados ao grupo",
+              "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
+              "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
+              "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo",
+              "area": "Adiciona todos os sensores de potência da área especificada",
+              "floor": "Adicionar todos os sensores de potência da área especificada"
+            }
+          },
+          "options": {
+            "name": "Opções",
+            "data": {
+              "device": "Dispositivo",
+              "hide_members": "Ocultar membros",
+              "include_non_powercalc_sensors": "Incluir sensores não powercalc",
+              "force_calculate_group_energy": "Forçar cálculo da energia",
+              "group_energy_start_at_zero": "Iniciar com zero",
+              "create_energy_sensor": "Criar sensor de consumo",
+              "create_utility_meters": "Criar medidores de utilidade"
+            },
+            "data_description": {
+              "device": "Adicionar o grupo de entidades powercalc a um dispositivo existente",
+              "include_non_powercalc_sensors": "Controle se deve incluir sensores não powercalc ao usar a opção de área",
+              "force_calculate_group_energy": "Por padrão powercalc soma os sensores de energia dos sensores membros. Ative esta opção para forçar a criação de um sensor de soma Riemann",
+              "group_energy_start_at_zero": "Quando ativado, o sensor de energia iniciará em zero quando o sensor é criado. Caso contrário, ele soma todos os estados do sensor de energia dos membros atual",
+              "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh"
+            }
+          }
         },
         "title": "Criar um sensor de grupo"
       },
@@ -647,30 +678,48 @@
       },
       "global_configuration": {
         "title": "Opções básicas",
-        "data": {
-          "create_energy_sensors": "Criar sensor de consumo",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Criar grupo de standby",
-          "create_utility_meters": "Criar medidores de utilidade",
-          "disable_extended_attributes": "Desativar atributos estendidos",
-          "disable_library_download": "Desativar o download da biblioteca remota",
-          "enable_analytics": "Habilitar Estatísticas de uso anônimas",
-          "ignore_unavailable_state": "Ignorar estado indisponível",
-          "include_non_powercalc_sensors": "Incluir sensores não powercalc",
-          "power_sensor_category": "Categoria do sensor de potência",
-          "power_sensor_friendly_naming": "Padrão de nome amigável para sensor de potência",
-          "power_sensor_naming": "Padrão de nome do sensor de potência"
-        },
-        "data_description": {
-          "create_energy_sensors": "Se o powercalc precisa criar sensores kWh",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Criar grupo que soma todo o consumo de energia em standby e auto-uso dos dispositivos IoT",
-          "create_utility_meters": "Deixe que energia crie medidores utilitários, de ciclo diário, horário, etc.",
-          "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados de potência, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
-          "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
-          "enable_analytics": "Permitir que o Powercalc envie estatísticas de uso anônimas e agregadas para ajudar a melhorar a integração",
-          "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
-          "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos"
+        "sections": {
+          "power_options": {
+            "name": "Sensor de potência",
+            "data": {
+              "power_sensor_naming": "Padrão de nome do sensor de potência",
+              "power_sensor_friendly_naming": "Padrão de nome amigável para sensor de potência",
+              "power_sensor_category": "Categoria do sensor de potência",
+              "power_sensor_precision": "Precisão do sensor de potência"
+            }
+          },
+          "features": {
+            "name": "Criar sensores",
+            "data": {
+              "create_energy_sensors": "Criar sensor de consumo",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Criar grupo de standby",
+              "create_utility_meters": "Criar medidores de utilidade"
+            },
+            "data_description": {
+              "create_energy_sensors": "Se o powercalc precisa criar sensores kWh",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Criar grupo que soma todo o consumo de energia em standby e auto-uso dos dispositivos IoT",
+              "create_utility_meters": "Deixe que energia crie medidores utilitários, de ciclo diário, horário, etc."
+            }
+          },
+          "advanced": {
+            "name": "Avançado",
+            "data": {
+              "enable_analytics": "Habilitar Estatísticas de uso anônimas",
+              "ignore_unavailable_state": "Ignorar estado indisponível",
+              "include_non_powercalc_sensors": "Incluir sensores não powercalc",
+              "disable_extended_attributes": "Desativar atributos estendidos",
+              "disable_library_download": "Desativar o download da biblioteca remota"
+            },
+            "data_description": {
+              "enable_analytics": "Permitir que o Powercalc envie estatísticas de uso anônimas e agregadas para ajudar a melhorar a integração",
+              "ignore_unavailable_state": "Manter os sensores do Powercalc disponíveis mesmo quando a entidade de origem estiver indisponível",
+              "include_non_powercalc_sensors": "Controle se você deseja incluir sensores não powercalc em grupos",
+              "disable_extended_attributes": "Desativar todos os atributos extras que o powercalc adiciona aos estados de potência, energia e entidade de grupo. Isso ajudará a manter o tamanho do banco de dados pequeno",
+              "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -767,30 +816,42 @@
       },
       "group_custom": {
         "title": "Opções do grupo",
-        "data": {
-          "area": "Área",
-          "floor": "Piso",
-          "device": "Dispositivo",
-          "force_calculate_group_energy": "Forçar cálculo da energia",
-          "group_energy_entities": "Entidades de energia adicionais",
-          "group_member_devices": "Dispositivos membros",
-          "group_member_sensors": "Sensores powercalc membros",
-          "group_power_entities": "Entidades de potência adicionais",
-          "hide_members": "Ocultar membros",
-          "include_non_powercalc_sensors": "Incluir sensores não powercalc",
-          "sub_groups": "Subgrupos"
-        },
-        "data_description": {
-          "area": "Adicionar todos os sensores de potência da área especificada",
-          "floor": "Adiciona todos os sensores de potência da área especificada",
-          "device": "Adicionar o grupo de entidades powercalc a um dispositivo existente",
-          "force_calculate_group_energy": "Por padrão powercalc soma os sensores de energia dos sensores membros. Ative esta opção para forçar a criação de um sensor de soma Riemann",
-          "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
-          "group_member_devices": "Adicionar entidades de potência e consumo dos dispositivos selecionados ao grupo",
-          "group_member_sensors": "Sensores Powercalc para incluir no grupo",
-          "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
-          "include_non_powercalc_sensors": "Controle se deve incluir sensores não powercalc ao usar a opção de área",
-          "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
+        "sections": {
+          "members": {
+            "name": "Membros",
+            "data": {
+              "group_member_sensors": "Sensores powercalc membros",
+              "group_member_devices": "Dispositivos membros",
+              "group_power_entities": "Entidades de potência adicionais",
+              "group_energy_entities": "Entidades de energia adicionais",
+              "sub_groups": "Subgrupos",
+              "area": "Área",
+              "floor": "Piso"
+            },
+            "data_description": {
+              "group_member_sensors": "Sensores Powercalc para incluir no grupo",
+              "group_member_devices": "Adicionar entidades de potência e consumo dos dispositivos selecionados ao grupo",
+              "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
+              "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
+              "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo",
+              "area": "Adicionar todos os sensores de potência da área especificada",
+              "floor": "Adiciona todos os sensores de potência da área especificada"
+            }
+          },
+          "options": {
+            "name": "Opções",
+            "data": {
+              "device": "Dispositivo",
+              "hide_members": "Ocultar membros",
+              "include_non_powercalc_sensors": "Incluir sensores não powercalc",
+              "force_calculate_group_energy": "Forçar cálculo da energia"
+            },
+            "data_description": {
+              "device": "Adicionar o grupo de entidades powercalc a um dispositivo existente",
+              "include_non_powercalc_sensors": "Controle se deve incluir sensores não powercalc ao usar a opção de área",
+              "force_calculate_group_energy": "Por padrão powercalc soma os sensores de energia dos sensores membros. Ative esta opção para forçar a criação de um sensor de soma Riemann"
+            }
+          }
         }
       },
       "group_subtract": {

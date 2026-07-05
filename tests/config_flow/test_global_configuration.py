@@ -85,6 +85,8 @@ from tests.config_flow.common import (
     handle_options_flow_update,
     initialize_options_flow,
     select_menu_item,
+    submit_form_step,
+    submit_options_step,
 )
 
 
@@ -94,8 +96,9 @@ async def test_config_flow(hass: HomeAssistant) -> None:
 
     result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
+    result = await submit_form_step(
+        hass,
+        result,
         {
             CONF_DISABLE_LIBRARY_DOWNLOAD: True,
             CONF_CREATE_ENERGY_SENSORS: True,
@@ -206,10 +209,7 @@ async def test_energy_and_utility_options_skipped(
     """Test the energy and utility_meter options are only shown when relevant."""
     result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        user_input,
-    )
+    result = await submit_form_step(hass, result, user_input)
 
     # Submit discovery step
     result = await hass.config_entries.flow.async_configure(
@@ -381,8 +381,9 @@ async def test_cost_options_step_in_config_flow(hass: HomeAssistant) -> None:
     """The cost options step is shown in the wizard and the price is stored."""
     result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
+    result = await submit_form_step(
+        hass,
+        result,
         {
             CONF_CREATE_ENERGY_SENSORS: False,
             CONF_CREATE_UTILITY_METERS: False,
@@ -426,8 +427,9 @@ async def test_cost_options_step_skipped_when_disabled(hass: HomeAssistant) -> N
     """The cost options step is skipped when cost sensors are disabled."""
     result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
+    result = await submit_form_step(
+        hass,
+        result,
         {
             CONF_CREATE_ENERGY_SENSORS: False,
             CONF_CREATE_UTILITY_METERS: False,
@@ -495,10 +497,7 @@ def _create_cost_toggle_power_entry(create_cost_sensor: bool) -> MockConfigEntry
 async def _toggle_cost_sensors(hass: HomeAssistant, entry: MockConfigEntry, value: bool) -> FlowResult:
     """Open the options basic step and flip create_cost_sensors, returning the resulting step."""
     result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION)
-    return await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        {CONF_CREATE_COST_SENSORS: value},
-    )
+    return await submit_options_step(hass, result, {CONF_CREATE_COST_SENSORS: value})
 
 
 async def test_toggling_cost_sensors_redirects_to_apply_step(hass: HomeAssistant) -> None:
@@ -592,8 +591,9 @@ async def test_cost_step_requires_a_price_in_config_flow(hass: HomeAssistant) ->
     """Submitting the cost step without a price shows a validation error."""
     result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
+    result = await submit_form_step(
+        hass,
+        result,
         {
             CONF_CREATE_ENERGY_SENSORS: False,
             CONF_CREATE_UTILITY_METERS: False,
