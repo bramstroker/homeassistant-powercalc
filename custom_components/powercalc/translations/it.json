@@ -128,7 +128,7 @@
       },
       "global_configuration_cost": {
         "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh.",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Consulta la [documentazione]({docs_uri}) per maggiori informazioni",
         "data": {
           "energy_price": "Fixed energy price",
           "energy_price_multiplier": "Energy price multiplier",
@@ -633,7 +633,7 @@
       },
       "global_configuration_cost": {
         "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh.",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Consulta la [documentazione]({docs_uri}) per maggiori informazioni",
         "data": {
           "energy_price": "Fixed energy price",
           "energy_price_multiplier": "Energy price multiplier",
