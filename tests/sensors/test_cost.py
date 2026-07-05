@@ -200,6 +200,34 @@ async def test_cost_sensor_price_at_consumption(hass: HomeAssistant) -> None:
     _assert_cost(hass, 6.0)
 
 
+@pytest.mark.parametrize(
+    "price_unit,expected_unit",
+    [
+        ("€/kWh", "€"),
+        ("EUR/kWh", "EUR"),
+        ("USD/kWh", "USD"),
+        (None, "EUR"),  # no unit on price sensor -> fall back to HA currency
+    ],
+)
+async def test_cost_sensor_unit_derived_from_price_sensor(
+    hass: HomeAssistant,
+    price_unit: str | None,
+    expected_unit: str,
+) -> None:
+    """The cost sensor's unit is taken from the price sensor's currency when available."""
+    attributes = {ATTR_UNIT_OF_MEASUREMENT: price_unit} if price_unit is not None else None
+    await set_states(hass, [("sensor.energy_price", "0.20", attributes)])
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True},
+        {CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price"},
+    )
+
+    cost_state = hass.states.get("sensor.test_cost")
+    assert cost_state
+    assert cost_state.attributes[ATTR_UNIT_OF_MEASUREMENT] == expected_unit
+
+
 async def test_cost_sensor_price_sensor_with_surcharge(hass: HomeAssistant) -> None:
     """Cost uses the dynamic price sensor value plus surcharge."""
     await set_states(hass, [("sensor.energy_price", "0.20")])

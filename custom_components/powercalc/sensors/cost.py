@@ -86,6 +86,19 @@ def _parse_energy_kwh(state: State | None) -> Decimal | None:
     return value * _to_kwh_factor(state.attributes.get(ATTR_UNIT_OF_MEASUREMENT))
 
 
+def _currency_from_price_unit(unit: str | None) -> str | None:
+    """Derive the monetary unit from an energy price sensor's unit of measurement.
+
+    Price sensors typically express their unit as ``<currency>/kWh`` (for example
+    ``EUR/kWh`` or ``€/kWh``). The part before the slash is the currency the cost is
+    denominated in. Returns None when no currency can be determined.
+    """
+    if not unit:
+        return None
+    currency = unit.split("/", 1)[0].strip()
+    return currency or None
+
+
 def create_cost_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
@@ -246,7 +259,12 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
         # Seed the current price and, for a price sensor, track its changes so consumption
         # is always settled at the price that was in effect when it was consumed.
         if self._price_entity_id is not None:
-            self._current_price = self._effective_price(_parse_decimal(self.hass.states.get(self._price_entity_id)))
+            price_state = self.hass.states.get(self._price_entity_id)
+            # Prefer the currency of the price sensor (e.g. `€/kWh` -> `€`) over the HA currency.
+            price_unit = price_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) if price_state else None
+            if (currency := _currency_from_price_unit(price_unit)) is not None:
+                self._attr_native_unit_of_measurement = currency
+            self._current_price = self._effective_price(_parse_decimal(price_state))
             self.async_on_remove(
                 async_track_state_change_event(
                     self.hass,
