@@ -65,9 +65,10 @@ nav:
          - 'sensor-types/group/tracked-untracked.md'
          - 'sensor-types/group/include-entities.md'
       - 'sensor-types/real-power-sensor.md'
-      - 'sensor-types/energy-sensor.md'
-      - 'sensor-types/cost-sensor.md'
-      - 'sensor-types/utility-meter.md'
+      - 'Derived sensors':
+         - 'sensor-types/energy-sensor.md'
+         - 'sensor-types/utility-meter.md'
+         - 'sensor-types/cost-sensor.md'
   - 'Strategies':
       - 'strategies/index.md'
       - 'strategies/fixed.md'

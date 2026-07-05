@@ -40,7 +40,18 @@ This allows you to create an energy sensor for that which you can add to the ene
 Use this when you have an existing power sensor in your installation, which you want to create energy sensor (and optionally utility meters) for.
 This also makes it possible to add the power sensor to a powercalc [group](group/custom.md).
 
-### Energy sensors and utility meters
+## Derived sensors
 
-When setting up power sensors using the above methods Powercalc can automatically create an [energy sensor](energy-sensor.md) (kWh) and optionally [utility meters](utility-meter.md) (sensors which cycle each hour, week, month).
-The can be toggled in the GUI or use the YAML options `create_energy_sensor` and `create_utility_meters` globally or per sensor.
+When setting up power sensors using the above methods, Powercalc can automatically derive additional sensors from them. Each can be toggled in the GUI or with a YAML option, globally or per sensor.
+
+### [Energy sensor](energy-sensor.md)
+
+An energy sensor (kWh) integrated from the power sensor, ready to add to the Home Assistant [energy dashboard](https://www.home-assistant.io/docs/energy/). Toggle with `create_energy_sensor`.
+
+### [Utility meter](utility-meter.md)
+
+Utility meters cycle the energy consumption per period (hourly, daily, weekly, monthly, ...), so you can track usage per cycle. Toggle with `create_utility_meters`.
+
+### [Cost sensor](cost-sensor.md)
+
+A cost sensor (`monetary`) multiplies the consumed energy by an energy price to track what it costs. Toggle with `create_cost_sensors`. You can also create a [standalone cost sensor](cost-sensor.md#cost-sensor-for-an-existing-energy-sensor) for an existing energy sensor that was not created by Powercalc.
