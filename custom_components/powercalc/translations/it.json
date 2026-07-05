@@ -124,7 +124,7 @@
               "create_energy_sensors": "Considera powercalc deve creare sensori kWh",
               "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
               "create_standby_group": "Crea un gruppo che somma tutti i consumi di energia standby e l'autoutilizzo dei dispositivi IOT",
-              "create_utility_meters": ""
+              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
             }
           },
           "advanced": {
