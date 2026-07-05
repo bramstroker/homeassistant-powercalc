@@ -5,12 +5,21 @@ import logging
 from typing import TYPE_CHECKING
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
-from homeassistant.const import CONF_NAME, CONF_UNIQUE_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
+from homeassistant.const import (
+    ATTR_UNIT_OF_MEASUREMENT,
+    CONF_NAME,
+    CONF_UNIQUE_ID,
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
+    UnitOfEnergy,
+)
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
+from homeassistant.exceptions import HomeAssistantError
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.util.unit_conversion import EnergyConverter
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -51,6 +60,30 @@ def _parse_decimal(state: State | None) -> Decimal | None:
         return Decimal(state.state)
     except DecimalException, ValueError:
         return None
+
+
+def _to_kwh_factor(unit: str | None) -> Decimal:
+    """Return the multiplier to convert an energy value expressed in `unit` to kWh."""
+    if not unit or unit == UnitOfEnergy.KILO_WATT_HOUR:
+        return Decimal(1)
+    try:
+        return Decimal(str(EnergyConverter.convert(1, unit, UnitOfEnergy.KILO_WATT_HOUR)))
+    except HomeAssistantError:
+        _LOGGER.warning("Cannot convert energy unit '%s' to kWh, assuming kWh", unit)
+        return Decimal(1)
+
+
+def _parse_energy_kwh(state: State | None) -> Decimal | None:
+    """Parse an energy sensor state into a Decimal amount expressed in kWh.
+
+    The energy price is defined per kWh, so an energy sensor reporting in a different
+    unit (for example Wh or MWh) is converted using its unit of measurement.
+    """
+    value = _parse_decimal(state)
+    if value is None:
+        return None
+    assert state is not None  # a parsed value implies the state is present and numeric
+    return value * _to_kwh_factor(state.attributes.get(ATTR_UNIT_OF_MEASUREMENT))
 
 
 def create_cost_sensor(
@@ -233,7 +266,7 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
     @callback
     def _handle_energy_state_change(self, event: Event[EventStateChangedData]) -> None:
         """Accumulate cost based on the delta of the energy sensor and the current price."""
-        new_energy = _parse_decimal(event.data["new_state"])
+        new_energy = _parse_energy_kwh(event.data["new_state"])
         if new_energy is None:
             return
 
@@ -249,7 +282,7 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
         """Settle the energy consumed so far at the previous price, then adopt the new price."""
         # Recalculate the outstanding energy delta with the previously known price before switching.
         if self._last_energy is not None and self._current_price is not None:
-            current_energy = _parse_decimal(self.hass.states.get(self._source_energy_entity))
+            current_energy = _parse_energy_kwh(self.hass.states.get(self._source_energy_entity))
             if current_energy is not None:
                 self._accumulate(current_energy, self._current_price)
 
@@ -300,7 +333,7 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
         self.async_write_ha_state()
 
     def _set_current_energy_baseline(self) -> None:
-        current_energy = _parse_decimal(self.hass.states.get(self._source_energy_entity))
+        current_energy = _parse_energy_kwh(self.hass.states.get(self._source_energy_entity))
         if current_energy is not None:
             self._last_energy = current_energy
 
