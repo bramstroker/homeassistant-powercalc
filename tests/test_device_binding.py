@@ -8,14 +8,15 @@ import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
-    mock_device_registry, mock_registry,
+    mock_device_registry,
+    mock_registry,
 )
 
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
-    CONF_GROUP_POWER_ENTITIES, CONF_MANUFACTURER,
+    CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
