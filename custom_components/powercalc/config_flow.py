@@ -47,6 +47,7 @@ from .const import (
 )
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults
+from .flow_helper.flows.cost import CostConfigFlow, CostOptionsFlow
 from .flow_helper.flows.daily_energy import (
     SCHEMA_DAILY_ENERGY_OPTIONS,
     DailyEnergyConfigFlow,
@@ -90,6 +91,7 @@ MENU_SENSOR_TYPE = [
     Step.MENU_GROUP,
     Step.DAILY_ENERGY,
     Step.REAL_POWER,
+    Step.COST,
 ]
 
 MENU_OPTIONS = [
@@ -125,6 +127,10 @@ FLOW_HANDLERS: dict[FlowType, dict] = {
         "config": RealPowerConfigFlow,
         "options": RealPowerOptionsFlow,
     },
+    FlowType.COST: {
+        "config": CostConfigFlow,
+        "options": CostOptionsFlow,
+    },
 }
 
 
@@ -155,6 +161,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             FlowType.GROUP: FLOW_HANDLERS[FlowType.GROUP][flow_key](self),
             FlowType.DAILY_ENERGY: FLOW_HANDLERS[FlowType.DAILY_ENERGY][flow_key](self),
             FlowType.REAL_POWER: FLOW_HANDLERS[FlowType.REAL_POWER][flow_key](self),
+            FlowType.COST: FLOW_HANDLERS[FlowType.COST][flow_key](self),
         }
 
         for step in Step:
@@ -535,6 +542,9 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     def build_menu(self) -> list[Step]:
         """Build the options menu."""
+        if self.selected_sensor_type == SensorType.COST:
+            return [Step.COST]
+
         menu = [Step.BASIC_OPTIONS]
         if self.selected_sensor_type == SensorType.VIRTUAL_POWER:
             if self.strategy and self.should_add_strategy_option_to_menu():

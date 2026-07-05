@@ -7,7 +7,8 @@
   },
   "config": {
     "abort": {
-      "already_configured": "Sensor is reeds geconfigureerd, specifieer een uniek ID"
+      "already_configured": "Sensor is reeds geconfigureerd, specifieer een uniek ID",
+      "cost_no_global_price": "Er is nog geen energieprijs geconfigureerd. Stel eerst een energieprijs in in de globale Powercalc-configuratie voordat je een kostensensor maakt. Zie de [documentatie]({url})."
     },
     "error": {
       "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
@@ -431,6 +432,18 @@
         "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
         "title": "Maak een energiesensor voor een bestaande stroomsensor"
       },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "Energiesensor",
+          "name": "Naam"
+        },
+        "data_description": {
+          "energy_sensor_id": "De bestaande energiesensor (kWh) waarvoor de kosten worden berekend. Dit kan een sensor van elke integratie zijn, niet alleen Powercalc",
+          "name": "Basisnaam voor de kostensensor. De volledige entiteitsnaam wordt ingesteld volgens de instelling cost_sensor_naming"
+        },
+        "description": "Maak een kostensensor voor een bestaande energiesensor. De energieprijs wordt overgenomen uit de globale Powercalc-configuratie.",
+        "title": "Kostensensor maken"
+      },
       "sub_profile": {
         "data": {
           "sub_profile": "Sub profiel"
@@ -462,6 +475,7 @@
           "sensor_type": "Type sensor"
         },
         "menu_options": {
+          "cost": "Kostensensor (van bestaande energiesensor)",
           "daily_energy": "Dagelijkse energie",
           "group": "Groep",
           "global_configuration": "Globale configuratie",
@@ -816,6 +830,7 @@
         "menu_options": {
           "advanced_options": "Geavanceerde opties",
           "basic_options": "Basisopties",
+          "cost": "Kostenopties",
           "daily_energy": "Dagelijkse energie opties",
           "energy_options": "Energie opties",
           "fixed": "Fixed opties",
@@ -884,6 +899,15 @@
         },
         "data_description": {
           "device": "Voeg de gecreëerde energiesensor toe aan een specifiek apparaat"
+        }
+      },
+      "cost": {
+        "title": "Kostenopties",
+        "data": {
+          "energy_sensor_id": "Energiesensor"
+        },
+        "data_description": {
+          "energy_sensor_id": "De bestaande energiesensor (kWh) waarvoor de kosten worden berekend"
         }
       },
       "utility_meter_options": {

@@ -184,7 +184,10 @@ def _apply_sensor_creation_defaults(config: dict) -> None:
 
 
 def _apply_dummy_entity_id_default(config: dict) -> None:
-    if not _is_entity_id_required(config) and CONF_ENTITY_ID not in config:
+    if CONF_ENTITY_ID in config:
+        return
+    # A standalone cost sensor has no source appliance entity, use the dummy placeholder.
+    if not _is_entity_id_required(config) or config.get(CONF_SENSOR_TYPE) == SensorType.COST:
         config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
 

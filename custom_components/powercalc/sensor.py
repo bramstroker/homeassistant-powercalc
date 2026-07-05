@@ -53,6 +53,7 @@ from .const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_COMPOSITE,
+    CONF_COST,
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
@@ -155,7 +156,7 @@ from .errors import (
 )
 from .group_include.filter import FILTER_CONFIG, FilterOperator, create_composite_filter
 from .group_include.include import find_entities
-from .sensors.cost import CostSensor
+from .sensors.cost import CostSensor, create_cost_sensor_for_energy_entity
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
@@ -191,6 +192,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_DISABLE_STANDBY_POWER): cv.boolean,
     vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
     vol.Optional(CONF_POWER_SENSOR_ID): cv.entity_id,
+    vol.Optional(CONF_COST): vol.Schema({vol.Required(CONF_ENERGY_SENSOR_ID): cv.entity_id}),
     vol.Optional(CONF_FORCE_ENERGY_SENSOR_CREATION): cv.boolean,
     vol.Optional(CONF_FORCE_CALCULATE_GROUP_ENERGY): cv.boolean,
     vol.Optional(CONF_FIXED): FIXED_SCHEMA,
@@ -274,6 +276,7 @@ PLATFORM_SCHEMA = vol.All(
         CONF_ENTITIES,
         CONF_INCLUDE,
         CONF_DAILY_FIXED_ENERGY,
+        CONF_COST,
     ),
     PLATFORM_SCHEMA.extend(SENSOR_CONFIG),
 )
@@ -471,6 +474,9 @@ def save_entity_ids_on_config_entry(
     We need this in group sensor logic to differentiate between energy sensor and utility meters.
     """
     _LOGGER.debug("Saving entity ids on config entry %s", config_entry.entry_id)
+    if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.COST:
+        # A standalone cost sensor entry has neither a power nor an energy sensor to track.
+        return
     power_entities = [e.entity_id for e in entities.all() if isinstance(e, VirtualPowerSensor)]
     new_data = config_entry.data.copy()
     if power_entities:
@@ -739,14 +745,29 @@ async def setup_individual_sensors(
     context: CreationContext,
 ) -> EntitiesBucket:
     """Set up an individual sensor."""
+    if CONF_COST in config:
+        config[CONF_SENSOR_TYPE] = SensorType.COST
+
+    sensor_type = resolve_sensor_type(config)
     merged_sensor_config = get_merged_sensor_configuration(global_config, config)
-    sensor_type = SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
 
     if sensor_type == SensorType.GROUP:
         collect_sensor_analytics(hass, sensor_type, context.discovery_type, config_entry)
         return EntitiesBucket(new=await create_group_sensors(hass, merged_sensor_config, config_entry))
 
+    if sensor_type == SensorType.COST:
+        collect_sensor_analytics(hass, sensor_type, context.discovery_type, config_entry)
+        cost_sensor = create_cost_sensor_for_energy_entity(hass, merged_sensor_config)
+        return EntitiesBucket(new=[cost_sensor] if cost_sensor else [])
+
     return await create_individual_sensors(hass, merged_sensor_config, context, sensor_type, config_entry)
+
+
+def resolve_sensor_type(config: ConfigType) -> SensorType:
+    """Resolve the sensor type based on the configuration."""
+    if CONF_COST in config:
+        return SensorType.COST
+    return SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
 
 
 def collect_sensor_analytics(

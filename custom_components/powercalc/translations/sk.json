@@ -7,7 +7,8 @@
   },
   "config": {
     "abort": {
-      "already_configured": "Senzor je už nakonfigurovaný, zadajte jedinečné_id"
+      "already_configured": "Senzor je už nakonfigurovaný, zadajte jedinečné_id",
+      "cost_no_global_price": "Ešte nie je nakonfigurovaná žiadna cena energie. Pred vytvorením senzora nákladov nastavte cenu energie v globálnej konfigurácii Powercalc. Pozrite si [dokumentáciu]({url})."
     },
     "error": {
       "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
@@ -431,6 +432,18 @@
         "description": "V súčasnosti možno špecifické nastavenia konfigurovať len globálne",
         "title": "Vytvorenie snímača energie pre existujúci snímač energie"
       },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "Energetický senzor",
+          "name": "Názov"
+        },
+        "data_description": {
+          "energy_sensor_id": "Existujúci energetický senzor (kWh), pre ktorý sa majú vypočítať náklady. Môže to byť senzor z ľubovoľnej integrácie, nielen z Powercalc",
+          "name": "Základný názov senzora nákladov. Úplný názov entity sa nastaví podľa nastavenia cost_sensor_naming"
+        },
+        "description": "Vytvoriť senzor nákladov pre existujúci energetický senzor. Cena energie sa berie z globálnej konfigurácie Powercalc.",
+        "title": "Vytvoriť senzor nákladov"
+      },
       "sub_profile": {
         "data": {
           "sub_profile": "Podprofil"
@@ -462,6 +475,7 @@
           "sensor_type": "Typ snímača"
         },
         "menu_options": {
+          "cost": "Senzor nákladov (z existujúceho energetického senzora)",
           "daily_energy": "Denná energia",
           "group": "Skupiny",
           "global_configuration": "Globálna konfigurácia",
@@ -816,6 +830,7 @@
         "menu_options": {
           "advanced_options": "Pokročilé možnosti",
           "basic_options": "Základné možnosti",
+          "cost": "Možnosti nákladov",
           "daily_energy": "Denné energetické možnosti",
           "energy_options": "Vlastnosti energie",
           "fixed": "Pevné možnosti",
@@ -884,6 +899,15 @@
         },
         "data_description": {
           "device": "Pridajte vytvorený energetický senzor do konkrétneho zariadenia"
+        }
+      },
+      "cost": {
+        "title": "Možnosti nákladov",
+        "data": {
+          "energy_sensor_id": "Energetický senzor"
+        },
+        "data_description": {
+          "energy_sensor_id": "Existujúci energetický senzor (kWh), pre ktorý sa majú vypočítať náklady"
         }
       },
       "utility_meter_options": {

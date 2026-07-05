@@ -7,7 +7,8 @@
   },
   "config": {
     "abort": {
-      "already_configured": "Le capteur est déjà configuré, spécifiez un identifiant unique"
+      "already_configured": "Le capteur est déjà configuré, spécifiez un identifiant unique",
+      "cost_no_global_price": "Aucun prix de l’énergie n’est encore configuré. Définissez un prix de l’énergie dans la configuration globale de Powercalc avant de créer un capteur de coût. Voir la [documentation]({url})."
     },
     "error": {
       "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
@@ -431,6 +432,18 @@
         "description": "Actuellement, les paramètres spécifiques ne peuvent être configurés que globalement",
         "title": "Créer un capteur d'énergie pour un capteur de puissance existant"
       },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "Capteur d’énergie",
+          "name": "Nom"
+        },
+        "data_description": {
+          "energy_sensor_id": "Le capteur d’énergie existant (kWh) pour lequel calculer le coût. Il peut provenir de n’importe quelle intégration, pas seulement Powercalc",
+          "name": "Nom de base du capteur de coût. Le nom complet de l’entité est défini selon le paramètre cost_sensor_naming"
+        },
+        "description": "Créer un capteur de coût pour un capteur d’énergie existant. Le prix de l’énergie est pris dans la configuration globale de Powercalc.",
+        "title": "Créer un capteur de coût"
+      },
       "sub_profile": {
         "data": {
           "sub_profile": "Sous-profil"
@@ -462,6 +475,7 @@
           "sensor_type": "Type de capteur"
         },
         "menu_options": {
+          "cost": "Capteur de coût (à partir d’un capteur d’énergie existant)",
           "daily_energy": "Énergie quotidienne",
           "group": "Groupe",
           "global_configuration": "Global configuration",
@@ -816,6 +830,7 @@
         "menu_options": {
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
+          "cost": "Options de coût",
           "daily_energy": "Daily energy options",
           "energy_options": "Energy options",
           "fixed": "Fixed options",
@@ -884,6 +899,15 @@
         },
         "data_description": {
           "device": "Add the created energy sensor to an specific device"
+        }
+      },
+      "cost": {
+        "title": "Options de coût",
+        "data": {
+          "energy_sensor_id": "Capteur d’énergie"
+        },
+        "data_description": {
+          "energy_sensor_id": "Le capteur d’énergie existant (kWh) pour lequel calculer le coût"
         }
       },
       "utility_meter_options": {

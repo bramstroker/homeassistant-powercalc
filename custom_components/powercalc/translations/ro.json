@@ -7,7 +7,8 @@
   },
   "config": {
     "abort": {
-      "already_configured": "Senzorul este deja configurat, specificați un ID unic"
+      "already_configured": "Senzorul este deja configurat, specificați un ID unic",
+      "cost_no_global_price": "Nu este configurat încă niciun preț al energiei. Configurează un preț al energiei în configurația globală Powercalc înainte de a crea un senzor de cost. Vezi [documentația]({url})."
     },
     "error": {
       "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
@@ -431,6 +432,18 @@
         "description": "În prezent, setările specifice pot fi configurate numai global",
         "title": "Creați un senzor de energie pentru un senzor de putere existent"
       },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "Senzor de energie",
+          "name": "Nume"
+        },
+        "data_description": {
+          "energy_sensor_id": "Senzorul de energie existent (kWh) pentru care se calculează costul. Poate fi un senzor din orice integrare, nu doar Powercalc",
+          "name": "Numele de bază al senzorului de cost. Numele complet al entității este setat în funcție de setarea cost_sensor_naming"
+        },
+        "description": "Creează un senzor de cost pentru un senzor de energie existent. Prețul energiei este preluat din configurația globală Powercalc.",
+        "title": "Creează senzor de cost"
+      },
       "sub_profile": {
         "data": {
           "sub_profile": "Subprofil"
@@ -462,6 +475,7 @@
           "sensor_type": "Tip senzor"
         },
         "menu_options": {
+          "cost": "Senzor de cost (dintr-un senzor de energie existent)",
           "daily_energy": "Energie zilnică",
           "group": "Grup",
           "global_configuration": "Global configuration",
@@ -816,6 +830,7 @@
         "menu_options": {
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
+          "cost": "Opțiuni de cost",
           "daily_energy": "Daily energy options",
           "energy_options": "Energy options",
           "fixed": "Fixed options",
@@ -884,6 +899,15 @@
         },
         "data_description": {
           "device": "Add the created energy sensor to an specific device"
+        }
+      },
+      "cost": {
+        "title": "Opțiuni de cost",
+        "data": {
+          "energy_sensor_id": "Senzor de energie"
+        },
+        "data_description": {
+          "energy_sensor_id": "Senzorul de energie existent (kWh) pentru care se calculează costul"
         }
       },
       "utility_meter_options": {
