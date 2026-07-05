@@ -301,6 +301,7 @@ class SensorType(StrEnum):
     VIRTUAL_POWER = "virtual_power"
     GROUP = "group"
     REAL_POWER = "real_power"
+    COST = "cost"
 
 
 class PowercalcDiscoveryType(StrEnum):

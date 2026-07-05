@@ -93,6 +93,17 @@ in the global configuration and on a per sensor basis.
     you enable the **Apply to existing sensors** option. When enabled, every existing GUI
     powercalc sensor is updated to match the new setting.
 
+## Cost sensor for an existing energy sensor
+
+You can also create a **standalone** cost sensor for an energy sensor that was **not**
+created by Powercalc, for example an energy sensor from a smart plug or utility
+integration. In the GUI, add a new Powercalc sensor and choose **Cost sensor (from
+existing energy sensor)**, then select the energy sensor and give it a name.
+
+This requires an energy price to be configured in the [global
+configuration](../configuration/global-configuration.md) first. When no price is
+configured yet, the flow will point you to set one up before continuing.
+
 ## Naming
 
 By default a cost sensor is named `{appliance} cost` (for example `Floorlamp cost`). You

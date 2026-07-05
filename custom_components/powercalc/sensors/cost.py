@@ -5,10 +5,11 @@ import logging
 from typing import TYPE_CHECKING
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
-from homeassistant.const import CONF_NAME, STATE_UNAVAILABLE, STATE_UNKNOWN
+from homeassistant.const import CONF_NAME, CONF_UNIQUE_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
 from homeassistant.helpers.device import async_entity_id_to_device
 from homeassistant.helpers.device_registry import DeviceInfo
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import ConfigType
@@ -20,11 +21,13 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_PRICE_MULTIPLIER,
     CONF_ENERGY_PRICE_SENSOR,
     CONF_ENERGY_PRICE_SURCHARGE,
+    CONF_ENERGY_SENSOR_ID,
     DEFAULT_COST_SENSOR_PRECISION,
     DOMAIN,
     DOMAIN_CONFIG,
 )
 from custom_components.powercalc.device_binding import get_device_info
+from custom_components.powercalc.errors import SensorConfigurationError
 
 from .abstract import (
     BaseEntity,
@@ -33,7 +36,7 @@ from .abstract import (
     generate_cost_sensor_entity_id,
     generate_cost_sensor_name,
 )
-from .energy import EnergySensor
+from .energy import EnergySensor, RealEnergySensor
 
 if TYPE_CHECKING:
     from .utility_meter import VirtualUtilityMeter
@@ -61,12 +64,14 @@ def create_cost_sensor(
     source_entity: SourceEntity | None = None,
     name: str | None = None,
     reset_on_source_reset: bool = False,
+    unique_id: str | None = None,
 ) -> CostSensor | None:
     """Create a cost sensor tracking the cost of the given energy sensor.
 
     The energy sensor can be a regular energy sensor or a utility meter. The energy
     price is defined globally, either as a fixed price or a price sensor. When no price
-    is configured, no cost sensor is created.
+    is configured, no cost sensor is created. A ``unique_id`` can be provided to override
+    the id derived from the energy sensor (used for standalone cost sensor config entries).
     """
     global_config: ConfigType = hass.data[DOMAIN].get(DOMAIN_CONFIG, {})
     fixed_price = global_config.get(CONF_ENERGY_PRICE)
@@ -83,7 +88,8 @@ def create_cost_sensor(
 
     name_base = name if name is not None else sensor_config.get(CONF_NAME)
     cost_name = generate_cost_sensor_name(sensor_config, name_base, source_entity)
-    unique_id = f"{energy_sensor.unique_id}_cost" if energy_sensor.unique_id is not None else None
+    if unique_id is None and energy_sensor.unique_id is not None:
+        unique_id = f"{energy_sensor.unique_id}_cost"
     entity_id = generate_cost_sensor_entity_id(
         hass,
         sensor_config,
@@ -119,6 +125,23 @@ def create_cost_sensor(
         reset_on_source_reset=reset_on_source_reset,
         device_info=get_device_info(hass, sensor_config, source_entity),
     )
+
+
+def create_cost_sensor_for_energy_entity(hass: HomeAssistant, sensor_config: ConfigType) -> CostSensor | None:
+    """Create a standalone cost sensor tracking an existing (non-powercalc) energy sensor."""
+    energy_sensor_id = sensor_config[CONF_ENERGY_SENSOR_ID]
+    entity_entry = er.async_get(hass).async_get(energy_sensor_id)
+    if entity_entry is None:
+        raise SensorConfigurationError(
+            f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
+            "Double check the `energy_sensor_id` setting",
+        )
+    energy_sensor = RealEnergySensor(
+        entity_entry.entity_id,
+        entity_entry.name or entity_entry.original_name,
+        entity_entry.unique_id,
+    )
+    return create_cost_sensor(hass, sensor_config, energy_sensor, unique_id=sensor_config.get(CONF_UNIQUE_ID))
 
 
 class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
