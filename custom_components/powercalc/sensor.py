@@ -762,11 +762,13 @@ async def setup_individual_sensors(
 
     return await create_individual_sensors(hass, merged_sensor_config, context, sensor_type, config_entry)
 
+
 def resolve_sensor_type(config: ConfigType) -> SensorType:
     """Resolve the sensor type based on the configuration."""
     if CONF_COST in config:
         return SensorType.COST
     return SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
+
 
 def collect_sensor_analytics(
     hass: HomeAssistant,
