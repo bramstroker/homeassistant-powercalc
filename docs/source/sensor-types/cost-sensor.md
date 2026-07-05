@@ -184,6 +184,12 @@ different unit (for example `Wh` or `MWh`), the consumed energy is converted to 
 based on the sensor's unit of measurement before it is priced. When the sensor has no
 recognizable energy unit, it is assumed to already be in kWh.
 
+The same applies to a price sensor: when its unit is expressed per another energy unit
+(for example `EUR/MWh`, as some dynamic tariff integrations report), the price is
+converted to a per-kWh price before it is applied. The cost sensor also adopts the
+currency from the price sensor's unit (for example `€/kWh` results in a `€` cost
+sensor), falling back to the Home Assistant currency when the price sensor has no unit.
+
 ## Limitations / tariffs
 
 Fixed per-tariff prices (for example a different fixed `peak` and `offpeak` price used
