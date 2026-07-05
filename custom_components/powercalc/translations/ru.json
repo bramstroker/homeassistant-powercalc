@@ -102,30 +102,48 @@
       "global_configuration": {
         "title": "Глобальная конфигурация",
         "description": "Настройка глобальных параметров Powercalc. Подробнее см. [документацию]({docs_uri}). Дополнительные параметры для сенсоров энергии и счётчиков можно указать на следующих шагах.",
-        "data": {
-          "create_energy_sensors": "Создавать сенсоры энергии",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Создать группу ожидания",
-          "create_utility_meters": "Создавать счётчики",
-          "disable_extended_attributes": "Отключить расширенные атрибуты",
-          "disable_library_download": "Отключить загрузку библиотеки",
-          "enable_analytics": "Включить анонимную аналитику",
-          "ignore_unavailable_state": "Игнорировать недоступное состояние",
-          "include_non_powercalc_sensors": "Включать сторонние сенсоры",
-          "power_sensor_category": "Категория сенсора мощности",
-          "power_sensor_friendly_naming": "Шаблон понятного имени сенсора мощности",
-          "power_sensor_naming": "Шаблон имени сенсора мощности"
-        },
-        "data_description": {
-          "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
-          "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами",
-          "disable_extended_attributes": "Отключить дополнительные атрибуты для сенсоров мощности, энергии и групп. Это поможет уменьшить размер базы данных",
-          "disable_library_download": "Отключить функцию загрузки библиотеки Powercalc",
-          "enable_analytics": "Разрешить Powercalc отправлять анонимную статистику для улучшения интеграции",
-          "ignore_unavailable_state": "Сохранять сенсоры Powercalc доступными, даже когда исходный объект недоступен",
-          "include_non_powercalc_sensors": "Включать ли сторонние сенсоры в группы"
+        "sections": {
+          "power_options": {
+            "name": "Датчик мощности",
+            "data": {
+              "power_sensor_naming": "Шаблон имени сенсора мощности",
+              "power_sensor_friendly_naming": "Шаблон понятного имени сенсора мощности",
+              "power_sensor_category": "Категория сенсора мощности",
+              "power_sensor_precision": "Точность датчика мощности"
+            }
+          },
+          "features": {
+            "name": "Создание датчиков",
+            "data": {
+              "create_energy_sensors": "Создавать сенсоры энергии",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Создать группу ожидания",
+              "create_utility_meters": "Создавать счётчики"
+            },
+            "data_description": {
+              "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
+              "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами"
+            }
+          },
+          "advanced": {
+            "name": "Дополнительно",
+            "data": {
+              "enable_analytics": "Включить анонимную аналитику",
+              "ignore_unavailable_state": "Игнорировать недоступное состояние",
+              "include_non_powercalc_sensors": "Включать сторонние сенсоры",
+              "disable_extended_attributes": "Отключить расширенные атрибуты",
+              "disable_library_download": "Отключить загрузку библиотеки"
+            },
+            "data_description": {
+              "enable_analytics": "Разрешить Powercalc отправлять анонимную статистику для улучшения интеграции",
+              "ignore_unavailable_state": "Сохранять сенсоры Powercalc доступными, даже когда исходный объект недоступен",
+              "include_non_powercalc_sensors": "Включать ли сторонние сенсоры в группы",
+              "disable_extended_attributes": "Отключить дополнительные атрибуты для сенсоров мощности, энергии и групп. Это поможет уменьшить размер базы данных",
+              "disable_library_download": "Отключить функцию загрузки библиотеки Powercalc"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -220,36 +238,49 @@
       },
       "group_custom": {
         "data": {
-          "area": "Зона",
-          "floor": "Этаж",
-          "create_energy_sensor": "Создать сенсор энергии",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Создать счётчики",
-          "device": "Устройство",
-          "force_calculate_group_energy": "Принудительно вычислять энергию",
-          "group_energy_entities": "Дополнительные объекты энергии",
-          "group_energy_start_at_zero": "Начать с нуля",
-          "group_member_devices": "Устройства-участники",
-          "group_member_sensors": "Сенсоры powercalc-участники",
-          "group_power_entities": "Дополнительные объекты мощности",
-          "hide_members": "Скрыть участников",
-          "include_non_powercalc_sensors": "Включать сторонние сенсоры",
-          "name": "Название",
-          "sub_groups": "Подгруппы"
+          "name": "Название"
         },
-        "data_description": {
-          "area": "Добавить все сенсоры мощности из указанной зоны",
-          "floor": "Добавить все сенсоры мощности из указанного этажа",
-          "create_energy_sensor": "Создавать ли сенсор потребления в кВт·ч",
-          "device": "Добавить создаваемые объекты группы к существующему устройству",
-          "force_calculate_group_energy": "По умолчанию powercalc суммирует сенсоры энергии участников. Включите для принудительного создания сенсора суммы Римана",
-          "group_energy_entities": "Дополнительные сенсоры энергии (кВт·ч) из вашей установки HA для включения",
-          "group_energy_start_at_zero": "При включении сенсор энергии начнёт с нуля. Иначе будет суммировать текущие значения участников",
-          "group_member_devices": "Добавить объекты мощности и энергии выбранных устройств в группу",
-          "group_member_sensors": "Сенсоры Powercalc для включения в группу",
-          "group_power_entities": "Дополнительные сенсоры мощности (Вт) из вашей установки HA для включения",
-          "include_non_powercalc_sensors": "Включать ли сторонние сенсоры при использовании опции зоны",
-          "sub_groups": "Все сенсоры выбранных подгрупп также будут добавлены в эту группу"
+        "sections": {
+          "members": {
+            "name": "Участники",
+            "data": {
+              "group_member_sensors": "Сенсоры powercalc-участники",
+              "group_member_devices": "Устройства-участники",
+              "group_power_entities": "Дополнительные объекты мощности",
+              "group_energy_entities": "Дополнительные объекты энергии",
+              "sub_groups": "Подгруппы",
+              "area": "Зона",
+              "floor": "Этаж"
+            },
+            "data_description": {
+              "group_member_sensors": "Сенсоры Powercalc для включения в группу",
+              "group_member_devices": "Добавить объекты мощности и энергии выбранных устройств в группу",
+              "group_power_entities": "Дополнительные сенсоры мощности (Вт) из вашей установки HA для включения",
+              "group_energy_entities": "Дополнительные сенсоры энергии (кВт·ч) из вашей установки HA для включения",
+              "sub_groups": "Все сенсоры выбранных подгрупп также будут добавлены в эту группу",
+              "area": "Добавить все сенсоры мощности из указанной зоны",
+              "floor": "Добавить все сенсоры мощности из указанного этажа"
+            }
+          },
+          "options": {
+            "name": "Параметры",
+            "data": {
+              "device": "Устройство",
+              "hide_members": "Скрыть участников",
+              "include_non_powercalc_sensors": "Включать сторонние сенсоры",
+              "force_calculate_group_energy": "Принудительно вычислять энергию",
+              "group_energy_start_at_zero": "Начать с нуля",
+              "create_energy_sensor": "Создать сенсор энергии",
+              "create_utility_meters": "Создать счётчики"
+            },
+            "data_description": {
+              "device": "Добавить создаваемые объекты группы к существующему устройству",
+              "include_non_powercalc_sensors": "Включать ли сторонние сенсоры при использовании опции зоны",
+              "force_calculate_group_energy": "По умолчанию powercalc суммирует сенсоры энергии участников. Включите для принудительного создания сенсора суммы Римана",
+              "group_energy_start_at_zero": "При включении сенсор энергии начнёт с нуля. Иначе будет суммировать текущие значения участников",
+              "create_energy_sensor": "Создавать ли сенсор потребления в кВт·ч"
+            }
+          }
         },
         "title": "Создать групповой сенсор"
       },
@@ -647,30 +678,48 @@
       },
       "global_configuration": {
         "title": "Основные параметры",
-        "data": {
-          "create_energy_sensors": "Создавать сенсоры энергии",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Создать группу ожидания",
-          "create_utility_meters": "Создавать счётчики",
-          "disable_extended_attributes": "Отключить расширенные атрибуты",
-          "disable_library_download": "Отключить загрузку библиотеки",
-          "enable_analytics": "Включить анонимную аналитику",
-          "ignore_unavailable_state": "Игнорировать недоступное состояние",
-          "include_non_powercalc_sensors": "Включать сторонние сенсоры",
-          "power_sensor_category": "Категория сенсора мощности",
-          "power_sensor_friendly_naming": "Шаблон понятного имени сенсора мощности",
-          "power_sensor_naming": "Шаблон имени сенсора мощности"
-        },
-        "data_description": {
-          "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
-          "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами",
-          "disable_extended_attributes": "Отключить дополнительные атрибуты для сенсоров мощности, энергии и групп. Это поможет уменьшить размер базы данных",
-          "disable_library_download": "Отключить функцию загрузки библиотеки Powercalc",
-          "enable_analytics": "Разрешить Powercalc отправлять анонимную статистику для улучшения интеграции",
-          "ignore_unavailable_state": "Сохранять сенсоры Powercalc доступными, даже когда исходный объект недоступен",
-          "include_non_powercalc_sensors": "Включать ли сторонние сенсоры в группы"
+        "sections": {
+          "power_options": {
+            "name": "Датчик мощности",
+            "data": {
+              "power_sensor_naming": "Шаблон имени сенсора мощности",
+              "power_sensor_friendly_naming": "Шаблон понятного имени сенсора мощности",
+              "power_sensor_category": "Категория сенсора мощности",
+              "power_sensor_precision": "Точность датчика мощности"
+            }
+          },
+          "features": {
+            "name": "Создание датчиков",
+            "data": {
+              "create_energy_sensors": "Создавать сенсоры энергии",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Создать группу ожидания",
+              "create_utility_meters": "Создавать счётчики"
+            },
+            "data_description": {
+              "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
+              "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами"
+            }
+          },
+          "advanced": {
+            "name": "Дополнительно",
+            "data": {
+              "enable_analytics": "Включить анонимную аналитику",
+              "ignore_unavailable_state": "Игнорировать недоступное состояние",
+              "include_non_powercalc_sensors": "Включать сторонние сенсоры",
+              "disable_extended_attributes": "Отключить расширенные атрибуты",
+              "disable_library_download": "Отключить загрузку библиотеки"
+            },
+            "data_description": {
+              "enable_analytics": "Разрешить Powercalc отправлять анонимную статистику для улучшения интеграции",
+              "ignore_unavailable_state": "Сохранять сенсоры Powercalc доступными, даже когда исходный объект недоступен",
+              "include_non_powercalc_sensors": "Включать ли сторонние сенсоры в группы",
+              "disable_extended_attributes": "Отключить дополнительные атрибуты для сенсоров мощности, энергии и групп. Это поможет уменьшить размер базы данных",
+              "disable_library_download": "Отключить функцию загрузки библиотеки Powercalc"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -767,30 +816,42 @@
       },
       "group_custom": {
         "title": "Параметры группы",
-        "data": {
-          "area": "Зона",
-          "floor": "Этаж",
-          "device": "Устройство",
-          "force_calculate_group_energy": "Принудительно вычислять энергию",
-          "group_energy_entities": "Дополнительные объекты энергии",
-          "group_member_devices": "Устройства-участники",
-          "group_member_sensors": "Сенсоры powercalc-участники",
-          "group_power_entities": "Дополнительные объекты мощности",
-          "hide_members": "Скрыть участников",
-          "include_non_powercalc_sensors": "Включать сторонние сенсоры",
-          "sub_groups": "Подгруппы"
-        },
-        "data_description": {
-          "area": "Добавить все сенсоры мощности из указанной зоны",
-          "floor": "Добавить все сенсоры мощности из указанного этажа",
-          "device": "Добавить создаваемые объекты группы к существующему устройству",
-          "force_calculate_group_energy": "По умолчанию powercalc суммирует сенсоры энергии участников. Включите для принудительного создания сенсора суммы Римана",
-          "group_energy_entities": "Дополнительные сенсоры энергии (кВт·ч) из вашей установки HA для включения",
-          "group_member_devices": "Добавить объекты мощности и энергии выбранных устройств в группу",
-          "group_member_sensors": "Сенсоры Powercalc для включения в группу",
-          "group_power_entities": "Дополнительные сенсоры мощности (Вт) из вашей установки HA для включения",
-          "include_non_powercalc_sensors": "Включать ли сторонние сенсоры при использовании опции зоны",
-          "sub_groups": "Все сенсоры выбранных подгрупп также будут добавлены в эту группу"
+        "sections": {
+          "members": {
+            "name": "Участники",
+            "data": {
+              "group_member_sensors": "Сенсоры powercalc-участники",
+              "group_member_devices": "Устройства-участники",
+              "group_power_entities": "Дополнительные объекты мощности",
+              "group_energy_entities": "Дополнительные объекты энергии",
+              "sub_groups": "Подгруппы",
+              "area": "Зона",
+              "floor": "Этаж"
+            },
+            "data_description": {
+              "group_member_sensors": "Сенсоры Powercalc для включения в группу",
+              "group_member_devices": "Добавить объекты мощности и энергии выбранных устройств в группу",
+              "group_power_entities": "Дополнительные сенсоры мощности (Вт) из вашей установки HA для включения",
+              "group_energy_entities": "Дополнительные сенсоры энергии (кВт·ч) из вашей установки HA для включения",
+              "sub_groups": "Все сенсоры выбранных подгрупп также будут добавлены в эту группу",
+              "area": "Добавить все сенсоры мощности из указанной зоны",
+              "floor": "Добавить все сенсоры мощности из указанного этажа"
+            }
+          },
+          "options": {
+            "name": "Параметры",
+            "data": {
+              "device": "Устройство",
+              "hide_members": "Скрыть участников",
+              "include_non_powercalc_sensors": "Включать сторонние сенсоры",
+              "force_calculate_group_energy": "Принудительно вычислять энергию"
+            },
+            "data_description": {
+              "device": "Добавить создаваемые объекты группы к существующему устройству",
+              "include_non_powercalc_sensors": "Включать ли сторонние сенсоры при использовании опции зоны",
+              "force_calculate_group_energy": "По умолчанию powercalc суммирует сенсоры энергии участников. Включите для принудительного создания сенсора суммы Римана"
+            }
+          }
         }
       },
       "group_subtract": {

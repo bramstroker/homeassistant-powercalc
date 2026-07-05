@@ -102,30 +102,48 @@
       "global_configuration": {
         "title": "Globálna konfigurácia",
         "description": "Nastavte globálnu konfiguráciu pre Powercalc. Ďalšie informácie nájdete v [dokumentácii]({docs_uri}). Ďalšie možnosti pre snímače energie a elektromery môžu byť poskytnuté v ďalších krokoch.",
-        "data": {
-          "create_energy_sensors": "Vytvorte energetické senzory",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Create standby group",
-          "create_utility_meters": "Vytvorte merače spotreby",
-          "disable_extended_attributes": "Zakázať rozšírené atribúty",
-          "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
-          "enable_analytics": "Povoliť anonymnú analýzu",
-          "ignore_unavailable_state": "Ignorovať nedostupný stav",
-          "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
-          "power_sensor_category": "Kategória snímača výkonu",
-          "power_sensor_friendly_naming": "Vzor názvu priateľského snímača výkonu",
-          "power_sensor_naming": "Vzor názvu snímača výkonu"
-        },
-        "data_description": {
-          "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-          "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
-          "disable_extended_attributes": "Vypnite všetky extra atribúty, ktoré powercalc pridáva k stavu energie, energie a skupiny. To pomôže udržať veľkosť databázy malú",
-          "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-          "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
-          "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
+        "sections": {
+          "power_options": {
+            "name": "Senzor výkonu",
+            "data": {
+              "power_sensor_naming": "Vzor názvu snímača výkonu",
+              "power_sensor_friendly_naming": "Vzor názvu priateľského snímača výkonu",
+              "power_sensor_category": "Kategória snímača výkonu",
+              "power_sensor_precision": "Presnosť senzora výkonu"
+            }
+          },
+          "features": {
+            "name": "Vytvoriť senzory",
+            "data": {
+              "create_energy_sensors": "Vytvorte energetické senzory",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Create standby group",
+              "create_utility_meters": "Vytvorte merače spotreby"
+            },
+            "data_description": {
+              "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+              "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď."
+            }
+          },
+          "advanced": {
+            "name": "Pokročilé",
+            "data": {
+              "enable_analytics": "Povoliť anonymnú analýzu",
+              "ignore_unavailable_state": "Ignorovať nedostupný stav",
+              "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
+              "disable_extended_attributes": "Zakázať rozšírené atribúty",
+              "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice"
+            },
+            "data_description": {
+              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
+              "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc",
+              "disable_extended_attributes": "Vypnite všetky extra atribúty, ktoré powercalc pridáva k stavu energie, energie a skupiny. To pomôže udržať veľkosť databázy malú",
+              "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -220,36 +238,49 @@
       },
       "group_custom": {
         "data": {
-          "area": "Oblasť",
-          "floor": "Poschodie",
-          "create_energy_sensor": "Vytvoriť snímač energie",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Vytvorte merače spotreby",
-          "device": "Zariadenie",
-          "force_calculate_group_energy": "Sila vypočítať energiu",
-          "group_energy_entities": "Ďlšie energetické entity",
-          "group_energy_start_at_zero": "Začať v nule",
-          "group_member_devices": "Zariadenia užívateľa",
-          "group_member_sensors": "Členské snímače powercalc",
-          "group_power_entities": "Ďalšie výkonové entity",
-          "hide_members": "Skrytý členovania",
-          "include_non_powercalc_sensors": "Zahrnúť nie powercalc snímače",
-          "name": "Názov",
-          "sub_groups": "Podskupiny"
+          "name": "Názov"
         },
-        "data_description": {
-          "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
-          "floor": "Adds all power sensors from the specified floor",
-          "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh snímač",
-          "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
-          "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
-          "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
-          "group_energy_start_at_zero": "Keď je aktivovaný, senzor energie sa po vytvorení senzora spustí na nule. V opačnom prípade spočíta všetky aktuálne stavy snímača energie člena",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
-          "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
-          "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
-          "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
-          "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny"
+        "sections": {
+          "members": {
+            "name": "Členovia",
+            "data": {
+              "group_member_sensors": "Členské snímače powercalc",
+              "group_member_devices": "Zariadenia užívateľa",
+              "group_power_entities": "Ďalšie výkonové entity",
+              "group_energy_entities": "Ďlšie energetické entity",
+              "sub_groups": "Podskupiny",
+              "area": "Oblasť",
+              "floor": "Poschodie"
+            },
+            "data_description": {
+              "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
+              "group_member_devices": "Add power and energy entities from the selected devices to the group",
+              "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
+              "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
+              "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
+              "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
+              "floor": "Adds all power sensors from the specified floor"
+            }
+          },
+          "options": {
+            "name": "Možnosti",
+            "data": {
+              "device": "Zariadenie",
+              "hide_members": "Skrytý členovania",
+              "include_non_powercalc_sensors": "Zahrnúť nie powercalc snímače",
+              "force_calculate_group_energy": "Sila vypočítať energiu",
+              "group_energy_start_at_zero": "Začať v nule",
+              "create_energy_sensor": "Vytvoriť snímač energie",
+              "create_utility_meters": "Vytvorte merače spotreby"
+            },
+            "data_description": {
+              "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
+              "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
+              "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
+              "group_energy_start_at_zero": "Keď je aktivovaný, senzor energie sa po vytvorení senzora spustí na nule. V opačnom prípade spočíta všetky aktuálne stavy snímača energie člena",
+              "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh snímač"
+            }
+          }
         },
         "title": "Vytvoriť skupinu snímača"
       },
@@ -647,30 +678,48 @@
       },
       "global_configuration": {
         "title": "Základné možnosti",
-        "data": {
-          "create_energy_sensors": "Vytvorte energetické senzory",
-          "create_cost_sensors": "Create cost sensors",
-          "create_standby_group": "Create standby group",
-          "create_utility_meters": "Vytvorte merače spotreby",
-          "disable_extended_attributes": "Zakázať rozšírené atribúty",
-          "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
-          "enable_analytics": "Enable anonymous analytics",
-          "ignore_unavailable_state": "Ignorovať nedostupný stav",
-          "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
-          "power_sensor_category": "Kategória snímača výkonu",
-          "power_sensor_friendly_naming": "Vzor názvu priateľského snímača výkonu",
-          "power_sensor_naming": "Vzor názvu snímača výkonu"
-        },
-        "data_description": {
-          "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
-          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-          "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
-          "disable_extended_attributes": "Zakážte všetky extra atribúty, ktoré powercalc pridáva k výkonu, energii a stavom entity skupiny. Pomôže to udržať veľkosť databázy malú",
-          "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-          "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
-          "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
+        "sections": {
+          "power_options": {
+            "name": "Senzor výkonu",
+            "data": {
+              "power_sensor_naming": "Vzor názvu snímača výkonu",
+              "power_sensor_friendly_naming": "Vzor názvu priateľského snímača výkonu",
+              "power_sensor_category": "Kategória snímača výkonu",
+              "power_sensor_precision": "Presnosť senzora výkonu"
+            }
+          },
+          "features": {
+            "name": "Vytvoriť senzory",
+            "data": {
+              "create_energy_sensors": "Vytvorte energetické senzory",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Create standby group",
+              "create_utility_meters": "Vytvorte merače spotreby"
+            },
+            "data_description": {
+              "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+              "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď."
+            }
+          },
+          "advanced": {
+            "name": "Pokročilé",
+            "data": {
+              "enable_analytics": "Enable anonymous analytics",
+              "ignore_unavailable_state": "Ignorovať nedostupný stav",
+              "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
+              "disable_extended_attributes": "Zakázať rozšírené atribúty",
+              "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice"
+            },
+            "data_description": {
+              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
+              "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc",
+              "disable_extended_attributes": "Zakážte všetky extra atribúty, ktoré powercalc pridáva k výkonu, energii a stavom entity skupiny. Pomôže to udržať veľkosť databázy malú",
+              "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc"
+            }
+          }
         }
       },
       "global_configuration_cost": {
@@ -767,30 +816,42 @@
       },
       "group_custom": {
         "title": "Možnosti skupiny",
-        "data": {
-          "area": "Oblasť",
-          "floor": "Poschodie",
-          "device": "Zariadenie",
-          "force_calculate_group_energy": "Sila vypočítať energiu",
-          "group_energy_entities": "Ďalšie energetické entity",
-          "group_member_devices": "Zariadenia užívateľa",
-          "group_member_sensors": "Členské snímače powercalc",
-          "group_power_entities": "Ďalšie výkonové entity",
-          "hide_members": "Skrytí členovia",
-          "include_non_powercalc_sensors": "Zahrnúť nie powercalc snímače",
-          "sub_groups": "Podskupiny"
-        },
-        "data_description": {
-          "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
-          "floor": "Adds all power sensors from the specified floor",
-          "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
-          "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
-          "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahŕňajú",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
-          "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
-          "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
-          "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
-          "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny"
+        "sections": {
+          "members": {
+            "name": "Členovia",
+            "data": {
+              "group_member_sensors": "Členské snímače powercalc",
+              "group_member_devices": "Zariadenia užívateľa",
+              "group_power_entities": "Ďalšie výkonové entity",
+              "group_energy_entities": "Ďalšie energetické entity",
+              "sub_groups": "Podskupiny",
+              "area": "Oblasť",
+              "floor": "Poschodie"
+            },
+            "data_description": {
+              "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
+              "group_member_devices": "Add power and energy entities from the selected devices to the group",
+              "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
+              "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahŕňajú",
+              "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
+              "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
+              "floor": "Adds all power sensors from the specified floor"
+            }
+          },
+          "options": {
+            "name": "Možnosti",
+            "data": {
+              "device": "Zariadenie",
+              "hide_members": "Skrytí členovia",
+              "include_non_powercalc_sensors": "Zahrnúť nie powercalc snímače",
+              "force_calculate_group_energy": "Sila vypočítať energiu"
+            },
+            "data_description": {
+              "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
+              "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
+              "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum"
+            }
+          }
         }
       },
       "group_subtract": {
