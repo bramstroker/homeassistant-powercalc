@@ -257,7 +257,7 @@ def create_utility_meter(
 
     params = {key: value for key, value in params.items() if key in signature.parameters}
 
-    utility_meter = VirtualUtilityMeter(**params)
+    utility_meter = VirtualUtilityMeter(**params)  # type: ignore[no-untyped-call]
     utility_meter.rounding_digits = int(
         sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION),
     )

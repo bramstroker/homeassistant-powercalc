@@ -195,29 +195,27 @@ async def test_entities_are_bound_to_source_device3(
 
 async def test_configured_device_takes_precedence_over_source_device(
     hass: HomeAssistant,
-    entity_registry: er.EntityRegistry,
-    device_registry: DeviceRegistry,
 ) -> None:
-    source_config_entry = MockConfigEntry(domain="source")
-    source_config_entry.add_to_hass(hass)
-    configured_config_entry = MockConfigEntry(domain="configured")
-    configured_config_entry.add_to_hass(hass)
-
-    source_device = device_registry.async_get_or_create(
-        config_entry_id=source_config_entry.entry_id,
-        connections={("source", "device")},
-    )
-    configured_device = device_registry.async_get_or_create(
-        config_entry_id=configured_config_entry.entry_id,
-        connections={("configured", "device")},
+    source_device = DeviceEntry(id="source-device", manufacturer="source", model="Source Device")
+    configured_device = DeviceEntry(id="configured-device", manufacturer="configured", model="Configured Device")
+    mock_device_registry(
+        hass,
+        {
+            source_device.id: source_device,
+            configured_device.id: configured_device,
+        },
     )
 
-    entity_registry.async_get_or_create(
-        "switch",
-        "switch",
-        "configured-precedence-source",
-        suggested_object_id="configured_precedence",
-        device_id=source_device.id,
+    entity_registry = mock_registry(
+        hass,
+        {
+            "switch.configured_precedence": RegistryEntryWithDefaults(
+                entity_id="switch.configured_precedence",
+                unique_id="configured-precedence-source",
+                platform="switch",
+                device_id=source_device.id,
+            ),
+        },
     )
 
     await create_mock_config_entry(

@@ -32,9 +32,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class BaseEntity(Entity):
-    def __init__(self, *args: object, **kwargs: object) -> None:
-        super().__init__(*args, **kwargs)
-
     async def async_added_to_hass(self) -> None:
         """Bind configured registry metadata."""
         await super().async_added_to_hass()

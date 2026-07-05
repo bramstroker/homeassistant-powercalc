@@ -239,7 +239,7 @@ class EnergySensor(BaseEntity):
     """Class which all energy sensors should extend from."""
 
 
-class VirtualEnergySensor(EnergySensor, IntegrationSensor):
+class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     """Virtual energy sensor, totalling kWh."""
 
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
@@ -279,7 +279,7 @@ class VirtualEnergySensor(EnergySensor, IntegrationSensor):
 
         params = {key: val for key, val in params.items() if key in signature.parameters}
 
-        super().__init__(**params)  # ty: ignore[invalid-argument-type]
+        super().__init__(**params)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
 
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
