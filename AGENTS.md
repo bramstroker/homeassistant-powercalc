@@ -19,6 +19,16 @@ Documentation is built with **Zensical**, not raw MkDocs.
 - Verify docs changes from the `docs/` directory with `uv run --group docs zensical build --clean`
 - If sandboxing blocks `uv` cache access, rerun the same Zensical command with the required approval rather than switching to `mkdocs build`
 
+## Translations
+
+Use the repo-local translation skill at `.agents/skills/powercalc_translations/SKILL.md` whenever a task adds or changes translation strings or keys.
+
+- `custom_components/powercalc/translations/en.json` is always the source translation file
+- Keep the same nested keys in every `custom_components/powercalc/translations/*.json` file
+- Keep placeholders such as `{entity}` and `{docs_uri}` identical to `en.json` for each string path
+- Before editing non-English translations, ask whether to copy English strings or actually translate them, unless the user already specified the mode
+- Validate translation changes with `python .github/scripts/validate_translations.py` and `uv run pytest tests/test_translations.py`
+
 ## Profile Library
 
 ### library.json is auto-generated
