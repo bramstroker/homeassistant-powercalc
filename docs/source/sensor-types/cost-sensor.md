@@ -12,7 +12,7 @@ integration such as Nordpool, Tibber or Frank Energie).
 
 ## Configuring the energy price
 
-Define the price once in the global configuration. Provide **either** a fixed price
+Define the price once in the [global configuration](../configuration/global-configuration.md). Provide **either** a fixed price
 **or** a price sensor.
 
 Fixed price (per kWh, in your local currency):
