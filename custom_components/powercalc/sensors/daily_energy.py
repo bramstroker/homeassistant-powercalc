@@ -161,7 +161,7 @@ async def create_daily_fixed_energy_power_sensor(
     )
 
 
-class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
+class DailyEnergySensor(EnergySensor, RestoreEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_state_class = SensorStateClass.TOTAL
     _attr_should_poll = False
@@ -211,6 +211,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
 
     async def async_added_to_hass(self) -> None:
         """Handle entity which will be added."""
+        await super().async_added_to_hass()
+
         if state := await self.async_get_last_state():
             try:
                 self._state = Decimal(state.state)

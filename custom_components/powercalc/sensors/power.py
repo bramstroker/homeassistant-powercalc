@@ -368,7 +368,7 @@ class PowerSensor(BaseEntity):
     """Class which all power sensors should extend from."""
 
 
-class VirtualPowerSensor(SensorEntity, PowerSensor):
+class VirtualPowerSensor(PowerSensor, SensorEntity):
     """Virtual power sensor."""
 
     _attr_device_class = SensorDeviceClass.POWER

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import cast
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import CONF_NAME
@@ -12,7 +13,6 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
-    CONF_AREA,
     CONF_COST_SENSOR_FRIENDLY_NAMING,
     CONF_COST_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
@@ -24,6 +24,7 @@ from custom_components.powercalc.const import (
     DEFAULT_POWER_NAME_PATTERN,
     DOMAIN,
 )
+from custom_components.powercalc.device_binding import bind_entity_to_registry_metadata
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -33,59 +34,14 @@ _LOGGER = logging.getLogger(__name__)
 class BaseEntity(Entity):
     async def async_added_to_hass(self) -> None:
         """Bind configured registry metadata."""
+        await super().async_added_to_hass()
 
-        bind_entity_to_device(self.hass, self.entity_id, self.device_entry)
-
-        if not hasattr(self, "_sensor_config"):
-            return
-
-        sensor_config = getattr(self, "_sensor_config")  # noqa: B009
-        bind_entity_to_area(self.hass, self.entity_id, sensor_config)
-
-
-@callback
-def bind_entity_to_device(
-    hass: HomeAssistant,
-    entity_id: str | None,
-    device_entry: DeviceEntry | None,
-) -> None:
-    """Bind a Powercalc entity to the resolved device."""
-    # Home Assistant only consumes entity.device_entry while creating registry
-    # entries for config-entry platforms. Only YAML/platform entities need this
-    # explicit registry update after they have been added.
-    if entity_id is None or device_entry is None:
-        return
-
-    entity_reg = er.async_get(hass)
-    entity_entry = entity_reg.async_get(entity_id)
-    if entity_entry is None or entity_entry.config_entry_id is not None or entity_entry.device_id == device_entry.id:
-        return
-
-    _LOGGER.debug("Binding %s to device %s", entity_id, device_entry.id)
-    entity_reg.async_update_entity(entity_id, device_id=device_entry.id)
-
-
-@callback
-def bind_entity_to_area(
-    hass: HomeAssistant,
-    entity_id: str | None,
-    sensor_config: ConfigType,
-) -> None:
-    """Bind a Powercalc entity to the configured area."""
-    if entity_id is None:
-        return
-
-    area_id = sensor_config.get(CONF_AREA)
-    if not area_id:
-        return
-
-    entity_reg = er.async_get(hass)
-    entity_entry = entity_reg.async_get(entity_id)
-    if entity_entry is None or entity_entry.area_id == area_id:
-        return
-
-    _LOGGER.debug("Binding %s to area %s", entity_id, area_id)
-    entity_reg.async_update_entity(entity_id, area_id=area_id)
+        bind_entity_to_registry_metadata(
+            self.hass,
+            self.entity_id,
+            cast(DeviceEntry | None, getattr(self, "device_entry", None)),
+            cast(ConfigType | None, getattr(self, "_sensor_config", None)),
+        )
 
 
 def generate_power_sensor_name(

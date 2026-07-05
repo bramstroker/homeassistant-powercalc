@@ -57,7 +57,7 @@ def create_general_standby_sensors(
     return sensors
 
 
-class StandbyPowerSensor(SensorEntity, PowerSensor):
+class StandbyPowerSensor(PowerSensor, SensorEntity):
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfPower.WATT

@@ -1362,7 +1362,7 @@ async def test_create_group_with_real_power_sensors(hass: HomeAssistant) -> None
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.existing_power"}
 
 
-async def test_bind_to_configured_device(
+async def test_group_entity_binds_to_configured_device(
     hass: HomeAssistant,
     entity_registry: er.EntityRegistry,
     device_registry: DeviceRegistry,

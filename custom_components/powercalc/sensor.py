@@ -147,7 +147,7 @@ from .const import (
     SensorType,
     UnitPrefix,
 )
-from .device_binding import attach_entities_to_source_device
+from .device_binding import attach_entities_to_resolved_device
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
@@ -380,7 +380,7 @@ async def _async_setup_entities(
         _LOGGER.error(err)
         return
 
-    await attach_entities_to_source_device(config_entry, entities.new, hass, None)
+    await attach_entities_to_resolved_device(config_entry, entities.new, hass, None, config)
 
     entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
     for entity in entities_to_add:
@@ -393,8 +393,8 @@ async def _async_setup_entities(
     # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
     # Remove entities which are disabled because of a disabled device from the list of entities to add
     # When we add nevertheless the entity_platform code will set device_id to None and abort entity addition.
-    # `async_added_to_hass` hook will not be called, which powercalc uses to bind the entity to device again
-    # This causes the powercalc entity to never be bound to the device again and be disabled forever.
+    # `async_added_to_hass` will not be called, so BaseEntity cannot repair registry metadata.
+    # This causes the powercalc entity to never be rebound and to stay disabled.
     entity_reg = er.async_get(hass)
     for entity in entities_to_add:
         existing_entry = entity_reg.async_get(entity.entity_id)
@@ -949,7 +949,7 @@ async def create_individual_sensors(
             create_energy_related_sensors(hass, sensor_config, energy_sensor, source_entity, config_entry),
         )
 
-    await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
+    await attach_entities_to_resolved_device(config_entry, entities_to_add, hass, source_entity, sensor_config)
     update_registries(hass, source_entity, entities_to_add, context)
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
