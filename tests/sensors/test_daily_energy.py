@@ -560,7 +560,7 @@ async def test_template_error_catched(hass: HomeAssistant, caplog: pytest.LogCap
             },
         )
         await _trigger_periodic_update(hass, 10)
-        assert "Could not render value template" in caplog.text
+        assert "Could not render template" in caplog.text
 
 
 async def test_entity_category(hass: HomeAssistant) -> None:

@@ -12,7 +12,7 @@ import voluptuous as vol
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_POWER, CONF_STATES_POWER
 from custom_components.powercalc.errors import StrategyConfigurationError
-from custom_components.powercalc.helpers import evaluate_power
+from custom_components.powercalc.unit import evaluate_to_decimal
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -46,7 +46,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         if self._per_state_power is not None:
             # Lookup by state
             if entity_state.state in self._per_state_power:
-                return evaluate_power(
+                return evaluate_to_decimal(
                     self._per_state_power.get(entity_state.state) or 0,
                 )
 
@@ -55,12 +55,12 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 if "|" in state_key:
                     attribute, value = state_key.split("|", 2)
                     if str(entity_state.attributes.get(attribute)) == value:
-                        return evaluate_power(power)
+                        return evaluate_to_decimal(power)
 
         if self._power is None:
             return None
 
-        return evaluate_power(self._power)
+        return evaluate_to_decimal(self._power)
 
     async def validate_config(self) -> None:
         """Validate correct setup of the strategy."""

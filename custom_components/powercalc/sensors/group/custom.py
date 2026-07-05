@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 from datetime import datetime, timedelta
-from decimal import Decimal, DecimalException
+from decimal import Decimal
 import logging
 import time
 from typing import Any
@@ -48,11 +48,6 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
-from homeassistant.util.unit_conversion import (
-    BaseUnitConverter,
-    EnergyConverter,
-    PowerConverter,
-)
 
 from custom_components.powercalc.analytics.analytics import collect_analytics
 from custom_components.powercalc.const import (
@@ -119,6 +114,11 @@ from custom_components.powercalc.sensors.abstract import (
 from custom_components.powercalc.sensors.energy import EnergySensor, VirtualEnergySensor
 from custom_components.powercalc.sensors.energy_related import create_energy_related_sensors
 from custom_components.powercalc.sensors.power import PowerSensor
+from custom_components.powercalc.unit import (
+    ENERGY_UNIT_PREFIX_MAPPING,
+    convert_to_decimal,
+    parse_decimal,
+)
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -127,17 +127,6 @@ STORAGE_KEY = "powercalc_group"
 STORAGE_VERSION = 2
 # How long between periodically saving the current states to disk
 STATE_DUMP_INTERVAL = timedelta(minutes=10)
-
-ENERGY_UNIT_PREFIX_MAPPING = {
-    UnitPrefix.KILO: UnitOfEnergy.KILO_WATT_HOUR,
-    UnitPrefix.MEGA: UnitOfEnergy.MEGA_WATT_HOUR,
-    UnitPrefix.NONE: UnitOfEnergy.WATT_HOUR,
-}
-
-UNIT_CONVERTERS: dict[str | None, type[BaseUnitConverter]] = {
-    **dict.fromkeys(EnergyConverter.VALID_UNITS, EnergyConverter),
-    **dict.fromkeys(PowerConverter.VALID_UNITS, PowerConverter),
-}
 
 
 def create_group_sensors_yaml(
@@ -650,21 +639,19 @@ class GroupedSensor(BaseEntity, SensorEntity):
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
         """Convert value of member entity state to match the unit of measurement of the group sensor."""
-        value: str | float = state.state
         unit = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
         if unit and self._attr_native_unit_of_measurement != unit:
-            converter = UNIT_CONVERTERS[unit]
-            value = converter.convert(float(value), unit, self._attr_native_unit_of_measurement)
-        try:
-            return Decimal(value)
-        except DecimalException as err:
+            value = convert_to_decimal(state.state, unit, self._attr_native_unit_of_measurement)
+        else:
+            value = parse_decimal(state.state)
+        if value is None:
             _LOGGER.warning(
-                "Error converting state value %s to Decimal for %s: %s",
-                value,
+                "Error converting state value %s to Decimal for %s",
+                state.state,
                 state.entity_id,
-                err,
             )
             return Decimal(0)
+        return value
 
     def _set_native_value(self, value: Decimal, write_state: bool = True) -> None:
         self._native_value_exact = value
@@ -916,22 +903,23 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
             return
 
         last_sensor_state = await self.async_get_last_sensor_data()
-        try:
-            if last_sensor_state and last_sensor_state.native_value:
-                self._set_native_value(Decimal(last_sensor_state.native_value))  # type: ignore
-            elif last_state:
-                self._set_native_value(Decimal(last_state.state))
-            _LOGGER.debug(
-                "%s: Restoring state: %s",
-                self.entity_id,
-                self._attr_native_value,
-            )
-        except DecimalException as err:
-            _LOGGER.warning(
-                "%s: Could not restore last state: %s",
-                self.entity_id,
-                err,
-            )
+        if last_sensor_state and last_sensor_state.native_value:
+            restored = parse_decimal(last_sensor_state.native_value)
+        elif last_state:
+            restored = parse_decimal(last_state.state)
+        else:
+            restored = None
+
+        if restored is None:
+            _LOGGER.warning("%s: Could not restore last state", self.entity_id)
+            return
+
+        self._set_native_value(restored)
+        _LOGGER.debug(
+            "%s: Restoring state: %s",
+            self.entity_id,
+            self._attr_native_value,
+        )
 
 
 class PreviousStateStore:

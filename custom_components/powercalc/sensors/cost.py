@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from decimal import Decimal, DecimalException
+from decimal import Decimal
 import logging
 from typing import TYPE_CHECKING
 
@@ -10,18 +10,14 @@ from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
     CONF_UNIQUE_ID,
-    STATE_UNAVAILABLE,
-    STATE_UNKNOWN,
     UnitOfEnergy,
 )
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
-from homeassistant.exceptions import HomeAssistantError
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_conversion import EnergyConverter
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -37,6 +33,7 @@ from custom_components.powercalc.const import (
     DOMAIN_CONFIG,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
+from custom_components.powercalc.unit import convert_to_decimal, parse_decimal
 
 from .abstract import (
     BaseEntity,
@@ -56,35 +53,17 @@ ATTR_LAST_ENERGY = "last_energy"
 _LOGGER = logging.getLogger(__name__)
 
 
-def _parse_decimal(state: State | None) -> Decimal | None:
-    """Parse a numeric state into a Decimal, returning None when it is not a usable number."""
-    if state is None or state.state in (STATE_UNKNOWN, STATE_UNAVAILABLE):
-        return None
-    try:
-        return Decimal(state.state)
-    except DecimalException, ValueError:
-        return None
-
-
 def _parse_scaled(state: State | None, unit_to_factor: Callable[[str | None], Decimal]) -> Decimal | None:
     """Parse a numeric state into a Decimal, scaled by a factor derived from its unit.
 
     Both energy amounts (converted to kWh) and prices (converted to per kWh) are parsed this
     way; ``unit_to_factor`` maps the state's unit of measurement to the multiplier to apply.
     """
-    value = _parse_decimal(state)
+    value = parse_decimal(state)
     if value is None:
         return None
     assert state is not None  # a parsed value implies the state is present and numeric
     return value * unit_to_factor(state.attributes.get(ATTR_UNIT_OF_MEASUREMENT))
-
-
-def _energy_ratio(from_unit: str, to_unit: str) -> Decimal | None:
-    """Return the ratio between two energy units, or None when they are not convertible."""
-    try:
-        return Decimal(str(EnergyConverter.convert(1, from_unit, to_unit)))
-    except HomeAssistantError:
-        return None
 
 
 def _to_kwh_factor(unit: str | None) -> Decimal:
@@ -94,7 +73,7 @@ def _to_kwh_factor(unit: str | None) -> Decimal:
     """
     if not unit or unit == UnitOfEnergy.KILO_WATT_HOUR:
         return Decimal(1)
-    if (factor := _energy_ratio(unit, UnitOfEnergy.KILO_WATT_HOUR)) is not None:
+    if (factor := convert_to_decimal(1, unit, UnitOfEnergy.KILO_WATT_HOUR)) is not None:
         return factor
     _LOGGER.warning("Cannot convert energy unit '%s' to kWh, assuming kWh", unit)
     return Decimal(1)
@@ -113,7 +92,7 @@ def _price_per_kwh_factor(unit: str | None) -> Decimal:
     denominator = unit.rsplit("/", 1)[-1].strip()
     if not denominator or denominator == UnitOfEnergy.KILO_WATT_HOUR:
         return Decimal(1)
-    if (factor := _energy_ratio(UnitOfEnergy.KILO_WATT_HOUR, denominator)) is not None:
+    if (factor := convert_to_decimal(1, UnitOfEnergy.KILO_WATT_HOUR, denominator)) is not None:
         return factor
     _LOGGER.warning("Cannot convert energy price unit '%s' to a per-kWh price, assuming per kWh", unit)
     return Decimal(1)
@@ -279,16 +258,8 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
         await super().async_added_to_hass()
 
         if (state := await self.async_get_last_state()) is not None:
-            try:
-                self._state = Decimal(state.state)
-            except DecimalException, ValueError:
-                self._state = Decimal(0)
-            last_energy = state.attributes.get(ATTR_LAST_ENERGY)
-            if last_energy is not None:
-                try:
-                    self._last_energy = Decimal(str(last_energy))
-                except DecimalException, ValueError:  # pragma: no cover
-                    self._last_energy = None
+            self._state = parse_decimal(state) or Decimal(0)
+            self._last_energy = parse_decimal(state.attributes.get(ATTR_LAST_ENERGY))
 
         # A resetting (per utility meter cycle) cost sensor exposes last_reset so long-term
         # statistics treat each cycle reset as a new cycle rather than negative consumption.

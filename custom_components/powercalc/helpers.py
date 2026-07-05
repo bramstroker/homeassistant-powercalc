@@ -1,6 +1,4 @@
 from collections.abc import Callable, Coroutine, Iterable, Iterator
-import decimal
-from decimal import Decimal
 from functools import wraps
 import logging
 import os.path
@@ -12,10 +10,8 @@ from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import TemplateError
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
@@ -30,28 +26,6 @@ from custom_components.powercalc.power_profile.power_profile import PowerProfile
 _LOGGER = logging.getLogger(__name__)
 
 PLACEHOLDER_REGEX = re.compile(r"\[\[\s*([A-Za-z_]\w*(?::[A-Za-z_]\w*)*)\s*\]\]")
-
-
-def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
-    """When power is a template render it."""
-
-    if isinstance(power, Decimal):
-        return power
-
-    try:
-        if isinstance(power, Template):
-            try:
-                power = power.async_render()
-            except TemplateError as ex:
-                _LOGGER.error("Could not render power template %s: %s", power, ex)
-                return None
-            if power == "unknown":
-                return None
-
-        return Decimal(power)  # type: ignore[arg-type]
-    except decimal.DecimalException, ValueError:
-        _LOGGER.error("Could not convert power value %s to decimal", power)
-        return None
 
 
 def get_library_path(sub_path: str = "") -> str:
