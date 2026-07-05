@@ -80,6 +80,7 @@
         "data": {
           "name": "Názov",
           "create_energy_sensor": "Vytvorte energetický snímač",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Vytvorte merače spotreby",
           "domain": "Entity doména",
           "exclude_entities": "Vynechať entity"
@@ -101,6 +102,7 @@
         "description": "Nastavte globálnu konfiguráciu pre Powercalc. Ďalšie informácie nájdete v [dokumentácii]({docs_uri}). Ďalšie možnosti pre snímače energie a elektromery môžu byť poskytnuté v ďalších krokoch.",
         "data": {
           "create_energy_sensors": "Vytvorte energetické senzory",
+          "create_cost_sensors": "Create cost sensors",
           "create_standby_group": "Create standby group",
           "create_utility_meters": "Vytvorte merače spotreby",
           "disable_extended_attributes": "Zakázať rozšírené atribúty",
@@ -114,6 +116,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
+          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
           "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "disable_extended_attributes": "Vypnite všetky extra atribúty, ktoré powercalc pridáva k stavu energie, energie a skupiny. To pomôže udržať veľkosť databázy malú",
@@ -121,6 +124,22 @@
           "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
           "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Cost options",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh.",
+        "data": {
+          "energy_price": "Fixed energy price",
+          "energy_price_multiplier": "Energy price multiplier",
+          "energy_price_sensor": "Energy price sensor",
+          "energy_price_surcharge": "Energy price surcharge"
+        },
+        "data_description": {
+          "energy_price": "A fixed price per kWh in your local currency",
+          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
         }
       },
       "global_configuration_discovery": {
@@ -176,6 +195,7 @@
           "area": "Oblasť",
           "floor": "Poschodie",
           "create_energy_sensor": "Vytvoriť snímač energie",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Vytvorte merače spotreby",
           "device": "Zariadenie",
           "force_calculate_group_energy": "Sila vypočítať energiu",
@@ -208,6 +228,7 @@
       "group_subtract": {
         "data": {
           "create_energy_sensor": "Vytvorte energetický senzor",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Vytvorte merače spotreby",
           "entity_id": "Základná entita",
           "name": "Názov",
@@ -224,6 +245,7 @@
           "main_power_sensor": "Senzor sieťového napájania",
           "group_tracked_auto": "Automaticky pridané entity",
           "create_energy_sensor": "Vytvorte energetický senzor",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Vytvorte merače spotreby"
         },
         "data_description": {
@@ -440,6 +462,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Vytvoriť snímač energie",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Vytvorte merače spotreby",
           "entity_id": "Zdrojová entita",
           "mode": "Stratégia výpočtu",
@@ -526,6 +549,7 @@
         "title": "Základné možnosti",
         "data": {
           "create_energy_sensor": "Vytvoriť snímač energie",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Vytvorte merače spotreby",
           "entity_id": "Zdrojová entita",
           "name": "Názov",
@@ -583,6 +607,7 @@
         "title": "Základné možnosti",
         "data": {
           "create_energy_sensors": "Vytvorte energetické senzory",
+          "create_cost_sensors": "Create cost sensors",
           "create_standby_group": "Create standby group",
           "create_utility_meters": "Vytvorte merače spotreby",
           "disable_extended_attributes": "Zakázať rozšírené atribúty",
@@ -596,6 +621,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
+          "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
           "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "disable_extended_attributes": "Zakážte všetky extra atribúty, ktoré powercalc pridáva k výkonu, energii a stavom entity skupiny. Pomôže to udržať veľkosť databázy malú",
@@ -603,6 +629,22 @@
           "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
           "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
           "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Cost options",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh.",
+        "data": {
+          "energy_price": "Fixed energy price",
+          "energy_price_multiplier": "Energy price multiplier",
+          "energy_price_sensor": "Energy price sensor",
+          "energy_price_surcharge": "Energy price surcharge"
+        },
+        "data_description": {
+          "energy_price": "A fixed price per kWh in your local currency",
+          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
         }
       },
       "global_configuration_discovery": {
@@ -699,6 +741,7 @@
           "main_power_sensor": "Senzor sieťového napájania",
           "group_tracked_auto": "Automaticky pridané entity",
           "create_energy_sensor": "Vytvorte energetický senzor",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Vytvorte merače spotreby"
         },
         "data_description": {
@@ -847,6 +890,16 @@
       },
       "name": "Kalibrácia snímača energie"
     },
+    "calibrate_cost": {
+      "description": "Sets the cost sensor to a given monetary value.",
+      "fields": {
+        "value": {
+          "description": "The value to set.",
+          "name": "Value"
+        }
+      },
+      "name": "Calibrate cost sensor"
+    },
     "calibrate_utility_meter": {
       "description": "Kalibruje snímač merača spotreby.",
       "fields": {
@@ -900,6 +953,10 @@
     "reset_energy": {
       "description": "Resetovanie snímača energie na nulovú hodnotu kWh.",
       "name": "Resetovanie snímača energie"
+    },
+    "reset_cost": {
+      "description": "Reset a cost sensor to zero.",
+      "name": "Reset cost sensor"
     },
     "stop_playbook": {
       "description": "Zastavenie aktuálne aktívneho playbooku",
