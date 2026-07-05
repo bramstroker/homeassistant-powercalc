@@ -55,6 +55,7 @@ DUMMY_ENTITY_ID = "sensor.dummy"
 
 CONF_ALL = "all"
 CONF_AND = "and"
+CONF_APPLY_TO_ALL = "apply_to_all"
 CONF_ENABLE_ANALYTICS = "enable_analytics"
 CONF_AREA = "area"
 CONF_AUTOSTART = "autostart"

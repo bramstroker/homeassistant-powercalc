@@ -5,8 +5,9 @@ from typing import Any
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, STATE_ON, EntityCategory
+from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON, EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResult
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -22,6 +23,9 @@ from custom_components.powercalc import (
 )
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
+    CONF_APPLY_TO_ALL,
+    CONF_COST_SENSOR_NAMING,
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_COST_SENSORS,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -69,6 +73,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
+from custom_components.powercalc.flow_helper.schema import SECTION_COST_NAMING, SECTION_COST_PRICING
 from tests.common import (
     assert_entity_state,
     create_mock_config_entry,
@@ -144,6 +149,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_CREATE_STANDBY_GROUP: True,
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_COST_SENSORS: False,
+        CONF_COST_SENSOR_NAMING: "{} cost",
         CONF_CREATE_UTILITY_METERS: True,
         CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
         CONF_DISABLE_LIBRARY_DOWNLOAD: True,
@@ -399,9 +405,12 @@ async def test_cost_options_step_in_config_flow(hass: HomeAssistant) -> None:
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {
-            CONF_ENERGY_PRICE: 0.30,
-            CONF_ENERGY_PRICE_SURCHARGE: 0.05,
-            CONF_ENERGY_PRICE_MULTIPLIER: 1.21,
+            SECTION_COST_PRICING: {
+                CONF_ENERGY_PRICE: 0.30,
+                CONF_ENERGY_PRICE_SURCHARGE: 0.05,
+                CONF_ENERGY_PRICE_MULTIPLIER: 1.21,
+            },
+            SECTION_COST_NAMING: {CONF_COST_SENSOR_NAMING: "{} cost"},
         },
     )
 
@@ -410,6 +419,7 @@ async def test_cost_options_step_in_config_flow(hass: HomeAssistant) -> None:
     assert result["data"][CONF_ENERGY_PRICE] == pytest.approx(0.30)
     assert result["data"][CONF_ENERGY_PRICE_SURCHARGE] == pytest.approx(0.05)
     assert result["data"][CONF_ENERGY_PRICE_MULTIPLIER] == pytest.approx(1.21)
+    assert result["data"][CONF_COST_SENSOR_NAMING] == "{} cost"
 
 
 async def test_cost_options_step_skipped_when_disabled(hass: HomeAssistant) -> None:
@@ -444,9 +454,12 @@ async def test_cost_options_flow(hass: HomeAssistant) -> None:
         entry,
         Step.GLOBAL_CONFIGURATION_COST,
         {
-            CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price",
-            CONF_ENERGY_PRICE_SURCHARGE: 0.05,
-            CONF_ENERGY_PRICE_MULTIPLIER: 1.21,
+            SECTION_COST_PRICING: {
+                CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price",
+                CONF_ENERGY_PRICE_SURCHARGE: 0.05,
+                CONF_ENERGY_PRICE_MULTIPLIER: 1.21,
+            },
+            SECTION_COST_NAMING: {CONF_COST_SENSOR_NAMING: "{} costs"},
         },
     )
 
@@ -454,11 +467,207 @@ async def test_cost_options_flow(hass: HomeAssistant) -> None:
     assert entry.data[CONF_ENERGY_PRICE_SENSOR] == "sensor.energy_price"
     assert entry.data[CONF_ENERGY_PRICE_SURCHARGE] == pytest.approx(0.05)
     assert entry.data[CONF_ENERGY_PRICE_MULTIPLIER] == pytest.approx(1.21)
+    assert entry.data[CONF_COST_SENSOR_NAMING] == "{} costs"
 
     # Check if global config in hass object is updated.
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_ENERGY_PRICE_SENSOR] == "sensor.energy_price"
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_ENERGY_PRICE_SURCHARGE] == pytest.approx(0.05)
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_ENERGY_PRICE_MULTIPLIER] == pytest.approx(1.21)
+
+
+def _create_cost_toggle_power_entry(create_cost_sensor: bool) -> MockConfigEntry:
+    """Build a virtual power config entry carrying an explicit create_cost_sensor flag."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="cost-toggle-entry",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "cost-toggle-entry",
+            CONF_ENTITY_ID: "light.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_CREATE_COST_SENSOR: create_cost_sensor,
+        },
+        title="Cost toggle entry",
+    )
+
+
+async def _toggle_cost_sensors(hass: HomeAssistant, entry: MockConfigEntry, value: bool) -> FlowResult:
+    """Open the options basic step and flip create_cost_sensors, returning the resulting step."""
+    result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION)
+    return await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {CONF_CREATE_COST_SENSORS: value},
+    )
+
+
+async def test_toggling_cost_sensors_redirects_to_apply_step(hass: HomeAssistant) -> None:
+    """Flipping create_cost_sensors redirects to the dedicated apply step."""
+    entry = await create_mock_global_config_entry(hass, {CONF_ENERGY_PRICE: 0.25})
+
+    result = await _toggle_cost_sensors(hass, entry, value=True)
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST_APPLY
+
+
+async def test_no_apply_step_when_cost_toggle_unchanged(hass: HomeAssistant) -> None:
+    """Not touching create_cost_sensors persists directly without the apply step."""
+    entry = await create_mock_global_config_entry(hass, {CONF_ENERGY_PRICE: 0.25, CONF_CREATE_COST_SENSORS: True})
+
+    result = await _toggle_cost_sensors(hass, entry, value=True)
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+
+async def test_apply_to_all_enables_cost_sensor_on_existing_entries(hass: HomeAssistant) -> None:
+    """Enabling cost sensors + apply toggle turns on create_cost_sensor for all config entries."""
+    power_entry = _create_cost_toggle_power_entry(create_cost_sensor=False)
+    power_entry.add_to_hass(hass)
+
+    entry = await create_mock_global_config_entry(hass, {CONF_ENERGY_PRICE: 0.25})
+
+    result = await _toggle_cost_sensors(hass, entry, value=True)
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST_APPLY
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {CONF_APPLY_TO_ALL: True},
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    updated = hass.config_entries.async_get_entry(power_entry.entry_id)
+    assert updated.data[CONF_CREATE_COST_SENSOR] is True
+    # The transient toggle itself is not persisted to the global config.
+    assert CONF_APPLY_TO_ALL not in hass.data[DOMAIN][DOMAIN_CONFIG]
+
+
+async def test_disabling_cost_sensors_applies_to_all(hass: HomeAssistant) -> None:
+    """Disabling cost sensors + apply toggle turns off create_cost_sensor for all config entries."""
+    power_entry = _create_cost_toggle_power_entry(create_cost_sensor=True)
+    power_entry.add_to_hass(hass)
+
+    entry = await create_mock_global_config_entry(
+        hass,
+        {CONF_ENERGY_PRICE: 0.25, CONF_CREATE_COST_SENSORS: True},
+    )
+
+    result = await _toggle_cost_sensors(hass, entry, value=False)
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST_APPLY
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {CONF_APPLY_TO_ALL: True},
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    updated = hass.config_entries.async_get_entry(power_entry.entry_id)
+    assert updated.data[CONF_CREATE_COST_SENSOR] is False
+
+
+async def test_existing_entries_untouched_without_apply_to_all(hass: HomeAssistant) -> None:
+    """Existing config entries keep their create_cost_sensor flag when the apply toggle is off."""
+    power_entry = _create_cost_toggle_power_entry(create_cost_sensor=False)
+    power_entry.add_to_hass(hass)
+
+    entry = await create_mock_global_config_entry(hass, {CONF_ENERGY_PRICE: 0.25})
+
+    result = await _toggle_cost_sensors(hass, entry, value=True)
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST_APPLY
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {CONF_APPLY_TO_ALL: False},
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    updated = hass.config_entries.async_get_entry(power_entry.entry_id)
+    assert updated.data[CONF_CREATE_COST_SENSOR] is False
+
+
+async def test_cost_step_requires_a_price_in_config_flow(hass: HomeAssistant) -> None:
+    """Submitting the cost step without a price shows a validation error."""
+    result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_CREATE_ENERGY_SENSORS: False,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_CREATE_COST_SENSORS: True,
+        },
+    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST
+
+    # Submit without a price or price sensor.
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {SECTION_COST_PRICING: {}, SECTION_COST_NAMING: {}},
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST
+    assert result["errors"] == {"base": "cost_price_mandatory"}
+
+    # Supplying a price now completes the flow.
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {SECTION_COST_PRICING: {CONF_ENERGY_PRICE: 0.30}, SECTION_COST_NAMING: {}},
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_ENERGY_PRICE] == pytest.approx(0.30)
+
+
+async def test_cost_step_requires_a_price_in_options_flow(hass: HomeAssistant) -> None:
+    """Submitting the cost options step without a price shows a validation error."""
+    entry = await create_mock_global_config_entry(
+        hass,
+        {
+            CONF_CREATE_COST_SENSORS: True,
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION_COST)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {SECTION_COST_PRICING: {}, SECTION_COST_NAMING: {}},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST
+    assert result["errors"] == {"base": "cost_price_mandatory"}
+
+
+async def test_enabling_cost_sensors_without_price_continues_to_price_step(hass: HomeAssistant) -> None:
+    """Enabling cost sensors without a price: apply step first, then the cost/price step."""
+    entry = await create_mock_global_config_entry(hass, {})
+
+    result = await _toggle_cost_sensors(hass, entry, value=True)
+
+    # First the apply step is shown (the toggle was flipped).
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST_APPLY
+
+    # No price configured yet, so after the apply step the cost/price step follows.
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_COST
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {SECTION_COST_PRICING: {CONF_ENERGY_PRICE: 0.30}, SECTION_COST_NAMING: {}},
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_CREATE_COST_SENSORS] is True
+    assert entry.data[CONF_ENERGY_PRICE] == pytest.approx(0.30)
+    assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_ENERGY_PRICE] == pytest.approx(0.30)
 
 
 async def test_discovery_options_flow(hass: HomeAssistant) -> None:

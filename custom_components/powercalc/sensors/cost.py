@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal, DecimalException
 import logging
+from typing import TYPE_CHECKING
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.const import CONF_NAME, STATE_UNAVAILABLE, STATE_UNKNOWN
@@ -14,10 +15,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
-    ATTR_SOURCE_DOMAIN,
-    ATTR_SOURCE_ENTITY,
     CONF_COST_SENSOR_PRECISION,
-    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_PRICE,
     CONF_ENERGY_PRICE_MULTIPLIER,
     CONF_ENERGY_PRICE_SENSOR,
@@ -36,6 +34,9 @@ from .abstract import (
     generate_cost_sensor_name,
 )
 from .energy import EnergySensor
+
+if TYPE_CHECKING:
+    from .utility_meter import VirtualUtilityMeter
 
 COST_ICON = "mdi:cash"
 ATTR_LAST_ENERGY = "last_energy"
@@ -56,14 +57,16 @@ def _parse_decimal(state: State | None) -> Decimal | None:
 def create_cost_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
-    energy_sensor: EnergySensor,
+    energy_sensor: EnergySensor | VirtualUtilityMeter,
     source_entity: SourceEntity | None = None,
     name: str | None = None,
+    reset_on_source_reset: bool = False,
 ) -> CostSensor | None:
     """Create a cost sensor tracking the cost of the given energy sensor.
 
-    The energy price is defined globally, either as a fixed price or a price sensor.
-    When no price is configured, no cost sensor is created.
+    The energy sensor can be a regular energy sensor or a utility meter. The energy
+    price is defined globally, either as a fixed price or a price sensor. When no price
+    is configured, no cost sensor is created.
     """
     global_config: ConfigType = hass.data[DOMAIN].get(DOMAIN_CONFIG, {})
     fixed_price = global_config.get(CONF_ENERGY_PRICE)
@@ -113,8 +116,7 @@ def create_cost_sensor(
         price_entity_id=price_entity_id,
         price_surcharge=price_surcharge,
         price_multiplier=price_multiplier,
-        powercalc_source_entity=source_entity.entity_id if source_entity else None,
-        powercalc_source_domain=source_entity.domain if source_entity else None,
+        reset_on_source_reset=reset_on_source_reset,
         device_info=get_device_info(hass, sensor_config, source_entity),
     )
 
@@ -126,7 +128,7 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
     _attr_state_class = SensorStateClass.TOTAL
     _attr_should_poll = False
     _attr_icon = COST_ICON
-    _unrecorded_attributes = frozenset({ATTR_SOURCE_DOMAIN, ATTR_SOURCE_ENTITY, ATTR_LAST_ENERGY})
+    _unrecorded_attributes = frozenset({ATTR_LAST_ENERGY})
 
     def __init__(
         self,
@@ -140,12 +142,12 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
         price_entity_id: str | None = None,
         price_surcharge: Decimal = Decimal(0),
         price_multiplier: Decimal = Decimal(1),
-        powercalc_source_entity: str | None = None,
-        powercalc_source_domain: str | None = None,
+        reset_on_source_reset: bool = False,
         device_info: DeviceInfo | None = None,
     ) -> None:
         self._source_energy_entity = source_energy_entity
         self._sensor_config = sensor_config
+        self._reset_on_source_reset = reset_on_source_reset
         self._attr_name = name
         self._attr_unique_id = unique_id
         self._attr_native_unit_of_measurement = hass.config.currency
@@ -154,8 +156,6 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
         self._price_entity_id = price_entity_id
         self._price_surcharge = price_surcharge
         self._price_multiplier = price_multiplier
-        self._powercalc_source_entity = powercalc_source_entity
-        self._powercalc_source_domain = powercalc_source_domain
         self._rounding_digits = int(sensor_config.get(CONF_COST_SENSOR_PRECISION, DEFAULT_COST_SENSOR_PRECISION))
         self._attr_suggested_display_precision = self._rounding_digits
         self._state: Decimal = Decimal(0)
@@ -241,8 +241,14 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
             return
 
         delta = new_energy - self._last_energy
-        # The energy sensor got reset (e.g. restart or calibrate), treat the new value as the delta.
         if delta < 0:
+            if self._reset_on_source_reset:
+                # The source (utility meter) reset for a new cycle, start the cost cycle over.
+                self._state = Decimal(0)
+                self._last_energy = new_energy
+                self.async_write_ha_state()
+                return
+            # The energy sensor got reset (e.g. restart or calibrate), treat the new value as the delta.
             delta = new_energy
         if delta == 0:
             return
@@ -279,12 +285,6 @@ class CostSensor(RestoreEntity, SensorEntity, BaseEntity):
     @property
     def extra_state_attributes(self) -> dict[str, str] | None:
         """Return the state attributes of the cost sensor."""
-        attrs: dict[str, str] = {}
-        if self._last_energy is not None:
-            attrs[ATTR_LAST_ENERGY] = str(self._last_energy)
-
-        if not self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES) and self._powercalc_source_entity:
-            attrs[ATTR_SOURCE_ENTITY] = self._powercalc_source_entity
-            attrs[ATTR_SOURCE_DOMAIN] = self._powercalc_source_domain or ""
-
-        return attrs or None
+        if self._last_energy is None:
+            return None
+        return {ATTR_LAST_ENERGY: str(self._last_energy)}
