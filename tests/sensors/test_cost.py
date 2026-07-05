@@ -154,6 +154,32 @@ async def test_cost_sensor_fixed_price_with_surcharge_and_multiplier(hass: HomeA
     _assert_cost(hass, 3.6)
 
 
+@pytest.mark.parametrize(
+    "unit,baseline,reading,expected_cost",
+    [
+        (UnitOfEnergy.WATT_HOUR, "10000", "15000", 1.25),  # +5000 Wh = 5 kWh * 0.25
+        (UnitOfEnergy.MEGA_WATT_HOUR, "0", "0.01", 2.5),  # +0.01 MWh = 10 kWh * 0.25
+        (UnitOfEnergy.KILO_WATT_HOUR, "0", "10", 2.5),  # +10 kWh * 0.25
+        (None, "0", "10", 2.5),  # no unit, assumed kWh
+        ("W", "0", "10", 2.5),  # unrecognized unit, assumed kWh
+    ],
+)
+async def test_cost_sensor_converts_energy_unit_to_kwh(
+    hass: HomeAssistant,
+    unit: str | None,
+    baseline: str,
+    reading: str,
+    expected_cost: float,
+) -> None:
+    """Energy in any unit is converted to kWh (the price unit) before pricing."""
+    await _setup_cost_sensor(hass, {CONF_CREATE_COST_SENSOR: True}, {CONF_ENERGY_PRICE: 0.25})
+
+    attributes = {ATTR_UNIT_OF_MEASUREMENT: unit} if unit is not None else None
+    await set_states(hass, [("sensor.existing_energy", baseline, attributes)])
+    await set_states(hass, [("sensor.existing_energy", reading, attributes)])
+    _assert_cost(hass, expected_cost)
+
+
 async def test_cost_sensor_price_at_consumption(hass: HomeAssistant) -> None:
     """A dynamic price sensor prices energy at the price valid when it was consumed."""
     await set_states(hass, [("sensor.energy_price", "0.20")])

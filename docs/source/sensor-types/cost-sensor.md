@@ -179,6 +179,11 @@ before the new price takes effect. This way energy is always priced against the 
 that was active while it was consumed, and the accumulated cost stays correct even when
 the price changes over time.
 
+The energy price is interpreted per kWh. If the source energy sensor reports in a
+different unit (for example `Wh` or `MWh`), the consumed energy is converted to kWh
+based on the sensor's unit of measurement before it is priced. When the sensor has no
+recognizable energy unit, it is assumed to already be in kWh.
+
 ## Limitations / tariffs
 
 Fixed per-tariff prices (for example a different fixed `peak` and `offpeak` price used
