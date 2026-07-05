@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import datetime, time, timedelta
-import decimal
 from decimal import Decimal
 import logging
 from typing import Any
@@ -45,6 +44,7 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_SENSOR_PRECISION,
     UnitPrefix,
 )
+from custom_components.powercalc.unit import ENERGY_UNIT_PREFIX_MAPPING, parse_decimal
 
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from .energy import EnergySensor
@@ -202,27 +202,25 @@ class DailyEnergySensor(EnergySensor, RestoreEntity, SensorEntity):
     def set_native_unit_of_measurement(self) -> None:
         """Set the native unit of measurement."""
         unit_prefix = self._sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX) or UnitPrefix.KILO
-        if unit_prefix == UnitPrefix.KILO:
-            self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
-        elif unit_prefix == UnitPrefix.NONE:
-            self._attr_native_unit_of_measurement = UnitOfEnergy.WATT_HOUR
-        elif unit_prefix == UnitPrefix.MEGA:
-            self._attr_native_unit_of_measurement = UnitOfEnergy.MEGA_WATT_HOUR
+        self._attr_native_unit_of_measurement = ENERGY_UNIT_PREFIX_MAPPING.get(
+            unit_prefix,
+            UnitOfEnergy.KILO_WATT_HOUR,
+        )
 
     async def async_added_to_hass(self) -> None:
         """Handle entity which will be added."""
         await super().async_added_to_hass()
 
         if state := await self.async_get_last_state():
-            try:
-                self._state = Decimal(state.state)
-            except decimal.DecimalException:
+            if (restored := parse_decimal(state)) is None:
                 _LOGGER.warning(
                     "%s: Cannot restore state: %s",
                     self.entity_id,
                     state.state,
                 )
                 self._state = Decimal(0)
+            else:
+                self._state = restored
             self._last_updated = state.last_changed.timestamp()
             self._state += self.calculate_delta()
             self.async_schedule_update_ha_state()

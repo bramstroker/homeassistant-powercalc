@@ -1,5 +1,4 @@
 from collections.abc import Callable, Coroutine, Iterable, Iterator
-import decimal
 from decimal import Decimal
 from functools import wraps
 import logging
@@ -26,6 +25,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
+from custom_components.powercalc.unit import parse_decimal
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,20 +38,19 @@ def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
     if isinstance(power, Decimal):
         return power
 
-    try:
-        if isinstance(power, Template):
-            try:
-                power = power.async_render()
-            except TemplateError as ex:
-                _LOGGER.error("Could not render power template %s: %s", power, ex)
-                return None
-            if power == "unknown":
-                return None
+    if isinstance(power, Template):
+        try:
+            power = power.async_render()
+        except TemplateError as ex:
+            _LOGGER.error("Could not render power template %s: %s", power, ex)
+            return None
+        if power == "unknown":
+            return None
 
-        return Decimal(power)  # type: ignore[arg-type]
-    except decimal.DecimalException, ValueError:
+    if (result := parse_decimal(power)) is None:
         _LOGGER.error("Could not convert power value %s to decimal", power)
         return None
+    return result
 
 
 def get_library_path(sub_path: str = "") -> str:
