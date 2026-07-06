@@ -13,7 +13,6 @@ from homeassistant.const import (
     UnitOfEnergy,
 )
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
-import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import ConfigType
@@ -32,7 +31,6 @@ from custom_components.powercalc.const import (
     DOMAIN,
     DOMAIN_CONFIG,
 )
-from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.unit import convert_to_decimal, parse_decimal
 
 from .abstract import (
@@ -40,7 +38,7 @@ from .abstract import (
     generate_cost_sensor_entity_id,
     generate_cost_sensor_name,
 )
-from .energy import EnergySensor, RealEnergySensor
+from .energy import EnergySensor, resolve_existing_energy_sensor
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -188,17 +186,7 @@ def create_cost_sensor_for_energy_entity(hass: HomeAssistant, sensor_config: Con
     """
     cost_config = sensor_config.get(CONF_COST, {})
     energy_sensor_id = cost_config.get(CONF_ENERGY_SENSOR_ID) or sensor_config[CONF_ENERGY_SENSOR_ID]
-    entity_entry = er.async_get(hass).async_get(energy_sensor_id)
-    if entity_entry is None:
-        raise SensorConfigurationError(
-            f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
-            "Double check the `energy_sensor_id` setting",
-        )
-    energy_sensor = RealEnergySensor(
-        entity_entry.entity_id,
-        entity_entry.name or entity_entry.original_name,
-        entity_entry.unique_id,
-    )
+    energy_sensor = resolve_existing_energy_sensor(hass, energy_sensor_id)
     # In YAML the name is optional, fall back to the name of the tracked energy sensor.
     name = sensor_config.get(CONF_NAME) or energy_sensor.name
     return create_cost_sensor(
