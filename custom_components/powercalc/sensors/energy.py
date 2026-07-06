@@ -80,6 +80,17 @@ def create_energy_sensor(
     return _create_virtual_energy_sensor(hass, sensor_config, power_sensor, source_entity)
 
 
+def resolve_existing_energy_sensor(hass: HomeAssistant, energy_sensor_id: str) -> RealEnergySensor:
+    """Look up an existing energy sensor in the entity registry, raising when not found."""
+    entity_entry = er.async_get(hass).async_get(energy_sensor_id)
+    if entity_entry is None:
+        raise SensorConfigurationError(
+            f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
+            "Double check the `energy_sensor_id` setting",
+        )
+    return RealEnergySensor.from_registry_entry(entity_entry)
+
+
 def _get_existing_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
@@ -88,19 +99,7 @@ def _get_existing_energy_sensor(
     if CONF_ENERGY_SENSOR_ID not in sensor_config:
         return None
 
-    ent_reg = er.async_get(hass)
-    energy_sensor_id = sensor_config[CONF_ENERGY_SENSOR_ID]
-    entity_entry = ent_reg.async_get(energy_sensor_id)
-    if entity_entry is None:
-        raise SensorConfigurationError(
-            f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
-            "Double check `energy_sensor_id` setting",
-        )
-    return RealEnergySensor(
-        entity_entry.entity_id,
-        entity_entry.name or entity_entry.original_name,
-        entity_entry.unique_id,
-    )
+    return resolve_existing_energy_sensor(hass, sensor_config[CONF_ENERGY_SENSOR_ID])
 
 
 def _get_related_energy_sensor(
@@ -227,12 +226,7 @@ def _find_related_real_energy_sensor(
     if not energy_sensors:
         return None
 
-    entity_entry = energy_sensors[0]
-    return RealEnergySensor(
-        entity_entry.entity_id,
-        entity_entry.name or entity_entry.original_name,
-        entity_entry.unique_id,
-    )
+    return RealEnergySensor.from_registry_entry(energy_sensors[0])
 
 
 class EnergySensor(BaseEntity):
@@ -364,6 +358,11 @@ class RealEnergySensor(EnergySensor):
         self.entity_id = entity_id
         self._name = name
         self._unique_id = unique_id
+
+    @classmethod
+    def from_registry_entry(cls, entry: er.RegistryEntry) -> RealEnergySensor:
+        """Create a reference to an existing energy sensor from its registry entry."""
+        return cls(entry.entity_id, entry.name or entry.original_name, entry.unique_id)
 
     @property
     def name(self) -> str | None:
