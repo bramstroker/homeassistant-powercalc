@@ -2,6 +2,7 @@ from datetime import timedelta
 import logging
 from unittest.mock import patch
 
+from freezegun.api import FrozenDateTimeFactory
 from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -528,3 +529,48 @@ async def test_outlier_filtering(hass: HomeAssistant, caplog: pytest.LogCaptureF
         ],
     )
     assert "Rejecting power value 7000000 as outlier for energy integration" in caplog.text
+
+
+async def test_outlier_filtering_does_not_leak_energy(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """Regression test for https://github.com/bramstroker/homeassistant-powercalc/issues/4279.
+
+    With the default `left` Riemann integration method the harmful contribution of an outlier
+    is not on its own state change (it becomes the new_state), but on the *following* state
+    change when it acts as the old_state. Ensure the spike never leaks into the energy total.
+    """
+    caplog.set_level(logging.DEBUG)
+
+    power_sensor_id = "sensor.test_power"
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_POWER_SENSOR_ID: power_sensor_id,
+            CONF_ENERGY_FILTER_OUTLIER_ENABLED: True,
+        },
+    )
+
+    async def advance_and_set(value: str) -> None:
+        freezer.tick(timedelta(seconds=15))
+        await set_states(hass, [(power_sensor_id, value, {ATTR_UNIT_OF_MEASUREMENT: "W"})])
+
+    # Warm up the filter with a stable but slightly varied ~4W baseline (non-zero MAD)
+    for value in ["4.4", "4.1", "4.6", "4.2", "4.5", "4.4", "4.5", "4.1", "4.0", "4.2"]:
+        await advance_and_set(value)
+
+    energy_before = float(hass.states.get("sensor.test_energy").state)
+
+    # Spike to an unrealistic value and back to the baseline
+    await advance_and_set("6553.5")
+    await advance_and_set("4.0")
+
+    energy_after = float(hass.states.get("sensor.test_energy").state)
+
+    assert "Rejecting power value 6553.5 as outlier for energy integration" in caplog.text
+    # The spike (6553.5W integrated over 15s ~= 0.027 kWh) must not have leaked into the total.
+    # Only the ~4W baseline over the two intervals (~0.00003 kWh) may have accrued.
+    assert energy_after - energy_before < 0.001
