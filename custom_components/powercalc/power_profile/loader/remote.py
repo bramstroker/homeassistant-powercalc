@@ -191,7 +191,7 @@ class RemoteLoader(Loader):
     @async_cache
     async def find_manufacturers(self, search: str) -> set[str]:
         """Find the manufacturer in the library."""
-        return self.manufacturer_lookup.get(search, set())
+        return self.manufacturer_lookup.get(search.lower(), set())
 
     @async_cache
     async def get_model_listing(
