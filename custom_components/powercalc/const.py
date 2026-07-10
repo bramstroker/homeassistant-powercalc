@@ -14,6 +14,7 @@ from homeassistant.const import (
     STATE_OPEN,
     STATE_STANDBY,
     STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
     EntityCategory,
 )
 
@@ -272,6 +273,7 @@ SERVICE_RELOAD = "reload"
 SIGNAL_POWER_SENSOR_STATE_CHANGE = "powercalc_power_sensor_state_change"
 
 OFF_STATES = {STATE_OFF, STATE_STANDBY, STATE_UNAVAILABLE}
+UNAVAILABLE_STATES = frozenset({STATE_UNAVAILABLE, STATE_UNKNOWN})
 OFF_STATES_BY_DOMAIN: dict[str, set[str]] = {
     cover.DOMAIN: {STATE_CLOSED, STATE_OPEN},
     device_tracker.DOMAIN: {STATE_NOT_HOME},

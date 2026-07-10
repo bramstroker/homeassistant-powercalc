@@ -4,7 +4,6 @@ from decimal import Decimal
 import logging
 
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
@@ -16,6 +15,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_FACTOR,
     CONF_VOLTAGE,
     OFF_STATES,
+    UNAVAILABLE_STATES,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.helpers import get_related_entity_by_device_class
@@ -68,7 +68,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
         if current_state is None:
             return None
 
-        if current_state.state in [STATE_UNAVAILABLE, STATE_UNKNOWN]:
+        if current_state.state in UNAVAILABLE_STATES:
             _LOGGER.warning(
                 "%s: Estimated current entity %s is not available",
                 self._light_entity.entity_id,

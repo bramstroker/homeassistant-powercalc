@@ -399,10 +399,14 @@ async def _async_setup_entities(
     # `async_added_to_hass` will not be called, so BaseEntity cannot repair registry metadata.
     # This causes the powercalc entity to never be rebound and to stay disabled.
     entity_reg = er.async_get(hass)
-    for entity in entities_to_add:
-        existing_entry = entity_reg.async_get(entity.entity_id)
-        if existing_entry and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE:
-            entities_to_add.remove(entity)
+    entities_to_add = [
+        entity
+        for entity in entities_to_add
+        if not (
+            (existing_entry := entity_reg.async_get(entity.entity_id))
+            and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE
+        )
+    ]
 
     async_add_entities(entities_to_add)
 
@@ -681,23 +685,21 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
     return sensor_config
 
 
+GROUP_DISCOVERY_TYPES = {
+    PowercalcDiscoveryType.DOMAIN_GROUP: GroupType.DOMAIN,
+    PowercalcDiscoveryType.STANDBY_GROUP: GroupType.STANDBY,
+}
+
+
 def convert_discovery_info_to_sensor_config(
     discovery_info: DiscoveryInfoType,
 ) -> ConfigType:
     """Convert discovery info to sensor config."""
-    if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP:
-        config = discovery_info
-        config[CONF_GROUP_TYPE] = GroupType.DOMAIN
-        config[CONF_SENSOR_TYPE] = SensorType.GROUP
-        config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
-        return config
-
-    if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.STANDBY_GROUP:
-        config = discovery_info
-        config[CONF_GROUP_TYPE] = GroupType.STANDBY
-        config[CONF_SENSOR_TYPE] = SensorType.GROUP
-        config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
-        return config
+    group_type = GROUP_DISCOVERY_TYPES.get(discovery_info[DISCOVERY_TYPE])
+    if group_type:
+        discovery_info[CONF_GROUP_TYPE] = group_type
+        discovery_info[CONF_SENSOR_TYPE] = SensorType.GROUP
+        discovery_info[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
     return discovery_info
 

@@ -11,8 +11,6 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDevic
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
-    STATE_UNAVAILABLE,
-    STATE_UNKNOWN,
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
@@ -40,6 +38,7 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_SENSOR_PRECISION,
     DEFAULT_ENERGY_UPDATE_INTERVAL,
+    UNAVAILABLE_STATES,
     UnitPrefix,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
@@ -60,7 +59,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def _numeric_state_value(state: State | None) -> float | None:
     """Return the numeric value of a state, or None when it is not a usable number."""
-    if state is None or state.state in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+    if state is None or state.state in UNAVAILABLE_STATES:
         return None
     try:
         return float(state.state)

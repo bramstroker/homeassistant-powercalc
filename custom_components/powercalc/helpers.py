@@ -200,14 +200,6 @@ def _resolve_related_entity_by_device_class(
     return get_related_entity_by_device_class(hass, source_entity, device_class)
 
 
-def _resolve_related_entity_by_translation_key(
-    hass: HomeAssistant,
-    source_entity: SourceEntity,
-    translation_key: str,
-) -> str | None:
-    return get_related_entity_by_translation_key(hass, source_entity, translation_key)
-
-
 RELATED_ENTITY_PLACEHOLDER_DEFINITIONS = (
     RelatedEntityPlaceholderDefinition(
         PLACEHOLDER_ENTITY_BY_DEVICE_CLASS,
@@ -217,7 +209,11 @@ RELATED_ENTITY_PLACEHOLDER_DEFINITIONS = (
     RelatedEntityPlaceholderDefinition(
         PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
         "translation key",
-        _resolve_related_entity_by_translation_key,
+        lambda hass, source_entity, translation_key: get_related_entity_by_translation_key(
+            hass,
+            source_entity,
+            translation_key,
+        ),
     ),
 )
 

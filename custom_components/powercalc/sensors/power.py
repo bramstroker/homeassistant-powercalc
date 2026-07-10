@@ -76,7 +76,6 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
-    DATA_DISCOVERY_MANAGER,
     DATA_POWER_PROFILE_SOURCES,
     DATA_POWER_PROFILES,
     DATA_STANDBY_POWER_SENSORS,
@@ -87,10 +86,11 @@ from custom_components.powercalc.const import (
     OFF_STATES,
     OFF_STATES_BY_DOMAIN,
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
+    UNAVAILABLE_STATES,
     CalculationStrategy,
     PowerProfileSource,
 )
-from custom_components.powercalc.discovery import DiscoveryManager
+from custom_components.powercalc.discovery import get_discovery_manager
 from custom_components.powercalc.errors import (
     ModelNotSupportedError,
     StrategyConfigurationError,
@@ -238,7 +238,7 @@ async def _get_power_profile(
     source_entity: SourceEntity,
 ) -> PowerProfile | None:
     """Retrieve the power profile based on auto-discovery or manual configuration."""
-    discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+    discovery_manager = get_discovery_manager(hass)
     if is_manually_configured(sensor_config):
         return None
 
@@ -649,7 +649,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         if self.source_entity == DUMMY_ENTITY_ID:
             return True
 
-        return self._ignore_unavailable_state or state.state not in [STATE_UNAVAILABLE, STATE_UNKNOWN]
+        return self._ignore_unavailable_state or state.state not in UNAVAILABLE_STATES
 
     async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
