@@ -152,7 +152,7 @@ async def test_migrate_config_entry_version_5(hass: HomeAssistant) -> None:
             CONF_ENABLE_AUTODISCOVERY_DEPRECATED: False,
         },
         version=4,
-        entry_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        unique_id=ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     )
     assert entry.data == {
         CONF_DISCOVERY: {

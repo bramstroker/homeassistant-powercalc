@@ -51,7 +51,7 @@ async def async_migrate_config_entry(hass: HomeAssistant, config_entry: ConfigEn
     if version <= 3:
         _migrate_playbook_trigger(data)
 
-    if version <= 4 and config_entry.entry_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+    if version <= 4 and config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
         _migrate_global_discovery_config(data)
 
     if version <= 5:
