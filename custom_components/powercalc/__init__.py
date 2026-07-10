@@ -461,7 +461,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await async_fix_legacy_profile_config_entry(hass, entry)
     await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR, Platform.SELECT])
-    # await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
 
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
 
