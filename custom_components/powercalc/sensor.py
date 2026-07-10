@@ -3,24 +3,18 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-import copy
 from dataclasses import dataclass, field
-from datetime import timedelta
 import logging
 from typing import Any, cast
 import uuid
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, PLATFORM_SCHEMA, SensorEntity
-from homeassistant.components.utility_meter import max_28_days
-from homeassistant.components.utility_meter.const import METER_TYPES
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorEntity
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
-    CONF_ID,
     CONF_NAME,
-    CONF_PATH,
     CONF_UNIQUE_ID,
 )
 from homeassistant.core import Event, HomeAssistant, SupportsResponse, callback
@@ -35,7 +29,6 @@ from homeassistant.helpers.entity_registry import (
     RegistryEntryDisabler,
 )
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
-from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 import voluptuous as vol
 
@@ -46,71 +39,22 @@ from .common import (
     create_source_entity,
     get_merged_sensor_configuration,
     validate_is_number,
-    validate_name_pattern,
 )
+from .configuration.config_entry_conversion import convert_config_entry_to_sensor_config
+from .configuration.discovery_info import convert_discovery_info_to_sensor_config
+from .configuration.sensor_config import PLATFORM_SCHEMA as PLATFORM_SCHEMA
 from .const import (
-    CONF_AND,
-    CONF_AVAILABILITY_ENTITY,
-    CONF_CALCULATION_ENABLED_CONDITION,
-    CONF_COMPOSITE,
     CONF_COST,
-    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
-    CONF_CREATE_UTILITY_METERS,
-    CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DAILY_FIXED_ENERGY,
-    CONF_DELAY,
-    CONF_DISABLE_STANDBY_POWER,
-    CONF_ENERGY_FILTER_OUTLIER_ENABLED,
-    CONF_ENERGY_FILTER_OUTLIER_MAX,
-    CONF_ENERGY_INTEGRATION_METHOD,
-    CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
-    CONF_ENERGY_SENSOR_NAMING,
-    CONF_ENERGY_SENSOR_UNIT_PREFIX,
-    CONF_FILTER,
-    CONF_FIXED,
-    CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
-    CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_TYPE,
-    CONF_HIDE_MEMBERS,
-    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
-    CONF_LINEAR,
-    CONF_MANUFACTURER,
-    CONF_MODE,
-    CONF_MODEL,
-    CONF_MULTI_SWITCH,
-    CONF_MULTIPLY_FACTOR,
-    CONF_MULTIPLY_FACTOR_STANDBY,
-    CONF_NOT,
-    CONF_ON_TIME,
-    CONF_OR,
-    CONF_PLAYBOOK,
-    CONF_PLAYBOOKS,
-    CONF_POWER,
-    CONF_POWER_SENSOR_CATEGORY,
-    CONF_POWER_SENSOR_ID,
-    CONF_POWER_SENSOR_NAMING,
-    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
-    CONF_SLEEP_POWER,
-    CONF_STANDBY_POWER,
-    CONF_STATE,
-    CONF_STATES_POWER,
-    CONF_SUBTRACT_ENTITIES,
-    CONF_UNAVAILABLE_POWER,
-    CONF_UTILITY_METER_NET_CONSUMPTION,
-    CONF_UTILITY_METER_OFFSET,
-    CONF_UTILITY_METER_TARIFFS,
-    CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
-    CONF_VALUE_TEMPLATE,
-    CONF_VARIABLES,
-    CONF_WLED,
     DATA_CONFIG_TYPES,
     DATA_CONFIGURED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
@@ -124,8 +68,6 @@ from .const import (
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
-    ENERGY_INTEGRATION_METHODS,
-    ENTITY_CATEGORIES,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
@@ -141,12 +83,10 @@ from .const import (
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
     SERVICE_SWITCH_SUB_PROFILE,
-    CalculationStrategy,
     EntityType,
     GroupType,
     PowercalcDiscoveryType,
     SensorType,
-    UnitPrefix,
 )
 from .device_binding import attach_entities_to_resolved_device
 from .errors import (
@@ -154,11 +94,10 @@ from .errors import (
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
-from .group_include.filter import FILTER_CONFIG, FilterOperator, create_composite_filter
+from .group_include.filter import FilterOperator, create_composite_filter
 from .group_include.include import find_entities
 from .sensors.cost import CostSensor, create_cost_sensor_for_energy_entity
 from .sensors.daily_energy import (
-    DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
@@ -169,117 +108,8 @@ from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
 from .sensors.group.standby import StandbyPowerSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
-from .strategy.composite import CONFIG_SCHEMA as COMPOSITE_SCHEMA
-from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
-from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
-from .strategy.multi_switch import CONFIG_SCHEMA as MULTI_SWITCH_SCHEMA
-from .strategy.playbook import CONFIG_SCHEMA as PLAYBOOK_SCHEMA
-from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
-
-MAX_GROUP_NESTING_LEVEL = 5
-
-SENSOR_CONFIG = {
-    vol.Optional(CONF_NAME): cv.string,
-    vol.Optional(CONF_ENTITY_ID): cv.entity_id,
-    vol.Optional(CONF_AVAILABILITY_ENTITY): cv.entity_id,
-    vol.Optional(CONF_UNIQUE_ID): cv.string,
-    vol.Optional(CONF_MODEL): cv.string,
-    vol.Optional(CONF_MANUFACTURER): cv.string,
-    vol.Optional(CONF_MODE): vol.In([cls.value for cls in CalculationStrategy]),
-    vol.Optional(CONF_STANDBY_POWER): vol.Any(vol.Coerce(float), cv.template),
-    vol.Optional(CONF_DISABLE_STANDBY_POWER): cv.boolean,
-    vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
-    vol.Optional(CONF_POWER_SENSOR_ID): cv.entity_id,
-    vol.Optional(CONF_COST): vol.Schema({vol.Required(CONF_ENERGY_SENSOR_ID): cv.entity_id}),
-    vol.Optional(CONF_FORCE_ENERGY_SENSOR_CREATION): cv.boolean,
-    vol.Optional(CONF_FORCE_CALCULATE_GROUP_ENERGY): cv.boolean,
-    vol.Optional(CONF_FIXED): FIXED_SCHEMA,
-    vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
-    vol.Optional(CONF_MULTI_SWITCH): MULTI_SWITCH_SCHEMA,
-    vol.Optional(CONF_WLED): WLED_SCHEMA,
-    vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
-    vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
-    vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
-    vol.Optional(CONF_CREATE_COST_SENSOR): cv.boolean,
-    vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
-    vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION): cv.boolean,
-    vol.Optional(CONF_UTILITY_METER_TARIFFS): vol.All(cv.ensure_list, [cv.string]),
-    vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
-    vol.Optional(CONF_UTILITY_METER_OFFSET): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
-    vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
-    vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY): cv.boolean,
-    vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
-    vol.Optional(CONF_POWER_SENSOR_CATEGORY): vol.In(ENTITY_CATEGORIES),
-    vol.Optional(CONF_ENERGY_SENSOR_ID): cv.entity_id,
-    vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
-    vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): vol.In(ENTITY_CATEGORIES),
-    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(ENERGY_INTEGRATION_METHODS),
-    vol.Optional(CONF_ENERGY_FILTER_OUTLIER_ENABLED): cv.boolean,
-    vol.Optional(CONF_ENERGY_FILTER_OUTLIER_MAX): cv.positive_int,
-    vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): vol.In([cls.value for cls in UnitPrefix]),
-    vol.Optional(CONF_CREATE_GROUP): cv.string,
-    vol.Optional(CONF_GROUP_ENERGY_START_AT_ZERO): cv.boolean,
-    vol.Optional(CONF_GROUP_TYPE): vol.In([cls.value for cls in GroupType]),
-    vol.Optional(CONF_SUBTRACT_ENTITIES): vol.All(cv.ensure_list, [cv.entity_id]),
-    vol.Optional(CONF_HIDE_MEMBERS): cv.boolean,
-    vol.Optional(CONF_INCLUDE): vol.Schema(
-        {
-            **FILTER_CONFIG.schema,
-            vol.Optional(CONF_FILTER): vol.Schema(
-                {
-                    **FILTER_CONFIG.schema,
-                    vol.Optional(CONF_OR): vol.All(cv.ensure_list, [FILTER_CONFIG]),
-                    vol.Optional(CONF_AND): vol.All(cv.ensure_list, [FILTER_CONFIG]),
-                    vol.Optional(CONF_NOT): vol.All(cv.ensure_list, [FILTER_CONFIG]),
-                },
-            ),
-            vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): cv.boolean,
-        },
-    ),
-    vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
-    vol.Optional(CONF_CALCULATION_ENABLED_CONDITION): cv.template,
-    vol.Optional(CONF_SLEEP_POWER): vol.Schema(
-        {
-            vol.Required(CONF_POWER): vol.Coerce(float),
-            vol.Required(CONF_DELAY): cv.positive_int,
-        },
-    ),
-    vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
-    vol.Optional(CONF_COMPOSITE): COMPOSITE_SCHEMA,
-    vol.Optional(CONF_VARIABLES): vol.Schema({cv.string: cv.string}),
-}
-
-
-def build_nested_configuration_schema(schema: dict, iteration: int = 0) -> dict:
-    if iteration == MAX_GROUP_NESTING_LEVEL:
-        return schema
-    iteration += 1
-    schema.update(
-        {
-            vol.Optional(CONF_ENTITIES): vol.All(
-                cv.ensure_list,
-                [build_nested_configuration_schema(schema.copy(), iteration)],
-            ),
-        },
-    )
-    return schema
-
-
-SENSOR_CONFIG = build_nested_configuration_schema(SENSOR_CONFIG)
-
-PLATFORM_SCHEMA = vol.All(
-    cv.has_at_least_one_key(
-        CONF_ENTITY_ID,
-        CONF_POWER_SENSOR_ID,
-        CONF_ENTITIES,
-        CONF_INCLUDE,
-        CONF_DAILY_FIXED_ENERGY,
-        CONF_COST,
-    ),
-    PLATFORM_SCHEMA.extend(SENSOR_CONFIG),
-)
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -583,125 +413,6 @@ def register_entity_services() -> None:
         "debug_group",
         supports_response=SupportsResponse.ONLY,
     )
-
-
-def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeAssistant) -> ConfigType:  # noqa: C901
-    """Convert the config entry structure to the sensor config used to create the entities."""
-    sensor_config = dict(config_entry.data.copy())
-    sensor_type = sensor_config.get(CONF_SENSOR_TYPE)
-
-    def handle_sensor_type() -> None:
-        """Handle sensor type-specific configuration."""
-        if sensor_type == SensorType.GROUP:
-            sensor_config[CONF_CREATE_GROUP] = sensor_config.get(CONF_NAME)
-        elif sensor_type == SensorType.REAL_POWER:
-            sensor_config[CONF_POWER_SENSOR_ID] = sensor_config.get(CONF_ENTITY_ID)
-            sensor_config[CONF_FORCE_ENERGY_SENSOR_CREATION] = True
-
-    def process_template(config: dict, template_key: str, target_key: str) -> None:
-        """Convert a template key in the config to a Template object."""
-        if template_key in config:
-            config[target_key] = Template(config[template_key], hass)
-            del config[template_key]
-
-    def process_on_time(config: dict) -> None:
-        """Convert on_time dictionary to timedelta."""
-        on_time = config.get(CONF_ON_TIME)
-        config[CONF_ON_TIME] = (
-            timedelta(hours=on_time["hours"], minutes=on_time["minutes"], seconds=on_time["seconds"])
-            if on_time
-            else timedelta(days=1)
-        )
-
-    def process_states_power(states_power: dict | list) -> dict:
-        """Convert state power values to Template objects where necessary.
-
-        Handles both dict format (legacy/YAML) and list format (config flow).
-        """
-        if isinstance(states_power, list):
-            states_power = {item[CONF_STATE]: item[CONF_POWER] for item in states_power}
-        return {
-            key: Template(value, hass) if isinstance(value, str) and "{{" in value else value
-            for key, value in states_power.items()
-        }
-
-    def process_daily_fixed_energy() -> None:
-        """Process daily fixed energy configuration."""
-        if CONF_DAILY_FIXED_ENERGY not in sensor_config:
-            return
-
-        daily_fixed_config = copy.copy(sensor_config[CONF_DAILY_FIXED_ENERGY])
-        process_template(daily_fixed_config, CONF_VALUE_TEMPLATE, CONF_VALUE)
-        process_on_time(daily_fixed_config)
-        sensor_config[CONF_DAILY_FIXED_ENERGY] = daily_fixed_config
-
-    def process_fixed_config() -> None:
-        """Process fixed energy configuration."""
-        if CONF_FIXED not in sensor_config:
-            return
-
-        fixed_config = copy.copy(sensor_config[CONF_FIXED])
-        process_template(fixed_config, CONF_POWER_TEMPLATE, CONF_POWER)
-        if CONF_STATES_POWER in fixed_config:
-            fixed_config[CONF_STATES_POWER] = process_states_power(fixed_config[CONF_STATES_POWER])
-        sensor_config[CONF_FIXED] = fixed_config
-
-    def process_linear_config() -> None:
-        """Process linear energy configuration."""
-        if CONF_LINEAR not in sensor_config:
-            return
-
-        linear_config = copy.copy(sensor_config[CONF_LINEAR])
-        sensor_config[CONF_LINEAR] = linear_config
-
-    def process_calculation_enabled_condition() -> None:
-        """Process calculation enabled condition template."""
-        if CONF_CALCULATION_ENABLED_CONDITION in sensor_config:
-            sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = Template(
-                sensor_config[CONF_CALCULATION_ENABLED_CONDITION],
-                hass,
-            )
-
-    def process_utility_meter_offset() -> None:
-        if CONF_UTILITY_METER_OFFSET in sensor_config:
-            sensor_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=sensor_config[CONF_UTILITY_METER_OFFSET])
-
-    def process_playbook_config() -> None:
-        if CONF_PLAYBOOK not in sensor_config:
-            return
-        playbook_config = copy.copy(sensor_config[CONF_PLAYBOOK])
-        playbook_config[CONF_PLAYBOOKS] = {item[CONF_ID]: item[CONF_PATH] for item in playbook_config[CONF_PLAYBOOKS]}
-        sensor_config[CONF_PLAYBOOK] = playbook_config
-
-    handle_sensor_type()
-
-    process_daily_fixed_energy()
-    process_fixed_config()
-    process_linear_config()
-    process_playbook_config()
-    process_calculation_enabled_condition()
-    process_utility_meter_offset()
-
-    return sensor_config
-
-
-GROUP_DISCOVERY_TYPES = {
-    PowercalcDiscoveryType.DOMAIN_GROUP: GroupType.DOMAIN,
-    PowercalcDiscoveryType.STANDBY_GROUP: GroupType.STANDBY,
-}
-
-
-def convert_discovery_info_to_sensor_config(
-    discovery_info: DiscoveryInfoType,
-) -> ConfigType:
-    """Convert discovery info to sensor config."""
-    group_type = GROUP_DISCOVERY_TYPES.get(discovery_info[DISCOVERY_TYPE])
-    if group_type:
-        discovery_info[CONF_GROUP_TYPE] = group_type
-        discovery_info[CONF_SENSOR_TYPE] = SensorType.GROUP
-        discovery_info[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
-
-    return discovery_info
 
 
 async def create_sensors(

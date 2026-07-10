@@ -37,6 +37,7 @@ from .configuration.global_config import (
     FLAG_HAS_GLOBAL_GUI_CONFIG,
     get_global_configuration,
 )
+from .configuration.sensor_config import SENSOR_CONFIG
 from .const import (
     CONF_COST_SENSOR_FRIENDLY_NAMING,
     CONF_COST_SENSOR_NAMING,
@@ -108,7 +109,6 @@ from .const import (
 from .discovery import DiscoveryManager, DiscoveryStatus, get_discovery_manager
 from .migrate import async_fix_legacy_profile_config_entry, async_migrate_config_entry
 from .power_profile.power_profile import DeviceType
-from .sensor import SENSOR_CONFIG
 from .sensors.group.config_entry_utils import (
     get_entries_excluding_global_config,
     get_entries_having_subgroup,
@@ -128,6 +128,7 @@ DISCOVERY_SCHEMA = vol.Schema(
         vol.Optional(CONF_EXCLUDE_SELF_USAGE): cv.boolean,
     },
 )
+
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(DOMAIN, default=dict): vol.All(
