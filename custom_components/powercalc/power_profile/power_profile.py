@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Mapping
+from copy import deepcopy
 from dataclasses import dataclass
 from enum import StrEnum
 import logging
@@ -131,7 +132,8 @@ class PowerProfile:
         self._model = model.replace("#slash#", "/")
         self._hass = hass
         self._directory = directory
-        self._json_data = json_data
+        self._base_json_data = deepcopy(json_data)
+        self._json_data = deepcopy(json_data)
         self.sub_profile: str | None = None
         self._sub_profile_dir: str | None = None
         self._sub_profiles = sub_profiles or []
@@ -411,7 +413,8 @@ class PowerProfile:
         self._sub_profile_dir = os.path.join(self._directory, sub_profile)
         _LOGGER.debug("Loading sub profile: %s", sub_profile)
 
-        self._json_data.update(found_profile)
+        self._json_data = deepcopy(self._base_json_data)
+        self._json_data.update(deepcopy(found_profile))
 
         self.sub_profile = sub_profile
 
