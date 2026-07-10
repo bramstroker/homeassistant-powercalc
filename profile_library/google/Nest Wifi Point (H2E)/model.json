@@ -2,7 +2,6 @@
   "aliases": [
     "Nest Wifi point"
   ],
-  "author": "Bob Shaker <bobshaker1@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2026-01-21T21:30:47Z",

@@ -32,10 +32,6 @@
       },
       "description": "List of compatible integrations for this model"
     },
-    "author": {
-      "type": "string",
-      "deprecated": true
-    },
     "author_info": {
       "type": "object",
       "description": "Info about the contributor of the profile",

@@ -4,7 +4,6 @@
     "SNPL-00112EU",
     "SNPL-10112EU"
   ],
-  "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2024-12-01T18:36:00Z",
   "device_type": "smart_switch",

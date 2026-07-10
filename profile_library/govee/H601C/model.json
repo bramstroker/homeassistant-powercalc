@@ -1,5 +1,4 @@
 {
-  "author": "Brian Egge <brianegge@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-09-29T02:06:51Z",
   "device_type": "light",

@@ -1,5 +1,4 @@
 {
-  "author": "Dieter <dieter.kuhn@koeln.de>",
   "calculation_strategy": "lut",
   "created_at": "2023-04-29T09:47:02Z",
   "device_type": "light",

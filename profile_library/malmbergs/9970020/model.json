@@ -1,5 +1,4 @@
 {
-  "author": "Magnus Larsson <maglars2@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2022-08-02T08:35:28Z",
   "device_type": "light",

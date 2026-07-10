@@ -4,7 +4,6 @@
     "9290022691",
     "LCL006"
   ],
-  "author": "KrzysztofHajdamowicz <uosiumen@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2022-03-29T12:17:41Z",
   "device_type": "light",

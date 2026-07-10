@@ -1,5 +1,4 @@
 {
-  "author": "Thorsten Niemann <ThorstenNiemann.TN@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2026-02-12T15:06:00Z",
   "device_type": "generic_iot",

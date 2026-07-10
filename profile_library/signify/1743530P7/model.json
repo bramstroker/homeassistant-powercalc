@@ -3,7 +3,6 @@
     "17435/30/P7",
     "9150057314"
   ],
-  "author": "Marc Geurts <geurtsmarc@hotmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2023-02-12T12:11:40Z",
   "device_type": "light",

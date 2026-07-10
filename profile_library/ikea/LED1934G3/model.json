@@ -3,7 +3,6 @@
     "TRADFRIbulbE27WWclear250lm",
     "LED1934G3_E27"
   ],
-  "author": "Linus <linus.nordin@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2022-07-10T21:08:46Z",
   "device_type": "light",

@@ -3,7 +3,6 @@
     "ASKVADER",
     "On/Off plug (ASKVADER on/off switch)"
   ],
-  "author": "confucius78 <dekker.wj@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2023-12-31T20:16:31Z",
   "device_type": "smart_switch",

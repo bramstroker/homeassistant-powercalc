@@ -2,7 +2,6 @@
   "aliases": [
     "ORMANAS LED Strip"
   ],
-  "author": "Marius <33354141+Mariusthvdb@users.noreply.github.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-11-09T00:06:13Z",
   "device_type": "light",

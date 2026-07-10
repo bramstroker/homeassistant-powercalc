@@ -2,7 +2,6 @@
   "aliases": [
     "SHIX3-1"
   ],
-  "author": "Michal Bartak <maxym.srpl@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2026-01-09T22:55:00Z",
   "device_type": "generic_iot",

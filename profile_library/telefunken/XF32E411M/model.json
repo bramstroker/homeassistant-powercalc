@@ -1,5 +1,4 @@
 {
-  "author": "Justin Hahn <justin.hahn@live.com>",
   "calculation_enabled_condition": "{{not is_state('[[entity]]', 'unavailable') }}",
   "calculation_strategy": "linear",
   "config_flow_sub_profile_remarks": "Select a profile based on your picture settings. These apply only to picture default profiles, customized profiles may differ.\nSwitching Sat channels lowers power by ~5W for 2-3 seconds, which Powercalc cannot account for.Thus, this profile is not recommended for Sat use. Other tuners were not tested.\nUSB devices can increase TV power consumption by up to 7W.",

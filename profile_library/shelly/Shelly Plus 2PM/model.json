@@ -6,7 +6,6 @@
     "Plus 2PM UL",
     "SNSW-002P15UL"
   ],
-  "author": "Michal Bartak <maxym.srpl@gmail.com>",
   "calculation_strategy": "multi_switch",
   "created_at": "2025-01-12T21:46:00Z",
   "device_type": "smart_switch",

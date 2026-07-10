@@ -1,5 +1,4 @@
 {
-  "author": "bramstroker <bgerritsen@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-12-08T10:13:50Z",
   "device_type": "light",

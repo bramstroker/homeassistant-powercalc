@@ -2,7 +2,6 @@
   "aliases": [
     "SHRGB"
   ],
-  "author": "Mike Debney <mike.debney@outlook.com>",
   "calculation_strategy": "lut",
   "created_at": "2025-11-08T06:11:27Z",
   "device_type": "light",

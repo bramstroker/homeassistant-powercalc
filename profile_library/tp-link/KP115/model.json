@@ -3,7 +3,6 @@
     "KP115(AU)",
     "KP115(US)"
   ],
-  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2022-09-06T08:26:19Z",
   "device_type": "smart_switch",

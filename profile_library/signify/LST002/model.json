@@ -2,7 +2,6 @@
   "aliases": [
     "915005106701"
   ],
-  "author": "Simon Hörrle",
   "calculation_strategy": "lut",
   "created_at": "2021-09-10T20:49:41Z",
   "device_type": "light",

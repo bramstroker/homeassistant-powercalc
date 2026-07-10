@@ -2,7 +2,6 @@
   "aliases": [
     "HS300(US)"
   ],
-  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "multi_switch",
   "created_at": "2025-09-08T09:20:48Z",
   "device_type": "smart_switch",

@@ -1,5 +1,4 @@
 {
-  "author": "CV",
   "calculation_strategy": "lut",
   "config_flow_discovery_remarks": "This device has separate light entities for the RGB ring and the white center light. You will be prompted to select a sub-profile. Choose the one according to the entity_id presented at that time.\nThe standby power of the device is 0.36W but divided between both light equally at this moment due to no better solutions (2025-01-27). If you only setup one light you need to correct the value yourself.",
   "created_at": "2025-01-18T11:56:26Z",

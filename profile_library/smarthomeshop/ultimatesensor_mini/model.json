@@ -1,5 +1,4 @@
 {
-  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2026-01-18T11:38:00Z",
   "device_type": "generic_iot",

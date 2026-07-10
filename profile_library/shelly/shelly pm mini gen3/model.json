@@ -2,7 +2,6 @@
   "aliases": [
     "S3PM-001PCEU16"
   ],
-  "author": "RubenKelevra <cyrond@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2024-12-01T16:51:00Z",
   "device_type": "power_meter",
