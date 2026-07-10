@@ -17,7 +17,7 @@ from homeassistant.helpers.storage import STORAGE_DIR
 from homeassistant.loader import async_get_integration
 
 from custom_components.powercalc.const import API_URL, BUILT_IN_LIBRARY_DIR, DOMAIN
-from custom_components.powercalc.helpers import async_cache
+from custom_components.powercalc.helpers import async_cache, clear_async_cache
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy
@@ -66,6 +66,7 @@ class RemoteLoader(Loader):
         integration = await async_get_integration(self.hass, DOMAIN)
         powercalc_version = AwesomeVersion(str(integration.version))
 
+        self._clear_caches()
         self.library_contents = await self.load_library_json()
         self.profile_hashes = await self.hass.async_add_executor_job(self._load_profile_hashes)
 
@@ -122,6 +123,15 @@ class RemoteLoader(Loader):
 
             self.manufacturer_models[manufacturer_name] = kept_models
             self.model_lookup[manufacturer_name] = lookup
+
+    def _clear_caches(self) -> None:
+        """Clear cached lookups backed by mutable library state."""
+        clear_async_cache(self.get_manufacturer_listing)
+        clear_async_cache(self.find_manufacturers)
+        clear_async_cache(self.get_model_listing)
+        clear_async_cache(self.find_model)
+        clear_async_cache(self.find_model_migration)
+        clear_async_cache(self.load_model)
 
     async def load_library_json(self) -> dict[str, Any]:
         """Load library.json file"""

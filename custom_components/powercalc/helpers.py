@@ -3,7 +3,7 @@ from functools import wraps
 import logging
 import os.path
 import re
-from typing import Any, NamedTuple, TypeVar
+from typing import Any, NamedTuple, TypeVar, cast
 import uuid
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
@@ -112,7 +112,16 @@ def async_cache[R](func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[...,
         cache[cache_key] = result
         return result
 
+    cast(Any, wrapper).cache_clear = cache.clear
     return wrapper
+
+
+def clear_async_cache(func: Callable[..., Coroutine[Any, Any, Any]]) -> None:
+    """Clear a function wrapped with async_cache."""
+    target = getattr(func, "__func__", func)
+    cache_clear = getattr(target, "cache_clear", None)
+    if callable(cache_clear):
+        cache_clear()
 
 
 def collect_placeholders(data: list | str | dict[str, Any]) -> set[str]:
