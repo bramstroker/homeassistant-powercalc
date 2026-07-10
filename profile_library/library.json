@@ -7371,10 +7371,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "c34caadbf951200d0de868c446a98aa8"
+          "hash": "95a7bbf61c9a3ef1a371fb053e9f73e5"
         },
         {
           "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>",
@@ -7616,10 +7616,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "51d5604db5bcc0cfe27d387cb02d4279"
+          "hash": "758f8e15877c02a17d1cddd1b33c3eeb"
         },
         {
           "aliases": [
@@ -7763,10 +7763,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "1ff6a702a7a874b460c91d8928583ee4"
+          "hash": "2ae12e0d5a18a515556c27f9e9778cd7"
         },
         {
           "aliases": [
@@ -9218,10 +9218,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "a12e0dc5b993953d8ea52016dac393b1"
+          "hash": "36c33360d2d09b944d362960140acda7"
         },
         {
           "aliases": [
@@ -9819,10 +9819,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "9340a4f180443bbb316ddbb5690b7ba3"
+          "hash": "464fd382058d7e9be65a1ea0e60fbf80"
         },
         {
           "aliases": [],
@@ -10048,10 +10048,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "bf84bd664c38e25ebb9190f427ea7030"
+          "hash": "823658863038110c6a9fa3eb67c2e657"
         },
         {
           "aliases": [
@@ -11381,10 +11381,10 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "hsv",
-            "color_temp"
+            "color_temp",
+            "hsv"
           ],
-          "hash": "9d1982351c156dc4410c730b85fd510e"
+          "hash": "588f2b004db57a238645d53eb907732d"
         },
         {
           "aliases": [
@@ -12138,10 +12138,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "afbbde565fb290d3032408e1589bdcbb"
+          "hash": "8036aa7ef0ea31f5439fa76159fb938c"
         },
         {
           "author": "NotSoBrightReally <98243827+NotSoBrightReally@users.noreply.github.com>",
@@ -18136,10 +18136,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "2a0902ba71dad533840978d9ac24e2ca"
+          "hash": "a28d2fb500e7b8129553eb92959ad787"
         },
         {
           "author": "dsolva <diego_10sv@hotmail.com>",
@@ -18992,10 +18992,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "953b3637b3a77c46dc7513ada8de63cd"
+          "hash": "db0831d14b70b40bd36fea4b21d78f74"
         },
         {
           "author": "Udo Ha\u00df <udo.hass@proton.me>",
@@ -19023,10 +19023,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "ca835c2c050c377470043f69d75e0e45"
+          "hash": "9ee9d851f62f1483b14ca39f34cefe45"
         },
         {
           "author": "sockmonkey0223 <joshua.oswald@gmail.com>",
@@ -19113,10 +19113,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "fc32a8e4378dd50d1ba5f7b508e89fb3"
+          "hash": "e51ce873f4958f34050c38778bb55322"
         },
         {
           "author": "Chris Hallgren <challgren@gmail.com>",
@@ -19203,10 +19203,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "4c36aaae24715c4f9bc1ea0dcf35e520"
+          "hash": "b8ba79c307b90439d3849a26bc5a829e"
         },
         {
           "calculation_strategy": "lut",
@@ -19234,10 +19234,34 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "2ea3e415936623fe485ee433c5d5a8e3"
+          "hash": "d83e25738b3ed996675dabf9b112c0be"
+        },
+        {
+          "calculation_strategy": "lut",
+          "created_at": "2026-06-30T04:03:04Z",
+          "device_type": "light",
+          "measure_device": "shelly",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 1,
+            "VERSION": "v1.21.2:docker"
+          },
+          "name": "Govee ST19 Smart Edison Light Bulb E26",
+          "standby_power": 0.5,
+          "id": "H14C0",
+          "manufacturer": "govee",
+          "updated_at": "2026-07-10T03:05:45",
+          "max_power": 5.25,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "hash": "5dee896115bcb7f51383424366252655"
         },
         {
           "author": "Kenneth Fribert <fribse@gmail.com>",

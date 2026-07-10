@@ -11,5 +11,11 @@
     "VERSION": "v1.21.2:docker"
   },
   "name": "Govee ST19 Smart Edison Light Bulb E26",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author_info": {
+    "name": "Benjamin Pearce",
+    "github": "bcpearce",
+    "email": "admin@bcpearce.com"
+  },
+  "author": "Benjamin Pearce"
 }
