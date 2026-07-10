@@ -96,16 +96,22 @@ def _migrate_playbook_trigger(data: dict) -> None:
 
 
 def _migrate_global_discovery_config(data: dict) -> None:
+    deprecated_keys = [
+        CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
+        CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
+        CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
+    ]
+    # Nothing to convert when there are no legacy keys and the new format is already present;
+    # avoid clobbering an existing discovery config.
+    if not any(key in data for key in deprecated_keys) and CONF_DISCOVERY in data:
+        return
+
     data[CONF_DISCOVERY] = {
         CONF_ENABLED: data.get(CONF_ENABLE_AUTODISCOVERY_DEPRECATED, True),
         CONF_EXCLUDE_DEVICE_TYPES: data.get(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED, []),
         CONF_EXCLUDE_SELF_USAGE: data.get(CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED, False),
     }
-    for key in [
-        CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
-        CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
-        CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
-    ]:
+    for key in deprecated_keys:
         data.pop(key, None)
 
 
