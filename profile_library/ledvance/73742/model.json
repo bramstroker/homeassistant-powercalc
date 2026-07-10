@@ -1,5 +1,4 @@
 {
-  "author": "Mark Atwood <me@mark.atwood.name>",
   "calculation_strategy": "lut",
   "created_at": "2023-02-14T18:41:55Z",
   "device_type": "light",

@@ -2,7 +2,6 @@
   "aliases": [
     "mono1"
   ],
-  "author": "OzGav <gavnosp@hotmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2021-08-31T08:42:26Z",
   "device_type": "light",

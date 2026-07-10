@@ -3,7 +3,6 @@
     "Tuya CS3S/BK7231N",
     "3004154"
   ],
-  "author": "TyzzyT <80623729+TyzzyT@users.noreply.github.com>",
   "calculation_strategy": "lut",
   "created_at": "2023-06-30T08:56:29Z",
   "device_type": "light",

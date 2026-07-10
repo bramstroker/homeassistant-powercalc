@@ -1,5 +1,4 @@
 {
-  "author": "Greg Hesp <greg.hesp@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2025-01-08T16:05:27Z",

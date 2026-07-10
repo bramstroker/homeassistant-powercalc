@@ -5,7 +5,6 @@
     "915005987201",
     "929003479701"
   ],
-  "author": "Manuel Kasper <mk@neon1.net>",
   "calculation_strategy": "lut",
   "created_at": "2024-05-20T22:38:20Z",
   "device_type": "light",

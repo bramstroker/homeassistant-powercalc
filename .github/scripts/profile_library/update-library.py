@@ -30,6 +30,7 @@ PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../.
 DATA_DIR = f"{PROJECT_ROOT}/profile_library"
 REPO_OWNER = "bramstroker"
 REPO_NAME = "homeassistant-powercalc"
+MAX_CONCURRENT_FILE_TASKS = 50
 
 @dataclass
 class Author:
@@ -103,28 +104,60 @@ async def generate_library_json(model_listing: list[dict]) -> None:
     print("Generated library.json")
 
 
-async def update_authors(model_listing: list[dict]) -> None:
-    tasks = []
-    for model in model_listing:
-        author = model.get("author_info")
-        model_json_path = model.get("full_path")
-        if author:
-            continue
-
-        tasks.append(process_author_update(model_json_path))
-
-    if tasks:
-        await asyncio.gather(*tasks)
+async def update_authors(_model_listing: list[dict]) -> None:
+    model_json_paths = sorted(
+        glob.glob(f"{DATA_DIR}/**/model.json", recursive=True),
+        key=lambda model_json_path: (len(Path(model_json_path).parts), model_json_path),
+    )
+    for model_json_path in model_json_paths:
+        await process_author_update(model_json_path)
 
 async def process_author_update(model_json_path: str) -> None:
     """Process a single author update asynchronously"""
-    author = await find_first_commit_author(model_json_path)
-    if author is None:
-        print(f"Skipping {model_json_path}, author not found")
+    async with aiofiles.open(model_json_path, mode="r") as file:
+        content = await file.read()
+        json_data = json.loads(content)
+
+    changed = False
+    if is_main_model_json(model_json_path) and not has_author_info(json_data):
+        author = await find_first_commit_author(model_json_path)
+        if author is None:
+            print(f"Skipping {model_json_path}, author not found")
+        else:
+            json_data["author_info"] = author_to_json(author)
+            changed = True
+
+    if "author" in json_data:
+        del json_data["author"]
+        changed = True
+
+    if not changed:
         return
 
-    await write_author_to_file(model_json_path, author)
-    print(f"Updated {model_json_path} with author {author}")
+    async with aiofiles.open(model_json_path, mode="w") as file:
+        await file.write(json.dumps(json_data, indent=2, ensure_ascii=False) + "\n")
+    print(f"Updated author metadata in {model_json_path}")
+
+
+def has_author_info(model_data: dict) -> bool:
+    author_info = model_data.get("author_info")
+    return isinstance(author_info, dict) and bool(author_info.get("name")) and bool(author_info.get("github"))
+
+
+def is_main_model_json(model_json_path: str) -> bool:
+    relative_path = Path(model_json_path).relative_to(DATA_DIR)
+    return len(relative_path.parts) == 3
+
+
+def author_to_json(author: Author) -> dict:
+    author_json = {
+        "name": author.name,
+        "github": author.github_username,
+    }
+    if author.email:
+        author_json["email"] = author.email
+    return author_json
+
 
 async def update_translations(model_listing: list[dict]) -> None:
     data_translations: dict[str, str] =  {}
@@ -204,9 +237,13 @@ async def get_model_list() -> list[dict]:
         recursive=True,
     )
 
-    # Process files concurrently
-    tasks = [process_model_file(json_path) for json_path in json_paths]
-    models = await asyncio.gather(*tasks)
+    semaphore = asyncio.Semaphore(MAX_CONCURRENT_FILE_TASKS)
+
+    async def process_with_limit(json_path: str) -> dict:
+        async with semaphore:
+            return await process_model_file(json_path)
+
+    models = await asyncio.gather(*(process_with_limit(json_path) for json_path in json_paths))
 
     # Filter out None values (if any)
     return [model for model in models if model]
@@ -216,6 +253,7 @@ async def process_model_file(json_path: str) -> dict:
     async with aiofiles.open(json_path, mode='r') as json_file:
         content = await json_file.read()
         model_data: dict = json.loads(content)
+        model_data.pop("author", None)
         model_directory = os.path.dirname(json_path)
         model_data['id'] = os.path.basename(model_directory)
         if "linked_profile" in model_data:
@@ -416,34 +454,6 @@ async def find_first_commit_author(file: str, check_paths: bool = True) -> Autho
             author = await get_commit_author(commit)
             return author
     return None
-
-async def read_author_from_file(file_path: str) -> str | None:
-    """Read the author from the model.json file."""
-    async with aiofiles.open(file_path, mode='r') as file:
-        content = await file.read()
-        json_data = json.loads(content)
-
-    return json_data.get("author")
-
-
-async def write_author_to_file(file_path: str, author: Author) -> None:
-    """Write the author to the model.json file."""
-    # Read the existing content
-    async with aiofiles.open(file_path, mode='r') as file:
-        content = await file.read()
-        json_data = json.loads(content)
-
-    author_json = {
-        "name": author.name,
-        "github": author.github_username,
-    }
-    if author.email:
-        author_json["email"] = author.email
-    json_data["author_info"] = author_json
-    json_data["author"] = author.name # For backward compatibility, will be removed later
-
-    async with aiofiles.open(file_path, mode='w') as file:
-        await file.write(json.dumps(json_data, indent=2) + "\n")
 
 async def main_async():
     parser = argparse.ArgumentParser(description="Process profiles JSON files and perform updates.")

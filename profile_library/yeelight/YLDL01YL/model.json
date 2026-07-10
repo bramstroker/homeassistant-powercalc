@@ -2,7 +2,6 @@
   "aliases": [
     "ceiling10"
   ],
-  "author": "Morten Trab <morten@trab.dk>",
   "calculation_strategy": "lut",
   "created_at": "2022-03-17T21:45:16Z",
   "device_type": "light",

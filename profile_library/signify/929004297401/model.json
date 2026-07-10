@@ -2,7 +2,6 @@
   "aliases": [
     "929004297401"
   ],
-  "author": "Tom Frenzel <admin@tom-frenzel.de",
   "calculation_strategy": "lut",
   "created_at": "2025-11-04T00:15:59Z",
   "device_type": "light",

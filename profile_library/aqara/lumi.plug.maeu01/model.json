@@ -2,7 +2,6 @@
   "aliases": [
     "Aqara Smart Plug EU"
   ],
-  "author": "BenRoe",
   "calculation_strategy": "fixed",
   "created_at": "2023-12-17T16:08:15Z",
   "device_type": "smart_switch",

@@ -2,7 +2,6 @@
   "aliases": [
     "TRADFRI bulb E27 WS globe 1055lm"
   ],
-  "author": "Jari Eskelinen <jari.eskelinen@iki.fi>",
   "calculation_strategy": "lut",
   "created_at": "2023-12-28T17:44:26Z",
   "device_type": "light",

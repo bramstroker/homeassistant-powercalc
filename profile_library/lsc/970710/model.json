@@ -2,7 +2,6 @@
   "aliases": [
     "PAR16-GL-WIFILIC-TY-RGBCW"
   ],
-  "author": "Jort <63785276+JortvanSchijndel@users.noreply.github.com>",
   "calculation_strategy": "lut",
   "created_at": "2025-04-28T16:19:32Z",
   "device_type": "light",

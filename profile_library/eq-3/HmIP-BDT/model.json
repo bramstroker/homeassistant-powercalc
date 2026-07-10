@@ -1,5 +1,4 @@
 {
-  "author": "CV",
   "calculation_strategy": "linear",
   "config_flow_discovery_remarks": "This device controls a non-smart device, hence it only tracks standby power by default. You need to configure the power draw of the controlled device yourself while or after the configuring process.",
   "created_at": "2025-02-04T18:37:40Z",

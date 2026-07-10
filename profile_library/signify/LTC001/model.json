@@ -5,7 +5,6 @@
     "3261048P6",
     "3261030P7"
   ],
-  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2021-06-19T18:55:29Z",
   "device_type": "light",

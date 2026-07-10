@@ -1,5 +1,4 @@
 {
-  "author": "Bart Kummel <bart@leap.ac>",
   "calculation_strategy": "lut",
   "created_at": "2024-11-15T11:59:34Z",
   "device_type": "light",
