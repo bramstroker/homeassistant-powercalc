@@ -151,7 +151,7 @@
         "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Consulte a [documentação]({docs_uri}) para mais informações",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Precificação",
             "data": {
               "energy_price": "Fixed energy price",
               "energy_price_multiplier": "Energy price multiplier",
@@ -343,7 +343,7 @@
       "library_custom_fields": {
         "title": "Profile configuration",
         "data": {
-          "power_factor": "Power Factor"
+          "power_factor": "Fator de potência"
         },
         "data_description": {
           "power_factor": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters."
@@ -669,7 +669,7 @@
       "fixed": {
         "title": "Opções de Fixo",
         "data": {
-          "fixed_value": "Fixed value",
+          "fixed_value": "Valor fixo",
           "self_usage_included": "Auto uso incluído"
         },
         "data_description": {
@@ -692,7 +692,7 @@
             "name": "Criar sensores",
             "data": {
               "create_energy_sensors": "Criar sensor de consumo",
-              "create_cost_sensors": "Create cost sensors",
+              "create_cost_sensors": "Criar sensores de custo",
               "create_standby_group": "Criar grupo de standby",
               "create_utility_meters": "Criar medidores de utilidade"
             },
@@ -723,11 +723,11 @@
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
+        "title": "Opções de custo",
         "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Consulte a [documentação]({docs_uri}) para mais informações",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Precificação",
             "data": {
               "energy_price": "Fixed energy price",
               "energy_price_multiplier": "Energy price multiplier",
@@ -1034,7 +1034,7 @@
       "fields": {
         "value": {
           "description": "The value to set.",
-          "name": "Value"
+          "name": "Valor"
         }
       },
       "name": "Calibrate cost sensor"
