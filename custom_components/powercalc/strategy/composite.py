@@ -159,9 +159,7 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
             if isinstance(strategy, PlaybookStrategy):
                 await self.activate_playbook(strategy)
 
-            if (
-                entity_state.state == STATE_OFF and strategy.can_calculate_standby()
-            ) or entity_state.state != STATE_OFF:
+            if entity_state.state != STATE_OFF or strategy.can_calculate_standby():
                 value = await strategy.calculate(entity_state)
                 if value is not None:
                     if self.mode == CompositeMode.STOP_AT_FIRST:

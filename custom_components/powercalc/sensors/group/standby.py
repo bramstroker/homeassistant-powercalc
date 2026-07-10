@@ -72,10 +72,12 @@ class StandbyPowerSensor(PowerSensor, SensorEntity):
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
         await super().async_added_to_hass()
-        async_dispatcher_connect(
-            self.hass,
-            SIGNAL_POWER_SENSOR_STATE_CHANGE,
-            self._recalculate,
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                SIGNAL_POWER_SENSOR_STATE_CHANGE,
+                self._recalculate,
+            ),
         )
 
     async def _recalculate(self) -> None:
