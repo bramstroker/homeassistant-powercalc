@@ -2,7 +2,6 @@ from functools import partial
 import json
 import logging
 import os
-import re
 from typing import Any, cast
 
 from homeassistant.core import HomeAssistant
@@ -154,8 +153,7 @@ class LocalLoader(Loader):
 
             manufacturer = manufacturer_dir.lower()
             for model_dir in next(os.walk(manufacturer_path))[1]:
-                pattern = re.compile(r"^\..*")
-                if pattern.match(model_dir):
+                if model_dir.startswith("."):
                     continue
 
                 model_path = os.path.join(manufacturer_path, model_dir)
