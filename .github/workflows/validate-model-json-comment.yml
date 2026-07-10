@@ -38,19 +38,35 @@ jobs:
       - name: Read validation result
         id: validation-result
         run: |
-          echo "status=$(cat artifacts/model_json_validation_status.txt)" >> "$GITHUB_OUTPUT"
+          status="$(tr -d '[:space:]' < artifacts/model_json_validation_status.txt)"
+          if [ "${status}" != "success" ] && [ "${status}" != "failure" ]; then
+            echo "Unexpected validation status: ${status}" >&2
+            exit 1
+          fi
+          echo "status=${status}" >> "$GITHUB_OUTPUT"
       - name: Read PR number
         id: pr
         env:
           PR_NUMBER: ${{ github.event.inputs.pr_number }}
         run: |
           if [ -n "${PR_NUMBER}" ]; then
-            echo "number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+            pr_number="${PR_NUMBER}"
           else
-            echo "number=$(cat artifacts/pr_number.txt)" >> "$GITHUB_OUTPUT"
+            pr_number="$(tr -d '[:space:]' < artifacts/pr_number.txt)"
+          fi
+          echo "number=${pr_number}" >> "$GITHUB_OUTPUT"
+      - name: Ensure validation report exists
+        if: steps.validation-result.outputs.status == 'failure'
+        run: |
+          if [ ! -s artifacts/model_json_validation_report.md ]; then
+            {
+              echo "<!-- model.json validate action comment -->"
+              echo
+              echo "The model.json validation workflow failed before it could write a detailed report."
+            } > artifacts/model_json_validation_report.md
           fi
       - name: Create or update validation comment
-        if: steps.validation-result.outputs.status != 'success'
+        if: steps.validation-result.outputs.status == 'failure'
         uses: ./.github/actions/upsert-pr-comment
         with:
           pr-number: ${{ steps.pr.outputs.number }}
