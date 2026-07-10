@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 from freezegun.api import FrozenDateTimeFactory
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.components.sensor import ATTR_STATE_CLASS, DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.sensor import (
     SensorDeviceClass,
     SensorStateClass,
@@ -127,16 +127,13 @@ async def test_grouped_power_sensor(hass: HomeAssistant, entity_registry: Entity
         },
     )
 
-    power_state = hass.states.get("sensor.test1_power")
-    assert power_state
-
     power_entry = entity_registry.async_get("sensor.testgroup_power")
     assert power_entry
     assert power_entry.unique_id == "group_unique_id"
 
     power_state = hass.states.get("sensor.testgroup_power")
     assert power_state
-    assert power_state.attributes.get("state_class") == SensorStateClass.MEASUREMENT
+    assert power_state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert power_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
     assert power_state.attributes.get(ATTR_ENTITIES) == {
@@ -152,7 +149,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant, entity_registry: Entity
 
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert energy_state
-    assert energy_state.attributes.get("state_class") == SensorStateClass.TOTAL
+    assert energy_state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL
     assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
@@ -162,7 +159,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant, entity_registry: Entity
 
     await set_states(hass, [("input_boolean.test1", STATE_OFF)], block_count=0)
 
-    assert_entity_state(hass, "sensor.test1_power", "10.50")
+    assert_entity_state(hass, "sensor.testgroup_power", "50.00")
 
 
 async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
