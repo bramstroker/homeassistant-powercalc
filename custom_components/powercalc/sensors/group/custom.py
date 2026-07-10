@@ -90,6 +90,7 @@ from custom_components.powercalc.const import (
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
     SERVICE_RESET_ENERGY,
+    UNAVAILABLE_STATES,
     GroupType,
     SensorType,
     UnitPrefix,
@@ -545,7 +546,7 @@ class GroupedSensor(BaseEntity, SensorEntity):
                 SensorDeviceClass.ENERGY if self._is_energy_sensor else SensorDeviceClass.POWER,
             )
         excluded_entities = self._sensor_config.get(CONF_EXCLUDE_ENTITIES) or []
-        self._entities = set({entity for entity in entities if entity not in excluded_entities})
+        self._entities = {entity for entity in entities if entity not in excluded_entities}
 
     async def on_start(self, _: HomeAssistant) -> None:
         """Initialize group sensor when HA is starting."""
@@ -571,9 +572,7 @@ class GroupedSensor(BaseEntity, SensorEntity):
         """Initial update for the group sensor state."""
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
-        available_states = [
-            state for state in states if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
-        ]
+        available_states = [state for state in states if state and state.state not in UNAVAILABLE_STATES]
         if not available_states and not self._ignore_unavailable_state:
             new_state: Decimal | str = STATE_UNAVAILABLE
         else:
@@ -685,7 +684,7 @@ class GroupedSensor(BaseEntity, SensorEntity):
                 ATTR_UNIT_OF_MEASUREMENT: None,
             }
 
-        if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
+        if state.state in UNAVAILABLE_STATES:
             return {
                 ATTR_STATE: str(state.state),
                 ATTR_UNIT_OF_MEASUREMENT: state.attributes.get(ATTR_UNIT_OF_MEASUREMENT),
@@ -732,7 +731,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
         return self.get_summed_state()
 
     def calculate_new_state(self, state: State) -> Decimal | str:
-        if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
+        if state.state in UNAVAILABLE_STATES:
             if state.entity_id in self._member_states:
                 del self._member_states[state.entity_id]
         else:
@@ -825,7 +824,7 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
 
         For each member, calculate the delta between the previous known state and the current.
         """
-        group_sum = Decimal(self._native_value_exact) if self._native_value_exact else Decimal(0)
+        group_sum = self._native_value_exact
         _LOGGER.debug("%s: Recalculate, current value: %s", self.entity_id, group_sum)
         for state in member_available_states:
             group_sum += self.calculate_delta(state)
@@ -838,8 +837,8 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
         return group_sum
 
     def calculate_new_state(self, state: State) -> Decimal | str:
-        group_sum = Decimal(self._native_value_exact) if self._native_value_exact else Decimal(0)
-        if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
+        group_sum = self._native_value_exact
+        if state.state in UNAVAILABLE_STATES:
             if group_sum == 0:
                 return STATE_UNAVAILABLE
             _LOGGER.debug(

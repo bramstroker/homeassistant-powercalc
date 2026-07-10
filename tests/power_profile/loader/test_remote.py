@@ -532,7 +532,7 @@ async def test_profile_redownloaded_when_model_json_corrupt(
     ]
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini?hash=b1107c61234f582a3c713b0891582e4e",
+        re.compile(rf"{ENDPOINT_DOWNLOAD}/apple/HomePod.*"),
         status=200,
         payload=remote_files,
         repeat=True,
@@ -578,7 +578,7 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
     ]
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini?hash=b1107c61234f582a3c713b0891582e4e",
+        re.compile(rf"{ENDPOINT_DOWNLOAD}/apple/HomePod.*"),
         status=200,
         payload=remote_files,
         repeat=True,

@@ -188,7 +188,7 @@ class LutRegistry:
             _LOGGER.debug("Loading LUT data file: %s", path)
             return open(path)
 
-        raise LutFileNotFoundError("Data file not found: %s")
+        raise LutFileNotFoundError(f"Data file not found: {path}")
 
 
 class LutStrategy(PowerCalculationStrategyInterface):

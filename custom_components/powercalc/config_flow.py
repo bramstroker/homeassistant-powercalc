@@ -103,14 +103,11 @@ MENU_OPTIONS = [
     Step.WLED,
 ]
 
+# Order matters: async_step() delegates to the first handler that defines the requested step.
 FLOW_HANDLERS: dict[FlowType, dict] = {
-    FlowType.GROUP: {
-        "config": GroupConfigFlow,
-        "options": GroupOptionsFlow,
-    },
-    FlowType.DAILY_ENERGY: {
-        "config": DailyEnergyConfigFlow,
-        "options": DailyEnergyOptionsFlow,
+    FlowType.GLOBAL_CONFIGURATION: {
+        "config": GlobalConfigurationConfigFlow,
+        "options": GlobalConfigurationOptionsFlow,
     },
     FlowType.LIBRARY: {
         "config": LibraryConfigFlow,
@@ -120,9 +117,13 @@ FLOW_HANDLERS: dict[FlowType, dict] = {
         "config": VirtualPowerConfigFlow,
         "options": VirtualPowerOptionsFlow,
     },
-    FlowType.GLOBAL_CONFIGURATION: {
-        "config": GlobalConfigurationConfigFlow,
-        "options": GlobalConfigurationOptionsFlow,
+    FlowType.GROUP: {
+        "config": GroupConfigFlow,
+        "options": GroupOptionsFlow,
+    },
+    FlowType.DAILY_ENERGY: {
+        "config": DailyEnergyConfigFlow,
+        "options": DailyEnergyOptionsFlow,
     },
     FlowType.REAL_POWER: {
         "config": RealPowerConfigFlow,
@@ -153,17 +154,9 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self.name: str | None = None
         self.handled_steps: list[Step] = []
 
-        # Initialize flow handlers
+        # Initialize flow handlers. Iteration order follows FLOW_HANDLERS, which async_step() relies on.
         flow_key = "options" if self.is_options_flow else "config"
-        self.flow_handlers = {
-            FlowType.GLOBAL_CONFIGURATION: FLOW_HANDLERS[FlowType.GLOBAL_CONFIGURATION][flow_key](self),
-            FlowType.LIBRARY: FLOW_HANDLERS[FlowType.LIBRARY][flow_key](self),
-            FlowType.VIRTUAL_POWER: FLOW_HANDLERS[FlowType.VIRTUAL_POWER][flow_key](self),
-            FlowType.GROUP: FLOW_HANDLERS[FlowType.GROUP][flow_key](self),
-            FlowType.DAILY_ENERGY: FLOW_HANDLERS[FlowType.DAILY_ENERGY][flow_key](self),
-            FlowType.REAL_POWER: FLOW_HANDLERS[FlowType.REAL_POWER][flow_key](self),
-            FlowType.COST: FLOW_HANDLERS[FlowType.COST][flow_key](self),
-        }
+        self.flow_handlers = {flow_type: handlers[flow_key](self) for flow_type, handlers in FLOW_HANDLERS.items()}
 
         for step in Step:
             step_method = f"async_step_{step}"

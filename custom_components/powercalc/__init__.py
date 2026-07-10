@@ -105,7 +105,7 @@ from .const import (
     SensorType,
     UnitPrefix,
 )
-from .discovery import DiscoveryManager, DiscoveryStatus
+from .discovery import DiscoveryManager, DiscoveryStatus, get_discovery_manager
 from .migrate import async_fix_legacy_profile_config_entry, async_migrate_config_entry
 from .power_profile.power_profile import DeviceType
 from .sensor import SENSOR_CONFIG
@@ -307,7 +307,7 @@ def register_services(hass: HomeAssistant) -> None:
 
     async def _handle_update_library_service(_: ServiceCall) -> None:
         _LOGGER.info("Updating library and rediscovering devices")
-        discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+        discovery_manager = get_discovery_manager(hass)
         await discovery_manager.update_library_and_rediscover()
 
     hass.services.async_register(
@@ -461,7 +461,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await async_fix_legacy_profile_config_entry(hass, entry)
     await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR, Platform.SELECT])
-    # await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
 
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
 
@@ -474,7 +473,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             await apply_global_gui_configuration_changes(hass)
 
         discovery_enabled = bool(entry.data.get(CONF_DISCOVERY, {}).get(CONF_ENABLED, False))
-        discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+        discovery_manager = get_discovery_manager(hass)
         if discovery_enabled and discovery_manager.status == DiscoveryStatus.DISABLED:
             _LOGGER.debug("Enabling discovery manager based on global configuration")
             discovery_manager.enable()
@@ -530,7 +529,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 
 async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
     """Called after a config entry is removed."""
-    discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+    discovery_manager = get_discovery_manager(hass)
     discovery_manager.remove_initialized_flow(config_entry)
 
     updated_entries: list[ConfigEntry] = []

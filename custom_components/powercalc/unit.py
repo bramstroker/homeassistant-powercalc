@@ -5,7 +5,7 @@ from __future__ import annotations
 from decimal import Decimal, DecimalException
 import logging
 
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, UnitOfEnergy
+from homeassistant.const import UnitOfEnergy
 from homeassistant.core import State
 from homeassistant.exceptions import HomeAssistantError, TemplateError
 from homeassistant.helpers.template import Template
@@ -15,7 +15,7 @@ from homeassistant.util.unit_conversion import (
     PowerConverter,
 )
 
-from custom_components.powercalc.const import UnitPrefix
+from custom_components.powercalc.const import UNAVAILABLE_STATES, UnitPrefix
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def parse_decimal(value: object) -> Decimal | None:
     Unknown or unavailable states and values that are not numeric yield None instead of raising.
     """
     if isinstance(value, State):
-        if value.state in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+        if value.state in UNAVAILABLE_STATES:
             return None
         value = value.state
     if not isinstance(value, (str, int, float, Decimal)):
@@ -66,7 +66,7 @@ def evaluate_to_decimal(value: object) -> Decimal | None:
         except TemplateError as ex:
             _LOGGER.error("Could not render template %s: %s", value, ex)
             return None
-        if value in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+        if value in UNAVAILABLE_STATES:
             return None
 
     result = parse_decimal(value)

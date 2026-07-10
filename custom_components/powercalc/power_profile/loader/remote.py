@@ -279,7 +279,7 @@ class RemoteLoader(Loader):
         """Retrieve model info, or raise an error if not found."""
         model_info = self.model_infos.get(f"{manufacturer}/{model}")
         if not model_info:
-            raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
+            raise LibraryLoadingError(f"Model not found in library: {manufacturer}/{model}")
         return model_info
 
     async def _needs_update(
@@ -424,10 +424,14 @@ class RemoteLoader(Loader):
         except (TimeoutError, aiohttp.ClientError) as e:
             raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
 
+    def _get_profile_hashes_path(self) -> str:
+        """Retrieve the local storage path for the profile hashes file."""
+        return str(self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, ".profile_hashes"))
+
     def _load_profile_hashes(self) -> dict[str, str]:
         """Load profile hashes from local storage"""
 
-        path = self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, ".profile_hashes")
+        path = self._get_profile_hashes_path()
         if not os.path.exists(path):
             return {}
 
@@ -437,6 +441,6 @@ class RemoteLoader(Loader):
     def _write_profile_hashes(self, hashes: dict[str, str]) -> None:
         """Write profile hashes to local storage"""
 
-        path = self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, ".profile_hashes")
+        path = self._get_profile_hashes_path()
         with open(path, "w") as json_file:
             json.dump(hashes, json_file, indent=4)
