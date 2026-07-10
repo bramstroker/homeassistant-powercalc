@@ -70,6 +70,40 @@ async def test_can_calculate_power(
     assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(state))
 
 
+async def test_calculate_returns_none_when_dependent_state_is_missing(
+    hass: HomeAssistant,
+) -> None:
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntryWithDefaults(
+                entity_id="light.test",
+                unique_id="1234",
+                platform="light",
+            ),
+            "sensor.test_estimated_current": RegistryEntryWithDefaults(
+                entity_id="sensor.test_estimated_current",
+                unique_id="5678",
+                platform="sensor",
+            ),
+        },
+    )
+    light_source_entity = create_source_entity("light.test", hass)
+
+    strategy = WledStrategy(
+        config={CONF_VOLTAGE: 5, CONF_POWER_FACTOR: 0.9},
+        light_entity=light_source_entity,
+        hass=hass,
+        standby_power=0.1,
+    )
+    await strategy.validate_config()
+
+    assert await strategy.calculate(State("sensor.test_estimated_current", "50.0")) is None
+
+    await set_states(hass, [("light.test", STATE_ON)])
+    assert await strategy.calculate(State("light.test", STATE_ON)) is None
+
+
 async def test_find_estimated_current_entity_by_device_class(
     hass: HomeAssistant,
 ) -> None:

@@ -536,10 +536,10 @@ async def test_utility_meter_cost_sensor_accumulates(hass: HomeAssistant) -> Non
     for value in ("10", "20", "30", "40"):
         await set_states(hass, [("sensor.existing_energy", value, _KWH)])
 
-    # The meter tracked 30 kWh (10 -> 40); its cost sensor prices the deltas seen after
-    # its first (baseline) reading: (20 kWh) * 0.25 = 5.0.
+    # The meter tracked 30 kWh (10 -> 40); its cost sensor prices the utility-meter
+    # cycle from zero: (30 kWh) * 0.25 = 7.5.
     assert hass.states.get(meter_id).state == "30.0000"
-    _assert_cost(hass, 5.0, meter_cost_id)
+    _assert_cost(hass, 7.5, meter_cost_id)
 
     # When the utility meter resets for a new cycle, its cost sensor resets to zero too.
     hass.states.async_set(meter_id, "0", _KWH)

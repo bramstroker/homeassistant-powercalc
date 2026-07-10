@@ -1,15 +1,18 @@
 import asyncio
 from collections.abc import Generator
 from functools import lru_cache
+import inspect
 import json
 import logging
 import os
 import shutil
 from typing import Any, Protocol, cast
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 import uuid
 
 from _pytest.fixtures import SubRequest
+import aiohttp
+import aioresponses.core
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
@@ -29,6 +32,23 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from tests.common import get_test_config_dir, mock_device
+
+# Remove this once aioresponses supports aiohttp 3.14+.
+# See https://github.com/pnuckowski/aioresponses/issues/289.
+_client_response_init = aiohttp.ClientResponse.__init__
+if "stream_writer" in inspect.signature(_client_response_init).parameters:
+    _client_response_init_any = cast(Any, _client_response_init)
+
+    def _patched_client_response_init(self: aiohttp.ClientResponse, *args: object, **kwargs: object) -> None:
+        kwargs.setdefault("stream_writer", Mock(output_size=0))
+        _client_response_init_any(self, *args, **kwargs)
+
+    aiohttp.ClientResponse.__init__ = _patched_client_response_init  # type: ignore[method-assign]
+
+    def _patched_stream_reader_factory(loop: asyncio.AbstractEventLoop | None = None) -> aiohttp.StreamReader:
+        return aiohttp.StreamReader(Mock(), limit=2**16, loop=loop)
+
+    aioresponses.core.stream_reader_factory = _patched_stream_reader_factory
 
 
 @lru_cache(maxsize=1)

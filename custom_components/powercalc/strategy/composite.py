@@ -9,6 +9,7 @@ from typing import Any
 
 from homeassistant.const import CONF_ATTRIBUTE, CONF_CONDITION, CONF_ENTITY_ID, STATE_OFF
 from homeassistant.core import HomeAssistant, State
+from homeassistant.exceptions import ConditionError
 from homeassistant.helpers.condition import ConditionCheckerType
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
@@ -152,7 +153,7 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         for sub_strategy in self.strategies:
             strategy = sub_strategy.strategy
 
-            if sub_strategy.condition and not sub_strategy.condition(self.hass, {"state": entity_state}):
+            if sub_strategy.condition and not self._condition_matches(sub_strategy.condition, entity_state):
                 continue
 
             if isinstance(strategy, PlaybookStrategy):
@@ -168,6 +169,13 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
                     total += value
 
         return total if self.mode == CompositeMode.SUM_ALL else None
+
+    def _condition_matches(self, condition: ConditionCheckerType, entity_state: State) -> bool:
+        try:
+            return condition(self.hass, {"state": entity_state})
+        except ConditionError:
+            _LOGGER.debug("Skipping composite sub-strategy because condition evaluation failed", exc_info=True)
+            return False
 
     async def stop_active_playbooks(self) -> None:
         """Stop any active playbooks from sub strategies."""
