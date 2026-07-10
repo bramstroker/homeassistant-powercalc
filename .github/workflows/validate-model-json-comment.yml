@@ -31,6 +31,13 @@ jobs:
           path: artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
+      - name: Extract downloaded artifact archive
+        run: |
+          shopt -s nullglob
+          for archive in artifacts/*.zip; do
+            unzip -o "${archive}" -d artifacts
+            rm "${archive}"
+          done
       - name: Checkout comment action
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:

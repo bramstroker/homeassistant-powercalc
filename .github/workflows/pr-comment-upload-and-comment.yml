@@ -33,6 +33,13 @@ jobs:
           path: artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
+      - name: Extract downloaded artifact archive
+        run: |
+          shopt -s nullglob
+          for archive in artifacts/*.zip; do
+            unzip -o "${archive}" -d artifacts
+            rm "${archive}"
+          done
       - name: Checkout comment action
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
@@ -43,10 +50,11 @@ jobs:
           PR_NUMBER: ${{ github.event.inputs.pr_number }}
         run: |
           if [ -n "${PR_NUMBER}" ]; then
-            echo "number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+            pr_number="${PR_NUMBER}"
           else
-            echo "number=$(cat artifacts/pr_number.txt)" >> "$GITHUB_OUTPUT"
+            pr_number="$(tr -d '[:space:]' < artifacts/pr_number.txt)"
           fi
+          echo "number=${pr_number}" >> "$GITHUB_OUTPUT"
       - name: Upload the plots to Imgur
         uses: devicons/public-upload-to-imgur@b774d640a6703b5ce1deef66e7789409c217f3b2 # v2
         id: imgur_step
