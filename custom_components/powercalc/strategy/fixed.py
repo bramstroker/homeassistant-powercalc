@@ -53,7 +53,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             # Lookup by state attribute (attribute|value)
             for state_key, power in self._per_state_power.items():
                 if "|" in state_key:
-                    attribute, value = state_key.split("|", 2)
+                    attribute, value = state_key.split("|", 1)
                     if str(entity_state.attributes.get(attribute)) == value:
                         return evaluate_to_decimal(power)
 
