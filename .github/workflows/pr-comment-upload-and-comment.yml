@@ -26,6 +26,10 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout comment action
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
       - name: Download Artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
@@ -33,17 +37,6 @@ jobs:
           path: artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
-      - name: Extract downloaded artifact archive
-        run: |
-          shopt -s nullglob
-          for archive in artifacts/*.zip; do
-            unzip -o "${archive}" -d artifacts
-            rm "${archive}"
-          done
-      - name: Checkout comment action
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          persist-credentials: false
       - name: Read PR number
         id: pr
         env:
