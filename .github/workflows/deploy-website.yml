@@ -93,6 +93,9 @@ jobs:
             ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" "mkdir -p ${remote_path}"
             ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" "test -w ${remote_path}" || {
               echo "Deploy path is not writable by ${WEBSITE_SSH_USER}: ${WEBSITE_DEPLOY_PATH}" >&2
+              echo "Remote permission diagnostics:" >&2
+              ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" \
+                "whoami; id; stat -c '%A %U %G %n' ${remote_path}; touch ${remote_path}/.deploy-write-test && rm ${remote_path}/.deploy-write-test" >&2 || true
               echo "Fix by chowning the deploy path to ${WEBSITE_SSH_USER}, or set WEBSITE_RSYNC_USE_SUDO=true and allow passwordless sudo for rsync/mkdir." >&2
               exit 1
             }
