@@ -1,0 +1,79 @@
+name: Deploy website
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - website/**
+      - .github/workflows/deploy-website.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-website
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout website
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Configure SSH
+        env:
+          WEBSITE_SSH_KEY: ${{ secrets.WEBSITE_SSH_KEY }}
+          WEBSITE_SSH_KNOWN_HOSTS: ${{ secrets.WEBSITE_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${WEBSITE_SSH_KEY}" ]; then
+            echo "Missing WEBSITE_SSH_KEY secret" >&2
+            exit 1
+          fi
+
+          if [ -z "${WEBSITE_SSH_KNOWN_HOSTS}" ]; then
+            echo "Missing WEBSITE_SSH_KNOWN_HOSTS secret" >&2
+            exit 1
+          fi
+
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${WEBSITE_SSH_KEY}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "${WEBSITE_SSH_KNOWN_HOSTS}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy with rsync
+        env:
+          WEBSITE_SSH_HOST: ${{ secrets.WEBSITE_SSH_HOST }}
+          WEBSITE_SSH_PORT: ${{ secrets.WEBSITE_SSH_PORT || '22' }}
+          WEBSITE_SSH_USER: ${{ secrets.WEBSITE_SSH_USER }}
+          WEBSITE_DEPLOY_PATH: ${{ secrets.WEBSITE_DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+
+          for variable in WEBSITE_SSH_HOST WEBSITE_SSH_PORT WEBSITE_SSH_USER WEBSITE_DEPLOY_PATH; do
+            if [ -z "${!variable}" ]; then
+              echo "Missing ${variable} secret" >&2
+              exit 1
+            fi
+          done
+
+          ssh -i ~/.ssh/deploy_key \
+            -p "${WEBSITE_SSH_PORT}" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" \
+            "mkdir -p '${WEBSITE_DEPLOY_PATH}'"
+
+          rsync -az --delete \
+            --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r \
+            -e "ssh -i ~/.ssh/deploy_key -p ${WEBSITE_SSH_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            website/ \
+            "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}:${WEBSITE_DEPLOY_PATH}/"

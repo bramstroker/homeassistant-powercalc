@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Powercalc creates virtual power and energy sensors in Home Assistant for devices without their own power meter."
+    >
+    <title>Powercalc - Home Assistant virtual power sensors</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --panel-soft: #eef3ff;
+        --text: #17202a;
+        --muted: #5d6b76;
+        --line: #dce5ea;
+        --accent: #5488e8;
+        --accent-dark: #3869c7;
+        --sun: #f4c542;
+        --leaf: #42a66b;
+        --shadow: 0 22px 60px rgba(20, 36, 52, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at top left, rgba(244, 197, 66, 0.24), transparent 30rem),
+          linear-gradient(135deg, #f8fbfd 0%, var(--bg) 42%, #eaf0ff 100%);
+        color: var(--text);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .wrap {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 24px 0;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+
+      .brand img {
+        width: 166px;
+        height: auto;
+        display: block;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .nav a,
+      .button {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 7px;
+        padding: 10px 16px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+
+      .nav a {
+        color: var(--muted);
+      }
+
+      .nav a:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .link-icon {
+        width: 1.1em;
+        height: 1.1em;
+        flex: 0 0 auto;
+        fill: currentColor;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.36fr) minmax(260px, 0.64fr);
+        gap: 44px;
+        align-items: center;
+        padding: 48px 0 72px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 18px;
+        color: var(--accent-dark);
+        font-size: 0.88rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 740px;
+        margin: 0;
+        font-size: clamp(2.55rem, 4.7vw, 4.35rem);
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      .lede {
+        max-width: 680px;
+        margin: 24px 0 0;
+        color: var(--muted);
+        font-size: clamp(1.08rem, 2vw, 1.28rem);
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+      }
+
+      .button.primary {
+        color: #ffffff;
+        background: var(--accent-dark);
+        box-shadow: 0 16px 34px rgba(84, 136, 232, 0.28);
+      }
+
+      .button.secondary {
+        color: var(--text);
+        background: #ffffff;
+        border: 1px solid var(--line);
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+      }
+
+      .highlights {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 38px;
+      }
+
+      .highlight-item {
+        padding: 16px;
+        border: 1px solid rgba(220, 229, 234, 0.9);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.74);
+      }
+
+      .highlight-item strong {
+        display: block;
+        font-size: 1rem;
+        line-height: 1.25;
+      }
+
+      .highlight-item span {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .preview {
+        position: relative;
+        width: min(100%, 520px);
+        justify-self: end;
+      }
+
+      .preview-frame {
+        overflow: hidden;
+        border: 1px solid rgba(220, 229, 234, 0.8);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .preview-top {
+        display: flex;
+        gap: 7px;
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--line);
+        background: #f8fafb;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--line);
+      }
+
+      .dot:nth-child(1) {
+        background: #ff6b6b;
+      }
+
+      .dot:nth-child(2) {
+        background: var(--sun);
+      }
+
+      .dot:nth-child(3) {
+        background: var(--leaf);
+      }
+
+      .preview video {
+        width: 100%;
+        display: block;
+      }
+
+      .preview-caption {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .preview-caption strong {
+        color: var(--text);
+      }
+
+      section {
+        padding: 54px 0;
+      }
+
+      .section-heading {
+        max-width: 720px;
+        margin-bottom: 28px;
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-size: clamp(1.9rem, 3.4vw, 3rem);
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .section-heading p {
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 1.06rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        min-height: 100%;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.84);
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 1.18rem;
+      }
+
+      .card p {
+        margin: 12px 0 0;
+        color: var(--muted);
+      }
+
+      .icon {
+        width: 42px;
+        height: 42px;
+        display: inline-grid;
+        place-items: center;
+        margin-bottom: 18px;
+        border-radius: 8px;
+        background: var(--panel-soft);
+        color: var(--accent-dark);
+        font-weight: 900;
+      }
+
+      .sustainability {
+        display: grid;
+        grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+        gap: 34px;
+        align-items: center;
+        padding: 36px;
+        border: 1px solid #cfe4d7;
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(66, 166, 107, 0.13), rgba(84, 136, 232, 0.08)),
+          #ffffff;
+      }
+
+      .sustainability h2 {
+        margin: 0;
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .sustainability p {
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 1.06rem;
+      }
+
+      .impact-list {
+        display: grid;
+        gap: 14px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .impact-list li {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 12px;
+        align-items: start;
+        color: var(--muted);
+      }
+
+      .impact-list strong {
+        display: block;
+        color: var(--text);
+      }
+
+      .impact-mark {
+        width: 28px;
+        height: 28px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 50%;
+        background: rgba(66, 166, 107, 0.16);
+        color: #247347;
+        font-weight: 900;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 0.88fr 1.12fr;
+        gap: 28px;
+        align-items: start;
+        padding: 42px;
+        border-radius: 8px;
+        background: #17202a;
+        color: #ffffff;
+      }
+
+      .split h2 {
+        margin: 0;
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .split p {
+        color: #ccdade;
+      }
+
+      .link-list {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .link-list a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 62px;
+        padding: 16px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 8px;
+        color: #ffffff;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .link-list a:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .footer {
+        padding: 30px 0 42px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .footer .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        border-top: 1px solid var(--line);
+        padding-top: 24px;
+      }
+
+      .footer a {
+        color: var(--accent-dark);
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      @media (max-width: 880px) {
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .hero,
+        .split {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          padding-top: 28px;
+        }
+
+        .grid,
+        .highlights {
+          grid-template-columns: 1fr;
+        }
+
+        .sustainability {
+          grid-template-columns: 1fr;
+          padding: 26px;
+        }
+
+        .preview {
+          justify-self: stretch;
+          width: 100%;
+        }
+
+        .split {
+          padding: 26px;
+        }
+
+        .footer .wrap {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg aria-hidden="true" style="display: none">
+      <symbol id="icon-github" viewBox="0 0 16 16">
+        <path d="M8 0C3.58 0 0 3.67 0 8.2c0 3.62 2.29 6.69 5.47 7.78.4.08.55-.18.55-.4 0-.2-.01-.85-.01-1.54-2.01.38-2.53-.5-2.69-.96-.09-.24-.48-.96-.82-1.15-.28-.16-.68-.55-.01-.56.63-.01 1.08.59 1.23.84.72 1.24 1.87.89 2.33.68.07-.53.28-.89.51-1.1-1.78-.21-3.64-.91-3.64-4.05 0-.89.31-1.63.82-2.2-.08-.21-.36-1.04.08-2.17 0 0 .67-.22 2.2.84A7.35 7.35 0 0 1 8 3.94c.68 0 1.36.09 2 .28 1.53-1.06 2.2-.84 2.2-.84.44 1.13.16 1.96.08 2.17.51.57.82 1.3.82 2.2 0 3.15-1.87 3.84-3.65 4.05.29.26.54.75.54 1.52 0 1.1-.01 1.98-.01 2.26 0 .22.15.48.55.4A8.09 8.09 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"></path>
+      </symbol>
+    </svg>
+    <div class="page">
+      <header class="wrap topbar">
+        <a class="brand" href="https://docs.powercalc.nl" aria-label="Powercalc documentation">
+          <img src="assets/powercalc-logo.svg" alt="Powercalc">
+        </a>
+        <nav class="nav" aria-label="Primary navigation">
+          <a href="https://docs.powercalc.nl/quick-start/">Quick start</a>
+          <a href="https://library.powercalc.nl">Library</a>
+          <a href="https://github.com/bramstroker/homeassistant-powercalc">
+            <svg class="link-icon" aria-hidden="true"><use href="#icon-github"></use></svg>
+            GitHub
+          </a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="wrap hero">
+          <div>
+            <p class="eyebrow">Home Assistant virtual power sensors</p>
+            <h1>Energy insight without smart plugs everywhere.</h1>
+            <p class="lede">
+              Powercalc estimates power, energy, cost, and utility meter data for lights, fans, media players,
+              and other devices that cannot measure consumption themselves.
+            </p>
+            <div class="actions" aria-label="Important links">
+              <a class="button primary" href="https://docs.powercalc.nl/quick-start/">Start with Powercalc</a>
+              <a class="button secondary" href="https://library.powercalc.nl">Find a device profile</a>
+              <a class="button secondary" href="https://github.com/bramstroker/homeassistant-powercalc">
+                <svg class="link-icon" aria-hidden="true"><use href="#icon-github"></use></svg>
+                View on GitHub
+              </a>
+            </div>
+            <div class="highlights" aria-label="Powercalc highlights">
+              <div class="highlight-item">
+                <strong>Use devices you already own</strong>
+                <span>Estimate consumption for lights, fans, switches, media players, and more without adding meters everywhere.</span>
+              </div>
+              <div class="highlight-item">
+                <strong>Start from measured profiles</strong>
+                <span>Match supported devices from the shared library, then fine-tune with standby power and custom strategies.</span>
+              </div>
+              <div class="highlight-item">
+                <strong>Feed Home Assistant Energy</strong>
+                <span>Create power, energy, utility meter, group, and cost sensors for dashboards and automations.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview" aria-label="Powercalc preview">
+            <div class="preview-frame">
+              <div class="preview-top" aria-hidden="true">
+                <span class="dot">&nbsp;</span>
+                <span class="dot">&nbsp;</span>
+                <span class="dot">&nbsp;</span>
+              </div>
+              <video autoplay loop muted playsinline aria-label="Powercalc sensors inside Home Assistant">
+                <source src="assets/powercalc-preview.webm" type="video/webm">
+                <source src="assets/powercalc-preview.mp4" type="video/mp4">
+              </video>
+            </div>
+            <p class="preview-caption"><strong>Realtime estimates</strong></p>
+          </div>
+        </section>
+
+        <section class="wrap">
+          <div class="section-heading">
+            <h2>Built for the devices Home Assistant already knows about.</h2>
+            <p>
+              Add realistic consumption data where physical meters are expensive, impractical, or simply missing.
+            </p>
+          </div>
+          <div class="grid">
+            <article class="card">
+              <span class="icon">W</span>
+              <h3>Virtual power sensors</h3>
+              <p>Estimate live wattage from entity state, brightness, color temperature, fan speed, or custom strategies.</p>
+            </article>
+            <article class="card">
+              <span class="icon">kWh</span>
+              <h3>Energy and utility meters</h3>
+              <p>Create energy totals and daily, weekly, monthly, or yearly utility meters for dashboards and automations.</p>
+            </article>
+            <article class="card">
+              <span class="icon">$</span>
+              <h3>Cost tracking</h3>
+              <p>Translate estimated energy use into spending so rooms, groups, and devices become easier to compare.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="wrap">
+          <div class="sustainability">
+            <div>
+              <p class="eyebrow">Sustainability</p>
+              <h2>Use energy insight to lower your footprint.</h2>
+              <p>
+                Powercalc makes power patterns visible across your home, helping you choose smarter devices,
+                reduce waste, and avoid extra hardware where virtual sensors are accurate enough.
+              </p>
+            </div>
+            <ul class="impact-list">
+              <li>
+                <span class="impact-mark">1</span>
+                <span><strong>Reduce unnecessary plugs</strong>Use virtual sensors where estimates are good enough, and reserve physical meters for devices that need exact measurements.</span>
+              </li>
+              <li>
+                <span class="impact-mark">2</span>
+                <span><strong>Understand power patterns</strong>Standby power, room totals, and utility meters make recurring waste easier to find, compare, and automate away.</span>
+              </li>
+              <li>
+                <span class="impact-mark">3</span>
+                <span><strong>Choose efficient devices</strong>The profile library can support purchasing decisions by comparing devices on measured or estimated consumption.</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="wrap">
+          <div class="split">
+            <div>
+              <h2>Next steps</h2>
+              <p>
+                Check whether your device is already supported, add Powercalc to Home Assistant, and use the
+                documentation to refine sensors for standby power, grouped rooms, tariffs, and custom strategies.
+              </p>
+            </div>
+            <ul class="link-list">
+              <li><a href="https://docs.powercalc.nl/quick-start/"><span>Install and configure Powercalc</span><strong>Quick start</strong></a></li>
+              <li><a href="https://library.powercalc.nl"><span>Search supported lights, fans, and other profiles</span><strong>Library</strong></a></li>
+              <li><a href="https://docs.powercalc.nl/library/discovery/"><span>Understand automatic profile discovery</span><strong>Discovery</strong></a></li>
+              <li><a href="https://docs.powercalc.nl/contributing/measure/"><span>Measure a device and improve the shared library</span><strong>Contribute</strong></a></li>
+            </ul>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="wrap">
+          <span>Powercalc is an open source Home Assistant integration.</span>
+          <a href="https://www.buymeacoffee.com/bramski">Support the project</a>
+        </div>
+      </footer>
+    </div>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4a69b15124334ced87f7e166cbb500f1","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+  </body>
+</html>
