@@ -55,21 +55,15 @@ jobs:
           WEBSITE_SSH_PORT: ${{ secrets.WEBSITE_SSH_PORT || '22' }}
           WEBSITE_SSH_USER: ${{ secrets.WEBSITE_SSH_USER }}
           WEBSITE_DEPLOY_PATH: ${{ secrets.WEBSITE_DEPLOY_PATH }}
-          WEBSITE_RSYNC_USE_SUDO: ${{ secrets.WEBSITE_RSYNC_USE_SUDO || 'false' }}
         run: |
           set -euo pipefail
 
-          for variable in WEBSITE_SSH_HOST WEBSITE_SSH_PORT WEBSITE_SSH_USER WEBSITE_DEPLOY_PATH WEBSITE_RSYNC_USE_SUDO; do
+          for variable in WEBSITE_SSH_HOST WEBSITE_SSH_PORT WEBSITE_SSH_USER WEBSITE_DEPLOY_PATH; do
             if [ -z "${!variable}" ]; then
               echo "Missing ${variable} secret" >&2
               exit 1
             fi
           done
-
-          if [ "${WEBSITE_RSYNC_USE_SUDO}" != "true" ] && [ "${WEBSITE_RSYNC_USE_SUDO}" != "false" ]; then
-            echo "WEBSITE_RSYNC_USE_SUDO must be either 'true' or 'false'" >&2
-            exit 1
-          fi
 
           remote_path="$(printf '%q' "${WEBSITE_DEPLOY_PATH}")"
           ssh_options=(
@@ -78,29 +72,12 @@ jobs:
             -o IdentitiesOnly=yes
             -o StrictHostKeyChecking=yes
           )
-          rsync_options=(
-            -az
-            --delete
-            --itemize-changes
-            --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r
-            -e "ssh -i ~/.ssh/deploy_key -p ${WEBSITE_SSH_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
-          )
 
-          if [ "${WEBSITE_RSYNC_USE_SUDO}" = "true" ]; then
-            ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" "sudo mkdir -p ${remote_path}"
-            rsync_options+=(--rsync-path="sudo rsync")
-          else
-            ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" "mkdir -p ${remote_path}"
-            ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" "test -w ${remote_path}" || {
-              echo "Deploy path is not writable by ${WEBSITE_SSH_USER}: ${WEBSITE_DEPLOY_PATH}" >&2
-              echo "Remote permission diagnostics:" >&2
-              ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" \
-                "whoami; id; stat -c '%A %U %G %n' ${remote_path}; touch ${remote_path}/.deploy-write-test && rm ${remote_path}/.deploy-write-test" >&2 || true
-              echo "Fix by chowning the deploy path to ${WEBSITE_SSH_USER}, or set WEBSITE_RSYNC_USE_SUDO=true and allow passwordless sudo for rsync/mkdir." >&2
-              exit 1
-            }
-          fi
+          ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" "mkdir -p ${remote_path}"
+          ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" "test -w ${remote_path}"
 
-          rsync "${rsync_options[@]}" \
+          rsync -az --delete \
+            --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r \
+            -e "ssh -i ~/.ssh/deploy_key -p ${WEBSITE_SSH_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
             website/ \
             "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}:${WEBSITE_DEPLOY_PATH}/"
