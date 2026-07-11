@@ -10,6 +10,25 @@
     "calculation_strategy",
     "created_at"
   ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "device_type": {
+            "const": "light"
+          }
+        },
+        "required": [
+          "device_type"
+        ]
+      },
+      "then": {
+        "required": [
+          "standby_power"
+        ]
+      }
+    }
+  ],
   "properties": {
     "aliases": {
       "type": "array",
