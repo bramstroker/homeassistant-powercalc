@@ -2128,10 +2128,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "d30f14ccbc8d0d210443ef2730bf8568"
+          "hash": "9eb841ad7377841347faafffa453740c"
         }
       ],
       "device_types": [
@@ -7138,11 +7138,11 @@
           "max_power": 11.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "95a34fdb82dede81d81a89437df5a772"
+          "hash": "dab70c54efd76d0e49dca47f27d9bd79"
         },
         {
           "calculation_strategy": "lut",
@@ -7375,11 +7375,11 @@
           "max_power": 41.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "a653425ab3fc9ae2f4650246572bfda7"
+          "hash": "43145f60f044cb67f0b142f1f34e416c"
         },
         {
           "aliases": [
@@ -7517,11 +7517,11 @@
           "max_power": 11.63,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "6c40e7cf554d7b18a3b3e36d5794cdd6"
+          "hash": "83ea6a4cb6a306d2deddb9c1fd3364ca"
         },
         {
           "aliases": [
@@ -7654,10 +7654,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "effect"
+            "effect",
+            "brightness"
           ],
-          "hash": "3d1193b2b444af35d122475a287dfd31"
+          "hash": "a20cceb246cdbc5bc88bf09659371279"
         },
         {
           "aliases": [
@@ -8924,11 +8924,11 @@
           "max_power": 7.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "ce834586498329ae8d28eb001d152951"
+          "hash": "16a56344c901aecc3dd0837434b49e42"
         },
         {
           "aliases": [
@@ -9506,11 +9506,11 @@
           "max_power": 4.81,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "c133b82f92e325a028710413f9bc47da"
+          "hash": "4078d6ceed4de6b8c64f562658646c80"
         },
         {
           "aliases": [],
@@ -9727,11 +9727,11 @@
           "max_power": 5.16,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "9d455f377ba6128cc76f1447c930722e"
+          "hash": "68e3968f88d60032f75553880aace7c8"
         },
         {
           "aliases": [
@@ -11008,20 +11008,21 @@
           },
           "min_version": "1.20.6",
           "name": "Hue Datura ceiling light",
+          "standby_power": 0.36,
           "author_info": {
             "name": "Lukas K\u00f6hl",
             "github": "lkoehl"
           },
           "id": "929003736201",
           "manufacturer": "signify",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-07-11T07:50:39",
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "hsv",
-            "color_temp"
+            "color_temp",
+            "hsv"
           ],
-          "hash": "1d73018538011282795e6b9fa4eb498c"
+          "hash": "4884f7c0494fb1f71dfcf69249b8029d"
         },
         {
           "aliases": [
@@ -11750,11 +11751,11 @@
           "max_power": 29.03,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "93549fc493811ffd86b2bd99826e19bc"
+          "hash": "7bac4e756ecf6adaf2866db2f82f5fa4"
         },
         {
           "calculation_strategy": "lut",
@@ -12564,10 +12565,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "bfd2798a9f79cbddecea99b3a8d24f87"
+          "hash": "10e331012803216aeb5a067380f2a12c"
         },
         {
           "aliases": [
@@ -12643,10 +12644,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "ea4d1038787476b9c516f185ad27a247"
+          "hash": "c0e67b6cb520ef5a5d05bdc2f7afec45"
         },
         {
           "calculation_strategy": "lut",
@@ -17553,11 +17554,11 @@
           "max_power": null,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "28ad3a432f68458710c50f22acbf07f4"
+          "hash": "c60f9cbd35f910892bba73ac054a2389"
         },
         {
           "calculation_strategy": "lut",
@@ -17970,6 +17971,7 @@
           "aliases": [
             "ceild"
           ],
+          "standby_power": 0.5,
           "author_info": {
             "name": "xxddff",
             "github": "xxddff",
@@ -17977,13 +17979,13 @@
           },
           "id": "YLXD024",
           "manufacturer": "yeelight",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-07-11T07:50:39",
           "max_power": 40.45,
           "sub_profile_count": 2,
           "color_modes": [
             "color_temp"
           ],
-          "hash": "9c712ecdab42bd872610f405363c1307"
+          "hash": "c1efcbf9ceaf1654eb88a0a2bf9f6b5c"
         },
         {
           "aliases": [
@@ -18249,10 +18251,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "99df4968cad4078e5eae2b6efcaf14ce"
+          "hash": "b6fc5dcc3ddec411f1387ed46deb6e11"
         }
       ],
       "device_types": [
@@ -18382,11 +18384,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "98c2ee64660ce7299d12e9715db6a5de"
+          "hash": "bbad7e84b38271c3a08c12ed357f4bac"
         },
         {
           "calculation_strategy": "lut",
@@ -18412,11 +18414,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "07c880347893d55a0d7f489e52558b9d"
+          "hash": "ed341a18fd68f61e6e59b5e3427fb23b"
         },
         {
           "calculation_strategy": "lut",
@@ -18471,10 +18473,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "8adb904a7a5b55bfe5a94dd13d2fbf22"
+          "hash": "e63bcc1511b74c357d98a2d8e2d0856c"
         },
         {
           "calculation_strategy": "lut",
@@ -18499,11 +18501,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "ab690721e02ee55b9bc53e17d11a0396"
+          "hash": "ff35335646b908d93b971648daea731c"
         },
         {
           "calculation_strategy": "lut",
@@ -18587,10 +18589,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "5ca77e866faa0ed82e2c8fe9dfab0b52"
+          "hash": "742ad6d56ddd255eda6ec7dced5b49c8"
         },
         {
           "calculation_strategy": "lut",
@@ -18616,11 +18618,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
             "hs",
+            "effect",
             "color_temp"
           ],
-          "hash": "0f6a21c5d2fad0bdb5756fef0e498ed1"
+          "hash": "61b7fe98c9ad2d981ae48d790cfbc40b"
         },
         {
           "calculation_strategy": "lut",
