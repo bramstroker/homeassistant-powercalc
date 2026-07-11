@@ -474,7 +474,6 @@ class GroupedSensor(BaseEntity, SensorEntity):
         self._start_time: float = time.time()
         self._last_update_time: float = 0
         self._update_interval_exceeded_callback: CALLBACK_TYPE | None = None
-        self._unit_converter_cache: dict[str, Callable[[float], float]] = {}
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -793,7 +792,6 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
         """Reset the group sensor and underlying member sensor when supported."""
         _LOGGER.debug("%s: Reset grouped energy sensor", self.entity_id)
         self._set_native_value(Decimal(0))
-        self.async_write_ha_state()
 
         for entity_id in self._entities:
             _LOGGER.debug("Resetting %s", entity_id)
@@ -813,7 +811,6 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
     async def async_calibrate(self, value: str) -> None:
         _LOGGER.debug("%s: Calibrate group energy sensor to: %s", self.entity_id, value)
         self._set_native_value(Decimal(value))
-        self.async_write_ha_state()
 
     def calculate_initial_state(
         self,
