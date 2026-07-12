@@ -14,6 +14,9 @@ class ConsoleInteraction:
     def notify(self, message: str) -> None:
         print(message)
 
+    def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
+        return
+
     def wait(self, seconds: float) -> None:
         time.sleep(seconds)
 
@@ -25,6 +28,9 @@ class ImmediateInteraction:
         return
 
     def notify(self, _: str) -> None:
+        return
+
+    def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
         return
 
     def wait(self, seconds: float) -> None:
@@ -42,6 +48,10 @@ class SessionInteraction:
 
     def notify(self, message: str) -> None:
         self.control.log(message)
+
+    def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
+        remaining = "" if remaining_seconds is None else f"{int(remaining_seconds)}s"
+        self.control.progress(completed=completed, total=total, mode=phase, estimated_remaining=remaining)
 
     def wait(self, seconds: float) -> None:
         self.control.wait(seconds)

@@ -26,6 +26,10 @@ export class ResultView extends LitElement {
     .status-mark { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--line); border-radius: 50%; color: var(--good); font: 700 1.3rem/1 ui-monospace, monospace; }
     .status-mark.failed { color: var(--danger); }
     .status-mark.cancelled, .status-mark.resumable { color: var(--signal); }
+    .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); margin-top: 1.5rem; }
+    .metric { padding: 1rem; background: var(--field); }
+    .metric span { display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .metric strong { display: block; margin-top: 0.35rem; font: 700 1.4rem/1.1 "DIN Alternate", sans-serif; color: var(--signal-strong); }
     .files-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1.5rem; }
     .files-header h3 { margin: 0; font-size: 1rem; }
     .download-all { min-height: 36px; padding: 0.45rem 0.75rem; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
@@ -51,6 +55,7 @@ export class ResultView extends LitElement {
           <div><h2 id="result-title">${this.resultTitle(state)}</h2><p class="muted">${this.description(state)}</p></div>
         </div>
         ${error ? html`<p class="notice error" role="alert">${error}</p>` : nothing}
+        ${this.renderSummary()}
         ${this.files.length ? html`
           <div class="files-header">
             <h3>Generated files</h3>
@@ -59,7 +64,7 @@ export class ResultView extends LitElement {
           <ul>${this.files.map((file) => html`
             <li><span>${file.name}</span><small>${this.size(file.size)}</small><a href=${this.fileUrl(file.name)} download>Download<span class="sr-only"> ${file.name}</span></a></li>
           `)}</ul>
-        ` : html`<p class="notice">No downloadable files are available for this session.</p>`}
+        ` : this.summaryEntries().length ? nothing : html`<p class="notice">No downloadable files are available for this session.</p>`}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         <div class="actions">
           <button type="button" @click=${() => this.emit("new")}>New measurement</button>
@@ -67,6 +72,18 @@ export class ResultView extends LitElement {
         </div>
       </section>
     `;
+  }
+
+  private summaryEntries(): [string, string][] {
+    return this.snapshot.summary ? Object.entries(this.snapshot.summary) : [];
+  }
+
+  private renderSummary() {
+    const entries = this.summaryEntries();
+    if (!entries.length) return nothing;
+    return html`<div class="readout" aria-label="Measurement result">
+      ${entries.map(([label, value]) => html`<div class="metric"><span>${label}</span><strong>${value}</strong></div>`)}
+    </div>`;
   }
 
   private renderResume(state: SessionSnapshot["state"]) {
@@ -81,14 +98,14 @@ export class ResultView extends LitElement {
   }
 
   private resultTitle(state: SessionSnapshot["state"]): string {
-    if (state === "completed") return "Profile captured";
+    if (state === "completed") return this.summaryEntries().length ? "Measurement complete" : "Profile captured";
     if (state === "failed") return "Measurement stopped with an error";
     if (state === "resumable") return "A measurement can be resumed";
     return "Measurement cancelled";
   }
 
   private description(state: SessionSnapshot["state"]): string {
-    if (state === "completed") return "The complete output is ready to inspect or download.";
+    if (state === "completed") return this.summaryEntries().length ? "Here is the measured result." : "The complete output is ready to inspect or download.";
     if (state === "resumable") return "Compatible output was found. Continue from the last complete variation.";
     return "Any complete output rows have been kept safely.";
   }

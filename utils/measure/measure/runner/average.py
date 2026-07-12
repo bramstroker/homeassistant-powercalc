@@ -1,4 +1,5 @@
 import logging
+from statistics import mean
 from typing import Any
 
 import inquirer
@@ -36,9 +37,24 @@ class AverageRunner(MeasurementRunner):
     ) -> RunnerResult | None:
         self.interaction.confirm("Ready to start the average measurement.")
 
-        result = self.measure_util.take_average_measurement(self.duration)
+        result = self.measure_util.take_average_measurement(self.duration, on_progress=self._report_progress)
 
-        return RunnerResult(model_json_data={}, voltages=result.voltages)
+        summary = {
+            "Average power": f"{round(result.power, 2)} W",
+            "Duration": f"{self.duration} s",
+        }
+        if result.voltages:
+            summary["Average voltage"] = f"{round(mean(result.voltages), 1)} V"
+
+        return RunnerResult(model_json_data={}, voltages=result.voltages, summary=summary)
+
+    def _report_progress(self, elapsed: float, duration: float) -> None:
+        self.interaction.progress(
+            int(min(elapsed, duration)),
+            int(duration),
+            phase="Averaging",
+            remaining_seconds=max(0.0, duration - elapsed),
+        )
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         return [

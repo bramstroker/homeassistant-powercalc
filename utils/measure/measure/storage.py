@@ -76,6 +76,7 @@ class SessionStorage:
             files=tuple(state.get("files", [])),
             warnings=tuple(state.get("warnings", [])),
             event_sequence=int(state.get("event_sequence", 0)),
+            summary=state.get("summary"),
         )
         if snapshot.state in {SessionState.RUNNING, SessionState.CANCELLING}:
             resumable = self.can_resume(snapshot.id)

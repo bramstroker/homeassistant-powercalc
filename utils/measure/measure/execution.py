@@ -19,6 +19,9 @@ class RunInteraction(Protocol):
     def notify(self, message: str) -> None:
         """Present non-terminal run information to the operator."""
 
+    def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
+        """Report measurement progress. ``total`` of 0 means the run is open-ended."""
+
     def wait(self, seconds: float) -> None:
         """Wait for a duration, raising if the run is cancelled."""
 

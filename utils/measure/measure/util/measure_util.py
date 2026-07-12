@@ -74,6 +74,7 @@ class MeasureUtil:
         duration: int,
         measure_resistance: bool = False,
         convergence: AverageMeasurementConvergence | None = None,
+        on_progress: Callable[[float, float], None] | None = None,
     ) -> MeasurementResult:
         """
         Measure the average power consumption or resistance for a given time period in seconds.
@@ -105,7 +106,9 @@ class MeasureUtil:
             - Ignores single measurements of <= 0 W.
         """
         _LOGGER.info("Measuring average %s over %s seconds", "resistance" if measure_resistance else "power", duration)
-        state = self._collect_average_measurements(duration, measure_resistance, convergence)
+        state = self._collect_average_measurements(duration, measure_resistance, convergence, on_progress)
+        if on_progress is not None:
+            on_progress(duration, duration)
 
         if not state.readings:
             _LOGGER.error("No valid readings were recorded.")
@@ -125,6 +128,7 @@ class MeasureUtil:
         duration: int,
         measure_resistance: bool,
         convergence: AverageMeasurementConvergence | None,
+        on_progress: Callable[[float, float], None] | None = None,
     ) -> AverageMeasurementState:
         start_time = time.time()
         state = AverageMeasurementState(start_time, [], [], [])
@@ -134,6 +138,8 @@ class MeasureUtil:
             if not first_measurement and not self._sleep_before_next_average_reading(start_time, duration):
                 break
             first_measurement = False
+            if on_progress is not None:
+                on_progress(time.time() - start_time, duration)
 
             try:
                 result = self._take_average_measurement_reading(measure_resistance)

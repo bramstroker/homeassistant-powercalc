@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import time
 from types import SimpleNamespace
 from typing import Any
 
@@ -80,6 +81,18 @@ class CompletingService:
         (directory / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
         control.progress(completed=1, total=1, mode="brightness", estimated_remaining="0s")
         return RunnerResult(model_json_data={}), directory
+
+
+class SummaryService:
+    def run(
+        self,
+        request: LightMeasurementRequest,
+        control: SessionControl,
+        output_root: Path,
+    ) -> tuple[RunnerResult, Path]:
+        control.progress(completed=30, total=30, mode="Averaging", estimated_remaining="0s")
+        summary = {"Average power": "42.3 W", "Duration": "30 s"}
+        return RunnerResult(model_json_data={}, summary=summary), output_root / request.model_id
 
 
 def payload() -> dict[str, object]:
@@ -208,6 +221,29 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     assert files.json()[0]["name"] == "LCT010/brightness.csv"
     download = test_client.get("/api/session/current/files/LCT010/brightness.csv")
     assert download.status_code == 200
+
+
+def test_session_summary_is_exposed(tmp_path: Path) -> None:
+    app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
+    app.state.context.client = FakeClient
+    app.state.context.coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SummaryService)
+    test_client = TestClient(app)
+
+    run_payload = {
+        "measure_type": MeasureType.AVERAGE,
+        "answers": {"powermeter_entity_id": "sensor.test_power", "duration": 30},
+    }
+    assert test_client.post("/api/runs", json=run_payload).status_code == 201
+
+    current = {}
+    for _ in range(50):
+        current = test_client.get("/api/session/current").json()
+        if current["state"] == "completed":
+            break
+        time.sleep(0.02)
+
+    assert current["state"] == "completed"
+    assert current["summary"] == {"Average power": "42.3 W", "Duration": "30 s"}
 
 
 def test_validation_errors_have_stable_shape(tmp_path: Path) -> None:

@@ -56,6 +56,8 @@ export class RunningView extends LitElement {
 
   render() {
     const progress = this.snapshot.progress ?? { completed: 0, total: 0 };
+    const openEnded = this.snapshot.mode === "Recording" && (progress.total ?? 0) === 0;
+    const timeBased = this.snapshot.mode === "Averaging";
     const percent = progress.percent ?? (progress.total ? progress.completed / progress.total * 100 : 0);
     return html`
       <section class="panel" aria-labelledby="running-title">
@@ -66,12 +68,15 @@ export class RunningView extends LitElement {
             <span class="muted">${this.snapshot.phase ?? "Preparing measurement"}</span>
             <span class="connection ${this.connected ? "connected" : ""}" role="status">${this.connected ? "Live" : "Reconnecting"}</span>
           </div>
-          <div class="value" aria-label="${Math.round(percent)} percent complete">${Math.round(percent)}<small>%</small></div>
-          <progress max="100" .value=${percent}>${Math.round(percent)}%</progress>
+          ${openEnded
+            ? html`<div class="value" aria-label="${progress.completed} samples recorded">${progress.completed}<small>samples</small></div>
+                   <progress max="100" aria-label="Recording"></progress>`
+            : html`<div class="value" aria-label="${Math.round(percent)} percent complete">${Math.round(percent)}<small>%</small></div>
+                   <progress max="100" .value=${percent}>${Math.round(percent)}%</progress>`}
           <div class="metrics">
             <div class="metric"><span>Mode</span><strong>${this.snapshot.mode ?? "—"}</strong></div>
-            <div class="metric"><span>Variation</span><strong>${progress.completed} / ${progress.total}</strong></div>
-            <div class="metric"><span>Remaining</span><strong>${this.remaining(progress.estimated_remaining_seconds)}</strong></div>
+            <div class="metric"><span>${openEnded ? "Recorded" : timeBased ? "Seconds" : "Variation"}</span><strong>${openEnded ? progress.completed : html`${progress.completed} / ${progress.total}`}</strong></div>
+            <div class="metric"><span>Remaining</span><strong>${openEnded ? "Until stopped" : this.remaining(progress.estimated_remaining_seconds)}</strong></div>
           </div>
           ${this.samples.length ? this.renderChart() : nothing}
         </div>
@@ -79,7 +84,9 @@ export class RunningView extends LitElement {
         ${this.logs.length ? this.renderLog() : nothing}
         <div class="actions">
           ${this.snapshot.state === "awaiting_confirmation" ? html`<button class="primary" type="button" @click=${this.confirm} ?disabled=${this.busy}>Start measurement</button>` : nothing}
-          <button class="danger" type="button" @click=${this.cancel} ?disabled=${this.busy || this.snapshot.state === "cancelling"}>${this.snapshot.state === "cancelling" ? "Cancelling…" : "Cancel measurement"}</button>
+          ${openEnded
+            ? html`<button class="primary" type="button" @click=${this.cancel} ?disabled=${this.busy || this.snapshot.state === "cancelling"}>${this.snapshot.state === "cancelling" ? "Stopping…" : "Stop recording"}</button>`
+            : html`<button class="danger" type="button" @click=${this.cancel} ?disabled=${this.busy || this.snapshot.state === "cancelling"}>${this.snapshot.state === "cancelling" ? "Cancelling…" : "Cancel measurement"}</button>`}
         </div>
       </section>
     `;

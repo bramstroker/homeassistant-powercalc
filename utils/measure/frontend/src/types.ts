@@ -112,6 +112,7 @@ export interface SessionSnapshot {
   progress?: SessionProgress;
   warnings?: string[];
   error?: { code?: string; message: string } | string | null;
+  summary?: Record<string, string> | null;
   request?: MeasurementRequest;
 }
 

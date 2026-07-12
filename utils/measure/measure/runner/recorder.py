@@ -10,6 +10,7 @@ from measure.execution import RunInteraction
 from measure.interactions import ConsoleInteraction
 from measure.runner.const import QUESTION_EXPORT_FILENAME
 from measure.runner.runner import MeasurementRunner, RunnerResult
+from measure.session import MeasurementCancelledError
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 INTERVAL = 2
@@ -42,12 +43,15 @@ class RecorderRunner(MeasurementRunner):
         answers: dict[str, Any],
         export_directory: str,
     ) -> RunnerResult | None:
-        self.interaction.confirm("Ready to start recording. Cancel the measurement when you are finished.")
+        self.interaction.confirm("Ready to start recording. Stop the measurement when you are finished.")
 
+        csv_filepath = f"{export_directory}/{self.filename}"
+        start_time = time.time()
+        voltages: list[float] = []
+        recorded = 0
+        # Stopping a recorder (KeyboardInterrupt on the CLI, cancellation in the app) is the
+        # normal way to finish it, so we treat it as a successful completion, not a cancel.
         try:
-            csv_filepath = f"{export_directory}/{self.filename}"
-            start_time = time.time()
-            voltages: list[float] = []
             with open(csv_filepath, "w", newline="") as csv_file:
                 writer = csv.writer(csv_file)
                 while True:
@@ -57,11 +61,18 @@ class RecorderRunner(MeasurementRunner):
                     _LOGGER.info("Measurement %.2f", measurement.power)
                     writer.writerow([timestamp - start_time, measurement.power])
                     voltages.extend(measurement.voltages)
+                    recorded += 1
+                    # Open-ended recording: report the running sample count (total 0 = indeterminate).
+                    self.interaction.progress(recorded, 0, phase="Recording")
                     self.interaction.wait(INTERVAL)
-        except KeyboardInterrupt:
+        except KeyboardInterrupt, MeasurementCancelledError:
             _LOGGER.info("Stopped recording")
 
-        return RunnerResult(model_json_data={}, voltages=voltages)
+        summary = {
+            "Samples recorded": str(recorded),
+            "Duration": f"{round(time.time() - start_time)} s",
+        }
+        return RunnerResult(model_json_data={}, voltages=voltages, summary=summary)
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         return [

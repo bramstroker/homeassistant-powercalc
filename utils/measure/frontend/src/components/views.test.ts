@@ -226,6 +226,34 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector(".chart")).toBeNull();
   });
 
+  it("shows a live sample count for an open-ended recording", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", mode: "Recording", progress: { completed: 7, total: 0 } };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".value")?.textContent).toContain("7");
+    expect(element.shadowRoot.textContent).toContain("samples");
+    expect(element.shadowRoot.textContent).toContain("Until stopped");
+    const stop = [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Stop recording"));
+    expect(stop).toBeTruthy();
+    expect(element.shadowRoot.querySelector("button.danger")).toBeNull();
+  });
+
+  it("labels average progress in seconds", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", mode: "Averaging", progress: { completed: 12, total: 60, estimated_remaining_seconds: 48 } };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.textContent).toContain("Seconds");
+    expect(element.shadowRoot.textContent).toContain("12 / 60");
+  });
+
   it("auto-scrolls the log container when new log lines arrive", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot;
@@ -462,5 +490,23 @@ describe("result view", () => {
     expect(button.textContent).toContain("Download all");
     button.click();
     expect(downloadAll).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders a summary readout for a file-less measurement", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot; files: { name: string; size: number; media_type: string }[];
+      fileUrl: (name: string) => string; downloadAll: () => void;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "completed", summary: { "Average power": "42.3 W", "Duration": "30 s" } };
+    element.files = [];
+    element.fileUrl = (name) => name;
+    element.downloadAll = () => {};
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".readout")?.textContent).toContain("42.3 W");
+    expect(element.shadowRoot.querySelector("#result-title")?.textContent).toContain("Measurement complete");
+    expect(element.shadowRoot.textContent).not.toContain("No downloadable files");
   });
 });

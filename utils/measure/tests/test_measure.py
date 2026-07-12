@@ -273,7 +273,8 @@ def test_run_average(
     measure = _create_measure_instance(config=mock_config)
     measure.start()
 
-    mock_average_measurement.assert_called_once_with(30)
+    mock_average_measurement.assert_called_once()
+    assert mock_average_measurement.call_args.args[0] == 30
 
     assert not os.path.exists(os.path.join(PROJECT_DIR, "export", "generic"))
     assert "Exporting to" not in caplog.text

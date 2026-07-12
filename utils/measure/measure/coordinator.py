@@ -158,14 +158,18 @@ class MeasurementCoordinator:
         control: SessionControl,
     ) -> None:
         try:
-            self.service_factory().run(request.to_domain(), control, self.storage.output_directory(session_id))
+            result, _ = self.service_factory().run(
+                request.to_domain(),
+                control,
+                self.storage.output_directory(session_id),
+            )
         except MeasurementCancelledError:
             self._finish(SessionState.CANCELLED)
         except Exception as error:
             _LOGGER.exception("Measurement session %s failed", session_id)
             self._finish(SessionState.FAILED, error=str(error))
         else:
-            self._finish(SessionState.COMPLETED)
+            self._finish(SessionState.COMPLETED, summary=result.summary)
 
     def _handle_event(self, event: SessionEvent) -> None:
         with self._lock:
@@ -211,7 +215,7 @@ class MeasurementCoordinator:
             self.storage.append_event(self._snapshot.id, event)
             self.storage.write_snapshot(self._snapshot)
 
-    def _finish(self, state: SessionState, error: str | None = None) -> None:
+    def _finish(self, state: SessionState, error: str | None = None, summary: dict[str, str] | None = None) -> None:
         with self._lock:
             if self._snapshot is None:
                 return
@@ -225,6 +229,7 @@ class MeasurementCoordinator:
                 error=error,
                 files=files,
                 event_sequence=sequence,
+                summary=summary if summary is not None else self._snapshot.summary,
             )
             event = SessionEvent(
                 sequence=sequence,

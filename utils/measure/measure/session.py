@@ -59,6 +59,7 @@ class SessionSnapshot:
     files: tuple[str, ...] = ()
     warnings: tuple[str, ...] = ()
     event_sequence: int = 0
+    summary: dict[str, str] | None = None
 
     @property
     def progress(self) -> float:

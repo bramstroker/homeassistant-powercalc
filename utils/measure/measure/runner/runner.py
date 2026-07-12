@@ -34,3 +34,4 @@ class MeasurementRunner(ABC):
 class RunnerResult:
     model_json_data: dict
     voltages: list[float] | None = None
+    summary: dict[str, str] | None = None
