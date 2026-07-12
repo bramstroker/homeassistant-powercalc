@@ -31,6 +31,7 @@ class FakeClient:
                         "on",
                         friendly_name="Test light",
                         supported_color_modes=["brightness", "color_temp", "hs"],
+                        effect_list=["colorloop"],
                     ),
                     "switch_like": entity(
                         "light.switch_like",
@@ -112,9 +113,10 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     lights = test_client.get("/api/entities?domain=light")
 
     assert capabilities.status_code == 200
-    assert capabilities.json()["modes"] == ["brightness", "color_temp", "hs"]
+    assert capabilities.json()["modes"] == ["brightness", "color_temp", "hs", "effect"]
     assert [item["entity_id"] for item in powers.json()] == ["sensor.test_power"]
     assert "light.switch_like" not in {item["entity_id"] for item in lights.json()}
+    assert lights.json()[0]["supported_modes"] == ["brightness", "color_temp", "hs", "effect"]
 
 
 def test_preflight_rejects_unavailable_entity(tmp_path: Path) -> None:

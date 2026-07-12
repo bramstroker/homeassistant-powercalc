@@ -69,7 +69,7 @@ class LightMeasurementRequestModel(BaseModel):
     @field_validator("modes")
     @classmethod
     def validate_modes(cls, value: set[LutMode]) -> set[LutMode]:
-        unsupported = value - {LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS}
+        unsupported = value - {LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS, LutMode.EFFECT}
         if unsupported:
             raise ValueError(f"Unsupported app measurement modes: {', '.join(sorted(unsupported))}")
         return value

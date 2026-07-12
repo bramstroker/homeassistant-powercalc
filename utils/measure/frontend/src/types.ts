@@ -9,7 +9,7 @@ export type SessionState =
   | "failed"
   | "resumable";
 
-export type LutMode = "brightness" | "color_temp" | "hs";
+export type LutMode = "brightness" | "color_temp" | "hs" | "effect";
 
 export interface EntityDescriptor {
   entity_id: string;
@@ -17,6 +17,7 @@ export interface EntityDescriptor {
   state?: string;
   unit?: string;
   supported_modes?: LutMode[];
+  effect_list?: string[];
 }
 
 export interface MeasureDefaults {

@@ -48,6 +48,7 @@ class EntityDescriptor(BaseModel):
     state: str | None = None
     unit: str | None = None
     supported_modes: list[LutMode] | None = None
+    effect_list: list[str] | None = None
 
 
 class PreflightResponse(BaseModel):
@@ -190,7 +191,7 @@ def _register_measurement_routes(router: APIRouter) -> None:
     @router.get("/capabilities")
     async def capabilities() -> CapabilitiesResponse:
         return CapabilitiesResponse(
-            modes=[LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS],
+            modes=[LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS, LutMode.EFFECT],
             defaults={
                 "sleep_time": 2,
                 "sample_count": 1,
@@ -342,6 +343,7 @@ def _describe_entity(entity: Any, domain: Literal["light"] | None, unit: str | N
         state=entity_state,
         unit=str(entity_unit) if entity_unit else None,
         supported_modes=supported_modes,
+        effect_list=list(attributes.get("effect_list", [])) or None,
     )
 
 
@@ -350,6 +352,8 @@ def _supported_light_modes(attributes: dict[str, Any]) -> list[LutMode]:
     modes = [mode for mode in (LutMode.COLOR_TEMP, LutMode.HS) if mode.value in values]
     if values - {"onoff"} or "brightness" in attributes:
         modes.insert(0, LutMode.BRIGHTNESS)
+    if attributes.get("effect_list"):
+        modes.append(LutMode.EFFECT)
     return modes
 
 
@@ -375,11 +379,12 @@ def _preflight(context: AppContext, payload: LightMeasurementRequestModel) -> Pr
         raise HTTPException(status_code=422, detail="Selected power entity is unavailable or not measured in W")
     if payload.voltage_entity_id and payload.voltage_entity_id not in voltages:
         raise HTTPException(status_code=422, detail="Selected voltage entity is unavailable or not measured in V")
-    supported = set(lights[payload.light_entity_id].supported_modes or [])
+    light = lights[payload.light_entity_id]
+    supported = set(light.supported_modes or [])
     requested = set(payload.modes)
     if not requested.issubset(supported):
         raise HTTPException(status_code=422, detail="Selected light does not advertise every requested mode")
-    estimated = _estimated_variations(payload)
+    estimated = _estimated_variations(payload, len(light.effect_list or []))
     return PreflightResponse(
         valid=True,
         warnings=[],
@@ -389,7 +394,7 @@ def _preflight(context: AppContext, payload: LightMeasurementRequestModel) -> Pr
     )
 
 
-def _estimated_variations(payload: LightMeasurementRequestModel) -> int:
+def _estimated_variations(payload: LightMeasurementRequestModel, effect_count: int = 0) -> int:
     count = 0
     if LutMode.BRIGHTNESS in payload.modes:
         count += 255 // payload.brightness_step + 1
@@ -399,6 +404,8 @@ def _estimated_variations(payload: LightMeasurementRequestModel) -> int:
         count += (
             (255 // payload.brightness_step + 1) * (360 // payload.hue_step + 1) * (100 // payload.saturation_step + 1)
         )
+    if LutMode.EFFECT in payload.modes:
+        count += max(1, effect_count) * (255 // payload.brightness_step + 1)
     return count
 
 

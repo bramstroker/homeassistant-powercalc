@@ -39,24 +39,30 @@ export class AppShell extends LitElement {
 
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-height: 100vh; background: var(--canvas); }
-    .shell { width: min(980px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(1.2rem, 5vw, 3.5rem) 0 4rem; }
-    header { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: end; margin-bottom: clamp(1.5rem, 5vw, 3rem); }
-    .brand { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.3rem; color: var(--muted); font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.16em; text-transform: uppercase; }
-    .brand-mark { display: inline-grid; grid-template-columns: repeat(3, 4px); align-items: end; gap: 3px; height: 16px; }
-    .brand-mark i { display: block; width: 4px; background: var(--signal); } .brand-mark i:nth-child(1) { height: 35%; } .brand-mark i:nth-child(2) { height: 100%; } .brand-mark i:nth-child(3) { height: 65%; }
-    h1 { max-width: 650px; margin: 0; font-size: clamp(2.2rem, 7vw, 4.8rem); line-height: 0.92; letter-spacing: -0.045em; }
-    .subtitle { max-width: 480px; margin: 1.2rem 0 0; color: var(--muted); font-size: 1rem; line-height: 1.6; }
-    .header-aside { display: grid; gap: 1.1rem; justify-items: end; }
-    .settings-toggle { min-height: 0; padding: 0.4rem 0.8rem; border-radius: 999px; font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.12em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.45rem; }
+    .shell { width: min(1320px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(1rem, 3vw, 2rem) 0 4rem; }
+    header { margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 0.7rem; color: var(--muted); font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.16em; text-transform: uppercase; }
+    .brand-logo { width: 20px; height: 24px; object-fit: contain; }
+    .intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr); gap: 1.25rem clamp(1.5rem, 5vw, 4rem); align-items: end; padding-top: clamp(1.5rem, 4vw, 2.5rem); }
+    h1 { grid-column: 1 / -1; margin: 0; font-size: clamp(2rem, 3.4vw, 3rem); line-height: 1; letter-spacing: -0.04em; }
+    .subtitle { max-width: 540px; margin: 0.8rem 0 0; color: var(--muted); font-size: 1rem; line-height: 1.6; }
+    .settings-toggle { min-height: 36px; padding: 0.4rem 0.8rem; border-radius: 999px; font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.12em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.45rem; }
     .settings-toggle::before { content: "⚙"; font-size: 0.95rem; }
-    .sequence { display: grid; gap: 0.5rem; justify-items: end; }
-    .sequence > span { width: 68px; height: 3px; border-radius: 99px; background: var(--line); }
-    .sequence > span.active, .sequence > span.done { background: var(--signal); }
+    .sequence { margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; list-style: none; }
+    .sequence > li { position: relative; display: grid; gap: 0.45rem; min-width: 0; color: var(--muted); font: 700 0.68rem/1.15 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+    .sequence > li:not(:last-child)::after { content: ""; position: absolute; top: 10px; left: calc(20px + 0.45rem); width: calc(100% - 40px - 0.45rem); height: 2px; border-radius: 99px; background: var(--line); }
+    .step-number { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid var(--line); border-radius: 50%; background: var(--canvas); color: var(--muted); font-size: 0.66rem; z-index: 1; }
+    .sequence > li.active { color: var(--ink); } .sequence > li.done { color: var(--signal-strong); }
+    .sequence > li.active .step-number { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 16%, transparent); color: var(--on-signal); background: var(--signal); }
+    .sequence > li.done .step-number { border-color: var(--signal); color: var(--on-signal); background: var(--signal); }
+    .sequence > li.done:not(:last-child)::after { background: var(--signal); }
     .loading { min-height: 260px; display: grid; place-items: center; text-align: center; }
     .pulse { width: 40px; height: 40px; margin: 0 auto 1rem; border: 2px solid var(--line); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     footer { margin-top: 1rem; color: var(--muted); font-size: 0.72rem; text-align: right; }
-    @media (max-width: 700px) { header { grid-template-columns: 1fr; } .sequence { grid-template-columns: repeat(4, 1fr); justify-items: stretch; } .sequence > span { width: auto; } }
+    @media (max-width: 700px) { .intro { grid-template-columns: 1fr; } h1 { grid-column: auto; } .sequence { max-width: 560px; } }
+    @media (max-width: 460px) { .shell { width: min(100% - 1.25rem, 980px); } .sequence { gap: 0.3rem; } .sequence > li { font-size: 0.58rem; letter-spacing: 0.04em; } .sequence > li:not(:last-child)::after { left: calc(20px + 0.3rem); width: calc(100% - 40px - 0.3rem); } }
   `];
 
   connectedCallback(): void { super.connectedCallback(); void this.boot(); }
@@ -66,15 +72,19 @@ export class AppShell extends LitElement {
     return html`
       <main class="shell">
         <header>
-          <div>
-            <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Powercalc Measure</div>
-            <h1>Turn real watts into a precise profile.</h1>
-            <p class="subtitle">Configure, validate, and monitor a light measurement without leaving Home Assistant.</p>
-          </div>
-          <div class="header-aside">
+          <div class="topbar">
+            <div class="brand"><img class="brand-logo" src="powercalc-logo.svg" alt="" />Powercalc Measure</div>
             <button class="settings-toggle" type="button" @click=${this.openSettings} ?disabled=${this.view === "loading" || this.view === "settings"}>Settings</button>
-            <nav class="sequence" aria-label="Measurement steps">
-              ${["setup", "review", "running", "result"].map((step, index) => html`<span class=${this.stepClass(index)}><span class="sr-only">${step}</span></span>`)}
+          </div>
+          <div class="intro">
+            <h1>Turn real watts into a precise profile.</h1>
+            <div>
+            <p class="subtitle">Configure, validate, and monitor a light measurement without leaving Home Assistant.</p>
+            </div>
+            <nav aria-label="Measurement progress">
+              <ol class="sequence">
+                ${["Set up", "Review", "Measure", "Result"].map((step, index) => html`<li class=${this.stepClass(index)} aria-current=${index === this.currentStep() ? "step" : nothing}><span class="step-number">${index < this.currentStep() ? "✓" : index + 1}</span><span>${step}</span></li>`)}
+              </ol>
             </nav>
           </div>
         </header>
@@ -102,7 +112,7 @@ export class AppShell extends LitElement {
     if (this.view === "running" && this.snapshot) return html`
       <measure-running-view .snapshot=${this.snapshot} .connected=${this.connectedToEvents} .logs=${this.logs} .busy=${this.busy} @cancel=${this.cancel}></measure-running-view>`;
     if (this.view === "result" && this.snapshot) return html`
-      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .fileUrl=${(name: string) => this.api.fileUrl(name)} .busy=${this.busy} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
+      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .busy=${this.busy} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
     return html`
       <measure-setup-view .capabilities=${this.capabilities} .lights=${this.lights} .powers=${this.powers} .voltages=${this.voltages} .initialRequest=${this.request} .defaultPowerEntityId=${this.settings?.default_power_entity_id ?? ""} .busy=${this.busy} .errorMessage=${this.errorMessage} @preflight=${this.runPreflight}></measure-setup-view>`;
   }
@@ -188,6 +198,18 @@ export class AppShell extends LitElement {
     finally { this.busy = false; }
   }
   private async loadFiles(): Promise<void> { try { this.files = await this.api.getFiles(); } catch { this.files = []; } }
+  private downloadAllFiles(): void {
+    for (const file of this.files) {
+      const anchor = document.createElement("a");
+      anchor.href = this.api.fileUrl(file.name);
+      anchor.download = file.name.split("/").pop() ?? file.name;
+      anchor.rel = "noopener";
+      anchor.style.display = "none";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+    }
+  }
   private newMeasurement(): void {
     this.eventStream?.close(); this.snapshot = { state: "idle" }; this.request = undefined; this.preflight = undefined;
     this.files = []; this.logs = []; this.errorMessage = ""; this.view = "setup";
@@ -213,11 +235,12 @@ export class AppShell extends LitElement {
     finally { this.busy = false; }
   }
   private stepClass(index: number): string {
-    const current = { loading: 0, setup: 0, review: 1, running: 2, result: 3, settings: 0 }[this.view];
+    const current = this.currentStep();
     if (index === current) return "active";
     if (index < current) return "done";
     return "";
   }
+  private currentStep(): number { return { loading: 0, setup: 0, review: 1, running: 2, result: 3, settings: 0 }[this.view]; }
   private message(error: unknown): string { return error instanceof Error ? error.message : "Something went wrong. Try again."; }
 }
 

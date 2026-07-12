@@ -1,10 +1,12 @@
 import type { AppSettings, Capabilities, EntityDescriptor, SessionSnapshot } from "../types";
+import { AppShell } from "./app-shell";
+import "./result-view";
 import "./running-view";
 import "./settings-view";
 import "./setup-view";
 
 const capabilities: Capabilities = {
-  modes: ["brightness", "color_temp", "hs"],
+  modes: ["brightness", "color_temp", "hs", "effect"],
   defaults: { sleep_time: 1, sample_count: 5, brightness_step: 5, hue_step: 10, saturation_step: 10, color_temp_step: 5 },
 };
 
@@ -17,6 +19,7 @@ describe("setup view", () => {
       lights: EntityDescriptor[];
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
+      selectedLightId: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
@@ -24,19 +27,62 @@ describe("setup view", () => {
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
+    element.selectedLightId = "light.desk";
     document.body.append(element);
     await element.updateComplete;
 
     expect(element.shadowRoot.textContent).toContain("Desk lamp · light.desk");
-    expect(element.shadowRoot.textContent).toContain("Hue & saturation");
+    expect(element.shadowRoot.textContent).toContain("Brightness");
     expect(element.shadowRoot.querySelector("details")?.open).toBe(false);
-    expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(3);
+    expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
 
     const light = element.shadowRoot.querySelector('select[name="light_entity_id"]') as HTMLSelectElement;
     light.value = "light.desk";
     light.dispatchEvent(new Event("change"));
     await element.updateComplete;
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
+  });
+
+  it("auto-selects every supported color mode for a capable light", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = capabilities;
+    element.lights = [{ entity_id: "light.rgb", name: "RGB lamp", supported_modes: ["brightness", "color_temp", "hs"] }];
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.voltages = [];
+    document.body.append(element);
+    await element.updateComplete;
+
+    const checkedModes = [...element.shadowRoot.querySelectorAll<HTMLInputElement>('input[name="modes"]:checked')].map((input) => input.value);
+    expect(checkedModes).toEqual(["brightness", "color_temp", "hs", "effect"]);
+  });
+
+  it("includes effect mode when the light exposes effects", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = capabilities;
+    element.lights = [{ entity_id: "light.effect", name: "Effect lamp", supported_modes: ["brightness", "effect"], effect_list: ["colorloop"] }];
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.voltages = [];
+    document.body.append(element);
+    await element.updateComplete;
+
+    const labels = [...element.shadowRoot.querySelectorAll("label.check")].map((label) => label.textContent?.trim());
+    expect(labels).toContain("Effect");
+    const checkedModes = [...element.shadowRoot.querySelectorAll<HTMLInputElement>('input[name="modes"]:checked')].map((input) => input.value);
+    expect(checkedModes).toContain("effect");
   });
 });
 
@@ -106,5 +152,50 @@ describe("settings view", () => {
     (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
 
     expect((await saved).default_power_entity_id).toBe("sensor.plug_power");
+  });
+});
+
+describe("app shell", () => {
+  it("keeps Settings in the app bar and labels each measurement step", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.view = "running";
+    element.snapshot = { state: "running" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const topbar = element.shadowRoot?.querySelector(".topbar");
+    const steps = [...(element.shadowRoot?.querySelectorAll(".sequence > li") ?? [])];
+    expect(topbar?.querySelector(".settings-toggle")?.textContent).toContain("Settings");
+    expect(steps.map((step) => step.textContent?.trim())).toEqual(["✓Set up", "✓Review", "3Measure", "4Result"]);
+    expect(steps.at(2)?.getAttribute("aria-current")).toBe("step");
+  });
+});
+
+describe("result view", () => {
+  it("shows a download-all action for generated files", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      files: { name: string; size: number; media_type: string }[];
+      fileUrl: (name: string) => string;
+      downloadAll: () => void;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    const downloadAll = vi.fn();
+    element.snapshot = { state: "completed" };
+    element.files = [
+      { name: "model.csv", size: 1234, media_type: "text/csv" },
+      { name: "model.json", size: 5678, media_type: "application/json" },
+    ];
+    element.fileUrl = (name) => `/download/${name}`;
+    element.downloadAll = downloadAll;
+    document.body.append(element);
+    await element.updateComplete;
+
+    const button = element.shadowRoot.querySelector(".download-all") as HTMLButtonElement;
+    expect(button.textContent).toContain("Download all");
+    button.click();
+    expect(downloadAll).toHaveBeenCalledTimes(1);
   });
 });

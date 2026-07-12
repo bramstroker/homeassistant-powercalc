@@ -59,6 +59,7 @@ export class SetupView extends LitElement {
     const defaults = this.capabilities?.defaults ?? fallbackDefaults;
     const request = this.initialRequest;
     const modes = this.availableModes(request);
+    const selectedModes = request?.modes.length ? request.modes : modes;
     return html`
       <section class="panel" aria-labelledby="setup-title">
         <div class="context">
@@ -66,7 +67,6 @@ export class SetupView extends LitElement {
             <p class="eyebrow">01 / Setup</p>
             <h2 id="setup-title">Configure the measurement</h2>
           </div>
-          <p class="muted">One light · One active session</p>
         </div>
         <form @submit=${this.submit}>
           <div class="grid">
@@ -87,7 +87,7 @@ export class SetupView extends LitElement {
             <div class="checks">
               ${modes.map((mode) => html`
                 <label class="check">
-                  <input type="checkbox" name="modes" value=${mode} .checked=${request?.modes.includes(mode) ?? mode === "brightness"} />
+                  <input type="checkbox" name="modes" value=${mode} .checked=${selectedModes.includes(mode)} />
                   ${this.modeLabel(mode)}
                 </label>
               `)}
@@ -144,7 +144,7 @@ export class SetupView extends LitElement {
   }
 
   private modeLabel(mode: LutMode): string {
-    return { brightness: "Brightness", color_temp: "Color temperature", hs: "Hue & saturation" }[mode];
+    return { brightness: "Brightness", color_temp: "Color temperature", hs: "Hue & saturation", effect: "Effect" }[mode];
   }
 
   private availableModes(request?: MeasurementRequest): LutMode[] {
