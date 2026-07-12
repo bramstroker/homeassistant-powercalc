@@ -71,14 +71,16 @@ class AppContext:
         hass_url: str,
         hass_token: str,
         trusted_ingress_only: bool,
+        use_dummy_power_meter: bool = False,
     ) -> None:
         self.hass_url = hass_url
         self.hass_token = hass_token
         self.trusted_ingress_only = trusted_ingress_only
+        self.use_dummy_power_meter = use_dummy_power_meter
         self.storage = SessionStorage(data_root)
         self.coordinator = MeasurementCoordinator(
             self.storage,
-            lambda: MeasurementService(self.hass_url, self.hass_token),
+            lambda: MeasurementService(self.hass_url, self.hass_token, self.use_dummy_power_meter),
         )
 
     def client(self) -> Client:
@@ -92,6 +94,7 @@ def create_app(
     hass_token: str | None = None,
     static_root: Path | None = None,
     trusted_ingress_only: bool | None = None,
+    use_dummy_power_meter: bool = False,
 ) -> FastAPI:
     token = hass_token or os.environ.get("SUPERVISOR_TOKEN")
     if not token:
@@ -103,6 +106,7 @@ def create_app(
         trusted_ingress_only=(os.environ.get("MEASURE_TRUSTED_INGRESS_ONLY", "false").lower() == "true")
         if trusted_ingress_only is None
         else trusted_ingress_only,
+        use_dummy_power_meter=use_dummy_power_meter,
     )
     app = FastAPI(title="Powercalc Measure", version="0.1.0", docs_url=None, redoc_url=None)
     app.state.context = context

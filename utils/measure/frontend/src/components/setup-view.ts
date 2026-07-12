@@ -3,8 +3,8 @@ import type { Capabilities, EntityDescriptor, LutMode, MeasurementRequest } from
 import { sharedStyles } from "../styles";
 
 const fallbackDefaults = {
-  sleep_time: 1,
-  sample_count: 5,
+  sleep_time: 2,
+  sample_count: 1,
   brightness_step: 5,
   hue_step: 10,
   saturation_step: 10,
@@ -39,7 +39,7 @@ export class SetupView extends LitElement {
     label > span, legend { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
     input, select {
       width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 9px;
-      padding: 0.65rem 0.75rem; background: #101519; color: var(--ink);
+      padding: 0.65rem 0.75rem; background: var(--field); color: var(--ink);
     }
     fieldset { border: 0; padding: 0; margin: 0; }
     .checks { display: flex; flex-wrap: wrap; gap: 0.6rem; }
@@ -71,7 +71,7 @@ export class SetupView extends LitElement {
             ${this.textField("model_id", "Model ID", request?.model_id, "e.g. LWA017", true)}
             ${this.textField("product_name", "Full product name", request?.product_name, "e.g. Hue White Ambiance", true)}
             ${this.textField("measure_device", "Measurement device", request?.measure_device, "e.g. Shelly Plug S", true)}
-            ${this.numberField("multiple_light_count", "Number of lights", request?.multiple_light_count ?? 1, 1, 20)}
+            ${this.numberField("multiple_light_count", "Number of lights", request?.multiple_light_count ?? 1, 1, 100)}
           </div>
 
           <div class="grid">
@@ -94,7 +94,7 @@ export class SetupView extends LitElement {
 
           <div class="checks">
             ${this.boolField("generate_model", "Generate model.json", request?.generate_model ?? true)}
-            ${this.boolField("gzip", "Compress CSV files", request?.gzip ?? false)}
+            ${this.boolField("gzip", "Compress CSV files", request?.gzip ?? true)}
           </div>
 
           <details>

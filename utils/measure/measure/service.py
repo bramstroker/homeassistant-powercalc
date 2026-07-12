@@ -15,7 +15,9 @@ from measure.controller.light.const import LutMode
 from measure.controller.light.hass import HassLightController
 from measure.model import write_model_json
 from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID
+from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.hass import HassPowerMeter
+from measure.powermeter.powermeter import PowerMeter
 from measure.request import AppMeasureConfig, LightMeasurementRequest
 from measure.runner.const import QUESTION_GZIP, QUESTION_MODE, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
 from measure.runner.light import LightRunner
@@ -51,9 +53,10 @@ def _redact(message: str, secrets: tuple[str, ...]) -> str:
 
 
 class MeasurementService:
-    def __init__(self, hass_url: str, hass_token: str) -> None:
+    def __init__(self, hass_url: str, hass_token: str, use_dummy_power_meter: bool = False) -> None:
         self.hass_url = hass_url
         self.hass_token = hass_token
+        self.use_dummy_power_meter = use_dummy_power_meter
 
     def run(
         self,
@@ -63,7 +66,9 @@ class MeasurementService:
     ) -> tuple[RunnerResult, Path]:
         handler = _SessionLogHandler(control, (self.hass_token,))
         previous_level = _LOGGER.level
-        _LOGGER.setLevel(logging.INFO)
+        # Ensure at least INFO reaches the handler, but preserve DEBUG when enabled.
+        if previous_level == logging.NOTSET or previous_level > logging.INFO:
+            _LOGGER.setLevel(logging.INFO)
         _LOGGER.addHandler(handler)
         try:
             return self._run(request, control, output_root)
@@ -84,7 +89,12 @@ class MeasurementService:
     ) -> tuple[RunnerResult, Path]:
         control.checkpoint()
         config = AppMeasureConfig(request, self.hass_url, self.hass_token)
-        power_meter = HassPowerMeter(config.hass_url, config.hass_token, config.hass_call_update_entity_service)
+        power_meter: PowerMeter
+        if self.use_dummy_power_meter:
+            _LOGGER.warning("Using dummy power meter — reported power values are synthetic, not real measurements")
+            power_meter = DummyPowerMeter()
+        else:
+            power_meter = HassPowerMeter(config.hass_url, config.hass_token, config.hass_call_update_entity_service)
         light_controller = HassLightController(config.hass_url, config.hass_token, config.light_transition_time)
         answers: dict[str, object] = {
             QUESTION_ENTITY_ID: request.light_entity_id,

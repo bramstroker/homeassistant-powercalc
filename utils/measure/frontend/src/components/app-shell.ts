@@ -35,7 +35,7 @@ export class AppShell extends LitElement {
   private eventStream?: SessionEventStream;
 
   static styles = [sharedStyles, css`
-    :host { display: block; min-height: 100vh; background: #101418; }
+    :host { display: block; min-height: 100vh; background: var(--canvas); }
     .shell { width: min(980px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(1.2rem, 5vw, 3.5rem) 0 4rem; }
     header { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: end; margin-bottom: clamp(1.5rem, 5vw, 3rem); }
     .brand { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.3rem; color: var(--muted); font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.16em; text-transform: uppercase; }
@@ -136,9 +136,7 @@ export class AppShell extends LitElement {
 
   private consumeEvent(event: SessionEvent): void {
     if (event.message && event.type === "log") this.logs = [...this.logs.slice(-39), event.message];
-    if (event.message && event.type === "warning" && this.snapshot) this.snapshot = { ...this.snapshot, warnings: [...(this.snapshot.warnings ?? []), event.message] };
     if (event.snapshot) this.snapshot = event.snapshot;
-    else if (this.snapshot) this.snapshot = { ...this.snapshot, progress: event.progress ?? this.snapshot.progress, phase: event.phase ?? this.snapshot.phase, mode: event.mode ?? this.snapshot.mode };
     if (this.snapshot && ["completed", "failed", "cancelled", "resumable"].includes(this.snapshot.state)) {
       this.eventStream?.close(); this.connectedToEvents = false; this.view = "result"; void this.loadFiles();
     }

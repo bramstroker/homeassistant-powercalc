@@ -31,7 +31,7 @@ phue = { git = "https://github.com/studioimaginaire/phue.git", rev = "f5c79ff07d
 [project.optional-dependencies]
 ocr = [
     "numpy>=2.4",
-    "opencv-python>=4.7",
+    "opencv-python-headless>=4.7",
     "pillow>=12.0",
     "pytesseract>=0.3",
 ]

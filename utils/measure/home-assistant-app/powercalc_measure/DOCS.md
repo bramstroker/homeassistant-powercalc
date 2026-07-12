@@ -67,4 +67,12 @@ Use **Resume** only when the UI offers it and the light, meter, and measurement 
 
 Check available disk space in Home Assistant, then restart the app. Do not delete app data while a job is active. Restore an app backup if persistent state was damaged.
 
+### Enabling debug logging
+
+Turn on **Debug logging** in the app's **Configuration** tab and restart the app to capture verbose output in the app log. Use it when reporting an issue, then turn it back off once you have collected the log.
+
+### Dummy power meter (developers)
+
+The **Dummy power meter** option in the **Configuration** tab replaces the real power sensor with a fixed synthetic reading. It exists only to exercise the measurement flow without a physical load, so any profile produced while it is enabled is meaningless. Leave it off for real measurements.
+
 For additional guidance, see the [Powercalc measure documentation](https://docs.powercalc.nl/contributing/measure/home-assistant-app/).

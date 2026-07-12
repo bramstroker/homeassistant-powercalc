@@ -2,13 +2,20 @@ import { css } from "lit";
 
 export const sharedStyles = css`
   :host {
-    --ink: #eef2f1;
-    --muted: #9ba8a6;
-    --surface: #171d21;
-    --surface-raised: #20282d;
-    --line: #364148;
-    --signal: #f6b84a;
-    --signal-strong: #ffd27b;
+    --ink: #eef2f7;
+    --muted: #93a1b5;
+    --canvas: #0d1119;
+    --surface: #151b24;
+    --surface-raised: #1e2632;
+    --well: #0a0e15;
+    --field: #0f1520;
+    --line: #2c3644;
+    --track: #2a3444;
+    --grid: #55647a;
+    --signal: #5488e8;
+    --signal-deep: #3f74d6;
+    --signal-strong: #93b5f4;
+    --on-signal: #ffffff;
     --good: #61d4a3;
     --danger: #ff7b72;
     --radius: 14px;
@@ -41,7 +48,8 @@ export const sharedStyles = css`
   button:hover:not(:disabled) { border-color: var(--signal); transform: translateY(-1px); }
   button:active:not(:disabled) { transform: translateY(0); }
   button:disabled { opacity: 0.52; cursor: not-allowed; }
-  button.primary { border-color: var(--signal); background: var(--signal); color: #17120a; }
+  button.primary { border-color: var(--signal-deep); background: var(--signal-deep); color: var(--on-signal); }
+  button.primary:hover:not(:disabled) { border-color: var(--signal); background: var(--signal); }
   button.danger { border-color: color-mix(in srgb, var(--danger) 70%, var(--line)); color: var(--danger); }
 
   button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible {
@@ -66,4 +74,3 @@ export const sharedStyles = css`
     *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
   }
 `;
-

@@ -1,5 +1,5 @@
 # Keep standalone OCR environments aligned with the optional project extra.
 numpy>=2.4
-opencv-python>=4.7
+opencv-python-headless>=4.7
 Pillow>=12.0
 pytesseract>=0.3

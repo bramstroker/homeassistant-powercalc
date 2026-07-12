@@ -31,7 +31,7 @@ export function apiUrl(path: string, base = document.baseURI): URL {
 
 export class MeasureApiClient {
   constructor(
-    private readonly fetcher: Fetcher = fetch,
+    private readonly fetcher: Fetcher = globalThis.fetch.bind(globalThis),
     private readonly base = document.baseURI,
   ) {}
 
@@ -39,10 +39,9 @@ export class MeasureApiClient {
     return this.request("api/capabilities");
   }
 
-  async getEntities(filter: "light" | "power" | "voltage"): Promise<EntityDescriptor[]> {
+  getEntities(filter: "light" | "power" | "voltage"): Promise<EntityDescriptor[]> {
     const query = filter === "light" ? "domain=light" : `kind=${filter}`;
-    const response = await this.request<EntityDescriptor[] | { entities: EntityDescriptor[] }>(`api/entities?${query}`);
-    return Array.isArray(response) ? response : response.entities;
+    return this.request<EntityDescriptor[]>(`api/entities?${query}`);
   }
 
   preflight(request: MeasurementRequest): Promise<PreflightResponse> {
@@ -65,9 +64,8 @@ export class MeasureApiClient {
     return this.request("api/session/current/resume", { method: "POST" });
   }
 
-  async getFiles(): Promise<SessionFile[]> {
-    const response = await this.request<SessionFile[] | { files: SessionFile[] }>("api/session/current/files");
-    return Array.isArray(response) ? response : response.files;
+  getFiles(): Promise<SessionFile[]> {
+    return this.request<SessionFile[]>("api/session/current/files");
   }
 
   fileUrl(name: string): string {
@@ -120,7 +118,7 @@ export class SessionEventStream {
     };
     source.onerror = () => this.onConnection(false);
     source.onmessage = (event) => this.consume(event.data);
-    for (const type of ["progress", "state", "warning", "log"] as const) {
+    for (const type of ["progress", "state", "warning", "log", "heartbeat"] as const) {
       source.addEventListener(type, (event) => this.consume((event as MessageEvent<string>).data));
     }
   }

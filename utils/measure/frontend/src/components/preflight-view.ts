@@ -19,7 +19,7 @@ export class PreflightView extends LitElement {
 
   static styles = [sharedStyles, css`
     .readout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); }
-    .metric { padding: 1rem; background: #101519; }
+    .metric { padding: 1rem; background: var(--field); }
     .metric span { display: block; color: var(--muted); font-size: 0.75rem; }
     .metric strong { display: block; margin-top: 0.35rem; font: 650 1rem/1.3 ui-monospace, monospace; }
     dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.6rem 1rem; }

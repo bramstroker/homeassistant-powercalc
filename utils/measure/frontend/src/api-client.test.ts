@@ -5,6 +5,18 @@ function response(body: unknown, status = 200): Response {
 }
 
 describe("MeasureApiClient", () => {
+  it("binds the browser fetch implementation to its global receiver", async () => {
+    const browserFetch = vi.fn<typeof fetch>().mockResolvedValue(response({ modes: [], defaults: {} }));
+    vi.stubGlobal("fetch", browserFetch);
+
+    await new MeasureApiClient(undefined, "http://ha.local/prefix/").getCapabilities();
+
+    expect(browserFetch).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/capabilities"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
   it("keeps requests and downloads below the ingress prefix", async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ modes: [], defaults: {} }));
     const client = new MeasureApiClient(fetcher, "http://ha.local/api/hassio_ingress/token/");
@@ -19,9 +31,10 @@ describe("MeasureApiClient", () => {
     expect(apiUrl("api/entities", "http://ha.local/prefix/").pathname).toBe("/prefix/api/entities");
   });
 
-  it("normalizes entity response envelopes", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ entities: [{ entity_id: "light.desk", name: "Desk" }] }));
+  it("returns the entity array from the API", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response([{ entity_id: "light.desk", name: "Desk" }]));
     const entities = await new MeasureApiClient(fetcher, "http://ha.local/prefix/").getEntities("light");
+    expect(fetcher).toHaveBeenCalledWith(new URL("http://ha.local/prefix/api/entities?domain=light"), expect.anything());
     expect(entities).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
   });
 
@@ -57,5 +70,23 @@ describe("SessionEventStream", () => {
     expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "progress" }));
     stream.close();
     expect(fake.close).toHaveBeenCalledOnce();
+  });
+
+  it("consumes named heartbeat events to refresh the snapshot", () => {
+    const listeners = new Map<string, EventListener>();
+    const fake = {
+      close: vi.fn(),
+      onopen: null as (() => void) | null,
+      onerror: null as (() => void) | null,
+      onmessage: null as ((event: MessageEvent) => void) | null,
+      addEventListener: vi.fn((type: string, listener: EventListener) => listeners.set(type, listener)),
+    };
+    const onEvent = vi.fn();
+    const stream = new SessionEventStream("events", onEvent, vi.fn(), vi.fn(), () => fake as unknown as EventSource);
+
+    stream.connect();
+    listeners.get("heartbeat")?.(new MessageEvent("heartbeat", { data: JSON.stringify({ type: "heartbeat", snapshot: { state: "running" } }) }));
+
+    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "heartbeat", snapshot: { state: "running" } }));
   });
 });
