@@ -14,6 +14,7 @@ from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.request import LightMeasurementRequestModel
 from measure.runner.light import CSV_HEADERS
 from measure.session import SessionEvent, SessionSnapshot, SessionState, utc_now
+from measure.settings import AppSettings
 
 
 class SessionStorage:
@@ -94,6 +95,19 @@ class SessionStorage:
 
     def output_directory(self, session_id: str) -> Path:
         return self._contained(self.session_directory(session_id) / "output")
+
+    def load_settings(self) -> AppSettings:
+        path = self.data_root / "settings.json"
+        if not path.exists():
+            return AppSettings()
+        try:
+            return AppSettings.model_validate(self._read_json(path))
+        except OSError, ValueError:
+            return AppSettings()
+
+    def save_settings(self, settings: AppSettings) -> AppSettings:
+        self._write_json(self.data_root / "settings.json", settings.model_dump(mode="json"))
+        return settings
 
     def can_resume(self, session_id: str) -> bool:
         """Return whether the session has a complete row matching its persisted request."""

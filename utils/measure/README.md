@@ -77,6 +77,45 @@ After the measurements are finished you will find the files in `export` director
 
 See the WIKI article for further documentation https://docs.powercalc.nl/contributing/measure/
 
+## Developing the Home Assistant app locally
+
+The Home Assistant app has a FastAPI backend (`measure/`) and a Lit frontend (`frontend/`). You can run both locally with hot-reloading of the UI.
+
+**Prerequisites:**
+- A reachable Home Assistant instance and a long-lived access token (HA → profile → Security → *Long-lived access tokens*). The app proxies real HA entity data, so `/api/entities` needs a live instance.
+- Python/uv set up as described under [Native](#native), and Node.js for the frontend.
+
+**Terminal 1 — backend** (from `utils/measure`):
+```
+uv run python -m measure.app \
+  --host 127.0.0.1 --port 8099 \
+  --data-root .dev-data \
+  --hass-url http://127.0.0.1:8123/api/ \
+  --hass-token <LONG_LIVED_TOKEN>
+```
+The `--hass-url` must end in `/api/`. `--hass-token` may be omitted if `SUPERVISOR_TOKEN` is exported instead. Session state and settings are written to `--data-root` (here `.dev-data`).
+
+**Terminal 2 — frontend** (from `utils/measure/frontend`):
+```
+npm install
+npm run dev
+```
+Open http://localhost:5173. The Vite dev server proxies `/api` (including the SSE event stream) to the backend on port 8099, mirroring the single-origin ingress deployment.
+
+To run the app the way it ships (single origin, no hot-reload), build the frontend with `npm run build` and start the backend with `create_app(..., static_root=Path("frontend/dist"))`; the UI is then served by FastAPI on port 8099.
+
+### Checks
+
+```
+# backend (from utils/measure)
+uv run ruff check measure/ tests/
+uv run pytest
+
+# frontend (from utils/measure/frontend)
+npm run typecheck
+npm test
+```
+
 ## Building and running docker image locally
 ```
 docker build -t measure .

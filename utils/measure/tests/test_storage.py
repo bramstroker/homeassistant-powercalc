@@ -78,3 +78,25 @@ def test_file_path_rejects_traversal(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError):
         storage.file_path("a1b2-c3d4", "../../secret")
+
+
+def test_settings_default_when_absent(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+
+    assert storage.load_settings().default_power_entity_id is None
+
+
+def test_settings_round_trip(tmp_path: Path) -> None:
+    from measure.settings import AppSettings
+
+    storage = SessionStorage(tmp_path)
+    storage.save_settings(AppSettings(default_power_entity_id="sensor.plug_power"))
+
+    assert storage.load_settings().default_power_entity_id == "sensor.plug_power"
+
+
+def test_settings_recover_from_corrupt_file(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    (tmp_path / "settings.json").write_text("not json")
+
+    assert storage.load_settings().default_power_entity_id is None

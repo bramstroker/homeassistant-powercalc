@@ -95,6 +95,10 @@ export interface SessionEvent {
   mode?: string;
 }
 
+export interface AppSettings {
+  default_power_entity_id: string | null;
+}
+
 export interface ApiErrorBody {
   code: string;
   message: string;

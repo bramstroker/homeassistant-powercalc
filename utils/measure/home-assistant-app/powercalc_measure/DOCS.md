@@ -37,6 +37,10 @@ The app requires Home Assistant OS. It cannot be installed on Home Assistant Con
 
 Home Assistant authenticates ingress and provides Core API access. Do not configure or paste a long-lived token into the app.
 
+### Measurement defaults
+
+Open **Settings** in the app to store defaults that are pre-filled for every new measurement. The default power sensor is the first supported option; leave it set to the meter you use most and each new session starts with it selected. You can still change it per session.
+
 ## Sessions, cancellation, and storage
 
 Only one measurement can run at a time. **Cancel** requests a cooperative stop, so an in-flight device call or wait may finish first. Completed CSV rows are retained and may be resumable when the same measurement settings are used.

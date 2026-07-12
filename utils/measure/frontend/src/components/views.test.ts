@@ -1,5 +1,6 @@
-import type { Capabilities, EntityDescriptor, SessionSnapshot } from "../types";
+import type { AppSettings, Capabilities, EntityDescriptor, SessionSnapshot } from "../types";
 import "./running-view";
+import "./settings-view";
 import "./setup-view";
 
 const capabilities: Capabilities = {
@@ -57,5 +58,53 @@ describe("running view", () => {
     expect(element.shadowRoot.textContent).toContain("Live");
     expect(element.shadowRoot.querySelector("progress")?.value).toBe(25);
     expect(element.shadowRoot.querySelector("button")?.textContent).toContain("Cancel measurement");
+  });
+});
+
+describe("setup view defaults", () => {
+  it("preselects the default power sensor for a new measurement", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      defaultPowerEntityId: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = capabilities;
+    element.lights = lights;
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.voltages = [];
+    element.defaultPowerEntityId = "sensor.plug_power";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const power = element.shadowRoot.querySelector('select[name="power_entity_id"]') as HTMLSelectElement;
+    expect(power.value).toBe("sensor.plug_power");
+  });
+});
+
+describe("settings view", () => {
+  it("lists power sensors and emits the selected default on save", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      powers: EntityDescriptor[];
+      settings: AppSettings;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.settings = { default_power_entity_id: null };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const saved = new Promise<AppSettings>((resolve) => {
+      element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettings>).detail));
+    });
+    const select = element.shadowRoot.querySelector('select[name="default_power_entity_id"]') as HTMLSelectElement;
+    select.value = "sensor.plug_power";
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+
+    expect((await saved).default_power_entity_id).toBe("sensor.plug_power");
   });
 });

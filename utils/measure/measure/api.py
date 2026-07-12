@@ -24,6 +24,7 @@ from measure.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.request import LightMeasurementRequestModel
 from measure.service import MeasurementService
 from measure.session import SessionEvent, SessionSnapshot, SessionState
+from measure.settings import AppSettings
 from measure.storage import SessionStorage
 
 _LOGGER = logging.getLogger("measure")
@@ -196,6 +197,14 @@ def _router() -> APIRouter:  # noqa: C901
                 "sample_count": {"min": 1, "max": 100},
             },
         )
+
+    @router.get("/settings", response_model=AppSettings)
+    async def get_settings(request: Request) -> AppSettings:
+        return await run_in_threadpool(_context(request).storage.load_settings)
+
+    @router.put("/settings", response_model=AppSettings, responses={400: _ERROR})
+    async def update_settings(payload: AppSettings, request: Request) -> AppSettings:
+        return await run_in_threadpool(_context(request).storage.save_settings, payload)
 
     @router.get("/entities", response_model=list[EntityDescriptor], responses={400: _ERROR})
     async def entities(

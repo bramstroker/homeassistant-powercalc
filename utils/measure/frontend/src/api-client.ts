@@ -1,5 +1,6 @@
 import type {
   ApiErrorBody,
+  AppSettings,
   Capabilities,
   EntityDescriptor,
   MeasurementRequest,
@@ -37,6 +38,14 @@ export class MeasureApiClient {
 
   getCapabilities(): Promise<Capabilities> {
     return this.request("api/capabilities");
+  }
+
+  getSettings(): Promise<AppSettings> {
+    return this.request("api/settings");
+  }
+
+  saveSettings(settings: AppSettings): Promise<AppSettings> {
+    return this.request("api/settings", { method: "PUT", body: JSON.stringify(settings) });
   }
 
   getEntities(filter: "light" | "power" | "voltage"): Promise<EntityDescriptor[]> {

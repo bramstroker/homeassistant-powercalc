@@ -195,3 +195,24 @@ def test_trusted_ingress_mode_rejects_other_source(tmp_path: Path) -> None:
 
     assert response.status_code == 403
     assert response.json()["code"] == "ingress_required"
+
+
+def test_settings_default_and_update(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+
+    assert test_client.get("/api/settings").json() == {"default_power_entity_id": None}
+
+    updated = test_client.put("/api/settings", json={"default_power_entity_id": "sensor.test_power"})
+    assert updated.status_code == 200
+    assert updated.json()["default_power_entity_id"] == "sensor.test_power"
+
+    assert test_client.get("/api/settings").json()["default_power_entity_id"] == "sensor.test_power"
+
+
+def test_settings_rejects_invalid_entity(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+
+    response = test_client.put("/api/settings", json={"default_power_entity_id": "not-an-entity"})
+
+    assert response.status_code == 400
+    assert response.json()["code"] == "validation_error"

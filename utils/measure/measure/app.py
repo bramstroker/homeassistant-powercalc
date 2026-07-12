@@ -15,12 +15,24 @@ def main() -> None:
     parser.add_argument("--host", default="0.0.0.0")  # noqa: S104
     parser.add_argument("--port", type=int, default=8099)
     parser.add_argument("--data-root", type=Path, default=Path("/data"))
+    parser.add_argument(
+        "--hass-url",
+        default="http://supervisor/core/api/",
+        help="Home Assistant Core REST API base URL. Override for local development.",
+    )
+    parser.add_argument(
+        "--hass-token",
+        default=None,
+        help="Home Assistant access token. Defaults to the SUPERVISOR_TOKEN environment variable.",
+    )
     args = parser.parse_args()
     options = _read_options(args.data_root)
     debug = bool(options.get("debug_logging", False))
     _configure_logging(debug)
     app = create_app(
         data_root=args.data_root,
+        hass_url=args.hass_url,
+        hass_token=args.hass_token,
         use_dummy_power_meter=bool(options.get("dummy_power_meter", False)),
     )
     uvicorn.run(

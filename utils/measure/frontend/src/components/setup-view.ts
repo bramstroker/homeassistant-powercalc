@@ -18,6 +18,7 @@ export class SetupView extends LitElement {
     powers: { attribute: false },
     voltages: { attribute: false },
     initialRequest: { attribute: false },
+    defaultPowerEntityId: { type: String },
     busy: { type: Boolean },
     errorMessage: { type: String },
     selectedLightId: { state: true },
@@ -28,6 +29,7 @@ export class SetupView extends LitElement {
   powers: EntityDescriptor[] = [];
   voltages: EntityDescriptor[] = [];
   initialRequest?: MeasurementRequest;
+  defaultPowerEntityId = "";
   busy = false;
   errorMessage = "";
   selectedLightId = "";
@@ -76,7 +78,7 @@ export class SetupView extends LitElement {
 
           <div class="grid">
             ${this.entitySelect("light_entity_id", "Light", this.lights, request?.light_entity_id, true)}
-            ${this.entitySelect("power_entity_id", "Power sensor", this.powers, request?.power_entity_id, true)}
+            ${this.entitySelect("power_entity_id", "Power sensor", this.powers, request?.power_entity_id ?? this.defaultPowerEntityId, true)}
           </div>
           ${this.entitySelect("voltage_entity_id", "Voltage sensor (optional)", this.voltages, request?.voltage_entity_id ?? "", false)}
 
