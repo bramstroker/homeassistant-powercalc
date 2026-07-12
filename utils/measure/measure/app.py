@@ -37,7 +37,7 @@ def _read_options(data_root: Path) -> dict[str, object]:
     """Read the add-on options written to ``options.json`` by the Home Assistant supervisor."""
     try:
         options = json.loads((data_root / "options.json").read_text())
-    except (OSError, ValueError):
+    except OSError, ValueError:
         return {}
     return options if isinstance(options, dict) else {}
 
