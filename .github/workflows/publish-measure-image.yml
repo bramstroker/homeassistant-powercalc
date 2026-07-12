@@ -6,6 +6,7 @@ on:
       - 'master'
     paths:
       - 'utils/measure/**'
+      - '.github/actions/build-measure-docker/**'
   release:
     types: [published]
   workflow_dispatch:
@@ -60,6 +61,46 @@ jobs:
       - name: Build and push
         uses: ./.github/actions/build-measure-docker
         with:
+          push: "true"
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  home-assistant-app:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - name: Validate app metadata
+        run: ruby utils/measure/home-assistant-app/validate.rb
+      - name: Run Home Assistant app linter
+        uses: frenck/action-addon-linter@f995494fd84fae6310d23617e66d0e37de4f14eb # v2.21.0
+        with:
+          path: ./utils/measure/home-assistant-app/powercalc_measure
+      - name: Read app version
+        id: app
+        run: |
+          version=$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV.fetch(0))).fetch("version")' utils/measure/home-assistant-app/powercalc_measure/config.yaml)
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
+        with:
+          images: ghcr.io/bramstroker/powercalc-measure-app
+          tags: |
+            type=raw,value=${{ steps.app.outputs.version }}
+      - name: Log in to GHCR
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Home Assistant app
+        uses: ./.github/actions/build-measure-docker
+        with:
+          target: ha-app
           push: "true"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

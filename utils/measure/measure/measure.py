@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
-import json
 import logging
 import os
+from pathlib import Path
 import sys
 from typing import Any
 
@@ -29,6 +28,7 @@ from measure.const import (
 )
 from measure.controller.light.const import LutMode
 from measure.controller.light.errors import LightControllerError
+from measure.model import write_model_json as write_profile_model_json
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.factory import PowerMeterFactory
 from measure.powermeter.powermeter import PowerMeter
@@ -259,32 +259,15 @@ class Measure:
         voltage_json_data: dict | None = None,
     ) -> None:
         """Write model.json manifest file"""
-        created_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
-        json_data = {
-            "created_at": created_at,
-            "measure_device": measure_device,
-            "measure_method": "script",
-            "measure_description": "Measured with utils/measure script",
-            "measure_settings": {
-                "VERSION": _VERSION,
-                "SAMPLE_COUNT": self.config.sample_count,
-                "SLEEP_TIME": self.config.sleep_time,
-            },
-            "name": name,
-            "standby_power": standby_power,
-        }
-        if voltage_json_data:
-            json_data.update(voltage_json_data)
-        if extra_json_data:
-            json_data.update(extra_json_data)
-
-        json_string = json.dumps(
-            json_data,
-            indent=2,
-            sort_keys=True,
+        write_profile_model_json(
+            Path(directory),
+            standby_power=standby_power,
+            name=name,
+            measure_device=measure_device,
+            config=self.config,
+            extra_json_data=extra_json_data,
+            voltage_json_data=voltage_json_data,
         )
-        with open(os.path.join(directory, "model.json"), "w") as json_file:
-            json_file.write(json_string)
 
     def get_questions(self) -> list[Question]:
         """

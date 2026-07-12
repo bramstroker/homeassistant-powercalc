@@ -56,6 +56,12 @@ uv sync --extra dev
 uv run python -m measure.measure
 ```
 
+For OCR measurements, install its optional native dependencies as well:
+
+```bash
+uv sync --extra dev --extra ocr
+```
+
 Native runs write output to `utils/measure/export`.
 
 ## Required configuration

@@ -1,0 +1,17 @@
+.coverage
+.DS_Store
+.env
+.idea/
+.omx/
+.persistent/
+.pytest_cache/
+.ruff_cache/
+.venv/
+cov.xml
+export/
+frontend/dist/
+frontend/node_modules/
+htmlcov/
+measure.egg-info/
+measure.log
+tests/

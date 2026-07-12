@@ -4,8 +4,14 @@ This package contains everything you need to automatically take measurements of 
 
 ## Setup
 
-There are two ways to run the measure script, using Docker and natively using Python.
-The recommended way is with docker as all the needed dependencies are bundled.
+There are three ways to run the measure tool: as an experimental Home Assistant app, using Docker, or natively using Python.
+Home Assistant OS users can use the app; for other installations, Docker is recommended because it bundles the required dependencies.
+
+### Home Assistant app (experimental)
+
+Home Assistant OS users can run light measurements from an ingress UI without creating a long-lived access token. The first release supports Home Assistant light entities and Home Assistant power sensors, with an optional voltage sensor. It does not yet support the direct device controllers, OCR, speakers, fans, charging, or other CLI runners.
+
+See the [Home Assistant app guide](https://docs.powercalc.nl/contributing/measure/home-assistant-app/) for availability, installation, safety notes, storage, and troubleshooting. The existing Docker and native workflows remain fully supported.
 
 ### Docker
 
@@ -58,6 +64,12 @@ uv run python -m measure.measure
 ```
 
 The script will ask you a few questions, then proceed taking measurements.
+
+For OCR measurements, install the optional OCR dependencies first:
+
+```
+uv sync --extra dev --extra ocr
+```
 
 After the measurements are finished you will find the files in `export` directory.
 

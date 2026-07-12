@@ -158,6 +158,7 @@ nav:
       - 'Measure':
           - 'contributing/measure/measure.md'
           - 'contributing/measure/setup.md'
+          - 'contributing/measure/home-assistant-app.md'
           - 'contributing/measure/lights.md'
           - 'contributing/measure/modes.md'
           - 'contributing/measure/output.md'

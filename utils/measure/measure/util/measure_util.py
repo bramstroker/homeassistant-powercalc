@@ -8,9 +8,7 @@ import os
 from statistics import mean
 import time
 
-import numpy as np
-
-from measure.config import MeasureConfig
+from measure.configuration import MeasureRuntimeConfig
 from measure.const import (
     DUMMY_LOAD_MEASUREMENT_COUNT,
     DUMMY_LOAD_MEASUREMENTS_DURATION,
@@ -61,13 +59,15 @@ class MeasureUtil:
     def __init__(
         self,
         power_meter: PowerMeter,
-        config: MeasureConfig,
+        config: MeasureRuntimeConfig,
         include_voltage: Callable[[], bool] | None = None,
+        wait: Callable[[float], None] = time.sleep,
     ) -> None:
         self.power_meter = power_meter
         self.dummy_load_value: float | None = None
         self.config = config
         self._include_voltage = include_voltage or (lambda: False)
+        self._wait = wait
 
     def take_average_measurement(
         self,
@@ -244,7 +244,7 @@ class MeasureUtil:
     def _sleep_before_next_average_reading(self, start_time: float, duration: int) -> bool:
         if not ((time.time() - start_time + self.config.sleep_time) < duration):
             return False
-        time.sleep(self.config.sleep_time)
+        self._wait(self.config.sleep_time)
         return True
 
     def _take_resistance_reading(self) -> MeasurementResult | None:
@@ -317,7 +317,7 @@ class MeasureUtil:
                 return self._retry_measurement_or_raise(error, start_timestamp, retry_count)
 
             if self.config.sample_count > 1:
-                time.sleep(self.config.sleep_time_sample)
+                self._wait(self.config.sleep_time_sample)
 
         # Determine Average PM reading
         if not measurements:
@@ -388,7 +388,7 @@ class MeasureUtil:
                 self.config.max_retries,
             )
             raise error
-        time.sleep(self.config.sleep_time)
+        self._wait(self.config.sleep_time)
         return self.take_measurement(start_timestamp, retry_count + 1)
 
     def initialize_dummy_load(self) -> float:
@@ -477,15 +477,8 @@ class MeasureUtil:
         first_half = averages[:mid]
         second_half = averages[mid:]
 
-        # Helper function to calculate trend
-        def calc_trend(values: list[float]) -> float:
-            # Perform a linear regression to estimate the trend
-            x = np.arange(len(values))
-            coeffs = np.polyfit(x, values, 1)  # Linear fit: y = mx + c
-            return coeffs[0]  # Extract the slope (m)
-
-        first_trend = calc_trend(first_half)
-        second_trend = calc_trend(second_half)
+        first_trend = self._linear_slope(first_half)
+        second_trend = self._linear_slope(second_half)
 
         def trend_direction(slope: float, threshold: float = 0.01) -> Trend:
             if slope > threshold:
@@ -500,6 +493,17 @@ class MeasureUtil:
         if first_trend == second_trend and first_trend != Trend.STEADY:
             return first_trend
         return Trend.STEADY
+
+    @staticmethod
+    def _linear_slope(values: list[float]) -> float:
+        """Return the least-squares slope for equally spaced values without NumPy."""
+        if len(values) < 2:
+            return 0.0
+        mean_x = (len(values) - 1) / 2
+        mean_y = mean(values)
+        numerator = sum((index - mean_x) * (value - mean_y) for index, value in enumerate(values))
+        denominator = sum((index - mean_x) ** 2 for index in range(len(values)))
+        return numerator / denominator
 
     def _validate_voltage_support(self) -> None:
         """Check if the power meter supports voltage readings."""

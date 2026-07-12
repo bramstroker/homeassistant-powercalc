@@ -10,13 +10,14 @@ import os
 import re
 import shutil
 import time
-from typing import Any, TextIO
+from typing import Any, TextIO, cast
 
 import inquirer
 
 from measure.config import MeasureConfig
+from measure.configuration import MeasureRuntimeConfig
 from measure.controller.light.const import LutMode
-from measure.controller.light.controller import LightInfo
+from measure.controller.light.controller import LightController, LightInfo
 from measure.controller.light.errors import ApiConnectionError
 from measure.controller.light.factory import LightControllerFactory
 from measure.powermeter.errors import (
@@ -27,6 +28,7 @@ from measure.powermeter.errors import (
 from measure.runner.const import QUESTION_GZIP, QUESTION_MODE, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
 from measure.runner.errors import RunnerError
 from measure.runner.runner import MeasurementRunner, RunnerResult
+from measure.session import SessionControl
 from measure.util.measure_util import AverageMeasurementConvergence, MeasurementResult, MeasureUtil
 
 CSV_HEADERS = {
@@ -58,8 +60,14 @@ class LightRunner(MeasurementRunner):
     power value in watt.
     """
 
-    def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
-        self.light_controller = LightControllerFactory(config).create()
+    def __init__(
+        self,
+        measure_util: MeasureUtil,
+        config: MeasureRuntimeConfig,
+        light_controller: LightController | None = None,
+        session_control: SessionControl | None = None,
+    ) -> None:
+        self.light_controller = light_controller or LightControllerFactory(cast(MeasureConfig, config)).create()
         self.measure_util = measure_util
         self.lut_modes: set[LutMode] | None = None
         self.num_lights: int = 1
@@ -67,6 +75,17 @@ class LightRunner(MeasurementRunner):
         self.light_info: LightInfo | None = None
         self.config = config
         self.effect_list: list[str] | None = None
+        self.session_control = session_control
+
+    def _wait(self, seconds: float) -> None:
+        if self.session_control is None:
+            time.sleep(seconds)
+            return
+        self.session_control.wait(seconds)
+
+    def _checkpoint(self) -> None:
+        if self.session_control is not None:
+            self.session_control.checkpoint()
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.light_controller.process_answers(answers)
@@ -90,6 +109,9 @@ class LightRunner(MeasurementRunner):
 
         for measurement_info in measurements_to_run:
             voltages.extend(self.run_mode(answers, measurement_info, all_variations, left_variations))
+
+        if left_variations and self.session_control is not None:
+            raise RunnerError(f"Measurement ended with {len(left_variations)} incomplete variations")
 
         return RunnerResult(
             model_json_data={
@@ -161,12 +183,13 @@ class LightRunner(MeasurementRunner):
                 mode.value,
             )
             _LOGGER.info("Waiting %d seconds...", self.config.sleep_initial)
-            time.sleep(self.config.sleep_initial)
+            self._wait(self.config.sleep_initial)
 
             previous_variation = None
             for count, variation in enumerate(measurement_info.variations):
                 self._log_progress(mode, count, variation, all_variations, left_variations)
                 _LOGGER.info("Changing light to: %s", variation)
+                self._checkpoint()
                 variation_start_time = time.time()
                 self._change_light_with_retry(mode, variation)
                 self.wait(variation, previous_variation)
@@ -174,6 +197,7 @@ class LightRunner(MeasurementRunner):
                 previous_variation = variation
 
                 try:
+                    self._checkpoint()
                     measurement_result = self.take_power_measurement(mode, variation_start_time)
                 except OutdatedMeasurementError:
                     measurement_result = self.nudge_and_remeasure(mode, variation)
@@ -192,9 +216,17 @@ class LightRunner(MeasurementRunner):
                 if measurement_result is None:
                     continue
                 _LOGGER.info("Measured power: %.2f", measurement_result.power)
+                self._checkpoint()
                 csv_writer.write_measurement(variation, measurement_result.power)
                 voltages.extend(measurement_result.voltages)
                 left_variations.remove(variation)
+                if self.session_control is not None:
+                    self.session_control.progress(
+                        completed=len(all_variations) - len(left_variations),
+                        total=len(all_variations),
+                        mode=mode.value,
+                        estimated_remaining=self.calculate_time_left(mode, all_variations, left_variations, variation),
+                    )
 
             csv_file.close()
             _LOGGER.info(
@@ -234,6 +266,7 @@ class LightRunner(MeasurementRunner):
     def _change_light_with_retry(self, mode: LutMode, variation: Variation) -> None:
         for _ in range(5):
             try:
+                self._checkpoint()
                 self.light_controller.change_light_state(
                     mode,
                     on=True,
@@ -242,12 +275,12 @@ class LightRunner(MeasurementRunner):
                 return
             except ApiConnectionError as error:
                 _LOGGER.warning("Failed to change light state: %s. Retrying...", error)
-                time.sleep(5)
+                self._wait(5)
         raise RunnerError("Failed to change light state after 5 retries")
 
     def wait(self, variation: Variation, previous_variation: Variation | None) -> None:
         """Wait for the light to process the change"""
-        time.sleep(self.config.sleep_time)
+        self._wait(self.config.sleep_time)
 
         if not previous_variation:
             return
@@ -258,16 +291,16 @@ class LightRunner(MeasurementRunner):
             and variation.ct < previous_variation.ct
         ):
             _LOGGER.info("Extra waiting for significant CT change...")
-            time.sleep(self.config.sleep_time_ct)
+            self._wait(self.config.sleep_time_ct)
             return
 
         if isinstance(variation, HsVariation) and isinstance(previous_variation, HsVariation):
             if variation.hue < previous_variation.hue:
                 _LOGGER.info("Extra waiting for significant HUE change...")
-                time.sleep(self.config.sleep_time_hue)
+                self._wait(self.config.sleep_time_hue)
             if variation.sat < previous_variation.sat:
                 _LOGGER.info("Extra waiting for significant SAT change...")
-                time.sleep(self.config.sleep_time_sat)
+                self._wait(self.config.sleep_time_sat)
             return
 
         if (
@@ -276,7 +309,7 @@ class LightRunner(MeasurementRunner):
             and variation.is_effect_changed(previous_variation)
         ):
             _LOGGER.info("Extra waiting for effect change...")
-            time.sleep(self.config.sleep_time_effect_change)
+            self._wait(self.config.sleep_time_effect_change)
 
     def set_light_to_maximum_brightness(self, mode: LutMode) -> None:
         """
@@ -286,6 +319,7 @@ class LightRunner(MeasurementRunner):
         _LOGGER.info("Turning on light with maximum brightness")
         # Turn the light on twice to ensure it's in the correct state
         for _ in range(2):
+            self._checkpoint()
             if mode == LutMode.HS:
                 self.light_controller.change_light_state(
                     mode,
@@ -307,7 +341,7 @@ class LightRunner(MeasurementRunner):
                     on=True,
                     bri=255,
                 )
-            time.sleep(self.config.sleep_time)  # Wait for the light to process
+            self._wait(self.config.sleep_time)  # Wait for the light to process
 
     def get_variations(
         self,
@@ -506,20 +540,22 @@ class LightRunner(MeasurementRunner):
                 # Likely not significant enough change for PM to detect. Try nudging it
                 _LOGGER.warning("Measurement is stuck, Nudging")
                 # If brightness is low, set brightness high. Else, turn light off
+                self._checkpoint()
                 self.light_controller.change_light_state(
                     LutMode.BRIGHTNESS,
                     on=(variation.bri < 128),
                     bri=255,
                 )
-                time.sleep(self.config.pulse_time_nudge)
+                self._wait(self.config.pulse_time_nudge)
                 variation_start_time = time.time()
+                self._checkpoint()
                 self.light_controller.change_light_state(
                     mode,
                     on=True,
                     **asdict(variation),
                 )
                 # Wait a longer amount of time for the PM to settle
-                time.sleep(self.config.sleep_time_nudge)
+                self._wait(self.config.sleep_time_nudge)
                 return self.take_power_measurement(mode, variation_start_time)
             except OutdatedMeasurementError:
                 continue
@@ -577,6 +613,8 @@ class LightRunner(MeasurementRunner):
 
         should_resume = self.config.resume
         if should_resume:
+            if not self.config.prompt_resume:
+                return True
             return inquirer.confirm(
                 message=f"CSV File {csv_file_path} already exists. Do you want to resume measurements?",
                 default=True,
@@ -680,14 +718,16 @@ class LightRunner(MeasurementRunner):
 
     def measure_standby_power(self) -> MeasurementResult:
         """Measures the standby power (when the light is OFF)"""
+        self._checkpoint()
         self.light_controller.change_light_state(LutMode.BRIGHTNESS, on=False)
         start_time = time.time()
         _LOGGER.info(
             "Measuring standby power. Waiting for %d seconds...",
             self.config.sleep_standby,
         )
-        time.sleep(self.config.sleep_standby)
+        self._wait(self.config.sleep_standby)
         try:
+            self._checkpoint()
             return self.take_power_measurement(LutMode.BRIGHTNESS, start_time)
         except OutdatedMeasurementError:
             return self.nudge_and_remeasure(LutMode.BRIGHTNESS, Variation(0)) or MeasurementResult(power=0, voltages=[])
@@ -815,7 +855,7 @@ class CsvWriter:
         csv_file: TextIO,
         mode: LutMode,
         add_header: bool,
-        config: MeasureConfig,
+        config: MeasureRuntimeConfig,
     ) -> None:
         self.csv_file = csv_file
         self.config = config

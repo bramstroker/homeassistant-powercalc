@@ -8,20 +8,19 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.14,<4.0"
 dependencies = [
-    "aiohttp>=3.8",
     "chardet>=5.1",
     "charset-normalizer>=3.1",
+    "fastapi>=0.116",
     "homeassistant-api~=6.0",
     "inquirer>=3.1",
-    "numpy>=2.2",
-    "opencv-python>=4.7",
-    "pytesseract>=0.3",
+    "pydantic>=2.13",
     "python-decouple>=3.4",
     "python-kasa>=0.6",
     "readchar>=4.0",
     "requests>=2.28",
     "tuyapower>=0.2",
     "typing-extensions>=4.6",
+    "uvicorn>=0.35",
     "pycryptodome",
     "phue"
 ]
@@ -30,7 +29,15 @@ dependencies = [
 phue = { git = "https://github.com/studioimaginaire/phue.git", rev = "f5c79ff07dafbaad155de6ca1cfd513705bbdbd3" }
 
 [project.optional-dependencies]
+ocr = [
+    "numpy>=2.4",
+    "opencv-python>=4.7",
+    "pillow>=12.0",
+    "pytesseract>=0.3",
+]
 dev = [
+    "httpx2>=0.1",
+    "mypy==2.2.0",
     "ruff>=0.2",
     "pytest>=8.3.3",
     "pytest-cov>=6.0"

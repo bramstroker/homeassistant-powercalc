@@ -1,0 +1,23 @@
+name: Powercalc Measure
+version: "0.1.0"
+slug: powercalc_measure
+description: Create Powercalc light profiles from Home Assistant entities
+url: https://docs.powercalc.nl/contributing/measure/home-assistant-app/
+arch:
+  - aarch64
+  - amd64
+image: ghcr.io/bramstroker/powercalc-measure-app
+startup: application
+boot: auto
+stage: experimental
+ingress: true
+ingress_port: 8099
+ingress_stream: true
+panel_admin: true
+panel_icon: mdi:chart-bell-curve-cumulative
+homeassistant_api: true
+environment:
+  MEASURE_TRUSTED_INGRESS_ONLY: "true"
+backup: cold
+options: {}
+schema: {}

@@ -240,6 +240,10 @@ class MeasureConfig:
             return True
 
     @property
+    def prompt_resume(self) -> bool:
+        return True
+
+    @property
     def shelly_ip(self) -> str:
         return config("SHELLY_IP")
 

@@ -13,6 +13,18 @@ import pytest
 from tests.conftest import MockConfigFactory
 
 
+@pytest.mark.parametrize(
+    ("values", "expected"),
+    [
+        ([1.0, 2.0, 3.0], 1.0),
+        ([3.0, 2.0, 1.0], -1.0),
+        ([4.0], 0.0),
+    ],
+)
+def test_linear_slope_does_not_require_numpy(values: list[float], expected: float) -> None:
+    assert MeasureUtil._linear_slope(values) == pytest.approx(expected)  # noqa: SLF001
+
+
 class _ErrorThenSuccessPowerMeter(PowerMeter):
     """Power meter that raises errors for the first N calls, then succeeds."""
 

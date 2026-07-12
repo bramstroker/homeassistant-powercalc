@@ -1,0 +1,55 @@
+from __future__ import annotations
+
+from datetime import UTC, datetime
+import json
+from pathlib import Path
+from typing import Any
+
+from measure.configuration import MeasureRuntimeConfig
+from measure.const import MODEL_JSON_MAX_VOLTAGE, MODEL_JSON_MIN_VOLTAGE, PROJECT_DIR
+
+
+def measure_version() -> str:
+    return (Path(PROJECT_DIR) / ".VERSION").read_text(encoding="utf-8").strip()
+
+
+def write_model_json(
+    directory: Path,
+    *,
+    standby_power: float,
+    name: str,
+    measure_device: str,
+    config: MeasureRuntimeConfig,
+    extra_json_data: dict[str, Any] | None = None,
+    voltages: list[float] | None = None,
+    voltage_json_data: dict[str, float] | None = None,
+) -> Path:
+    created_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
+    json_data: dict[str, Any] = {
+        "created_at": created_at,
+        "measure_device": measure_device,
+        "measure_method": "script",
+        "measure_description": "Measured with utils/measure script",
+        "measure_settings": {
+            "VERSION": measure_version(),
+            "SAMPLE_COUNT": config.sample_count,
+            "SLEEP_TIME": config.sleep_time,
+        },
+        "name": name,
+        "standby_power": standby_power,
+    }
+    if voltage_json_data:
+        json_data.update(voltage_json_data)
+    elif voltages:
+        json_data.update(
+            {
+                MODEL_JSON_MIN_VOLTAGE: round(min(voltages), 2),
+                MODEL_JSON_MAX_VOLTAGE: round(max(voltages), 2),
+            },
+        )
+    if extra_json_data:
+        json_data.update(extra_json_data)
+
+    path = directory / "model.json"
+    path.write_text(json.dumps(json_data, indent=2, sort_keys=True), encoding="utf-8")
+    return path
