@@ -214,7 +214,9 @@ export class AppShell extends LitElement {
   }
   private stepClass(index: number): string {
     const current = { loading: 0, setup: 0, review: 1, running: 2, result: 3, settings: 0 }[this.view];
-    return index === current ? "active" : index < current ? "done" : "";
+    if (index === current) return "active";
+    if (index < current) return "done";
+    return "";
   }
   private message(error: unknown): string { return error instanceof Error ? error.message : "Something went wrong. Try again."; }
 }

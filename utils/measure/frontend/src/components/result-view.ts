@@ -34,7 +34,7 @@ export class ResultView extends LitElement {
     return html`
       <section class="panel" aria-labelledby="result-title">
         <p class="eyebrow">04 / Result</p>
-        <div class="status-mark ${state}" aria-hidden="true">${state === "completed" ? "✓" : state === "failed" ? "!" : "↻"}</div>
+        <div class="status-mark ${state}" aria-hidden="true">${this.statusMark(state)}</div>
         <h2 id="result-title">${this.resultTitle(state)}</h2>
         <p class="muted">${this.description(state)}</p>
         ${error ? html`<p class="notice error" role="alert">${error}</p>` : nothing}
@@ -51,6 +51,12 @@ export class ResultView extends LitElement {
         </div>
       </section>
     `;
+  }
+
+  private statusMark(state: SessionSnapshot["state"]): string {
+    if (state === "completed") return "✓";
+    if (state === "failed") return "!";
+    return "↻";
   }
 
   private resultTitle(state: SessionSnapshot["state"]): string {

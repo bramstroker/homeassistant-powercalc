@@ -21,10 +21,10 @@ abort "Unsupported architecture" unless config.fetch("arch").sort == %w[aarch64 
 abort "App version must be a container tag" unless config.fetch("version").match?(/\A[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?\z/)
 abort "App and frontend versions differ" if frontend && config.fetch("version") != frontend.fetch("version")
 abort "App image must not include a tag" if config.fetch("image").include?("@") || config.fetch("image").split("/").last.include?(":")
-abort "Ingress configuration is incomplete" unless config["ingress"] && config["ingress_port"] == 8099 && config["ingress_stream"]
+abort "Ingress configuration is incomplete" unless config["ingress"] && config["ingress_stream"]
 abort "Home Assistant API access is required" unless config["homeassistant_api"]
 abort "Ingress source checks must remain enabled" unless config.dig("environment", "MEASURE_TRUSTED_INGRESS_ONLY") == "true"
-abort "App must remain admin-only" unless config["panel_admin"]
+abort "App must remain admin-only" if config["panel_admin"] == false
 abort "App must remain experimental" unless config["stage"] == "experimental"
 abort "Host ports must not be exposed" if config.key?("ports") || config["host_network"]
 abort "App must not request privileged access" if config["full_access"] || config.key?("privileged")

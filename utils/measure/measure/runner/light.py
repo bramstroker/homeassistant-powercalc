@@ -141,6 +141,13 @@ class LightRunner(MeasurementRunner):
             is_resuming=bool(resume_at),
         )
 
+    def _resolve_white_mode(self, mode: LutMode) -> LutMode:
+        """WHITE is measured as BRIGHTNESS after turning the light fully on."""
+        if mode == LutMode.WHITE:
+            self.light_controller.change_light_state(mode, on=True, bri=255)
+            return LutMode.BRIGHTNESS
+        return mode
+
     def run_mode(
         self,
         answers: dict[str, Any],
@@ -150,15 +157,8 @@ class LightRunner(MeasurementRunner):
     ) -> list[float]:
         """Run the measurement session for lights"""
 
-        mode = measurement_info.mode
+        mode = self._resolve_white_mode(measurement_info.mode)
         voltages: list[float] = []
-        if mode == LutMode.WHITE:
-            self.light_controller.change_light_state(
-                mode,
-                on=True,
-                bri=255,
-            )
-            mode = LutMode.BRIGHTNESS
 
         file_write_mode, write_header_row = self._get_csv_write_options(measurement_info)
 

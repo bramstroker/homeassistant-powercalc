@@ -9,7 +9,7 @@ import mimetypes
 import os
 from pathlib import Path
 import re
-from typing import Annotated, Literal, cast
+from typing import Annotated, Any, Literal, cast
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
@@ -38,6 +38,7 @@ class ErrorResponse(BaseModel):
 
 # Shared OpenAPI documentation for the JSON error body returned by every failed request.
 _ERROR = {"model": ErrorResponse}
+_NO_SESSION = "No measurement session"
 
 
 class EntityDescriptor(BaseModel):
@@ -177,9 +178,14 @@ def create_app(
     return app
 
 
-def _router() -> APIRouter:  # noqa: C901
+def _router() -> APIRouter:
     router = APIRouter(prefix="/api")
+    _register_measurement_routes(router)
+    _register_session_routes(router)
+    return router
 
+
+def _register_measurement_routes(router: APIRouter) -> None:
     @router.get("/capabilities", response_model=CapabilitiesResponse)
     async def capabilities() -> CapabilitiesResponse:
         return CapabilitiesResponse(
@@ -230,13 +236,12 @@ def _router() -> APIRouter:  # noqa: C901
             raise HTTPException(status_code=409, detail=str(error)) from error
         return _snapshot_response(context, snapshot)
 
+
+def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/session/current", responses={404: _ERROR})
     async def current_session(request: Request) -> dict[str, object]:
         context = _context(request)
-        snapshot = context.coordinator.current
-        if snapshot is None:
-            raise HTTPException(status_code=404, detail="No measurement session")
-        return _snapshot_response(context, snapshot)
+        return _snapshot_response(context, _require_current_session(context))
 
     @router.delete("/session/current", status_code=202, responses={409: _ERROR})
     async def cancel_session(request: Request) -> dict[str, object]:
@@ -263,9 +268,7 @@ def _router() -> APIRouter:  # noqa: C901
     @router.get("/session/current/files", response_model=list[SessionFile], responses={404: _ERROR})
     async def files(request: Request) -> list[SessionFile]:
         context = _context(request)
-        snapshot = context.coordinator.current
-        if snapshot is None:
-            raise HTTPException(status_code=404, detail="No measurement session")
+        snapshot = _require_current_session(context)
         return [
             _file_descriptor(context.storage.file_path(snapshot.id, name), name)
             for name in context.storage.list_files(snapshot.id)
@@ -274,9 +277,7 @@ def _router() -> APIRouter:  # noqa: C901
     @router.get("/session/current/files/{name:path}", responses={404: _ERROR})
     async def download(name: str, request: Request) -> FileResponse:
         context = _context(request)
-        snapshot = context.coordinator.current
-        if snapshot is None:
-            raise HTTPException(status_code=404, detail="No measurement session")
+        snapshot = _require_current_session(context)
         try:
             path = context.storage.file_path(snapshot.id, name)
         except (FileNotFoundError, ValueError) as error:
@@ -286,15 +287,19 @@ def _router() -> APIRouter:  # noqa: C901
     @router.get("/session/current/events", responses={404: _ERROR})
     async def events(request: Request) -> StreamingResponse:
         context = _context(request)
-        if context.coordinator.current is None:
-            raise HTTPException(status_code=404, detail="No measurement session")
+        _require_current_session(context)
         return StreamingResponse(_event_stream(request, context), media_type="text/event-stream")
-
-    return router
 
 
 def _context(request: Request) -> AppContext:
     return cast(AppContext, request.app.state.context)
+
+
+def _require_current_session(context: AppContext) -> SessionSnapshot:
+    snapshot = context.coordinator.current
+    if snapshot is None:
+        raise HTTPException(status_code=404, detail=_NO_SESSION)
+    return snapshot
 
 
 def _load_entities(
@@ -307,35 +312,44 @@ def _load_entities(
     if selected_domain not in all_entities:
         return []
     unit = {"power": "W", "voltage": "V"}.get(kind or "")
-    result: list[EntityDescriptor] = []
-    for entity in all_entities[selected_domain].entities.values():
-        attributes = entity.state.attributes
-        entity_unit = attributes.get("unit_of_measurement")
-        if unit and entity_unit != unit:
-            continue
-        entity_state = str(entity.state.state)
-        if entity_state.casefold() in {"unavailable", "unknown", "none"}:
-            continue
-        if unit and not _is_finite_number(entity_state):
-            continue
-        supported_modes = None
-        if domain == "light":
-            values = set(attributes.get("supported_color_modes", []))
-            supported_modes = [mode for mode in (LutMode.COLOR_TEMP, LutMode.HS) if mode.value in values]
-            if values - {"onoff"} or "brightness" in attributes:
-                supported_modes.insert(0, LutMode.BRIGHTNESS)
-            if not supported_modes:
-                continue
-        result.append(
-            EntityDescriptor(
-                entity_id=entity.entity_id,
-                name=str(attributes.get("friendly_name", entity.entity_id)),
-                state=str(entity.state.state),
-                unit=str(entity_unit) if entity_unit else None,
-                supported_modes=supported_modes,
-            ),
-        )
+    result = [
+        descriptor
+        for entity in all_entities[selected_domain].entities.values()
+        if (descriptor := _describe_entity(entity, domain, unit)) is not None
+    ]
     return sorted(result, key=lambda item: (item.name.casefold(), item.entity_id))
+
+
+def _describe_entity(entity: Any, domain: Literal["light"] | None, unit: str | None) -> EntityDescriptor | None:  # noqa: ANN401
+    attributes = entity.state.attributes
+    entity_unit = attributes.get("unit_of_measurement")
+    if unit and entity_unit != unit:
+        return None
+    entity_state = str(entity.state.state)
+    if entity_state.casefold() in {"unavailable", "unknown", "none"}:
+        return None
+    if unit and not _is_finite_number(entity_state):
+        return None
+    supported_modes = None
+    if domain == "light":
+        supported_modes = _supported_light_modes(attributes)
+        if not supported_modes:
+            return None
+    return EntityDescriptor(
+        entity_id=entity.entity_id,
+        name=str(attributes.get("friendly_name", entity.entity_id)),
+        state=entity_state,
+        unit=str(entity_unit) if entity_unit else None,
+        supported_modes=supported_modes,
+    )
+
+
+def _supported_light_modes(attributes: dict[str, Any]) -> list[LutMode]:
+    values = set(attributes.get("supported_color_modes", []))
+    modes = [mode for mode in (LutMode.COLOR_TEMP, LutMode.HS) if mode.value in values]
+    if values - {"onoff"} or "brightness" in attributes:
+        modes.insert(0, LutMode.BRIGHTNESS)
+    return modes
 
 
 def _preflight(context: AppContext, payload: LightMeasurementRequestModel) -> PreflightResponse:

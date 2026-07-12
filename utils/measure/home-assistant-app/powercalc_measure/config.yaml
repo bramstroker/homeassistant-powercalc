@@ -7,13 +7,9 @@ arch:
   - aarch64
   - amd64
 image: ghcr.io/bramstroker/powercalc-measure-app
-startup: application
-boot: auto
 stage: experimental
 ingress: true
-ingress_port: 8099
 ingress_stream: true
-panel_admin: true
 panel_icon: mdi:chart-bell-curve-cumulative
 homeassistant_api: true
 environment:
