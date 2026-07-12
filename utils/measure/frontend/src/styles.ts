@@ -66,4 +66,3 @@ export const sharedStyles = css`
     *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
   }
 `;
-

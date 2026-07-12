@@ -99,7 +99,7 @@ class SessionStorage:
         """Return whether the session has a complete row matching its persisted request."""
         try:
             request = self.load_request(session_id)
-        except (FileNotFoundError, KeyError, ValueError):
+        except FileNotFoundError, KeyError, ValueError:
             return False
         model_root = self.output_directory(session_id) / request.model_id
         for mode in request.modes:
@@ -168,7 +168,7 @@ class SessionStorage:
             if not all(math.isfinite(float(value)) for value in last_row):
                 return False
             return SessionStorage._variation_matches_request(mode, last_row[:-1], request)
-        except (OSError, UnicodeDecodeError, ValueError):
+        except OSError, UnicodeDecodeError, ValueError:
             return False
 
     @staticmethod

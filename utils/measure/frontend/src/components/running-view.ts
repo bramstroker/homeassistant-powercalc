@@ -73,4 +73,3 @@ export class RunningView extends LitElement {
 }
 
 customElements.define("measure-running-view", RunningView);
-
