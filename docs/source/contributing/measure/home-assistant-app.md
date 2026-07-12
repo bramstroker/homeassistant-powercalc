@@ -43,7 +43,7 @@ Verify that the chosen power sensor measures only the target light. Keep Home As
 
 1. Open the app and select the light, power sensor, and optional voltage sensor.
 2. Choose supported measurement modes and enter the device details.
-3. Review preflight results. Resolve unavailable entities, incompatible units, or storage errors before continuing.
+3. Review the setup check results. Resolve unavailable entities, incompatible units, or storage errors before continuing.
 4. Start the measurement. You can close or reload the browser; the app owns the job and restores its latest persisted status when you return.
 5. Download generated CSV and model files from the result view.
 

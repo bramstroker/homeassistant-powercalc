@@ -31,7 +31,7 @@ The app requires Home Assistant OS. It cannot be installed on Home Assistant Con
 1. Start the app and enable **Show in sidebar** if desired.
 2. Select **Open Web UI**.
 3. Choose the light and its power sensor. Add a voltage sensor only when your setup needs it.
-4. Review preflight warnings and settings before starting.
+4. Review setup check warnings and settings before starting.
 5. Leave Home Assistant and the measured devices running. Closing or reloading the browser does not stop an active measurement.
 6. Download the generated CSV and model files from the result view.
 

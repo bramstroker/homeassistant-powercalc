@@ -7,6 +7,7 @@ from typing import Any
 
 from fastapi.testclient import TestClient
 from measure.api import create_app
+from measure.configuration import MeasurementSettings
 from measure.const import MeasureType
 from measure.coordinator import MeasurementCoordinator
 from measure.request import LightMeasurementRequest
@@ -137,6 +138,15 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
 
     assert capabilities.status_code == 200
     assert capabilities.json()["modes"] == ["brightness", "color_temp", "hs", "effect"]
+    defaults = MeasurementSettings()
+    assert capabilities.json()["defaults"] == {
+        "sleep_time": defaults.sleep_time,
+        "sample_count": defaults.sample_count,
+        "brightness_step": defaults.brightness_step,
+        "hue_step": defaults.hue_step,
+        "saturation_step": defaults.saturation_step,
+        "color_temp_step": defaults.color_temp_step,
+    }
     assert [item["entity_id"] for item in powers.json()] == ["sensor.test_power"]
     assert "light.switch_like" not in {item["entity_id"] for item in lights.json()}
     assert lights.json()[0]["supported_modes"] == ["brightness", "color_temp", "hs", "effect"]

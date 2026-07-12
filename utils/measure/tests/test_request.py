@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from measure.configuration import MeasurementSettings
 from measure.controller.light.const import LutMode
 from measure.request import LightMeasurementRequestModel
 from pydantic import ValidationError
@@ -23,6 +24,12 @@ def test_request_converts_to_domain_values() -> None:
 
     assert request.model_id == "LCT010"
     assert request.modes == frozenset({LutMode.BRIGHTNESS})
+
+
+def test_request_uses_measurement_settings_defaults() -> None:
+    request = LightMeasurementRequestModel.model_validate(valid_request()).to_domain()
+
+    assert request.settings == MeasurementSettings()
 
 
 @pytest.mark.parametrize("model_id", ["../secret", "/unsafe/file", "a/b", ".."])

@@ -254,16 +254,37 @@ describe("running view", () => {
     expect(element.shadowRoot.textContent).toContain("12 / 60");
   });
 
+  it("keeps the log collapsed by default and opens it as an overlay on toggle", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; logs: string[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", progress: { completed: 1, total: 10 } };
+    element.logs = ["First log", "Second log"];
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".log-overlay")).toBeNull();
+    const toggle = element.shadowRoot.querySelector(".log-toggle") as HTMLButtonElement;
+    expect(toggle.textContent).toContain("2");
+
+    toggle.click();
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector(".log-overlay")).toBeTruthy();
+    expect(element.shadowRoot.querySelector(".log-overlay")?.textContent).toContain("Second log");
+  });
+
   it("auto-scrolls the log container when new log lines arrive", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot;
       connected: boolean;
       logs: string[];
+      logOpen: boolean;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
     element.snapshot = { state: "running", progress: { completed: 1, total: 10 } };
     element.logs = ["First log"];
+    element.logOpen = true;
     document.body.append(element);
     await element.updateComplete;
 

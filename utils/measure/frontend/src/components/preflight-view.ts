@@ -46,7 +46,7 @@ export class PreflightView extends LitElement {
   render() {
     return html`
       <section class="panel" aria-labelledby="review-title">
-        <p class="eyebrow">02 / Preflight</p>
+        <p class="eyebrow">02 / Setup check</p>
         <h2 id="review-title">${this.title}</h2>
         <p class="muted">Powercalc checked entity availability and storage. Starting will begin controlling the selected device.</p>
         ${this.metrics.length ? html`

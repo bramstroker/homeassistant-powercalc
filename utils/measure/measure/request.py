@@ -17,6 +17,7 @@ from measure.powermeter.const import PowerMeterType
 LIGHT_ENTITY_PATTERN = r"^light\.[a-z0-9_]+$"
 POWER_ENTITY_PATTERN = r"^sensor\.[a-z0-9_]+$"
 VOLTAGE_ENTITY_PATTERN = r"^sensor\.[a-z0-9_]+$"
+_DEFAULT_SETTINGS = MeasurementSettings()
 
 
 class ResumePolicy(StrEnum):
@@ -68,12 +69,12 @@ class LightMeasurementRequestModel(BaseModel):
     generate_model: bool = True
     gzip: bool = True
     multiple_light_count: int = Field(default=1, ge=1, le=100)
-    sleep_time: float = Field(default=2, ge=0, le=120)
-    sample_count: int = Field(default=1, ge=1, le=100)
-    brightness_step: int = Field(default=5, ge=1, le=100)
-    hue_step: int = Field(default=10, ge=1, le=360)
-    saturation_step: int = Field(default=10, ge=1, le=100)
-    color_temp_step: int = Field(default=5, ge=1, le=100)
+    sleep_time: float = Field(default=_DEFAULT_SETTINGS.sleep_time, ge=0, le=120)
+    sample_count: int = Field(default=_DEFAULT_SETTINGS.sample_count, ge=1, le=100)
+    brightness_step: int = Field(default=_DEFAULT_SETTINGS.brightness_step, ge=1, le=100)
+    hue_step: int = Field(default=_DEFAULT_SETTINGS.hue_step, ge=1, le=360)
+    saturation_step: int = Field(default=_DEFAULT_SETTINGS.saturation_step, ge=1, le=100)
+    color_temp_step: int = Field(default=_DEFAULT_SETTINGS.color_temp_step, ge=1, le=100)
     resume_policy: ResumePolicy = ResumePolicy.NEW
 
     @field_validator("model_id")
@@ -135,8 +136,8 @@ class MeasurementRunRequestModel(BaseModel):
     measure_device: str = Field(default="", max_length=200)
     answers: dict[str, object] = Field(default_factory=dict)
     generate_model: bool = False
-    sleep_time: float = Field(default=2, ge=0, le=120)
-    sample_count: int = Field(default=1, ge=1, le=100)
+    sleep_time: float = Field(default=_DEFAULT_SETTINGS.sleep_time, ge=0, le=120)
+    sample_count: int = Field(default=_DEFAULT_SETTINGS.sample_count, ge=1, le=100)
     resume_policy: ResumePolicy = ResumePolicy.NEW
 
     @field_validator("model_id")

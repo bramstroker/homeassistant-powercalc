@@ -219,7 +219,7 @@ export class SetupView extends LitElement {
         </fieldset>
 
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
-        <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? "Checking…" : "Review preflight"}</button></div>
+        <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? "Checking setup…" : "Check setup"}</button></div>
       </form>
     `;
   }
@@ -251,7 +251,7 @@ export class SetupView extends LitElement {
         </fieldset>
 
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
-        <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? "Checking…" : "Review preflight"}</button></div>
+        <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? "Checking setup…" : "Check setup"}</button></div>
       </form>
     `;
   }

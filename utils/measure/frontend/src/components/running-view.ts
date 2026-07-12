@@ -10,6 +10,7 @@ export class RunningView extends LitElement {
     logs: { attribute: false },
     samples: { attribute: false },
     busy: { type: Boolean },
+    logOpen: { state: true },
   };
 
   snapshot!: SessionSnapshot;
@@ -17,6 +18,7 @@ export class RunningView extends LitElement {
   logs: string[] = [];
   samples: number[] = [];
   busy = false;
+  logOpen = false;
   private readonly logContainer = createRef<HTMLDivElement>();
 
   static readonly styles = [sharedStyles, css`
@@ -26,14 +28,22 @@ export class RunningView extends LitElement {
     .connection { display: inline-flex; align-items: center; gap: 0.45rem; color: var(--muted); font-size: 0.82rem; }
     .connection::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
     .connection.connected::before { background: var(--good); box-shadow: 0 0 0 4px color-mix(in srgb, var(--good) 16%, transparent); }
-    .value { position: relative; margin: 2rem 0 1.2rem; font: 700 clamp(3rem, 12vw, 7rem)/0.85 "DIN Alternate", sans-serif; letter-spacing: -0.06em; color: var(--signal-strong); }
-    .value small { font-size: 0.18em; letter-spacing: 0.08em; color: var(--muted); }
+    .value { position: relative; margin: 0.9rem 0 1rem; font: 700 clamp(2.5rem, 7vw, 4rem)/1 "DIN Alternate", sans-serif; letter-spacing: -0.03em; color: var(--signal-strong); }
+    .value small { margin-left: 0.3rem; font-size: 0.32em; font-weight: 650; letter-spacing: 0.04em; color: var(--muted); }
     progress { position: relative; display: block; width: 100%; height: 8px; border: 0; border-radius: 99px; overflow: hidden; appearance: none; }
     progress::-webkit-progress-bar { background: var(--track); } progress::-webkit-progress-value { background: var(--signal); } progress::-moz-progress-bar { background: var(--signal); }
     .metrics { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.2rem; }
     .metric span { display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
     .metric strong { display: block; margin-top: 0.25rem; font: 600 1rem/1.3 ui-monospace, monospace; }
-    .log { max-height: 9rem; overflow: auto; margin-top: 1rem; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); font: 0.8rem/1.6 ui-monospace, monospace; color: var(--muted); }
+    .topline-right { display: inline-flex; align-items: center; gap: 0.9rem; }
+    .log-toggle { min-height: 30px; padding: 0.25rem 0.7rem; border-radius: 999px; font: 700 0.68rem/1 ui-monospace, monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: transparent; }
+    .log-toggle:hover:not(:disabled) { color: var(--ink); }
+    .log-count { color: var(--signal-strong); }
+    .log-overlay { position: fixed; top: 0; right: 0; bottom: 0; z-index: 60; display: flex; flex-direction: column; width: min(400px, 92vw); padding: 1rem; background: color-mix(in srgb, var(--surface) 96%, transparent); border-left: 1px solid var(--line); box-shadow: -18px 0 40px rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); }
+    .log-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
+    .log-head span { color: var(--muted); font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.12em; text-transform: uppercase; }
+    .log-head button { min-height: 32px; padding: 0.3rem 0.6rem; }
+    .log { flex: 1; overflow: auto; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); font: 0.8rem/1.6 ui-monospace, monospace; color: var(--muted); }
     .log p { margin: 0; }
     .chart { position: relative; margin-top: 1.4rem; }
     .chart-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
@@ -48,7 +58,7 @@ export class RunningView extends LitElement {
   `];
 
   protected updated(changedProperties: PropertyValues<this>): void {
-    if (changedProperties.has("logs") && this.logs.length) {
+    if ((changedProperties.has("logs") || changedProperties.has("logOpen")) && this.logOpen && this.logs.length) {
       const container = this.logContainer.value;
       if (container) container.scrollTop = container.scrollHeight;
     }
@@ -66,7 +76,10 @@ export class RunningView extends LitElement {
         <div class="instrument">
           <div class="topline">
             <span class="muted">${this.snapshot.phase ?? "Preparing measurement"}</span>
-            <span class="connection ${this.connected ? "connected" : ""}" role="status">${this.connected ? "Live" : "Reconnecting"}</span>
+            <span class="topline-right">
+              ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>Log <span class="log-count">${this.logs.length}</span></button>` : nothing}
+              <span class="connection ${this.connected ? "connected" : ""}" role="status">${this.connected ? "Live" : "Reconnecting"}</span>
+            </span>
           </div>
           ${openEnded
             ? html`<div class="value" aria-label="${progress.completed} samples recorded">${progress.completed}<small>samples</small></div>
@@ -81,7 +94,7 @@ export class RunningView extends LitElement {
           ${this.samples.length ? this.renderChart() : nothing}
         </div>
         ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
-        ${this.logs.length ? this.renderLog() : nothing}
+        ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
         <div class="actions">
           ${this.snapshot.state === "awaiting_confirmation" ? html`<button class="primary" type="button" @click=${this.confirm} ?disabled=${this.busy}>Start measurement</button>` : nothing}
           ${openEnded
@@ -121,11 +134,22 @@ export class RunningView extends LitElement {
   }
 
   private renderLog() {
-    return html`<div ${ref(this.logContainer)} class="log" aria-label="Recent measurement log" aria-live="polite">${this.logs.map((log) => this.logLine(log))}</div>`;
+    return html`
+      <aside class="log-overlay" aria-label="Measurement log">
+        <div class="log-head">
+          <span>Measurement log</span>
+          <button type="button" @click=${this.toggleLog} aria-label="Close log">Close ✕</button>
+        </div>
+        <div ${ref(this.logContainer)} class="log" aria-live="polite">${this.logs.map((log) => this.logLine(log))}</div>
+      </aside>`;
   }
 
   private logLine(log: string) {
     return html`<p>${log}</p>`;
+  }
+
+  private toggleLog(): void {
+    this.logOpen = !this.logOpen;
   }
 
   private remaining(seconds?: number | null): string {

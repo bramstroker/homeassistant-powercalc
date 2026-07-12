@@ -19,6 +19,7 @@ from homeassistant_api import Client
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 
+from measure.configuration import MeasurementSettings
 from measure.const import MeasureType
 from measure.controller.light.const import LutMode
 from measure.coordinator import MeasurementCoordinator, SessionConflictError
@@ -229,15 +230,16 @@ def _router() -> APIRouter:
 def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/capabilities")
     async def capabilities() -> CapabilitiesResponse:
+        defaults = MeasurementSettings()
         return CapabilitiesResponse(
             modes=[LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS, LutMode.EFFECT],
             defaults={
-                "sleep_time": 2,
-                "sample_count": 1,
-                "brightness_step": 5,
-                "hue_step": 10,
-                "saturation_step": 10,
-                "color_temp_step": 5,
+                "sleep_time": defaults.sleep_time,
+                "sample_count": defaults.sample_count,
+                "brightness_step": defaults.brightness_step,
+                "hue_step": defaults.hue_step,
+                "saturation_step": defaults.saturation_step,
+                "color_temp_step": defaults.color_temp_step,
             },
             limits={
                 "sleep_time": {"min": 0, "max": 120},
