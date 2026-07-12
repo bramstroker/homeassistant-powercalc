@@ -186,7 +186,7 @@ def _router() -> APIRouter:
 
 
 def _register_measurement_routes(router: APIRouter) -> None:
-    @router.get("/capabilities", response_model=CapabilitiesResponse)
+    @router.get("/capabilities")
     async def capabilities() -> CapabilitiesResponse:
         return CapabilitiesResponse(
             modes=[LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS],
@@ -204,15 +204,15 @@ def _register_measurement_routes(router: APIRouter) -> None:
             },
         )
 
-    @router.get("/settings", response_model=AppSettings)
+    @router.get("/settings")
     async def get_settings(request: Request) -> AppSettings:
         return await run_in_threadpool(_context(request).storage.load_settings)
 
-    @router.put("/settings", response_model=AppSettings, responses={400: _ERROR})
+    @router.put("/settings", responses={400: _ERROR})
     async def update_settings(payload: AppSettings, request: Request) -> AppSettings:
         return await run_in_threadpool(_context(request).storage.save_settings, payload)
 
-    @router.get("/entities", response_model=list[EntityDescriptor], responses={400: _ERROR})
+    @router.get("/entities", responses={400: _ERROR})
     async def entities(
         request: Request,
         domain: Annotated[Literal["light"] | None, Query()] = None,
@@ -222,7 +222,7 @@ def _register_measurement_routes(router: APIRouter) -> None:
             raise HTTPException(status_code=400, detail="Specify exactly one entity filter")
         return await run_in_threadpool(_load_entities, _context(request), domain, kind)
 
-    @router.post("/preflight", response_model=PreflightResponse, responses={409: _ERROR, 422: _ERROR})
+    @router.post("/preflight", responses={409: _ERROR, 422: _ERROR})
     async def preflight(payload: LightMeasurementRequestModel, request: Request) -> PreflightResponse:
         return await run_in_threadpool(_preflight, _context(request), payload)
 
@@ -265,7 +265,7 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
             raise HTTPException(status_code=409, detail=str(error)) from error
         return _snapshot_response(context, snapshot)
 
-    @router.get("/session/current/files", response_model=list[SessionFile], responses={404: _ERROR})
+    @router.get("/session/current/files", responses={404: _ERROR})
     async def files(request: Request) -> list[SessionFile]:
         context = _context(request)
         snapshot = _require_current_session(context)

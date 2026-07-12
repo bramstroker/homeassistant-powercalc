@@ -47,10 +47,15 @@ export class ResultView extends LitElement {
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         <div class="actions">
           <button type="button" @click=${() => this.emit("new")}>New measurement</button>
-          ${state === "resumable" || state === "cancelled" ? html`<button class="primary" type="button" @click=${() => this.emit("resume")} ?disabled=${this.busy}>${this.busy ? "Resuming…" : "Resume measurement"}</button>` : nothing}
+          ${this.renderResume(state)}
         </div>
       </section>
     `;
+  }
+
+  private renderResume(state: SessionSnapshot["state"]) {
+    if (state !== "resumable" && state !== "cancelled") return nothing;
+    return html`<button class="primary" type="button" @click=${() => this.emit("resume")} ?disabled=${this.busy}>${this.busy ? "Resuming…" : "Resume measurement"}</button>`;
   }
 
   private statusMark(state: SessionSnapshot["state"]): string {

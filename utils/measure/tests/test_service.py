@@ -30,7 +30,7 @@ def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None
         patch("measure.service.HassPowerMeter", return_value=DummyPowerMeter()),
         patch("measure.service.HassLightController", return_value=DummyLightController()),
     ):
-        result, export_directory = MeasurementService("http://supervisor/core/api/", "token").run(
+        result, export_directory = MeasurementService("https://supervisor/core/api/", "token").run(
             request,
             control,
             tmp_path,
@@ -63,7 +63,7 @@ def test_service_uses_dummy_power_meter_when_enabled(tmp_path: Path) -> None:
         patch("measure.service.HassLightController", return_value=DummyLightController()),
     ):
         result, _ = MeasurementService(
-            "http://supervisor/core/api/",
+            "https://supervisor/core/api/",
             "token",
             use_dummy_power_meter=True,
         ).run(request, control, tmp_path)

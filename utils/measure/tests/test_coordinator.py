@@ -80,8 +80,9 @@ def test_coordinator_rejects_concurrent_start_and_cancels(tmp_path: Path) -> Non
     coordinator.start(request_model())
     assert started.wait(1)
 
+    duplicate = request_model()
     with pytest.raises(SessionConflictError):
-        coordinator.start(request_model())
+        coordinator.start(duplicate)
 
     coordinator.cancel()
     wait_for_state(coordinator, SessionState.CANCELLED)

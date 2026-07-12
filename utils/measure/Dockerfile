@@ -48,7 +48,7 @@ FROM python-runtime AS runtime
 
 # OCR remains a CLI-only capability. Keep its native dependencies out of the
 # Home Assistant image, where only Home Assistant entity measurements are supported.
-RUN apt-get update && apt-get install -y libgl1 tesseract-ocr && rm -rf /var/lib/apt/lists/*
-RUN uv sync --locked --extra ocr
+RUN apt-get update && apt-get install -y libgl1 tesseract-ocr && rm -rf /var/lib/apt/lists/* \
+    && uv sync --locked --extra ocr
 
 ENTRYPOINT ["python", "-m", "measure.measure"]
