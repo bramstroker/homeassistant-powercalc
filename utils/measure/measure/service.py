@@ -14,7 +14,11 @@ from measure.const import (
 from measure.controller.light.const import LutMode
 from measure.controller.light.hass import HassLightController
 from measure.model import write_model_json
-from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID
+from measure.powermeter.const import (
+    QUESTION_POWERMETER_ENTITY_ID,
+    QUESTION_VOLTAGEMETER_ENTITY_ID,
+    PowerMeterType,
+)
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.hass import HassPowerMeter
 from measure.powermeter.powermeter import PowerMeter
@@ -53,10 +57,10 @@ def _redact(message: str, secrets: tuple[str, ...]) -> str:
 
 
 class MeasurementService:
-    def __init__(self, hass_url: str, hass_token: str, use_dummy_power_meter: bool = False) -> None:
+    def __init__(self, hass_url: str, hass_token: str, power_meter: PowerMeterType = PowerMeterType.HASS) -> None:
         self.hass_url = hass_url
         self.hass_token = hass_token
-        self.use_dummy_power_meter = use_dummy_power_meter
+        self.power_meter = power_meter
 
     def run(
         self,
@@ -88,9 +92,9 @@ class MeasurementService:
         output_root: Path,
     ) -> tuple[RunnerResult, Path]:
         control.checkpoint()
-        config = AppMeasureConfig(request, self.hass_url, self.hass_token)
+        config = AppMeasureConfig(request, self.hass_url, self.hass_token, self.power_meter)
         power_meter: PowerMeter
-        if self.use_dummy_power_meter:
+        if config.selected_power_meter == PowerMeterType.DUMMY:
             _LOGGER.warning("Using dummy power meter — reported power values are synthetic, not real measurements")
             power_meter = DummyPowerMeter()
         else:

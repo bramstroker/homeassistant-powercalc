@@ -21,6 +21,7 @@ from starlette.concurrency import run_in_threadpool
 
 from measure.controller.light.const import LutMode
 from measure.coordinator import MeasurementCoordinator, SessionConflictError
+from measure.powermeter.const import PowerMeterType
 from measure.request import LightMeasurementRequestModel
 from measure.service import MeasurementService
 from measure.session import SessionEvent, SessionSnapshot, SessionState
@@ -86,7 +87,11 @@ class AppContext:
         self.storage = SessionStorage(data_root)
         self.coordinator = MeasurementCoordinator(
             self.storage,
-            lambda: MeasurementService(self.hass_url, self.hass_token, self.use_dummy_power_meter),
+            lambda: MeasurementService(
+                self.hass_url,
+                self.hass_token,
+                PowerMeterType.DUMMY if self.use_dummy_power_meter else PowerMeterType.HASS,
+            ),
         )
 
     def client(self) -> Client:

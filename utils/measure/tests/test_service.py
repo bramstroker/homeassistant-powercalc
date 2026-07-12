@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from measure.controller.light.dummy import DummyLightController
+from measure.powermeter.const import PowerMeterType
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.request import LightMeasurementRequestModel
 from measure.service import MeasurementService, _redact
@@ -65,7 +66,7 @@ def test_service_uses_dummy_power_meter_when_enabled(tmp_path: Path) -> None:
         result, _ = MeasurementService(
             "https://supervisor/core/api/",
             "token",
-            use_dummy_power_meter=True,
+            PowerMeterType.DUMMY,
         ).run(request, control, tmp_path)
 
     hass_power_meter.assert_not_called()

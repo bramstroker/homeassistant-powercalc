@@ -107,10 +107,16 @@ class AppMeasureConfig:
     lookup-table step scale.
     """
 
-    def __init__(self, request: LightMeasurementRequest, hass_url: str, hass_token: str) -> None:
+    def __init__(
+        self,
+        request: LightMeasurementRequest,
+        hass_url: str,
+        hass_token: str,
+        power_meter: PowerMeterType = PowerMeterType.HASS,
+    ) -> None:
         settings = request.settings
         self.selected_light_controller = LightControllerType.HASS
-        self.selected_power_meter = PowerMeterType.HASS
+        self.selected_power_meter = power_meter
         self.hass_url = hass_url
         self.hass_token = hass_token
         self.hass_call_update_entity_service = settings.call_update_entity
