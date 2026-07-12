@@ -4,6 +4,9 @@ import type {
   Capabilities,
   EntityDescriptor,
   MeasurementRequest,
+  MeasurementRunRequest,
+  MeasureDefinition,
+  PowerMeterTestResult,
   PreflightResponse,
   SessionEvent,
   SessionFile,
@@ -40,6 +43,10 @@ export class MeasureApiClient {
     return this.request("api/capabilities");
   }
 
+  getMeasureDefinitions(): Promise<MeasureDefinition[]> {
+    return this.request("api/measure-definitions");
+  }
+
   getSettings(): Promise<AppSettings> {
     return this.request("api/settings");
   }
@@ -48,9 +55,17 @@ export class MeasureApiClient {
     return this.request("api/settings", { method: "PUT", body: JSON.stringify(settings) });
   }
 
+  testPowerMeter(settings: AppSettings): Promise<PowerMeterTestResult> {
+    return this.request("api/settings/test-power-meter", { method: "POST", body: JSON.stringify(settings) });
+  }
+
   getEntities(filter: "light" | "power" | "voltage"): Promise<EntityDescriptor[]> {
     const query = filter === "light" ? "domain=light" : `kind=${filter}`;
     return this.request<EntityDescriptor[]>(`api/entities?${query}`);
+  }
+
+  getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]> {
+    return this.request<EntityDescriptor[]>(`api/entities?domain=${encodeURIComponent(domain)}`);
   }
 
   preflight(request: MeasurementRequest): Promise<PreflightResponse> {
@@ -61,12 +76,24 @@ export class MeasureApiClient {
     return this.request("api/sessions", { method: "POST", body: JSON.stringify(request) });
   }
 
+  preflightRun(request: MeasurementRunRequest): Promise<PreflightResponse> {
+    return this.request("api/runs/preflight", { method: "POST", body: JSON.stringify(request) });
+  }
+
+  startRun(request: MeasurementRunRequest): Promise<SessionSnapshot> {
+    return this.request("api/runs", { method: "POST", body: JSON.stringify(request) });
+  }
+
   getCurrent(): Promise<SessionSnapshot> {
     return this.request("api/session/current");
   }
 
   cancel(): Promise<SessionSnapshot> {
     return this.request("api/session/current", { method: "DELETE" });
+  }
+
+  confirm(): Promise<SessionSnapshot> {
+    return this.request("api/session/current/confirm", { method: "POST" });
   }
 
   resume(): Promise<SessionSnapshot> {
@@ -127,7 +154,7 @@ export class SessionEventStream {
     };
     source.onerror = () => this.onConnection(false);
     source.onmessage = (event) => this.consume(event.data);
-    for (const type of ["progress", "state", "warning", "log", "heartbeat"] as const) {
+    for (const type of ["progress", "state", "warning", "log", "checkpoint", "heartbeat", "sample"] as const) {
       source.addEventListener(type, (event) => this.consume((event as MessageEvent<string>).data));
     }
   }

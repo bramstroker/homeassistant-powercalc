@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing, type PropertyValues } from "lit";
+import { LitElement, css, html, nothing, svg, type PropertyValues } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import type { SessionSnapshot } from "../types";
 import { sharedStyles } from "../styles";
@@ -8,12 +8,14 @@ export class RunningView extends LitElement {
     snapshot: { attribute: false },
     connected: { type: Boolean },
     logs: { attribute: false },
+    samples: { attribute: false },
     busy: { type: Boolean },
   };
 
   snapshot!: SessionSnapshot;
   connected = false;
   logs: string[] = [];
+  samples: number[] = [];
   busy = false;
   private readonly logContainer = createRef<HTMLDivElement>();
 
@@ -33,6 +35,15 @@ export class RunningView extends LitElement {
     .metric strong { display: block; margin-top: 0.25rem; font: 600 1rem/1.3 ui-monospace, monospace; }
     .log { max-height: 9rem; overflow: auto; margin-top: 1rem; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); font: 0.8rem/1.6 ui-monospace, monospace; color: var(--muted); }
     .log p { margin: 0; }
+    .chart { position: relative; margin-top: 1.4rem; }
+    .chart-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    .chart-head span { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .chart-head strong { font: 700 clamp(1.4rem, 5vw, 2rem)/1 "DIN Alternate", sans-serif; color: var(--signal-strong); letter-spacing: -0.02em; }
+    .chart-head strong small { font-size: 0.5em; color: var(--muted); letter-spacing: 0.06em; margin-left: 0.15em; }
+    .spark { display: block; width: 100%; height: 110px; margin-top: 0.6rem; }
+    .spark .area { fill: color-mix(in srgb, var(--signal) 14%, transparent); stroke: none; }
+    .spark .line { fill: none; stroke: var(--signal); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+    .chart-scale { display: flex; justify-content: space-between; margin-top: 0.3rem; color: var(--muted); font: 0.68rem/1 ui-monospace, monospace; }
     @media (max-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } .topline { align-items: flex-start; flex-direction: column; } }
   `];
 
@@ -49,7 +60,7 @@ export class RunningView extends LitElement {
     return html`
       <section class="panel" aria-labelledby="running-title">
         <p class="eyebrow">03 / Measurement</p>
-        <h2 id="running-title">${this.snapshot.state === "cancelling" ? "Stopping safely" : "Sampling in progress"}</h2>
+        <h2 id="running-title">${this.runningTitle()}</h2>
         <div class="instrument">
           <div class="topline">
             <span class="muted">${this.snapshot.phase ?? "Preparing measurement"}</span>
@@ -62,11 +73,43 @@ export class RunningView extends LitElement {
             <div class="metric"><span>Variation</span><strong>${progress.completed} / ${progress.total}</strong></div>
             <div class="metric"><span>Remaining</span><strong>${this.remaining(progress.estimated_remaining_seconds)}</strong></div>
           </div>
+          ${this.samples.length ? this.renderChart() : nothing}
         </div>
         ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
         ${this.logs.length ? this.renderLog() : nothing}
-        <div class="actions"><button class="danger" type="button" @click=${this.cancel} ?disabled=${this.busy || this.snapshot.state === "cancelling"}>${this.snapshot.state === "cancelling" ? "Cancelling…" : "Cancel measurement"}</button></div>
+        <div class="actions">
+          ${this.snapshot.state === "awaiting_confirmation" ? html`<button class="primary" type="button" @click=${this.confirm} ?disabled=${this.busy}>Start measurement</button>` : nothing}
+          <button class="danger" type="button" @click=${this.cancel} ?disabled=${this.busy || this.snapshot.state === "cancelling"}>${this.snapshot.state === "cancelling" ? "Cancelling…" : "Cancel measurement"}</button>
+        </div>
       </section>
+    `;
+  }
+
+  private renderChart() {
+    const latest = this.samples.at(-1) ?? 0;
+    const max = Math.max(...this.samples);
+    const min = Math.min(...this.samples);
+    const range = max - min || 1;
+    const count = this.samples.length;
+    const point = (watt: number, index: number): [number, number] => {
+      const x = count === 1 ? 100 : (index / (count - 1)) * 100;
+      const y = 30 - ((watt - min) / range) * 28; // 2..30 within a 32-high viewBox
+      return [x, y];
+    };
+    const line = this.samples.map((watt, index) => point(watt, index).map((value) => value.toFixed(2)).join(",")).join(" ");
+    const area = `0,32 ${line} 100,32`;
+    return html`
+      <div class="chart">
+        <div class="chart-head">
+          <span>Live power</span>
+          <strong>${latest.toFixed(1)}<small>W</small></strong>
+        </div>
+        <svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none" role="img" aria-label="Live power readings, currently ${latest.toFixed(1)} watt">
+          ${svg`<polygon class="area" points=${area} />`}
+          ${svg`<polyline class="line" points=${line} />`}
+        </svg>
+        <div class="chart-scale"><span>${min.toFixed(1)} W</span><span>peak ${max.toFixed(1)} W</span></div>
+      </div>
     `;
   }
 
@@ -86,6 +129,16 @@ export class RunningView extends LitElement {
 
   private cancel(): void {
     this.dispatchEvent(new CustomEvent("cancel", { bubbles: true, composed: true }));
+  }
+
+  private confirm(): void {
+    this.dispatchEvent(new CustomEvent("confirm", { bubbles: true, composed: true }));
+  }
+
+  private runningTitle(): string {
+    if (this.snapshot.state === "cancelling") return "Stopping safely";
+    if (this.snapshot.state === "awaiting_confirmation") return "Ready when you are";
+    return "Sampling in progress";
   }
 }
 

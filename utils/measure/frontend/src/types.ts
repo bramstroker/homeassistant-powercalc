@@ -2,6 +2,7 @@ export type SessionState =
   | "idle"
   | "validating"
   | "ready"
+  | "awaiting_confirmation"
   | "running"
   | "cancelling"
   | "cancelled"
@@ -33,6 +34,39 @@ export interface Capabilities {
   modes: LutMode[];
   defaults: MeasureDefaults;
   limits?: Record<string, { min: number; max: number }>;
+}
+
+export type MeasureType = "Light bulb(s)" | "Smart speaker" | "Recorder" | "Average" | "Charging device" | "Fan";
+
+export interface FormField {
+  name: string;
+  label: string;
+  control: "entity" | "number" | "text" | "boolean" | "select";
+  required: boolean;
+  entity_domain?: string | null;
+  options: { value: string; label: string }[];
+  default?: string | number | boolean | null;
+}
+
+export interface MeasureDefinition {
+  measure_type: MeasureType;
+  label: string;
+  description: string;
+  fields: FormField[];
+  supports_profile: boolean;
+  supports_resume: boolean;
+}
+
+export interface MeasurementRunRequest {
+  measure_type: MeasureType;
+  model_id: string;
+  product_name: string;
+  measure_device: string;
+  answers: Record<string, string | number | boolean>;
+  generate_model: boolean;
+  sleep_time: number;
+  sample_count: number;
+  resume_policy: "new";
 }
 
 export interface MeasurementRequest {
@@ -88,16 +122,26 @@ export interface SessionFile {
 }
 
 export interface SessionEvent {
-  type: "progress" | "state" | "warning" | "log" | "heartbeat";
+  type: "progress" | "state" | "warning" | "log" | "checkpoint" | "heartbeat" | "sample";
   snapshot?: SessionSnapshot;
   message?: string;
   progress?: SessionProgress;
   phase?: string;
   mode?: string;
+  power?: number;
 }
 
 export interface AppSettings {
   default_power_entity_id: string | null;
+  default_measure_device: string | null;
+  power_meter: "hass" | "shelly" | "dummy" | null;
+  shelly_ip: string | null;
+}
+
+export interface PowerMeterTestResult {
+  success: boolean;
+  power?: number | null;
+  message?: string | null;
 }
 
 export interface ApiErrorBody {

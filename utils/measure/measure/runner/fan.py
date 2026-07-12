@@ -1,5 +1,4 @@
 import logging
-import time
 from typing import Any
 
 import inquirer
@@ -7,6 +6,8 @@ import inquirer
 from measure.config import MeasureConfig
 from measure.controller.fan.controller import FanController
 from measure.controller.fan.factory import FanControllerFactory
+from measure.execution import RunInteraction
+from measure.interactions import ConsoleInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
@@ -16,10 +17,16 @@ SLEEP_TIME_PERCENTAGE_CHANGE = 15
 
 
 class FanRunner(MeasurementRunner):
-    def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
+    def __init__(
+        self,
+        measure_util: MeasureUtil,
+        config: MeasureConfig,
+        interaction: RunInteraction | None = None,
+    ) -> None:
         self.measure_util = measure_util
         self.config = config
         self.fan_controller: FanController = FanControllerFactory(config).create()
+        self.interaction = interaction or ConsoleInteraction()
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.fan_controller.process_answers(answers)
@@ -35,7 +42,7 @@ class FanRunner(MeasurementRunner):
             _LOGGER.info("Setting percentage to %d", percentage)
             self.fan_controller.set_percentage(percentage)
             _LOGGER.info("Waiting %d seconds to measure power", SLEEP_TIME_PERCENTAGE_CHANGE)
-            time.sleep(SLEEP_TIME_PERCENTAGE_CHANGE)
+            self.interaction.wait(SLEEP_TIME_PERCENTAGE_CHANGE)
             result = self.measure_util.take_average_measurement(20)
             measurements[percentage] = result.power
             voltages.extend(result.voltages)
@@ -59,5 +66,5 @@ class FanRunner(MeasurementRunner):
         _LOGGER.info("Turning off fan to start measuring standby power")
         self.fan_controller.turn_off()
         _LOGGER.info("Waiting %d seconds to measure power", SLEEP_TIME_PERCENTAGE_CHANGE)
-        time.sleep(SLEEP_TIME_PERCENTAGE_CHANGE)
+        self.interaction.wait(SLEEP_TIME_PERCENTAGE_CHANGE)
         return self.measure_util.take_average_measurement(20)

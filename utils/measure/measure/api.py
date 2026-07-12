@@ -19,10 +19,16 @@ from homeassistant_api import Client
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 
+from measure.const import MeasureType
 from measure.controller.light.const import LutMode
 from measure.coordinator import MeasurementCoordinator, SessionConflictError
-from measure.powermeter.const import PowerMeterType
-from measure.request import LightMeasurementRequestModel
+from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, PowerMeterType
+from measure.powermeter.dummy import DummyPowerMeter
+from measure.powermeter.errors import PowerMeterError
+from measure.powermeter.hass import HassPowerMeter
+from measure.powermeter.powermeter import PowerMeter
+from measure.powermeter.shelly import ShellyPowerMeter
+from measure.request import LightMeasurementRequestModel, MeasurementRunRequestModel
 from measure.service import MeasurementService
 from measure.session import SessionEvent, SessionSnapshot, SessionState
 from measure.settings import AppSettings
@@ -40,6 +46,9 @@ class ErrorResponse(BaseModel):
 # Shared OpenAPI documentation for the JSON error body returned by every failed request.
 _ERROR = {"model": ErrorResponse}
 _NO_SESSION = "No measurement session"
+
+# Entity domains that can be picked as the measurement device in the app.
+DeviceDomain = Literal["light", "media_player", "fan", "vacuum"]
 
 
 class EntityDescriptor(BaseModel):
@@ -71,6 +80,31 @@ class CapabilitiesResponse(BaseModel):
     limits: dict[str, dict[str, int | float]]
 
 
+class FormField(BaseModel):
+    name: str
+    label: str
+    control: Literal["entity", "number", "text", "boolean", "select"]
+    required: bool = True
+    entity_domain: str | None = None
+    options: list[dict[str, str]] = []
+    default: str | int | bool | None = None
+
+
+class MeasureDefinition(BaseModel):
+    measure_type: MeasureType
+    label: str
+    description: str
+    fields: list[FormField]
+    supports_profile: bool
+    supports_resume: bool
+
+
+class PowerMeterTestResult(BaseModel):
+    success: bool
+    power: float | None = None
+    message: str | None = None
+
+
 class AppContext:
     def __init__(
         self,
@@ -79,16 +113,23 @@ class AppContext:
         hass_url: str,
         hass_token: str,
         trusted_ingress_only: bool,
-        power_meter: PowerMeterType = PowerMeterType.HASS,
     ) -> None:
         self.hass_url = hass_url
         self.hass_token = hass_token
         self.trusted_ingress_only = trusted_ingress_only
-        self.power_meter = power_meter
         self.storage = SessionStorage(data_root)
         self.coordinator = MeasurementCoordinator(
             self.storage,
-            lambda: MeasurementService(self.hass_url, self.hass_token, self.power_meter),
+            self._measurement_service,
+        )
+
+    def _measurement_service(self) -> MeasurementService:
+        settings = self.storage.load_settings()
+        return MeasurementService(
+            self.hass_url,
+            self.hass_token,
+            settings.power_meter,
+            settings.shelly_ip,
         )
 
     def client(self) -> Client:
@@ -102,7 +143,6 @@ def create_app(
     hass_token: str | None = None,
     static_root: Path | None = None,
     trusted_ingress_only: bool | None = None,
-    power_meter: PowerMeterType = PowerMeterType.HASS,
 ) -> FastAPI:
     token = hass_token or os.environ.get("SUPERVISOR_TOKEN")
     if not token:
@@ -114,7 +154,6 @@ def create_app(
         trusted_ingress_only=(os.environ.get("MEASURE_TRUSTED_INGRESS_ONLY", "false").lower() == "true")
         if trusted_ingress_only is None
         else trusted_ingress_only,
-        power_meter=power_meter,
     )
     app = FastAPI(title="Powercalc Measure", version="0.1.0", docs_url=None, redoc_url=None)
     app.state.context = context
@@ -187,7 +226,7 @@ def _router() -> APIRouter:
     return router
 
 
-def _register_measurement_routes(router: APIRouter) -> None:
+def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/capabilities")
     async def capabilities() -> CapabilitiesResponse:
         return CapabilitiesResponse(
@@ -206,6 +245,10 @@ def _register_measurement_routes(router: APIRouter) -> None:
             },
         )
 
+    @router.get("/measure-definitions")
+    async def measure_definitions() -> list[MeasureDefinition]:
+        return _measure_definitions()
+
     @router.get("/settings")
     async def get_settings(request: Request) -> AppSettings:
         return await run_in_threadpool(_context(request).storage.load_settings)
@@ -214,10 +257,14 @@ def _register_measurement_routes(router: APIRouter) -> None:
     async def update_settings(payload: AppSettings, request: Request) -> AppSettings:
         return await run_in_threadpool(_context(request).storage.save_settings, payload)
 
+    @router.post("/settings/test-power-meter")
+    async def test_power_meter(payload: AppSettings, request: Request) -> PowerMeterTestResult:
+        return await run_in_threadpool(_test_power_meter, _context(request), payload)
+
     @router.get("/entities", responses={400: _ERROR})
     async def entities(
         request: Request,
-        domain: Annotated[Literal["light"] | None, Query()] = None,
+        domain: Annotated[DeviceDomain | None, Query()] = None,
         kind: Annotated[Literal["power", "voltage"] | None, Query()] = None,
     ) -> list[EntityDescriptor]:
         if (domain is None) == (kind is None):
@@ -228,10 +275,24 @@ def _register_measurement_routes(router: APIRouter) -> None:
     async def preflight(payload: LightMeasurementRequestModel, request: Request) -> PreflightResponse:
         return await run_in_threadpool(_preflight, _context(request), payload)
 
+    @router.post("/runs/preflight", responses={409: _ERROR, 422: _ERROR})
+    async def preflight_run(payload: MeasurementRunRequestModel, request: Request) -> PreflightResponse:
+        return await run_in_threadpool(_preflight_run, _context(request), payload)
+
     @router.post("/sessions", status_code=201, responses={409: _ERROR, 422: _ERROR})
     async def start_session(payload: LightMeasurementRequestModel, request: Request) -> dict[str, object]:
         context = _context(request)
         await run_in_threadpool(_preflight, context, payload)
+        try:
+            snapshot = context.coordinator.start(payload)
+        except SessionConflictError as error:
+            raise HTTPException(status_code=409, detail=str(error)) from error
+        return _snapshot_response(context, snapshot)
+
+    @router.post("/runs", status_code=201, responses={409: _ERROR, 422: _ERROR})
+    async def start_run(payload: MeasurementRunRequestModel, request: Request) -> dict[str, object]:
+        context = _context(request)
+        await run_in_threadpool(_preflight_run, context, payload)
         try:
             snapshot = context.coordinator.start(payload)
         except SessionConflictError as error:
@@ -250,6 +311,15 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         context = _context(request)
         try:
             snapshot = context.coordinator.cancel()
+        except SessionConflictError as error:
+            raise HTTPException(status_code=409, detail=str(error)) from error
+        return _snapshot_response(context, snapshot)
+
+    @router.post("/session/current/confirm", responses={404: _ERROR, 409: _ERROR})
+    async def confirm_session(request: Request) -> dict[str, object]:
+        context = _context(request)
+        try:
+            snapshot = context.coordinator.confirm()
         except SessionConflictError as error:
             raise HTTPException(status_code=409, detail=str(error)) from error
         return _snapshot_response(context, snapshot)
@@ -306,7 +376,7 @@ def _require_current_session(context: AppContext) -> SessionSnapshot:
 
 def _load_entities(
     context: AppContext,
-    domain: Literal["light"] | None,
+    domain: DeviceDomain | None,
     kind: Literal["power", "voltage"] | None,
 ) -> list[EntityDescriptor]:
     all_entities = context.client().get_entities()
@@ -322,7 +392,7 @@ def _load_entities(
     return sorted(result, key=lambda item: (item.name.casefold(), item.entity_id))
 
 
-def _describe_entity(entity: Any, domain: Literal["light"] | None, unit: str | None) -> EntityDescriptor | None:  # noqa: ANN401
+def _describe_entity(entity: Any, domain: DeviceDomain | None, unit: str | None) -> EntityDescriptor | None:  # noqa: ANN401
     attributes = entity.state.attributes
     entity_unit = attributes.get("unit_of_measurement")
     if unit and entity_unit != unit:
@@ -357,11 +427,142 @@ def _supported_light_modes(attributes: dict[str, Any]) -> list[LutMode]:
     return modes
 
 
+def _measure_definitions() -> list[MeasureDefinition]:
+    power = FormField(name="powermeter_entity_id", label="Power sensor", control="entity", entity_domain="sensor")
+    entity = lambda label, domain: FormField(name="entity_id", label=label, control="entity", entity_domain=domain)  # noqa: E731
+    return [
+        MeasureDefinition(
+            measure_type=MeasureType.LIGHT,
+            label="Light bulb(s)",
+            description="Build a lookup-table power profile for a light.",
+            fields=[power, entity("Light", "light")],
+            supports_profile=True,
+            supports_resume=True,
+        ),
+        MeasureDefinition(
+            measure_type=MeasureType.SPEAKER,
+            label="Smart speaker",
+            description="Measure power across media-player volume levels.",
+            fields=[
+                power,
+                entity("Media player", "media_player"),
+                FormField(
+                    name="disable_streaming",
+                    label="Disable automatic pink-noise streaming",
+                    control="boolean",
+                    required=False,
+                    default=False,
+                ),
+            ],
+            supports_profile=True,
+            supports_resume=False,
+        ),
+        MeasureDefinition(
+            measure_type=MeasureType.RECORDER,
+            label="Recorder",
+            description="Record live power readings to a CSV file until cancelled.",
+            fields=[
+                power,
+                FormField(name="export_filename", label="Export filename", control="text", default="record.csv"),
+            ],
+            supports_profile=False,
+            supports_resume=False,
+        ),
+        MeasureDefinition(
+            measure_type=MeasureType.AVERAGE,
+            label="Average",
+            description="Measure average power for a fixed duration.",
+            fields=[power, FormField(name="duration", label="Duration (seconds)", control="number", default=60)],
+            supports_profile=False,
+            supports_resume=False,
+        ),
+        MeasureDefinition(
+            measure_type=MeasureType.CHARGING,
+            label="Charging device",
+            description="Measure charging power against battery level.",
+            fields=[
+                power,
+                FormField(
+                    name="charging_device_type",
+                    label="Charging device type",
+                    control="select",
+                    options=[
+                        {"value": "vacuum_robot", "label": "Vacuum robot"},
+                        {"value": "lawn_mower_robot", "label": "Lawn mower robot"},
+                    ],
+                ),
+                entity("Charging device", "vacuum"),
+            ],
+            supports_profile=True,
+            supports_resume=False,
+        ),
+        MeasureDefinition(
+            measure_type=MeasureType.FAN,
+            label="Fan",
+            description="Measure fan power across percentage levels.",
+            fields=[power, entity("Fan", "fan")],
+            supports_profile=True,
+            supports_resume=False,
+        ),
+    ]
+
+
+def _test_power_meter(context: AppContext, settings: AppSettings) -> PowerMeterTestResult:
+    """Take a single live reading from the configured power meter to confirm connectivity."""
+    try:
+        meter = _build_test_power_meter(context, settings)
+        reading = meter.get_power(include_voltage=False)
+    except PowerMeterError as error:
+        return PowerMeterTestResult(success=False, message=str(error))
+    except Exception as error:  # noqa: BLE001 - surface any connection/parsing failure to the user
+        _LOGGER.debug("Power meter test failed", exc_info=True)
+        return PowerMeterTestResult(success=False, message=str(error) or "Could not read from the power meter")
+    return PowerMeterTestResult(success=True, power=round(reading.power, 2))
+
+
+def _build_test_power_meter(context: AppContext, settings: AppSettings) -> PowerMeter:
+    if settings.power_meter == PowerMeterType.DUMMY:
+        return DummyPowerMeter()
+    if settings.power_meter == PowerMeterType.SHELLY:
+        if not settings.shelly_ip:
+            raise PowerMeterError("Enter the Shelly IP address first")
+        return ShellyPowerMeter(settings.shelly_ip)
+    if not settings.default_power_entity_id:
+        raise PowerMeterError("Select a power sensor first")
+    meter = HassPowerMeter(context.hass_url, context.hass_token, call_update_entity=False)
+    meter.process_answers({QUESTION_POWERMETER_ENTITY_ID: settings.default_power_entity_id})
+    return meter
+
+
+def _preflight_run(context: AppContext, payload: MeasurementRunRequestModel) -> PreflightResponse:
+    current = context.coordinator.current
+    if current is not None and current.state in {
+        SessionState.VALIDATING,
+        SessionState.READY,
+        SessionState.AWAITING_CONFIRMATION,
+        SessionState.RUNNING,
+        SessionState.CANCELLING,
+    }:
+        raise HTTPException(status_code=409, detail="A measurement session is already active")
+    try:
+        context.storage.verify_writable()
+    except OSError as error:
+        raise HTTPException(status_code=422, detail="Persistent app storage is not writable") from error
+    definition = next((item for item in _measure_definitions() if item.measure_type == payload.measure_type), None)
+    if definition is None:
+        raise HTTPException(status_code=422, detail="Selected measurement type is unavailable")
+    missing = [field.label for field in definition.fields if field.required and not payload.answers.get(field.name)]
+    if missing:
+        raise HTTPException(status_code=422, detail=f"Missing required fields: {', '.join(missing)}")
+    return PreflightResponse(valid=True, warnings=[])
+
+
 def _preflight(context: AppContext, payload: LightMeasurementRequestModel) -> PreflightResponse:
     current = context.coordinator.current
     if current is not None and current.state in {
         SessionState.VALIDATING,
         SessionState.READY,
+        SessionState.AWAITING_CONFIRMATION,
         SessionState.RUNNING,
         SessionState.CANCELLING,
     }:
@@ -375,9 +576,10 @@ def _preflight(context: AppContext, payload: LightMeasurementRequestModel) -> Pr
     voltages = {entity.entity_id: entity for entity in _load_entities(context, None, "voltage")}
     if payload.light_entity_id not in lights:
         raise HTTPException(status_code=422, detail="Selected light entity is unavailable")
-    if payload.power_entity_id not in powers:
+    uses_hass_meter = context.storage.load_settings().power_meter == PowerMeterType.HASS
+    if uses_hass_meter and payload.power_entity_id not in powers:
         raise HTTPException(status_code=422, detail="Selected power entity is unavailable or not measured in W")
-    if payload.voltage_entity_id and payload.voltage_entity_id not in voltages:
+    if uses_hass_meter and payload.voltage_entity_id and payload.voltage_entity_id not in voltages:
         raise HTTPException(status_code=422, detail="Selected voltage entity is unavailable or not measured in V")
     light = lights[payload.light_entity_id]
     supported = set(light.supported_modes or [])

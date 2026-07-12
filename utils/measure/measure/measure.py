@@ -28,6 +28,8 @@ from measure.const import (
 )
 from measure.controller.light.const import LutMode
 from measure.controller.light.errors import LightControllerError
+from measure.execution import MeasurementExecution, MeasurementMetadata
+from measure.interactions import ConsoleInteraction
 from measure.model import write_model_json as write_profile_model_json
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.factory import PowerMeterFactory
@@ -139,42 +141,49 @@ class Measure:
         answers = self.ask_questions(self.get_questions())
         self.power_meter.process_answers(answers)
         self._track_voltage = self._should_track_voltage()
-        self.runner.prepare(answers)
-
-        if answers.get(QUESTION_DUMMY_LOAD, False):
-            measure_util.initialize_dummy_load()
-            self._reset_voltage_readings()
-
         generate_model_json = bool(answers.get(QUESTION_GENERATE_MODEL_JSON, False))
         export_directory = self._prepare_export_directory(answers, generate_model_json)
-
-        if answers.get(QUESTION_DUMMY_LOAD, False):
-            input(
-                "Please connect the appliance you want to measure in parallel to the dummy load "
-                "and press enter to start measurement session...",
-            )
-        runner_result = self._run_measurement(answers, export_directory)
-        self._record_voltages(runner_result.voltages or [])
-
-        generate_model_json = generate_model_json and bool(export_directory)
-
-        if generate_model_json:
-            standby_result = self._measure_standby_power()
-            self._record_voltages(standby_result.voltages)
-            self.write_model_json(
-                directory=export_directory,
-                standby_power=standby_result.power,
-                name=answers[QUESTION_MODEL_NAME],
-                measure_device=answers[QUESTION_MEASURE_DEVICE],
-                extra_json_data=runner_result.model_json_data,
-                voltage_json_data=self._get_voltage_json_data(),
-            )
+        execution = MeasurementExecution(
+            runner=self.runner,
+            measure_util=measure_util,
+            answers=answers,
+            metadata=MeasurementMetadata(
+                model_id=answers.get(QUESTION_MODEL_ID, "generic"),
+                model_name=answers.get(QUESTION_MODEL_NAME, ""),
+                measure_device=answers.get(QUESTION_MEASURE_DEVICE, ""),
+                generate_model_json=generate_model_json,
+            ),
+            output_directory=Path(export_directory) if export_directory else None,
+            interaction=ConsoleInteraction(),
+            write_model=self._write_model_from_execution,
+        )
+        execution.run()
 
         if export_directory and (generate_model_json or self.runner.writes_export_files()):
             _LOGGER.info(
                 "Measurement session finished. Files exported to %s",
                 export_directory,
             )
+
+    def _write_model_from_execution(
+        self,
+        directory: Path,
+        standby_power: float,
+        name: str,
+        measure_device: str,
+        extra_json_data: dict[str, Any],
+        voltages: list[float],
+    ) -> None:
+        self._reset_voltage_readings()
+        self._record_voltages(voltages)
+        self.write_model_json(
+            directory=str(directory),
+            standby_power=standby_power,
+            name=name,
+            measure_device=measure_device,
+            extra_json_data=extra_json_data,
+            voltage_json_data=self._get_voltage_json_data(),
+        )
 
     def _select_measure_type(self) -> None:
         if self.config.selected_measure_type:

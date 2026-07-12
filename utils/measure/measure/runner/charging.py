@@ -10,6 +10,8 @@ from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import ChargingControllerError
 from measure.controller.charging.factory import ChargingControllerFactory
 from measure.controller.charging.hass import ATTR_BATTERY_LEVEL
+from measure.execution import RunInteraction
+from measure.interactions import ConsoleInteraction
 from measure.runner.const import QUESTION_CHARGING_DEVICE_TYPE
 from measure.runner.errors import RunnerError
 from measure.runner.runner import MeasurementRunner, RunnerResult
@@ -22,13 +24,19 @@ TRICKLE_CHARGING_TIME = 1800
 
 
 class ChargingRunner(MeasurementRunner):
-    def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
+    def __init__(
+        self,
+        measure_util: MeasureUtil,
+        config: MeasureConfig,
+        interaction: RunInteraction | None = None,
+    ) -> None:
         self.battery_level_entity: str | None = None
         self.config = config
         self.battery_level_attribute: str | None = None
         self.measure_util = measure_util
         self.controller: ChargingController = ChargingControllerFactory(config).create()
         self.charging_device_type: ChargingDeviceType | None = None
+        self.interaction = interaction or ConsoleInteraction()
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.controller.process_answers(answers)
@@ -41,12 +49,10 @@ class ChargingRunner(MeasurementRunner):
         self.charging_device_type = ChargingDeviceType(answers[QUESTION_CHARGING_DEVICE_TYPE])
         self.battery_level_attribute = answers.get(QUESTION_BATTERY_LEVEL_ATTRIBUTE, ATTR_BATTERY_LEVEL)
 
-        print(
+        self.interaction.notify(
             "Make sure the device is as close to 0% charged as possible before starting the test.",
         )
-        input("Hit enter when you are ready to start..")
-
-        print()
+        self.interaction.confirm("Ready to start charging measurement.")
 
         battery_level = self.controller.get_battery_level()
         measurements: dict[int, list[float]] = {}
@@ -69,16 +75,16 @@ class ChargingRunner(MeasurementRunner):
                 _LOGGER.info("Measured power: %.2f W", result.power)
                 measurements[battery_level].append(result.power)
                 voltages.extend(result.voltages)
-                time.sleep(self.config.sleep_time)
+                self.interaction.wait(self.config.sleep_time)
                 error_count = 0
             except ChargingControllerError as e:
                 _LOGGER.error("Error during measurement: %s", e)
                 error_count += 1
                 if error_count > 10:
                     raise RunnerError("Too many errors occurred during measurements. aborting") from e
-                time.sleep(self.config.sleep_time)
+                self.interaction.wait(self.config.sleep_time)
 
-        print("Done charging, start measurements for trickle charging..")
+        self.interaction.notify("Done charging, start measurements for trickle charging..")
 
         trickle_result = self.measure_util.take_average_measurement(TRICKLE_CHARGING_TIME)
         measurements[100] = [trickle_result.power]
@@ -94,14 +100,14 @@ class ChargingRunner(MeasurementRunner):
                 raise RunnerError("Device is not in a valid state.")
 
             if not wait_message_printed:
-                print("waiting for vacuum cleaner to start charging...")
+                self.interaction.notify("Waiting for charging device to start charging...")
                 wait_message_printed = True
 
-            time.sleep(1)
+            self.interaction.wait(1)
             is_charging = self.controller.is_charging()
 
         if wait_message_printed:
-            print("vacuum cleaner started charging, starting measurements")
+            self.interaction.notify("Charging device started charging, starting measurements")
 
     def _build_model_json_data(self, measurements: dict[int, list[float]]) -> dict:
         """Build the model JSON data from the measurements"""

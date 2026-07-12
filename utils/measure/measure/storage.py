@@ -11,7 +11,7 @@ from typing import Any
 from uuid import uuid4
 
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
-from measure.request import LightMeasurementRequestModel
+from measure.request import LightMeasurementRequestModel, MeasurementRunRequestModel
 from measure.runner.light import CSV_HEADERS
 from measure.session import SessionEvent, SessionSnapshot, SessionState, utc_now
 from measure.settings import AppSettings
@@ -28,7 +28,11 @@ class SessionStorage:
             raise ValueError("Invalid session id")
         return self._contained(self.sessions_root / session_id)
 
-    def create(self, snapshot: SessionSnapshot, request: LightMeasurementRequestModel) -> Path:
+    def create(
+        self,
+        snapshot: SessionSnapshot,
+        request: LightMeasurementRequestModel | MeasurementRunRequestModel,
+    ) -> Path:
         directory = self.session_directory(snapshot.id)
         (directory / "output").mkdir(parents=True, exist_ok=False)
         self._write_json(directory / "request.json", request.model_dump(mode="json"))
@@ -88,10 +92,11 @@ class SessionStorage:
             self.write_snapshot(snapshot)
         return snapshot
 
-    def load_request(self, session_id: str) -> LightMeasurementRequestModel:
-        return LightMeasurementRequestModel.model_validate(
-            self._read_json(self.session_directory(session_id) / "request.json"),
-        )
+    def load_request(self, session_id: str) -> LightMeasurementRequestModel | MeasurementRunRequestModel:
+        data = self._read_json(self.session_directory(session_id) / "request.json")
+        if "measure_type" in data:
+            return MeasurementRunRequestModel.model_validate(data)
+        return LightMeasurementRequestModel.model_validate(data)
 
     def output_directory(self, session_id: str) -> Path:
         return self._contained(self.session_directory(session_id) / "output")
@@ -114,6 +119,8 @@ class SessionStorage:
         try:
             request = self.load_request(session_id)
         except FileNotFoundError, KeyError, ValueError:
+            return False
+        if not isinstance(request, LightMeasurementRequestModel):
             return False
         model_root = self.output_directory(session_id) / request.model_id
         for mode in request.modes:

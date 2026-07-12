@@ -7,7 +7,11 @@ import re
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from measure.configuration import MeasurementSettings
+from measure.const import MeasureType
+from measure.controller.charging.const import ChargingControllerType
+from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import LightControllerType, LutMode
+from measure.controller.media.const import MediaControllerType
 from measure.powermeter.const import PowerMeterType
 
 LIGHT_ENTITY_PATTERN = r"^light\.[a-z0-9_]+$"
@@ -27,12 +31,26 @@ class LightMeasurementRequest:
     model_name: str
     measure_device: str
     light_entity_id: str
-    power_entity_id: str
+    power_entity_id: str | None
     voltage_entity_id: str | None = None
     modes: frozenset[LutMode] = field(default_factory=lambda: frozenset({LutMode.BRIGHTNESS}))
     generate_model_json: bool = True
     gzip: bool = True
     num_lights: int = 1
+    resume_policy: ResumePolicy = ResumePolicy.NEW
+    settings: MeasurementSettings = field(default_factory=MeasurementSettings)
+
+
+@dataclass(frozen=True)
+class MeasurementRunRequest:
+    """Transport-neutral request used by every measurement runner."""
+
+    measure_type: MeasureType
+    model_id: str
+    model_name: str
+    measure_device: str
+    answers: dict[str, object]
+    generate_model_json: bool = False
     resume_policy: ResumePolicy = ResumePolicy.NEW
     settings: MeasurementSettings = field(default_factory=MeasurementSettings)
 
@@ -44,7 +62,7 @@ class LightMeasurementRequestModel(BaseModel):
     product_name: str = Field(min_length=1, max_length=200)
     measure_device: str = Field(min_length=1, max_length=200)
     light_entity_id: str = Field(pattern=LIGHT_ENTITY_PATTERN)
-    power_entity_id: str = Field(pattern=POWER_ENTITY_PATTERN)
+    power_entity_id: str | None = Field(default=None, pattern=POWER_ENTITY_PATTERN)
     voltage_entity_id: str | None = Field(default=None, pattern=VOLTAGE_ENTITY_PATTERN)
     modes: set[LutMode] = Field(default_factory=lambda: {LutMode.BRIGHTNESS}, min_length=1)
     generate_model: bool = True
@@ -65,6 +83,11 @@ class LightMeasurementRequestModel(BaseModel):
         if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", value):
             raise ValueError("model_id contains unsafe characters")
         return value
+
+    @field_validator("power_entity_id", "voltage_entity_id", mode="before")
+    @classmethod
+    def empty_entity_is_none(cls, value: str | None) -> str | None:
+        return value or None
 
     @field_validator("modes")
     @classmethod
@@ -98,6 +121,42 @@ class LightMeasurementRequestModel(BaseModel):
         )
 
 
+class MeasurementRunRequestModel(BaseModel):
+    """Generic web request for a runner definition.
+
+    The definition registry validates the mode-specific answer values before execution.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    measure_type: MeasureType
+    model_id: str = Field(default="measurement", min_length=1, max_length=120)
+    product_name: str = Field(default="Measurement", min_length=1, max_length=200)
+    measure_device: str = Field(default="", max_length=200)
+    answers: dict[str, object] = Field(default_factory=dict)
+    generate_model: bool = False
+    sleep_time: float = Field(default=2, ge=0, le=120)
+    sample_count: int = Field(default=1, ge=1, le=100)
+    resume_policy: ResumePolicy = ResumePolicy.NEW
+
+    @field_validator("model_id")
+    @classmethod
+    def validate_model_id(cls, value: str) -> str:
+        return LightMeasurementRequestModel.validate_model_id(value)
+
+    def to_domain(self) -> MeasurementRunRequest:
+        return MeasurementRunRequest(
+            measure_type=self.measure_type,
+            model_id=self.model_id,
+            model_name=self.product_name.strip(),
+            measure_device=self.measure_device.strip(),
+            answers=self.answers,
+            generate_model_json=self.generate_model,
+            resume_policy=self.resume_policy,
+            settings=MeasurementSettings(sleep_time=round(self.sleep_time), sample_count=self.sample_count),
+        )
+
+
 class AppMeasureConfig:
     """Runtime config for the Home Assistant app, adapted from a request's settings.
 
@@ -109,13 +168,16 @@ class AppMeasureConfig:
 
     def __init__(
         self,
-        request: LightMeasurementRequest,
+        request: LightMeasurementRequest | MeasurementRunRequest,
         hass_url: str,
         hass_token: str,
         power_meter: PowerMeterType = PowerMeterType.HASS,
     ) -> None:
         settings = request.settings
         self.selected_light_controller = LightControllerType.HASS
+        self.selected_media_controller = MediaControllerType.HASS
+        self.selected_fan_controller = FanControllerType.HASS
+        self.selected_charging_controller = ChargingControllerType.HASS
         self.selected_power_meter = power_meter
         self.hass_url = hass_url
         self.hass_token = hass_token

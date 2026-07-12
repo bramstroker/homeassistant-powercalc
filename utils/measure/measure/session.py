@@ -12,6 +12,7 @@ class SessionState(StrEnum):
     IDLE = "idle"
     VALIDATING = "validating"
     READY = "ready"
+    AWAITING_CONFIRMATION = "awaiting_confirmation"
     RUNNING = "running"
     CANCELLING = "cancelling"
     CANCELLED = "cancelled"
@@ -25,6 +26,8 @@ class SessionEventType(StrEnum):
     PROGRESS = "progress"
     WARNING = "warning"
     LOG = "log"
+    CHECKPOINT = "checkpoint"
+    SAMPLE = "sample"
 
 
 class MeasurementCancelledError(Exception):
@@ -78,6 +81,7 @@ class SessionControl:
     initial_sequence: int = 0
     _cancelled: Event = field(default_factory=Event)
     _listeners: list[Callable[[SessionEvent], None]] = field(default_factory=list)
+    _confirmed: Event = field(default_factory=Event)
     _sequence: int = field(default=0, init=False)
     _lock: Lock = field(default_factory=Lock)
 
@@ -101,6 +105,16 @@ class SessionControl:
             return
         if self._cancelled.wait(seconds):
             raise MeasurementCancelledError
+
+    def confirm(self, message: str) -> None:
+        self._confirmed.clear()
+        self.emit(SessionEventType.CHECKPOINT, {"message": message})
+        while not self._confirmed.wait(0.25):
+            self.checkpoint()
+        self.checkpoint()
+
+    def continue_run(self) -> None:
+        self._confirmed.set()
 
     def subscribe(self, listener: Callable[[SessionEvent], None]) -> None:
         self._listeners.append(listener)
@@ -131,3 +145,7 @@ class SessionControl:
 
     def log(self, message: str, *, warning: bool = False) -> None:
         self.emit(SessionEventType.WARNING if warning else SessionEventType.LOG, {"message": message})
+
+    def sample(self, power: float) -> None:
+        """Emit a live power reading for realtime visualisation. Not persisted."""
+        self.emit(SessionEventType.SAMPLE, {"power": round(power, 2)})

@@ -7,6 +7,8 @@ import inquirer
 from measure.config import MeasureConfig
 from measure.controller.media.controller import MediaController
 from measure.controller.media.factory import MediaControllerFactory
+from measure.execution import RunInteraction
+from measure.interactions import ConsoleInteraction
 from measure.powermeter.errors import ZeroReadingError
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasurementResult, MeasureUtil
@@ -21,10 +23,16 @@ _LOGGER = logging.getLogger("measure")
 
 
 class SpeakerRunner(MeasurementRunner):
-    def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
+    def __init__(
+        self,
+        measure_util: MeasureUtil,
+        config: MeasureConfig,
+        interaction: RunInteraction | None = None,
+    ) -> None:
         self.measure_util = measure_util
         self.config = config
         self.media_controller: MediaController = MediaControllerFactory(config).create()
+        self.interaction = interaction or ConsoleInteraction()
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.media_controller.process_answers(answers)
@@ -38,15 +46,15 @@ class SpeakerRunner(MeasurementRunner):
         voltages: list[float] = []
         duration = DURATION_PER_VOLUME_LEVEL
 
-        print(
+        self.interaction.notify(
             f"Prepare to start measuring the power for {duration} seconds on each volume level "
             "starting with 10 until 100 (with steps of 10 between)",
         )
-        print(
+        self.interaction.notify(
             "WARNING: during the measurement session the volume will be increased to the maximum, "
             "which can be harmful for your ears",
         )
-        input("Hit enter when you are ready to start..")
+        self.interaction.confirm("Ready to start speaker measurement. Volume will increase to maximum.")
 
         disable_streaming = bool(answers.get(QUESTION_DISABLE_STREAMING, False))
 
@@ -56,22 +64,22 @@ class SpeakerRunner(MeasurementRunner):
             if not disable_streaming:
                 _LOGGER.info("Start streaming noise")
                 self.media_controller.play_audio(STREAM_URL)
-            time.sleep(SLEEP_PRE_MEASURE)
+            self.interaction.wait(SLEEP_PRE_MEASURE)
             result = self.measure_util.take_average_measurement(duration)
             summary[volume] = result.power
             voltages.extend(result.voltages)
 
         _LOGGER.info("Muting volume and waiting for %d seconds", SLEEP_MUTE)
-        time.sleep(SLEEP_MUTE)
+        self.interaction.wait(SLEEP_MUTE)
         result = self.measure_util.take_average_measurement(duration)
         summary[0] = result.power
         voltages.extend(result.voltages)
 
         self.media_controller.set_volume(10)
 
-        print("Summary of all average measurements:")
+        self.interaction.notify("Summary of all average measurements:")
         for volume in summary:
-            print(volume, " : ", summary[volume])
+            self.interaction.notify(f"{volume} : {summary[volume]}")
 
         return RunnerResult(model_json_data=self._build_model_json_data(summary), voltages=voltages)
 
@@ -106,7 +114,7 @@ class SpeakerRunner(MeasurementRunner):
             "Measuring standby power. Waiting for %d seconds...",
             self.config.sleep_standby,
         )
-        time.sleep(self.config.sleep_standby)
+        self.interaction.wait(self.config.sleep_standby)
         try:
             return self.measure_util.take_measurement(start_time)
         except ZeroReadingError:

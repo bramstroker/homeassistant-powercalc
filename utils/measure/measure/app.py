@@ -8,7 +8,6 @@ from pathlib import Path
 import uvicorn
 
 from measure.api import create_app
-from measure.powermeter.const import PowerMeterType
 
 
 def main() -> None:
@@ -34,7 +33,6 @@ def main() -> None:
         data_root=args.data_root,
         hass_url=args.hass_url,
         hass_token=args.hass_token,
-        power_meter=PowerMeterType.DUMMY if options.get("dummy_power_meter", False) else PowerMeterType.HASS,
     )
     uvicorn.run(
         app,

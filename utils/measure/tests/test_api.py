@@ -6,6 +6,7 @@ from typing import Any
 
 from fastapi.testclient import TestClient
 from measure.api import create_app
+from measure.const import MeasureType
 from measure.coordinator import MeasurementCoordinator
 from measure.request import LightMeasurementRequest
 from measure.runner.runner import RunnerResult
@@ -40,6 +41,15 @@ class FakeClient:
                         supported_color_modes=["onoff"],
                     ),
                 },
+            ),
+            "fan": SimpleNamespace(
+                entities={"fan": entity("fan.test", "on", friendly_name="Test fan")},
+            ),
+            "media_player": SimpleNamespace(
+                entities={"speaker": entity("media_player.test", "playing", friendly_name="Test speaker")},
+            ),
+            "vacuum": SimpleNamespace(
+                entities={"robot": entity("vacuum.test", "docked", friendly_name="Test robot")},
             ),
             "sensor": SimpleNamespace(
                 entities={
@@ -117,6 +127,45 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     assert [item["entity_id"] for item in powers.json()] == ["sensor.test_power"]
     assert "light.switch_like" not in {item["entity_id"] for item in lights.json()}
     assert lights.json()[0]["supported_modes"] == ["brightness", "color_temp", "hs", "effect"]
+
+    for domain, expected in (("fan", "fan.test"), ("media_player", "media_player.test"), ("vacuum", "vacuum.test")):
+        response = test_client.get(f"/api/entities?domain={domain}")
+        assert response.status_code == 200, domain
+        assert [item["entity_id"] for item in response.json()] == [expected]
+
+
+def test_power_meter_test_endpoint(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+
+    dummy = test_client.post("/api/settings/test-power-meter", json={"power_meter": "dummy"})
+    assert dummy.status_code == 200
+    assert dummy.json()["success"] is True
+    assert 0 <= dummy.json()["power"] <= 100
+
+    shelly = test_client.post("/api/settings/test-power-meter", json={"power_meter": "shelly", "shelly_ip": None})
+    assert shelly.json() == {"success": False, "power": None, "message": "Enter the Shelly IP address first"}
+
+    hass = test_client.post(
+        "/api/settings/test-power-meter",
+        json={"power_meter": "hass", "default_power_entity_id": None},
+    )
+    assert hass.json()["success"] is False
+    assert "power sensor" in hass.json()["message"].lower()
+
+
+def test_measure_definitions_and_generic_run(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+
+    definitions = test_client.get("/api/measure-definitions")
+    assert definitions.status_code == 200
+    assert {item["measure_type"] for item in definitions.json()} == {item.value for item in MeasureType}
+
+    payload = {
+        "measure_type": MeasureType.AVERAGE,
+        "answers": {"powermeter_entity_id": "sensor.test_power", "duration": 60},
+    }
+    assert test_client.post("/api/runs/preflight", json=payload).status_code == 200
+    assert test_client.post("/api/runs", json=payload).status_code == 201
 
 
 def test_preflight_rejects_unavailable_entity(tmp_path: Path) -> None:
@@ -202,13 +251,24 @@ def test_trusted_ingress_mode_rejects_other_source(tmp_path: Path) -> None:
 def test_settings_default_and_update(tmp_path: Path) -> None:
     test_client = client(tmp_path)
 
-    assert test_client.get("/api/settings").json() == {"default_power_entity_id": None}
+    assert test_client.get("/api/settings").json() == {
+        "default_power_entity_id": None,
+        "default_measure_device": None,
+        "power_meter": "hass",
+        "shelly_ip": None,
+    }
 
-    updated = test_client.put("/api/settings", json={"default_power_entity_id": "sensor.test_power"})
+    updated = test_client.put(
+        "/api/settings",
+        json={"default_power_entity_id": "sensor.test_power", "default_measure_device": "Shelly Plug S"},
+    )
     assert updated.status_code == 200
     assert updated.json()["default_power_entity_id"] == "sensor.test_power"
+    assert updated.json()["default_measure_device"] == "Shelly Plug S"
 
-    assert test_client.get("/api/settings").json()["default_power_entity_id"] == "sensor.test_power"
+    reloaded = test_client.get("/api/settings").json()
+    assert reloaded["default_power_entity_id"] == "sensor.test_power"
+    assert reloaded["default_measure_device"] == "Shelly Plug S"
 
 
 def test_settings_rejects_invalid_entity(tmp_path: Path) -> None:

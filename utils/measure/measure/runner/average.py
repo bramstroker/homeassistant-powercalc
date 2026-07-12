@@ -3,6 +3,8 @@ from typing import Any
 
 import inquirer
 
+from measure.execution import RunInteraction
+from measure.interactions import ConsoleInteraction
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 from .const import QUESTION_DURATION
@@ -14,9 +16,15 @@ _LOGGER = logging.getLogger("measure")
 
 
 class AverageRunner(MeasurementRunner):
-    def __init__(self, measure_util: MeasureUtil, duration: int = 60) -> None:
+    def __init__(
+        self,
+        measure_util: MeasureUtil,
+        duration: int = 60,
+        interaction: RunInteraction | None = None,
+    ) -> None:
         self.measure_util = measure_util
         self.duration = duration
+        self.interaction = interaction or ConsoleInteraction()
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.duration = int(answers[QUESTION_DURATION])
@@ -26,7 +34,7 @@ class AverageRunner(MeasurementRunner):
         answers: dict[str, Any],
         export_directory: str,
     ) -> RunnerResult | None:
-        input("Press enter to start")
+        self.interaction.confirm("Ready to start the average measurement.")
 
         result = self.measure_util.take_average_measurement(self.duration)
 

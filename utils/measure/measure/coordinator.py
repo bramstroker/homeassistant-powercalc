@@ -8,7 +8,13 @@ from threading import Lock, Thread
 from typing import Protocol
 from uuid import uuid4
 
-from measure.request import LightMeasurementRequest, LightMeasurementRequestModel, ResumePolicy
+from measure.request import (
+    LightMeasurementRequest,
+    LightMeasurementRequestModel,
+    MeasurementRunRequest,
+    MeasurementRunRequestModel,
+    ResumePolicy,
+)
 from measure.runner.runner import RunnerResult
 from measure.session import (
     MeasurementCancelledError,
@@ -31,7 +37,7 @@ class SessionConflictError(Exception):
 class MeasurementExecutor(Protocol):
     def run(
         self,
-        request: LightMeasurementRequest,
+        request: LightMeasurementRequest | MeasurementRunRequest,
         control: SessionControl,
         output_root: Path,
     ) -> tuple[RunnerResult, Path]: ...
@@ -52,11 +58,12 @@ class MeasurementCoordinator:
         with self._lock:
             return self._snapshot
 
-    def start(self, request: LightMeasurementRequestModel) -> SessionSnapshot:
+    def start(self, request: LightMeasurementRequestModel | MeasurementRunRequestModel) -> SessionSnapshot:
         with self._lock:
             if self._snapshot and self._snapshot.state in {
                 SessionState.VALIDATING,
                 SessionState.READY,
+                SessionState.AWAITING_CONFIRMATION,
                 SessionState.RUNNING,
                 SessionState.CANCELLING,
             }:
@@ -101,7 +108,11 @@ class MeasurementCoordinator:
         with self._lock:
             if self._snapshot is not None and self._snapshot.state == SessionState.CANCELLED:
                 return self._snapshot
-            if self._snapshot is None or self._snapshot.state not in {SessionState.RUNNING, SessionState.CANCELLING}:
+            if self._snapshot is None or self._snapshot.state not in {
+                SessionState.RUNNING,
+                SessionState.AWAITING_CONFIRMATION,
+                SessionState.CANCELLING,
+            }:
                 raise SessionConflictError("No running measurement session")
             if self._snapshot.state != SessionState.CANCELLING:
                 self._snapshot = replace(self._snapshot, state=SessionState.CANCELLING, updated_at=utc_now())
@@ -110,11 +121,22 @@ class MeasurementCoordinator:
                 self._control.cancel()
             return self._snapshot
 
+    def confirm(self) -> SessionSnapshot:
+        with self._lock:
+            if self._snapshot is None or self._snapshot.state != SessionState.AWAITING_CONFIRMATION:
+                raise SessionConflictError("The current session is not waiting for confirmation")
+            if self._control is None:
+                raise SessionConflictError("The current session cannot be continued")
+            self._snapshot = replace(self._snapshot, state=SessionState.RUNNING, updated_at=utc_now())
+            self.storage.write_snapshot(self._snapshot)
+            self._control.continue_run()
+            return self._snapshot
+
     def events_since(self, sequence: int) -> tuple[SessionEvent, ...]:
         with self._lock:
             return tuple(event for event in self._events if event.sequence > sequence)
 
-    def _launch_locked(self, request: LightMeasurementRequestModel) -> None:
+    def _launch_locked(self, request: LightMeasurementRequestModel | MeasurementRunRequestModel) -> None:
         assert self._snapshot is not None
         self._control = SessionControl(initial_sequence=self._snapshot.event_sequence)
         self._control.subscribe(self._handle_event)
@@ -129,7 +151,12 @@ class MeasurementCoordinator:
         )
         self._worker.start()
 
-    def _run(self, session_id: str, request: LightMeasurementRequestModel, control: SessionControl) -> None:
+    def _run(
+        self,
+        session_id: str,
+        request: LightMeasurementRequestModel | MeasurementRunRequestModel,
+        control: SessionControl,
+    ) -> None:
         try:
             self.service_factory().run(request.to_domain(), control, self.storage.output_directory(session_id))
         except MeasurementCancelledError:
@@ -147,6 +174,10 @@ class MeasurementCoordinator:
             self._events.append(event)
             if len(self._events) > 1000:
                 self._events = self._events[-1000:]
+            if event.type == SessionEventType.SAMPLE:
+                # High-frequency live readings: stream to clients, but don't persist
+                # or mutate the snapshot (they are transient realtime data only).
+                return
             if event.type == SessionEventType.PROGRESS:
                 self._snapshot = replace(
                     self._snapshot,
@@ -163,6 +194,13 @@ class MeasurementCoordinator:
                     event_sequence=event.sequence,
                     updated_at=event.created_at,
                     warnings=(*self._snapshot.warnings[-19:], str(event.data["message"])),
+                )
+            elif event.type == SessionEventType.CHECKPOINT:
+                self._snapshot = replace(
+                    self._snapshot,
+                    event_sequence=event.sequence,
+                    updated_at=event.created_at,
+                    state=SessionState.AWAITING_CONFIRMATION,
                 )
             else:
                 self._snapshot = replace(

@@ -6,6 +6,8 @@ from typing import Any
 import inquirer
 
 from measure.config import MeasureConfig
+from measure.execution import RunInteraction
+from measure.interactions import ConsoleInteraction
 from measure.runner.const import QUESTION_EXPORT_FILENAME
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasurementResult, MeasureUtil
@@ -18,10 +20,16 @@ DEFAULT_FILENAME = "record.csv"
 
 
 class RecorderRunner(MeasurementRunner):
-    def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
+    def __init__(
+        self,
+        measure_util: MeasureUtil,
+        config: MeasureConfig,
+        interaction: RunInteraction | None = None,
+    ) -> None:
         self.measure_util = measure_util
         self.config = config
         self.filename = DEFAULT_FILENAME
+        self.interaction = interaction or ConsoleInteraction()
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.filename = answers[QUESTION_EXPORT_FILENAME]
@@ -34,7 +42,7 @@ class RecorderRunner(MeasurementRunner):
         answers: dict[str, Any],
         export_directory: str,
     ) -> RunnerResult | None:
-        input("Press Enter to start and CTRL+C to stop")
+        self.interaction.confirm("Ready to start recording. Cancel the measurement when you are finished.")
 
         try:
             csv_filepath = f"{export_directory}/{self.filename}"
@@ -44,12 +52,12 @@ class RecorderRunner(MeasurementRunner):
                 writer = csv.writer(csv_file)
                 while True:
                     timestamp = time.time()
-                    print("Measurement")
+                    self.interaction.notify("Measurement")
                     measurement = self.measure_util.take_measurement(timestamp)
                     _LOGGER.info("Measurement %.2f", measurement.power)
                     writer.writerow([timestamp - start_time, measurement.power])
                     voltages.extend(measurement.voltages)
-                    time.sleep(INTERVAL)
+                    self.interaction.wait(INTERVAL)
         except KeyboardInterrupt:
             _LOGGER.info("Stopped recording")
 

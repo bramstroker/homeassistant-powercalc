@@ -17,7 +17,5 @@ environment:
 backup: cold
 options:
   debug_logging: false
-  dummy_power_meter: false
 schema:
   debug_logging: bool
-  dummy_power_meter: bool
