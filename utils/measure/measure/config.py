@@ -2,6 +2,7 @@ import logging
 
 from decouple import Choices, UndefinedValueError, config
 
+from measure.configuration import MeasurementSettings
 from measure.const import MeasureType
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.fan.const import FanControllerType
@@ -11,6 +12,9 @@ from measure.powermeter.const import PowerMeterType
 
 _LOGGER = logging.getLogger("measure")
 
+# Shared tuning defaults; the environment variables below only override these.
+_DEFAULTS = MeasurementSettings()
+
 
 class MeasureConfig:
     @property
@@ -19,7 +23,7 @@ class MeasureConfig:
             max(
                 config(
                     "MIN_BRIGHTNESS",
-                    default=config("START_BRIGHTNESS", default=1, cast=int),
+                    default=config("START_BRIGHTNESS", default=_DEFAULTS.min_brightness, cast=int),
                     cast=int,
                 ),
                 1,
@@ -29,23 +33,23 @@ class MeasureConfig:
 
     @property
     def max_brightness(self) -> int:
-        return 255
+        return _DEFAULTS.max_brightness
 
     @property
     def min_sat(self) -> int:
-        return min(max(config("MIN_SAT", default=1, cast=int), 1), 255)
+        return min(max(config("MIN_SAT", default=_DEFAULTS.min_sat, cast=int), 1), 255)
 
     @property
     def max_sat(self) -> int:
-        return min(max(config("MAX_SAT", default=255, cast=int), 1), 255)
+        return min(max(config("MAX_SAT", default=_DEFAULTS.max_sat, cast=int), 1), 255)
 
     @property
     def min_hue(self) -> int:
-        return min(max(config("MIN_HUE", default=1, cast=int), 1), 65535)
+        return min(max(config("MIN_HUE", default=_DEFAULTS.min_hue, cast=int), 1), 65535)
 
     @property
     def max_hue(self) -> int:
-        return min(max(config("MAX_HUE", default=65535, cast=int), 1), 65535)
+        return min(max(config("MAX_HUE", default=_DEFAULTS.max_hue, cast=int), 1), 65535)
 
     @property
     def ct_bri_steps(self) -> int:
@@ -97,7 +101,7 @@ class MeasureConfig:
 
     @property
     def effect_bri_steps(self) -> int:
-        return config("EFFECT_BRI_STEPS", default=40, cast=int)
+        return config("EFFECT_BRI_STEPS", default=_DEFAULTS.effect_bri_steps, cast=int)
 
     @property
     def selected_light_controller(self) -> LightControllerType:
@@ -145,85 +149,103 @@ class MeasureConfig:
 
     @property
     def sleep_initial(self) -> int:
-        return config("SLEEP_INITIAL", default=10, cast=int)
+        return config("SLEEP_INITIAL", default=_DEFAULTS.sleep_initial, cast=int)
 
     @property
     def sleep_standby(self) -> int:
-        return config("SLEEP_STANDBY", default=20, cast=int)
+        return config("SLEEP_STANDBY", default=_DEFAULTS.sleep_standby, cast=int)
 
     @property
     def sleep_time(self) -> int:
-        return config("SLEEP_TIME", default=2, cast=int)
+        return config("SLEEP_TIME", default=_DEFAULTS.sleep_time, cast=int)
 
     @property
     def sleep_time_sample(self) -> int:
-        return config("SLEEP_TIME_SAMPLE", default=1, cast=int)
+        return config("SLEEP_TIME_SAMPLE", default=_DEFAULTS.sleep_time_sample, cast=int)
 
     @property
     def sleep_time_hue(self) -> int:
-        return config("SLEEP_TIME_HUE", default=5, cast=int)
+        return config("SLEEP_TIME_HUE", default=_DEFAULTS.sleep_time_hue, cast=int)
 
     @property
     def sleep_time_sat(self) -> int:
-        return config("SLEEP_TIME_SAT", default=10, cast=int)
+        return config("SLEEP_TIME_SAT", default=_DEFAULTS.sleep_time_sat, cast=int)
 
     @property
     def sleep_time_ct(self) -> int:
-        return config("SLEEP_TIME_CT", default=10, cast=int)
+        return config("SLEEP_TIME_CT", default=_DEFAULTS.sleep_time_ct, cast=int)
 
     @property
     def measure_time_effect(self) -> int:
         """Maximum seconds to measure each effect/brightness combination."""
-        return config("MEASURE_TIME_EFFECT", default=180, cast=int)
+        return config("MEASURE_TIME_EFFECT", default=_DEFAULTS.measure_time_effect, cast=int)
 
     @property
     def measure_time_effect_min(self) -> int:
         """Minimum seconds before effect measurement can stop on convergence."""
-        return min(config("MEASURE_TIME_EFFECT_MIN", default=20, cast=int), self.measure_time_effect)
+        return min(
+            config("MEASURE_TIME_EFFECT_MIN", default=_DEFAULTS.measure_time_effect_min, cast=int),
+            self.measure_time_effect,
+        )
 
     @property
     def measure_time_effect_convergence_window(self) -> int:
         """Seconds between cumulative-average snapshots used for convergence checks."""
         return min(
-            config("MEASURE_TIME_EFFECT_CONVERGENCE_WINDOW", default=15, cast=int),
+            config(
+                "MEASURE_TIME_EFFECT_CONVERGENCE_WINDOW",
+                default=_DEFAULTS.measure_time_effect_convergence_window,
+                cast=int,
+            ),
             self.measure_time_effect_min,
         )
 
     @property
     def measure_time_effect_convergence_abs(self) -> float:
         """Maximum watt change allowed for effect average convergence."""
-        return config("MEASURE_TIME_EFFECT_CONVERGENCE_ABS", default=0.1, cast=float)
+        return config(
+            "MEASURE_TIME_EFFECT_CONVERGENCE_ABS",
+            default=_DEFAULTS.measure_time_effect_convergence_abs,
+            cast=float,
+        )
 
     @property
     def measure_time_effect_convergence_rel(self) -> float:
         """Maximum percentage change allowed for effect average convergence."""
-        return config("MEASURE_TIME_EFFECT_CONVERGENCE_REL", default=1.0, cast=float) / 100
+        return (
+            config(
+                "MEASURE_TIME_EFFECT_CONVERGENCE_REL",
+                default=_DEFAULTS.measure_time_effect_convergence_rel * 100,
+                cast=float,
+            )
+            / 100
+        )
 
     @property
     def sleep_time_effect_change(self) -> int:
-        return config("SLEEP_TIME_EFFECT_CHANGE", default=5, cast=int)
+        return config("SLEEP_TIME_EFFECT_CHANGE", default=_DEFAULTS.sleep_time_effect_change, cast=int)
 
     @property
     def sleep_time_nudge(self) -> float:
-        return config("SLEEP_TIME_NUDGE", default=10, cast=float)
+        return config("SLEEP_TIME_NUDGE", default=_DEFAULTS.sleep_time_nudge, cast=float)
 
     @property
     def pulse_time_nudge(self) -> float:
-        return config("PULSE_TIME_NUDGE", default=2, cast=float)
+        return config("PULSE_TIME_NUDGE", default=_DEFAULTS.pulse_time_nudge, cast=float)
 
     @property
     def max_retries(self) -> int:
-        return config("MAX_RETRIES", default=5, cast=int)
+        return config("MAX_RETRIES", default=_DEFAULTS.max_retries, cast=int)
 
     @property
     def max_nudges(self) -> int:
-        return config("MAX_NUDGES", default=0, cast=int)
+        return config("MAX_NUDGES", default=_DEFAULTS.max_nudges, cast=int)
 
     @property
     def sample_count(self) -> int:
         if self.selected_power_meter == PowerMeterType.MANUAL:
             return 1
-        return config("SAMPLE_COUNT", default=1, cast=int)
+        return config("SAMPLE_COUNT", default=_DEFAULTS.sample_count, cast=int)
 
     @property
     def selected_measure_type(self) -> str | None:
@@ -291,7 +313,7 @@ class MeasureConfig:
     def light_transition_time(self) -> int:
         return config(
             "LIGHT_TRANSITION_TIME",
-            default=0,
+            default=_DEFAULTS.light_transition_time,
             cast=int,
         )
 
@@ -309,7 +331,7 @@ class MeasureConfig:
 
     @property
     def csv_add_datetime_column(self) -> bool:
-        return config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)
+        return config("CSV_ADD_DATETIME_COLUMN", default=_DEFAULTS.csv_add_datetime_column, cast=bool)
 
     @staticmethod
     def get_conf_value(key: str) -> str | None:

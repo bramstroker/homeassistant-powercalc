@@ -6,44 +6,19 @@ import re
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from measure.configuration import MeasurementSettings
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.powermeter.const import PowerMeterType
+
+LIGHT_ENTITY_PATTERN = r"^light\.[a-z0-9_]+$"
+POWER_ENTITY_PATTERN = r"^sensor\.[a-z0-9_]+$"
+VOLTAGE_ENTITY_PATTERN = r"^sensor\.[a-z0-9_]+$"
 
 
 class ResumePolicy(StrEnum):
     NEW = "new"
     RESUME = "resume"
     OVERWRITE = "overwrite"
-
-
-@dataclass(frozen=True)
-class MeasurementSettings:
-    min_brightness: int = 1
-    min_sat: int = 1
-    max_sat: int = 255
-    min_hue: int = 1
-    max_hue: int = 65535
-    brightness_step: int = 5
-    color_temp_step: int = 5
-    hue_step: int = 10
-    saturation_step: int = 10
-    effect_bri_steps: int = 40
-    sleep_initial: int = 10
-    sleep_standby: int = 20
-    sleep_time: int = 2
-    sleep_time_sample: int = 1
-    sleep_time_hue: int = 5
-    sleep_time_sat: int = 10
-    sleep_time_ct: int = 10
-    sleep_time_effect_change: int = 5
-    sleep_time_nudge: float = 10
-    pulse_time_nudge: float = 2
-    sample_count: int = 1
-    max_retries: int = 5
-    max_nudges: int = 0
-    light_transition_time: int = 0
-    call_update_entity: bool = False
-    csv_add_datetime_column: bool = False
 
 
 @dataclass(frozen=True)
@@ -68,9 +43,9 @@ class LightMeasurementRequestModel(BaseModel):
     model_id: str = Field(min_length=1, max_length=120)
     product_name: str = Field(min_length=1, max_length=200)
     measure_device: str = Field(min_length=1, max_length=200)
-    light_entity_id: str = Field(pattern=r"^light\.[a-z0-9_]+$")
-    power_entity_id: str = Field(pattern=r"^sensor\.[a-z0-9_]+$")
-    voltage_entity_id: str | None = Field(default=None, pattern=r"^sensor\.[a-z0-9_]+$")
+    light_entity_id: str = Field(pattern=LIGHT_ENTITY_PATTERN)
+    power_entity_id: str = Field(pattern=POWER_ENTITY_PATTERN)
+    voltage_entity_id: str | None = Field(default=None, pattern=VOLTAGE_ENTITY_PATTERN)
     modes: set[LutMode] = Field(default_factory=lambda: {LutMode.BRIGHTNESS}, min_length=1)
     generate_model: bool = True
     gzip: bool = True
@@ -124,7 +99,13 @@ class LightMeasurementRequestModel(BaseModel):
 
 
 class AppMeasureConfig:
-    """Measure runner configuration derived from a validated app request."""
+    """Runtime config for the Home Assistant app, adapted from a request's settings.
+
+    All tuning values come straight from ``request.settings`` (whose defaults live in
+    ``MeasurementSettings``). The only app-specific logic is fixing the controllers to
+    Home Assistant and mapping the request's user-facing step sizes onto the internal
+    lookup-table step scale.
+    """
 
     def __init__(self, request: LightMeasurementRequest, hass_url: str, hass_token: str) -> None:
         settings = request.settings
@@ -135,11 +116,12 @@ class AppMeasureConfig:
         self.hass_call_update_entity_service = settings.call_update_entity
         self.light_transition_time = settings.light_transition_time
         self.min_brightness = settings.min_brightness
-        self.max_brightness = 255
+        self.max_brightness = settings.max_brightness
         self.min_sat = settings.min_sat
         self.max_sat = settings.max_sat
         self.min_hue = settings.min_hue
         self.max_hue = settings.max_hue
+        # The app expresses steps as user-facing increments; map them to internal knobs.
         self.ct_bri_steps = settings.brightness_step
         self.ct_mired_steps = settings.color_temp_step
         self.bri_bri_steps = settings.brightness_step
@@ -147,11 +129,11 @@ class AppMeasureConfig:
         self.hs_hue_steps = max(1, round(settings.hue_step / 360 * 65535))
         self.hs_sat_steps = max(1, round(settings.saturation_step / 100 * 255))
         self.effect_bri_steps = settings.effect_bri_steps
-        self.measure_time_effect = 180
-        self.measure_time_effect_min = 20
-        self.measure_time_effect_convergence_window = 15
-        self.measure_time_effect_convergence_abs = 0.1
-        self.measure_time_effect_convergence_rel = 0.01
+        self.measure_time_effect = settings.measure_time_effect
+        self.measure_time_effect_min = settings.measure_time_effect_min
+        self.measure_time_effect_convergence_window = settings.measure_time_effect_convergence_window
+        self.measure_time_effect_convergence_abs = settings.measure_time_effect_convergence_abs
+        self.measure_time_effect_convergence_rel = settings.measure_time_effect_convergence_rel
         self.sleep_initial = settings.sleep_initial
         self.sleep_standby = settings.sleep_standby
         self.sleep_time = settings.sleep_time

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
-POWER_ENTITY_PATTERN = r"^sensor\.[a-z0-9_]+$"
+from measure.request import POWER_ENTITY_PATTERN
 
 
 class AppSettings(BaseModel):
