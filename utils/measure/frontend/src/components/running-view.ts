@@ -1,4 +1,5 @@
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, type PropertyValues } from "lit";
+import { createRef, ref } from "lit/directives/ref.js";
 import type { SessionSnapshot } from "../types";
 import { sharedStyles } from "../styles";
 
@@ -14,6 +15,7 @@ export class RunningView extends LitElement {
   connected = false;
   logs: string[] = [];
   busy = false;
+  private readonly logContainer = createRef<HTMLDivElement>();
 
   static readonly styles = [sharedStyles, css`
     .instrument { position: relative; overflow: hidden; background: var(--well); border: 1px solid var(--line); border-radius: 16px; padding: clamp(1.2rem, 4vw, 2rem); }
@@ -33,6 +35,13 @@ export class RunningView extends LitElement {
     .log p { margin: 0; }
     @media (max-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } .topline { align-items: flex-start; flex-direction: column; } }
   `];
+
+  protected updated(changedProperties: PropertyValues<this>): void {
+    if (changedProperties.has("logs") && this.logs.length) {
+      const container = this.logContainer.value;
+      if (container) container.scrollTop = container.scrollHeight;
+    }
+  }
 
   render() {
     const progress = this.snapshot.progress ?? { completed: 0, total: 0 };
@@ -62,7 +71,7 @@ export class RunningView extends LitElement {
   }
 
   private renderLog() {
-    return html`<div class="log" aria-label="Recent measurement log" aria-live="polite">${this.logs.map((log) => this.logLine(log))}</div>`;
+    return html`<div ${ref(this.logContainer)} class="log" aria-label="Recent measurement log" aria-live="polite">${this.logs.map((log) => this.logLine(log))}</div>`;
   }
 
   private logLine(log: string) {

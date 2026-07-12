@@ -105,6 +105,29 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector("progress")?.value).toBe(25);
     expect(element.shadowRoot.querySelector("button")?.textContent).toContain("Cancel measurement");
   });
+
+  it("auto-scrolls the log container when new log lines arrive", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      connected: boolean;
+      logs: string[];
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", progress: { completed: 1, total: 10 } };
+    element.logs = ["First log"];
+    document.body.append(element);
+    await element.updateComplete;
+
+    const logContainer = element.shadowRoot.querySelector(".log") as HTMLDivElement;
+    Object.defineProperty(logContainer, "scrollHeight", { value: 240, configurable: true });
+    Object.defineProperty(logContainer, "scrollTop", { value: 0, writable: true, configurable: true });
+
+    element.logs = [...element.logs, "Second log"];
+    await element.updateComplete;
+
+    expect(logContainer.scrollTop).toBe(240);
+  });
 });
 
 describe("setup view defaults", () => {
