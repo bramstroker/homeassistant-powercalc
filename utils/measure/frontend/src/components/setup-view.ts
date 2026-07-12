@@ -12,7 +12,7 @@ const fallbackDefaults = {
 };
 
 export class SetupView extends LitElement {
-  static properties = {
+  static readonly properties = {
     capabilities: { attribute: false },
     lights: { attribute: false },
     powers: { attribute: false },
@@ -32,7 +32,7 @@ export class SetupView extends LitElement {
   errorMessage = "";
   selectedLightId = "";
 
-  static styles = [sharedStyles, css`
+  static readonly styles = [sharedStyles, css`
     form { display: grid; gap: 1rem; }
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     label, fieldset { display: grid; gap: 0.4rem; }
@@ -164,14 +164,18 @@ export class SetupView extends LitElement {
       this.errorMessage = "Select at least one lookup-table mode.";
       return;
     }
-    const number = (name: string) => Number(data.get(name));
+    const text = (name: string): string => {
+      const value = data.get(name);
+      return typeof value === "string" ? value : "";
+    };
+    const number = (name: string) => Number(text(name));
     const request: MeasurementRequest = {
-      model_id: String(data.get("model_id") ?? "").trim(),
-      product_name: String(data.get("product_name") ?? "").trim(),
-      measure_device: String(data.get("measure_device") ?? "").trim(),
-      light_entity_id: String(data.get("light_entity_id") ?? ""),
-      power_entity_id: String(data.get("power_entity_id") ?? ""),
-      voltage_entity_id: String(data.get("voltage_entity_id") ?? "") || null,
+      model_id: text("model_id").trim(),
+      product_name: text("product_name").trim(),
+      measure_device: text("measure_device").trim(),
+      light_entity_id: text("light_entity_id"),
+      power_entity_id: text("power_entity_id"),
+      voltage_entity_id: text("voltage_entity_id") || null,
       modes,
       generate_model: data.has("generate_model"),
       gzip: data.has("gzip"),
@@ -182,7 +186,7 @@ export class SetupView extends LitElement {
       hue_step: number("hue_step"),
       saturation_step: number("saturation_step"),
       color_temp_step: number("color_temp_step"),
-      resume_policy: String(data.get("resume_policy") ?? "new") as MeasurementRequest["resume_policy"],
+      resume_policy: (text("resume_policy") || "new") as MeasurementRequest["resume_policy"],
     };
     this.dispatchEvent(new CustomEvent("preflight", { detail: request, bubbles: true, composed: true }));
   }

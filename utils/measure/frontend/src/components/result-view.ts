@@ -3,7 +3,7 @@ import type { SessionFile, SessionSnapshot } from "../types";
 import { sharedStyles } from "../styles";
 
 export class ResultView extends LitElement {
-  static properties = {
+  static readonly properties = {
     snapshot: { attribute: false },
     files: { attribute: false },
     fileUrl: { attribute: false },
@@ -17,7 +17,7 @@ export class ResultView extends LitElement {
   busy = false;
   errorMessage = "";
 
-  static styles = [sharedStyles, css`
+  static readonly styles = [sharedStyles, css`
     .status-mark { display: grid; place-items: center; width: 54px; height: 54px; margin-bottom: 1rem; border: 1px solid var(--line); border-radius: 50%; color: var(--good); font: 700 1.5rem/1 ui-monospace, monospace; }
     .status-mark.failed { color: var(--danger); }
     .status-mark.cancelled, .status-mark.resumable { color: var(--signal); }
@@ -67,7 +67,9 @@ export class ResultView extends LitElement {
   }
 
   private size(bytes: number): string {
-    return bytes < 1024 ? `${bytes} B` : bytes < 1_048_576 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1_048_576).toFixed(1)} MB`;
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1_048_576) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1_048_576).toFixed(1)} MB`;
   }
 
   private emit(name: "new" | "resume"): void {

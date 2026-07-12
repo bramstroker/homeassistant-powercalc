@@ -3,7 +3,7 @@ import type { SessionSnapshot } from "../types";
 import { sharedStyles } from "../styles";
 
 export class RunningView extends LitElement {
-  static properties = {
+  static readonly properties = {
     snapshot: { attribute: false },
     connected: { type: Boolean },
     logs: { attribute: false },
@@ -15,7 +15,7 @@ export class RunningView extends LitElement {
   logs: string[] = [];
   busy = false;
 
-  static styles = [sharedStyles, css`
+  static readonly styles = [sharedStyles, css`
     .instrument { position: relative; overflow: hidden; background: var(--well); border: 1px solid var(--line); border-radius: 16px; padding: clamp(1.2rem, 4vw, 2rem); }
     .instrument::before { content: ""; position: absolute; inset: 0; opacity: 0.24; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), var(--grid) 10%); }
     .topline { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
@@ -55,10 +55,18 @@ export class RunningView extends LitElement {
           </div>
         </div>
         ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
-        ${this.logs.length ? html`<div class="log" aria-label="Recent measurement log" aria-live="polite">${this.logs.map((log) => html`<p>${log}</p>`)}</div>` : nothing}
+        ${this.logs.length ? this.renderLog() : nothing}
         <div class="actions"><button class="danger" type="button" @click=${this.cancel} ?disabled=${this.busy || this.snapshot.state === "cancelling"}>${this.snapshot.state === "cancelling" ? "Cancelling…" : "Cancel measurement"}</button></div>
       </section>
     `;
+  }
+
+  private renderLog() {
+    return html`<div class="log" aria-label="Recent measurement log" aria-live="polite">${this.logs.map((log) => this.logLine(log))}</div>`;
+  }
+
+  private logLine(log: string) {
+    return html`<p>${log}</p>`;
   }
 
   private remaining(seconds?: number | null): string {

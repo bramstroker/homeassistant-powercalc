@@ -35,6 +35,10 @@ class ErrorResponse(BaseModel):
     field: str | None = None
 
 
+# Shared OpenAPI documentation for the JSON error body returned by every failed request.
+_ERROR = {"model": ErrorResponse}
+
+
 class EntityDescriptor(BaseModel):
     entity_id: str
     name: str
@@ -193,7 +197,7 @@ def _router() -> APIRouter:  # noqa: C901
             },
         )
 
-    @router.get("/entities", response_model=list[EntityDescriptor])
+    @router.get("/entities", response_model=list[EntityDescriptor], responses={400: _ERROR})
     async def entities(
         request: Request,
         domain: Annotated[Literal["light"] | None, Query()] = None,
@@ -203,11 +207,11 @@ def _router() -> APIRouter:  # noqa: C901
             raise HTTPException(status_code=400, detail="Specify exactly one entity filter")
         return await run_in_threadpool(_load_entities, _context(request), domain, kind)
 
-    @router.post("/preflight", response_model=PreflightResponse)
+    @router.post("/preflight", response_model=PreflightResponse, responses={409: _ERROR, 422: _ERROR})
     async def preflight(payload: LightMeasurementRequestModel, request: Request) -> PreflightResponse:
         return await run_in_threadpool(_preflight, _context(request), payload)
 
-    @router.post("/sessions", status_code=201)
+    @router.post("/sessions", status_code=201, responses={409: _ERROR, 422: _ERROR})
     async def start_session(payload: LightMeasurementRequestModel, request: Request) -> dict[str, object]:
         context = _context(request)
         await run_in_threadpool(_preflight, context, payload)
@@ -217,7 +221,7 @@ def _router() -> APIRouter:  # noqa: C901
             raise HTTPException(status_code=409, detail=str(error)) from error
         return _snapshot_response(context, snapshot)
 
-    @router.get("/session/current")
+    @router.get("/session/current", responses={404: _ERROR})
     async def current_session(request: Request) -> dict[str, object]:
         context = _context(request)
         snapshot = context.coordinator.current
@@ -225,7 +229,7 @@ def _router() -> APIRouter:  # noqa: C901
             raise HTTPException(status_code=404, detail="No measurement session")
         return _snapshot_response(context, snapshot)
 
-    @router.delete("/session/current", status_code=202)
+    @router.delete("/session/current", status_code=202, responses={409: _ERROR})
     async def cancel_session(request: Request) -> dict[str, object]:
         context = _context(request)
         try:
@@ -234,7 +238,7 @@ def _router() -> APIRouter:  # noqa: C901
             raise HTTPException(status_code=409, detail=str(error)) from error
         return _snapshot_response(context, snapshot)
 
-    @router.post("/session/current/resume")
+    @router.post("/session/current/resume", responses={404: _ERROR, 409: _ERROR})
     async def resume_session(request: Request) -> dict[str, object]:
         context = _context(request)
         try:
@@ -247,7 +251,7 @@ def _router() -> APIRouter:  # noqa: C901
             raise HTTPException(status_code=409, detail=str(error)) from error
         return _snapshot_response(context, snapshot)
 
-    @router.get("/session/current/files", response_model=list[SessionFile])
+    @router.get("/session/current/files", response_model=list[SessionFile], responses={404: _ERROR})
     async def files(request: Request) -> list[SessionFile]:
         context = _context(request)
         snapshot = context.coordinator.current
@@ -258,7 +262,7 @@ def _router() -> APIRouter:  # noqa: C901
             for name in context.storage.list_files(snapshot.id)
         ]
 
-    @router.get("/session/current/files/{name:path}")
+    @router.get("/session/current/files/{name:path}", responses={404: _ERROR})
     async def download(name: str, request: Request) -> FileResponse:
         context = _context(request)
         snapshot = context.coordinator.current
@@ -270,7 +274,7 @@ def _router() -> APIRouter:  # noqa: C901
             raise HTTPException(status_code=404, detail="File not found") from error
         return FileResponse(path, filename=path.name)
 
-    @router.get("/session/current/events")
+    @router.get("/session/current/events", responses={404: _ERROR})
     async def events(request: Request) -> StreamingResponse:
         context = _context(request)
         if context.coordinator.current is None:
@@ -403,7 +407,7 @@ def _is_finite_number(value: str) -> bool:
 def _duration_seconds(value: str | None) -> int | None:
     if value is None:
         return None
-    match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)([hms])", value)
+    match = re.fullmatch(r"(\d+(?:\.\d+)?)([hms])", value)
     if match is None:
         return None
     multiplier = {"h": 3600, "m": 60, "s": 1}[match.group(2)]

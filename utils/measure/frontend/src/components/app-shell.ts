@@ -10,7 +10,7 @@ import "./setup-view";
 type View = "loading" | "setup" | "review" | "running" | "result";
 
 export class AppShell extends LitElement {
-  static properties = {
+  static readonly properties = {
     view: { state: true }, loadingMessage: { state: true }, errorMessage: { state: true }, busy: { state: true },
     connectedToEvents: { state: true }, snapshot: { state: true }, request: { state: true }, preflight: { state: true },
     files: { state: true }, logs: { state: true },
@@ -34,7 +34,7 @@ export class AppShell extends LitElement {
   private readonly api = new MeasureApiClient();
   private eventStream?: SessionEventStream;
 
-  static styles = [sharedStyles, css`
+  static readonly styles = [sharedStyles, css`
     :host { display: block; min-height: 100vh; background: var(--canvas); }
     .shell { width: min(980px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(1.2rem, 5vw, 3.5rem) 0 4rem; }
     header { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: end; margin-bottom: clamp(1.5rem, 5vw, 3rem); }
@@ -75,9 +75,17 @@ export class AppShell extends LitElement {
     `;
   }
 
+  private renderLoading() {
+    return html`
+      <section class="panel loading" aria-live="polite"><div><div class="pulse" aria-hidden="true"></div><p>${this.loadingMessage}</p>${this.errorMessage ? this.renderRetry() : nothing}</div></section>`;
+  }
+
+  private renderRetry() {
+    return html`<p class="error" role="alert">${this.errorMessage}</p><button @click=${this.boot}>Retry</button>`;
+  }
+
   private renderView() {
-    if (this.view === "loading") return html`
-      <section class="panel loading" aria-live="polite"><div><div class="pulse" aria-hidden="true"></div><p>${this.loadingMessage}</p>${this.errorMessage ? html`<p class="error" role="alert">${this.errorMessage}</p><button @click=${this.boot}>Retry</button>` : nothing}</div></section>`;
+    if (this.view === "loading") return this.renderLoading();
     if (this.view === "review" && this.request && this.preflight) return html`
       <measure-preflight-view .request=${this.request} .preflight=${this.preflight} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`

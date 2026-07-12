@@ -34,5 +34,7 @@ def test_request_rejects_unsafe_model_id(model_id: str) -> None:
 
 
 def test_request_rejects_unknown_fields() -> None:
+    payload = valid_request() | {"token": "secret"}
+
     with pytest.raises(ValidationError):
-        LightMeasurementRequestModel.model_validate(valid_request() | {"token": "secret"})
+        LightMeasurementRequestModel.model_validate(payload)

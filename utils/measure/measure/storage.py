@@ -168,7 +168,7 @@ class SessionStorage:
             if not all(math.isfinite(float(value)) for value in last_row):
                 return False
             return SessionStorage._variation_matches_request(mode, last_row[:-1], request)
-        except OSError, UnicodeDecodeError, ValueError:
+        except OSError, ValueError:
             return False
 
     @staticmethod

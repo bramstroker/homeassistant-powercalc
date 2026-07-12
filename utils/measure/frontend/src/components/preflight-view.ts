@@ -3,7 +3,7 @@ import type { MeasurementRequest, PreflightResponse } from "../types";
 import { sharedStyles } from "../styles";
 
 export class PreflightView extends LitElement {
-  static properties = {
+  static readonly properties = {
     request: { attribute: false },
     preflight: { attribute: false },
     busy: { type: Boolean },
@@ -17,7 +17,7 @@ export class PreflightView extends LitElement {
   errorMessage = "";
   overwriteConfirmed = false;
 
-  static styles = [sharedStyles, css`
+  static readonly styles = [sharedStyles, css`
     .readout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); }
     .metric { padding: 1rem; background: var(--field); }
     .metric span { display: block; color: var(--muted); font-size: 0.75rem; }
