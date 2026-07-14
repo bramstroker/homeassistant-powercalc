@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from measure.execution import RunInteraction
+from measure.execution import OperatingPoint, RunInteraction
 from measure.ha_app.session import SessionControl
 
 
@@ -30,3 +30,6 @@ class SessionInteraction(RunInteraction):
 
     def checkpoint(self) -> None:
         self.control.checkpoint()
+
+    def operating_point(self, point: OperatingPoint) -> None:
+        self.control.operating_point(point)

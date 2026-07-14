@@ -13,6 +13,12 @@ export type SessionState =
 export type LutMode = "brightness" | "color_temp" | "hs" | "effect";
 export type DeviceClass = "power" | "voltage";
 
+export type OperatingPoint =
+  | { type: "light"; on: boolean; brightness?: number; color_temp_mired?: number; hue?: number; saturation?: number; effect?: string }
+  | { type: "speaker"; volume: number; muted: boolean }
+  | { type: "fan"; percentage: number; on: boolean }
+  | { type: "charging"; battery_level: number; charging: boolean };
+
 export interface EntityDescriptor {
   entity_id: string;
   name: string;
@@ -155,6 +161,7 @@ export interface SessionSnapshot {
   error?: { code?: string; message: string } | string | null;
   summary?: Record<string, string> | null;
   request?: MeasurementRequest;
+  operating_point?: OperatingPoint | null;
 }
 
 export interface SessionFile {
@@ -174,12 +181,21 @@ export interface SessionEventData {
   error?: string | null;
 }
 
-export interface SessionEvent {
+interface RegularSessionEvent {
   sequence: number;
   type: "progress" | "state" | "warning" | "log" | "checkpoint" | "heartbeat" | "sample";
   data: SessionEventData;
   snapshot?: SessionSnapshot;
 }
+
+interface OperatingPointSessionEvent {
+  sequence: number;
+  type: "operating_point";
+  data: OperatingPoint;
+  snapshot?: SessionSnapshot;
+}
+
+export type SessionEvent = RegularSessionEvent | OperatingPointSessionEvent;
 
 export interface AppSettings {
   default_power_entity_id: string | null;

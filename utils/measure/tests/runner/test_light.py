@@ -86,6 +86,9 @@ def test_run(export_path: str) -> None:
     remaining = [call.kwargs["remaining_seconds"] for call in interaction.progress.call_args_list]
     assert remaining[0] > remaining[-1]
     assert remaining[-1] == 0
+    points = [call.args[0] for call in interaction.operating_point.call_args_list]
+    assert points[0] == {"type": "light", "on": True, "brightness": 1}
+    assert points[-1] == {"type": "light", "on": True, "brightness": 255}
 
 
 def test_cleanup_turns_off_light() -> None:

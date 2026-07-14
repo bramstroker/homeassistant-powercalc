@@ -5,9 +5,9 @@ from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 from threading import Event, Lock
-from typing import Any
+from typing import Any, cast
 
-from measure.execution import MeasurementCancelledError
+from measure.execution import MeasurementCancelledError, OperatingPoint
 
 
 class SessionState(StrEnum):
@@ -42,6 +42,7 @@ class SessionEventType(StrEnum):
     LOG = "log"
     CHECKPOINT = "checkpoint"
     SAMPLE = "sample"
+    OPERATING_POINT = "operating_point"
 
 
 @dataclass(frozen=True)
@@ -72,6 +73,7 @@ class SessionSnapshot:
     warnings: tuple[str, ...] = ()
     event_sequence: int = 0
     summary: dict[str, str] | None = None
+    operating_point: OperatingPoint | None = None
 
     @property
     def progress(self) -> float:
@@ -174,3 +176,6 @@ class SessionControl:
     def sample(self, power: float) -> None:
         """Emit a transient live power reading for realtime visualisation."""
         self.emit(SessionEventType.SAMPLE, {"power": round(power, 2)})
+
+    def operating_point(self, point: OperatingPoint) -> None:
+        self.emit(SessionEventType.OPERATING_POINT, cast(dict[str, Any], dict(point)))

@@ -47,9 +47,22 @@ jobs:
             measure/assembler.py \
             measure/execution.py \
             measure/model.py \
+            measure/home_assistant.py \
+            measure/home_assistant_entities.py \
+            measure/cli/interaction.py \
+            measure/cli/main.py \
+            measure/cli/measurements.py \
+            measure/cli/questions.py \
+            measure/controller/charging/spec.py \
+            measure/controller/light/capabilities.py \
             measure/controller/light/hass.py \
             measure/runner/light_plan.py \
             measure/runner/light.py \
+            measure/runner/speaker.py \
+            measure/runner/fan.py \
+            measure/runner/charging.py \
+            measure/ha_app/interaction.py \
+            measure/ha_app/session.py \
             measure/ha_app/storage.py \
             measure/ha_app/coordinator.py \
             measure/ha_app/service.py \

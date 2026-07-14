@@ -3,12 +3,43 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import time
-from typing import Any, Protocol
+from typing import Any, Literal, NotRequired, Protocol, TypedDict
 
 from measure.model import write_model_json
 from measure.request import MeasurementRequest
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasureUtilInteraction
+
+
+class LightOperatingPoint(TypedDict):
+    type: Literal["light"]
+    on: bool
+    brightness: NotRequired[int]
+    color_temp_mired: NotRequired[int]
+    hue: NotRequired[int]
+    saturation: NotRequired[int]
+    effect: NotRequired[str]
+
+
+class SpeakerOperatingPoint(TypedDict):
+    type: Literal["speaker"]
+    volume: int
+    muted: bool
+
+
+class FanOperatingPoint(TypedDict):
+    type: Literal["fan"]
+    percentage: int
+    on: bool
+
+
+class ChargingOperatingPoint(TypedDict):
+    type: Literal["charging"]
+    battery_level: int
+    charging: bool
+
+
+type OperatingPoint = LightOperatingPoint | SpeakerOperatingPoint | FanOperatingPoint | ChargingOperatingPoint
 
 
 class RunInteraction(MeasureUtilInteraction, Protocol):
@@ -22,6 +53,9 @@ class RunInteraction(MeasureUtilInteraction, Protocol):
 
     def checkpoint(self) -> None:
         """Raise when the active run has been cancelled."""
+
+    def operating_point(self, point: OperatingPoint) -> None:
+        """Report the device state currently being measured."""
 
 
 class MeasurementCancelledError(Exception):
@@ -47,6 +81,9 @@ class ImmediateInteraction(RunInteraction):
         time.sleep(seconds)
 
     def checkpoint(self) -> None:
+        return
+
+    def operating_point(self, point: OperatingPoint) -> None:
         return
 
 

@@ -146,7 +146,7 @@ export class SessionEventStream {
     };
     source.onerror = () => this.onConnection(false);
     source.onmessage = (event) => this.consume(event.data);
-    for (const type of ["progress", "state", "warning", "log", "checkpoint", "heartbeat", "sample"] as const) {
+    for (const type of ["progress", "state", "warning", "log", "checkpoint", "heartbeat", "sample", "operating_point"] as const) {
       source.addEventListener(type, (event) => this.consume((event as MessageEvent<string>).data));
     }
   }

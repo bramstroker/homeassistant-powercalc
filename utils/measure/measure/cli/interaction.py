@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 
-from measure.execution import RunInteraction
+from measure.execution import OperatingPoint, RunInteraction
 
 
 class ConsoleInteraction(RunInteraction):
@@ -28,4 +28,7 @@ class ConsoleInteraction(RunInteraction):
         time.sleep(seconds)
 
     def checkpoint(self) -> None:
+        return
+
+    def operating_point(self, point: OperatingPoint) -> None:
         return

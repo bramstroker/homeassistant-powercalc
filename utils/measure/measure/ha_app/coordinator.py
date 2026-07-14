@@ -6,10 +6,10 @@ import logging
 from pathlib import Path
 from threading import Lock, Thread
 import time
-from typing import Protocol
+from typing import Protocol, cast
 from uuid import uuid4
 
-from measure.execution import MeasurementCancelledError
+from measure.execution import MeasurementCancelledError, OperatingPoint
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
     SessionControl,
@@ -208,6 +208,13 @@ class MeasurementCoordinator:
                     total=int(event.data["total"]),
                     mode=str(event.data["mode"]),
                     estimated_remaining=str(event.data["estimated_remaining"]),
+                )
+            elif event.type == SessionEventType.OPERATING_POINT:
+                self._snapshot = replace(
+                    self._snapshot,
+                    event_sequence=event.sequence,
+                    updated_at=event.created_at,
+                    operating_point=cast(OperatingPoint, event.data),
                 )
             elif event.type == SessionEventType.WARNING:
                 self._snapshot = replace(

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from threading import Event, Thread
 
-from measure.execution import MeasurementCancelledError
+from measure.execution import FanOperatingPoint, MeasurementCancelledError
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType
 import pytest
 
@@ -38,6 +38,18 @@ def test_sample_emits_rounded_power_reading() -> None:
 
     assert events[0].type == SessionEventType.SAMPLE
     assert events[0].data == {"power": 4.21}
+
+
+def test_operating_point_emits_typed_device_state() -> None:
+    control = SessionControl()
+    events = []
+    control.subscribe(events.append)
+    point = FanOperatingPoint(type="fan", percentage=35, on=True)
+
+    control.operating_point(point)
+
+    assert events[0].type == SessionEventType.OPERATING_POINT
+    assert events[0].data == point
 
 
 def test_confirmation_emits_checkpoint_and_continues() -> None:

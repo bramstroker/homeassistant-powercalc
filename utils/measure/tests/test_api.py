@@ -8,6 +8,7 @@ from unittest.mock import MagicMock
 
 from fastapi.testclient import TestClient
 from measure.const import MeasureType
+from measure.execution import LightOperatingPoint
 from measure.ha_app.api import create_app
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionMeasurementService
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
@@ -125,6 +126,7 @@ class CompletingService(SessionMeasurementService):
         directory = output_root / request.model_id
         directory.mkdir(parents=True)
         (directory / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
+        control.operating_point(LightOperatingPoint(type="light", on=True, brightness=128))
         control.progress(completed=1, total=1, mode="brightness", estimated_remaining="0s")
         return RunnerResult(model_json_data={})
 
@@ -319,6 +321,7 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     current = test_client.get("/api/session/current")
     assert current.status_code == 200
     assert current.json()["progress"]["estimated_remaining_seconds"] == 0
+    assert current.json()["operating_point"] == {"type": "light", "on": True, "brightness": 128}
     files = test_client.get("/api/session/current/files")
     assert files.json()[0]["name"] == "LCT010/brightness.csv"
     download = test_client.get("/api/session/current/files/LCT010/brightness.csv")

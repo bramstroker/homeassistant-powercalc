@@ -4,7 +4,7 @@ import time
 from measure.controller.charging.const import ATTR_BATTERY_LEVEL, ChargingDeviceType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import ChargingControllerError
-from measure.execution import ImmediateInteraction, RunInteraction
+from measure.execution import ChargingOperatingPoint, ImmediateInteraction, RunInteraction
 from measure.request import ChargingMeasurementRequest
 from measure.runner.errors import RunnerError
 from measure.runner.runner import MeasurementRunner, RunnerResult
@@ -47,6 +47,13 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         self.interaction.confirm("Ready to start charging measurement.")
 
         battery_level = self.controller.get_battery_level()
+        self.interaction.operating_point(
+            ChargingOperatingPoint(
+                type="charging",
+                battery_level=battery_level,
+                charging=self.controller.is_charging(),
+            ),
+        )
         measurements: dict[int, list[float]] = {}
         voltages: list[float] = []
 
@@ -58,6 +65,13 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
             try:
                 battery_level = self.controller.get_battery_level()
                 is_charging = self.controller.is_charging()
+                self.interaction.operating_point(
+                    ChargingOperatingPoint(
+                        type="charging",
+                        battery_level=battery_level,
+                        charging=is_charging,
+                    ),
+                )
                 if not is_charging:
                     raise RunnerError("Device is not charging anymore.")
                 _LOGGER.info("Battery level: %d%%", battery_level)

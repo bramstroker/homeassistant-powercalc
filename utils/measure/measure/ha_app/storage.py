@@ -9,11 +9,12 @@ import logging
 import os
 from pathlib import Path
 import shutil
-from typing import Any
+from typing import Any, cast
 from uuid import uuid4
 
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
+from measure.execution import OperatingPoint
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
@@ -154,6 +155,7 @@ class SessionStorage:
                 warnings=tuple(state.get("warnings", [])),
                 event_sequence=int(state.get("event_sequence", 0)),
                 summary=state.get("summary"),
+                operating_point=cast(OperatingPoint | None, state.get("operating_point")),
             )
         except (OSError, KeyError, TypeError, ValueError) as error:
             _LOGGER.warning("Discarding incompatible current session pointer: %s", error)

@@ -13,7 +13,7 @@ from typing import Literal, TextIO
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
 from measure.controller.light.errors import ApiConnectionError
-from measure.execution import ImmediateInteraction, RunInteraction
+from measure.execution import ImmediateInteraction, LightOperatingPoint, RunInteraction
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
@@ -94,6 +94,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             _LOGGER.warning("Could not turn off the light during measurement cleanup: %s", error)
         else:
             _LOGGER.info("Turning off the light")
+            self.interaction.operating_point(LightOperatingPoint(type="light", on=False))
 
     def run(self, request: LightMeasurementRequest, export_directory: str) -> RunnerResult:
         self._configure(request)
@@ -277,6 +278,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                     on=True,
                     **asdict(variation),
                 )
+                self.interaction.operating_point(self._operating_point(mode, variation))
                 return
             except ApiConnectionError as error:
                 _LOGGER.warning("Failed to change light state: %s. Retrying...", error)
@@ -423,6 +425,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                     on=True,
                     **asdict(variation),
                 )
+                self.interaction.operating_point(self._operating_point(mode, variation))
                 # Wait a longer amount of time for the PM to settle
                 self._wait(self.config.sleep_time_nudge)
                 return self.take_power_measurement(mode, variation_start_time)
@@ -532,6 +535,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         """Measures the standby power (when the light is OFF)"""
         self._checkpoint()
         self.light_controller.change_light_state(LutMode.BRIGHTNESS, on=False)
+        self.interaction.operating_point(LightOperatingPoint(type="light", on=False))
         start_time = time.time()
         _LOGGER.info(
             "Measuring standby power. Waiting for %d seconds...",
@@ -550,6 +554,18 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                 "or using a dummy load.",
             )
             return MeasurementResult(power=0, voltages=[])
+
+    @staticmethod
+    def _operating_point(mode: LutMode, variation: Variation) -> LightOperatingPoint:
+        point = LightOperatingPoint(type="light", on=True, brightness=variation.bri)
+        if mode == LutMode.COLOR_TEMP and isinstance(variation, ColorTempVariation):
+            point["color_temp_mired"] = variation.ct
+        elif mode == LutMode.HS and isinstance(variation, HsVariation):
+            point["hue"] = variation.hue
+            point["saturation"] = variation.sat
+        elif mode == LutMode.EFFECT and isinstance(variation, EffectVariation):
+            point["effect"] = variation.effect
+        return point
 
 
 @dataclass(frozen=True)

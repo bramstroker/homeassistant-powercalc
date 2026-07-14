@@ -2,7 +2,7 @@ import logging
 import time
 
 from measure.controller.media.controller import MediaController
-from measure.execution import ImmediateInteraction, RunInteraction
+from measure.execution import ImmediateInteraction, RunInteraction, SpeakerOperatingPoint
 from measure.powermeter.errors import ZeroReadingError
 from measure.request import SpeakerMeasurementRequest
 from measure.runner.runner import MeasurementRunner, RunnerResult
@@ -54,6 +54,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
         for volume in range(10, 101, 10):
             _LOGGER.info("Setting volume to %d", volume)
             self.media_controller.set_volume(volume)
+            self.interaction.operating_point(SpeakerOperatingPoint(type="speaker", volume=volume, muted=False))
             if not disable_streaming:
                 _LOGGER.info("Start streaming noise")
                 self.media_controller.play_audio(STREAM_URL)
@@ -64,12 +65,14 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
 
         _LOGGER.info("Muting volume and waiting for %d seconds", SLEEP_MUTE)
         self.media_controller.mute_volume()
+        self.interaction.operating_point(SpeakerOperatingPoint(type="speaker", volume=0, muted=True))
         self.interaction.wait(SLEEP_MUTE)
         result = self.measure_util.take_average_measurement(duration)
         summary[0] = result.power
         voltages.extend(result.voltages)
 
         self.media_controller.set_volume(10)
+        self.interaction.operating_point(SpeakerOperatingPoint(type="speaker", volume=10, muted=False))
 
         self.interaction.notify("Summary of all average measurements:")
         for volume in summary:
@@ -90,6 +93,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
 
     def measure_standby_power(self) -> MeasurementResult:
         self.media_controller.turn_off()
+        self.interaction.operating_point(SpeakerOperatingPoint(type="speaker", volume=0, muted=True))
         start_time = time.time()
         _LOGGER.info(
             "Measuring standby power. Waiting for %d seconds...",

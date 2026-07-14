@@ -1,6 +1,6 @@
 import { LitElement, css, html, nothing, svg, type PropertyValues } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
-import type { SessionSnapshot } from "../types";
+import type { OperatingPoint, SessionSnapshot } from "../types";
 import { sharedStyles } from "../styles";
 
 export class RunningView extends LitElement {
@@ -33,6 +33,10 @@ export class RunningView extends LitElement {
     progress { position: relative; display: block; width: 100%; height: 8px; border: 0; border-radius: 99px; overflow: hidden; appearance: none; }
     progress::-webkit-progress-bar { background: var(--track); } progress::-webkit-progress-value { background: var(--signal); } progress::-moz-progress-bar { background: var(--signal); }
     .metrics { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.2rem; }
+    .operating-point { position: relative; margin-top: 1.2rem; }
+    .operating-point > span { display: block; margin-bottom: 0.55rem; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .state-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .state-chip { padding: 0.38rem 0.65rem; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--signal) 8%, var(--well)); font: 650 0.78rem/1 ui-monospace, monospace; color: var(--ink); }
     .metric span { display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
     .metric strong { display: block; margin-top: 0.25rem; font: 600 1rem/1.3 ui-monospace, monospace; }
     .topline-right { display: inline-flex; align-items: center; gap: 0.9rem; }
@@ -86,6 +90,7 @@ export class RunningView extends LitElement {
                    <progress max="100" aria-label="Recording"></progress>`
             : html`<div class="value" aria-label="${Math.round(percent)} percent complete">${Math.round(percent)}<small>%</small></div>
                    <progress max="100" .value=${percent}>${Math.round(percent)}%</progress>`}
+          ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
           <div class="metrics">
             <div class="metric"><span>Mode</span><strong>${this.snapshot.mode ?? "—"}</strong></div>
             <div class="metric"><span>${openEnded ? "Recorded" : timeBased ? "Seconds" : "Variation"}</span><strong>${openEnded ? progress.completed : html`${progress.completed} / ${progress.total}`}</strong></div>
@@ -131,6 +136,32 @@ export class RunningView extends LitElement {
         <div class="chart-scale"><span>${min.toFixed(1)} W</span><span>peak ${max.toFixed(1)} W</span></div>
       </div>
     `;
+  }
+
+  private renderOperatingPoint(point: OperatingPoint) {
+    const values = this.operatingPointValues(point);
+    return html`
+      <div class="operating-point" aria-live="polite">
+        <span>Current measurement point</span>
+        <div class="state-chips">${values.map((value) => html`<span class="state-chip">${value}</span>`)}</div>
+      </div>
+    `;
+  }
+
+  private operatingPointValues(point: OperatingPoint): string[] {
+    if (point.type === "light") {
+      if (!point.on) return ["Off"];
+      const values: string[] = [];
+      if (typeof point.brightness === "number") values.push(`Brightness ${Math.round(point.brightness / 255 * 100)}%`);
+      if (typeof point.color_temp_mired === "number") values.push(`Color temp ${Math.round(1_000_000 / point.color_temp_mired)} K`);
+      if (typeof point.hue === "number") values.push(`Hue ${Math.round(point.hue / 65_535 * 360)}°`);
+      if (typeof point.saturation === "number") values.push(`Saturation ${Math.round(point.saturation / 255 * 100)}%`);
+      if (point.effect) values.push(`Effect ${point.effect}`);
+      return values;
+    }
+    if (point.type === "speaker") return [point.muted ? "Muted" : `Volume ${point.volume}%`];
+    if (point.type === "fan") return [point.on ? `Fan speed ${point.percentage}%` : "Off"];
+    return [`Battery ${point.battery_level}%`, point.charging ? "Charging" : "Not charging"];
   }
 
   private renderLog() {

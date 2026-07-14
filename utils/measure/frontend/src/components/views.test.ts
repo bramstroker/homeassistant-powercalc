@@ -1,4 +1,4 @@
-import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, SessionSnapshot } from "../types";
+import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, SessionSnapshot } from "../types";
 import { AppShell } from "./app-shell";
 import "./result-view";
 import "./running-view";
@@ -440,6 +440,30 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector("svg.spark polyline.line")?.getAttribute("points")).toContain(",");
     expect(element.shadowRoot.querySelector(".chart-head strong")?.textContent).toContain("4.8");
     expect(element.shadowRoot.querySelector(".chart-scale")?.textContent).toContain("peak 5.1 W");
+  });
+
+  it.each([
+    [
+      { type: "light", on: true, brightness: 128, color_temp_mired: 370, hue: 32_768, saturation: 128 } as OperatingPoint,
+      ["Brightness 50%", "Color temp 2703 K", "Hue 180°", "Saturation 50%"],
+    ],
+    [{ type: "light", on: false } as OperatingPoint, ["Off"]],
+    [{ type: "speaker", volume: 40, muted: false } as OperatingPoint, ["Volume 40%"]],
+    [{ type: "speaker", volume: 0, muted: true } as OperatingPoint, ["Muted"]],
+    [{ type: "fan", percentage: 65, on: true } as OperatingPoint, ["Fan speed 65%"]],
+    [{ type: "charging", battery_level: 72, charging: true } as OperatingPoint, ["Battery 72%", "Charging"]],
+  ])("renders a compact current measurement point for %#", async (operatingPoint, expected) => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", operating_point: operatingPoint };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const state = element.shadowRoot.querySelector(".operating-point");
+    expect(state?.getAttribute("aria-live")).toBe("polite");
+    expect(state?.textContent).toContain("Current measurement point");
+    for (const value of expected) expect(state?.textContent).toContain(value);
   });
 
   it("hides the power chart until the first sample arrives", async () => {

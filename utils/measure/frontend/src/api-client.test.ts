@@ -99,4 +99,32 @@ describe("SessionEventStream", () => {
 
     expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "heartbeat", snapshot: { state: "running" } }));
   });
+
+  it("consumes named operating-point events", () => {
+    const listeners = new Map<string, EventListener>();
+    const fake = {
+      close: vi.fn(),
+      onopen: null,
+      onerror: null,
+      onmessage: null,
+      addEventListener: vi.fn((type: string, listener: EventListener) => listeners.set(type, listener)),
+    };
+    const onEvent = vi.fn();
+    const stream = new SessionEventStream("events", onEvent, vi.fn(), vi.fn(), () => fake as unknown as EventSource);
+
+    stream.connect();
+    listeners.get("operating_point")?.(new MessageEvent("operating_point", {
+      data: JSON.stringify({
+        sequence: 3,
+        type: "operating_point",
+        data: { type: "fan", percentage: 35, on: true },
+        snapshot: { state: "running", operating_point: { type: "fan", percentage: 35, on: true } },
+      }),
+    }));
+
+    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({
+      type: "operating_point",
+      data: { type: "fan", percentage: 35, on: true },
+    }));
+  });
 });

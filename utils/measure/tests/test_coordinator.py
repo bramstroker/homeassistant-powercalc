@@ -5,6 +5,7 @@ from threading import Event
 import time
 
 from measure.controller.light.spec import DummyLightControllerSpec
+from measure.execution import LightOperatingPoint
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError, SessionMeasurementService
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
@@ -75,6 +76,18 @@ class SamplingService(SessionMeasurementService):
     ) -> RunnerResult:
         control.sample(4.2)
         return RunnerResult(model_json_data={})
+
+
+class OperatingPointService(SessionMeasurementService):
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        output_root: Path,
+    ) -> RunnerResult:
+        control.operating_point(LightOperatingPoint(type="light", on=True, brightness=128))
+        control.wait(60)
+        raise AssertionError("Cancelled wait returned")
 
 
 def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
@@ -152,3 +165,22 @@ def test_coordinator_reloads_persisted_events_for_reconnect(tmp_path: Path) -> N
     reloaded = MeasurementCoordinator(storage, CompletingService)
 
     assert [event.sequence for event in reloaded.events_since(0)] == [1, 2]
+
+
+def test_coordinator_projects_and_persists_operating_point(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, OperatingPointService)
+    coordinator.start(light_request())
+
+    deadline = time.monotonic() + 1
+    while coordinator.current and coordinator.current.operating_point is None and time.monotonic() < deadline:
+        time.sleep(0.01)
+
+    assert coordinator.current is not None
+    assert coordinator.current.operating_point == {"type": "light", "on": True, "brightness": 128}
+    persisted = storage.load_current()
+    assert persisted is not None
+    assert persisted.operating_point == coordinator.current.operating_point
+
+    coordinator.cancel()
+    wait_for_state(coordinator, SessionState.CANCELLED)

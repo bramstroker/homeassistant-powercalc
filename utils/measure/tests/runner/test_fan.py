@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 from measure.controller.fan.dummy import DummyFanController
 from measure.controller.fan.spec import DummyFanControllerSpec
+from measure.execution import RunInteraction
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import FanMeasurementRequest
 from measure.runner.fan import FanRunner
@@ -52,3 +53,22 @@ def test_run(export_path: str) -> None:
     assert model_data["device_type"] == "fan"
     assert model_data["calculation_strategy"] == "linear"
     assert "linear_config" in model_data
+
+
+def test_run_reports_fan_percentage_operating_points(export_path: str) -> None:
+    measure_util = MagicMock(MeasureUtil)
+    measure_util.take_average_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    runner = FanRunner(measure_util, DummyFanController(), interaction)
+    request = FanMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyFanControllerSpec(),
+    )
+
+    runner.run(request, export_path)
+
+    points = [call.args[0] for call in interaction.operating_point.call_args_list]
+    assert points[0] == {"type": "fan", "percentage": 5, "on": True}
+    assert points[-1] == {"type": "fan", "percentage": 100, "on": True}

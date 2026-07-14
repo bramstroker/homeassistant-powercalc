@@ -1,7 +1,7 @@
 import logging
 
 from measure.controller.fan.controller import FanController
-from measure.execution import ImmediateInteraction, RunInteraction
+from measure.execution import FanOperatingPoint, ImmediateInteraction, RunInteraction
 from measure.request import FanMeasurementRequest
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasurementResult, MeasureUtil
@@ -32,6 +32,7 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
         for percentage in range(5, 101, 5):
             _LOGGER.info("Setting percentage to %d", percentage)
             self.fan_controller.set_percentage(percentage)
+            self.interaction.operating_point(FanOperatingPoint(type="fan", percentage=percentage, on=True))
             _LOGGER.info("Waiting %d seconds to measure power", SLEEP_TIME_PERCENTAGE_CHANGE)
             self.interaction.wait(SLEEP_TIME_PERCENTAGE_CHANGE)
             result = self.measure_util.take_average_measurement(20)
@@ -53,6 +54,7 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
     def measure_standby_power(self) -> MeasurementResult:
         _LOGGER.info("Turning off fan to start measuring standby power")
         self.fan_controller.turn_off()
+        self.interaction.operating_point(FanOperatingPoint(type="fan", percentage=0, on=False))
         _LOGGER.info("Waiting %d seconds to measure power", SLEEP_TIME_PERCENTAGE_CHANGE)
         self.interaction.wait(SLEEP_TIME_PERCENTAGE_CHANGE)
         return self.measure_util.take_average_measurement(20)

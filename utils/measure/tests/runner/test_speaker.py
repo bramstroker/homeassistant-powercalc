@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 from measure.controller.media.controller import MediaController
 from measure.controller.media.spec import DummyMediaControllerSpec
+from measure.execution import RunInteraction
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import SpeakerMeasurementRequest
 from measure.runner.speaker import SpeakerRunner
@@ -47,3 +48,26 @@ def test_streaming_is_started_for_every_volume_level() -> None:
     _run(media_controller)
 
     assert media_controller.play_audio.call_count == 10
+
+
+def test_run_reports_volume_and_muted_operating_points() -> None:
+    media_controller = MagicMock(MediaController)
+    measure_util = MagicMock(MeasureUtil)
+    measure_util.take_average_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    runner = SpeakerRunner(measure_util, MeasurementParameters(), media_controller, interaction)
+    request = SpeakerMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyMediaControllerSpec(),
+    )
+
+    runner.run(request, "")
+
+    points = [call.args[0] for call in interaction.operating_point.call_args_list]
+    assert points[:2] == [
+        {"type": "speaker", "volume": 10, "muted": False},
+        {"type": "speaker", "volume": 20, "muted": False},
+    ]
+    assert {"type": "speaker", "volume": 0, "muted": True} in points

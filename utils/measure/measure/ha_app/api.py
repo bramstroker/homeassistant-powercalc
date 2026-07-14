@@ -490,6 +490,7 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[s
         "warnings": list(snapshot.warnings),
         "error": snapshot.error,
         "summary": snapshot.summary,
+        "operating_point": snapshot.operating_point,
         "request": request,
     }
 
