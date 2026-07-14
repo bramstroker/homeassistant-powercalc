@@ -97,6 +97,10 @@ jobs:
         run: |
           version=$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV.fetch(0))).fetch("version")' utils/measure/home-assistant-app/powercalc_measure/config.yaml)
           echo "version=${version}" >> "$GITHUB_OUTPUT"
+      - name: Write app version file
+        run: 'echo "${APP_VERSION}:app" > utils/measure/.VERSION'
+        env:
+          APP_VERSION: ${{ steps.app.outputs.version }}
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
