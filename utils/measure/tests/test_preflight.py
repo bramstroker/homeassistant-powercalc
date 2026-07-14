@@ -83,9 +83,10 @@ def test_preflight_validates_runtime_dependencies_for_every_non_light_kind(paylo
 
 def test_preflight_rejects_missing_hass_power_entity_for_non_light_kind() -> None:
     request = AverageMeasurementRequest(power_meter=HassPowerMeterSpec(entity_id="sensor.missing"))
+    checker = preflight(base_entities())
 
     with pytest.raises(PreflightError, match="power entity"):
-        preflight(base_entities()).validate(request)
+        checker.validate(request)
 
 
 @pytest.mark.parametrize(
@@ -126,8 +127,10 @@ def test_preflight_rejects_missing_hass_power_entity_for_non_light_kind() -> Non
     ],
 )
 def test_preflight_requires_ha_device_entities(measurement: Any, message: str) -> None:  # noqa: ANN401
+    checker = preflight(base_entities())
+
     with pytest.raises(PreflightError, match=message):
-        preflight(base_entities()).validate(measurement)
+        checker.validate(measurement)
 
 
 def test_preflight_rejects_charging_type_entity_domain_mismatch() -> None:
@@ -136,9 +139,10 @@ def test_preflight_rejects_charging_type_entity_domain_mismatch() -> None:
         controller=HassChargingControllerSpec(entity_id="vacuum.test"),
         charging_device_type="lawn_mower_robot",
     )
+    checker = preflight(base_entities())
 
     with pytest.raises(PreflightError, match="does not match"):
-        preflight(base_entities()).validate(request)
+        checker.validate(request)
 
 
 def test_light_preflight_returns_supported_modes_and_estimate() -> None:
@@ -229,13 +233,19 @@ def test_hs_preflight_uses_historical_native_resolution_by_default() -> None:
 
 
 def test_preflight_reports_active_session_before_external_checks() -> None:
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    checker = preflight({}, active=True)
+
     with pytest.raises(ActiveSessionError):
-        preflight({}, active=True).validate(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec()))
+        checker.validate(request)
 
 
 def test_preflight_reports_unwritable_storage() -> None:
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    checker = preflight({}, writable=False)
+
     with pytest.raises(PreflightError, match="not writable"):
-        preflight({}, writable=False).validate(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec()))
+        checker.validate(request)
 
 
 def test_non_hass_power_meter_does_not_require_power_entity() -> None:

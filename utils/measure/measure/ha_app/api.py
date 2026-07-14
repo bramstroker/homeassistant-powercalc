@@ -151,13 +151,13 @@ def create_app(
     token = hass_token or os.environ.get("SUPERVISOR_TOKEN")
     if not token:
         raise RuntimeError("SUPERVISOR_TOKEN is required to start the Home Assistant app")
+    if trusted_ingress_only is None:
+        trusted_ingress_only = os.environ.get("MEASURE_TRUSTED_INGRESS_ONLY", "false").lower() == "true"
     context = AppContext(
         data_root=data_root,
         hass_url=hass_url,
         hass_token=token,
-        trusted_ingress_only=(os.environ.get("MEASURE_TRUSTED_INGRESS_ONLY", "false").lower() == "true")
-        if trusted_ingress_only is None
-        else trusted_ingress_only,
+        trusted_ingress_only=trusted_ingress_only,
     )
     app = FastAPI(title="Powercalc Measure", version="0.1.0", docs_url=None, redoc_url=None, lifespan=_lifespan)
     app.state.context = context
@@ -174,6 +174,22 @@ def create_app(
             return JSONResponse(status_code=403, content=error.model_dump())
         return await call_next(request)
 
+    _register_error_handlers(app)
+
+    assets = static_root or Path(__file__).parent.parent / "static"
+    if assets.exists():
+        assets_directory = assets / "assets"
+        if assets_directory.exists():
+            app.mount("/assets", StaticFiles(directory=assets_directory), name="assets")
+
+        @app.get("/", include_in_schema=False)
+        async def index() -> FileResponse:
+            return FileResponse(assets / "index.html")
+
+    return app
+
+
+def _register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(RequestValidationError)
     async def validation_error(_: Request, error: RequestValidationError) -> JSONResponse:
         first = error.errors()[0] if error.errors() else {}
@@ -209,18 +225,6 @@ def create_app(
             status_code=500,
             content=ErrorResponse(code="internal_error", message="Internal server error").model_dump(),
         )
-
-    assets = static_root or Path(__file__).parent.parent / "static"
-    if assets.exists():
-        assets_directory = assets / "assets"
-        if assets_directory.exists():
-            app.mount("/assets", StaticFiles(directory=assets_directory), name="assets")
-
-        @app.get("/", include_in_schema=False)
-        async def index() -> FileResponse:
-            return FileResponse(assets / "index.html")
-
-    return app
 
 
 def _router() -> APIRouter:

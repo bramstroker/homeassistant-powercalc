@@ -1,6 +1,6 @@
 import { LitElement, css, html, nothing, svg, type PropertyValues } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
-import type { OperatingPoint, SessionSnapshot } from "../types";
+import type { OperatingPoint, SessionProgress, SessionSnapshot } from "../types";
 import { sharedStyles } from "../styles";
 
 type StateChipIcon =
@@ -91,8 +91,6 @@ export class RunningView extends LitElement {
   render() {
     const progress = this.snapshot.progress ?? { completed: 0, total: 0 };
     const openEnded = this.snapshot.mode === "Recording" && (progress.total ?? 0) === 0;
-    const timeBased = this.snapshot.mode === "Averaging";
-    const percent = progress.percent ?? (progress.total ? progress.completed / progress.total * 100 : 0);
     return html`
       <section class="panel" aria-labelledby="running-title">
         <p class="eyebrow">03 / Measurement</p>
@@ -105,29 +103,50 @@ export class RunningView extends LitElement {
               <span class="connection ${this.connected ? "connected" : ""}" role="status">${this.connected ? "Live" : "Reconnecting"}</span>
             </span>
           </div>
-          ${openEnded
-            ? html`<div class="value" aria-label="${progress.completed} samples recorded">${progress.completed}<small>samples</small></div>
-                   <progress max="100" aria-label="Recording"></progress>`
-            : html`<div class="value" aria-label="${Math.round(percent)} percent complete">${Math.round(percent)}<small>%</small></div>
-                   <progress max="100" .value=${percent}>${Math.round(percent)}%</progress>`}
+          ${this.renderProgress(openEnded, progress)}
           ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
-          <div class="metrics">
-            <div class="metric"><span>Mode</span><strong>${this.snapshot.mode ?? "—"}</strong></div>
-            <div class="metric"><span>${openEnded ? "Recorded" : timeBased ? "Seconds" : "Variation"}</span><strong>${openEnded ? progress.completed : html`${progress.completed} / ${progress.total}`}</strong></div>
-            <div class="metric"><span>Remaining</span><strong>${openEnded ? "Until stopped" : this.remaining(progress.estimated_remaining_seconds)}</strong></div>
-          </div>
+          ${this.renderMetrics(openEnded, progress)}
           ${this.samples.length ? this.renderChart() : nothing}
         </div>
         ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
         ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
         <div class="actions">
           ${this.snapshot.state === "awaiting_confirmation" ? html`<button class="primary" type="button" @click=${this.confirm} ?disabled=${this.busy}>Start measurement</button>` : nothing}
-          ${openEnded
-            ? html`<button class="primary" type="button" @click=${this.cancel} ?disabled=${this.busy || this.snapshot.state === "cancelling"}>${this.snapshot.state === "cancelling" ? "Stopping…" : "Stop recording"}</button>`
-            : html`<button class="danger" type="button" @click=${this.cancel} ?disabled=${this.busy || this.snapshot.state === "cancelling"}>${this.snapshot.state === "cancelling" ? "Cancelling…" : "Cancel measurement"}</button>`}
+          ${this.renderStopButton(openEnded)}
         </div>
       </section>
     `;
+  }
+
+  private renderProgress(openEnded: boolean, progress: SessionProgress) {
+    if (openEnded) {
+      return html`<div class="value" aria-label="${progress.completed} samples recorded">${progress.completed}<small>samples</small></div>
+                  <progress max="100" aria-label="Recording"></progress>`;
+    }
+    const percent = progress.percent ?? (progress.total ? progress.completed / progress.total * 100 : 0);
+    return html`<div class="value" aria-label="${Math.round(percent)} percent complete">${Math.round(percent)}<small>%</small></div>
+                <progress max="100" .value=${percent}>${Math.round(percent)}%</progress>`;
+  }
+
+  private renderMetrics(openEnded: boolean, progress: SessionProgress) {
+    let progressLabel = "Variation";
+    if (openEnded) progressLabel = "Recorded";
+    else if (this.snapshot.mode === "Averaging") progressLabel = "Seconds";
+    return html`
+      <div class="metrics">
+        <div class="metric"><span>Mode</span><strong>${this.snapshot.mode ?? "—"}</strong></div>
+        <div class="metric"><span>${progressLabel}</span><strong>${openEnded ? progress.completed : html`${progress.completed} / ${progress.total}`}</strong></div>
+        <div class="metric"><span>Remaining</span><strong>${openEnded ? "Until stopped" : this.remaining(progress.estimated_remaining_seconds)}</strong></div>
+      </div>
+    `;
+  }
+
+  private renderStopButton(openEnded: boolean) {
+    const cancelling = this.snapshot.state === "cancelling";
+    if (openEnded) {
+      return html`<button class="primary" type="button" @click=${this.cancel} ?disabled=${this.busy || cancelling}>${cancelling ? "Stopping…" : "Stop recording"}</button>`;
+    }
+    return html`<button class="danger" type="button" @click=${this.cancel} ?disabled=${this.busy || cancelling}>${cancelling ? "Cancelling…" : "Cancel measurement"}</button>`;
   }
 
   private renderChart() {
@@ -171,24 +190,30 @@ export class RunningView extends LitElement {
   }
 
   private operatingPointChips(point: OperatingPoint): StateChip[] {
-    if (point.type === "light") {
-      if (!point.on) return [{ label: "Off", icon: "off" }];
-      const chips: StateChip[] = [];
-      if (typeof point.brightness === "number") chips.push({ label: `Brightness ${Math.round(point.brightness / 255 * 100)}%`, icon: "brightness" });
-      if (typeof point.color_temp_mired === "number") chips.push({ label: `Color temp ${Math.round(1_000_000 / point.color_temp_mired)} K`, icon: "color-temp" });
-      if (typeof point.hue === "number") chips.push({ label: `Hue ${Math.round(point.hue / 65_535 * 360)}°`, icon: "hue" });
-      if (typeof point.saturation === "number") chips.push({ label: `Saturation ${Math.round(point.saturation / 255 * 100)}%`, icon: "saturation" });
-      if (point.effect) chips.push({ label: `Effect ${point.effect}`, icon: "effect" });
-      return chips;
+    switch (point.type) {
+      case "light":
+        return this.lightChips(point);
+      case "speaker":
+        return [{ label: point.muted ? "Muted" : `Volume ${point.volume}%`, icon: point.muted ? "muted" : "volume" }];
+      case "fan":
+        return [{ label: point.on ? `Fan speed ${point.percentage}%` : "Off", icon: point.on ? "fan-speed" : "off" }];
+      case "charging":
+        return [
+          { label: `Battery ${point.battery_level}%`, icon: "battery" },
+          { label: point.charging ? "Charging" : "Not charging", icon: point.charging ? "charging" : "not-charging" },
+        ];
     }
-    if (point.type === "speaker") {
-      return [{ label: point.muted ? "Muted" : `Volume ${point.volume}%`, icon: point.muted ? "muted" : "volume" }];
-    }
-    if (point.type === "fan") return [{ label: point.on ? `Fan speed ${point.percentage}%` : "Off", icon: point.on ? "fan-speed" : "off" }];
-    return [
-      { label: `Battery ${point.battery_level}%`, icon: "battery" },
-      { label: point.charging ? "Charging" : "Not charging", icon: point.charging ? "charging" : "not-charging" },
-    ];
+  }
+
+  private lightChips(point: Extract<OperatingPoint, { type: "light" }>): StateChip[] {
+    if (!point.on) return [{ label: "Off", icon: "off" }];
+    const chips: StateChip[] = [];
+    if (typeof point.brightness === "number") chips.push({ label: `Brightness ${Math.round(point.brightness / 255 * 100)}%`, icon: "brightness" });
+    if (typeof point.color_temp_mired === "number") chips.push({ label: `Color temp ${Math.round(1_000_000 / point.color_temp_mired)} K`, icon: "color-temp" });
+    if (typeof point.hue === "number") chips.push({ label: `Hue ${Math.round(point.hue / 65_535 * 360)}°`, icon: "hue" });
+    if (typeof point.saturation === "number") chips.push({ label: `Saturation ${Math.round(point.saturation / 255 * 100)}%`, icon: "saturation" });
+    if (point.effect) chips.push({ label: `Effect ${point.effect}`, icon: "effect" });
+    return chips;
   }
 
   private stateIcon(icon: StateChipIcon) {

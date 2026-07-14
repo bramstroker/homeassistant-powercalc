@@ -40,5 +40,5 @@ def test_cli_environment_preserves_value_normalization(monkeypatch: pytest.Monke
     assert config.hs_bri_steps == 16
     assert config.measure_time_effect_min == 12
     assert config.measure_time_effect_convergence_window == 12
-    assert config.measure_time_effect_convergence_rel == 0.025
+    assert config.measure_time_effect_convergence_rel == pytest.approx(0.025)
     assert config.selected_measure_type == MeasureType.AVERAGE

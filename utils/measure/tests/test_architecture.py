@@ -98,19 +98,21 @@ def test_only_home_assistant_manager_constructs_websocket_clients() -> None:
         if path.name == "home_assistant.py":
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            if not isinstance(node, ast.Call):
-                continue
-            if isinstance(node.func, ast.Name):
-                name = node.func.id
-            elif isinstance(node.func, ast.Attribute):
-                name = node.func.attr
-            else:
-                name = None
-            if name == "HomeAssistantWebsocketClient":
-                violations.append(str(path.relative_to(MEASURE_ROOT)))
+        violations.extend(
+            str(path.relative_to(MEASURE_ROOT))
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and _call_name(node) == "HomeAssistantWebsocketClient"
+        )
 
     assert violations == []
+
+
+def _call_name(node: ast.Call) -> str | None:
+    if isinstance(node.func, ast.Name):
+        return node.func.id
+    if isinstance(node.func, ast.Attribute):
+        return node.func.attr
+    return None
 
 
 def test_runtime_service_bundle_is_not_reintroduced() -> None:

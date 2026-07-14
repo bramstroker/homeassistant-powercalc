@@ -118,11 +118,7 @@ export class SettingsView extends LitElement {
                     ${this.powers.map((entity) => html`<option value=${entity.entity_id} ?selected=${entity.entity_id === selected}>${entity.name} · ${entity.entity_id}</option>`)}
                   </select>
                 </label>` : nothing}
-                ${powerMeter === "dummy" ? nothing : html`
-                  <div class="test-row">
-                    <button type="button" @click=${this.test} ?disabled=${this.testing || this.busy}>${this.testing ? "Testing…" : "Test connection"}</button>
-                    ${this.renderTestResult()}
-                  </div>`}
+                ${powerMeter === "dummy" ? nothing : this.renderTestRow()}
               </div>
             </section>
 
@@ -148,6 +144,14 @@ export class SettingsView extends LitElement {
     `;
   }
 
+  private renderTestRow() {
+    return html`
+      <div class="test-row">
+        <button type="button" @click=${this.test} ?disabled=${this.testing || this.busy}>${this.testing ? "Testing…" : "Test connection"}</button>
+        ${this.renderTestResult()}
+      </div>`;
+  }
+
   private renderTestResult() {
     if (!this.testResult) return nothing;
     if (this.testResult.success) {
@@ -161,7 +165,8 @@ export class SettingsView extends LitElement {
     if (!element) return null;
     const data = new FormData(element);
     const value = data.get("default_power_entity_id");
-    const powerMeter = String(data.get("power_meter") ?? "hass") as AppSettings["power_meter"];
+    const powerMeterValue = data.get("power_meter");
+    const powerMeter = (typeof powerMeterValue === "string" ? powerMeterValue : "hass") as AppSettings["power_meter"];
     const shellyIp = data.get("shelly_ip");
     const measureDevice = data.get("default_measure_device");
     return {

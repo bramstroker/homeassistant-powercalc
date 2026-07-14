@@ -43,7 +43,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   testingPowerMeter = false;
   powerMeterTestResult?: PowerMeterTestResult;
 
-  private api: MeasureAppApi & Pick<MeasureApiClient, "fileUrl" | "eventsUrl"> = new MeasureApiClient();
+  private readonly api: MeasureAppApi & Pick<MeasureApiClient, "fileUrl" | "eventsUrl"> = new MeasureApiClient();
   private readonly controller = new MeasureAppController(
     this,
     () => this.api,
@@ -148,7 +148,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
 
   private reviewMetrics(): ReviewMetric[] {
-    if (!this.request || this.request.measure_type !== LIGHT_TYPE || !this.preflight) return [];
+    if (this.request?.measure_type !== LIGHT_TYPE || !this.preflight) return [];
     const duration = this.preflight.estimated_duration_seconds;
     return [
       { label: "Variations", value: String(this.preflight.estimated_variations ?? "—") },

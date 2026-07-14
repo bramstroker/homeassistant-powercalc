@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import cast
 from unittest.mock import MagicMock, patch
 
 import inquirer
@@ -70,7 +71,7 @@ def _entity(
 def _catalog(*entities: EntityDescriptor) -> HomeAssistantEntityCatalog:
     catalog = MagicMock(spec=HomeAssistantEntityCatalog)
     catalog.load_snapshot.return_value = EntityCatalogSnapshot(list(entities))
-    return catalog
+    return cast(HomeAssistantEntityCatalog, catalog)
 
 
 def test_every_measure_type_has_an_explicit_cli_builder() -> None:
@@ -303,10 +304,10 @@ def test_cli_reuses_and_closes_prefill_manager(mock_config_factory: MockConfigFa
         patch.object(measure, "ask_questions", return_value={}),
         patch("measure.cli.main.request_from_answers"),
         patch("measure.cli.main.MeasurementAssembler") as assembler,
-        pytest.raises(RuntimeError, match="stop after assembly"),
     ):
         assembler.return_value.assemble.side_effect = RuntimeError("stop after assembly")
-        measure.start()
+        with pytest.raises(RuntimeError, match="stop after assembly"):
+            measure.start()
 
     assert assembler.call_args.kwargs["home_assistant"] is home_assistant
     home_assistant.close.assert_called_once_with()

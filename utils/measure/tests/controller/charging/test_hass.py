@@ -53,8 +53,8 @@ def test_get_battery_level_attribute_error() -> None:
 
     client = _mock_client()
     client.get_entity.return_value = MagicMock(state=mocked_state)
+    hass_controller = _get_instance(client=client, battery_level_attribute=ATTR_BATTERY_LEVEL)
     with pytest.raises(BatteryLevelRetrievalError):
-        hass_controller = _get_instance(client=client, battery_level_attribute=ATTR_BATTERY_LEVEL)
         hass_controller.get_battery_level()
 
 
@@ -62,13 +62,12 @@ def test_get_battery_level_entity_error() -> None:
     """Test error when entity is not found."""
     client = _mock_client()
     client.get_entity.return_value = None
+    hass_controller = _get_instance(
+        client=client,
+        battery_level_source_type=BatteryLevelSourceType.ENTITY,
+        battery_level_entity_id="sensor.vacuum_battery",
+    )
     with pytest.raises(BatteryLevelRetrievalError):
-        hass_controller = _get_instance(
-            client=client,
-            battery_level_source_type=BatteryLevelSourceType.ENTITY,
-            battery_level_entity_id="sensor.vacuum_battery",
-        )
-
         hass_controller.get_battery_level()
 
 
@@ -83,13 +82,12 @@ def test_get_battery_level_entity_invalid_state() -> None:
 
     client = _mock_client()
     client.get_entity.return_value = mocked_entity
+    hass_controller = _get_instance(
+        client=client,
+        battery_level_source_type=BatteryLevelSourceType.ENTITY,
+        battery_level_entity_id="sensor.vacuum_battery",
+    )
     with pytest.raises(BatteryLevelRetrievalError):
-        hass_controller = _get_instance(
-            client=client,
-            battery_level_source_type=BatteryLevelSourceType.ENTITY,
-            battery_level_entity_id="sensor.vacuum_battery",
-        )
-
         hass_controller.get_battery_level()
 
 

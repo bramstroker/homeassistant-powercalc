@@ -84,7 +84,7 @@ def test_dummy_load_reuses_value_through_interaction_boundary(
     monkeypatch.setattr("measure.util.measure_util.PROJECT_DIR", tmp_path)
     measure_util = MeasureUtil(MagicMock(PowerMeter), mock_config_factory(), interaction=interaction)
 
-    assert measure_util.initialize_dummy_load() == 42.5
+    assert measure_util.initialize_dummy_load() == pytest.approx(42.5)
     assert interaction.notifications
 
 

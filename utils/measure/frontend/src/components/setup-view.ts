@@ -219,24 +219,24 @@ export class SetupView extends LitElement {
                 <option value="overwrite" ?selected=${request?.resume_policy === "overwrite"}>Delete it and start over</option>
               </select></label>
               <p class="advanced-heading">Sampling</p>
-              ${this.numberField("sleep_time", "Settle time (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, "0.1", "Wait after changing the light before reading power.")}
-              ${this.numberField("sample_count", "Samples per point", request?.parameters.sample_count ?? defaults.sample_count, 1, 100, "1", "More samples reduce noise but increase measurement time.", false, this.sampleCountChanged)}
-              ${this.numberField("sleep_time_sample", "Time between samples (seconds)", request?.parameters.sleep_time_sample ?? defaults.sleep_time_sample, 0, 120, "1", "Only used when taking more than one sample.", (request?.parameters.sample_count ?? defaults.sample_count) <= 1)}
-              ${this.numberField("min_brightness", "Minimum brightness", request?.parameters.min_brightness ?? defaults.min_brightness, 1, 255, "1", "Increase this when the light does not turn on at its lowest level.")}
+              ${this.numberField("sleep_time", "Settle time (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, { step: "0.1", hint: "Wait after changing the light before reading power." })}
+              ${this.numberField("sample_count", "Samples per point", request?.parameters.sample_count ?? defaults.sample_count, 1, 100, { hint: "More samples reduce noise but increase measurement time.", onInput: this.sampleCountChanged })}
+              ${this.numberField("sleep_time_sample", "Time between samples (seconds)", request?.parameters.sleep_time_sample ?? defaults.sleep_time_sample, 0, 120, { hint: "Only used when taking more than one sample.", disabled: (request?.parameters.sample_count ?? defaults.sample_count) <= 1 })}
+              ${this.numberField("min_brightness", "Minimum brightness", request?.parameters.min_brightness ?? defaults.min_brightness, 1, 255, { hint: "Increase this when the light does not turn on at its lowest level." })}
               ${this.numberField("sleep_initial", "Initial stabilization (seconds)", request?.parameters.sleep_initial ?? defaults.sleep_initial, 0, 3600)}
               ${this.numberField("sleep_standby", "Standby stabilization (seconds)", request?.parameters.sleep_standby ?? defaults.sleep_standby, 0, 3600)}
               <p class="advanced-heading">Profile resolution</p>
-              ${this.numberField("bri_bri_steps", "Brightness mode step", request?.parameters.bri_bri_steps ?? defaults.bri_bri_steps, 1, 255, "1", "Native brightness increment (1–255).", !selectedModes.includes("brightness"))}
-              ${this.numberField("ct_bri_steps", "Color temperature brightness step", request?.parameters.ct_bri_steps ?? defaults.ct_bri_steps, 1, 255, "1", "Native brightness increment used while measuring color temperature.", !selectedModes.includes("color_temp"))}
-              ${this.numberField("ct_mired_steps", "Color temperature mired step", request?.parameters.ct_mired_steps ?? defaults.ct_mired_steps, 1, 500, "1", "Native color-temperature increment in mired.", !selectedModes.includes("color_temp"))}
-              ${this.numberField("hs_bri_steps", "HS brightness step", request?.parameters.hs_bri_steps ?? defaults.hs_bri_steps, 1, 255, "1", "Native brightness increment used for hue and saturation.", !selectedModes.includes("hs"))}
-              ${this.numberField("hs_hue_steps", "HS hue step", request?.parameters.hs_hue_steps ?? defaults.hs_hue_steps, 1, 65535, "1", "Native Home Assistant hue increment (0–65535).", !selectedModes.includes("hs"))}
-              ${this.numberField("hs_sat_steps", "HS saturation step", request?.parameters.hs_sat_steps ?? defaults.hs_sat_steps, 1, 255, "1", "Native saturation increment (1–255).", !selectedModes.includes("hs"))}
+              ${this.numberField("bri_bri_steps", "Brightness mode step", request?.parameters.bri_bri_steps ?? defaults.bri_bri_steps, 1, 255, { hint: "Native brightness increment (1–255).", disabled: !selectedModes.includes("brightness") })}
+              ${this.numberField("ct_bri_steps", "Color temperature brightness step", request?.parameters.ct_bri_steps ?? defaults.ct_bri_steps, 1, 255, { hint: "Native brightness increment used while measuring color temperature.", disabled: !selectedModes.includes("color_temp") })}
+              ${this.numberField("ct_mired_steps", "Color temperature mired step", request?.parameters.ct_mired_steps ?? defaults.ct_mired_steps, 1, 500, { hint: "Native color-temperature increment in mired.", disabled: !selectedModes.includes("color_temp") })}
+              ${this.numberField("hs_bri_steps", "HS brightness step", request?.parameters.hs_bri_steps ?? defaults.hs_bri_steps, 1, 255, { hint: "Native brightness increment used for hue and saturation.", disabled: !selectedModes.includes("hs") })}
+              ${this.numberField("hs_hue_steps", "HS hue step", request?.parameters.hs_hue_steps ?? defaults.hs_hue_steps, 1, 65535, { hint: "Native Home Assistant hue increment (0–65535).", disabled: !selectedModes.includes("hs") })}
+              ${this.numberField("hs_sat_steps", "HS saturation step", request?.parameters.hs_sat_steps ?? defaults.hs_sat_steps, 1, 255, { hint: "Native saturation increment (1–255).", disabled: !selectedModes.includes("hs") })}
               <div class="grid effect-settings" ?hidden=${!selectedModes.includes("effect")}>
                 <p class="advanced-heading">Effect mode</p>
-                ${this.numberField("effect_bri_steps", "Effect brightness step", request?.parameters.effect_bri_steps ?? defaults.effect_bri_steps, 1, 255, "1", "Native brightness increment between long-running effect samples.", !selectedModes.includes("effect"))}
-                ${this.numberField("measure_time_effect_min", "Minimum time per effect (seconds)", request?.parameters.measure_time_effect_min ?? defaults.measure_time_effect_min, 1, 3600, "1", "An effect can stop after this time once its average converges.", !selectedModes.includes("effect"))}
-                ${this.numberField("measure_time_effect", "Maximum time per effect (seconds)", request?.parameters.measure_time_effect ?? defaults.measure_time_effect, 1, 3600, "1", "Upper time limit for every effect and brightness combination.", !selectedModes.includes("effect"))}
+                ${this.numberField("effect_bri_steps", "Effect brightness step", request?.parameters.effect_bri_steps ?? defaults.effect_bri_steps, 1, 255, { hint: "Native brightness increment between long-running effect samples.", disabled: !selectedModes.includes("effect") })}
+                ${this.numberField("measure_time_effect_min", "Minimum time per effect (seconds)", request?.parameters.measure_time_effect_min ?? defaults.measure_time_effect_min, 1, 3600, { hint: "An effect can stop after this time once its average converges.", disabled: !selectedModes.includes("effect") })}
+                ${this.numberField("measure_time_effect", "Maximum time per effect (seconds)", request?.parameters.measure_time_effect ?? defaults.measure_time_effect, 1, 3600, { hint: "Upper time limit for every effect and brightness combination.", disabled: !selectedModes.includes("effect") })}
               </div>
             </div>
           </details>
@@ -296,12 +296,12 @@ export class SetupView extends LitElement {
     return html`<details>
       <summary>Advanced timing & quality</summary>
       <div class="grid">
-        ${this.numberField("sleep_time", "Reading interval (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, "0.1", "Delay between repeated power readings and retries.")}
+        ${this.numberField("sleep_time", "Reading interval (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, { step: "0.1", hint: "Delay between repeated power readings and retries." })}
         ${supportsPointSamples
-          ? this.numberField("sample_count", "Samples per reading", request?.parameters.sample_count ?? defaults.sample_count, 1, 100, "1", "More samples reduce noise but increase measurement time.", false, this.sampleCountChanged)
+          ? this.numberField("sample_count", "Samples per reading", request?.parameters.sample_count ?? defaults.sample_count, 1, 100, { hint: "More samples reduce noise but increase measurement time.", onInput: this.sampleCountChanged })
           : nothing}
         ${supportsPointSamples
-          ? this.numberField("sleep_time_sample", "Time between samples (seconds)", request?.parameters.sleep_time_sample ?? defaults.sleep_time_sample, 0, 120, "1", "Only used when taking more than one sample.", (request?.parameters.sample_count ?? defaults.sample_count) <= 1)
+          ? this.numberField("sleep_time_sample", "Time between samples (seconds)", request?.parameters.sleep_time_sample ?? defaults.sleep_time_sample, 0, 120, { hint: "Only used when taking more than one sample.", disabled: (request?.parameters.sample_count ?? defaults.sample_count) <= 1 })
           : nothing}
         ${type === "speaker"
           ? this.numberField("sleep_standby", "Standby stabilization (seconds)", request?.parameters.sleep_standby ?? defaults.sleep_standby, 0, 3600)
@@ -324,11 +324,9 @@ export class SetupView extends LitElement {
     value: number,
     fallbackMin: number,
     fallbackMax: number,
-    step = "1",
-    hint = "",
-    disabled = false,
-    onInput: ((event: Event) => void) | null = null,
+    options: { step?: string; hint?: string; disabled?: boolean; onInput?: (event: Event) => void } = {},
   ) {
+    const { step = "1", hint = "", disabled = false, onInput = null } = options;
     // Bounds come from the capabilities endpoint so the form cannot drift from
     // server-side validation; the literals only cover fields without server limits.
     const { min, max } = this.capabilities?.limits?.[name] ?? { min: fallbackMin, max: fallbackMax };
@@ -553,7 +551,8 @@ export class SetupView extends LitElement {
       this.errorMessage = `Could not load ${failedDomain} entities. Retry before starting the measurement.`;
       return;
     }
-    const powerEntityId = String(form.get("power_entity_id") ?? "");
+    const powerEntityValue = form.get("power_entity_id");
+    const powerEntityId = typeof powerEntityValue === "string" ? powerEntityValue : "";
     const voltageEntityId = this.relatedVoltageEntityId(powerEntityId) || null;
     const request = buildNonLightRequest(definition, form, this.capabilities, this.powerMeterSpec(powerEntityId, voltageEntityId));
     if (request.measure_type === "charging") {

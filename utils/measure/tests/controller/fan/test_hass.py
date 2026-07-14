@@ -16,8 +16,9 @@ def test_set_percentage() -> None:
 def test_set_percentage_error() -> None:
     client = _mock_client()
     client.trigger_service.side_effect = HomeassistantAPIError("Error")
+    controller = _get_instance(client)
     with pytest.raises(ControllerError):
-        _get_instance(client).set_percentage(80)
+        controller.set_percentage(80)
 
 
 def test_turn_off() -> None:

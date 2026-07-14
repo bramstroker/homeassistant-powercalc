@@ -435,7 +435,7 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
     assert reloaded["measurement_defaults"]["sample_count"] == 4
     effective_defaults = test_client.get("/api/capabilities").json()["defaults"]
     assert effective_defaults["sample_count"] == 4
-    assert effective_defaults["sleep_time"] == 3.5
+    assert effective_defaults["sleep_time"] == pytest.approx(3.5)
 
 
 def test_settings_rejects_invalid_entity(tmp_path: Path) -> None:

@@ -156,9 +156,11 @@ def test_request_rejects_unknown_fields() -> None:
     ["../record.csv", "folder/record.csv", r"folder\record.csv", "..", "bad:name.csv"],
 )
 def test_recorder_request_rejects_unsafe_export_filename(export_filename: str) -> None:
+    power_meter = DummyPowerMeterSpec()
+
     with pytest.raises(ValidationError):
         RecorderMeasurementRequest(
-            power_meter=DummyPowerMeterSpec(),
+            power_meter=power_meter,
             export_filename=export_filename,
         )
 
@@ -180,7 +182,7 @@ def test_request_preserves_subsecond_sleep_time() -> None:
         parameters={"sleep_time": 0.25},
     )
 
-    assert request.parameters.sleep_time == 0.25
+    assert request.parameters.sleep_time == pytest.approx(0.25)
 
 
 def test_measurement_parameters_default_to_historical_native_light_grid() -> None:
@@ -214,8 +216,10 @@ def test_measurement_parameters_preserve_explicit_native_steps() -> None:
 
 @pytest.mark.parametrize("field", ["brightness_step", "color_temp_step", "hue_step", "saturation_step"])
 def test_light_request_rejects_removed_percentage_step_fields(field: str) -> None:
+    payload = valid_request() | {"parameters": {field: 5}}
+
     with pytest.raises(ValidationError):
-        LightMeasurementRequest.model_validate(valid_request() | {"parameters": {field: 5}})
+        LightMeasurementRequest.model_validate(payload)
 
 
 @pytest.mark.parametrize(
@@ -232,5 +236,7 @@ def test_light_request_rejects_removed_percentage_step_fields(field: str) -> Non
     ],
 )
 def test_request_rejects_invalid_exposed_tuning(parameters: dict[str, int], message: str) -> None:
+    payload = valid_request() | {"parameters": parameters}
+
     with pytest.raises(ValidationError, match=message):
-        LightMeasurementRequest.model_validate(valid_request() | {"parameters": parameters})
+        LightMeasurementRequest.model_validate(payload)

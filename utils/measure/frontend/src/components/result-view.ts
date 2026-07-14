@@ -58,15 +58,7 @@ export class ResultView extends LitElement {
         </div>
         ${error ? html`<p class="notice error" role="alert">${error}</p>` : nothing}
         ${this.renderSummary()}
-        ${this.files.length ? html`
-          <div class="files-header">
-            <h3>Generated files</h3>
-            <button class="download-all" type="button" @click=${() => this.downloadAll()}>Download all</button>
-          </div>
-          <ul>${this.files.map((file) => html`
-            <li><span>${file.name}</span><small>${this.size(file.size)}</small><a href=${this.fileUrl(file.name)} download>Download<span class="sr-only"> ${file.name}</span></a></li>
-          `)}</ul>
-        ` : this.summaryEntries().length ? nothing : html`<p class="notice">No downloadable files are available for this session.</p>`}
+        ${this.renderFiles()}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         <div class="actions">
           <button type="button" @click=${() => this.emit("new")}>New measurement</button>
@@ -74,6 +66,22 @@ export class ResultView extends LitElement {
         </div>
       </section>
     `;
+  }
+
+  private renderFiles() {
+    if (this.files.length) {
+      return html`
+        <div class="files-header">
+          <h3>Generated files</h3>
+          <button class="download-all" type="button" @click=${() => this.downloadAll()}>Download all</button>
+        </div>
+        <ul>${this.files.map((file) => html`
+          <li><span>${file.name}</span><small>${this.size(file.size)}</small><a href=${this.fileUrl(file.name)} download>Download<span class="sr-only"> ${file.name}</span></a></li>
+        `)}</ul>
+      `;
+    }
+    if (this.summaryEntries().length) return nothing;
+    return html`<p class="notice">No downloadable files are available for this session.</p>`;
   }
 
   private summaryEntries(): [string, string][] {

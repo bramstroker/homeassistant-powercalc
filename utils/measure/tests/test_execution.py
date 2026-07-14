@@ -63,10 +63,10 @@ def test_execution_writes_model_from_prepared_measurement(tmp_path: Path) -> Non
     model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
     assert model["name"] == "Test device"
     assert model["measure_device"] == "Test meter"
-    assert model["standby_power"] == 0.5
+    assert model["standby_power"] == pytest.approx(0.5)
     assert model["device_type"] == "generic"
-    assert model["min_voltage"] == 229.9
-    assert model["max_voltage"] == 231.2
+    assert model["min_voltage"] == pytest.approx(229.9)
+    assert model["max_voltage"] == pytest.approx(231.2)
     assert model["measure_settings"]["SAMPLE_COUNT"] == 3
 
 
@@ -80,7 +80,9 @@ def test_execution_cleans_up_runner_after_failure(tmp_path: Path) -> None:
         runner=runner,
     )
 
+    execution = MeasurementExecution(measurement=prepared, output_directory=tmp_path / "unused")
+
     with pytest.raises(RuntimeError, match="measurement failed"):
-        MeasurementExecution(measurement=prepared, output_directory=tmp_path / "unused").run()
+        execution.run()
 
     runner.cleanup.assert_called_once_with()

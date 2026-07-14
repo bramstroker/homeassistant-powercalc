@@ -181,6 +181,7 @@ def _describe_entity(
     device_class = _device_class(attributes.get(HASS_ENTITY_DEVICE_CLASS))
     supported_modes = supported_light_modes(attributes) if domain == EntityDomain.LIGHT else None
     light_info = light_info_from_attributes(attributes) if domain == EntityDomain.LIGHT else None
+    unit = attributes.get(HASS_ENTITY_UNIT_OF_MEASUREMENT)
     return EntityDescriptor(
         entity_id=entity.entity_id,
         name=str(attributes.get("friendly_name", entity.entity_id)),
@@ -189,7 +190,7 @@ def _describe_entity(
         device_id=device_id,
         model_id=str(model_id) if model_id else None,
         state=str(entity.state.state),
-        unit=str(unit) if (unit := attributes.get(HASS_ENTITY_UNIT_OF_MEASUREMENT)) else None,
+        unit=str(unit) if unit else None,
         attribute_names=sorted(attributes),
         supported_modes=supported_modes,
         effect_list=[str(effect) for effect in attributes.get("effect_list", [])] or None,

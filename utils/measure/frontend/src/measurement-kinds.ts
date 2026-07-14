@@ -35,14 +35,24 @@ export function requestFieldValue(request: NonLightMeasurementRequest, name: str
   switch (request.measure_type) {
     case "average": return name === "duration" ? request.duration : undefined;
     case "recorder": return name === "export_filename" ? request.export_filename : undefined;
-    case "speaker":
-      if (name === "media_player_entity_id") return request.controller.type === "hass" ? request.controller.entity_id : undefined;
-      return name === "disable_streaming" ? request.disable_streaming : undefined;
-    case "charging":
-      if (name === "charging_entity_id") return request.controller.type === "hass" ? request.controller.entity_id : undefined;
-      return name === "charging_device_type" ? request.charging_device_type : undefined;
-    case "fan": return name === "fan_entity_id" && request.controller.type === "hass" ? request.controller.entity_id : undefined;
+    case "speaker": return speakerFieldValue(request, name);
+    case "charging": return chargingFieldValue(request, name);
+    case "fan": return name === "fan_entity_id" ? hassEntityId(request.controller) : undefined;
   }
+}
+
+function speakerFieldValue(request: Extract<NonLightMeasurementRequest, { measure_type: "speaker" }>, name: string): string | boolean | undefined {
+  if (name === "media_player_entity_id") return hassEntityId(request.controller);
+  return name === "disable_streaming" ? request.disable_streaming : undefined;
+}
+
+function chargingFieldValue(request: Extract<NonLightMeasurementRequest, { measure_type: "charging" }>, name: string): string | undefined {
+  if (name === "charging_entity_id") return hassEntityId(request.controller);
+  return name === "charging_device_type" ? request.charging_device_type : undefined;
+}
+
+function hassEntityId(controller: { type: string; entity_id?: string }): string | undefined {
+  return controller.type === "hass" ? controller.entity_id : undefined;
 }
 
 export function entityDomain(definition: MeasureDefinition, field: FormField, selectedOption?: string): string | undefined {
@@ -59,7 +69,7 @@ export function entityDomains(definition: MeasureDefinition, values?: FormData):
     .flatMap((field) => {
       if (field.name !== "charging_entity_id") return field.entity_domains ?? [];
       const options = definition.fields.find((candidate) => candidate.name === "charging_device_type")?.options ?? [];
-      if (values) return [entityDomain(definition, field, String(values.get("charging_device_type") ?? ""))];
+      if (values) return [entityDomain(definition, field, text(values, "charging_device_type"))];
       return options.map((option) => option.entity_domain);
     })
     .filter((domain): domain is string => Boolean(domain));

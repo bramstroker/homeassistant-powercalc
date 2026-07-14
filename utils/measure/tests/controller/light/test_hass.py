@@ -93,8 +93,9 @@ def test_turn_off() -> None:
 def test_change_light_state_error() -> None:
     client = _mock_client()
     client.trigger_service.side_effect = HomeassistantAPIError("Error")
+    controller = _get_instance(client)
     with pytest.raises(ApiConnectionError):
-        _get_instance(client).change_light_state(LutMode.BRIGHTNESS, on=True, bri=100)
+        controller.change_light_state(LutMode.BRIGHTNESS, on=True, bri=100)
 
 
 def test_connection_validation() -> None:

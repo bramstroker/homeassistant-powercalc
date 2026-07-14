@@ -126,8 +126,11 @@ def test_assembler_applies_power_meter_decorator() -> None:
 
 
 def test_assembler_rejects_a_controller_for_the_wrong_measurement_type() -> None:
+    power_meter = DummyPowerMeterSpec()
+    controller = DummyLightControllerSpec()
+
     with pytest.raises(ValidationError):
         FanMeasurementRequest(
-            power_meter=DummyPowerMeterSpec(),
-            controller=DummyLightControllerSpec(),
+            power_meter=power_meter,
+            controller=controller,
         )

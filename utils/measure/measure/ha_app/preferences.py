@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict, Field
-from pydantic.fields import FieldInfo
 
 from measure.const import PARAMETER_LIMITS
 from measure.powermeter.const import PowerMeterType
@@ -11,7 +12,7 @@ from measure.tuning import MeasurementParameters
 _DEFAULTS = MeasurementParameters()
 
 
-def _bounded_field(name: str, default: float) -> FieldInfo:
+def _bounded_field(name: str, default: float) -> Any:  # noqa: ANN401  # typed as Any so assignments match the field's type, like pydantic's Field()
     minimum, maximum = PARAMETER_LIMITS[name]
     return Field(default=default, ge=minimum, le=maximum)
 
