@@ -41,7 +41,7 @@ ENV POWERCALC_MEASURE_DATA_ROOT=/data
 
 EXPOSE 8099
 
-ENTRYPOINT ["python", "-m", "measure.app"]
+ENTRYPOINT ["python", "-m", "measure.ha_app.main"]
 CMD ["--host", "0.0.0.0", "--port", "8099", "--data-root", "/data"]
 
 FROM python-runtime AS runtime

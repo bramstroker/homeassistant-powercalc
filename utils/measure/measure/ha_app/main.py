@@ -7,7 +7,7 @@ from pathlib import Path
 
 import uvicorn
 
-from measure.api import create_app
+from measure.ha_app.api import create_app
 
 
 def main() -> None:
@@ -17,8 +17,8 @@ def main() -> None:
     parser.add_argument("--data-root", type=Path, default=Path("/data"))
     parser.add_argument(
         "--hass-url",
-        default="http://supervisor/core/api/",
-        help="Home Assistant Core REST API base URL. Override for local development.",
+        default="ws://supervisor/core/websocket",
+        help="Home Assistant Core WebSocket API URL. Override for local development.",
     )
     parser.add_argument(
         "--hass-token",

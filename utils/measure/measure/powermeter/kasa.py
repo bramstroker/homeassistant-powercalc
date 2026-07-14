@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import Any
 
 from kasa import SmartPlug
 
@@ -31,6 +30,3 @@ class KasaPowerMeter(PowerMeter):
 
     def has_voltage_support(self) -> bool:
         return True
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        pass

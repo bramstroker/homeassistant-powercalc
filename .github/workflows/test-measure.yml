@@ -42,14 +42,20 @@ jobs:
             --follow-imports=silent \
             --ignore-missing-imports \
             --config-file ../../pyproject.toml \
-            measure/session.py \
             measure/request.py \
-            measure/storage.py \
-            measure/coordinator.py \
+            measure/tuning.py \
+            measure/assembler.py \
+            measure/execution.py \
             measure/model.py \
-            measure/service.py \
-            measure/api.py \
-            measure/app.py
+            measure/controller/light/hass.py \
+            measure/runner/light_plan.py \
+            measure/runner/light.py \
+            measure/ha_app/storage.py \
+            measure/ha_app/coordinator.py \
+            measure/ha_app/service.py \
+            measure/ha_app/preflight.py \
+            measure/ha_app/api.py \
+            measure/ha_app/main.py
           uv run --extra dev pytest \
             -qq \
             --durations=10 \

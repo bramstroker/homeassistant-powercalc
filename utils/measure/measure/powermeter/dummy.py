@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import random
 import time
-from typing import Any
 
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
@@ -20,6 +19,3 @@ class DummyPowerMeter(PowerMeter):
 
     def has_voltage_support(self) -> bool:
         return True
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        pass

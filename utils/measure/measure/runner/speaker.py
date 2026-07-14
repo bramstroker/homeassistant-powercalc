@@ -1,47 +1,40 @@
 import logging
 import time
-from typing import Any
 
-import inquirer
-
-from measure.config import MeasureConfig
 from measure.controller.media.controller import MediaController
-from measure.controller.media.factory import MediaControllerFactory
-from measure.execution import RunInteraction
-from measure.interactions import ConsoleInteraction
+from measure.execution import ImmediateInteraction, RunInteraction
 from measure.powermeter.errors import ZeroReadingError
+from measure.request import SpeakerMeasurementRequest
 from measure.runner.runner import MeasurementRunner, RunnerResult
+from measure.tuning import MeasurementParameters
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 DURATION_PER_VOLUME_LEVEL = 20
 STREAM_URL = "https://powercalc.s3.eu-west-1.amazonaws.com/g_pink.mp3"
 SLEEP_PRE_MEASURE = 2
 SLEEP_MUTE = 5
-QUESTION_DISABLE_STREAMING = "disable_streaming"
 
 _LOGGER = logging.getLogger("measure")
 
 
-class SpeakerRunner(MeasurementRunner):
+class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
     def __init__(
         self,
         measure_util: MeasureUtil,
-        config: MeasureConfig,
+        parameters: MeasurementParameters,
+        media_controller: MediaController,
         interaction: RunInteraction | None = None,
     ) -> None:
         self.measure_util = measure_util
-        self.config = config
-        self.media_controller: MediaController = MediaControllerFactory(config).create()
-        self.interaction = interaction or ConsoleInteraction()
-
-    def prepare(self, answers: dict[str, Any]) -> None:
-        self.media_controller.process_answers(answers)
+        self.config = parameters
+        self.media_controller = media_controller
+        self.interaction = interaction or ImmediateInteraction()
 
     def run(
         self,
-        answers: dict[str, Any],
+        request: SpeakerMeasurementRequest,
         export_directory: str,
-    ) -> RunnerResult | None:
+    ) -> RunnerResult:
         summary = {}
         voltages: list[float] = []
         duration = DURATION_PER_VOLUME_LEVEL
@@ -56,7 +49,7 @@ class SpeakerRunner(MeasurementRunner):
         )
         self.interaction.confirm("Ready to start speaker measurement. Volume will increase to maximum.")
 
-        disable_streaming = bool(answers.get(QUESTION_DISABLE_STREAMING, False))
+        disable_streaming = request.disable_streaming
 
         for volume in range(10, 101, 10):
             _LOGGER.info("Setting volume to %d", volume)
@@ -93,19 +86,6 @@ class SpeakerRunner(MeasurementRunner):
             "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
             "linear_config": {"calibrate": calibrate_list},
         }
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        questions = self.media_controller.get_questions()
-        questions.extend(
-            [
-                inquirer.Confirm(
-                    name=QUESTION_DISABLE_STREAMING,
-                    message="Amazon Alexa devices do not support direct streaming. Set this option to `y` to disable automatic streaming. You need to manually stream pink noise. See the documentation for more info",  # noqa: E501
-                    default=False,
-                ),
-            ],
-        )
-        return questions
 
     def measure_standby_power(self) -> MeasurementResult:
         self.media_controller.turn_off()

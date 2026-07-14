@@ -4,16 +4,18 @@ from pathlib import Path
 import time
 from types import SimpleNamespace
 from typing import Any
+from unittest.mock import MagicMock
 
 from fastapi.testclient import TestClient
-from measure.api import create_app
-from measure.configuration import MeasurementSettings
 from measure.const import MeasureType
-from measure.coordinator import MeasurementCoordinator
-from measure.request import LightMeasurementRequest
+from measure.ha_app.api import create_app
+from measure.ha_app.coordinator import MeasurementCoordinator
+from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
+from measure.ha_app.storage import SessionStorage
+from measure.home_assistant import HomeAssistantManager
+from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
-from measure.session import SessionControl, SessionSnapshot, SessionState
-from measure.storage import SessionStorage
+from measure.tuning import MeasurementParameters
 import pytest
 
 
@@ -25,6 +27,22 @@ def entity(entity_id: str, state: str, **attributes: Any) -> SimpleNamespace:  #
 
 
 class FakeClient:
+    def close(self) -> None:
+        return None
+
+    def list_entity_registry(self) -> tuple[SimpleNamespace, ...]:
+        return (
+            SimpleNamespace(entity_id="sensor.test_power", device_id="meter-device"),
+            SimpleNamespace(entity_id="sensor.test_voltage", device_id="meter-device"),
+            SimpleNamespace(entity_id="light.test", device_id="light-device"),
+        )
+
+    def get_device_registry(self) -> tuple[dict[str, object], ...]:
+        return (
+            {"id": "meter-device", "model_id": "PM-001", "model": "Power Meter"},
+            {"id": "light-device", "model_id": None, "model": "Hue White Ambiance"},
+        )
+
     def get_entities(self) -> dict[str, SimpleNamespace]:
         return {
             "light": SimpleNamespace(
@@ -35,6 +53,8 @@ class FakeClient:
                         friendly_name="Test light",
                         supported_color_modes=["brightness", "color_temp", "hs"],
                         effect_list=["colorloop"],
+                        min_color_temp_kelvin=2202,
+                        max_color_temp_kelvin=6535,
                     ),
                     "switch_like": entity(
                         "light.switch_like",
@@ -55,16 +75,34 @@ class FakeClient:
             ),
             "sensor": SimpleNamespace(
                 entities={
-                    "power": entity("sensor.test_power", "4.2", friendly_name="Test power", unit_of_measurement="W"),
+                    "power": entity(
+                        "sensor.test_power",
+                        "4.2",
+                        friendly_name="Test power",
+                        device_class="power",
+                        unit_of_measurement="W",
+                    ),
                     "voltage": entity(
                         "sensor.test_voltage",
                         "230",
                         friendly_name="Test voltage",
+                        device_class="voltage",
                         unit_of_measurement="V",
                     ),
                     "temperature": entity("sensor.temperature", "20", unit_of_measurement="°C"),
-                    "unknown_power": entity("sensor.unknown_power", "unknown", unit_of_measurement="W"),
-                    "text_power": entity("sensor.text_power", "nope", unit_of_measurement="W"),
+                    "unknown_power": entity(
+                        "sensor.unknown_power",
+                        "unknown",
+                        device_class="power",
+                        unit_of_measurement="W",
+                    ),
+                    "text_power": entity("sensor.text_power", "nope", device_class="power", unit_of_measurement="W"),
+                    "wrong_device_class": entity(
+                        "sensor.wrong_device_class",
+                        "4.2",
+                        device_class="energy",
+                        unit_of_measurement="W",
+                    ),
                 },
             ),
         }
@@ -73,47 +111,53 @@ class FakeClient:
 class CompletingService:
     def run(
         self,
-        request: LightMeasurementRequest,
+        request: MeasurementRequest,
         control: SessionControl,
         output_root: Path,
-    ) -> tuple[RunnerResult, Path]:
+    ) -> RunnerResult:
         directory = output_root / request.model_id
         directory.mkdir(parents=True)
         (directory / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
         control.progress(completed=1, total=1, mode="brightness", estimated_remaining="0s")
-        return RunnerResult(model_json_data={}), directory
+        return RunnerResult(model_json_data={})
 
 
 class SummaryService:
     def run(
         self,
-        request: LightMeasurementRequest,
+        request: MeasurementRequest,
         control: SessionControl,
         output_root: Path,
-    ) -> tuple[RunnerResult, Path]:
+    ) -> RunnerResult:
         control.progress(completed=30, total=30, mode="Averaging", estimated_remaining="0s")
         summary = {"Average power": "42.3 W", "Duration": "30 s"}
-        return RunnerResult(model_json_data={}, summary=summary), output_root / request.model_id
+        return RunnerResult(model_json_data={}, summary=summary)
 
 
 def payload() -> dict[str, object]:
     return {
+        "measure_type": MeasureType.LIGHT,
         "model_id": "LCT010",
         "product_name": "Test light",
         "measure_device": "Test meter",
-        "light_entity_id": "light.test",
-        "power_entity_id": "sensor.test_power",
-        "voltage_entity_id": "sensor.test_voltage",
+        "controller": {"type": "hass", "entity_id": "light.test"},
+        "power_meter": {
+            "type": "hass",
+            "entity_id": "sensor.test_power",
+            "voltage_entity_id": "sensor.test_voltage",
+        },
         "modes": ["brightness"],
         "generate_model": True,
         "gzip": False,
         "multiple_light_count": 1,
-        "sleep_time": 0,
-        "sample_count": 1,
-        "brightness_step": 5,
-        "hue_step": 10,
-        "saturation_step": 10,
-        "color_temp_step": 5,
+        "parameters": {
+            "sleep_time": 0,
+            "sample_count": 1,
+            "brightness_step": 5,
+            "hue_step": 10,
+            "saturation_step": 10,
+            "color_temp_step": 5,
+        },
         "resume_policy": "new",
     }
 
@@ -124,7 +168,7 @@ def client(tmp_path: Path, *, trusted_ingress_only: bool = False) -> TestClient:
         hass_token="test-token",  # noqa: S106
         trusted_ingress_only=trusted_ingress_only,
     )
-    app.state.context.client = FakeClient
+    app.state.context.home_assistant = FakeClient()
     app.state.context.coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
     return TestClient(app)
 
@@ -133,12 +177,12 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     test_client = client(tmp_path)
 
     capabilities = test_client.get("/api/capabilities")
-    powers = test_client.get("/api/entities?kind=power")
+    powers = test_client.get("/api/entities?device_class=power")
     lights = test_client.get("/api/entities?domain=light")
 
     assert capabilities.status_code == 200
     assert capabilities.json()["modes"] == ["brightness", "color_temp", "hs", "effect"]
-    defaults = MeasurementSettings()
+    defaults = MeasurementParameters()
     assert capabilities.json()["defaults"] == {
         "sleep_time": defaults.sleep_time,
         "sample_count": defaults.sample_count,
@@ -148,13 +192,30 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
         "color_temp_step": defaults.color_temp_step,
     }
     assert [item["entity_id"] for item in powers.json()] == ["sensor.test_power"]
+    assert powers.json()[0]["device_id"] == "meter-device"
+    assert powers.json()[0]["model_id"] == "PM-001"
+    assert test_client.get("/api/entities?kind=power").status_code == 400
     assert "light.switch_like" not in {item["entity_id"] for item in lights.json()}
     assert lights.json()[0]["supported_modes"] == ["brightness", "color_temp", "hs", "effect"]
+    assert lights.json()[0]["model_id"] == "Hue White Ambiance"
+    assert lights.json()[0]["min_mired"] == 153
+    assert lights.json()[0]["max_mired"] == 454
 
     for domain, expected in (("fan", "fan.test"), ("media_player", "media_player.test"), ("vacuum", "vacuum.test")):
         response = test_client.get(f"/api/entities?domain={domain}")
         assert response.status_code == 200, domain
         assert [item["entity_id"] for item in response.json()] == [expected]
+
+
+def test_app_closes_home_assistant_manager_at_shutdown(tmp_path: Path) -> None:
+    app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    app.state.context.home_assistant = home_assistant
+
+    with TestClient(app) as test_client:
+        assert test_client.get("/api/capabilities").status_code == 200
+
+    home_assistant.close.assert_called_once_with()
 
 
 def test_power_meter_test_endpoint(tmp_path: Path) -> None:
@@ -176,7 +237,7 @@ def test_power_meter_test_endpoint(tmp_path: Path) -> None:
     assert "power sensor" in hass.json()["message"].lower()
 
 
-def test_measure_definitions_and_generic_run(tmp_path: Path) -> None:
+def test_measure_definitions_and_average_request(tmp_path: Path) -> None:
     test_client = client(tmp_path)
 
     definitions = test_client.get("/api/measure-definitions")
@@ -185,16 +246,20 @@ def test_measure_definitions_and_generic_run(tmp_path: Path) -> None:
 
     payload = {
         "measure_type": MeasureType.AVERAGE,
-        "answers": {"powermeter_entity_id": "sensor.test_power", "duration": 60},
+        "power_meter": {"type": "hass", "entity_id": "sensor.test_power"},
+        "duration": 60,
     }
-    assert test_client.post("/api/runs/preflight", json=payload).status_code == 200
-    assert test_client.post("/api/runs", json=payload).status_code == 201
+    assert test_client.post("/api/preflight", json=payload).status_code == 200
+    assert test_client.post("/api/sessions", json=payload).status_code == 201
 
 
 def test_preflight_rejects_unavailable_entity(tmp_path: Path) -> None:
     test_client = client(tmp_path)
 
-    response = test_client.post("/api/preflight", json=payload() | {"power_entity_id": "sensor.missing"})
+    response = test_client.post(
+        "/api/preflight",
+        json=payload() | {"power_meter": {"type": "hass", "entity_id": "sensor.missing"}},
+    )
 
     assert response.status_code == 422
     assert response.json()["code"] == "preflight_failed"
@@ -202,7 +267,10 @@ def test_preflight_rejects_unavailable_entity(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("entity_id", ["sensor.unknown_power", "sensor.text_power"])
 def test_preflight_rejects_non_numeric_power_state(tmp_path: Path, entity_id: str) -> None:
-    response = client(tmp_path).post("/api/preflight", json=payload() | {"power_entity_id": entity_id})
+    response = client(tmp_path).post(
+        "/api/preflight",
+        json=payload() | {"power_meter": {"type": "hass", "entity_id": entity_id}},
+    )
 
     assert response.status_code == 422
 
@@ -235,15 +303,16 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
 
 def test_session_summary_is_exposed(tmp_path: Path) -> None:
     app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
-    app.state.context.client = FakeClient
+    app.state.context.home_assistant = FakeClient()
     app.state.context.coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SummaryService)
     test_client = TestClient(app)
 
     run_payload = {
         "measure_type": MeasureType.AVERAGE,
-        "answers": {"powermeter_entity_id": "sensor.test_power", "duration": 30},
+        "power_meter": {"type": "hass", "entity_id": "sensor.test_power"},
+        "duration": 30,
     }
-    assert test_client.post("/api/runs", json=run_payload).status_code == 201
+    assert test_client.post("/api/sessions", json=run_payload).status_code == 201
 
     current = {}
     for _ in range(50):

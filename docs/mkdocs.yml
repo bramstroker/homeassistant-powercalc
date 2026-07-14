@@ -41,7 +41,11 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - attr_list
@@ -159,6 +163,7 @@ nav:
           - 'contributing/measure/measure.md'
           - 'contributing/measure/setup.md'
           - 'contributing/measure/home-assistant-app.md'
+          - 'contributing/measure/architecture.md'
           - 'contributing/measure/lights.md'
           - 'contributing/measure/modes.md'
           - 'contributing/measure/output.md'

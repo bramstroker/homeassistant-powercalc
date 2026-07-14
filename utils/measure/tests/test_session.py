@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from threading import Event, Thread
 
-from measure.session import MeasurementCancelledError, SessionControl, SessionEvent, SessionEventType
+from measure.execution import MeasurementCancelledError
+from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType
 import pytest
 
 

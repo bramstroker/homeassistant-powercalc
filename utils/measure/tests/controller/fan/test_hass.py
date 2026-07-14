@@ -1,83 +1,43 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-from homeassistant_api import Client
 from homeassistant_api.errors import HomeassistantAPIError
-from measure.const import QUESTION_ENTITY_ID
 from measure.controller.errors import ApiConnectionError, ControllerError
 from measure.controller.fan.hass import HassFanController
+from measure.home_assistant import HomeAssistantManager
 import pytest
 
 
 def test_set_percentage() -> None:
-    hass_controller = _get_instance()
-    with patch.object(
-        Client,
-        "trigger_service",
-        return_value=None,
-    ) as mock_trigger_service:
-        hass_controller.process_answers({QUESTION_ENTITY_ID: "fan.test"})
-        hass_controller.set_percentage(20)
-
-        mock_trigger_service.assert_called_once_with("fan", "set_percentage", entity_id="fan.test", percentage=20)
+    client = _mock_client()
+    _get_instance(client).set_percentage(20)
+    client.trigger_service.assert_called_once_with("fan", "set_percentage", entity_id="fan.test", percentage=20)
 
 
 def test_set_percentage_error() -> None:
-    hass_controller = _get_instance()
-    with (
-        patch.object(
-            Client,
-            "trigger_service",
-            side_effect=HomeassistantAPIError("Error"),
-        ),
-        pytest.raises(ControllerError),
-    ):
-        hass_controller.set_percentage(80)
+    client = _mock_client()
+    client.trigger_service.side_effect = HomeassistantAPIError("Error")
+    with pytest.raises(ControllerError):
+        _get_instance(client).set_percentage(80)
 
 
 def test_turn_off() -> None:
-    hass_controller = _get_instance()
-    with patch.object(
-        Client,
-        "trigger_service",
-        return_value=None,
-    ) as mock_trigger_service:
-        hass_controller.process_answers({QUESTION_ENTITY_ID: "fan.test"})
-        hass_controller.turn_off()
-
-        mock_trigger_service.assert_called_once_with("fan", "turn_off", entity_id="fan.test")
+    client = _mock_client()
+    _get_instance(client).turn_off()
+    client.trigger_service.assert_called_once_with("fan", "turn_off", entity_id="fan.test")
 
 
 def test_connection_validation() -> None:
-    with (
-        patch.object(
-            Client,
-            "get_config",
-            side_effect=HomeassistantAPIError("Error"),
-        ),
-        pytest.raises(ApiConnectionError),
-    ):
-        HassFanController("http://localhost:812", "abc")
+    client = _mock_client()
+    client.get_config.side_effect = HomeassistantAPIError("Error")
+    with pytest.raises(ApiConnectionError):
+        HassFanController(client)
 
 
-def test_get_questions() -> None:
-    hass_controller = _get_instance()
-    with patch.object(
-        Client,
-        "get_entities",
-        return_value={
-            "fan": MagicMock(
-                entities={
-                    "fan.test1": MagicMock(entity_id="fan.test1"),
-                    "fan.test2": MagicMock(entity_id="fan.test2"),
-                },
-            ),
-        },
-    ):
-        questions = hass_controller.get_questions()
-        assert len(questions) == 1
-        assert questions[0].name == QUESTION_ENTITY_ID
-        assert questions[0].choices == ["fan.test1", "fan.test2"]
+def _get_instance(client: MagicMock | None = None) -> HassFanController:
+    return HassFanController(client or _mock_client(), entity_id="fan.test")
 
 
-def _get_instance() -> HassFanController:
-    return HassFanController("http://localhost:812", "abc")
+def _mock_client() -> MagicMock:
+    client = MagicMock(spec=HomeAssistantManager)
+    client.get_config.return_value = {}
+    return client

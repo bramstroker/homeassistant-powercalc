@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from collections import deque
 import csv
 from dataclasses import replace
 import json
+import logging
 import math
 import os
 from pathlib import Path
@@ -11,13 +13,17 @@ from typing import Any
 from uuid import uuid4
 
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
-from measure.request import LightMeasurementRequestModel, MeasurementRunRequestModel
+from measure.ha_app.preferences import AppPreferences
+from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot, SessionState, utc_now
+from measure.request import LightMeasurementRequest, MeasurementRequest, parse_measurement_request
 from measure.runner.light import CSV_HEADERS
-from measure.session import SessionEvent, SessionSnapshot, SessionState, utc_now
-from measure.settings import AppSettings
+
+_LOGGER = logging.getLogger("measure")
 
 
 class SessionStorage:
+    """Persist session state and outputs below a confined data root."""
+
     def __init__(self, data_root: Path) -> None:
         self.data_root = data_root.resolve()
         self.sessions_root = self.data_root / "sessions"
@@ -31,8 +37,10 @@ class SessionStorage:
     def create(
         self,
         snapshot: SessionSnapshot,
-        request: LightMeasurementRequestModel | MeasurementRunRequestModel,
+        request: MeasurementRequest,
     ) -> Path:
+        """Create a session layout and mark it as current."""
+
         directory = self.session_directory(snapshot.id)
         (directory / "output").mkdir(parents=True, exist_ok=False)
         self._write_json(directory / "request.json", request.model_dump(mode="json"))
@@ -50,35 +58,87 @@ class SessionStorage:
         directory.mkdir(parents=True, exist_ok=True)
         self._write_json(directory / "state.json", snapshot.to_dict())
 
-    def append_event(self, session_id: str, event: SessionEvent) -> None:
+    def append_event(self, session_id: str, event: SessionEvent, *, durable: bool = True) -> None:
+        """Append an event, fsyncing only when durability is required."""
+
         path = self.session_directory(session_id) / "events.jsonl"
         with path.open("a", encoding="utf-8") as file:
             file.write(json.dumps(event.to_dict(), separators=(",", ":"), default=str) + "\n")
             file.flush()
-            os.fsync(file.fileno())
+            if durable:
+                os.fsync(file.fileno())
+
+    def load_events(self, session_id: str, *, limit: int = 1000) -> tuple[SessionEvent, ...]:
+        """Load the persisted replay window for SSE reconnections."""
+        path = self.session_directory(session_id) / "events.jsonl"
+        if not path.exists():
+            return ()
+        events: deque[SessionEvent] = deque(maxlen=limit)
+        pending_line: str | None = None
+        with path.open(encoding="utf-8") as file:
+            for line in file:
+                if not line.strip():
+                    continue
+                if pending_line is not None:
+                    events.append(self._decode_event(pending_line))
+                pending_line = line
+        if pending_line is not None:
+            try:
+                events.append(self._decode_event(pending_line))
+            except json.JSONDecodeError:
+                _LOGGER.warning("Ignoring a truncated final session event for %s", session_id)
+        return tuple(events)
+
+    @staticmethod
+    def _decode_event(line: str) -> SessionEvent:
+        value = json.loads(line)
+        data = value.get("data") if isinstance(value, dict) else None
+        if not isinstance(value, dict) or not isinstance(data, dict):
+            raise ValueError("Persisted session event must be an object")
+        return SessionEvent(
+            sequence=int(value["sequence"]),
+            type=SessionEventType(value["type"]),
+            created_at=str(value["created_at"]),
+            data=data,
+        )
 
     def load_current(self) -> SessionSnapshot | None:
+        """Load the current snapshot and recover interrupted active sessions."""
+
         current_path = self.data_root / "current.json"
         if not current_path.exists():
             return None
-        session_id = str(self._read_json(current_path)["id"])
-        state = self._read_json(self.session_directory(session_id) / "state.json")
-        snapshot = SessionSnapshot(
-            id=str(state["id"]),
-            state=SessionState(state["state"]),
-            created_at=str(state["created_at"]),
-            updated_at=str(state["updated_at"]),
-            completed=int(state.get("completed", 0)),
-            total=int(state.get("total", 0)),
-            mode=state.get("mode"),
-            estimated_remaining=state.get("estimated_remaining"),
-            error=state.get("error"),
-            files=tuple(state.get("files", [])),
-            warnings=tuple(state.get("warnings", [])),
-            event_sequence=int(state.get("event_sequence", 0)),
-            summary=state.get("summary"),
-        )
-        if snapshot.state in {SessionState.RUNNING, SessionState.CANCELLING}:
+        try:
+            session_id = str(self._read_json(current_path)["id"])
+            self.load_request(session_id)
+            state_path = self.session_directory(session_id) / "state.json"
+            state = self._read_json(state_path)
+            snapshot = SessionSnapshot(
+                id=str(state["id"]),
+                state=SessionState(state["state"]),
+                created_at=str(state["created_at"]),
+                updated_at=str(state["updated_at"]),
+                completed=int(state.get("completed", 0)),
+                total=int(state.get("total", 0)),
+                mode=state.get("mode"),
+                estimated_remaining=state.get("estimated_remaining"),
+                error=state.get("error"),
+                files=tuple(state.get("files", [])),
+                warnings=tuple(state.get("warnings", [])),
+                event_sequence=int(state.get("event_sequence", 0)),
+                summary=state.get("summary"),
+            )
+        except (OSError, KeyError, TypeError, ValueError) as error:
+            _LOGGER.warning("Discarding incompatible current session pointer: %s", error)
+            current_path.unlink(missing_ok=True)
+            return None
+        if snapshot.state in {
+            SessionState.VALIDATING,
+            SessionState.READY,
+            SessionState.AWAITING_CONFIRMATION,
+            SessionState.RUNNING,
+            SessionState.CANCELLING,
+        }:
             resumable = self.can_resume(snapshot.id)
             snapshot = replace(
                 snapshot,
@@ -93,25 +153,24 @@ class SessionStorage:
             self.write_snapshot(snapshot)
         return snapshot
 
-    def load_request(self, session_id: str) -> LightMeasurementRequestModel | MeasurementRunRequestModel:
-        data = self._read_json(self.session_directory(session_id) / "request.json")
-        if "measure_type" in data:
-            return MeasurementRunRequestModel.model_validate(data)
-        return LightMeasurementRequestModel.model_validate(data)
+    def load_request(self, session_id: str) -> MeasurementRequest:
+        path = self.session_directory(session_id) / "request.json"
+        return parse_measurement_request(self._read_json(path))
 
     def output_directory(self, session_id: str) -> Path:
         return self._contained(self.session_directory(session_id) / "output")
 
-    def load_settings(self) -> AppSettings:
+    def load_settings(self) -> AppPreferences:
         path = self.data_root / "settings.json"
         if not path.exists():
-            return AppSettings()
+            return AppPreferences()
         try:
-            return AppSettings.model_validate(self._read_json(path))
-        except OSError, ValueError:
-            return AppSettings()
+            return AppPreferences.model_validate(self._read_json(path))
+        except (OSError, ValueError) as error:
+            _LOGGER.warning("Could not load persisted app settings; using defaults: %s", error)
+            return AppPreferences()
 
-    def save_settings(self, settings: AppSettings) -> AppSettings:
+    def save_settings(self, settings: AppPreferences) -> AppPreferences:
         self._write_json(self.data_root / "settings.json", settings.model_dump(mode="json"))
         return settings
 
@@ -121,7 +180,7 @@ class SessionStorage:
             request = self.load_request(session_id)
         except FileNotFoundError, KeyError, ValueError:
             return False
-        if not isinstance(request, LightMeasurementRequestModel):
+        if not isinstance(request, LightMeasurementRequest):
             return False
         model_root = self.output_directory(session_id) / request.model_id
         for mode in request.modes:
@@ -152,6 +211,8 @@ class SessionStorage:
         )
 
     def file_path(self, session_id: str, relative_name: str) -> Path:
+        """Resolve a listed regular output file without allowing path traversal."""
+
         output = self.output_directory(session_id)
         path = self._contained(output / relative_name)
         if not path.is_relative_to(output):
@@ -173,7 +234,7 @@ class SessionStorage:
         path: Path,
         expected_header: list[str],
         mode: LutMode,
-        request: LightMeasurementRequestModel,
+        request: LightMeasurementRequest,
     ) -> bool:
         if not path.is_file() or path.is_symlink():
             return False
@@ -187,7 +248,7 @@ class SessionStorage:
             last_row = rows[-1]
             if len(last_row) != len(expected_header):
                 return False
-            if not all(math.isfinite(float(value)) for value in last_row):
+            if not math.isfinite(float(last_row[-1])):
                 return False
             return SessionStorage._variation_matches_request(mode, last_row[:-1], request)
         except OSError, ValueError:
@@ -197,29 +258,51 @@ class SessionStorage:
     def _variation_matches_request(
         mode: LutMode,
         values: list[str],
-        request: LightMeasurementRequestModel,
+        request: LightMeasurementRequest,
     ) -> bool:
+        parameters = request.parameters
+        if mode == LutMode.EFFECT:
+            if len(values) != 2 or not values[0].strip():
+                return False
+            return 1 <= int(values[1]) <= 255
         variation = [int(value) for value in values]
         if mode == LutMode.BRIGHTNESS:
-            return SessionStorage._matches_inclusive_step(variation[0], 1, 255, request.brightness_step)
+            return SessionStorage._matches_inclusive_step(
+                variation[0],
+                1,
+                255,
+                parameters.resolved_bri_bri_steps,
+            )
         if mode == LutMode.COLOR_TEMP:
             return (
                 SessionStorage._matches_inclusive_step(
                     variation[0],
                     1,
                     255,
-                    request.brightness_step,
+                    parameters.resolved_ct_bri_steps,
                 )
                 and MIN_MIRED <= variation[1] <= MAX_MIRED
             )
         if mode == LutMode.HS:
-            brightness_step = max(1, round(request.brightness_step / 100 * 255))
-            hue_step = max(1, round(request.hue_step / 360 * 65535))
-            saturation_step = max(1, round(request.saturation_step / 100 * 255))
             return (
-                SessionStorage._matches_inclusive_step(variation[0], 1, 255, brightness_step)
-                and SessionStorage._matches_inclusive_step(variation[1], 1, 65535, hue_step)
-                and SessionStorage._matches_inclusive_step(variation[2], 1, 255, saturation_step)
+                SessionStorage._matches_inclusive_step(
+                    variation[0],
+                    1,
+                    255,
+                    parameters.resolved_hs_bri_steps,
+                )
+                and SessionStorage._matches_inclusive_step(
+                    variation[1],
+                    1,
+                    65535,
+                    parameters.resolved_hs_hue_steps,
+                )
+                and SessionStorage._matches_inclusive_step(
+                    variation[2],
+                    1,
+                    255,
+                    parameters.resolved_hs_sat_steps,
+                )
             )
         return False
 
@@ -237,6 +320,8 @@ class SessionStorage:
 
     @staticmethod
     def _write_json(path: Path, value: dict[str, Any]) -> None:
+        """Atomically replace a JSON document after flushing it to disk."""
+
         path.parent.mkdir(parents=True, exist_ok=True)
         temporary = path.with_suffix(path.suffix + ".tmp")
         with temporary.open("w", encoding="utf-8") as file:

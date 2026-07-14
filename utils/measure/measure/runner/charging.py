@@ -1,20 +1,14 @@
 import logging
 import time
-from typing import Any
 
-import inquirer
-
-from measure.config import MeasureConfig
-from measure.controller.charging.const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
+from measure.controller.charging.const import ATTR_BATTERY_LEVEL, ChargingDeviceType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import ChargingControllerError
-from measure.controller.charging.factory import ChargingControllerFactory
-from measure.controller.charging.hass import ATTR_BATTERY_LEVEL
-from measure.execution import RunInteraction
-from measure.interactions import ConsoleInteraction
-from measure.runner.const import QUESTION_CHARGING_DEVICE_TYPE
+from measure.execution import ImmediateInteraction, RunInteraction
+from measure.request import ChargingMeasurementRequest
 from measure.runner.errors import RunnerError
 from measure.runner.runner import MeasurementRunner, RunnerResult
+from measure.tuning import MeasurementParameters
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 _LOGGER = logging.getLogger("measure")
@@ -23,31 +17,29 @@ _LOGGER = logging.getLogger("measure")
 TRICKLE_CHARGING_TIME = 1800
 
 
-class ChargingRunner(MeasurementRunner):
+class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
     def __init__(
         self,
         measure_util: MeasureUtil,
-        config: MeasureConfig,
+        parameters: MeasurementParameters,
+        controller: ChargingController,
         interaction: RunInteraction | None = None,
+        battery_level_attribute: str | None = ATTR_BATTERY_LEVEL,
     ) -> None:
         self.battery_level_entity: str | None = None
-        self.config = config
-        self.battery_level_attribute: str | None = None
+        self.config = parameters
+        self.battery_level_attribute = battery_level_attribute
         self.measure_util = measure_util
-        self.controller: ChargingController = ChargingControllerFactory(config).create()
+        self.controller = controller
         self.charging_device_type: ChargingDeviceType | None = None
-        self.interaction = interaction or ConsoleInteraction()
-
-    def prepare(self, answers: dict[str, Any]) -> None:
-        self.controller.process_answers(answers)
+        self.interaction = interaction or ImmediateInteraction()
 
     def run(
         self,
-        answers: dict[str, Any],
+        request: ChargingMeasurementRequest,
         export_directory: str,
-    ) -> RunnerResult | None:
-        self.charging_device_type = ChargingDeviceType(answers[QUESTION_CHARGING_DEVICE_TYPE])
-        self.battery_level_attribute = answers.get(QUESTION_BATTERY_LEVEL_ATTRIBUTE, ATTR_BATTERY_LEVEL)
+    ) -> RunnerResult:
+        self.charging_device_type = request.charging_device_type
 
         self.interaction.notify(
             "Make sure the device is as close to 0% charged as possible before starting the test.",
@@ -111,6 +103,8 @@ class ChargingRunner(MeasurementRunner):
 
     def _build_model_json_data(self, measurements: dict[int, list[float]]) -> dict:
         """Build the model JSON data from the measurements"""
+        if self.charging_device_type is None:
+            raise RuntimeError("Charging runner is not configured")
         calibrate_list = []
         for battery_level, powers in measurements.items():
             average_power = round(sum(powers) / len(powers), 2)
@@ -118,29 +112,16 @@ class ChargingRunner(MeasurementRunner):
 
         calculation_enabled_condition = "{{ is_state('[[entity]]', 'docked') }}"
 
+        linear_config: dict[str, object] = {"calibrate": calibrate_list}
+        if self.battery_level_attribute is not None:
+            linear_config["attribute"] = self.battery_level_attribute
+
         return {
             "device_type": self.charging_device_type.value,
             "calculation_strategy": "linear",
             "calculation_enabled_condition": calculation_enabled_condition,
-            "linear_config": {
-                "attribute": self.battery_level_attribute,
-                "calibrate": calibrate_list,
-            },
+            "linear_config": linear_config,
         }
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        """Get questions to ask for the charging runner"""
-        questions = [
-            inquirer.List(
-                name=QUESTION_CHARGING_DEVICE_TYPE,
-                message="Select the charging device type",
-                choices=[
-                    (charging_device_type.value, charging_device_type) for charging_device_type in ChargingDeviceType
-                ],
-            ),
-        ]
-        questions.extend(self.controller.get_questions())
-        return questions
 
     def measure_standby_power(self) -> MeasurementResult:
         return MeasurementResult(power=0, voltages=[])

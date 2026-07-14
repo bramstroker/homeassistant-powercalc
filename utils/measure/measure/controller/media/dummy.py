@@ -1,7 +1,3 @@
-from typing import Any
-
-import inquirer
-
 from measure.controller.media.controller import MediaController
 
 
@@ -20,11 +16,4 @@ class DummyMediaController(MediaController):
 
     def turn_off(self) -> None:
         # Dummy controller intentionally performs no media device action.
-        pass
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        return []
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        # Dummy controller has no setup answers to process.
         pass

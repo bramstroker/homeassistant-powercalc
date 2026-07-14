@@ -4,33 +4,25 @@ import type {
   Capabilities,
   EntityDescriptor,
   LutMode,
+  LightMeasurementRequest,
   MeasureDefinition,
   MeasureType,
   MeasurementRequest,
-  MeasurementRunRequest,
+  NonLightMeasurementRequest,
+  PowerMeterSpec,
 } from "../types";
+import {
+  buildNonLightRequest,
+  canonicalFieldName,
+  deviceFields,
+  entityDomains,
+  LIGHT_TYPE,
+  measurementIcon,
+  requestFieldValue,
+} from "../measurement-kinds";
 import { sharedStyles } from "../styles";
 
-const fallbackDefaults = {
-  sleep_time: 2,
-  sample_count: 1,
-  brightness_step: 5,
-  hue_step: 10,
-  saturation_step: 10,
-  color_temp_step: 5,
-};
-
-const LIGHT_TYPE: MeasureType = "Light bulb(s)";
-
-/** Emoji glyph per measurement type — keeps the picker recognisable without shipping icon assets. */
-const TYPE_ICONS: Record<MeasureType, string> = {
-  "Light bulb(s)": "💡",
-  "Smart speaker": "🔊",
-  Recorder: "⏺",
-  Average: "📊",
-  "Charging device": "🔋",
-  Fan: "🌀",
-};
+const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging.";
 
 export class SetupView extends LitElement {
   static readonly properties = {
@@ -40,17 +32,19 @@ export class SetupView extends LitElement {
     powers: { attribute: false },
     voltages: { attribute: false },
     deviceEntities: { attribute: false },
+    deviceEntityErrors: { attribute: false },
     initialRequest: { attribute: false },
-    initialRunRequest: { attribute: false },
     initialType: { attribute: false },
     defaultPowerEntityId: { type: String },
     defaultMeasureDevice: { type: String },
     powerMeter: { type: String },
+    shellyIp: { type: String },
     busy: { type: Boolean },
     errorMessage: { type: String },
     selectedType: { state: true },
     selectedLightId: { state: true },
     selectedPowerId: { state: true },
+    selectedDeviceEntityId: { state: true },
   };
 
   capabilities?: Capabilities;
@@ -59,23 +53,27 @@ export class SetupView extends LitElement {
   powers: EntityDescriptor[] = [];
   voltages: EntityDescriptor[] = [];
   deviceEntities: Record<string, EntityDescriptor[]> = {};
+  deviceEntityErrors: Record<string, string> = {};
   initialRequest?: MeasurementRequest;
-  initialRunRequest?: MeasurementRunRequest;
   initialType?: MeasureType;
   defaultPowerEntityId = "";
   defaultMeasureDevice = "";
   powerMeter: AppSettings["power_meter"] = "hass";
+  shellyIp = "";
   busy = false;
   errorMessage = "";
   selectedType?: MeasureType;
   selectedLightId = "";
   selectedPowerId = "";
+  selectedDeviceEntityId = "";
 
   static readonly styles = [sharedStyles, css`
     form { display: grid; gap: 1rem; }
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .profile-grid { align-items: start; }
     label, fieldset { display: grid; gap: 0.4rem; }
     label > span, legend { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+    .field-hint { color: var(--muted); font-size: 0.74rem; line-height: 1.4; }
     input, select {
       width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 9px;
       padding: 0.65rem 0.75rem; background: var(--field); color: var(--ink);
@@ -139,7 +137,7 @@ export class SetupView extends LitElement {
       <div class="type-grid" role="list">
         ${this.definitions.map((definition) => html`
           <button type="button" class="type-card" role="listitem" @click=${() => this.selectType(definition.measure_type)}>
-            <span class="type-icon" aria-hidden="true">${TYPE_ICONS[definition.measure_type] ?? "•"}</span>
+            <span class="type-icon" aria-hidden="true">${measurementIcon(definition.measure_type)}</span>
             <span class="type-label">${definition.label}</span>
             <span class="type-desc">${definition.description}</span>
           </button>
@@ -152,7 +150,7 @@ export class SetupView extends LitElement {
     const definition = this.definition(type);
     return html`
       <div class="type-chip">
-        <span class="type-icon" aria-hidden="true">${TYPE_ICONS[type] ?? "•"}</span>
+        <span class="type-icon" aria-hidden="true">${measurementIcon(type)}</span>
         <span class="chip-body">
           <strong>${definition?.label ?? type}</strong>
           ${definition ? html`<span class="type-desc">${definition.description}</span>` : nothing}
@@ -163,8 +161,9 @@ export class SetupView extends LitElement {
   }
 
   private renderLightForm() {
-    const defaults = this.capabilities?.defaults ?? fallbackDefaults;
-    const request = this.initialRequest;
+    if (!this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
+    const defaults = this.capabilities.defaults;
+    const request = this.initialRequest?.measure_type === LIGHT_TYPE ? this.initialRequest : undefined;
     const modes = this.availableModes(request);
     const selectedModes = request?.modes.length ? request.modes : modes;
     return html`
@@ -182,11 +181,18 @@ export class SetupView extends LitElement {
 
         <fieldset class="section">
           <legend>Light profile</legend>
-          <div class="grid">
-            ${this.textField("model_id", "Model ID", request?.model_id, "e.g. LWA017", true)}
-            ${this.textField("product_name", "Full product name", request?.product_name, "e.g. Hue White Ambiance", true)}
-            ${this.entitySelect("light_entity_id", "Light", this.lights, request?.light_entity_id, true)}
+          <div class="grid profile-grid">
+            ${this.entitySelect("light_entity_id", "Light", this.lights, request?.controller.type === "hass" ? request.controller.entity_id : "", true)}
             ${this.numberField("multiple_light_count", "Number of lights", request?.multiple_light_count ?? 1, 1, 100)}
+            ${this.textField("model_id", "Model ID", this.modelId(request), "e.g. LWA017", true)}
+            ${this.textField(
+              "product_name",
+              "Full product name",
+              request?.product_name,
+              "e.g. Philips Hue White Ambiance A60 E27",
+              true,
+              FULL_PRODUCT_NAME_HINT,
+            )}
           </div>
 
           <fieldset>
@@ -208,12 +214,12 @@ export class SetupView extends LitElement {
                 <option value="new" ?selected=${(request?.resume_policy ?? "new") === "new"}>Keep it and start a new session</option>
                 <option value="overwrite" ?selected=${request?.resume_policy === "overwrite"}>Delete it and start over</option>
               </select></label>
-              ${this.numberField("sleep_time", "Settle time (seconds)", request?.sleep_time ?? defaults.sleep_time, 0, 120, "0.1")}
-              ${this.numberField("sample_count", "Samples per step", request?.sample_count ?? defaults.sample_count, 1, 100)}
-              ${this.numberField("brightness_step", "Brightness step", request?.brightness_step ?? defaults.brightness_step, 1, 100)}
-              ${this.numberField("color_temp_step", "Color temperature step", request?.color_temp_step ?? defaults.color_temp_step, 1, 100)}
-              ${this.numberField("hue_step", "Hue step", request?.hue_step ?? defaults.hue_step, 1, 360)}
-              ${this.numberField("saturation_step", "Saturation step", request?.saturation_step ?? defaults.saturation_step, 1, 100)}
+              ${this.numberField("sleep_time", "Settle time (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, "0.1")}
+              ${this.numberField("sample_count", "Samples per step", request?.parameters.sample_count ?? defaults.sample_count, 1, 100)}
+              ${this.numberField("brightness_step", "Brightness step", request?.parameters.brightness_step ?? defaults.brightness_step, 1, 100)}
+              ${this.numberField("color_temp_step", "Color temperature step", request?.parameters.color_temp_step ?? defaults.color_temp_step, 1, 100)}
+              ${this.numberField("hue_step", "Hue step", request?.parameters.hue_step ?? defaults.hue_step, 1, 360)}
+              ${this.numberField("saturation_step", "Saturation step", request?.parameters.saturation_step ?? defaults.saturation_step, 1, 100)}
             </div>
           </details>
         </fieldset>
@@ -226,10 +232,10 @@ export class SetupView extends LitElement {
 
   private renderGenericForm(type: MeasureType) {
     const definition = this.definition(type);
-    if (!definition) return nothing;
-    const run = this.initialRunRequest;
-    const fields = definition.fields.filter((field) => field.name !== "powermeter_entity_id");
-    const power = run?.answers?.powermeter_entity_id?.toString() ?? this.defaultPowerEntityId;
+    if (!definition || !this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
+    const run = this.nonLightRequest();
+    const fields = deviceFields(definition);
+    const power = run?.power_meter.type === "hass" ? run.power_meter.entity_id : this.defaultPowerEntityId;
     return html`
       <form @submit=${this.submitGeneric}>
         <fieldset class="section">
@@ -243,11 +249,13 @@ export class SetupView extends LitElement {
 
         <fieldset class="section">
           <legend>${definition.label}</legend>
-          ${definition.supports_profile ? html`<div class="grid">
-            ${this.textField("model_id", "Model ID", run?.model_id ?? "", "e.g. WSP002", true)}
-            ${this.textField("product_name", "Full product name", run?.product_name ?? "", definition.label, true)}
-          </div>` : nothing}
-          <div class="grid">${fields.map((field) => this.genericField(field, run))}</div>
+          <div class="grid profile-grid">
+            ${fields.map((field) => this.genericField(field, run))}
+            ${definition.supports_profile ? this.textField("model_id", "Model ID", this.modelId(run), "e.g. WSP002", true) : nothing}
+            ${definition.supports_profile
+              ? this.textField("product_name", "Full product name", run?.product_name ?? "", definition.label, true, FULL_PRODUCT_NAME_HINT)
+              : nothing}
+          </div>
         </fieldset>
 
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
@@ -261,8 +269,12 @@ export class SetupView extends LitElement {
     return html`<p class="muted">Power readings come from the configured ${label}. Change this under Settings.</p>`;
   }
 
-  private textField(name: string, label: string, value = "", placeholder = "", required = false) {
-    return html`<label><span>${label}</span><input name=${name} .value=${value} placeholder=${placeholder} ?required=${required} autocomplete="off" /></label>`;
+  private textField(name: string, label: string, value = "", placeholder = "", required = false, hint = "") {
+    return html`<label>
+      <span>${label}</span>
+      <input name=${name} .value=${value} placeholder=${placeholder} ?required=${required} autocomplete="off" />
+      ${hint ? html`<small class="field-hint">${hint}</small>` : nothing}
+    </label>`;
   }
 
   private numberField(name: string, label: string, value: number, min: number, max: number, step = "1") {
@@ -271,52 +283,77 @@ export class SetupView extends LitElement {
 
   private entitySelect(name: string, label: string, entities: EntityDescriptor[], selected = "", required = false) {
     return html`
-      <label><span>${label}</span><select name=${name} ?required=${required} @change=${name === "light_entity_id" ? this.lightChanged : name === "power_entity_id" ? this.powerChanged : null}>
+      <label><span>${label}</span><select name=${name} ?required=${required} @change=${this.entityChanged(name)}>
         <option value="">${required ? "Select an entity" : "None"}</option>
         ${entities.map((entity) => html`<option value=${entity.entity_id} ?selected=${entity.entity_id === selected}>${entity.name} · ${entity.entity_id}</option>`)}
       </select></label>
     `;
   }
 
-  private genericField(field: MeasureDefinition["fields"][number], run?: MeasurementRunRequest) {
-    const stored = run?.answers?.[field.name];
+  private genericField(field: MeasureDefinition["fields"][number], run?: NonLightMeasurementRequest) {
+    if (!this.selectedType) return nothing;
+    const name = canonicalFieldName(this.selectedType, field.name);
+    const stored = run && requestFieldValue(run, name);
     if (field.control === "boolean") {
-      return html`<label class="check"><input type="checkbox" name=${field.name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
+      return html`<label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
     }
     if (field.control === "entity") {
       const value = (stored ?? field.default ?? "").toString();
-      const entities = (field.entity_domain && this.deviceEntities[field.entity_domain]) || [];
-      if (entities.length) {
-        return this.entitySelect(field.name, field.label, entities, value, field.required);
+      const domains = this.fieldDomains(field);
+      const failed = domains.find((domain) => this.deviceEntityErrors[domain]);
+      if (failed) {
+        return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
       }
-      // No matching entities were discovered — fall back to manual entry.
-      return html`<label><span>${field.label}${field.entity_domain ? ` (${field.entity_domain})` : ""}</span><input name=${field.name} .value=${value} ?required=${field.required} placeholder=${field.entity_domain ? `${field.entity_domain}.example` : ""} autocomplete="off" /></label>`;
+      const entities = domains.flatMap((domain) => this.deviceEntities[domain] ?? []);
+      if (!entities.length && field.allow_manual_entry) {
+        return html`<label><span>${field.label}</span><input name=${name} .value=${value} ?required=${field.required} autocomplete="off" /></label>`;
+      }
+      return this.entitySelect(name, field.label, entities, value, field.required);
     }
     if (field.control === "select") {
       const value = (stored ?? field.default ?? "").toString();
-      return html`<label><span>${field.label}</span><select name=${field.name} ?required=${field.required}>
+      return html`<label><span>${field.label}</span><select name=${name} ?required=${field.required} @change=${name === "charging_device_type" ? this.chargingTypeChanged : null}>
         ${field.options.map((option) => html`<option value=${option.value} ?selected=${option.value === value}>${option.label}</option>`)}
       </select></label>`;
     }
     const type = field.control === "number" ? "number" : "text";
     const value = (stored ?? field.default ?? "").toString();
-    return html`<label><span>${field.label}${field.entity_domain ? ` (${field.entity_domain})` : ""}</span><input type=${type} name=${field.name} .value=${value} ?required=${field.required} autocomplete="off" /></label>`;
+    return html`<label><span>${field.label}</span><input
+      type=${type}
+      name=${name}
+      .value=${value}
+      min=${field.minimum ?? nothing}
+      max=${field.maximum ?? nothing}
+      ?required=${field.required}
+      autocomplete="off"
+    /></label>`;
+  }
+
+  private fieldDomains(field: MeasureDefinition["fields"][number]): string[] {
+    if (field.entity_domains?.length) return field.entity_domains;
+    return field.entity_domain ? [field.entity_domain] : [];
   }
 
   private modeLabel(mode: LutMode): string {
     return { brightness: "Brightness", color_temp: "Color temperature", hs: "Hue & saturation", effect: "Effect" }[mode];
   }
 
-  private availableModes(request?: MeasurementRequest): LutMode[] {
-    const supported = this.capabilities?.modes ?? ["brightness", "color_temp", "hs"];
-    const lightId = this.selectedLightId || request?.light_entity_id;
+  private availableModes(request?: LightMeasurementRequest): LutMode[] {
+    const supported = this.capabilities?.modes ?? [];
+    const lightId = this.selectedLightId || (request?.controller.type === "hass" ? request.controller.entity_id : "");
     const entityModes = this.lights.find((entity) => entity.entity_id === lightId)?.supported_modes;
     return entityModes?.length ? supported.filter((mode) => entityModes.includes(mode)) : supported;
+  }
+
+  private nonLightRequest(): NonLightMeasurementRequest | undefined {
+    const request = this.initialRequest;
+    return request && request.measure_type !== LIGHT_TYPE ? request as NonLightMeasurementRequest : undefined;
   }
 
   private selectType(type: MeasureType): void {
     this.errorMessage = "";
     this.selectedType = type;
+    this.dispatchEvent(new CustomEvent("measure-type-selected", { detail: type, bubbles: true, composed: true }));
   }
 
   private changeType(): void {
@@ -332,24 +369,50 @@ export class SetupView extends LitElement {
     this.selectedPowerId = (event.currentTarget as HTMLSelectElement).value;
   }
 
+  private deviceChanged(event: Event): void {
+    this.selectedDeviceEntityId = (event.currentTarget as HTMLSelectElement).value;
+  }
+
+  private entityChanged(name: string): ((event: Event) => void) | null {
+    if (name === "light_entity_id") return this.lightChanged;
+    if (name === "power_entity_id") return this.powerChanged;
+    if (name === "voltage_entity_id") return null;
+    return this.deviceChanged;
+  }
+
+  private chargingTypeChanged(_event: Event): void {
+    const definition = this.definition("charging");
+    if (definition) this.dispatchEvent(new CustomEvent("entity-domains-requested", { detail: entityDomains(definition), bubbles: true, composed: true }));
+  }
+
   private definition(type: MeasureType): MeasureDefinition | undefined {
     return this.definitions.find((item) => item.measure_type === type);
   }
 
-  private powerEntityId(request?: MeasurementRequest): string {
-    return this.selectedPowerId || request?.power_entity_id || this.defaultPowerEntityId;
+  private powerEntityId(request?: LightMeasurementRequest): string {
+    const requestEntityId = request?.power_meter.type === "hass" ? request.power_meter.entity_id : "";
+    return this.selectedPowerId || requestEntityId || this.defaultPowerEntityId;
   }
 
-  private voltageEntityId(request?: MeasurementRequest): string {
-    if (request?.voltage_entity_id) {
-      return request.voltage_entity_id;
+  private voltageEntityId(request?: LightMeasurementRequest): string {
+    if (request?.power_meter.type === "hass" && request.power_meter.voltage_entity_id) {
+      return request.power_meter.voltage_entity_id;
     }
     return this.matchingVoltageEntityId(this.powerEntityId(request));
   }
 
   private matchingVoltageEntityId(powerEntityId: string): string {
-    const devicePrefix = powerEntityId.endsWith("_power") ? powerEntityId.slice(0, -"_power".length) : "";
-    return this.voltages.find((entity) => entity.entity_id === `${devicePrefix}_voltage`)?.entity_id ?? "";
+    const deviceId = this.powers.find((entity) => entity.entity_id === powerEntityId)?.device_id;
+    if (!deviceId) return "";
+    return this.voltages.find((entity) => entity.device_id === deviceId)?.entity_id ?? "";
+  }
+
+  private modelId(request?: MeasurementRequest): string {
+    if (request?.model_id) return request.model_id;
+    const requestEntityId = request && "controller" in request && request.controller.type === "hass" ? request.controller.entity_id : "";
+    const entityId = this.selectedType === LIGHT_TYPE ? this.selectedLightId || requestEntityId : this.selectedDeviceEntityId || requestEntityId;
+    const entities = [...this.lights, ...Object.values(this.deviceEntities).flat()];
+    return entities.find((entity) => entity.entity_id === entityId)?.model_id ?? "";
   }
 
   private submitLight(event: SubmitEvent): void {
@@ -365,24 +428,26 @@ export class SetupView extends LitElement {
       return typeof value === "string" ? value : "";
     };
     const number = (name: string) => Number(text(name));
-    const request: MeasurementRequest = {
+    const request: LightMeasurementRequest = {
+      measure_type: LIGHT_TYPE,
       model_id: text("model_id").trim(),
       product_name: text("product_name").trim(),
       measure_device: text("measure_device").trim(),
-      light_entity_id: text("light_entity_id"),
-      power_entity_id: text("power_entity_id"),
-      voltage_entity_id: text("voltage_entity_id") || null,
+      controller: { type: "hass", entity_id: text("light_entity_id") },
+      power_meter: this.powerMeterSpec(text("power_entity_id"), text("voltage_entity_id") || null),
       modes,
       generate_model: true,
       gzip: true,
       multiple_light_count: number("multiple_light_count"),
-      sleep_time: number("sleep_time"),
-      sample_count: number("sample_count"),
-      brightness_step: number("brightness_step"),
-      hue_step: number("hue_step"),
-      saturation_step: number("saturation_step"),
-      color_temp_step: number("color_temp_step"),
-      resume_policy: (text("resume_policy") || "new") as MeasurementRequest["resume_policy"],
+      parameters: {
+        sleep_time: number("sleep_time"),
+        sample_count: number("sample_count"),
+        brightness_step: number("brightness_step"),
+        hue_step: number("hue_step"),
+        saturation_step: number("saturation_step"),
+        color_temp_step: number("color_temp_step"),
+      },
+      resume_policy: (text("resume_policy") || "new") as LightMeasurementRequest["resume_policy"],
     };
     this.dispatchEvent(new CustomEvent("preflight", { detail: request, bubbles: true, composed: true }));
   }
@@ -390,27 +455,30 @@ export class SetupView extends LitElement {
   private submitGeneric(event: SubmitEvent): void {
     event.preventDefault();
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    if (!definition) return;
+    if (!definition || !this.capabilities) return;
     const form = new FormData(event.currentTarget as HTMLFormElement);
-    const answers: MeasurementRunRequest["answers"] = {};
-    for (const field of definition.fields) {
-      if (field.name === "powermeter_entity_id") continue;
-      const value = form.get(field.name);
-      answers[field.name] = field.control === "boolean" ? form.has(field.name) : field.control === "number" ? Number(value) : String(value ?? "");
+    const failedDomain = entityDomains(definition, form).find((domain) => this.deviceEntityErrors[domain]);
+    if (failedDomain) {
+      this.errorMessage = `Could not load ${failedDomain} entities. Retry before starting the measurement.`;
+      return;
     }
-    answers.powermeter_entity_id = this.powerMeter === "hass" ? String(form.get("power_entity_id") ?? "") : "__managed__";
-    const request: MeasurementRunRequest = {
-      measure_type: definition.measure_type,
-      model_id: String(form.get("model_id") ?? "measurement").trim() || "measurement",
-      product_name: String(form.get("product_name") ?? definition.label).trim() || definition.label,
-      measure_device: String(form.get("measure_device") ?? "").trim(),
-      answers,
-      generate_model: definition.supports_profile,
-      sleep_time: 2,
-      sample_count: 1,
-      resume_policy: "new",
-    };
-    this.dispatchEvent(new CustomEvent("preflight-run", { detail: request, bubbles: true, composed: true }));
+    const powerEntityId = String(form.get("power_entity_id") ?? "");
+    const voltageEntityId = this.matchingVoltageEntityId(powerEntityId) || null;
+    const request = buildNonLightRequest(definition, form, this.capabilities, this.powerMeterSpec(powerEntityId, voltageEntityId));
+    if (request.measure_type === "charging") {
+      const expectedDomain = request.charging_device_type === "lawn_mower_robot" ? "lawn_mower." : "vacuum.";
+      if (request.controller.type !== "hass" || !request.controller.entity_id.startsWith(expectedDomain)) {
+        this.errorMessage = `Select a ${expectedDomain.slice(0, -1)} entity for the chosen charging device type.`;
+        return;
+      }
+    }
+    this.dispatchEvent(new CustomEvent("preflight", { detail: request, bubbles: true, composed: true }));
+  }
+
+  private powerMeterSpec(entityId: string, voltageEntityId: string | null = null): PowerMeterSpec {
+    if (this.powerMeter === "dummy") return { type: "dummy" };
+    if (this.powerMeter === "shelly") return { type: "shelly", device_ip: this.shellyIp };
+    return { type: "hass", entity_id: entityId, voltage_entity_id: voltageEntityId };
   }
 }
 

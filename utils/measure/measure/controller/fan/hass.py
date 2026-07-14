@@ -1,15 +1,22 @@
 from __future__ import annotations
 
 from homeassistant_api.errors import HomeassistantAPIError
-import inquirer
 
-from measure.const import QUESTION_ENTITY_ID
 from measure.controller.errors import ControllerError
 from measure.controller.fan.controller import FanController
 from measure.controller.hass_controller import HassControllerBase
+from measure.home_assistant import HomeAssistantManager
 
 
 class HassFanController(HassControllerBase, FanController):
+    def __init__(
+        self,
+        home_assistant: HomeAssistantManager,
+        *,
+        entity_id: str | None = None,
+    ) -> None:
+        super().__init__(home_assistant, entity_id=entity_id)
+
     def set_percentage(self, percentage: int) -> None:
         assert percentage >= 0
         assert percentage <= 100
@@ -23,12 +30,3 @@ class HassFanController(HassControllerBase, FanController):
             self.client.trigger_service("fan", "turn_off", entity_id=self.entity_id)
         except HomeassistantAPIError as e:
             raise ControllerError(f"Failed to turn off fan: {e}") from e
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        return [
-            inquirer.List(
-                name=QUESTION_ENTITY_ID,
-                message="Select the fan entity",
-                choices=self.get_domain_entity_list("fan"),
-            ),
-        ]

@@ -1,23 +1,24 @@
-from typing import Any
+from __future__ import annotations
 
-from homeassistant_api import Client, State
-from homeassistant_api.errors import HomeassistantAPIError
+from homeassistant_api import State
 
-from measure.const import QUESTION_ENTITY_ID
 from measure.controller.errors import ApiConnectionError, ControllerError
+from measure.home_assistant import HomeAssistantManager
 
 
 class HassControllerBase:
-    def __init__(self, api_url: str, token: str) -> None:
-        self.entity_id: str | None = None
+    def __init__(
+        self,
+        home_assistant: HomeAssistantManager,
+        *,
+        entity_id: str | None = None,
+    ) -> None:
+        self.entity_id = entity_id
+        self.client = home_assistant
         try:
-            self.client = Client(api_url, token)
             self.client.get_config()
-        except HomeassistantAPIError as e:
+        except Exception as e:
             raise ApiConnectionError(f"Failed to connect to HA API: {e}") from e
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        self.entity_id = answers[QUESTION_ENTITY_ID]
 
     def get_domain_entity_list(self, domain: str) -> list:
         entities = self.client.get_entities()

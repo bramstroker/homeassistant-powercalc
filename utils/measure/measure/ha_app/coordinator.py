@@ -5,19 +5,12 @@ from dataclasses import replace
 import logging
 from pathlib import Path
 from threading import Lock, Thread
+import time
 from typing import Protocol
 from uuid import uuid4
 
-from measure.request import (
-    LightMeasurementRequest,
-    LightMeasurementRequestModel,
-    MeasurementRunRequest,
-    MeasurementRunRequestModel,
-    ResumePolicy,
-)
-from measure.runner.runner import RunnerResult
-from measure.session import (
-    MeasurementCancelledError,
+from measure.execution import MeasurementCancelledError
+from measure.ha_app.session import (
     SessionControl,
     SessionEvent,
     SessionEventType,
@@ -25,31 +18,42 @@ from measure.session import (
     SessionState,
     utc_now,
 )
-from measure.storage import SessionStorage
+from measure.ha_app.storage import SessionStorage
+from measure.request import MeasurementRequest, ResumePolicy
+from measure.runner.runner import RunnerResult
 
 _LOGGER = logging.getLogger("measure")
+_SNAPSHOT_PERSIST_INTERVAL = 5.0
 
 
 class SessionConflictError(Exception):
     """Raised when an operation conflicts with the active session state."""
 
 
-class MeasurementExecutor(Protocol):
+class SessionMeasurementService(Protocol):
+    """Run one session without exposing its adapter composition to the coordinator."""
+
     def run(
         self,
-        request: LightMeasurementRequest | MeasurementRunRequest,
+        request: MeasurementRequest,
         control: SessionControl,
         output_root: Path,
-    ) -> tuple[RunnerResult, Path]: ...
+    ) -> RunnerResult: ...
 
 
 class MeasurementCoordinator:
-    def __init__(self, storage: SessionStorage, service_factory: Callable[[], MeasurementExecutor]) -> None:
+    """Own the single persisted Home Assistant measurement session.
+
+    State transitions are serialized under a lock while the measurement runs on a worker thread.
+    """
+
+    def __init__(self, storage: SessionStorage, service_factory: Callable[[], SessionMeasurementService]) -> None:
         self.storage = storage
         self.service_factory = service_factory
         self._lock = Lock()
         self._snapshot = storage.load_current()
-        self._events: list[SessionEvent] = []
+        self._events = list(storage.load_events(self._snapshot.id)) if self._snapshot is not None else []
+        self._last_snapshot_write = 0.0
         self._control: SessionControl | None = None
         self._worker: Thread | None = None
 
@@ -58,7 +62,9 @@ class MeasurementCoordinator:
         with self._lock:
             return self._snapshot
 
-    def start(self, request: LightMeasurementRequestModel | MeasurementRunRequestModel) -> SessionSnapshot:
+    def start(self, request: MeasurementRequest) -> SessionSnapshot:
+        """Persist and launch a new session, rejecting overlapping work."""
+
         with self._lock:
             if self._snapshot and self._snapshot.state in {
                 SessionState.VALIDATING,
@@ -85,10 +91,13 @@ class MeasurementCoordinator:
                 self.storage.delete_session(previous_session_id)
             self._snapshot = snapshot
             self._events = []
+            self._last_snapshot_write = 0.0
             self._launch_locked(request)
             return self._snapshot
 
     def resume(self) -> SessionSnapshot:
+        """Relaunch the current session from compatible persisted output."""
+
         with self._lock:
             if self._snapshot is None or self._snapshot.state not in {
                 SessionState.RESUMABLE,
@@ -105,6 +114,8 @@ class MeasurementCoordinator:
             return self._snapshot
 
     def cancel(self) -> SessionSnapshot:
+        """Persist cancellation intent and signal the worker cooperatively."""
+
         with self._lock:
             if self._snapshot is not None and self._snapshot.state == SessionState.CANCELLED:
                 return self._snapshot
@@ -122,6 +133,8 @@ class MeasurementCoordinator:
             return self._snapshot
 
     def confirm(self) -> SessionSnapshot:
+        """Release a worker paused at an operator checkpoint."""
+
         with self._lock:
             if self._snapshot is None or self._snapshot.state != SessionState.AWAITING_CONFIRMATION:
                 raise SessionConflictError("The current session is not waiting for confirmation")
@@ -133,10 +146,14 @@ class MeasurementCoordinator:
             return self._snapshot
 
     def events_since(self, sequence: int) -> tuple[SessionEvent, ...]:
+        """Return buffered events after ``sequence`` for client replay."""
+
         with self._lock:
             return tuple(event for event in self._events if event.sequence > sequence)
 
-    def _launch_locked(self, request: LightMeasurementRequestModel | MeasurementRunRequestModel) -> None:
+    def _launch_locked(self, request: MeasurementRequest) -> None:
+        """Create session control and launch the worker while holding the coordinator lock."""
+
         assert self._snapshot is not None
         self._control = SessionControl(initial_sequence=self._snapshot.event_sequence)
         self._control.subscribe(self._handle_event)
@@ -154,12 +171,12 @@ class MeasurementCoordinator:
     def _run(
         self,
         session_id: str,
-        request: LightMeasurementRequestModel | MeasurementRunRequestModel,
+        request: MeasurementRequest,
         control: SessionControl,
     ) -> None:
         try:
-            result, _ = self.service_factory().run(
-                request.to_domain(),
+            result = self.service_factory().run(
+                request,
                 control,
                 self.storage.output_directory(session_id),
             )
@@ -172,6 +189,8 @@ class MeasurementCoordinator:
             self._finish(SessionState.COMPLETED, summary=result.summary)
 
     def _handle_event(self, event: SessionEvent) -> None:
+        """Project runner events onto the snapshot and persistence policy."""
+
         with self._lock:
             if self._snapshot is None:
                 return
@@ -180,7 +199,9 @@ class MeasurementCoordinator:
                 self._events = self._events[-1000:]
             if event.type == SessionEventType.SAMPLE:
                 # High-frequency live readings: stream to clients, but don't persist
-                # or mutate the snapshot (they are transient realtime data only).
+                # the snapshot. Keep the in-memory cursor current so the terminal
+                # state cannot reuse a transient event's sequence number.
+                self._snapshot = replace(self._snapshot, event_sequence=event.sequence, updated_at=event.created_at)
                 return
             if event.type == SessionEventType.PROGRESS:
                 self._snapshot = replace(
@@ -212,16 +233,34 @@ class MeasurementCoordinator:
                     event_sequence=event.sequence,
                     updated_at=event.created_at,
                 )
-            self.storage.append_event(self._snapshot.id, event)
-            self.storage.write_snapshot(self._snapshot)
+            durable = event.type in {SessionEventType.STATE, SessionEventType.WARNING, SessionEventType.CHECKPOINT}
+            self.storage.append_event(self._snapshot.id, event, durable=durable)
+            if self._should_persist_snapshot(event):
+                self.storage.write_snapshot(self._snapshot)
+                self._last_snapshot_write = time.monotonic()
+
+    def _should_persist_snapshot(self, event: SessionEvent) -> bool:
+        if event.type == SessionEventType.LOG:
+            return False
+        if event.type != SessionEventType.PROGRESS:
+            return True
+        return time.monotonic() - self._last_snapshot_write >= _SNAPSHOT_PERSIST_INTERVAL
 
     def _finish(self, state: SessionState, error: str | None = None, summary: dict[str, str] | None = None) -> None:
+        """Persist the terminal snapshot and its final state event."""
+
         with self._lock:
             if self._snapshot is None:
                 return
             files = self.storage.list_files(self._snapshot.id)
             updated_at = utc_now()
-            sequence = self._snapshot.event_sequence + 1
+            sequence = (
+                max(
+                    self._snapshot.event_sequence,
+                    self._control.sequence if self._control is not None else 0,
+                )
+                + 1
+            )
             self._snapshot = replace(
                 self._snapshot,
                 state=state,

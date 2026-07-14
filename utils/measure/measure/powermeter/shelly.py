@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import logging
 import time
-from typing import Any
 
 import requests
 
@@ -52,15 +51,7 @@ class ShellyApiGen2Plus(ShellyApi):
         return PowerMeasurementResult(power=float(json["apower"]), updated=time.time())
 
     def check_gen2_plus_endpoints(self) -> None:
-        """Check the endpoint for Gen2+ devices.
-
-        Shelly Gen2+ devices come with different capabilities, and depending on the device type,
-        they may have different API endpoints. By default, we try to use the
-        "/rpc/Switch.GetStatus?id=0" endpoint, which is suitable for devices that support
-        switching. However, some Gen2+ devices are designed purely for power measurement without
-        any relay (so they can't act as a switch). For those devices, the endpoint
-        "/rpc/PM1.GetStatus?id=0" is used instead.
-        """
+        """Select the switch or meter-only RPC endpoint supported by the device."""
         endpoints = ["/rpc/Switch.GetStatus?id=0", "/rpc/PM1.GetStatus?id=0"]
         for endpoint in endpoints:
             if self._check_endpoint_availability(endpoint):
@@ -137,6 +128,3 @@ class ShellyPowerMeter(PowerMeter):
 
     def has_voltage_support(self) -> bool:
         return isinstance(self.api, ShellyApiGen2Plus)
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        pass

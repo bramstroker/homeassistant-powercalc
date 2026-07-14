@@ -7,7 +7,7 @@ from typing import Any, Protocol, cast
 from unittest.mock import MagicMock, patch
 
 from decouple import UndefinedValueError
-from measure.config import MeasureConfig
+from measure.cli.environment import CliEnvironment
 from measure.const import (
     PROJECT_DIR,
     QUESTION_DUMMY_LOAD,
@@ -55,9 +55,7 @@ def clean_export_directory() -> None:
 
 @pytest.fixture
 def mock_config_factory() -> MockConfigFactory:
-    @patch("measure.config.MeasureConfig", autospec=True)
     def _mock_config(
-        mock: MagicMock,
         config_values: dict[str, Any] | None = None,
         set_question_defaults: bool = True,
         question_defaults: dict[str, Any] | None = None,
@@ -123,12 +121,12 @@ def mock_config_factory() -> MockConfigFactory:
                 },
             )
 
-        real_config = MeasureConfig()
-        mock_instance = mock.return_value
+        real_config = CliEnvironment()
+        mock_instance = MagicMock(spec=CliEnvironment)
         mock_instance.get_conf_value = MagicMock()
         mock_instance.get_conf_value.side_effect = lambda k: default_config_values.get(k.lower())
 
-        properties = {prop for prop in dir(MeasureConfig) if isinstance(getattr(MeasureConfig, prop, None), property)}
+        properties = {prop for prop in dir(CliEnvironment) if isinstance(getattr(CliEnvironment, prop, None), property)}
         for prop in properties:
             try:
                 default_val = getattr(real_config, prop)

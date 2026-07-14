@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
-import inquirer.questions
-
 from .controller import LightController, LightInfo
 
 
@@ -18,12 +14,6 @@ class DummyLightController(LightController):
 
     def get_light_info(self) -> LightInfo:
         return LightInfo("dummy")
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        return []
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        pass
 
     def has_effect_support(self) -> bool:
         return True

@@ -7,8 +7,8 @@ import logging
 import os
 from statistics import mean
 import time
+from typing import Protocol
 
-from measure.configuration import MeasureRuntimeConfig
 from measure.const import (
     DUMMY_LOAD_MEASUREMENT_COUNT,
     DUMMY_LOAD_MEASUREMENTS_DURATION,
@@ -19,11 +19,50 @@ from measure.const import (
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
+    UnsupportedFeatureError,
     ZeroReadingError,
 )
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
+from measure.tuning import MeasurementParameters
 
 _LOGGER = logging.getLogger("measure")
+
+
+class MeasurementError(PowerMeterError):
+    """Base error for invalid or incomplete measurement results."""
+
+
+class NoValidReadingsError(MeasurementError):
+    """Raised when a measurement completes without a usable reading."""
+
+
+class DummyLoadMeasurementError(MeasurementError):
+    """Raised when a dummy-load measurement cannot produce a valid result."""
+
+
+class MeasurementInteractionRequiredError(MeasurementError):
+    """Raised when an interactive operation has no interaction adapter."""
+
+
+class MeasureUtilInteraction(Protocol):
+    """Input/output boundary used by optional interactive utility workflows."""
+
+    def confirm(self, message: str) -> None: ...
+
+    def choose(self, message: str, *, default: bool) -> bool: ...
+
+    def notify(self, message: str) -> None: ...
+
+
+class _MissingInteraction:
+    def confirm(self, message: str) -> None:
+        raise MeasurementInteractionRequiredError(message)
+
+    def choose(self, message: str, *, default: bool) -> bool:
+        raise MeasurementInteractionRequiredError(message)
+
+    def notify(self, message: str) -> None:
+        _LOGGER.info(message)
 
 
 @dataclass(frozen=True)
@@ -59,15 +98,17 @@ class MeasureUtil:
     def __init__(
         self,
         power_meter: PowerMeter,
-        config: MeasureRuntimeConfig,
+        parameters: MeasurementParameters,
         include_voltage: Callable[[], bool] | None = None,
         wait: Callable[[float], None] = time.sleep,
+        interaction: MeasureUtilInteraction | None = None,
     ) -> None:
         self.power_meter = power_meter
         self.dummy_load_value: float | None = None
-        self.config = config
+        self.config = parameters
         self._include_voltage = include_voltage or (lambda: False)
         self._wait = wait
+        self._interaction = interaction or _MissingInteraction()
 
     def take_average_measurement(
         self,
@@ -76,43 +117,14 @@ class MeasureUtil:
         convergence: AverageMeasurementConvergence | None = None,
         on_progress: Callable[[float, float], None] | None = None,
     ) -> MeasurementResult:
-        """
-        Measure the average power consumption or resistance for a given time period in seconds.
-
-        This function calculates the average power or resistance by taking multiple readings over
-        the specified duration. If `measure_resistance` is True, the function computes resistance
-        using the formula R = V^2 / P, where V is the voltage and P is the power. If a dummy load
-        resistive value is set, the power consumption of the dummy load calculated for each
-        measurement, depending on the current voltage and is subtracted from the power
-        measurements.
-
-        Args:
-            duration (int): The time duration (in seconds) over which to take measurements.
-            measure_resistance (bool): Whether to measure resistance instead of power. Defaults to False.
-            convergence (AverageMeasurementConvergence | None): Stop early when the cumulative average has stabilized.
-
-        Returns:
-            float: The average resistance (in Ω) or power (in W) over the measurement duration.
-
-        Raises:
-            UnsupportedFeatureError: If `measure_resistance` is True but the power meter does not
-                                      support voltage measurements.
-
-        Error handling:
-            - If voltage measurements are not supported, the program will terminate with an appropriate
-              error message, if measuring power consumption and a dummy load resistive value is set.
-            - For resistance measurements, voltage values below 1 are treated as invalid, and the program
-              exits to avoid incorrect calculations.
-            - Ignores single measurements of <= 0 W.
-        """
+        """Average valid readings, optionally as resistance, until duration or convergence."""
         _LOGGER.info("Measuring average %s over %s seconds", "resistance" if measure_resistance else "power", duration)
         state = self._collect_average_measurements(duration, measure_resistance, convergence, on_progress)
         if on_progress is not None:
             on_progress(duration, duration)
 
         if not state.readings:
-            _LOGGER.error("No valid readings were recorded.")
-            exit(1)
+            raise NoValidReadingsError("No valid readings were recorded")
 
         average = round(mean(state.readings), 2)
         _LOGGER.info(
@@ -258,8 +270,7 @@ class MeasureUtil:
         power, voltage = result.power, result.voltage
 
         if voltage < 1:
-            _LOGGER.error("Error during measurement: Voltage measurement returned zero. Aborting measurement.")
-            exit(1)
+            raise ZeroReadingError("Voltage measurement returned zero")
 
         if round(power, 2) == 0:
             _LOGGER.warning("Invalid measurement: power: %.2f W, voltage: %.2f", power, voltage)
@@ -276,8 +287,7 @@ class MeasureUtil:
         power, voltage = result.power, result.voltage
 
         if voltage < 1:
-            _LOGGER.error("Error during measurement: Voltage measurement returned zero. Aborting measurement.")
-            exit(1)
+            raise ZeroReadingError("Voltage measurement returned zero")
 
         assert self.dummy_load_value is not None
         power -= (voltage**2) / self.dummy_load_value
@@ -327,8 +337,7 @@ class MeasureUtil:
 
         # Determine Average PM reading
         if not measurements:
-            _LOGGER.error("No valid readings were recorded.")
-            exit(1)
+            raise NoValidReadingsError("No valid readings were recorded")
 
         average = mean(measurements)
         _LOGGER.info("Average measurement: %.3f W", average)
@@ -409,24 +418,20 @@ class MeasureUtil:
                 value = float(f.read())
             _LOGGER.info("Dummy load was already measured before, value: %s Ω", value)
 
-            print("You need to preheat the dummy load, so it's consumption can stabilize.")
-            print(
-                "If you're unsure the dummy load is sufficiently preheated or you're using a different one, remeasure.",
+            self._interaction.notify("You need to preheat the dummy load so its consumption can stabilize.")
+            remeasure = self._interaction.choose(
+                "Remeasure the dummy load if it is not sufficiently preheated or a different load is connected?",
+                default=False,
             )
-            print()
-            inquirer = input("Do you want to measure the dummy load again? (y/n): ")
-            if inquirer.lower() == "n":
+            if not remeasure:
                 self.dummy_load_value = value
                 return self.dummy_load_value
 
-        print()
-        print("Tip: Use a dummy load with constant power consumption. Stick to resistive loads for the best results!")
-        print("Important: Connect only the dummy load to your smart plug—not the device you're measuring.")
-        print()
-        print("The script will now measure the dummy load and continue once it's consumption has stabilized.")
-        print("Depending on the dummy load this may take 2 hours.")
-        print()
-        input("Ready to begin measuring the dummy load? Hit Enter ")
+        self._interaction.notify(
+            "Use a constant resistive dummy load and connect only that load to the smart plug. "
+            "Stabilization can take up to two hours.",
+        )
+        self._interaction.confirm("Ready to begin measuring the dummy load?")
 
         self.dummy_load_value = self._measure_dummy_load(dummy_load_file)
         return self.dummy_load_value
@@ -434,7 +439,7 @@ class MeasureUtil:
     def _measure_dummy_load(self, file_path: str) -> float:
         """Measure the dummy load and persist the value for future measurement session"""
 
-        print(
+        self._interaction.notify(
             "Measuring and checking dummy load... this will take at least %.0f minutes."
             % (DUMMY_LOAD_MEASUREMENT_COUNT / 60 * DUMMY_LOAD_MEASUREMENTS_DURATION),
         )
@@ -451,13 +456,12 @@ class MeasureUtil:
             trend = self._check_trend(averages)
 
             if not trend:
-                _LOGGER.error("Error during measurement: No trend could be calculated")
-                exit(1)
+                raise DummyLoadMeasurementError("No dummy-load resistance trend could be calculated")
 
             if trend == Trend.STEADY:
                 break
 
-            print(f"Dummy load resistance has not yet stabilized and is {trend}, repeating.")
+            self._interaction.notify(f"Dummy load resistance has not yet stabilized and is {trend}; repeating.")
 
         average = round(mean(averages), 2)
 
@@ -468,13 +472,7 @@ class MeasureUtil:
         return average
 
     def _check_trend(self, averages: list[float]) -> Trend | None:
-        """
-        Checks if the resistance readings of a dummy load are increasing, decreasing, or steady (fluctuating).
-
-        Returns:
-            str: "increasing", "decreasing", or "steady" based on the trends.
-            None: if not enough samples were supplied
-        """
+        """Classify resistance readings as increasing, decreasing or steady."""
         if len(averages) < 20:
             return None
 
@@ -483,8 +481,8 @@ class MeasureUtil:
         first_half = averages[:mid]
         second_half = averages[mid:]
 
-        first_trend = self._linear_slope(first_half)
-        second_trend = self._linear_slope(second_half)
+        first_slope = self._linear_slope(first_half)
+        second_slope = self._linear_slope(second_half)
 
         def trend_direction(slope: float, threshold: float = 0.01) -> Trend:
             if slope > threshold:
@@ -493,8 +491,8 @@ class MeasureUtil:
                 return Trend.DECREASING
             return Trend.STEADY
 
-        first_trend = trend_direction(first_trend)
-        second_trend = trend_direction(second_trend)
+        first_trend = trend_direction(first_slope)
+        second_trend = trend_direction(second_slope)
 
         if first_trend == second_trend and first_trend != Trend.STEADY:
             return first_trend
@@ -515,8 +513,9 @@ class MeasureUtil:
         """Check if the power meter supports voltage readings."""
 
         if not self.power_meter.has_voltage_support():
-            print("The selected power meter does not support voltage measurements, required to measure dummy loads.")
-            exit(1)
+            raise UnsupportedFeatureError(
+                "The selected power meter does not support voltage measurements required for dummy loads",
+            )
 
     @staticmethod
     def _get_voltages(measurement: PowerMeasurementResult) -> list[float]:

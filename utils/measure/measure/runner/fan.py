@@ -1,13 +1,8 @@
 import logging
-from typing import Any
 
-import inquirer
-
-from measure.config import MeasureConfig
 from measure.controller.fan.controller import FanController
-from measure.controller.fan.factory import FanControllerFactory
-from measure.execution import RunInteraction
-from measure.interactions import ConsoleInteraction
+from measure.execution import ImmediateInteraction, RunInteraction
+from measure.request import FanMeasurementRequest
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
@@ -16,26 +11,22 @@ _LOGGER = logging.getLogger("measure")
 SLEEP_TIME_PERCENTAGE_CHANGE = 15
 
 
-class FanRunner(MeasurementRunner):
+class FanRunner(MeasurementRunner[FanMeasurementRequest]):
     def __init__(
         self,
         measure_util: MeasureUtil,
-        config: MeasureConfig,
+        fan_controller: FanController,
         interaction: RunInteraction | None = None,
     ) -> None:
         self.measure_util = measure_util
-        self.config = config
-        self.fan_controller: FanController = FanControllerFactory(config).create()
-        self.interaction = interaction or ConsoleInteraction()
-
-    def prepare(self, answers: dict[str, Any]) -> None:
-        self.fan_controller.process_answers(answers)
+        self.fan_controller = fan_controller
+        self.interaction = interaction or ImmediateInteraction()
 
     def run(
         self,
-        answers: dict[str, Any],
+        request: FanMeasurementRequest,
         export_directory: str,
-    ) -> RunnerResult | None:
+    ) -> RunnerResult:
         measurements: dict[int, float] = {}
         voltages: list[float] = []
         for percentage in range(5, 101, 5):
@@ -58,9 +49,6 @@ class FanRunner(MeasurementRunner):
             "calculation_strategy": "linear",
             "linear_config": {"calibrate": calibrate_list},
         }
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        return self.fan_controller.get_questions()
 
     def measure_standby_power(self) -> MeasurementResult:
         _LOGGER.info("Turning off fan to start measuring standby power")

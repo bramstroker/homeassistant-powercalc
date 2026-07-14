@@ -4,7 +4,7 @@ import json
 import logging
 from pathlib import Path
 
-from measure.app import _configure_logging, _read_options
+from measure.ha_app.main import _configure_logging, _read_options
 
 
 def test_read_options_empty_when_missing(tmp_path: Path) -> None:

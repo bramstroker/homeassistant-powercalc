@@ -2,21 +2,21 @@ import logging
 
 from decouple import Choices, UndefinedValueError, config
 
-from measure.configuration import MeasurementSettings
-from measure.const import MeasureType
+from measure.const import parse_measure_type
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.fan.const import FanControllerType
-from measure.controller.light.const import LightControllerType
+from measure.controller.light.const import DEFAULT_LIGHT_TRANSITION_TIME, LightControllerType
 from measure.controller.media.const import MediaControllerType
 from measure.powermeter.const import PowerMeterType
+from measure.tuning import MeasurementParameters
 
 _LOGGER = logging.getLogger("measure")
 
 # Shared tuning defaults; the environment variables below only override these.
-_DEFAULTS = MeasurementSettings()
+_DEFAULTS = MeasurementParameters()
 
 
-class MeasureConfig:
+class CliEnvironment:
     @property
     def min_brightness(self) -> int:
         return min(
@@ -156,8 +156,8 @@ class MeasureConfig:
         return config("SLEEP_STANDBY", default=_DEFAULTS.sleep_standby, cast=int)
 
     @property
-    def sleep_time(self) -> int:
-        return config("SLEEP_TIME", default=_DEFAULTS.sleep_time, cast=int)
+    def sleep_time(self) -> float:
+        return config("SLEEP_TIME", default=_DEFAULTS.sleep_time, cast=float)
 
     @property
     def sleep_time_sample(self) -> int:
@@ -250,7 +250,7 @@ class MeasureConfig:
     @property
     def selected_measure_type(self) -> str | None:
         try:
-            return MeasureType(config("SELECTED_MEASURE_TYPE"))
+            return parse_measure_type(config("SELECTED_MEASURE_TYPE"))
         except UndefinedValueError:
             return None
 
@@ -313,7 +313,7 @@ class MeasureConfig:
     def light_transition_time(self) -> int:
         return config(
             "LIGHT_TRANSITION_TIME",
-            default=_DEFAULTS.light_transition_time,
+            default=DEFAULT_LIGHT_TRANSITION_TIME,
             cast=int,
         )
 

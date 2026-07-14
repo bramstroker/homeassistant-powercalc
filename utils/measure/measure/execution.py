@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+import time
 from typing import Any, Protocol
 
-from measure.const import QUESTION_DUMMY_LOAD
+from measure.model import write_model_json
+from measure.request import MeasurementRequest
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasureUtil
 
 
 class RunInteraction(Protocol):
@@ -19,80 +19,93 @@ class RunInteraction(Protocol):
     def notify(self, message: str) -> None:
         """Present non-terminal run information to the operator."""
 
+    def choose(self, message: str, *, default: bool) -> bool:
+        """Ask the operator to make a binary choice."""
+
     def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
         """Report measurement progress. ``total`` of 0 means the run is open-ended."""
 
     def wait(self, seconds: float) -> None:
         """Wait for a duration, raising if the run is cancelled."""
 
+    def checkpoint(self) -> None:
+        """Raise when the active run has been cancelled."""
+
+
+class MeasurementCancelledError(Exception):
+    """Raised when an active measurement is cancelled cooperatively."""
+
+
+class ImmediateInteraction:
+    """Non-interactive execution adapter used by tests and unattended runs."""
+
+    def confirm(self, _: str) -> None:
+        return
+
+    def notify(self, _: str) -> None:
+        return
+
+    def choose(self, _: str, *, default: bool) -> bool:
+        return default
+
+    def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
+        return
+
+    def wait(self, seconds: float) -> None:
+        time.sleep(seconds)
+
+    def checkpoint(self) -> None:
+        return
+
 
 @dataclass(frozen=True)
-class MeasurementMetadata:
-    """Shared output settings, independent of the UI that collected them."""
+class PreparedMeasurement:
+    """Fully assembled measurement graph ready for transport-independent execution."""
 
-    model_id: str
-    model_name: str
-    measure_device: str
-    generate_model_json: bool
-
-
-@dataclass(frozen=True)
-class ExecutionResult:
-    runner_result: RunnerResult
-    export_directory: Path | None
+    request: MeasurementRequest
+    runner: MeasurementRunner[Any]
 
 
 class MeasurementExecution:
-    """Execute a prepared runner without depending on CLI or web transport details."""
+    """Own output, cleanup, standby measurement and model writing for a prepared runner."""
 
     def __init__(
         self,
         *,
-        runner: MeasurementRunner,
-        measure_util: MeasureUtil,
-        answers: dict[str, Any],
-        metadata: MeasurementMetadata,
+        measurement: PreparedMeasurement,
         output_directory: Path | None,
-        interaction: RunInteraction,
-        write_model: Callable[[Path, float, str, str, dict[str, Any], list[float]], None],
-        cleanup: Callable[[], None] | None = None,
     ) -> None:
-        self.runner = runner
-        self.measure_util = measure_util
-        self.answers = answers
-        self.metadata = metadata
-        self.output_directory = output_directory
-        self.interaction = interaction
-        self.write_model = write_model
-        self.cleanup = cleanup
+        self.measurement = measurement
+        self.output_directory = (
+            output_directory
+            if output_directory is not None
+            and (measurement.request.generate_model_json or measurement.runner.writes_export_files())
+            else None
+        )
 
-    def run(self) -> ExecutionResult:
-        self.runner.prepare(self.answers)
-        if self.answers.get(QUESTION_DUMMY_LOAD, False):
-            self.measure_util.initialize_dummy_load()
-            self.interaction.confirm(
-                "Please connect the appliance in parallel to the dummy load and confirm to start measurement.",
-            )
+    def run(self) -> RunnerResult:
+        """Run and clean the device before measuring standby power and writing the model."""
 
-        export_directory = self.output_directory
-        if export_directory is not None:
-            export_directory.mkdir(parents=True, exist_ok=True)
+        output_directory = self.output_directory
+        if output_directory is not None:
+            output_directory.mkdir(parents=True, exist_ok=True)
 
+        runner = self.measurement.runner
+        request = self.measurement.request
         try:
-            result = self.runner.run(self.answers, str(export_directory or ""))
-            if result is None:
-                raise RuntimeError("Measurement runner did not return a result")
-            if self.metadata.generate_model_json and export_directory is not None:
-                standby = self.runner.measure_standby_power()
-                self.write_model(
-                    export_directory,
-                    standby.power,
-                    self.metadata.model_name,
-                    self.metadata.measure_device,
-                    result.model_json_data,
-                    list(result.voltages or []) + standby.voltages,
-                )
-            return ExecutionResult(runner_result=result, export_directory=export_directory)
+            result = runner.run(request, str(output_directory or ""))
         finally:
-            if self.cleanup is not None:
-                self.cleanup()
+            runner.cleanup()
+
+        if request.generate_model_json and output_directory is not None:
+            standby = runner.measure_standby_power()
+            write_model_json(
+                output_directory,
+                standby_power=standby.power,
+                name=request.model_name,
+                measure_device=request.measure_device,
+                parameters=request.parameters,
+                extra_json_data=result.model_json_data,
+                voltages=list(result.voltages or []) + standby.voltages,
+            )
+        return result

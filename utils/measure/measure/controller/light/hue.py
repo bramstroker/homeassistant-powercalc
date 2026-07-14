@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 from typing import Any
 
-import inquirer
 from phue import Bridge, PhueRegistrationException, PhueRequestTimeout
 
 from measure.const import PROJECT_DIR
@@ -16,12 +15,14 @@ TYPE_GROUP = "group"
 
 
 class HueLightController(LightController):
-    def __init__(self, bridge_ip: str) -> None:
+    def __init__(self, bridge_ip: str, *, light: str | None = None) -> None:
         self.bridge = self.initialize_hue_bridge(bridge_ip)
         self.lights = {light.light_id: light.name for light in self.bridge.lights}
         self.groups = {group.group_id: group.name for group in self.bridge.groups}
         self.is_group: bool = False
         self.light_id: int | None = None
+        if light is not None:
+            self._select_light(light)
 
     def change_light_state(
         self,
@@ -94,23 +95,8 @@ class HueLightController(LightController):
 
         return bridge
 
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        def get_message(answers: dict[str, Any]) -> str:
-            if answers.get("multiple_lights"):
-                return "Select the lightgroup"
-            return "Select the light"
-
-        def get_light_list(answers: dict[str, Any]) -> list:
-            if answers.get("multiple_lights"):
-                return [(name, f"{TYPE_GROUP}:{group_id}") for group_id, name in self.groups.items()]
-            return [(name, f"{TYPE_LIGHT}:{light_id}") for light_id, name in self.lights.items()]
-
-        return [
-            inquirer.List(name="light", message=get_message, choices=get_light_list),
-        ]
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        light_type, light_id = answers["light"].split(":")
+    def _select_light(self, light: str) -> None:
+        light_type, light_id = light.split(":")
         self.is_group = light_type == TYPE_GROUP
         self.light_id = int(light_id)
 

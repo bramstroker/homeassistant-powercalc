@@ -2,9 +2,9 @@ import type {
   ApiErrorBody,
   AppSettings,
   Capabilities,
+  DeviceClass,
   EntityDescriptor,
   MeasurementRequest,
-  MeasurementRunRequest,
   MeasureDefinition,
   PowerMeterTestResult,
   PreflightResponse,
@@ -59,13 +59,12 @@ export class MeasureApiClient {
     return this.request("api/settings/test-power-meter", { method: "POST", body: JSON.stringify(settings) });
   }
 
-  getEntities(filter: "light" | "power" | "voltage"): Promise<EntityDescriptor[]> {
-    const query = filter === "light" ? "domain=light" : `kind=${filter}`;
-    return this.request<EntityDescriptor[]>(`api/entities?${query}`);
-  }
-
   getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]> {
     return this.request<EntityDescriptor[]>(`api/entities?domain=${encodeURIComponent(domain)}`);
+  }
+
+  getEntitiesByDeviceClass(deviceClass: DeviceClass): Promise<EntityDescriptor[]> {
+    return this.request<EntityDescriptor[]>(`api/entities?device_class=${encodeURIComponent(deviceClass)}`);
   }
 
   preflight(request: MeasurementRequest): Promise<PreflightResponse> {
@@ -76,13 +75,6 @@ export class MeasureApiClient {
     return this.request("api/sessions", { method: "POST", body: JSON.stringify(request) });
   }
 
-  preflightRun(request: MeasurementRunRequest): Promise<PreflightResponse> {
-    return this.request("api/runs/preflight", { method: "POST", body: JSON.stringify(request) });
-  }
-
-  startRun(request: MeasurementRunRequest): Promise<SessionSnapshot> {
-    return this.request("api/runs", { method: "POST", body: JSON.stringify(request) });
-  }
 
   getCurrent(): Promise<SessionSnapshot> {
     return this.request("api/session/current");
@@ -166,9 +158,14 @@ export class SessionEventStream {
 
   private consume(data: string): void {
     try {
-      this.onEvent(JSON.parse(data) as SessionEvent);
+      const event = JSON.parse(data) as Partial<SessionEvent>;
+      if (typeof event.sequence !== "number" || typeof event.type !== "string" || typeof event.data !== "object" || event.data === null) {
+        throw new Error("Invalid event envelope");
+      }
+      this.onEvent(event as SessionEvent);
     } catch {
-      this.onEvent({ type: "log", message: data });
+      this.onConnection(false);
+      this.onEvent({ sequence: 0, type: "log", data: { message: "Received an invalid event from the measure app." } });
     }
   }
 }

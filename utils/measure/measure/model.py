@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from measure.configuration import MeasureRuntimeConfig
 from measure.const import MODEL_JSON_MAX_VOLTAGE, MODEL_JSON_MIN_VOLTAGE, PROJECT_DIR
+from measure.tuning import MeasurementParameters
 
 
 def measure_version() -> str:
@@ -19,10 +19,9 @@ def write_model_json(
     standby_power: float,
     name: str,
     measure_device: str,
-    config: MeasureRuntimeConfig,
+    parameters: MeasurementParameters,
     extra_json_data: dict[str, Any] | None = None,
     voltages: list[float] | None = None,
-    voltage_json_data: dict[str, float] | None = None,
 ) -> Path:
     created_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
     json_data: dict[str, Any] = {
@@ -32,15 +31,13 @@ def write_model_json(
         "measure_description": "Measured with utils/measure script",
         "measure_settings": {
             "VERSION": measure_version(),
-            "SAMPLE_COUNT": config.sample_count,
-            "SLEEP_TIME": config.sleep_time,
+            "SAMPLE_COUNT": parameters.sample_count,
+            "SLEEP_TIME": parameters.sleep_time,
         },
         "name": name,
         "standby_power": standby_power,
     }
-    if voltage_json_data:
-        json_data.update(voltage_json_data)
-    elif voltages:
+    if voltages:
         json_data.update(
             {
                 MODEL_JSON_MIN_VOLTAGE: round(min(voltages), 2),

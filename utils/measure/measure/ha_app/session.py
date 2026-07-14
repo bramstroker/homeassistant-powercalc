@@ -7,6 +7,8 @@ from enum import StrEnum
 from threading import Event, Lock
 from typing import Any
 
+from measure.execution import MeasurementCancelledError
+
 
 class SessionState(StrEnum):
     IDLE = "idle"
@@ -30,10 +32,6 @@ class SessionEventType(StrEnum):
     SAMPLE = "sample"
 
 
-class MeasurementCancelledError(Exception):
-    """Raised when a measurement session is cancelled cooperatively."""
-
-
 @dataclass(frozen=True)
 class SessionEvent:
     sequence: int
@@ -47,6 +45,8 @@ class SessionEvent:
 
 @dataclass(frozen=True)
 class SessionSnapshot:
+    """Persisted projection of the current session state."""
+
     id: str
     state: SessionState
     created_at: str
@@ -79,6 +79,8 @@ def utc_now() -> str:
 
 @dataclass
 class SessionControl:
+    """Thread-safe bridge for worker cancellation, confirmation and events."""
+
     initial_sequence: int = 0
     _cancelled: Event = field(default_factory=Event)
     _listeners: list[Callable[[SessionEvent], None]] = field(default_factory=list)
@@ -108,6 +110,8 @@ class SessionControl:
             raise MeasurementCancelledError
 
     def confirm(self, message: str) -> None:
+        """Pause at an operator checkpoint while remaining cancellable."""
+
         self._confirmed.clear()
         self.emit(SessionEventType.CHECKPOINT, {"message": message})
         while not self._confirmed.wait(0.25):
@@ -120,7 +124,15 @@ class SessionControl:
     def subscribe(self, listener: Callable[[SessionEvent], None]) -> None:
         self._listeners.append(listener)
 
+    @property
+    def sequence(self) -> int:
+        """Return the last sequence allocated, including transient events."""
+        with self._lock:
+            return self._sequence
+
     def emit(self, event_type: SessionEventType, data: dict[str, Any]) -> SessionEvent:
+        """Allocate a sequence number and notify a stable listener snapshot."""
+
         with self._lock:
             self._sequence += 1
             event = SessionEvent(
@@ -148,5 +160,5 @@ class SessionControl:
         self.emit(SessionEventType.WARNING if warning else SessionEventType.LOG, {"message": message})
 
     def sample(self, power: float) -> None:
-        """Emit a live power reading for realtime visualisation. Not persisted."""
+        """Emit a transient live power reading for realtime visualisation."""
         self.emit(SessionEventType.SAMPLE, {"power": round(power, 2)})

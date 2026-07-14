@@ -3,14 +3,11 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 
 from measure.powermeter.const import PowerMeterType
-from measure.request import POWER_ENTITY_PATTERN
+from measure.powermeter.spec import POWER_ENTITY_PATTERN
 
 
-class AppSettings(BaseModel):
-    """Persistent, user-configurable defaults reused when starting new measurement sessions.
-
-    Unknown keys are ignored so settings files written by other app versions keep loading.
-    """
+class AppPreferences(BaseModel):
+    """Persisted defaults for new sessions, tolerant of unknown settings keys."""
 
     model_config = ConfigDict(extra="ignore")
 

@@ -31,11 +31,17 @@ describe("MeasureApiClient", () => {
     expect(apiUrl("api/entities", "http://ha.local/prefix/").pathname).toBe("/prefix/api/entities");
   });
 
-  it("returns the entity array from the API", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response([{ entity_id: "light.desk", name: "Desk" }]));
-    const entities = await new MeasureApiClient(fetcher, "http://ha.local/prefix/").getEntities("light");
-    expect(fetcher).toHaveBeenCalledWith(new URL("http://ha.local/prefix/api/entities?domain=light"), expect.anything());
-    expect(entities).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
+  it("loads entities by Home Assistant domain or device class", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockImplementation(async () => response([{ entity_id: "light.desk", name: "Desk" }]));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    const lights = await client.getEntitiesByDomain("light");
+    const powers = await client.getEntitiesByDeviceClass("power");
+
+    expect(fetcher).toHaveBeenNthCalledWith(1, new URL("http://ha.local/prefix/api/entities?domain=light"), expect.anything());
+    expect(fetcher).toHaveBeenNthCalledWith(2, new URL("http://ha.local/prefix/api/entities?device_class=power"), expect.anything());
+    expect(lights).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
+    expect(powers).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
   });
 
   it("surfaces stable API errors", async () => {
@@ -63,7 +69,9 @@ describe("SessionEventStream", () => {
 
     stream.connect();
     fake.onopen?.();
-    listeners.get("progress")?.(new MessageEvent("progress", { data: JSON.stringify({ type: "progress", progress: { completed: 2, total: 4 } }) }));
+    listeners.get("progress")?.(new MessageEvent("progress", {
+      data: JSON.stringify({ sequence: 2, type: "progress", data: { completed: 2, total: 4 } }),
+    }));
 
     expect(onConnection).toHaveBeenCalledWith(true);
     expect(onReconnect).toHaveBeenCalledOnce();
@@ -85,7 +93,9 @@ describe("SessionEventStream", () => {
     const stream = new SessionEventStream("events", onEvent, vi.fn(), vi.fn(), () => fake as unknown as EventSource);
 
     stream.connect();
-    listeners.get("heartbeat")?.(new MessageEvent("heartbeat", { data: JSON.stringify({ type: "heartbeat", snapshot: { state: "running" } }) }));
+    listeners.get("heartbeat")?.(new MessageEvent("heartbeat", {
+      data: JSON.stringify({ sequence: 1, type: "heartbeat", data: {}, snapshot: { state: "running" } }),
+    }));
 
     expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "heartbeat", snapshot: { state: "running" } }));
   });

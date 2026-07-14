@@ -4,21 +4,27 @@ from pathlib import Path
 from threading import Event
 import time
 
-from measure.coordinator import MeasurementCoordinator, SessionConflictError
-from measure.request import LightMeasurementRequest, LightMeasurementRequestModel, ResumePolicy
+from measure.controller.light.spec import DummyLightControllerSpec
+from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
+from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
+from measure.ha_app.storage import SessionStorage
+from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.request import (
+    LightMeasurementRequest,
+    MeasurementRequest,
+    ResumePolicy,
+)
 from measure.runner.runner import RunnerResult
-from measure.session import SessionControl, SessionSnapshot, SessionState
-from measure.storage import SessionStorage
 import pytest
 
 
-def request_model() -> LightMeasurementRequestModel:
-    return LightMeasurementRequestModel(
+def light_request() -> LightMeasurementRequest:
+    return LightMeasurementRequest(
         model_id="LCT010",
         product_name="Test light",
         measure_device="Test meter",
-        light_entity_id="light.test",
-        power_entity_id="sensor.test_power",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyLightControllerSpec(),
     )
 
 
@@ -34,15 +40,15 @@ def wait_for_state(coordinator: MeasurementCoordinator, state: SessionState) -> 
 class CompletingService:
     def run(
         self,
-        request: LightMeasurementRequest,
+        request: MeasurementRequest,
         control: SessionControl,
         output_root: Path,
-    ) -> tuple[RunnerResult, Path]:
+    ) -> RunnerResult:
         directory = output_root / request.model_id
         directory.mkdir(parents=True)
         (directory / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
         control.progress(completed=1, total=1, mode="brightness", estimated_remaining="0s")
-        return RunnerResult(model_json_data={}), directory
+        return RunnerResult(model_json_data={})
 
 
 class BlockingService:
@@ -51,19 +57,30 @@ class BlockingService:
 
     def run(
         self,
-        request: LightMeasurementRequest,
+        request: MeasurementRequest,
         control: SessionControl,
         output_root: Path,
-    ) -> tuple[RunnerResult, Path]:
+    ) -> RunnerResult:
         self.started.set()
         control.wait(60)
         raise AssertionError("Cancelled wait returned")
 
 
+class SamplingService:
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        output_root: Path,
+    ) -> RunnerResult:
+        control.sample(4.2)
+        return RunnerResult(model_json_data={})
+
+
 def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
 
-    coordinator.start(request_model())
+    coordinator.start(light_request())
     wait_for_state(coordinator, SessionState.COMPLETED)
 
     assert coordinator.current is not None
@@ -77,10 +94,10 @@ def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
 def test_coordinator_rejects_concurrent_start_and_cancels(tmp_path: Path) -> None:
     started = Event()
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
-    coordinator.start(request_model())
+    coordinator.start(light_request())
     assert started.wait(1)
 
-    duplicate = request_model()
+    duplicate = light_request()
     with pytest.raises(SessionConflictError):
         coordinator.start(duplicate)
 
@@ -97,7 +114,7 @@ def test_coordinator_rejects_resume_without_compatible_output(tmp_path: Path) ->
         created_at="2026-07-12T12:00:00Z",
         updated_at="2026-07-12T12:00:00Z",
     )
-    storage.create(current, request_model())
+    storage.create(current, light_request())
     coordinator = MeasurementCoordinator(storage, CompletingService)
 
     with pytest.raises(SessionConflictError, match="no compatible complete row"):
@@ -106,10 +123,32 @@ def test_coordinator_rejects_resume_without_compatible_output(tmp_path: Path) ->
 
 def test_overwrite_removes_previous_session_files(tmp_path: Path) -> None:
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
-    first = coordinator.start(request_model())
+    first = coordinator.start(light_request())
     wait_for_state(coordinator, SessionState.COMPLETED)
     old_directory = coordinator.storage.session_directory(first.id)
 
-    coordinator.start(request_model().model_copy(update={"resume_policy": ResumePolicy.OVERWRITE}))
+    coordinator.start(light_request().model_copy(update={"resume_policy": ResumePolicy.OVERWRITE}))
 
     assert not old_directory.exists()
+
+
+def test_transient_sample_does_not_reuse_terminal_event_sequence(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SamplingService)
+
+    coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    events = coordinator.events_since(0)
+    assert [event.sequence for event in events] == [1, 2]
+    assert len({event.sequence for event in events}) == len(events)
+
+
+def test_coordinator_reloads_persisted_events_for_reconnect(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, CompletingService)
+    coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    reloaded = MeasurementCoordinator(storage, CompletingService)
+
+    assert [event.sequence for event in reloaded.events_since(0)] == [1, 2]

@@ -80,6 +80,7 @@ See the WIKI article for further documentation https://docs.powercalc.nl/contrib
 ## Developing the Home Assistant app locally
 
 The Home Assistant app has a FastAPI backend (`measure/`) and a Lit frontend (`frontend/`). You can run both locally with hot-reloading of the UI.
+See the [measurement tool architecture](../../docs/source/contributing/measure/architecture.md) for the shared CLI/API request, assembly, execution, and result pipeline.
 
 **Prerequisites:**
 - A reachable Home Assistant instance and a long-lived access token (HA → profile → Security → *Long-lived access tokens*). The app proxies real HA entity data, so `/api/entities` needs a live instance.
@@ -87,13 +88,13 @@ The Home Assistant app has a FastAPI backend (`measure/`) and a Lit frontend (`f
 
 **Terminal 1 — backend** (from `utils/measure`):
 ```
-uv run python -m measure.app \
+uv run python -m measure.ha_app.main \
   --host 127.0.0.1 --port 8099 \
   --data-root .dev-data \
-  --hass-url http://127.0.0.1:8123/api/ \
+  --hass-url ws://127.0.0.1:8123/api/websocket \
   --hass-token <LONG_LIVED_TOKEN>
 ```
-The `--hass-url` must end in `/api/`. `--hass-token` may be omitted if `SUPERVISOR_TOKEN` is exported instead. Session state and settings are written to `--data-root` (here `.dev-data`).
+Use the full Home Assistant WebSocket endpoint: `ws://<host>:8123/api/websocket` for a direct connection, or `ws://supervisor/core/websocket` from a Home Assistant add-on. `--hass-token` may be omitted if `SUPERVISOR_TOKEN` is exported instead. Session state and settings are written to `--data-root` (here `.dev-data`).
 
 **Terminal 2 — frontend** (from `utils/measure/frontend`):
 ```

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from typing import Any
 
 import requests
 
@@ -34,6 +33,3 @@ class MyStromPowerMeter(PowerMeter):
 
     def has_voltage_support(self) -> bool:
         return False
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        pass

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-from typing import Any
 
 from measure.powermeter.errors import UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
@@ -39,6 +38,3 @@ class OcrPowerMeter(PowerMeter):
 
     def has_voltage_support(self) -> bool:
         return False
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        pass

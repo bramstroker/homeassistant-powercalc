@@ -5,13 +5,13 @@ import json
 import logging
 import os
 import sys
-from typing import Any
 from unittest.mock import MagicMock, patch
 
 import inquirer
 from inquirer import events
 from inquirer.render import ConsoleRender
-from measure.config import MeasureConfig
+from measure.cli.environment import CliEnvironment
+from measure.cli.main import Measure, main
 from measure.const import (
     MODEL_JSON_MAX_VOLTAGE,
     MODEL_JSON_MIN_VOLTAGE,
@@ -22,18 +22,16 @@ from measure.const import (
 )
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.light.const import LutMode
-from measure.measure import Measure
-from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.runner.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
     QUESTION_COLOR_MODE,
+    QUESTION_DISABLE_STREAMING,
     QUESTION_DURATION,
     QUESTION_EXPORT_FILENAME,
     QUESTION_GZIP,
     QUESTION_MODE,
 )
-from measure.runner.speaker import QUESTION_DISABLE_STREAMING
 from measure.util.measure_util import (
     AverageMeasurementConvergence,
     AverageMeasurementSnapshot,
@@ -281,7 +279,7 @@ def test_run_average(
     assert "Files exported to" not in caplog.text
 
 
-def _create_measure_instance(config: MeasureConfig, console_events: EventGenerator | None = None) -> Measure:
+def _create_measure_instance(config: CliEnvironment, console_events: EventGenerator | None = None) -> Measure:
     """Create instance of the Measure class"""
 
     sys.stdin = StringIO()
@@ -291,8 +289,19 @@ def _create_measure_instance(config: MeasureConfig, console_events: EventGenerat
         event_generator=console_events,
     )
 
-    power_meter = DummyPowerMeter()
-    return Measure(power_meter, config, render)
+    return Measure(config, render)
+
+
+def test_main_always_runs_the_wizard_even_with_legacy_average_arguments() -> None:
+    with (
+        patch.object(sys, "argv", ["measure", "average", "30"]),
+        patch.object(Measure, "start") as start,
+        pytest.raises(SystemExit) as exit_info,
+    ):
+        main()
+
+    start.assert_called_once_with()
+    assert exit_info.value.code == 0
 
 
 class SequencePowerMeter(PowerMeter):
@@ -309,9 +318,6 @@ class SequencePowerMeter(PowerMeter):
 
     def has_voltage_support(self) -> bool:
         return True
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        pass
 
 
 def test_ask_questions_with_no_predefined_answers(mock_config_factory: MockConfigFactory) -> None:

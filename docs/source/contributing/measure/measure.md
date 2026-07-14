@@ -28,6 +28,7 @@ The light mode is the most common contribution path. Other modes are useful when
 3. [Other measure modes](modes.md) - measure speakers, fans, charging devices, average readings, or recorder sessions.
 4. [Output and pull requests](output.md) - inspect the generated files and submit them.
 5. [Troubleshooting](troubleshooting.md) - fix common measurement problems.
+6. [Architecture](architecture.md) - understand how the CLI and app share the request, assembly, execution, and result pipeline.
 
 For OCR-based meters, also see [Measure using OCR](measure-ocr.md).
 

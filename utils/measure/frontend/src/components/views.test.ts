@@ -1,4 +1,4 @@
-import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRunRequest, SessionSnapshot } from "../types";
+import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, SessionSnapshot } from "../types";
 import { AppShell } from "./app-shell";
 import "./result-view";
 import "./running-view";
@@ -28,7 +28,7 @@ describe("setup view", () => {
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
-    element.selectedType = "Light bulb(s)";
+    element.selectedType = "light";
     element.selectedLightId = "light.desk";
     document.body.append(element);
     await element.updateComplete;
@@ -59,7 +59,7 @@ describe("setup view", () => {
     element.lights = [{ entity_id: "light.rgb", name: "RGB lamp", supported_modes: ["brightness", "color_temp", "hs"] }];
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
-    element.selectedType = "Light bulb(s)";
+    element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
 
@@ -81,7 +81,7 @@ describe("setup view", () => {
     element.lights = [{ entity_id: "light.effect", name: "Effect lamp", supported_modes: ["brightness", "effect"], effect_list: ["colorloop"] }];
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
-    element.selectedType = "Light bulb(s)";
+    element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
 
@@ -93,13 +93,13 @@ describe("setup view", () => {
 });
 
 const definitions: MeasureDefinition[] = [
-  { measure_type: "Light bulb(s)", label: "Light bulb(s)", description: "Build a lookup-table power profile for a light.", fields: [], supports_profile: true, supports_resume: true },
+  { measure_type: "light", label: "Light bulb(s)", description: "Build a lookup-table power profile for a light.", fields: [], supports_profile: true, supports_resume: true },
   {
-    measure_type: "Average",
+    measure_type: "average",
     label: "Average",
     description: "Measure average power for a fixed duration.",
     fields: [
-      { name: "powermeter_entity_id", label: "Power sensor", control: "entity", required: true, options: [] },
+      { name: "power_entity_id", label: "Power sensor", control: "entity", required: true, options: [] },
       { name: "duration", label: "Duration (seconds)", control: "number", required: true, options: [], default: 60 },
     ],
     supports_profile: false,
@@ -121,16 +121,17 @@ describe("setup type picker", () => {
     expect(element.shadowRoot.querySelector("form")).toBeNull();
   });
 
-  it("renders generic fields, dedupes the power sensor, and emits preflight-run for a non-light type", async () => {
+  it("renders generic fields, dedupes the power sensor, and emits one typed preflight request", async () => {
     const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; powers: EntityDescriptor[]; powerMeter: string;
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powers: EntityDescriptor[]; powerMeter: string;
       defaultPowerEntityId: string; selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
     };
     element.definitions = definitions;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.powerMeter = "hass";
     element.defaultPowerEntityId = "sensor.plug_power";
-    element.selectedType = "Average";
+    element.capabilities = capabilities;
+    element.selectedType = "average";
     document.body.append(element);
     await element.updateComplete;
 
@@ -139,30 +140,53 @@ describe("setup type picker", () => {
     // The powermeter field from the definition must not be rendered a second time.
     expect(element.shadowRoot.querySelectorAll('[name="powermeter_entity_id"]')).toHaveLength(0);
 
-    const submitted = new Promise<MeasurementRunRequest>((resolve) => {
-      element.addEventListener("preflight-run", (event) => resolve((event as CustomEvent<MeasurementRunRequest>).detail));
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
     });
     (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
     const request = await submitted;
-    expect(request.measure_type).toBe("Average");
-    expect(request.answers.powermeter_entity_id).toBe("sensor.plug_power");
-    expect(request.answers.duration).toBe(60);
+    expect(request.measure_type).toBe("average");
+    expect(request.power_meter).toEqual({ type: "hass", entity_id: "sensor.plug_power", voltage_entity_id: null });
+    expect(request.measure_type === "average" && request.duration).toBe(60);
+    expect(request.parameters.sleep_time).toBe(capabilities.defaults.sleep_time);
+    expect(request.parameters.sample_count).toBe(capabilities.defaults.sample_count);
+  });
+
+  it("includes the configured Shelly adapter in the submitted request", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string; shellyIp: string;
+      selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.definitions = definitions;
+    element.capabilities = capabilities;
+    element.powerMeter = "shelly";
+    element.shellyIp = "192.0.2.20";
+    element.selectedType = "average";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
+    });
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+
+    expect((await submitted).power_meter).toEqual({ type: "shelly", device_ip: "192.0.2.20" });
   });
 
   it("renders an entity dropdown for a device domain when entities are available", async () => {
     const fanDefinition: MeasureDefinition = {
-      measure_type: "Fan",
+      measure_type: "fan",
       label: "Fan",
       description: "Measure fan power across percentage levels.",
       fields: [
-        { name: "powermeter_entity_id", label: "Power sensor", control: "entity", required: true, options: [] },
-        { name: "entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] },
+        { name: "power_entity_id", label: "Power sensor", control: "entity", required: true, options: [] },
+        { name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] },
       ],
       supports_profile: true,
       supports_resume: false,
     };
     const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; powers: EntityDescriptor[]; powerMeter: string;
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powers: EntityDescriptor[]; powerMeter: string;
       deviceEntities: Record<string, EntityDescriptor[]>; selectedType: string;
       updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
     };
@@ -170,13 +194,183 @@ describe("setup type picker", () => {
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.powerMeter = "hass";
     element.deviceEntities = { fan: [{ entity_id: "fan.bedroom", name: "Bedroom fan" }] };
-    element.selectedType = "Fan";
+    element.capabilities = capabilities;
+    element.selectedType = "fan";
     document.body.append(element);
     await element.updateComplete;
 
-    const fanSelect = element.shadowRoot.querySelector('select[name="entity_id"]') as HTMLSelectElement;
+    const fanSelect = element.shadowRoot.querySelector('select[name="fan_entity_id"]') as HTMLSelectElement;
     expect(fanSelect).toBeTruthy();
     expect(fanSelect.textContent).toContain("Bedroom fan · fan.bedroom");
+  });
+
+  it.each([
+    {
+      type: "fan" as const,
+      definition: {
+        measure_type: "fan" as const,
+        label: "Fan",
+        description: "Measure fan power across percentage levels.",
+        fields: [
+          { name: "fan_entity_id", label: "Fan", control: "entity" as const, required: true, entity_domain: "fan", options: [] },
+        ],
+        supports_profile: true,
+        supports_resume: false,
+      },
+      entities: { fan: [{ entity_id: "fan.bedroom", name: "Bedroom fan", model_id: "FAN-001" }] },
+      entityField: "fan_entity_id",
+      entityId: "fan.bedroom",
+      expectedFields: ["fan_entity_id", "model_id", "product_name"],
+      modelId: "FAN-001",
+    },
+    {
+      type: "speaker" as const,
+      definition: {
+        measure_type: "speaker" as const,
+        label: "Speaker",
+        description: "Measure power across media-player volume levels.",
+        fields: [
+          { name: "media_player_entity_id", label: "Media player", control: "entity" as const, required: true, entity_domain: "media_player", options: [] },
+          { name: "disable_streaming", label: "Disable automatic pink-noise streaming", control: "boolean" as const, required: false, default: false, options: [] },
+        ],
+        supports_profile: true,
+        supports_resume: false,
+      },
+      entities: { media_player: [{ entity_id: "media_player.office", name: "Office speaker", model_id: "SPEAKER-001" }] },
+      entityField: "media_player_entity_id",
+      entityId: "media_player.office",
+      expectedFields: ["media_player_entity_id", "disable_streaming", "model_id", "product_name"],
+      modelId: "SPEAKER-001",
+    },
+    {
+      type: "charging" as const,
+      definition: {
+        measure_type: "charging" as const,
+        label: "Charging device",
+        description: "Measure charging power against battery level.",
+        fields: [
+          {
+            name: "charging_device_type",
+            label: "Charging device type",
+            control: "select" as const,
+            required: true,
+            options: [{ value: "vacuum_robot", label: "Vacuum robot" }, { value: "lawn_mower_robot", label: "Lawn mower robot" }],
+          },
+          {
+            name: "charging_entity_id",
+            label: "Charging device",
+            control: "entity" as const,
+            required: true,
+            entity_domains: ["vacuum", "lawn_mower"],
+            options: [],
+          },
+        ],
+        supports_profile: true,
+        supports_resume: false,
+      },
+      entities: { vacuum: [{ entity_id: "vacuum.downstairs", name: "Downstairs vacuum", model_id: "VAC-001" }] },
+      entityField: "charging_entity_id",
+      entityId: "vacuum.downstairs",
+      expectedFields: ["charging_device_type", "charging_entity_id", "model_id", "product_name"],
+      modelId: "VAC-001",
+    },
+  ])("orders $type fields by dependency and prefills the selected device model ID", async ({
+    type, definition, entities, entityField, entityId, expectedFields, modelId,
+  }) => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[];
+      capabilities: Capabilities;
+      powerMeter: string;
+      deviceEntities: Record<string, EntityDescriptor[]>;
+      selectedType: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.definitions = [definition];
+    element.capabilities = capabilities;
+    element.powerMeter = "dummy";
+    element.deviceEntities = Object.fromEntries(Object.entries(entities));
+    element.selectedType = type;
+    document.body.append(element);
+    await element.updateComplete;
+
+    const profileSection = [...element.shadowRoot.querySelectorAll("fieldset.section")][1];
+    const fields = [...(profileSection?.querySelectorAll<HTMLInputElement | HTMLSelectElement>(":scope > .profile-grid [name]") ?? [])];
+    expect(fields.map((field) => field.name)).toEqual(expectedFields);
+
+    const entity = element.shadowRoot.querySelector(`select[name="${entityField}"]`) as HTMLSelectElement;
+    entity.value = entityId;
+    entity.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+
+    expect((element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value).toBe(modelId);
+  });
+
+  it("shows entity discovery failures instead of silently enabling free-text input", async () => {
+    const fanDefinition: MeasureDefinition = {
+      measure_type: "fan", label: "Fan", description: "Measure fan power.",
+      fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] }],
+      supports_profile: false, supports_resume: false,
+    };
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
+      deviceEntityErrors: Record<string, string>; selectedType: string;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.definitions = [fanDefinition];
+    element.capabilities = capabilities;
+    element.powerMeter = "dummy";
+    element.deviceEntityErrors = { fan: "Home Assistant is unavailable" };
+    element.selectedType = "fan";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".notice.error")?.textContent).toContain("Home Assistant is unavailable");
+    expect(element.shadowRoot.querySelector('[name="fan_entity_id"]')).toBeNull();
+  });
+
+  it("combines charging domains and rejects an entity from the wrong device type", async () => {
+    const chargingDefinition: MeasureDefinition = {
+      measure_type: "charging", label: "Charging device", description: "Measure charging power.",
+      fields: [
+        {
+          name: "charging_device_type", label: "Device type", control: "select", required: true,
+          options: [{ value: "vacuum_robot", label: "Vacuum" }, { value: "lawn_mower_robot", label: "Lawn mower" }],
+        },
+        {
+          name: "charging_entity_id", label: "Charging device", control: "entity", required: true,
+          entity_domains: ["vacuum", "lawn_mower"], options: [],
+        },
+      ],
+      supports_profile: false, supports_resume: false,
+    };
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
+      deviceEntities: Record<string, EntityDescriptor[]>; selectedType: string; errorMessage: string;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.definitions = [chargingDefinition];
+    element.capabilities = capabilities;
+    element.powerMeter = "dummy";
+    element.deviceEntities = {
+      vacuum: [{ entity_id: "vacuum.downstairs", name: "Downstairs vacuum" }],
+      lawn_mower: [{ entity_id: "lawn_mower.garden", name: "Garden mower" }],
+    };
+    element.selectedType = "charging";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const entity = element.shadowRoot.querySelector('[name="charging_entity_id"]') as HTMLSelectElement;
+    expect(entity.textContent).toContain("Downstairs vacuum");
+    expect(entity.textContent).toContain("Garden mower");
+    entity.value = "vacuum.downstairs";
+    const type = element.shadowRoot.querySelector('[name="charging_device_type"]') as HTMLSelectElement;
+    type.value = "lawn_mower_robot";
+    type.dispatchEvent(new Event("change"));
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+    await element.updateComplete;
+
+    expect(element.errorMessage).toContain("Select a lawn_mower entity");
   });
 });
 
@@ -316,7 +510,7 @@ describe("setup view defaults", () => {
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
     element.defaultPowerEntityId = "sensor.plug_power";
-    element.selectedType = "Light bulb(s)";
+    element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
 
@@ -338,27 +532,83 @@ describe("setup view defaults", () => {
     element.capabilities = capabilities;
     element.lights = lights;
     element.powers = [
-      { entity_id: "sensor.plug_power", name: "Plug power", unit: "W" },
-      { entity_id: "sensor.strip_power", name: "Strip power", unit: "W" },
+      { entity_id: "sensor.plug_power", name: "Plug power", unit: "W", device_id: "plug-device" },
+      { entity_id: "sensor.strip_consumption", name: "Strip power", unit: "W", device_id: "strip-device" },
     ];
     element.voltages = [
-      { entity_id: "sensor.plug_voltage", name: "Plug voltage", unit: "V" },
-      { entity_id: "sensor.strip_voltage", name: "Strip voltage", unit: "V" },
+      { entity_id: "sensor.plug_line_voltage", name: "Plug voltage", unit: "V", device_id: "plug-device" },
+      { entity_id: "sensor.strip_mains", name: "Strip voltage", unit: "V", device_id: "strip-device" },
     ];
     element.defaultPowerEntityId = "sensor.plug_power";
-    element.selectedType = "Light bulb(s)";
+    element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
 
     const voltage = element.shadowRoot.querySelector('select[name="voltage_entity_id"]') as HTMLSelectElement;
-    expect(voltage.value).toBe("sensor.plug_voltage");
+    expect(voltage.value).toBe("sensor.plug_line_voltage");
     expect(voltage.closest(".grid")?.children).toHaveLength(1);
 
     const power = element.shadowRoot.querySelector('select[name="power_entity_id"]') as HTMLSelectElement;
-    power.value = "sensor.strip_power";
+    power.value = "sensor.strip_consumption";
     power.dispatchEvent(new Event("change"));
     await element.updateComplete;
-    expect(voltage.value).toBe("sensor.strip_voltage");
+    expect(voltage.value).toBe("sensor.strip_mains");
+  });
+
+  it("prefills the model ID from the selected measurement device", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      defaultPowerEntityId: string;
+      selectedType: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = capabilities;
+    element.lights = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"], device_id: "light-device", model_id: "LWA017" }];
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", device_id: "plug-device", model_id: "WSP002" }];
+    element.voltages = [];
+    element.defaultPowerEntityId = "sensor.plug_power";
+    element.selectedType = "light";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const light = element.shadowRoot.querySelector('select[name="light_entity_id"]') as HTMLSelectElement;
+    light.value = "light.desk";
+    light.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+
+    const modelId = element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement;
+    expect(modelId.value).toBe("LWA017");
+  });
+
+  it("orders the light fields by dependency and explains the full product name", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      selectedType: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = capabilities;
+    element.lights = lights;
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power" }];
+    element.voltages = [];
+    element.selectedType = "light";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const profileSection = [...element.shadowRoot.querySelectorAll("fieldset.section")][1];
+    expect(profileSection).toBeTruthy();
+    expect(profileSection?.querySelector(".profile-grid")).toBeTruthy();
+    const profileFields = profileSection?.querySelectorAll<HTMLLabelElement>(":scope > .grid > label") ?? [];
+    const labels = [...profileFields].map((field) => field.querySelector(":scope > span")?.textContent?.trim());
+    expect(labels).toEqual(["Light", "Number of lights", "Model ID", "Full product name"]);
+    expect(element.shadowRoot.querySelector(".field-hint")?.textContent).toContain("complete marketed name");
   });
 });
 
@@ -387,12 +637,12 @@ describe("settings view", () => {
 });
 
 describe("app shell device entities", () => {
-  it("fetches device entities per domain during boot and exposes them for the picker", async () => {
+  it("loads device entities only after their measurement type is selected", async () => {
     const fanDefinition: MeasureDefinition = {
-      measure_type: "Fan", label: "Fan", description: "Measure fan power across percentage levels.",
+      measure_type: "fan", label: "Fan", description: "Measure fan power across percentage levels.",
       fields: [
-        { name: "powermeter_entity_id", label: "Power sensor", control: "entity", required: true, options: [], entity_domain: "sensor" },
-        { name: "entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] },
+        { name: "power_entity_id", label: "Power sensor", control: "entity", required: true, options: [], entity_domain: "sensor" },
+        { name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] },
       ],
       supports_profile: true, supports_resume: false,
     };
@@ -400,7 +650,7 @@ describe("app shell device entities", () => {
     const element = new AppShell();
     (element as unknown as { api: unknown }).api = {
       getCapabilities: async () => capabilities,
-      getEntities: async () => [],
+      getEntitiesByDeviceClass: async () => [],
       getSettings: async () => ({ default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null }),
       getCurrent: async () => ({ state: "idle" }),
       getMeasureDefinitions: async () => [fanDefinition],
@@ -412,8 +662,40 @@ describe("app shell device entities", () => {
 
     await (element as unknown as { boot: () => Promise<void> }).boot();
 
-    expect(requestedDomains).toEqual(["fan"]);
-    expect(element.deviceEntities.fan).toEqual([{ entity_id: "fan.bedroom", name: "Bedroom fan" }]);
+    expect(requestedDomains).toEqual(["light"]);
+    (element as unknown as { measureTypeSelected: (event: CustomEvent<"fan">) => void })
+      .measureTypeSelected(new CustomEvent("measure-type-selected", { detail: "fan" }));
+    await vi.waitFor(() => expect(element.deviceEntities.fan).toEqual([{ entity_id: "fan.bedroom", name: "Bedroom fan" }]));
+    expect(requestedDomains).toEqual(["light", "fan"]);
+  });
+
+  it("restores a generic request into the generic setup flow", async () => {
+    const element = new AppShell();
+    (element as unknown as { api: unknown }).api = {
+      getCapabilities: async () => capabilities,
+      getEntitiesByDeviceClass: async () => [],
+      getSettings: async () => ({ default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null }),
+      getCurrent: async () => ({
+        state: "idle",
+        request: {
+          measure_type: "average",
+          model_id: "measurement",
+          product_name: "Measurement",
+          measure_device: "",
+          power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+          duration: 60,
+          generate_model: false,
+          parameters: { ...capabilities.defaults, sleep_time: 2, sample_count: 1 },
+          resume_policy: "new",
+        },
+      }),
+      getMeasureDefinitions: async () => [],
+      getEntitiesByDomain: async () => [],
+    };
+
+    await (element as unknown as { boot: () => Promise<void> }).boot();
+
+    expect(element.request?.measure_type).toBe("average");
   });
 });
 

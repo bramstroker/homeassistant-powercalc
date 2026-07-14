@@ -1,20 +1,24 @@
 from unittest.mock import MagicMock
 
+from measure.controller.fan.dummy import DummyFanController
+from measure.controller.fan.spec import DummyFanControllerSpec
+from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.request import FanMeasurementRequest
 from measure.runner.fan import FanRunner
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
-from tests.conftest import MockConfigFactory
 
-
-def test_run(mock_config_factory: MockConfigFactory, export_path: str) -> None:
-    mock_config = mock_config_factory()
-
+def test_run(export_path: str) -> None:
     measure_util_mock = MagicMock(MeasureUtil)
     measure_util_mock.take_average_measurement.return_value = MeasurementResult(power=10.50, voltages=[])
-    runner = FanRunner(measure_util_mock, mock_config)
-    runner.prepare({})
-
-    result = runner.run({}, export_path)
+    runner = FanRunner(measure_util_mock, DummyFanController())
+    request = FanMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyFanControllerSpec(),
+    )
+    result = runner.run(request, export_path)
 
     model_data = result.model_json_data
     assert model_data == {

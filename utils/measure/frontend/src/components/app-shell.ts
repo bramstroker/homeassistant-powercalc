@@ -1,6 +1,9 @@
 import { LitElement, css, html, nothing } from "lit";
-import { ApiError, MeasureApiClient, SessionEventStream } from "../api-client";
-import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, MeasurementRunRequest, PowerMeterTestResult, PreflightResponse, SessionEvent, SessionFile, SessionSnapshot } from "../types";
+import { MeasureApiClient, SessionEventStream } from "../api-client";
+import { MeasureAppController } from "../app-controller";
+import type { AppView, MeasureAppApi, MeasureAppState } from "../app-controller";
+import { LIGHT_TYPE } from "../measurement-kinds";
+import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PowerMeterTestResult, PreflightResponse, SessionFile, SessionSnapshot } from "../types";
 import type { ReviewMetric, ReviewRow } from "./preflight-view";
 import { sharedStyles } from "../styles";
 import "./preflight-view";
@@ -9,24 +12,22 @@ import "./running-view";
 import "./settings-view";
 import "./setup-view";
 
-type View = "loading" | "setup" | "review" | "running" | "result" | "settings";
-
-export class AppShell extends LitElement {
+export class AppShell extends LitElement implements MeasureAppState {
   static readonly properties = {
     view: { state: true }, loadingMessage: { state: true }, errorMessage: { state: true }, busy: { state: true },
     connectedToEvents: { state: true }, snapshot: { state: true }, request: { state: true }, preflight: { state: true },
-    files: { state: true }, logs: { state: true }, settings: { state: true }, runRequest: { state: true },
+    files: { state: true }, logs: { state: true }, settings: { state: true },
     samples: { state: true }, testingPowerMeter: { state: true }, powerMeterTestResult: { state: true },
+    deviceEntities: { state: true }, deviceEntityErrors: { state: true },
   };
 
-  view: View = "loading";
+  view: AppView = "loading";
   loadingMessage = "Connecting to Home Assistant…";
   errorMessage = "";
   busy = false;
   connectedToEvents = false;
   snapshot?: SessionSnapshot;
   request?: MeasurementRequest;
-  runRequest?: MeasurementRunRequest;
   preflight?: PreflightResponse;
   files: SessionFile[] = [];
   logs: string[] = [];
@@ -38,12 +39,17 @@ export class AppShell extends LitElement {
   settings?: AppSettings;
   definitions: MeasureDefinition[] = [];
   deviceEntities: Record<string, EntityDescriptor[]> = {};
+  deviceEntityErrors: Record<string, string> = {};
   testingPowerMeter = false;
   powerMeterTestResult?: PowerMeterTestResult;
 
-  private readonly api = new MeasureApiClient();
-  private eventStream?: SessionEventStream;
-  private settingsReturnView: View = "setup";
+  private api: MeasureAppApi & Pick<MeasureApiClient, "fileUrl" | "eventsUrl"> = new MeasureApiClient();
+  private readonly controller = new MeasureAppController(
+    this,
+    () => this.api,
+    ({ onEvent, onConnection, onReconnect }) => new SessionEventStream(this.api.eventsUrl(), onEvent, onConnection, onReconnect),
+    () => this.requestUpdate(),
+  );
 
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-height: 100vh; background: var(--canvas); }
@@ -74,7 +80,7 @@ export class AppShell extends LitElement {
   `];
 
   connectedCallback(): void { super.connectedCallback(); void this.boot(); }
-  disconnectedCallback(): void { this.eventStream?.close(); super.disconnectedCallback(); }
+  disconnectedCallback(): void { this.controller.dispose(); super.disconnectedCallback(); }
 
   render() {
     return html`
@@ -115,7 +121,7 @@ export class AppShell extends LitElement {
     if (this.view === "loading") return this.renderLoading();
     if (this.view === "settings") return html`
       <measure-settings-view .powers=${this.powers} .settings=${this.settings} .busy=${this.busy} .testing=${this.testingPowerMeter} .testResult=${this.powerMeterTestResult} .errorMessage=${this.errorMessage} @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter}></measure-settings-view>`;
-    if (this.view === "review" && this.preflight && (this.request || this.runRequest)) return html`
+    if (this.view === "review" && this.preflight && this.request) return html`
       <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .canOverwrite=${this.reviewCanOverwrite()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`
       <measure-running-view .snapshot=${this.snapshot} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
@@ -124,21 +130,20 @@ export class AppShell extends LitElement {
     return html`
       <measure-setup-view
         .capabilities=${this.capabilities} .definitions=${this.definitions}
-        .lights=${this.lights} .powers=${this.powers} .voltages=${this.voltages} .deviceEntities=${this.deviceEntities}
-        .initialType=${this.pendingType()} .initialRequest=${this.request} .initialRunRequest=${this.runRequest}
-        .defaultPowerEntityId=${this.settings?.default_power_entity_id ?? ""} .defaultMeasureDevice=${this.settings?.default_measure_device ?? ""} .powerMeter=${this.settings?.power_meter ?? "hass"}
+        .lights=${this.lights} .powers=${this.powers} .voltages=${this.voltages} .deviceEntities=${this.deviceEntities} .deviceEntityErrors=${this.deviceEntityErrors}
+        .initialType=${this.pendingType()} .initialRequest=${this.request}
+        .defaultPowerEntityId=${this.settings?.default_power_entity_id ?? ""} .defaultMeasureDevice=${this.settings?.default_measure_device ?? ""} .powerMeter=${this.settings?.power_meter ?? "hass"} .shellyIp=${this.settings?.shelly_ip ?? ""}
         .busy=${this.busy} .errorMessage=${this.errorMessage}
-        @preflight=${this.runPreflight} @preflight-run=${this.runPreflightRun}></measure-setup-view>`;
+        @preflight=${this.runPreflight} @measure-type-selected=${this.measureTypeSelected} @entity-domains-requested=${this.entityDomainsRequested}></measure-setup-view>`;
   }
 
   private pendingType(): MeasureType | undefined {
-    if (this.runRequest) return this.runRequest.measure_type;
-    if (this.request) return "Light bulb(s)";
+    if (this.request) return this.request.measure_type;
     return undefined;
   }
 
   private reviewMetrics(): ReviewMetric[] {
-    if (!this.request || !this.preflight) return [];
+    if (!this.request || this.request.measure_type !== LIGHT_TYPE || !this.preflight) return [];
     const duration = this.preflight.estimated_duration_seconds;
     return [
       { label: "Variations", value: String(this.preflight.estimated_variations ?? "—") },
@@ -148,19 +153,22 @@ export class AppShell extends LitElement {
   }
 
   private reviewSummary(): ReviewRow[] {
-    if (this.request) {
+    if (this.request?.measure_type === LIGHT_TYPE) {
       return [
         { label: "Model", value: `${this.request.product_name} (${this.request.model_id})` },
-        { label: "Light", value: this.request.light_entity_id },
-        { label: "Power", value: this.request.power_entity_id || "Configured power meter" },
+        { label: "Light", value: this.request.controller.type === "hass" ? this.request.controller.entity_id : this.request.controller.type },
+        { label: "Power", value: this.request.power_meter.type === "hass" ? this.request.power_meter.entity_id : this.request.power_meter.type },
         { label: "Modes", value: this.request.modes.join(", ") },
       ];
     }
-    if (this.runRequest) {
-      const rows: ReviewRow[] = [{ label: "Type", value: this.runRequest.measure_type }];
-      if (this.runRequest.measure_device) rows.push({ label: "Device", value: this.runRequest.measure_device });
-      const power = this.runRequest.answers.powermeter_entity_id;
-      if (typeof power === "string" && power && power !== "__managed__") rows.push({ label: "Power", value: power });
+    if (this.request) {
+      const label = this.definitions.find((definition) => definition.measure_type === this.request?.measure_type)?.label ?? this.request.measure_type;
+      const rows: ReviewRow[] = [{ label: "Type", value: label }];
+      if (this.request.measure_device) rows.push({ label: "Device", value: this.request.measure_device });
+      rows.push({
+        label: "Power",
+        value: this.request.power_meter.type === "hass" ? this.request.power_meter.entity_id : this.request.power_meter.type,
+      });
       return rows;
     }
     return [];
@@ -178,120 +186,30 @@ export class AppShell extends LitElement {
   }
 
   private async boot(): Promise<void> {
-    this.view = "loading"; this.errorMessage = "";
-    try {
-      const currentPromise = this.api.getCurrent().catch((error: unknown) => {
-        if (error instanceof ApiError && error.status === 404) return { state: "idle" } satisfies SessionSnapshot;
-        throw error;
-      });
-      [this.capabilities, this.lights, this.powers, this.voltages, this.settings, this.snapshot, this.definitions] = await Promise.all([
-        this.api.getCapabilities(), this.api.getEntities("light"), this.api.getEntities("power"), this.api.getEntities("voltage"), this.api.getSettings(), currentPromise, this.api.getMeasureDefinitions(),
-      ]);
-      await this.loadDeviceEntities();
-      this.request = this.snapshot.request;
-      await this.routeSnapshot();
-    } catch (error) { this.errorMessage = this.message(error); }
+    await this.controller.boot();
   }
 
-  private async loadDeviceEntities(): Promise<void> {
-    // Devices for the non-light measurement types (media_player, fan, vacuum, …).
-    // Lights are already fetched separately, and "sensor" is handled by the power selectors.
-    const domains = [...new Set(
-      this.definitions
-        .flatMap((definition) => definition.fields)
-        .filter((field) => field.control === "entity" && field.entity_domain && field.entity_domain !== "sensor" && field.entity_domain !== "light")
-        .map((field) => field.entity_domain as string),
-    )];
-    const lists = await Promise.all(domains.map((domain) => this.api.getEntitiesByDomain(domain).catch(() => [] as EntityDescriptor[])));
-    const entities: Record<string, EntityDescriptor[]> = {};
-    domains.forEach((domain, index) => { entities[domain] = lists[index] ?? []; });
-    this.deviceEntities = entities;
+  private measureTypeSelected(event: CustomEvent<MeasureType>): void {
+    this.controller.selectMeasureType(event.detail);
   }
-
-  private async routeSnapshot(): Promise<void> {
-    const state = this.snapshot?.state ?? "idle";
-    if (["running", "awaiting_confirmation", "cancelling", "validating", "ready"].includes(state)) { this.view = "running"; this.connectEvents(); return; }
-    if (["completed", "failed", "cancelled", "resumable"].includes(state)) { this.view = "result"; await this.loadFiles(); return; }
-    this.view = "setup";
+  private entityDomainsRequested(event: CustomEvent<string[]>): void {
+    this.controller.loadEntityDomains(event.detail);
   }
-
-  private runPreflight(event: CustomEvent<MeasurementRequest>): void { void this.preflightRequest(event.detail); }
-  private runPreflightRun(event: CustomEvent<MeasurementRunRequest>): void { void this.preflightRunRequest(event.detail); }
-  private async preflightRequest(request: MeasurementRequest): Promise<void> {
-    this.busy = true; this.errorMessage = ""; this.request = request; this.runRequest = undefined;
-    try { this.preflight = await this.api.preflight(request); this.view = "review"; }
-    catch (error) { this.errorMessage = this.message(error); }
-    finally { this.busy = false; }
+  private runPreflight(event: CustomEvent<MeasurementRequest>): void {
+    void this.controller.preflight(event.detail);
   }
-  private async preflightRunRequest(request: MeasurementRunRequest): Promise<void> {
-    this.busy = true; this.errorMessage = ""; this.runRequest = request; this.request = undefined;
-    try { this.preflight = await this.api.preflightRun(request); this.view = "review"; }
-    catch (error) { this.errorMessage = this.message(error); }
-    finally { this.busy = false; }
+  private backToSetup(): void {
+    this.controller.backToSetup();
   }
-  private backToSetup(): void { this.errorMessage = ""; this.view = "setup"; }
-  private start(): void { void this.startRequest(); }
-  private async startRequest(): Promise<void> {
-    this.busy = true; this.errorMessage = ""; this.samples = [];
-    try {
-      this.snapshot = this.runRequest ? await this.api.startRun(this.runRequest) : this.request ? await this.api.start(this.request) : undefined;
-      if (!this.snapshot) return;
-      this.view = "running"; this.connectEvents();
-    }
-    catch (error) { this.errorMessage = this.message(error); }
-    finally { this.busy = false; }
+  private start(): void {
+    void this.controller.start();
   }
-
-  private connectEvents(): void {
-    this.eventStream?.close();
-    this.eventStream = new SessionEventStream(this.api.eventsUrl(), (event) => this.consumeEvent(event),
-      (connected) => { this.connectedToEvents = connected; }, () => { void this.refreshSnapshot(); });
-    this.eventStream.connect();
+  private cancel(): void {
+    void this.controller.cancel();
   }
-
-  private consumeEvent(event: SessionEvent): void {
-    if (event.message && (event.type === "log" || event.type === "checkpoint")) this.logs = [...this.logs.slice(-39), event.message];
-    if (event.type === "sample" && typeof event.power === "number") this.samples = [...this.samples.slice(-179), event.power];
-    if (event.snapshot) this.snapshot = event.snapshot;
-    if (this.snapshot && this.isTerminal(this.snapshot.state)) void this.enterResult();
+  private confirm(): void {
+    void this.controller.confirm();
   }
-
-  private async refreshSnapshot(): Promise<void> {
-    try {
-      this.snapshot = await this.api.getCurrent();
-      if (this.isTerminal(this.snapshot.state)) await this.enterResult();
-    }
-    catch { this.connectedToEvents = false; }
-  }
-
-  private isTerminal(state: SessionSnapshot["state"]): boolean {
-    return ["completed", "failed", "cancelled", "resumable"].includes(state);
-  }
-
-  private async enterResult(): Promise<void> {
-    this.eventStream?.close();
-    this.connectedToEvents = false;
-    // If the user is on the settings view when a session finishes, don't yank them
-    // away — send them to the result view only once they close settings.
-    if (this.view === "settings") this.settingsReturnView = "result";
-    else this.view = "result";
-    await this.loadFiles();
-  }
-  private cancel(): void { void this.cancelRequest(); }
-  private confirm(): void { void this.confirmRequest(); }
-  private async confirmRequest(): Promise<void> {
-    this.busy = true;
-    try { this.snapshot = await this.api.confirm(); }
-    catch (error) { this.logs = [...this.logs, `Confirmation failed: ${this.message(error)}`]; }
-    finally { this.busy = false; }
-  }
-  private async cancelRequest(): Promise<void> {
-    this.busy = true;
-    try { this.snapshot = await this.api.cancel(); }
-    catch (error) { this.logs = [...this.logs, `Cancellation failed: ${this.message(error)}`]; }
-    finally { this.busy = false; }
-  }
-  private async loadFiles(): Promise<void> { try { this.files = await this.api.getFiles(); } catch { this.files = []; } }
   private downloadAllFiles(): void {
     for (const file of this.files) {
       const anchor = document.createElement("a");
@@ -305,35 +223,22 @@ export class AppShell extends LitElement {
     }
   }
   private newMeasurement(): void {
-    this.eventStream?.close(); this.snapshot = { state: "idle" }; this.request = undefined; this.runRequest = undefined; this.preflight = undefined;
-    this.files = []; this.logs = []; this.samples = []; this.errorMessage = ""; this.view = "setup";
+    this.controller.newMeasurement();
   }
-  private resume(): void { void this.resumeRequest(); }
-  private async resumeRequest(): Promise<void> {
-    this.busy = true; this.errorMessage = "";
-    try { this.snapshot = await this.api.resume(); this.view = "running"; this.connectEvents(); }
-    catch (error) { this.errorMessage = this.message(error); }
-    finally { this.busy = false; }
+  private resume(): void {
+    void this.controller.resume();
   }
   private openSettings(): void {
-    if (this.view === "loading" || this.view === "settings") return;
-    this.settingsReturnView = this.view;
-    this.errorMessage = ""; this.powerMeterTestResult = undefined; this.view = "settings";
+    this.controller.openSettings();
   }
-  private closeSettings(): void { this.errorMessage = ""; this.view = this.settingsReturnView; }
-  private testPowerMeter(event: CustomEvent<AppSettings>): void { void this.testPowerMeterRequest(event.detail); }
-  private async testPowerMeterRequest(settings: AppSettings): Promise<void> {
-    this.testingPowerMeter = true; this.powerMeterTestResult = undefined;
-    try { this.powerMeterTestResult = await this.api.testPowerMeter(settings); }
-    catch (error) { this.powerMeterTestResult = { success: false, message: this.message(error) }; }
-    finally { this.testingPowerMeter = false; }
+  private closeSettings(): void {
+    this.controller.closeSettings();
   }
-  private saveSettings(event: CustomEvent<AppSettings>): void { void this.saveSettingsRequest(event.detail); }
-  private async saveSettingsRequest(settings: AppSettings): Promise<void> {
-    this.busy = true; this.errorMessage = "";
-    try { this.settings = await this.api.saveSettings(settings); this.view = this.settingsReturnView; }
-    catch (error) { this.errorMessage = this.message(error); }
-    finally { this.busy = false; }
+  private testPowerMeter(event: CustomEvent<AppSettings>): void {
+    void this.controller.testPowerMeter(event.detail);
+  }
+  private saveSettings(event: CustomEvent<AppSettings>): void {
+    void this.controller.saveSettings(event.detail);
   }
   private stepClass(index: number): string {
     const current = this.currentStep();
@@ -342,7 +247,6 @@ export class AppShell extends LitElement {
     return "";
   }
   private currentStep(): number { return { loading: 0, setup: 0, review: 1, running: 2, result: 3, settings: 0 }[this.view]; }
-  private message(error: unknown): string { return error instanceof Error ? error.message : "Something went wrong. Try again."; }
 }
 
 customElements.define("powercalc-measure-app", AppShell);
