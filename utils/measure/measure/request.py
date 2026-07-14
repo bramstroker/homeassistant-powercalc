@@ -28,10 +28,12 @@ class ResumePolicy(StrEnum):
 _BASE_PARAMETER_FIELDS = ("sleep_time", "sample_count", "sleep_time_sample", "max_retries", "max_nudges")
 _LIGHT_PARAMETER_FIELDS = (
     "min_brightness",
-    "brightness_step",
-    "hue_step",
-    "saturation_step",
-    "color_temp_step",
+    "bri_bri_steps",
+    "ct_bri_steps",
+    "ct_mired_steps",
+    "hs_bri_steps",
+    "hs_hue_steps",
+    "hs_sat_steps",
     "effect_bri_steps",
     "sleep_initial",
     "sleep_standby",

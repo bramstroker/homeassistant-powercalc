@@ -152,14 +152,14 @@ def test_light_preflight_returns_supported_modes_and_estimate() -> None:
         ),
         controller=HassLightControllerSpec(entity_id="light.test"),
         modes={LutMode.BRIGHTNESS},
-        parameters={"brightness_step": 5, "sleep_time": 0.5, "sample_count": 2},
+        parameters={"sleep_time": 0.5, "sample_count": 2},
     )
 
     result = preflight(base_entities()).validate(request)
 
     assert result.supported_modes == (LutMode.BRIGHTNESS,)
-    assert result.estimated_variations == 21
-    assert result.estimated_duration_seconds == 92
+    assert result.estimated_variations == 255
+    assert result.estimated_duration_seconds == 782
 
 
 def test_light_preflight_uses_device_color_temperature_range() -> None:
@@ -187,14 +187,14 @@ def test_light_preflight_uses_device_color_temperature_range() -> None:
     assert result.estimated_variations == 12
 
 
-def test_light_preflight_maps_color_temperature_percentage_to_device_range() -> None:
+def test_light_preflight_uses_historical_color_temperature_resolution_by_default() -> None:
     entities = base_entities()
     entities[("light", None)] = [
         Entity(
             "light.test",
             [LutMode.COLOR_TEMP],
-            min_mired=200,
-            max_mired=300,
+            min_mired=150,
+            max_mired=500,
         ),
     ]
     request = LightMeasurementRequest(
@@ -204,15 +204,14 @@ def test_light_preflight_maps_color_temperature_percentage_to_device_range() -> 
         power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
         controller=HassLightControllerSpec(entity_id="light.test"),
         modes={LutMode.COLOR_TEMP},
-        parameters={"brightness_step": 100, "color_temp_step": 25},
     )
 
     result = preflight(entities).validate(request)
 
-    assert result.estimated_variations == 10
+    assert result.estimated_variations == 1_872
 
 
-def test_hs_preflight_uses_runner_native_step_units() -> None:
+def test_hs_preflight_uses_historical_native_resolution_by_default() -> None:
     entities = base_entities()
     entities[("light", None)] = [Entity("light.test", [LutMode.HS])]
     request = LightMeasurementRequest(
@@ -226,7 +225,7 @@ def test_hs_preflight_uses_runner_native_step_units() -> None:
 
     result = preflight(entities).validate(request)
 
-    assert result.estimated_variations == 8_778
+    assert result.estimated_variations == 2_025
 
 
 def test_preflight_reports_active_session_before_external_checks() -> None:

@@ -4,7 +4,7 @@ from collections.abc import Mapping
 import math
 from typing import Any
 
-from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
+from measure.controller.light.const import HASS_HS_COMPATIBLE_COLOR_MODES, MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 
 
@@ -22,9 +22,13 @@ def light_info_from_attributes(attributes: Mapping[str, Any]) -> LightInfo:
 
 def supported_light_modes(attributes: Mapping[str, Any]) -> list[LutMode]:
     values = set(attributes.get("supported_color_modes", []))
-    modes = [mode for mode in (LutMode.COLOR_TEMP, LutMode.HS) if mode.value in values]
-    if values - {"onoff"} or "brightness" in attributes:
-        modes.insert(0, LutMode.BRIGHTNESS)
+    modes: list[LutMode] = []
+    if LutMode.BRIGHTNESS in values:
+        modes.append(LutMode.BRIGHTNESS)
+    if LutMode.COLOR_TEMP in values:
+        modes.append(LutMode.COLOR_TEMP)
+    if values & HASS_HS_COMPATIBLE_COLOR_MODES:
+        modes.append(LutMode.HS)
     if attributes.get("effect_list"):
         modes.append(LutMode.EFFECT)
     return modes

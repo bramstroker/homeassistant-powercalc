@@ -14,7 +14,8 @@ const capabilities: Capabilities = {
   modes: ["brightness", "color_temp", "hs", "effect"],
   defaults: {
     ...measurementDefaults,
-    brightness_step: 5, hue_step: 10, saturation_step: 10, color_temp_step: 5,
+    bri_bri_steps: 1, ct_bri_steps: 5, ct_mired_steps: 10,
+    hs_bri_steps: 32, hs_hue_steps: 2731, hs_sat_steps: 32,
     min_brightness: 1, sleep_initial: 10, sleep_standby: 20,
     effect_bri_steps: 40, measure_time_effect: 180, measure_time_effect_min: 20,
   },
@@ -50,6 +51,12 @@ describe("setup view", () => {
     expect(element.shadowRoot.querySelector<HTMLElement>(".effect-settings")?.hidden).toBe(true);
     expect((element.shadowRoot.querySelector('input[name="sleep_time"]') as HTMLInputElement).value).toBe("1");
     expect((element.shadowRoot.querySelector('input[name="sleep_time_sample"]') as HTMLInputElement).disabled).toBe(false);
+    expect((element.shadowRoot.querySelector('input[name="bri_bri_steps"]') as HTMLInputElement).value).toBe("1");
+    expect((element.shadowRoot.querySelector('input[name="ct_bri_steps"]') as HTMLInputElement).value).toBe("5");
+    expect((element.shadowRoot.querySelector('input[name="ct_mired_steps"]') as HTMLInputElement).value).toBe("10");
+    expect((element.shadowRoot.querySelector('input[name="hs_bri_steps"]') as HTMLInputElement).value).toBe("32");
+    expect((element.shadowRoot.querySelector('input[name="hs_hue_steps"]') as HTMLInputElement).value).toBe("2731");
+    expect((element.shadowRoot.querySelector('input[name="hs_sat_steps"]') as HTMLInputElement).value).toBe("32");
 
     const light = element.shadowRoot.querySelector('select[name="light_entity_id"]') as HTMLSelectElement;
     light.value = "light.desk";
@@ -78,6 +85,45 @@ describe("setup view", () => {
 
     const checkedModes = [...element.shadowRoot.querySelectorAll<HTMLInputElement>('input[name="modes"]:checked')].map((input) => input.value);
     expect(checkedModes).toEqual(["brightness", "color_temp", "hs", "effect"]);
+  });
+
+  it("submits mode-specific native light-grid steps", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      selectedType: string;
+      selectedLightId: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = capabilities;
+    element.lights = [{ entity_id: "light.rgb", name: "RGB lamp", supported_modes: ["brightness", "color_temp", "hs"] }];
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.voltages = [];
+    element.selectedType = "light";
+    element.selectedLightId = "light.rgb";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
+    });
+    (element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value = "LCT010";
+    (element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).value = "Test light";
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+
+    const request = await submitted;
+    expect(request.measure_type).toBe("light");
+    expect(request.parameters).toMatchObject({
+      bri_bri_steps: 1,
+      ct_bri_steps: 5,
+      ct_mired_steps: 10,
+      hs_bri_steps: 32,
+      hs_hue_steps: 2731,
+      hs_sat_steps: 32,
+    });
   });
 
   it("includes effect mode when the light exposes effects", async () => {
@@ -464,6 +510,33 @@ describe("running view", () => {
     expect(state?.getAttribute("aria-live")).toBe("polite");
     expect(state?.textContent).toContain("Current measurement point");
     for (const value of expected) expect(state?.textContent).toContain(value);
+  });
+
+  it.each([
+    [
+      { type: "light", on: true, brightness: 128, color_temp_mired: 370, hue: 32_768, saturation: 128, effect: "candle" } as OperatingPoint,
+      ["brightness", "color-temp", "hue", "saturation", "effect"],
+    ],
+    [{ type: "light", on: false } as OperatingPoint, ["off"]],
+    [{ type: "speaker", volume: 40, muted: false } as OperatingPoint, ["volume"]],
+    [{ type: "speaker", volume: 0, muted: true } as OperatingPoint, ["muted"]],
+    [{ type: "fan", percentage: 65, on: true } as OperatingPoint, ["fan-speed"]],
+    [{ type: "fan", percentage: 0, on: false } as OperatingPoint, ["off"]],
+    [{ type: "charging", battery_level: 72, charging: true } as OperatingPoint, ["battery", "charging"]],
+    [{ type: "charging", battery_level: 25, charging: false } as OperatingPoint, ["battery", "not-charging"]],
+  ])("adds an icon to every operating-point chip for %#", async (operatingPoint, icons) => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", operating_point: operatingPoint };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const chips = [...element.shadowRoot.querySelectorAll(".state-chip")];
+    const renderedIcons = [...element.shadowRoot.querySelectorAll("[data-state-icon]")];
+    expect(renderedIcons.map((icon) => icon.getAttribute("data-state-icon"))).toEqual(icons);
+    expect(renderedIcons).toHaveLength(chips.length);
+    for (const icon of renderedIcons) expect(icon.getAttribute("aria-hidden")).toBe("true");
   });
 
   it("hides the power chart until the first sample arrives", async () => {

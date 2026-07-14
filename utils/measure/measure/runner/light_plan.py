@@ -200,7 +200,7 @@ def _variations_for_mode(
             for bri in _inclusive_range(
                 parameters.min_brightness,
                 parameters.max_brightness,
-                parameters.resolved_bri_bri_steps,
+                parameters.bri_bri_steps,
             )
         ]
     if mode == LutMode.COLOR_TEMP:
@@ -211,12 +211,12 @@ def _variations_for_mode(
             for bri in _inclusive_range(
                 parameters.min_brightness,
                 parameters.max_brightness,
-                parameters.resolved_ct_bri_steps,
+                parameters.ct_bri_steps,
             )
             for mired in _inclusive_range(
                 min_mired,
                 max_mired,
-                parameters.resolve_ct_mired_steps(min_mired, max_mired),
+                parameters.ct_mired_steps,
             )
         ]
     if mode == LutMode.HS:
@@ -225,17 +225,17 @@ def _variations_for_mode(
             for bri in _inclusive_range(
                 parameters.min_brightness,
                 parameters.max_brightness,
-                parameters.resolved_hs_bri_steps,
+                parameters.hs_bri_steps,
             )
             for sat in _inclusive_range(
                 parameters.min_sat,
                 parameters.max_sat,
-                parameters.resolved_hs_sat_steps,
+                parameters.hs_sat_steps,
             )
             for hue in _inclusive_range(
                 parameters.min_hue,
                 parameters.max_hue,
-                parameters.resolved_hs_hue_steps,
+                parameters.hs_hue_steps,
             )
         ]
     if mode == LutMode.EFFECT:
@@ -279,19 +279,19 @@ def _mode_transition_time(
         brightness = hs_variation.bri if hs_variation else parameters.min_brightness
         sat_steps_left = (
             round(
-                (parameters.max_brightness - brightness) / parameters.resolved_hs_bri_steps,
+                (parameters.max_brightness - brightness) / parameters.hs_bri_steps,
             )
             - 1
         )
         time_left = sat_steps_left * parameters.sleep_time_sat
-        hue_steps_left = round(parameters.max_hue / parameters.resolved_hs_hue_steps * sat_steps_left)
+        hue_steps_left = round(parameters.max_hue / parameters.hs_hue_steps * sat_steps_left)
         return time_left + hue_steps_left * parameters.sleep_time_hue
     if mode == LutMode.COLOR_TEMP:
         ct_variation = current_variation if isinstance(current_variation, ColorTempVariation) else None
         brightness = ct_variation.bri if ct_variation else parameters.min_brightness
         ct_steps_left = (
             round(
-                (parameters.max_brightness - brightness) / parameters.resolved_ct_bri_steps,
+                (parameters.max_brightness - brightness) / parameters.ct_bri_steps,
             )
             - 1
         )

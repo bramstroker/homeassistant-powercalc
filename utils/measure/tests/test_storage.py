@@ -118,7 +118,7 @@ def test_running_session_becomes_resumable_after_restart(tmp_path: Path) -> None
     storage.create(snapshot(SessionState.RUNNING), light_request())
     output = storage.output_directory("a1b2-c3d4") / "LCT010"
     output.mkdir()
-    (output / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
+    (output / "brightness.csv").write_text("bri,watt\n2,1.0\n", encoding="utf-8")
 
     loaded = SessionStorage(tmp_path).load_current()
 
@@ -155,7 +155,6 @@ def test_every_orphaned_nonterminal_session_is_recovered(tmp_path: Path, state: 
         "wrong,watt\n1,1.0\n",
         "bri,watt\n1,",
         "bri,watt\n999,1.0\n",
-        "bri,watt\n2,1.0\n",
     ],
 )
 def test_interrupted_session_without_compatible_complete_row_fails(tmp_path: Path, contents: str) -> None:

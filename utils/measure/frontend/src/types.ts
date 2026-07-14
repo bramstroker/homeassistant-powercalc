@@ -37,10 +37,12 @@ export interface MeasurementParameters {
   sleep_time_sample: number;
   max_retries: number;
   max_nudges: number;
-  brightness_step: number;
-  hue_step: number;
-  saturation_step: number;
-  color_temp_step: number;
+  bri_bri_steps: number;
+  ct_bri_steps: number;
+  ct_mired_steps: number;
+  hs_bri_steps: number;
+  hs_hue_steps: number;
+  hs_sat_steps: number;
   min_brightness: number;
   sleep_initial: number;
   sleep_standby: number;

@@ -183,50 +183,19 @@ def test_request_preserves_subsecond_sleep_time() -> None:
     assert request.parameters.sleep_time == 0.25
 
 
-@pytest.mark.parametrize(
-    ("brightness_step", "hue_step", "saturation_step", "expected_brightness", "expected_hue", "expected_saturation"),
-    [
-        (1, 1, 1, 3, 182, 3),
-        (5, 10, 10, 13, 1820, 26),
-        (100, 360, 100, 255, 65535, 255),
-    ],
-)
-def test_app_measure_config_maps_percentage_steps_to_native_ranges(
-    brightness_step: int,
-    hue_step: int,
-    saturation_step: int,
-    expected_brightness: int,
-    expected_hue: int,
-    expected_saturation: int,
-) -> None:
-    request = LightMeasurementRequest.model_validate(
-        valid_request()
-        | {
-            "parameters": {
-                "brightness_step": brightness_step,
-                "hue_step": hue_step,
-                "saturation_step": saturation_step,
-                "color_temp_step": 7,
-            },
-        },
-    )
+def test_measurement_parameters_default_to_historical_native_light_grid() -> None:
+    parameters = MeasurementParameters()
 
-    parameters = request.parameters
-
-    assert parameters.resolved_bri_bri_steps == expected_brightness
-    assert parameters.resolved_ct_bri_steps == expected_brightness
-    assert parameters.resolve_ct_mired_steps(200, 300) == 7
-    assert parameters.resolved_hs_bri_steps == expected_brightness
-    assert parameters.resolved_hs_hue_steps == expected_hue
-    assert parameters.resolved_hs_sat_steps == expected_saturation
+    assert parameters.bri_bri_steps == 1
+    assert parameters.ct_bri_steps == 5
+    assert parameters.ct_mired_steps == 10
+    assert parameters.hs_bri_steps == 32
+    assert parameters.hs_hue_steps == 2731
+    assert parameters.hs_sat_steps == 32
 
 
-def test_native_cli_steps_override_derived_app_steps() -> None:
+def test_measurement_parameters_preserve_explicit_native_steps() -> None:
     parameters = MeasurementParameters(
-        brightness_step=5,
-        color_temp_step=7,
-        hue_step=10,
-        saturation_step=10,
         ct_bri_steps=11,
         ct_mired_steps=12,
         bri_bri_steps=13,
@@ -235,12 +204,18 @@ def test_native_cli_steps_override_derived_app_steps() -> None:
         hs_sat_steps=16,
     )
 
-    assert parameters.resolved_ct_bri_steps == 11
-    assert parameters.resolve_ct_mired_steps(200, 300) == 12
-    assert parameters.resolved_bri_bri_steps == 13
-    assert parameters.resolved_hs_bri_steps == 14
-    assert parameters.resolved_hs_hue_steps == 15
-    assert parameters.resolved_hs_sat_steps == 16
+    assert parameters.ct_bri_steps == 11
+    assert parameters.ct_mired_steps == 12
+    assert parameters.bri_bri_steps == 13
+    assert parameters.hs_bri_steps == 14
+    assert parameters.hs_hue_steps == 15
+    assert parameters.hs_sat_steps == 16
+
+
+@pytest.mark.parametrize("field", ["brightness_step", "color_temp_step", "hue_step", "saturation_step"])
+def test_light_request_rejects_removed_percentage_step_fields(field: str) -> None:
+    with pytest.raises(ValidationError):
+        LightMeasurementRequest.model_validate(valid_request() | {"parameters": {field: 5}})
 
 
 @pytest.mark.parametrize(
@@ -250,6 +225,9 @@ def test_native_cli_steps_override_derived_app_steps() -> None:
         ({"max_retries": 101}, "max_retries"),
         ({"max_nudges": 21}, "max_nudges"),
         ({"min_brightness": 0}, "min_brightness"),
+        ({"bri_bri_steps": 0}, "bri_bri_steps"),
+        ({"ct_mired_steps": 501}, "ct_mired_steps"),
+        ({"hs_hue_steps": 65_536}, "hs_hue_steps"),
         ({"measure_time_effect": 10, "measure_time_effect_min": 20}, "measure_time_effect_min"),
     ],
 )

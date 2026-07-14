@@ -2,6 +2,8 @@ from enum import StrEnum
 import os
 from pathlib import Path
 
+from measure.controller.light.const import MAX_MIRED
+
 QUESTION_GENERATE_MODEL_JSON = "generate_model_json"
 QUESTION_DUMMY_LOAD = "dummy_load"
 QUESTION_MODEL_NAME = "model_name"
@@ -81,10 +83,12 @@ PARAMETER_LIMITS: dict[str, tuple[float, float]] = {
     "max_retries": (0, RETRY_COUNT_LIMIT),
     "max_nudges": (0, MAX_NUDGES_LIMIT),
     "min_brightness": (1, 255),
-    "brightness_step": (1, 100),
-    "hue_step": (1, 360),
-    "saturation_step": (1, 100),
-    "color_temp_step": (1, 100),
+    "bri_bri_steps": (1, 255),
+    "ct_bri_steps": (1, 255),
+    "ct_mired_steps": (1, MAX_MIRED),
+    "hs_bri_steps": (1, 255),
+    "hs_hue_steps": (1, 65535),
+    "hs_sat_steps": (1, 255),
     "effect_bri_steps": (1, 255),
     "sleep_initial": (0, 3600),
     "sleep_standby": (0, 3600),

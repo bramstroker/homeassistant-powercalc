@@ -11,7 +11,8 @@ const capabilities = {
   modes: ["brightness" as const],
   defaults: {
     ...measurementDefaults,
-    brightness_step: 5, hue_step: 10, saturation_step: 10, color_temp_step: 5,
+    bri_bri_steps: 1, ct_bri_steps: 5, ct_mired_steps: 10,
+    hs_bri_steps: 32, hs_hue_steps: 2731, hs_sat_steps: 32,
     min_brightness: 1, sleep_initial: 10, sleep_standby: 20,
     effect_bri_steps: 40, measure_time_effect: 180, measure_time_effect_min: 20,
   },

@@ -226,10 +226,12 @@ export class SetupView extends LitElement {
               ${this.numberField("sleep_initial", "Initial stabilization (seconds)", request?.parameters.sleep_initial ?? defaults.sleep_initial, 0, 3600)}
               ${this.numberField("sleep_standby", "Standby stabilization (seconds)", request?.parameters.sleep_standby ?? defaults.sleep_standby, 0, 3600)}
               <p class="advanced-heading">Profile resolution</p>
-              ${this.numberField("brightness_step", "Brightness step (%)", request?.parameters.brightness_step ?? defaults.brightness_step, 1, 100)}
-              ${this.numberField("color_temp_step", "Color temperature step (%)", request?.parameters.color_temp_step ?? defaults.color_temp_step, 1, 100)}
-              ${this.numberField("hue_step", "Hue step (degrees)", request?.parameters.hue_step ?? defaults.hue_step, 1, 360)}
-              ${this.numberField("saturation_step", "Saturation step (%)", request?.parameters.saturation_step ?? defaults.saturation_step, 1, 100)}
+              ${this.numberField("bri_bri_steps", "Brightness mode step", request?.parameters.bri_bri_steps ?? defaults.bri_bri_steps, 1, 255, "1", "Native brightness increment (1–255).", !selectedModes.includes("brightness"))}
+              ${this.numberField("ct_bri_steps", "Color temperature brightness step", request?.parameters.ct_bri_steps ?? defaults.ct_bri_steps, 1, 255, "1", "Native brightness increment used while measuring color temperature.", !selectedModes.includes("color_temp"))}
+              ${this.numberField("ct_mired_steps", "Color temperature mired step", request?.parameters.ct_mired_steps ?? defaults.ct_mired_steps, 1, 500, "1", "Native color-temperature increment in mired.", !selectedModes.includes("color_temp"))}
+              ${this.numberField("hs_bri_steps", "HS brightness step", request?.parameters.hs_bri_steps ?? defaults.hs_bri_steps, 1, 255, "1", "Native brightness increment used for hue and saturation.", !selectedModes.includes("hs"))}
+              ${this.numberField("hs_hue_steps", "HS hue step", request?.parameters.hs_hue_steps ?? defaults.hs_hue_steps, 1, 65535, "1", "Native Home Assistant hue increment (0–65535).", !selectedModes.includes("hs"))}
+              ${this.numberField("hs_sat_steps", "HS saturation step", request?.parameters.hs_sat_steps ?? defaults.hs_sat_steps, 1, 255, "1", "Native saturation increment (1–255).", !selectedModes.includes("hs"))}
               <div class="grid effect-settings" ?hidden=${!selectedModes.includes("effect")}>
                 <p class="advanced-heading">Effect mode</p>
                 ${this.numberField("effect_bri_steps", "Effect brightness step", request?.parameters.effect_bri_steps ?? defaults.effect_bri_steps, 1, 255, "1", "Native brightness increment between long-running effect samples.", !selectedModes.includes("effect"))}
@@ -523,10 +525,12 @@ export class SetupView extends LitElement {
         sleep_time_sample: numberOrDefault("sleep_time_sample"),
         max_retries: defaults.max_retries,
         max_nudges: defaults.max_nudges,
-        brightness_step: numberOrDefault("brightness_step"),
-        hue_step: numberOrDefault("hue_step"),
-        saturation_step: numberOrDefault("saturation_step"),
-        color_temp_step: numberOrDefault("color_temp_step"),
+        bri_bri_steps: numberOrDefault("bri_bri_steps"),
+        ct_bri_steps: numberOrDefault("ct_bri_steps"),
+        ct_mired_steps: numberOrDefault("ct_mired_steps"),
+        hs_bri_steps: numberOrDefault("hs_bri_steps"),
+        hs_hue_steps: numberOrDefault("hs_hue_steps"),
+        hs_sat_steps: numberOrDefault("hs_sat_steps"),
         min_brightness: numberOrDefault("min_brightness"),
         sleep_initial: numberOrDefault("sleep_initial"),
         sleep_standby: numberOrDefault("sleep_standby"),
