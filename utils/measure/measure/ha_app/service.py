@@ -7,6 +7,7 @@ import re
 
 from measure.assembler import MeasurementAssembler
 from measure.execution import MeasurementExecution
+from measure.ha_app.coordinator import SessionMeasurementService
 from measure.ha_app.interaction import SessionInteraction
 from measure.ha_app.session import SessionControl, SessionEventType
 from measure.home_assistant import HomeAssistantManager
@@ -61,7 +62,7 @@ def _redact(message: str, secrets: tuple[str, ...]) -> str:
     return redacted
 
 
-class MeasurementService:
+class MeasurementService(SessionMeasurementService):
     """Compose Home Assistant adapters and execute one measurement session."""
 
     def __init__(

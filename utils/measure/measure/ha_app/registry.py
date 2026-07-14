@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from measure.const import MEASURE_TYPE_LABELS, MeasureType
+from measure.controller.charging.const import ChargingDeviceType
+from measure.controller.charging.spec import charging_entity_domain
 from measure.controller.light.const import LutMode
 
 
@@ -19,6 +21,7 @@ class FieldControl(StrEnum):
 class FieldOption:
     value: str
     label: str
+    entity_domain: str | None = None
 
 
 @dataclass(frozen=True)
@@ -115,11 +118,23 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                 label="Charging device type",
                 control=FieldControl.SELECT,
                 options=(
-                    FieldOption(value="vacuum_robot", label="Vacuum robot"),
-                    FieldOption(value="lawn_mower_robot", label="Lawn mower robot"),
+                    FieldOption(
+                        value=ChargingDeviceType.VACUUM_ROBOT,
+                        label="Vacuum robot",
+                        entity_domain=charging_entity_domain(ChargingDeviceType.VACUUM_ROBOT),
+                    ),
+                    FieldOption(
+                        value=ChargingDeviceType.LAWN_MOWER_ROBOT,
+                        label="Lawn mower robot",
+                        entity_domain=charging_entity_domain(ChargingDeviceType.LAWN_MOWER_ROBOT),
+                    ),
                 ),
             ),
-            _entity("charging_entity_id", "Charging device", "vacuum", "lawn_mower"),
+            _entity(
+                "charging_entity_id",
+                "Charging device",
+                *(charging_entity_domain(device_type) for device_type in ChargingDeviceType),
+            ),
         ),
     ),
     MeasureType.FAN: MeasurementDefinition(

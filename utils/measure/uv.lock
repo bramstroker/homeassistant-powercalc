@@ -605,7 +605,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.3" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.0" },
     { name = "python-decouple", specifier = ">=3.4" },
-    { name = "python-kasa", specifier = ">=0.6" },
+    { name = "python-kasa", specifier = ">=0.7" },
     { name = "readchar", specifier = ">=4.0" },
     { name = "requests", specifier = ">=2.28" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.2" },

@@ -8,7 +8,7 @@ from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import LutMode
 from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec
 from measure.controller.media.spec import HassMediaControllerSpec
-from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
+from measure.ha_app.preflight import ActiveSessionError, EntityRecord, MeasurementPreflight, PreflightError
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
@@ -21,7 +21,7 @@ import pytest
 
 
 @dataclass
-class Entity:
+class Entity(EntityRecord):
     entity_id: str
     supported_modes: list[LutMode] | None = None
     effect_list: list[str] | None = None

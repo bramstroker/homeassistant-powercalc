@@ -13,8 +13,8 @@ import type {
 } from "../types";
 import {
   buildNonLightRequest,
-  canonicalFieldName,
   deviceFields,
+  entityDomain,
   entityDomains,
   LIGHT_TYPE,
   measurementIcon,
@@ -348,14 +348,19 @@ export class SetupView extends LitElement {
 
   private genericField(field: MeasureDefinition["fields"][number], run?: NonLightMeasurementRequest) {
     if (!this.selectedType) return nothing;
-    const name = canonicalFieldName(this.selectedType, field.name);
+    const definition = this.definition(this.selectedType);
+    if (!definition) return nothing;
+    const name = field.name;
     const stored = run && requestFieldValue(run, name);
     if (field.control === "boolean") {
       return html`<label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
     }
     if (field.control === "entity") {
       const value = (stored ?? field.default ?? "").toString();
-      const domains = name === "charging_entity_id" ? [this.chargingDomain(run)] : this.fieldDomains(field);
+      const chargingOptions = definition.fields.find((candidate) => candidate.name === "charging_device_type")?.options ?? [];
+      const selectedType = this.selectedChargingType
+        || (run?.measure_type === "charging" ? run.charging_device_type : chargingOptions[0]?.value);
+      const domains = name === "charging_entity_id" ? [entityDomain(definition, field, selectedType)].filter((domain): domain is string => Boolean(domain)) : this.fieldDomains(field);
       const failed = domains.find((domain) => this.deviceEntityErrors[domain]);
       if (failed) {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
@@ -383,8 +388,7 @@ export class SetupView extends LitElement {
   }
 
   private fieldDomains(field: MeasureDefinition["fields"][number]): string[] {
-    if (field.entity_domains?.length) return field.entity_domains;
-    return field.entity_domain ? [field.entity_domain] : [];
+    return field.entity_domains ?? [];
   }
 
   private modeLabel(mode: LutMode): string {
@@ -455,12 +459,6 @@ export class SetupView extends LitElement {
     if (definition) this.dispatchEvent(new CustomEvent("entity-domains-requested", { detail: entityDomains(definition), bubbles: true, composed: true }));
   }
 
-  private chargingDomain(run?: NonLightMeasurementRequest): string {
-    const chargingType = this.selectedChargingType
-      || (run?.measure_type === "charging" ? run.charging_device_type : "vacuum_robot");
-    return chargingType === "lawn_mower_robot" ? "lawn_mower" : "vacuum";
-  }
-
   private definition(type: MeasureType): MeasureDefinition | undefined {
     return this.definitions.find((item) => item.measure_type === type);
   }
@@ -474,13 +472,11 @@ export class SetupView extends LitElement {
     if (request?.power_meter.type === "hass" && request.power_meter.voltage_entity_id) {
       return request.power_meter.voltage_entity_id;
     }
-    return this.matchingVoltageEntityId(this.powerEntityId(request));
+    return this.relatedVoltageEntityId(this.powerEntityId(request));
   }
 
-  private matchingVoltageEntityId(powerEntityId: string): string {
-    const deviceId = this.powers.find((entity) => entity.entity_id === powerEntityId)?.device_id;
-    if (!deviceId) return "";
-    return this.voltages.find((entity) => entity.device_id === deviceId)?.entity_id ?? "";
+  private relatedVoltageEntityId(powerEntityId: string): string {
+    return this.powers.find((entity) => entity.entity_id === powerEntityId)?.related_voltage_entity_id ?? "";
   }
 
   private modelId(request?: MeasurementRequest): string {
@@ -554,12 +550,13 @@ export class SetupView extends LitElement {
       return;
     }
     const powerEntityId = String(form.get("power_entity_id") ?? "");
-    const voltageEntityId = this.matchingVoltageEntityId(powerEntityId) || null;
+    const voltageEntityId = this.relatedVoltageEntityId(powerEntityId) || null;
     const request = buildNonLightRequest(definition, form, this.capabilities, this.powerMeterSpec(powerEntityId, voltageEntityId));
     if (request.measure_type === "charging") {
-      const expectedDomain = request.charging_device_type === "lawn_mower_robot" ? "lawn_mower." : "vacuum.";
-      if (request.controller.type !== "hass" || !request.controller.entity_id.startsWith(expectedDomain)) {
-        this.errorMessage = `Select a ${expectedDomain.slice(0, -1)} entity for the chosen charging device type.`;
+      const chargingField = definition.fields.find((field) => field.name === "charging_entity_id");
+      const expectedDomain = chargingField && entityDomain(definition, chargingField, request.charging_device_type);
+      if (!expectedDomain || request.controller.type !== "hass" || !request.controller.entity_id.startsWith(`${expectedDomain}.`)) {
+        this.errorMessage = `Select a ${expectedDomain ?? "matching"} entity for the chosen charging device type.`;
         return;
       }
     }

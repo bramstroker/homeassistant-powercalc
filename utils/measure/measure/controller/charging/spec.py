@@ -4,7 +4,16 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from measure.controller.charging.const import BatteryLevelSourceType, ChargingControllerType
+from measure.controller.charging.const import BatteryLevelSourceType, ChargingControllerType, ChargingDeviceType
+
+
+def charging_entity_domain(device_type: ChargingDeviceType) -> str:
+    """Return the Home Assistant domain controlled for a charging device type."""
+
+    return {
+        ChargingDeviceType.VACUUM_ROBOT: "vacuum",
+        ChargingDeviceType.LAWN_MOWER_ROBOT: "lawn_mower",
+    }[device_type]
 
 
 class _ChargingControllerSpec(BaseModel):

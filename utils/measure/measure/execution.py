@@ -8,19 +8,11 @@ from typing import Any, Protocol
 from measure.model import write_model_json
 from measure.request import MeasurementRequest
 from measure.runner.runner import MeasurementRunner, RunnerResult
+from measure.util.measure_util import MeasureUtilInteraction
 
 
-class RunInteraction(Protocol):
-    """Adapter boundary for input/output needed while a measurement is running."""
-
-    def confirm(self, message: str) -> None:
-        """Wait until the operator confirms that a measurement may continue."""
-
-    def notify(self, message: str) -> None:
-        """Present non-terminal run information to the operator."""
-
-    def choose(self, message: str, *, default: bool) -> bool:
-        """Ask the operator to make a binary choice."""
+class RunInteraction(MeasureUtilInteraction, Protocol):
+    """Full interaction boundary used while a measurement is running."""
 
     def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
         """Report measurement progress. ``total`` of 0 means the run is open-ended."""
@@ -36,7 +28,7 @@ class MeasurementCancelledError(Exception):
     """Raised when an active measurement is cancelled cooperatively."""
 
 
-class ImmediateInteraction:
+class ImmediateInteraction(RunInteraction):
     """Non-interactive execution adapter used by tests and unattended runs."""
 
     def confirm(self, _: str) -> None:

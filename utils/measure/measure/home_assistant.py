@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 import contextlib
+from dataclasses import dataclass
 from threading import RLock
 from types import TracebackType
 from typing import Any, Self
@@ -9,12 +10,16 @@ from typing import Any, Self
 from homeassistant_api import Entity, EntityRegistryEntry, Group, State, WebsocketClient
 from homeassistant_api.errors import WebsocketError
 
-from measure.const import (
-    HASS_DEVICE_REGISTRY_ID,
-    HASS_DEVICE_REGISTRY_LIST,
-    HASS_DEVICE_REGISTRY_MODEL,
-    HASS_DEVICE_REGISTRY_MODEL_ID,
-)
+from measure.const import HASS_DEVICE_REGISTRY_LIST
+
+
+@dataclass(frozen=True)
+class HomeAssistantEntityData:
+    """Raw live entity and registry data captured under one client lock."""
+
+    entities: dict[str, Group]
+    entity_registry: tuple[EntityRegistryEntry, ...]
+    device_registry: tuple[dict[str, object], ...]
 
 
 class HomeAssistantWebsocketClient(WebsocketClient):
@@ -50,25 +55,6 @@ class HomeAssistantWebsocketClient(WebsocketClient):
         """Return Home Assistant device registry entries."""
 
         return tuple(self.recv_result_list(self.send(HASS_DEVICE_REGISTRY_LIST)))
-
-    def get_device_model(self, entity_id: str) -> str | None:
-        """Return the preferred model identifier for an entity's device."""
-
-        registry_entry = next((entry for entry in self.list_entity_registry() if entry.entity_id == entity_id), None)
-        if registry_entry is None or registry_entry.device_id is None:
-            return None
-        device = next(
-            (
-                entry
-                for entry in self.get_device_registry()
-                if entry.get(HASS_DEVICE_REGISTRY_ID) == registry_entry.device_id
-            ),
-            None,
-        )
-        if device is None:
-            return None
-        model = device.get(HASS_DEVICE_REGISTRY_MODEL_ID) or device.get(HASS_DEVICE_REGISTRY_MODEL)
-        return str(model) if model else None
 
     def __del__(self) -> None:
         with contextlib.suppress(Exception):
@@ -186,8 +172,16 @@ class HomeAssistantManager:
     def get_device_registry(self) -> tuple[dict[str, object], ...]:
         return self._execute(lambda client: client.get_device_registry())
 
-    def get_device_model(self, entity_id: str) -> str | None:
-        return self._execute(lambda client: client.get_device_model(entity_id))
+    def get_entity_data(self) -> HomeAssistantEntityData:
+        """Load fresh entity and registry data as one consistency unit."""
+
+        return self._execute(
+            lambda client: HomeAssistantEntityData(
+                entities=client.get_entities(),
+                entity_registry=tuple(client.list_entity_registry()),
+                device_registry=tuple(client.get_device_registry()),
+            ),
+        )
 
     def close(self) -> None:
         with self._lock:

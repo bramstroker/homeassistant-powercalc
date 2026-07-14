@@ -206,7 +206,7 @@ describe("setup type picker", () => {
       description: "Measure fan power across percentage levels.",
       fields: [
         { name: "power_entity_id", label: "Power sensor", control: "entity", required: true, options: [] },
-        { name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] },
+        { name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] },
       ],
       supports_profile: true,
       supports_resume: false,
@@ -238,7 +238,7 @@ describe("setup type picker", () => {
         label: "Fan",
         description: "Measure fan power across percentage levels.",
         fields: [
-          { name: "fan_entity_id", label: "Fan", control: "entity" as const, required: true, entity_domain: "fan", options: [] },
+          { name: "fan_entity_id", label: "Fan", control: "entity" as const, required: true, entity_domains: ["fan"], options: [] },
         ],
         supports_profile: true,
         supports_resume: false,
@@ -256,7 +256,7 @@ describe("setup type picker", () => {
         label: "Speaker",
         description: "Measure power across media-player volume levels.",
         fields: [
-          { name: "media_player_entity_id", label: "Media player", control: "entity" as const, required: true, entity_domain: "media_player", options: [] },
+          { name: "media_player_entity_id", label: "Media player", control: "entity" as const, required: true, entity_domains: ["media_player"], options: [] },
           { name: "disable_streaming", label: "Disable automatic pink-noise streaming", control: "boolean" as const, required: false, default: false, options: [] },
         ],
         supports_profile: true,
@@ -280,7 +280,10 @@ describe("setup type picker", () => {
             label: "Charging device type",
             control: "select" as const,
             required: true,
-            options: [{ value: "vacuum_robot", label: "Vacuum robot" }, { value: "lawn_mower_robot", label: "Lawn mower robot" }],
+            options: [
+              { value: "vacuum_robot", label: "Vacuum robot", entity_domain: "vacuum" },
+              { value: "lawn_mower_robot", label: "Lawn mower robot", entity_domain: "lawn_mower" },
+            ],
           },
           {
             name: "charging_entity_id",
@@ -335,7 +338,7 @@ describe("setup type picker", () => {
   it("shows entity discovery failures instead of silently enabling free-text input", async () => {
     const fanDefinition: MeasureDefinition = {
       measure_type: "fan", label: "Fan", description: "Measure fan power.",
-      fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] }],
+      fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
       supports_profile: false, supports_resume: false,
     };
     const element = document.createElement("measure-setup-view") as HTMLElement & {
@@ -361,7 +364,10 @@ describe("setup type picker", () => {
       fields: [
         {
           name: "charging_device_type", label: "Device type", control: "select", required: true,
-          options: [{ value: "vacuum_robot", label: "Vacuum" }, { value: "lawn_mower_robot", label: "Lawn mower" }],
+          options: [
+            { value: "vacuum_robot", label: "Vacuum", entity_domain: "vacuum" },
+            { value: "lawn_mower_robot", label: "Lawn mower", entity_domain: "lawn_mower" },
+          ],
         },
         {
           name: "charging_entity_id", label: "Charging device", control: "entity", required: true,
@@ -559,8 +565,8 @@ describe("setup view defaults", () => {
     element.capabilities = capabilities;
     element.lights = lights;
     element.powers = [
-      { entity_id: "sensor.plug_power", name: "Plug power", unit: "W", device_id: "plug-device" },
-      { entity_id: "sensor.strip_consumption", name: "Strip power", unit: "W", device_id: "strip-device" },
+      { entity_id: "sensor.plug_power", name: "Plug power", unit: "W", related_voltage_entity_id: "sensor.plug_line_voltage" },
+      { entity_id: "sensor.strip_consumption", name: "Strip power", unit: "W", related_voltage_entity_id: "sensor.strip_mains" },
     ];
     element.voltages = [
       { entity_id: "sensor.plug_line_voltage", name: "Plug voltage", unit: "V", device_id: "plug-device" },
@@ -681,8 +687,8 @@ describe("app shell device entities", () => {
     const fanDefinition: MeasureDefinition = {
       measure_type: "fan", label: "Fan", description: "Measure fan power across percentage levels.",
       fields: [
-        { name: "power_entity_id", label: "Power sensor", control: "entity", required: true, options: [], entity_domain: "sensor" },
-        { name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] },
+        { name: "power_entity_id", label: "Power sensor", control: "entity", required: true, options: [], entity_domains: ["sensor"] },
+        { name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] },
       ],
       supports_profile: true, supports_resume: false,
     };

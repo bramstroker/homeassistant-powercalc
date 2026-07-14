@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
-import math
+from collections.abc import Callable
 import time
 from typing import Any
 
@@ -9,21 +8,10 @@ from homeassistant_api.errors import HomeassistantAPIError
 
 from measure.controller.errors import ApiConnectionError
 from measure.controller.hass_controller import HassControllerBase
-from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
+from measure.controller.light.capabilities import light_info_from_attributes, mired_to_kelvin
+from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
 from measure.home_assistant import HomeAssistantManager
-
-
-def light_info_from_attributes(attributes: Mapping[str, Any]) -> LightInfo:
-    """Translate Home Assistant light attributes into runner-native mired bounds."""
-
-    min_mired = MIN_MIRED
-    if "max_color_temp_kelvin" in attributes:
-        min_mired = HassLightController.kelvin_to_mired(float(attributes["max_color_temp_kelvin"]))
-    max_mired = MAX_MIRED
-    if "min_color_temp_kelvin" in attributes:
-        max_mired = HassLightController.kelvin_to_mired(float(attributes["min_color_temp_kelvin"]))
-    return LightInfo("unknown", min_mired, max_mired)
 
 
 class HassLightController(HassControllerBase, LightController):
@@ -90,7 +78,7 @@ class HassLightController(HassControllerBase, LightController):
             "entity_id": self.entity_id,
             "transition": self._transition_time,
             "brightness": bri,
-            "color_temp_kelvin": self.mired_to_kelvin(ct),
+            "color_temp_kelvin": mired_to_kelvin(ct),
         }
 
     def build_bri_json_body(self, bri: int) -> dict[str, Any]:
@@ -112,13 +100,3 @@ class HassLightController(HassControllerBase, LightController):
             "entity_id": self.entity_id,
             "white": bri,
         }
-
-    @staticmethod
-    def kelvin_to_mired(kelvin_temperature: float) -> int:
-        """Convert degrees kelvin to mired shift."""
-        return math.floor(1000000 / kelvin_temperature)
-
-    @staticmethod
-    def mired_to_kelvin(mired_temperature: float) -> int:
-        """Convert absolute mired shift to degrees kelvin."""
-        return math.floor(1000000 / mired_temperature)

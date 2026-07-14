@@ -20,13 +20,6 @@ class HassControllerBase:
         except Exception as e:
             raise ApiConnectionError(f"Failed to connect to HA API: {e}") from e
 
-    def get_domain_entity_list(self, domain: str) -> list:
-        entities = self.client.get_entities()
-        if domain not in entities:
-            return []
-        found_entities = entities[domain].entities.values()
-        return sorted([entity.entity_id for entity in found_entities])
-
     def get_entity_state(self) -> State:
         entity = self.client.get_entity(entity_id=self.entity_id)
         if not entity:

@@ -54,7 +54,7 @@ class MeasureUtilInteraction(Protocol):
     def notify(self, message: str) -> None: ...
 
 
-class _MissingInteraction:
+class _MissingInteraction(MeasureUtilInteraction):
     def confirm(self, message: str) -> None:
         raise MeasurementInteractionRequiredError(message)
 

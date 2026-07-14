@@ -5,7 +5,7 @@ from threading import Event
 import time
 
 from measure.controller.light.spec import DummyLightControllerSpec
-from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
+from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError, SessionMeasurementService
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
@@ -37,7 +37,7 @@ def wait_for_state(coordinator: MeasurementCoordinator, state: SessionState) -> 
     raise AssertionError(f"Session did not reach {state}")
 
 
-class CompletingService:
+class CompletingService(SessionMeasurementService):
     def run(
         self,
         request: MeasurementRequest,
@@ -51,7 +51,7 @@ class CompletingService:
         return RunnerResult(model_json_data={})
 
 
-class BlockingService:
+class BlockingService(SessionMeasurementService):
     def __init__(self, started: Event) -> None:
         self.started = started
 
@@ -66,7 +66,7 @@ class BlockingService:
         raise AssertionError("Cancelled wait returned")
 
 
-class SamplingService:
+class SamplingService(SessionMeasurementService):
     def run(
         self,
         request: MeasurementRequest,

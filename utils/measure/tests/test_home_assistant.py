@@ -3,8 +3,7 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from time import sleep
-from types import SimpleNamespace
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from measure.home_assistant import HomeAssistantManager, HomeAssistantWebsocketClient
 import pytest
@@ -14,25 +13,6 @@ def test_client_uses_canonical_websocket_url() -> None:
     client = HomeAssistantWebsocketClient("ws://homeassistant.local:8123/api/websocket", "token")
 
     assert client.api_url == "ws://homeassistant.local:8123/api/websocket"
-
-
-def test_device_model_prefers_model_id_and_falls_back_to_model() -> None:
-    client = HomeAssistantWebsocketClient("ws://homeassistant.local:8123/api/websocket", "token")
-    registry = (
-        SimpleNamespace(entity_id="light.preferred", device_id="preferred-device"),
-        SimpleNamespace(entity_id="light.fallback", device_id="fallback-device"),
-    )
-    devices = (
-        {"id": "preferred-device", "model_id": "LWA017", "model": "Hue White Ambiance"},
-        {"id": "fallback-device", "model_id": None, "model": "Hue White"},
-    )
-
-    with (
-        patch.object(client, "list_entity_registry", return_value=registry),
-        patch.object(client, "get_device_registry", return_value=devices),
-    ):
-        assert client.get_device_model("light.preferred") == "LWA017"
-        assert client.get_device_model("light.fallback") == "Hue White"
 
 
 def test_manager_reuses_one_client_for_its_lifecycle() -> None:

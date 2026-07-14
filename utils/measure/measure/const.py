@@ -15,6 +15,8 @@ HASS_DEVICE_REGISTRY_LIST = "config/device_registry/list"
 HASS_DEVICE_REGISTRY_ID = "id"
 HASS_DEVICE_REGISTRY_MODEL = "model"
 HASS_DEVICE_REGISTRY_MODEL_ID = "model_id"
+HASS_ENTITY_DEVICE_CLASS = "device_class"
+HASS_ENTITY_UNIT_OF_MEASUREMENT = "unit_of_measurement"
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()

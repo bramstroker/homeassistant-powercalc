@@ -2,16 +2,15 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from enum import StrEnum
-from typing import Literal, Protocol
+from typing import Protocol
 
-from measure.controller.charging.const import ChargingDeviceType
-from measure.controller.charging.spec import HassChargingControllerSpec
+from measure.controller.charging.spec import HassChargingControllerSpec, charging_entity_domain
 from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.controller.light.spec import HassLightControllerSpec
 from measure.controller.media.spec import HassMediaControllerSpec
+from measure.home_assistant_entities import DeviceClass, EntityDomain
 from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import (
     ChargingMeasurementRequest,
@@ -37,14 +36,6 @@ class EntityRecord(Protocol):
     effect_list: list[str] | None
     min_mired: int | None
     max_mired: int | None
-
-
-type EntityDomain = Literal["light", "media_player", "fan", "vacuum", "lawn_mower"]
-
-
-class DeviceClass(StrEnum):
-    POWER = "power"
-    VOLTAGE = "voltage"
 
 
 EntityLoader = Callable[[EntityDomain | None, DeviceClass | None], Sequence[EntityRecord]]
@@ -101,16 +92,14 @@ class MeasurementPreflight:
             if isinstance(request.controller, HassMediaControllerSpec):
                 self._require_entity(
                     request.controller.entity_id,
-                    "media_player",
+                    EntityDomain.MEDIA_PLAYER,
                     "Selected media player is unavailable",
                 )
         elif isinstance(request, FanMeasurementRequest):
             if isinstance(request.controller, HassFanControllerSpec):
-                self._require_entity(request.controller.entity_id, "fan", "Selected fan is unavailable")
+                self._require_entity(request.controller.entity_id, EntityDomain.FAN, "Selected fan is unavailable")
         elif isinstance(request, ChargingMeasurementRequest):
-            domain: EntityDomain = (
-                "vacuum" if request.charging_device_type == ChargingDeviceType.VACUUM_ROBOT else "lawn_mower"
-            )
+            domain = EntityDomain(charging_entity_domain(request.charging_device_type))
             if isinstance(request.controller, HassChargingControllerSpec):
                 if not request.controller.entity_id.startswith(f"{domain}."):
                     raise PreflightError("Charging device type does not match the selected entity")
@@ -119,7 +108,7 @@ class MeasurementPreflight:
     def _validate_light(self, request: LightMeasurementRequest) -> PreflightResult:
         if not isinstance(request.controller, HassLightControllerSpec):
             raise PreflightError("Selected light entity is unavailable")
-        lights = {entity.entity_id: entity for entity in self._load_entities("light", None)}
+        lights = {entity.entity_id: entity for entity in self._load_entities(EntityDomain.LIGHT, None)}
         light = lights.get(request.controller.entity_id)
         if light is None:
             raise PreflightError("Selected light entity is unavailable")

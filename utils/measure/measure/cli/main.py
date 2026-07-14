@@ -8,10 +8,10 @@ from pathlib import Path
 import sys
 from typing import Any, cast
 
-import inquirer  # type: ignore[import-untyped]
-from inquirer.errors import ValidationError  # type: ignore[import-untyped]
-from inquirer.questions import Question  # type: ignore[import-untyped]
-from inquirer.render import ConsoleRender  # type: ignore[import-untyped]
+import inquirer
+from inquirer.errors import ValidationError
+from inquirer.questions import Question
+from inquirer.render import ConsoleRender
 
 from measure.assembler import MeasurementAssembler
 from measure.cli.environment import CliEnvironment
@@ -37,6 +37,7 @@ from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.media.const import MediaControllerType
 from measure.execution import MeasurementExecution
 from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant_entities import HomeAssistantEntityCatalog
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.errors import PowerMeterError
 from measure.runner.const import QUESTION_MODE
@@ -79,6 +80,7 @@ class Measure:
         self.config = config
         self._model_id_defaults: dict[str, str | None] = {}
         self._home_assistant: HomeAssistantManager | None = None
+        self._entity_catalog: HomeAssistantEntityCatalog | None = None
 
     def start(self) -> None:
         """Run the interactive wizard and dispatch the resulting request."""
@@ -86,7 +88,8 @@ class Measure:
         try:
             self._select_measure_type()
             self._log_selected_controllers()
-            specific_questions = measurement_questions(self.measure_type, self.config)
+            entity_catalog = self._home_assistant_entity_catalog() if self._uses_home_assistant() else None
+            specific_questions = measurement_questions(self.measure_type, self.config, entity_catalog)
             answers = self.ask_questions(self.get_questions(specific_questions))
             interaction = ConsoleInteraction()
             request = request_from_answers(self.measure_type, answers, self.config)
@@ -109,6 +112,7 @@ class Measure:
             if self._home_assistant is not None:
                 self._home_assistant.close()
             self._home_assistant = None
+            self._entity_catalog = None
 
         if execution.output_directory is not None:
             _LOGGER.info(
@@ -197,7 +201,8 @@ class Measure:
             return None
         if entity_id not in self._model_id_defaults:
             try:
-                self._model_id_defaults[entity_id] = self._home_assistant_manager().get_device_model(entity_id)
+                entity = self._home_assistant_entity_catalog().load_snapshot().get(entity_id)
+                self._model_id_defaults[entity_id] = entity.model_id if entity is not None else None
             except Exception as error:  # noqa: BLE001 - prefill is optional; manual input remains available
                 _LOGGER.warning("Could not prefill model ID for %s: %s", entity_id, error)
                 self._model_id_defaults[entity_id] = None
@@ -207,6 +212,11 @@ class Measure:
         if self._home_assistant is None:
             self._home_assistant = HomeAssistantManager(self.config.hass_url, self.config.hass_token)
         return self._home_assistant
+
+    def _home_assistant_entity_catalog(self) -> HomeAssistantEntityCatalog:
+        if self._entity_catalog is None:
+            self._entity_catalog = HomeAssistantEntityCatalog(self._home_assistant_manager())
+        return self._entity_catalog
 
     def _uses_home_assistant(self) -> bool:
         return (

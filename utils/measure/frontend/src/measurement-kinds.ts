@@ -12,63 +12,56 @@ export const LIGHT_TYPE = "light" as const;
 
 interface MeasurementKindMetadata {
   icon: string;
-  entityField?: "media_player_entity_id" | "charging_entity_id" | "fan_entity_id";
 }
 
 export const MEASUREMENT_KINDS: Record<MeasureType, MeasurementKindMetadata> = {
   light: { icon: "💡" },
-  speaker: { icon: "🔊", entityField: "media_player_entity_id" },
+  speaker: { icon: "🔊" },
   recorder: { icon: "⏺" },
   average: { icon: "📊" },
-  charging: { icon: "🔋", entityField: "charging_entity_id" },
-  fan: { icon: "🌀", entityField: "fan_entity_id" },
+  charging: { icon: "🔋" },
+  fan: { icon: "🌀" },
 };
 
 export function measurementIcon(type: MeasureType): string {
   return MEASUREMENT_KINDS[type].icon;
 }
 
-/** Normalize pre-refactor field names while persisted clients and servers are upgraded. */
-export function canonicalFieldName(type: MeasureType, name: string): string {
-  if (name === "powermeter_entity_id") return "power_entity_id";
-  if (name === "entity_id") return MEASUREMENT_KINDS[type].entityField ?? name;
-  return name;
-}
-
-export function canonicalFields(definition: MeasureDefinition): FormField[] {
-  return definition.fields.map((field) => ({ ...field, name: canonicalFieldName(definition.measure_type, field.name) }));
-}
-
 export function deviceFields(definition: MeasureDefinition): FormField[] {
-  return canonicalFields(definition).filter((field) => field.name !== "power_entity_id");
+  return definition.fields.filter((field) => field.name !== "power_entity_id");
 }
 
 export function requestFieldValue(request: NonLightMeasurementRequest, name: string): string | number | boolean | undefined {
-  const field = canonicalFieldName(request.measure_type, name);
   switch (request.measure_type) {
-    case "average": return field === "duration" ? request.duration : undefined;
-    case "recorder": return field === "export_filename" ? request.export_filename : undefined;
+    case "average": return name === "duration" ? request.duration : undefined;
+    case "recorder": return name === "export_filename" ? request.export_filename : undefined;
     case "speaker":
-      if (field === "media_player_entity_id") return request.controller.type === "hass" ? request.controller.entity_id : undefined;
-      return field === "disable_streaming" ? request.disable_streaming : undefined;
+      if (name === "media_player_entity_id") return request.controller.type === "hass" ? request.controller.entity_id : undefined;
+      return name === "disable_streaming" ? request.disable_streaming : undefined;
     case "charging":
-      if (field === "charging_entity_id") return request.controller.type === "hass" ? request.controller.entity_id : undefined;
-      return field === "charging_device_type" ? request.charging_device_type : undefined;
-    case "fan": return field === "fan_entity_id" && request.controller.type === "hass" ? request.controller.entity_id : undefined;
+      if (name === "charging_entity_id") return request.controller.type === "hass" ? request.controller.entity_id : undefined;
+      return name === "charging_device_type" ? request.charging_device_type : undefined;
+    case "fan": return name === "fan_entity_id" && request.controller.type === "hass" ? request.controller.entity_id : undefined;
   }
 }
 
-export function entityDomain(type: MeasureType, field: FormField, values?: FormData): string | undefined {
-  if (type === "charging" && canonicalFieldName(type, field.name) === "charging_entity_id") {
-    return values?.get("charging_device_type") === "lawn_mower_robot" ? "lawn_mower" : "vacuum";
+export function entityDomain(definition: MeasureDefinition, field: FormField, selectedOption?: string): string | undefined {
+  if (field.name === "charging_entity_id") {
+    const options = definition.fields.find((candidate) => candidate.name === "charging_device_type")?.options ?? [];
+    return options.find((option) => option.value === selectedOption)?.entity_domain ?? undefined;
   }
-  return field.entity_domain ?? undefined;
+  return field.entity_domains?.[0];
 }
 
 export function entityDomains(definition: MeasureDefinition, values?: FormData): string[] {
-  return canonicalFields(definition)
+  return definition.fields
     .filter((field) => field.control === "entity" && field.name !== "power_entity_id" && field.name !== "light_entity_id")
-    .flatMap((field) => field.entity_domains?.length ? field.entity_domains : [entityDomain(definition.measure_type, field, values)])
+    .flatMap((field) => {
+      if (field.name !== "charging_entity_id") return field.entity_domains ?? [];
+      const options = definition.fields.find((candidate) => candidate.name === "charging_device_type")?.options ?? [];
+      if (values) return [entityDomain(definition, field, String(values.get("charging_device_type") ?? ""))];
+      return options.map((option) => option.entity_domain);
+    })
     .filter((domain): domain is string => Boolean(domain));
 }
 

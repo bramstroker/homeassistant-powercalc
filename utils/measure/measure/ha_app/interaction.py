@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from measure.execution import RunInteraction
 from measure.ha_app.session import SessionControl
 
 
-class SessionInteraction:
+class SessionInteraction(RunInteraction):
     """Home Assistant session implementation with progress and cancellation."""
 
     def __init__(self, control: SessionControl) -> None:

@@ -5,12 +5,11 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 import json
 import logging
-import math
 import mimetypes
 import os
 from pathlib import Path
 import re
-from typing import Annotated, Any, cast
+from typing import Annotated, cast
 
 from fastapi import APIRouter, Body, FastAPI, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
@@ -19,23 +18,22 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
-from measure.const import (
-    HASS_DEVICE_REGISTRY_ID,
-    HASS_DEVICE_REGISTRY_MODEL,
-    HASS_DEVICE_REGISTRY_MODEL_ID,
-    PARAMETER_LIMITS,
-    MeasureType,
-)
+from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LutMode
-from measure.controller.light.hass import light_info_from_attributes
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.ha_app.preferences import AppPreferences
-from measure.ha_app.preflight import ActiveSessionError, DeviceClass, EntityDomain, MeasurementPreflight, PreflightError
+from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
 from measure.ha_app.registry import FieldControl, measurement_definitions, supported_light_modes
 from measure.ha_app.service import MeasurementService
 from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionEvent, SessionSnapshot
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant_entities import (
+    DeviceClass,
+    EntityDescriptor,
+    EntityDomain,
+    HomeAssistantEntityCatalog,
+)
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.errors import PowerMeterError
@@ -59,22 +57,6 @@ _ERROR = {"model": ErrorResponse}
 _NO_SESSION = "No measurement session"
 MeasurementRequestPayload = Annotated[MeasurementRequest, Body(discriminator="measure_type")]
 
-# Entity domains that can be picked as the measurement device in the app.
-DeviceDomain = EntityDomain
-
-
-class EntityDescriptor(BaseModel):
-    entity_id: str
-    name: str
-    device_id: str | None = None
-    model_id: str | None = None
-    state: str | None = None
-    unit: str | None = None
-    supported_modes: list[LutMode] | None = None
-    effect_list: list[str] | None = None
-    min_mired: int | None = None
-    max_mired: int | None = None
-
 
 class PreflightResponse(BaseModel):
     valid: bool
@@ -96,14 +78,19 @@ class CapabilitiesResponse(BaseModel):
     limits: dict[str, dict[str, int | float]]
 
 
+class FormFieldOption(BaseModel):
+    value: str
+    label: str
+    entity_domain: str | None = None
+
+
 class FormField(BaseModel):
     name: str
     label: str
     control: FieldControl
     required: bool = True
-    entity_domain: str | None = None
     entity_domains: list[str] = Field(default_factory=list)
-    options: list[dict[str, str]] = Field(default_factory=list)
+    options: list[FormFieldOption] = Field(default_factory=list)
     default: str | int | bool | None = None
     minimum: int | float | None = None
     maximum: int | float | None = None
@@ -289,12 +276,15 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/entities", responses={400: _ERROR})
     async def entities(
         request: Request,
-        domain: Annotated[DeviceDomain | None, Query()] = None,
+        domain: Annotated[EntityDomain | None, Query()] = None,
         device_class: Annotated[DeviceClass | None, Query()] = None,
     ) -> list[EntityDescriptor]:
         if (domain is None) == (device_class is None):
             raise HTTPException(status_code=400, detail="Specify exactly one entity filter")
-        return await run_in_threadpool(_load_entities, _context(request), domain, device_class)
+        snapshot = await run_in_threadpool(
+            HomeAssistantEntityCatalog(_context(request).home_assistant).load_snapshot,
+        )
+        return snapshot.select(domain=domain, device_class=device_class)
 
     @router.post("/preflight", responses={409: _ERROR, 422: _ERROR})
     async def preflight(payload: MeasurementRequestPayload, request: Request) -> PreflightResponse:
@@ -385,91 +375,6 @@ def _require_current_session(context: AppContext) -> SessionSnapshot:
     return snapshot
 
 
-def _load_entities(
-    context: AppContext,
-    domain: EntityDomain | None,
-    device_class: DeviceClass | None,
-) -> list[EntityDescriptor]:
-    all_entities = context.home_assistant.get_entities()
-    entity_registry = {entry.entity_id: entry for entry in context.home_assistant.list_entity_registry()}
-    device_registry = {
-        str(entry[HASS_DEVICE_REGISTRY_ID]): entry for entry in context.home_assistant.get_device_registry()
-    }
-    selected_domain = domain or "sensor"
-    if selected_domain not in all_entities:
-        return []
-    unit = {DeviceClass.POWER: "W", DeviceClass.VOLTAGE: "V"}[device_class] if device_class is not None else None
-    result = [
-        descriptor
-        for entity in all_entities[selected_domain].entities.values()
-        if (
-            descriptor := _describe_entity(
-                entity,
-                domain,
-                device_class,
-                unit,
-                entity_registry.get(entity.entity_id),
-                device_registry,
-            )
-        )
-        is not None
-    ]
-    return sorted(result, key=lambda item: (item.name.casefold(), item.entity_id))
-
-
-def _describe_entity(
-    entity: Any,  # noqa: ANN401
-    domain: DeviceDomain | None,
-    device_class: DeviceClass | None,
-    unit: str | None,
-    registry_entry: Any | None,  # noqa: ANN401
-    device_registry: dict[str, dict[str, object]],
-) -> EntityDescriptor | None:
-    attributes = entity.state.attributes
-    if device_class is not None and attributes.get("device_class") != device_class:
-        return None
-    entity_unit = attributes.get("unit_of_measurement")
-    if unit and entity_unit != unit:
-        return None
-    entity_state = str(entity.state.state)
-    if entity_state.casefold() in {"unavailable", "unknown", "none"}:
-        return None
-    if unit and not _is_finite_number(entity_state):
-        return None
-    supported_modes = None
-    light_info = None
-    if domain == "light":
-        supported_modes = _supported_light_modes(attributes)
-        if not supported_modes:
-            return None
-        light_info = light_info_from_attributes(attributes)
-    device_id = str(registry_entry.device_id) if registry_entry is not None and registry_entry.device_id else None
-    device = device_registry.get(device_id, {}) if device_id is not None else {}
-    model_id = device.get(HASS_DEVICE_REGISTRY_MODEL_ID) or device.get(HASS_DEVICE_REGISTRY_MODEL)
-    return EntityDescriptor(
-        entity_id=entity.entity_id,
-        name=str(attributes.get("friendly_name", entity.entity_id)),
-        device_id=device_id,
-        model_id=str(model_id) if model_id else None,
-        state=entity_state,
-        unit=str(entity_unit) if entity_unit else None,
-        supported_modes=supported_modes,
-        effect_list=list(attributes.get("effect_list", [])) or None,
-        min_mired=light_info.min_mired if light_info is not None else None,
-        max_mired=light_info.max_mired if light_info is not None else None,
-    )
-
-
-def _supported_light_modes(attributes: dict[str, Any]) -> list[LutMode]:
-    values = set(attributes.get("supported_color_modes", []))
-    modes = [mode for mode in (LutMode.COLOR_TEMP, LutMode.HS) if mode.value in values]
-    if values - {"onoff"} or "brightness" in attributes:
-        modes.insert(0, LutMode.BRIGHTNESS)
-    if attributes.get("effect_list"):
-        modes.append(LutMode.EFFECT)
-    return modes
-
-
 def _measure_definitions() -> list[MeasureDefinition]:
     return [
         MeasureDefinition(
@@ -482,9 +387,15 @@ def _measure_definitions() -> list[MeasureDefinition]:
                     label=field.label,
                     control=field.control,
                     required=field.required,
-                    entity_domain=field.entity_domains[0] if len(field.entity_domains) == 1 else None,
                     entity_domains=list(field.entity_domains),
-                    options=[{"value": option.value, "label": option.label} for option in field.options],
+                    options=[
+                        FormFieldOption(
+                            value=option.value,
+                            label=option.label,
+                            entity_domain=option.entity_domain,
+                        )
+                        for option in field.options
+                    ],
                     default=field.default,
                     minimum=field.minimum,
                     maximum=field.maximum,
@@ -528,11 +439,23 @@ def _build_test_power_meter(context: AppContext, settings: AppPreferences) -> Po
 
 
 def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightResponse:
+    catalog = HomeAssistantEntityCatalog(context.home_assistant)
+    snapshot = None
+
+    def load_entities(
+        domain: EntityDomain | None,
+        device_class: DeviceClass | None,
+    ) -> list[EntityDescriptor]:
+        nonlocal snapshot
+        if snapshot is None:
+            snapshot = catalog.load_snapshot()
+        return snapshot.select(domain=domain, device_class=device_class)
+
     try:
         result = MeasurementPreflight(
             has_active_session=lambda: _is_active(context.coordinator.current),
             verify_storage=context.storage.verify_writable,
-            load_entities=lambda domain, device_class: _load_entities(context, domain, device_class),
+            load_entities=load_entities,
         ).validate(payload)
     except ActiveSessionError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
@@ -569,13 +492,6 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[s
         "summary": snapshot.summary,
         "request": request,
     }
-
-
-def _is_finite_number(value: str) -> bool:
-    try:
-        return math.isfinite(float(value))
-    except ValueError:
-        return False
 
 
 def _duration_seconds(value: str | None) -> int | None:

@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import time
 
+from measure.execution import RunInteraction
 
-class ConsoleInteraction:
+
+class ConsoleInteraction(RunInteraction):
     """Interactive terminal implementation of the execution boundary."""
 
     def confirm(self, message: str) -> None:

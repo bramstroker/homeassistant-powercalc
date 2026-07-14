@@ -52,7 +52,7 @@ describe("measure app controller", () => {
     const appApi = api({
       getMeasureDefinitions: async () => [{
         measure_type: "fan", label: "Fan", description: "Measure fan power.", supports_profile: true, supports_resume: false,
-        fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] }],
+        fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
       }],
       getEntitiesByDomain: async (domain) => {
         requestedDomains.push(domain);
@@ -77,7 +77,7 @@ describe("measure app controller", () => {
       getCurrent: async () => ({ state: "running" }),
       getMeasureDefinitions: async () => [{
         measure_type: "fan", label: "Fan", description: "Measure fan power.", supports_profile: true, supports_resume: false,
-        fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domain: "fan", options: [] }],
+        fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
       }],
       getEntitiesByDomain: async (domain) => {
         if (domain === "fan") throw new Error("Entity API failed");

@@ -22,6 +22,7 @@ export interface EntityDescriptor {
   unit?: string;
   supported_modes?: LutMode[];
   effect_list?: string[];
+  related_voltage_entity_id?: string;
 }
 
 export interface MeasurementParameters {
@@ -57,9 +58,8 @@ export interface FormField {
   label: string;
   control: "entity" | "number" | "text" | "boolean" | "select";
   required: boolean;
-  entity_domain?: string | null;
   entity_domains?: string[];
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; entity_domain?: string | null }[];
   default?: string | number | boolean | null;
   minimum?: number | null;
   maximum?: number | null;

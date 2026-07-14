@@ -9,10 +9,10 @@ from unittest.mock import MagicMock
 from fastapi.testclient import TestClient
 from measure.const import MeasureType
 from measure.ha_app.api import create_app
-from measure.ha_app.coordinator import MeasurementCoordinator
+from measure.ha_app.coordinator import MeasurementCoordinator, SessionMeasurementService
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
 from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
@@ -107,8 +107,15 @@ class FakeClient:
             ),
         }
 
+    def get_entity_data(self) -> HomeAssistantEntityData:
+        return HomeAssistantEntityData(
+            entities=self.get_entities(),  # type: ignore[arg-type]
+            entity_registry=self.list_entity_registry(),  # type: ignore[arg-type]
+            device_registry=self.get_device_registry(),
+        )
 
-class CompletingService:
+
+class CompletingService(SessionMeasurementService):
     def run(
         self,
         request: MeasurementRequest,
@@ -122,7 +129,7 @@ class CompletingService:
         return RunnerResult(model_json_data={})
 
 
-class SummaryService:
+class SummaryService(SessionMeasurementService):
     def run(
         self,
         request: MeasurementRequest,
@@ -203,6 +210,7 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     assert [item["entity_id"] for item in powers.json()] == ["sensor.test_power"]
     assert powers.json()[0]["device_id"] == "meter-device"
     assert powers.json()[0]["model_id"] == "PM-001"
+    assert powers.json()[0]["related_voltage_entity_id"] == "sensor.test_voltage"
     assert test_client.get("/api/entities?kind=power").status_code == 400
     assert "light.switch_like" not in {item["entity_id"] for item in lights.json()}
     assert lights.json()[0]["supported_modes"] == ["brightness", "color_temp", "hs", "effect"]
@@ -252,6 +260,13 @@ def test_measure_definitions_and_average_request(tmp_path: Path) -> None:
     definitions = test_client.get("/api/measure-definitions")
     assert definitions.status_code == 200
     assert {item["measure_type"] for item in definitions.json()} == {item.value for item in MeasureType}
+    charging = next(item for item in definitions.json() if item["measure_type"] == MeasureType.CHARGING)
+    fields = {field["name"]: field for field in charging["fields"]}
+    assert "entity_domain" not in fields["charging_entity_id"]
+    assert fields["charging_device_type"]["options"] == [
+        {"value": "vacuum_robot", "label": "Vacuum robot", "entity_domain": "vacuum"},
+        {"value": "lawn_mower_robot", "label": "Lawn mower robot", "entity_domain": "lawn_mower"},
+    ]
 
     payload = {
         "measure_type": MeasureType.AVERAGE,
