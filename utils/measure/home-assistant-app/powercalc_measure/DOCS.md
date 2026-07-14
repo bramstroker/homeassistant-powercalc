@@ -17,10 +17,8 @@ Direct Hue, Tuya, Kasa, Tasmota and myStrom connections, OCR and manual power me
 
 ## Installation
 
-When the experimental Powercalc Apps repository is published:
-
 1. Open **Settings > Apps > App store** in Home Assistant.
-2. Add the published Powercalc Apps repository URL from the app-store repository menu.
+2. Add the Powercalc Apps repository from the app-store repository menu: `https://github.com/bramstroker/powercalc-measure-app`.
 3. Select **Powercalc Measure**, install it, and wait for the pre-built image to download.
 4. Start the app and select **Open Web UI**.
 

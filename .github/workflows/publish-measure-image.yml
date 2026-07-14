@@ -70,6 +70,8 @@ jobs:
   home-assistant-app:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.app.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -112,3 +114,48 @@ jobs:
           push: "true"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  # Mirrors home-assistant-app/ to the dedicated app-store repository. Runs
+  # after the image push so the store never references a tag that is not yet
+  # pullable. Requires the APPS_REPO_TOKEN secret: a fine-grained PAT with
+  # contents read/write on bramstroker/powercalc-measure-app.
+  publish-app-repository:
+    if: github.repository == 'bramstroker/homeassistant-powercalc'
+    needs: home-assistant-app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - name: Checkout app repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          repository: bramstroker/powercalc-measure-app
+          token: ${{ secrets.APPS_REPO_TOKEN }}
+          path: apps-repo
+          persist-credentials: false
+      - name: Sync app metadata
+        run: |
+          rsync -a --delete \
+            --exclude '.git' \
+            --exclude '.DS_Store' \
+            --exclude 'validate.rb' \
+            utils/measure/home-assistant-app/ apps-repo/
+      - name: Commit and push
+        working-directory: apps-repo
+        env:
+          VERSION: ${{ needs.home-assistant-app.outputs.version }}
+          APPS_REPO_TOKEN: ${{ secrets.APPS_REPO_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "App repository is already up to date"
+          else
+            git commit -m "Powercalc Measure ${VERSION}"
+            # The token is supplied only for this push instead of being
+            # persisted in .git/config by actions/checkout.
+            git push "https://x-access-token:${APPS_REPO_TOKEN}@github.com/bramstroker/powercalc-measure-app.git" HEAD
+          fi
