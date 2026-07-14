@@ -10,12 +10,18 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      publish_cli_image:
+        description: Also build and publish the standalone measure CLI image
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
   docker:
+    if: github.event_name != 'workflow_dispatch' || inputs.publish_cli_image
     runs-on: ubuntu-latest
     permissions:
       contents: read
