@@ -41,6 +41,12 @@ ENV POWERCALC_MEASURE_DATA_ROOT=/data
 
 EXPOSE 8099
 
+# The Supervisor restarts the app when the container reports unhealthy. A
+# restart aborts an active measurement session, which is preferable to
+# leaving a hung app running unattended.
+HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8099/health', timeout=5)"]
+
 ENTRYPOINT ["python", "-m", "measure.ha_app.main"]
 CMD ["--host", "0.0.0.0", "--port", "8099", "--data-root", "/data"]
 

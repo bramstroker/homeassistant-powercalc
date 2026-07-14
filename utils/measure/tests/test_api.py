@@ -394,11 +394,17 @@ def test_trusted_ingress_mode_rejects_other_source(tmp_path: Path) -> None:
     assert response.json()["code"] == "ingress_required"
 
 
-def test_health_endpoint_for_supervisor_watchdog(tmp_path: Path) -> None:
+def test_health_endpoint_for_container_healthcheck(tmp_path: Path) -> None:
     response = client(tmp_path).get("/health")
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+
+
+def test_health_endpoint_bypasses_ingress_source_check(tmp_path: Path) -> None:
+    response = client(tmp_path, trusted_ingress_only=True).get("/health")
+
+    assert response.status_code == 200
 
 
 def test_settings_default_and_update(tmp_path: Path) -> None:

@@ -173,7 +173,9 @@ def create_app(
         call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
         client_host = request.client.host if request.client else None
-        if context.trusted_ingress_only and client_host != "172.30.32.2":
+        # /health is probed by the container HEALTHCHECK from localhost and
+        # exposes no data, so it bypasses the ingress source check.
+        if context.trusted_ingress_only and request.url.path != "/health" and client_host != "172.30.32.2":
             error = ErrorResponse(code="ingress_required", message="Ingress access required")
             return JSONResponse(status_code=403, content=error.model_dump())
         return await call_next(request)
