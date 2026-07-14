@@ -1,19 +1,19 @@
 # Powercalc Measure
 
-Powercalc Measure creates a light power profile using entities already available in Home Assistant. The app is experimental and supports Home Assistant OS on `amd64` and `aarch64` only.
+Powercalc Measure creates device power profiles using entities already available in Home Assistant. The app is experimental and supports Home Assistant OS on `amd64` and `aarch64` only.
 
 ## Before starting
 
-The app repeatedly changes the selected light and may run for hours. Keep the light powered, do not rely on it for safety-critical illumination, and avoid automations or people changing it during a measurement. Confirm that the selected power sensor reports only the load being measured.
+The app repeatedly changes the selected device and may run for hours. Keep the device powered, do not rely on it for safety-critical purposes during the run, and avoid automations or people changing it during a measurement. Confirm that the selected power sensor reports only the load being measured.
 
 The first release supports:
 
-- a Home Assistant `light` entity;
-- a power sensor measured in watts;
-- an optional voltage sensor measured in volts;
-- brightness, color-temperature, HS, and supported combined light modes.
+- light profiles from a Home Assistant `light` entity, covering brightness, color-temperature, HS, and supported combined light modes;
+- speaker, fan, and charging (robot vacuum and robot lawn mower) measurements through their Home Assistant entities;
+- average and recorder measurements for any load;
+- power readings from a Home Assistant power sensor in watts (with an optional voltage sensor in volts) or a Shelly plug.
 
-Direct Hue, Shelly, Tuya, Kasa, Tasmota and myStrom connections, OCR/manual meters, dummy loads, and non-light runners remain available only in the CLI.
+Direct Hue, Tuya, Kasa, Tasmota and myStrom connections, OCR and manual power meters, and dummy resistive loads remain available only in the CLI.
 
 ## Installation
 
@@ -30,7 +30,7 @@ The app requires Home Assistant OS. It cannot be installed on Home Assistant Con
 
 1. Start the app and enable **Show in sidebar** if desired.
 2. Select **Open Web UI**.
-3. Choose the light and its power sensor. Add a voltage sensor only when your setup needs it.
+3. Choose the measurement type, the device entity, and its power sensor. Add a voltage sensor only when your setup needs it.
 4. Review setup check warnings and settings before starting.
 5. Leave Home Assistant and the measured devices running. Closing or reloading the browser does not stop an active measurement.
 6. Download the generated CSV and model files from the result view.
@@ -53,7 +53,7 @@ After an app or host restart, reopen the UI. An interrupted session is shown as 
 
 ### An entity is missing
 
-Confirm that the light or sensor exists and is currently available in Home Assistant. Power sensors must use `W`, and voltage sensors must use `V`. Refresh the app after correcting the entity or its unit.
+Confirm that the device entity or sensor exists and is currently available in Home Assistant. Power sensors must use `W`, and voltage sensors must use `V`. Refresh the app after correcting the entity or its unit.
 
 ### Power readings are stale
 
@@ -65,7 +65,7 @@ Ingress or browser reconnects do not own the measurement job. Reload the app to 
 
 ### A session was interrupted
 
-Use **Resume** only when the UI offers it and the light, meter, and measurement settings are unchanged. Otherwise start a new measurement and choose overwrite when prompted.
+Use **Resume** only when the UI offers it and the device, meter, and measurement settings are unchanged. Otherwise start a new measurement and choose overwrite when prompted.
 
 ### Storage failed
 
@@ -77,6 +77,6 @@ Turn on **Debug logging** in the app's **Configuration** tab and restart the app
 
 ### Dummy power meter (developers)
 
-The **Dummy power meter** option in the **Configuration** tab replaces the real power sensor with a fixed synthetic reading. It exists only to exercise the measurement flow without a physical load, so any profile produced while it is enabled is meaningless. Leave it off for real measurements.
+The **Dummy meter** backend under **Settings → Power meter** in the app's web UI replaces the real power sensor with a synthetic reading. It exists only to exercise the measurement flow without a physical load, so any profile produced while it is enabled is meaningless. Keep the backend set to a real power meter for actual measurements.
 
 For additional guidance, see the [Powercalc measure documentation](https://docs.powercalc.nl/contributing/measure/home-assistant-app/).

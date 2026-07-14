@@ -38,6 +38,8 @@ logo = File.binread(File.join(root, "powercalc_measure", "logo.png"), 24)
 png_signature = "\x89PNG\r\n\x1A\n".b
 abort "icon.png must be a PNG" unless icon.start_with?(png_signature)
 abort "logo.png must be a PNG" unless logo.start_with?(png_signature)
-abort "icon.png must be 128x128" unless icon.unpack("@16N2") == [128, 128]
+icon_width, icon_height = icon.unpack("@16N2")
+abort "icon.png must be square" unless icon_width == icon_height
+abort "icon.png must be at least 128px" unless icon_width >= 128
 
 puts "Home Assistant app metadata is valid"

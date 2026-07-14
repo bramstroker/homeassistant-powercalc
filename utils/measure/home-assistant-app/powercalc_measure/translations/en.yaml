@@ -1,0 +1,4 @@
+configuration:
+  debug_logging:
+    name: Debug logging
+    description: Log verbose output from the measure app. Enable it when collecting logs for an issue report, then turn it back off.
