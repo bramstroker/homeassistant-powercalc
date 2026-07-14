@@ -76,6 +76,9 @@ jobs:
   home-assistant-app:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     outputs:
       version: ${{ steps.app.outputs.version }}
     steps:
