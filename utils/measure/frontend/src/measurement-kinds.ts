@@ -80,13 +80,24 @@ export function buildNonLightRequest(
 ): NonLightMeasurementRequest {
   if (definition.measure_type === LIGHT_TYPE) throw new Error("Light requests use the specialized form");
 
+  const parameter = (name: keyof Capabilities["defaults"]): number => {
+    const value = form.get(name);
+    return typeof value === "string" && value !== "" ? Number(value) : capabilities.defaults[name];
+  };
+
   const base: BaseMeasurementRequest = {
     model_id: text(form, "model_id") || "measurement",
     product_name: text(form, "product_name") || definition.label,
     measure_device: text(form, "measure_device"),
     power_meter: powerMeter,
     generate_model: definition.supports_profile,
-    parameters: { ...capabilities.defaults },
+    parameters: {
+      ...capabilities.defaults,
+      sleep_time: parameter("sleep_time"),
+      sample_count: parameter("sample_count"),
+      sleep_time_sample: parameter("sleep_time_sample"),
+      sleep_standby: parameter("sleep_standby"),
+    },
     resume_policy: "new",
   };
 

@@ -22,6 +22,7 @@ from measure.powermeter.errors import (
 from measure.request import LightMeasurementRequest
 from measure.runner.errors import RunnerError
 from measure.runner.light_plan import (
+    CSV_HEADERS,
     ColorTempVariation,
     EffectVariation,
     HsVariation,
@@ -30,18 +31,12 @@ from measure.runner.light_plan import (
     Variation,
     build_light_plan,
     estimate_light_time_left,
+    variation_from_csv_row,
     variations_after,
 )
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
 from measure.util.measure_util import AverageMeasurementConvergence, MeasurementResult, MeasureUtil
-
-CSV_HEADERS = {
-    LutMode.HS: ["bri", "hue", "sat", "watt"],
-    LutMode.COLOR_TEMP: ["bri", "mired", "watt"],
-    LutMode.BRIGHTNESS: ["bri", "watt"],
-    LutMode.EFFECT: ["effect", "bri", "watt"],
-}
 
 CSV_WRITE_BUFFER = 50
 MAX_ALLOWED_0_READINGS = 50
@@ -210,7 +205,6 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
 
                 previous_variation = variation
 
-                measurement_result: MeasurementResult | None
                 try:
                     self._checkpoint()
                     measurement_result = self.take_power_measurement(mode, variation_start_time)
@@ -220,16 +214,12 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                     self.num_0_readings += 1
                     _LOGGER.warning("Discarding measurement: %s", error)
                     if self.num_0_readings > MAX_ALLOWED_0_READINGS:
-                        _LOGGER.error(
+                        raise RunnerError(
                             "Aborting measurement session. Received too many 0 readings",
-                        )
-                        return voltages
+                        ) from error
                     continue
                 except PowerMeterError as error:
-                    _LOGGER.error("Aborting: %s", error)
-                    return voltages
-                if measurement_result is None:
-                    continue
+                    raise RunnerError(f"Aborting measurement session: {error}") from error
                 _LOGGER.info("Measured power: %.2f", measurement_result.power)
                 self._checkpoint()
                 csv_writer.write_measurement(variation, measurement_result.power)
@@ -247,7 +237,6 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                     ),
                 )
 
-            csv_file.close()
             _LOGGER.info(
                 "Hooray! measurements finished. Exported CSV file %s",
                 measurement_info.csv_file,
@@ -410,9 +399,12 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         self,
         mode: LutMode,
         variation: Variation,
-    ) -> MeasurementResult | None:
-        nudge_count = 0
-        for nudge_count in range(self.config.max_nudges):  # noqa: B007
+    ) -> MeasurementResult:
+        if self.config.max_nudges == 0:
+            raise OutdatedMeasurementError(
+                "Power measurement is outdated and nudging is disabled (max_nudges=0)",
+            )
+        for _ in range(self.config.max_nudges):
             try:
                 # Likely not significant enough change for PM to detect. Try nudging it
                 _LOGGER.warning("Measurement is stuck, Nudging")
@@ -440,13 +432,12 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                 self.num_0_readings += 1
                 _LOGGER.warning("Discarding measurement: %s", error)
                 if self.num_0_readings > MAX_ALLOWED_0_READINGS:
-                    _LOGGER.error(
+                    raise RunnerError(
                         "Aborting measurement session. Received too many 0 readings",
-                    )
-                    return None
+                    ) from error
                 continue
         raise OutdatedMeasurementError(
-            f"Power measurement is outdated. Aborting after {nudge_count + 1} nudged retries",
+            f"Power measurement is outdated. Aborting after {self.config.max_nudges} nudge attempts",
         )
 
     def should_resume(self, csv_file_path: str) -> bool:
@@ -474,32 +465,31 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         return should_resume
 
     def get_resume_variation(self, csv_file_path: str, mode: LutMode) -> Variation | None:
-        """Parse the last CSV row into the variation from which the mode resumes."""
+        """Parse the last complete CSV row into the variation from which the mode resumes.
 
-        with open(csv_file_path) as csv_file:
-            rows = csv.reader(csv_file)
-            last_row = list(rows)[-1]
+        Trailing rows that cannot be parsed (typically a torn final line after a crash)
+        are dropped from the file so appended measurements produce a valid CSV.
+        """
 
-        if mode == LutMode.BRIGHTNESS:
-            return Variation(bri=int(last_row[0]))
+        with open(csv_file_path, newline="") as csv_file:
+            rows = list(csv.reader(csv_file))
 
-        if mode == LutMode.COLOR_TEMP:
-            return ColorTempVariation(bri=int(last_row[0]), ct=int(last_row[1]))
+        valid_row_count = len(rows)
+        while valid_row_count > 1 and variation_from_csv_row(rows[valid_row_count - 1], mode) is None:
+            valid_row_count -= 1
 
-        if mode == LutMode.HS:
-            return HsVariation(
-                bri=int(last_row[0]),
-                hue=int(last_row[1]),
-                sat=int(last_row[2]),
+        if valid_row_count < len(rows):
+            _LOGGER.warning(
+                "Dropping %d incomplete trailing row(s) from %s before resuming",
+                len(rows) - valid_row_count,
+                csv_file_path,
             )
+            with open(csv_file_path, "w", newline="") as csv_file:
+                csv.writer(csv_file).writerows(rows[:valid_row_count])
 
-        if mode == LutMode.EFFECT:
-            return EffectVariation(
-                effect=last_row[0],
-                bri=int(last_row[1]),
-            )
-
-        raise RunnerError(f"Mode {mode} not supported")
+        if valid_row_count == 1:
+            return None
+        return variation_from_csv_row(rows[valid_row_count - 1], mode)
 
     def take_power_measurement(
         self,
@@ -552,7 +542,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             self._checkpoint()
             return self.take_power_measurement(LutMode.BRIGHTNESS, start_time)
         except OutdatedMeasurementError:
-            return self.nudge_and_remeasure(LutMode.BRIGHTNESS, Variation(0)) or MeasurementResult(power=0, voltages=[])
+            return self.nudge_and_remeasure(LutMode.BRIGHTNESS, Variation(0))
         except ZeroReadingError:
             _LOGGER.error(
                 "Measured 0 watt as standby usage, continuing now, "

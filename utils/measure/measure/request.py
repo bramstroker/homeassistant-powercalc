@@ -1,18 +1,13 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from enum import StrEnum
 import re
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator
 
-from measure.const import (
-    MEASUREMENT_SAMPLE_COUNT_MAX,
-    MEASUREMENT_SAMPLE_COUNT_MIN,
-    MEASUREMENT_SLEEP_TIME_MAX,
-    MEASUREMENT_SLEEP_TIME_MIN,
-    MeasureType,
-)
+from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.spec import ChargingControllerSpec
 from measure.controller.fan.spec import FanControllerSpec
@@ -28,6 +23,29 @@ class ResumePolicy(StrEnum):
     NEW = "new"
     RESUME = "resume"
     OVERWRITE = "overwrite"
+
+
+_BASE_PARAMETER_FIELDS = ("sleep_time", "sample_count", "sleep_time_sample", "max_retries", "max_nudges")
+_LIGHT_PARAMETER_FIELDS = (
+    "min_brightness",
+    "brightness_step",
+    "hue_step",
+    "saturation_step",
+    "color_temp_step",
+    "effect_bri_steps",
+    "sleep_initial",
+    "sleep_standby",
+    "measure_time_effect",
+    "measure_time_effect_min",
+)
+
+
+def _validate_parameter_limits(parameters: MeasurementParameters, names: Iterable[str]) -> None:
+    for name in names:
+        minimum, maximum = PARAMETER_LIMITS[name]
+        number = getattr(parameters, name)
+        if not minimum <= number <= maximum:
+            raise ValueError(f"{name} must be between {minimum} and {maximum}")
 
 
 class BaseMeasurementRequest(BaseModel):
@@ -55,14 +73,7 @@ class BaseMeasurementRequest(BaseModel):
     @field_validator("parameters")
     @classmethod
     def validate_parameters(cls, value: MeasurementParameters) -> MeasurementParameters:
-        if not MEASUREMENT_SLEEP_TIME_MIN <= value.sleep_time <= MEASUREMENT_SLEEP_TIME_MAX:
-            raise ValueError(
-                f"sleep_time must be between {MEASUREMENT_SLEEP_TIME_MIN} and {MEASUREMENT_SLEEP_TIME_MAX}",
-            )
-        if not MEASUREMENT_SAMPLE_COUNT_MIN <= value.sample_count <= MEASUREMENT_SAMPLE_COUNT_MAX:
-            raise ValueError(
-                f"sample_count must be between {MEASUREMENT_SAMPLE_COUNT_MIN} and {MEASUREMENT_SAMPLE_COUNT_MAX}",
-            )
+        _validate_parameter_limits(value, _BASE_PARAMETER_FIELDS)
         return value
 
     @property
@@ -96,15 +107,9 @@ class LightMeasurementRequest(BaseMeasurementRequest):
     @field_validator("parameters")
     @classmethod
     def validate_light_parameters(cls, value: MeasurementParameters) -> MeasurementParameters:
-        for name, minimum, maximum in (
-            ("brightness_step", 1, 100),
-            ("hue_step", 1, 360),
-            ("saturation_step", 1, 100),
-            ("color_temp_step", 1, 100),
-        ):
-            number = getattr(value, name)
-            if not minimum <= number <= maximum:
-                raise ValueError(f"{name} must be between {minimum} and {maximum}")
+        _validate_parameter_limits(value, _LIGHT_PARAMETER_FIELDS)
+        if value.measure_time_effect_min > value.measure_time_effect:
+            raise ValueError("measure_time_effect_min must not exceed measure_time_effect")
         return value
 
 

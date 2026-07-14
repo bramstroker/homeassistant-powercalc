@@ -47,30 +47,43 @@ class MeasurementParameters:
 
     @property
     def resolved_ct_bri_steps(self) -> int:
-        return self.ct_bri_steps if self.ct_bri_steps is not None else self.brightness_step
+        return (
+            self.ct_bri_steps
+            if self.ct_bri_steps is not None
+            else self._percentage_to_native(self.brightness_step, 255)
+        )
 
-    @property
-    def resolved_ct_mired_steps(self) -> int:
-        return self.ct_mired_steps if self.ct_mired_steps is not None else self.color_temp_step
+    def resolve_ct_mired_steps(self, min_mired: int, max_mired: int) -> int:
+        if self.ct_mired_steps is not None:
+            return self.ct_mired_steps
+        return self._percentage_to_native(self.color_temp_step, max_mired - min_mired)
 
     @property
     def resolved_bri_bri_steps(self) -> int:
-        return self.bri_bri_steps if self.bri_bri_steps is not None else self.brightness_step
+        return (
+            self.bri_bri_steps
+            if self.bri_bri_steps is not None
+            else self._percentage_to_native(self.brightness_step, 255)
+        )
 
     @property
     def resolved_hs_bri_steps(self) -> int:
         if self.hs_bri_steps is not None:
             return self.hs_bri_steps
-        return max(1, round(self.brightness_step / 100 * 255))
+        return self._percentage_to_native(self.brightness_step, 255)
 
     @property
     def resolved_hs_hue_steps(self) -> int:
         if self.hs_hue_steps is not None:
             return self.hs_hue_steps
-        return max(1, round(self.hue_step / 360 * 65535))
+        return self._percentage_to_native(self.hue_step, 65535, scale=360)
 
     @property
     def resolved_hs_sat_steps(self) -> int:
         if self.hs_sat_steps is not None:
             return self.hs_sat_steps
-        return max(1, round(self.saturation_step / 100 * 255))
+        return self._percentage_to_native(self.saturation_step, 255)
+
+    @staticmethod
+    def _percentage_to_native(value: int, native_range: int, *, scale: int = 100) -> int:
+        return max(1, round(value / scale * native_range))

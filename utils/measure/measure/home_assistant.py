@@ -7,6 +7,7 @@ from types import TracebackType
 from typing import Any, Self
 
 from homeassistant_api import Entity, EntityRegistryEntry, Group, State, WebsocketClient
+from homeassistant_api.errors import WebsocketError
 
 from measure.const import (
     HASS_DEVICE_REGISTRY_ID,
@@ -102,13 +103,59 @@ class HomeAssistantManager:
             self._client = client
         return self._client
 
-    def get_config(self) -> dict[str, Any]:
+    @staticmethod
+    def _is_connection_error(error: BaseException) -> bool:
+        pending = [error]
+        seen: set[int] = set()
+        while pending:
+            current = pending.pop()
+            if id(current) in seen:
+                continue
+            seen.add(id(current))
+            if isinstance(current, OSError | EOFError | WebsocketError):
+                return True
+            if current.__cause__ is not None:
+                pending.append(current.__cause__)
+            if current.__context__ is not None:
+                pending.append(current.__context__)
+        return False
+
+    def _discard_client(self) -> None:
+        client = self._client
+        self._client = None
+        if client is not None:
+            with contextlib.suppress(Exception):
+                client.close()
+
+    def _execute[T](
+        self,
+        operation: Callable[[HomeAssistantWebsocketClient], T],
+        *,
+        retry_on_disconnect: bool = True,
+    ) -> T:
         with self._lock:
-            return self._connected_client().get_config()
+            client = self._connected_client()
+            try:
+                return operation(client)
+            except Exception as error:
+                if not self._is_connection_error(error):
+                    raise
+                self._discard_client()
+                if not retry_on_disconnect:
+                    raise
+
+            try:
+                return operation(self._connected_client())
+            except Exception as error:
+                if self._is_connection_error(error):
+                    self._discard_client()
+                raise
+
+    def get_config(self) -> dict[str, Any]:
+        return self._execute(lambda client: client.get_config())
 
     def get_entities(self) -> dict[str, Group]:
-        with self._lock:
-            return self._connected_client().get_entities()
+        return self._execute(lambda client: client.get_entities())
 
     def get_state(
         self,
@@ -117,8 +164,7 @@ class HomeAssistantManager:
         group_id: str | None = None,
         slug: str | None = None,
     ) -> State:
-        with self._lock:
-            return self._connected_client().get_state(entity_id=entity_id, group_id=group_id, slug=slug)
+        return self._execute(lambda client: client.get_state(entity_id=entity_id, group_id=group_id, slug=slug))
 
     def get_entity(
         self,
@@ -126,28 +172,23 @@ class HomeAssistantManager:
         slug: str | None = None,
         entity_id: str | None = None,
     ) -> Entity | None:
-        with self._lock:
-            return self._connected_client().get_entity(group_id=group_id, slug=slug, entity_id=entity_id)
+        return self._execute(lambda client: client.get_entity(group_id=group_id, slug=slug, entity_id=entity_id))
 
     def trigger_service(self, domain: str, service: str, **service_data: Any) -> None:  # noqa: ANN401
-        with self._lock:
-            self._connected_client().trigger_service(domain, service, **service_data)
+        self._execute(
+            lambda client: client.trigger_service(domain, service, **service_data),
+            retry_on_disconnect=False,
+        )
 
     def list_entity_registry(self) -> tuple[EntityRegistryEntry, ...]:
-        with self._lock:
-            return self._connected_client().list_entity_registry()
+        return self._execute(lambda client: client.list_entity_registry())
 
     def get_device_registry(self) -> tuple[dict[str, object], ...]:
-        with self._lock:
-            return self._connected_client().get_device_registry()
+        return self._execute(lambda client: client.get_device_registry())
 
     def get_device_model(self, entity_id: str) -> str | None:
-        with self._lock:
-            return self._connected_client().get_device_model(entity_id)
+        return self._execute(lambda client: client.get_device_model(entity_id))
 
     def close(self) -> None:
         with self._lock:
-            if self._client is None:
-                return
-            self._client.close()
-            self._client = None
+            self._discard_client()

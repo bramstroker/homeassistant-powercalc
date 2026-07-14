@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 
 from measure.assembler import MeasurementAssembler
 from measure.controller.fan.spec import DummyFanControllerSpec
@@ -90,11 +90,13 @@ def test_assembler_applies_typed_home_assistant_configuration_at_construction() 
         True,
         entity_id="sensor.power",
         voltage_entity_id="sensor.voltage",
+        wait=ANY,
     )
     light_controller.assert_called_once_with(
         home_assistant,
         2,
         entity_id="light.test",
+        wait=ANY,
     )
 
 

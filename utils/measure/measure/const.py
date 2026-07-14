@@ -67,3 +67,25 @@ MEASUREMENT_SLEEP_TIME_MIN = 0
 MEASUREMENT_SLEEP_TIME_MAX = 120
 MEASUREMENT_SAMPLE_COUNT_MIN = 1
 MEASUREMENT_SAMPLE_COUNT_MAX = 100
+MAX_NUDGES_LIMIT = 20
+
+# Single source of measurement-parameter bounds. Request validation, persisted app
+# preferences and the capabilities endpoint (which the frontend forms read) all
+# derive from this table so the layers cannot drift apart.
+PARAMETER_LIMITS: dict[str, tuple[float, float]] = {
+    "sleep_time": (MEASUREMENT_SLEEP_TIME_MIN, MEASUREMENT_SLEEP_TIME_MAX),
+    "sample_count": (MEASUREMENT_SAMPLE_COUNT_MIN, MEASUREMENT_SAMPLE_COUNT_MAX),
+    "sleep_time_sample": (0, MEASUREMENT_SLEEP_TIME_MAX),
+    "max_retries": (0, RETRY_COUNT_LIMIT),
+    "max_nudges": (0, MAX_NUDGES_LIMIT),
+    "min_brightness": (1, 255),
+    "brightness_step": (1, 100),
+    "hue_step": (1, 360),
+    "saturation_step": (1, 100),
+    "color_temp_step": (1, 100),
+    "effect_bri_steps": (1, 255),
+    "sleep_initial": (0, 3600),
+    "sleep_standby": (0, 3600),
+    "measure_time_effect": (1, 3600),
+    "measure_time_effect_min": (1, 3600),
+}

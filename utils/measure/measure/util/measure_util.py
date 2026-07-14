@@ -362,8 +362,7 @@ class MeasureUtil:
         if start_timestamp and measurement.updated < start_timestamp:
             result = MeasurementResult(power=measurement.power, voltages=self._get_voltages(measurement))
             return result, OutdatedMeasurementError(
-                "Power measurement is outdated. Aborting after %d successive retries",
-                self.config.max_retries,
+                f"Power measurement is outdated. Aborting after {self.config.max_retries} successive retries",
             )
 
         power = measurement.power

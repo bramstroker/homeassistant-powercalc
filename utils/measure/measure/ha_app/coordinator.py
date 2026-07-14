@@ -11,6 +11,7 @@ from uuid import uuid4
 
 from measure.execution import MeasurementCancelledError
 from measure.ha_app.session import (
+    ACTIVE_SESSION_STATES,
     SessionControl,
     SessionEvent,
     SessionEventType,
@@ -66,19 +67,10 @@ class MeasurementCoordinator:
         """Persist and launch a new session, rejecting overlapping work."""
 
         with self._lock:
-            if self._snapshot and self._snapshot.state in {
-                SessionState.VALIDATING,
-                SessionState.READY,
-                SessionState.AWAITING_CONFIRMATION,
-                SessionState.RUNNING,
-                SessionState.CANCELLING,
-            }:
+            if self._snapshot and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if request.resume_policy == ResumePolicy.RESUME:
                 raise SessionConflictError("Use the current-session resume action for persisted output")
-            previous_session_id = None
-            if request.resume_policy == ResumePolicy.OVERWRITE and self._snapshot is not None:
-                previous_session_id = self._snapshot.id
             now = utc_now()
             snapshot = SessionSnapshot(
                 id=str(uuid4()),
@@ -87,8 +79,12 @@ class MeasurementCoordinator:
                 updated_at=now,
             )
             self.storage.create(snapshot, request)
-            if previous_session_id is not None:
-                self.storage.delete_session(previous_session_id)
+            # Bound add-on storage: keep the new session, plus the replaced one when the
+            # operator chose to preserve its output instead of overwriting it.
+            keep = {snapshot.id}
+            if request.resume_policy != ResumePolicy.OVERWRITE and self._snapshot is not None:
+                keep.add(self._snapshot.id)
+            self.storage.prune_sessions(keep)
             self._snapshot = snapshot
             self._events = []
             self._last_snapshot_write = 0.0

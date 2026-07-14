@@ -55,12 +55,15 @@ class CliEnvironment:
     def ct_bri_steps(self) -> int:
         if self.selected_power_meter == PowerMeterType.MANUAL:
             return 15
+        # Capped so automated sessions cannot produce profiles coarser than step 10;
+        # manual meters get a coarser fixed step because hand-reading is laborious.
         return min(config("CT_BRI_STEPS", default=5, cast=int), 10)
 
     @property
     def ct_mired_steps(self) -> int:
         if self.selected_power_meter == PowerMeterType.MANUAL:
             return 50
+        # Capped for the same profile-density reason as ct_bri_steps.
         return min(config("CT_MIRED_STEPS", default=10, cast=int), 10)
 
     @property
@@ -256,10 +259,7 @@ class CliEnvironment:
 
     @property
     def resume(self) -> bool:
-        try:
-            return config("RESUME", default=True, cast=bool)
-        except UndefinedValueError:
-            return True
+        return config("RESUME", default=True, cast=bool)
 
     @property
     def prompt_resume(self) -> bool:

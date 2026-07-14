@@ -242,6 +242,7 @@ export class MeasureAppController {
     this.changed();
     try {
       this.state.settings = await this.api().saveSettings(settings);
+      this.state.capabilities = await this.api().getCapabilities();
       this.state.view = this.settingsReturnView;
     } catch (error) {
       this.state.errorMessage = message(error);

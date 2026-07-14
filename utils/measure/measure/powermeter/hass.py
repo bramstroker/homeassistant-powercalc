@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 import time
 
 from homeassistant_api import BaseEntity
@@ -17,11 +18,13 @@ class HassPowerMeter(PowerMeter):
         *,
         entity_id: str | None = None,
         voltage_entity_id: str | None = None,
+        wait: Callable[[float], None] = time.sleep,
     ) -> None:
         self._call_update_entity = call_update_entity
         self._entity_id = entity_id
         self._voltage_entity_id = voltage_entity_id
         self._entities: list[BaseEntity] | None = None
+        self._wait = wait
         self.client = home_assistant
 
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
@@ -32,7 +35,7 @@ class HassPowerMeter(PowerMeter):
                 "update_entity",
                 entity_id=self._entity_id,
             )
-            time.sleep(1)
+            self._wait(1)
 
         state = self.client.get_state(entity_id=self._entity_id)
         if state.state == "unavailable":
@@ -40,7 +43,9 @@ class HassPowerMeter(PowerMeter):
         last_updated = state.last_updated.timestamp() if state.last_updated is not None else time.time()
         power_value = float(state.state)
 
-        if include_voltage and not self.has_voltage_support():
+        # Availability of the voltage entity is checked by the read below; avoid the
+        # extra has_voltage_support() round-trip on every measurement.
+        if include_voltage and not self._voltage_entity_id:
             raise UnsupportedFeatureError("Voltage sensor entity not found.")
 
         if include_voltage:

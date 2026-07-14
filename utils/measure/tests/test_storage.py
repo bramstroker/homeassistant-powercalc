@@ -186,12 +186,27 @@ def test_effect_output_is_recognized_as_resumable(tmp_path: Path) -> None:
     storage.create(snapshot(SessionState.RUNNING), request)
     output = storage.output_directory("a1b2-c3d4") / "LCT010"
     output.mkdir()
-    (output / "effect.csv").write_text("effect,bri,watt\nnightlight,200,3.0\n", encoding="utf-8")
+    (output / "effect.csv").write_text("effect,bri,watt\nnightlight,205,3.0\n", encoding="utf-8")
 
     loaded = SessionStorage(tmp_path).load_current()
 
     assert loaded is not None
     assert loaded.state == SessionState.RESUMABLE
+
+
+def test_effect_output_off_the_measurement_grid_is_not_resumable(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    request = light_request().model_copy(update={"modes": {LutMode.EFFECT}})
+    storage.create(snapshot(SessionState.RUNNING), request)
+    output = storage.output_directory("a1b2-c3d4") / "LCT010"
+    output.mkdir()
+    # bri=200 is not produced by the effect brightness grid, so the runner could not resume it.
+    (output / "effect.csv").write_text("effect,bri,watt\nnightlight,200,3.0\n", encoding="utf-8")
+
+    loaded = SessionStorage(tmp_path).load_current()
+
+    assert loaded is not None
+    assert loaded.state == SessionState.FAILED
 
 
 def test_settings_default_when_absent(tmp_path: Path) -> None:

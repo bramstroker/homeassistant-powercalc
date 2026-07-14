@@ -9,6 +9,7 @@ export class ResultView extends LitElement {
     fileUrl: { attribute: false },
     downloadAll: { attribute: false },
     busy: { type: Boolean },
+    canResume: { type: Boolean },
     errorMessage: { type: String },
   };
 
@@ -17,6 +18,7 @@ export class ResultView extends LitElement {
   fileUrl: (name: string) => string = () => "";
   downloadAll: () => void = () => {};
   busy = false;
+  canResume = false;
   errorMessage = "";
 
   static readonly styles = [sharedStyles, css`
@@ -87,7 +89,7 @@ export class ResultView extends LitElement {
   }
 
   private renderResume(state: SessionSnapshot["state"]) {
-    if (state !== "resumable" && state !== "cancelled") return nothing;
+    if (!this.canResume || (state !== "resumable" && state !== "cancelled")) return nothing;
     return html`<button class="primary" type="button" @click=${() => this.emit("resume")} ?disabled=${this.busy}>${this.busy ? "Resuming…" : "Resume measurement"}</button>`;
   }
 

@@ -45,6 +45,7 @@ export class SetupView extends LitElement {
     selectedLightId: { state: true },
     selectedPowerId: { state: true },
     selectedDeviceEntityId: { state: true },
+    selectedChargingType: { state: true },
   };
 
   capabilities?: Capabilities;
@@ -66,6 +67,7 @@ export class SetupView extends LitElement {
   selectedLightId = "";
   selectedPowerId = "";
   selectedDeviceEntityId = "";
+  selectedChargingType = "";
 
   static readonly styles = [sharedStyles, css`
     form { display: grid; gap: 1rem; }
@@ -87,6 +89,8 @@ export class SetupView extends LitElement {
     details { border-top: 1px solid var(--line); padding-top: 1rem; }
     summary { width: fit-content; color: var(--signal-strong); cursor: pointer; font-weight: 700; }
     details .grid { margin-top: 1rem; }
+    .advanced-heading { grid-column: 1 / -1; margin: 0.25rem 0 -0.25rem; color: var(--signal-strong); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+    .effect-settings { grid-column: 1 / -1; }
     .context { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
     .context p { margin-bottom: 0; }
 
@@ -200,7 +204,7 @@ export class SetupView extends LitElement {
             <div class="checks">
               ${modes.map((mode) => html`
                 <label class="check">
-                  <input type="checkbox" name="modes" value=${mode} .checked=${selectedModes.includes(mode)} />
+                  <input type="checkbox" name="modes" value=${mode} .checked=${selectedModes.includes(mode)} @change=${this.modesChanged} />
                   ${this.modeLabel(mode)}
                 </label>
               `)}
@@ -214,12 +218,24 @@ export class SetupView extends LitElement {
                 <option value="new" ?selected=${(request?.resume_policy ?? "new") === "new"}>Keep it and start a new session</option>
                 <option value="overwrite" ?selected=${request?.resume_policy === "overwrite"}>Delete it and start over</option>
               </select></label>
-              ${this.numberField("sleep_time", "Settle time (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, "0.1")}
-              ${this.numberField("sample_count", "Samples per step", request?.parameters.sample_count ?? defaults.sample_count, 1, 100)}
-              ${this.numberField("brightness_step", "Brightness step", request?.parameters.brightness_step ?? defaults.brightness_step, 1, 100)}
-              ${this.numberField("color_temp_step", "Color temperature step", request?.parameters.color_temp_step ?? defaults.color_temp_step, 1, 100)}
-              ${this.numberField("hue_step", "Hue step", request?.parameters.hue_step ?? defaults.hue_step, 1, 360)}
-              ${this.numberField("saturation_step", "Saturation step", request?.parameters.saturation_step ?? defaults.saturation_step, 1, 100)}
+              <p class="advanced-heading">Sampling</p>
+              ${this.numberField("sleep_time", "Settle time (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, "0.1", "Wait after changing the light before reading power.")}
+              ${this.numberField("sample_count", "Samples per point", request?.parameters.sample_count ?? defaults.sample_count, 1, 100, "1", "More samples reduce noise but increase measurement time.", false, this.sampleCountChanged)}
+              ${this.numberField("sleep_time_sample", "Time between samples (seconds)", request?.parameters.sleep_time_sample ?? defaults.sleep_time_sample, 0, 120, "1", "Only used when taking more than one sample.", (request?.parameters.sample_count ?? defaults.sample_count) <= 1)}
+              ${this.numberField("min_brightness", "Minimum brightness", request?.parameters.min_brightness ?? defaults.min_brightness, 1, 255, "1", "Increase this when the light does not turn on at its lowest level.")}
+              ${this.numberField("sleep_initial", "Initial stabilization (seconds)", request?.parameters.sleep_initial ?? defaults.sleep_initial, 0, 3600)}
+              ${this.numberField("sleep_standby", "Standby stabilization (seconds)", request?.parameters.sleep_standby ?? defaults.sleep_standby, 0, 3600)}
+              <p class="advanced-heading">Profile resolution</p>
+              ${this.numberField("brightness_step", "Brightness step (%)", request?.parameters.brightness_step ?? defaults.brightness_step, 1, 100)}
+              ${this.numberField("color_temp_step", "Color temperature step (%)", request?.parameters.color_temp_step ?? defaults.color_temp_step, 1, 100)}
+              ${this.numberField("hue_step", "Hue step (degrees)", request?.parameters.hue_step ?? defaults.hue_step, 1, 360)}
+              ${this.numberField("saturation_step", "Saturation step (%)", request?.parameters.saturation_step ?? defaults.saturation_step, 1, 100)}
+              <div class="grid effect-settings" ?hidden=${!selectedModes.includes("effect")}>
+                <p class="advanced-heading">Effect mode</p>
+                ${this.numberField("effect_bri_steps", "Effect brightness step", request?.parameters.effect_bri_steps ?? defaults.effect_bri_steps, 1, 255, "1", "Native brightness increment between long-running effect samples.", !selectedModes.includes("effect"))}
+                ${this.numberField("measure_time_effect_min", "Minimum time per effect (seconds)", request?.parameters.measure_time_effect_min ?? defaults.measure_time_effect_min, 1, 3600, "1", "An effect can stop after this time once its average converges.", !selectedModes.includes("effect"))}
+                ${this.numberField("measure_time_effect", "Maximum time per effect (seconds)", request?.parameters.measure_time_effect ?? defaults.measure_time_effect, 1, 3600, "1", "Upper time limit for every effect and brightness combination.", !selectedModes.includes("effect"))}
+              </div>
             </div>
           </details>
         </fieldset>
@@ -258,6 +274,8 @@ export class SetupView extends LitElement {
           </div>
         </fieldset>
 
+        ${this.renderGenericTuning(type, run)}
+
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? "Checking setup…" : "Check setup"}</button></div>
       </form>
@@ -269,6 +287,27 @@ export class SetupView extends LitElement {
     return html`<p class="muted">Power readings come from the configured ${label}. Change this under Settings.</p>`;
   }
 
+  private renderGenericTuning(type: MeasureType, request?: NonLightMeasurementRequest) {
+    if (!this.capabilities) return nothing;
+    const defaults = this.capabilities.defaults;
+    const supportsPointSamples = type === "charging" || type === "recorder";
+    return html`<details>
+      <summary>Advanced timing & quality</summary>
+      <div class="grid">
+        ${this.numberField("sleep_time", "Reading interval (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, "0.1", "Delay between repeated power readings and retries.")}
+        ${supportsPointSamples
+          ? this.numberField("sample_count", "Samples per reading", request?.parameters.sample_count ?? defaults.sample_count, 1, 100, "1", "More samples reduce noise but increase measurement time.", false, this.sampleCountChanged)
+          : nothing}
+        ${supportsPointSamples
+          ? this.numberField("sleep_time_sample", "Time between samples (seconds)", request?.parameters.sleep_time_sample ?? defaults.sleep_time_sample, 0, 120, "1", "Only used when taking more than one sample.", (request?.parameters.sample_count ?? defaults.sample_count) <= 1)
+          : nothing}
+        ${type === "speaker"
+          ? this.numberField("sleep_standby", "Standby stabilization (seconds)", request?.parameters.sleep_standby ?? defaults.sleep_standby, 0, 3600)
+          : nothing}
+      </div>
+    </details>`;
+  }
+
   private textField(name: string, label: string, value = "", placeholder = "", required = false, hint = "") {
     return html`<label>
       <span>${label}</span>
@@ -277,8 +316,25 @@ export class SetupView extends LitElement {
     </label>`;
   }
 
-  private numberField(name: string, label: string, value: number, min: number, max: number, step = "1") {
-    return html`<label><span>${label}</span><input type="number" name=${name} .value=${String(value)} min=${min} max=${max} step=${step} required /></label>`;
+  private numberField(
+    name: string,
+    label: string,
+    value: number,
+    fallbackMin: number,
+    fallbackMax: number,
+    step = "1",
+    hint = "",
+    disabled = false,
+    onInput: ((event: Event) => void) | null = null,
+  ) {
+    // Bounds come from the capabilities endpoint so the form cannot drift from
+    // server-side validation; the literals only cover fields without server limits.
+    const { min, max } = this.capabilities?.limits?.[name] ?? { min: fallbackMin, max: fallbackMax };
+    return html`<label>
+      <span>${label}</span>
+      <input type="number" name=${name} .value=${String(value)} min=${min} max=${max} step=${step} required ?disabled=${disabled} @input=${onInput} />
+      ${hint ? html`<small class="field-hint">${hint}</small>` : nothing}
+    </label>`;
   }
 
   private entitySelect(name: string, label: string, entities: EntityDescriptor[], selected = "", required = false) {
@@ -299,15 +355,12 @@ export class SetupView extends LitElement {
     }
     if (field.control === "entity") {
       const value = (stored ?? field.default ?? "").toString();
-      const domains = this.fieldDomains(field);
+      const domains = name === "charging_entity_id" ? [this.chargingDomain(run)] : this.fieldDomains(field);
       const failed = domains.find((domain) => this.deviceEntityErrors[domain]);
       if (failed) {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
       }
       const entities = domains.flatMap((domain) => this.deviceEntities[domain] ?? []);
-      if (!entities.length && field.allow_manual_entry) {
-        return html`<label><span>${field.label}</span><input name=${name} .value=${value} ?required=${field.required} autocomplete="off" /></label>`;
-      }
       return this.entitySelect(name, field.label, entities, value, field.required);
     }
     if (field.control === "select") {
@@ -336,6 +389,22 @@ export class SetupView extends LitElement {
 
   private modeLabel(mode: LutMode): string {
     return { brightness: "Brightness", color_temp: "Color temperature", hs: "Hue & saturation", effect: "Effect" }[mode];
+  }
+
+  private modesChanged(): void {
+    const effectEnabled = Boolean(this.shadowRoot?.querySelector<HTMLInputElement>('input[name="modes"][value="effect"]')?.checked);
+    const settings = this.shadowRoot?.querySelector<HTMLElement>(".effect-settings");
+    if (!settings) return;
+    settings.hidden = !effectEnabled;
+    settings.querySelectorAll<HTMLInputElement>("input").forEach((input) => {
+      input.disabled = !effectEnabled;
+    });
+  }
+
+  private sampleCountChanged(event: Event): void {
+    const count = Number((event.currentTarget as HTMLInputElement).value);
+    const interval = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="sleep_time_sample"]');
+    if (interval) interval.disabled = count <= 1;
   }
 
   private availableModes(request?: LightMeasurementRequest): LutMode[] {
@@ -380,9 +449,16 @@ export class SetupView extends LitElement {
     return this.deviceChanged;
   }
 
-  private chargingTypeChanged(_event: Event): void {
+  private chargingTypeChanged(event: Event): void {
+    this.selectedChargingType = (event.currentTarget as HTMLSelectElement).value;
     const definition = this.definition("charging");
     if (definition) this.dispatchEvent(new CustomEvent("entity-domains-requested", { detail: entityDomains(definition), bubbles: true, composed: true }));
+  }
+
+  private chargingDomain(run?: NonLightMeasurementRequest): string {
+    const chargingType = this.selectedChargingType
+      || (run?.measure_type === "charging" ? run.charging_device_type : "vacuum_robot");
+    return chargingType === "lawn_mower_robot" ? "lawn_mower" : "vacuum";
   }
 
   private definition(type: MeasureType): MeasureDefinition | undefined {
@@ -417,6 +493,8 @@ export class SetupView extends LitElement {
 
   private submitLight(event: SubmitEvent): void {
     event.preventDefault();
+    if (!this.capabilities) return;
+    const defaults = this.capabilities.defaults;
     const data = new FormData(event.currentTarget as HTMLFormElement);
     const modes = data.getAll("modes") as LutMode[];
     if (modes.length === 0) {
@@ -428,6 +506,10 @@ export class SetupView extends LitElement {
       return typeof value === "string" ? value : "";
     };
     const number = (name: string) => Number(text(name));
+    const numberOrDefault = (name: keyof typeof defaults): number => {
+      const value = text(name);
+      return value === "" ? defaults[name] : Number(value);
+    };
     const request: LightMeasurementRequest = {
       measure_type: LIGHT_TYPE,
       model_id: text("model_id").trim(),
@@ -440,12 +522,21 @@ export class SetupView extends LitElement {
       gzip: true,
       multiple_light_count: number("multiple_light_count"),
       parameters: {
-        sleep_time: number("sleep_time"),
-        sample_count: number("sample_count"),
-        brightness_step: number("brightness_step"),
-        hue_step: number("hue_step"),
-        saturation_step: number("saturation_step"),
-        color_temp_step: number("color_temp_step"),
+        sleep_time: numberOrDefault("sleep_time"),
+        sample_count: numberOrDefault("sample_count"),
+        sleep_time_sample: numberOrDefault("sleep_time_sample"),
+        max_retries: defaults.max_retries,
+        max_nudges: defaults.max_nudges,
+        brightness_step: numberOrDefault("brightness_step"),
+        hue_step: numberOrDefault("hue_step"),
+        saturation_step: numberOrDefault("saturation_step"),
+        color_temp_step: numberOrDefault("color_temp_step"),
+        min_brightness: numberOrDefault("min_brightness"),
+        sleep_initial: numberOrDefault("sleep_initial"),
+        sleep_standby: numberOrDefault("sleep_standby"),
+        effect_bri_steps: numberOrDefault("effect_bri_steps"),
+        measure_time_effect: numberOrDefault("measure_time_effect"),
+        measure_time_effect_min: numberOrDefault("measure_time_effect_min"),
       },
       resume_policy: (text("resume_policy") || "new") as LightMeasurementRequest["resume_policy"],
     };

@@ -186,10 +186,19 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     assert capabilities.json()["defaults"] == {
         "sleep_time": defaults.sleep_time,
         "sample_count": defaults.sample_count,
+        "sleep_time_sample": defaults.sleep_time_sample,
+        "max_retries": defaults.max_retries,
+        "max_nudges": defaults.max_nudges,
         "brightness_step": defaults.brightness_step,
         "hue_step": defaults.hue_step,
         "saturation_step": defaults.saturation_step,
         "color_temp_step": defaults.color_temp_step,
+        "min_brightness": defaults.min_brightness,
+        "sleep_initial": defaults.sleep_initial,
+        "sleep_standby": defaults.sleep_standby,
+        "effect_bri_steps": defaults.effect_bri_steps,
+        "measure_time_effect": defaults.measure_time_effect,
+        "measure_time_effect_min": defaults.measure_time_effect_min,
     }
     assert [item["entity_id"] for item in powers.json()] == ["sensor.test_power"]
     assert powers.json()[0]["device_id"] == "meter-device"
@@ -371,11 +380,28 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
         "default_measure_device": None,
         "power_meter": "hass",
         "shelly_ip": None,
+        "measurement_defaults": {
+            "sleep_time": 2.0,
+            "sample_count": 1,
+            "sleep_time_sample": 1,
+            "max_retries": 5,
+            "max_nudges": 0,
+        },
     }
 
     updated = test_client.put(
         "/api/settings",
-        json={"default_power_entity_id": "sensor.test_power", "default_measure_device": "Shelly Plug S"},
+        json={
+            "default_power_entity_id": "sensor.test_power",
+            "default_measure_device": "Shelly Plug S",
+            "measurement_defaults": {
+                "sleep_time": 3.5,
+                "sample_count": 4,
+                "sleep_time_sample": 2,
+                "max_retries": 8,
+                "max_nudges": 1,
+            },
+        },
     )
     assert updated.status_code == 200
     assert updated.json()["default_power_entity_id"] == "sensor.test_power"
@@ -384,12 +410,25 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
     reloaded = test_client.get("/api/settings").json()
     assert reloaded["default_power_entity_id"] == "sensor.test_power"
     assert reloaded["default_measure_device"] == "Shelly Plug S"
+    assert reloaded["measurement_defaults"]["sample_count"] == 4
+    effective_defaults = test_client.get("/api/capabilities").json()["defaults"]
+    assert effective_defaults["sample_count"] == 4
+    assert effective_defaults["sleep_time"] == 3.5
 
 
 def test_settings_rejects_invalid_entity(tmp_path: Path) -> None:
     test_client = client(tmp_path)
 
     response = test_client.put("/api/settings", json={"default_power_entity_id": "not-an-entity"})
+
+    assert response.status_code == 400
+    assert response.json()["code"] == "validation_error"
+
+
+def test_settings_rejects_invalid_measurement_defaults(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+
+    response = test_client.put("/api/settings", json={"measurement_defaults": {"max_nudges": 21}})
 
     assert response.status_code == 400
     assert response.json()["code"] == "validation_error"

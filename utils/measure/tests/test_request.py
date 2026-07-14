@@ -213,9 +213,9 @@ def test_app_measure_config_maps_percentage_steps_to_native_ranges(
 
     parameters = request.parameters
 
-    assert parameters.resolved_bri_bri_steps == brightness_step
-    assert parameters.resolved_ct_bri_steps == brightness_step
-    assert parameters.resolved_ct_mired_steps == 7
+    assert parameters.resolved_bri_bri_steps == expected_brightness
+    assert parameters.resolved_ct_bri_steps == expected_brightness
+    assert parameters.resolve_ct_mired_steps(200, 300) == 7
     assert parameters.resolved_hs_bri_steps == expected_brightness
     assert parameters.resolved_hs_hue_steps == expected_hue
     assert parameters.resolved_hs_sat_steps == expected_saturation
@@ -236,8 +236,23 @@ def test_native_cli_steps_override_derived_app_steps() -> None:
     )
 
     assert parameters.resolved_ct_bri_steps == 11
-    assert parameters.resolved_ct_mired_steps == 12
+    assert parameters.resolve_ct_mired_steps(200, 300) == 12
     assert parameters.resolved_bri_bri_steps == 13
     assert parameters.resolved_hs_bri_steps == 14
     assert parameters.resolved_hs_hue_steps == 15
     assert parameters.resolved_hs_sat_steps == 16
+
+
+@pytest.mark.parametrize(
+    ("parameters", "message"),
+    [
+        ({"sleep_time_sample": -1}, "sleep_time_sample"),
+        ({"max_retries": 101}, "max_retries"),
+        ({"max_nudges": 21}, "max_nudges"),
+        ({"min_brightness": 0}, "min_brightness"),
+        ({"measure_time_effect": 10, "measure_time_effect_min": 20}, "measure_time_effect_min"),
+    ],
+)
+def test_request_rejects_invalid_exposed_tuning(parameters: dict[str, int], message: str) -> None:
+    with pytest.raises(ValidationError, match=message):
+        LightMeasurementRequest.model_validate(valid_request() | {"parameters": parameters})

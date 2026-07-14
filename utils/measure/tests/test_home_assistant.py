@@ -104,3 +104,69 @@ def test_manager_discards_client_when_connection_fails() -> None:
     assert manager.get_config() == {"location_name": "Home"}
     assert client_factory.call_count == 2
     failed_client.close.assert_called_once_with()
+
+
+def test_manager_reconnects_once_when_read_fails_on_closed_websocket() -> None:
+    disconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
+
+    def fail_with_websocket_cleanup_error() -> None:
+        try:
+            try:
+                raise OSError("stream closed error")
+            except OSError as error:
+                raise RuntimeError("connection broken") from error
+        except RuntimeError:
+            raise AssertionError from None
+
+    disconnected_client.get_entities.side_effect = fail_with_websocket_cleanup_error
+    disconnected_client.close.side_effect = AssertionError
+    reconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    reconnected_client.get_entities.return_value = {"media_player": MagicMock()}
+    client_factory = MagicMock(side_effect=(disconnected_client, reconnected_client))
+    manager = HomeAssistantManager(
+        "ws://homeassistant.local:8123/api/websocket",
+        "token",
+        client_factory=client_factory,
+    )
+
+    assert manager.get_entities() == {"media_player": reconnected_client.get_entities.return_value["media_player"]}
+    assert client_factory.call_count == 2
+    disconnected_client.close.assert_called_once_with()
+    reconnected_client.get_entities.assert_called_once_with()
+
+
+def test_manager_does_not_retry_non_connection_errors() -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    client.get_entities.side_effect = ValueError("invalid entity response")
+    client_factory = MagicMock(return_value=client)
+    manager = HomeAssistantManager(
+        "ws://homeassistant.local:8123/api/websocket",
+        "token",
+        client_factory=client_factory,
+    )
+
+    with pytest.raises(ValueError, match="invalid entity response"):
+        manager.get_entities()
+
+    client_factory.assert_called_once_with("ws://homeassistant.local:8123/api/websocket", "token")
+    client.close.assert_not_called()
+
+
+def test_manager_does_not_retry_service_call_after_disconnect() -> None:
+    disconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    disconnected_client.trigger_service.side_effect = OSError("stream closed error")
+    reconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    reconnected_client.get_config.return_value = {"location_name": "Home"}
+    client_factory = MagicMock(side_effect=(disconnected_client, reconnected_client))
+    manager = HomeAssistantManager(
+        "ws://homeassistant.local:8123/api/websocket",
+        "token",
+        client_factory=client_factory,
+    )
+
+    with pytest.raises(OSError, match="stream closed error"):
+        manager.trigger_service("media_player", "turn_off", entity_id="media_player.test")
+
+    assert manager.get_config() == {"location_name": "Home"}
+    disconnected_client.close.assert_called_once_with()
+    reconnected_client.trigger_service.assert_not_called()

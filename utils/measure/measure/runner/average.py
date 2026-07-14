@@ -16,11 +16,10 @@ class AverageRunner(MeasurementRunner[AverageMeasurementRequest]):
     def __init__(
         self,
         measure_util: MeasureUtil,
-        duration: int = 60,
         interaction: RunInteraction | None = None,
     ) -> None:
         self.measure_util = measure_util
-        self.duration = duration
+        self.duration = 60
         self.interaction = interaction or ImmediateInteraction()
 
     def run(

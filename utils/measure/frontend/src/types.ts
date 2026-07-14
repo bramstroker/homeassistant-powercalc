@@ -24,14 +24,25 @@ export interface EntityDescriptor {
   effect_list?: string[];
 }
 
-export interface MeasureDefaults {
+export interface MeasurementParameters {
   sleep_time: number;
   sample_count: number;
+  sleep_time_sample: number;
+  max_retries: number;
+  max_nudges: number;
   brightness_step: number;
   hue_step: number;
   saturation_step: number;
   color_temp_step: number;
+  min_brightness: number;
+  sleep_initial: number;
+  sleep_standby: number;
+  effect_bri_steps: number;
+  measure_time_effect: number;
+  measure_time_effect_min: number;
 }
+
+export type MeasureDefaults = MeasurementParameters;
 
 export interface Capabilities {
   modes: LutMode[];
@@ -52,7 +63,6 @@ export interface FormField {
   default?: string | number | boolean | null;
   minimum?: number | null;
   maximum?: number | null;
-  allow_manual_entry?: boolean;
 }
 
 export interface MeasureDefinition {
@@ -74,13 +84,12 @@ export interface BaseMeasurementRequest {
   power_meter: PowerMeterSpec;
 }
 
-export interface MeasurementParameters {
+export interface AppMeasurementDefaults {
   sleep_time: number;
   sample_count: number;
-  brightness_step: number;
-  hue_step: number;
-  saturation_step: number;
-  color_temp_step: number;
+  sleep_time_sample: number;
+  max_retries: number;
+  max_nudges: number;
 }
 
 export type PowerMeterSpec =
@@ -177,6 +186,7 @@ export interface AppSettings {
   default_measure_device: string | null;
   power_meter: "hass" | "shelly" | "dummy" | null;
   shelly_ip: string | null;
+  measurement_defaults: AppMeasurementDefaults;
 }
 
 export interface PowerMeterTestResult {

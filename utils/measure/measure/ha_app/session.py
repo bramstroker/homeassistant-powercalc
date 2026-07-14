@@ -23,6 +23,18 @@ class SessionState(StrEnum):
     RESUMABLE = "resumable"
 
 
+# States in which a session owns the single measurement slot.
+ACTIVE_SESSION_STATES = frozenset(
+    {
+        SessionState.VALIDATING,
+        SessionState.READY,
+        SessionState.AWAITING_CONFIRMATION,
+        SessionState.RUNNING,
+        SessionState.CANCELLING,
+    },
+)
+
+
 class SessionEventType(StrEnum):
     STATE = "state"
     PROGRESS = "progress"

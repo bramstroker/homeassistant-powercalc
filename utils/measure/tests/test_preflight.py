@@ -158,8 +158,8 @@ def test_light_preflight_returns_supported_modes_and_estimate() -> None:
     result = preflight(base_entities()).validate(request)
 
     assert result.supported_modes == (LutMode.BRIGHTNESS,)
-    assert result.estimated_variations == 52
-    assert result.estimated_duration_seconds == 183
+    assert result.estimated_variations == 21
+    assert result.estimated_duration_seconds == 92
 
 
 def test_light_preflight_uses_device_color_temperature_range() -> None:
@@ -185,6 +185,31 @@ def test_light_preflight_uses_device_color_temperature_range() -> None:
     result = preflight(entities).validate(request)
 
     assert result.estimated_variations == 12
+
+
+def test_light_preflight_maps_color_temperature_percentage_to_device_range() -> None:
+    entities = base_entities()
+    entities[("light", None)] = [
+        Entity(
+            "light.test",
+            [LutMode.COLOR_TEMP],
+            min_mired=200,
+            max_mired=300,
+        ),
+    ]
+    request = LightMeasurementRequest(
+        model_id="LCT010",
+        product_name="Test light",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=HassLightControllerSpec(entity_id="light.test"),
+        modes={LutMode.COLOR_TEMP},
+        parameters={"brightness_step": 100, "color_temp_step": 25},
+    )
+
+    result = preflight(entities).validate(request)
+
+    assert result.estimated_variations == 10
 
 
 def test_hs_preflight_uses_runner_native_step_units() -> None:

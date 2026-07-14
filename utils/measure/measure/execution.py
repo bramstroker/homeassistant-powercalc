@@ -87,11 +87,12 @@ class MeasurementExecution:
         """Run and clean the device before measuring standby power and writing the model."""
 
         output_directory = self.output_directory
-        if output_directory is not None:
-            output_directory.mkdir(parents=True, exist_ok=True)
-
         runner = self.measurement.runner
         request = self.measurement.request
+        if output_directory is None and (request.generate_model_json or runner.writes_export_files()):
+            raise ValueError("An output directory is required for a measurement that writes files")
+        if output_directory is not None:
+            output_directory.mkdir(parents=True, exist_ok=True)
         try:
             result = runner.run(request, str(output_directory or ""))
         finally:

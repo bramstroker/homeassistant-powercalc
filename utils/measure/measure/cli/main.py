@@ -8,7 +8,6 @@ from pathlib import Path
 import sys
 from typing import Any, cast
 
-from decouple import UndefinedValueError, config as decouple_config  # type: ignore[import-untyped]
 import inquirer  # type: ignore[import-untyped]
 from inquirer.errors import ValidationError  # type: ignore[import-untyped]
 from inquirer.questions import Question  # type: ignore[import-untyped]
@@ -32,17 +31,16 @@ from measure.const import (
     parse_measure_type,
 )
 from measure.controller.charging.const import ChargingControllerType
+from measure.controller.errors import ControllerError
 from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import LightControllerType, LutMode
-from measure.controller.light.errors import LightControllerError
 from measure.controller.media.const import MediaControllerType
 from measure.execution import MeasurementExecution
 from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.errors import PowerMeterError
 from measure.runner.const import QUESTION_MODE
-
-sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+from measure.runner.errors import RunnerError
 
 with open(os.path.join(PROJECT_DIR, ".VERSION")) as f:
     _VERSION = f.read().strip()
@@ -260,14 +258,6 @@ class Measure:
         return answers
 
 
-def config_key_exists(key: str) -> bool:
-    try:
-        decouple_config(key)
-        return True
-    except UndefinedValueError:
-        return False
-
-
 def validate_required(_: Any, val: str) -> bool:  # noqa: ANN401
     if len(val) == 0:
         raise ValidationError(
@@ -288,10 +278,10 @@ def main() -> None:
 
     try:
         Measure(config).start()
-        exit(0)
-    except (PowerMeterError, LightControllerError, KeyboardInterrupt) as e:
+        sys.exit(0)
+    except (PowerMeterError, ControllerError, RunnerError, KeyboardInterrupt) as e:
         _LOGGER.error("Aborting: %s", e)
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -2,10 +2,19 @@ import { MeasureAppController } from "./app-controller";
 import type { EventConnection, MeasureAppApi, MeasureAppState } from "./app-controller";
 import type { SessionEvent } from "./types";
 
-const settings = { default_power_entity_id: null, default_measure_device: null, power_meter: "hass" as const, shelly_ip: null };
+const measurementDefaults = { sleep_time: 1, sample_count: 2, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
+const settings = {
+  default_power_entity_id: null, default_measure_device: null, power_meter: "hass" as const, shelly_ip: null,
+  measurement_defaults: measurementDefaults,
+};
 const capabilities = {
   modes: ["brightness" as const],
-  defaults: { sleep_time: 1, sample_count: 2, brightness_step: 5, hue_step: 10, saturation_step: 10, color_temp_step: 5 },
+  defaults: {
+    ...measurementDefaults,
+    brightness_step: 5, hue_step: 10, saturation_step: 10, color_temp_step: 5,
+    min_brightness: 1, sleep_initial: 10, sleep_standby: 20,
+    effect_bri_steps: 40, measure_time_effect: 180, measure_time_effect_min: 20,
+  },
 };
 
 function state(): MeasureAppState {
@@ -86,6 +95,33 @@ describe("measure app controller", () => {
 
     onEvent?.({ sequence: 1, type: "sample", data: { power: 12.5 }, snapshot: { state: "running" } });
     expect(appState.samples).toEqual([12.5]);
+  });
+
+  it("reloads effective capabilities after saving measurement defaults", async () => {
+    const appState = state();
+    let currentCapabilities = capabilities;
+    const controller = new MeasureAppController(appState, () => api({
+      getCapabilities: async () => currentCapabilities,
+      saveSettings: async (value) => {
+        currentCapabilities = {
+          ...capabilities,
+          defaults: { ...capabilities.defaults, ...value.measurement_defaults },
+        };
+        return value;
+      },
+    }), () => connection(), () => undefined);
+    await controller.boot();
+    controller.openSettings();
+    const updated = {
+      ...settings,
+      measurement_defaults: { ...measurementDefaults, sleep_time: 4, sample_count: 3 },
+    };
+
+    await controller.saveSettings(updated);
+
+    expect(appState.capabilities?.defaults.sleep_time).toBe(4);
+    expect(appState.capabilities?.defaults.sample_count).toBe(3);
+    expect(appState.view).toBe("setup");
   });
 });
 

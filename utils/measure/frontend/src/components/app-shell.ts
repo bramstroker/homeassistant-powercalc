@@ -120,13 +120,13 @@ export class AppShell extends LitElement implements MeasureAppState {
   private renderView() {
     if (this.view === "loading") return this.renderLoading();
     if (this.view === "settings") return html`
-      <measure-settings-view .powers=${this.powers} .settings=${this.settings} .busy=${this.busy} .testing=${this.testingPowerMeter} .testResult=${this.powerMeterTestResult} .errorMessage=${this.errorMessage} @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter}></measure-settings-view>`;
+      <measure-settings-view .powers=${this.powers} .settings=${this.settings} .capabilities=${this.capabilities} .busy=${this.busy} .testing=${this.testingPowerMeter} .testResult=${this.powerMeterTestResult} .errorMessage=${this.errorMessage} @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter}></measure-settings-view>`;
     if (this.view === "review" && this.preflight && this.request) return html`
       <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .canOverwrite=${this.reviewCanOverwrite()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`
       <measure-running-view .snapshot=${this.snapshot} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
     if (this.view === "result" && this.snapshot) return html`
-      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .busy=${this.busy} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
+      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
     return html`
       <measure-setup-view
         .capabilities=${this.capabilities} .definitions=${this.definitions}
@@ -140,6 +140,11 @@ export class AppShell extends LitElement implements MeasureAppState {
   private pendingType(): MeasureType | undefined {
     if (this.request) return this.request.measure_type;
     return undefined;
+  }
+
+  private canResumeSession(): boolean {
+    const type = this.snapshot?.request?.measure_type ?? this.request?.measure_type;
+    return this.definitions.find((definition) => definition.measure_type === type)?.supports_resume ?? false;
   }
 
   private reviewMetrics(): ReviewMetric[] {

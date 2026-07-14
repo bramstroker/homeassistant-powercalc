@@ -5,9 +5,19 @@ import "./running-view";
 import "./settings-view";
 import "./setup-view";
 
+const measurementDefaults = { sleep_time: 1, sample_count: 5, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
+const defaultSettings: AppSettings = {
+  default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null,
+  measurement_defaults: measurementDefaults,
+};
 const capabilities: Capabilities = {
   modes: ["brightness", "color_temp", "hs", "effect"],
-  defaults: { sleep_time: 1, sample_count: 5, brightness_step: 5, hue_step: 10, saturation_step: 10, color_temp_step: 5 },
+  defaults: {
+    ...measurementDefaults,
+    brightness_step: 5, hue_step: 10, saturation_step: 10, color_temp_step: 5,
+    min_brightness: 1, sleep_initial: 10, sleep_standby: 20,
+    effect_bri_steps: 40, measure_time_effect: 180, measure_time_effect_min: 20,
+  },
 };
 
 const lights: EntityDescriptor[] = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"] }];
@@ -37,6 +47,9 @@ describe("setup view", () => {
     expect(element.shadowRoot.textContent).toContain("Brightness");
     expect(element.shadowRoot.querySelector("details")?.open).toBe(false);
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
+    expect(element.shadowRoot.querySelector<HTMLElement>(".effect-settings")?.hidden).toBe(true);
+    expect((element.shadowRoot.querySelector('input[name="sleep_time"]') as HTMLInputElement).value).toBe("1");
+    expect((element.shadowRoot.querySelector('input[name="sleep_time_sample"]') as HTMLInputElement).disabled).toBe(false);
 
     const light = element.shadowRoot.querySelector('select[name="light_entity_id"]') as HTMLSelectElement;
     light.value = "light.desk";
@@ -89,6 +102,15 @@ describe("setup view", () => {
     expect(labels).toContain("Effect");
     const checkedModes = [...element.shadowRoot.querySelectorAll<HTMLInputElement>('input[name="modes"]:checked')].map((input) => input.value);
     expect(checkedModes).toContain("effect");
+    const effectSettings = element.shadowRoot.querySelector<HTMLElement>(".effect-settings");
+    expect(effectSettings?.hidden).toBe(false);
+
+    const effect = element.shadowRoot.querySelector<HTMLInputElement>('input[name="modes"][value="effect"]');
+    if (!effect) throw new Error("Expected effect mode input");
+    effect.checked = false;
+    effect.dispatchEvent(new Event("change"));
+    expect(effectSettings?.hidden).toBe(true);
+    expect((effectSettings?.querySelector("input") as HTMLInputElement).disabled).toBe(true);
   });
 });
 
@@ -137,6 +159,10 @@ describe("setup type picker", () => {
 
     expect(element.shadowRoot.querySelector('select[name="power_entity_id"]')).toBeTruthy();
     expect(element.shadowRoot.querySelector('input[name="duration"]')).toBeTruthy();
+    const readingInterval = element.shadowRoot.querySelector('input[name="sleep_time"]') as HTMLInputElement;
+    expect(readingInterval).toBeTruthy();
+    expect(element.shadowRoot.querySelector('input[name="sample_count"]')).toBeNull();
+    readingInterval.value = "2.5";
     // The powermeter field from the definition must not be rendered a second time.
     expect(element.shadowRoot.querySelectorAll('[name="powermeter_entity_id"]')).toHaveLength(0);
 
@@ -148,7 +174,7 @@ describe("setup type picker", () => {
     expect(request.measure_type).toBe("average");
     expect(request.power_meter).toEqual({ type: "hass", entity_id: "sensor.plug_power", voltage_entity_id: null });
     expect(request.measure_type === "average" && request.duration).toBe(60);
-    expect(request.parameters.sleep_time).toBe(capabilities.defaults.sleep_time);
+    expect(request.parameters.sleep_time).toBe(2.5);
     expect(request.parameters.sample_count).toBe(capabilities.defaults.sample_count);
   });
 
@@ -329,7 +355,7 @@ describe("setup type picker", () => {
     expect(element.shadowRoot.querySelector('[name="fan_entity_id"]')).toBeNull();
   });
 
-  it("combines charging domains and rejects an entity from the wrong device type", async () => {
+  it("filters charging entities by the selected device type", async () => {
     const chargingDefinition: MeasureDefinition = {
       measure_type: "charging", label: "Charging device", description: "Measure charging power.",
       fields: [
@@ -362,15 +388,16 @@ describe("setup type picker", () => {
 
     const entity = element.shadowRoot.querySelector('[name="charging_entity_id"]') as HTMLSelectElement;
     expect(entity.textContent).toContain("Downstairs vacuum");
-    expect(entity.textContent).toContain("Garden mower");
-    entity.value = "vacuum.downstairs";
+    expect(entity.textContent).not.toContain("Garden mower");
+
     const type = element.shadowRoot.querySelector('[name="charging_device_type"]') as HTMLSelectElement;
     type.value = "lawn_mower_robot";
     type.dispatchEvent(new Event("change"));
-    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
     await element.updateComplete;
 
-    expect(element.errorMessage).toContain("Select a lawn_mower entity");
+    const updated = element.shadowRoot.querySelector('[name="charging_entity_id"]') as HTMLSelectElement;
+    expect(updated.textContent).toContain("Garden mower");
+    expect(updated.textContent).not.toContain("Downstairs vacuum");
   });
 });
 
@@ -621,9 +648,20 @@ describe("settings view", () => {
       shadowRoot: ShadowRoot;
     };
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
-    element.settings = { default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null };
+    element.settings = defaultSettings;
     document.body.append(element);
     await element.updateComplete;
+
+    const sectionButtons = [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".settings-nav button")];
+    expect(sectionButtons.map((button) => button.textContent?.trim())).toEqual(["Power meter", "Measure tuning"]);
+    expect(sectionButtons[0]?.classList.contains("active")).toBe(true);
+    expect(element.shadowRoot.querySelector<HTMLElement>('[aria-labelledby="measure-tuning-title"]')?.hidden).toBe(true);
+
+    sectionButtons[1]?.click();
+    await element.updateComplete;
+    expect(sectionButtons[1]?.classList.contains("active")).toBe(true);
+    expect(element.shadowRoot.querySelector<HTMLElement>('[aria-labelledby="power-meter-title"]')?.hidden).toBe(true);
+    expect(element.shadowRoot.querySelector<HTMLElement>('[aria-labelledby="measure-tuning-title"]')?.hidden).toBe(false);
 
     const saved = new Promise<AppSettings>((resolve) => {
       element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettings>).detail));
@@ -632,7 +670,9 @@ describe("settings view", () => {
     select.value = "sensor.plug_power";
     (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
 
-    expect((await saved).default_power_entity_id).toBe("sensor.plug_power");
+    const settings = await saved;
+    expect(settings.default_power_entity_id).toBe("sensor.plug_power");
+    expect(settings.measurement_defaults).toEqual(measurementDefaults);
   });
 });
 
@@ -651,7 +691,7 @@ describe("app shell device entities", () => {
     (element as unknown as { api: unknown }).api = {
       getCapabilities: async () => capabilities,
       getEntitiesByDeviceClass: async () => [],
-      getSettings: async () => ({ default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null }),
+      getSettings: async () => defaultSettings,
       getCurrent: async () => ({ state: "idle" }),
       getMeasureDefinitions: async () => [fanDefinition],
       getEntitiesByDomain: async (domain: string) => {
@@ -674,7 +714,7 @@ describe("app shell device entities", () => {
     (element as unknown as { api: unknown }).api = {
       getCapabilities: async () => capabilities,
       getEntitiesByDeviceClass: async () => [],
-      getSettings: async () => ({ default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null }),
+      getSettings: async () => defaultSettings,
       getCurrent: async () => ({
         state: "idle",
         request: {
@@ -706,7 +746,7 @@ describe("settings power meter test", () => {
       updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
     };
     element.powers = [];
-    element.settings = { default_power_entity_id: null, default_measure_device: null, power_meter: "shelly", shelly_ip: "192.168.1.50" };
+    element.settings = { ...defaultSettings, power_meter: "shelly", shelly_ip: "192.168.1.50" };
     document.body.append(element);
     await element.updateComplete;
 
@@ -730,7 +770,7 @@ describe("settings power meter test", () => {
       updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
     };
     element.powers = [];
-    element.settings = { default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null };
+    element.settings = defaultSettings;
     document.body.append(element);
     await element.updateComplete;
 

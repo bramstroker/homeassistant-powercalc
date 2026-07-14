@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Collection
 import csv
 from dataclasses import replace
 import json
 import logging
-import math
 import os
 from pathlib import Path
 import shutil
@@ -13,10 +13,25 @@ from typing import Any
 from uuid import uuid4
 
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
+from measure.controller.light.controller import LightInfo
 from measure.ha_app.preferences import AppPreferences
-from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot, SessionState, utc_now
+from measure.ha_app.session import (
+    ACTIVE_SESSION_STATES,
+    SessionEvent,
+    SessionEventType,
+    SessionSnapshot,
+    SessionState,
+    utc_now,
+)
 from measure.request import LightMeasurementRequest, MeasurementRequest, parse_measurement_request
-from measure.runner.light import CSV_HEADERS
+from measure.runner.light_plan import (
+    CSV_HEADERS,
+    ColorTempVariation,
+    EffectVariation,
+    Variation,
+    build_light_plan,
+    variation_from_csv_row,
+)
 
 _LOGGER = logging.getLogger("measure")
 
@@ -28,6 +43,9 @@ class SessionStorage:
         self.data_root = data_root.resolve()
         self.sessions_root = self.data_root / "sessions"
         self.sessions_root.mkdir(parents=True, exist_ok=True)
+        # Requests are immutable per session; cache them so hot paths (SSE encoding)
+        # do not re-read and re-validate the JSON document from disk.
+        self._request_cache: dict[str, MeasurementRequest] = {}
 
     def session_directory(self, session_id: str) -> Path:
         if not session_id or not session_id.replace("-", "").isalnum():
@@ -44,14 +62,23 @@ class SessionStorage:
         directory = self.session_directory(snapshot.id)
         (directory / "output").mkdir(parents=True, exist_ok=False)
         self._write_json(directory / "request.json", request.model_dump(mode="json"))
+        self._request_cache[snapshot.id] = request
         self.write_snapshot(snapshot)
         self._write_json(self.data_root / "current.json", {"id": snapshot.id})
         return directory
 
     def delete_session(self, session_id: str) -> None:
+        self._request_cache.pop(session_id, None)
         directory = self.session_directory(session_id)
         if directory.exists():
             shutil.rmtree(directory)
+
+    def prune_sessions(self, keep: Collection[str]) -> None:
+        """Delete persisted sessions other than ``keep`` so add-on storage stays bounded."""
+        for path in self.sessions_root.iterdir():
+            if path.is_dir() and path.name not in keep:
+                self._request_cache.pop(path.name, None)
+                shutil.rmtree(path, ignore_errors=True)
 
     def write_snapshot(self, snapshot: SessionSnapshot) -> None:
         directory = self.session_directory(snapshot.id)
@@ -132,13 +159,7 @@ class SessionStorage:
             _LOGGER.warning("Discarding incompatible current session pointer: %s", error)
             current_path.unlink(missing_ok=True)
             return None
-        if snapshot.state in {
-            SessionState.VALIDATING,
-            SessionState.READY,
-            SessionState.AWAITING_CONFIRMATION,
-            SessionState.RUNNING,
-            SessionState.CANCELLING,
-        }:
+        if snapshot.state in ACTIVE_SESSION_STATES:
             resumable = self.can_resume(snapshot.id)
             snapshot = replace(
                 snapshot,
@@ -154,8 +175,13 @@ class SessionStorage:
         return snapshot
 
     def load_request(self, session_id: str) -> MeasurementRequest:
+        cached = self._request_cache.get(session_id)
+        if cached is not None:
+            return cached
         path = self.session_directory(session_id) / "request.json"
-        return parse_measurement_request(self._read_json(path))
+        request = parse_measurement_request(self._read_json(path))
+        self._request_cache[session_id] = request
+        return request
 
     def output_directory(self, session_id: str) -> Path:
         return self._contained(self.session_directory(session_id) / "output")
@@ -185,7 +211,7 @@ class SessionStorage:
         model_root = self.output_directory(session_id) / request.model_id
         for mode in request.modes:
             path = model_root / f"{mode.value}.csv"
-            if self._has_complete_measurement_row(path, CSV_HEADERS[mode], mode, request):
+            if self._has_complete_measurement_row(path, mode, request):
                 return True
         return False
 
@@ -232,7 +258,6 @@ class SessionStorage:
     @staticmethod
     def _has_complete_measurement_row(
         path: Path,
-        expected_header: list[str],
         mode: LutMode,
         request: LightMeasurementRequest,
     ) -> bool:
@@ -243,72 +268,30 @@ class SessionStorage:
             if not raw.endswith((b"\n", b"\r")):
                 return False
             rows = list(csv.reader(raw.decode("utf-8").splitlines()))
-            if len(rows) < 2 or rows[0] != expected_header:
+            if len(rows) < 2 or rows[0] != CSV_HEADERS[mode]:
                 return False
-            last_row = rows[-1]
-            if len(last_row) != len(expected_header):
+            variation = variation_from_csv_row(rows[-1], mode)
+            if variation is None:
                 return False
-            if not math.isfinite(float(last_row[-1])):
-                return False
-            return SessionStorage._variation_matches_request(mode, last_row[:-1], request)
+            return SessionStorage._variation_matches_request(variation, mode, request)
         except OSError, ValueError:
             return False
 
     @staticmethod
     def _variation_matches_request(
+        variation: Variation,
         mode: LutMode,
-        values: list[str],
         request: LightMeasurementRequest,
     ) -> bool:
-        parameters = request.parameters
-        if mode == LutMode.EFFECT:
-            if len(values) != 2 or not values[0].strip():
-                return False
-            return 1 <= int(values[1]) <= 255
-        variation = [int(value) for value in values]
-        if mode == LutMode.BRIGHTNESS:
-            return SessionStorage._matches_inclusive_step(
-                variation[0],
-                1,
-                255,
-                parameters.resolved_bri_bri_steps,
-            )
-        if mode == LutMode.COLOR_TEMP:
-            return (
-                SessionStorage._matches_inclusive_step(
-                    variation[0],
-                    1,
-                    255,
-                    parameters.resolved_ct_bri_steps,
-                )
-                and MIN_MIRED <= variation[1] <= MAX_MIRED
-            )
-        if mode == LutMode.HS:
-            return (
-                SessionStorage._matches_inclusive_step(
-                    variation[0],
-                    1,
-                    255,
-                    parameters.resolved_hs_bri_steps,
-                )
-                and SessionStorage._matches_inclusive_step(
-                    variation[1],
-                    1,
-                    65535,
-                    parameters.resolved_hs_hue_steps,
-                )
-                and SessionStorage._matches_inclusive_step(
-                    variation[2],
-                    1,
-                    255,
-                    parameters.resolved_hs_sat_steps,
-                )
-            )
-        return False
-
-    @staticmethod
-    def _matches_inclusive_step(value: int, start: int, end: int, step: int) -> bool:
-        return value == end or (start <= value < end and (value - start) % step == 0)
+        """Check the parsed row against the exact plan the runner would rebuild on resume."""
+        light_info = LightInfo("unknown", min_mired=MIN_MIRED, max_mired=MAX_MIRED)
+        effects = [variation.effect] if isinstance(variation, EffectVariation) else ()
+        plan_variations = build_light_plan({mode}, request.parameters, light_info, effects).for_mode(mode).variations
+        if isinstance(variation, ColorTempVariation):
+            # The light's real mired range is unknown offline, so only the brightness
+            # column can be validated against the plan.
+            return variation.bri in {row.bri for row in plan_variations} and MIN_MIRED <= variation.ct <= MAX_MIRED
+        return variation in plan_variations
 
     @staticmethod
     def _read_json(path: Path) -> dict[str, Any]:

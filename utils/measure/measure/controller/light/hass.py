@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 import math
 import time
 from typing import Any
@@ -33,8 +33,10 @@ class HassLightController(HassControllerBase, LightController):
         transition_time: int,
         *,
         entity_id: str | None = None,
+        wait: Callable[[float], None] = time.sleep,
     ) -> None:
         self._transition_time: int = transition_time
+        self._wait = wait
         super().__init__(home_assistant, entity_id=entity_id)
 
     def change_light_state(
@@ -62,7 +64,7 @@ class HassLightController(HassControllerBase, LightController):
             self.client.trigger_service("light", "turn_on", **json)
         except HomeassistantAPIError as e:
             raise ApiConnectionError(f"Failed to change light state: {e}") from e
-        time.sleep(self._transition_time)
+        self._wait(self._transition_time)
 
     def get_light_info(self) -> LightInfo:
         state = self.client.get_state(entity_id=self.entity_id)

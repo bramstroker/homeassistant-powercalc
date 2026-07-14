@@ -34,11 +34,16 @@ def _not_empty(_: Any, current: str) -> bool:  # noqa: ANN401
     return bool(current.strip())
 
 
+def _positive_number(_: Any, current: str) -> bool:  # noqa: ANN401
+    return re.fullmatch(r"\d+", current) is not None and int(current) > 0
+
+
 def average_questions() -> list[Question]:
     return [
         inquirer.Text(
             name=QUESTION_DURATION,
             message="For how long do you want to measure? In seconds",
+            validate=_positive_number,
         ),
     ]
 
@@ -108,7 +113,7 @@ def light_questions(*, supports_effects: bool) -> list[Question]:
             name=QUESTION_NUM_LIGHTS,
             message="How many lights are you measuring?",
             ignore=lambda answers: not answers.get(QUESTION_MULTIPLE_LIGHTS),
-            validate=lambda _, current: re.match(r"\d+", current),
+            validate=_positive_number,
         ),
     ]
 

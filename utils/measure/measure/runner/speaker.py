@@ -63,6 +63,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
             voltages.extend(result.voltages)
 
         _LOGGER.info("Muting volume and waiting for %d seconds", SLEEP_MUTE)
+        self.media_controller.mute_volume()
         self.interaction.wait(SLEEP_MUTE)
         result = self.measure_util.take_average_measurement(duration)
         summary[0] = result.power

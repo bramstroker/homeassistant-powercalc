@@ -23,10 +23,7 @@ from measure.const import (
     HASS_DEVICE_REGISTRY_ID,
     HASS_DEVICE_REGISTRY_MODEL,
     HASS_DEVICE_REGISTRY_MODEL_ID,
-    MEASUREMENT_SAMPLE_COUNT_MAX,
-    MEASUREMENT_SAMPLE_COUNT_MIN,
-    MEASUREMENT_SLEEP_TIME_MAX,
-    MEASUREMENT_SLEEP_TIME_MIN,
+    PARAMETER_LIMITS,
     MeasureType,
 )
 from measure.controller.light.const import LutMode
@@ -36,7 +33,7 @@ from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.preflight import ActiveSessionError, DeviceClass, EntityDomain, MeasurementPreflight, PreflightError
 from measure.ha_app.registry import FieldControl, measurement_definitions, supported_light_modes
 from measure.ha_app.service import MeasurementService
-from measure.ha_app.session import SessionEvent, SessionSnapshot, SessionState
+from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionEvent, SessionSnapshot
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.const import PowerMeterType
@@ -248,22 +245,29 @@ def _router() -> APIRouter:
 
 def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/capabilities")
-    async def capabilities() -> CapabilitiesResponse:
+    async def capabilities(request: Request) -> CapabilitiesResponse:
         defaults = MeasurementParameters()
+        app_defaults = (await run_in_threadpool(_context(request).storage.load_settings)).measurement_defaults
         return CapabilitiesResponse(
             modes=list(supported_light_modes()),
             defaults={
-                "sleep_time": defaults.sleep_time,
-                "sample_count": defaults.sample_count,
+                "sleep_time": app_defaults.sleep_time,
+                "sample_count": app_defaults.sample_count,
+                "sleep_time_sample": app_defaults.sleep_time_sample,
+                "max_retries": app_defaults.max_retries,
+                "max_nudges": app_defaults.max_nudges,
                 "brightness_step": defaults.brightness_step,
                 "hue_step": defaults.hue_step,
                 "saturation_step": defaults.saturation_step,
                 "color_temp_step": defaults.color_temp_step,
+                "min_brightness": defaults.min_brightness,
+                "sleep_initial": defaults.sleep_initial,
+                "sleep_standby": defaults.sleep_standby,
+                "effect_bri_steps": defaults.effect_bri_steps,
+                "measure_time_effect": defaults.measure_time_effect,
+                "measure_time_effect_min": defaults.measure_time_effect_min,
             },
-            limits={
-                "sleep_time": {"min": MEASUREMENT_SLEEP_TIME_MIN, "max": MEASUREMENT_SLEEP_TIME_MAX},
-                "sample_count": {"min": MEASUREMENT_SAMPLE_COUNT_MIN, "max": MEASUREMENT_SAMPLE_COUNT_MAX},
-            },
+            limits={name: {"min": minimum, "max": maximum} for name, (minimum, maximum) in PARAMETER_LIMITS.items()},
         )
 
     @router.get("/measure-definitions")
@@ -544,13 +548,7 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
 
 
 def _is_active(snapshot: SessionSnapshot | None) -> bool:
-    return snapshot is not None and snapshot.state in {
-        SessionState.VALIDATING,
-        SessionState.READY,
-        SessionState.AWAITING_CONFIRMATION,
-        SessionState.RUNNING,
-        SessionState.CANCELLING,
-    }
+    return snapshot is not None and snapshot.state in ACTIVE_SESSION_STATES
 
 
 def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[str, object]:

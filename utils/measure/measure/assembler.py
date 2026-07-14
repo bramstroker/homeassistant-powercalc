@@ -123,6 +123,7 @@ class MeasurementAssembler:
                 spec.call_update_entity,
                 entity_id=spec.entity_id,
                 voltage_entity_id=spec.voltage_entity_id,
+                wait=self._interaction.wait,
             )
         if isinstance(spec, KasaPowerMeterSpec):
             return KasaPowerMeter(spec.device_ip)
@@ -196,6 +197,7 @@ class MeasurementAssembler:
                 hass,
                 spec.transition_time,
                 entity_id=spec.entity_id,
+                wait=self._interaction.wait,
             )
         if isinstance(spec, HueLightControllerSpec):
             return HueLightController(spec.bridge_ip, light=spec.light)
