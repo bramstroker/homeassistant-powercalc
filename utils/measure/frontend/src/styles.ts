@@ -19,6 +19,7 @@ export const sharedStyles = css`
     --good: #61d4a3;
     --danger: #ff7b72;
     --radius: 14px;
+    color-scheme: dark;
     color: var(--ink);
     font-family: "Avenir Next", "Segoe UI", sans-serif;
   }

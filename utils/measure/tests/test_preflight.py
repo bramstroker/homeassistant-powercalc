@@ -191,7 +191,7 @@ def test_light_preflight_uses_device_color_temperature_range() -> None:
     assert result.estimated_variations == 12
 
 
-def test_light_preflight_uses_historical_color_temperature_resolution_by_default() -> None:
+def test_light_preflight_uses_default_color_temperature_resolution() -> None:
     entities = base_entities()
     entities[("light", None)] = [
         Entity(
@@ -215,7 +215,7 @@ def test_light_preflight_uses_historical_color_temperature_resolution_by_default
     assert result.estimated_variations == 1_872
 
 
-def test_hs_preflight_uses_historical_native_resolution_by_default() -> None:
+def test_hs_preflight_uses_default_native_resolution() -> None:
     entities = base_entities()
     entities[("light", None)] = [Entity("light.test", [LutMode.HS])]
     request = LightMeasurementRequest(

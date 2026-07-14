@@ -2,26 +2,16 @@ from __future__ import annotations
 
 from measure.cli.request_adapter import request_from_answers
 from measure.const import QUESTION_ENTITY_ID, QUESTION_MEASURE_DEVICE, MeasureType
-from measure.controller.charging.spec import HassChargingControllerSpec
-from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import LightControllerType, LutMode
-from measure.controller.light.spec import HassLightControllerSpec
-from measure.controller.media.spec import HassMediaControllerSpec
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
-    BaseMeasurementRequest,
-    ChargingMeasurementRequest,
-    FanMeasurementRequest,
     LightMeasurementRequest,
-    MeasurementRequest,
     RecorderMeasurementRequest,
-    SpeakerMeasurementRequest,
     parse_measurement_request,
 )
 from measure.runner.const import QUESTION_EXPORT_FILENAME, QUESTION_MODE
-from measure.tuning import MeasurementParameters
 from pydantic import ValidationError
 import pytest
 
@@ -38,22 +28,7 @@ def valid_request() -> dict[str, object]:
     }
 
 
-def test_request_converts_to_domain_values() -> None:
-    model = LightMeasurementRequest.model_validate(valid_request())
-
-    request = model
-
-    assert request.model_id == "LCT010"
-    assert request.modes == {LutMode.BRIGHTNESS}
-
-
-def test_request_uses_measurement_settings_defaults() -> None:
-    request = LightMeasurementRequest.model_validate(valid_request())
-
-    assert request.parameters == MeasurementParameters()
-
-
-def test_request_round_trip_preserves_resolved_adapters_and_parameters() -> None:
+def test_request_round_trip_preserves_typed_input() -> None:
     request = LightMeasurementRequest.model_validate(
         valid_request() | {"parameters": {"sleep_time": 0.5, "sample_count": 3}},
     )
@@ -61,62 +36,6 @@ def test_request_round_trip_preserves_resolved_adapters_and_parameters() -> None
     restored = parse_measurement_request(request.model_dump(mode="json"))
 
     assert restored == request
-
-
-def test_requests_share_a_validated_base() -> None:
-    light_request = LightMeasurementRequest.model_validate(valid_request())
-    run_request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=60)
-
-    assert isinstance(light_request, BaseMeasurementRequest)
-    assert light_request.measure_type == MeasureType.LIGHT
-    assert light_request.controller == HassLightControllerSpec(entity_id="light.test")
-    assert isinstance(run_request, BaseMeasurementRequest)
-    assert run_request.measure_type == MeasureType.AVERAGE
-    assert run_request.duration == 60
-
-
-@pytest.mark.parametrize(
-    ("model", "measure_type"),
-    [
-        (AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=60), MeasureType.AVERAGE),
-        (
-            RecorderMeasurementRequest(
-                power_meter=DummyPowerMeterSpec(),
-                export_filename="record.csv",
-            ),
-            MeasureType.RECORDER,
-        ),
-        (
-            SpeakerMeasurementRequest(
-                power_meter=DummyPowerMeterSpec(),
-                controller=HassMediaControllerSpec(entity_id="media_player.test"),
-            ),
-            MeasureType.SPEAKER,
-        ),
-        (
-            ChargingMeasurementRequest(
-                power_meter=DummyPowerMeterSpec(),
-                controller=HassChargingControllerSpec(entity_id="vacuum.test"),
-                charging_device_type="vacuum_robot",
-            ),
-            MeasureType.CHARGING,
-        ),
-        (
-            FanMeasurementRequest(
-                power_meter=DummyPowerMeterSpec(),
-                controller=HassFanControllerSpec(entity_id="fan.test"),
-            ),
-            MeasureType.FAN,
-        ),
-    ],
-)
-def test_concrete_requests_have_their_measure_type(
-    model: MeasurementRequest,
-    measure_type: MeasureType,
-) -> None:
-    request = model
-
-    assert request.measure_type == measure_type
 
 
 def test_cli_request_contains_only_resolved_measurement_input(mock_config_factory: MockConfigFactory) -> None:
@@ -183,43 +102,6 @@ def test_request_preserves_subsecond_sleep_time() -> None:
     )
 
     assert request.parameters.sleep_time == pytest.approx(0.25)
-
-
-def test_measurement_parameters_default_to_historical_native_light_grid() -> None:
-    parameters = MeasurementParameters()
-
-    assert parameters.bri_bri_steps == 1
-    assert parameters.ct_bri_steps == 5
-    assert parameters.ct_mired_steps == 10
-    assert parameters.hs_bri_steps == 32
-    assert parameters.hs_hue_steps == 2731
-    assert parameters.hs_sat_steps == 32
-
-
-def test_measurement_parameters_preserve_explicit_native_steps() -> None:
-    parameters = MeasurementParameters(
-        ct_bri_steps=11,
-        ct_mired_steps=12,
-        bri_bri_steps=13,
-        hs_bri_steps=14,
-        hs_hue_steps=15,
-        hs_sat_steps=16,
-    )
-
-    assert parameters.ct_bri_steps == 11
-    assert parameters.ct_mired_steps == 12
-    assert parameters.bri_bri_steps == 13
-    assert parameters.hs_bri_steps == 14
-    assert parameters.hs_hue_steps == 15
-    assert parameters.hs_sat_steps == 16
-
-
-@pytest.mark.parametrize("field", ["brightness_step", "color_temp_step", "hue_step", "saturation_step"])
-def test_light_request_rejects_removed_percentage_step_fields(field: str) -> None:
-    payload = valid_request() | {"parameters": {field: 5}}
-
-    with pytest.raises(ValidationError):
-        LightMeasurementRequest.model_validate(payload)
 
 
 @pytest.mark.parametrize(

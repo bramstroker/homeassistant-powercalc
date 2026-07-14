@@ -1,4 +1,5 @@
 import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, SessionSnapshot } from "../types";
+import { sharedStyles } from "../styles";
 import { AppShell } from "./app-shell";
 import "./result-view";
 import "./running-view";
@@ -22,6 +23,10 @@ const capabilities: Capabilities = {
 };
 
 const lights: EntityDescriptor[] = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"] }];
+
+it("uses dark native form controls so iOS select indicators remain visible", () => {
+  expect(sharedStyles.cssText).toContain("color-scheme: dark");
+});
 
 describe("setup view", () => {
   it("renders dynamic entities, mode choices, and collapsed advanced settings", async () => {

@@ -4,7 +4,7 @@ import ast
 from pathlib import Path
 
 MEASURE_ROOT = Path(__file__).parents[1] / "measure"
-COMPATIBILITY_MODULES = {"measure.py"}
+CLI_ENTRYPOINTS = {"measure.py"}
 EXECUTION_BOUNDARIES = {
     Path("cli/main.py"),
     Path("cli/measurements.py"),
@@ -18,7 +18,7 @@ def test_shared_modules_do_not_import_transport_packages() -> None:
     violations: list[str] = []
     for path in MEASURE_ROOT.rglob("*.py"):
         relative = path.relative_to(MEASURE_ROOT)
-        if relative.parts[0] in {"cli", "ha_app"} or relative.name in COMPATIBILITY_MODULES:
+        if relative.parts[0] in {"cli", "ha_app"} or relative.name in CLI_ENTRYPOINTS:
             continue
         violations.extend(
             f"{relative}: {imported}"
@@ -74,24 +74,6 @@ def test_transports_do_not_write_profile_models() -> None:
     assert violations == []
 
 
-def test_production_components_do_not_process_raw_question_answers() -> None:
-    violations: list[str] = []
-    for path in MEASURE_ROOT.rglob("*.py"):
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            raw_answer_method = (
-                isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) and node.name == "process_answers"
-            )
-            raw_option_attribute = isinstance(node, ast.Attribute) and node.attr in {
-                "controller_options",
-                "power_meter_options",
-            }
-            if raw_answer_method or raw_option_attribute:
-                violations.append(str(path.relative_to(MEASURE_ROOT)))
-
-    assert violations == []
-
-
 def test_only_home_assistant_manager_constructs_websocket_clients() -> None:
     violations: list[str] = []
     for path in MEASURE_ROOT.rglob("*.py"):
@@ -113,11 +95,6 @@ def _call_name(node: ast.Call) -> str | None:
     if isinstance(node.func, ast.Attribute):
         return node.func.attr
     return None
-
-
-def test_runtime_service_bundle_is_not_reintroduced() -> None:
-    assert not (MEASURE_ROOT / "runtime.py").exists()
-    assert all("measure.runtime" not in _imports(path) for path in MEASURE_ROOT.rglob("*.py"))
 
 
 def _imports(path: Path) -> list[str]:

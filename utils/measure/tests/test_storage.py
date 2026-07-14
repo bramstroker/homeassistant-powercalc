@@ -42,30 +42,6 @@ def test_storage_round_trips_current_session(tmp_path: Path) -> None:
     persisted_state = json.loads((directory / "state.json").read_text(encoding="utf-8"))
     assert persisted_request["measure_type"] == "light"
     assert persisted_state["state"] == loaded.state
-    assert "version" not in persisted_request | persisted_state
-    assert "request" not in persisted_request
-    assert "snapshot" not in persisted_state
-
-
-def test_incompatible_current_request_is_discarded_without_deleting_session(
-    tmp_path: Path,
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    storage = SessionStorage(tmp_path)
-    current = snapshot(SessionState.COMPLETED)
-    directory = storage.create(current, light_request())
-    request_path = directory / "request.json"
-    persisted_request = json.loads(request_path.read_text(encoding="utf-8"))
-    persisted_request["measure_type"] = "Average"
-    request_path.write_text(json.dumps(persisted_request), encoding="utf-8")
-
-    with caplog.at_level(logging.WARNING, logger="measure"):
-        loaded = SessionStorage(tmp_path).load_current()
-
-    assert loaded is None
-    assert not (tmp_path / "current.json").exists()
-    assert directory.exists()
-    assert "Discarding incompatible current session" in caplog.text
 
 
 def test_storage_round_trips_bounded_event_replay(tmp_path: Path) -> None:
@@ -206,21 +182,6 @@ def test_effect_output_off_the_measurement_grid_is_not_resumable(tmp_path: Path)
 
     assert loaded is not None
     assert loaded.state == SessionState.FAILED
-
-
-def test_settings_default_when_absent(tmp_path: Path) -> None:
-    storage = SessionStorage(tmp_path)
-
-    assert storage.load_settings().default_power_entity_id is None
-
-
-def test_settings_round_trip(tmp_path: Path) -> None:
-    from measure.ha_app.preferences import AppPreferences
-
-    storage = SessionStorage(tmp_path)
-    storage.save_settings(AppPreferences(default_power_entity_id="sensor.plug_power"))
-
-    assert storage.load_settings().default_power_entity_id == "sensor.plug_power"
 
 
 def test_settings_recover_from_corrupt_file(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:

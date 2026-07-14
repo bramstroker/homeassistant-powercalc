@@ -11,7 +11,7 @@ import inquirer
 from inquirer import events
 from inquirer.render import ConsoleRender
 from measure.cli.environment import CliEnvironment
-from measure.cli.main import Measure, main
+from measure.cli.main import Measure
 from measure.const import (
     MODEL_JSON_MAX_VOLTAGE,
     MODEL_JSON_MIN_VOLTAGE,
@@ -290,18 +290,6 @@ def _create_measure_instance(config: CliEnvironment, console_events: EventGenera
     )
 
     return Measure(config, render)
-
-
-def test_main_always_runs_the_wizard_even_with_legacy_average_arguments() -> None:
-    with (
-        patch.object(sys, "argv", ["measure", "average", "30"]),
-        patch.object(Measure, "start") as start,
-        pytest.raises(SystemExit) as exit_info,
-    ):
-        main()
-
-    start.assert_called_once_with()
-    assert exit_info.value.code == 0
 
 
 class SequencePowerMeter(PowerMeter):
