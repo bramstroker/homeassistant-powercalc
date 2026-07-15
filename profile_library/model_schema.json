@@ -10,6 +10,25 @@
     "calculation_strategy",
     "created_at"
   ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "device_type": {
+            "const": "light"
+          }
+        },
+        "required": [
+          "device_type"
+        ]
+      },
+      "then": {
+        "required": [
+          "standby_power"
+        ]
+      }
+    }
+  ],
   "properties": {
     "aliases": {
       "type": "array",
@@ -31,10 +50,6 @@
         "type": "string"
       },
       "description": "List of compatible integrations for this model"
-    },
-    "author": {
-      "type": "string",
-      "deprecated": true
     },
     "author_info": {
       "type": "object",

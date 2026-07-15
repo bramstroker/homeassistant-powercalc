@@ -5,6 +5,14 @@ on:
     workflows: [Validate model.json]
     types:
       - completed
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Validate model.json run ID to download artifacts from.
+        required: true
+      pr_number:
+        description: Pull request number to comment on.
+        required: true
 
 permissions:
   actions: read
@@ -14,29 +22,54 @@ permissions:
 jobs:
   comment:
     name: Comment on model.json validation
-    if: github.event.workflow_run.pull_requests[0].number != null
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout comment action
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
       - name: Download validation result
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: model-json-validation
           path: artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
-      - name: Checkout comment action
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          persist-credentials: false
+          run-id: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
       - name: Read validation result
         id: validation-result
         run: |
-          echo "status=$(cat artifacts/model_json_validation_status.txt)" >> "$GITHUB_OUTPUT"
+          status="$(tr -d '[:space:]' < artifacts/model_json_validation_status.txt)"
+          if [ "${status}" != "success" ] && [ "${status}" != "failure" ]; then
+            echo "Unexpected validation status: ${status}" >&2
+            exit 1
+          fi
+          echo "status=${status}" >> "$GITHUB_OUTPUT"
+      - name: Read PR number
+        id: pr
+        env:
+          PR_NUMBER: ${{ github.event.inputs.pr_number }}
+        run: |
+          if [ -n "${PR_NUMBER}" ]; then
+            pr_number="${PR_NUMBER}"
+          else
+            pr_number="$(tr -d '[:space:]' < artifacts/pr_number.txt)"
+          fi
+          echo "number=${pr_number}" >> "$GITHUB_OUTPUT"
+      - name: Ensure validation report exists
+        if: steps.validation-result.outputs.status == 'failure'
+        run: |
+          if [ ! -s artifacts/model_json_validation_report.md ]; then
+            {
+              echo "<!-- model.json validate action comment -->"
+              echo
+              echo "The model.json validation workflow failed before it could write a detailed report."
+            } > artifacts/model_json_validation_report.md
+          fi
       - name: Create or update validation comment
-        if: steps.validation-result.outputs.status != 'success'
+        if: steps.validation-result.outputs.status == 'failure'
         uses: ./.github/actions/upsert-pr-comment
         with:
-          pr-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          pr-number: ${{ steps.pr.outputs.number }}
           body-file: artifacts/model_json_validation_report.md
           match-text: |
             <!-- model.json validate action comment -->
@@ -45,7 +78,7 @@ jobs:
         if: steps.validation-result.outputs.status == 'success'
         uses: ./.github/actions/upsert-pr-comment
         with:
-          pr-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          pr-number: ${{ steps.pr.outputs.number }}
           state: absent
           match-text: |
             <!-- model.json validate action comment -->

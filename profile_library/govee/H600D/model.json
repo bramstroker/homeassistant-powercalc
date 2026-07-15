@@ -1,5 +1,4 @@
 {
-  "author": "Benjamin Neff <benjamin@coding4coffee.ch>",
   "calculation_strategy": "lut",
   "created_at": "2025-12-20T22:56:04Z",
   "device_type": "light",

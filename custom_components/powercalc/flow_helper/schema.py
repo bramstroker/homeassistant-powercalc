@@ -1,15 +1,25 @@
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
 from homeassistant.const import UnitOfPower
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
-from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig, NumberSelectorMode
+from homeassistant.helpers.selector import NumberSelector, NumberSelectorMode
 import voluptuous as vol
 
 from custom_components.powercalc.const import (
+    CONF_APPLY_TO_ALL,
+    CONF_COST_SENSOR_FRIENDLY_NAMING,
+    CONF_COST_SENSOR_NAMING,
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_FILTER_OUTLIER_ENABLED,
     CONF_ENERGY_FILTER_OUTLIER_MAX,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_MULTIPLIER,
+    CONF_ENERGY_PRICE_SENSOR,
+    CONF_ENERGY_PRICE_SURCHARGE,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_SUB_PROFILE,
     CONF_UTILITY_METER_NET_CONSUMPTION,
@@ -31,6 +41,58 @@ SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
 SCHEMA_ENERGY_SENSOR_TOGGLE = vol.Schema(
     {
         vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): selector.BooleanSelector(),
+    },
+)
+
+SCHEMA_COST_SENSOR_TOGGLE = vol.Schema(
+    {
+        vol.Optional(CONF_CREATE_COST_SENSOR, default=False): selector.BooleanSelector(),
+    },
+)
+
+SECTION_COST_PRICING = "cost_pricing"
+SECTION_COST_NAMING = "cost_naming"
+
+SCHEMA_GLOBAL_COST_PRICING = vol.Schema(
+    {
+        vol.Optional(CONF_ENERGY_PRICE): NumberSelector(
+            selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
+        ),
+        vol.Optional(CONF_ENERGY_PRICE_SENSOR): selector.EntitySelector(
+            selector.EntitySelectorConfig(domain="sensor", device_class=SensorDeviceClass.MONETARY),
+        ),
+        vol.Optional(CONF_ENERGY_PRICE_SURCHARGE): NumberSelector(
+            selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
+        ),
+        vol.Optional(CONF_ENERGY_PRICE_MULTIPLIER): NumberSelector(
+            selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
+        ),
+    },
+)
+
+SCHEMA_GLOBAL_COST_NAMING = vol.Schema(
+    {
+        vol.Optional(CONF_COST_SENSOR_NAMING): selector.TextSelector(),
+        vol.Optional(CONF_COST_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
+    },
+)
+
+# Presented in the GUI as two collapsible sections (pricing and naming).
+SCHEMA_GLOBAL_COST = vol.Schema(
+    {
+        vol.Required(SECTION_COST_PRICING): section(SCHEMA_GLOBAL_COST_PRICING),
+        vol.Required(SECTION_COST_NAMING): section(SCHEMA_GLOBAL_COST_NAMING, {"collapsed": True}),
+    },
+)
+
+# Flat variant with all cost keys, used to merge/clear the (un)nested user input.
+SCHEMA_GLOBAL_COST_FLAT = SCHEMA_GLOBAL_COST_PRICING.extend(SCHEMA_GLOBAL_COST_NAMING.schema)
+
+# Shown when the global create_cost_sensors toggle is flipped, to optionally propagate the
+# change to all existing GUI sensors.
+SCHEMA_COST_APPLY = vol.Schema(
+    {
+        vol.Optional(CONF_APPLY_TO_ALL, default=True): selector.BooleanSelector(),
     },
 )
 
@@ -64,7 +126,7 @@ SCHEMA_SENSOR_ENERGY_OPTIONS = SCHEMA_ENERGY_OPTIONS.extend(
         {
             vol.Optional(CONF_ENERGY_FILTER_OUTLIER_ENABLED, default=False): selector.BooleanSelector(),
             vol.Optional(CONF_ENERGY_FILTER_OUTLIER_MAX): NumberSelector(
-                NumberSelectorConfig(mode=NumberSelectorMode.BOX, unit_of_measurement=UnitOfPower.WATT),
+                selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, unit_of_measurement=UnitOfPower.WATT),
             ),
         },
     ).schema,

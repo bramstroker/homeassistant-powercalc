@@ -2,7 +2,6 @@
   "aliases": [
     "YUKA mini 600 (YUKA mini 600)"
   ],
-  "author": "Alexandre Bertrand <alexandrebertrand96@gmail.com>",
   "calculation_strategy": "composite",
   "composite_config": [
     {

@@ -17,7 +17,7 @@ from homeassistant.helpers.storage import STORAGE_DIR
 from homeassistant.loader import async_get_integration
 
 from custom_components.powercalc.const import API_URL, BUILT_IN_LIBRARY_DIR, DOMAIN
-from custom_components.powercalc.helpers import async_cache
+from custom_components.powercalc.helpers import async_cache, clear_async_cache
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy
@@ -66,6 +66,7 @@ class RemoteLoader(Loader):
         integration = await async_get_integration(self.hass, DOMAIN)
         powercalc_version = AwesomeVersion(str(integration.version))
 
+        self._clear_caches()
         self.library_contents = await self.load_library_json()
         self.profile_hashes = await self.hass.async_add_executor_job(self._load_profile_hashes)
 
@@ -122,6 +123,15 @@ class RemoteLoader(Loader):
 
             self.manufacturer_models[manufacturer_name] = kept_models
             self.model_lookup[manufacturer_name] = lookup
+
+    def _clear_caches(self) -> None:
+        """Clear cached lookups backed by mutable library state."""
+        clear_async_cache(self.get_manufacturer_listing)
+        clear_async_cache(self.find_manufacturers)
+        clear_async_cache(self.get_model_listing)
+        clear_async_cache(self.find_model)
+        clear_async_cache(self.find_model_migration)
+        clear_async_cache(self.load_model)
 
     async def load_library_json(self) -> dict[str, Any]:
         """Load library.json file"""
@@ -191,7 +201,7 @@ class RemoteLoader(Loader):
     @async_cache
     async def find_manufacturers(self, search: str) -> set[str]:
         """Find the manufacturer in the library."""
-        return self.manufacturer_lookup.get(search, set())
+        return self.manufacturer_lookup.get(search.lower(), set())
 
     @async_cache
     async def get_model_listing(
@@ -279,7 +289,7 @@ class RemoteLoader(Loader):
         """Retrieve model info, or raise an error if not found."""
         model_info = self.model_infos.get(f"{manufacturer}/{model}")
         if not model_info:
-            raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
+            raise LibraryLoadingError(f"Model not found in library: {manufacturer}/{model}")
         return model_info
 
     async def _needs_update(
@@ -424,10 +434,14 @@ class RemoteLoader(Loader):
         except (TimeoutError, aiohttp.ClientError) as e:
             raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
 
+    def _get_profile_hashes_path(self) -> str:
+        """Retrieve the local storage path for the profile hashes file."""
+        return str(self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, ".profile_hashes"))
+
     def _load_profile_hashes(self) -> dict[str, str]:
         """Load profile hashes from local storage"""
 
-        path = self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, ".profile_hashes")
+        path = self._get_profile_hashes_path()
         if not os.path.exists(path):
             return {}
 
@@ -437,6 +451,6 @@ class RemoteLoader(Loader):
     def _write_profile_hashes(self, hashes: dict[str, str]) -> None:
         """Write profile hashes to local storage"""
 
-        path = self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, ".profile_hashes")
+        path = self._get_profile_hashes_path()
         with open(path, "w") as json_file:
             json.dump(hashes, json_file, indent=4)

@@ -17,7 +17,6 @@ from custom_components.powercalc.const import DUMMY_ENTITY_ID, PLACEHOLDER_ENTIT
 from custom_components.powercalc.helpers import (
     build_related_entity_placeholder_not_found_message,
     collect_placeholders,
-    evaluate_power,
     get_or_create_unique_id,
     get_related_entity_by_device_class,
     get_related_entity_by_translation_key,
@@ -25,6 +24,7 @@ from custom_components.powercalc.helpers import (
     replace_placeholders,
     resolve_related_entity_placeholder,
 )
+from custom_components.powercalc.unit import evaluate_to_decimal
 from tests.common import get_test_profile_dir
 
 
@@ -39,24 +39,24 @@ from tests.common import get_test_profile_dir
         (lambda hass: (1, 2), None),
     ],
 )
-def test_evaluate_power(
+def test_evaluate_to_decimal(
     hass: HomeAssistant,
     power_factory: Callable[[HomeAssistant], Template | Decimal | float],
     expected_output: Decimal | None,
 ) -> None:
     power = power_factory(hass)
-    assert evaluate_power(power) == expected_output
+    assert evaluate_to_decimal(power) == expected_output
 
 
 @patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception()))
-def test_evaluate_power_template_error(
+def test_evaluate_to_decimal_template_error(
     _: object,
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     power = Template("{{ 1 + 3 }}", hass)
-    evaluate_power(power)
-    assert "Could not render power template" in caplog.text
+    evaluate_to_decimal(power)
+    assert "Could not render template" in caplog.text
 
 
 def test_get_unique_id_from_config() -> None:

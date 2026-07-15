@@ -2,7 +2,6 @@
   "aliases": [
     "MSP-3-1-X1"
   ],
-  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2022-10-04T18:58:32Z",
   "device_type": "smart_switch",

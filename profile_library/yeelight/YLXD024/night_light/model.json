@@ -1,6 +1,5 @@
 {
   "name": "LED Smart Ceiling Light(8-jō size) night light",
-  "standby_power": 0,
   "calculation_strategy": "linear",
   "linear_config": {
     "calibrate": [
@@ -14,5 +13,6 @@
       "224 -> 1.619",
       "255 -> 1.659"
     ]
-  }
+  },
+  "standby_power": 0
 }

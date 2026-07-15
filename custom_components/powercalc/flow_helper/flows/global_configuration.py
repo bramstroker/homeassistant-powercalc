@@ -5,12 +5,17 @@ from typing import TYPE_CHECKING, Any
 
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_ENABLED, CONF_SENSORS, UnitOfTime
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
+from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
 from custom_components.powercalc import DeviceType
 from custom_components.powercalc.const import (
+    CONF_APPLY_TO_ALL,
+    CONF_CREATE_COST_SENSOR,
+    CONF_CREATE_COST_SENSORS,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_STANDBY_GROUP,
     CONF_CREATE_UTILITY_METERS,
@@ -18,6 +23,8 @@ from custom_components.powercalc.const import (
     CONF_DISABLE_LIBRARY_DOWNLOAD,
     CONF_DISCOVERY,
     CONF_ENABLE_ANALYTICS,
+    CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_SENSOR,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
@@ -44,17 +51,27 @@ from custom_components.powercalc.const import (
     ENTITY_CATEGORIES,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
 )
-from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
+from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, flatten_sections
 from custom_components.powercalc.flow_helper.schema import (
+    SCHEMA_COST_APPLY,
     SCHEMA_ENERGY_OPTIONS,
+    SCHEMA_GLOBAL_COST,
+    SCHEMA_GLOBAL_COST_FLAT,
     SCHEMA_UTILITY_METER_OPTIONS,
     SCHEMA_UTILITY_METER_TOGGLE,
+    SECTION_COST_NAMING,
+    SECTION_COST_PRICING,
 )
+from custom_components.powercalc.service.gui_configuration import apply_field_to_config_entries
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
 
-SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
+SECTION_GLOBAL_POWER = "power_options"
+SECTION_GLOBAL_FEATURES = "features"
+SECTION_GLOBAL_ADVANCED = "advanced"
+
+SCHEMA_GLOBAL_CONFIGURATION_POWER = vol.Schema(
     {
         vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
@@ -67,20 +84,41 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
             selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
         ),
+    },
+)
+
+SCHEMA_GLOBAL_CONFIGURATION_FEATURES = vol.Schema(
+    {
+        vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_CREATE_COST_SENSORS, default=False): selector.BooleanSelector(),
+        vol.Optional(CONF_CREATE_STANDBY_GROUP, default=True): selector.BooleanSelector(),
+        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+    },
+)
+
+SCHEMA_GLOBAL_CONFIGURATION_ADVANCED = vol.Schema(
+    {
         vol.Optional(CONF_ENABLE_ANALYTICS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_LIBRARY_DOWNLOAD, default=False): selector.BooleanSelector(),
-        vol.Optional(CONF_CREATE_STANDBY_GROUP, default=True): selector.BooleanSelector(),
-        vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
-        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+    },
+)
+
+# Presented in the GUI as three collapsible sections (power sensor, features, advanced).
+SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
+    {
+        vol.Required(SECTION_GLOBAL_POWER): section(SCHEMA_GLOBAL_CONFIGURATION_POWER),
+        vol.Required(SECTION_GLOBAL_FEATURES): section(SCHEMA_GLOBAL_CONFIGURATION_FEATURES),
+        vol.Required(SECTION_GLOBAL_ADVANCED): section(SCHEMA_GLOBAL_CONFIGURATION_ADVANCED, {"collapsed": True}),
     },
 )
 
 SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY = vol.Schema(
     {
         vol.Optional(CONF_ENABLED, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_EXCLUDE_DEVICE_TYPES): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=[cls.value for cls in DeviceType],
@@ -88,7 +126,6 @@ SCHEMA_GLOBAL_CONFIGURATION_DISCOVERY = vol.Schema(
                 multiple=True,
             ),
         ),
-        vol.Optional(CONF_EXCLUDE_SELF_USAGE, default=False): selector.BooleanSelector(),
     },
 )
 
@@ -139,13 +176,16 @@ def merge_global_config(global_config: ConfigType, user_input: dict[str, Any], s
     Keys present in the schema but absent from the user input were cleared in the form
     and must be removed, otherwise a previously saved value would incorrectly persist.
     """
-    for key in schema.schema:
-        if isinstance(key, vol.Marker):
-            key = key.schema
-        if key in user_input:
-            global_config[key] = user_input[key]
-        elif key in global_config:
-            global_config.pop(key)
+    for key, val in schema.schema.items():
+        base_key = key.schema if isinstance(key, vol.Marker) else key
+        if isinstance(val, section):
+            # Recurse into collapsible sections, whose values are nested under the section key.
+            merge_global_config(global_config, user_input.get(base_key) or {}, val.schema)
+            continue
+        if base_key in user_input:
+            global_config[base_key] = user_input[base_key]
+        elif base_key in global_config:
+            global_config.pop(base_key)
 
 
 def get_global_powercalc_config(flow: PowercalcCommonFlow) -> ConfigType:
@@ -166,6 +206,11 @@ def get_global_powercalc_config(flow: PowercalcCommonFlow) -> ConfigType:
 class GlobalConfigurationFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
+
+    def is_energy_price_configured(self) -> bool:
+        """Check whether an energy price (fixed or sensor) has been configured globally."""
+        config = self.flow.global_config
+        return bool(config.get(CONF_ENERGY_PRICE) or config.get(CONF_ENERGY_PRICE_SENSOR))
 
     async def async_step_global_configuration_discovery(
         self,
@@ -257,10 +302,7 @@ class GlobalConfigurationFlow:
             self.flow.global_config.update(user_input)
 
         if not bool(self.flow.global_config.get(CONF_CREATE_UTILITY_METERS)) or user_input is not None:
-            return self.flow.async_create_entry(
-                title="Global Configuration",
-                data=self.flow.global_config,
-            )
+            return await self.async_step_global_configuration_cost()
 
         return await self.flow.handle_form_step(
             PowercalcFormStep(
@@ -271,6 +313,65 @@ class GlobalConfigurationFlow:
                         "docs_uri": DOCS_URI,
                     },
                 },
+            ),
+        )
+
+    async def async_step_global_configuration_cost(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
+        """Handle the global cost sensor configuration step (energy price)."""
+
+        form_step = PowercalcFormStep(
+            step=Step.GLOBAL_CONFIGURATION_COST,
+            schema=SCHEMA_GLOBAL_COST,
+            form_kwarg={
+                "description_placeholders": {
+                    "docs_uri": "https://docs.powercalc.nl/sensor-types/cost-sensor/",
+                },
+            },
+        )
+
+        if user_input is not None:
+            # The form presents pricing and naming as two sections, flatten them back to plain keys.
+            user_input = {**user_input.get(SECTION_COST_PRICING, {}), **user_input.get(SECTION_COST_NAMING, {})}
+            if not user_input.get(CONF_ENERGY_PRICE) and not user_input.get(CONF_ENERGY_PRICE_SENSOR):
+                return await self.flow._show_form(form_step, SchemaFlowError("cost_price_mandatory"))  # noqa: SLF001
+            if self.flow.is_options_flow:
+                merge_global_config(self.flow.global_config, user_input, SCHEMA_GLOBAL_COST_FLAT)
+                return self.flow.persist_config_entry()
+            self.flow.global_config.update(user_input)
+
+        if not bool(self.flow.global_config.get(CONF_CREATE_COST_SENSORS)) or user_input is not None:
+            return self.flow.async_create_entry(
+                title="Global Configuration",
+                data=self.flow.global_config,
+            )
+
+        return await self.flow.handle_form_step(form_step)
+
+    async def async_step_global_configuration_cost_apply(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
+        """Ask whether to apply the changed create_cost_sensors setting to existing GUI sensors."""
+
+        if user_input is not None:
+            if user_input.get(CONF_APPLY_TO_ALL):
+                apply_field_to_config_entries(
+                    self.flow.hass,
+                    CONF_CREATE_COST_SENSOR,
+                    bool(self.flow.global_config.get(CONF_CREATE_COST_SENSORS)),
+                )
+            # When cost sensors were just enabled but no price is configured yet, continue to the price step.
+            if self.flow.global_config.get(CONF_CREATE_COST_SENSORS) and not self.is_energy_price_configured():
+                return await self.async_step_global_configuration_cost()
+            return self.flow.persist_config_entry()
+
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GLOBAL_CONFIGURATION_COST_APPLY,
+                schema=SCHEMA_COST_APPLY,
             ),
         )
 
@@ -287,7 +388,7 @@ class GlobalConfigurationConfigFlow(GlobalConfigurationFlow):
         self.flow.abort_if_unique_id_configured()
 
         if user_input is not None:
-            self.flow.global_config.update(user_input)
+            self.flow.global_config.update(flatten_sections(user_input, SCHEMA_GLOBAL_CONFIGURATION))
             return await self.async_step_global_configuration_discovery()
 
         return await self.flow.handle_form_step(
@@ -317,6 +418,8 @@ class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
         }
         if self.flow.global_config.get(CONF_CREATE_ENERGY_SENSORS):
             menu[Step.GLOBAL_CONFIGURATION_ENERGY] = "Energy options"
+        if self.flow.global_config.get(CONF_CREATE_COST_SENSORS):
+            menu[Step.GLOBAL_CONFIGURATION_COST] = "Cost options"
         if self.flow.global_config.get(CONF_CREATE_UTILITY_METERS):
             menu[Step.GLOBAL_CONFIGURATION_UTILITY_METER] = "Utility meter options"
         return menu
@@ -325,7 +428,12 @@ class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
         """Handle the global configuration step."""
 
         if user_input is not None:
+            cost_sensors_before = bool(self.flow.global_config.get(CONF_CREATE_COST_SENSORS))
             merge_global_config(self.flow.global_config, user_input, SCHEMA_GLOBAL_CONFIGURATION)
+            # When the create_cost_sensors toggle is flipped (either direction), offer to apply
+            # the change to all existing GUI sensors in a dedicated step.
+            if bool(self.flow.global_config.get(CONF_CREATE_COST_SENSORS)) != cost_sensors_before:
+                return await self.async_step_global_configuration_cost_apply()
             return self.flow.persist_config_entry()
 
         return await self.flow.handle_form_step(

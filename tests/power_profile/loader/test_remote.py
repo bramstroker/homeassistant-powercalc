@@ -532,7 +532,7 @@ async def test_profile_redownloaded_when_model_json_corrupt(
     ]
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini?hash=b1107c61234f582a3c713b0891582e4e",
+        re.compile(rf"{ENDPOINT_DOWNLOAD}/apple/HomePod.*"),
         status=200,
         payload=remote_files,
         repeat=True,
@@ -578,7 +578,7 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
     ]
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini?hash=b1107c61234f582a3c713b0891582e4e",
+        re.compile(rf"{ENDPOINT_DOWNLOAD}/apple/HomePod.*"),
         status=200,
         payload=remote_files,
         repeat=True,
@@ -637,6 +637,55 @@ async def test_find_model(
         assert sorted(actual_models) == expected_models
 
 
+async def test_initialize_clears_cached_library_lookups(hass: HomeAssistant) -> None:
+    first_library = {
+        "manufacturers": [
+            {
+                "name": "Test",
+                "dir_name": "test",
+                "models": [
+                    {
+                        "id": "old_model",
+                        "name": "Old Model",
+                        "device_type": "light",
+                    },
+                ],
+            },
+        ],
+    }
+    second_library = {
+        "manufacturers": [
+            {
+                "name": "Test",
+                "dir_name": "test",
+                "models": [
+                    {
+                        "id": "new_model",
+                        "name": "New Model",
+                        "device_type": "light",
+                    },
+                ],
+            },
+        ],
+    }
+
+    with patch(
+        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.load_library_json",
+        new_callable=AsyncMock,
+        side_effect=[first_library, second_library],
+    ):
+        loader = RemoteLoader(hass)
+
+        await loader.initialize()
+        assert await loader.find_model("test", {"old_model"}) == ["old_model"]
+        assert await loader.get_model_listing("test", {DeviceType.LIGHT}) == {("old_model", "Old Model")}
+
+        await loader.initialize()
+        assert await loader.find_model("test", {"old_model"}) == []
+        assert await loader.find_model("test", {"new_model"}) == ["new_model"]
+        assert await loader.get_model_listing("test", {DeviceType.LIGHT}) == {("new_model", "New Model")}
+
+
 def clear_storage_dir(storage_path: str) -> None:
     if not os.path.exists(storage_path):
         return
@@ -681,11 +730,15 @@ async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aiorespon
 
     manufacturers = await library.find_manufacturers("my-alias")
     assert manufacturers == {"manufacturer1", "manufacturer2"}
+    manufacturers = await library.find_manufacturers("MY-ALIAS")
+    assert manufacturers == {"manufacturer1", "manufacturer2"}
 
     model_listing = await library.get_model_listing("my-alias", {DeviceType.LIGHT})
     assert len(model_listing) == 2
 
     models = await library.find_models(ModelInfo("my-alias", "model1"))
+    assert sorted(models) == [ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")]
+    models = await library.find_models(ModelInfo("MY-ALIAS", "model1"))
     assert sorted(models) == [ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")]
 
 

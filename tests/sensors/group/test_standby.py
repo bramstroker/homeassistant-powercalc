@@ -1,4 +1,5 @@
 from homeassistant.components.mqtt.const import CONF_STATE_CLOSING, CONF_STATE_OPENING
+from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.const import (
     CONF_ENTITY_ID,
     STATE_OFF,
@@ -12,6 +13,7 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP
 from custom_components.powercalc.const import (
+    CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -19,6 +21,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
+    CONF_UTILITY_METER_TYPES,
     CalculationStrategy,
 )
 from tests.common import assert_entity_state, run_powercalc_setup, set_states
@@ -54,6 +57,24 @@ async def test_standby_group(hass: HomeAssistant) -> None:
 
     await set_states(hass, [("input_boolean.test2", STATE_ON)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.20")
+
+
+async def test_standby_group_utility_meter(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test1",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+        {
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
+    )
+
+    assert hass.states.get("sensor.all_standby_energy_daily")
 
 
 async def test_self_usage_sensors_included(hass: HomeAssistant) -> None:

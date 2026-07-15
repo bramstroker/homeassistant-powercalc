@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
 
+from homeassistant.data_entry_flow import section
 import voluptuous as vol
 
 
@@ -32,6 +33,7 @@ class Step(StrEnum):
     POWER_ADVANCED = "power_advanced"
     DAILY_ENERGY = "daily_energy"
     REAL_POWER = "real_power"
+    COST = "cost"
     MANUFACTURER = "manufacturer"
     MENU_LIBRARY = "menu_library"
     MENU_GROUP = "menu_group"
@@ -46,6 +48,8 @@ class Step(StrEnum):
     GLOBAL_CONFIGURATION = "global_configuration"
     GLOBAL_CONFIGURATION_DISCOVERY = "global_configuration_discovery"
     GLOBAL_CONFIGURATION_ENERGY = "global_configuration_energy"
+    GLOBAL_CONFIGURATION_COST = "global_configuration_cost"
+    GLOBAL_CONFIGURATION_COST_APPLY = "global_configuration_cost_apply"
     GLOBAL_CONFIGURATION_THROTTLING = "global_configuration_throttling"
     GLOBAL_CONFIGURATION_UTILITY_METER = "global_configuration_utility_meter"
 
@@ -54,6 +58,7 @@ class FlowType(StrEnum):
     VIRTUAL_POWER = "virtual_power"
     DAILY_ENERGY = "daily_energy"
     REAL_POWER = "real_power"
+    COST = "cost"
     LIBRARY = "library"
     GROUP = "group"
     GLOBAL_CONFIGURATION = "global_configuration"
@@ -89,7 +94,10 @@ def fill_schema_defaults(
     schema = {}
     for key, val in data_schema.schema.items():
         new_key = key
-        if key in options and isinstance(key, vol.Marker):
+        if isinstance(val, section):
+            # Recurse into collapsible sections, filling their fields from the flat options.
+            val = section(fill_schema_defaults(val.schema, options), val.options)
+        elif key in options and isinstance(key, vol.Marker):
             if isinstance(key, vol.Optional) and callable(key.default) and key.default():
                 new_key = vol.Optional(key.schema, default=options.get(key))  # type: ignore[call-overload]
             elif isinstance(key, vol.Required):
@@ -100,6 +108,29 @@ def fill_schema_defaults(
                 new_key.description = {"suggested_value": options.get(key)}  # type: ignore[call-overload]
         schema[new_key] = val
     return vol.Schema(schema)
+
+
+def flatten_sections(user_input: dict[str, Any], schema: vol.Schema) -> dict[str, Any]:
+    """Flatten values nested under `section` wrappers back into a flat dict.
+
+    Fields presented inside collapsible sections are returned by Home Assistant as a nested
+    dict keyed by the section name. This merges them back to the top level so the rest of the
+    flow can keep treating the user input as flat.
+    """
+    if not user_input:
+        return user_input
+    section_keys = {
+        (key.schema if isinstance(key, vol.Marker) else key)
+        for key, val in schema.schema.items()
+        if isinstance(val, section)
+    }
+    flat: dict[str, Any] = {}
+    for key, value in user_input.items():
+        if key in section_keys and isinstance(value, dict):
+            flat.update(value)
+        else:
+            flat[key] = value
+    return flat
 
 
 def unwrap_choose_selector(

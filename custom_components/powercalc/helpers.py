@@ -1,21 +1,17 @@
 from collections.abc import Callable, Coroutine, Iterable, Iterator
-import decimal
-from decimal import Decimal
 from functools import wraps
 import logging
 import os.path
 import re
-from typing import Any, NamedTuple, TypeVar
+from typing import Any, NamedTuple, TypeVar, cast
 import uuid
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import TemplateError
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
@@ -30,28 +26,6 @@ from custom_components.powercalc.power_profile.power_profile import PowerProfile
 _LOGGER = logging.getLogger(__name__)
 
 PLACEHOLDER_REGEX = re.compile(r"\[\[\s*([A-Za-z_]\w*(?::[A-Za-z_]\w*)*)\s*\]\]")
-
-
-def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
-    """When power is a template render it."""
-
-    if isinstance(power, Decimal):
-        return power
-
-    try:
-        if isinstance(power, Template):
-            try:
-                power = power.async_render()
-            except TemplateError as ex:
-                _LOGGER.error("Could not render power template %s: %s", power, ex)
-                return None
-            if power == "unknown":
-                return None
-
-        return Decimal(power)  # type: ignore[arg-type]
-    except decimal.DecimalException, ValueError:
-        _LOGGER.error("Could not convert power value %s to decimal", power)
-        return None
 
 
 def get_library_path(sub_path: str = "") -> str:
@@ -138,7 +112,16 @@ def async_cache[R](func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[...,
         cache[cache_key] = result
         return result
 
+    cast(Any, wrapper).cache_clear = cache.clear
     return wrapper
+
+
+def clear_async_cache(func: Callable[..., Coroutine[Any, Any, Any]]) -> None:
+    """Clear a function wrapped with async_cache."""
+    target = getattr(func, "__func__", func)
+    cache_clear = getattr(target, "cache_clear", None)
+    if callable(cache_clear):
+        cache_clear()
 
 
 def collect_placeholders(data: list | str | dict[str, Any]) -> set[str]:
@@ -226,14 +209,6 @@ def _resolve_related_entity_by_device_class(
     return get_related_entity_by_device_class(hass, source_entity, device_class)
 
 
-def _resolve_related_entity_by_translation_key(
-    hass: HomeAssistant,
-    source_entity: SourceEntity,
-    translation_key: str,
-) -> str | None:
-    return get_related_entity_by_translation_key(hass, source_entity, translation_key)
-
-
 RELATED_ENTITY_PLACEHOLDER_DEFINITIONS = (
     RelatedEntityPlaceholderDefinition(
         PLACEHOLDER_ENTITY_BY_DEVICE_CLASS,
@@ -243,7 +218,11 @@ RELATED_ENTITY_PLACEHOLDER_DEFINITIONS = (
     RelatedEntityPlaceholderDefinition(
         PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
         "translation key",
-        _resolve_related_entity_by_translation_key,
+        lambda hass, source_entity, translation_key: get_related_entity_by_translation_key(
+            hass,
+            source_entity,
+            translation_key,
+        ),
     ),
 )
 

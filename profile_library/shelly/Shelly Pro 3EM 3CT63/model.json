@@ -2,7 +2,6 @@
   "aliases": [
     "SPEM-003CEBEU63"
   ],
-  "author": "Michal Bartak <maxym.srpl@gmail.com>",
   "calculation_strategy": "fixed",
   "created_at": "2024-01-03T19:07:00Z",
   "device_type": "power_meter",

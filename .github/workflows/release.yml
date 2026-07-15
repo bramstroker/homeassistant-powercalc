@@ -10,7 +10,6 @@ permissions:
 jobs:
   release_zip_file:
     name: Prepare release asset
-    if: github.event.release.prerelease == false
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository

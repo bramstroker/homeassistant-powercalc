@@ -23,6 +23,7 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
 )
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers import entity_registry as er, selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -47,6 +48,7 @@ from .const import (
 )
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults
+from .flow_helper.flows.cost import CostConfigFlow, CostOptionsFlow
 from .flow_helper.flows.daily_energy import (
     SCHEMA_DAILY_ENERGY_OPTIONS,
     DailyEnergyConfigFlow,
@@ -72,6 +74,7 @@ from .flow_helper.flows.virtual_power import (
 )
 from .flow_helper.profile_preview import async_setup_preview as async_setup_powercalc_preview
 from .flow_helper.schema import (
+    SCHEMA_COST_SENSOR_TOGGLE,
     SCHEMA_ENERGY_SENSOR_TOGGLE,
     SCHEMA_SENSOR_ENERGY_OPTIONS,
     SCHEMA_UTILITY_METER_OPTIONS,
@@ -89,6 +92,7 @@ MENU_SENSOR_TYPE = [
     Step.MENU_GROUP,
     Step.DAILY_ENERGY,
     Step.REAL_POWER,
+    Step.COST,
 ]
 
 MENU_OPTIONS = [
@@ -99,14 +103,11 @@ MENU_OPTIONS = [
     Step.WLED,
 ]
 
+# Order matters: async_step() delegates to the first handler that defines the requested step.
 FLOW_HANDLERS: dict[FlowType, dict] = {
-    FlowType.GROUP: {
-        "config": GroupConfigFlow,
-        "options": GroupOptionsFlow,
-    },
-    FlowType.DAILY_ENERGY: {
-        "config": DailyEnergyConfigFlow,
-        "options": DailyEnergyOptionsFlow,
+    FlowType.GLOBAL_CONFIGURATION: {
+        "config": GlobalConfigurationConfigFlow,
+        "options": GlobalConfigurationOptionsFlow,
     },
     FlowType.LIBRARY: {
         "config": LibraryConfigFlow,
@@ -116,13 +117,21 @@ FLOW_HANDLERS: dict[FlowType, dict] = {
         "config": VirtualPowerConfigFlow,
         "options": VirtualPowerOptionsFlow,
     },
-    FlowType.GLOBAL_CONFIGURATION: {
-        "config": GlobalConfigurationConfigFlow,
-        "options": GlobalConfigurationOptionsFlow,
+    FlowType.GROUP: {
+        "config": GroupConfigFlow,
+        "options": GroupOptionsFlow,
+    },
+    FlowType.DAILY_ENERGY: {
+        "config": DailyEnergyConfigFlow,
+        "options": DailyEnergyOptionsFlow,
     },
     FlowType.REAL_POWER: {
         "config": RealPowerConfigFlow,
         "options": RealPowerOptionsFlow,
+    },
+    FlowType.COST: {
+        "config": CostConfigFlow,
+        "options": CostOptionsFlow,
     },
 }
 
@@ -145,16 +154,9 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self.name: str | None = None
         self.handled_steps: list[Step] = []
 
-        # Initialize flow handlers
+        # Initialize flow handlers. Iteration order follows FLOW_HANDLERS, which async_step() relies on.
         flow_key = "options" if self.is_options_flow else "config"
-        self.flow_handlers = {
-            FlowType.GLOBAL_CONFIGURATION: FLOW_HANDLERS[FlowType.GLOBAL_CONFIGURATION][flow_key](self),
-            FlowType.LIBRARY: FLOW_HANDLERS[FlowType.LIBRARY][flow_key](self),
-            FlowType.VIRTUAL_POWER: FLOW_HANDLERS[FlowType.VIRTUAL_POWER][flow_key](self),
-            FlowType.GROUP: FLOW_HANDLERS[FlowType.GROUP][flow_key](self),
-            FlowType.DAILY_ENERGY: FLOW_HANDLERS[FlowType.DAILY_ENERGY][flow_key](self),
-            FlowType.REAL_POWER: FLOW_HANDLERS[FlowType.REAL_POWER][flow_key](self),
-        }
+        self.flow_handlers = {flow_type: handlers[flow_key](self) for flow_type, handlers in FLOW_HANDLERS.items()}
 
         for step in Step:
             step_method = f"async_step_{step}"
@@ -332,7 +334,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if isinstance(form_step.schema, vol.Schema):
             return form_step.schema
         schema = await form_step.schema()
-        if schema is None:
+        if schema is None:  # pragma: no cover
             return vol.Schema({})
         return schema
 
@@ -361,7 +363,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
 
-    VERSION = 8
+    VERSION = 9
 
     def __init__(self) -> None:
         """Initialize options flow."""
@@ -534,6 +536,9 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     def build_menu(self) -> list[Step]:
         """Build the options menu."""
+        if self.selected_sensor_type == SensorType.COST:
+            return [Step.COST]
+
         menu = [Step.BASIC_OPTIONS]
         if self.selected_sensor_type == SensorType.VIRTUAL_POWER:
             if self.strategy and self.should_add_strategy_option_to_menu():
@@ -660,23 +665,32 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         Process the provided user input against the schema.
         Update current_config with the new options. Used to save the data to the config entry later.
         """
-        for key in schema.schema:
-            if isinstance(key, vol.Marker):
-                key = key.schema
-            if key in user_input:
-                self.sensor_config[key] = user_input.get(key)
-            elif key in self.sensor_config:
-                self.sensor_config.pop(key)
+        for key, val in schema.schema.items():
+            base_key = key.schema if isinstance(key, vol.Marker) else key
+            if isinstance(val, section):
+                # Recurse into collapsible sections, whose values are nested under the section key.
+                self._process_user_input(user_input.get(base_key) or {}, val.schema)
+                continue
+            if base_key in user_input:
+                self.sensor_config[base_key] = user_input.get(base_key)
+            elif base_key in self.sensor_config:
+                self.sensor_config.pop(base_key)
 
     def build_basic_options_schema(self) -> vol.Schema:
         """Build the basic options schema. depending on the selected sensor type."""
         if self.selected_sensor_type in [SensorType.REAL_POWER, SensorType.DAILY_ENERGY]:
-            return SCHEMA_UTILITY_METER_TOGGLE
+            return vol.Schema(
+                {
+                    **SCHEMA_COST_SENSOR_TOGGLE.schema,
+                    **SCHEMA_UTILITY_METER_TOGGLE.schema,
+                },
+            )
 
         if self.selected_sensor_type == SensorType.GROUP:
             return vol.Schema(
                 {
                     **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+                    **SCHEMA_COST_SENSOR_TOGGLE.schema,
                     **SCHEMA_UTILITY_METER_TOGGLE.schema,
                 },
             )
@@ -696,6 +710,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         return schema.extend(  # type: ignore[no-any-return]
             {
                 **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+                **SCHEMA_COST_SENSOR_TOGGLE.schema,
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
             },
         )

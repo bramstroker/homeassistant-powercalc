@@ -5,7 +5,6 @@
     "929003055101",
     "929003055201"
   ],
-  "author": "dansie <dansie@users.noreply.github.com>",
   "calculation_strategy": "lut",
   "created_at": "2023-11-01T15:35:10Z",
   "device_type": "light",

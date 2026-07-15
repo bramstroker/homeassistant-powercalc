@@ -2,7 +2,6 @@
   "aliases": [
     "On/Off plug (SP 220)"
   ],
-  "author": "ca-dmin",
   "calculation_strategy": "fixed",
   "created_at": "2023-12-31T08:21:16Z",
   "device_type": "smart_switch",

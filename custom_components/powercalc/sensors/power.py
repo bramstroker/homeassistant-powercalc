@@ -76,7 +76,6 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
-    DATA_DISCOVERY_MANAGER,
     DATA_POWER_PROFILE_SOURCES,
     DATA_POWER_PROFILES,
     DATA_STANDBY_POWER_SENSORS,
@@ -87,16 +86,16 @@ from custom_components.powercalc.const import (
     OFF_STATES,
     OFF_STATES_BY_DOMAIN,
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
+    UNAVAILABLE_STATES,
     CalculationStrategy,
     PowerProfileSource,
 )
-from custom_components.powercalc.discovery import DiscoveryManager
+from custom_components.powercalc.discovery import get_discovery_manager
 from custom_components.powercalc.errors import (
     ModelNotSupportedError,
     StrategyConfigurationError,
     UnsupportedStrategyError,
 )
-from custom_components.powercalc.helpers import evaluate_power
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.power_profile.sub_profile_selector import SubProfileSelectConfig, SubProfileSelector
@@ -106,6 +105,7 @@ from custom_components.powercalc.strategy.selector import detect_calculation_str
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
+from custom_components.powercalc.unit import evaluate_to_decimal
 
 from .abstract import (
     BaseEntity,
@@ -238,7 +238,7 @@ async def _get_power_profile(
     source_entity: SourceEntity,
 ) -> PowerProfile | None:
     """Retrieve the power profile based on auto-discovery or manual configuration."""
-    discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+    discovery_manager = get_discovery_manager(hass)
     if is_manually_configured(sensor_config):
         return None
 
@@ -368,7 +368,7 @@ class PowerSensor(BaseEntity):
     """Class which all power sensors should extend from."""
 
 
-class VirtualPowerSensor(SensorEntity, PowerSensor):
+class VirtualPowerSensor(PowerSensor, SensorEntity):
     """Virtual power sensor."""
 
     _attr_device_class = SensorDeviceClass.POWER
@@ -649,7 +649,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self.source_entity == DUMMY_ENTITY_ID:
             return True
 
-        return self._ignore_unavailable_state or state.state not in [STATE_UNAVAILABLE, STATE_UNKNOWN]
+        return self._ignore_unavailable_state or state.state not in UNAVAILABLE_STATES
 
     async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
@@ -770,7 +770,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self._strategy_instance.can_calculate_standby():
             standby_power = await self._strategy_instance.calculate(state) or self._standby_power
 
-        evaluated = evaluate_power(standby_power)
+        evaluated = evaluate_to_decimal(standby_power)
         if evaluated is None:
             evaluated = Decimal(0)
         standby_power = evaluated

@@ -11,14 +11,11 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDevic
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
-    STATE_UNAVAILABLE,
-    STATE_UNKNOWN,
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, State, callback
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
@@ -41,9 +38,9 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_SENSOR_PRECISION,
     DEFAULT_ENERGY_UPDATE_INTERVAL,
+    UNAVAILABLE_STATES,
     UnitPrefix,
 )
-from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.filter.outlier import OutlierFilter
 
@@ -58,6 +55,16 @@ ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _numeric_state_value(state: State | None) -> float | None:
+    """Return the numeric value of a state, or None when it is not a usable number."""
+    if state is None or state.state in UNAVAILABLE_STATES:
+        return None
+    try:
+        return float(state.state)
+    except TypeError, ValueError:
+        return None
 
 
 def create_energy_sensor(
@@ -82,6 +89,17 @@ def create_energy_sensor(
     return _create_virtual_energy_sensor(hass, sensor_config, power_sensor, source_entity)
 
 
+def resolve_existing_energy_sensor(hass: HomeAssistant, energy_sensor_id: str) -> RealEnergySensor:
+    """Look up an existing energy sensor in the entity registry, raising when not found."""
+    entity_entry = er.async_get(hass).async_get(energy_sensor_id)
+    if entity_entry is None:
+        raise SensorConfigurationError(
+            f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
+            "Double check the `energy_sensor_id` setting",
+        )
+    return RealEnergySensor.from_registry_entry(entity_entry)
+
+
 def _get_existing_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
@@ -90,19 +108,7 @@ def _get_existing_energy_sensor(
     if CONF_ENERGY_SENSOR_ID not in sensor_config:
         return None
 
-    ent_reg = er.async_get(hass)
-    energy_sensor_id = sensor_config[CONF_ENERGY_SENSOR_ID]
-    entity_entry = ent_reg.async_get(energy_sensor_id)
-    if entity_entry is None:
-        raise SensorConfigurationError(
-            f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
-            "Double check `energy_sensor_id` setting",
-        )
-    return RealEnergySensor(
-        entity_entry.entity_id,
-        entity_entry.name or entity_entry.original_name,
-        entity_entry.unique_id,
-    )
+    return resolve_existing_energy_sensor(hass, sensor_config[CONF_ENERGY_SENSOR_ID])
 
 
 def _get_related_energy_sensor(
@@ -178,7 +184,6 @@ def _create_virtual_energy_sensor(
         powercalc_source_entity=source_entity.entity_id if source_entity else None,
         powercalc_source_domain=source_entity.domain if source_entity else None,
         sensor_config=sensor_config,
-        device_info=get_device_info(hass, sensor_config, source_entity),
     )
 
 
@@ -230,12 +235,7 @@ def _find_related_real_energy_sensor(
     if not energy_sensors:
         return None
 
-    entity_entry = energy_sensors[0]
-    return RealEnergySensor(
-        entity_entry.entity_id,
-        entity_entry.name or entity_entry.original_name,
-        entity_entry.unique_id,
-    )
+    return RealEnergySensor.from_registry_entry(energy_sensors[0])
 
 
 class EnergySensor(BaseEntity):
@@ -260,7 +260,6 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         entity_category: EntityCategory | None = None,
         name: str | None = None,
         unit_prefix: str | None = None,
-        device_info: DeviceInfo | None = None,
     ) -> None:
         round_digits: int = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
         integration_method: str = sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD, DEFAULT_ENERGY_INTEGRATION_METHOD)
@@ -274,7 +273,6 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             "unit_time": UnitOfTime.HOURS,
             "integration_method": integration_method,
             "unique_id": unique_id,
-            "device_info": device_info,
             "max_sub_interval": timedelta(
                 seconds=sensor_config.get(CONF_ENERGY_UPDATE_INTERVAL, DEFAULT_ENERGY_UPDATE_INTERVAL),
             ),
@@ -301,27 +299,86 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             max_z_score=3.5,
             max_expected_step=sensor_config.get(CONF_ENERGY_FILTER_OUTLIER_MAX, 1000),
         )
+        self._last_accepted_value: float | None = None
+        self._last_rejected_value: float | None = None
 
     def _integrate_on_state_change(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
-        """Override to add outlier filtering."""
+        """Override to add outlier filtering.
 
-        new_state: State | None = kwargs.get("new_state")
-        if new_state is None and args:
-            last_arg = args[-1]
-            if isinstance(last_arg, State):
-                new_state = last_arg
+        Simply skipping integration when an outlier arrives as the ``new_state`` is not
+        enough: the energy sensor integrates over consecutive states, and depending on the
+        integration method the outlier also contributes when it is the *old* state of the
+        following event. With the default ``left`` Riemann method the contribution of a
+        state change is ``old_state * elapsed_time``, so a rejected spike still leaks into
+        the total on the next update. Instead of skipping, we substitute any outlier reading
+        with the last accepted value wherever it appears (as old and as new state), so it can
+        never affect the energy total regardless of the integration method.
+        """
+        if not self._filter_outliers:
+            super()._integrate_on_state_change(*args, **kwargs)
+            return
 
-        if self._filter_outliers and new_state is not None:
-            valid_state = new_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE)
-            if valid_state and not self._outlier_filter.accept(float(new_state.state)):
-                _LOGGER.debug(
-                    "%s: Rejecting power value %s as outlier for energy integration",
-                    self.entity_id,
-                    new_state.state,
-                )
-                return
+        arg_list = list(args)
+        state_positions = [index for index, value in enumerate(arg_list) if isinstance(value, State)]
 
-        super()._integrate_on_state_change(*args, **kwargs)
+        # The integration sensor passes the states positionally (old_state, new_state being
+        # the last two). Sanitize old_state first, then new_state, since processing new_state
+        # updates the tracking used to detect the outlier as a subsequent old_state.
+        if len(state_positions) >= 2:
+            old_index = state_positions[-2]
+            arg_list[old_index] = self._replace_outlier_state(arg_list[old_index])
+        if state_positions:
+            new_index = state_positions[-1]
+            arg_list[new_index] = self._sanitize_new_state(arg_list[new_index])
+
+        super()._integrate_on_state_change(*arg_list, **kwargs)
+
+    def _schedule_max_sub_interval_exceeded_if_state_is_numeric(self, source_state: State | None) -> None:
+        """Prevent a rejected outlier from being integrated as the assumed constant value.
+
+        When ``max_sub_interval`` is configured (always the case for powercalc energy sensors)
+        the integration sensor keeps integrating the last known source state until a new state
+        change arrives. Substitute the outlier with the last accepted value so this fallback
+        does not leak the spike either.
+        """
+        if self._filter_outliers:
+            source_state = self._replace_outlier_state(source_state)
+        super()._schedule_max_sub_interval_exceeded_if_state_is_numeric(source_state)
+
+    def _sanitize_new_state(self, state: State | None) -> State | None:
+        """Feed a new state through the outlier filter, substituting rejected outliers."""
+        value = _numeric_state_value(state)
+        if value is None:
+            return state
+
+        if self._outlier_filter.accept(value):
+            self._last_accepted_value = value
+            self._last_rejected_value = None
+            return state
+
+        self._last_rejected_value = value
+        _LOGGER.debug(
+            "%s: Rejecting power value %s as outlier for energy integration",
+            self.entity_id,
+            state.state if state else value,
+        )
+        return self._replace_outlier_state(state)
+
+    def _replace_outlier_state(self, state: State | None) -> State | None:
+        """Replace a state holding the last rejected outlier value with the last accepted value."""
+        if state is None or self._last_rejected_value is None or self._last_accepted_value is None:
+            return state
+        if _numeric_state_value(state) != self._last_rejected_value:
+            return state
+        return State(
+            state.entity_id,
+            str(self._last_accepted_value),
+            state.attributes,
+            last_changed=state.last_changed,
+            last_reported=state.last_reported,
+            last_updated=state.last_updated,
+            context=state.context,
+        )
 
     @property
     def extra_state_attributes(self) -> dict[str, str] | None:
@@ -369,6 +426,11 @@ class RealEnergySensor(EnergySensor):
         self.entity_id = entity_id
         self._name = name
         self._unique_id = unique_id
+
+    @classmethod
+    def from_registry_entry(cls, entry: er.RegistryEntry) -> RealEnergySensor:
+        """Create a reference to an existing energy sensor from its registry entry."""
+        return cls(entry.entity_id, entry.name or entry.original_name, entry.unique_id)
 
     @property
     def name(self) -> str | None:

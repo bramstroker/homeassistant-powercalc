@@ -1,5 +1,4 @@
 {
-  "author": "Ed Kutuev <ed@napych.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-10-08T20:39:54Z",
   "device_type": "light",

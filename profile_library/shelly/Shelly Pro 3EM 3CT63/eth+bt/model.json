@@ -1,5 +1,4 @@
 {
-  "author": "Michal Bartak <maxym.srpl@gmail.com>",
   "created_at": "2024-01-03T19:07:00Z",
   "measure_description": "The device measured with Ethernet port and BlueTooth enabled. Other interfaces were disabled",
   "name": "Eth + BT",

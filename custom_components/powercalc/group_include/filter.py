@@ -11,6 +11,7 @@ from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers import area_registry, device_registry, entity_registry, floor_registry, label_registry
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.template import Template
@@ -148,8 +149,6 @@ class GroupFilter(EntityFilter):
 
 class StandardGroupFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
-        entity_reg = entity_registry.async_get(hass)
-        entity_reg.async_get(group_id)
         group_state = hass.states.get(group_id)
         if group_state is None:
             raise SensorConfigurationError(f"Group state {group_id} not found")
@@ -161,14 +160,7 @@ class StandardGroupFilter(EntityFilter):
 
 class LightGroupFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
-        light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
-        light_group = next(
-            filter(
-                lambda entity: entity.entity_id == group_id,
-                light_component.entities,
-            ),
-            None,
-        )
+        light_group = self._find_light_group(hass, group_id)
         if light_group is None or light_group.platform.platform_name != GROUP_DOMAIN:
             raise SensorConfigurationError(f"Light group {group_id} not found")
 
@@ -177,6 +169,17 @@ class LightGroupFilter(EntityFilter):
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.entity_id in self.entity_ids
 
+    @staticmethod
+    def _find_light_group(hass: HomeAssistant, group_entity_id: str) -> Entity | None:
+        light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
+        return next(
+            filter(
+                lambda entity: entity.entity_id == group_entity_id,
+                light_component.entities,
+            ),
+            None,
+        )
+
     def find_all_entity_ids_recursively(
         self,
         hass: HomeAssistant,
@@ -184,14 +187,7 @@ class LightGroupFilter(EntityFilter):
         all_entity_ids: list[str],
     ) -> list[str]:
         entity_reg = entity_registry.async_get(hass)
-        light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
-        light_group = next(
-            filter(
-                lambda entity: entity.entity_id == group_entity_id,
-                light_component.entities,
-            ),
-            None,
-        )
+        light_group = self._find_light_group(hass, group_entity_id)
 
         entity_ids: list[str] = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)  # type: ignore
         for entity_id in entity_ids:
@@ -373,7 +369,7 @@ class CompositeFilter(EntityFilter):
         self.operator = operator
 
     def is_valid(self, entity: RegistryEntry) -> bool:
-        evaluations = [entity_filter.is_valid(entity) for entity_filter in self.filters]
+        evaluations = (entity_filter.is_valid(entity) for entity_filter in self.filters)
         if self.operator == FilterOperator.OR:
             return any(evaluations)
 

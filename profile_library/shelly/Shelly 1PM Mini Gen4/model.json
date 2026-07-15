@@ -3,7 +3,6 @@
     "S4SW-001P8EU",
     "Shelly Mini1PMG4"
   ],
-  "author": "Michal Bartak <maxym.srpl@gmail.com>",
   "calculation_strategy": "fixed",
   "config_flow_sub_profile_remarks": "You need to select a profile depending on your Shelly configuration.\nIf not sure, select 'Other combinations' which will report the highest possible draw.",
   "created_at": "2025-11-29T09:48:00Z",

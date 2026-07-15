@@ -4,7 +4,6 @@ from decimal import Decimal
 import logging
 
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
@@ -16,9 +15,11 @@ from custom_components.powercalc.const import (
     CONF_POWER_FACTOR,
     CONF_VOLTAGE,
     OFF_STATES,
+    UNAVAILABLE_STATES,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
-from custom_components.powercalc.helpers import evaluate_power, get_related_entity_by_device_class
+from custom_components.powercalc.helpers import get_related_entity_by_device_class
+from custom_components.powercalc.unit import evaluate_to_decimal
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -53,14 +54,21 @@ class WledStrategy(PowerCalculationStrategyInterface):
             if entity_state.entity_id == self._light_entity.entity_id
             else self._hass.states.get(self._light_entity.entity_id)
         )
+        if light_state is None:
+            return None
 
         if light_state.state in OFF_STATES and self._standby_power:
             return self._standby_power
 
-        if entity_state.entity_id != self._estimated_current_entity:
-            entity_state = self._hass.states.get(self._estimated_current_entity)
+        current_state = (
+            entity_state
+            if entity_state.entity_id == self._estimated_current_entity
+            else self._hass.states.get(self._estimated_current_entity)
+        )
+        if current_state is None:
+            return None
 
-        if entity_state.state in [STATE_UNAVAILABLE, STATE_UNKNOWN]:
+        if current_state.state in UNAVAILABLE_STATES:
             _LOGGER.warning(
                 "%s: Estimated current entity %s is not available",
                 self._light_entity.entity_id,
@@ -71,12 +79,12 @@ class WledStrategy(PowerCalculationStrategyInterface):
         _LOGGER.debug(
             "%s: Estimated current %s (voltage=%d, power_factor=%.2f)",
             self._light_entity.entity_id,
-            entity_state.state,
+            current_state.state,
             self._voltage,
             self._power_factor,
         )
-        power = float(entity_state.state) / 1000 * self._voltage * self._power_factor
-        return evaluate_power(power)
+        power = float(current_state.state) / 1000 * self._voltage * self._power_factor
+        return evaluate_to_decimal(power)
 
     async def find_estimated_current_entity(self) -> str:
         entity_reg = entity_registry.async_get(self._hass)

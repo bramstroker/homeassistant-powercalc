@@ -5,8 +5,9 @@ from typing import Any
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.data_entry_flow import FlowManager, FlowResult, section
 import pytest
+import voluptuous as vol
 
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.common import SourceEntity
@@ -30,12 +31,104 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.flow_helper.flows.global_configuration import SCHEMA_GLOBAL_CONFIGURATION
+from custom_components.powercalc.flow_helper.flows.group import create_schema_group_custom
 from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 DEFAULT_ENTITY_ID = "light.test"
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
+
+
+def _schema_keys(schema: vol.Schema) -> set[str]:
+    """Return the plain field keys of a (flat) voluptuous schema."""
+    return {key.schema if isinstance(key, vol.Marker) else key for key in schema.schema}
+
+
+def section_schema(data_schema: vol.Schema, section_key: str) -> vol.Schema:
+    """Return the inner schema of a collapsible `section` within a form schema."""
+    for key, val in data_schema.schema.items():
+        base_key = key.schema if isinstance(key, vol.Marker) else key
+        if base_key == section_key:
+            return val.schema
+    raise KeyError(section_key)
+
+
+def build_section_input(flat: dict[str, Any], sections: dict[str, set[str]]) -> dict[str, Any]:
+    """Convert a flat user input into the nested section structure a form expects.
+
+    ``sections`` maps each section key to the field keys that live inside it. Fields not
+    belonging to any section stay at the top level. All section keys are always present
+    (possibly empty), matching the required sections in the form schema.
+    """
+    result: dict[str, Any] = {section_key: {} for section_key in sections}
+    for key, value in flat.items():
+        for section_key, field_keys in sections.items():
+            if key in field_keys:
+                result[section_key][key] = value
+                break
+        else:
+            result[key] = value
+    return result
+
+
+def _schema_sections(schema: vol.Schema) -> dict[str, set[str]]:
+    """Map each collapsible section in a form schema to the field keys it contains."""
+    sections: dict[str, set[str]] = {}
+    for key, val in schema.schema.items():
+        base_key = key.schema if isinstance(key, vol.Marker) else key
+        if isinstance(val, section):
+            sections[base_key] = _schema_keys(val.schema)
+    return sections
+
+
+def _sections_for_step(hass: HomeAssistant, step: Step) -> dict[str, set[str]] | None:
+    """Return the section layout (section key -> field keys) for a form step, if it has any.
+
+    Steps whose forms group fields into collapsible sections are listed here so submissions
+    can be flattened automatically. The group-custom layout uses the config-flow schema, whose
+    section field keys are a superset of the options-flow schema, so it covers both flows.
+    """
+    if step == Step.GLOBAL_CONFIGURATION:
+        return _schema_sections(SCHEMA_GLOBAL_CONFIGURATION)
+    if step == Step.GROUP_CUSTOM:
+        return _schema_sections(create_schema_group_custom(hass, is_option_flow=False))
+    return None
+
+
+async def submit_form_step(
+    hass: HomeAssistant,
+    result: FlowResult,
+    user_input: dict[str, Any] | None = None,
+) -> FlowResult:
+    """Submit flat user input to the current config-flow step.
+
+    The step is read from ``result``; if it groups fields into collapsible sections the flat
+    input is distributed into them automatically, so tests never nest the input themselves.
+    """
+    return await _submit_step(hass.config_entries.flow, hass, result, user_input)
+
+
+async def submit_options_step(
+    hass: HomeAssistant,
+    result: FlowResult,
+    user_input: dict[str, Any] | None = None,
+) -> FlowResult:
+    """Options-flow counterpart of :func:`submit_form_step`."""
+    return await _submit_step(hass.config_entries.options, hass, result, user_input)
+
+
+async def _submit_step(
+    manager: FlowManager,
+    hass: HomeAssistant,
+    result: FlowResult,
+    user_input: dict[str, Any] | None,
+) -> FlowResult:
+    sections = _sections_for_step(hass, Step(result["step_id"]))
+    if sections is not None:
+        user_input = build_section_input(user_input or {}, sections)
+    return await manager.async_configure(result["flow_id"], user_input or {})
 
 
 async def select_menu_item(
@@ -132,12 +225,9 @@ async def handle_options_flow_update(
     selected_menu_item: Step,
     user_input: dict[str, Any],
 ) -> FlowResult:
-    """Open the options flow, select a menu item, and handle user input."""
+    """Open the options flow, select a menu item, and handle (flat) user input."""
     result = await initialize_options_flow(hass, entry, selected_menu_item)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input,
-    )
+    result = await submit_options_step(hass, result, user_input)
     await hass.async_block_till_done()
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     return result

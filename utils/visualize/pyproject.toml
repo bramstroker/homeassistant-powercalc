@@ -14,7 +14,7 @@ dependencies = [
     "fonttools>=4.38",
     "imageio>=2.25",
     "kiwisolver>=1.4",
-    "matplotlib>=3.6",
+    "matplotlib>=3.11",
     "numpy",
     "packaging>=22.0",
     "pandas>=2.2",
@@ -33,7 +33,7 @@ dependencies = [
 dev = [
     "pre-commit>=4.0.0",
     "ruff>=0.12.0",
-    "mypy==2.1.0"
+    "mypy==2.3.0"
 ]
 
 [build-system]

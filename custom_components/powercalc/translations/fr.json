@@ -7,9 +7,11 @@
   },
   "config": {
     "abort": {
-      "already_configured": "Le capteur est déjà configuré, spécifiez un identifiant unique"
+      "already_configured": "Le capteur est déjà configuré, spécifiez un identifiant unique",
+      "cost_no_global_price": "Aucun prix de l’énergie n’est encore configuré. Définissez un prix de l’énergie dans la configuration globale de Powercalc avant de créer un capteur de coût. Voir la [documentation]({url})."
     },
     "error": {
+      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
       "daily_energy_mandatory": "Vous devez fournir au moins une valeur ou un modèle de valeur",
       "entity_mandatory": "La sélection d'une entité est requise pour toute stratégie autre que le playbook",
       "fixed_mandatory": "Vous devez fournir au moins une alimentation, un modèle d'alimentation ou un état d'alimentation",
@@ -80,6 +82,7 @@
         "data": {
           "name": "Name",
           "create_energy_sensor": "Create energy sensor",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Create utility meters",
           "domain": "Entity domain",
           "exclude_entities": "Exclude entities"
@@ -99,28 +102,90 @@
       "global_configuration": {
         "title": "Global configuration",
         "description": "Setup global configuration for Powercalc. For more information see the [documentation]({docs_uri}). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "sections": {
+          "power_options": {
+            "name": "Capteur de puissance",
+            "data": {
+              "power_sensor_naming": "Power sensor name pattern",
+              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
+              "power_sensor_category": "Power sensor category",
+              "power_sensor_precision": "Précision du capteur de puissance"
+            }
+          },
+          "features": {
+            "name": "Créer des capteurs",
+            "data": {
+              "create_energy_sensors": "Create energy sensors",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Create standby group",
+              "create_utility_meters": "Create utility meters"
+            },
+            "data_description": {
+              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+            }
+          },
+          "advanced": {
+            "name": "Avancé",
+            "data": {
+              "enable_analytics": "Enable anonymous analytics",
+              "ignore_unavailable_state": "Ignore unavailable state",
+              "include_non_powercalc_sensors": "Include non powercalc sensors",
+              "disable_extended_attributes": "Disable extended attributes",
+              "disable_library_download": "Disable remote library download"
+            },
+            "data_description": {
+              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
+              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
+              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
+              "disable_library_download": "Disable the Powercalc library download feature"
+            }
+          }
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Cost options",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Consultez la [documentation]({docs_uri}) pour plus d’informations",
+        "sections": {
+          "cost_pricing": {
+            "name": "Pricing",
+            "data": {
+              "energy_price": "Fixed energy price",
+              "energy_price_multiplier": "Energy price multiplier",
+              "energy_price_sensor": "Energy price sensor",
+              "energy_price_surcharge": "Energy price surcharge"
+            },
+            "data_description": {
+              "energy_price": "A fixed price per kWh in your local currency",
+              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+            }
+          },
+          "cost_naming": {
+            "name": "Naming",
+            "data": {
+              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
+              "cost_sensor_naming": "Cost sensor name pattern"
+            },
+            "data_description": {
+              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
+              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+            }
+          }
+        }
+      },
+      "global_configuration_cost_apply": {
+        "title": "Apply cost sensors",
+        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
         "data": {
-          "create_energy_sensors": "Create energy sensors",
-          "create_standby_group": "Create standby group",
-          "create_utility_meters": "Create utility meters",
-          "disable_extended_attributes": "Disable extended attributes",
-          "disable_library_download": "Disable remote library download",
-          "enable_analytics": "Enable anonymous analytics",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
+          "apply_to_all": "Apply to existing sensors"
         },
         "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
         }
       },
       "global_configuration_discovery": {
@@ -173,41 +238,56 @@
       },
       "group_custom": {
         "data": {
-          "area": "Zone",
-          "floor": "Étage",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Créer des compteurs d'électricité",
-          "device": "Device",
-          "force_calculate_group_energy": "Force calculate energy",
-          "group_energy_entities": "Entités énergétiques supplémentaires",
-          "group_energy_start_at_zero": "Start at zero",
-          "group_member_devices": "Member devices",
-          "group_member_sensors": "Membres des capteurs powercalc",
-          "group_power_entities": "Entités de puissance supplémentaires",
-          "hide_members": "Masquer les membres",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "name": "Nom",
-          "sub_groups": "Sous-groupes"
+          "name": "Nom"
         },
-        "data_description": {
-          "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
-          "floor": "Ajoute tous les capteurs powercalc de l'étage spécifié",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "device": "Add the group entities powercalc creates to an existing device",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-          "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
-          "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
-          "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
-          "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
-          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-          "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe"
+        "sections": {
+          "members": {
+            "name": "Membres",
+            "data": {
+              "group_member_sensors": "Membres des capteurs powercalc",
+              "group_member_devices": "Member devices",
+              "group_power_entities": "Entités de puissance supplémentaires",
+              "group_energy_entities": "Entités énergétiques supplémentaires",
+              "sub_groups": "Sous-groupes",
+              "area": "Zone",
+              "floor": "Étage"
+            },
+            "data_description": {
+              "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
+              "group_member_devices": "Add power and energy entities from the selected devices to the group",
+              "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
+              "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
+              "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe",
+              "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
+              "floor": "Ajoute tous les capteurs powercalc de l'étage spécifié"
+            }
+          },
+          "options": {
+            "name": "Options",
+            "data": {
+              "device": "Device",
+              "hide_members": "Masquer les membres",
+              "include_non_powercalc_sensors": "Include non powercalc sensors",
+              "force_calculate_group_energy": "Force calculate energy",
+              "group_energy_start_at_zero": "Start at zero",
+              "create_energy_sensor": "Create energy sensor",
+              "create_utility_meters": "Créer des compteurs d'électricité"
+            },
+            "data_description": {
+              "device": "Add the group entities powercalc creates to an existing device",
+              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
+              "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
+              "create_energy_sensor": "Whether powercalc needs to create a kWh sensor"
+            }
+          }
         },
         "title": "Créer un capteur de groupe"
       },
       "group_subtract": {
         "data": {
           "create_energy_sensor": "Create energy sensor",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Create utility meters",
           "entity_id": "Base entity",
           "name": "Name",
@@ -224,6 +304,7 @@
           "main_power_sensor": "Mains power sensor",
           "group_tracked_auto": "Entities auto added",
           "create_energy_sensor": "Create energy sensor",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Create utility meters"
         },
         "data_description": {
@@ -382,6 +463,18 @@
         "description": "Actuellement, les paramètres spécifiques ne peuvent être configurés que globalement",
         "title": "Créer un capteur d'énergie pour un capteur de puissance existant"
       },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "Capteur d’énergie",
+          "name": "Nom"
+        },
+        "data_description": {
+          "energy_sensor_id": "Le capteur d’énergie existant (kWh) pour lequel calculer le coût. Il peut provenir de n’importe quelle intégration, pas seulement Powercalc",
+          "name": "Nom de base du capteur de coût. Le nom complet de l’entité est défini selon le paramètre cost_sensor_naming"
+        },
+        "description": "Créer un capteur de coût pour un capteur d’énergie existant. Le prix de l’énergie est pris dans la configuration globale de Powercalc.",
+        "title": "Créer un capteur de coût"
+      },
       "sub_profile": {
         "data": {
           "sub_profile": "Sous-profil"
@@ -413,6 +506,7 @@
           "sensor_type": "Type de capteur"
         },
         "menu_options": {
+          "cost": "Capteur de coût (à partir d’un capteur d’énergie existant)",
           "daily_energy": "Énergie quotidienne",
           "group": "Groupe",
           "global_configuration": "Global configuration",
@@ -440,6 +534,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Créer un capteur d'énergie",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Créer un compteur d'électricité",
           "entity_id": "Entité source",
           "mode": "Stratégie de calcul",
@@ -495,6 +590,7 @@
       "model_not_support": "Model not supported"
     },
     "error": {
+      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
       "fixed_mandatory": "Vous devez fournir au moins une alimentation, un modèle d'alimentation ou une alimentation des états",
       "fixed_states_power_only": "Cette entité ne peut fonctionner qu'avec des 'Etat de puissance' et non 'Puissance'",
       "group_mandatory": "Vous devez définir au moins des sous-groupes ou des entités de puissance et d'énergie",
@@ -526,6 +622,7 @@
         "title": "Basic options",
         "data": {
           "create_energy_sensor": "Créer un capteur d'énergie",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Créer un compteur d'électricité",
           "entity_id": "Source entity",
           "name": "Nom",
@@ -581,28 +678,90 @@
       },
       "global_configuration": {
         "title": "Basic options",
+        "sections": {
+          "power_options": {
+            "name": "Capteur de puissance",
+            "data": {
+              "power_sensor_naming": "Power sensor name pattern",
+              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
+              "power_sensor_category": "Power sensor category",
+              "power_sensor_precision": "Précision du capteur de puissance"
+            }
+          },
+          "features": {
+            "name": "Créer des capteurs",
+            "data": {
+              "create_energy_sensors": "Create energy sensors",
+              "create_cost_sensors": "Create cost sensors",
+              "create_standby_group": "Create standby group",
+              "create_utility_meters": "Create utility meters"
+            },
+            "data_description": {
+              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
+              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
+              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+            }
+          },
+          "advanced": {
+            "name": "Avancé",
+            "data": {
+              "enable_analytics": "Enable anonymous analytics",
+              "ignore_unavailable_state": "Ignore unavailable state",
+              "include_non_powercalc_sensors": "Include non powercalc sensors",
+              "disable_extended_attributes": "Disable extended attributes",
+              "disable_library_download": "Disable remote library download"
+            },
+            "data_description": {
+              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
+              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
+              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
+              "disable_library_download": "Disable the Powercalc library download feature"
+            }
+          }
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Cost options",
+        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Consultez la [documentation]({docs_uri}) pour plus d’informations",
+        "sections": {
+          "cost_pricing": {
+            "name": "Pricing",
+            "data": {
+              "energy_price": "Fixed energy price",
+              "energy_price_multiplier": "Energy price multiplier",
+              "energy_price_sensor": "Energy price sensor",
+              "energy_price_surcharge": "Energy price surcharge"
+            },
+            "data_description": {
+              "energy_price": "A fixed price per kWh in your local currency",
+              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
+              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+            }
+          },
+          "cost_naming": {
+            "name": "Naming",
+            "data": {
+              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
+              "cost_sensor_naming": "Cost sensor name pattern"
+            },
+            "data_description": {
+              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
+              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+            }
+          }
+        }
+      },
+      "global_configuration_cost_apply": {
+        "title": "Apply cost sensors",
+        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
         "data": {
-          "create_energy_sensors": "Create energy sensors",
-          "create_standby_group": "Create standby group",
-          "create_utility_meters": "Create utility meters",
-          "disable_extended_attributes": "Disable extended attributes",
-          "disable_library_download": "Disable remote library download",
-          "enable_analytics": "Enable anonymous analytics",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
+          "apply_to_all": "Apply to existing sensors"
         },
         "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
         }
       },
       "global_configuration_discovery": {
@@ -657,30 +816,42 @@
       },
       "group_custom": {
         "title": "Group options",
-        "data": {
-          "area": "Zone",
-          "floor": "Étage",
-          "device": "Device",
-          "force_calculate_group_energy": "Force calculate energy",
-          "group_energy_entities": "Entités d'énergies supplémentaires",
-          "group_member_devices": "Member devices",
-          "group_member_sensors": "Membres capteurs powercalc",
-          "group_power_entities": "Entités de puissances supplémentaires",
-          "hide_members": "Cacher membres",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "sub_groups": "Sous-groupes"
-        },
-        "data_description": {
-          "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
-          "floor": "Ajoute tous les capteurs powercalc de l'étage spécifié",
-          "device": "Add the group entities powercalc creates to an existing device",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-          "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
-          "group_member_devices": "Add power and energy entities from the selected devices to the group",
-          "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
-          "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
-          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-          "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe"
+        "sections": {
+          "members": {
+            "name": "Membres",
+            "data": {
+              "group_member_sensors": "Membres capteurs powercalc",
+              "group_member_devices": "Member devices",
+              "group_power_entities": "Entités de puissances supplémentaires",
+              "group_energy_entities": "Entités d'énergies supplémentaires",
+              "sub_groups": "Sous-groupes",
+              "area": "Zone",
+              "floor": "Étage"
+            },
+            "data_description": {
+              "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
+              "group_member_devices": "Add power and energy entities from the selected devices to the group",
+              "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
+              "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
+              "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe",
+              "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
+              "floor": "Ajoute tous les capteurs powercalc de l'étage spécifié"
+            }
+          },
+          "options": {
+            "name": "Options",
+            "data": {
+              "device": "Device",
+              "hide_members": "Cacher membres",
+              "include_non_powercalc_sensors": "Include non powercalc sensors",
+              "force_calculate_group_energy": "Force calculate energy"
+            },
+            "data_description": {
+              "device": "Add the group entities powercalc creates to an existing device",
+              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor"
+            }
+          }
         }
       },
       "group_subtract": {
@@ -699,6 +870,7 @@
           "main_power_sensor": "Mains power sensor",
           "group_tracked_auto": "Entities auto added",
           "create_energy_sensor": "Create energy sensor",
+          "create_cost_sensor": "Create cost sensor",
           "create_utility_meters": "Create utility meters"
         },
         "data_description": {
@@ -719,6 +891,7 @@
         "menu_options": {
           "advanced_options": "Advanced options",
           "basic_options": "Basic options",
+          "cost": "Options de coût",
           "daily_energy": "Daily energy options",
           "energy_options": "Energy options",
           "fixed": "Fixed options",
@@ -789,6 +962,15 @@
           "device": "Add the created energy sensor to an specific device"
         }
       },
+      "cost": {
+        "title": "Options de coût",
+        "data": {
+          "energy_sensor_id": "Capteur d’énergie"
+        },
+        "data_description": {
+          "energy_sensor_id": "Le capteur d’énergie existant (kWh) pour lequel calculer le coût"
+        }
+      },
       "utility_meter_options": {
         "title": "Utility meter options",
         "data": {
@@ -847,6 +1029,16 @@
       },
       "name": "Calibrer le capteur d'énergie"
     },
+    "calibrate_cost": {
+      "description": "Sets the cost sensor to a given monetary value.",
+      "fields": {
+        "value": {
+          "description": "The value to set.",
+          "name": "Value"
+        }
+      },
+      "name": "Calibrate cost sensor"
+    },
     "calibrate_utility_meter": {
       "description": "Étalonne un capteur de compteur de services publics.",
       "fields": {
@@ -900,6 +1092,10 @@
     "reset_energy": {
       "description": "Réinitialiser un capteur d'énergie à zéro kWh.",
       "name": "Réinitialiser le capteur d'énergie"
+    },
+    "reset_cost": {
+      "description": "Reset a cost sensor to zero.",
+      "name": "Reset cost sensor"
     },
     "stop_playbook": {
       "description": "Arrêter le playbook actuellement actif.",

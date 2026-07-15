@@ -3,7 +3,6 @@
     "yeelink.light.ml2",
     "Mesh: YLDP25YL/YLDP26YL, yeelink.light.ml2"
   ],
-  "author": "Ed Kutuev <ed@napych.com>",
   "calculation_strategy": "lut",
   "created_at": "2024-10-10T06:13:43Z",
   "device_type": "light",

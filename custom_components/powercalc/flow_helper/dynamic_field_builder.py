@@ -23,12 +23,21 @@ def build_dynamic_field_schema(
         else:
             key = vol.Required(field.key, description=field_description)
 
+        field_selector = field.selector
         if "entity" in field.selector and source_entity and source_entity.device_entry:
             entity_reg = er.async_get(hass)
-            field.selector["entity"]["include_entities"] = [
-                entity.entity_id
-                for entity in entity_reg.entities.get_entries_for_device_id(source_entity.device_entry.id)
-            ]
+            # Build a new selector dict instead of mutating field.selector, which is a reference
+            # into the (potentially cached) profile json_data.
+            field_selector = {
+                **field.selector,
+                "entity": {
+                    **field.selector["entity"],
+                    "include_entities": [
+                        entity.entity_id
+                        for entity in entity_reg.entities.get_entries_for_device_id(source_entity.device_entry.id)
+                    ],
+                },
+            }
 
-        schema[key] = selector(field.selector)
+        schema[key] = selector(field_selector)
     return vol.Schema(schema)

@@ -65,8 +65,10 @@ nav:
          - 'sensor-types/group/tracked-untracked.md'
          - 'sensor-types/group/include-entities.md'
       - 'sensor-types/real-power-sensor.md'
-      - 'sensor-types/energy-sensor.md'
-      - 'sensor-types/utility-meter.md'
+      - 'Derived sensors':
+         - 'sensor-types/energy-sensor.md'
+         - 'sensor-types/utility-meter.md'
+         - 'sensor-types/cost-sensor.md'
   - 'Strategies':
       - 'strategies/index.md'
       - 'strategies/fixed.md'
@@ -113,6 +115,7 @@ nav:
   - 'Actions':
       - 'actions/index.md'
       - 'actions/activate-playbook.md'
+      - 'actions/calibrate-cost.md'
       - 'actions/calibrate-energy.md'
       - 'actions/calibrate-utility-meter.md'
       - 'actions/change-gui-configuration.md'
@@ -120,6 +123,7 @@ nav:
       - 'actions/get-group-entities.md'
       - 'actions/increase-daily-energy.md'
       - 'actions/reload.md'
+      - 'actions/reset-cost.md'
       - 'actions/reset-energy.md'
       - 'actions/stop-playbook.md'
       - 'actions/switch-sub-profile.md'

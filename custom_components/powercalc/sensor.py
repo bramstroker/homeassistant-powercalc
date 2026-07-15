@@ -3,24 +3,18 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-import copy
 from dataclasses import dataclass, field
-from datetime import timedelta
 import logging
 from typing import Any, cast
 import uuid
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, PLATFORM_SCHEMA, SensorEntity
-from homeassistant.components.utility_meter import max_28_days
-from homeassistant.components.utility_meter.const import METER_TYPES
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorEntity
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
-    CONF_ID,
     CONF_NAME,
-    CONF_PATH,
     CONF_UNIQUE_ID,
 )
 from homeassistant.core import Event, HomeAssistant, SupportsResponse, callback
@@ -35,7 +29,6 @@ from homeassistant.helpers.entity_registry import (
     RegistryEntryDisabler,
 )
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
-from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 import voluptuous as vol
 
@@ -46,69 +39,22 @@ from .common import (
     create_source_entity,
     get_merged_sensor_configuration,
     validate_is_number,
-    validate_name_pattern,
 )
+from .configuration.config_entry_conversion import convert_config_entry_to_sensor_config
+from .configuration.discovery_info import convert_discovery_info_to_sensor_config
+from .configuration.sensor_config import PLATFORM_SCHEMA as PLATFORM_SCHEMA
 from .const import (
-    CONF_AND,
-    CONF_AVAILABILITY_ENTITY,
-    CONF_CALCULATION_ENABLED_CONDITION,
-    CONF_COMPOSITE,
+    CONF_COST,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
-    CONF_CREATE_UTILITY_METERS,
-    CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DAILY_FIXED_ENERGY,
-    CONF_DELAY,
-    CONF_DISABLE_STANDBY_POWER,
-    CONF_ENERGY_FILTER_OUTLIER_ENABLED,
-    CONF_ENERGY_FILTER_OUTLIER_MAX,
-    CONF_ENERGY_INTEGRATION_METHOD,
-    CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
-    CONF_ENERGY_SENSOR_NAMING,
-    CONF_ENERGY_SENSOR_UNIT_PREFIX,
-    CONF_FILTER,
-    CONF_FIXED,
-    CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
-    CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_TYPE,
-    CONF_HIDE_MEMBERS,
-    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
-    CONF_LINEAR,
-    CONF_MANUFACTURER,
-    CONF_MODE,
-    CONF_MODEL,
-    CONF_MULTI_SWITCH,
-    CONF_MULTIPLY_FACTOR,
-    CONF_MULTIPLY_FACTOR_STANDBY,
-    CONF_NOT,
-    CONF_ON_TIME,
-    CONF_OR,
-    CONF_PLAYBOOK,
-    CONF_PLAYBOOKS,
-    CONF_POWER,
-    CONF_POWER_SENSOR_CATEGORY,
-    CONF_POWER_SENSOR_ID,
-    CONF_POWER_SENSOR_NAMING,
-    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
-    CONF_SLEEP_POWER,
-    CONF_STANDBY_POWER,
-    CONF_STATE,
-    CONF_STATES_POWER,
-    CONF_SUBTRACT_ENTITIES,
-    CONF_UNAVAILABLE_POWER,
-    CONF_UTILITY_METER_NET_CONSUMPTION,
-    CONF_UTILITY_METER_OFFSET,
-    CONF_UTILITY_METER_TARIFFS,
-    CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
-    CONF_VALUE_TEMPLATE,
-    CONF_VARIABLES,
-    CONF_WLED,
     DATA_CONFIG_TYPES,
     DATA_CONFIGURED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
@@ -122,156 +68,48 @@ from .const import (
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
-    ENERGY_INTEGRATION_METHODS,
-    ENTITY_CATEGORIES,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SERVICE_ACTIVATE_PLAYBOOK,
+    SERVICE_CALIBRATE_COST,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_DEBUG_GROUP,
     SERVICE_GET_ACTIVE_PLAYBOOK,
     SERVICE_GET_GROUP_ENTITIES,
     SERVICE_INCREASE_DAILY_ENERGY,
+    SERVICE_RESET_COST,
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
     SERVICE_SWITCH_SUB_PROFILE,
-    CalculationStrategy,
     EntityType,
     GroupType,
     PowercalcDiscoveryType,
     SensorType,
-    UnitPrefix,
 )
-from .device_binding import attach_entities_to_source_device
+from .device_binding import attach_entities_to_resolved_device
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
-from .group_include.filter import FILTER_CONFIG, FilterOperator, create_composite_filter
+from .group_include.filter import FilterOperator, create_composite_filter
 from .group_include.include import find_entities
+from .sensors.cost import CostSensor, create_cost_sensor_for_energy_entity
 from .sensors.daily_energy import (
-    DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
+from .sensors.energy_related import create_energy_related_sensors
 from .sensors.group.config_entry_utils import add_to_associated_groups
 from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
 from .sensors.group.standby import StandbyPowerSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
-from .sensors.utility_meter import create_utility_meters
-from .strategy.composite import CONFIG_SCHEMA as COMPOSITE_SCHEMA
-from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
-from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
-from .strategy.multi_switch import CONFIG_SCHEMA as MULTI_SWITCH_SCHEMA
-from .strategy.playbook import CONFIG_SCHEMA as PLAYBOOK_SCHEMA
-from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
-
-MAX_GROUP_NESTING_LEVEL = 5
-
-SENSOR_CONFIG = {
-    vol.Optional(CONF_NAME): cv.string,
-    vol.Optional(CONF_ENTITY_ID): cv.entity_id,
-    vol.Optional(CONF_AVAILABILITY_ENTITY): cv.entity_id,
-    vol.Optional(CONF_UNIQUE_ID): cv.string,
-    vol.Optional(CONF_MODEL): cv.string,
-    vol.Optional(CONF_MANUFACTURER): cv.string,
-    vol.Optional(CONF_MODE): vol.In([cls.value for cls in CalculationStrategy]),
-    vol.Optional(CONF_STANDBY_POWER): vol.Any(vol.Coerce(float), cv.template),
-    vol.Optional(CONF_DISABLE_STANDBY_POWER): cv.boolean,
-    vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
-    vol.Optional(CONF_POWER_SENSOR_ID): cv.entity_id,
-    vol.Optional(CONF_FORCE_ENERGY_SENSOR_CREATION): cv.boolean,
-    vol.Optional(CONF_FORCE_CALCULATE_GROUP_ENERGY): cv.boolean,
-    vol.Optional(CONF_FIXED): FIXED_SCHEMA,
-    vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
-    vol.Optional(CONF_MULTI_SWITCH): MULTI_SWITCH_SCHEMA,
-    vol.Optional(CONF_WLED): WLED_SCHEMA,
-    vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
-    vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
-    vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
-    vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
-    vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION): cv.boolean,
-    vol.Optional(CONF_UTILITY_METER_TARIFFS): vol.All(cv.ensure_list, [cv.string]),
-    vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
-    vol.Optional(CONF_UTILITY_METER_OFFSET): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
-    vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
-    vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY): cv.boolean,
-    vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
-    vol.Optional(CONF_POWER_SENSOR_CATEGORY): vol.In(ENTITY_CATEGORIES),
-    vol.Optional(CONF_ENERGY_SENSOR_ID): cv.entity_id,
-    vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
-    vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): vol.In(ENTITY_CATEGORIES),
-    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(ENERGY_INTEGRATION_METHODS),
-    vol.Optional(CONF_ENERGY_FILTER_OUTLIER_ENABLED): cv.boolean,
-    vol.Optional(CONF_ENERGY_FILTER_OUTLIER_MAX): cv.positive_int,
-    vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): vol.In([cls.value for cls in UnitPrefix]),
-    vol.Optional(CONF_CREATE_GROUP): cv.string,
-    vol.Optional(CONF_GROUP_ENERGY_START_AT_ZERO): cv.boolean,
-    vol.Optional(CONF_GROUP_TYPE): vol.In([cls.value for cls in GroupType]),
-    vol.Optional(CONF_SUBTRACT_ENTITIES): vol.All(cv.ensure_list, [cv.entity_id]),
-    vol.Optional(CONF_HIDE_MEMBERS): cv.boolean,
-    vol.Optional(CONF_INCLUDE): vol.Schema(
-        {
-            **FILTER_CONFIG.schema,
-            vol.Optional(CONF_FILTER): vol.Schema(
-                {
-                    **FILTER_CONFIG.schema,
-                    vol.Optional(CONF_OR): vol.All(cv.ensure_list, [FILTER_CONFIG]),
-                    vol.Optional(CONF_AND): vol.All(cv.ensure_list, [FILTER_CONFIG]),
-                    vol.Optional(CONF_NOT): vol.All(cv.ensure_list, [FILTER_CONFIG]),
-                },
-            ),
-            vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): cv.boolean,
-        },
-    ),
-    vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
-    vol.Optional(CONF_CALCULATION_ENABLED_CONDITION): cv.template,
-    vol.Optional(CONF_SLEEP_POWER): vol.Schema(
-        {
-            vol.Required(CONF_POWER): vol.Coerce(float),
-            vol.Required(CONF_DELAY): cv.positive_int,
-        },
-    ),
-    vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
-    vol.Optional(CONF_COMPOSITE): COMPOSITE_SCHEMA,
-    vol.Optional(CONF_VARIABLES): vol.Schema({cv.string: cv.string}),
-}
-
-
-def build_nested_configuration_schema(schema: dict, iteration: int = 0) -> dict:
-    if iteration == MAX_GROUP_NESTING_LEVEL:
-        return schema
-    iteration += 1
-    schema.update(
-        {
-            vol.Optional(CONF_ENTITIES): vol.All(
-                cv.ensure_list,
-                [build_nested_configuration_schema(schema.copy(), iteration)],
-            ),
-        },
-    )
-    return schema
-
-
-SENSOR_CONFIG = build_nested_configuration_schema(SENSOR_CONFIG)
-
-PLATFORM_SCHEMA = vol.All(
-    cv.has_at_least_one_key(
-        CONF_ENTITY_ID,
-        CONF_POWER_SENSOR_ID,
-        CONF_ENTITIES,
-        CONF_INCLUDE,
-        CONF_DAILY_FIXED_ENERGY,
-    ),
-    PLATFORM_SCHEMA.extend(SENSOR_CONFIG),
-)
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -375,7 +213,7 @@ async def _async_setup_entities(
         _LOGGER.error(err)
         return
 
-    await attach_entities_to_source_device(config_entry, entities.new, hass, None)
+    await attach_entities_to_resolved_device(config_entry, entities.new, hass, None, config)
 
     entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
     for entity in entities_to_add:
@@ -388,13 +226,17 @@ async def _async_setup_entities(
     # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
     # Remove entities which are disabled because of a disabled device from the list of entities to add
     # When we add nevertheless the entity_platform code will set device_id to None and abort entity addition.
-    # `async_added_to_hass` hook will not be called, which powercalc uses to bind the entity to device again
-    # This causes the powercalc entity to never be bound to the device again and be disabled forever.
+    # `async_added_to_hass` will not be called, so BaseEntity cannot repair registry metadata.
+    # This causes the powercalc entity to never be rebound and to stay disabled.
     entity_reg = er.async_get(hass)
-    for entity in entities_to_add:
-        existing_entry = entity_reg.async_get(entity.entity_id)
-        if existing_entry and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE:
-            entities_to_add.remove(entity)
+    entities_to_add = [
+        entity
+        for entity in entities_to_add
+        if not (
+            (existing_entry := entity_reg.async_get(entity.entity_id))
+            and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE
+        )
+    ]
 
     async_add_entities(entities_to_add)
 
@@ -447,6 +289,8 @@ def _register_entity_id_change_listener(
 def _resolve_entity_type(entity: Entity) -> EntityType:
     if isinstance(entity, UtilityMeterSensor):
         return EntityType.UTILITY_METER
+    if isinstance(entity, CostSensor):
+        return EntityType.COST_SENSOR
     if isinstance(entity, EnergySensor):
         return EntityType.ENERGY_SENSOR
     if isinstance(entity, PowerSensor):
@@ -464,6 +308,9 @@ def save_entity_ids_on_config_entry(
     We need this in group sensor logic to differentiate between energy sensor and utility meters.
     """
     _LOGGER.debug("Saving entity ids on config entry %s", config_entry.entry_id)
+    if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.COST:
+        # A standalone cost sensor entry has neither a power nor an energy sensor to track.
+        return
     power_entities = [e.entity_id for e in entities.all() if isinstance(e, VirtualPowerSensor)]
     new_data = config_entry.data.copy()
     if power_entities:
@@ -499,7 +346,19 @@ def register_entity_services() -> None:
     )
 
     platform.async_register_entity_service(
+        SERVICE_RESET_COST,
+        {},
+        "async_reset",
+    )
+
+    platform.async_register_entity_service(
         SERVICE_CALIBRATE_UTILITY_METER,
+        {vol.Required(CONF_VALUE): validate_is_number},
+        "async_calibrate",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_CALIBRATE_COST,
         {vol.Required(CONF_VALUE): validate_is_number},
         "async_calibrate",
     )
@@ -556,127 +415,6 @@ def register_entity_services() -> None:
     )
 
 
-def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeAssistant) -> ConfigType:  # noqa: C901
-    """Convert the config entry structure to the sensor config used to create the entities."""
-    sensor_config = dict(config_entry.data.copy())
-    sensor_type = sensor_config.get(CONF_SENSOR_TYPE)
-
-    def handle_sensor_type() -> None:
-        """Handle sensor type-specific configuration."""
-        if sensor_type == SensorType.GROUP:
-            sensor_config[CONF_CREATE_GROUP] = sensor_config.get(CONF_NAME)
-        elif sensor_type == SensorType.REAL_POWER:
-            sensor_config[CONF_POWER_SENSOR_ID] = sensor_config.get(CONF_ENTITY_ID)
-            sensor_config[CONF_FORCE_ENERGY_SENSOR_CREATION] = True
-
-    def process_template(config: dict, template_key: str, target_key: str) -> None:
-        """Convert a template key in the config to a Template object."""
-        if template_key in config:
-            config[target_key] = Template(config[template_key], hass)
-            del config[template_key]
-
-    def process_on_time(config: dict) -> None:
-        """Convert on_time dictionary to timedelta."""
-        on_time = config.get(CONF_ON_TIME)
-        config[CONF_ON_TIME] = (
-            timedelta(hours=on_time["hours"], minutes=on_time["minutes"], seconds=on_time["seconds"])
-            if on_time
-            else timedelta(days=1)
-        )
-
-    def process_states_power(states_power: dict | list) -> dict:
-        """Convert state power values to Template objects where necessary.
-
-        Handles both dict format (legacy/YAML) and list format (config flow).
-        """
-        if isinstance(states_power, list):
-            states_power = {item[CONF_STATE]: item[CONF_POWER] for item in states_power}
-        return {
-            key: Template(value, hass) if isinstance(value, str) and "{{" in value else value
-            for key, value in states_power.items()
-        }
-
-    def process_daily_fixed_energy() -> None:
-        """Process daily fixed energy configuration."""
-        if CONF_DAILY_FIXED_ENERGY not in sensor_config:
-            return
-
-        daily_fixed_config = copy.copy(sensor_config[CONF_DAILY_FIXED_ENERGY])
-        process_template(daily_fixed_config, CONF_VALUE_TEMPLATE, CONF_VALUE)
-        process_on_time(daily_fixed_config)
-        sensor_config[CONF_DAILY_FIXED_ENERGY] = daily_fixed_config
-
-    def process_fixed_config() -> None:
-        """Process fixed energy configuration."""
-        if CONF_FIXED not in sensor_config:
-            return
-
-        fixed_config = copy.copy(sensor_config[CONF_FIXED])
-        process_template(fixed_config, CONF_POWER_TEMPLATE, CONF_POWER)
-        if CONF_STATES_POWER in fixed_config:
-            fixed_config[CONF_STATES_POWER] = process_states_power(fixed_config[CONF_STATES_POWER])
-        sensor_config[CONF_FIXED] = fixed_config
-
-    def process_linear_config() -> None:
-        """Process linear energy configuration."""
-        if CONF_LINEAR not in sensor_config:
-            return
-
-        linear_config = copy.copy(sensor_config[CONF_LINEAR])
-        sensor_config[CONF_LINEAR] = linear_config
-
-    def process_calculation_enabled_condition() -> None:
-        """Process calculation enabled condition template."""
-        if CONF_CALCULATION_ENABLED_CONDITION in sensor_config:
-            sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = Template(
-                sensor_config[CONF_CALCULATION_ENABLED_CONDITION],
-                hass,
-            )
-
-    def process_utility_meter_offset() -> None:
-        if CONF_UTILITY_METER_OFFSET in sensor_config:
-            sensor_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=sensor_config[CONF_UTILITY_METER_OFFSET])
-
-    def process_playbook_config() -> None:
-        if CONF_PLAYBOOK not in sensor_config:
-            return
-        playbook_config = copy.copy(sensor_config[CONF_PLAYBOOK])
-        playbook_config[CONF_PLAYBOOKS] = {item[CONF_ID]: item[CONF_PATH] for item in playbook_config[CONF_PLAYBOOKS]}
-        sensor_config[CONF_PLAYBOOK] = playbook_config
-
-    handle_sensor_type()
-
-    process_daily_fixed_energy()
-    process_fixed_config()
-    process_linear_config()
-    process_playbook_config()
-    process_calculation_enabled_condition()
-    process_utility_meter_offset()
-
-    return sensor_config
-
-
-def convert_discovery_info_to_sensor_config(
-    discovery_info: DiscoveryInfoType,
-) -> ConfigType:
-    """Convert discovery info to sensor config."""
-    if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP:
-        config = discovery_info
-        config[CONF_GROUP_TYPE] = GroupType.DOMAIN
-        config[CONF_SENSOR_TYPE] = SensorType.GROUP
-        config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
-        return config
-
-    if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.STANDBY_GROUP:
-        config = discovery_info
-        config[CONF_GROUP_TYPE] = GroupType.STANDBY
-        config[CONF_SENSOR_TYPE] = SensorType.GROUP
-        config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
-        return config
-
-    return discovery_info
-
-
 async def create_sensors(
     hass: HomeAssistant,
     config: ConfigType,
@@ -720,14 +458,29 @@ async def setup_individual_sensors(
     context: CreationContext,
 ) -> EntitiesBucket:
     """Set up an individual sensor."""
+    if CONF_COST in config:
+        config[CONF_SENSOR_TYPE] = SensorType.COST
+
+    sensor_type = resolve_sensor_type(config)
     merged_sensor_config = get_merged_sensor_configuration(global_config, config)
-    sensor_type = SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
 
     if sensor_type == SensorType.GROUP:
         collect_sensor_analytics(hass, sensor_type, context.discovery_type, config_entry)
         return EntitiesBucket(new=await create_group_sensors(hass, merged_sensor_config, config_entry))
 
+    if sensor_type == SensorType.COST:
+        collect_sensor_analytics(hass, sensor_type, context.discovery_type, config_entry)
+        cost_sensor = create_cost_sensor_for_energy_entity(hass, merged_sensor_config)
+        return EntitiesBucket(new=[cost_sensor] if cost_sensor else [])
+
     return await create_individual_sensors(hass, merged_sensor_config, context, sensor_type, config_entry)
+
+
+def resolve_sensor_type(config: ConfigType) -> SensorType:
+    """Resolve the sensor type based on the configuration."""
+    if CONF_COST in config:
+        return SensorType.COST
+    return SensorType(str(config.get(CONF_SENSOR_TYPE, SensorType.VIRTUAL_POWER)))
 
 
 def collect_sensor_analytics(
@@ -904,7 +657,7 @@ async def create_individual_sensors(
     collect_sensor_analytics(hass, sensor_type, context.discovery_type, config_entry)
 
     entities_to_add: list[Entity] = []
-    energy_sensor = await handle_energy_sensor_creation(hass, sensor_config, source_entity, entities_to_add)
+    energy_sensor = await _create_daily_fixed_energy_sensors(hass, sensor_config, source_entity, entities_to_add)
 
     if not energy_sensor:
         try:
@@ -912,16 +665,26 @@ async def create_individual_sensors(
         except PowercalcSetupError:
             return EntitiesBucket()
         entities_to_add.append(power_sensor)
-        energy_sensor = create_energy_sensor_if_needed(hass, sensor_config, power_sensor, source_entity)
-        if energy_sensor:
+        if (
+            sensor_config.get(CONF_CREATE_ENERGY_SENSOR)
+            or sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION)
+            or CONF_ENERGY_SENSOR_ID in sensor_config
+        ):
+            energy_sensor = create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
             entities_to_add.append(energy_sensor)
-            attach_energy_sensor_to_power_sensor(power_sensor, energy_sensor)
+            if isinstance(power_sensor, VirtualPowerSensor):
+                power_sensor.set_energy_sensor_attribute(energy_sensor.entity_id)
 
     if energy_sensor:
-        entities_to_add.extend(create_utility_meters(hass, energy_sensor, sensor_config, config_entry))
+        entities_to_add.extend(
+            create_energy_related_sensors(hass, sensor_config, energy_sensor, source_entity, config_entry),
+        )
 
-    await attach_entities_to_source_device(config_entry, entities_to_add, hass, source_entity)
-    update_registries(hass, source_entity, entities_to_add, context)
+    await attach_entities_to_resolved_device(config_entry, entities_to_add, hass, source_entity, sensor_config)
+    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
+        {source_entity.entity_id: [(entity, context.is_yaml) for entity in entities_to_add]},
+    )
+    hass.data[DOMAIN][DATA_DOMAIN_ENTITIES].setdefault(source_entity.domain, []).extend(entities_to_add)
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
     if unique_id:
@@ -930,6 +693,23 @@ async def create_individual_sensors(
     collect_analytics(hass, config_entry).inc(DATA_SOURCE_DOMAINS, source_entity.domain)
 
     return EntitiesBucket(new=entities_to_add, existing=[])
+
+
+async def _create_daily_fixed_energy_sensors(
+    hass: HomeAssistant,
+    sensor_config: dict,
+    source_entity: SourceEntity,
+    entities_to_add: list[Entity],
+) -> EnergySensor | None:
+    if CONF_DAILY_FIXED_ENERGY not in sensor_config:
+        return None
+
+    energy_sensor = create_daily_fixed_energy_sensor(hass, sensor_config, source_entity)
+    entities_to_add.append(energy_sensor)
+    power_sensor = await create_daily_fixed_energy_power_sensor(hass, sensor_config, source_entity)
+    if power_sensor:
+        entities_to_add.append(power_sensor)
+    return energy_sensor
 
 
 def _attach_configured_device_entry(
@@ -945,61 +725,6 @@ def _attach_configured_device_entry(
     if device_entry:
         return source_entity._replace(device_entry=device_entry)
     return source_entity
-
-
-async def handle_energy_sensor_creation(
-    hass: HomeAssistant,
-    sensor_config: dict,
-    source_entity: SourceEntity,
-    entities_to_add: list[Entity],
-) -> EnergySensor | None:
-    """Handle the creation of an energy sensor if needed."""
-    if CONF_DAILY_FIXED_ENERGY in sensor_config:
-        energy_sensor = create_daily_fixed_energy_sensor(hass, sensor_config, source_entity)
-        entities_to_add.append(energy_sensor)
-        if source_entity:
-            daily_fixed_power_sensor = await create_daily_fixed_energy_power_sensor(hass, sensor_config, source_entity)
-            if daily_fixed_power_sensor:
-                entities_to_add.append(daily_fixed_power_sensor)
-        return energy_sensor
-    return None
-
-
-def create_energy_sensor_if_needed(
-    hass: HomeAssistant,
-    sensor_config: dict,
-    power_sensor: PowerSensor,
-    source_entity: SourceEntity,
-) -> EnergySensor | None:
-    """Create an energy sensor if it is needed."""
-    if (
-        sensor_config.get(CONF_CREATE_ENERGY_SENSOR)
-        or sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION)
-        or CONF_ENERGY_SENSOR_ID in sensor_config
-    ):
-        return create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
-    return None
-
-
-def attach_energy_sensor_to_power_sensor(power_sensor: Entity, energy_sensor: EnergySensor) -> None:
-    """Attach the energy sensor to the power sensor."""
-    if isinstance(power_sensor, VirtualPowerSensor):
-        power_sensor.set_energy_sensor_attribute(energy_sensor.entity_id)
-
-
-def update_registries(
-    hass: HomeAssistant,
-    source_entity: SourceEntity,
-    entities_to_add: list[Entity],
-    creation_context: CreationContext,
-) -> None:
-    """Update various registries with the new entities."""
-    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
-        {source_entity.entity_id: [(entity, creation_context.is_yaml) for entity in entities_to_add]},
-    )
-
-    domain_entities = hass.data[DOMAIN][DATA_DOMAIN_ENTITIES].setdefault(source_entity.domain, [])
-    domain_entities.extend(entities_to_add)
 
 
 def check_entity_not_already_configured(

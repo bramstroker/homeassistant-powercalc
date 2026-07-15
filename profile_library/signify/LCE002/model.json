@@ -3,7 +3,6 @@
     "9290022942",
     "929002294203"
   ],
-  "author": "Simon Hörrle <simon.hoerrle@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2021-08-18T20:12:14Z",
   "device_type": "light",

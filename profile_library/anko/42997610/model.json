@@ -1,5 +1,4 @@
 {
-  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2022-08-07T16:56:45Z",
   "device_type": "light",

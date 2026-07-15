@@ -1,25 +1,30 @@
 from __future__ import annotations
 
 import logging
+from typing import cast
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, callback
-import homeassistant.helpers.device_registry as dr
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_COST_SENSOR_FRIENDLY_NAMING,
+    CONF_COST_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
+    DEFAULT_COST_NAME_PATTERN,
     DEFAULT_ENERGY_NAME_PATTERN,
     DEFAULT_POWER_NAME_PATTERN,
     DOMAIN,
 )
+from custom_components.powercalc.device_binding import bind_entity_to_registry_metadata
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -28,20 +33,15 @@ _LOGGER = logging.getLogger(__name__)
 
 class BaseEntity(Entity):
     async def async_added_to_hass(self) -> None:
-        """Attach the entity to same device as the source entity."""
+        """Bind configured registry metadata."""
+        await super().async_added_to_hass()
 
-        entity_reg = er.async_get(self.hass)
-        entity_entry = entity_reg.async_get(self.entity_id)
-        if entity_entry is None or not hasattr(self, "source_device_id"):
-            return
-
-        device_id: str = getattr(self, "source_device_id")  # noqa: B009
-        device_reg = dr.async_get(self.hass)
-        device_entry = device_reg.async_get(device_id)
-        if not device_entry or device_entry.id == entity_entry.device_id:  # pragma: no cover
-            return
-        _LOGGER.debug("Binding %s to device %s", self.entity_id, device_id)
-        entity_reg.async_update_entity(self.entity_id, device_id=device_id)
+        bind_entity_to_registry_metadata(
+            self.hass,
+            self.entity_id,
+            cast(DeviceEntry | None, getattr(self, "device_entry", None)),
+            cast(ConfigType | None, getattr(self, "_sensor_config", None)),
+        )
 
 
 def generate_power_sensor_name(
@@ -54,6 +54,7 @@ def generate_power_sensor_name(
         sensor_config,
         CONF_POWER_SENSOR_NAMING,
         CONF_POWER_SENSOR_FRIENDLY_NAMING,
+        DEFAULT_POWER_NAME_PATTERN,
         name,
         source_entity,
     )
@@ -69,6 +70,23 @@ def generate_energy_sensor_name(
         sensor_config,
         CONF_ENERGY_SENSOR_NAMING,
         CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+        DEFAULT_ENERGY_NAME_PATTERN,
+        name,
+        source_entity,
+    )
+
+
+def generate_cost_sensor_name(
+    sensor_config: ConfigType,
+    name: str | None = None,
+    source_entity: SourceEntity | None = None,
+) -> str:
+    """Generates the name to use for a cost sensor."""
+    return _generate_sensor_name(
+        sensor_config,
+        CONF_COST_SENSOR_NAMING,
+        CONF_COST_SENSOR_FRIENDLY_NAMING,
+        DEFAULT_COST_NAME_PATTERN,
         name,
         source_entity,
     )
@@ -78,6 +96,7 @@ def _generate_sensor_name(
     sensor_config: ConfigType,
     naming_conf_key: str,
     friendly_naming_conf_key: str,
+    default_pattern: str,
     name: str | None = None,
     source_entity: SourceEntity | None = None,
 ) -> str:
@@ -89,12 +108,7 @@ def _generate_sensor_name(
         friendly_name_pattern = str(sensor_config.get(friendly_naming_conf_key))
         return friendly_name_pattern.format(name)
 
-    name_pattern = str(
-        sensor_config.get(
-            naming_conf_key,
-            DEFAULT_POWER_NAME_PATTERN if naming_conf_key == CONF_POWER_SENSOR_NAMING else DEFAULT_ENERGY_NAME_PATTERN,
-        ),
-    )
+    name_pattern = str(sensor_config.get(naming_conf_key, default_pattern))
     return name_pattern.format(name)
 
 
@@ -107,16 +121,14 @@ def generate_power_sensor_entity_id(
     unique_id: str | None = None,
 ) -> str:
     """Generates the entity_id to use for a power sensor."""
-    if entity_id := get_entity_id_by_unique_id(hass, unique_id):
-        return entity_id
-    name_pattern = str(sensor_config.get(CONF_POWER_SENSOR_NAMING, DEFAULT_POWER_NAME_PATTERN))
-    object_id = name or sensor_config.get(CONF_NAME)
-    if object_id is None and source_entity:
-        object_id = source_entity.object_id
-    return async_generate_entity_id(
-        ENTITY_ID_FORMAT,
-        name_pattern.format(object_id),
-        hass=hass,
+    return _generate_sensor_entity_id(
+        hass,
+        sensor_config,
+        CONF_POWER_SENSOR_NAMING,
+        DEFAULT_POWER_NAME_PATTERN,
+        source_entity,
+        name,
+        unique_id,
     )
 
 
@@ -129,9 +141,50 @@ def generate_energy_sensor_entity_id(
     unique_id: str | None = None,
 ) -> str:
     """Generates the entity_id to use for an energy sensor."""
+    return _generate_sensor_entity_id(
+        hass,
+        sensor_config,
+        CONF_ENERGY_SENSOR_NAMING,
+        DEFAULT_ENERGY_NAME_PATTERN,
+        source_entity,
+        name,
+        unique_id,
+    )
+
+
+@callback
+def generate_cost_sensor_entity_id(
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    source_entity: SourceEntity | None = None,
+    name: str | None = None,
+    unique_id: str | None = None,
+) -> str:
+    """Generates the entity_id to use for a cost sensor."""
+    return _generate_sensor_entity_id(
+        hass,
+        sensor_config,
+        CONF_COST_SENSOR_NAMING,
+        DEFAULT_COST_NAME_PATTERN,
+        source_entity,
+        name,
+        unique_id,
+    )
+
+
+def _generate_sensor_entity_id(
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    naming_conf_key: str,
+    default_pattern: str,
+    source_entity: SourceEntity | None = None,
+    name: str | None = None,
+    unique_id: str | None = None,
+) -> str:
+    """Generates the entity_id to use for a sensor."""
     if entity_id := get_entity_id_by_unique_id(hass, unique_id):
         return entity_id
-    name_pattern = str(sensor_config.get(CONF_ENERGY_SENSOR_NAMING, DEFAULT_ENERGY_NAME_PATTERN))
+    name_pattern = str(sensor_config.get(naming_conf_key, default_pattern))
     object_id = name or sensor_config.get(CONF_NAME)
     if object_id is None and source_entity:
         object_id = source_entity.object_id

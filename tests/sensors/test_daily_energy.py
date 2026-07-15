@@ -1,7 +1,7 @@
 from datetime import timedelta
 from unittest.mock import patch
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
@@ -110,7 +110,7 @@ async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant) -> None:
     sensor_entity_id = "sensor.ip_camera_upstairs_energy"
     state = hass.states.get(sensor_entity_id)
     assert state
-    assert state.attributes.get("state_class") == SensorStateClass.TOTAL
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
 
@@ -560,7 +560,7 @@ async def test_template_error_catched(hass: HomeAssistant, caplog: pytest.LogCap
             },
         )
         await _trigger_periodic_update(hass, 10)
-        assert "Could not render value template" in caplog.text
+        assert "Could not render template" in caplog.text
 
 
 async def test_entity_category(hass: HomeAssistant) -> None:

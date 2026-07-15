@@ -114,6 +114,34 @@ async def test_load_sub_profile_without_model_json(hass: HomeAssistant) -> None:
     assert power_profile.sub_profile == "a"
 
 
+async def test_switching_sub_profile_does_not_retain_previous_overlay_keys(hass: HomeAssistant) -> None:
+    power_profile = PowerProfile(
+        hass,
+        "test",
+        "test",
+        get_test_profile_dir("sub_profile"),
+        {
+            "name": "Base",
+            "calculation_strategy": CalculationStrategy.FIXED,
+            "fixed_config": {CONF_POWER: 1},
+        },
+        sub_profiles=[
+            ("a", {"name": "Profile A", "fixed_config": {CONF_POWER: 2}, "standby_power": 3}),
+            ("b", {"name": "Profile B", "fixed_config": {CONF_POWER: 4}}),
+        ],
+    )
+
+    await power_profile.select_sub_profile("a")
+    assert power_profile.name == "Profile A"
+    assert power_profile.fixed_config == {CONF_POWER: 2}
+    assert power_profile.standby_power == 3
+
+    await power_profile.select_sub_profile("b")
+    assert power_profile.name == "Profile B"
+    assert power_profile.fixed_config == {CONF_POWER: 4}
+    assert power_profile.standby_power == 0
+
+
 async def test_get_model_directory_root_only_ignores_selected_sub_profile(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(

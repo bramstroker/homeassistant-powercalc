@@ -29,10 +29,10 @@
       }
     ]
   },
+  "standby_power": 0.5,
   "author_info": {
     "name": "xxddff",
     "github": "xxddff",
     "email": "772327379@qq.com"
-  },
-  "author": "xxddff"
+  }
 }

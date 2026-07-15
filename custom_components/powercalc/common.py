@@ -12,6 +12,8 @@ import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 
 from .const import (
+    CONF_CREATE_COST_SENSOR,
+    CONF_CREATE_COST_SENSORS,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
@@ -35,6 +37,16 @@ class SourceEntity(NamedTuple):
     supported_color_modes: list[ColorMode] | None = None
     entity_entry: er.RegistryEntry | None = None
     device_entry: dr.DeviceEntry | None = None
+
+
+EXCLUDE_FROM_PARENT_CONFIG = (
+    CONF_NAME,
+    CONF_ENTITY_ID,
+    CONF_UNIQUE_ID,
+    CONF_POWER_SENSOR_ID,
+    CONF_FORCE_ENERGY_SENSOR_CREATION,
+)
+ENTITY_ID_OPTIONAL_KEYS = (CONF_DAILY_FIXED_ENERGY, CONF_POWER_SENSOR_ID, CONF_MULTI_SWITCH)
 
 
 def is_number(value: str) -> bool:
@@ -143,50 +155,61 @@ def _get_state_name(hass: HomeAssistant, entity_id: str) -> str | None:
 
 def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
     """Merges configuration from multiple levels (global, group, sensor) into a single dict."""
-    exclude_from_merging = [
-        CONF_NAME,
-        CONF_ENTITY_ID,
-        CONF_UNIQUE_ID,
-        CONF_POWER_SENSOR_ID,
-        CONF_FORCE_ENERGY_SENSOR_CREATION,
-    ]
+    merged_config = _merge_config_levels(configs)
+    _apply_sensor_creation_defaults(merged_config)
+    _apply_dummy_entity_id_default(merged_config)
+    _validate_entity_id_config(merged_config, validate)
+
+    return merged_config
+
+
+def _merge_config_levels(configs: tuple[dict, ...]) -> dict:
+    """Merge config levels while keeping deepest-level-only fields local."""
     num_configs = len(configs)
 
     merged_config = {}
     for i, config in enumerate(configs, 1):
         config_copy = config.copy()
-        # Remove config properties which are only allowed on the deepest level
         if i < num_configs:
-            for key in exclude_from_merging:
-                if key in config:
-                    config_copy.pop(key)
+            for key in EXCLUDE_FROM_PARENT_CONFIG:
+                config_copy.pop(key, None)
 
         merged_config.update(config_copy)
+    return merged_config
 
-    if CONF_CREATE_ENERGY_SENSOR not in merged_config:
-        merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
-            CONF_CREATE_ENERGY_SENSORS,
-        )
 
-    is_entity_id_required = not any(
-        key in merged_config for key in (CONF_DAILY_FIXED_ENERGY, CONF_POWER_SENSOR_ID, CONF_MULTI_SWITCH)
-    )
+def _apply_sensor_creation_defaults(config: dict) -> None:
+    config.setdefault(CONF_CREATE_ENERGY_SENSOR, config.get(CONF_CREATE_ENERGY_SENSORS))
+    config.setdefault(CONF_CREATE_COST_SENSOR, config.get(CONF_CREATE_COST_SENSORS))
 
-    if not is_entity_id_required and CONF_ENTITY_ID not in merged_config:
-        merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
-    sensor_type = merged_config.get(CONF_SENSOR_TYPE)
-    if (
-        validate
-        and CONF_CREATE_GROUP not in merged_config
-        and CONF_ENTITY_ID not in merged_config
-        and sensor_type != SensorType.GROUP
-    ):
+def _apply_dummy_entity_id_default(config: dict) -> None:
+    if CONF_ENTITY_ID in config:
+        return
+    # A standalone cost sensor has no source appliance entity, use the dummy placeholder.
+    if not _is_entity_id_required(config) or config.get(CONF_SENSOR_TYPE) == SensorType.COST:
+        config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
+
+
+def _is_entity_id_required(config: dict) -> bool:
+    return not any(key in config for key in ENTITY_ID_OPTIONAL_KEYS)
+
+
+def _validate_entity_id_config(config: dict, validate: bool) -> None:
+    if _is_missing_required_entity_id(config, validate):
         raise SensorConfigurationError(
             "You must supply an entity_id in the configuration, see the README",
         )
 
-    return merged_config
+
+def _is_missing_required_entity_id(config: dict, validate: bool) -> bool:
+    sensor_type = config.get(CONF_SENSOR_TYPE)
+    return (
+        validate
+        and CONF_CREATE_GROUP not in config
+        and CONF_ENTITY_ID not in config
+        and sensor_type != SensorType.GROUP
+    )
 
 
 def validate_name_pattern(value: str) -> str:

@@ -2,7 +2,6 @@
   "aliases": [
     "The Perfume Genie 2.0"
   ],
-  "author": "Bram Gerritsen <bgerritsen@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[switch_entity]]', 'on') }}",
   "calculation_strategy": "fixed",
   "compatible_integrations": [

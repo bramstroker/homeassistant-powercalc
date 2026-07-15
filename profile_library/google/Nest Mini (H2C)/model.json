@@ -2,7 +2,6 @@
   "aliases": [
     "Google Nest Mini"
   ],
-  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2022-10-05T10:14:54Z",

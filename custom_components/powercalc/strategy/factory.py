@@ -211,7 +211,8 @@ class PowerCalculatorStrategyFactory:
         """Create instance of multi switch strategy."""
         multi_switch_config: ConfigType = {}
         if power_profile and power_profile.multi_switch_config:
-            multi_switch_config = power_profile.multi_switch_config
+            # Copy to avoid mutating the (potentially cached) profile config with the user's config below.
+            multi_switch_config = dict(power_profile.multi_switch_config)
         multi_switch_config.update(config.get(CONF_MULTI_SWITCH, {}))
 
         if not multi_switch_config:

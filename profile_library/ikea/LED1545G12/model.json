@@ -2,7 +2,6 @@
   "aliases": [
     "TRADFRI bulb E27 WS opal 980lm"
   ],
-  "author": "CM000n <simon.hoerrle@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2021-08-13T14:31:12Z",
   "device_type": "light",

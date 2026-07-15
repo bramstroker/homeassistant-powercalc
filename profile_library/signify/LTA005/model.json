@@ -3,7 +3,6 @@
     "8719514392830",
     "9290024775"
   ],
-  "author": "Niklas Ausborn <niklas@ausborn.de>",
   "calculation_strategy": "lut",
   "created_at": "2022-10-24T18:43:24Z",
   "device_type": "light",

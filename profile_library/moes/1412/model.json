@@ -1,5 +1,4 @@
 {
-  "author": "Chris Hallgren <challgren@gmail.com>",
   "calculation_strategy": "lut",
   "created_at": "2025-01-28T02:11:03Z",
   "device_type": "light",

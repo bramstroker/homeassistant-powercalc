@@ -1,6 +1,5 @@
 {
   "aliases": [],
-  "author": "Morten Trab <morten@trab.dk>",
   "calculation_strategy": "lut",
   "created_at": "2022-04-04T12:25:47Z",
   "device_type": "light",

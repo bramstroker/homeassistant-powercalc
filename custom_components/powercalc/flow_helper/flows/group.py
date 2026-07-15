@@ -15,6 +15,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.selector import TextSelector
@@ -45,7 +46,12 @@ from custom_components.powercalc.const import (
     GroupType,
     SensorType,
 )
-from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, fill_schema_defaults
+from custom_components.powercalc.flow_helper.common import (
+    PowercalcFormStep,
+    Step,
+    fill_schema_defaults,
+    flatten_sections,
+)
 from custom_components.powercalc.flow_helper.schema import SCHEMA_ENERGY_SENSOR_TOGGLE, SCHEMA_UTILITY_METER_TOGGLE
 from custom_components.powercalc.group_include.include import find_entities
 from custom_components.powercalc.sensors.group.config_entry_utils import get_group_entries
@@ -57,6 +63,9 @@ if TYPE_CHECKING:
 
 # Constants
 UNIQUE_ID_TRACKED_UNTRACKED = "pc_tracked_untracked"
+
+SECTION_GROUP_MEMBERS = "members"
+SECTION_GROUP_OPTIONS = "options"
 
 # Schemas
 SCHEMA_GROUP = vol.Schema(
@@ -192,7 +201,10 @@ def create_schema_group_custom(
     config_entry: ConfigEntry | None = None,
     is_option_flow: bool = False,
 ) -> vol.Schema:
-    """Create config schema for groups."""
+    """Create config schema for groups.
+
+    Presented in the GUI as two collapsible sections (members and options).
+    """
     member_sensors = [
         selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.title)
         for config_entry in hass.config_entries.async_entries(DOMAIN)
@@ -208,7 +220,7 @@ def create_schema_group_custom(
         ),
     )
 
-    schema = vol.Schema(
+    members_schema = vol.Schema(
         {
             vol.Optional(CONF_GROUP_MEMBER_SENSORS): member_sensor_selector,
             vol.Optional(CONF_GROUP_MEMBER_DEVICES): selector.DeviceSelector(
@@ -236,6 +248,11 @@ def create_schema_group_custom(
             vol.Optional(CONF_SUB_GROUPS): create_group_selector(hass, current_entry=config_entry),
             vol.Optional(CONF_AREA): selector.AreaSelector(),
             vol.Optional(CONF_FLOOR): selector.FloorSelector(),
+        },
+    )
+
+    options_schema = vol.Schema(
+        {
             vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
             vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
             vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
@@ -244,7 +261,7 @@ def create_schema_group_custom(
     )
 
     if not is_option_flow:
-        schema = schema.extend(
+        options_schema = options_schema.extend(
             {
                 vol.Optional(CONF_GROUP_ENERGY_START_AT_ZERO, default=True): selector.BooleanSelector(),
                 **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
@@ -252,7 +269,12 @@ def create_schema_group_custom(
             },
         )
 
-    return schema
+    return vol.Schema(
+        {
+            vol.Required(SECTION_GROUP_MEMBERS): section(members_schema),
+            vol.Required(SECTION_GROUP_OPTIONS): section(options_schema),
+        },
+    )
 
 
 def create_group_selector(
@@ -388,7 +410,11 @@ class GroupConfigFlow(GroupFlow):
         schema: vol.Schema | None = None,
         next_step: Callable[[dict[str, Any]], Step | None] | None = None,
     ) -> ConfigFlowResult:
+        resolved_schema = schema or GROUP_SCHEMAS[group_type]
+
         def _validate(ui: dict[str, Any]) -> dict[str, Any]:
+            # Flatten collapsible sections (e.g. the custom group members/options) back to flat keys.
+            ui = flatten_sections(ui, resolved_schema)
             if group_type == GroupType.CUSTOM:
                 validate_group_input(ui)
 
@@ -403,7 +429,7 @@ class GroupConfigFlow(GroupFlow):
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=step,
-                schema=schema or GROUP_SCHEMAS[group_type],
+                schema=resolved_schema,
                 validate_user_input=_validate,
                 continue_utility_meter_options_step=True,
                 next_step=next_step,
@@ -412,7 +438,8 @@ class GroupConfigFlow(GroupFlow):
         )
 
     async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        schema = SCHEMA_GROUP.extend(create_schema_group_custom(self.flow.hass).schema)
+        # Keep the name at top level; the remaining fields are grouped into collapsible sections.
+        schema = vol.Schema({vol.Required(CONF_NAME): str}).extend(create_schema_group_custom(self.flow.hass).schema)
         return await self.handle_group_step(GroupType.CUSTOM, user_input, schema)
 
     async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
