@@ -10,6 +10,9 @@ resolution-markers = [
     "(python_full_version < '3.15' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.15' and sys_platform != 'darwin' and sys_platform != 'linux')",
 ]
 
+[options]
+prerelease-mode = "allow"
+
 [[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"
