@@ -36,6 +36,9 @@ class FakeClient:
     def close(self) -> None:
         return None
 
+    async def discover_zeroconf(self, collection_window: float = 2.0) -> tuple[dict[str, object], ...]:
+        return ()
+
     def list_entity_registry(self) -> tuple[SimpleNamespace, ...]:
         return (
             SimpleNamespace(entity_id="sensor.test_power", device_id="meter-device"),
@@ -288,6 +291,15 @@ def test_power_meter_test_endpoint(tmp_path: Path) -> None:
     assert validated.json()["success"] is True
     assert validated.json()["precision_decimals"] == 1
     assert validated.json()["update_interval_status"] == "poor"
+
+
+def test_shelly_discovery_endpoint(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+
+    response = test_client.get("/api/power-meters/shelly")
+
+    assert response.status_code == 200
+    assert response.json() == {"devices": [], "available": True, "message": None}
 
 
 def test_measure_definitions_and_average_request(tmp_path: Path) -> None:

@@ -1,6 +1,6 @@
 import { LitElement, css, html, nothing } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
-import type { AppSettings, Capabilities, EntityDescriptor, PowerMeterDiagnostic } from "../types";
+import type { AppSettings, Capabilities, EntityDescriptor, PowerMeterDiagnostic, ShellyDiscoveryDevice } from "../types";
 import { sharedStyles } from "../styles";
 import "./power-meter-diagnostic";
 
@@ -15,6 +15,12 @@ export class SettingsView extends LitElement {
     errorMessage: { type: String },
     meter: { state: true },
     activeSection: { state: true },
+    shellyDiscoveryDevices: { attribute: false },
+    discoveringShellys: { type: Boolean },
+    shellyDiscoveryError: { type: String },
+    shellyDiscoveryAvailable: { attribute: false },
+    shellyDiscoveryMessage: { attribute: false },
+    shellyIp: { state: true },
   };
 
   powers: EntityDescriptor[] = [];
@@ -26,6 +32,12 @@ export class SettingsView extends LitElement {
   testResult?: PowerMeterDiagnostic;
   errorMessage = "";
   activeSection: "power_meter" | "measure_tuning" = "power_meter";
+  shellyDiscoveryDevices: ShellyDiscoveryDevice[] = [];
+  discoveringShellys = false;
+  shellyDiscoveryError = "";
+  shellyDiscoveryAvailable?: boolean;
+  shellyDiscoveryMessage?: string | null;
+  private shellyIp?: string;
   private readonly form = createRef<HTMLFormElement>();
 
   static readonly styles = [sharedStyles, css`
@@ -56,6 +68,12 @@ export class SettingsView extends LitElement {
     .test-row { display: grid; gap: 0.75rem; }
     .test-row > button { justify-self: start; }
     .test-row button { min-height: 40px; }
+    .discovery { display: grid; gap: 0.65rem; padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in srgb, var(--field) 68%, transparent); }
+    .discovery-header { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; }
+    .discovery-header strong { color: var(--ink); font-size: 0.82rem; }
+    .discovery-header button { min-height: 36px; padding: 0.45rem 0.7rem; }
+    .discovery-status { margin: 0; color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
+    .discovery-status.error { color: var(--danger); }
     @media (max-width: 700px) {
       .settings-layout { grid-template-columns: 1fr; }
       .settings-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -110,7 +128,7 @@ export class SettingsView extends LitElement {
                     <option value="dummy" ?selected=${powerMeter === "dummy"}>Dummy meter</option>
                   </select>
                 </label>
-                ${powerMeter === "shelly" ? html`<label><span>Shelly IP address</span><input name="shelly_ip" .value=${this.settings?.shelly_ip ?? ""} required autocomplete="off" placeholder="192.168.1.50" @input=${this.powerMeterSettingsChanged} /></label>` : nothing}
+                ${powerMeter === "shelly" ? this.renderShellyFields() : nothing}
                 ${powerMeter === "hass" ? html`<label>
                   <span>Power sensor</span>
                   <select name="default_power_entity_id" required @change=${this.powerMeterSettingsChanged}>
@@ -157,6 +175,53 @@ export class SettingsView extends LitElement {
   private renderTestResult() {
     if (!this.testResult) return nothing;
     return html`<measure-power-meter-diagnostic .diagnostic=${this.testResult}></measure-power-meter-diagnostic>`;
+  }
+
+  private renderShellyFields() {
+    const address = this.shellyIp ?? this.settings?.shelly_ip ?? "";
+    return html`
+      <div class="discovery">
+        <div class="discovery-header">
+          <strong>Discovered Shelly devices</strong>
+          <button type="button" @click=${this.discoverShellys} ?disabled=${this.discoveringShellys || this.busy}>
+            ${this.discoveringShellys ? "Searching…" : "Refresh"}
+          </button>
+        </div>
+        ${this.renderShellyDiscovery(address)}
+      </div>
+      <label>
+        <span>Shelly IP address</span>
+        <input name="shelly_ip" .value=${address} required autocomplete="off" placeholder="192.168.1.50" @input=${this.shellyIpChanged} />
+        <small class="field-hint">Select a discovered device above or enter its IP address manually.</small>
+      </label>`;
+  }
+
+  private renderShellyDiscovery(selectedAddress: string) {
+    if (this.discoveringShellys) return html`<p class="discovery-status" role="status">Searching for Shelly devices on your network…</p>`;
+    if (this.shellyDiscoveryError) return html`<p class="discovery-status error" role="alert">${this.shellyDiscoveryError}</p>`;
+    if (this.shellyDiscoveryAvailable === false) {
+      return html`<p class="discovery-status">${this.shellyDiscoveryMessage ?? "Shelly discovery is unavailable. Enter the IP address manually."}</p>`;
+    }
+    if (!this.shellyDiscoveryDevices.length) return html`<p class="discovery-status">No Shelly devices found. You can refresh or enter an IP address manually.</p>`;
+    return html`<label>
+      <span>Select device</span>
+      <select name="discovered_shelly" @change=${this.discoveredShellyChanged}>
+        <option value="">Select a discovered Shelly</option>
+        ${this.shellyDiscoveryDevices.map((device) => html`
+          <option
+            value=${device.ip_address}
+            ?selected=${device.supported && device.ip_address === selectedAddress}
+            ?disabled=${!device.supported}
+          >${this.shellyDeviceLabel(device)}</option>`)}
+      </select>
+    </label>`;
+  }
+
+  private shellyDeviceLabel(device: ShellyDiscoveryDevice): string {
+    const identity = [device.name, device.model, device.generation === null ? null : `Gen ${device.generation}`, device.ip_address]
+      .filter((part): part is string => Boolean(part))
+      .join(" · ");
+    return device.supported ? identity : `${identity} — ${device.reason ?? "Not supported"}`;
   }
 
   private collect(): AppSettings | null {
@@ -215,10 +280,27 @@ export class SettingsView extends LitElement {
     // Keep the choice in local state so an app-shell re-render can't clobber the
     // in-progress form (which would reset the meter type and typed Shelly IP).
     this.meter = (event.currentTarget as HTMLSelectElement).value as AppSettings["power_meter"];
+    if (this.meter === "shelly") this.discoverShellys();
   }
 
   private powerMeterSettingsChanged(): void {
     this.clearTestResult();
+  }
+
+  private shellyIpChanged(event: Event): void {
+    this.shellyIp = (event.currentTarget as HTMLInputElement).value;
+    this.powerMeterSettingsChanged();
+  }
+
+  private discoveredShellyChanged(event: Event): void {
+    const address = (event.currentTarget as HTMLSelectElement).value;
+    if (!address) return;
+    this.shellyIp = address;
+    this.powerMeterSettingsChanged();
+  }
+
+  private discoverShellys(): void {
+    this.dispatchEvent(new CustomEvent("shelly-discover", { bubbles: true, composed: true }));
   }
 
   private clearTestResult(): void {

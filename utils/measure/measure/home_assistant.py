@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable
 import contextlib
 from dataclasses import dataclass
@@ -7,10 +8,49 @@ from threading import RLock
 from types import TracebackType
 from typing import Any, Self
 
-from homeassistant_api import Entity, EntityRegistryEntry, Group, State, WebsocketClient
+from homeassistant_api import AsyncWebsocketClient, Entity, EntityRegistryEntry, Group, State, WebsocketClient
 from homeassistant_api.errors import WebsocketError
 
-from measure.const import HASS_DEVICE_REGISTRY_LIST
+from measure.const import HASS_DEVICE_REGISTRY_LIST, HASS_ZEROCONF_SUBSCRIBE_DISCOVERY
+
+
+class HomeAssistantDiscoveryError(RuntimeError):
+    """Raised when Home Assistant rejects a discovery subscription."""
+
+
+class HomeAssistantDiscoveryClient(AsyncWebsocketClient):
+    """Read raw Home Assistant Zeroconf subscription events."""
+
+    async def discover_zeroconf(self, collection_window: float) -> tuple[dict[str, object], ...]:
+        subscription_id = await self.send(HASS_ZEROCONF_SUBSCRIBE_DISCOVERY)
+        response = await self._async_recv()
+        if response.get("id") != subscription_id or response.get("type") != "result":
+            raise HomeAssistantDiscoveryError("Unexpected Home Assistant discovery response")
+        if response.get("success") is not True:
+            error = response.get("error")
+            message = error.get("message") if isinstance(error, dict) else None
+            raise HomeAssistantDiscoveryError(str(message or "Home Assistant discovery is unavailable"))
+
+        services: list[dict[str, object]] = []
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + collection_window
+        while True:
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                break
+            try:
+                event_response = await asyncio.wait_for(self._async_recv(), timeout=remaining)
+            except TimeoutError:
+                break
+            if event_response.get("id") != subscription_id or event_response.get("type") != "event":
+                continue
+            event = event_response.get("event")
+            if not isinstance(event, dict):
+                continue
+            added = event.get("add")
+            if isinstance(added, list):
+                services.extend(service for service in added if isinstance(service, dict))
+        return tuple(services)
 
 
 @dataclass(frozen=True)
@@ -70,10 +110,12 @@ class HomeAssistantManager:
         token: str,
         *,
         client_factory: Callable[[str, str], HomeAssistantWebsocketClient] | None = None,
+        discovery_client_factory: Callable[[str, str], HomeAssistantDiscoveryClient] | None = None,
     ) -> None:
         self.api_url = api_url
         self.token = token
         self._client_factory = client_factory or HomeAssistantWebsocketClient
+        self._discovery_client_factory = discovery_client_factory or HomeAssistantDiscoveryClient
         self._client: HomeAssistantWebsocketClient | None = None
         self._lock = RLock()
 
@@ -182,6 +224,12 @@ class HomeAssistantManager:
                 device_registry=tuple(client.get_device_registry()),
             ),
         )
+
+    async def discover_zeroconf(self, collection_window: float = 2.0) -> tuple[dict[str, object], ...]:
+        """Collect the current Home Assistant Zeroconf discovery results."""
+
+        async with self._discovery_client_factory(self.api_url, self.token) as client:
+            return await client.discover_zeroconf(collection_window)
 
     def close(self) -> None:
         with self._lock:

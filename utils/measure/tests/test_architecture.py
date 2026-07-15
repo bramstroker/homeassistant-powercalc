@@ -83,7 +83,8 @@ def test_only_home_assistant_manager_constructs_websocket_clients() -> None:
         violations.extend(
             str(path.relative_to(MEASURE_ROOT))
             for node in ast.walk(tree)
-            if isinstance(node, ast.Call) and _call_name(node) == "HomeAssistantWebsocketClient"
+            if isinstance(node, ast.Call)
+            and _call_name(node) in {"HomeAssistantWebsocketClient", "HomeAssistantDiscoveryClient"}
         )
 
     assert violations == []

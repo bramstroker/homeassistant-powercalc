@@ -45,6 +45,18 @@ describe("MeasureApiClient", () => {
     expect(powers).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
   });
 
+  it("discovers Shelly power meters below the ingress prefix", async () => {
+    const discovery = { available: true, message: null, devices: [] };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(discovery));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getShellyDevices()).resolves.toEqual(discovery);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/power-meters/shelly"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
   it("surfaces stable API errors", async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ code: "active_session", message: "Already measuring", field: null }, 409));
     await expect(new MeasureApiClient(fetcher, "http://ha.local/prefix/").cancel()).rejects.toEqual(

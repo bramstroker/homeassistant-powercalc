@@ -208,6 +208,23 @@ export interface AppSettings {
   measurement_defaults: AppMeasurementDefaults;
 }
 
+export interface ShellyDiscoveryDevice {
+  id: string;
+  name: string;
+  model: string | null;
+  generation: number | null;
+  ip_address: string;
+  supported: boolean;
+  reason: string | null;
+  auth_required: boolean;
+}
+
+export interface ShellyDiscoveryResponse {
+  devices: ShellyDiscoveryDevice[];
+  available: boolean;
+  message: string | null;
+}
+
 export type DiagnosticStatus = "good" | "warning" | "poor" | "unsupported";
 
 export interface PowerMeterDiagnostic {

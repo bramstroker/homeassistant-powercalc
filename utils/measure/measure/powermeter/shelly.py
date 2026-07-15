@@ -6,6 +6,12 @@ import time
 
 import requests
 
+from measure.powermeter.const import (
+    SHELLY_GEN1_STATUS_ENDPOINT,
+    SHELLY_GEN2_STATUS_ENDPOINTS,
+    SHELLY_GEN2_SWITCH_STATUS_ENDPOINT,
+    SHELLY_INFO_ENDPOINT,
+)
 from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
@@ -24,7 +30,7 @@ class ShellyApi(ABC):
 class ShellyApiGen1(ShellyApi):
     @property
     def endpoint(self) -> str:
-        return "/status"
+        return SHELLY_GEN1_STATUS_ENDPOINT
 
     def parse_json(self, json: dict) -> PowerMeasurementResult:
         meter = json["meters"][0]
@@ -35,7 +41,7 @@ class ShellyApiGen2Plus(ShellyApi):
     def __init__(self, ip_address: str, timeout: int) -> None:
         self.ip_address = ip_address
         self.timeout = timeout
-        self._endpoint = "/rpc/Switch.GetStatus?id=0"
+        self._endpoint = SHELLY_GEN2_SWITCH_STATUS_ENDPOINT
 
     @property
     def endpoint(self) -> str:
@@ -52,8 +58,7 @@ class ShellyApiGen2Plus(ShellyApi):
 
     def check_gen2_plus_endpoints(self) -> None:
         """Select the switch or meter-only RPC endpoint supported by the device."""
-        endpoints = ["/rpc/Switch.GetStatus?id=0", "/rpc/PM1.GetStatus?id=0"]
-        for endpoint in endpoints:
+        for endpoint in SHELLY_GEN2_STATUS_ENDPOINTS:
             if self._check_endpoint_availability(endpoint):
                 self._endpoint = endpoint
                 return
@@ -80,6 +85,7 @@ class ShellyPowerMeter(PowerMeter):
         self.timeout = timeout
         self.ip_address = shelly_ip
         api_version = self._detect_api_version()
+        self.api: ShellyApi
         if api_version == 1:
             self.api = ShellyApiGen1()
         else:
@@ -110,7 +116,7 @@ class ShellyPowerMeter(PowerMeter):
     def _detect_api_version(self) -> int:
         """Check the generation / supported API version. All shelly's should implement the /shelly endpoint"""
         try:
-            uri = f"http://{self.ip_address}/shelly"
+            uri = f"http://{self.ip_address}{SHELLY_INFO_ENDPOINT}"
             _LOGGER.debug("Checking API connection: %s", uri)
             response = requests.get(uri, timeout=self.timeout)
         except requests.RequestException as ex:

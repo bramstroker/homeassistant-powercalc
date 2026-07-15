@@ -11,6 +11,7 @@ import type {
   SessionEvent,
   SessionFile,
   SessionSnapshot,
+  ShellyDiscoveryResponse,
 } from "./types";
 
 export class ApiError extends Error {
@@ -57,6 +58,10 @@ export class MeasureApiClient {
 
   testPowerMeter(settings: AppSettings): Promise<PowerMeterDiagnostic> {
     return this.request("api/settings/test-power-meter", { method: "POST", body: JSON.stringify(settings) });
+  }
+
+  getShellyDevices(): Promise<ShellyDiscoveryResponse> {
+    return this.request("api/power-meters/shelly");
   }
 
   getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]> {

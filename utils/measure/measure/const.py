@@ -14,11 +14,17 @@ QUESTION_SELECTED_MEASURE_TYPE = "selected_measure_type"
 MODEL_JSON_MAX_VOLTAGE = "max_voltage"
 MODEL_JSON_MIN_VOLTAGE = "min_voltage"
 HASS_DEVICE_REGISTRY_LIST = "config/device_registry/list"
+HASS_ZEROCONF_SUBSCRIBE_DISCOVERY = "zeroconf/subscribe_discovery"
 HASS_DEVICE_REGISTRY_ID = "id"
 HASS_DEVICE_REGISTRY_MODEL = "model"
 HASS_DEVICE_REGISTRY_MODEL_ID = "model_id"
 HASS_ENTITY_DEVICE_CLASS = "device_class"
 HASS_ENTITY_UNIT_OF_MEASUREMENT = "unit_of_measurement"
+ZEROCONF_HTTP_SERVICE_TYPE = "_http._tcp.local."
+ZEROCONF_SHELLY_SERVICE_TYPE = "_shelly._tcp.local."
+SHELLY_DISCOVERY_COLLECTION_WINDOW_SECONDS = 2.0
+SHELLY_DISCOVERY_PROBE_TIMEOUT_SECONDS = 2
+SHELLY_DISCOVERY_MAX_CONCURRENT_PROBES = 8
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()

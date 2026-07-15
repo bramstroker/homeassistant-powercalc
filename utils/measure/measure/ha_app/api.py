@@ -29,6 +29,7 @@ from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, P
 from measure.ha_app.registry import FieldControl, measurement_definitions, supported_light_modes
 from measure.ha_app.service import MeasurementService
 from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionEvent, SessionSnapshot
+from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantManager
 from measure.home_assistant_entities import (
@@ -288,6 +289,10 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
     @router.post("/settings/test-power-meter")
     async def test_power_meter(payload: AppPreferences, request: Request) -> PowerMeterDiagnostic:
         return await run_in_threadpool(_test_power_meter, _context(request), payload)
+
+    @router.get("/power-meters/shelly")
+    async def discover_shelly_power_meters(request: Request) -> ShellyDiscoveryResponse:
+        return await ShellyDiscoveryService(_context(request).home_assistant).discover()
 
     @router.get("/entities", responses={400: _ERROR})
     async def entities(

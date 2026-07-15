@@ -3,7 +3,7 @@ import { MeasureApiClient, SessionEventStream } from "../api-client";
 import { MeasureAppController } from "../app-controller";
 import type { AppView, MeasureAppApi, MeasureAppState } from "../app-controller";
 import { LIGHT_TYPE } from "../measurement-kinds";
-import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot } from "../types";
+import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, ShellyDiscoveryDevice } from "../types";
 import type { ReviewMetric, ReviewRow } from "./preflight-view";
 import { sharedStyles } from "../styles";
 import "./preflight-view";
@@ -21,6 +21,8 @@ export class AppShell extends LitElement implements MeasureAppState {
     files: { state: true }, logs: { state: true }, settings: { state: true },
     samples: { state: true }, testingPowerMeter: { state: true }, powerMeterTestResult: { state: true },
     deviceEntities: { state: true }, deviceEntityErrors: { state: true },
+    shellyDiscoveryDevices: { state: true }, discoveringShellys: { state: true }, shellyDiscoveryError: { state: true },
+    shellyDiscoveryAvailable: { state: true }, shellyDiscoveryMessage: { state: true },
   };
 
   view: AppView = "loading";
@@ -45,6 +47,11 @@ export class AppShell extends LitElement implements MeasureAppState {
   deviceEntityErrors: Record<string, string> = {};
   testingPowerMeter = false;
   powerMeterTestResult?: PowerMeterDiagnostic;
+  shellyDiscoveryDevices: ShellyDiscoveryDevice[] = [];
+  discoveringShellys = false;
+  shellyDiscoveryError = "";
+  shellyDiscoveryAvailable?: boolean;
+  shellyDiscoveryMessage?: string | null;
 
   private readonly api: MeasureAppApi & Pick<MeasureApiClient, "diagnosticsUrl" | "fileUrl" | "eventsUrl"> = new MeasureApiClient();
   private readonly controller = new MeasureAppController(
@@ -123,7 +130,14 @@ export class AppShell extends LitElement implements MeasureAppState {
   private renderView() {
     if (this.view === "loading") return this.renderLoading();
     if (this.view === "settings") return html`
-      <measure-settings-view .powers=${this.powers} .settings=${this.settings} .capabilities=${this.capabilities} .busy=${this.busy} .testing=${this.testingPowerMeter} .testResult=${this.powerMeterTestResult} .errorMessage=${this.errorMessage} @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter} @test-clear=${this.clearPowerMeterTestResult}></measure-settings-view>`;
+      <measure-settings-view
+        .powers=${this.powers} .settings=${this.settings} .capabilities=${this.capabilities}
+        .busy=${this.busy} .testing=${this.testingPowerMeter} .testResult=${this.powerMeterTestResult} .errorMessage=${this.errorMessage}
+        .shellyDiscoveryDevices=${this.shellyDiscoveryDevices} .discoveringShellys=${this.discoveringShellys}
+        .shellyDiscoveryError=${this.shellyDiscoveryError} .shellyDiscoveryAvailable=${this.shellyDiscoveryAvailable}
+        .shellyDiscoveryMessage=${this.shellyDiscoveryMessage}
+        @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter} @test-clear=${this.clearPowerMeterTestResult}
+        @shelly-discover=${this.discoverShellys}></measure-settings-view>`;
     if (this.view === "review" && this.preflight && this.request) return html`
       <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .powerMeterDiagnostic=${this.preflight.power_meter_diagnostic} .canOverwrite=${this.reviewCanOverwrite()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`
@@ -151,6 +165,10 @@ export class AppShell extends LitElement implements MeasureAppState {
 
   private clearPowerMeterTestResult(): void {
     this.controller.clearPowerMeterTestResult();
+  }
+
+  private discoverShellys(): void {
+    void this.controller.discoverShellys();
   }
 
   private pendingType(): MeasureType | undefined {

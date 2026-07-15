@@ -954,6 +954,68 @@ describe("settings power meter test", () => {
     expect((element.shadowRoot.querySelector('input[name="shelly_ip"]') as HTMLInputElement).value).toBe("10.0.0.5");
   });
 
+  it("discovers Shellys automatically and selects only compatible devices", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      powers: EntityDescriptor[]; settings: AppSettings; shellyDiscoveryDevices: import("../types").ShellyDiscoveryDevice[];
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.powers = [];
+    element.settings = defaultSettings;
+    const discover = vi.fn();
+    element.addEventListener("shelly-discover", discover);
+    document.body.append(element);
+    await element.updateComplete;
+
+    const meterSelect = element.shadowRoot.querySelector('select[name="power_meter"]') as HTMLSelectElement;
+    meterSelect.value = "shelly";
+    meterSelect.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+    expect(discover).toHaveBeenCalledOnce();
+
+    element.shellyDiscoveryDevices = [
+      { id: "plug", name: "Kitchen plug", model: "S3PL-00112EU", generation: 3, ip_address: "10.0.0.8", supported: true, reason: null, auth_required: false },
+      { id: "auth", name: "Locked plug", model: null, generation: 2, ip_address: "10.0.0.9", supported: false, reason: "Authentication is not supported yet.", auth_required: true },
+    ];
+    await element.updateComplete;
+
+    const discovered = element.shadowRoot.querySelector('select[name="discovered_shelly"]') as HTMLSelectElement;
+    expect(discovered.options[1]?.textContent).toContain("Kitchen plug");
+    expect(discovered.options[2]?.textContent).toContain("Authentication is not supported yet.");
+    expect(discovered.options[2]?.disabled).toBe(true);
+    discovered.value = "10.0.0.8";
+    discovered.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+    expect((element.shadowRoot.querySelector('input[name="shelly_ip"]') as HTMLInputElement).value).toBe("10.0.0.8");
+  });
+
+  it("renders Shelly discovery loading, empty, unavailable, and error states with refresh", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      settings: AppSettings; discoveringShellys: boolean; shellyDiscoveryAvailable?: boolean;
+      shellyDiscoveryMessage?: string; shellyDiscoveryError: string;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.settings = { ...defaultSettings, power_meter: "shelly" };
+    element.discoveringShellys = true;
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot.textContent).toContain("Searching for Shelly devices");
+
+    element.discoveringShellys = false;
+    element.shellyDiscoveryAvailable = true;
+    await element.updateComplete;
+    expect(element.shadowRoot.textContent).toContain("No Shelly devices found");
+
+    element.shellyDiscoveryAvailable = false;
+    element.shellyDiscoveryMessage = "Discovery is unavailable.";
+    await element.updateComplete;
+    expect(element.shadowRoot.textContent).toContain("Discovery is unavailable.");
+
+    element.shellyDiscoveryError = "Discovery request failed";
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector('[role="alert"]')?.textContent).toContain("Discovery request failed");
+    expect([...element.shadowRoot.querySelectorAll("button")].some((button) => button.textContent?.includes("Refresh"))).toBe(true);
+  });
+
   it("clears an earlier result when the power sensor, meter type, or Shelly address changes", async () => {
     const element = document.createElement("measure-settings-view") as HTMLElement & {
       powers: EntityDescriptor[]; settings: AppSettings; testResult?: PowerMeterDiagnostic;
@@ -1015,14 +1077,14 @@ describe("preflight power meter diagnostics", () => {
 });
 
 describe("app shell", () => {
-  it("loads the Powercalc logo from the ingress-served asset bundle", async () => {
+  it("loads the Powercalc SVG logo", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;
     document.body.append(element);
     await element.updateComplete;
 
     const logo = element.shadowRoot?.querySelector<HTMLImageElement>(".brand-logo");
-    expect(new URL(logo?.src ?? "").pathname).toContain("/src/assets/powercalc-logo.svg");
+    expect(logo?.src).toContain("image/svg+xml");
   });
 
   it("does not restore a stale validation result after meter settings change", async () => {

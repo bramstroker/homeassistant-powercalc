@@ -13,6 +13,8 @@ import type {
   SessionEvent,
   SessionFile,
   SessionSnapshot,
+  ShellyDiscoveryDevice,
+  ShellyDiscoveryResponse,
 } from "./types";
 
 export type AppView = "loading" | "setup" | "review" | "running" | "result" | "settings";
@@ -39,6 +41,11 @@ export interface MeasureAppState {
   deviceEntityErrors: Record<string, string>;
   testingPowerMeter: boolean;
   powerMeterTestResult?: PowerMeterDiagnostic;
+  shellyDiscoveryDevices: ShellyDiscoveryDevice[];
+  discoveringShellys: boolean;
+  shellyDiscoveryError: string;
+  shellyDiscoveryAvailable?: boolean;
+  shellyDiscoveryMessage?: string | null;
 }
 
 export interface MeasureAppApi {
@@ -47,6 +54,7 @@ export interface MeasureAppApi {
   getSettings(): Promise<AppSettings>;
   saveSettings(settings: AppSettings): Promise<AppSettings>;
   testPowerMeter(settings: AppSettings): Promise<PowerMeterDiagnostic>;
+  getShellyDevices(): Promise<ShellyDiscoveryResponse>;
   getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]>;
   getEntitiesByDeviceClass(deviceClass: DeviceClass): Promise<EntityDescriptor[]>;
   preflight(request: MeasurementRequest): Promise<PreflightResponse>;
@@ -76,6 +84,7 @@ export class MeasureAppController {
   private eventConnection?: EventConnection;
   private settingsReturnView: AppView = "setup";
   private powerMeterTestVersion = 0;
+  private shellyDiscoveryVersion = 0;
 
   constructor(
     private readonly state: MeasureAppState,
@@ -85,6 +94,7 @@ export class MeasureAppController {
   ) {}
 
   dispose(): void {
+    this.shellyDiscoveryVersion += 1;
     this.eventConnection?.close();
   }
 
@@ -221,6 +231,7 @@ export class MeasureAppController {
     this.state.testingPowerMeter = false;
     this.state.view = "settings";
     this.changed();
+    if (this.state.settings?.power_meter === "shelly") void this.discoverShellys();
   }
 
   closeSettings(): void {
@@ -263,6 +274,28 @@ export class MeasureAppController {
     this.state.testingPowerMeter = false;
     this.state.powerMeterTestResult = undefined;
     this.changed();
+  }
+
+  async discoverShellys(): Promise<void> {
+    const version = ++this.shellyDiscoveryVersion;
+    this.state.discoveringShellys = true;
+    this.state.shellyDiscoveryError = "";
+    this.changed();
+    try {
+      const result = await this.api().getShellyDevices();
+      if (version !== this.shellyDiscoveryVersion) return;
+      this.state.shellyDiscoveryDevices = result.devices;
+      this.state.shellyDiscoveryAvailable = result.available;
+      this.state.shellyDiscoveryMessage = result.message;
+    } catch (error) {
+      if (version !== this.shellyDiscoveryVersion) return;
+      this.state.shellyDiscoveryError = message(error);
+    } finally {
+      if (version === this.shellyDiscoveryVersion) {
+        this.state.discoveringShellys = false;
+        this.changed();
+      }
+    }
   }
 
   async saveSettings(settings: AppSettings): Promise<void> {

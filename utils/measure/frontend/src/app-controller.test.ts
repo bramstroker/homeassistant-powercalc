@@ -23,6 +23,7 @@ function state(): MeasureAppState {
     view: "loading", errorMessage: "", busy: false, connectedToEvents: false,
     files: [], logs: [], samples: [], lights: [], powers: [], voltages: [], definitions: [],
     deviceEntities: {}, deviceEntityErrors: {}, testingPowerMeter: false,
+    shellyDiscoveryDevices: [], discoveringShellys: false, shellyDiscoveryError: "",
   };
 }
 
@@ -44,6 +45,7 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
       update_interval_status: "good",
       messages: [],
     }),
+    getShellyDevices: async () => ({ available: true, message: null, devices: [] }),
     getEntitiesByDomain: async () => [],
     getEntitiesByDeviceClass: async () => [],
     preflight: async () => ({ valid: true, warnings: [] }),
@@ -168,6 +170,58 @@ describe("measure app controller", () => {
 
     expect(appState.testingPowerMeter).toBe(false);
     expect(appState.powerMeterTestResult).toBeUndefined();
+  });
+
+  it("discovers Shellys when opening Shelly settings and exposes unavailable discovery", async () => {
+    const appState = state();
+    appState.view = "setup";
+    appState.settings = { ...settings, power_meter: "shelly", shelly_ip: "10.0.0.5" };
+    const controller = new MeasureAppController(appState, () => api({
+      getShellyDevices: async () => ({
+        available: false,
+        message: "Shelly discovery requires Home Assistant 2025.5 or newer.",
+        devices: [{
+          id: "shellyplug-s-aabbcc", name: "Shelly Plug S", model: "SHPLG-S", generation: 1,
+          ip_address: "10.0.0.5", supported: true, reason: null, auth_required: false,
+        }],
+      }),
+    }), () => connection(), () => undefined);
+
+    controller.openSettings();
+
+    expect(appState.view).toBe("settings");
+    expect(appState.discoveringShellys).toBe(true);
+    await vi.waitFor(() => expect(appState.discoveringShellys).toBe(false));
+    expect(appState.shellyDiscoveryDevices).toHaveLength(1);
+    expect(appState.shellyDiscoveryAvailable).toBe(false);
+    expect(appState.shellyDiscoveryMessage).toContain("2025.5");
+  });
+
+  it("ignores a stale Shelly discovery result after refresh", async () => {
+    let resolveFirst: (value: Awaited<ReturnType<MeasureAppApi["getShellyDevices"]>>) => void = () => undefined;
+    const first = new Promise<Awaited<ReturnType<MeasureAppApi["getShellyDevices"]>>>((resolve) => { resolveFirst = resolve; });
+    let calls = 0;
+    const appState = state();
+    const controller = new MeasureAppController(appState, () => api({
+      getShellyDevices: async () => {
+        calls += 1;
+        if (calls === 1) return first;
+        return { available: true, message: null, devices: [{
+          id: "new", name: "New Shelly", model: null, generation: 2,
+          ip_address: "10.0.0.8", supported: true, reason: null, auth_required: false,
+        }] };
+      },
+    }), () => connection(), () => undefined);
+
+    const stale = controller.discoverShellys();
+    await controller.discoverShellys();
+    resolveFirst({ available: true, message: null, devices: [{
+      id: "old", name: "Old Shelly", model: null, generation: 1,
+      ip_address: "10.0.0.7", supported: true, reason: null, auth_required: false,
+    }] });
+    await stale;
+
+    expect(appState.shellyDiscoveryDevices.map((device) => device.id)).toEqual(["new"]);
   });
 });
 
