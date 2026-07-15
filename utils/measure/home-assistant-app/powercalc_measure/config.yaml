@@ -10,7 +10,7 @@ image: ghcr.io/bramstroker/powercalc-measure-app
 stage: experimental
 ingress: true
 ingress_stream: true
-panel_icon: mdi:chart-bell-curve-cumulative
+panel_icon: mdi:lightning-bolt
 homeassistant_api: true
 environment:
   MEASURE_TRUSTED_INGRESS_ONLY: "true"

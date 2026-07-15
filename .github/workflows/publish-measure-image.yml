@@ -167,12 +167,13 @@ jobs:
           build-args: |
             FINAL_STAGE=ha-app
           cache-gha-scope: powercalc-measure-app
-          cache-image-tag: ${{ needs.home-assistant-app-init.outputs.version }}
           container-registry-password: ${{ secrets.GITHUB_TOKEN }}
           context: ./utils/measure
           cosign: "true"
           image: ${{ matrix.image }}
-          image-tags: ${{ needs.home-assistant-app-init.outputs.version }}
+          image-tags: |
+            ${{ needs.home-assistant-app-init.outputs.version }}
+            latest
           labels: |
             io.hass.type=app
           push: "true"
@@ -195,7 +196,9 @@ jobs:
           container-registry-password: ${{ secrets.GITHUB_TOKEN }}
           cosign: "true"
           image-name: ${{ env.APP_IMAGE_NAME }}
-          image-tags: ${{ needs.home-assistant-app-init.outputs.version }}
+          image-tags: |
+            ${{ needs.home-assistant-app-init.outputs.version }}
+            latest
 
   # Mirrors home-assistant-app/ to the dedicated app-store repository. Runs
   # after the image push so the store never references a tag that is not yet

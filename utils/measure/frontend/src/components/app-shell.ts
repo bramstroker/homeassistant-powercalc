@@ -12,6 +12,8 @@ import "./running-view";
 import "./settings-view";
 import "./setup-view";
 
+const POWERCALC_LOGO_URL = new URL("../assets/powercalc-logo.svg", import.meta.url).href;
+
 export class AppShell extends LitElement implements MeasureAppState {
   static readonly properties = {
     view: { state: true }, loadingMessage: { state: true }, errorMessage: { state: true }, busy: { state: true },
@@ -88,7 +90,7 @@ export class AppShell extends LitElement implements MeasureAppState {
       <main class="shell">
         <header>
           <div class="topbar">
-            <div class="brand"><img class="brand-logo" src="powercalc-logo.svg" alt="" />Powercalc Measure</div>
+            <div class="brand"><img class="brand-logo" src=${POWERCALC_LOGO_URL} alt="" />Powercalc Measure</div>
             <button class="settings-toggle" type="button" @click=${this.openSettings} ?disabled=${this.view === "loading" || this.view === "settings"}>Settings</button>
           </div>
           <div class="intro">

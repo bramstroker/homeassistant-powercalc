@@ -1015,6 +1015,16 @@ describe("preflight power meter diagnostics", () => {
 });
 
 describe("app shell", () => {
+  it("loads the Powercalc logo from the ingress-served asset bundle", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    document.body.append(element);
+    await element.updateComplete;
+
+    const logo = element.shadowRoot?.querySelector<HTMLImageElement>(".brand-logo");
+    expect(new URL(logo?.src ?? "").pathname).toContain("/src/assets/powercalc-logo.svg");
+  });
+
   it("does not restore a stale validation result after meter settings change", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;
