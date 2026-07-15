@@ -23,6 +23,7 @@ from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LutMode
 from measure.execution import ImmediateInteraction
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
+from measure.ha_app.diagnostics import build_session_diagnostics
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
 from measure.ha_app.registry import FieldControl, measurement_definitions, supported_light_modes
@@ -371,6 +372,27 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         except (FileNotFoundError, ValueError) as error:
             raise HTTPException(status_code=404, detail="File not found") from error
         return FileResponse(path, filename=path.name)
+
+    @router.get("/session/current/diagnostics", responses={404: _ERROR})
+    async def diagnostics(request: Request) -> Response:
+        context = _context(request)
+        snapshot = _require_current_session(context)
+        files = [
+            _file_descriptor(context.storage.file_path(snapshot.id, name), name).model_dump()
+            for name in context.storage.list_files(snapshot.id)
+        ]
+        payload = build_session_diagnostics(
+            snapshot,
+            context.storage.load_request(snapshot.id),
+            context.storage.load_events(snapshot.id, limit=None),
+            files,
+        )
+        filename = f"powercalc-measure-diagnostics-{snapshot.id[:8]}.json"
+        return Response(
+            content=json.dumps(payload, indent=2, default=str),
+            media_type="application/json",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
 
     @router.get("/session/current/events", responses={404: _ERROR})
     async def events(request: Request) -> StreamingResponse:

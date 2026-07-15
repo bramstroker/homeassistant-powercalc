@@ -262,7 +262,7 @@ def test_hass_entity_precedes_model_id_and_prefills_from_device(mock_config_fact
         {
             "selected_light_controller": LightControllerType.HASS,
             "selected_power_meter": PowerMeterType.DUMMY,
-            "hass_url": "ws://homeassistant.local:8123/api/websocket",
+            "hass_url": "ws://127.0.0.1:8123/api/websocket",
             "hass_token": "token",
         },
     )

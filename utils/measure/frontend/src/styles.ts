@@ -64,6 +64,8 @@ export const sharedStyles = css`
   .muted { color: var(--muted); }
   .error { color: var(--danger); }
   .notice { padding: 0.8rem 1rem; border-left: 3px solid var(--signal); background: color-mix(in srgb, var(--signal) 8%, transparent); }
+  .diagnostics-download { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 1rem; margin-top: 1.25rem; color: var(--muted); font-size: 0.78rem; }
+  .diagnostics-download a { color: var(--signal-strong); font-weight: 700; white-space: nowrap; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
   @media (max-width: 640px) {

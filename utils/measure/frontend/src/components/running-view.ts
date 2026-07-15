@@ -28,6 +28,7 @@ export class RunningView extends LitElement {
     connected: { type: Boolean },
     logs: { attribute: false },
     samples: { attribute: false },
+    diagnosticsUrl: { type: String },
     busy: { type: Boolean },
     logOpen: { state: true },
   };
@@ -36,6 +37,7 @@ export class RunningView extends LitElement {
   connected = false;
   logs: string[] = [];
   samples: number[] = [];
+  diagnosticsUrl = "";
   busy = false;
   logOpen = false;
   private readonly logContainer = createRef<HTMLDivElement>();
@@ -110,6 +112,10 @@ export class RunningView extends LitElement {
         </div>
         ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
         ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
+        <div class="diagnostics-download">
+          <span>Session snapshot and logs for issue reporting.</span>
+          <a href=${this.diagnosticsUrl} download>Download diagnostics</a>
+        </div>
         <div class="actions">
           ${this.snapshot.state === "awaiting_confirmation" ? html`<button class="primary" type="button" @click=${this.confirm} ?disabled=${this.busy}>Start measurement</button>` : nothing}
           ${this.renderStopButton(openEnded)}

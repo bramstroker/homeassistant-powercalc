@@ -500,11 +500,13 @@ describe("running view", () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot;
       connected: boolean;
+      diagnosticsUrl: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
     element.snapshot = { state: "running", phase: "Brightness", mode: "brightness", progress: { completed: 25, total: 100, estimated_remaining_seconds: 120 } };
     element.connected = true;
+    element.diagnosticsUrl = "http://ha.local/ingress/api/session/current/diagnostics";
     document.body.append(element);
     await element.updateComplete;
 
@@ -513,6 +515,10 @@ describe("running view", () => {
     expect(element.shadowRoot.textContent).toContain("Live");
     expect(element.shadowRoot.querySelector("progress")?.value).toBe(25);
     expect(element.shadowRoot.querySelector("button")?.textContent).toContain("Cancel measurement");
+    const diagnostics = element.shadowRoot.querySelector(".diagnostics-download a") as HTMLAnchorElement;
+    expect(diagnostics.textContent).toBe("Download diagnostics");
+    expect(diagnostics.href).toBe(element.diagnosticsUrl);
+    expect(element.shadowRoot.querySelector(".diagnostics-download")?.textContent).toContain("snapshot and logs");
   });
 
   it("draws a live power chart from streamed samples", async () => {
@@ -1044,13 +1050,33 @@ describe("app shell", () => {
 
     const topbar = element.shadowRoot?.querySelector(".topbar");
     const steps = [...(element.shadowRoot?.querySelectorAll(".sequence > li") ?? [])];
+    const running = element.shadowRoot?.querySelector("measure-running-view") as HTMLElement & { diagnosticsUrl: string };
     expect(topbar?.querySelector(".settings-toggle")?.textContent).toContain("Settings");
     expect(steps.map((step) => step.textContent?.trim())).toEqual(["✓Set up", "✓Review", "3Measure", "4Result"]);
     expect(steps.at(2)?.getAttribute("aria-current")).toBe("step");
+    expect(new URL(running.diagnosticsUrl).pathname).toContain("/api/session/current/diagnostics");
   });
 });
 
 describe("result view", () => {
+  it.each(["completed", "failed", "cancelled", "resumable"] as const)("offers diagnostics for a %s session without generated files", async (state) => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      diagnosticsUrl: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state };
+    element.diagnosticsUrl = "http://ha.local/ingress/api/session/current/diagnostics";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const diagnostics = element.shadowRoot.querySelector(".diagnostics-download a") as HTMLAnchorElement;
+    expect(diagnostics.textContent).toBe("Download diagnostics");
+    expect(diagnostics.href).toBe(element.diagnosticsUrl);
+    expect(element.shadowRoot.querySelector(".diagnostics-download")?.textContent).toContain("snapshot and logs");
+  });
+
   it("shows a download-all action for generated files", async () => {
     const element = document.createElement("measure-result-view") as HTMLElement & {
       snapshot: SessionSnapshot;

@@ -10,9 +10,9 @@ import pytest
 
 
 def test_client_uses_canonical_websocket_url() -> None:
-    client = HomeAssistantWebsocketClient("ws://homeassistant.local:8123/api/websocket", "token")
+    client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
 
-    assert client.api_url == "ws://homeassistant.local:8123/api/websocket"
+    assert client.api_url == "ws://127.0.0.1:8123/api/websocket"
 
 
 def test_manager_reuses_one_client_for_its_lifecycle() -> None:
@@ -20,7 +20,7 @@ def test_manager_reuses_one_client_for_its_lifecycle() -> None:
     client.get_config.return_value = {"location_name": "Home"}
     client_factory = MagicMock(return_value=client)
     manager = HomeAssistantManager(
-        "ws://homeassistant.local:8123/api/websocket",
+        "ws://127.0.0.1:8123/api/websocket",
         "token",
         client_factory=client_factory,
     )
@@ -28,7 +28,7 @@ def test_manager_reuses_one_client_for_its_lifecycle() -> None:
     assert manager.get_config() == {"location_name": "Home"}
     assert manager.get_config() == {"location_name": "Home"}
 
-    client_factory.assert_called_once_with("ws://homeassistant.local:8123/api/websocket", "token")
+    client_factory.assert_called_once_with("ws://127.0.0.1:8123/api/websocket", "token")
     client.connect.assert_called_once_with()
 
     manager.close()
@@ -54,7 +54,7 @@ def test_manager_serializes_access_to_shared_websocket() -> None:
 
     client.get_config.side_effect = get_config
     manager = HomeAssistantManager(
-        "ws://homeassistant.local:8123/api/websocket",
+        "ws://127.0.0.1:8123/api/websocket",
         "token",
         client_factory=MagicMock(return_value=client),
     )
@@ -73,7 +73,7 @@ def test_manager_discards_client_when_connection_fails() -> None:
     connected_client.get_config.return_value = {"location_name": "Home"}
     client_factory = MagicMock(side_effect=(failed_client, connected_client))
     manager = HomeAssistantManager(
-        "ws://homeassistant.local:8123/api/websocket",
+        "ws://127.0.0.1:8123/api/websocket",
         "token",
         client_factory=client_factory,
     )
@@ -104,7 +104,7 @@ def test_manager_reconnects_once_when_read_fails_on_closed_websocket() -> None:
     reconnected_client.get_entities.return_value = {"media_player": MagicMock()}
     client_factory = MagicMock(side_effect=(disconnected_client, reconnected_client))
     manager = HomeAssistantManager(
-        "ws://homeassistant.local:8123/api/websocket",
+        "ws://127.0.0.1:8123/api/websocket",
         "token",
         client_factory=client_factory,
     )
@@ -120,7 +120,7 @@ def test_manager_does_not_retry_non_connection_errors() -> None:
     client.get_entities.side_effect = ValueError("invalid entity response")
     client_factory = MagicMock(return_value=client)
     manager = HomeAssistantManager(
-        "ws://homeassistant.local:8123/api/websocket",
+        "ws://127.0.0.1:8123/api/websocket",
         "token",
         client_factory=client_factory,
     )
@@ -128,7 +128,7 @@ def test_manager_does_not_retry_non_connection_errors() -> None:
     with pytest.raises(ValueError, match="invalid entity response"):
         manager.get_entities()
 
-    client_factory.assert_called_once_with("ws://homeassistant.local:8123/api/websocket", "token")
+    client_factory.assert_called_once_with("ws://127.0.0.1:8123/api/websocket", "token")
     client.close.assert_not_called()
 
 
@@ -139,7 +139,7 @@ def test_manager_does_not_retry_service_call_after_disconnect() -> None:
     reconnected_client.get_config.return_value = {"location_name": "Home"}
     client_factory = MagicMock(side_effect=(disconnected_client, reconnected_client))
     manager = HomeAssistantManager(
-        "ws://homeassistant.local:8123/api/websocket",
+        "ws://127.0.0.1:8123/api/websocket",
         "token",
         client_factory=client_factory,
     )

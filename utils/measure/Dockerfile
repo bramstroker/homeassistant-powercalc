@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1
 
+ARG FINAL_STAGE=runtime
+
 FROM node:24-alpine AS frontend-build
 
 WORKDIR /frontend
@@ -55,3 +57,7 @@ RUN apt-get update && apt-get install -y libgl1 tesseract-ocr && rm -rf /var/lib
     && uv sync --locked --extra cli --extra ocr
 
 ENTRYPOINT ["python", "-m", "measure.measure"]
+
+# Preserve the standalone CLI as the local default while allowing builders
+# without a target option to select the Home Assistant stage.
+FROM ${FINAL_STAGE} AS final

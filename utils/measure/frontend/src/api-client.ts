@@ -100,6 +100,10 @@ export class MeasureApiClient {
     return apiUrl(`api/session/current/files/${encodeURIComponent(name)}`, this.base).toString();
   }
 
+  diagnosticsUrl(): string {
+    return apiUrl("api/session/current/diagnostics", this.base).toString();
+  }
+
   eventsUrl(): string {
     return apiUrl("api/session/current/events", this.base).toString();
   }

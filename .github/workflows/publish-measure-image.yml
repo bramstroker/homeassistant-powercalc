@@ -19,6 +19,10 @@ on:
 permissions:
   contents: read
 
+env:
+  APP_ARCHITECTURES: '["amd64", "aarch64"]'
+  APP_IMAGE_NAME: powercalc-measure-app
+
 jobs:
   docker:
     if: >-
@@ -90,16 +94,17 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  home-assistant-app:
+  home-assistant-app-init:
+    name: Initialize Home Assistant app build
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'measure-v'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
     outputs:
       version: ${{ steps.app.outputs.version }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -127,36 +132,70 @@ jobs:
             echo "Release tag ${RELEASE_TAG} does not match app version ${VERSION}" >&2
             exit 1
           fi
+      - name: Prepare architecture matrix
+        id: matrix
+        uses: home-assistant/builder/actions/prepare-multi-arch-matrix@4de35182ce1e329181bffcbcc84d33db5e2c7e10 # 2026.06.0
+        with:
+          architectures: ${{ env.APP_ARCHITECTURES }}
+          image-name: ${{ env.APP_IMAGE_NAME }}
+
+  home-assistant-app-build:
+    name: Build Home Assistant app (${{ matrix.arch }})
+    if: needs.home-assistant-app-init.result == 'success'
+    needs: home-assistant-app-init
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.home-assistant-app-init.outputs.matrix) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
       - name: Write app version file
         run: 'echo "v${APP_VERSION}:app" > utils/measure/.VERSION'
         env:
-          APP_VERSION: ${{ steps.app.outputs.version }}
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
+          APP_VERSION: ${{ needs.home-assistant-app-init.outputs.version }}
+      - name: Build, publish and sign architecture image
+        uses: home-assistant/builder/actions/build-image@4de35182ce1e329181bffcbcc84d33db5e2c7e10 # 2026.06.0
         with:
-          images: ghcr.io/bramstroker/powercalc-measure-app
-          tags: |
-            type=raw,value=${{ steps.app.outputs.version }}
-          # Required on Home Assistant app images that are not built with the
-          # official builder action.
+          arch: ${{ matrix.arch }}
+          build-args: |
+            FINAL_STAGE=ha-app
+          cache-gha-scope: powercalc-measure-app
+          cache-image-tag: ${{ needs.home-assistant-app-init.outputs.version }}
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          context: ./utils/measure
+          cosign: "true"
+          image: ${{ matrix.image }}
+          image-tags: ${{ needs.home-assistant-app-init.outputs.version }}
           labels: |
-            io.hass.version=${{ steps.app.outputs.version }}
             io.hass.type=app
-            io.hass.arch=aarch64|amd64
-      - name: Log in to GHCR
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push Home Assistant app
-        uses: ./.github/actions/build-measure-docker
-        with:
-          target: ha-app
           push: "true"
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          version: ${{ needs.home-assistant-app-init.outputs.version }}
+
+  home-assistant-app-manifest:
+    name: Publish signed Home Assistant app manifest
+    needs:
+      - home-assistant-app-init
+      - home-assistant-app-build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      packages: write
+    steps:
+      - name: Publish and sign multi-architecture manifest
+        uses: home-assistant/builder/actions/publish-multi-arch-manifest@4de35182ce1e329181bffcbcc84d33db5e2c7e10 # 2026.06.0
+        with:
+          architectures: ${{ env.APP_ARCHITECTURES }}
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          cosign: "true"
+          image-name: ${{ env.APP_IMAGE_NAME }}
+          image-tags: ${{ needs.home-assistant-app-init.outputs.version }}
 
   # Mirrors home-assistant-app/ to the dedicated app-store repository. Runs
   # after the image push so the store never references a tag that is not yet
@@ -164,7 +203,9 @@ jobs:
   # contents read/write on bramstroker/powercalc-measure-app.
   publish-app-repository:
     if: github.repository == 'bramstroker/homeassistant-powercalc'
-    needs: home-assistant-app
+    needs:
+      - home-assistant-app-init
+      - home-assistant-app-manifest
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -188,7 +229,7 @@ jobs:
       - name: Commit and push
         working-directory: apps-repo
         env:
-          VERSION: ${{ needs.home-assistant-app.outputs.version }}
+          VERSION: ${{ needs.home-assistant-app-init.outputs.version }}
           APPS_REPO_TOKEN: ${{ secrets.APPS_REPO_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"

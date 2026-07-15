@@ -142,6 +142,7 @@ class CompletingService(SessionMeasurementService):
         directory = output_root / request.model_id
         directory.mkdir(parents=True)
         (directory / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
+        control.log("Reading light.test with sensor.test_power")
         control.operating_point(LightOperatingPoint(type="light", on=True, brightness=128))
         control.progress(completed=1, total=1, mode="brightness", estimated_remaining="0s")
         return RunnerResult(model_json_data={})
@@ -379,6 +380,18 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     assert files.json()[0]["name"] == "LCT010/brightness.csv"
     download = test_client.get("/api/session/current/files/LCT010/brightness.csv")
     assert download.status_code == 200
+    diagnostics = test_client.get("/api/session/current/diagnostics")
+    assert diagnostics.status_code == 200
+    assert diagnostics.headers["content-disposition"].startswith('attachment; filename="powercalc-measure-diagnostics-')
+    report = diagnostics.json()
+    assert report["snapshot"]["state"] == "completed"
+    assert report["request"]["model_id"] == "LCT010"
+    assert report["request"]["controller"]["entity_id"] == "light.test"
+    assert report["request"]["power_meter"]["entity_id"] == "sensor.test_power"
+    assert report["logs"][0]["data"]["message"] == "Reading light.test with sensor.test_power"
+    assert report["events"][-1]["data"]["state"] == "completed"
+    assert report["files"][0]["name"] == "LCT010/brightness.csv"
+    assert "test-token" not in diagnostics.text
 
 
 def test_session_summary_is_exposed(tmp_path: Path) -> None:
@@ -421,6 +434,7 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
     assert set(paths["/api/sessions"]) == {"post"}
     assert set(paths["/api/session/current"]) == {"get", "delete"}
     assert set(paths["/api/session/current/resume"]) == {"post"}
+    assert set(paths["/api/session/current/diagnostics"]) == {"get"}
     assert set(paths["/api/session/current/files/{name}"]) == {"get"}
 
 

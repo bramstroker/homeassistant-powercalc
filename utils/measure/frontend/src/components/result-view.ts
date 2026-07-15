@@ -8,6 +8,7 @@ export class ResultView extends LitElement {
     files: { attribute: false },
     fileUrl: { attribute: false },
     downloadAll: { attribute: false },
+    diagnosticsUrl: { type: String },
     busy: { type: Boolean },
     canResume: { type: Boolean },
     errorMessage: { type: String },
@@ -17,6 +18,7 @@ export class ResultView extends LitElement {
   files: SessionFile[] = [];
   fileUrl: (name: string) => string = () => "";
   downloadAll: () => void = () => {};
+  diagnosticsUrl = "";
   busy = false;
   canResume = false;
   errorMessage = "";
@@ -60,6 +62,10 @@ export class ResultView extends LitElement {
         ${this.renderSummary()}
         ${this.renderFiles()}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
+        <div class="diagnostics-download">
+          <span>Session snapshot and logs for issue reporting.</span>
+          <a href=${this.diagnosticsUrl} download>Download diagnostics</a>
+        </div>
         <div class="actions">
           <button type="button" @click=${() => this.emit("new")}>New measurement</button>
           ${this.renderResume(state)}

@@ -61,8 +61,10 @@ def test_storage_round_trips_bounded_event_replay(tmp_path: Path) -> None:
         )
 
     events = storage.load_events(current.id, limit=2)
+    all_events = storage.load_events(current.id, limit=None)
 
     assert [event.sequence for event in events] == [2, 3]
+    assert [event.sequence for event in all_events] == [1, 2, 3]
 
 
 def test_storage_recovers_from_truncated_final_event(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:

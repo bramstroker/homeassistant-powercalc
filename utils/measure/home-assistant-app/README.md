@@ -22,7 +22,7 @@ This repository is generated from [`utils/measure/home-assistant-app`](https://g
 
 ## Development
 
-The application source and the multi-architecture image build live in the main Powercalc repository. The published metadata references `ghcr.io/bramstroker/powercalc-measure-app:<version>`, where the image tag is taken from `powercalc_measure/config.yaml`.
+The application source and the multi-architecture image build live in the main Powercalc repository. The published metadata references `ghcr.io/bramstroker/powercalc-measure-app:<version>`, where the image tag is taken from `powercalc_measure/config.yaml`. Release images are built with the official Home Assistant Builder actions and signed keylessly with Cosign through GitHub Actions OIDC.
 
 For development with a pre-built image, copy `powercalc_measure/` to `/addons/powercalc_measure` on a Home Assistant OS host and reload the app store. The referenced image version must already exist in GHCR. Source builds use the `ha-app` target in `utils/measure/Dockerfile` and are tested from the main repository rather than by Supervisor cloning the full Powercalc source tree.
 

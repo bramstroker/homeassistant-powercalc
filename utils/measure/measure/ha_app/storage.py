@@ -96,8 +96,8 @@ class SessionStorage:
             if durable:
                 os.fsync(file.fileno())
 
-    def load_events(self, session_id: str, *, limit: int = 1000) -> tuple[SessionEvent, ...]:
-        """Load the persisted replay window for SSE reconnections."""
+    def load_events(self, session_id: str, *, limit: int | None = 1000) -> tuple[SessionEvent, ...]:
+        """Load persisted events, optionally retaining only the newest entries."""
         path = self.session_directory(session_id) / "events.jsonl"
         if not path.exists():
             return ()

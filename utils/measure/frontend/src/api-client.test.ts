@@ -28,6 +28,7 @@ describe("MeasureApiClient", () => {
       expect.objectContaining({ headers: expect.any(Headers) }),
     );
     expect(client.fileUrl("model data.json")).toBe("http://ha.local/api/hassio_ingress/token/api/session/current/files/model%20data.json");
+    expect(client.diagnosticsUrl()).toBe("http://ha.local/api/hassio_ingress/token/api/session/current/diagnostics");
     expect(apiUrl("api/entities", "http://ha.local/prefix/").pathname).toBe("/prefix/api/entities");
   });
 

@@ -44,7 +44,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   testingPowerMeter = false;
   powerMeterTestResult?: PowerMeterDiagnostic;
 
-  private readonly api: MeasureAppApi & Pick<MeasureApiClient, "fileUrl" | "eventsUrl"> = new MeasureApiClient();
+  private readonly api: MeasureAppApi & Pick<MeasureApiClient, "diagnosticsUrl" | "fileUrl" | "eventsUrl"> = new MeasureApiClient();
   private readonly controller = new MeasureAppController(
     this,
     () => this.api,
@@ -125,9 +125,9 @@ export class AppShell extends LitElement implements MeasureAppState {
     if (this.view === "review" && this.preflight && this.request) return html`
       <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .powerMeterDiagnostic=${this.preflight.power_meter_diagnostic} .canOverwrite=${this.reviewCanOverwrite()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`
-      <measure-running-view .snapshot=${this.snapshot} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
+      <measure-running-view .snapshot=${this.snapshot} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
     if (this.view === "result" && this.snapshot) return html`
-      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
+      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
     return html`
       <measure-setup-view
         .capabilities=${this.capabilities} .definitions=${this.definitions}

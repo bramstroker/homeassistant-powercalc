@@ -76,7 +76,7 @@ def test_assembler_applies_typed_home_assistant_configuration_at_construction() 
         ),
         controller=HassLightControllerSpec(entity_id="light.test", transition_time=2),
     )
-    home_assistant = HomeAssistantManager("ws://ha/api/websocket", "token")
+    home_assistant = HomeAssistantManager("ws://127.0.0.1/api/websocket", "token")
 
     with (
         patch("measure.assembler.HassPowerMeter") as power_meter,
