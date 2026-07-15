@@ -1,4 +1,4 @@
-import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, SessionSnapshot } from "../types";
+import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, PowerMeterDiagnostic, SessionSnapshot } from "../types";
 import { sharedStyles } from "../styles";
 import { AppShell } from "./app-shell";
 import "./result-view";
@@ -22,6 +22,19 @@ const capabilities: Capabilities = {
   },
 };
 
+const goodPowerMeterDiagnostic: PowerMeterDiagnostic = {
+  success: true,
+  power: 12.3,
+  status: "good",
+  precision_decimals: 2,
+  max_report_interval_seconds: 1.8,
+  reports_observed: 7,
+  duration_seconds: 12,
+  precision_status: "good",
+  update_interval_status: "good",
+  messages: ["The sensor meets the recommended update frequency."],
+};
+
 const lights: EntityDescriptor[] = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"] }];
 
 it("uses dark native form controls so iOS select indicators remain visible", () => {
@@ -37,6 +50,7 @@ describe("setup view", () => {
       voltages: EntityDescriptor[];
       selectedType: string;
       selectedLightId: string;
+      defaultMeasureDevice: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
@@ -100,6 +114,7 @@ describe("setup view", () => {
       voltages: EntityDescriptor[];
       selectedType: string;
       selectedLightId: string;
+      defaultMeasureDevice: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
@@ -109,6 +124,7 @@ describe("setup view", () => {
     element.voltages = [];
     element.selectedType = "light";
     element.selectedLightId = "light.rgb";
+    element.defaultMeasureDevice = "Shelly Plug S";
     document.body.append(element);
     await element.updateComplete;
 
@@ -121,6 +137,7 @@ describe("setup view", () => {
 
     const request = await submitted;
     expect(request.measure_type).toBe("light");
+    expect(request.measure_device).toBe("Shelly Plug S");
     expect(request.parameters).toMatchObject({
       bri_bri_steps: 1,
       ct_bri_steps: 5,
@@ -181,6 +198,22 @@ const definitions: MeasureDefinition[] = [
 ];
 
 describe("setup type picker", () => {
+  it("requires power meter setup before choosing a measurement type", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[]; powerMeterConfigured: boolean; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.definitions = definitions;
+    element.powerMeterConfigured = false;
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.textContent).toContain("Set up your power meter");
+    expect(element.shadowRoot.querySelector(".type-card")).toBeNull();
+    const openSettings = new Promise<void>((resolve) => element.addEventListener("open-settings", () => resolve()));
+    (element.shadowRoot.querySelector(".power-meter-required button") as HTMLButtonElement).click();
+    await openSettings;
+  });
+
   it("shows a card per measurement type before a type is chosen", async () => {
     const element = document.createElement("measure-setup-view") as HTMLElement & {
       definitions: MeasureDefinition[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
@@ -197,18 +230,21 @@ describe("setup type picker", () => {
   it("renders generic fields, dedupes the power sensor, and emits one typed preflight request", async () => {
     const element = document.createElement("measure-setup-view") as HTMLElement & {
       definitions: MeasureDefinition[]; capabilities: Capabilities; powers: EntityDescriptor[]; powerMeter: string;
-      defaultPowerEntityId: string; selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+      defaultPowerEntityId: string; defaultMeasureDevice: string; selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
     };
     element.definitions = definitions;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.powerMeter = "hass";
     element.defaultPowerEntityId = "sensor.plug_power";
+    element.defaultMeasureDevice = "Shelly Plug S";
     element.capabilities = capabilities;
     element.selectedType = "average";
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelector('select[name="power_entity_id"]')).toBeTruthy();
+    expect(element.shadowRoot.querySelector('select[name="power_entity_id"]')).toBeNull();
+    expect(element.shadowRoot.querySelector(".power-meter-summary")?.textContent).toContain("Plug power · sensor.plug_power");
+    expect(element.shadowRoot.querySelector(".power-meter-summary button")?.textContent).toContain("Change");
     expect(element.shadowRoot.querySelector('input[name="duration"]')).toBeTruthy();
     const readingInterval = element.shadowRoot.querySelector('input[name="sleep_time"]') as HTMLInputElement;
     expect(readingInterval).toBeTruthy();
@@ -223,6 +259,7 @@ describe("setup type picker", () => {
     (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
     const request = await submitted;
     expect(request.measure_type).toBe("average");
+    expect(request.measure_device).toBe("Shelly Plug S");
     expect(request.power_meter).toEqual({ type: "hass", entity_id: "sensor.plug_power", voltage_entity_id: null });
     expect(request.measure_type === "average" && request.duration).toBe(60);
     expect(request.parameters.sleep_time).toBe(2.5);
@@ -629,13 +666,14 @@ describe("running view", () => {
 });
 
 describe("setup view defaults", () => {
-  it("preselects the default power sensor for a new measurement", async () => {
+  it("shows the configured power sensor as read-only measurement context", async () => {
     const element = document.createElement("measure-setup-view") as HTMLElement & {
       capabilities: Capabilities;
       lights: EntityDescriptor[];
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
       defaultPowerEntityId: string;
+      defaultMeasureDevice: string;
       selectedType: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
@@ -645,15 +683,21 @@ describe("setup view defaults", () => {
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
     element.defaultPowerEntityId = "sensor.plug_power";
+    element.defaultMeasureDevice = "Shelly Plug S";
     element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
 
-    const power = element.shadowRoot.querySelector('select[name="power_entity_id"]') as HTMLSelectElement;
-    expect(power.value).toBe("sensor.plug_power");
+    expect(element.shadowRoot.querySelector('select[name="power_entity_id"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('input[name="measure_device"]')).toBeNull();
+    expect(element.shadowRoot.querySelector(".power-meter-summary")?.textContent).toContain("Plug power · sensor.plug_power");
+    expect(element.shadowRoot.querySelector(".power-meter-summary")?.textContent).toContain("Measurement device: Shelly Plug S");
+    const openSettings = new Promise<void>((resolve) => element.addEventListener("open-settings", () => resolve()));
+    (element.shadowRoot.querySelector(".power-meter-summary button") as HTMLButtonElement).click();
+    await openSettings;
   });
 
-  it("keeps the voltage selector aligned to the form grid and pairs it with the power sensor", async () => {
+  it("shows the voltage sensor automatically paired with the configured power sensor", async () => {
     const element = document.createElement("measure-setup-view") as HTMLElement & {
       capabilities: Capabilities;
       lights: EntityDescriptor[];
@@ -679,15 +723,10 @@ describe("setup view defaults", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const voltage = element.shadowRoot.querySelector('select[name="voltage_entity_id"]') as HTMLSelectElement;
-    expect(voltage.value).toBe("sensor.plug_line_voltage");
-    expect(voltage.closest(".grid")?.children).toHaveLength(1);
-
-    const power = element.shadowRoot.querySelector('select[name="power_entity_id"]') as HTMLSelectElement;
-    power.value = "sensor.strip_consumption";
-    power.dispatchEvent(new Event("change"));
-    await element.updateComplete;
-    expect(voltage.value).toBe("sensor.strip_mains");
+    const summary = element.shadowRoot.querySelector(".power-meter-summary");
+    expect(summary?.textContent).toContain("Plug power · sensor.plug_power");
+    expect(summary?.textContent).toContain("Voltage: Plug voltage · sensor.plug_line_voltage");
+    expect(element.shadowRoot.querySelector('select[name="voltage_entity_id"]')).toBeNull();
   });
 
   it("prefills the model ID from the selected measurement device", async () => {
@@ -775,6 +814,11 @@ describe("settings view", () => {
       element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettings>).detail));
     });
     const select = element.shadowRoot.querySelector('select[name="default_power_entity_id"]') as HTMLSelectElement;
+    const measureDevice = element.shadowRoot.querySelector('input[name="default_measure_device"]') as HTMLInputElement;
+    expect(measureDevice.required).toBe(true);
+    measureDevice.value = "Shelly Plug S";
+    expect(select.required).toBe(true);
+    expect(select.options[0]?.textContent).toBe("Select a power sensor");
     select.value = "sensor.plug_power";
     (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
 
@@ -848,28 +892,34 @@ describe("app shell device entities", () => {
 });
 
 describe("settings power meter test", () => {
-  it("emits a test event with the current form values and shows the result", async () => {
+  it("explains the meter requirements, emits a validation event, and shows diagnostic metrics", async () => {
     const element = document.createElement("measure-settings-view") as HTMLElement & {
-      powers: EntityDescriptor[]; settings: AppSettings; testResult: { success: boolean; power?: number | null; message?: string | null };
+      powers: EntityDescriptor[]; settings: AppSettings; testResult: PowerMeterDiagnostic;
       updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
     };
-    element.powers = [];
-    element.settings = { ...defaultSettings, power_meter: "shelly", shelly_ip: "192.168.1.50" };
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.settings = { ...defaultSettings, default_power_entity_id: "sensor.plug_power" };
     document.body.append(element);
     await element.updateComplete;
 
+    expect(element.shadowRoot.textContent).toContain("at least 0.1 W reported resolution");
     const tested = new Promise<AppSettings>((resolve) => {
       element.addEventListener("test", (event) => resolve((event as CustomEvent<AppSettings>).detail));
     });
-    const testButton = [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Test connection"));
+    const testButton = [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Validate measurement device"));
     testButton?.click();
     const detail = await tested;
-    expect(detail.power_meter).toBe("shelly");
-    expect(detail.shelly_ip).toBe("192.168.1.50");
+    expect(detail.power_meter).toBe("hass");
+    expect(detail.default_power_entity_id).toBe("sensor.plug_power");
 
-    element.testResult = { success: true, power: 12.3 };
+    element.testResult = goodPowerMeterDiagnostic;
     await element.updateComplete;
-    expect(element.shadowRoot.querySelector(".test-result.ok")?.textContent).toContain("12.3 W");
+    const diagnostic = element.shadowRoot.querySelector("measure-power-meter-diagnostic") as HTMLElement & { updateComplete: Promise<boolean>; shadowRoot: ShadowRoot };
+    await diagnostic.updateComplete;
+    expect(diagnostic.shadowRoot.textContent).toContain("12.3 W");
+    expect(diagnostic.shadowRoot.textContent).toContain("2 decimals");
+    expect(diagnostic.shadowRoot.textContent).toContain("1.8 s");
+    expect(diagnostic.shadowRoot.textContent).toContain("Good");
   });
 
   it("keeps the selected meter and Shelly IP across a re-render", async () => {
@@ -897,9 +947,93 @@ describe("settings power meter test", () => {
     expect(element.shadowRoot.querySelector('input[name="shelly_ip"]')).toBeTruthy();
     expect((element.shadowRoot.querySelector('input[name="shelly_ip"]') as HTMLInputElement).value).toBe("10.0.0.5");
   });
+
+  it("clears an earlier result when the power sensor, meter type, or Shelly address changes", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      powers: EntityDescriptor[]; settings: AppSettings; testResult?: PowerMeterDiagnostic;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.powers = [
+      { entity_id: "sensor.plug_power", name: "Plug power" },
+      { entity_id: "sensor.other_power", name: "Other power" },
+    ];
+    element.settings = { ...defaultSettings, default_power_entity_id: "sensor.plug_power" };
+    element.testResult = goodPowerMeterDiagnostic;
+    const cleared = vi.fn();
+    element.addEventListener("test-clear", cleared);
+    document.body.append(element);
+    await element.updateComplete;
+
+    const powerSensor = element.shadowRoot.querySelector('select[name="default_power_entity_id"]') as HTMLSelectElement;
+    powerSensor.value = "sensor.other_power";
+    powerSensor.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector("measure-power-meter-diagnostic")).toBeNull();
+
+    element.testResult = goodPowerMeterDiagnostic;
+    await element.updateComplete;
+    const meterType = element.shadowRoot.querySelector('select[name="power_meter"]') as HTMLSelectElement;
+    meterType.value = "shelly";
+    meterType.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector("measure-power-meter-diagnostic")).toBeNull();
+
+    element.testResult = goodPowerMeterDiagnostic;
+    await element.updateComplete;
+    const shellyIp = element.shadowRoot.querySelector('input[name="shelly_ip"]') as HTMLInputElement;
+    shellyIp.value = "10.0.0.7";
+    shellyIp.dispatchEvent(new Event("input"));
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector("measure-power-meter-diagnostic")).toBeNull();
+    expect(cleared).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe("preflight power meter diagnostics", () => {
+  it("shows the same quality details before a measurement starts", async () => {
+    const element = document.createElement("measure-preflight-view") as HTMLElement & {
+      powerMeterDiagnostic: PowerMeterDiagnostic;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.powerMeterDiagnostic = goodPowerMeterDiagnostic;
+    document.body.append(element);
+    await element.updateComplete;
+
+    const diagnostic = element.shadowRoot.querySelector("measure-power-meter-diagnostic") as HTMLElement & { updateComplete: Promise<boolean>; shadowRoot: ShadowRoot };
+    await diagnostic.updateComplete;
+    expect(diagnostic.getAttribute("heading")).toBe("Measurement device quality");
+    expect(diagnostic.shadowRoot.textContent).toContain("1.8 s");
+    expect(diagnostic.shadowRoot.textContent).toContain("Good");
+  });
 });
 
 describe("app shell", () => {
+  it("does not restore a stale validation result after meter settings change", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.view = "settings";
+    element.settings = { ...defaultSettings, default_power_entity_id: "sensor.plug_power", default_measure_device: "Shelly Plug S" };
+    element.powers = [
+      { entity_id: "sensor.plug_power", name: "Plug power" },
+      { entity_id: "sensor.other_power", name: "Other power" },
+    ];
+    element.powerMeterTestResult = goodPowerMeterDiagnostic;
+    document.body.append(element);
+    await element.updateComplete;
+
+    const settings = element.shadowRoot?.querySelector("measure-settings-view") as HTMLElement & { updateComplete: Promise<boolean>; shadowRoot: ShadowRoot };
+    await settings.updateComplete;
+    const powerSensor = settings.shadowRoot.querySelector('select[name="default_power_entity_id"]') as HTMLSelectElement;
+    powerSensor.value = "sensor.other_power";
+    powerSensor.dispatchEvent(new Event("change"));
+    await settings.updateComplete;
+    await element.updateComplete;
+
+    expect(element.powerMeterTestResult).toBeUndefined();
+    expect(settings.shadowRoot.querySelector("measure-power-meter-diagnostic")).toBeNull();
+  });
+
   it("keeps Settings in the app bar and labels each measurement step", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;

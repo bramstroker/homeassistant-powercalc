@@ -15,9 +15,6 @@ FROM python:3.14-slim AS python-runtime
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Install git for dependencies that come from git repositories
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
 # Copy only the package inputs needed by the runtime image. In particular,
@@ -52,9 +49,9 @@ CMD ["--host", "0.0.0.0", "--port", "8099", "--data-root", "/data"]
 
 FROM python-runtime AS runtime
 
-# OCR remains a CLI-only capability. Keep its native dependencies out of the
-# Home Assistant image, where only Home Assistant entity measurements are supported.
+# Install direct-device and OCR capabilities only in the standalone CLI image.
+# The Home Assistant image stays limited to its entity-based adapters.
 RUN apt-get update && apt-get install -y libgl1 tesseract-ocr && rm -rf /var/lib/apt/lists/* \
-    && uv sync --locked --extra ocr
+    && uv sync --locked --extra cli --extra ocr
 
 ENTRYPOINT ["python", "-m", "measure.measure"]

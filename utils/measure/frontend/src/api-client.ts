@@ -6,7 +6,7 @@ import type {
   EntityDescriptor,
   MeasurementRequest,
   MeasureDefinition,
-  PowerMeterTestResult,
+  PowerMeterDiagnostic,
   PreflightResponse,
   SessionEvent,
   SessionFile,
@@ -55,7 +55,7 @@ export class MeasureApiClient {
     return this.request("api/settings", { method: "PUT", body: JSON.stringify(settings) });
   }
 
-  testPowerMeter(settings: AppSettings): Promise<PowerMeterTestResult> {
+  testPowerMeter(settings: AppSettings): Promise<PowerMeterDiagnostic> {
     return this.request("api/settings/test-power-meter", { method: "POST", body: JSON.stringify(settings) });
   }
 

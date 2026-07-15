@@ -54,3 +54,7 @@ class LightController(Protocol):
     def get_effect_list(self) -> list[str]:
         """Get the list of supported effects"""
         ...
+
+    def close(self) -> None:
+        """Release resources owned by the controller."""
+        ...

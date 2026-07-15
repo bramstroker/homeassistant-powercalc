@@ -49,7 +49,7 @@ def test_execution_writes_model_from_prepared_measurement(tmp_path: Path) -> Non
     )
 
     def measure_standby_power() -> MeasurementResult:
-        runner.cleanup.assert_called_once_with()
+        runner.cleanup.assert_not_called()
         return MeasurementResult(power=0.5, voltages=[230.4])
 
     runner.measure_standby_power.side_effect = measure_standby_power
@@ -59,6 +59,8 @@ def test_execution_writes_model_from_prepared_measurement(tmp_path: Path) -> Non
     )
 
     MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
+
+    runner.cleanup.assert_called_once_with()
 
     model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
     assert model["name"] == "Test device"
@@ -84,5 +86,21 @@ def test_execution_cleans_up_runner_after_failure(tmp_path: Path) -> None:
 
     with pytest.raises(RuntimeError, match="measurement failed"):
         execution.run()
+
+    runner.cleanup.assert_called_once_with()
+
+
+def test_execution_cleans_up_runner_after_standby_failure(tmp_path: Path) -> None:
+    request = AverageMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        generate_model=True,
+    )
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.run.return_value = RunnerResult(model_json_data={})
+    runner.measure_standby_power.side_effect = RuntimeError("standby failed")
+    prepared = PreparedMeasurement(request=request, runner=runner)
+
+    with pytest.raises(RuntimeError, match="standby failed"):
+        MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
 
     runner.cleanup.assert_called_once_with()

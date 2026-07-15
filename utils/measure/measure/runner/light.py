@@ -95,6 +95,11 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         else:
             _LOGGER.info("Turning off the light")
             self.interaction.operating_point(LightOperatingPoint(type="light", on=False))
+        finally:
+            try:
+                self.light_controller.close()
+            except Exception as error:  # noqa: BLE001 - cleanup must not mask the measurement outcome
+                _LOGGER.warning("Could not close the light controller during measurement cleanup: %s", error)
 
     def run(self, request: LightMeasurementRequest, export_directory: str) -> RunnerResult:
         self._configure(request)

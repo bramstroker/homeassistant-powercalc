@@ -144,6 +144,7 @@ export interface PreflightResponse {
   estimated_variations?: number;
   estimated_duration_seconds?: number;
   supported_modes?: LutMode[];
+  power_meter_diagnostic?: PowerMeterDiagnostic | null;
 }
 
 export interface SessionProgress {
@@ -207,9 +208,19 @@ export interface AppSettings {
   measurement_defaults: AppMeasurementDefaults;
 }
 
-export interface PowerMeterTestResult {
+export type DiagnosticStatus = "good" | "warning" | "poor" | "unsupported";
+
+export interface PowerMeterDiagnostic {
   success: boolean;
   power?: number | null;
+  status: DiagnosticStatus;
+  precision_decimals?: number | null;
+  max_report_interval_seconds?: number | null;
+  reports_observed: number;
+  duration_seconds: number;
+  precision_status: "good" | "poor" | "unsupported";
+  update_interval_status: DiagnosticStatus;
+  messages: string[];
   message?: string | null;
 }
 

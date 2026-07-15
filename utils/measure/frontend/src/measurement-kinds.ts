@@ -80,6 +80,7 @@ export function buildNonLightRequest(
   form: FormData,
   capabilities: Capabilities,
   powerMeter: PowerMeterSpec,
+  measureDevice: string,
 ): NonLightMeasurementRequest {
   if (definition.measure_type === LIGHT_TYPE) throw new Error("Light requests use the specialized form");
 
@@ -91,7 +92,7 @@ export function buildNonLightRequest(
   const base: BaseMeasurementRequest = {
     model_id: text(form, "model_id") || "measurement",
     product_name: text(form, "product_name") || definition.label,
-    measure_device: text(form, "measure_device"),
+    measure_device: measureDevice,
     power_meter: powerMeter,
     generate_model: definition.supports_profile,
     parameters: {

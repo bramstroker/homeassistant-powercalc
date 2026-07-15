@@ -41,7 +41,14 @@ LIGHT_CONTROLLER=hue
 HUE_BRIDGE_IP=x.x.x.x
 ```
 
-The script asks you to select the light entity or discover the Hue light, depending on the selected controller.
+Native installations need the optional direct-Hue dependency. Install it and keep the extra enabled when starting the wizard:
+
+```bash
+uv sync --extra dev --extra cli
+uv run --extra cli python -m measure.measure
+```
+
+The script asks you to select a Home Assistant light entity or enter a Hue light/group identifier, depending on the selected controller.
 
 ## Run the light measurement
 

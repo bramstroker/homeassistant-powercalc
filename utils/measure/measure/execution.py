@@ -113,7 +113,7 @@ class MeasurementExecution:
         )
 
     def run(self) -> RunnerResult:
-        """Run and clean the device before measuring standby power and writing the model."""
+        """Run, optionally write the model, and always clean up runner resources."""
 
         output_directory = self.output_directory
         runner = self.measurement.runner
@@ -124,18 +124,17 @@ class MeasurementExecution:
             output_directory.mkdir(parents=True, exist_ok=True)
         try:
             result = runner.run(request, str(output_directory or ""))
+            if request.generate_model_json and output_directory is not None:
+                standby = runner.measure_standby_power()
+                write_model_json(
+                    output_directory,
+                    standby_power=standby.power,
+                    name=request.model_name,
+                    measure_device=request.measure_device,
+                    parameters=request.parameters,
+                    extra_json_data=result.model_json_data,
+                    voltages=list(result.voltages or []) + standby.voltages,
+                )
+            return result
         finally:
             runner.cleanup()
-
-        if request.generate_model_json and output_directory is not None:
-            standby = runner.measure_standby_power()
-            write_model_json(
-                output_directory,
-                standby_power=standby.power,
-                name=request.model_name,
-                measure_device=request.measure_device,
-                parameters=request.parameters,
-                extra_json_data=result.model_json_data,
-                voltages=list(result.voltages or []) + standby.voltages,
-            )
-        return result

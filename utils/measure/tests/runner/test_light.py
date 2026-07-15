@@ -98,6 +98,7 @@ def test_cleanup_turns_off_light() -> None:
     runner.cleanup()
 
     light_controller.change_light_state.assert_called_once_with(LutMode.BRIGHTNESS, on=False)
+    light_controller.close.assert_called_once_with()
 
 
 def test_cleanup_failure_does_not_mask_measurement_result(caplog: pytest.LogCaptureFixture) -> None:
@@ -108,6 +109,17 @@ def test_cleanup_failure_does_not_mask_measurement_result(caplog: pytest.LogCapt
     runner.cleanup()
 
     assert "Could not turn off the light during measurement cleanup: unavailable" in caplog.text
+    light_controller.close.assert_called_once_with()
+
+
+def test_controller_close_failure_does_not_mask_measurement_result(caplog: pytest.LogCaptureFixture) -> None:
+    light_controller = MagicMock(spec=DummyLightController)
+    light_controller.close.side_effect = RuntimeError("close unavailable")
+    runner = LightRunner(MagicMock(MeasureUtil), _parameters(), light_controller)
+
+    runner.cleanup()
+
+    assert "Could not close the light controller during measurement cleanup: close unavailable" in caplog.text
 
 
 def test_resume_effect(tmp_path: Path) -> None:

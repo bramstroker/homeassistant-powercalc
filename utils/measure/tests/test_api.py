@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 import time
 from types import SimpleNamespace
@@ -14,6 +15,7 @@ from measure.ha_app.coordinator import MeasurementCoordinator, SessionMeasuremen
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
+from measure.powermeter.diagnostics import PowerMeterDiagnostics
 from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
@@ -28,6 +30,9 @@ def entity(entity_id: str, state: str, **attributes: Any) -> SimpleNamespace:  #
 
 
 class FakeClient:
+    def __init__(self) -> None:
+        self.state_calls = 0
+
     def close(self) -> None:
         return None
 
@@ -115,6 +120,17 @@ class FakeClient:
             device_registry=self.get_device_registry(),
         )
 
+    def get_state(
+        self,
+        *,
+        entity_id: str | None = None,
+        group_id: str | None = None,
+        slug: str | None = None,
+    ) -> SimpleNamespace:
+        self.state_calls += 1
+        now = datetime.now(UTC)
+        return SimpleNamespace(state="4.2", last_reported=now, last_updated=now)
+
 
 class CompletingService(SessionMeasurementService):
     def run(
@@ -180,6 +196,10 @@ def client(tmp_path: Path, *, trusted_ingress_only: bool = False) -> TestClient:
         trusted_ingress_only=trusted_ingress_only,
     )
     app.state.context.home_assistant = FakeClient()
+    app.state.context.power_meter_diagnostics = PowerMeterDiagnostics(
+        app.state.context.build_power_meter,
+        duration=0,
+    )
     app.state.context.coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
     return TestClient(app)
 
@@ -247,10 +267,11 @@ def test_power_meter_test_endpoint(tmp_path: Path) -> None:
     dummy = test_client.post("/api/settings/test-power-meter", json={"power_meter": "dummy"})
     assert dummy.status_code == 200
     assert dummy.json()["success"] is True
-    assert 0 <= dummy.json()["power"] <= 100
+    assert dummy.json()["status"] == "unsupported"
 
     shelly = test_client.post("/api/settings/test-power-meter", json={"power_meter": "shelly", "shelly_ip": None})
-    assert shelly.json() == {"success": False, "power": None, "message": "Enter the Shelly IP address first"}
+    assert shelly.json()["success"] is False
+    assert shelly.json()["message"] == "Enter the Shelly IP address first"
 
     hass = test_client.post(
         "/api/settings/test-power-meter",
@@ -258,6 +279,14 @@ def test_power_meter_test_endpoint(tmp_path: Path) -> None:
     )
     assert hass.json()["success"] is False
     assert "power sensor" in hass.json()["message"].lower()
+
+    validated = test_client.post(
+        "/api/settings/test-power-meter",
+        json={"power_meter": "hass", "default_power_entity_id": "sensor.test_power"},
+    )
+    assert validated.json()["success"] is True
+    assert validated.json()["precision_decimals"] == 1
+    assert validated.json()["update_interval_status"] == "poor"
 
 
 def test_measure_definitions_and_average_request(tmp_path: Path) -> None:
@@ -281,6 +310,20 @@ def test_measure_definitions_and_average_request(tmp_path: Path) -> None:
     }
     assert test_client.post("/api/preflight", json=payload).status_code == 200
     assert test_client.post("/api/sessions", json=payload).status_code == 201
+
+
+def test_preflight_exposes_quality_warnings_and_start_reuses_diagnostics(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    home_assistant = test_client.app.state.context.home_assistant
+
+    response = test_client.post("/api/preflight", json=payload())
+
+    assert response.status_code == 200
+    assert response.json()["power_meter_diagnostic"]["precision_status"] == "good"
+    assert response.json()["power_meter_diagnostic"]["update_interval_status"] == "poor"
+    assert "did not report often enough" in response.json()["warnings"][0]
+    assert test_client.post("/api/sessions", json=payload()).status_code == 201
+    assert home_assistant.state_calls == 1
 
 
 def test_preflight_rejects_unavailable_entity(tmp_path: Path) -> None:
@@ -322,10 +365,16 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     response = test_client.post("/api/sessions", json=payload())
 
     assert response.status_code == 201
-    current = test_client.get("/api/session/current")
-    assert current.status_code == 200
-    assert current.json()["progress"]["estimated_remaining_seconds"] == 0
-    assert current.json()["operating_point"] == {"type": "light", "on": True, "brightness": 128}
+    current = {}
+    for _ in range(50):
+        current_response = test_client.get("/api/session/current")
+        assert current_response.status_code == 200
+        current = current_response.json()
+        if current["state"] == "completed":
+            break
+        time.sleep(0.02)
+    assert current["progress"]["estimated_remaining_seconds"] == 0
+    assert current["operating_point"] == {"type": "light", "on": True, "brightness": 128}
     files = test_client.get("/api/session/current/files")
     assert files.json()[0]["name"] == "LCT010/brightness.csv"
     download = test_client.get("/api/session/current/files/LCT010/brightness.csv")

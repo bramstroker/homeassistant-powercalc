@@ -8,7 +8,7 @@ import type {
   MeasureDefinition,
   MeasureType,
   MeasurementRequest,
-  PowerMeterTestResult,
+  PowerMeterDiagnostic,
   PreflightResponse,
   SessionEvent,
   SessionFile,
@@ -24,6 +24,7 @@ export interface MeasureAppState {
   connectedToEvents: boolean;
   snapshot?: SessionSnapshot;
   request?: MeasurementRequest;
+  selectedMeasureType?: MeasureType;
   preflight?: PreflightResponse;
   files: SessionFile[];
   logs: string[];
@@ -37,7 +38,7 @@ export interface MeasureAppState {
   deviceEntities: Record<string, EntityDescriptor[]>;
   deviceEntityErrors: Record<string, string>;
   testingPowerMeter: boolean;
-  powerMeterTestResult?: PowerMeterTestResult;
+  powerMeterTestResult?: PowerMeterDiagnostic;
 }
 
 export interface MeasureAppApi {
@@ -45,7 +46,7 @@ export interface MeasureAppApi {
   getMeasureDefinitions(): Promise<MeasureDefinition[]>;
   getSettings(): Promise<AppSettings>;
   saveSettings(settings: AppSettings): Promise<AppSettings>;
-  testPowerMeter(settings: AppSettings): Promise<PowerMeterTestResult>;
+  testPowerMeter(settings: AppSettings): Promise<PowerMeterDiagnostic>;
   getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]>;
   getEntitiesByDeviceClass(deviceClass: DeviceClass): Promise<EntityDescriptor[]>;
   preflight(request: MeasurementRequest): Promise<PreflightResponse>;
@@ -74,6 +75,7 @@ type EventConnectionFactory = (callbacks: EventCallbacks) => EventConnection;
 export class MeasureAppController {
   private eventConnection?: EventConnection;
   private settingsReturnView: AppView = "setup";
+  private powerMeterTestVersion = 0;
 
   constructor(
     private readonly state: MeasureAppState,
@@ -123,6 +125,8 @@ export class MeasureAppController {
   }
 
   selectMeasureType(type: MeasureType): void {
+    this.state.selectedMeasureType = type;
+    this.changed();
     void this.loadTypeEntities(type);
   }
 
@@ -198,6 +202,7 @@ export class MeasureAppController {
     this.eventConnection?.close();
     this.state.snapshot = { state: "idle" };
     this.state.request = undefined;
+    this.state.selectedMeasureType = undefined;
     this.state.preflight = undefined;
     this.state.files = [];
     this.state.logs = [];
@@ -211,7 +216,9 @@ export class MeasureAppController {
     if (this.state.view === "loading" || this.state.view === "settings") return;
     this.settingsReturnView = this.state.view;
     this.state.errorMessage = "";
+    this.powerMeterTestVersion += 1;
     this.state.powerMeterTestResult = undefined;
+    this.state.testingPowerMeter = false;
     this.state.view = "settings";
     this.changed();
   }
@@ -223,17 +230,39 @@ export class MeasureAppController {
   }
 
   async testPowerMeter(settings: AppSettings): Promise<void> {
+    const version = ++this.powerMeterTestVersion;
     this.state.testingPowerMeter = true;
     this.state.powerMeterTestResult = undefined;
     this.changed();
     try {
-      this.state.powerMeterTestResult = await this.api().testPowerMeter(settings);
+      const result = await this.api().testPowerMeter(settings);
+      if (version === this.powerMeterTestVersion) this.state.powerMeterTestResult = result;
     } catch (error) {
-      this.state.powerMeterTestResult = { success: false, message: message(error) };
+      if (version === this.powerMeterTestVersion) {
+        this.state.powerMeterTestResult = {
+          success: false,
+          status: "poor",
+          reports_observed: 0,
+          duration_seconds: 0,
+          precision_status: "unsupported",
+          update_interval_status: "unsupported",
+          messages: [],
+          message: message(error),
+        };
+      }
     } finally {
-      this.state.testingPowerMeter = false;
-      this.changed();
+      if (version === this.powerMeterTestVersion) {
+        this.state.testingPowerMeter = false;
+        this.changed();
+      }
     }
+  }
+
+  clearPowerMeterTestResult(): void {
+    this.powerMeterTestVersion += 1;
+    this.state.testingPowerMeter = false;
+    this.state.powerMeterTestResult = undefined;
+    this.changed();
   }
 
   async saveSettings(settings: AppSettings): Promise<void> {

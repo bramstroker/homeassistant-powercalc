@@ -1,16 +1,20 @@
 from __future__ import annotations
 
+from typing import Any
+
+from measure.controller.light.const import LutMode
+
 from .controller import LightController, LightInfo
 
 
 class DummyLightController(LightController):
     def change_light_state(
         self,
-        color_mode: str,
+        lut_mode: LutMode,
         on: bool = True,
-        **kwargs,  # noqa: ANN003
+        **kwargs: Any,  # noqa: ANN401
     ) -> None:
-        pass
+        return
 
     def get_light_info(self) -> LightInfo:
         return LightInfo("dummy")
@@ -20,3 +24,6 @@ class DummyLightController(LightController):
 
     def get_effect_list(self) -> list[str]:
         return ["A", "B", "C"]
+
+    def close(self) -> None:
+        return

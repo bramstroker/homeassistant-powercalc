@@ -3,7 +3,7 @@ import { MeasureApiClient, SessionEventStream } from "../api-client";
 import { MeasureAppController } from "../app-controller";
 import type { AppView, MeasureAppApi, MeasureAppState } from "../app-controller";
 import { LIGHT_TYPE } from "../measurement-kinds";
-import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PowerMeterTestResult, PreflightResponse, SessionFile, SessionSnapshot } from "../types";
+import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot } from "../types";
 import type { ReviewMetric, ReviewRow } from "./preflight-view";
 import { sharedStyles } from "../styles";
 import "./preflight-view";
@@ -28,6 +28,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   connectedToEvents = false;
   snapshot?: SessionSnapshot;
   request?: MeasurementRequest;
+  selectedMeasureType?: MeasureType;
   preflight?: PreflightResponse;
   files: SessionFile[] = [];
   logs: string[] = [];
@@ -41,7 +42,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   deviceEntities: Record<string, EntityDescriptor[]> = {};
   deviceEntityErrors: Record<string, string> = {};
   testingPowerMeter = false;
-  powerMeterTestResult?: PowerMeterTestResult;
+  powerMeterTestResult?: PowerMeterDiagnostic;
 
   private readonly api: MeasureAppApi & Pick<MeasureApiClient, "fileUrl" | "eventsUrl"> = new MeasureApiClient();
   private readonly controller = new MeasureAppController(
@@ -120,9 +121,9 @@ export class AppShell extends LitElement implements MeasureAppState {
   private renderView() {
     if (this.view === "loading") return this.renderLoading();
     if (this.view === "settings") return html`
-      <measure-settings-view .powers=${this.powers} .settings=${this.settings} .capabilities=${this.capabilities} .busy=${this.busy} .testing=${this.testingPowerMeter} .testResult=${this.powerMeterTestResult} .errorMessage=${this.errorMessage} @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter}></measure-settings-view>`;
+      <measure-settings-view .powers=${this.powers} .settings=${this.settings} .capabilities=${this.capabilities} .busy=${this.busy} .testing=${this.testingPowerMeter} .testResult=${this.powerMeterTestResult} .errorMessage=${this.errorMessage} @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter} @test-clear=${this.clearPowerMeterTestResult}></measure-settings-view>`;
     if (this.view === "review" && this.preflight && this.request) return html`
-      <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .canOverwrite=${this.reviewCanOverwrite()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
+      <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .powerMeterDiagnostic=${this.preflight.power_meter_diagnostic} .canOverwrite=${this.reviewCanOverwrite()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`
       <measure-running-view .snapshot=${this.snapshot} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
     if (this.view === "result" && this.snapshot) return html`
@@ -133,13 +134,26 @@ export class AppShell extends LitElement implements MeasureAppState {
         .lights=${this.lights} .powers=${this.powers} .voltages=${this.voltages} .deviceEntities=${this.deviceEntities} .deviceEntityErrors=${this.deviceEntityErrors}
         .initialType=${this.pendingType()} .initialRequest=${this.request}
         .defaultPowerEntityId=${this.settings?.default_power_entity_id ?? ""} .defaultMeasureDevice=${this.settings?.default_measure_device ?? ""} .powerMeter=${this.settings?.power_meter ?? "hass"} .shellyIp=${this.settings?.shelly_ip ?? ""}
+        .powerMeterConfigured=${this.powerMeterConfigured()}
         .busy=${this.busy} .errorMessage=${this.errorMessage}
-        @preflight=${this.runPreflight} @measure-type-selected=${this.measureTypeSelected} @entity-domains-requested=${this.entityDomainsRequested}></measure-setup-view>`;
+        @preflight=${this.runPreflight} @measure-type-selected=${this.measureTypeSelected} @entity-domains-requested=${this.entityDomainsRequested} @open-settings=${this.openSettings}></measure-setup-view>`;
+  }
+
+  private powerMeterConfigured(): boolean {
+    if (!this.settings?.power_meter) return false;
+    if (!this.settings.default_measure_device) return false;
+    if (this.settings.power_meter === "hass") return Boolean(this.settings.default_power_entity_id);
+    if (this.settings.power_meter === "shelly") return Boolean(this.settings.shelly_ip);
+    return this.settings.power_meter === "dummy";
+  }
+
+  private clearPowerMeterTestResult(): void {
+    this.controller.clearPowerMeterTestResult();
   }
 
   private pendingType(): MeasureType | undefined {
     if (this.request) return this.request.measure_type;
-    return undefined;
+    return this.selectedMeasureType;
   }
 
   private canResumeSession(): boolean {

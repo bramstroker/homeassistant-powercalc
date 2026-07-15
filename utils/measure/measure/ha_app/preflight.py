@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Protocol
 
 from measure.controller.charging.spec import HassChargingControllerSpec, charging_entity_domain
@@ -11,7 +11,8 @@ from measure.controller.light.controller import LightInfo
 from measure.controller.light.spec import HassLightControllerSpec
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.home_assistant_entities import DeviceClass, EntityDomain
-from measure.powermeter.spec import HassPowerMeterSpec
+from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
+from measure.powermeter.spec import HassPowerMeterSpec, PowerMeterSpec
 from measure.request import (
     ChargingMeasurementRequest,
     FanMeasurementRequest,
@@ -47,6 +48,7 @@ class PreflightResult:
     estimated_variations: int | None = None
     estimated_duration_seconds: int | None = None
     supported_modes: tuple[LutMode, ...] | None = None
+    power_meter_diagnostic: PowerMeterDiagnostic | None = None
 
 
 class MeasurementPreflight:
@@ -58,10 +60,12 @@ class MeasurementPreflight:
         has_active_session: Callable[[], bool],
         verify_storage: Callable[[], None],
         load_entities: EntityLoader,
+        diagnose_power_meter: Callable[[PowerMeterSpec], PowerMeterDiagnostic] | None = None,
     ) -> None:
         self._has_active_session = has_active_session
         self._verify_storage = verify_storage
         self._load_entities = load_entities
+        self._diagnose_power_meter = diagnose_power_meter
 
     def validate(self, request: MeasurementRequest) -> PreflightResult:
         """Return warnings and estimates, or raise a typed preflight error."""
@@ -76,9 +80,20 @@ class MeasurementPreflight:
         self._validate_power_meter(request)
 
         if isinstance(request, LightMeasurementRequest):
-            return self._validate_light(request)
-        self._validate_controller(request)
-        return PreflightResult()
+            result = self._validate_light(request)
+        else:
+            self._validate_controller(request)
+            result = PreflightResult()
+
+        if self._diagnose_power_meter is None:
+            return result
+        diagnostic = self._diagnose_power_meter(request.power_meter)
+        if not diagnostic.success:
+            raise PreflightError(diagnostic.message or "Could not read from the power meter")
+        warnings = (
+            tuple(diagnostic.messages) if diagnostic.status in {DiagnosticStatus.WARNING, DiagnosticStatus.POOR} else ()
+        )
+        return replace(result, warnings=warnings, power_meter_diagnostic=diagnostic)
 
     def _validate_power_meter(self, request: MeasurementRequest) -> None:
         if not isinstance(request.power_meter, HassPowerMeterSpec):

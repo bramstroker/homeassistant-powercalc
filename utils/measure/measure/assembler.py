@@ -19,7 +19,6 @@ from measure.controller.fan.spec import DummyFanControllerSpec, FanControllerSpe
 from measure.controller.light.controller import LightController
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.hass import HassLightController
-from measure.controller.light.hue import HueLightController
 from measure.controller.light.spec import (
     DummyLightControllerSpec,
     HassLightControllerSpec,
@@ -95,7 +94,7 @@ class MeasurementAssembler:
     def assemble(self, request: MeasurementRequest) -> PreparedMeasurement:
         """Resolve a request once into a transport-independent runner graph."""
 
-        power_meter = self._power_meter(request.power_meter)
+        power_meter = self.build_power_meter(request.power_meter)
         if self._power_meter_decorator is not None:
             power_meter = self._power_meter_decorator(power_meter)
         voltage_enabled = power_meter.has_voltage_support()
@@ -113,7 +112,9 @@ class MeasurementAssembler:
             runner=runner,
         )
 
-    def _power_meter(self, spec: PowerMeterSpec) -> PowerMeter:  # noqa: C901
+    def build_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:  # noqa: C901
+        """Build the configured meter for execution or preflight diagnostics."""
+
         if isinstance(spec, DummyPowerMeterSpec):
             return DummyPowerMeter()
         if isinstance(spec, HassPowerMeterSpec):
@@ -200,6 +201,8 @@ class MeasurementAssembler:
                 wait=self._interaction.wait,
             )
         if isinstance(spec, HueLightControllerSpec):
+            from measure.controller.light.hue import HueLightController
+
             return HueLightController(spec.bridge_ip, light=spec.light)
         raise ValueError(f"Expected a light controller specification, got {type(spec).__name__}")
 

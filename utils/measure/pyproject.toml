@@ -22,13 +22,12 @@ dependencies = [
     "typing-extensions>=4.6",
     "uvicorn>=0.35",
     "pycryptodome",
-    "phue"
 ]
 
-[tool.uv.sources]
-phue = { git = "https://github.com/studioimaginaire/phue.git", rev = "f5c79ff07dafbaad155de6ca1cfd513705bbdbd3" }
-
 [project.optional-dependencies]
+cli = [
+    "aiohue>=4.8.1,<5",
+]
 ocr = [
     "numpy>=2.4",
     "opencv-python-headless>=4.7",

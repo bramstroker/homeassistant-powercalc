@@ -1,6 +1,6 @@
 import { MeasureAppController } from "./app-controller";
 import type { EventConnection, MeasureAppApi, MeasureAppState } from "./app-controller";
-import type { SessionEvent } from "./types";
+import type { PowerMeterDiagnostic, SessionEvent } from "./types";
 
 const measurementDefaults = { sleep_time: 1, sample_count: 2, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
 const settings = {
@@ -32,7 +32,18 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     getMeasureDefinitions: async () => [],
     getSettings: async () => settings,
     saveSettings: async (value) => value,
-    testPowerMeter: async () => ({ success: true, power: 1 }),
+    testPowerMeter: async () => ({
+      success: true,
+      power: 1,
+      status: "good",
+      precision_decimals: 1,
+      max_report_interval_seconds: 2,
+      reports_observed: 3,
+      duration_seconds: 4,
+      precision_status: "good",
+      update_interval_status: "good",
+      messages: [],
+    }),
     getEntitiesByDomain: async () => [],
     getEntitiesByDeviceClass: async () => [],
     preflight: async () => ({ valid: true, warnings: [] }),
@@ -67,6 +78,7 @@ describe("measure app controller", () => {
     expect(requestedDomains).toEqual(["light"]);
 
     controller.selectMeasureType("fan");
+    expect(appState.selectedMeasureType).toBe("fan");
     await vi.waitFor(() => expect(appState.deviceEntities.fan?.[0]?.entity_id).toBe("fan.bedroom"));
     expect(requestedDomains).toEqual(["light", "fan"]);
   });
@@ -123,6 +135,39 @@ describe("measure app controller", () => {
     expect(appState.capabilities?.defaults.sleep_time).toBe(4);
     expect(appState.capabilities?.defaults.sample_count).toBe(3);
     expect(appState.view).toBe("setup");
+  });
+
+  it("ignores a validation result after the meter configuration changes", async () => {
+    let resolveValidation: (result: PowerMeterDiagnostic) => void = () => undefined;
+    const validation = new Promise<PowerMeterDiagnostic>((resolve) => {
+      resolveValidation = resolve;
+    });
+    const appState = state();
+    const controller = new MeasureAppController(
+      appState,
+      () => api({ testPowerMeter: async () => validation }),
+      () => connection(),
+      () => undefined,
+    );
+
+    const pending = controller.testPowerMeter(settings);
+    controller.clearPowerMeterTestResult();
+    resolveValidation({
+      success: true,
+      power: 2.3,
+      status: "good",
+      precision_decimals: 1,
+      max_report_interval_seconds: 1,
+      reports_observed: 10,
+      duration_seconds: 12,
+      precision_status: "good",
+      update_interval_status: "good",
+      messages: [],
+    });
+    await pending;
+
+    expect(appState.testingPowerMeter).toBe(false);
+    expect(appState.powerMeterTestResult).toBeUndefined();
   });
 });
 

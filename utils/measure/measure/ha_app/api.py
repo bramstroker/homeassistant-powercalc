@@ -18,8 +18,10 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
+from measure.assembler import MeasurementAssembler
 from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LutMode
+from measure.execution import ImmediateInteraction
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
@@ -35,11 +37,10 @@ from measure.home_assistant_entities import (
     HomeAssistantEntityCatalog,
 )
 from measure.powermeter.const import PowerMeterType
-from measure.powermeter.dummy import DummyPowerMeter
+from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic, PowerMeterDiagnostics
 from measure.powermeter.errors import PowerMeterError
-from measure.powermeter.hass import HassPowerMeter
 from measure.powermeter.powermeter import PowerMeter
-from measure.powermeter.shelly import ShellyPowerMeter
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, PowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.tuning import MeasurementParameters
 
@@ -64,6 +65,7 @@ class PreflightResponse(BaseModel):
     estimated_variations: int | None = None
     estimated_duration_seconds: int | None = None
     supported_modes: list[LutMode] | None = None
+    power_meter_diagnostic: PowerMeterDiagnostic | None = None
 
 
 class SessionFile(BaseModel):
@@ -105,12 +107,6 @@ class MeasureDefinition(BaseModel):
     supports_resume: bool
 
 
-class PowerMeterTestResult(BaseModel):
-    success: bool
-    power: float | None = None
-    message: str | None = None
-
-
 class AppContext:
     def __init__(
         self,
@@ -123,6 +119,7 @@ class AppContext:
         self.home_assistant = HomeAssistantManager(hass_url, hass_token)
         self.trusted_ingress_only = trusted_ingress_only
         self.storage = SessionStorage(data_root)
+        self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
         self.coordinator = MeasurementCoordinator(
             self.storage,
             self._measurement_service,
@@ -130,6 +127,12 @@ class AppContext:
 
     def _measurement_service(self) -> MeasurementService:
         return MeasurementService(self.home_assistant)
+
+    def build_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:
+        return MeasurementAssembler(
+            ImmediateInteraction(),
+            home_assistant=self.home_assistant,
+        ).build_power_meter(spec)
 
 
 @asynccontextmanager
@@ -282,7 +285,7 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
         return await run_in_threadpool(_context(request).storage.save_settings, payload)
 
     @router.post("/settings/test-power-meter")
-    async def test_power_meter(payload: AppPreferences, request: Request) -> PowerMeterTestResult:
+    async def test_power_meter(payload: AppPreferences, request: Request) -> PowerMeterDiagnostic:
         return await run_in_threadpool(_test_power_meter, _context(request), payload)
 
     @router.get("/entities", responses={400: _ERROR})
@@ -421,33 +424,33 @@ def _measure_definitions() -> list[MeasureDefinition]:
     ]
 
 
-def _test_power_meter(context: AppContext, settings: AppPreferences) -> PowerMeterTestResult:
-    """Take a single live reading from the configured power meter to confirm connectivity."""
+def _test_power_meter(context: AppContext, settings: AppPreferences) -> PowerMeterDiagnostic:
+    """Validate connectivity and measurement quality for the configured meter."""
     try:
-        meter = _build_test_power_meter(context, settings)
-        reading = meter.get_power(include_voltage=False)
+        spec = _power_meter_spec(settings)
     except PowerMeterError as error:
-        return PowerMeterTestResult(success=False, message=str(error))
-    except Exception as error:  # noqa: BLE001 - surface any connection/parsing failure to the user
-        _LOGGER.debug("Power meter test failed", exc_info=True)
-        return PowerMeterTestResult(success=False, message=str(error) or "Could not read from the power meter")
-    return PowerMeterTestResult(success=True, power=round(reading.power, 2))
+        message = str(error)
+        return PowerMeterDiagnostic(
+            success=False,
+            status=DiagnosticStatus.POOR,
+            precision_status=DiagnosticStatus.UNSUPPORTED,
+            update_interval_status=DiagnosticStatus.UNSUPPORTED,
+            messages=[message],
+            message=message,
+        )
+    return context.power_meter_diagnostics.evaluate(spec, force=True)
 
 
-def _build_test_power_meter(context: AppContext, settings: AppPreferences) -> PowerMeter:
+def _power_meter_spec(settings: AppPreferences) -> PowerMeterSpec:
     if settings.power_meter == PowerMeterType.DUMMY:
-        return DummyPowerMeter()
+        return DummyPowerMeterSpec()
     if settings.power_meter == PowerMeterType.SHELLY:
         if not settings.shelly_ip:
             raise PowerMeterError("Enter the Shelly IP address first")
-        return ShellyPowerMeter(settings.shelly_ip)
+        return ShellyPowerMeterSpec(device_ip=settings.shelly_ip)
     if not settings.default_power_entity_id:
         raise PowerMeterError("Select a power sensor first")
-    return HassPowerMeter(
-        context.home_assistant,
-        call_update_entity=False,
-        entity_id=settings.default_power_entity_id,
-    )
+    return HassPowerMeterSpec(entity_id=settings.default_power_entity_id)
 
 
 def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightResponse:
@@ -468,6 +471,7 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
             has_active_session=lambda: _is_active(context.coordinator.current),
             verify_storage=context.storage.verify_writable,
             load_entities=load_entities,
+            diagnose_power_meter=context.power_meter_diagnostics.evaluate,
         ).validate(payload)
     except ActiveSessionError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
@@ -479,6 +483,7 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
         estimated_variations=result.estimated_variations,
         estimated_duration_seconds=result.estimated_duration_seconds,
         supported_modes=list(result.supported_modes) if result.supported_modes is not None else None,
+        power_meter_diagnostic=result.power_meter_diagnostic,
     )
 
 

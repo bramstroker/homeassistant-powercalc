@@ -5,7 +5,7 @@ import time
 
 from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
-from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter, PowerMeterDiagnosticSample
 
 
 class HassPowerMeter(PowerMeter):
@@ -67,3 +67,16 @@ class HassPowerMeter(PowerMeter):
         if voltage_state.state == "unavailable":
             raise PowerMeterError(f"Voltage sensor {self._voltage_entity_id} unavailable")
         return True
+
+    def diagnostic_sample(self) -> PowerMeterDiagnosticSample:
+        """Read the raw HA state and its source reporting timestamp without forcing an update."""
+
+        state = self.client.get_state(entity_id=self._entity_id)
+        if state.state in {"unavailable", "unknown"}:
+            raise PowerMeterError(f"Power sensor {self._entity_id} {state.state}")
+        reported = state.last_reported or state.last_updated
+        return PowerMeterDiagnosticSample(
+            power=float(state.state),
+            raw_value=state.state,
+            reported_at=reported.timestamp() if reported is not None else time.time(),
+        )

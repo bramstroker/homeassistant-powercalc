@@ -39,11 +39,11 @@ export class SetupView extends LitElement {
     defaultMeasureDevice: { type: String },
     powerMeter: { type: String },
     shellyIp: { type: String },
+    powerMeterConfigured: { type: Boolean },
     busy: { type: Boolean },
     errorMessage: { type: String },
     selectedType: { state: true },
     selectedLightId: { state: true },
-    selectedPowerId: { state: true },
     selectedDeviceEntityId: { state: true },
     selectedChargingType: { state: true },
   };
@@ -61,15 +61,16 @@ export class SetupView extends LitElement {
   defaultMeasureDevice = "";
   powerMeter: AppSettings["power_meter"] = "hass";
   shellyIp = "";
+  powerMeterConfigured = true;
   busy = false;
   errorMessage = "";
   selectedType?: MeasureType;
   selectedLightId = "";
-  selectedPowerId = "";
   selectedDeviceEntityId = "";
   selectedChargingType = "";
 
   static readonly styles = [sharedStyles, css`
+    :host { display: block; min-width: 0; max-width: 100%; }
     form { display: grid; gap: 1rem; }
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     .profile-grid { align-items: start; }
@@ -80,7 +81,7 @@ export class SetupView extends LitElement {
       width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 9px;
       padding: 0.65rem 0.75rem; background: var(--field); color: var(--ink);
     }
-    fieldset { border: 0; padding: 0; margin: 0; }
+    fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
     fieldset.section { border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem 1.2rem; margin: 0; display: grid; gap: 1rem; }
     fieldset.section > legend { padding: 0 0.4rem; color: var(--signal-strong); font-size: 0.85rem; font-weight: 700; }
     .checks { display: flex; flex-wrap: wrap; gap: 0.6rem; }
@@ -106,7 +107,26 @@ export class SetupView extends LitElement {
     .type-chip .chip-body { display: grid; gap: 0.1rem; flex: 1; min-width: 0; }
     .type-chip button { min-height: 38px; padding: 0.4rem 0.9rem; }
 
-    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } .context { display: block; } .type-grid { grid-template-columns: 1fr; } }
+    .power-meter-required { display: grid; justify-items: start; gap: 0.65rem; margin-top: 1.25rem; padding: 1.1rem; border: 1px solid var(--signal); border-radius: 12px; background: color-mix(in srgb, var(--signal) 8%, var(--field)); }
+    .power-meter-required h3, .power-meter-required p { margin: 0; }
+    .power-meter-summary { display: flex; align-items: center; gap: 0.8rem; min-width: 0; padding: 0.8rem 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
+    .power-meter-icon { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: color-mix(in srgb, var(--signal) 14%, transparent); color: var(--signal-strong); font-size: 1.05rem; }
+    .power-meter-details { display: grid; gap: 0.12rem; flex: 1; min-width: 0; }
+    .power-meter-details strong { overflow-wrap: anywhere; color: var(--ink); font-size: 0.84rem; }
+    .power-meter-details span { overflow-wrap: anywhere; color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
+    .power-meter-summary button { flex: 0 0 auto; min-height: 38px; padding: 0.4rem 0.9rem; }
+
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .context { display: block; }
+      .type-grid { grid-template-columns: 1fr; }
+      .type-chip { flex-wrap: wrap; }
+      .type-chip .chip-body { min-width: calc(100% - 50px); }
+      .type-chip button { width: 100%; }
+      .power-meter-summary { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; }
+      .power-meter-details { min-width: 0; }
+      .power-meter-summary button { grid-column: 1 / -1; width: 100%; }
+    }
   `];
 
   willUpdate(changed: Map<string, unknown>): void {
@@ -125,10 +145,22 @@ export class SetupView extends LitElement {
             <h2 id="setup-title">Configure the measurement</h2>
           </div>
         </div>
-        ${this.selectedType ? this.renderChip(this.selectedType) : this.renderPicker()}
-        ${this.selectedType === LIGHT_TYPE ? this.renderLightForm() : nothing}
-        ${this.selectedType && this.selectedType !== LIGHT_TYPE ? this.renderGenericForm(this.selectedType) : nothing}
+        ${this.powerMeterConfigured ? html`
+          ${this.selectedType ? this.renderChip(this.selectedType) : this.renderPicker()}
+          ${this.selectedType === LIGHT_TYPE ? this.renderLightForm() : nothing}
+          ${this.selectedType && this.selectedType !== LIGHT_TYPE ? this.renderGenericForm(this.selectedType) : nothing}
+        ` : this.renderPowerMeterRequired()}
       </section>
+    `;
+  }
+
+  private renderPowerMeterRequired() {
+    return html`
+      <div class="power-meter-required">
+        <h3>Set up your power meter</h3>
+        <p class="muted">Choose the power source used for every measurement before creating a profile.</p>
+        <button class="primary" type="button" @click=${this.openSettings}>Set up power meter</button>
+      </div>
     `;
   }
 
@@ -173,14 +205,8 @@ export class SetupView extends LitElement {
     return html`
       <form @submit=${this.submitLight}>
         <fieldset class="section">
-          <legend>Power measurement</legend>
-          <div class="grid">
-            ${this.textField("measure_device", "Measurement device", request?.measure_device ?? this.defaultMeasureDevice, "e.g. Shelly Plug S", true)}
-            ${this.powerMeter === "hass" ? this.entitySelect("power_entity_id", "Power sensor", this.powers, this.powerEntityId(request), true) : nothing}
-          </div>
-          ${this.powerMeter === "hass" ? html`<div class="grid">
-            ${this.entitySelect("voltage_entity_id", "Voltage sensor (optional)", this.voltages, this.voltageEntityId(request), false)}
-          </div>` : this.powerMeterNote()}
+          <legend>Measurement device</legend>
+          ${this.renderPowerMeterSummary()}
         </fieldset>
 
         <fieldset class="section">
@@ -253,16 +279,11 @@ export class SetupView extends LitElement {
     if (!definition || !this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
     const run = this.nonLightRequest();
     const fields = deviceFields(definition);
-    const power = run?.power_meter.type === "hass" ? run.power_meter.entity_id : this.defaultPowerEntityId;
     return html`
       <form @submit=${this.submitGeneric}>
         <fieldset class="section">
-          <legend>Power measurement</legend>
-          <div class="grid">
-            ${definition.supports_profile ? this.textField("measure_device", "Measurement device", run?.measure_device ?? this.defaultMeasureDevice, "e.g. Shelly Plug S", true) : nothing}
-            ${this.powerMeter === "hass" ? this.entitySelect("power_entity_id", "Power sensor", this.powers, power, true) : nothing}
-          </div>
-          ${this.powerMeter === "hass" ? nothing : this.powerMeterNote()}
+          <legend>Measurement device</legend>
+          ${this.renderPowerMeterSummary()}
         </fieldset>
 
         <fieldset class="section">
@@ -284,9 +305,30 @@ export class SetupView extends LitElement {
     `;
   }
 
-  private powerMeterNote() {
-    const label = this.powerMeter === "dummy" ? "dummy power meter" : "Shelly power meter";
-    return html`<p class="muted">Power readings come from the configured ${label}. Change this under Settings.</p>`;
+  private renderPowerMeterSummary() {
+    let source = "Dummy power meter";
+    let detail = "No external readings are used.";
+    if (this.powerMeter === "shelly") {
+      source = "Shelly power meter";
+      detail = this.shellyIp;
+    } else if (this.powerMeter === "hass") {
+      const entity = this.powers.find((candidate) => candidate.entity_id === this.defaultPowerEntityId);
+      source = entity ? `${entity.name} · ${entity.entity_id}` : this.defaultPowerEntityId;
+      const voltageEntityId = this.relatedVoltageEntityId(this.defaultPowerEntityId);
+      const voltage = this.voltages.find((candidate) => candidate.entity_id === voltageEntityId);
+      detail = voltageEntityId ? `Voltage: ${voltage ? `${voltage.name} · ` : ""}${voltageEntityId}` : "Home Assistant power sensor";
+    }
+    return html`
+      <div class="power-meter-summary">
+        <span class="power-meter-icon" aria-hidden="true">⚡</span>
+        <span class="power-meter-details">
+          <strong>${source}</strong>
+          <span>Measurement device: ${this.defaultMeasureDevice}</span>
+          <span>${detail}</span>
+        </span>
+        <button type="button" @click=${this.openSettings}>Change</button>
+      </div>
+    `;
   }
 
   private renderGenericTuning(type: MeasureType, request?: NonLightMeasurementRequest) {
@@ -438,19 +480,17 @@ export class SetupView extends LitElement {
     this.selectedLightId = (event.currentTarget as HTMLSelectElement).value;
   }
 
-  private powerChanged(event: Event): void {
-    this.selectedPowerId = (event.currentTarget as HTMLSelectElement).value;
-  }
-
   private deviceChanged(event: Event): void {
     this.selectedDeviceEntityId = (event.currentTarget as HTMLSelectElement).value;
   }
 
   private entityChanged(name: string): ((event: Event) => void) | null {
     if (name === "light_entity_id") return this.lightChanged;
-    if (name === "power_entity_id") return this.powerChanged;
-    if (name === "voltage_entity_id") return null;
     return this.deviceChanged;
+  }
+
+  private openSettings(): void {
+    this.dispatchEvent(new CustomEvent("open-settings", { bubbles: true, composed: true }));
   }
 
   private chargingTypeChanged(event: Event): void {
@@ -461,18 +501,6 @@ export class SetupView extends LitElement {
 
   private definition(type: MeasureType): MeasureDefinition | undefined {
     return this.definitions.find((item) => item.measure_type === type);
-  }
-
-  private powerEntityId(request?: LightMeasurementRequest): string {
-    const requestEntityId = request?.power_meter.type === "hass" ? request.power_meter.entity_id : "";
-    return this.selectedPowerId || requestEntityId || this.defaultPowerEntityId;
-  }
-
-  private voltageEntityId(request?: LightMeasurementRequest): string {
-    if (request?.power_meter.type === "hass" && request.power_meter.voltage_entity_id) {
-      return request.power_meter.voltage_entity_id;
-    }
-    return this.relatedVoltageEntityId(this.powerEntityId(request));
   }
 
   private relatedVoltageEntityId(powerEntityId: string): string {
@@ -510,9 +538,9 @@ export class SetupView extends LitElement {
       measure_type: LIGHT_TYPE,
       model_id: text("model_id").trim(),
       product_name: text("product_name").trim(),
-      measure_device: text("measure_device").trim(),
+      measure_device: this.defaultMeasureDevice,
       controller: { type: "hass", entity_id: text("light_entity_id") },
-      power_meter: this.powerMeterSpec(text("power_entity_id"), text("voltage_entity_id") || null),
+      power_meter: this.powerMeterSpec(),
       modes,
       generate_model: true,
       gzip: true,
@@ -551,10 +579,7 @@ export class SetupView extends LitElement {
       this.errorMessage = `Could not load ${failedDomain} entities. Retry before starting the measurement.`;
       return;
     }
-    const powerEntityValue = form.get("power_entity_id");
-    const powerEntityId = typeof powerEntityValue === "string" ? powerEntityValue : "";
-    const voltageEntityId = this.relatedVoltageEntityId(powerEntityId) || null;
-    const request = buildNonLightRequest(definition, form, this.capabilities, this.powerMeterSpec(powerEntityId, voltageEntityId));
+    const request = buildNonLightRequest(definition, form, this.capabilities, this.powerMeterSpec(), this.defaultMeasureDevice);
     if (request.measure_type === "charging") {
       const chargingField = definition.fields.find((field) => field.name === "charging_entity_id");
       const expectedDomain = chargingField && entityDomain(definition, chargingField, request.charging_device_type);
@@ -566,10 +591,14 @@ export class SetupView extends LitElement {
     this.dispatchEvent(new CustomEvent("preflight", { detail: request, bubbles: true, composed: true }));
   }
 
-  private powerMeterSpec(entityId: string, voltageEntityId: string | null = null): PowerMeterSpec {
+  private powerMeterSpec(): PowerMeterSpec {
     if (this.powerMeter === "dummy") return { type: "dummy" };
     if (this.powerMeter === "shelly") return { type: "shelly", device_ip: this.shellyIp };
-    return { type: "hass", entity_id: entityId, voltage_entity_id: voltageEntityId };
+    return {
+      type: "hass",
+      entity_id: this.defaultPowerEntityId,
+      voltage_entity_id: this.relatedVoltageEntityId(this.defaultPowerEntityId) || null,
+    };
   }
 }
 

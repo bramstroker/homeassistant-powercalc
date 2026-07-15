@@ -25,3 +25,14 @@ This repository is generated from [`utils/measure/home-assistant-app`](https://g
 The application source and the multi-architecture image build live in the main Powercalc repository. The published metadata references `ghcr.io/bramstroker/powercalc-measure-app:<version>`, where the image tag is taken from `powercalc_measure/config.yaml`.
 
 For development with a pre-built image, copy `powercalc_measure/` to `/addons/powercalc_measure` on a Home Assistant OS host and reload the app store. The referenced image version must already exist in GHCR. Source builds use the `ha-app` target in `utils/measure/Dockerfile` and are tested from the main repository rather than by Supervisor cloning the full Powercalc source tree.
+
+## Preparing a release
+
+Add user-visible changes below `## Unreleased` in `powercalc_measure/CHANGELOG.md`. From `utils/measure`, preview and prepare the release with:
+
+```shell
+uv run python prepare_app_release.py 0.2.0 --dry-run
+uv run python prepare_app_release.py 0.2.0
+```
+
+The script promotes the unreleased notes and keeps the app config, frontend package, and package lock versions in sync. Review and commit the resulting diff before publishing the Home Assistant app workflow.

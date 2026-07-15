@@ -65,6 +65,9 @@ class HassLightController(HassControllerBase, LightController):
         light_state = self.client.get_state(entity_id=self.entity_id)
         return [str(effect) for effect in light_state.attributes.get("effect_list", [])]
 
+    def close(self) -> None:
+        return
+
     def build_hs_json_body(self, bri: int, hue: int, sat: int) -> dict[str, Any]:
         return {
             "entity_id": self.entity_id,

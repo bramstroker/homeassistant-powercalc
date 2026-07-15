@@ -1,7 +1,8 @@
 import { LitElement, css, html, nothing } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
-import type { AppSettings, Capabilities, EntityDescriptor, PowerMeterTestResult } from "../types";
+import type { AppSettings, Capabilities, EntityDescriptor, PowerMeterDiagnostic } from "../types";
 import { sharedStyles } from "../styles";
+import "./power-meter-diagnostic";
 
 export class SettingsView extends LitElement {
   static readonly properties = {
@@ -22,7 +23,7 @@ export class SettingsView extends LitElement {
   meter?: AppSettings["power_meter"];
   busy = false;
   testing = false;
-  testResult?: PowerMeterTestResult;
+  testResult?: PowerMeterDiagnostic;
   errorMessage = "";
   activeSection: "power_meter" | "measure_tuning" = "power_meter";
   private readonly form = createRef<HTMLFormElement>();
@@ -51,11 +52,10 @@ export class SettingsView extends LitElement {
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     .field-hint { color: var(--muted); font-size: 0.74rem; line-height: 1.4; }
     .context { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
-    .test-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .quality-requirements { margin: -0.15rem 0 0; padding: 0.7rem 0.8rem; border-left: 3px solid var(--signal); background: color-mix(in srgb, var(--signal) 8%, transparent); color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
+    .test-row { display: grid; gap: 0.75rem; }
+    .test-row > button { justify-self: start; }
     .test-row button { min-height: 40px; }
-    .test-result { font-size: 0.85rem; font-weight: 650; }
-    .test-result.ok { color: var(--good); }
-    .test-result.fail { color: var(--danger); }
     @media (max-width: 700px) {
       .settings-layout { grid-template-columns: 1fr; }
       .settings-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -80,7 +80,7 @@ export class SettingsView extends LitElement {
             <h2 id="settings-title">Measurement defaults</h2>
           </div>
         </div>
-        <p class="muted">Configure the measurement hardware and reusable defaults for new sessions.</p>
+        <p class="muted">Configure the measurement hardware once and set reusable defaults for new sessions.</p>
         <form ${ref(this.form)} @submit=${this.submit}>
           <div class="settings-layout">
             <nav class="settings-nav" aria-label="Settings sections">
@@ -99,25 +99,27 @@ export class SettingsView extends LitElement {
               <p class="muted">Choose where readings come from and set the default measurement hardware.</p>
               <div class="section-fields">
                 <label>
-                  <span>Default measurement device</span>
-                  <input name="default_measure_device" .value=${this.settings?.default_measure_device ?? ""} autocomplete="off" placeholder="e.g. Shelly Plug S" />
+                  <span>Measurement device name</span>
+                  <input name="default_measure_device" .value=${this.settings?.default_measure_device ?? ""} required autocomplete="off" placeholder="e.g. Shelly Plug S" />
                 </label>
                 <label>
-                  <span>Power meter backend</span>
+                  <span>Type</span>
                   <select name="power_meter" @change=${this.powerMeterChanged}>
                     <option value="hass" ?selected=${powerMeter === "hass"}>Home Assistant sensor</option>
                     <option value="shelly" ?selected=${powerMeter === "shelly"}>Shelly plug</option>
                     <option value="dummy" ?selected=${powerMeter === "dummy"}>Dummy meter</option>
                   </select>
                 </label>
-                ${powerMeter === "shelly" ? html`<label><span>Shelly IP address</span><input name="shelly_ip" .value=${this.settings?.shelly_ip ?? ""} required autocomplete="off" placeholder="192.168.1.50" /></label>` : nothing}
+                ${powerMeter === "shelly" ? html`<label><span>Shelly IP address</span><input name="shelly_ip" .value=${this.settings?.shelly_ip ?? ""} required autocomplete="off" placeholder="192.168.1.50" @input=${this.powerMeterSettingsChanged} /></label>` : nothing}
                 ${powerMeter === "hass" ? html`<label>
-                  <span>Default power sensor</span>
-                  <select name="default_power_entity_id">
-                    <option value="">No default</option>
+                  <span>Power sensor</span>
+                  <select name="default_power_entity_id" required @change=${this.powerMeterSettingsChanged}>
+                    <option value="">Select a power sensor</option>
                     ${this.powers.map((entity) => html`<option value=${entity.entity_id} ?selected=${entity.entity_id === selected}>${entity.name} · ${entity.entity_id}</option>`)}
                   </select>
                 </label>` : nothing}
+                ${powerMeter === "hass" ? html`<p class="quality-requirements">For reliable profiles, use a sensor with at least 0.1 W reported resolution and updates every 5 seconds or faster. Updates within 2 seconds are recommended.</p>` : nothing}
+                ${powerMeter === "shelly" ? html`<p class="quality-requirements">Powercalc polls this device directly, so Home Assistant sensor resolution and update-frequency checks do not apply.</p>` : nothing}
                 ${powerMeter === "dummy" ? nothing : this.renderTestRow()}
               </div>
             </section>
@@ -147,17 +149,14 @@ export class SettingsView extends LitElement {
   private renderTestRow() {
     return html`
       <div class="test-row">
-        <button type="button" @click=${this.test} ?disabled=${this.testing || this.busy}>${this.testing ? "Testing…" : "Test connection"}</button>
+        <button type="button" @click=${this.test} ?disabled=${this.testing || this.busy}>${this.testing ? "Validating…" : "Validate measurement device"}</button>
         ${this.renderTestResult()}
       </div>`;
   }
 
   private renderTestResult() {
     if (!this.testResult) return nothing;
-    if (this.testResult.success) {
-      return html`<span class="test-result ok" role="status">✓ Reading ${this.testResult.power ?? "—"} W</span>`;
-    }
-    return html`<span class="test-result fail" role="alert">✕ ${this.testResult.message ?? "No reading"}</span>`;
+    return html`<measure-power-meter-diagnostic .diagnostic=${this.testResult}></measure-power-meter-diagnostic>`;
   }
 
   private collect(): AppSettings | null {
@@ -212,10 +211,19 @@ export class SettingsView extends LitElement {
   }
 
   private powerMeterChanged(event: Event): void {
-    this.testResult = undefined;
+    this.clearTestResult();
     // Keep the choice in local state so an app-shell re-render can't clobber the
     // in-progress form (which would reset the meter type and typed Shelly IP).
     this.meter = (event.currentTarget as HTMLSelectElement).value as AppSettings["power_meter"];
+  }
+
+  private powerMeterSettingsChanged(): void {
+    this.clearTestResult();
+  }
+
+  private clearTestResult(): void {
+    this.testResult = undefined;
+    this.dispatchEvent(new CustomEvent("test-clear", { bubbles: true, composed: true }));
   }
 
   private selectSection(section: "power_meter" | "measure_tuning"): void {

@@ -1,5 +1,7 @@
 import { LitElement, css, html, nothing } from "lit";
+import type { PowerMeterDiagnostic } from "../types";
 import { sharedStyles } from "../styles";
+import "./power-meter-diagnostic";
 
 export interface ReviewMetric {
   label: string;
@@ -17,6 +19,7 @@ export class PreflightView extends LitElement {
     metrics: { attribute: false },
     summary: { attribute: false },
     warnings: { attribute: false },
+    powerMeterDiagnostic: { attribute: false },
     canOverwrite: { type: Boolean },
     busy: { type: Boolean },
     errorMessage: { type: String },
@@ -27,6 +30,7 @@ export class PreflightView extends LitElement {
   metrics: ReviewMetric[] = [];
   summary: ReviewRow[] = [];
   warnings: string[] = [];
+  powerMeterDiagnostic?: PowerMeterDiagnostic | null;
   canOverwrite = false;
   busy = false;
   errorMessage = "";
@@ -56,6 +60,7 @@ export class PreflightView extends LitElement {
         <dl>
           ${this.summary.map((row) => html`<dt>${row.label}</dt><dd>${row.value}</dd>`)}
         </dl>
+        ${this.powerMeterDiagnostic ? html`<measure-power-meter-diagnostic heading="Measurement device quality" .diagnostic=${this.powerMeterDiagnostic}></measure-power-meter-diagnostic>` : nothing}
         ${this.warnings.length ? html`
           <div class="notice"><strong>Check before starting</strong><ul class="warning-list">${this.warnings.map((warning) => html`<li>${warning}</li>`)}</ul></div>
         ` : nothing}

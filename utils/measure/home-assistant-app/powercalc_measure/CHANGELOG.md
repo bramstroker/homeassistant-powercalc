@@ -1,5 +1,7 @@
 # Changelog
 
+## Unreleased
+
 ## 0.1.0
 
 - Add the experimental ingress workflow for light measurements using Home Assistant light, power, and optional voltage entities.
