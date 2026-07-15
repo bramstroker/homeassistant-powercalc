@@ -11,6 +11,6 @@
     "VERSION": "v1.21.2:docker"
   },
   "name": "A60 RGB-CCT E27 806lm",
-  "standby_power": 0.9
+  "standby_power": 0.9,
   "author": "erdoking"
 }
