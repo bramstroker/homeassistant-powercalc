@@ -18,7 +18,7 @@ abort "Missing repository keys: #{missing_repository.join(', ')}" unless missing
 abort "Missing app keys: #{missing_config.join(', ')}" unless missing_config.empty?
 
 abort "Unsupported architecture" unless config.fetch("arch").sort == %w[aarch64 amd64]
-abort "App version must be a container tag" unless config.fetch("version").match?(/\A[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?\z/)
+abort "App version must be a container tag" unless config.fetch("version").match?(/\A[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?\z/)
 abort "App and frontend versions differ" if frontend && config.fetch("version") != frontend.fetch("version")
 abort "App image must not include a tag" if config.fetch("image").include?("@") || config.fetch("image").split("/").last.include?(":")
 abort "Ingress configuration is incomplete" unless config["ingress"] && config["ingress_stream"]

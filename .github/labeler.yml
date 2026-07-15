@@ -14,4 +14,10 @@ bug:
 
 measure-tool:
   - changed-files:
-      - any-glob-to-any-file: utils/measure/**
+      - any-glob-to-any-file:
+          - utils/measure/**
+          - .github/actions/build-measure-docker/**
+          - .github/release-drafter-measure.yml
+          - .github/workflows/prepare-measure-release.yml
+          - .github/workflows/publish-measure-image.yml
+          - .github/workflows/test-measure.yml

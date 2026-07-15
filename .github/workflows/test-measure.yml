@@ -36,12 +36,13 @@ jobs:
       - name: Run tests
         run: |
           cd ./utils/measure
-          uv run --extra dev --extra cli ruff check measure tests
+          uv run --extra dev --extra cli ruff check measure tests prepare_app_release.py
           MYPYPATH=. uv run --extra dev --extra cli mypy \
             --explicit-package-bases \
             --follow-imports=silent \
             --ignore-missing-imports \
             --config-file ../../pyproject.toml \
+            prepare_app_release.py \
             measure/request.py \
             measure/tuning.py \
             measure/assembler.py \

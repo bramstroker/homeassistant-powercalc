@@ -16,7 +16,7 @@ CONFIG_PATH = Path("home-assistant-app/powercalc_measure/config.yaml")
 CHANGELOG_PATH = Path("home-assistant-app/powercalc_measure/CHANGELOG.md")
 PACKAGE_PATH = Path("frontend/package.json")
 PACKAGE_LOCK_PATH = Path("frontend/package-lock.json")
-VERSION_PATTERN = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?")
+VERSION_PATTERN = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?")
 CONFIG_VERSION_PATTERN = re.compile(
     rf"^(?P<prefix>version:\s*)(?P<quote>[\"']?)(?P<version>{VERSION_PATTERN.pattern})(?P=quote)\s*$",
     re.MULTILINE,
@@ -27,11 +27,12 @@ class ReleasePreparationError(ValueError):
     """Raised when the app release inputs are incomplete or inconsistent."""
 
 
-def prepare_release(root: Path, version: str, release_date: date) -> dict[Path, str]:
-    """Validate and prepare every file changed by an app release."""
+def prepare_release(root: Path, version: str, release_date: date, release_notes: str) -> dict[Path, str]:
+    """Validate and prepare versioned files for a Measure release."""
 
     if VERSION_PATTERN.fullmatch(version) is None:
         raise ReleasePreparationError(f"Invalid app version: {version}")
+    release_notes = _validate_release_notes(release_notes)
 
     config_path = root / CONFIG_PATH
     changelog_path = root / CHANGELOG_PATH
@@ -48,7 +49,7 @@ def prepare_release(root: Path, version: str, release_date: date) -> dict[Path, 
     _validate_current_versions(current_version, package, package_lock)
 
     changelog = changelog_path.read_text(encoding="utf-8")
-    updated_changelog = _promote_changelog(changelog, current_version, version, release_date)
+    updated_changelog = _add_changelog_release(changelog, current_version, version, release_date, release_notes)
     package["version"] = version
     package_lock["version"] = version
     package_lock_root = _package_lock_root(package_lock)
@@ -114,13 +115,30 @@ def _package_lock_root(package_lock: dict[str, Any]) -> dict[str, Any]:
     return cast(dict[str, Any], root_package)
 
 
-def _promote_changelog(changelog: str, current_version: str, version: str, release_date: date) -> str:
+def _validate_release_notes(release_notes: str) -> str:
+    release_notes = release_notes.strip("\r\n")
+    if not release_notes.strip():
+        raise ReleasePreparationError("Release notes file is empty")
+    if re.search(r"^[ \t]{0,3}#{1,2}(?:[ \t]+|$)", release_notes, re.MULTILINE) is not None:
+        raise ReleasePreparationError(
+            "Release notes must not contain level-one or level-two headings; use level-three headings for categories",
+        )
+    return release_notes
+
+
+def _add_changelog_release(
+    changelog: str,
+    current_version: str,
+    version: str,
+    release_date: date,
+    release_notes: str,
+) -> str:
     if re.search(rf"^## {re.escape(current_version)}(?:\s|$)", changelog, re.MULTILINE) is None:
         raise ReleasePreparationError(f"Changelog has no section for current version {current_version}")
     if re.search(rf"^## {re.escape(version)}(?:\s|$)", changelog, re.MULTILINE) is not None:
         raise ReleasePreparationError(f"Changelog already contains version {version}")
 
-    unreleased_matches = list(re.finditer(r"^## Unreleased\s*$", changelog, re.MULTILINE))
+    unreleased_matches = list(re.finditer(r"^## Unreleased[ \t]*$", changelog, re.MULTILINE))
     if len(unreleased_matches) != 1:
         raise ReleasePreparationError("Changelog must contain exactly one '## Unreleased' section")
 
@@ -131,12 +149,13 @@ def _promote_changelog(changelog: str, current_version: str, version: str, relea
         raise ReleasePreparationError("Changelog has no released version after '## Unreleased'")
 
     body_end = body_start + next_section.start()
-    release_notes = changelog[body_start:body_end].strip()
-    if not release_notes:
-        raise ReleasePreparationError("Add release notes below '## Unreleased' before preparing a release")
+    if changelog[body_start:body_end].strip():
+        raise ReleasePreparationError(
+            "The '## Unreleased' section must remain empty; supply Release Drafter notes with --notes-file",
+        )
 
-    promoted = f"## Unreleased\n\n## {version} - {release_date.isoformat()}\n\n{release_notes}\n\n"
-    return changelog[: unreleased.start()] + promoted + changelog[body_end:]
+    release = f"\n\n## {version} - {release_date.isoformat()}\n\n{release_notes}\n\n"
+    return changelog[:body_start] + release + changelog[body_end:]
 
 
 def _format_json(data: dict[str, Any]) -> str:
@@ -161,8 +180,14 @@ def _print_diff(changes: dict[Path, str], root: Path) -> None:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Prepare a Powercalc Measure Home Assistant app release")
+    parser = argparse.ArgumentParser(description="Prepare a Powercalc Measure release")
     parser.add_argument("version", help="New semantic version, for example 0.2.0")
+    parser.add_argument(
+        "--notes-file",
+        type=Path,
+        required=True,
+        help="Release Drafter Markdown to add to the changelog",
+    )
     parser.add_argument(
         "--date",
         default=datetime.now(UTC).date().isoformat(),
@@ -174,7 +199,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         release_date = date.fromisoformat(args.date)
-        changes = prepare_release(args.root.resolve(), args.version, release_date)
+        release_notes = args.notes_file.read_text(encoding="utf-8")
+        changes = prepare_release(args.root.resolve(), args.version, release_date, release_notes)
     except (ReleasePreparationError, ValueError, OSError, json.JSONDecodeError) as error:
         parser.error(str(error))
 

@@ -1,8 +1,10 @@
-name-template: 'v$RESOLVED_VERSION 🌈'
-tag-template: 'v$RESOLVED_VERSION'
-tag-prefix: 'v'
+name-template: 'Powercalc Measure v$RESOLVED_VERSION'
+tag-template: 'measure-v$RESOLVED_VERSION'
+tag-prefix: 'measure-v'
+latest: false
 change-template: '- #$NUMBER $TITLE @$AUTHOR'
 sort-direction: ascending
+category-template: '### $TITLE'
 exclude-contributors:
   - 'github-actions[bot]'
   - 'github-actions'
@@ -12,14 +14,22 @@ exclude-contributors:
   - 'pre-commit-ci[bot]'
   - 'bramstroker'
   - 'crowdin-bot'
-exclude-labels:
-  - 'skip-changelog'
-  - 'dependencies'
-  - 'measure-tool'
 categories:
-  - title: '💡 Power profiles'
-    labels:
-      - 'powerprofile'
+  - type: pre-include
+    when:
+      - label: 'measure-tool'
+      - paths:
+          - 'utils/measure/**'
+          - '.github/actions/build-measure-docker/**'
+          - '.github/release-drafter-measure.yml'
+          - '.github/workflows/prepare-measure-release.yml'
+          - '.github/workflows/publish-measure-image.yml'
+          - '.github/workflows/test-measure.yml'
+  - type: pre-exclude
+    when:
+      labels:
+        - 'skip-changelog'
+        - 'dependencies'
   - title: '🚀 Features'
     labels:
       - 'feature'
@@ -43,8 +53,4 @@ version-resolver:
       - 'patch'
   default: patch
 template: |
-  ## Changes
-
   $CHANGES
-
-  <!-- SUPPORTERS_SECTION -->

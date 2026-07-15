@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   release_zip_file:
+    if: startsWith(github.event.release.tag_name, 'v')
     name: Prepare release asset
     runs-on: ubuntu-latest
     steps:
@@ -16,16 +17,9 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
-      - name: Get version
-        id: version
-        uses: home-assistant/actions/helpers/version@f4ca6f671bd429efb108c0f2fa0ae8af0215986c # master
       - name: "Set manifest version number"
         run: |
           python3 "${{ github.workspace }}/.github/scripts/update_hacs_manifest.py" --version "${GITHUB_REF_NAME}"
-      - name: Set measure tool version number
-        run: 'echo "${STEPS_VERSION_OUTPUTS_VERSION}" > utils/measure/.VERSION'
-        env:
-          STEPS_VERSION_OUTPUTS_VERSION: ${{ steps.version.outputs.version }}
       - name: Create zip
         run: |
           cd custom_components/powercalc

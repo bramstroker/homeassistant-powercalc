@@ -21,7 +21,10 @@ permissions:
 
 jobs:
   docker:
-    if: github.event_name != 'workflow_dispatch' || inputs.publish_cli_image
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'measure-v')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish_cli_image)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,14 +34,28 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
-      - name: Get version
-        id: version
-        uses: home-assistant/actions/helpers/version@f4ca6f671bd429efb108c0f2fa0ae8af0215986c # master
-      - if: github.event.action == 'published'
-        name: Write version file
-        run: 'echo "${STEPS_VERSION_OUTPUTS_VERSION}:docker" > utils/measure/.VERSION'
+      - name: Read measure version
+        if: github.event_name != 'push'
+        id: measure
+        run: |
+          version=$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV.fetch(0))).fetch("version")' utils/measure/home-assistant-app/powercalc_measure/config.yaml)
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+      - name: Validate release tag
+        if: github.event_name == 'release'
         env:
-          STEPS_VERSION_OUTPUTS_VERSION: ${{ steps.version.outputs.version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          VERSION: ${{ steps.measure.outputs.version }}
+        run: |
+          expected_tag="measure-v${VERSION}"
+          if [[ "$RELEASE_TAG" != "$expected_tag" ]]; then
+            echo "Release tag ${RELEASE_TAG} does not match measure version ${VERSION}" >&2
+            exit 1
+          fi
+      - name: Write CLI version file
+        if: github.event_name != 'push'
+        run: 'echo "v${VERSION}:cli" > utils/measure/.VERSION'
+        env:
+          VERSION: ${{ steps.measure.outputs.version }}
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
@@ -52,9 +69,9 @@ jobs:
           # generate Docker tags based on the following events/attributes
           tags: |
             type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=semver,pattern={{version}},value=v${{ steps.measure.outputs.version }},enable=${{ github.event_name != 'push' }}
+            type=semver,pattern={{major}}.{{minor}},value=v${{ steps.measure.outputs.version }},enable=${{ github.event_name != 'push' }}
+            type=semver,pattern={{major}},value=v${{ steps.measure.outputs.version }},enable=${{ github.event_name != 'push' }}
       - name: Log in to GHCR
         uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4
         with:
@@ -74,7 +91,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   home-assistant-app:
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'measure-v'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -97,8 +116,19 @@ jobs:
         run: |
           version=$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV.fetch(0))).fetch("version")' utils/measure/home-assistant-app/powercalc_measure/config.yaml)
           echo "version=${version}" >> "$GITHUB_OUTPUT"
+      - name: Validate release tag
+        if: github.event_name == 'release'
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          VERSION: ${{ steps.app.outputs.version }}
+        run: |
+          expected_tag="measure-v${VERSION}"
+          if [[ "$RELEASE_TAG" != "$expected_tag" ]]; then
+            echo "Release tag ${RELEASE_TAG} does not match app version ${VERSION}" >&2
+            exit 1
+          fi
       - name: Write app version file
-        run: 'echo "${APP_VERSION}:app" > utils/measure/.VERSION'
+        run: 'echo "v${APP_VERSION}:app" > utils/measure/.VERSION'
         env:
           APP_VERSION: ${{ steps.app.outputs.version }}
       - name: Docker meta

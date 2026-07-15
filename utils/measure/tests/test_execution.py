@@ -34,7 +34,14 @@ def test_execution_consumes_prepared_measurement_without_reassembling_fields(tmp
     assert result.model_json_data == {}
 
 
-def test_execution_writes_model_from_prepared_measurement(tmp_path: Path) -> None:
+@pytest.mark.parametrize("measure_version", ["v0.1.0:app", "v0.1.0:cli"])
+def test_execution_writes_model_from_prepared_measurement(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    measure_version: str,
+) -> None:
+    (tmp_path / ".VERSION").write_text(measure_version, encoding="utf-8")
+    monkeypatch.setattr("measure.model.PROJECT_DIR", str(tmp_path))
     request = AverageMeasurementRequest(
         product_name="Test device",
         measure_device="Test meter",
@@ -70,6 +77,7 @@ def test_execution_writes_model_from_prepared_measurement(tmp_path: Path) -> Non
     assert model["min_voltage"] == pytest.approx(229.9)
     assert model["max_voltage"] == pytest.approx(231.2)
     assert model["measure_settings"]["SAMPLE_COUNT"] == 3
+    assert model["measure_settings"]["VERSION"] == measure_version
 
 
 def test_execution_cleans_up_runner_after_failure(tmp_path: Path) -> None:
