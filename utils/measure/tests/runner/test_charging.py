@@ -30,6 +30,7 @@ def test_run_reports_battery_and_charging_operating_points() -> None:
 
     runner.run(request, "")
 
+    interaction.phase.assert_any_call("Starting charging measurement")
     assert [call.args[0] for call in interaction.operating_point.call_args_list] == [
         {"type": "charging", "battery_level": 99, "charging": True},
         {"type": "charging", "battery_level": 99, "charging": True},

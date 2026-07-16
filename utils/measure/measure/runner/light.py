@@ -198,6 +198,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                 mode.value,
             )
             _LOGGER.info("Waiting %d seconds...", self.config.sleep_initial)
+            self.interaction.phase(f"Stabilizing light before the first reading ({self.config.sleep_initial} s)")
             self._wait(self.config.sleep_initial)
 
             previous_variation = None

@@ -48,6 +48,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
             "which can be harmful for your ears",
         )
         self.interaction.confirm("Ready to start speaker measurement. Volume will increase to maximum.")
+        self.interaction.phase("Starting speaker measurement")
 
         disable_streaming = request.disable_streaming
 
@@ -58,18 +59,24 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
             if not disable_streaming:
                 _LOGGER.info("Start streaming noise")
                 self.media_controller.play_audio(STREAM_URL)
+            self.interaction.phase(f"Stabilizing speaker at {volume}% volume")
             self.interaction.wait(SLEEP_PRE_MEASURE)
+            self.interaction.phase(f"Measuring speaker at {volume}% volume")
             result = self.measure_util.take_average_measurement(duration)
             summary[volume] = result.power
             voltages.extend(result.voltages)
+            self.interaction.progress(volume // 10, 11, phase="Measuring volume levels")
 
         _LOGGER.info("Muting volume and waiting for %d seconds", SLEEP_MUTE)
         self.media_controller.mute_volume()
         self.interaction.operating_point(SpeakerOperatingPoint(type="speaker", volume=0, muted=True))
+        self.interaction.phase("Stabilizing muted speaker")
         self.interaction.wait(SLEEP_MUTE)
+        self.interaction.phase("Measuring muted speaker")
         result = self.measure_util.take_average_measurement(duration)
         summary[0] = result.power
         voltages.extend(result.voltages)
+        self.interaction.progress(11, 11, phase="Measuring volume levels", remaining_seconds=0)
 
         self.media_controller.set_volume(10)
         self.interaction.operating_point(SpeakerOperatingPoint(type="speaker", volume=10, muted=False))

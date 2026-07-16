@@ -41,6 +41,7 @@ class FormFieldDefinition:
 class MeasurementDefinition:
     kind: MeasureType
     description: str
+    confirmation_action: str | None = None
     fields: tuple[FormFieldDefinition, ...] = ()
     supports_profile: bool = True
     supports_resume: bool = False
@@ -66,6 +67,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
     MeasureType.SPEAKER: MeasurementDefinition(
         kind=MeasureType.SPEAKER,
         description="Measure power across media-player volume levels.",
+        confirmation_action="Start speaker measurement",
         fields=(
             POWER_FIELD,
             _entity("media_player_entity_id", "Media player", "media_player"),
@@ -81,6 +83,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
     MeasureType.RECORDER: MeasurementDefinition(
         kind=MeasureType.RECORDER,
         description="Record live power readings to a CSV file until cancelled.",
+        confirmation_action="Start recording",
         fields=(
             POWER_FIELD,
             FormFieldDefinition(
@@ -95,6 +98,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
     MeasureType.AVERAGE: MeasurementDefinition(
         kind=MeasureType.AVERAGE,
         description="Measure average power for a fixed duration.",
+        confirmation_action="Start averaging",
         fields=(
             POWER_FIELD,
             FormFieldDefinition(
@@ -111,6 +115,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
     MeasureType.CHARGING: MeasurementDefinition(
         kind=MeasureType.CHARGING,
         description="Measure charging power against battery level.",
+        confirmation_action="Start charging measurement",
         fields=(
             POWER_FIELD,
             FormFieldDefinition(

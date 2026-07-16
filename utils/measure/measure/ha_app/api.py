@@ -104,6 +104,7 @@ class MeasureDefinition(BaseModel):
     measure_type: MeasureType
     label: str
     description: str
+    confirmation_action: str | None
     fields: list[FormField]
     supports_profile: bool
     supports_resume: bool
@@ -423,6 +424,7 @@ def _measure_definitions() -> list[MeasureDefinition]:
             measure_type=definition.kind,
             label=definition.label,
             description=definition.description,
+            confirmation_action=definition.confirmation_action,
             fields=[
                 FormField(
                     name=field.name,
@@ -523,7 +525,8 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[s
     return {
         "session_id": snapshot.id,
         "state": snapshot.state,
-        "phase": snapshot.state,
+        "phase": snapshot.phase,
+        "confirmation_message": snapshot.confirmation_message,
         "mode": snapshot.mode,
         "progress": {
             "completed": snapshot.completed,

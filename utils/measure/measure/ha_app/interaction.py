@@ -21,6 +21,9 @@ class SessionInteraction(RunInteraction):
         self.control.log(f"{message} Using the non-interactive default: {choice}.")
         return default
 
+    def phase(self, message: str) -> None:
+        self.control.phase(message)
+
     def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
         remaining = "" if remaining_seconds is None else f"{int(remaining_seconds)}s"
         self.control.progress(completed=completed, total=total, mode=phase, estimated_remaining=remaining)

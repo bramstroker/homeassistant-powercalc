@@ -22,10 +22,12 @@ def test_events_are_sequenced_and_delivered() -> None:
     events = []
     control.subscribe(events.append)
 
-    control.emit(SessionEventType.STATE, {"state": "running"})
+    control.phase("Preparing measurement devices")
     control.progress(completed=1, total=10, mode="brightness", estimated_remaining="9s")
 
     assert [event.sequence for event in events] == [1, 2]
+    assert events[0].type == SessionEventType.PHASE
+    assert events[0].data == {"message": "Preparing measurement devices"}
     assert events[1].data["completed"] == 1
 
 

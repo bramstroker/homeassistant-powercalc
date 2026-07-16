@@ -140,7 +140,7 @@ def mock_config_factory() -> MockConfigFactory:
 
 
 class MockRequestsGetFactory(Protocol):
-    def __call__(self, responses: dict[str, tuple[dict, int]]) -> patch: ...
+    def __call__(self, responses: dict[str, tuple[object, int]]) -> patch: ...
 
 
 @pytest.fixture
@@ -151,13 +151,13 @@ def mock_requests_get_factory() -> Iterator[MockRequestsGetFactory]:
 
     mock_requests_get_patchers: list[Any] = []
 
-    def factory(responses: dict[str, tuple[dict, int]]) -> patch:
+    def factory(responses: dict[str, tuple[object, int]]) -> patch:
         class MockResponse:
-            def __init__(self, json_data: dict, status_code: int) -> None:
+            def __init__(self, json_data: object, status_code: int) -> None:
                 self.json_data = json_data
                 self.status_code = status_code
 
-            def json(self) -> dict:
+            def json(self) -> object:
                 return self.json_data
 
         def mock_requests_get(url: str, *args: object, **kwargs: object) -> MockResponse:

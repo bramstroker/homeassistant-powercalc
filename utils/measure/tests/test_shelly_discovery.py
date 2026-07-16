@@ -108,8 +108,7 @@ def test_discovers_supported_gen1_and_gen2_devices_and_filters_other_http_servic
             "http://192.168.1.11/shelly": FakeResponse(
                 {"id": "shellyplusplugs-123", "name": "Desk plug", "model": "SNPL-00112EU", "gen": 2},
             ),
-            "http://192.168.1.11/rpc/Switch.GetStatus?id=0": FakeResponse({}, 404),
-            "http://192.168.1.11/rpc/PM1.GetStatus?id=0": FakeResponse({"apower": 2.4}),
+            "http://192.168.1.11/rpc/Shelly.GetStatus": FakeResponse({"switch:0": {"apower": 2.4}}),
         },
     )
 
@@ -137,8 +136,7 @@ def test_lists_authenticated_unsupported_and_ipv6_only_devices_with_reasons() ->
                 {"id": "shelly-auth", "model": "S3PL-00112EU", "gen": 3, "auth_en": True},
             ),
             "http://192.168.1.21/shelly": FakeResponse({"id": "shelly-no-meter", "model": "S3SN-0U12A", "gen": 3}),
-            "http://192.168.1.21/rpc/Switch.GetStatus?id=0": FakeResponse({}, 404),
-            "http://192.168.1.21/rpc/PM1.GetStatus?id=0": FakeResponse({}, 404),
+            "http://192.168.1.21/rpc/Shelly.GetStatus": FakeResponse({"wifi": {"sta_ip": "192.168.1.21"}}),
         },
     )
 
@@ -148,7 +146,7 @@ def test_lists_authenticated_unsupported_and_ipv6_only_devices_with_reasons() ->
     assert devices["shelly-auth"].auth_required is True
     assert "Authentication" in str(devices["shelly-auth"].reason)
     assert devices["shelly-no-meter"].supported is False
-    assert "power measurement endpoint" in str(devices["shelly-no-meter"].reason)
+    assert "power measurement component" in str(devices["shelly-no-meter"].reason)
     assert "IPv6" in str(devices["shelly-ipv6"].reason)
 
 
@@ -179,7 +177,7 @@ def test_duplicate_advertisements_are_probed_once() -> None:
     http_get = response_map(
         {
             "http://192.168.1.30/shelly": FakeResponse({"id": "shelly-duplicate", "gen": 2}),
-            "http://192.168.1.30/rpc/Switch.GetStatus?id=0": FakeResponse({"apower": 1.0}),
+            "http://192.168.1.30/rpc/Shelly.GetStatus": FakeResponse({"switch:0": {"apower": 1.0}}),
         },
     )
 
@@ -197,3 +195,39 @@ def test_unreachable_device_is_visible_but_disabled() -> None:
 
     assert result.devices[0].supported is False
     assert "could not be reached" in str(result.devices[0].reason)
+
+
+def test_discovers_gen3_pm1_component() -> None:
+    home_assistant = FakeHomeAssistant((service("shelly-pm-mini", "_shelly._tcp.local.", ["192.168.1.50"]),))
+    http_get = response_map(
+        {
+            "http://192.168.1.50/shelly": FakeResponse(
+                {"id": "shellypmmini-123", "name": "Fuse box", "model": "S3PM-001PCEU16", "gen": 3},
+            ),
+            "http://192.168.1.50/rpc/Shelly.GetStatus": FakeResponse({"pm1:0": {"apower": 4.2, "voltage": 229.8}}),
+        },
+    )
+
+    result = asyncio.run(ShellyDiscoveryService(home_assistant, http_get=http_get).discover())  # type: ignore[arg-type]
+
+    assert len(result.devices) == 1
+    assert result.devices[0].generation == 3
+    assert result.devices[0].model == "S3PM-001PCEU16"
+    assert result.devices[0].supported is True
+
+
+def test_lists_multichannel_device_as_unsupported() -> None:
+    home_assistant = FakeHomeAssistant((service("shelly-2pm", "_shelly._tcp.local.", ["192.168.1.51"]),))
+    http_get = response_map(
+        {
+            "http://192.168.1.51/shelly": FakeResponse({"id": "shelly-2pm", "gen": 3}),
+            "http://192.168.1.51/rpc/Shelly.GetStatus": FakeResponse(
+                {"switch:0": {"apower": 1.0}, "switch:1": {"apower": 2.0}},
+            ),
+        },
+    )
+
+    result = asyncio.run(ShellyDiscoveryService(home_assistant, http_get=http_get).discover())  # type: ignore[arg-type]
+
+    assert result.devices[0].supported is False
+    assert "Multiple power measurement components" in str(result.devices[0].reason)

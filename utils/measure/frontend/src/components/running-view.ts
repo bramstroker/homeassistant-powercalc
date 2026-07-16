@@ -25,6 +25,7 @@ interface StateChip {
 export class RunningView extends LitElement {
   static readonly properties = {
     snapshot: { attribute: false },
+    confirmationAction: { type: String },
     connected: { type: Boolean },
     logs: { attribute: false },
     samples: { attribute: false },
@@ -34,6 +35,7 @@ export class RunningView extends LitElement {
   };
 
   snapshot!: SessionSnapshot;
+  confirmationAction = "";
   connected = false;
   logs: string[] = [];
   samples: number[] = [];
@@ -80,7 +82,24 @@ export class RunningView extends LitElement {
     .spark .area { fill: color-mix(in srgb, var(--signal) 14%, transparent); stroke: none; }
     .spark .line { fill: none; stroke: var(--signal); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
     .chart-scale { display: flex; justify-content: space-between; margin-top: 0.3rem; color: var(--muted); font: 0.68rem/1 ui-monospace, monospace; }
+    .preparation { position: relative; display: grid; justify-items: center; gap: 0.8rem; padding: clamp(2rem, 8vw, 4rem) 1rem; text-align: center; }
+    .preparation h3, .preparation p { margin: 0; }
+    .preparation-spinner { width: 42px; height: 42px; border: 3px solid var(--track); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
+    .preparation-track { position: relative; width: min(360px, 100%); height: 8px; margin-top: 0.4rem; overflow: hidden; border-radius: 99px; background: var(--track); }
+    .preparation-bar { position: absolute; inset-block: 0; inset-inline-start: 0; width: 38%; border-radius: inherit; background: var(--signal); animation: prepare 1.35s ease-in-out infinite; }
+    .ready-card { display: grid; justify-items: center; gap: 0.8rem; padding: clamp(1.5rem, 6vw, 3rem); border: 1px solid color-mix(in srgb, var(--good) 42%, var(--line)); border-radius: 16px; background: color-mix(in srgb, var(--good) 6%, var(--well)); text-align: center; }
+    .ready-announcement { display: grid; justify-items: center; gap: 0.8rem; }
+    .ready-announcement h3, .ready-announcement p { margin: 0; }
+    .ready-icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: color-mix(in srgb, var(--good) 16%, transparent); color: var(--good); font-size: 1.4rem; }
+    .ready-message { max-width: 620px; color: var(--muted); line-height: 1.6; white-space: pre-line; }
+    .ready-topline { display: flex; justify-content: flex-end; align-items: center; gap: 0.9rem; width: 100%; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes prepare { 0% { transform: translateX(-105%); } 50% { transform: translateX(165%); } 100% { transform: translateX(-105%); } }
     @media (max-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } .topline { align-items: flex-start; flex-direction: column; } }
+    @media (prefers-reduced-motion: reduce) {
+      .preparation-spinner, .preparation-bar { animation: none; }
+      .preparation-bar { inset-inline-start: 31%; }
+    }
   `];
 
   protected updated(changedProperties: PropertyValues<this>): void {
@@ -91,24 +110,28 @@ export class RunningView extends LitElement {
   }
 
   render() {
+    if (this.snapshot.state === "awaiting_confirmation") return this.renderReady();
+    const preparing = !this.hasMeaningfulProgress();
     const progress = this.snapshot.progress ?? { completed: 0, total: 0 };
     const openEnded = this.snapshot.mode === "Recording" && (progress.total ?? 0) === 0;
     return html`
       <section class="panel" aria-labelledby="running-title">
         <p class="eyebrow">03 / Measurement</p>
-        <h2 id="running-title">${this.runningTitle()}</h2>
+        <h2 id="running-title">${this.runningTitle(preparing)}</h2>
         <div class="instrument">
           <div class="topline">
-            <span class="muted">${this.snapshot.phase ?? "Preparing measurement"}</span>
+            <span class="muted" aria-live="polite">${this.snapshot.phase ?? "Preparing measurement"}</span>
             <span class="topline-right">
               ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>Log <span class="log-count">${this.logs.length}</span></button>` : nothing}
               <span class="connection ${this.connected ? "connected" : ""}" role="status">${this.connected ? "Live" : "Reconnecting"}</span>
             </span>
           </div>
-          ${this.renderProgress(openEnded, progress)}
-          ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
-          ${this.renderMetrics(openEnded, progress)}
-          ${this.samples.length ? this.renderChart() : nothing}
+          ${preparing ? this.renderPreparation() : html`
+            ${this.renderProgress(openEnded, progress)}
+            ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
+            ${this.renderMetrics(openEnded, progress)}
+            ${this.samples.length ? this.renderChart() : nothing}
+          `}
         </div>
         ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
         ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
@@ -117,11 +140,61 @@ export class RunningView extends LitElement {
           <a href=${this.diagnosticsUrl} download>Download diagnostics</a>
         </div>
         <div class="actions">
-          ${this.snapshot.state === "awaiting_confirmation" ? html`<button class="primary" type="button" @click=${this.confirm} ?disabled=${this.busy}>Start measurement</button>` : nothing}
           ${this.renderStopButton(openEnded)}
         </div>
       </section>
     `;
+  }
+
+  private renderReady() {
+    const message = this.snapshot.confirmation_message ?? "Preparation is complete. Start the measurement when the device is ready.";
+    return html`
+      <section class="panel" aria-labelledby="running-title">
+        <p class="eyebrow">03 / Measurement</p>
+        <h2 id="running-title">Ready when you are</h2>
+        <div class="ready-card">
+          <span class="ready-topline">
+            ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>Log <span class="log-count">${this.logs.length}</span></button>` : nothing}
+            <span class="connection ${this.connected ? "connected" : ""}">${this.connected ? "Live" : "Reconnecting"}</span>
+          </span>
+          <div class="ready-announcement" role="status" aria-live="polite">
+            <span class="ready-icon" aria-hidden="true">✓</span>
+            <p class="eyebrow">Preparation complete</p>
+            <h3>Everything is ready</h3>
+            <p class="ready-message">${message}</p>
+          </div>
+          <button class="primary confirm" type="button" @click=${this.confirm} ?disabled=${this.busy}>${this.busy ? "Starting…" : this.confirmationAction || "Start measurement"}</button>
+        </div>
+        ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
+        ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
+        <div class="diagnostics-download">
+          <span>Session snapshot and logs for issue reporting.</span>
+          <a href=${this.diagnosticsUrl} download>Download diagnostics</a>
+        </div>
+        <div class="actions">${this.renderStopButton(false)}</div>
+      </section>
+    `;
+  }
+
+  private renderPreparation() {
+    const phase = this.snapshot.phase ?? "Preparing measurement devices";
+    return html`
+      <div class="preparation" role="status" aria-live="polite">
+        <span class="preparation-spinner" aria-hidden="true"></span>
+        <h3>${phase}</h3>
+        <p class="muted">Powercalc is getting everything ready. This can take a few seconds.</p>
+        <span class="preparation-track" aria-hidden="true"><span class="preparation-bar"></span></span>
+      </div>
+      ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
+      ${this.samples.length ? this.renderChart() : nothing}
+    `;
+  }
+
+  private hasMeaningfulProgress(): boolean {
+    const progress = this.snapshot.progress;
+    if (!progress) return false;
+    if (this.snapshot.mode === "Recording") return true;
+    return progress.completed > 0 || progress.total > 0 || (progress.percent ?? 0) > 0;
   }
 
   private renderProgress(openEnded: boolean, progress: SessionProgress) {
@@ -277,9 +350,10 @@ export class RunningView extends LitElement {
     this.dispatchEvent(new CustomEvent("confirm", { bubbles: true, composed: true }));
   }
 
-  private runningTitle(): string {
+  private runningTitle(preparing = false): string {
     if (this.snapshot.state === "cancelling") return "Stopping safely";
     if (this.snapshot.state === "awaiting_confirmation") return "Ready when you are";
+    if (preparing) return "Preparing measurement";
     return "Sampling in progress";
   }
 }

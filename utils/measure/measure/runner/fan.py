@@ -34,10 +34,13 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
             self.fan_controller.set_percentage(percentage)
             self.interaction.operating_point(FanOperatingPoint(type="fan", percentage=percentage, on=True))
             _LOGGER.info("Waiting %d seconds to measure power", SLEEP_TIME_PERCENTAGE_CHANGE)
+            self.interaction.phase(f"Stabilizing fan at {percentage}%")
             self.interaction.wait(SLEEP_TIME_PERCENTAGE_CHANGE)
+            self.interaction.phase(f"Measuring fan at {percentage}%")
             result = self.measure_util.take_average_measurement(20)
             measurements[percentage] = result.power
             voltages.extend(result.voltages)
+            self.interaction.progress(percentage // 5, 20, phase="Measuring fan speeds")
 
         return RunnerResult(model_json_data=self._build_model_json_data(measurements), voltages=voltages)
 

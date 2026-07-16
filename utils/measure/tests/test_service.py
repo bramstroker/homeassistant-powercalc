@@ -42,6 +42,9 @@ def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None
     assert (tmp_path / request.model_id / "brightness.csv").is_file()
     progress_events = [event for event in progress if event.type == SessionEventType.PROGRESS]
     assert progress_events[-1].data["completed"] == progress_events[-1].data["total"]
+    phases = [event.data["message"] for event in progress if event.type == SessionEventType.PHASE]
+    assert phases[:2] == ["Preparing measurement devices", "Starting measurement"]
+    assert any(message.startswith("Stabilizing light") for message in phases)
     assert any(event.type == SessionEventType.LOG for event in progress)
 
 

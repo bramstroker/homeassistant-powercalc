@@ -80,6 +80,7 @@ export interface MeasureDefinition {
   fields: FormField[];
   supports_profile: boolean;
   supports_resume: boolean;
+  confirmation_action?: string | null;
 }
 
 export interface BaseMeasurementRequest {
@@ -158,6 +159,7 @@ export interface SessionSnapshot {
   session_id?: string;
   state: SessionState;
   phase?: string;
+  confirmation_message?: string | null;
   mode?: string | null;
   progress?: SessionProgress;
   warnings?: string[];
@@ -186,7 +188,7 @@ export interface SessionEventData {
 
 interface RegularSessionEvent {
   sequence: number;
-  type: "progress" | "state" | "warning" | "log" | "checkpoint" | "heartbeat" | "sample";
+  type: "phase" | "progress" | "state" | "warning" | "log" | "checkpoint" | "heartbeat" | "sample";
   data: SessionEventData;
   snapshot?: SessionSnapshot;
 }

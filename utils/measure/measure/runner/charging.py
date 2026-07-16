@@ -45,7 +45,9 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
             "Make sure the device is as close to 0% charged as possible before starting the test.",
         )
         self.interaction.confirm("Ready to start charging measurement.")
+        self.interaction.phase("Starting charging measurement")
 
+        self.interaction.phase("Checking battery and charging state")
         battery_level = self.controller.get_battery_level()
         self.interaction.operating_point(
             ChargingOperatingPoint(
@@ -77,6 +79,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
                 _LOGGER.info("Battery level: %d%%", battery_level)
                 if battery_level not in measurements:
                     measurements[battery_level] = []
+                self.interaction.phase(f"Measuring charging power at {battery_level}% battery")
                 result = self.measure_util.take_measurement(time.time())
                 _LOGGER.info("Measured power: %.2f W", result.power)
                 measurements[battery_level].append(result.power)
@@ -91,6 +94,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
                 self.interaction.wait(self.config.sleep_time)
 
         self.interaction.notify("Done charging, start measurements for trickle charging..")
+        self.interaction.phase("Measuring trickle charging power")
 
         trickle_result = self.measure_util.take_average_measurement(TRICKLE_CHARGING_TIME)
         measurements[100] = [trickle_result.power]
@@ -107,6 +111,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
 
             if not wait_message_printed:
                 self.interaction.notify("Waiting for charging device to start charging...")
+                self.interaction.phase("Waiting for the device to start charging")
                 wait_message_printed = True
 
             self.interaction.wait(1)

@@ -69,6 +69,8 @@ def test_run_reports_fan_percentage_operating_points(export_path: str) -> None:
 
     runner.run(request, export_path)
 
+    interaction.phase.assert_any_call("Stabilizing fan at 5%")
+    interaction.phase.assert_any_call("Measuring fan at 5%")
     points = [call.args[0] for call in interaction.operating_point.call_args_list]
     assert points[0] == {"type": "fan", "percentage": 5, "on": True}
     assert points[-1] == {"type": "fan", "percentage": 100, "on": True}

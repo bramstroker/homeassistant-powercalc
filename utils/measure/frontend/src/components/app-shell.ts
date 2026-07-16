@@ -139,9 +139,9 @@ export class AppShell extends LitElement implements MeasureAppState {
         @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter} @test-clear=${this.clearPowerMeterTestResult}
         @shelly-discover=${this.discoverShellys}></measure-settings-view>`;
     if (this.view === "review" && this.preflight && this.request) return html`
-      <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .powerMeterDiagnostic=${this.preflight.power_meter_diagnostic} .canOverwrite=${this.reviewCanOverwrite()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
+      <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .powerMeterDiagnostic=${this.preflight.power_meter_diagnostic} .canOverwrite=${this.reviewCanOverwrite()} .confirmationAction=${this.confirmationAction()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`
-      <measure-running-view .snapshot=${this.snapshot} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
+      <measure-running-view .snapshot=${this.snapshot} .confirmationAction=${this.confirmationAction()} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
     if (this.view === "result" && this.snapshot) return html`
       <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
     return html`
@@ -215,6 +215,11 @@ export class AppShell extends LitElement implements MeasureAppState {
 
   private reviewCanOverwrite(): boolean {
     return this.request?.resume_policy === "overwrite";
+  }
+
+  private confirmationAction(): string {
+    const type = this.snapshot?.request?.measure_type ?? this.request?.measure_type;
+    return this.definitions.find((definition) => definition.measure_type === type)?.confirmation_action ?? "";
   }
 
   private duration(seconds: number): string {

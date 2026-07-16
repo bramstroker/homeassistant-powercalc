@@ -122,7 +122,13 @@ class MeasurementCoordinator:
             }:
                 raise SessionConflictError("No running measurement session")
             if self._snapshot.state != SessionState.CANCELLING:
-                self._snapshot = replace(self._snapshot, state=SessionState.CANCELLING, updated_at=utc_now())
+                self._snapshot = replace(
+                    self._snapshot,
+                    state=SessionState.CANCELLING,
+                    phase="Cancelling measurement",
+                    confirmation_message=None,
+                    updated_at=utc_now(),
+                )
                 self.storage.write_snapshot(self._snapshot)
             if self._control is not None:
                 self._control.cancel()
@@ -136,7 +142,13 @@ class MeasurementCoordinator:
                 raise SessionConflictError("The current session is not waiting for confirmation")
             if self._control is None:
                 raise SessionConflictError("The current session cannot be continued")
-            self._snapshot = replace(self._snapshot, state=SessionState.RUNNING, updated_at=utc_now())
+            self._snapshot = replace(
+                self._snapshot,
+                state=SessionState.RUNNING,
+                phase="Starting measurement",
+                confirmation_message=None,
+                updated_at=utc_now(),
+            )
             self.storage.write_snapshot(self._snapshot)
             self._control.continue_run()
             return self._snapshot
@@ -153,7 +165,14 @@ class MeasurementCoordinator:
         assert self._snapshot is not None
         self._control = SessionControl(initial_sequence=self._snapshot.event_sequence)
         self._control.subscribe(self._handle_event)
-        self._snapshot = replace(self._snapshot, state=SessionState.RUNNING, updated_at=utc_now(), error=None)
+        self._snapshot = replace(
+            self._snapshot,
+            state=SessionState.RUNNING,
+            phase="Initializing measurement",
+            confirmation_message=None,
+            updated_at=utc_now(),
+            error=None,
+        )
         self.storage.write_snapshot(self._snapshot)
         session_id = self._snapshot.id
         self._worker = Thread(
@@ -206,8 +225,16 @@ class MeasurementCoordinator:
                     updated_at=event.created_at,
                     completed=int(event.data["completed"]),
                     total=int(event.data["total"]),
+                    phase=str(event.data["mode"]),
                     mode=str(event.data["mode"]),
                     estimated_remaining=str(event.data["estimated_remaining"]),
+                )
+            elif event.type == SessionEventType.PHASE:
+                self._snapshot = replace(
+                    self._snapshot,
+                    event_sequence=event.sequence,
+                    updated_at=event.created_at,
+                    phase=str(event.data["message"]),
                 )
             elif event.type == SessionEventType.OPERATING_POINT:
                 self._snapshot = replace(
@@ -229,6 +256,8 @@ class MeasurementCoordinator:
                     event_sequence=event.sequence,
                     updated_at=event.created_at,
                     state=SessionState.AWAITING_CONFIRMATION,
+                    phase="Waiting for confirmation",
+                    confirmation_message=str(event.data["message"]),
                 )
             else:
                 self._snapshot = replace(
@@ -236,7 +265,12 @@ class MeasurementCoordinator:
                     event_sequence=event.sequence,
                     updated_at=event.created_at,
                 )
-            durable = event.type in {SessionEventType.STATE, SessionEventType.WARNING, SessionEventType.CHECKPOINT}
+            durable = event.type in {
+                SessionEventType.STATE,
+                SessionEventType.PHASE,
+                SessionEventType.WARNING,
+                SessionEventType.CHECKPOINT,
+            }
             self.storage.append_event(self._snapshot.id, event, durable=durable)
             if self._should_persist_snapshot(event):
                 self.storage.write_snapshot(self._snapshot)
@@ -267,6 +301,12 @@ class MeasurementCoordinator:
             self._snapshot = replace(
                 self._snapshot,
                 state=state,
+                phase={
+                    SessionState.CANCELLED: "Measurement cancelled",
+                    SessionState.COMPLETED: "Measurement completed",
+                    SessionState.FAILED: "Measurement failed",
+                }.get(state, self._snapshot.phase),
+                confirmation_message=None,
                 updated_at=updated_at,
                 error=error,
                 files=files,

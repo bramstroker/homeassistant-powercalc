@@ -82,12 +82,16 @@ describe("SessionEventStream", () => {
 
     stream.connect();
     fake.onopen?.();
+    listeners.get("phase")?.(new MessageEvent("phase", {
+      data: JSON.stringify({ sequence: 1, type: "phase", data: { message: "Preparing measurement devices" } }),
+    }));
     listeners.get("progress")?.(new MessageEvent("progress", {
       data: JSON.stringify({ sequence: 2, type: "progress", data: { completed: 2, total: 4 } }),
     }));
 
     expect(onConnection).toHaveBeenCalledWith(true);
     expect(onReconnect).toHaveBeenCalledOnce();
+    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "phase" }));
     expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "progress" }));
     stream.close();
     expect(fake.close).toHaveBeenCalledOnce();

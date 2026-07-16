@@ -34,6 +34,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
     ) -> RunnerResult:
         self.filename = validate_export_filename(request.export_filename)
         self.interaction.confirm("Ready to start recording. Stop the measurement when you are finished.")
+        self.interaction.phase("Starting recording")
 
         output_directory = Path(export_directory).resolve()
         csv_filepath = (output_directory / self.filename).resolve()

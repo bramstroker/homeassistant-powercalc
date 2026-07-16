@@ -106,12 +106,14 @@ class MeasurementService(SessionMeasurementService):
         if isinstance(request.power_meter, DummyPowerMeterSpec):
             _LOGGER.warning("Using dummy power meter — reported power values are synthetic, not real measurements")
         interaction = SessionInteraction(control)
+        control.phase("Preparing measurement devices")
         prepared = MeasurementAssembler(
             interaction,
             home_assistant=self.home_assistant,
             power_meter_decorator=lambda meter: _SamplingPowerMeter(meter, control.sample),
         ).assemble(request)
         output_directory = output_root / request.model_id
+        control.phase("Starting measurement")
         control.emit(SessionEventType.STATE, {"state": "running"})
 
         execution = MeasurementExecution(

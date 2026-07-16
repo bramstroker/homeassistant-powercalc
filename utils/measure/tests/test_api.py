@@ -308,6 +308,15 @@ def test_measure_definitions_and_average_request(tmp_path: Path) -> None:
     definitions = test_client.get("/api/measure-definitions")
     assert definitions.status_code == 200
     assert {item["measure_type"] for item in definitions.json()} == {item.value for item in MeasureType}
+    actions = {item["measure_type"]: item["confirmation_action"] for item in definitions.json()}
+    assert actions == {
+        "light": None,
+        "speaker": "Start speaker measurement",
+        "recorder": "Start recording",
+        "average": "Start averaging",
+        "charging": "Start charging measurement",
+        "fan": None,
+    }
     charging = next(item for item in definitions.json() if item["measure_type"] == MeasureType.CHARGING)
     fields = {field["name"]: field for field in charging["fields"]}
     assert "entity_domain" not in fields["charging_entity_id"]

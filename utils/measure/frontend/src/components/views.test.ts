@@ -496,6 +496,48 @@ describe("setup type picker", () => {
 });
 
 describe("running view", () => {
+  it("shows an indeterminate preparation state instead of zero progress", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", phase: "Preparing measurement devices" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const preparation = element.shadowRoot.querySelector(".preparation");
+    expect(preparation?.getAttribute("role")).toBe("status");
+    expect(preparation?.getAttribute("aria-live")).toBe("polite");
+    expect(preparation?.textContent).toContain("Preparing measurement devices");
+    expect(element.shadowRoot.querySelector("#running-title")?.textContent).toBe("Preparing measurement");
+    expect(element.shadowRoot.querySelector(".preparation-spinner")).toBeTruthy();
+    expect(element.shadowRoot.querySelector(".preparation-bar")).toBeTruthy();
+    expect(element.shadowRoot.querySelector(".value")).toBeNull();
+    expect(element.shadowRoot.querySelector("progress")).toBeNull();
+  });
+
+  it("shows a dedicated ready card with the requested confirmation action", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; confirmationAction: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      confirmation_message: "Switch on the test signal, then start recording.",
+    };
+    element.confirmationAction = "Start recording";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const ready = element.shadowRoot.querySelector(".ready-card");
+    const announcement = element.shadowRoot.querySelector(".ready-announcement");
+    expect(announcement).toBeTruthy();
+    expect(announcement?.getAttribute("role")).toBe("status");
+    expect(announcement?.getAttribute("aria-live")).toBe("polite");
+    expect(ready?.textContent).toContain("Switch on the test signal, then start recording.");
+    expect(ready?.querySelector("button.confirm")?.textContent).toBe("Start recording");
+    expect(element.shadowRoot.querySelector(".instrument")).toBeNull();
+    expect(element.shadowRoot.querySelector("progress")).toBeNull();
+  });
+
   it("shows progress, phase, connection state, and cancellation", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot;
@@ -536,6 +578,20 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector(".chart-scale")?.textContent).toContain("peak 5.1 W");
   });
 
+  it("keeps live samples visible while numeric progress is not available yet", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; samples: number[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", phase: "Stabilizing device" };
+    element.samples = [4.2, 4.3];
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".preparation")).toBeTruthy();
+    expect(element.shadowRoot.querySelector(".chart")).toBeTruthy();
+    expect(element.shadowRoot.querySelector(".value")).toBeNull();
+  });
+
   it.each([
     [
       { type: "light", on: true, brightness: 128, color_temp_mired: 370, hue: 32_768, saturation: 128 } as OperatingPoint,
@@ -555,6 +611,8 @@ describe("running view", () => {
     await element.updateComplete;
 
     const state = element.shadowRoot.querySelector(".operating-point");
+    expect(element.shadowRoot.querySelector(".preparation")).toBeTruthy();
+    expect(element.shadowRoot.querySelector(".value")).toBeNull();
     expect(state?.getAttribute("aria-live")).toBe("polite");
     expect(state?.textContent).toContain("Current measurement point");
     for (const value of expected) expect(state?.textContent).toContain(value);
@@ -1058,6 +1116,39 @@ describe("settings power meter test", () => {
 });
 
 describe("preflight power meter diagnostics", () => {
+  it("explains preparation and provides immediate feedback while the session initializes", async () => {
+    const element = document.createElement("measure-preflight-view") as HTMLElement & {
+      confirmationAction: string; busy: boolean; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.confirmationAction = "Start averaging";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.textContent).toContain("you will explicitly start the measurement on the next screen");
+    expect(element.shadowRoot.querySelector("button.primary")?.textContent).toBe("Prepare measurement");
+
+    element.busy = true;
+    await element.updateComplete;
+    const status = element.shadowRoot.querySelector(".starting");
+    expect(status?.getAttribute("role")).toBe("status");
+    expect(status?.getAttribute("aria-live")).toBe("polite");
+    expect(status?.textContent).toContain("Initializing measurement session");
+    expect(status?.textContent).toContain("This can take a few seconds");
+    expect((element.shadowRoot.querySelector("button.primary") as HTMLButtonElement).disabled).toBe(true);
+    expect((element.shadowRoot.querySelector(".actions button") as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("keeps direct measurements as a single Start measurement action", async () => {
+    const element = document.createElement("measure-preflight-view") as HTMLElement & {
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector("button.primary")?.textContent).toBe("Start measurement");
+    expect(element.shadowRoot.textContent).not.toContain("explicitly start");
+  });
+
   it("shows the same quality details before a measurement starts", async () => {
     const element = document.createElement("measure-preflight-view") as HTMLElement & {
       powerMeterDiagnostic: PowerMeterDiagnostic;
@@ -1077,6 +1168,44 @@ describe("preflight power meter diagnostics", () => {
 });
 
 describe("app shell", () => {
+  it("passes a workflow-specific confirmation action through review and ready states", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.definitions = [{
+      measure_type: "average",
+      label: "Average",
+      description: "Measure average power.",
+      fields: [],
+      supports_profile: false,
+      supports_resume: false,
+      confirmation_action: "Start averaging",
+    }];
+    element.request = {
+      measure_type: "average",
+      model_id: "measurement",
+      product_name: "Measurement",
+      measure_device: "Shelly Plug S",
+      generate_model: false,
+      duration: 60,
+      parameters: capabilities.defaults,
+      power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+      resume_policy: "new",
+    };
+    element.preflight = { valid: true, warnings: [] };
+    element.view = "review";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const review = element.shadowRoot?.querySelector("measure-preflight-view") as HTMLElement & { confirmationAction: string; updateComplete: Promise<boolean> };
+    expect(review.confirmationAction).toBe("Start averaging");
+
+    element.snapshot = { state: "awaiting_confirmation", request: element.request };
+    element.view = "running";
+    await element.updateComplete;
+    const running = element.shadowRoot?.querySelector("measure-running-view") as HTMLElement & { confirmationAction: string; updateComplete: Promise<boolean> };
+    expect(running.confirmationAction).toBe("Start averaging");
+  });
+
   it("loads the Powercalc SVG logo", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;

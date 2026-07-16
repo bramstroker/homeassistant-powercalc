@@ -21,6 +21,9 @@ class ConsoleInteraction(RunInteraction):
             return default
         return answer in {"y", "yes"}
 
+    def phase(self, message: str) -> None:
+        return
+
     def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
         return
 

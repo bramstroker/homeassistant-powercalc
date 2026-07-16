@@ -65,6 +65,8 @@ def test_run_reports_volume_and_muted_operating_points() -> None:
 
     runner.run(request, "")
 
+    interaction.phase.assert_any_call("Starting speaker measurement")
+    interaction.phase.assert_any_call("Measuring speaker at 10% volume")
     points = [call.args[0] for call in interaction.operating_point.call_args_list]
     assert points[:2] == [
         {"type": "speaker", "volume": 10, "muted": False},

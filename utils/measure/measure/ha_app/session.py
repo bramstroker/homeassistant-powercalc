@@ -37,6 +37,7 @@ ACTIVE_SESSION_STATES = frozenset(
 
 class SessionEventType(StrEnum):
     STATE = "state"
+    PHASE = "phase"
     PROGRESS = "progress"
     WARNING = "warning"
     LOG = "log"
@@ -66,6 +67,8 @@ class SessionSnapshot:
     updated_at: str
     completed: int = 0
     total: int = 0
+    phase: str | None = None
+    confirmation_message: str | None = None
     mode: str | None = None
     estimated_remaining: str | None = None
     error: str | None = None
@@ -169,6 +172,9 @@ class SessionControl:
                 "estimated_remaining": estimated_remaining,
             },
         )
+
+    def phase(self, message: str) -> None:
+        self.emit(SessionEventType.PHASE, {"message": message})
 
     def log(self, message: str, *, warning: bool = False) -> None:
         self.emit(SessionEventType.WARNING if warning else SessionEventType.LOG, {"message": message})

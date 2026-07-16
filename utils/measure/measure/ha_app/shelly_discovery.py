@@ -3,10 +3,8 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import StrEnum
 from ipaddress import IPv4Address, IPv6Address, ip_address
 import logging
-from typing import Any
 
 from homeassistant_api.errors import HomeassistantAPIError
 from pydantic import BaseModel, Field
@@ -20,15 +18,9 @@ from measure.const import (
     ZEROCONF_SHELLY_SERVICE_TYPE,
 )
 from measure.home_assistant import HomeAssistantDiscoveryError, HomeAssistantManager
-from measure.powermeter.const import SHELLY_GEN1_STATUS_ENDPOINT, SHELLY_GEN2_STATUS_ENDPOINTS, SHELLY_INFO_ENDPOINT
+from measure.powermeter.shelly_client import ShellyClient, ShellyDeviceInfo, ShellyProbeError
 
 _LOGGER = logging.getLogger("measure")
-
-
-class _EndpointProbeResult(StrEnum):
-    SUPPORTED = "supported"
-    AUTH_REQUIRED = "auth_required"
-    UNAVAILABLE = "unavailable"
 
 
 class ShellyDiscoveredDevice(BaseModel):
@@ -128,78 +120,16 @@ class ShellyDiscoveryService:
         if not _is_safe_lan_address(address):
             return _unsupported(candidate, "The discovered address is not a private LAN address")
 
-        info_result = self._fetch_info(candidate, address)
-        if isinstance(info_result, ShellyDiscoveredDevice):
-            return info_result
-        device = _device_from_info(candidate, info_result)
-        if device.auth_required:
-            return device
-        return self._probe_power_support(address, device)
-
-    def _fetch_info(
-        self,
-        candidate: _ShellyCandidate,
-        address: IPv4Address,
-    ) -> dict[str, Any] | ShellyDiscoveredDevice:
+        client = ShellyClient(str(address), SHELLY_DISCOVERY_PROBE_TIMEOUT_SECONDS, http_get=self._http_get)
         try:
-            info_response = self._http_get(
-                f"http://{address}{SHELLY_INFO_ENDPOINT}",
-                timeout=SHELLY_DISCOVERY_PROBE_TIMEOUT_SECONDS,
-                allow_redirects=False,
+            device = client.probe()
+        except ShellyProbeError as error:
+            if error.device_info is None:
+                return _unsupported(candidate, str(error), auth_required=error.auth_required)
+            return _device_from_info(candidate, error.device_info).model_copy(
+                update={"reason": str(error), "auth_required": error.auth_required},
             )
-        except requests.RequestException:
-            return _unsupported(candidate, "The Shelly device could not be reached")
-        if info_response.status_code in {401, 403}:
-            return _unsupported(candidate, "Authentication is enabled and is not supported yet", auth_required=True)
-        if info_response.status_code != 200:
-            return _unsupported(candidate, f"The Shelly information endpoint returned HTTP {info_response.status_code}")
-
-        try:
-            info = info_response.json()
-        except ValueError:
-            return _unsupported(candidate, "The Shelly information response was invalid")
-        if not isinstance(info, dict):
-            return _unsupported(candidate, "The Shelly information response was invalid")
-        return info
-
-    def _probe_power_support(self, address: IPv4Address, device: ShellyDiscoveredDevice) -> ShellyDiscoveredDevice:
-        endpoints = (SHELLY_GEN1_STATUS_ENDPOINT,) if device.generation == 1 else SHELLY_GEN2_STATUS_ENDPOINTS
-        for endpoint in endpoints:
-            endpoint_result = self._probe_power_endpoint(address, endpoint)
-            if endpoint_result is _EndpointProbeResult.SUPPORTED:
-                return device.model_copy(update={"supported": True, "reason": None})
-            if endpoint_result is _EndpointProbeResult.AUTH_REQUIRED:
-                return device.model_copy(
-                    update={"reason": "Authentication is enabled and is not supported yet", "auth_required": True},
-                )
-        return device.model_copy(update={"reason": "No supported power measurement endpoint was found"})
-
-    def _probe_power_endpoint(self, address: IPv4Address, endpoint: str) -> _EndpointProbeResult:
-        try:
-            response = self._http_get(
-                f"http://{address}{endpoint}",
-                timeout=SHELLY_DISCOVERY_PROBE_TIMEOUT_SECONDS,
-                allow_redirects=False,
-            )
-        except requests.RequestException:
-            return _EndpointProbeResult.UNAVAILABLE
-        if response.status_code in {401, 403}:
-            return _EndpointProbeResult.AUTH_REQUIRED
-        if response.status_code != 200:
-            return _EndpointProbeResult.UNAVAILABLE
-        try:
-            data = response.json()
-        except ValueError:
-            return _EndpointProbeResult.UNAVAILABLE
-        if not isinstance(data, dict):
-            return _EndpointProbeResult.UNAVAILABLE
-        if endpoint == SHELLY_GEN1_STATUS_ENDPOINT:
-            meters = data.get("meters")
-            supports_power = (
-                isinstance(meters, list) and bool(meters) and isinstance(meters[0], dict) and "power" in meters[0]
-            )
-            return _EndpointProbeResult.SUPPORTED if supports_power else _EndpointProbeResult.UNAVAILABLE
-        return _EndpointProbeResult.SUPPORTED if "apower" in data else _EndpointProbeResult.UNAVAILABLE
+        return _device_from_info(candidate, device.info).model_copy(update={"supported": True, "reason": None})
 
 
 def _parse_address(value: str) -> IPv4Address | IPv6Address | None:
@@ -229,25 +159,13 @@ def _unsupported(candidate: _ShellyCandidate, reason: str, *, auth_required: boo
     )
 
 
-def _device_from_info(candidate: _ShellyCandidate, info: dict[str, Any]) -> ShellyDiscoveredDevice:
-    generation_value = info.get("gen", 1)
-    try:
-        generation = int(generation_value)
-    except TypeError, ValueError:
-        generation = None
-    device_id = str(info.get("id") or info.get("mac") or candidate.name).casefold()
-    configured_name = info.get("name")
-    name = configured_name if isinstance(configured_name, str) and configured_name else candidate.name
-    model_value = info.get("model") or info.get("type")
-    model = str(model_value) if model_value else None
-    auth_required = info.get("auth_en") is True or info.get("auth") is True
+def _device_from_info(candidate: _ShellyCandidate, info: ShellyDeviceInfo) -> ShellyDiscoveredDevice:
     return ShellyDiscoveredDevice(
-        id=device_id,
-        name=name,
-        model=model,
-        generation=generation,
+        id=(info.device_id or candidate.name).casefold(),
+        name=info.name or candidate.name,
+        model=info.model,
+        generation=info.generation,
         ip_address=candidate.ip_address,
         supported=False,
-        reason="Authentication is enabled and is not supported yet" if auth_required else None,
-        auth_required=auth_required,
+        auth_required=info.auth_required,
     )

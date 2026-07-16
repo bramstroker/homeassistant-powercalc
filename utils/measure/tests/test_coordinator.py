@@ -90,6 +90,22 @@ class OperatingPointService(SessionMeasurementService):
         raise AssertionError("Cancelled wait returned")
 
 
+class CheckpointService(SessionMeasurementService):
+    def __init__(self, continued: Event) -> None:
+        self.continued = continued
+
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        output_root: Path,
+    ) -> RunnerResult:
+        control.phase("Preparing operator checkpoint")
+        control.confirm("Place the device on its charger, then start the measurement.")
+        self.continued.set()
+        return RunnerResult(model_json_data={})
+
+
 def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
 
@@ -184,3 +200,26 @@ def test_coordinator_projects_and_persists_operating_point(tmp_path: Path) -> No
 
     coordinator.cancel()
     wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_coordinator_projects_phase_and_confirmation_message(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    continued = Event()
+    coordinator = MeasurementCoordinator(storage, lambda: CheckpointService(continued))
+
+    coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
+
+    assert coordinator.current is not None
+    assert coordinator.current.phase == "Waiting for confirmation"
+    assert coordinator.current.confirmation_message == "Place the device on its charger, then start the measurement."
+    persisted = storage.load_current()
+    assert persisted is not None
+    assert persisted.confirmation_message == coordinator.current.confirmation_message
+
+    confirmed = coordinator.confirm()
+    assert confirmed.state == SessionState.RUNNING
+    assert confirmed.phase == "Starting measurement"
+    assert confirmed.confirmation_message is None
+    assert continued.wait(1)
+    wait_for_state(coordinator, SessionState.COMPLETED)

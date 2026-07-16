@@ -45,6 +45,9 @@ type OperatingPoint = LightOperatingPoint | SpeakerOperatingPoint | FanOperating
 class RunInteraction(MeasureUtilInteraction, Protocol):
     """Full interaction boundary used while a measurement is running."""
 
+    def phase(self, message: str) -> None:
+        """Report the current activity when numeric progress is unavailable."""
+
     def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
         """Report measurement progress. ``total`` of 0 means the run is open-ended."""
 
@@ -73,6 +76,9 @@ class ImmediateInteraction(RunInteraction):
 
     def choose(self, _: str, *, default: bool) -> bool:
         return default
+
+    def phase(self, message: str) -> None:
+        return
 
     def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
         return
