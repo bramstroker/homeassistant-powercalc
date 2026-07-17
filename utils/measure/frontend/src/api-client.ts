@@ -3,9 +3,11 @@ import type {
   AppSettings,
   Capabilities,
   DeviceClass,
+  DummyLoadCalibration,
   EntityDescriptor,
   MeasurementRequest,
   MeasureDefinition,
+  PlotCollection,
   PowerMeterDiagnostic,
   PreflightResponse,
   SessionEvent,
@@ -72,6 +74,10 @@ export class MeasureApiClient {
     return this.request<EntityDescriptor[]>(`api/entities?device_class=${encodeURIComponent(deviceClass)}`);
   }
 
+  getDummyLoadCalibration(): Promise<DummyLoadCalibration | null> {
+    return this.request<DummyLoadCalibration | null>("api/dummy-load/calibration");
+  }
+
   preflight(request: MeasurementRequest): Promise<PreflightResponse> {
     return this.request("api/preflight", { method: "POST", body: JSON.stringify(request) });
   }
@@ -99,6 +105,10 @@ export class MeasureApiClient {
 
   getFiles(): Promise<SessionFile[]> {
     return this.request<SessionFile[]>("api/session/current/files");
+  }
+
+  getPlots(): Promise<PlotCollection> {
+    return this.request<PlotCollection>("api/session/current/plots");
   }
 
   fileUrl(name: string): string {

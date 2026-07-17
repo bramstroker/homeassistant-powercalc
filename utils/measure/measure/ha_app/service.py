@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 import logging
 from pathlib import Path
 import re
 
 from measure.assembler import MeasurementAssembler
-from measure.execution import MeasurementExecution
+from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
+from measure.execution import DummyLoadCalibrationStore, MeasurementExecution
 from measure.ha_app.coordinator import SessionMeasurementService
 from measure.ha_app.interaction import SessionInteraction
-from measure.ha_app.session import SessionControl, SessionEventType
+from measure.ha_app.session import SessionControl, SessionEventType, utc_now
+from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantManager
-from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
@@ -35,23 +35,32 @@ class _SessionLogHandler(logging.Handler):
             self.handleError(record)
 
 
-class _SamplingPowerMeter(PowerMeter):
-    """Wraps a power meter to stream every reading to the session as a live sample."""
+class SessionDummyLoadCalibrationStore(DummyLoadCalibrationStore):
+    """Persist calibration globally and inside the active session."""
 
-    def __init__(self, inner: PowerMeter, on_sample: Callable[[float], None]) -> None:
-        self._inner = inner
-        self._on_sample = on_sample
+    def __init__(self, storage: SessionStorage, session_id: str) -> None:
+        self._storage = storage
+        self._session_id = session_id
 
-    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
-        result = self._inner.get_power(include_voltage=include_voltage)
-        try:
-            self._on_sample(result.power)
-        except Exception:  # noqa: BLE001  # pragma: no cover - streaming must not break a measurement
-            _LOGGER.debug("Failed to emit live power sample", exc_info=True)
-        return result
+    def load(self, request: MeasurementRequest) -> DummyLoadCalibration | None:
+        calibration = self._storage.load_session_dummy_load_calibration(self._session_id)
+        if calibration is None:
+            return None
+        fingerprint = power_meter_fingerprint(request.power_meter)
+        return calibration if calibration.power_meter_fingerprint == fingerprint else None
 
-    def has_voltage_support(self) -> bool:
-        return self._inner.has_voltage_support()
+    def save(self, request: MeasurementRequest, resistance: float) -> DummyLoadCalibration:
+        if request.dummy_load is None:
+            raise ValueError("Cannot save calibration without dummy-load configuration")
+        calibration = DummyLoadCalibration(
+            description=request.dummy_load.description,
+            resistance=resistance,
+            calibrated_at=utc_now(),
+            power_meter_fingerprint=power_meter_fingerprint(request.power_meter),
+        )
+        self._storage.save_session_dummy_load_calibration(self._session_id, calibration)
+        self._storage.save_dummy_load_calibration(calibration)
+        return calibration
 
 
 def _redact(message: str, secrets: tuple[str, ...]) -> str:
@@ -68,8 +77,10 @@ class MeasurementService(SessionMeasurementService):
     def __init__(
         self,
         home_assistant: HomeAssistantManager,
+        storage: SessionStorage | None = None,
     ) -> None:
         self.home_assistant = home_assistant
+        self.storage = storage
 
     def run(
         self,
@@ -104,13 +115,19 @@ class MeasurementService(SessionMeasurementService):
     ) -> RunnerResult:
         control.checkpoint()
         if isinstance(request.power_meter, DummyPowerMeterSpec):
-            _LOGGER.warning("Using dummy power meter — reported power values are synthetic, not real measurements")
+            _LOGGER.warning("Using synthetic test meter — reported power values are not real measurements")
         interaction = SessionInteraction(control)
         control.phase("Preparing measurement devices")
+        calibration_store = (
+            SessionDummyLoadCalibrationStore(self.storage, output_root.parent.name)
+            if request.dummy_load is not None and self.storage is not None
+            else None
+        )
         prepared = MeasurementAssembler(
             interaction,
             home_assistant=self.home_assistant,
-            power_meter_decorator=lambda meter: _SamplingPowerMeter(meter, control.sample),
+            on_sample=control.sample,
+            dummy_load_calibration_store=calibration_store,
         ).assemble(request)
         output_directory = output_root / request.model_id
         control.phase("Starting measurement")

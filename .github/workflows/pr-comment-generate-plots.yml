@@ -3,7 +3,8 @@ name: Generate PR plots
 on:
   pull_request:
     paths:
-      - '**/*.csv.gz'
+      - 'profile_library/**/*.csv.gz'
+      - 'profile_library/**/model.json'
 
 permissions:
   contents: read
@@ -20,7 +21,8 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
         with:
-          working-directory: './utils/visualize'
+          version: '0.10.10'
+          working-directory: './utils/measure'
           enable-cache: true
           cache-dependency-glob: |
             pyproject.toml
@@ -31,20 +33,39 @@ jobs:
         with:
           script: |
             const { execSync } = require('child_process')
-            const { commits } = context.payload.pull_request
-            const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits} | grep -E '(brightness|color_temp|hs|effect)\\.csv\\.gz$'`).toString()
-            const files = rawFiles.split('\n').filter(Boolean)
+            const fs = require('fs')
+            const { base, head } = context.payload.pull_request
+            const rawFiles = execSync(`git diff --name-only ${base.sha} ${head.sha}`).toString()
+            const files = rawFiles.split('\n').filter((file) => {
+              if (/^profile_library\\/.+\\/(brightness|color_temp|hs|effect)\\.csv\\.gz$/.test(file)) return true
+              if (!/^profile_library\\/.+\\/model\\.json$/.test(file) || !fs.existsSync(file)) return false
+              try {
+                const model = JSON.parse(fs.readFileSync(file, 'utf8'))
+                return model.calculation_strategy === 'linear' && Array.isArray(model.linear_config?.calibrate)
+              } catch {
+                return false
+              }
+            })
             core.setOutput('changedFiles', files.join('\n'))
+            core.setOutput('hasPlots', files.length ? 'true' : 'false')
       - name: Run visualization tool
+        if: steps.list-files.outputs.hasPlots == 'true'
         run: |
-          cd ./utils/visualize
+          mkdir -p plot-artifacts
           while IFS= read -r file; do
             if [ -z "${file}" ]; then
               continue
             fi
             echo "Generating plot for - ${file}."
             if [ -f "${{ github.workspace }}/${file}" ]; then
-              uv run python plot.py "${{ github.workspace }}/${file}" --output=auto
+              relative="${file#profile_library/}"
+              if [[ "${relative}" == */model.json ]]; then
+                output="plot-artifacts/${relative%model.json}calibration.png"
+              else
+                output="plot-artifacts/${relative%.csv.gz}.png"
+              fi
+              uv --project utils/measure run --group visualize powercalc-visualize \
+                "${{ github.workspace }}/${file}" --output="${output}"
             else
               echo "::error::Changed file is missing from checkout: ${file}"
               exit 1
@@ -53,19 +74,20 @@ jobs:
         env:
           STEPS_LIST_FILES_OUTPUTS_CHANGEDFILES: ${{ steps.list-files.outputs.changedFiles }}
       - name: Verify plots generated
+        if: steps.list-files.outputs.hasPlots == 'true'
         run: |
-          if ! compgen -G "./utils/visualize/*.png" > /dev/null; then
+          if ! find plot-artifacts -type f -name '*.png' -print -quit | grep -q .; then
             echo "::error::No plot PNG files were generated"
             exit 1
           fi
       - name: Write PR number
+        if: steps.list-files.outputs.hasPlots == 'true'
         run: |
-          echo "${{ github.event.pull_request.number }}" > ./utils/visualize/pr_number.txt
+          echo "${{ github.event.pull_request.number }}" > plot-artifacts/pr_number.txt
       - name: Upload Artifact
+        if: steps.list-files.outputs.hasPlots == 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: plots
           if-no-files-found: error
-          path: |
-            ./utils/visualize/*.png
-            ./utils/visualize/pr_number.txt
+          path: plot-artifacts

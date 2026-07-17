@@ -29,7 +29,13 @@ from measure.controller.media.controller import MediaController
 from measure.controller.media.dummy import DummyMediaController
 from measure.controller.media.hass import HassMediaController
 from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec, MediaControllerSpec
-from measure.execution import PreparedMeasurement, RunInteraction
+from measure.execution import (
+    DummyLoadCalibrationStore,
+    DummyLoadPreparation,
+    MeasurementPreparation,
+    PreparedMeasurement,
+    RunInteraction,
+)
 from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.errors import PowerMeterError
@@ -85,11 +91,15 @@ class MeasurementAssembler:
         home_assistant: HomeAssistantManager | None = None,
         tuya_device_key: str | None = None,
         power_meter_decorator: Callable[[PowerMeter], PowerMeter] | None = None,
+        on_sample: Callable[[float], None] | None = None,
+        dummy_load_calibration_store: DummyLoadCalibrationStore | None = None,
     ) -> None:
         self._interaction = interaction
         self._home_assistant_manager = home_assistant
         self._tuya_device_key = tuya_device_key
         self._power_meter_decorator = power_meter_decorator
+        self._on_sample = on_sample
+        self._dummy_load_calibration_store = dummy_load_calibration_store
 
     def assemble(self, request: MeasurementRequest) -> PreparedMeasurement:
         """Resolve a request once into a transport-independent runner graph."""
@@ -104,12 +114,26 @@ class MeasurementAssembler:
             parameters,
             include_voltage=lambda: voltage_enabled,
             wait=self._interaction.wait,
-            interaction=self._interaction,
+            on_sample=self._on_sample,
         )
         runner = self._runner(request, parameters, measure_util)
+        preparations: list[MeasurementPreparation] = (
+            [
+                DummyLoadPreparation(
+                    request=request,
+                    spec=request.dummy_load,
+                    measure_util=measure_util,
+                    calibration_store=self._dummy_load_calibration_store,
+                ),
+            ]
+            if request.dummy_load is not None
+            else []
+        )
         return PreparedMeasurement(
             request=request,
             runner=runner,
+            preparations=preparations,
+            interaction=self._interaction,
         )
 
     def build_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:  # noqa: C901

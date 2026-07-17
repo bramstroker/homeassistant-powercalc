@@ -5,12 +5,13 @@ from unittest.mock import patch
 
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import HassLightControllerSpec
-from measure.ha_app.service import MeasurementService, _redact
-from measure.ha_app.session import SessionControl, SessionEventType
+from measure.ha_app.service import MeasurementService, SessionDummyLoadCalibrationStore, _redact
+from measure.ha_app.session import SessionControl, SessionEventType, SessionSnapshot, SessionState, utc_now
+from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.spec import HassPowerMeterSpec
-from measure.request import LightMeasurementRequest
+from measure.request import DummyLoadCalibrationRequest, LightMeasurementRequest
 
 
 def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None:
@@ -50,3 +51,29 @@ def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None
 
 def test_sensitive_values_are_redacted_from_session_messages() -> None:
     assert _redact("Authorization: Bearer secret-token", ("secret-token",)) == "Authorization: Bearer [REDACTED]"
+
+
+def test_session_dummy_load_store_persists_for_resume_and_future_sessions(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    now = utc_now()
+    request = LightMeasurementRequest(
+        model_id="LCT010",
+        product_name="Test light",
+        measure_device="Test meter",
+        controller=HassLightControllerSpec(entity_id="light.test"),
+        power_meter=HassPowerMeterSpec(
+            entity_id="sensor.test_power",
+            voltage_entity_id="sensor.test_voltage",
+        ),
+        dummy_load=DummyLoadCalibrationRequest(description="40 W incandescent bulb"),
+    )
+    storage.create(
+        SessionSnapshot(id="a1b2-c3d4", state=SessionState.RUNNING, created_at=now, updated_at=now),
+        request,
+    )
+    store = SessionDummyLoadCalibrationStore(storage, "a1b2-c3d4")
+
+    calibration = store.save(request, 1322.5)
+
+    assert store.load(request) == calibration
+    assert storage.load_dummy_load_calibration() == calibration

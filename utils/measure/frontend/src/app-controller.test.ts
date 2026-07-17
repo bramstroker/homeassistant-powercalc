@@ -21,7 +21,9 @@ const capabilities = {
 function state(): MeasureAppState {
   return {
     view: "loading", errorMessage: "", busy: false, connectedToEvents: false,
-    files: [], logs: [], samples: [], lights: [], powers: [], voltages: [], definitions: [],
+    files: [], plotCollection: { partial: false, plots: [], warnings: [] },
+    logs: [], samples: [], lights: [], powers: [], voltages: [], definitions: [],
+    dummyLoadCalibration: null,
     deviceEntities: {}, deviceEntityErrors: {}, testingPowerMeter: false,
     shellyDiscoveryDevices: [], discoveringShellys: false, shellyDiscoveryError: "",
   };
@@ -48,6 +50,7 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     getShellyDevices: async () => ({ available: true, message: null, devices: [] }),
     getEntitiesByDomain: async () => [],
     getEntitiesByDeviceClass: async () => [],
+    getDummyLoadCalibration: async () => null,
     preflight: async () => ({ valid: true, warnings: [] }),
     start: async () => ({ state: "running" }),
     getCurrent: async () => ({ state: "idle" }),
@@ -55,11 +58,65 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     confirm: async () => ({ state: "running" }),
     resume: async () => ({ state: "running" }),
     getFiles: async () => [],
+    getPlots: async () => ({ partial: false, plots: [], warnings: [] }),
     ...overrides,
   };
 }
 
 describe("measure app controller", () => {
+  it("loads the matching dummy-load calibration during boot", async () => {
+    const appState = state();
+    const calibration = {
+      description: "60 W incandescent bulb",
+      resistance: 882.4,
+      calibrated_at: "2026-07-16T10:00:00Z",
+      power_meter_fingerprint: "hass:sensor.plug_power:sensor.plug_voltage",
+    };
+    const controller = new MeasureAppController(appState, () => api({
+      getDummyLoadCalibration: async () => calibration,
+    }), () => connection(), () => undefined);
+
+    await controller.boot();
+
+    expect(appState.dummyLoadCalibration).toEqual(calibration);
+  });
+
+  it("loads files and plots for a persisted terminal session", async () => {
+    const appState = state();
+    let calibrationCalls = 0;
+    const plots = {
+      partial: true,
+      warnings: ["Partial data"],
+      plots: [{
+        id: "brightness",
+        title: "Brightness",
+        kind: "scatter" as const,
+        x_label: "Brightness",
+        y_label: "Power (W)",
+        source: "LCT010/brightness.csv",
+        series: [{ label: null, color: "#5488e8", points: [{ x: 1, y: 0.5, color: null }] }],
+      }],
+    };
+    const controller = new MeasureAppController(appState, () => api({
+      getCurrent: async () => ({ state: "cancelled" }),
+      getFiles: async () => [{ name: "brightness.csv", size: 10, media_type: "text/csv" }],
+      getPlots: async () => plots,
+      getDummyLoadCalibration: async () => {
+        calibrationCalls += 1;
+        return calibrationCalls === 1
+          ? null
+          : { description: "Calibrated load", resistance: 880, calibrated_at: "2026-07-16T10:00:00Z" };
+      },
+    }), () => connection(), () => undefined);
+
+    await controller.boot();
+
+    expect(appState.view).toBe("result");
+    expect(appState.files).toHaveLength(1);
+    expect(appState.plotCollection).toEqual(plots);
+    expect(appState.dummyLoadCalibration?.description).toBe("Calibrated load");
+  });
+
   it("boots core data and lazily fetches entities for the selected measurement", async () => {
     const requestedDomains: string[] = [];
     const appState = state();
@@ -137,6 +194,28 @@ describe("measure app controller", () => {
     expect(appState.capabilities?.defaults.sleep_time).toBe(4);
     expect(appState.capabilities?.defaults.sample_count).toBe(3);
     expect(appState.view).toBe("setup");
+  });
+
+  it("reloads the matching dummy-load calibration after changing the power meter", async () => {
+    const appState = state();
+    let calibrationCalls = 0;
+    const controller = new MeasureAppController(appState, () => api({
+      getDummyLoadCalibration: async () => {
+        calibrationCalls += 1;
+        return calibrationCalls === 1 ? null : {
+          description: "Heater",
+          resistance: 1200,
+          calibrated_at: "2026-07-16T11:00:00Z",
+        };
+      },
+    }), () => connection(), () => undefined);
+    await controller.boot();
+    controller.openSettings();
+
+    await controller.saveSettings({ ...settings, power_meter: "shelly", shelly_ip: "192.0.2.10" });
+
+    expect(calibrationCalls).toBe(2);
+    expect(appState.dummyLoadCalibration?.description).toBe("Heater");
   });
 
   it("ignores a validation result after the meter configuration changes", async () => {

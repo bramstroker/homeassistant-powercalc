@@ -4,11 +4,22 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from measure.execution import MeasurementExecution, PreparedMeasurement
+from measure.dummy_load import DummyLoadCalibration
+from measure.execution import (
+    DummyLoadPreparation,
+    MeasurementCancelledError,
+    MeasurementExecution,
+    PreparedMeasurement,
+    RunInteraction,
+)
 from measure.powermeter.spec import DummyPowerMeterSpec
-from measure.request import AverageMeasurementRequest
+from measure.request import (
+    AverageMeasurementRequest,
+    DummyLoadCalibrationRequest,
+    DummyLoadReuseRequest,
+)
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasurementResult
+from measure.util.measure_util import MeasurementResult, MeasureUtil
 import pytest
 
 
@@ -112,3 +123,109 @@ def test_execution_cleans_up_runner_after_standby_failure(tmp_path: Path) -> Non
         MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
 
     runner.cleanup.assert_called_once_with()
+
+
+def test_execution_runs_preparations_before_runner(tmp_path: Path) -> None:
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    calls: list[str] = []
+    preparation = MagicMock()
+    preparation.run.side_effect = lambda interaction: calls.append("prepare")
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.writes_export_files.return_value = False
+    runner.run.side_effect = lambda request, output: calls.append("run") or RunnerResult(model_json_data={})
+    interaction = MagicMock(spec=RunInteraction)
+    prepared = PreparedMeasurement(request=request, runner=runner, preparations=[preparation], interaction=interaction)
+
+    MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
+
+    assert calls == ["prepare", "run"]
+    preparation.run.assert_called_once_with(interaction)
+
+
+def test_dummy_load_reuse_requires_two_confirmations_and_configures_measure_util() -> None:
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    measure_util = MagicMock(spec=MeasureUtil)
+    interaction = MagicMock(spec=RunInteraction)
+    preparation = DummyLoadPreparation(
+        request=request,
+        spec=DummyLoadReuseRequest(description="60 W lamp", resistance=812.4),
+        measure_util=measure_util,
+    )
+
+    preparation.run(interaction)
+
+    assert interaction.confirm.call_count == 2
+    measure_util.set_dummy_load_resistance.assert_called_once_with(812.4)
+
+
+def test_dummy_load_calibration_repeats_until_steady_and_saves_result(monkeypatch: pytest.MonkeyPatch) -> None:
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    measure_util = MagicMock(spec=MeasureUtil)
+    interaction = MagicMock(spec=RunInteraction)
+    calibration_store = MagicMock()
+    calibration_store.load.return_value = None
+    measure_util.take_average_measurement.side_effect = [
+        *[MeasurementResult(power=float(index), voltages=[230.0]) for index in range(20)],
+        *[MeasurementResult(power=100.0, voltages=[230.0]) for _ in range(20)],
+    ]
+    measure_util.dummy_load_trend.side_effect = ["increasing", "steady"]
+    preparation = DummyLoadPreparation(
+        request=request,
+        spec=DummyLoadCalibrationRequest(description="60 W lamp"),
+        measure_util=measure_util,
+        calibration_store=calibration_store,
+    )
+
+    preparation.run(interaction)
+
+    assert measure_util.take_average_measurement.call_count == 40
+    measure_util.set_dummy_load_resistance.assert_called_once_with(100.0)
+    calibration_store.save.assert_called_once_with(request, 100.0)
+    assert interaction.confirm.call_count == 2
+
+
+def test_dummy_load_cancelled_during_calibration_is_not_saved() -> None:
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    measure_util = MagicMock(spec=MeasureUtil)
+    interaction = MagicMock(spec=RunInteraction)
+    interaction.checkpoint.side_effect = MeasurementCancelledError
+    calibration_store = MagicMock()
+    calibration_store.load.return_value = None
+    preparation = DummyLoadPreparation(
+        request=request,
+        spec=DummyLoadCalibrationRequest(description="60 W lamp"),
+        measure_util=measure_util,
+        calibration_store=calibration_store,
+    )
+
+    with pytest.raises(MeasurementCancelledError):
+        preparation.run(interaction)
+
+    measure_util.take_average_measurement.assert_not_called()
+    calibration_store.save.assert_not_called()
+    measure_util.set_dummy_load_resistance.assert_not_called()
+
+
+def test_dummy_load_calibration_uses_resumed_value() -> None:
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    measure_util = MagicMock(spec=MeasureUtil)
+    interaction = MagicMock(spec=RunInteraction)
+    calibration_store = MagicMock()
+    calibration_store.load.return_value = DummyLoadCalibration(
+        description="60 W lamp",
+        resistance=456.7,
+        calibrated_at="2026-07-16T10:00:00+00:00",
+        power_meter_fingerprint="meter",
+    )
+    preparation = DummyLoadPreparation(
+        request=request,
+        spec=DummyLoadCalibrationRequest(description="60 W lamp"),
+        measure_util=measure_util,
+        calibration_store=calibration_store,
+    )
+
+    preparation.run(interaction)
+
+    measure_util.take_average_measurement.assert_not_called()
+    measure_util.set_dummy_load_resistance.assert_called_once_with(456.7)
+    calibration_store.save.assert_not_called()

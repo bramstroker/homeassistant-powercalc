@@ -1,52 +1,21 @@
 from __future__ import annotations
 
-import ast
 import logging
-from pathlib import Path
 import time
 from typing import Any
 from unittest.mock import MagicMock, patch
 
 from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
-import measure.util.measure_util as measure_util_module
-from measure.util.measure_util import AverageMeasurementState, MeasureUtil, NoValidReadingsError
+from measure.util.measure_util import (
+    AverageMeasurementState,
+    DummyLoadMeasurementError,
+    MeasureUtil,
+    NoValidReadingsError,
+)
 import pytest
 
 from tests.conftest import MockConfigFactory
-
-
-class _RecordingInteraction:
-    def __init__(self, choice: bool = False) -> None:
-        self.choice = choice
-        self.notifications: list[str] = []
-
-    def confirm(self, message: str) -> None:
-        raise AssertionError(f"Unexpected confirmation: {message}")
-
-    def choose(self, message: str, *, default: bool) -> bool:
-        self.notifications.append(message)
-        return self.choice
-
-    def notify(self, message: str) -> None:
-        self.notifications.append(message)
-
-
-def test_shared_measure_util_has_no_process_or_console_calls() -> None:
-    source_path = Path(str(measure_util_module.__file__))
-    tree = ast.parse(source_path.read_text(encoding="utf-8"))
-    forbidden = {
-        node.func.id
-        for node in ast.walk(tree)
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {"exit", "input", "print"}
-    }
-    raises_system_exit = any(
-        isinstance(node, ast.Raise) and isinstance(node.exc, ast.Name) and node.exc.id == "SystemExit"
-        for node in ast.walk(tree)
-    )
-
-    assert forbidden == set()
-    assert not raises_system_exit
 
 
 @pytest.mark.parametrize(
@@ -72,29 +41,39 @@ def test_no_valid_average_readings_raise_typed_error(mock_config_factory: MockCo
         measure_util.take_average_measurement(1)
 
 
-def test_dummy_load_reuses_value_through_interaction_boundary(
-    tmp_path: Path,
-    mock_config_factory: MockConfigFactory,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    persistent = tmp_path / ".persistent"
-    persistent.mkdir()
-    (persistent / "dummy_load_resistance").write_text("42.5", encoding="utf-8")
-    interaction = _RecordingInteraction(choice=False)
-    monkeypatch.setattr("measure.util.measure_util.PROJECT_DIR", tmp_path)
-    measure_util = MeasureUtil(MagicMock(PowerMeter), mock_config_factory(), interaction=interaction)
-
-    assert measure_util.initialize_dummy_load() == pytest.approx(42.5)
-    assert interaction.notifications
-
-
 def test_dummy_load_requires_voltage_support(mock_config_factory: MockConfigFactory) -> None:
     power_meter = MagicMock(PowerMeter)
     power_meter.has_voltage_support.return_value = False
     measure_util = MeasureUtil(power_meter, mock_config_factory())
 
     with pytest.raises(UnsupportedFeatureError):
-        measure_util._validate_voltage_support()  # noqa: SLF001
+        measure_util.set_dummy_load_resistance(42.5)
+
+
+def test_dummy_load_emits_corrected_sample(mock_config_factory: MockConfigFactory) -> None:
+    power_meter = MagicMock(PowerMeter)
+    power_meter.has_voltage_support.return_value = True
+    power_meter.get_power.return_value = PowerMeasurementResult(power=20.0, voltage=10.0, updated=time.time())
+    samples: list[float] = []
+    measure_util = MeasureUtil(power_meter, mock_config_factory(), on_sample=samples.append)
+    measure_util.set_dummy_load_resistance(10.0)
+
+    result = measure_util.take_measurement()
+
+    assert result.power == pytest.approx(10.0)
+    assert samples
+    assert all(sample == pytest.approx(10.0) for sample in samples)
+
+
+def test_dummy_load_rejects_non_positive_corrected_power(mock_config_factory: MockConfigFactory) -> None:
+    power_meter = MagicMock(PowerMeter)
+    power_meter.has_voltage_support.return_value = True
+    power_meter.get_power.return_value = PowerMeasurementResult(power=10.0, voltage=10.0, updated=time.time())
+    measure_util = MeasureUtil(power_meter, mock_config_factory())
+    measure_util.set_dummy_load_resistance(10.0)
+
+    with pytest.raises(DummyLoadMeasurementError, match="non-positive target power"):
+        measure_util.take_measurement()
 
 
 class _ErrorThenSuccessPowerMeter(PowerMeter):

@@ -29,6 +29,8 @@ An oven bulb is a good choice since it uses little power and is easy to find.
     Do **not** use an LED bulb as a dummy load.
     LED bulbs are not stable resistive loads and will cause fluctuating or inaccurate readings.
 
+The power meter must also provide voltage readings so the measure tool can calculate and subtract the dummy-load consumption. In the Home Assistant app, let the load warm up before starting its inline calibration. Calibration samples at least 20 periods of 30 seconds and continues if the calculated resistance is not stable. Keep the same dummy load connected for the entire measurement.
+
 #### 3. Try a Different Smart Plug / Energy Meter
 Not all smart meters can measure sub-watt loads. If possible, try another brand or model known for decent low-load accuracy.
 

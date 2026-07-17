@@ -80,7 +80,7 @@ source = ["custom_components/powercalc", "utils", "tests"]
 [tool.ruff]
 line-length = 120
 target-version = "py314"
-exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
+exclude = ["utils/measure/playground", ".github", "docs"]
 
 [tool.ruff.lint]
 select = ["A", "ANN", "ASYNC", "B", "BLE", "C", "C4", "COM", "E", "F", "FIX", "FURB", "G", "ICN", "I", "INP", "ISC", "LOG", "N", "NPY", "PERF", "PIE", "PYI", "Q", "RET", "RUF", "S", "SIM", "SLF", "SLOT", "T10", "T20", "TID", "UP", "W"]

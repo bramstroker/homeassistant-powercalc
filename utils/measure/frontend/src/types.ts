@@ -91,6 +91,18 @@ export interface BaseMeasurementRequest {
   parameters: MeasurementParameters;
   resume_policy: "new" | "resume" | "overwrite";
   power_meter: PowerMeterSpec;
+  dummy_load?: DummyLoadSpec | null;
+}
+
+export type DummyLoadSpec =
+  | { mode: "calibrate"; description: string }
+  | { mode: "reuse"; description: string; resistance: number };
+
+export interface DummyLoadCalibration {
+  description: string;
+  resistance: number;
+  calibrated_at: string;
+  power_meter_fingerprint?: string;
 }
 
 export interface AppMeasurementDefaults {
@@ -173,6 +185,34 @@ export interface SessionFile {
   name: string;
   size: number;
   media_type: string;
+}
+
+export interface PlotPoint {
+  x: number;
+  y: number;
+  color: string | null;
+}
+
+export interface PlotSeries {
+  label: string | null;
+  color: string | null;
+  points: PlotPoint[];
+}
+
+export interface PlotSpec {
+  id: string;
+  title: string;
+  kind: "scatter" | "line";
+  x_label: string;
+  y_label: string;
+  source: string;
+  series: PlotSeries[];
+}
+
+export interface PlotCollection {
+  partial: boolean;
+  plots: PlotSpec[];
+  warnings: string[];
 }
 
 export interface SessionEventData {

@@ -10,6 +10,7 @@ from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, TuyaPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
+    DummyLoadReuseRequest,
     FanMeasurementRequest,
     LightMeasurementRequest,
 )
@@ -134,3 +135,18 @@ def test_assembler_rejects_a_controller_for_the_wrong_measurement_type() -> None
             power_meter=power_meter,
             controller=controller,
         )
+
+
+def test_assembler_adds_dummy_load_preparation_and_corrected_sample_callback() -> None:
+    on_sample = MagicMock()
+    request = AverageMeasurementRequest.model_construct(
+        power_meter=DummyPowerMeterSpec(),
+        dummy_load=DummyLoadReuseRequest(description="test load", resistance=42.5),
+    )
+
+    prepared = MeasurementAssembler(
+        MagicMock(spec=RunInteraction),
+        on_sample=on_sample,
+    ).assemble(request)
+
+    assert len(prepared.preparations) == 1

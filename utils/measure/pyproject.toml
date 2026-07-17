@@ -42,6 +42,17 @@ dev = [
     "pytest-cov>=6.0"
 ]
 
+[project.scripts]
+powercalc-visualize = "measure.visualization.cli:main"
+
+[dependency-groups]
+visualize = [
+    "matplotlib>=3.11",
+]
+
+[tool.uv]
+prerelease = "allow"
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"

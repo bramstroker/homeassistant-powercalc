@@ -21,6 +21,7 @@ from starlette.concurrency import run_in_threadpool
 from measure.assembler import MeasurementAssembler
 from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LutMode
+from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import ImmediateInteraction
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.ha_app.diagnostics import build_session_diagnostics
@@ -28,7 +29,7 @@ from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
 from measure.ha_app.registry import FieldControl, measurement_definitions, supported_light_modes
 from measure.ha_app.service import MeasurementService
-from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionEvent, SessionSnapshot
+from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionEvent, SessionSnapshot, SessionState
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantManager
@@ -45,6 +46,7 @@ from measure.powermeter.powermeter import PowerMeter
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, PowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.tuning import MeasurementParameters
+from measure.visualization import PlotSpec, build_session_plots
 
 _LOGGER = logging.getLogger("measure")
 
@@ -74,6 +76,12 @@ class SessionFile(BaseModel):
     name: str
     size: int
     media_type: str
+
+
+class SessionPlots(BaseModel):
+    partial: bool
+    plots: list[PlotSpec]
+    warnings: list[str]
 
 
 class CapabilitiesResponse(BaseModel):
@@ -129,7 +137,7 @@ class AppContext:
         )
 
     def _measurement_service(self) -> MeasurementService:
-        return MeasurementService(self.home_assistant)
+        return MeasurementService(self.home_assistant, self.storage)
 
     def build_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:
         return MeasurementAssembler(
@@ -295,6 +303,10 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
     async def discover_shelly_power_meters(request: Request) -> ShellyDiscoveryResponse:
         return await ShellyDiscoveryService(_context(request).home_assistant).discover()
 
+    @router.get("/dummy-load/calibration")
+    async def dummy_load_calibration(request: Request) -> DummyLoadCalibration | None:
+        return await run_in_threadpool(_matching_dummy_load_calibration, _context(request))
+
     @router.get("/entities", responses={400: _ERROR})
     async def entities(
         request: Request,
@@ -368,6 +380,25 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
             _file_descriptor(context.storage.file_path(snapshot.id, name), name)
             for name in context.storage.list_files(snapshot.id)
         ]
+
+    @router.get("/session/current/plots", responses={404: _ERROR, 409: _ERROR})
+    async def plots(request: Request) -> SessionPlots:
+        context = _context(request)
+        snapshot = _require_current_session(context)
+        if snapshot.state in ACTIVE_SESSION_STATES:
+            raise HTTPException(status_code=409, detail="Plots are available after the measurement stops")
+        names = context.storage.list_files(snapshot.id)
+        paths = {name: context.storage.file_path(snapshot.id, name) for name in names}
+        result = await run_in_threadpool(
+            build_session_plots,
+            context.storage.load_request(snapshot.id),
+            paths,
+        )
+        return SessionPlots(
+            partial=snapshot.state is not SessionState.COMPLETED,
+            plots=list(result.plots),
+            warnings=list(result.warnings),
+        )
 
     @router.get("/session/current/files/{name:path}", responses={404: _ERROR})
     async def download(name: str, request: Request) -> FileResponse:
@@ -482,6 +513,24 @@ def _power_meter_spec(settings: AppPreferences) -> PowerMeterSpec:
     return HassPowerMeterSpec(entity_id=settings.default_power_entity_id)
 
 
+def _matching_dummy_load_calibration(context: AppContext) -> DummyLoadCalibration | None:
+    calibration = context.storage.load_dummy_load_calibration()
+    if calibration is None:
+        return None
+    try:
+        spec = _power_meter_spec(context.storage.load_settings())
+    except PowerMeterError:
+        return None
+    if isinstance(spec, HassPowerMeterSpec):
+        snapshot = HomeAssistantEntityCatalog(context.home_assistant).load_snapshot()
+        spec = spec.model_copy(
+            update={
+                "voltage_entity_id": snapshot.related_entity_id(spec.entity_id, DeviceClass.VOLTAGE),
+            },
+        )
+    return calibration if calibration.power_meter_fingerprint == power_meter_fingerprint(spec) else None
+
+
 def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightResponse:
     catalog = HomeAssistantEntityCatalog(context.home_assistant)
     snapshot = None
@@ -501,6 +550,7 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
             verify_storage=context.storage.verify_writable,
             load_entities=load_entities,
             diagnose_power_meter=context.power_meter_diagnostics.evaluate,
+            supports_voltage=lambda spec: context.build_power_meter(spec).has_voltage_support(),
         ).validate(payload)
     except ActiveSessionError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error

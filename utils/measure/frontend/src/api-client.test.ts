@@ -32,6 +32,35 @@ describe("MeasureApiClient", () => {
     expect(apiUrl("api/entities", "http://ha.local/prefix/").pathname).toBe("/prefix/api/entities");
   });
 
+  it("loads result plots below the ingress prefix", async () => {
+    const plots = { partial: false, plots: [], warnings: [] };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(plots));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getPlots()).resolves.toEqual(plots);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/session/current/plots"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
+  it("loads the matching dummy-load calibration below the ingress prefix", async () => {
+    const calibration = {
+      description: "60 W incandescent bulb",
+      resistance: 882.4,
+      calibrated_at: "2026-07-16T10:00:00Z",
+      power_meter_fingerprint: "hass:sensor.plug_power:sensor.plug_voltage",
+    };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(calibration));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getDummyLoadCalibration()).resolves.toEqual(calibration);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/dummy-load/calibration"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
   it("loads entities by Home Assistant domain or device class", async () => {
     const fetcher = vi.fn<typeof fetch>().mockImplementation(async () => response([{ entity_id: "light.desk", name: "Desk" }]));
     const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");

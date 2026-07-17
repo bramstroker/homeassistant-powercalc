@@ -1,6 +1,8 @@
 # Setup
 
-The measure tool can run with Docker or natively with Python. Docker is recommended for normal measurement work because the required dependencies are already included.
+The measure tool can run as a Home Assistant app, with Docker, or natively with Python.
+
+Use the [Home Assistant app](home-assistant-app.md) on Home Assistant OS when you want a guided UI, entity selectors, preflight checks, live progress, result plots, and persistent sessions. Use Docker or native Python for direct-device adapters, OCR, manual readings, or development.
 
 ## Prepare a working directory
 

@@ -6,14 +6,15 @@ Powercalc Measure creates device power profiles using entities already available
 
 The app repeatedly changes the selected device and may run for hours. Keep the device powered, do not rely on it for safety-critical purposes during the run, and avoid automations or people changing it during a measurement. Confirm that the selected power sensor reports only the load being measured.
 
-The first release supports:
+The app currently supports:
 
 - light profiles from a Home Assistant `light` entity, covering brightness, color-temperature, HS, and supported combined light modes;
 - speaker, fan, and charging (robot vacuum and robot lawn mower) measurements through their Home Assistant entities;
 - average and recorder measurements for any load;
-- power readings from a Home Assistant power sensor in watts (with an optional voltage sensor in volts) or a Shelly plug.
+- power readings from a Home Assistant power sensor in watts (with an optional voltage sensor in volts) or a Shelly plug;
+- calibrated resistive dummy-load correction for every real measurement type when the meter provides voltage readings.
 
-Direct Hue, Tuya, Kasa, Tasmota and myStrom connections, OCR and manual power meters, and dummy resistive loads remain available only in the CLI.
+Direct Hue, Tuya, Kasa, Tasmota and myStrom connections, OCR, and manual power meters remain available only in the CLI.
 
 ## Installation
 
@@ -37,13 +38,25 @@ Home Assistant authenticates ingress and provides Core API access. Do not config
 
 ### Measurement defaults
 
-Open **Settings** in the app to store defaults that are pre-filled for every new measurement. The default power sensor is the first supported option; leave it set to the meter you use most and each new session starts with it selected. You can still change it per session.
+Open **Settings** in the app to configure the measurement device and reusable tuning defaults. Choose a Home Assistant power sensor or discover or manually configure a Shelly plug, enter a recognizable measurement-device name, and use **Test connection** before starting a long run.
+
+For Home Assistant sensors, the connection test checks that readings are available, have at least `0.1 W` resolution, and update frequently enough. Two seconds or faster is recommended; more than five seconds is considered unsuitable for reliable automated measurements.
+
+### Resistive dummy loads
+
+Use a resistive dummy load when the target device consumes too little power for the configured meter to measure accurately. The feature requires the selected Home Assistant power sensor to have an associated voltage sensor reporting `V`, or a Shelly meter with voltage support. It is not available with the synthetic test meter.
+
+Use only a safe, stable resistive load, such as a suitable incandescent bulb. Do not use an LED bulb or another electronically controlled load. Connect the load in parallel only when you understand the electrical and thermal safety implications, and keep it connected throughout calibration and measurement.
+
+For a new calibration, warm up the load and connect only that load to the meter. The app measures at least 20 periods of 30 seconds and continues when the calculated resistance is still changing. After calibration, connect the target device in parallel and confirm before measurement starts.
+
+A later session can reuse the stored calibration only after you explicitly confirm that the same warmed-up load is connected. Choose **Recalibrate** whenever the load, meter, or wiring changes or stability is uncertain. Live and saved readings show the target-device power after the calculated dummy-load contribution is removed.
 
 ## Sessions, cancellation, and storage
 
 Only one measurement can run at a time. **Cancel** requests a cooperative stop, so an in-flight device call or wait may finish first. Completed CSV rows are retained and may be resumable when the same measurement settings are used.
 
-Session state and output are stored in the app's private `/data` directory. Home Assistant includes this data in app backups. Use the result view to download files; no Home Assistant configuration directory is mounted into the app.
+Session state and output are stored in the app's private `/data` directory. Home Assistant includes this data in app backups. The result view shows plots for supported measurement output and lets you download raw files, individual plot images, and a session diagnostics bundle containing the request, snapshot, events, logs, and file inventory. No Home Assistant configuration directory is mounted into the app.
 
 After an app or host restart, reopen the UI. An interrupted session is shown as resumable only when its stored output passes compatibility checks; otherwise it is reported as failed rather than incorrectly completed.
 
@@ -55,7 +68,7 @@ Confirm that the device entity or sensor exists and is currently available in Ho
 
 ### Power readings are stale
 
-Check the source integration's update interval and verify that the value changes in Home Assistant Developer Tools while the load changes. A stale meter cannot produce a trustworthy profile.
+Check the source integration's update interval and verify that the value changes in Home Assistant Developer Tools while the load changes. The sensor should expose at least one decimal place and preferably update every two seconds or faster. A stale or low-resolution meter cannot produce a trustworthy profile.
 
 ### The UI disconnected
 
@@ -73,8 +86,8 @@ Check available disk space in Home Assistant, then restart the app. Do not delet
 
 Turn on **Debug logging** in the app's **Configuration** tab and restart the app to capture verbose output in the app log. Use it when reporting an issue, then turn it back off once you have collected the log.
 
-### Dummy power meter (developers)
+### Synthetic test meter (developers)
 
-The **Dummy meter** backend under **Settings → Power meter** in the app's web UI replaces the real power sensor with a synthetic reading. It exists only to exercise the measurement flow without a physical load, so any profile produced while it is enabled is meaningless. Keep the backend set to a real power meter for actual measurements.
+The **Synthetic test meter** type under **Settings → Power meter** replaces the real power sensor with a generated reading. It exists only to exercise the measurement flow without a physical load, so any profile produced while it is enabled is meaningless. It is separate from the calibrated resistive dummy-load feature and cannot be used to calibrate one. Keep the type set to a real power meter for actual measurements.
 
 For additional guidance, see the [Powercalc measure documentation](https://docs.powercalc.nl/contributing/measure/home-assistant-app/).

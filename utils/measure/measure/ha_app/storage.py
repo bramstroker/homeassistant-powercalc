@@ -14,6 +14,7 @@ from uuid import uuid4
 
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
+from measure.dummy_load import DummyLoadCalibration
 from measure.execution import OperatingPoint
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.session import (
@@ -203,6 +204,44 @@ class SessionStorage:
     def save_settings(self, settings: AppPreferences) -> AppPreferences:
         self._write_json(self.data_root / "settings.json", settings.model_dump(mode="json"))
         return settings
+
+    def load_dummy_load_calibration(self) -> DummyLoadCalibration | None:
+        path = self.data_root / "dummy_load_calibration.json"
+        if not path.exists():
+            return None
+        try:
+            return DummyLoadCalibration.model_validate(self._read_json(path))
+        except (OSError, ValueError) as error:
+            _LOGGER.warning("Ignoring invalid dummy-load calibration: %s", error)
+            return None
+
+    def save_dummy_load_calibration(self, calibration: DummyLoadCalibration) -> DummyLoadCalibration:
+        self._write_json(
+            self.data_root / "dummy_load_calibration.json",
+            calibration.model_dump(mode="json"),
+        )
+        return calibration
+
+    def load_session_dummy_load_calibration(self, session_id: str) -> DummyLoadCalibration | None:
+        path = self.session_directory(session_id) / "dummy_load_calibration.json"
+        if not path.exists():
+            return None
+        try:
+            return DummyLoadCalibration.model_validate(self._read_json(path))
+        except (OSError, ValueError) as error:
+            _LOGGER.warning("Ignoring invalid session dummy-load calibration for %s: %s", session_id, error)
+            return None
+
+    def save_session_dummy_load_calibration(
+        self,
+        session_id: str,
+        calibration: DummyLoadCalibration,
+    ) -> DummyLoadCalibration:
+        self._write_json(
+            self.session_directory(session_id) / "dummy_load_calibration.json",
+            calibration.model_dump(mode="json"),
+        )
+        return calibration
 
     def can_resume(self, session_id: str) -> bool:
         """Return whether the session has a complete row matching its persisted request."""

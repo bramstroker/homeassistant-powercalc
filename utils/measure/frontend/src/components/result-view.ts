@@ -1,11 +1,13 @@
 import { LitElement, css, html, nothing } from "lit";
-import type { SessionFile, SessionSnapshot } from "../types";
+import type { PlotCollection, SessionFile, SessionSnapshot } from "../types";
 import { sharedStyles } from "../styles";
+import "./result-plot";
 
 export class ResultView extends LitElement {
   static readonly properties = {
     snapshot: { attribute: false },
     files: { attribute: false },
+    plotCollection: { attribute: false },
     fileUrl: { attribute: false },
     downloadAll: { attribute: false },
     diagnosticsUrl: { type: String },
@@ -16,6 +18,7 @@ export class ResultView extends LitElement {
 
   snapshot!: SessionSnapshot;
   files: SessionFile[] = [];
+  plotCollection: PlotCollection = { partial: false, plots: [], warnings: [] };
   fileUrl: (name: string) => string = () => "";
   downloadAll: () => void = () => {};
   diagnosticsUrl = "";
@@ -37,6 +40,10 @@ export class ResultView extends LitElement {
     .files-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1.5rem; }
     .files-header h3 { margin: 0; font-size: 1rem; }
     .download-all { min-height: 36px; padding: 0.45rem 0.75rem; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    .plots-header { margin: 1.5rem 0 0.75rem; }
+    .plots-header h3 { margin: 0; font-size: 1rem; }
+    .plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1rem; }
+    .plot-warning { margin-top: 0.75rem; }
     ul { list-style: none; margin: 0.65rem 0 0; padding: 0; border-top: 1px solid var(--line); }
     li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--line); }
     li span { overflow-wrap: anywhere; } li small { color: var(--muted); }
@@ -60,6 +67,7 @@ export class ResultView extends LitElement {
         </div>
         ${error ? html`<p class="notice error" role="alert">${error}</p>` : nothing}
         ${this.renderSummary()}
+        ${this.renderPlots()}
         ${this.renderFiles()}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         <div class="diagnostics-download">
@@ -88,6 +96,20 @@ export class ResultView extends LitElement {
     }
     if (this.summaryEntries().length) return nothing;
     return html`<p class="notice">No downloadable files are available for this session.</p>`;
+  }
+
+  private renderPlots() {
+    const { plots, warnings, partial } = this.plotCollection;
+    if (!plots.length && !warnings.length) return nothing;
+    return html`
+      ${plots.length ? html`
+        <div class="plots-header"><h3>Result plots</h3></div>
+        <div class="plots">
+          ${plots.map((plot) => html`<measure-result-plot .plot=${plot} .partial=${partial}></measure-result-plot>`)}
+        </div>
+      ` : nothing}
+      ${warnings.map((warning) => html`<p class="notice plot-warning">${warning}</p>`)}
+    `;
   }
 
   private summaryEntries(): [string, string][] {

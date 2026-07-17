@@ -5,7 +5,7 @@ from enum import StrEnum
 import re
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator, model_validator
 
 from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.charging.const import ChargingDeviceType
@@ -14,7 +14,7 @@ from measure.controller.fan.spec import FanControllerSpec
 from measure.controller.light.const import LutMode
 from measure.controller.light.spec import LightControllerSpec
 from measure.controller.media.spec import MediaControllerSpec
-from measure.powermeter.spec import PowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, PowerMeterSpec
 from measure.runner.const import DEFAULT_EXPORT_FILENAME
 from measure.tuning import MeasurementParameters
 
@@ -23,6 +23,47 @@ class ResumePolicy(StrEnum):
     NEW = "new"
     RESUME = "resume"
     OVERWRITE = "overwrite"
+
+
+class DummyLoadCalibrationRequest(BaseModel):
+    """Request calibration of a physical resistive dummy load before measuring."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    mode: Literal["calibrate"] = "calibrate"
+    description: str = Field(min_length=1, max_length=200)
+
+    @field_validator("description")
+    @classmethod
+    def validate_description(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("dummy-load description is required")
+        return value
+
+
+class DummyLoadReuseRequest(BaseModel):
+    """Use a previously calibrated physical resistive dummy load."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    mode: Literal["reuse"] = "reuse"
+    description: str = Field(min_length=1, max_length=200)
+    resistance: float = Field(gt=0)
+
+    @field_validator("description")
+    @classmethod
+    def validate_description(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("dummy-load description is required")
+        return value
+
+
+type DummyLoadRequest = Annotated[
+    DummyLoadCalibrationRequest | DummyLoadReuseRequest,
+    Field(discriminator="mode"),
+]
 
 
 _BASE_PARAMETER_FIELDS = ("sleep_time", "sample_count", "sleep_time_sample", "max_retries", "max_nudges")
@@ -63,6 +104,7 @@ class BaseMeasurementRequest(BaseModel):
     parameters: MeasurementParameters = Field(default_factory=MeasurementParameters)
     generate_model: bool = False
     resume_policy: ResumePolicy = ResumePolicy.NEW
+    dummy_load: DummyLoadRequest | None = None
 
     @field_validator("model_id")
     @classmethod
@@ -77,6 +119,12 @@ class BaseMeasurementRequest(BaseModel):
     def validate_parameters(cls, value: MeasurementParameters) -> MeasurementParameters:
         _validate_parameter_limits(value, _BASE_PARAMETER_FIELDS)
         return value
+
+    @model_validator(mode="after")
+    def validate_dummy_load_power_meter(self) -> BaseMeasurementRequest:
+        if self.dummy_load is not None and isinstance(self.power_meter, DummyPowerMeterSpec):
+            raise ValueError("A resistive dummy load cannot be used with the synthetic test power meter")
+        return self
 
     @property
     def model_name(self) -> str:

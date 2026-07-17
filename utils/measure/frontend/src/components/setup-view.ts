@@ -2,6 +2,8 @@ import { LitElement, css, html, nothing } from "lit";
 import type {
   AppSettings,
   Capabilities,
+  DummyLoadCalibration,
+  DummyLoadSpec,
   EntityDescriptor,
   LutMode,
   LightMeasurementRequest,
@@ -34,6 +36,7 @@ export class SetupView extends LitElement {
     deviceEntities: { attribute: false },
     deviceEntityErrors: { attribute: false },
     initialRequest: { attribute: false },
+    dummyLoadCalibration: { attribute: false },
     initialType: { attribute: false },
     defaultPowerEntityId: { type: String },
     defaultMeasureDevice: { type: String },
@@ -46,6 +49,8 @@ export class SetupView extends LitElement {
     selectedLightId: { state: true },
     selectedDeviceEntityId: { state: true },
     selectedChargingType: { state: true },
+    dummyLoadEnabled: { state: true },
+    dummyLoadMode: { state: true },
   };
 
   capabilities?: Capabilities;
@@ -56,6 +61,7 @@ export class SetupView extends LitElement {
   deviceEntities: Record<string, EntityDescriptor[]> = {};
   deviceEntityErrors: Record<string, string> = {};
   initialRequest?: MeasurementRequest;
+  dummyLoadCalibration: DummyLoadCalibration | null = null;
   initialType?: MeasureType;
   defaultPowerEntityId = "";
   defaultMeasureDevice = "";
@@ -68,6 +74,8 @@ export class SetupView extends LitElement {
   selectedLightId = "";
   selectedDeviceEntityId = "";
   selectedChargingType = "";
+  dummyLoadEnabled = false;
+  dummyLoadMode: DummyLoadSpec["mode"] = "calibrate";
 
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
@@ -115,6 +123,16 @@ export class SetupView extends LitElement {
     .power-meter-details strong { overflow-wrap: anywhere; color: var(--ink); font-size: 0.84rem; }
     .power-meter-details span { overflow-wrap: anywhere; color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
     .power-meter-summary button { flex: 0 0 auto; min-height: 38px; padding: 0.4rem 0.9rem; }
+    .dummy-load { display: grid; gap: 0.9rem; }
+    .dummy-load-toggle { width: fit-content; }
+    .dummy-load-options { display: grid; gap: 0.8rem; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
+    .dummy-load-options p { margin: 0; }
+    .calibration-card { display: grid; gap: 0.2rem; }
+    .calibration-card strong { color: var(--ink); }
+    .calibration-meta { color: var(--muted); font-size: 0.78rem; }
+    .choice-list { display: grid; gap: 0.5rem; }
+    .choice { display: flex; grid-template-columns: none; align-items: flex-start; gap: 0.55rem; color: var(--ink); }
+    .choice input { width: auto; min-height: auto; margin-top: 0.2rem; accent-color: var(--signal); }
 
     @media (max-width: 640px) {
       .grid { grid-template-columns: 1fr; }
@@ -133,6 +151,12 @@ export class SetupView extends LitElement {
     // Restore the previously chosen type when returning from the review step.
     if (changed.has("initialType") && this.initialType && this.selectedType === undefined) {
       this.selectedType = this.initialType;
+    }
+    if (changed.has("initialRequest")) {
+      this.dummyLoadEnabled = Boolean(this.initialRequest?.dummy_load);
+      this.dummyLoadMode = this.initialRequest?.dummy_load?.mode ?? (this.dummyLoadCalibration ? "reuse" : "calibrate");
+    } else if (changed.has("dummyLoadCalibration") && !this.dummyLoadEnabled) {
+      this.dummyLoadMode = this.dummyLoadCalibration ? "reuse" : "calibrate";
     }
   }
 
@@ -207,6 +231,7 @@ export class SetupView extends LitElement {
         <fieldset class="section">
           <legend>Measurement device</legend>
           ${this.renderPowerMeterSummary()}
+          ${this.renderDummyLoadSection(request?.dummy_load)}
         </fieldset>
 
         <fieldset class="section">
@@ -284,6 +309,7 @@ export class SetupView extends LitElement {
         <fieldset class="section">
           <legend>Measurement device</legend>
           ${this.renderPowerMeterSummary()}
+          ${this.renderDummyLoadSection(run?.dummy_load)}
         </fieldset>
 
         <fieldset class="section">
@@ -306,7 +332,7 @@ export class SetupView extends LitElement {
   }
 
   private renderPowerMeterSummary() {
-    let source = "Dummy power meter";
+    let source = "Synthetic test meter";
     let detail = "No external readings are used.";
     if (this.powerMeter === "shelly") {
       source = "Shelly power meter";
@@ -327,6 +353,61 @@ export class SetupView extends LitElement {
           <span>${detail}</span>
         </span>
         <button type="button" @click=${this.openSettings}>Change</button>
+      </div>
+    `;
+  }
+
+  private renderDummyLoadSection(request?: DummyLoadSpec | null) {
+    if (this.powerMeter === "dummy") return nothing;
+    const calibration = this.dummyLoadCalibration;
+    const description = request?.description ?? calibration?.description ?? "";
+    const voltageAvailable = this.powerMeter !== "hass" || Boolean(this.relatedVoltageEntityId(this.defaultPowerEntityId));
+    return html`
+      <div class="dummy-load">
+        <label class="check dummy-load-toggle">
+          <input
+            type="checkbox"
+            name="use_dummy_load"
+            .checked=${this.dummyLoadEnabled}
+            ?disabled=${!voltageAvailable}
+            @change=${this.dummyLoadEnabledChanged}
+          />
+          Use resistive dummy load
+        </label>
+        ${!voltageAvailable
+          ? html`<p class="muted">Dummy-load correction requires a voltage sensor associated with the selected power sensor.</p>`
+          : nothing}
+        ${this.dummyLoadEnabled && voltageAvailable ? html`
+          <div class="dummy-load-options">
+            ${calibration ? html`
+              <div class="calibration-card">
+                <strong>${calibration.description}</strong>
+                <span class="calibration-meta">${this.formatResistance(calibration.resistance)} Ω · calibrated ${this.formatCalibrationDate(calibration.calibrated_at)}</span>
+              </div>
+              <div class="choice-list" role="radiogroup" aria-label="Dummy-load calibration">
+                <label class="choice">
+                  <input type="radio" name="dummy_load_mode" value="reuse" .checked=${this.dummyLoadMode === "reuse"} @change=${this.dummyLoadModeChanged} />
+                  <span><strong>Use saved calibration</strong><br /><small class="field-hint">Confirm that this exact, preheated load is connected when the measurement starts.</small></span>
+                </label>
+                <label class="choice">
+                  <input type="radio" name="dummy_load_mode" value="calibrate" .checked=${this.dummyLoadMode === "calibrate"} @change=${this.dummyLoadModeChanged} />
+                  <span><strong>Recalibrate</strong><br /><small class="field-hint">Measure the load again before starting this measurement.</small></span>
+                </label>
+              </div>
+            ` : html`
+              <input type="hidden" name="dummy_load_mode" value="calibrate" />
+              <p class="muted">The dummy load will be calibrated inline before the measurement. Allow at least 10 minutes; an unstable load can take longer.</p>
+            `}
+            ${this.dummyLoadMode === "calibrate" ? this.textField(
+              "dummy_load_description",
+              "Dummy-load description",
+              description,
+              "e.g. 60 W incandescent bulb",
+              true,
+              "Identify the exact resistive load so the calibration can be safely reused later.",
+            ) : nothing}
+          </div>
+        ` : nothing}
       </div>
     `;
   }
@@ -453,6 +534,15 @@ export class SetupView extends LitElement {
     if (interval) interval.disabled = count <= 1;
   }
 
+  private dummyLoadEnabledChanged(event: Event): void {
+    this.dummyLoadEnabled = (event.currentTarget as HTMLInputElement).checked;
+    if (this.dummyLoadEnabled) this.dummyLoadMode = this.dummyLoadCalibration ? "reuse" : "calibrate";
+  }
+
+  private dummyLoadModeChanged(event: Event): void {
+    this.dummyLoadMode = (event.currentTarget as HTMLInputElement).value as DummyLoadSpec["mode"];
+  }
+
   private availableModes(request?: LightMeasurementRequest): LutMode[] {
     const supported = this.capabilities?.modes ?? [];
     const lightId = this.selectedLightId || (request?.controller.type === "hass" ? request.controller.entity_id : "");
@@ -565,6 +655,7 @@ export class SetupView extends LitElement {
         measure_time_effect_min: numberOrDefault("measure_time_effect_min"),
       },
       resume_policy: (text("resume_policy") || "new") as LightMeasurementRequest["resume_policy"],
+      dummy_load: this.dummyLoadSpec(data),
     };
     this.dispatchEvent(new CustomEvent("preflight", { detail: request, bubbles: true, composed: true }));
   }
@@ -580,6 +671,7 @@ export class SetupView extends LitElement {
       return;
     }
     const request = buildNonLightRequest(definition, form, this.capabilities, this.powerMeterSpec(), this.defaultMeasureDevice);
+    request.dummy_load = this.dummyLoadSpec(form);
     if (request.measure_type === "charging") {
       const chargingField = definition.fields.find((field) => field.name === "charging_entity_id");
       const expectedDomain = chargingField && entityDomain(definition, chargingField, request.charging_device_type);
@@ -599,6 +691,32 @@ export class SetupView extends LitElement {
       entity_id: this.defaultPowerEntityId,
       voltage_entity_id: this.relatedVoltageEntityId(this.defaultPowerEntityId) || null,
     };
+  }
+
+  private dummyLoadSpec(form: FormData): DummyLoadSpec | undefined {
+    if (this.powerMeter === "dummy" || !form.has("use_dummy_load")) return undefined;
+    const mode = form.get("dummy_load_mode");
+    if (mode === "reuse" && this.dummyLoadCalibration) {
+      return {
+        mode,
+        description: this.dummyLoadCalibration.description,
+        resistance: this.dummyLoadCalibration.resistance,
+      };
+    }
+    const description = form.get("dummy_load_description");
+    return {
+      mode: "calibrate",
+      description: typeof description === "string" ? description.trim() : "",
+    };
+  }
+
+  private formatResistance(resistance: number): string {
+    return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(resistance);
+  }
+
+  private formatCalibrationDate(value: string): string {
+    const date = new Date(value);
+    return Number.isNaN(date.valueOf()) ? value : date.toLocaleDateString();
   }
 }
 

@@ -4,15 +4,10 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime as dt
 import logging
-import os
 from statistics import mean
 import time
-from typing import Protocol
 
 from measure.const import (
-    DUMMY_LOAD_MEASUREMENT_COUNT,
-    DUMMY_LOAD_MEASUREMENTS_DURATION,
-    PROJECT_DIR,
     RETRY_COUNT_LIMIT,
     Trend,
 )
@@ -38,31 +33,6 @@ class NoValidReadingsError(MeasurementError):
 
 class DummyLoadMeasurementError(MeasurementError):
     """Raised when a dummy-load measurement cannot produce a valid result."""
-
-
-class MeasurementInteractionRequiredError(MeasurementError):
-    """Raised when an interactive operation has no interaction adapter."""
-
-
-class MeasureUtilInteraction(Protocol):
-    """Input/output boundary used by optional interactive utility workflows."""
-
-    def confirm(self, message: str) -> None: ...
-
-    def choose(self, message: str, *, default: bool) -> bool: ...
-
-    def notify(self, message: str) -> None: ...
-
-
-class _MissingInteraction(MeasureUtilInteraction):
-    def confirm(self, message: str) -> None:
-        raise MeasurementInteractionRequiredError(message)
-
-    def choose(self, message: str, *, default: bool) -> bool:
-        raise MeasurementInteractionRequiredError(message)
-
-    def notify(self, message: str) -> None:
-        _LOGGER.info(message)
 
 
 @dataclass(frozen=True)
@@ -101,14 +71,14 @@ class MeasureUtil:
         parameters: MeasurementParameters,
         include_voltage: Callable[[], bool] | None = None,
         wait: Callable[[float], None] = time.sleep,
-        interaction: MeasureUtilInteraction | None = None,
+        on_sample: Callable[[float], None] | None = None,
     ) -> None:
         self.power_meter = power_meter
         self.dummy_load_value: float | None = None
         self.config = parameters
         self._include_voltage = include_voltage or (lambda: False)
         self._wait = wait
-        self._interaction = interaction or _MissingInteraction()
+        self._on_sample = on_sample
 
     def take_average_measurement(
         self,
@@ -269,7 +239,7 @@ class MeasureUtil:
         result = self.power_meter.get_power(include_voltage=True)
         power, voltage = result.power, result.voltage
 
-        if voltage < 1:
+        if voltage is None or voltage < 1:
             raise ZeroReadingError("Voltage measurement returned zero")
 
         if round(power, 2) == 0:
@@ -281,25 +251,24 @@ class MeasureUtil:
         return MeasurementResult(power=resistance, voltages=[voltage])
 
     def _take_dummy_load_power_reading(self) -> MeasurementResult | None:
-        self._validate_voltage_support()
+        self.validate_dummy_load_support()
 
         result = self.power_meter.get_power(include_voltage=True)
         power, voltage = result.power, result.voltage
 
-        if voltage < 1:
+        if voltage is None or voltage < 1:
             raise ZeroReadingError("Voltage measurement returned zero")
 
         assert self.dummy_load_value is not None
         power -= (voltage**2) / self.dummy_load_value
         if round(power, 2) <= 0:
-            _LOGGER.warning(
-                "Invalid measurement after subtracting dummy load consumption. "
-                "Calculated consumption: %.2f W; ignoring",
-                power,
+            raise DummyLoadMeasurementError(
+                "Dummy-load correction produced non-positive target power; verify the selected calibration and wiring",
             )
             return None
 
         _LOGGER.info("Measured power: %.2f W", power)
+        self._emit_sample(power)
         return MeasurementResult(power=power, voltages=[voltage])
 
     def _take_power_reading(self) -> MeasurementResult | None:
@@ -309,6 +278,7 @@ class MeasureUtil:
             _LOGGER.warning("Invalid measurement. Consumption: %.2f W; ignoring", power)
             return None
         _LOGGER.info("Measured power: %.2f W", power)
+        self._emit_sample(power)
         return MeasurementResult(power=power, voltages=self._get_voltages(measurement))
 
     def take_measurement(
@@ -374,17 +344,21 @@ class MeasureUtil:
         if self.dummy_load_value:
             power, error = self._subtract_dummy_load(measurement)
 
+        if error is None:
+            self._emit_sample(power)
         return MeasurementResult(power=power, voltages=voltages), error
 
     def _subtract_dummy_load(self, measurement: PowerMeasurementResult) -> tuple[float, PowerMeterError | None]:
         voltage = measurement.voltage
-        if voltage < 1:
+        if voltage is None or voltage < 1:
             return measurement.power, ZeroReadingError("0 Volt was read from the power meter")
 
         assert self.dummy_load_value is not None
         power = measurement.power - (voltage**2) / self.dummy_load_value
         if round(power, 2) <= 0:
-            return power, ZeroReadingError("0 watt was read from the power meter, after subtracting the dummy load")
+            return power, DummyLoadMeasurementError(
+                "Dummy-load correction produced non-positive target power; verify the selected calibration and wiring",
+            )
         return power, None
 
     def _retry_measurement_or_raise(
@@ -405,72 +379,8 @@ class MeasureUtil:
         self._wait(self.config.sleep_time)
         return self.take_measurement(start_timestamp, retry_count + 1)
 
-    def initialize_dummy_load(self) -> float:
-        """Get the previously measured dummy load resistance, or take a new measurement if it doesn't exist"""
-
-        dummy_load_file = os.path.join(
-            PROJECT_DIR,
-            ".persistent/dummy_load_resistance",
-        )
-        if os.path.exists(dummy_load_file):
-            with open(dummy_load_file) as f:
-                value = float(f.read())
-            _LOGGER.info("Dummy load was already measured before, value: %s Ω", value)
-
-            self._interaction.notify("You need to preheat the dummy load so its consumption can stabilize.")
-            remeasure = self._interaction.choose(
-                "Remeasure the dummy load if it is not sufficiently preheated or a different load is connected?",
-                default=False,
-            )
-            if not remeasure:
-                self.dummy_load_value = value
-                return self.dummy_load_value
-
-        self._interaction.notify(
-            "Use a constant resistive dummy load and connect only that load to the smart plug. "
-            "Stabilization can take up to two hours.",
-        )
-        self._interaction.confirm("Ready to begin measuring the dummy load?")
-
-        self.dummy_load_value = self._measure_dummy_load(dummy_load_file)
-        return self.dummy_load_value
-
-    def _measure_dummy_load(self, file_path: str) -> float:
-        """Measure the dummy load and persist the value for future measurement session"""
-
-        self._interaction.notify(
-            "Measuring and checking dummy load... this will take at least %.0f minutes."
-            % (DUMMY_LOAD_MEASUREMENT_COUNT / 60 * DUMMY_LOAD_MEASUREMENTS_DURATION),
-        )
-
-        # Validate power meter is capable of measuring voltage
-        self._validate_voltage_support()
-
-        while True:
-            averages = [
-                self.take_average_measurement(DUMMY_LOAD_MEASUREMENTS_DURATION, measure_resistance=True).power
-                for _ in range(DUMMY_LOAD_MEASUREMENT_COUNT)
-            ]
-
-            trend = self._check_trend(averages)
-
-            if not trend:
-                raise DummyLoadMeasurementError("No dummy-load resistance trend could be calculated")
-
-            if trend == Trend.STEADY:
-                break
-
-            self._interaction.notify(f"Dummy load resistance has not yet stabilized and is {trend}; repeating.")
-
-        average = round(mean(averages), 2)
-
-        _LOGGER.info("Dummy load measurement completed. Resistance: %s Ω", average)
-
-        with open(file_path, "w") as f:
-            f.write(str(average))
-        return average
-
-    def _check_trend(self, averages: list[float]) -> Trend | None:
+    @staticmethod
+    def dummy_load_trend(averages: list[float]) -> Trend | None:
         """Classify resistance readings as increasing, decreasing or steady."""
         if len(averages) < 20:
             return None
@@ -480,8 +390,8 @@ class MeasureUtil:
         first_half = averages[:mid]
         second_half = averages[mid:]
 
-        first_slope = self._linear_slope(first_half)
-        second_slope = self._linear_slope(second_half)
+        first_slope = MeasureUtil._linear_slope(first_half)
+        second_slope = MeasureUtil._linear_slope(second_half)
 
         def trend_direction(slope: float, threshold: float = 0.01) -> Trend:
             if slope > threshold:
@@ -508,13 +418,27 @@ class MeasureUtil:
         denominator = sum((index - mean_x) ** 2 for index in range(len(values)))
         return numerator / denominator
 
-    def _validate_voltage_support(self) -> None:
-        """Check if the power meter supports voltage readings."""
-
+    def validate_dummy_load_support(self) -> None:
+        """Require voltage measurements before configuring a dummy load."""
         if not self.power_meter.has_voltage_support():
             raise UnsupportedFeatureError(
                 "The selected power meter does not support voltage measurements required for dummy loads",
             )
+
+    def set_dummy_load_resistance(self, resistance: float) -> None:
+        """Apply a known physical dummy-load resistance to subsequent power readings."""
+        self.validate_dummy_load_support()
+        if resistance <= 0:
+            raise DummyLoadMeasurementError("Dummy-load resistance must be positive")
+        self.dummy_load_value = resistance
+
+    def _emit_sample(self, power: float) -> None:
+        if self._on_sample is None:
+            return
+        try:
+            self._on_sample(power)
+        except Exception:  # noqa: BLE001  # live feedback must not break a measurement
+            _LOGGER.debug("Failed to emit live power sample", exc_info=True)
 
     @staticmethod
     def _get_voltages(measurement: PowerMeasurementResult) -> list[float]:

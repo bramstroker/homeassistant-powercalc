@@ -6,6 +6,7 @@ from pathlib import Path
 
 from measure.controller.light.const import LutMode
 from measure.controller.light.spec import DummyLightControllerSpec
+from measure.dummy_load import DummyLoadCalibration
 from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot, SessionState, utc_now
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
@@ -195,3 +196,31 @@ def test_settings_recover_from_corrupt_file(tmp_path: Path, caplog: pytest.LogCa
 
     assert settings.default_power_entity_id is None
     assert "using defaults" in caplog.text
+
+
+def test_storage_round_trips_global_and_session_dummy_load_calibration(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    storage.create(snapshot(), light_request())
+    calibration = DummyLoadCalibration(
+        description="40 W incandescent bulb",
+        resistance=1322.5,
+        calibrated_at="2026-07-16T12:00:00Z",
+        power_meter_fingerprint="meter-fingerprint",
+    )
+
+    storage.save_dummy_load_calibration(calibration)
+    storage.save_session_dummy_load_calibration("a1b2-c3d4", calibration)
+
+    assert storage.load_dummy_load_calibration() == calibration
+    assert storage.load_session_dummy_load_calibration("a1b2-c3d4") == calibration
+
+
+def test_storage_ignores_invalid_dummy_load_calibration(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    storage = SessionStorage(tmp_path)
+    (tmp_path / "dummy_load_calibration.json").write_text('{"resistance": -1}', encoding="utf-8")
+
+    with caplog.at_level(logging.WARNING, logger="measure"):
+        calibration = storage.load_dummy_load_calibration()
+
+    assert calibration is None
+    assert "invalid dummy-load calibration" in caplog.text

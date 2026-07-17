@@ -113,6 +113,8 @@ Use a dummy load only when you understand the wiring and safety implications. Th
 
 Do not use an LED bulb as a dummy load. Use a stable resistive load, such as a small incandescent bulb, when this method is needed. See [Standby troubleshooting](standby_troubleshooting.md) for more detail about using a dummy load for low standby readings.
 
+In the Home Assistant app, enable the resistive dummy load during measurement setup. The app calibrates a warmed-up load for at least 20 periods of 30 seconds and continues when its resistance is not yet stable. A stored calibration can be reused only after confirming that the same warmed-up load is connected; choose **Recalibrate** after changing the load, meter, or wiring. Keep the load connected throughout the measurement. The app subtracts its calculated consumption from live and saved power readings.
+
 ## Inspecting light output
 
 A successful light run creates files such as:

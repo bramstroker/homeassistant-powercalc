@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 import time
@@ -9,6 +10,7 @@ from unittest.mock import MagicMock
 
 from fastapi.testclient import TestClient
 from measure.const import MeasureType
+from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import LightOperatingPoint
 from measure.ha_app.api import create_app
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionMeasurementService
@@ -16,6 +18,7 @@ from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
+from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
@@ -254,6 +257,62 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
         assert [item["entity_id"] for item in response.json()] == [expected]
 
 
+def test_dummy_load_calibration_is_returned_only_for_the_configured_meter(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    settings = {
+        "default_power_entity_id": "sensor.test_power",
+        "default_measure_device": "Test meter",
+        "power_meter": "hass",
+    }
+    assert test_client.put("/api/settings", json=settings).status_code == 200
+    calibration = DummyLoadCalibration(
+        description="40 W incandescent bulb",
+        resistance=1322.5,
+        calibrated_at="2026-07-16T12:00:00Z",
+        power_meter_fingerprint=power_meter_fingerprint(
+            HassPowerMeterSpec(
+                entity_id="sensor.test_power",
+                voltage_entity_id="sensor.test_voltage",
+            ),
+        ),
+    )
+    test_client.app.state.context.storage.save_dummy_load_calibration(calibration)
+
+    response = test_client.get("/api/dummy-load/calibration")
+
+    assert response.status_code == 200
+    assert response.json()["resistance"] == pytest.approx(1322.5)
+
+    settings["default_power_entity_id"] = "sensor.other_power"
+    assert test_client.put("/api/settings", json=settings).status_code == 200
+    assert test_client.get("/api/dummy-load/calibration").json() is None
+
+
+def test_dummy_load_preflight_requires_voltage_and_includes_calibration_time(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    request = payload() | {
+        "dummy_load": {
+            "mode": "calibrate",
+            "description": "40 W incandescent bulb",
+        },
+    }
+
+    response = test_client.post("/api/preflight", json=request)
+
+    assert response.status_code == 200
+    assert response.json()["estimated_duration_seconds"] >= 600
+    assert any("at least 10 minutes" in warning for warning in response.json()["warnings"])
+
+    request["power_meter"] = {
+        "type": "hass",
+        "entity_id": "sensor.test_power",
+        "voltage_entity_id": None,
+    }
+    response = test_client.post("/api/preflight", json=request)
+    assert response.status_code == 422
+    assert "voltage sensor is required" in response.json()["message"]
+
+
 def test_app_closes_home_assistant_manager_at_shutdown(tmp_path: Path) -> None:
     app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
     home_assistant = MagicMock(spec=HomeAssistantManager)
@@ -399,6 +458,14 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     assert current["operating_point"] == {"type": "light", "on": True, "brightness": 128}
     files = test_client.get("/api/session/current/files")
     assert files.json()[0]["name"] == "LCT010/brightness.csv"
+    plots = test_client.get("/api/session/current/plots")
+    assert plots.status_code == 200
+    assert plots.json()["partial"] is False
+    assert plots.json()["warnings"] == []
+    assert plots.json()["plots"][0]["id"] == "brightness"
+    assert plots.json()["plots"][0]["series"][0]["points"] == [
+        {"x": 1.0, "y": 1.0, "color": None},
+    ]
     download = test_client.get("/api/session/current/files/LCT010/brightness.csv")
     assert download.status_code == 200
     diagnostics = test_client.get("/api/session/current/diagnostics")
@@ -456,7 +523,36 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
     assert set(paths["/api/session/current"]) == {"get", "delete"}
     assert set(paths["/api/session/current/resume"]) == {"post"}
     assert set(paths["/api/session/current/diagnostics"]) == {"get"}
+    assert set(paths["/api/session/current/plots"]) == {"get"}
     assert set(paths["/api/session/current/files/{name}"]) == {"get"}
+    assert set(paths["/api/dummy-load/calibration"]) == {"get"}
+
+
+def test_plot_endpoint_rejects_active_session(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    coordinator = test_client.app.state.context.coordinator
+    now = "2026-07-12T12:00:00Z"
+    coordinator._snapshot = SessionSnapshot(id="active", state=SessionState.RUNNING, created_at=now, updated_at=now)  # noqa: SLF001
+
+    response = test_client.get("/api/session/current/plots")
+
+    assert response.status_code == 409
+
+
+def test_plot_endpoint_marks_terminal_incomplete_session_as_partial(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    assert test_client.post("/api/sessions", json=payload()).status_code == 201
+    coordinator = test_client.app.state.context.coordinator
+    assert coordinator._worker is not None  # noqa: SLF001
+    coordinator._worker.join(timeout=5)  # noqa: SLF001
+    assert coordinator.current is not None and coordinator.current.state is SessionState.COMPLETED
+    coordinator._snapshot = replace(coordinator.current, state=SessionState.CANCELLED)  # noqa: SLF001
+
+    response = test_client.get("/api/session/current/plots")
+
+    assert response.status_code == 200
+    assert response.json()["partial"] is True
+    assert response.json()["plots"][0]["id"] == "brightness"
 
 
 def test_preflight_rejects_unwritable_storage(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

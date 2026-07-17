@@ -114,20 +114,30 @@ describe("setup view", () => {
       voltages: EntityDescriptor[];
       selectedType: string;
       selectedLightId: string;
+      defaultPowerEntityId: string;
       defaultMeasureDevice: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
     element.capabilities = capabilities;
     element.lights = [{ entity_id: "light.rgb", name: "RGB lamp", supported_modes: ["brightness", "color_temp", "hs"] }];
-    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
-    element.voltages = [];
+    element.powers = [{
+      entity_id: "sensor.plug_power",
+      name: "Plug power",
+      unit: "W",
+      related_voltage_entity_id: "sensor.plug_voltage",
+    }];
+    element.voltages = [{ entity_id: "sensor.plug_voltage", name: "Plug voltage", unit: "V" }];
     element.selectedType = "light";
     element.selectedLightId = "light.rgb";
+    element.defaultPowerEntityId = "sensor.plug_power";
     element.defaultMeasureDevice = "Shelly Plug S";
     document.body.append(element);
     await element.updateComplete;
 
+    element.shadowRoot.querySelector<HTMLInputElement>('input[name="use_dummy_load"]')!.click();
+    await element.updateComplete;
+    element.shadowRoot.querySelector<HTMLInputElement>('input[name="dummy_load_description"]')!.value = "Incandescent reference load";
     const submitted = new Promise<MeasurementRequest>((resolve) => {
       element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
     });
@@ -138,6 +148,7 @@ describe("setup view", () => {
     const request = await submitted;
     expect(request.measure_type).toBe("light");
     expect(request.measure_device).toBe("Shelly Plug S");
+    expect(request.dummy_load).toEqual({ mode: "calibrate", description: "Incandescent reference load" });
     expect(request.parameters).toMatchObject({
       bri_bri_steps: 1,
       ct_bri_steps: 5,
@@ -198,6 +209,123 @@ const definitions: MeasureDefinition[] = [
 ];
 
 describe("setup type picker", () => {
+  it("uses a matching saved dummy-load calibration by default", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powers: EntityDescriptor[]; powerMeter: string;
+      defaultPowerEntityId: string; defaultMeasureDevice: string; selectedType: string;
+      dummyLoadCalibration: { description: string; resistance: number; calibrated_at: string };
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.definitions = definitions;
+    element.capabilities = capabilities;
+    element.powers = [{
+      entity_id: "sensor.plug_power",
+      name: "Plug power",
+      unit: "W",
+      related_voltage_entity_id: "sensor.plug_voltage",
+    }];
+    element.powerMeter = "hass";
+    element.defaultPowerEntityId = "sensor.plug_power";
+    element.defaultMeasureDevice = "Shelly Plug S";
+    element.selectedType = "average";
+    element.dummyLoadCalibration = {
+      description: "60 W incandescent bulb",
+      resistance: 882.4,
+      calibrated_at: "2026-07-16T10:00:00Z",
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const enabled = element.shadowRoot.querySelector<HTMLInputElement>('input[name="use_dummy_load"]');
+    expect(enabled).toBeTruthy();
+    enabled!.click();
+    await element.updateComplete;
+    expect(element.shadowRoot.textContent).toContain("60 W incandescent bulb");
+    expect(element.shadowRoot.textContent).toContain("882.4 Ω");
+    expect(element.shadowRoot.textContent).toContain("Use saved calibration");
+    expect(element.shadowRoot.textContent).toContain("Recalibrate");
+
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
+    });
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+
+    expect((await submitted).dummy_load).toEqual({
+      mode: "reuse",
+      description: "60 W incandescent bulb",
+      resistance: 882.4,
+    });
+  });
+
+  it("collects a load description when inline calibration is required", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
+      selectedType: string; dummyLoadCalibration: null;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.definitions = definitions;
+    element.capabilities = capabilities;
+    element.powerMeter = "shelly";
+    element.selectedType = "average";
+    element.dummyLoadCalibration = null;
+    document.body.append(element);
+    await element.updateComplete;
+
+    element.shadowRoot.querySelector<HTMLInputElement>('input[name="use_dummy_load"]')!.click();
+    await element.updateComplete;
+    expect(element.shadowRoot.textContent).toContain("at least 10 minutes");
+    const description = element.shadowRoot.querySelector<HTMLInputElement>('input[name="dummy_load_description"]');
+    expect(description?.required).toBe(true);
+    description!.value = "Ceramic heater";
+
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
+    });
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+
+    expect((await submitted).dummy_load).toEqual({ mode: "calibrate", description: "Ceramic heater" });
+  });
+
+  it("does not offer a resistive dummy load for the synthetic test meter", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
+      selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.definitions = definitions;
+    element.capabilities = capabilities;
+    element.powerMeter = "dummy";
+    element.selectedType = "average";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('input[name="use_dummy_load"]')).toBeNull();
+    expect(element.shadowRoot.textContent).toContain("Synthetic test meter");
+  });
+
+  it("disables a resistive dummy load when the Home Assistant meter has no voltage sensor", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[];
+      capabilities: Capabilities;
+      powers: EntityDescriptor[];
+      powerMeter: string;
+      defaultPowerEntityId: string;
+      selectedType: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.definitions = definitions;
+    element.capabilities = capabilities;
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.powerMeter = "hass";
+    element.defaultPowerEntityId = "sensor.plug_power";
+    element.selectedType = "average";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector<HTMLInputElement>('input[name="use_dummy_load"]')?.disabled).toBe(true);
+    expect(element.shadowRoot.textContent).toContain("requires a voltage sensor");
+  });
+
   it("requires power meter setup before choosing a measurement type", async () => {
     const element = document.createElement("measure-setup-view") as HTMLElement & {
       definitions: MeasureDefinition[]; powerMeterConfigured: boolean; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
@@ -908,6 +1036,7 @@ describe("app shell device entities", () => {
       getCapabilities: async () => capabilities,
       getEntitiesByDeviceClass: async () => [],
       getSettings: async () => defaultSettings,
+      getDummyLoadCalibration: async () => null,
       getCurrent: async () => ({ state: "idle" }),
       getMeasureDefinitions: async () => [fanDefinition],
       getEntitiesByDomain: async (domain: string) => {
@@ -931,6 +1060,7 @@ describe("app shell device entities", () => {
       getCapabilities: async () => capabilities,
       getEntitiesByDeviceClass: async () => [],
       getSettings: async () => defaultSettings,
+      getDummyLoadCalibration: async () => null,
       getCurrent: async () => ({
         state: "idle",
         request: {
@@ -1320,5 +1450,49 @@ describe("result view", () => {
     expect(element.shadowRoot.querySelector(".readout")?.textContent).toContain("42.3 W");
     expect(element.shadowRoot.querySelector("#result-title")?.textContent).toContain("Measurement complete");
     expect(element.shadowRoot.textContent).not.toContain("No downloadable files");
+  });
+
+  it("renders partial plots and offers a PNG download", async () => {
+    const context = {
+      setTransform: vi.fn(), clearRect: vi.fn(), fillRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(),
+      lineTo: vi.fn(), stroke: vi.fn(), arc: vi.fn(), fill: vi.fn(), fillText: vi.fn(), save: vi.fn(),
+      restore: vi.fn(), translate: vi.fn(), rotate: vi.fn(), measureText: vi.fn(() => ({ width: 10 })),
+    } as unknown as CanvasRenderingContext2D;
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(context);
+    vi.spyOn(HTMLCanvasElement.prototype, "toDataURL").mockReturnValue("data:image/png;base64,plot");
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      plotCollection: {
+        partial: boolean;
+        warnings: string[];
+        plots: {
+          id: string; title: string; kind: "scatter"; x_label: string; y_label: string; source: string;
+          series: { label: null; color: string; points: { x: number; y: number; color: null }[] }[];
+        }[];
+      };
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "cancelled" };
+    element.plotCollection = {
+      partial: true,
+      warnings: [],
+      plots: [{
+        id: "brightness", title: "Brightness", kind: "scatter", x_label: "Brightness", y_label: "Power (W)",
+        source: "LCT010/brightness.csv",
+        series: [{ label: null, color: "#5488e8", points: [{ x: 1, y: 0.5, color: null }] }],
+      }],
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const plot = element.shadowRoot.querySelector("measure-result-plot") as HTMLElement & {
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    await plot.updateComplete;
+    expect(plot.shadowRoot.textContent).toContain("Partial result");
+    (plot.shadowRoot.querySelector(".plot-download") as HTMLButtonElement).click();
+    expect(click).toHaveBeenCalled();
   });
 });

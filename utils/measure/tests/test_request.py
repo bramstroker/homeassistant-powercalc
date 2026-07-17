@@ -7,6 +7,8 @@ from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
+    DummyLoadCalibrationRequest,
+    DummyLoadReuseRequest,
     LightMeasurementRequest,
     RecorderMeasurementRequest,
     parse_measurement_request,
@@ -30,12 +32,92 @@ def valid_request() -> dict[str, object]:
 
 def test_request_round_trip_preserves_typed_input() -> None:
     request = LightMeasurementRequest.model_validate(
-        valid_request() | {"parameters": {"sleep_time": 0.5, "sample_count": 3}},
+        valid_request()
+        | {
+            "parameters": {"sleep_time": 0.5, "sample_count": 3},
+            "dummy_load": {"mode": "reuse", "description": "60 W incandescent bulb", "resistance": 812.4},
+        },
     )
 
     restored = parse_measurement_request(request.model_dump(mode="json"))
 
     assert restored == request
+    assert isinstance(restored.dummy_load, DummyLoadReuseRequest)
+
+
+def test_request_accepts_dummy_load_calibration() -> None:
+    request = LightMeasurementRequest.model_validate(
+        valid_request() | {"dummy_load": {"mode": "calibrate", "description": "60 W incandescent bulb"}},
+    )
+
+    assert request.dummy_load == DummyLoadCalibrationRequest(description="60 W incandescent bulb")
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        valid_request() | {"measure_type": "light"},
+        {"measure_type": "average"},
+        {"measure_type": "recorder"},
+        {"measure_type": "speaker", "controller": {"type": "dummy"}},
+        {
+            "measure_type": "charging",
+            "controller": {"type": "dummy"},
+            "charging_device_type": "vacuum_robot",
+        },
+        {"measure_type": "fan", "controller": {"type": "dummy"}},
+    ],
+)
+def test_all_measurement_types_accept_dummy_load(payload: dict[str, object]) -> None:
+    request = parse_measurement_request(
+        payload
+        | {
+            "power_meter": {
+                "type": "hass",
+                "entity_id": "sensor.test_power",
+                "voltage_entity_id": "sensor.test_voltage",
+            },
+            "dummy_load": {
+                "mode": "reuse",
+                "description": "60 W incandescent bulb",
+                "resistance": 812.4,
+            },
+        },
+    )
+
+    assert request.dummy_load == DummyLoadReuseRequest(
+        description="60 W incandescent bulb",
+        resistance=812.4,
+    )
+
+
+def test_request_normalizes_and_requires_dummy_load_description() -> None:
+    assert DummyLoadCalibrationRequest(description="  reference load  ").description == "reference load"
+    with pytest.raises(ValidationError, match="description"):
+        DummyLoadCalibrationRequest(description=" ")
+
+
+@pytest.mark.parametrize("resistance", [0, -1])
+def test_request_rejects_non_positive_dummy_load_resistance(resistance: float) -> None:
+    with pytest.raises(ValidationError, match="resistance"):
+        LightMeasurementRequest.model_validate(
+            valid_request()
+            | {
+                "dummy_load": {
+                    "mode": "reuse",
+                    "description": "60 W incandescent bulb",
+                    "resistance": resistance,
+                },
+            },
+        )
+
+
+def test_request_rejects_dummy_load_with_synthetic_power_meter() -> None:
+    with pytest.raises(ValidationError, match="synthetic"):
+        AverageMeasurementRequest(
+            power_meter=DummyPowerMeterSpec(),
+            dummy_load=DummyLoadCalibrationRequest(description="test load"),
+        )
 
 
 def test_cli_request_contains_only_resolved_measurement_input(mock_config_factory: MockConfigFactory) -> None:

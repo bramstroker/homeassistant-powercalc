@@ -1,6 +1,6 @@
 # Powercalc measure tooling
 
-This package contains everything you need to automatically take measurements of lights to contribute to this repository.
+This package contains the tooling for measuring lights, speakers, fans, charging devices, average loads, and power time series for Powercalc profiles and analysis.
 
 ## Setup
 
@@ -9,7 +9,9 @@ Home Assistant OS users can use the app; for other installations, Docker is reco
 
 ### Home Assistant app (experimental)
 
-Home Assistant OS users can run light measurements from an ingress UI without creating a long-lived access token. The first release supports Home Assistant light entities and Home Assistant power sensors, with an optional voltage sensor. It does not yet support the direct device controllers, OCR, speakers, fans, charging, or other CLI runners.
+Home Assistant OS users can run light, speaker, fan, charging, average, and recorder measurements from an ingress UI without creating a long-lived access token. Devices are controlled through Home Assistant entities; power can be read from a Home Assistant power sensor with optional voltage data or directly from a discovered or manually configured Shelly plug.
+
+The app includes reusable measurement-device settings, power-meter quality diagnostics, preflight estimates, persistent sessions, live progress and operating-state feedback, cancellation, compatible light-session resume, result plots, raw file downloads, and session diagnostics. It can calibrate and subtract a stable resistive dummy load for any real measurement type when the configured meter provides voltage readings. Direct Hue, Tuya, Kasa, Tasmota and myStrom connections, OCR, and manual power entry remain CLI-only.
 
 See the [Home Assistant app guide](https://docs.powercalc.nl/contributing/measure/home-assistant-app/) for availability, installation, safety notes, storage, and troubleshooting. The existing Docker and native workflows remain fully supported.
 
@@ -72,6 +74,20 @@ uv sync --extra dev --extra ocr
 ```
 
 After the measurements are finished you will find the files in `export` directory.
+
+### Visualize measurement output
+
+Visualization is part of the measure package, while its scientific dependencies are isolated from the normal CLI and Home Assistant app installations:
+
+```bash
+uv run --group visualize powercalc-visualize export/LCT010/brightness.csv.gz --output=brightness.png
+```
+
+To generate or refresh every supported plot in the profile library:
+
+```bash
+uv run --group visualize powercalc-visualize ../../profile_library --force
+```
 
 ## More information about measuring
 

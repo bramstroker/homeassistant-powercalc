@@ -3,7 +3,7 @@ import { MeasureApiClient, SessionEventStream } from "../api-client";
 import { MeasureAppController } from "../app-controller";
 import type { AppView, MeasureAppApi, MeasureAppState } from "../app-controller";
 import { LIGHT_TYPE } from "../measurement-kinds";
-import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, ShellyDiscoveryDevice } from "../types";
+import type { AppSettings, Capabilities, DummyLoadCalibration, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, ShellyDiscoveryDevice } from "../types";
 import type { ReviewMetric, ReviewRow } from "./preflight-view";
 import { sharedStyles } from "../styles";
 import "./preflight-view";
@@ -18,9 +18,10 @@ export class AppShell extends LitElement implements MeasureAppState {
   static readonly properties = {
     view: { state: true }, loadingMessage: { state: true }, errorMessage: { state: true }, busy: { state: true },
     connectedToEvents: { state: true }, snapshot: { state: true }, request: { state: true }, preflight: { state: true },
-    files: { state: true }, logs: { state: true }, settings: { state: true },
+    files: { state: true }, plotCollection: { state: true }, logs: { state: true }, settings: { state: true },
     samples: { state: true }, testingPowerMeter: { state: true }, powerMeterTestResult: { state: true },
     deviceEntities: { state: true }, deviceEntityErrors: { state: true },
+    dummyLoadCalibration: { state: true },
     shellyDiscoveryDevices: { state: true }, discoveringShellys: { state: true }, shellyDiscoveryError: { state: true },
     shellyDiscoveryAvailable: { state: true }, shellyDiscoveryMessage: { state: true },
   };
@@ -35,12 +36,14 @@ export class AppShell extends LitElement implements MeasureAppState {
   selectedMeasureType?: MeasureType;
   preflight?: PreflightResponse;
   files: SessionFile[] = [];
+  plotCollection: PlotCollection = { partial: false, plots: [], warnings: [] };
   logs: string[] = [];
   samples: number[] = [];
   capabilities?: Capabilities;
   lights: EntityDescriptor[] = [];
   powers: EntityDescriptor[] = [];
   voltages: EntityDescriptor[] = [];
+  dummyLoadCalibration: DummyLoadCalibration | null = null;
   settings?: AppSettings;
   definitions: MeasureDefinition[] = [];
   deviceEntities: Record<string, EntityDescriptor[]> = {};
@@ -143,12 +146,13 @@ export class AppShell extends LitElement implements MeasureAppState {
     if (this.view === "running" && this.snapshot) return html`
       <measure-running-view .snapshot=${this.snapshot} .confirmationAction=${this.confirmationAction()} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
     if (this.view === "result" && this.snapshot) return html`
-      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
+      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .plotCollection=${this.plotCollection} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
     return html`
       <measure-setup-view
         .capabilities=${this.capabilities} .definitions=${this.definitions}
         .lights=${this.lights} .powers=${this.powers} .voltages=${this.voltages} .deviceEntities=${this.deviceEntities} .deviceEntityErrors=${this.deviceEntityErrors}
         .initialType=${this.pendingType()} .initialRequest=${this.request}
+        .dummyLoadCalibration=${this.dummyLoadCalibration}
         .defaultPowerEntityId=${this.settings?.default_power_entity_id ?? ""} .defaultMeasureDevice=${this.settings?.default_measure_device ?? ""} .powerMeter=${this.settings?.power_meter ?? "hass"} .shellyIp=${this.settings?.shelly_ip ?? ""}
         .powerMeterConfigured=${this.powerMeterConfigured()}
         .busy=${this.busy} .errorMessage=${this.errorMessage}
@@ -193,12 +197,14 @@ export class AppShell extends LitElement implements MeasureAppState {
 
   private reviewSummary(): ReviewRow[] {
     if (this.request?.measure_type === LIGHT_TYPE) {
-      return [
+      const rows: ReviewRow[] = [
         { label: "Model", value: `${this.request.product_name} (${this.request.model_id})` },
         { label: "Light", value: this.request.controller.type === "hass" ? this.request.controller.entity_id : this.request.controller.type },
         { label: "Power", value: this.request.power_meter.type === "hass" ? this.request.power_meter.entity_id : this.request.power_meter.type },
         { label: "Modes", value: this.request.modes.join(", ") },
       ];
+      if (this.request.dummy_load) rows.push({ label: "Dummy load", value: this.dummyLoadSummary(this.request.dummy_load) });
+      return rows;
     }
     if (this.request) {
       const label = this.definitions.find((definition) => definition.measure_type === this.request?.measure_type)?.label ?? this.request.measure_type;
@@ -208,6 +214,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         label: "Power",
         value: this.request.power_meter.type === "hass" ? this.request.power_meter.entity_id : this.request.power_meter.type,
       });
+      if (this.request.dummy_load) rows.push({ label: "Dummy load", value: this.dummyLoadSummary(this.request.dummy_load) });
       return rows;
     }
     return [];
@@ -227,6 +234,12 @@ export class AppShell extends LitElement implements MeasureAppState {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.ceil((seconds % 3600) / 60);
     return hours ? `${hours} hr ${minutes} min` : `${minutes} min`;
+  }
+
+  private dummyLoadSummary(dummyLoad: NonNullable<MeasurementRequest["dummy_load"]>): string {
+    return dummyLoad.mode === "reuse"
+      ? `${dummyLoad.description} (${dummyLoad.resistance} Ω, saved calibration)`
+      : `${dummyLoad.description} (calibrate before measurement)`;
   }
 
   private async boot(): Promise<void> {

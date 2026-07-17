@@ -9,10 +9,11 @@ from measure.controller.light.const import LutMode
 from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.ha_app.preflight import ActiveSessionError, EntityRecord, MeasurementPreflight, PreflightError
-from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
     ChargingMeasurementRequest,
+    DummyLoadCalibrationRequest,
     FanMeasurementRequest,
     LightMeasurementRequest,
     SpeakerMeasurementRequest,
@@ -34,6 +35,7 @@ def preflight(
     *,
     active: bool = False,
     writable: bool = True,
+    voltage_supported: bool = True,
 ) -> MeasurementPreflight:
     def verify() -> None:
         if not writable:
@@ -43,6 +45,7 @@ def preflight(
         has_active_session=lambda: active,
         verify_storage=verify,
         load_entities=lambda domain, device_class: entities.get((domain, device_class), []),
+        supports_voltage=lambda _: voltage_supported,
     )
 
 
@@ -87,6 +90,41 @@ def test_preflight_rejects_missing_hass_power_entity_for_non_light_kind() -> Non
 
     with pytest.raises(PreflightError, match="power entity"):
         checker.validate(request)
+
+
+def test_preflight_requires_voltage_sensor_for_dummy_load() -> None:
+    request = AverageMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        dummy_load=DummyLoadCalibrationRequest(description="40 W incandescent bulb"),
+    )
+
+    with pytest.raises(PreflightError, match="voltage sensor is required"):
+        preflight(base_entities()).validate(request)
+
+
+def test_preflight_rejects_power_meter_without_dummy_load_voltage_support() -> None:
+    request = AverageMeasurementRequest(
+        power_meter=ShellyPowerMeterSpec(device_ip="192.168.1.50"),
+        dummy_load=DummyLoadCalibrationRequest(description="40 W incandescent bulb"),
+    )
+
+    with pytest.raises(PreflightError, match="does not support voltage"):
+        preflight(base_entities(), voltage_supported=False).validate(request)
+
+
+def test_preflight_includes_minimum_dummy_load_calibration_duration() -> None:
+    request = AverageMeasurementRequest(
+        power_meter=HassPowerMeterSpec(
+            entity_id="sensor.power",
+            voltage_entity_id="sensor.voltage",
+        ),
+        dummy_load=DummyLoadCalibrationRequest(description="40 W incandescent bulb"),
+    )
+
+    result = preflight(base_entities()).validate(request)
+
+    assert result.estimated_duration_seconds == 600
+    assert "at least 10 minutes" in result.warnings[0]
 
 
 @pytest.mark.parametrize(

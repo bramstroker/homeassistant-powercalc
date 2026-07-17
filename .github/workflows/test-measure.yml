@@ -27,6 +27,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
         with:
+          version: '0.10.10'
           working-directory: './utils/measure'
           python-version: '3.14'
           enable-cache: true
@@ -48,9 +49,15 @@ jobs:
             measure/assembler.py \
             measure/execution.py \
             measure/model.py \
+            measure/dummy_load.py \
+            measure/visualization/__init__.py \
+            measure/visualization/core.py \
+            measure/visualization/renderer.py \
+            measure/visualization/cli.py \
             measure/home_assistant.py \
             measure/home_assistant_entities.py \
             measure/cli/interaction.py \
+            measure/cli/dummy_load.py \
             measure/cli/main.py \
             measure/cli/measurements.py \
             measure/cli/questions.py \
@@ -77,6 +84,7 @@ jobs:
             -o console_output_style=count \
             -p no:sugar \
             tests
+          uv run --extra dev --group visualize pytest -q tests/test_visualization_renderer.py
 
   docker:
     runs-on: "ubuntu-latest"

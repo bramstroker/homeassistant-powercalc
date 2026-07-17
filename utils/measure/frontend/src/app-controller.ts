@@ -4,10 +4,12 @@ import type {
   AppSettings,
   Capabilities,
   DeviceClass,
+  DummyLoadCalibration,
   EntityDescriptor,
   MeasureDefinition,
   MeasureType,
   MeasurementRequest,
+  PlotCollection,
   PowerMeterDiagnostic,
   PreflightResponse,
   SessionEvent,
@@ -29,12 +31,14 @@ export interface MeasureAppState {
   selectedMeasureType?: MeasureType;
   preflight?: PreflightResponse;
   files: SessionFile[];
+  plotCollection: PlotCollection;
   logs: string[];
   samples: number[];
   capabilities?: Capabilities;
   lights: EntityDescriptor[];
   powers: EntityDescriptor[];
   voltages: EntityDescriptor[];
+  dummyLoadCalibration: DummyLoadCalibration | null;
   settings?: AppSettings;
   definitions: MeasureDefinition[];
   deviceEntities: Record<string, EntityDescriptor[]>;
@@ -57,6 +61,7 @@ export interface MeasureAppApi {
   getShellyDevices(): Promise<ShellyDiscoveryResponse>;
   getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]>;
   getEntitiesByDeviceClass(deviceClass: DeviceClass): Promise<EntityDescriptor[]>;
+  getDummyLoadCalibration(): Promise<DummyLoadCalibration | null>;
   preflight(request: MeasurementRequest): Promise<PreflightResponse>;
   start(request: MeasurementRequest): Promise<SessionSnapshot>;
   getCurrent(): Promise<SessionSnapshot>;
@@ -64,6 +69,7 @@ export interface MeasureAppApi {
   confirm(): Promise<SessionSnapshot>;
   resume(): Promise<SessionSnapshot>;
   getFiles(): Promise<SessionFile[]>;
+  getPlots(): Promise<PlotCollection>;
 }
 
 export interface EventConnection {
@@ -116,6 +122,7 @@ export class MeasureAppController {
         this.state.settings,
         this.state.snapshot,
         this.state.definitions,
+        this.state.dummyLoadCalibration,
       ] = await Promise.all([
         api.getCapabilities(),
         api.getEntitiesByDomain("light"),
@@ -124,6 +131,7 @@ export class MeasureAppController {
         api.getSettings(),
         currentPromise,
         api.getMeasureDefinitions(),
+        api.getDummyLoadCalibration().catch(() => null),
       ]);
       this.state.request = this.state.snapshot.request;
       if (this.state.request) await this.loadTypeEntities(this.state.request.measure_type);
@@ -171,6 +179,7 @@ export class MeasureAppController {
     this.state.busy = true;
     this.state.errorMessage = "";
     this.state.samples = [];
+    this.state.plotCollection = { partial: false, plots: [], warnings: [] };
     this.changed();
     try {
       this.state.snapshot = await this.api().start(this.state.request);
@@ -195,6 +204,7 @@ export class MeasureAppController {
   async resume(): Promise<void> {
     this.state.busy = true;
     this.state.errorMessage = "";
+    this.state.plotCollection = { partial: false, plots: [], warnings: [] };
     this.changed();
     try {
       this.state.snapshot = await this.api().resume();
@@ -215,6 +225,7 @@ export class MeasureAppController {
     this.state.selectedMeasureType = undefined;
     this.state.preflight = undefined;
     this.state.files = [];
+    this.state.plotCollection = { partial: false, plots: [], warnings: [] };
     this.state.logs = [];
     this.state.samples = [];
     this.state.errorMessage = "";
@@ -304,7 +315,10 @@ export class MeasureAppController {
     this.changed();
     try {
       this.state.settings = await this.api().saveSettings(settings);
-      this.state.capabilities = await this.api().getCapabilities();
+      [this.state.capabilities, this.state.dummyLoadCalibration] = await Promise.all([
+        this.api().getCapabilities(),
+        this.api().getDummyLoadCalibration().catch(() => null),
+      ]);
       this.state.view = this.settingsReturnView;
     } catch (error) {
       this.state.errorMessage = message(error);
@@ -346,7 +360,7 @@ export class MeasureAppController {
     }
     if (isTerminal(state)) {
       this.state.view = "result";
-      await this.loadFiles();
+      await this.loadResultArtifacts();
       return;
     }
     this.state.view = "setup";
@@ -392,7 +406,7 @@ export class MeasureAppController {
     this.state.connectedToEvents = false;
     if (this.state.view === "settings") this.settingsReturnView = "result";
     else this.state.view = "result";
-    await this.loadFiles();
+    await this.loadResultArtifacts();
     this.changed();
   }
 
@@ -409,12 +423,17 @@ export class MeasureAppController {
     }
   }
 
-  private async loadFiles(): Promise<void> {
-    try {
-      this.state.files = await this.api().getFiles();
-    } catch {
-      this.state.files = [];
-    }
+  private async loadResultArtifacts(): Promise<void> {
+    const [files, plots, calibration] = await Promise.allSettled([
+      this.api().getFiles(),
+      this.api().getPlots(),
+      this.api().getDummyLoadCalibration(),
+    ]);
+    this.state.files = files.status === "fulfilled" ? files.value : [];
+    this.state.plotCollection = plots.status === "fulfilled"
+      ? plots.value
+      : { partial: false, plots: [], warnings: ["Plots could not be loaded."] };
+    if (calibration.status === "fulfilled") this.state.dummyLoadCalibration = calibration.value;
   }
 }
 

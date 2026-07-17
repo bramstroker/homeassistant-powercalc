@@ -125,7 +125,7 @@ export class SettingsView extends LitElement {
                   <select name="power_meter" @change=${this.powerMeterChanged}>
                     <option value="hass" ?selected=${powerMeter === "hass"}>Home Assistant sensor</option>
                     <option value="shelly" ?selected=${powerMeter === "shelly"}>Shelly plug</option>
-                    <option value="dummy" ?selected=${powerMeter === "dummy"}>Dummy meter</option>
+                    <option value="dummy" ?selected=${powerMeter === "dummy"}>Synthetic test meter</option>
                   </select>
                 </label>
                 ${powerMeter === "shelly" ? this.renderShellyFields() : nothing}

@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
 from typing import Protocol
 
+from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION
 from measure.controller.charging.spec import HassChargingControllerSpec, charging_entity_domain
 from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
@@ -15,6 +16,7 @@ from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnosti
 from measure.powermeter.spec import HassPowerMeterSpec, PowerMeterSpec
 from measure.request import (
     ChargingMeasurementRequest,
+    DummyLoadCalibrationRequest,
     FanMeasurementRequest,
     LightMeasurementRequest,
     MeasurementRequest,
@@ -61,11 +63,13 @@ class MeasurementPreflight:
         verify_storage: Callable[[], None],
         load_entities: EntityLoader,
         diagnose_power_meter: Callable[[PowerMeterSpec], PowerMeterDiagnostic] | None = None,
+        supports_voltage: Callable[[PowerMeterSpec], bool] | None = None,
     ) -> None:
         self._has_active_session = has_active_session
         self._verify_storage = verify_storage
         self._load_entities = load_entities
         self._diagnose_power_meter = diagnose_power_meter
+        self._supports_voltage = supports_voltage
 
     def validate(self, request: MeasurementRequest) -> PreflightResult:
         """Return warnings and estimates, or raise a typed preflight error."""
@@ -85,22 +89,44 @@ class MeasurementPreflight:
             self._validate_controller(request)
             result = PreflightResult()
 
+        if isinstance(request.dummy_load, DummyLoadCalibrationRequest):
+            result = replace(
+                result,
+                warnings=(
+                    *result.warnings,
+                    "Dummy-load calibration takes at least 10 minutes and repeats until the resistance is stable.",
+                ),
+                estimated_duration_seconds=(result.estimated_duration_seconds or 0)
+                + DUMMY_LOAD_MEASUREMENT_COUNT * DUMMY_LOAD_MEASUREMENTS_DURATION,
+            )
+
         if self._diagnose_power_meter is None:
             return result
         diagnostic = self._diagnose_power_meter(request.power_meter)
         if not diagnostic.success:
             raise PreflightError(diagnostic.message or "Could not read from the power meter")
-        warnings = (
+        warnings = result.warnings + (
             tuple(diagnostic.messages) if diagnostic.status in {DiagnosticStatus.WARNING, DiagnosticStatus.POOR} else ()
         )
         return replace(result, warnings=warnings, power_meter_diagnostic=diagnostic)
 
     def _validate_power_meter(self, request: MeasurementRequest) -> None:
-        if not isinstance(request.power_meter, HassPowerMeterSpec):
+        if isinstance(request.power_meter, HassPowerMeterSpec):
+            powers = {entity.entity_id for entity in self._load_entities(None, DeviceClass.POWER)}
+            if request.power_meter.entity_id not in powers:
+                raise PreflightError("Selected power entity is unavailable or not measured in W")
+        if request.dummy_load is None:
             return
-        powers = {entity.entity_id for entity in self._load_entities(None, DeviceClass.POWER)}
-        if request.power_meter.entity_id not in powers:
-            raise PreflightError("Selected power entity is unavailable or not measured in W")
+        if isinstance(request.power_meter, HassPowerMeterSpec):
+            if not request.power_meter.voltage_entity_id:
+                raise PreflightError("A voltage sensor is required when using a resistive dummy load")
+            voltages = {entity.entity_id for entity in self._load_entities(None, DeviceClass.VOLTAGE)}
+            if request.power_meter.voltage_entity_id not in voltages:
+                raise PreflightError("Selected voltage entity is unavailable or not measured in V")
+        if self._supports_voltage is not None and not self._supports_voltage(request.power_meter):
+            raise PreflightError(
+                "The selected power meter does not support voltage measurements required for dummy loads",
+            )
 
     def _validate_controller(self, request: MeasurementRequest) -> None:
         if isinstance(request, SpeakerMeasurementRequest):

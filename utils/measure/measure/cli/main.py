@@ -14,6 +14,12 @@ from inquirer.questions import Question
 from inquirer.render import ConsoleRender
 
 from measure.assembler import MeasurementAssembler
+from measure.cli.dummy_load import (
+    CliDummyLoadCalibrationStore,
+    apply_dummy_load_answers,
+    dummy_load_enabled_question,
+    dummy_load_questions,
+)
 from measure.cli.environment import CliEnvironment
 from measure.cli.interaction import ConsoleInteraction
 from measure.cli.measurements import measurement_questions
@@ -21,7 +27,6 @@ from measure.cli.request_adapter import request_from_answers
 from measure.const import (
     MEASURE_TYPE_LABELS,
     PROJECT_DIR,
-    QUESTION_DUMMY_LOAD,
     QUESTION_ENTITY_ID,
     QUESTION_GENERATE_MODEL_JSON,
     QUESTION_MEASURE_DEVICE,
@@ -74,6 +79,7 @@ class Measure:
         self,
         config: CliEnvironment,
         console_render: ConsoleRender | None = None,
+        dummy_load_calibration_store: CliDummyLoadCalibrationStore | None = None,
     ) -> None:
         self.measure_type: MeasureType = MeasureType.LIGHT
         self.console_render = console_render
@@ -81,6 +87,7 @@ class Measure:
         self._model_id_defaults: dict[str, str | None] = {}
         self._home_assistant: HomeAssistantManager | None = None
         self._entity_catalog: HomeAssistantEntityCatalog | None = None
+        self._dummy_load_calibration_store = dummy_load_calibration_store or CliDummyLoadCalibrationStore()
 
     def start(self) -> None:
         """Run the interactive wizard and dispatch the resulting request."""
@@ -93,11 +100,13 @@ class Measure:
             answers = self.ask_questions(self.get_questions(specific_questions))
             interaction = ConsoleInteraction()
             request = request_from_answers(self.measure_type, answers, self.config)
+            request = apply_dummy_load_answers(request, answers, self._dummy_load_calibration_store)
             if self._uses_home_assistant():
                 self._home_assistant_manager()
             prepared = MeasurementAssembler(
                 interaction,
                 home_assistant=self._home_assistant,
+                dummy_load_calibration_store=self._dummy_load_calibration_store,
                 tuya_device_key=(
                     self.config.tuya_device_key if self.config.selected_power_meter == PowerMeterType.TUYA else None
                 ),
@@ -161,14 +170,7 @@ class Measure:
                     message="Do you want to generate model.json?",
                     default=True,
                 ),
-                inquirer.Confirm(
-                    name=QUESTION_DUMMY_LOAD,
-                    message=(
-                        "Do you want to use a dummy load? This can help to be able to measure "
-                        "standby power and low brightness levels correctly"
-                    ),
-                    default=False,
-                ),
+                dummy_load_enabled_question(),
                 *questions_before_profile,
                 inquirer.Text(
                     name=QUESTION_MODEL_ID,
@@ -191,9 +193,12 @@ class Measure:
                 *questions_after_profile,
             ]
         else:
-            questions = specific_questions
+            questions = [dummy_load_enabled_question(), *specific_questions]
 
-        return questions
+        return [
+            *questions,
+            *dummy_load_questions(self.measure_type, self.config, self._dummy_load_calibration_store)[1:],
+        ]
 
     def _default_model_id(self, answers: dict[str, Any]) -> str | None:
         entity_id = str(answers.get(QUESTION_ENTITY_ID, "")).strip()
