@@ -28,18 +28,19 @@ For development with a pre-built image, copy `powercalc_measure/` to `/addons/po
 
 ## Preparing a release
 
-Measure CLI and app releases share one version and are drafted and published from the main Powercalc repository with a `measure-v` tag, for example `measure-v0.2.0`. This generated app-store repository does not have its own releases.
+Measure CLI and app releases share one version and are versioned from the main Powercalc repository with a plain `measure-v` git tag, for example `measure-v0.2.0`. The GitHub release itself is published in this app-store repository: HACS reads the published releases of the main repository to resolve Powercalc integration versions, so the main repository must never publish a `measure-v*` release (plain tags and draft releases are invisible to HACS).
 
-All changes below `utils/measure` are collected in the dedicated Measure Release Drafter draft and excluded from the main integration release notes. Keep the `## Unreleased` section in `powercalc_measure/CHANGELOG.md` empty.
+Every pull request merged to master that touches `utils/measure` (or carries the `measure-tool` label) is appended to the rolling `measure-next` draft release in the main repository by the **Measure Release** workflow, and excluded from the main integration release notes. Keep the `## Unreleased` section in `powercalc_measure/CHANGELOG.md` empty; the draft is the single source of unreleased notes.
 
-To prepare a release:
+The next version is resolved automatically from the merged pull requests and shown in the draft title: breaking changes (a conventional-commit `!` marker or a `major`/`breaking` label) bump major, features (`feat:` titles or `feature`/`enhancement` labels) bump minor, and everything else bumps patch. Explicit `major`/`minor`/`patch` labels override the resolution per pull request.
 
-1. Review the `Powercalc Measure` draft release in the main repository.
-2. Run the **Prepare Measure Release** workflow with the unprefixed version from that draft, for example `0.2.0`. Enable `dry_run` to preview and validate without creating a branch.
-3. Review and merge the generated release pull request.
-4. Publish the existing draft release. Its `measure-v0.2.0` tag must match the version in the merged app config.
+To release:
 
-The workflow copies the shared Measure draft notes into the Home Assistant changelog, synchronizes every app version source, and opens a release pull request labelled `skip-changelog`. Publishing the draft builds both artifacts with distinct embedded versions: `v0.2.0:cli` for the CLI image and `v0.2.0:app` for the Home Assistant app. The app-store repository is updated only after the app image is available.
+1. Review the rolling `Powercalc Measure v<version> (unreleased)` draft in the main repository.
+2. Run the **Prepare Measure Release** workflow. Leave the version empty to use the resolved version from the draft title, or pass one to override. Enable `dry_run` to preview and validate without creating a branch.
+3. Review and merge the generated release pull request. Everything after the merge is automatic.
+
+On merge, the **Measure Release** workflow detects the new changelog section, pushes the `measure-v0.2.0` tag, and dispatches the publish workflow on that tag. That builds both artifacts with distinct embedded versions (`v0.2.0:cli` for the CLI image, `v0.2.0:app` for the Home Assistant app), mirrors the app metadata to this repository after the images are pullable, creates the `v0.2.0` GitHub release here with the changelog notes, and finally deletes the rolling draft in the main repository so the next cycle starts empty. Measure pull requests merged while the publish pipeline is still running should be re-added to the fresh draft by hand if the draft deletion swallowed them.
 
 For local troubleshooting, export the draft body to a file and run from `utils/measure`:
 
@@ -49,5 +50,3 @@ uv run python prepare_app_release.py 0.2.0 --notes-file /tmp/measure-app-release
 ```
 
 The notes file must contain release notes only: use `###` headings for categories and do not include a release title or `#`/`##` headings. The script adds that Markdown as the exact body of the new changelog version and rejects empty or structurally invalid notes, duplicate changelog versions, and inconsistent current versions.
-
-For the one-time `0.1.0` bootstrap, align the initial draft body with the existing `0.1.0` changelog and publish `measure-v0.1.0` from the already-versioned source without running the preparation workflow. This establishes the independent Measure version history for future drafts.

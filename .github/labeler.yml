@@ -17,7 +17,8 @@ measure-tool:
       - any-glob-to-any-file:
           - utils/measure/**
           - .github/actions/build-measure-docker/**
-          - .github/release-drafter-measure.yml
+          - .github/scripts/update_measure_draft.py
+          - .github/workflows/measure-release.yml
           - .github/workflows/prepare-measure-release.yml
           - .github/workflows/publish-measure-image.yml
           - .github/workflows/test-measure.yml
