@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Protocol
 
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION
@@ -89,27 +89,29 @@ class MeasurementPreflight:
             self._validate_controller(request)
             result = PreflightResult()
 
+        warnings = list(result.warnings)
+        duration = result.estimated_duration_seconds
         if isinstance(request.dummy_load, DummyLoadCalibrationRequest):
-            result = replace(
-                result,
-                warnings=(
-                    *result.warnings,
-                    "Dummy-load calibration takes at least 10 minutes and repeats until the resistance is stable.",
-                ),
-                estimated_duration_seconds=(result.estimated_duration_seconds or 0)
-                + DUMMY_LOAD_MEASUREMENT_COUNT * DUMMY_LOAD_MEASUREMENTS_DURATION,
+            warnings.append(
+                "Dummy-load calibration takes at least 10 minutes and repeats until the resistance is stable.",
             )
+            duration = (duration or 0) + DUMMY_LOAD_MEASUREMENT_COUNT * DUMMY_LOAD_MEASUREMENTS_DURATION
 
-        if self._diagnose_power_meter is None:
-            return result
-        diagnostic = self._diagnose_power_meter(request.power_meter)
-        if not diagnostic.success:
-            raise PreflightError(diagnostic.message or "Could not read from the power meter")
-        warnings = result.warnings + (
-            tuple(diagnostic.messages) if diagnostic.status in {DiagnosticStatus.WARNING, DiagnosticStatus.POOR} else ()
+        diagnostic: PowerMeterDiagnostic | None = None
+        if self._diagnose_power_meter is not None:
+            diagnostic = self._diagnose_power_meter(request.power_meter)
+            if not diagnostic.success:
+                raise PreflightError(diagnostic.message or "Could not read from the power meter")
+            if diagnostic.status in {DiagnosticStatus.WARNING, DiagnosticStatus.POOR}:
+                warnings.extend(diagnostic.messages)
+
+        return PreflightResult(
+            warnings=tuple(warnings),
+            estimated_variations=result.estimated_variations,
+            estimated_duration_seconds=duration,
+            supported_modes=result.supported_modes,
+            power_meter_diagnostic=diagnostic,
         )
-        final_result: PreflightResult = replace(result, warnings=warnings, power_meter_diagnostic=diagnostic)
-        return final_result
 
     def _validate_power_meter(self, request: MeasurementRequest) -> None:
         if isinstance(request.power_meter, HassPowerMeterSpec):
