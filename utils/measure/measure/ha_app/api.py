@@ -88,6 +88,7 @@ class CapabilitiesResponse(BaseModel):
     modes: list[LutMode]
     defaults: dict[str, int | float]
     limits: dict[str, dict[str, int | float]]
+    developer_mode: bool = False
 
 
 class FormFieldOption(BaseModel):
@@ -126,9 +127,11 @@ class AppContext:
         hass_url: str,
         hass_token: str,
         trusted_ingress_only: bool,
+        developer_mode: bool = False,
     ) -> None:
         self.home_assistant = HomeAssistantManager(hass_url, hass_token)
         self.trusted_ingress_only = trusted_ingress_only
+        self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
         self.coordinator = MeasurementCoordinator(
@@ -161,6 +164,7 @@ def create_app(
     hass_token: str | None = None,
     static_root: Path | None = None,
     trusted_ingress_only: bool | None = None,
+    developer_mode: bool = False,
 ) -> FastAPI:
     token = hass_token or os.environ.get("SUPERVISOR_TOKEN")
     if not token:
@@ -172,6 +176,7 @@ def create_app(
         hass_url=hass_url,
         hass_token=token,
         trusted_ingress_only=trusted_ingress_only,
+        developer_mode=developer_mode,
     )
     app = FastAPI(title="Powercalc Measure", version="0.1.0", docs_url=None, redoc_url=None, lifespan=_lifespan)
     app.state.context = context
@@ -263,6 +268,7 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
             modes=list(supported_light_modes()),
             defaults={name: getattr(defaults, name) for name in PARAMETER_LIMITS} | app_defaults.model_dump(),
             limits={name: {"min": minimum, "max": maximum} for name, (minimum, maximum) in PARAMETER_LIMITS.items()},
+            developer_mode=_context(request).developer_mode,
         )
 
     @router.get("/measure-definitions")

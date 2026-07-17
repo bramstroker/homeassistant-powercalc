@@ -214,7 +214,8 @@ export class RunningView extends LitElement {
   private renderMetrics(openEnded: boolean, progress: SessionProgress) {
     let progressLabel = "Variation";
     if (openEnded) progressLabel = "Recorded";
-    else if (this.snapshot.mode === "Averaging") progressLabel = "Seconds";
+    else if (this.snapshot.mode === "Averaging" || this.snapshot.mode === "Trickle charging") progressLabel = "Seconds";
+    else if (this.snapshot.mode === "Charging") progressLabel = "Battery";
     return html`
       <div class="metrics">
         <div class="metric"><span>Mode</span><strong>${this.snapshot.mode ?? "—"}</strong></div>

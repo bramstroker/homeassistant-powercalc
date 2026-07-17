@@ -138,7 +138,7 @@ def test_preflight_includes_minimum_dummy_load_calibration_duration() -> None:
                 product_name="Test light",
                 measure_device="Test meter",
                 power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
-                controller=DummyLightControllerSpec(),
+                controller=HassLightControllerSpec(entity_id="light.missing"),
             ),
             "light entity",
         ),
@@ -183,6 +183,24 @@ def test_preflight_rejects_charging_type_entity_domain_mismatch() -> None:
 
     with pytest.raises(PreflightError, match="does not match"):
         checker.validate(request)
+
+
+def test_light_preflight_accepts_dummy_controller_without_entity_checks() -> None:
+    request = LightMeasurementRequest(
+        model_id="dummy",
+        product_name="Virtual light",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=DummyLightControllerSpec(),
+        modes={LutMode.BRIGHTNESS},
+        parameters={"sleep_time": 0.5, "sample_count": 2},
+    )
+
+    result = preflight(base_entities()).validate(request)
+
+    assert result.supported_modes == (LutMode.BRIGHTNESS,)
+    assert result.estimated_variations == 255
+    assert result.estimated_duration_seconds is not None
 
 
 def test_light_preflight_returns_supported_modes_and_estimate() -> None:

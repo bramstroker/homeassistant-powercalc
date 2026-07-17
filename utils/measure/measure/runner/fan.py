@@ -9,6 +9,7 @@ from measure.util.measure_util import MeasurementResult, MeasureUtil
 _LOGGER = logging.getLogger("measure")
 
 SLEEP_TIME_PERCENTAGE_CHANGE = 15
+MEASURE_DURATION_PER_STEP = 20
 
 
 class FanRunner(MeasurementRunner[FanMeasurementRequest]):
@@ -29,6 +30,7 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
     ) -> RunnerResult:
         measurements: dict[int, float] = {}
         voltages: list[float] = []
+        self.interaction.progress(0, 20, phase="Measuring fan speeds", remaining_seconds=self._remaining_seconds(0))
         for percentage in range(5, 101, 5):
             _LOGGER.info("Setting percentage to %d", percentage)
             self.fan_controller.set_percentage(percentage)
@@ -37,12 +39,22 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
             self.interaction.phase(f"Stabilizing fan at {percentage}%")
             self.interaction.wait(SLEEP_TIME_PERCENTAGE_CHANGE)
             self.interaction.phase(f"Measuring fan at {percentage}%")
-            result = self.measure_util.take_average_measurement(20)
+            result = self.measure_util.take_average_measurement(MEASURE_DURATION_PER_STEP)
             measurements[percentage] = result.power
             voltages.extend(result.voltages)
-            self.interaction.progress(percentage // 5, 20, phase="Measuring fan speeds")
+            self.interaction.progress(
+                percentage // 5,
+                20,
+                phase="Measuring fan speeds",
+                remaining_seconds=self._remaining_seconds(percentage // 5),
+            )
 
         return RunnerResult(model_json_data=self._build_model_json_data(measurements), voltages=voltages)
+
+    @staticmethod
+    def _remaining_seconds(completed_steps: int) -> float:
+        """Estimated time for the remaining fan-speed steps."""
+        return (20 - completed_steps) * (SLEEP_TIME_PERCENTAGE_CHANGE + MEASURE_DURATION_PER_STEP)
 
     @staticmethod
     def _build_model_json_data(measurements: dict) -> dict:
@@ -60,4 +72,4 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
         self.interaction.operating_point(FanOperatingPoint(type="fan", percentage=0, on=False))
         _LOGGER.info("Waiting %d seconds to measure power", SLEEP_TIME_PERCENTAGE_CHANGE)
         self.interaction.wait(SLEEP_TIME_PERCENTAGE_CHANGE)
-        return self.measure_util.take_average_measurement(20)
+        return self.measure_util.take_average_measurement(MEASURE_DURATION_PER_STEP)

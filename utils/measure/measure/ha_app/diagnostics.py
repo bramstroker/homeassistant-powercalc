@@ -4,8 +4,8 @@ from collections.abc import Collection, Iterable
 import platform
 
 from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot, utc_now
-from measure.model import measure_version
 from measure.request import MeasurementRequest
+from measure.version import measure_version
 
 REDACTED = "<redacted>"
 _SENSITIVE_KEYS = frozenset({"password", "secret", "token"})

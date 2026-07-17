@@ -39,21 +39,21 @@ class FakeClient:
     def close(self) -> None:
         return None
 
-    async def discover_zeroconf(self, collection_window: float = 2.0) -> tuple[dict[str, object], ...]:
-        return ()
+    async def discover_zeroconf(self, collection_window: float = 2.0) -> list[dict[str, object]]:
+        return []
 
-    def list_entity_registry(self) -> tuple[SimpleNamespace, ...]:
-        return (
+    def list_entity_registry(self) -> list[SimpleNamespace]:
+        return [
             SimpleNamespace(entity_id="sensor.test_power", device_id="meter-device"),
             SimpleNamespace(entity_id="sensor.test_voltage", device_id="meter-device"),
             SimpleNamespace(entity_id="light.test", device_id="light-device"),
-        )
+        ]
 
-    def get_device_registry(self) -> tuple[dict[str, object], ...]:
-        return (
+    def get_device_registry(self) -> list[dict[str, object]]:
+        return [
             {"id": "meter-device", "model_id": "PM-001", "model": "Power Meter"},
             {"id": "light-device", "model_id": None, "model": "Hue White Ambiance"},
-        )
+        ]
 
     def get_entities(self) -> dict[str, SimpleNamespace]:
         return {
@@ -196,11 +196,12 @@ def payload() -> dict[str, object]:
     }
 
 
-def client(tmp_path: Path, *, trusted_ingress_only: bool = False) -> TestClient:
+def client(tmp_path: Path, *, trusted_ingress_only: bool = False, developer_mode: bool = False) -> TestClient:
     app = create_app(
         data_root=tmp_path,
         hass_token="test-token",  # noqa: S106
         trusted_ingress_only=trusted_ingress_only,
+        developer_mode=developer_mode,
     )
     app.state.context.home_assistant = FakeClient()
     app.state.context.power_meter_diagnostics = PowerMeterDiagnostics(
@@ -246,6 +247,8 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     }
     assert capabilities.json()["limits"]["ct_bri_steps"] == {"min": 1, "max": 10}
     assert capabilities.json()["limits"]["min_sat"] == {"min": 1, "max": 255}
+    assert capabilities.json()["developer_mode"] is False
+    assert client(tmp_path, developer_mode=True).get("/api/capabilities").json()["developer_mode"] is True
     assert [item["entity_id"] for item in powers.json()] == ["sensor.test_power"]
     assert powers.json()[0]["device_id"] == "meter-device"
     assert powers.json()[0]["model_id"] == "PM-001"

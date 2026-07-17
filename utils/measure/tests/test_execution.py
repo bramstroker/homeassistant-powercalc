@@ -52,7 +52,7 @@ def test_execution_writes_model_from_prepared_measurement(
     measure_version: str,
 ) -> None:
     (tmp_path / ".VERSION").write_text(measure_version, encoding="utf-8")
-    monkeypatch.setattr("measure.model.PROJECT_DIR", str(tmp_path))
+    monkeypatch.setattr("measure.version.PROJECT_DIR", str(tmp_path))
     request = AverageMeasurementRequest(
         product_name="Test device",
         measure_device="Test meter",

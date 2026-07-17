@@ -79,15 +79,15 @@ def _entity_data(*, power_state: str = "4.2") -> HomeAssistantEntityData:
                 },
             ),
         },
-        entity_registry=(
+        entity_registry=[
             SimpleNamespace(entity_id="light.desk", device_id="light-device"),
             SimpleNamespace(entity_id="sensor.desk_power", device_id="meter-device"),
             SimpleNamespace(entity_id="sensor.desk_voltage", device_id="meter-device"),
-        ),
-        device_registry=(
+        ],
+        device_registry=[
             {"id": "light-device", "model_id": "LWA017", "model": "Hue White Ambiance"},
             {"id": "meter-device", "model_id": "PM-001", "model": "Power Meter"},
-        ),
+        ],
     )
 
 

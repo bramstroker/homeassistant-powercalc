@@ -49,6 +49,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
         )
         self.interaction.confirm("Ready to start speaker measurement. Volume will increase to maximum.")
         self.interaction.phase("Starting speaker measurement")
+        self.interaction.progress(0, 11, phase="Measuring volume levels", remaining_seconds=self._remaining_seconds(0))
 
         disable_streaming = request.disable_streaming
 
@@ -65,7 +66,12 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
             result = self.measure_util.take_average_measurement(duration)
             summary[volume] = result.power
             voltages.extend(result.voltages)
-            self.interaction.progress(volume // 10, 11, phase="Measuring volume levels")
+            self.interaction.progress(
+                volume // 10,
+                11,
+                phase="Measuring volume levels",
+                remaining_seconds=self._remaining_seconds(volume // 10),
+            )
 
         _LOGGER.info("Muting volume and waiting for %d seconds", SLEEP_MUTE)
         self.media_controller.mute_volume()
@@ -86,6 +92,14 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
             self.interaction.notify(f"{volume} : {summary[volume]}")
 
         return RunnerResult(model_json_data=self._build_model_json_data(summary), voltages=voltages)
+
+    @staticmethod
+    def _remaining_seconds(completed_levels: int) -> float:
+        """Estimated time for the remaining volume levels plus the muted baseline."""
+        remaining_levels = 10 - completed_levels
+        return (
+            remaining_levels * (SLEEP_PRE_MEASURE + DURATION_PER_VOLUME_LEVEL) + SLEEP_MUTE + DURATION_PER_VOLUME_LEVEL
+        )
 
     @staticmethod
     def _build_model_json_data(summary: dict) -> dict:

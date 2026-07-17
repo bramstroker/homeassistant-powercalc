@@ -17,5 +17,7 @@ environment:
 backup: cold
 options:
   debug_logging: false
+  developer_mode: false
 schema:
   debug_logging: bool
+  developer_mode: bool

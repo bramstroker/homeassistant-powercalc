@@ -23,10 +23,10 @@ class FakeResponse:
 
 class FakeHomeAssistant:
     def __init__(self, services: Sequence[dict[str, object]] = (), error: Exception | None = None) -> None:
-        self.services = tuple(services)
+        self.services = list(services)
         self.error = error
 
-    async def discover_zeroconf(self, collection_window: float = 2.0) -> tuple[dict[str, object], ...]:
+    async def discover_zeroconf(self, collection_window: float = 2.0) -> list[dict[str, object]]:
         assert collection_window == pytest.approx(2.0)
         if self.error:
             raise self.error
@@ -62,7 +62,7 @@ def test_home_assistant_discovery_client_collects_add_events_until_timeout() -> 
 
     result = asyncio.run(HomeAssistantDiscoveryClient.discover_zeroconf(client, 0.1))
 
-    assert result == ({"name": "shelly-one"},)
+    assert result == [{"name": "shelly-one"}]
     client.send.assert_awaited_once_with("zeroconf/subscribe_discovery")
 
 
@@ -82,13 +82,13 @@ def test_manager_uses_an_ephemeral_discovery_client() -> None:
     client = MagicMock(spec=HomeAssistantDiscoveryClient)
     client.__aenter__ = AsyncMock(return_value=client)
     client.__aexit__ = AsyncMock(return_value=None)
-    client.discover_zeroconf = AsyncMock(return_value=({"name": "shelly-one"},))
+    client.discover_zeroconf = AsyncMock(return_value=[{"name": "shelly-one"}])
     factory = MagicMock(return_value=client)
     manager = HomeAssistantManager("ws://127.0.0.1/api/websocket", "token", discovery_client_factory=factory)
 
     result = asyncio.run(manager.discover_zeroconf(0.25))
 
-    assert result == ({"name": "shelly-one"},)
+    assert result == [{"name": "shelly-one"}]
     factory.assert_called_once_with("ws://127.0.0.1/api/websocket", "token")
     client.discover_zeroconf.assert_awaited_once_with(0.25)
     client.__aexit__.assert_awaited_once()

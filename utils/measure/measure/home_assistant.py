@@ -40,7 +40,7 @@ def normalize_hass_url(url: str) -> str:
 def _validate_subscription_response(response: dict[str, Any], subscription_id: object) -> None:
     if response.get("id") != subscription_id or response.get("type") != "result":
         raise HomeAssistantDiscoveryError("Unexpected Home Assistant discovery response")
-    if response.get("success") is not True:
+    if not response.get("success"):
         error = response.get("error")
         message = error.get("message") if isinstance(error, dict) else None
         raise HomeAssistantDiscoveryError(str(message or "Home Assistant discovery is unavailable"))
@@ -61,7 +61,7 @@ def _added_services(event_response: dict[str, Any], subscription_id: object) -> 
 class HomeAssistantDiscoveryClient(AsyncWebsocketClient):
     """Read raw Home Assistant Zeroconf subscription events."""
 
-    async def discover_zeroconf(self, collection_window: float) -> tuple[dict[str, object], ...]:
+    async def discover_zeroconf(self, collection_window: float) -> list[dict[str, object]]:
         subscription_id = await self.send(HASS_ZEROCONF_SUBSCRIBE_DISCOVERY)
         _validate_subscription_response(await self._async_recv(), subscription_id)
 
@@ -77,7 +77,7 @@ class HomeAssistantDiscoveryClient(AsyncWebsocketClient):
             except TimeoutError:
                 break
             services.extend(_added_services(event_response, subscription_id))
-        return tuple(services)
+        return services
 
 
 @dataclass(frozen=True)
@@ -85,8 +85,8 @@ class HomeAssistantEntityData:
     """Raw live entity and registry data captured under one client lock."""
 
     entities: dict[str, Group]
-    entity_registry: tuple[EntityRegistryEntry, ...]
-    device_registry: tuple[dict[str, object], ...]
+    entity_registry: list[EntityRegistryEntry]
+    device_registry: list[dict[str, object]]
 
 
 class HomeAssistantWebsocketClient(WebsocketClient):
@@ -118,10 +118,10 @@ class HomeAssistantWebsocketClient(WebsocketClient):
     def close(self) -> None:
         self.__exit__(None, None, None)
 
-    def get_device_registry(self) -> tuple[dict[str, object], ...]:
+    def get_device_registry(self) -> list[dict[str, object]]:
         """Return Home Assistant device registry entries."""
 
-        return tuple(self.recv_result_list(self.send(HASS_DEVICE_REGISTRY_LIST)))
+        return self.recv_result_list(self.send(HASS_DEVICE_REGISTRY_LIST))
 
     def __del__(self) -> None:
         with contextlib.suppress(Exception):
@@ -235,10 +235,10 @@ class HomeAssistantManager:
             retry_on_disconnect=False,
         )
 
-    def list_entity_registry(self) -> tuple[EntityRegistryEntry, ...]:
-        return self._execute(lambda client: client.list_entity_registry())
+    def list_entity_registry(self) -> list[EntityRegistryEntry]:
+        return self._execute(lambda client: list(client.list_entity_registry()))
 
-    def get_device_registry(self) -> tuple[dict[str, object], ...]:
+    def get_device_registry(self) -> list[dict[str, object]]:
         return self._execute(lambda client: client.get_device_registry())
 
     def get_entity_data(self) -> HomeAssistantEntityData:
@@ -247,12 +247,12 @@ class HomeAssistantManager:
         return self._execute(
             lambda client: HomeAssistantEntityData(
                 entities=client.get_entities(),
-                entity_registry=tuple(client.list_entity_registry()),
-                device_registry=tuple(client.get_device_registry()),
+                entity_registry=list(client.list_entity_registry()),
+                device_registry=client.get_device_registry(),
             ),
         )
 
-    async def discover_zeroconf(self, collection_window: float = 2.0) -> tuple[dict[str, object], ...]:
+    async def discover_zeroconf(self, collection_window: float = 2.0) -> list[dict[str, object]]:
         """Collect the current Home Assistant Zeroconf discovery results."""
 
         async with self._discovery_client_factory(self.api_url, self.token) as client:

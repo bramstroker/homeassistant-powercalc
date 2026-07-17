@@ -57,6 +57,7 @@ export interface Capabilities {
   modes: LutMode[];
   defaults: MeasureDefaults;
   limits?: Record<string, { min: number; max: number }>;
+  developer_mode?: boolean;
 }
 
 export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan";

@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.controller import ChargingController
@@ -31,6 +31,11 @@ def test_run_reports_battery_and_charging_operating_points() -> None:
     runner.run(request, "")
 
     interaction.phase.assert_any_call("Starting charging measurement")
+    assert interaction.progress.call_args_list[0] == call(99, 100, phase="Charging")
+    # The trickle phase must keep reporting progress with a countdown.
+    trickle_progress = measure_util.take_average_measurement.call_args.kwargs["on_progress"]
+    trickle_progress(60.0, 1800.0)
+    assert interaction.progress.call_args_list[-1] == call(60, 1800, phase="Trickle charging", remaining_seconds=1740.0)
     assert [call.args[0] for call in interaction.operating_point.call_args_list] == [
         {"type": "charging", "battery_level": 99, "charging": True},
         {"type": "charging", "battery_level": 99, "charging": True},

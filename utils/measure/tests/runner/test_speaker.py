@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 from measure.controller.media.controller import MediaController
 from measure.controller.media.spec import DummyMediaControllerSpec
@@ -67,6 +67,10 @@ def test_run_reports_volume_and_muted_operating_points() -> None:
 
     interaction.phase.assert_any_call("Starting speaker measurement")
     interaction.phase.assert_any_call("Measuring speaker at 10% volume")
+    # Progress must be reported before the first volume level so the UI leaves the preparing state.
+    # 10 levels of stabilize+measure (2+20 s) plus the muted baseline (5+20 s).
+    assert interaction.progress.call_args_list[0] == call(0, 11, phase="Measuring volume levels", remaining_seconds=245)
+    assert interaction.progress.call_args_list[1] == call(1, 11, phase="Measuring volume levels", remaining_seconds=223)
     points = [call.args[0] for call in interaction.operating_point.call_args_list]
     assert points[:2] == [
         {"type": "speaker", "volume": 10, "muted": False},

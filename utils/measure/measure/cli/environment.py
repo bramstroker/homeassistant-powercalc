@@ -3,7 +3,7 @@ from typing import Any
 
 from decouple import Choices, UndefinedValueError, config
 
-from measure.const import CT_BRI_STEPS_MANUAL, CT_MIRED_STEPS_MANUAL, PARAMETER_LIMITS, parse_measure_type
+from measure.const import CT_BRI_STEPS_MANUAL, CT_MIRED_STEPS_MANUAL, PARAMETER_LIMITS, MeasureType, parse_measure_type
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import DEFAULT_LIGHT_TRANSITION_TIME, LightControllerType
@@ -264,7 +264,7 @@ class CliEnvironment:
         return _bounded("sample_count")
 
     @property
-    def selected_measure_type(self) -> str | None:
+    def selected_measure_type(self) -> MeasureType | None:
         try:
             return parse_measure_type(config("SELECTED_MEASURE_TYPE"))
         except UndefinedValueError:

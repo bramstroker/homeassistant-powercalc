@@ -9,7 +9,8 @@ from measure.controller.charging.spec import HassChargingControllerSpec, chargin
 from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
-from measure.controller.light.spec import HassLightControllerSpec
+from measure.controller.light.dummy import DummyLightController
+from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.home_assistant_entities import DeviceClass, EntityDomain
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
@@ -150,6 +151,8 @@ class MeasurementPreflight:
                 self._require_entity(request.controller.entity_id, domain, "Selected charging device is unavailable")
 
     def _validate_light(self, request: LightMeasurementRequest) -> PreflightResult:
+        if isinstance(request.controller, DummyLightControllerSpec):
+            return self._estimate_dummy_light(request)
         if not isinstance(request.controller, HassLightControllerSpec):
             raise PreflightError("Selected light entity is unavailable")
         lights = {entity.entity_id: entity for entity in self._load_entities(EntityDomain.LIGHT, None)}
@@ -173,6 +176,21 @@ class MeasurementPreflight:
             estimated_variations=plan.variation_count,
             estimated_duration_seconds=round(estimate_light_time_left(plan, request.parameters)),
             supported_modes=tuple(sorted(supported, key=str)),
+        )
+
+    @staticmethod
+    def _estimate_dummy_light(request: LightMeasurementRequest) -> PreflightResult:
+        controller = DummyLightController()
+        plan = build_light_plan(
+            request.modes,
+            request.parameters,
+            controller.get_light_info(),
+            controller.get_effect_list(),
+        )
+        return PreflightResult(
+            estimated_variations=plan.variation_count,
+            estimated_duration_seconds=round(estimate_light_time_left(plan, request.parameters)),
+            supported_modes=tuple(sorted(request.modes, key=str)),
         )
 
     def _require_entity(self, entity_id: str | None, domain: EntityDomain, message: str) -> None:

@@ -25,6 +25,11 @@ def main() -> None:
         default=None,
         help="Home Assistant access token. Defaults to the SUPERVISOR_TOKEN environment variable.",
     )
+    parser.add_argument(
+        "--developer-mode",
+        action="store_true",
+        help="Show developer testing options in the app, such as virtual (dummy) device controllers.",
+    )
     args = parser.parse_args()
     options = _read_options(args.data_root)
     debug = bool(options.get("debug_logging", False))
@@ -33,6 +38,7 @@ def main() -> None:
         data_root=args.data_root,
         hass_url=args.hass_url,
         hass_token=args.hass_token,
+        developer_mode=args.developer_mode or bool(options.get("developer_mode", False)),
     )
     uvicorn.run(
         app,

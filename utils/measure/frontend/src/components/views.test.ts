@@ -159,6 +159,103 @@ describe("setup view", () => {
     });
   });
 
+  it("hides the virtual-device toggle unless developer mode is enabled", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      selectedType: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = capabilities;
+    element.lights = lights;
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.voltages = [];
+    element.selectedType = "light";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('input[name="use_dummy_controller"]')).toBeNull();
+  });
+
+  it("submits a dummy light controller when the developer virtual-device toggle is on", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      selectedType: string;
+      defaultMeasureDevice: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = { ...capabilities, developer_mode: true };
+    element.lights = lights;
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.voltages = [];
+    element.selectedType = "light";
+    element.defaultMeasureDevice = "Shelly Plug S";
+    document.body.append(element);
+    await element.updateComplete;
+
+    element.shadowRoot.querySelector<HTMLInputElement>('input[name="use_dummy_controller"]')!.click();
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('select[name="light_entity_id"]')).toBeNull();
+    const checkedModes = [...element.shadowRoot.querySelectorAll<HTMLInputElement>('input[name="modes"]:checked')].map((input) => input.value);
+    expect(checkedModes).toEqual(["brightness", "color_temp", "hs", "effect"]);
+
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
+    });
+    (element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value = "dummy";
+    (element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).value = "Virtual light";
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+
+    const request = await submitted;
+    expect(request.measure_type).toBe("light");
+    expect("controller" in request && request.controller).toEqual({ type: "dummy" });
+  });
+
+  it("submits a dummy fan controller when the developer virtual-device toggle is on", async () => {
+    const fanDefinition: MeasureDefinition = {
+      measure_type: "fan", label: "Fan", description: "Measure fan power.",
+      fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
+      supports_profile: true, supports_resume: false,
+    };
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
+      deviceEntities: Record<string, EntityDescriptor[]>;
+      selectedType: string;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.definitions = [fanDefinition];
+    element.capabilities = { ...capabilities, developer_mode: true };
+    element.powerMeter = "dummy";
+    element.deviceEntities = {};
+    element.selectedType = "fan";
+    document.body.append(element);
+    await element.updateComplete;
+
+    element.shadowRoot.querySelector<HTMLInputElement>('input[name="use_dummy_controller"]')!.click();
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('select[name="fan_entity_id"]')).toBeNull();
+
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
+    });
+    (element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value = "dummy";
+    (element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).value = "Virtual fan";
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+
+    const request = await submitted;
+    expect(request.measure_type).toBe("fan");
+    expect("controller" in request && request.controller).toEqual({ type: "dummy" });
+  });
+
   it("includes effect mode when the light exposes effects", async () => {
     const element = document.createElement("measure-setup-view") as HTMLElement & {
       capabilities: Capabilities;

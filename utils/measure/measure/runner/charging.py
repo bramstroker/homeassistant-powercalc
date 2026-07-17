@@ -76,6 +76,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
                 )
                 if not is_charging:
                     raise RunnerError("Device is not charging anymore.")
+                self.interaction.progress(battery_level, 100, phase="Charging")
                 _LOGGER.info("Battery level: %d%%", battery_level)
                 if battery_level not in measurements:
                     measurements[battery_level] = []
@@ -96,11 +97,22 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         self.interaction.notify("Done charging, start measurements for trickle charging..")
         self.interaction.phase("Measuring trickle charging power")
 
-        trickle_result = self.measure_util.take_average_measurement(TRICKLE_CHARGING_TIME)
+        trickle_result = self.measure_util.take_average_measurement(
+            TRICKLE_CHARGING_TIME,
+            on_progress=self._report_trickle_progress,
+        )
         measurements[100] = [trickle_result.power]
         voltages.extend(trickle_result.voltages)
 
         return RunnerResult(model_json_data=self._build_model_json_data(measurements), voltages=voltages)
+
+    def _report_trickle_progress(self, elapsed: float, duration: float) -> None:
+        self.interaction.progress(
+            int(min(elapsed, duration)),
+            int(duration),
+            phase="Trickle charging",
+            remaining_seconds=max(0.0, duration - elapsed),
+        )
 
     def wait_for_vacuum_to_start_charging(self) -> None:
         is_charging = self.controller.is_charging()

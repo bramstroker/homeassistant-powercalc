@@ -47,9 +47,7 @@ from measure.powermeter.const import PowerMeterType
 from measure.powermeter.errors import PowerMeterError
 from measure.runner.const import QUESTION_MODE
 from measure.runner.errors import RunnerError
-
-with open(os.path.join(PROJECT_DIR, ".VERSION")) as f:
-    _VERSION = f.read().strip()
+from measure.version import measure_version
 
 config = CliEnvironment()
 
@@ -293,7 +291,7 @@ def str_to_bool(value: Any) -> bool:  # noqa: ANN401
 
 
 def main() -> None:
-    print(f"Powercalc measure: {_VERSION}\n")
+    print(f"Powercalc measure: {measure_version()}\n")
 
     try:
         Measure(config).start()

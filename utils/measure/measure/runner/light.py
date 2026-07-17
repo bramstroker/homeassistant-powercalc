@@ -201,6 +201,12 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             self.interaction.phase(f"Stabilizing light before the first reading ({self.config.sleep_initial} s)")
             self._wait(self.config.sleep_initial)
 
+            self.interaction.progress(
+                completed=len(all_variations) - len(remaining_variations),
+                total=len(all_variations),
+                phase=mode.value,
+                remaining_seconds=self.calculate_time_left_seconds(mode, all_variations, remaining_variations),
+            )
             previous_variation = None
             for count, variation in enumerate(measurement_info.variations):
                 self._log_progress(mode, count, variation, all_variations, remaining_variations)

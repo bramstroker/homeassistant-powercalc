@@ -15,6 +15,7 @@ import type {
 } from "../types";
 import {
   buildNonLightRequest,
+  CONTROLLER_ENTITY_FIELDS,
   deviceFields,
   entityDomain,
   entityDomains,
@@ -51,6 +52,7 @@ export class SetupView extends LitElement {
     selectedChargingType: { state: true },
     dummyLoadEnabled: { state: true },
     dummyLoadMode: { state: true },
+    dummyController: { state: true },
   };
 
   capabilities?: Capabilities;
@@ -76,6 +78,7 @@ export class SetupView extends LitElement {
   selectedChargingType = "";
   dummyLoadEnabled = false;
   dummyLoadMode: DummyLoadSpec["mode"] = "calibrate";
+  dummyController = false;
 
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
@@ -125,6 +128,9 @@ export class SetupView extends LitElement {
     .power-meter-summary button { flex: 0 0 auto; min-height: 38px; padding: 0.4rem 0.9rem; }
     .dummy-load { display: grid; gap: 0.9rem; }
     .dummy-load-toggle { width: fit-content; }
+    .dummy-controller { display: grid; gap: 0.4rem; }
+    .dummy-controller-toggle { width: fit-content; }
+    .dummy-controller p { margin: 0; }
     .dummy-load-options { display: grid; gap: 0.8rem; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
     .dummy-load-options p { margin: 0; }
     .calibration-card { display: grid; gap: 0.2rem; }
@@ -155,6 +161,9 @@ export class SetupView extends LitElement {
     if (changed.has("initialRequest")) {
       this.dummyLoadEnabled = Boolean(this.initialRequest?.dummy_load);
       this.dummyLoadMode = this.initialRequest?.dummy_load?.mode ?? (this.dummyLoadCalibration ? "reuse" : "calibrate");
+      this.dummyController = Boolean(
+        this.initialRequest && "controller" in this.initialRequest && this.initialRequest.controller.type === "dummy",
+      );
     } else if (changed.has("dummyLoadCalibration") && !this.dummyLoadEnabled) {
       this.dummyLoadMode = this.dummyLoadCalibration ? "reuse" : "calibrate";
     }
@@ -240,8 +249,11 @@ export class SetupView extends LitElement {
 
         <fieldset class="section">
           <legend>Light profile</legend>
+          ${this.renderDummyControllerToggle()}
           <div class="grid profile-grid">
-            ${this.entitySelect("light_entity_id", "Light", this.lights, request?.controller.type === "hass" ? request.controller.entity_id : "", true)}
+            ${this.dummyController
+              ? nothing
+              : this.entitySelect("light_entity_id", "Light", this.lights, request?.controller.type === "hass" ? request.controller.entity_id : "", true)}
             ${this.numberField("multiple_light_count", "Number of lights", request?.multiple_light_count ?? 1, 1, 100)}
             ${this.textField("model_id", "Model ID", this.modelId(request), "e.g. LWA017", true)}
             ${this.textField(
@@ -318,6 +330,7 @@ export class SetupView extends LitElement {
 
         <fieldset class="section">
           <legend>${definition.label}</legend>
+          ${definition.fields.some((field) => CONTROLLER_ENTITY_FIELDS.has(field.name)) ? this.renderDummyControllerToggle() : nothing}
           <div class="grid profile-grid">
             ${fields.map((field) => this.genericField(field, run))}
             ${definition.supports_profile ? this.textField("model_id", "Model ID", this.modelId(run), "e.g. WSP002", true) : nothing}
@@ -362,6 +375,26 @@ export class SetupView extends LitElement {
           <span>${detail}</span>
         </span>
         <button type="button" @click=${this.openSettings}>Change</button>
+      </div>
+    `;
+  }
+
+  private renderDummyControllerToggle() {
+    if (!this.capabilities?.developer_mode) return nothing;
+    return html`
+      <div class="dummy-controller">
+        <label class="check dummy-controller-toggle">
+          <input
+            type="checkbox"
+            name="use_dummy_controller"
+            .checked=${this.dummyController}
+            @change=${this.dummyControllerChanged}
+          />
+          Use virtual device (developer)
+        </label>
+        ${this.dummyController
+          ? html`<p class="muted">No real device is controlled during this measurement. Use it only to test the app itself.</p>`
+          : nothing}
       </div>
     `;
   }
@@ -488,6 +521,7 @@ export class SetupView extends LitElement {
     const definition = this.definition(this.selectedType);
     if (!definition) return nothing;
     const name = field.name;
+    if (this.dummyController && CONTROLLER_ENTITY_FIELDS.has(name)) return nothing;
     const stored = run && requestFieldValue(run, name);
     if (field.control === "boolean") {
       return html`<label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
@@ -557,8 +591,13 @@ export class SetupView extends LitElement {
     this.dummyLoadMode = (event.currentTarget as HTMLInputElement).value as DummyLoadSpec["mode"];
   }
 
+  private dummyControllerChanged(event: Event): void {
+    this.dummyController = (event.currentTarget as HTMLInputElement).checked;
+  }
+
   private availableModes(request?: LightMeasurementRequest): LutMode[] {
     const supported = this.capabilities?.modes ?? [];
+    if (this.dummyController) return supported;
     const lightId = this.selectedLightId || (request?.controller.type === "hass" ? request.controller.entity_id : "");
     const entityModes = this.lights.find((entity) => entity.entity_id === lightId)?.supported_modes;
     return entityModes?.length ? supported.filter((mode) => entityModes.includes(mode)) : supported;
@@ -572,6 +611,7 @@ export class SetupView extends LitElement {
   private selectType(type: MeasureType): void {
     this.errorMessage = "";
     this.selectedType = type;
+    this.dummyController = false;
     this.dispatchEvent(new CustomEvent("measure-type-selected", { detail: type, bubbles: true, composed: true }));
   }
 
@@ -643,7 +683,7 @@ export class SetupView extends LitElement {
       model_id: text("model_id").trim(),
       product_name: text("product_name").trim(),
       measure_device: this.defaultMeasureDevice,
-      controller: { type: "hass", entity_id: text("light_entity_id") },
+      controller: this.dummyController ? { type: "dummy" } : { type: "hass", entity_id: text("light_entity_id") },
       power_meter: this.powerMeterSpec(),
       modes,
       generate_model: true,
@@ -679,14 +719,23 @@ export class SetupView extends LitElement {
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
     if (!definition || !this.capabilities) return;
     const form = new FormData(event.currentTarget as HTMLFormElement);
-    const failedDomain = entityDomains(definition, form).find((domain) => this.deviceEntityErrors[domain]);
+    const failedDomain = this.dummyController
+      ? undefined
+      : entityDomains(definition, form).find((domain) => this.deviceEntityErrors[domain]);
     if (failedDomain) {
       this.errorMessage = `Could not load ${failedDomain} entities. Retry before starting the measurement.`;
       return;
     }
-    const request = buildNonLightRequest(definition, form, this.capabilities, this.powerMeterSpec(), this.defaultMeasureDevice);
+    const request = buildNonLightRequest(
+      definition,
+      form,
+      this.capabilities,
+      this.powerMeterSpec(),
+      this.defaultMeasureDevice,
+      this.dummyController,
+    );
     request.dummy_load = this.dummyLoadSpec(form);
-    if (request.measure_type === "charging") {
+    if (request.measure_type === "charging" && request.controller.type !== "dummy") {
       const chargingField = definition.fields.find((field) => field.name === "charging_entity_id");
       const expectedDomain = chargingField && entityDomain(definition, chargingField, request.charging_device_type);
       if (!expectedDomain || request.controller.type !== "hass" || !request.controller.entity_id.startsWith(`${expectedDomain}.`)) {

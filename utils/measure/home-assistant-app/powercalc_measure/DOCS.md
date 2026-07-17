@@ -90,4 +90,8 @@ Turn on **Debug logging** in the app's **Configuration** tab and restart the app
 
 The **Synthetic test meter** type under **Settings → Power meter** replaces the real power sensor with a generated reading. It exists only to exercise the measurement flow without a physical load, so any profile produced while it is enabled is meaningless. It is separate from the calibrated resistive dummy-load feature and cannot be used to calibrate one. Keep the type set to a real power meter for actual measurements.
 
+### Developer mode (virtual devices)
+
+Turn on **Developer mode** in the app's **Configuration** tab and restart the app to show a **Use virtual device** toggle on the light, speaker, charging, and fan setup forms. The toggle replaces the selected Home Assistant entity with a virtual (dummy) controller so the whole measurement flow can be tested without controlling a real device. Combine it with the synthetic test meter for a fully simulated run. Profiles produced this way are meaningless; leave developer mode off for normal use. When running the app outside the add-on, pass `--developer-mode` on the command line instead.
+
 For additional guidance, see the [Powercalc measure documentation](https://docs.powercalc.nl/contributing/measure/home-assistant-app/).

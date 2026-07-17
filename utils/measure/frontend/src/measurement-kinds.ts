@@ -10,6 +10,13 @@ import type {
 
 export const LIGHT_TYPE = "light" as const;
 
+/** Entity fields that select the device controller and can be replaced by a dummy controller. */
+export const CONTROLLER_ENTITY_FIELDS: ReadonlySet<string> = new Set([
+  "media_player_entity_id",
+  "charging_entity_id",
+  "fan_entity_id",
+]);
+
 interface MeasurementKindMetadata {
   icon: string;
 }
@@ -81,8 +88,12 @@ export function buildNonLightRequest(
   capabilities: Capabilities,
   powerMeter: PowerMeterSpec,
   measureDevice: string,
+  dummyController = false,
 ): NonLightMeasurementRequest {
   if (definition.measure_type === LIGHT_TYPE) throw new Error("Light requests use the specialized form");
+
+  const controller = (entityField: string): { type: "dummy" } | { type: "hass"; entity_id: string } =>
+    dummyController ? { type: "dummy" } : { type: "hass", entity_id: text(form, entityField) };
 
   const parameter = (name: keyof Capabilities["defaults"]): number => {
     const value = form.get(name);
@@ -111,19 +122,19 @@ export function buildNonLightRequest(
     case "speaker": return {
       ...base,
       measure_type: "speaker",
-      controller: { type: "hass", entity_id: text(form, "media_player_entity_id") },
+      controller: controller("media_player_entity_id"),
       disable_streaming: form.has("disable_streaming"),
     };
     case "charging": return {
       ...base,
       measure_type: "charging",
-      controller: { type: "hass", entity_id: text(form, "charging_entity_id") },
+      controller: controller("charging_entity_id"),
       charging_device_type: text(form, "charging_device_type") as "vacuum_robot" | "lawn_mower_robot",
     };
     case "fan": return {
       ...base,
       measure_type: "fan",
-      controller: { type: "hass", entity_id: text(form, "fan_entity_id") },
+      controller: controller("fan_entity_id"),
     };
   }
 }

@@ -5,12 +5,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from measure.const import MODEL_JSON_MAX_VOLTAGE, MODEL_JSON_MIN_VOLTAGE, PROJECT_DIR
+from measure.const import MODEL_JSON_MAX_VOLTAGE, MODEL_JSON_MIN_VOLTAGE
 from measure.tuning import MeasurementParameters
-
-
-def measure_version() -> str:
-    return (Path(PROJECT_DIR) / ".VERSION").read_text(encoding="utf-8").strip()
+from measure.version import measure_version
 
 
 def write_model_json(

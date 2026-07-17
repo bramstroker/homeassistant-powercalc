@@ -2,3 +2,6 @@ configuration:
   debug_logging:
     name: Debug logging
     description: Log verbose output from the measure app. Enable it when collecting logs for an issue report, then turn it back off.
+  developer_mode:
+    name: Developer mode
+    description: Show developer testing options in the app, such as running a measurement against a virtual (dummy) device instead of a real one. Leave off for normal use.
