@@ -73,7 +73,10 @@ jobs:
             -o StrictHostKeyChecking=yes
           )
 
+          # remote_path is intentionally expanded client-side; it is printf '%q'-quoted above.
+          # shellcheck disable=SC2029
           ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" "mkdir -p ${remote_path}"
+          # shellcheck disable=SC2029
           ssh "${ssh_options[@]}" "${WEBSITE_SSH_USER}@${WEBSITE_SSH_HOST}" "test -w ${remote_path}"
 
           rsync -az --delete \

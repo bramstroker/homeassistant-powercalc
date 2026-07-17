@@ -10,7 +10,7 @@ There are two possibilities to add virtual power sensors using LUT mode:
 1. Predefined light measurements: The component ships with predefined light measurements for some light models. Also see [supported models](https://library.powercalc.nl).
 2. Custom light measurements: It is possible to define your own custom light models. See [LUT file structure](../library/structure.md) for details on file and directory structure.
 
-These LUT files are created using the measurement tool Powercalc provides. When you are interested in taking measurements yourself and contribute to the profile library yourself see [measure](../contributing/measure.md).
+These LUT files are created using the measurement tool Powercalc provides. When you are interested in taking measurements yourself and contribute to the profile library yourself see [measure](../contributing/measure/index.md).
 
 You can setup sensors both with YAML or GUI.
 

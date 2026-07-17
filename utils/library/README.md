@@ -56,6 +56,19 @@ Generate a Markdown table of smart-switch power data, written to
 uv run --group library python -m utils.library.build_info_table
 ```
 
+### `csv_row_counts.py`
+
+List the number of data points (rows, excluding the header) per CSV file in the
+library, including gzipped CSVs, followed by a total. Accepts an optional
+directory; defaults to the whole library.
+
+```bash
+uv run --group library python -m utils.library.csv_row_counts
+
+# largest files first
+uv run --group library python -m utils.library.csv_row_counts --sort rows
+```
+
 ### `field_counts.py`
 
 Print the value counts for a profile field (defaults to `measure_device`).

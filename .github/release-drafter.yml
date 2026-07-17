@@ -1,5 +1,6 @@
 name-template: 'v$RESOLVED_VERSION 🌈'
 tag-template: 'v$RESOLVED_VERSION'
+tag-prefix: 'v'
 change-template: '- #$NUMBER $TITLE @$AUTHOR'
 sort-direction: ascending
 exclude-contributors:
@@ -14,6 +15,7 @@ exclude-contributors:
 exclude-labels:
   - 'skip-changelog'
   - 'dependencies'
+  - 'measure-tool'
 categories:
   - title: '💡 Power profiles'
     labels:

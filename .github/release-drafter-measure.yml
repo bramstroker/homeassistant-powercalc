@@ -1,0 +1,56 @@
+name-template: 'Powercalc Measure v$RESOLVED_VERSION'
+tag-template: 'measure-v$RESOLVED_VERSION'
+tag-prefix: 'measure-v'
+latest: false
+change-template: '- #$NUMBER $TITLE @$AUTHOR'
+sort-direction: ascending
+category-template: '### $TITLE'
+exclude-contributors:
+  - 'github-actions[bot]'
+  - 'github-actions'
+  - 'renovate[bot]'
+  - 'renovate'
+  - 'pre-commit-ci'
+  - 'pre-commit-ci[bot]'
+  - 'bramstroker'
+  - 'crowdin-bot'
+categories:
+  - type: pre-include
+    when:
+      - label: 'measure-tool'
+      - paths:
+          - 'utils/measure/**'
+          - '.github/actions/build-measure-docker/**'
+          - '.github/release-drafter-measure.yml'
+          - '.github/workflows/prepare-measure-release.yml'
+          - '.github/workflows/publish-measure-image.yml'
+          - '.github/workflows/test-measure.yml'
+  - type: pre-exclude
+    when:
+      labels:
+        - 'skip-changelog'
+        - 'dependencies'
+  - title: '🚀 Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+  - title: '🧰 Maintenance'
+    label: 'chore'
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+template: |
+  $CHANGES

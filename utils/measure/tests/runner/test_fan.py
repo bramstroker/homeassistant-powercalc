@@ -1,20 +1,25 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
+from measure.controller.fan.dummy import DummyFanController
+from measure.controller.fan.spec import DummyFanControllerSpec
+from measure.execution import RunInteraction
+from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.request import FanMeasurementRequest
 from measure.runner.fan import FanRunner
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
-from tests.conftest import MockConfigFactory
 
-
-def test_run(mock_config_factory: MockConfigFactory, export_path: str) -> None:
-    mock_config = mock_config_factory()
-
+def test_run(export_path: str) -> None:
     measure_util_mock = MagicMock(MeasureUtil)
     measure_util_mock.take_average_measurement.return_value = MeasurementResult(power=10.50, voltages=[])
-    runner = FanRunner(measure_util_mock, mock_config)
-    runner.prepare({})
-
-    result = runner.run({}, export_path)
+    runner = FanRunner(measure_util_mock, DummyFanController())
+    request = FanMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyFanControllerSpec(),
+    )
+    result = runner.run(request, export_path)
 
     model_data = result.model_json_data
     assert model_data == {
@@ -48,3 +53,28 @@ def test_run(mock_config_factory: MockConfigFactory, export_path: str) -> None:
     assert model_data["device_type"] == "fan"
     assert model_data["calculation_strategy"] == "linear"
     assert "linear_config" in model_data
+
+
+def test_run_reports_fan_percentage_operating_points(export_path: str) -> None:
+    measure_util = MagicMock(MeasureUtil)
+    measure_util.take_average_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    runner = FanRunner(measure_util, DummyFanController(), interaction)
+    request = FanMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyFanControllerSpec(),
+    )
+
+    runner.run(request, export_path)
+
+    interaction.phase.assert_any_call("Stabilizing fan at 5%")
+    interaction.phase.assert_any_call("Measuring fan at 5%")
+    # Progress must be reported before the first fan speed so the UI leaves the preparing state.
+    # 20 steps of stabilize+measure (15+20 s).
+    assert interaction.progress.call_args_list[0] == call(0, 20, phase="Measuring fan speeds", remaining_seconds=700)
+    assert interaction.progress.call_args_list[-1] == call(20, 20, phase="Measuring fan speeds", remaining_seconds=0)
+    points = [call.args[0] for call in interaction.operating_point.call_args_list]
+    assert points[0] == {"type": "fan", "percentage": 5, "on": True}
+    assert points[-1] == {"type": "fan", "percentage": 100, "on": True}

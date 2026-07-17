@@ -1,0 +1,24 @@
+#include <tunables/global>
+
+profile powercalc_measure flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  # Broad file access: the container only ships the app code, its Python
+  # virtual environment, and the /data volume. No capabilities, mounts, or
+  # ptrace are granted. To tighten the file rules further:
+  # 1. Add `complain` to the profile flags temporarily and run the app
+  # 2. Review the audit log with `journalctl _TRANSPORT="audit" -g 'apparmor="ALLOWED"'`
+  # 3. Replace this rule with the observed paths and remove the `complain` flag
+  file,
+
+  # Uvicorn ingress server and the Supervisor Core API/WebSocket proxy
+  network inet tcp,
+  network inet6 tcp,
+  network inet udp,
+  network inet6 udp,
+  network netlink raw,
+
+  # Lifecycle signals from the Supervisor and to child processes
+  signal (send) set=(kill,term,int,hup,cont),
+  signal (receive) peer=unconfined,
+}

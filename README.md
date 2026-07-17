@@ -57,7 +57,7 @@ You get realistic energy data — without physically measuring every device.
 PowerCalc is powered by a growing community:
 
 - Contribute new device profiles
-- Share measurements
+- [Share measurements](https://docs.powercalc.nl/contributing/measure/)
 - Improve accuracy for everyone
 
 ---

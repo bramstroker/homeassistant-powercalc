@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
-import inquirer.questions
-
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 
 
@@ -49,18 +47,14 @@ class LightController(Protocol):
         """Get device information about the light"""
         ...
 
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        """Get questions to ask for the chosen light controller"""
-        ...
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        """Process the answers of the questions"""
-        ...
-
     def has_effect_support(self) -> bool:
         """Check if the light controller supports effects"""
         ...
 
     def get_effect_list(self) -> list[str]:
         """Get the list of supported effects"""
+        ...
+
+    def close(self) -> None:
+        """Release resources owned by the controller."""
         ...

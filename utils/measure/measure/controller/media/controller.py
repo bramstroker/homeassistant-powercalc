@@ -1,9 +1,7 @@
 from typing import Protocol
 
-from measure.controller.answerable_protocol import Answerable
 
-
-class MediaController(Answerable, Protocol):
+class MediaController(Protocol):
     def set_volume(self, volume: int) -> None: ...
 
     def mute_volume(self) -> None: ...

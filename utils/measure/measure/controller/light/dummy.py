@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-import inquirer.questions
+from measure.controller.light.const import LutMode
 
 from .controller import LightController, LightInfo
 
@@ -10,23 +10,20 @@ from .controller import LightController, LightInfo
 class DummyLightController(LightController):
     def change_light_state(
         self,
-        color_mode: str,
+        lut_mode: LutMode,
         on: bool = True,
-        **kwargs,  # noqa: ANN003
+        **kwargs: Any,  # noqa: ANN401
     ) -> None:
-        pass
+        return
 
     def get_light_info(self) -> LightInfo:
         return LightInfo("dummy")
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        return []
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        pass
 
     def has_effect_support(self) -> bool:
         return True
 
     def get_effect_list(self) -> list[str]:
         return ["A", "B", "C"]
+
+    def close(self) -> None:
+        return

@@ -30,7 +30,23 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
+      - name: Find plots artifact
+        id: artifact
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          RUN_ID: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const runId = Number(process.env.RUN_ID)
+            const { data } = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+            })
+            core.setOutput('exists', data.artifacts.some((artifact) => artifact.name === 'plots') ? 'true' : 'false')
       - name: Download Artifact
+        if: steps.artifact.outputs.exists == 'true'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: plots
@@ -38,6 +54,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
       - name: Read PR number
+        if: steps.artifact.outputs.exists == 'true'
         id: pr
         env:
           PR_NUMBER: ${{ github.event.inputs.pr_number }}
@@ -49,18 +66,20 @@ jobs:
           fi
           echo "number=${pr_number}" >> "$GITHUB_OUTPUT"
       - name: Upload the plots to Imgur
+        if: steps.artifact.outputs.exists == 'true'
         uses: devicons/public-upload-to-imgur@b774d640a6703b5ce1deef66e7789409c217f3b2 # v2
         id: imgur_step
         with:
           path: ./artifacts/**/*.png
           client_id: ${{secrets.IMGUR_CLIENT_ID}}
       - name: Build PR message
+        if: steps.artifact.outputs.exists == 'true'
         id: build-pr-message
         run: |
           {
             echo 'PR_MESSAGE<<EOF'
-            echo "Thank you for submitting light measurements!"
-            echo -e "Here are some visualizations for the CSV files.\n"
+            echo "Thank you for submitting Powercalc measurements!"
+            echo -e "Here are visualizations of the contributed profile data.\n"
           } >> "$GITHUB_OUTPUT"
           for url in ${{ join(fromJSON(steps.imgur_step.outputs.imgur_urls), ' ') }}
           do
@@ -68,6 +87,7 @@ jobs:
           done
           echo 'EOF' >> "$GITHUB_OUTPUT"
       - name: Post Comment on PR
+        if: steps.artifact.outputs.exists == 'true'
         uses: ./.github/actions/upsert-pr-comment
         with:
           pr-number: ${{ steps.pr.outputs.number }}

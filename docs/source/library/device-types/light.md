@@ -19,7 +19,7 @@ Example model.json:
 
 ## Measure
 
-To generate a LUT you'll need to use the [measure utility](../../contributing/measure.md).
+To generate a LUT you'll need to use the [measure utility](../../contributing/measure/index.md).
 This will fully automate the process and generate the required CSV files and model.json.
 
 ## LUT data files

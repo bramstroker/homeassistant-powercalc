@@ -1,16 +1,23 @@
 import logging
 
 from homeassistant_api.errors import InternalServerError
-import inquirer
 
-from measure.const import QUESTION_ENTITY_ID
 from measure.controller.hass_controller import HassControllerBase
 from measure.controller.media.controller import MediaController
+from measure.home_assistant import HomeAssistantManager
 
 _LOGGER = logging.getLogger("measure")
 
 
 class HassMediaController(HassControllerBase, MediaController):
+    def __init__(
+        self,
+        home_assistant: HomeAssistantManager,
+        *,
+        entity_id: str | None = None,
+    ) -> None:
+        super().__init__(home_assistant, entity_id=entity_id)
+
     def set_volume(self, volume: int) -> None:
         self.client.trigger_service(
             "media_player",
@@ -52,12 +59,3 @@ class HassMediaController(HassControllerBase, MediaController):
                 "media_stop",
                 entity_id=self.entity_id,
             )
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        return [
-            inquirer.List(
-                name=QUESTION_ENTITY_ID,
-                message="Select the media player",
-                choices=self.get_domain_entity_list("media_player"),
-            ),
-        ]

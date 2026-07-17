@@ -1,6 +1,6 @@
 # Troubleshooting measurements
 
-This page covers common measure tool problems. For standby readings that show as `0` W, start with [Standby troubleshooting](standby_troubleshooting.md).
+This page covers common measure tool problems. For standby readings that show as `0` W, start with [Standby power shows 0 W](#standby-power-shows-0-w).
 
 ## Readings stay at 0 W
 
@@ -19,6 +19,49 @@ Try:
 - Set `HASS_CALL_UPDATE_ENTITY_SERVICE=true` when using a Home Assistant power sensor.
 - Increase `SLEEP_TIME` and `SLEEP_TIME_SAMPLE`.
 - Use multiple identical lights in parallel or a dummy load when the load is below the meter accuracy threshold.
+
+## Standby power shows 0 W
+
+Some bulbs use very little standby power (often 0.1-0.3 W). Most consumer grade smart plugs have a minimum measurable load of 0.3-0.5 W. Anything below that is rounded down to zero, even though the bulb does consume standby power.
+
+Try the following steps in order.
+
+### Measure multiple bulbs in parallel
+
+If you have more than one identical bulb, connect them in parallel and measure their combined standby power.
+
+Example:
+
+- Expected standby: ~0.2 W per bulb
+- With 4 bulbs: ~0.8 W total, which is usually measurable
+
+Make sure to have a group in Home Assistant that turns all bulbs on and off simultaneously during measurement. In the measure tool wizard select `yes` when asked `Are you measuring multiple lights?`, then enter the number of bulbs you are measuring.
+
+### Add a dummy load
+
+Some smart plugs require a stable resistive load before they can measure accurately. Use a small incandescent bulb (e.g., 25-40 W) as a dummy load on the same circuit. An oven bulb is a good choice since it uses little power and is easy to find.
+
+!!! warning
+
+    Do **not** use an LED bulb as a dummy load.
+    LED bulbs are not stable resistive loads and will cause fluctuating or inaccurate readings.
+
+The power meter must also provide voltage readings so the measure tool can calculate and subtract the dummy-load consumption. In the Home Assistant app, let the load warm up before starting its inline calibration. Calibration samples at least 20 periods of 30 seconds and continues if the calculated resistance is not stable. Keep the same dummy load connected for the entire measurement.
+
+### Try a different smart plug or energy meter
+
+Not all smart meters can measure sub-watt loads. If possible, try another brand or model known for decent low-load accuracy.
+
+Examples:
+
+- Good: many Tasmota-based plugs, Shelly Plug Gen3, Blitzwolf/Nous plugs
+- Less accurate: older Shelly Plug S, many Tuya-based plugs below 0.5 W
+
+### Standby is too low to measure
+
+If none of the above methods help, the bulb's standby consumption is likely below the accuracy threshold of your meter. In that case the measurement tool cannot determine a reliable value.
+
+You may manually set a fallback estimate (e.g., 0.2 W), but actual measurement is always preferred when possible. When doing this please note it in the PR description when submitting your measurements.
 
 ## Readings are stale or repeated
 

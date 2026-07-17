@@ -5,12 +5,98 @@ import time
 from typing import Any
 from unittest.mock import MagicMock, patch
 
-from measure.powermeter.errors import ApiConnectionError
+from measure.const import Trend
+from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
-from measure.util.measure_util import MeasureUtil
+from measure.util.measure_util import (
+    AverageMeasurementState,
+    DummyLoadMeasurementError,
+    MeasureUtil,
+    NoValidReadingsError,
+)
 import pytest
 
 from tests.conftest import MockConfigFactory
+
+
+@pytest.mark.parametrize(
+    ("values", "expected"),
+    [
+        ([1.0, 2.0, 3.0], 1.0),
+        ([3.0, 2.0, 1.0], -1.0),
+        ([4.0], 0.0),
+    ],
+)
+def test_linear_slope_does_not_require_numpy(values: list[float], expected: float) -> None:
+    assert MeasureUtil._linear_slope(values) == pytest.approx(expected)  # noqa: SLF001
+
+
+@pytest.mark.parametrize(
+    ("averages", "expected"),
+    [
+        # Sub-threshold drift on a high-ohm load (0.5 Ω/sample on ~6.2 kΩ) is meter noise, not a trend
+        ([6226.0 + 0.5 * index for index in range(20)], Trend.STEADY),
+        # Real warm-up drift still registers regardless of resistance magnitude
+        ([6000.0 + 10.0 * index for index in range(20)], Trend.INCREASING),
+        ([6000.0 - 10.0 * index for index in range(20)], Trend.DECREASING),
+        # The relative threshold keeps its sensitivity on low-ohm loads such as incandescent bulbs
+        ([40.0 + 0.05 * index for index in range(20)], Trend.INCREASING),
+        # Halves disagreeing on direction means the load has settled
+        ([6000.0 + 10.0 * index for index in range(10)] + [6100.0 - 10.0 * index for index in range(10)], Trend.STEADY),
+    ],
+)
+def test_dummy_load_trend_uses_relative_threshold(averages: list[float], expected: Trend) -> None:
+    assert MeasureUtil.dummy_load_trend(averages) == expected
+
+
+def test_dummy_load_trend_requires_twenty_samples() -> None:
+    assert MeasureUtil.dummy_load_trend([6226.0] * 19) is None
+
+
+def test_no_valid_average_readings_raise_typed_error(mock_config_factory: MockConfigFactory) -> None:
+    measure_util = MeasureUtil(MagicMock(PowerMeter), mock_config_factory())
+    empty = AverageMeasurementState(start_time=0, readings=[], snapshots=[], voltages=[])
+
+    with (
+        patch.object(measure_util, "_collect_average_measurements", return_value=empty),
+        pytest.raises(NoValidReadingsError),
+    ):
+        measure_util.take_average_measurement(1)
+
+
+def test_dummy_load_requires_voltage_support(mock_config_factory: MockConfigFactory) -> None:
+    power_meter = MagicMock(PowerMeter)
+    power_meter.has_voltage_support.return_value = False
+    measure_util = MeasureUtil(power_meter, mock_config_factory())
+
+    with pytest.raises(UnsupportedFeatureError):
+        measure_util.set_dummy_load_resistance(42.5)
+
+
+def test_dummy_load_emits_corrected_sample(mock_config_factory: MockConfigFactory) -> None:
+    power_meter = MagicMock(PowerMeter)
+    power_meter.has_voltage_support.return_value = True
+    power_meter.get_power.return_value = PowerMeasurementResult(power=20.0, voltage=10.0, updated=time.time())
+    samples: list[float] = []
+    measure_util = MeasureUtil(power_meter, mock_config_factory(), on_sample=samples.append)
+    measure_util.set_dummy_load_resistance(10.0)
+
+    result = measure_util.take_measurement()
+
+    assert result.power == pytest.approx(10.0)
+    assert samples
+    assert all(sample == pytest.approx(10.0) for sample in samples)
+
+
+def test_dummy_load_rejects_non_positive_corrected_power(mock_config_factory: MockConfigFactory) -> None:
+    power_meter = MagicMock(PowerMeter)
+    power_meter.has_voltage_support.return_value = True
+    power_meter.get_power.return_value = PowerMeasurementResult(power=10.0, voltage=10.0, updated=time.time())
+    measure_util = MeasureUtil(power_meter, mock_config_factory())
+    measure_util.set_dummy_load_resistance(10.0)
+
+    with pytest.raises(DummyLoadMeasurementError, match="non-positive target power"):
+        measure_util.take_measurement()
 
 
 class _ErrorThenSuccessPowerMeter(PowerMeter):

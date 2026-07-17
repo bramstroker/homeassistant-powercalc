@@ -3,7 +3,8 @@ name: Generate plots
 on:
   push:
     paths:
-      - '**/*.csv.gz'
+      - 'profile_library/**/*.csv.gz'
+      - 'profile_library/**/model.json'
     branches:
       - master
   workflow_dispatch:
@@ -23,13 +24,14 @@ jobs:
           persist-credentials: true
       - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
         with:
-          working-directory: './utils/visualize'
+          version: '0.10.10'
+          working-directory: './utils/measure'
           enable-cache: true
           cache-dependency-glob: |
             pyproject.toml
             uv.lock
       - name: Run visualization tool
-        run: bash ./utils/visualize/generate-all.sh ./profile_library
+        run: uv --project utils/measure run --group visualize powercalc-visualize ./profile_library --force
       - uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10
         if: github.ref == 'refs/heads/master'
         with:

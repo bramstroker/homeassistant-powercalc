@@ -19,7 +19,7 @@ Also you only need to download the profiles you actually use, saving bandwidth a
 
 For more information about the library structure, See [structure](structure.md).
 
-To contribute new profiles see the [measure](../contributing/measure.md) section.
+To contribute new profiles see the [measure](../contributing/measure/index.md) section.
 
 More information about how to setup specific device types can be found in the [device types](device-types/index.md) section.
 
@@ -68,7 +68,7 @@ Once the update process is complete, a discovery routine will be initiated to po
 
 - *At Each Startup*: The library checks for updates whenever the system is started.
 - *Every Two Hours*: Updates are scheduled to run automatically every two hours.
-- *Manual Trigger*: Updates can also be initiated manually by invoking the action [`powecalc.update_library`](../actions/update-library.md).
+- *Manual Trigger*: Updates can also be initiated manually by invoking the action [`powercalc.update_library`](../actions/update-library.md).
 
 This ensures that you always have the latest power profiles available, without the need to restart HA.
 
@@ -77,4 +77,4 @@ This ensures that you always have the latest power profiles available, without t
 Powercalc keeps track of hashes per profile to determine if a profile has changed.
 The file which contains the hashes is located at `config/.storage/powercalc_profiles/.profile_hashes`
 
-To force a redownload of all profiles, you can delete this file and restart HA or call the [`powecalc.update_library`](../actions/update-library.md) action.
+To force a redownload of all profiles, you can delete this file and restart HA or call the [`powercalc.update_library`](../actions/update-library.md) action.

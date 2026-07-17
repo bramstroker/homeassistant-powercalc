@@ -4,7 +4,7 @@ There are several ways to contribute to Powercalc.
 You can help with the providing new measurements, development, documentation, translations, or by creating tutorials and videos.
 Every contribution is welcome!
 
-## [Measuring / Submitting Power Profiles](measure/measure.md)
+## [Measuring / Submitting Power Profiles](measure/index.md)
 
 Help expand the library of supported devices by measuring and submitting power profiles. This involves:
 
@@ -24,7 +24,7 @@ Contribute to the codebase by:
 
 We strive for 100% test coverage to maintain a robust integration.
 
-## [Translating](translations.md)
+## [Translating](translating.md)
 
 Make Powercalc accessible to more users by:
 

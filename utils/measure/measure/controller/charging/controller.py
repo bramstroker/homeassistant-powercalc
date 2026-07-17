@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from measure.controller.answerable_protocol import Answerable
 
-
-class ChargingController(Answerable, Protocol):
+class ChargingController(Protocol):
     def get_battery_level(self) -> int:
         """Get actual battery level of the device"""
         ...

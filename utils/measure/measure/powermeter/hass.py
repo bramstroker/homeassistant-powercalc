@@ -1,45 +1,48 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 import time
-from typing import Any
 
-from homeassistant_api import Client, Entity
-import inquirer
-
-from measure.const import QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON
-from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID
+from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
-from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter, PowerMeterDiagnosticSample
 
 
 class HassPowerMeter(PowerMeter):
-    def __init__(self, api_url: str, token: str, call_update_entity: bool) -> None:
+    def __init__(
+        self,
+        home_assistant: HomeAssistantManager,
+        call_update_entity: bool,
+        *,
+        entity_id: str | None = None,
+        voltage_entity_id: str | None = None,
+        wait: Callable[[float], None] = time.sleep,
+    ) -> None:
         self._call_update_entity = call_update_entity
-        self._entity_id: str | None = None
-        self._voltage_entity_id: str | None = None
-        self._entities: list[Entity] | None = None
-        try:
-            self.client = Client(api_url, token)
-        except Exception as e:
-            raise PowerMeterError(f"Failed to connect to HA API: {e}") from e
+        self._entity_id = entity_id
+        self._voltage_entity_id = voltage_entity_id
+        self._wait = wait
+        self.client = home_assistant
 
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
-        """Get a new power reading from Hass-API. Optionally include voltage."""
+        """Get a new power reading from Home Assistant. Optionally include voltage."""
         if self._call_update_entity:
             self.client.trigger_service(
                 "homeassistant",
                 "update_entity",
                 entity_id=self._entity_id,
             )
-            time.sleep(1)
+            self._wait(1)
 
         state = self.client.get_state(entity_id=self._entity_id)
         if state.state == "unavailable":
             raise PowerMeterError(f"Power sensor {self._entity_id} unavailable")
-        last_updated = state.last_updated.timestamp()
+        last_updated = state.last_updated.timestamp() if state.last_updated is not None else time.time()
         power_value = float(state.state)
 
-        if include_voltage and not self.has_voltage_support():
+        # Availability of the voltage entity is checked by the read below; avoid the
+        # extra has_voltage_support() round-trip on every measurement.
+        if include_voltage and not self._voltage_entity_id:
             raise UnsupportedFeatureError("Voltage sensor entity not found.")
 
         if include_voltage:
@@ -65,79 +68,15 @@ class HassPowerMeter(PowerMeter):
             raise PowerMeterError(f"Voltage sensor {self._voltage_entity_id} unavailable")
         return True
 
-    def autodetect_voltage_entity(self, power_entity: str) -> bool:
-        """Try to find a matching voltage entity for the current power entity."""
-        matched_sensors = self.match_power_and_voltage_sensors()
+    def diagnostic_sample(self) -> PowerMeterDiagnosticSample:
+        """Read the raw HA state and its source reporting timestamp without forcing an update."""
 
-        if not matched_sensors or power_entity not in matched_sensors:
-            # no match found for our power sensor
-            return False
-
-        self._voltage_entity_id = matched_sensors.get(power_entity)
-        return True
-
-    def get_questions(self) -> list[inquirer.questions.Question]:
-        def _should_skip_voltage_sensor_question(answers: dict[str, Any]) -> bool:
-            """Determine if the voltage sensor question should be asked."""
-            if not answers.get(QUESTION_DUMMY_LOAD, False) and not answers.get(QUESTION_GENERATE_MODEL_JSON, False):
-                return True
-            power_entity = answers.get(QUESTION_POWERMETER_ENTITY_ID)
-            if power_entity and self.autodetect_voltage_entity(power_entity):
-                return True
-            return not self.get_voltage_sensors()
-
-        power_sensor_list = self.get_power_sensors()
-        return [
-            inquirer.List(
-                name=QUESTION_POWERMETER_ENTITY_ID,
-                message="Select the powermeter",
-                choices=power_sensor_list,
-            ),
-            inquirer.List(
-                name=QUESTION_VOLTAGEMETER_ENTITY_ID,
-                message="Select the voltage sensor",
-                choices=lambda answers: self.get_voltage_sensors(),
-                ignore=_should_skip_voltage_sensor_question,
-            ),
-        ]
-
-    def get_power_sensors(self) -> list[str]:
-        return self.get_entities_by_unit_of_measurement("W")
-
-    def get_voltage_sensors(self) -> list[str]:
-        return self.get_entities_by_unit_of_measurement("V")
-
-    def get_entities_by_unit_of_measurement(self, unit_of_measurement: str) -> list[str]:
-        return sorted(
-            [
-                entity.entity_id
-                for entity in self.get_entities()
-                if entity.state.attributes.get("unit_of_measurement") == unit_of_measurement
-            ],
+        state = self.client.get_state(entity_id=self._entity_id)
+        if state.state in {"unavailable", "unknown"}:
+            raise PowerMeterError(f"Power sensor {self._entity_id} {state.state}")
+        reported = state.last_reported or state.last_updated
+        return PowerMeterDiagnosticSample(
+            power=float(state.state),
+            raw_value=state.state,
+            reported_at=reported.timestamp() if reported is not None else time.time(),
         )
-
-    def get_entities(self) -> list[Entity]:
-        if not self._entities:
-            entities = self.client.get_entities()
-            self._entities = list(entities["sensor"].entities.values())
-        return self._entities
-
-    def match_power_and_voltage_sensors(self) -> dict[str, str]:
-        power_sensors = self.get_power_sensors()
-        voltage_sensors = self.get_voltage_sensors()
-
-        # Create mappings based on base names
-        power_map = {sensor.rsplit("_power", 1)[0]: sensor for sensor in power_sensors}
-        voltage_map = {sensor.rsplit("_voltage", 1)[0]: sensor for sensor in voltage_sensors}
-
-        matched_sensors = {}
-        for base_name, power_sensor in power_map.items():
-            if base_name in voltage_map:
-                matched_sensors[power_sensor] = voltage_map[base_name]
-
-        return matched_sensors
-
-    def process_answers(self, answers: dict[str, Any]) -> None:
-        self._entity_id = answers[QUESTION_POWERMETER_ENTITY_ID]
-        if QUESTION_VOLTAGEMETER_ENTITY_ID in answers:
-            self._voltage_entity_id = answers[QUESTION_VOLTAGEMETER_ENTITY_ID]

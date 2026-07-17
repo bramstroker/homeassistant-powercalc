@@ -1,0 +1,160 @@
+name: Prepare Measure Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Measure version without the measure-v prefix
+        required: true
+        type: string
+      dry_run:
+        description: Validate and preview without creating a branch or pull request
+        required: false
+        default: false
+        type: boolean
+
+permissions: {}
+
+concurrency:
+  group: prepare-measure-release-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare release pull request
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: '0.10.10'
+          working-directory: './utils/measure'
+          python-version: '3.14'
+          enable-cache: true
+          cache-dependency-glob: |
+            pyproject.toml
+            uv.lock
+      - name: Validate version and load draft notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid semantic version: $VERSION" >&2
+            exit 1
+          fi
+
+          tag="measure-v${VERSION}"
+          release_id=$(gh api "repos/${REPOSITORY}/releases" --paginate \
+            --jq ".[] | select(.draft == true and .tag_name == \"${tag}\") | .id")
+          if [[ -z "$release_id" ]]; then
+            echo "No draft release found for ${tag}" >&2
+            exit 1
+          fi
+
+          gh api "repos/${REPOSITORY}/releases/${release_id}" --jq '.body' > "$RUNNER_TEMP/measure-release-notes.md"
+      - name: Preview release changes
+        if: inputs.dry_run
+        working-directory: utils/measure
+        env:
+          VERSION: ${{ inputs.version }}
+        run: >-
+          uv run python prepare_app_release.py "$VERSION"
+          --notes-file "$RUNNER_TEMP/measure-release-notes.md"
+          --dry-run
+      - name: Check out release branch
+        id: release_branch
+        if: ${{ !inputs.dry_run }}
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          branch="release/measure-v${VERSION}"
+          git fetch origin master
+          if git fetch origin "$branch"; then
+            echo "expected_sha=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+          git checkout -B "$branch" origin/master
+      - name: Prepare release files
+        if: ${{ !inputs.dry_run }}
+        working-directory: utils/measure
+        env:
+          VERSION: ${{ inputs.version }}
+        run: >-
+          uv run python prepare_app_release.py "$VERSION"
+          --notes-file "$RUNNER_TEMP/measure-release-notes.md"
+      - name: Validate prepared release files
+        if: ${{ !inputs.dry_run }}
+        working-directory: utils/measure
+        run: |
+          uv run --extra dev pytest -qq tests/test_prepare_app_release.py
+          ruby home-assistant-app/validate.rb
+      - name: Commit and push release branch
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA: ${{ steps.release_branch.outputs.expected_sha }}
+        run: |
+          if git diff --quiet; then
+            echo "Release files are already prepared for ${VERSION}" >&2
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            utils/measure/frontend/package.json \
+            utils/measure/frontend/package-lock.json \
+            utils/measure/home-assistant-app/powercalc_measure/CHANGELOG.md \
+            utils/measure/home-assistant-app/powercalc_measure/config.yaml
+          git commit \
+            -m "Keep Measure App release metadata aligned for ${VERSION}" \
+            -m "The Release Drafter notes and every runtime version source are advanced together before publication." \
+            -m "Constraint: The Home Assistant app store reads its changelog and version from mirrored metadata" \
+            -m "Confidence: high" \
+            -m "Scope-risk: narrow" \
+            -m "Tested: prepare_app_release.py validated all release files"
+
+          branch="release/measure-v${VERSION}"
+          repository_url="https://x-access-token:${GH_TOKEN}@github.com/${REPOSITORY}.git"
+          if [[ -n "$EXPECTED_SHA" ]]; then
+            git push --force-with-lease="refs/heads/${branch}:${EXPECTED_SHA}" "$repository_url" "HEAD:${branch}"
+          else
+            git push "$repository_url" "HEAD:${branch}"
+          fi
+      - name: Open or update release pull request
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          branch="release/measure-v${VERSION}"
+          pull_request=$(gh pr list --head "$branch" --state open --json number --jq '.[0].number')
+          if [[ -z "$pull_request" ]]; then
+            gh pr create \
+              --base master \
+              --head "$branch" \
+              --title "Release Powercalc Measure ${VERSION}" \
+              --body "Prepares the shared Measure version metadata and Home Assistant changelog for \`measure-v${VERSION}\`." \
+              --label measure-tool \
+              --label skip-changelog
+          else
+            echo "Release pull request #${pull_request} is already open"
+          fi
+      - name: Run Measure release checks
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: gh workflow run test-measure.yml --ref "release/measure-v${VERSION}"

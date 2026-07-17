@@ -1,11 +1,11 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-from homeassistant_api import Client, State
+from homeassistant_api import State
 from homeassistant_api.errors import HomeassistantAPIError
-from measure.const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
 from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.hass import HassLightController
+from measure.home_assistant import HomeAssistantManager
 import pytest
 
 
@@ -30,11 +30,11 @@ def test_get_light_info(attributes: dict[str, int], min_mired: int, max_mired: i
         state="on",
         attributes=attributes,
     )
-    with patch.object(Client, "get_state", return_value=mocked_state):
-        hass_controller = _get_instance()
-        light_info = hass_controller.get_light_info()
-        assert light_info.get_min_mired() == min_mired
-        assert light_info.get_max_mired() == max_mired
+    client = _mock_client()
+    client.get_state.return_value = mocked_state
+    light_info = _get_instance(client).get_light_info()
+    assert light_info.get_min_mired() == min_mired
+    assert light_info.get_max_mired() == max_mired
 
 
 def test_effect_list() -> None:
@@ -43,9 +43,9 @@ def test_effect_list() -> None:
         state="on",
         attributes={"effect_list": ["A", "B", "C"]},
     )
-    with patch.object(Client, "get_state", return_value=mocked_state):
-        hass_controller = _get_instance()
-        assert hass_controller.get_effect_list() == ["A", "B", "C"]
+    client = _mock_client()
+    client.get_state.return_value = mocked_state
+    assert _get_instance(client).get_effect_list() == ["A", "B", "C"]
 
 
 def test_has_effect_support() -> None:
@@ -79,75 +79,41 @@ def test_has_effect_support() -> None:
     ],
 )
 def test_change_light_state(mode: LutMode, call_kwargs: dict, trigger_service_body: dict) -> None:
-    hass_controller = _get_instance()
-    with patch.object(
-        Client,
-        "trigger_service",
-        return_value=None,
-    ) as mock_trigger_service:
-        hass_controller.process_answers({QUESTION_ENTITY_ID: "light.test", QUESTION_MODEL_ID: "test"})
-        hass_controller.change_light_state(mode, on=True, **call_kwargs)
-
-        mock_trigger_service.assert_called_once_with("light", "turn_on", entity_id="light.test", **trigger_service_body)
+    client = _mock_client()
+    _get_instance(client).change_light_state(mode, on=True, **call_kwargs)
+    client.trigger_service.assert_called_once_with("light", "turn_on", entity_id="light.test", **trigger_service_body)
 
 
 def test_turn_off() -> None:
-    hass_controller = _get_instance()
-    with patch.object(
-        Client,
-        "trigger_service",
-        return_value=None,
-    ) as mock_trigger_service:
-        hass_controller.process_answers({QUESTION_ENTITY_ID: "light.test", QUESTION_MODEL_ID: "test"})
-        hass_controller.change_light_state(LutMode.BRIGHTNESS, on=False)
-
-        mock_trigger_service.assert_called_once_with("light", "turn_off", entity_id="light.test")
+    client = _mock_client()
+    _get_instance(client).change_light_state(LutMode.BRIGHTNESS, on=False)
+    client.trigger_service.assert_called_once_with("light", "turn_off", entity_id="light.test")
 
 
 def test_change_light_state_error() -> None:
-    hass_controller = _get_instance()
-    with (
-        patch.object(
-            Client,
-            "trigger_service",
-            side_effect=HomeassistantAPIError("Error"),
-        ),
-        pytest.raises(ApiConnectionError),
-    ):
-        hass_controller.change_light_state(LutMode.BRIGHTNESS, on=True, bri=100)
+    client = _mock_client()
+    client.trigger_service.side_effect = HomeassistantAPIError("Error")
+    controller = _get_instance(client)
+    with pytest.raises(ApiConnectionError):
+        controller.change_light_state(LutMode.BRIGHTNESS, on=True, bri=100)
 
 
 def test_connection_validation() -> None:
-    with (
-        patch.object(
-            Client,
-            "get_config",
-            side_effect=HomeassistantAPIError("Error"),
-        ),
-        pytest.raises(ApiConnectionError),
-    ):
-        HassLightController("http://localhost:812", "abc", 0)
+    client = _mock_client()
+    client.get_config.side_effect = HomeassistantAPIError("Error")
+    with pytest.raises(ApiConnectionError):
+        HassLightController(client, 0)
 
 
-def test_get_questions() -> None:
-    hass_controller = _get_instance()
-    with patch.object(
-        Client,
-        "get_entities",
-        return_value={
-            "light": MagicMock(
-                entities={
-                    "light.test1": MagicMock(entity_id="light.test1"),
-                    "light.test2": MagicMock(entity_id="light.test2"),
-                },
-            ),
-        },
-    ):
-        questions = hass_controller.get_questions()
-        assert len(questions) == 1
-        assert questions[0].name == QUESTION_ENTITY_ID
-        assert questions[0].choices == ["light.test1", "light.test2"]
+def _get_instance(client: MagicMock | None = None) -> HassLightController:
+    return HassLightController(
+        client or _mock_client(),
+        0,
+        entity_id="light.test",
+    )
 
 
-def _get_instance() -> HassLightController:
-    return HassLightController("http://localhost:812", "abc", 0)
+def _mock_client() -> MagicMock:
+    client = MagicMock(spec=HomeAssistantManager)
+    client.get_config.return_value = {}
+    return client

@@ -4,10 +4,7 @@ import ocr
 
 
 def main() -> None:
-    """
-    Handles command line arguments and begins the real-time OCR by calling ocr_stream().
-    A path to the Tesseract cmd root is required.
-    """
+    """Parse OCR CLI arguments and start the realtime stream."""
     parser = argparse.ArgumentParser()
 
     required_named = parser.add_argument_group("required named arguments")
