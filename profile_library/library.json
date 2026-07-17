@@ -3756,11 +3756,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "color_temp",
-            "hs",
-            "brightness"
+            "hs"
           ],
-          "hash": "dabbc76f6f7efdcd1d76c8cf3fcd2edc"
+          "hash": "139aa396b540695951342ca7cb16b1da"
         },
         {
           "calculation_strategy": "lut",
@@ -3787,10 +3787,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "f105a65565022ea3e406fe78a7c285ed"
+          "hash": "b1235a3c7c29aa872b3999de56811603"
         },
         {
           "calculation_strategy": "lut",
@@ -3933,10 +3933,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "19567111fa8c1d6d59d006ec430b832c"
+          "hash": "b1ee25ee173313e338cf28b60fe0b3e2"
         },
         {
           "calculation_strategy": "lut",
@@ -3962,10 +3962,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "005006a86480d47dceedfd79278efc71"
+          "hash": "ab58b23094d3180ec5ce0249ff019ee0"
         },
         {
           "calculation_strategy": "lut",
@@ -3991,10 +3991,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "742ad6d56ddd255eda6ec7dced5b49c8"
+          "hash": "5ca77e866faa0ed82e2c8fe9dfab0b52"
         },
         {
           "calculation_strategy": "lut",
@@ -4050,10 +4050,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "97712dc5a0c9a927bf106a90da2fca28"
+          "hash": "476942fae5bc38e95ba3d2ab256eccfa"
         }
       ],
       "device_types": [
@@ -5190,10 +5190,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "7bdb4308f66a32f54dce1f071f6f6447"
+          "hash": "b98cb2d7aead9e73a91f285b8831418f"
         },
         {
           "calculation_strategy": "lut",
@@ -6340,11 +6340,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "color_temp",
-            "hs",
-            "brightness"
+            "hs"
           ],
-          "hash": "a8187a1e79fa85ecbb7fa99cd6f14c2e"
+          "hash": "a78c57acf6f7c9ecbed7f7079839d05f"
         }
       ],
       "device_types": [
@@ -10193,10 +10193,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
-          "hash": "10e331012803216aeb5a067380f2a12c"
+          "hash": "bfd2798a9f79cbddecea99b3a8d24f87"
         },
         {
           "aliases": [
@@ -10381,11 +10381,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "color_temp",
-            "hs",
-            "brightness"
+            "hs"
           ],
-          "hash": "c2f2c6d822981fa64df9760f432c419f"
+          "hash": "23e48260f4bd34fd9afe96931cf5b740"
         }
       ],
       "device_types": [
@@ -11411,17 +11411,22 @@
           },
           "name": "A60 RGB-CCT E27 806lm",
           "standby_power": 0.9,
+          "author_info": {
+            "name": "erdo",
+            "github": null,
+            "email": "erdo@ichalsroot.de"
+          },
           "id": "970714",
           "manufacturer": "lsc",
-          "updated_at": "2026-07-15T16:15:39",
+          "updated_at": "2026-07-17T05:56:53",
           "max_power": 9.9,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "66984efaccaba899ed3c9917cbe07d9a"
+          "hash": "6e385c6d7b7464b1d232e8611ed07847"
         }
       ],
       "device_types": [
@@ -12211,10 +12216,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "251aa55b9bc8160db2eff79acec0fbf9"
+          "hash": "a6b95b20f3657594489a8e3162d716b4"
         },
         {
           "calculation_strategy": "fixed",
@@ -12801,10 +12806,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "bf09a3048060bf7e5d764dd9430b11a3"
+          "hash": "8a115ef44ae43c25b37dbc7b0906c15c"
         },
         {
           "aliases": [
@@ -13004,10 +13009,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "0a3a2fa84bd97c66778da7f14dd593c5"
+          "hash": "e99ec54cf0f164de9d3b87702d016a55"
         },
         {
           "calculation_strategy": "lut",
@@ -14026,10 +14031,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "129010e7095a3b70d1fe8c2eb462df7a"
+          "hash": "b7bef1cbf34debcfe0fd63fbef0f4b67"
         },
         {
           "calculation_strategy": "lut",
@@ -14471,10 +14476,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "83e36a05280fa99512f49a4a3db9a82e"
+          "hash": "eddc89c69ab518f92d432edca4de91bd"
         },
         {
           "calculation_strategy": "lut",
@@ -16139,10 +16144,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "effect"
+            "effect",
+            "brightness"
           ],
-          "hash": "3d1193b2b444af35d122475a287dfd31"
+          "hash": "a20cceb246cdbc5bc88bf09659371279"
         },
         {
           "calculation_strategy": "lut",
@@ -16726,10 +16731,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "7efe4aff8dcb505c7ef280d54538bd25"
+          "hash": "e3e07299739a51963f089e11b223b15c"
         },
         {
           "calculation_strategy": "lut",
@@ -16932,10 +16937,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "8bfc12d5e948366820260f3271fd9718"
+          "hash": "0fd6b692576407dc49820f1b42bfc4a8"
         },
         {
           "aliases": [
