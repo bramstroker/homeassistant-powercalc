@@ -31,13 +31,13 @@ Run the tool from the directory that contains `.env`.
 === "Linux and macOS"
 
     ```bash
-    docker run --pull=always --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
+    docker run --pull=always --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure-cli:latest
     ```
 
 === "Windows command prompt"
 
     ```bat
-    docker run --pull=always --rm --name=measure --env-file=.env -v %CD%/export:/app/export -v %CD%/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
+    docker run --pull=always --rm --name=measure --env-file=.env -v %CD%/export:/app/export -v %CD%/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure-cli:latest
     ```
 
 When using PowerShell, use full absolute paths for the mounted directories.

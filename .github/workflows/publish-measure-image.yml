@@ -7,14 +7,15 @@ on:
     paths:
       - 'utils/measure/**'
       - '.github/actions/build-measure-docker/**'
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
-      publish_cli_image:
-        description: Also build and publish the standalone measure CLI image
-        type: boolean
-        default: false
+      release_tag:
+        description: >-
+          Measure release tag to publish, for example measure-v0.1.0.
+          Dispatched automatically on that tag by the Measure Release workflow;
+          re-run it manually with an existing tag to republish a release.
+        required: true
+        type: string
 
 env:
   APP_ARCHITECTURES: '["amd64", "aarch64"]'
@@ -22,10 +23,7 @@ env:
 
 jobs:
   docker:
-    if: >-
-      github.event_name == 'push' ||
-      (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'measure-v')) ||
-      (github.event_name == 'workflow_dispatch' && inputs.publish_cli_image)
+    if: github.event_name == 'push' || inputs.release_tag != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -35,38 +33,27 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
-      - name: Read measure version
+      - name: Prepare CLI release version
         if: github.event_name != 'push'
         id: measure
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
           version=$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV.fetch(0))).fetch("version")' utils/measure/home-assistant-app/powercalc_measure/config.yaml)
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-      - name: Validate release tag
-        if: github.event_name == 'release'
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-          VERSION: ${{ steps.measure.outputs.version }}
-        run: |
-          expected_tag="measure-v${VERSION}"
-          if [[ "$RELEASE_TAG" != "$expected_tag" ]]; then
-            echo "Release tag ${RELEASE_TAG} does not match measure version ${VERSION}" >&2
+          if [[ "$RELEASE_TAG" != "measure-v${version}" ]]; then
+            echo "Release tag ${RELEASE_TAG} does not match measure version ${version}" >&2
             exit 1
           fi
-      - name: Write CLI version file
-        if: github.event_name != 'push'
-        run: 'echo "v${VERSION}:cli" > utils/measure/.VERSION'
-        env:
-          VERSION: ${{ steps.measure.outputs.version }}
+          echo "v${version}:cli" > utils/measure/.VERSION
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ghcr.io/bramstroker/measure
-            bramgerritsen/powercalc-measure
-          flavor: |
-            latest=auto
+            ghcr.io/bramstroker/powercalc-measure-cli
+            bramgerritsen/powercalc-measure-cli
           # generate Docker tags based on the following events/attributes
           tags: |
             type=ref,event=branch
@@ -93,9 +80,7 @@ jobs:
 
   home-assistant-app-init:
     name: Initialize Home Assistant app build
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'measure-v'))
+    if: inputs.release_tag != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -113,22 +98,17 @@ jobs:
         uses: frenck/action-addon-linter@f995494fd84fae6310d23617e66d0e37de4f14eb # v2.21.0
         with:
           path: ./utils/measure/home-assistant-app/powercalc_measure
-      - name: Read app version
+      - name: Read and validate app version
         id: app
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
           version=$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV.fetch(0))).fetch("version")' utils/measure/home-assistant-app/powercalc_measure/config.yaml)
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-      - name: Validate release tag
-        if: github.event_name == 'release'
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-          VERSION: ${{ steps.app.outputs.version }}
-        run: |
-          expected_tag="measure-v${VERSION}"
-          if [[ "$RELEASE_TAG" != "$expected_tag" ]]; then
-            echo "Release tag ${RELEASE_TAG} does not match app version ${VERSION}" >&2
+          if [[ "$RELEASE_TAG" != "measure-v${version}" ]]; then
+            echo "Release tag ${RELEASE_TAG} does not match app version ${version}" >&2
             exit 1
           fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
       - name: Prepare architecture matrix
         id: matrix
         uses: home-assistant/builder/actions/prepare-multi-arch-matrix@4de35182ce1e329181bffcbcc84d33db5e2c7e10 # 2026.06.0
@@ -138,7 +118,6 @@ jobs:
 
   home-assistant-app-build:
     name: Build Home Assistant app (${{ matrix.arch }})
-    if: needs.home-assistant-app-init.result == 'success'
     needs: home-assistant-app-init
     runs-on: ${{ matrix.os }}
     permissions:
@@ -244,4 +223,72 @@ jobs:
             # The token is supplied only for this push instead of being
             # persisted in .git/config by actions/checkout.
             git push "https://x-access-token:${APPS_REPO_TOKEN}@github.com/bramstroker/powercalc-measure-app.git" HEAD
+          fi
+
+  # Publishes the GitHub release in the app-store repository and clears the
+  # rolling measure-next draft here. The release object must live in
+  # powercalc-measure-app: a published measure-v* release in this repository
+  # would be picked up by HACS as a Powercalc integration version.
+  finalize-release:
+    name: Publish app repository release
+    if: github.repository == 'bramstroker/homeassistant-powercalc'
+    needs:
+      - home-assistant-app-init
+      - publish-app-repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - name: Extract release notes from changelog
+        env:
+          VERSION: ${{ needs.home-assistant-app-init.outputs.version }}
+        run: |
+          python3 - "$VERSION" > "$RUNNER_TEMP/measure-release-notes.md" <<'EOF'
+          import pathlib
+          import re
+          import sys
+
+          version = sys.argv[1]
+          changelog = pathlib.Path("utils/measure/home-assistant-app/powercalc_measure/CHANGELOG.md").read_text(encoding="utf-8")
+          match = re.search(
+              rf"^## {re.escape(version)} - [0-9-]+\n(?P<notes>.*?)(?=^## |\Z)",
+              changelog,
+              re.MULTILINE | re.DOTALL,
+          )
+          if match is None:
+              sys.exit(f"Changelog has no released section for {version}")
+          notes = match.group("notes").strip()
+          if not notes:
+              sys.exit(f"Changelog section for {version} is empty")
+          print(notes)
+          EOF
+      - name: Create release in app repository
+        env:
+          GH_TOKEN: ${{ secrets.APPS_REPO_TOKEN }}
+          VERSION: ${{ needs.home-assistant-app-init.outputs.version }}
+        run: |
+          if gh release view "v${VERSION}" --repo bramstroker/powercalc-measure-app > /dev/null 2>&1; then
+            echo "Release v${VERSION} already exists in powercalc-measure-app"
+          else
+            gh release create "v${VERSION}" \
+              --repo bramstroker/powercalc-measure-app \
+              --title "Powercalc Measure v${VERSION}" \
+              --notes-file "$RUNNER_TEMP/measure-release-notes.md"
+          fi
+      - name: Clear rolling draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          release_id=$(gh api "repos/${REPOSITORY}/releases" --paginate \
+            --jq '.[] | select(.draft == true and .tag_name == "measure-next") | .id' | head -n 1)
+          if [[ -n "$release_id" ]]; then
+            gh api -X DELETE "repos/${REPOSITORY}/releases/${release_id}"
+            echo "Removed rolling measure-next draft"
+          else
+            echo "No rolling measure-next draft to remove"
           fi
