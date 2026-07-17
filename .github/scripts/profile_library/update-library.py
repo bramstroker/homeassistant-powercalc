@@ -429,6 +429,10 @@ async def get_commit_author(commit_hash: str) -> Author | None:
 
     commit = data.get("commit")
     author = data.get("author")
+    if not author:
+        # Commit email is not linked to a GitHub account, so we cannot determine the username.
+        # Skip rather than writing a null github field, which violates the model schema.
+        return None
 
     email = commit["author"]["email"]
     if email.endswith("@users.noreply.github.com"):
@@ -436,7 +440,7 @@ async def get_commit_author(commit_hash: str) -> Author | None:
     return Author(
         name=commit["author"]["name"].replace("@", ""),
         email=email,
-        github_username=author["login"] if author else None,
+        github_username=author["login"],
     )
 
 async def find_first_commit_author(file: str, check_paths: bool = True) -> Author | None:
