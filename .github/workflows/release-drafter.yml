@@ -35,17 +35,13 @@ jobs:
             echo "$section"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+      # Measure changelog entries are collected separately by the Measure
+      # Release workflow: a published measure-v* release here would be picked
+      # up by HACS as a Powercalc integration version.
       - name: Update integration release draft
         uses: release-drafter/release-drafter@4d75298e00d9e34c483e5ff8c68d0ea1c1940c1e # v7
         with:
           footer: ${{ steps.supporters.outputs.value }}
           config-name: release-drafter.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update Measure release draft
-        if: github.ref_name == 'master'
-        uses: release-drafter/release-drafter@4d75298e00d9e34c483e5ff8c68d0ea1c1940c1e # v7
-        with:
-          config-name: release-drafter-measure.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

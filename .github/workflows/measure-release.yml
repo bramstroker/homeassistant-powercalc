@@ -1,0 +1,82 @@
+name: Measure Release
+
+# Measure releases are never published as GitHub releases in this repository:
+# HACS reads the published releases here to resolve Powercalc integration
+# versions, so a published measure-v* release would be offered to integration
+# users as an update. Changelog entries accumulate in the rolling measure-next
+# draft (invisible to HACS), and the release itself is published in the
+# powercalc-measure-app repository from a plain measure-v* git tag.
+
+on:
+  push:
+    branches:
+      - master
+
+permissions: {}
+
+# No concurrency group: a pending queued run would be cancelled by the next
+# master push, silently dropping its changelog entries. Parallel runs are
+# safe because draft updates are deduplicated per pull request number.
+
+jobs:
+  update-draft:
+    name: Update rolling draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - name: Append merged Measure pull requests to the draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_SHAS: ${{ toJSON(github.event.commits.*.id) }}
+        run: python3 .github/scripts/update_measure_draft.py
+
+  tag-release:
+    name: Tag and publish merged release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - name: Detect merged release
+        id: release
+        run: |
+          version=$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV.fetch(0))).fetch("version")' utils/measure/home-assistant-app/powercalc_measure/config.yaml)
+          if ! grep -qF "## ${version} - " utils/measure/home-assistant-app/powercalc_measure/CHANGELOG.md; then
+            echo "Changelog has no released section for ${version}; nothing to tag"
+            exit 0
+          fi
+          if [[ -n "$(git ls-remote --tags origin "refs/tags/measure-v${version}")" ]]; then
+            echo "Tag measure-v${version} already exists"
+            exit 0
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+      - name: Create release tag
+        if: steps.release.outputs.version != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          git tag "measure-v${VERSION}"
+          # The token is supplied only for this push instead of being
+          # persisted in .git/config by actions/checkout.
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPOSITORY}.git" "refs/tags/measure-v${VERSION}"
+      - name: Publish images and app repository
+        if: steps.release.outputs.version != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: >-
+          gh workflow run publish-measure-image.yml
+          --ref "measure-v${VERSION}"
+          -f "release_tag=measure-v${VERSION}"
