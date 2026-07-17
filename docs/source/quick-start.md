@@ -46,6 +46,7 @@ Powercalc supports both GUI and YAML configuration. Depending on your preference
 
 Powercalc includes a built-in library with 600+ measured power profiles, mostly for lighting devices.
 These profiles are measured and created by Powercalc users. See the [library website](https://library.powercalc.nl) for the listing of supported devices.
+Is your device missing? You can [measure it yourself](contributing/measure/index.md) and contribute the profile.
 
 After installation and restart, Powercalc will automatically:
 

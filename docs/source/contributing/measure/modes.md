@@ -1,20 +1,24 @@
 # Other measure modes
 
-The measure tool can also help with non-light profiles or one-off readings. These modes use the same power meter setup from [Setup](setup.md).
+The measure tool can also help with non-light profiles or one-off readings. All these modes are available in both the [Home Assistant app](home-assistant-app.md) and the [CLI](setup.md), and use the same power meter setup.
 
 ## Smart speaker
 
 Use `Smart speaker` for media players where power consumption changes with playback and volume level.
 
-Configuration:
+=== "Home Assistant app"
 
-```env
-MEDIA_CONTROLLER=hass
-HASS_URL=http://homeassistant.local:8123/api
-HASS_TOKEN=your_long_lived_access_token
-```
+    Select the `media_player` entity when creating the measurement session.
 
-The wizard asks for the `media_player` entity. The runner measures volume levels from `10` through `100` in steps of `10`, then measures the muted or off state. By default it streams pink noise from a Powercalc-hosted URL during each volume measurement.
+=== "CLI"
+
+    ```env
+    MEDIA_CONTROLLER=hass
+    ```
+
+    The Home Assistant connection is configured once in your `.env`; see [Home Assistant configuration](setup.md#home-assistant-configuration). The wizard asks for the `media_player` entity.
+
+The runner measures volume levels from `10` through `100` in steps of `10`, then measures the muted or off state. By default it streams pink noise from a Powercalc-hosted URL during each volume measurement.
 
 Some devices, such as Amazon Alexa devices, do not support direct streaming through this service call. In that case, choose the wizard option to disable automatic streaming and start a stable audio source manually.
 
@@ -28,13 +32,17 @@ The generated model uses a `linear` strategy with calibration points and a condi
 
 Use `Fan` for Home Assistant fan entities that support percentage control.
 
-Configuration:
+=== "Home Assistant app"
 
-```env
-FAN_CONTROLLER=hass
-HASS_URL=http://homeassistant.local:8123/api
-HASS_TOKEN=your_long_lived_access_token
-```
+    Select the `fan` entity when creating the measurement session.
+
+=== "CLI"
+
+    ```env
+    FAN_CONTROLLER=hass
+    ```
+
+    The wizard asks for the `fan` entity.
 
 The runner measures percentage values from `5` through `100` in steps of `5`. It waits after each percentage change, then takes an average measurement. It also measures standby after turning the fan off.
 
@@ -47,13 +55,17 @@ Use `Charging device` for devices where charging power can be mapped to battery 
 - `vacuum_robot`
 - `lawn_mower_robot`
 
-Configuration:
+=== "Home Assistant app"
 
-```env
-CHARGING_CONTROLLER=hass
-HASS_URL=http://homeassistant.local:8123/api
-HASS_TOKEN=your_long_lived_access_token
-```
+    Select the `vacuum` or `lawn_mower` entity when creating the measurement session.
+
+=== "CLI"
+
+    ```env
+    CHARGING_CONTROLLER=hass
+    ```
+
+    The wizard asks for the `vacuum` or `lawn_mower` entity.
 
 Start with the device as close to empty as possible. The runner waits for charging to start, records power readings while the battery level rises, and then measures trickle charging at 100 percent.
 

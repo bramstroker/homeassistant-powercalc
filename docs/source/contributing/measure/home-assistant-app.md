@@ -1,8 +1,8 @@
 # Home Assistant app
 
-!!! warning "Experimental"
+!!! note "New"
 
-    The Powercalc Measure app is under active development. It is intended for Home Assistant OS on `amd64` and `aarch64`; Home Assistant Container and Core installations should continue using the [Docker or native setup](setup.md).
+    The Powercalc Measure app is the recommended way to run measurements on Home Assistant OS (`amd64` and `aarch64`). It is new and under active development, so feedback is welcome. Home Assistant Container and Core installations should use the [CLI](setup.md) instead.
 
 The app provides an ingress UI for configuring, validating, running, and reviewing Powercalc measurements. It uses Home Assistant entities to control devices and can read power from either a Home Assistant sensor or a Shelly plug. Home Assistant supplies authentication and Core API access, so you do not create or paste a long-lived access token.
 

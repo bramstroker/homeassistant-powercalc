@@ -29,4 +29,4 @@ You can use the linear config in combination with the `calibrate` option to defi
 
 ## Measure
 
-Using the [measure utility](../../contributing/measure.md), select `Fan` in the first step of the wizard.
+Using the [measure utility](../../contributing/measure/index.md), select `Fan` in the first step of the wizard.

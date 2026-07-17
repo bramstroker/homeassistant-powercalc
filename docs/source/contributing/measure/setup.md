@@ -1,8 +1,10 @@
-# Setup
+# CLI (Docker / native Python)
 
-The measure tool can run as a Home Assistant app, with Docker, or natively with Python.
+This page covers running the measure tool from the command line, either with Docker or natively with Python.
 
-Use the [Home Assistant app](home-assistant-app.md) on Home Assistant OS when you want a guided UI, entity selectors, preflight checks, live progress, result plots, and persistent sessions. Use Docker or native Python for direct-device adapters, OCR, manual readings, or development.
+!!! tip
+
+    On Home Assistant OS, the [Home Assistant app](home-assistant-app.md) is the recommended way to run measurements. Use the CLI when you run Home Assistant Container or Core, need a direct device power meter or Hue controller, use an OCR meter or manual readings, or develop the tool itself.
 
 ## Prepare a working directory
 
@@ -46,7 +48,7 @@ Use the native setup when Docker does not work for you or when you are developin
 
 Prerequisites:
 
-- Python 3.13 or newer.
+- Python 3.14 or newer.
 - `uv`, installed with `curl -LsSf https://astral.sh/uv/install.sh | sh` or another method from the uv documentation.
 
 From the repository:
@@ -54,14 +56,8 @@ From the repository:
 ```bash
 cd utils/measure
 uv venv
-uv sync --extra dev
+uv sync
 uv run python -m measure.measure
-```
-
-For OCR measurements, install its optional native dependencies as well:
-
-```bash
-uv sync --extra dev --extra ocr
 ```
 
 Native runs write output to `utils/measure/export`.
@@ -89,7 +85,7 @@ Supported power meters:
 | `kasa` | Reads directly from a TP-Link Kasa plug. |
 | `mystrom` | Reads directly from a myStrom plug. |
 | `manual` | Prompts you to enter readings manually. |
-| `ocr` | Reads a meter display through OCR. See [Measure using OCR](measure-ocr.md). |
+| `ocr` | Reads a meter display through OCR. See [OCR power meter](#ocr-power-meter). |
 
 The `hass` power meter is often the easiest and most reliable path because it can use any power sensor Home Assistant already exposes.
 
@@ -133,6 +129,28 @@ TUYA_DEVICE_VERSION=3.3
 ```
 
 For Tuya measuring devices, make sure no other integration is connected to the same device while measuring. Some Tuya plugs only allow one local connection at a time.
+
+## OCR power meter
+
+With `POWER_METER=ocr`, the tool reads power values from a camera pointed at the display of a power meter. This requires the native Python setup.
+
+1. Install [tesseract](https://tesseract-ocr.github.io/tessdoc/Installation.html) for your OS.
+2. Install the optional OCR dependencies:
+
+    ```bash
+    cd utils/measure
+    uv sync --extra ocr
+    ```
+
+3. Start the OCR stream, passing the location of the tesseract executable:
+
+    ```bash
+    uv run --extra ocr python measure/ocr/main.py -t '/opt/homebrew/bin/tesseract'
+    ```
+
+4. Set `POWER_METER=ocr` in your `.env` and run the measure tool as usual in a second terminal.
+
+The OCR method is tested with the Zhurui PR10 power meter. Other meters with a clearly readable display may also work.
 
 ## Predefining wizard answers
 

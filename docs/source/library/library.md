@@ -19,7 +19,7 @@ Also you only need to download the profiles you actually use, saving bandwidth a
 
 For more information about the library structure, See [structure](structure.md).
 
-To contribute new profiles see the [measure](../contributing/measure.md) section.
+To contribute new profiles see the [measure](../contributing/measure/index.md) section.
 
 More information about how to setup specific device types can be found in the [device types](device-types/index.md) section.
 

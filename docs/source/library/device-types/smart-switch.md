@@ -100,7 +100,7 @@ The ability to measure the smart switch's standby power depends on the smart plu
 The Zhurui PR10 smart plug is a good option, as it can measure power as low as 0.1W.
 
 Alternatively, you can try another smart plug, but you might need to add a dummy load to the smart switch to get an accurate measurement.
-When using a smart plug, you can use the [measure tool](../../contributing/measure.md) and select the `average` mode for 1 minute to get a reading.
+When using a smart plug, you can use the [measure tool](../../contributing/measure/index.md) and select the `average` mode for 1 minute to get a reading.
 
 Now, you’re ready to measure the smart switch's power consumption in both the `ON` and `OFF` states.
 

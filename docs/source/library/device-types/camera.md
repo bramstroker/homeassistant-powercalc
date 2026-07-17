@@ -19,5 +19,5 @@ IP camera, webcam, or other camera devices.
 
 ## Measure
 
-You can use the [measure tool](../../contributing/measure.md) average mode.
+You can use the [measure tool](../../contributing/measure/index.md) average mode.
 Suggest to measure for 2 hours.

@@ -9,7 +9,7 @@ With playbooks, you can:
 - Automatically trigger different power profiles based on device states
 - Create realistic power consumption models for devices without built-in power monitoring
 
-You can generate a playbook using the powercalc [measure tool](../contributing/measure.md) or create one manually based on known power consumption patterns.
+You can generate a playbook using the powercalc [measure tool](../contributing/measure/index.md) or create one manually based on known power consumption patterns.
 
 ## Setup
 

@@ -37,7 +37,7 @@ Example model.json
 
 ## Measure
 
-To integrate a smart speaker with Powercalc, the [measure tool](../../contributing/measure.md) provides a mode to measure it's power consumption.
+To integrate a smart speaker with Powercalc, the [measure tool](../../contributing/measure/index.md) provides a mode to measure it's power consumption.
 It does that by playing pink noise at different volumes and measuring the power consumption.
 
 After starting the measure tool, select `Smart speaker` in the first step of the wizard.

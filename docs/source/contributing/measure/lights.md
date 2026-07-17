@@ -26,29 +26,35 @@ Run the measure tool once for every relevant supported color mode.
 
 ## Configure the controller
 
-Use the Home Assistant controller for most lights:
+=== "Home Assistant app"
 
-```env
-LIGHT_CONTROLLER=hass
-HASS_URL=http://homeassistant.local:8123/api
-HASS_TOKEN=your_long_lived_access_token
-```
+    The app always controls lights through Home Assistant. Select the light entity when creating the measurement session; no further controller configuration is needed. Direct Hue control is CLI-only.
 
-You can also control Hue lights through a Hue bridge:
+=== "CLI"
 
-```env
-LIGHT_CONTROLLER=hue
-HUE_BRIDGE_IP=x.x.x.x
-```
+    Use the Home Assistant controller for most lights:
 
-Native installations need the optional direct-Hue dependency. Install it and keep the extra enabled when starting the wizard:
+    ```env
+    LIGHT_CONTROLLER=hass
+    ```
 
-```bash
-uv sync --extra dev --extra cli
-uv run --extra cli python -m measure.measure
-```
+    The Home Assistant connection itself is configured once in your `.env`; see [Home Assistant configuration](setup.md#home-assistant-configuration).
 
-The script asks you to select a Home Assistant light entity or enter a Hue light/group identifier, depending on the selected controller.
+    You can also control Hue lights directly through a Hue bridge:
+
+    ```env
+    LIGHT_CONTROLLER=hue
+    HUE_BRIDGE_IP=x.x.x.x
+    ```
+
+    Native installations need the optional direct-Hue dependency. Install it and keep the extra enabled when starting the wizard:
+
+    ```bash
+    uv sync --extra cli
+    uv run --extra cli python -m measure.measure
+    ```
+
+    The wizard asks you to select a Home Assistant light entity or enter a Hue light/group identifier, depending on the selected controller.
 
 ## Run the light measurement
 
@@ -67,7 +73,7 @@ The run can take from minutes to several hours. Color and effect measurements ar
 
 ## Brightness and color precision
 
-The defaults keep profile generation practical. Increase precision only when you deliberately want a denser LUT and accept a longer measurement run.
+The defaults keep profile generation practical. Increase precision only when you deliberately want a denser LUT and accept a longer measurement run. These settings are CLI-only; the Home Assistant app uses the defaults.
 
 ```env
 MIN_BRIGHTNESS=1
@@ -88,11 +94,13 @@ Notes:
 
 When standby power is too low for your meter, measuring multiple identical lights in parallel can make the total load measurable. The wizard asks whether you are measuring multiple lights and how many lights are connected.
 
-Only use this when every connected light is the same model and receives the same commands. See [Standby troubleshooting](standby_troubleshooting.md) for details.
+Only use this when every connected light is the same model and receives the same commands. See [Standby power shows 0 W](troubleshooting.md#standby-power-shows-0-w) for details.
 
 ## Effect measurements
 
 Effect measurements are different because effects can fluctuate over time. The tool measures each effect and brightness combination for up to `MEASURE_TIME_EFFECT` seconds and can stop earlier when the cumulative average has stabilized.
+
+These tuning settings are CLI-only; the Home Assistant app uses the defaults.
 
 ```env
 MEASURE_TIME_EFFECT=180
@@ -111,7 +119,7 @@ A dummy load is a stable resistive load connected in parallel with the measured 
 
 Use a dummy load only when you understand the wiring and safety implications. The power meter must support voltage readings so the tool can subtract the dummy load contribution correctly.
 
-Do not use an LED bulb as a dummy load. Use a stable resistive load, such as a small incandescent bulb, when this method is needed. See [Standby troubleshooting](standby_troubleshooting.md) for more detail about using a dummy load for low standby readings.
+Do not use an LED bulb as a dummy load. Use a stable resistive load, such as a small incandescent bulb, when this method is needed. See [Standby power shows 0 W](troubleshooting.md#standby-power-shows-0-w) for more detail about using a dummy load for low standby readings.
 
 In the Home Assistant app, enable the resistive dummy load during measurement setup. The app calibrates a warmed-up load for at least 20 periods of 30 seconds and continues when its resistance is not yet stable. A stored calibration can be reused only after confirming that the same warmed-up load is connected; choose **Recalibrate** after changing the load, meter, or wiring. Keep the load connected throughout the measurement. The app subtracts its calculated consumption from live and saved power readings.
 
