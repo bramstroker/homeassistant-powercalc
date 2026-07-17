@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from threading import RLock
 from types import TracebackType
 from typing import Any, Self
+import urllib.parse
 
 from homeassistant_api import AsyncWebsocketClient, Entity, EntityRegistryEntry, Group, State, WebsocketClient
 from homeassistant_api.errors import WebsocketError
@@ -16,6 +17,24 @@ from measure.const import HASS_DEVICE_REGISTRY_LIST, HASS_ZEROCONF_SUBSCRIBE_DIS
 
 class HomeAssistantDiscoveryError(RuntimeError):
     """Raised when Home Assistant rejects a discovery subscription."""
+
+
+def normalize_hass_url(url: str) -> str:
+    """Normalize a Home Assistant URL to its WebSocket API endpoint.
+
+    Older measure installations configured the REST endpoint
+    (e.g. ``http://ha.lan:8123/api``); the WebSocket API lives at
+    ``/api/websocket`` and uses the ``ws``/``wss`` scheme.
+    """
+
+    parsed = urllib.parse.urlparse(url)
+    scheme = {"http": "ws", "https": "wss"}.get(parsed.scheme, parsed.scheme)
+    path = parsed.path.rstrip("/")
+    if not path:
+        path = "/api"
+    if not path.endswith("/websocket"):
+        path += "/websocket"
+    return urllib.parse.urlunparse(parsed._replace(scheme=scheme, path=path))
 
 
 def _validate_subscription_response(response: dict[str, Any], subscription_id: object) -> None:
@@ -120,7 +139,7 @@ class HomeAssistantManager:
         client_factory: Callable[[str, str], HomeAssistantWebsocketClient] | None = None,
         discovery_client_factory: Callable[[str, str], HomeAssistantDiscoveryClient] | None = None,
     ) -> None:
-        self.api_url = api_url
+        self.api_url = normalize_hass_url(api_url)
         self.token = token
         self._client_factory = client_factory or HomeAssistantWebsocketClient
         self._discovery_client_factory = discovery_client_factory or HomeAssistantDiscoveryClient

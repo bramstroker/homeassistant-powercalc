@@ -98,9 +98,11 @@ The `hass` power meter is often the easiest and most reliable path because it ca
 For `POWER_METER=hass` or any `hass` controller, set:
 
 ```env
-HASS_URL=http://homeassistant.local:8123/api
+HASS_URL=ws://homeassistant.local:8123/api/websocket
 HASS_TOKEN=your_long_lived_access_token
 ```
+
+The tool uses the Home Assistant WebSocket API. Older REST-style URLs (e.g. `http://homeassistant.local:8123/api`) are automatically normalized to the WebSocket endpoint, so existing configurations keep working.
 
 For the power meter, the tool asks you to select a power sensor with unit `W`. When voltage readings are needed, it can also use a voltage sensor with unit `V`.
 

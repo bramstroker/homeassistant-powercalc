@@ -5,7 +5,7 @@ from threading import Lock
 from time import sleep
 from unittest.mock import MagicMock
 
-from measure.home_assistant import HomeAssistantManager, HomeAssistantWebsocketClient
+from measure.home_assistant import HomeAssistantManager, HomeAssistantWebsocketClient, normalize_hass_url
 import pytest
 
 
@@ -13,6 +13,32 @@ def test_client_uses_canonical_websocket_url() -> None:
     client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
 
     assert client.api_url == "ws://127.0.0.1:8123/api/websocket"
+
+
+@pytest.mark.parametrize(
+    ("url", "expected"),
+    [
+        ("http://ha.lan:8123/api", "ws://ha.lan:8123/api/websocket"),
+        ("https://ha.lan:8123/api/", "wss://ha.lan:8123/api/websocket"),
+        ("http://ha.lan:8123", "ws://ha.lan:8123/api/websocket"),
+        ("https://my.duckdns.org", "wss://my.duckdns.org/api/websocket"),
+        ("ws://127.0.0.1:8123/api/websocket", "ws://127.0.0.1:8123/api/websocket"),
+        ("wss://ha.lan:8123/api/websocket", "wss://ha.lan:8123/api/websocket"),
+        ("ws://supervisor/core/websocket", "ws://supervisor/core/websocket"),
+    ],
+)
+def test_normalize_hass_url(url: str, expected: str) -> None:
+    assert normalize_hass_url(url) == expected
+
+
+def test_manager_normalizes_legacy_rest_url() -> None:
+    client_factory = MagicMock(return_value=MagicMock(spec=HomeAssistantWebsocketClient))
+    manager = HomeAssistantManager("http://ha.lan:8123/api", "token", client_factory=client_factory)
+
+    assert manager.api_url == "ws://ha.lan:8123/api/websocket"
+
+    manager.get_config()
+    client_factory.assert_called_once_with("ws://ha.lan:8123/api/websocket", "token")
 
 
 def test_manager_reuses_one_client_for_its_lifecycle() -> None:
