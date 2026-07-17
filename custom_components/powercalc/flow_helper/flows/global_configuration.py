@@ -415,11 +415,10 @@ class GlobalConfigurationOptionsFlow(GlobalConfigurationFlow):
             Step.GLOBAL_CONFIGURATION: "Basic options",
             Step.GLOBAL_CONFIGURATION_DISCOVERY: "Discovery options",
             Step.GLOBAL_CONFIGURATION_THROTTLING: "Throttling options",
+            Step.GLOBAL_CONFIGURATION_COST: "Cost options",
         }
         if self.flow.global_config.get(CONF_CREATE_ENERGY_SENSORS):
             menu[Step.GLOBAL_CONFIGURATION_ENERGY] = "Energy options"
-        if self.flow.global_config.get(CONF_CREATE_COST_SENSORS):
-            menu[Step.GLOBAL_CONFIGURATION_COST] = "Cost options"
         if self.flow.global_config.get(CONF_CREATE_UTILITY_METERS):
             menu[Step.GLOBAL_CONFIGURATION_UTILITY_METER] = "Utility meter options"
         return menu
