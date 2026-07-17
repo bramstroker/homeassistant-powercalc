@@ -424,15 +424,19 @@ async def get_commit_author(commit_hash: str) -> Author | None:
         r.raise_for_status()
         data = r.json()
 
-    if not "commit" in data and not "author" in data:
-        return None
+        if not "commit" in data and not "author" in data:
+            return None
 
-    commit = data.get("commit")
-    author = data.get("author")
-    if not author:
-        # Commit email is not linked to a GitHub account, so we cannot determine the username.
-        # Skip rather than writing a null github field, which violates the model schema.
-        return None
+        commit = data.get("commit")
+        author = data.get("author")
+
+        github_username = author["login"] if author else None
+        if not github_username:
+            # Commit email is not linked to a GitHub account, fall back to the author of the associated pull request
+            github_username = await get_pull_request_author(client, commit_hash, headers)
+        if not github_username:
+            # Skip rather than writing a null github field, which violates the model schema
+            return None
 
     email = commit["author"]["email"]
     if email.endswith("@users.noreply.github.com"):
@@ -440,8 +444,21 @@ async def get_commit_author(commit_hash: str) -> Author | None:
     return Author(
         name=commit["author"]["name"].replace("@", ""),
         email=email,
-        github_username=author["login"],
+        github_username=github_username,
     )
+
+async def get_pull_request_author(client: httpx.AsyncClient, commit_hash: str, headers: dict) -> str | None:
+    """Get the author of the pull request that contains the given commit."""
+    r = await client.get(
+        f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/commits/{commit_hash}/pulls",
+        headers=headers,
+    )
+    r.raise_for_status()
+    pulls = r.json()
+    if not pulls:
+        return None
+    user = pulls[0].get("user")
+    return user.get("login") if user else None
 
 async def find_first_commit_author(file: str, check_paths: bool = True) -> Author | None:
     """Find the first commit that affected the directory and return the author's name."""
