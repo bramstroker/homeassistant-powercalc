@@ -335,13 +335,7 @@ def register_services(hass: HomeAssistant) -> None:
         if DOMAIN in reload_config:
             for sensor_config in reload_config[DOMAIN].get(CONF_SENSORS, []):
                 sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
-                await async_load_platform(
-                    hass,
-                    Platform.SENSOR,
-                    DOMAIN,
-                    sensor_config,
-                    reload_config,
-                )
+                await _async_load_yaml_sensor(hass, sensor_config, reload_config)
 
         # Reload all config entries
         for entry in hass.config_entries.async_entries(DOMAIN):
@@ -426,15 +420,7 @@ async def setup_yaml_sensors(
         """Load secondary sensors after primary sensors."""
         await asyncio.gather(
             *(
-                hass.async_create_task(
-                    async_load_platform(
-                        hass,
-                        Platform.SENSOR,
-                        DOMAIN,
-                        sensor_config,
-                        config,
-                    ),
-                )
+                hass.async_create_task(_async_load_yaml_sensor(hass, sensor_config, config))
                 for sensor_config in secondary_sensors
             ),
         )
@@ -443,18 +429,14 @@ async def setup_yaml_sensors(
 
     await asyncio.gather(
         *(
-            hass.async_create_task(
-                async_load_platform(
-                    hass,
-                    Platform.SENSOR,
-                    DOMAIN,
-                    sensor_config,
-                    config,
-                ),
-            )
+            hass.async_create_task(_async_load_yaml_sensor(hass, sensor_config, config))
             for sensor_config in primary_sensors
         ),
     )
+
+
+async def _async_load_yaml_sensor(hass: HomeAssistant, sensor_config: ConfigType, config: ConfigType) -> None:
+    await async_load_platform(hass, Platform.SENSOR, DOMAIN, sensor_config, config)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
