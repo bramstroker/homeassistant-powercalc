@@ -483,10 +483,8 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
 
 
 def test_session_summary_is_exposed(tmp_path: Path) -> None:
-    app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
-    app.state.context.home_assistant = FakeClient()
-    app.state.context.coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SummaryService)
-    test_client = TestClient(app)
+    test_client = client(tmp_path)
+    test_client.app.state.context.coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SummaryService)
 
     run_payload = {
         "measure_type": MeasureType.AVERAGE,

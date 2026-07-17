@@ -151,8 +151,7 @@ def test_replaces_an_unauthorized_registration(monkeypatch: pytest.MonkeyPatch, 
     config_path = tmp_path / ".python_hue"
     config_path.write_text(json.dumps({"192.0.2.10": {"username": "stale-key"}}), encoding="utf-8")
 
-    with closing(HueLightController("192.0.2.10", light="light:1", config_file_path=config_path)):
-        pass
+    HueLightController("192.0.2.10", light="light:1", config_file_path=config_path).close()
 
     assert constructor_calls == [
         ("192.0.2.10", "stale-key"),

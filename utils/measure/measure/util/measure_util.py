@@ -8,6 +8,7 @@ from statistics import mean
 import time
 
 from measure.const import (
+    DUMMY_LOAD_TREND_RELATIVE_THRESHOLD,
     RETRY_COUNT_LIMIT,
     Trend,
 )
@@ -265,7 +266,6 @@ class MeasureUtil:
             raise DummyLoadMeasurementError(
                 "Dummy-load correction produced non-positive target power; verify the selected calibration and wiring",
             )
-            return None
 
         _LOGGER.info("Measured power: %.2f W", power)
         self._emit_sample(power)
@@ -393,7 +393,9 @@ class MeasureUtil:
         first_slope = MeasureUtil._linear_slope(first_half)
         second_slope = MeasureUtil._linear_slope(second_half)
 
-        def trend_direction(slope: float, threshold: float = 0.01) -> Trend:
+        threshold = mean(averages) * DUMMY_LOAD_TREND_RELATIVE_THRESHOLD
+
+        def trend_direction(slope: float) -> Trend:
             if slope > threshold:
                 return Trend.INCREASING
             if slope < -threshold:

@@ -71,6 +71,10 @@ class Trend(StrEnum):
 
 DUMMY_LOAD_MEASUREMENT_COUNT = 20
 DUMMY_LOAD_MEASUREMENTS_DURATION = 30
+# Fraction of the mean resistance a per-sample slope must exceed to count as drift.
+# Relative, so meter noise on high-ohm loads (a few Ω on multiple kΩ) stays below it
+# while genuine warm-up drift (~0.5% per half-run) is still detected.
+DUMMY_LOAD_TREND_RELATIVE_THRESHOLD = 0.0005
 RETRY_COUNT_LIMIT = 100
 
 MEASUREMENT_SLEEP_TIME_MIN = 0

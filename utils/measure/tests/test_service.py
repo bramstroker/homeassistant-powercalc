@@ -23,7 +23,7 @@ def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None
         power_meter=HassPowerMeterSpec(entity_id="sensor.test_power"),
         generate_model=False,
         gzip=False,
-        parameters={"sleep_time": 0, "bri_bri_steps": 255},
+        parameters={"sleep_time": 0, "sleep_initial": 0, "bri_bri_steps": 255},
     )
     progress = []
     control = SessionControl()

@@ -294,8 +294,11 @@ def main() -> None:
     try:
         Measure(config).start()
         sys.exit(0)
-    except (PowerMeterError, ControllerError, RunnerError, KeyboardInterrupt) as e:
-        _LOGGER.error("Aborting: %s", e)
+    except KeyboardInterrupt:
+        print("Aborted")
+        sys.exit(1)
+    except PowerMeterError, ControllerError, RunnerError:
+        _LOGGER.exception("Aborting")
         sys.exit(1)
 
 

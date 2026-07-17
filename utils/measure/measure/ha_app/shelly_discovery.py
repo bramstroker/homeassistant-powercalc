@@ -61,7 +61,7 @@ class ShellyDiscoveryService:
     async def discover(self) -> ShellyDiscoveryResponse:
         try:
             services = await self._home_assistant.discover_zeroconf(SHELLY_DISCOVERY_COLLECTION_WINDOW_SECONDS)
-        except (HomeAssistantDiscoveryError, HomeassistantAPIError, OSError, TimeoutError) as error:
+        except (HomeAssistantDiscoveryError, HomeassistantAPIError, OSError) as error:
             _LOGGER.warning("Shelly discovery through Home Assistant failed: %s", error)
             return ShellyDiscoveryResponse(
                 available=False,

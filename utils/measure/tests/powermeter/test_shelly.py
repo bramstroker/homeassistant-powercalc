@@ -68,8 +68,8 @@ def test_api_gen3_pm1_endpoint_with_voltage(mock_requests_get_factory: MockReque
     with patch("time.time", return_value=1733039773):
         power = pm.get_power(include_voltage=True)
 
-    assert power.power == 20.00
-    assert power.voltage == 230.1
+    assert power.power == pytest.approx(20.00)
+    assert power.voltage == pytest.approx(230.1)
     assert power.updated == 1733039773
     assert pm.has_voltage_support() is True
 
@@ -85,7 +85,7 @@ def test_api_gen3_switch_endpoint(mock_requests_get_factory: MockRequestsGetFact
 
     power_meter = ShellyPowerMeter(DEFAULT_SHELLY_IP)
 
-    assert power_meter.get_power().power == 7.5
+    assert power_meter.get_power().power == pytest.approx(7.5)
     assert power_meter.has_voltage_support() is False
 
 

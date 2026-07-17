@@ -5,6 +5,7 @@ import time
 from typing import Any
 from unittest.mock import MagicMock, patch
 
+from measure.const import Trend
 from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.util.measure_util import (
@@ -28,6 +29,28 @@ from tests.conftest import MockConfigFactory
 )
 def test_linear_slope_does_not_require_numpy(values: list[float], expected: float) -> None:
     assert MeasureUtil._linear_slope(values) == pytest.approx(expected)  # noqa: SLF001
+
+
+@pytest.mark.parametrize(
+    ("averages", "expected"),
+    [
+        # Sub-threshold drift on a high-ohm load (0.5 Ω/sample on ~6.2 kΩ) is meter noise, not a trend
+        ([6226.0 + 0.5 * index for index in range(20)], Trend.STEADY),
+        # Real warm-up drift still registers regardless of resistance magnitude
+        ([6000.0 + 10.0 * index for index in range(20)], Trend.INCREASING),
+        ([6000.0 - 10.0 * index for index in range(20)], Trend.DECREASING),
+        # The relative threshold keeps its sensitivity on low-ohm loads such as incandescent bulbs
+        ([40.0 + 0.05 * index for index in range(20)], Trend.INCREASING),
+        # Halves disagreeing on direction means the load has settled
+        ([6000.0 + 10.0 * index for index in range(10)] + [6100.0 - 10.0 * index for index in range(10)], Trend.STEADY),
+    ],
+)
+def test_dummy_load_trend_uses_relative_threshold(averages: list[float], expected: Trend) -> None:
+    assert MeasureUtil.dummy_load_trend(averages) == expected
+
+
+def test_dummy_load_trend_requires_twenty_samples() -> None:
+    assert MeasureUtil.dummy_load_trend([6226.0] * 19) is None
 
 
 def test_no_valid_average_readings_raise_typed_error(mock_config_factory: MockConfigFactory) -> None:

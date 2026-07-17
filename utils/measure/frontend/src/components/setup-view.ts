@@ -169,12 +169,16 @@ export class SetupView extends LitElement {
             <h2 id="setup-title">Configure the measurement</h2>
           </div>
         </div>
-        ${this.powerMeterConfigured ? html`
-          ${this.selectedType ? this.renderChip(this.selectedType) : this.renderPicker()}
-          ${this.selectedType === LIGHT_TYPE ? this.renderLightForm() : nothing}
-          ${this.selectedType && this.selectedType !== LIGHT_TYPE ? this.renderGenericForm(this.selectedType) : nothing}
-        ` : this.renderPowerMeterRequired()}
+        ${this.powerMeterConfigured ? this.renderSetupContent() : this.renderPowerMeterRequired()}
       </section>
+    `;
+  }
+
+  private renderSetupContent() {
+    return html`
+      ${this.selectedType ? this.renderChip(this.selectedType) : this.renderPicker()}
+      ${this.selectedType === LIGHT_TYPE ? this.renderLightForm() : nothing}
+      ${this.selectedType && this.selectedType !== LIGHT_TYPE ? this.renderGenericForm(this.selectedType) : nothing}
     `;
   }
 
@@ -342,7 +346,12 @@ export class SetupView extends LitElement {
       source = entity ? `${entity.name} · ${entity.entity_id}` : this.defaultPowerEntityId;
       const voltageEntityId = this.relatedVoltageEntityId(this.defaultPowerEntityId);
       const voltage = this.voltages.find((candidate) => candidate.entity_id === voltageEntityId);
-      detail = voltageEntityId ? `Voltage: ${voltage ? `${voltage.name} · ` : ""}${voltageEntityId}` : "Home Assistant power sensor";
+      if (voltageEntityId) {
+        const voltageName = voltage ? `${voltage.name} · ` : "";
+        detail = `Voltage: ${voltageName}${voltageEntityId}`;
+      } else {
+        detail = "Home Assistant power sensor";
+      }
     }
     return html`
       <div class="power-meter-summary">
@@ -377,37 +386,42 @@ export class SetupView extends LitElement {
         ${!voltageAvailable
           ? html`<p class="muted">Dummy-load correction requires a voltage sensor associated with the selected power sensor.</p>`
           : nothing}
-        ${this.dummyLoadEnabled && voltageAvailable ? html`
-          <div class="dummy-load-options">
-            ${calibration ? html`
-              <div class="calibration-card">
-                <strong>${calibration.description}</strong>
-                <span class="calibration-meta">${this.formatResistance(calibration.resistance)} Ω · calibrated ${this.formatCalibrationDate(calibration.calibrated_at)}</span>
-              </div>
-              <div class="choice-list" role="radiogroup" aria-label="Dummy-load calibration">
-                <label class="choice">
-                  <input type="radio" name="dummy_load_mode" value="reuse" .checked=${this.dummyLoadMode === "reuse"} @change=${this.dummyLoadModeChanged} />
-                  <span><strong>Use saved calibration</strong><br /><small class="field-hint">Confirm that this exact, preheated load is connected when the measurement starts.</small></span>
-                </label>
-                <label class="choice">
-                  <input type="radio" name="dummy_load_mode" value="calibrate" .checked=${this.dummyLoadMode === "calibrate"} @change=${this.dummyLoadModeChanged} />
-                  <span><strong>Recalibrate</strong><br /><small class="field-hint">Measure the load again before starting this measurement.</small></span>
-                </label>
-              </div>
-            ` : html`
-              <input type="hidden" name="dummy_load_mode" value="calibrate" />
-              <p class="muted">The dummy load will be calibrated inline before the measurement. Allow at least 10 minutes; an unstable load can take longer.</p>
-            `}
-            ${this.dummyLoadMode === "calibrate" ? this.textField(
-              "dummy_load_description",
-              "Dummy-load description",
-              description,
-              "e.g. 60 W incandescent bulb",
-              true,
-              "Identify the exact resistive load so the calibration can be safely reused later.",
-            ) : nothing}
+        ${this.dummyLoadEnabled && voltageAvailable ? this.renderDummyLoadOptions(description) : nothing}
+      </div>
+    `;
+  }
+
+  private renderDummyLoadOptions(description: string) {
+    const calibration = this.dummyLoadCalibration;
+    return html`
+      <div class="dummy-load-options">
+        ${calibration ? html`
+          <div class="calibration-card">
+            <strong>${calibration.description}</strong>
+            <span class="calibration-meta">${this.formatResistance(calibration.resistance)} Ω · calibrated ${this.formatCalibrationDate(calibration.calibrated_at)}</span>
           </div>
-        ` : nothing}
+          <div class="choice-list" role="radiogroup" aria-label="Dummy-load calibration">
+            <label class="choice">
+              <input type="radio" name="dummy_load_mode" value="reuse" .checked=${this.dummyLoadMode === "reuse"} @change=${this.dummyLoadModeChanged} />
+              <span><strong>Use saved calibration</strong><br /><small class="field-hint">Confirm that this exact, preheated load is connected when the measurement starts.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="dummy_load_mode" value="calibrate" .checked=${this.dummyLoadMode === "calibrate"} @change=${this.dummyLoadModeChanged} />
+              <span><strong>Recalibrate</strong><br /><small class="field-hint">Measure the load again before starting this measurement.</small></span>
+            </label>
+          </div>
+        ` : html`
+          <input type="hidden" name="dummy_load_mode" value="calibrate" />
+          <p class="muted">The dummy load will be calibrated inline before the measurement. Allow at least 10 minutes; an unstable load can take longer.</p>
+        `}
+        ${this.dummyLoadMode === "calibrate" ? this.textField(
+          "dummy_load_description",
+          "Dummy-load description",
+          description,
+          "e.g. 60 W incandescent bulb",
+          true,
+          "Identify the exact resistive load so the calibration can be safely reused later.",
+        ) : nothing}
       </div>
     `;
   }

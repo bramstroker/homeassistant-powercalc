@@ -18,18 +18,33 @@ class HomeAssistantDiscoveryError(RuntimeError):
     """Raised when Home Assistant rejects a discovery subscription."""
 
 
+def _validate_subscription_response(response: dict[str, Any], subscription_id: object) -> None:
+    if response.get("id") != subscription_id or response.get("type") != "result":
+        raise HomeAssistantDiscoveryError("Unexpected Home Assistant discovery response")
+    if response.get("success") is not True:
+        error = response.get("error")
+        message = error.get("message") if isinstance(error, dict) else None
+        raise HomeAssistantDiscoveryError(str(message or "Home Assistant discovery is unavailable"))
+
+
+def _added_services(event_response: dict[str, Any], subscription_id: object) -> list[dict[str, object]]:
+    if event_response.get("id") != subscription_id or event_response.get("type") != "event":
+        return []
+    event = event_response.get("event")
+    if not isinstance(event, dict):
+        return []
+    added = event.get("add")
+    if not isinstance(added, list):
+        return []
+    return [service for service in added if isinstance(service, dict)]
+
+
 class HomeAssistantDiscoveryClient(AsyncWebsocketClient):
     """Read raw Home Assistant Zeroconf subscription events."""
 
     async def discover_zeroconf(self, collection_window: float) -> tuple[dict[str, object], ...]:
         subscription_id = await self.send(HASS_ZEROCONF_SUBSCRIBE_DISCOVERY)
-        response = await self._async_recv()
-        if response.get("id") != subscription_id or response.get("type") != "result":
-            raise HomeAssistantDiscoveryError("Unexpected Home Assistant discovery response")
-        if response.get("success") is not True:
-            error = response.get("error")
-            message = error.get("message") if isinstance(error, dict) else None
-            raise HomeAssistantDiscoveryError(str(message or "Home Assistant discovery is unavailable"))
+        _validate_subscription_response(await self._async_recv(), subscription_id)
 
         services: list[dict[str, object]] = []
         loop = asyncio.get_running_loop()
@@ -42,14 +57,7 @@ class HomeAssistantDiscoveryClient(AsyncWebsocketClient):
                 event_response = await asyncio.wait_for(self._async_recv(), timeout=remaining)
             except TimeoutError:
                 break
-            if event_response.get("id") != subscription_id or event_response.get("type") != "event":
-                continue
-            event = event_response.get("event")
-            if not isinstance(event, dict):
-                continue
-            added = event.get("add")
-            if isinstance(added, list):
-                services.extend(service for service in added if isinstance(service, dict))
+            services.extend(_added_services(event_response, subscription_id))
         return tuple(services)
 
 

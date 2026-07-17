@@ -84,6 +84,9 @@ class ShellyProbeError(Exception):
         return self.failure is ShellyProbeFailure.AUTH_REQUIRED
 
 
+_INVALID_GENERATION_MESSAGE = "The Shelly generation was invalid"
+
+
 class ShellyClient:
     """Probe and read Shelly Gen1 and Gen2+ power components."""
 
@@ -126,13 +129,13 @@ class ShellyClient:
 
         generation_value = data.get("gen", 1)
         if isinstance(generation_value, bool):
-            raise self._invalid_response("The Shelly generation was invalid")
+            raise self._invalid_response(_INVALID_GENERATION_MESSAGE)
         try:
             generation = int(generation_value)
         except (TypeError, ValueError) as error:
-            raise self._invalid_response("The Shelly generation was invalid") from error
+            raise self._invalid_response(_INVALID_GENERATION_MESSAGE) from error
         if generation < 1:
-            raise self._invalid_response("The Shelly generation was invalid")
+            raise self._invalid_response(_INVALID_GENERATION_MESSAGE)
 
         return ShellyDeviceInfo(
             generation=generation,

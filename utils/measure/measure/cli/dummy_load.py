@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-import json
 import logging
 from pathlib import Path
 from typing import Any
@@ -68,7 +67,7 @@ class CliDummyLoadCalibrationStore:
             return None
         try:
             return DummyLoadCalibration.model_validate_json(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError, json.JSONDecodeError) as error:
+        except (OSError, ValueError) as error:
             _LOGGER.warning("Ignoring invalid CLI dummy-load calibration in %s: %s", path, error)
             return None
 

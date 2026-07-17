@@ -47,7 +47,7 @@ def test_builds_all_light_plot_modes_from_plain_and_gzip_csv(tmp_path: Path) -> 
     assert result.warnings == ()
     assert [plot.id for plot in result.plots] == ["brightness", "color_temp", "hs", "effect"]
     assert result.plots[0].kind is PlotKind.SCATTER
-    assert result.plots[0].series[0].points[-1].y == 8.2
+    assert result.plots[0].series[0].points[-1].y == pytest.approx(8.2)
     assert result.plots[1].series[0].points[0].color is not None
     assert result.plots[2].series[0].points[0].color is not None
     assert [series.label for series in result.plots[3].series] == ["Color loop", "Pulse"]
@@ -68,7 +68,7 @@ def test_prefers_plain_csv_when_compressed_copy_is_also_present(tmp_path: Path) 
         },
     )
 
-    assert result.plots[0].series[0].points[0].y == 1.0
+    assert result.plots[0].series[0].points[0].y == pytest.approx(1.0)
     assert result.plots[0].source == "LCT010/brightness.csv"
 
 

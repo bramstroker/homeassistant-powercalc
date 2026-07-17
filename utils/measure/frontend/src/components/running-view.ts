@@ -126,12 +126,7 @@ export class RunningView extends LitElement {
               <span class="connection ${this.connected ? "connected" : ""}" role="status">${this.connected ? "Live" : "Reconnecting"}</span>
             </span>
           </div>
-          ${preparing ? this.renderPreparation() : html`
-            ${this.renderProgress(openEnded, progress)}
-            ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
-            ${this.renderMetrics(openEnded, progress)}
-            ${this.samples.length ? this.renderChart() : nothing}
-          `}
+          ${preparing ? this.renderPreparation() : this.renderMeasurement(openEnded, progress)}
         </div>
         ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
         ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
@@ -173,6 +168,15 @@ export class RunningView extends LitElement {
         </div>
         <div class="actions">${this.renderStopButton(false)}</div>
       </section>
+    `;
+  }
+
+  private renderMeasurement(openEnded: boolean, progress: SessionProgress) {
+    return html`
+      ${this.renderProgress(openEnded, progress)}
+      ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
+      ${this.renderMetrics(openEnded, progress)}
+      ${this.samples.length ? this.renderChart() : nothing}
     `;
   }
 

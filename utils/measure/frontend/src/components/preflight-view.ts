@@ -86,10 +86,15 @@ export class PreflightView extends LitElement {
         ` : nothing}
         <div class="actions">
           <button type="button" @click=${() => this.emit("back")} ?disabled=${this.busy}>Back</button>
-          <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy || (this.canOverwrite && !this.overwriteConfirmed)}>${this.busy ? "Preparing…" : this.confirmationAction ? "Prepare measurement" : "Start measurement"}</button>
+          <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy || (this.canOverwrite && !this.overwriteConfirmed)}>${this.startButtonLabel()}</button>
         </div>
       </section>
     `;
+  }
+
+  private startButtonLabel(): string {
+    if (this.busy) return "Preparing…";
+    return this.confirmationAction ? "Prepare measurement" : "Start measurement";
   }
 
   private confirmOverwrite(event: Event): void {

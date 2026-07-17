@@ -119,8 +119,9 @@ def test_execution_cleans_up_runner_after_standby_failure(tmp_path: Path) -> Non
     runner.measure_standby_power.side_effect = RuntimeError("standby failed")
     prepared = PreparedMeasurement(request=request, runner=runner)
 
+    execution = MeasurementExecution(measurement=prepared, output_directory=tmp_path)
     with pytest.raises(RuntimeError, match="standby failed"):
-        MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
+        execution.run()
 
     runner.cleanup.assert_called_once_with()
 

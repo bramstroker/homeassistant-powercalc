@@ -27,7 +27,7 @@ class FakeHomeAssistant:
         self.error = error
 
     async def discover_zeroconf(self, collection_window: float = 2.0) -> tuple[dict[str, object], ...]:
-        assert collection_window == 2.0
+        assert collection_window == pytest.approx(2.0)
         if self.error:
             raise self.error
         return self.services
@@ -73,8 +73,9 @@ def test_home_assistant_discovery_client_reports_rejected_subscription() -> None
         return_value={"id": 3, "type": "result", "success": False, "error": {"message": "Unknown command"}},
     )
 
+    coroutine = HomeAssistantDiscoveryClient.discover_zeroconf(client, 0.1)
     with pytest.raises(HomeAssistantDiscoveryError, match="Unknown command"):
-        asyncio.run(HomeAssistantDiscoveryClient.discover_zeroconf(client, 0.1))
+        asyncio.run(coroutine)
 
 
 def test_manager_uses_an_ephemeral_discovery_client() -> None:

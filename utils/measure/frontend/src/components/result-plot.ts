@@ -110,6 +110,15 @@ export class ResultPlot extends LitElement {
   }
 }
 
+interface PlotFrame {
+  left: number;
+  top: number;
+  plotWidth: number;
+  plotHeight: number;
+  x: (value: number) => number;
+  y: (value: number) => number;
+}
+
 export function drawPlot(
   context: CanvasRenderingContext2D,
   plot: PlotSpec,
@@ -127,8 +136,14 @@ export function drawPlot(
   const plotHeight = Math.max(1, height - top - bottom);
   const [minX, maxX] = extent(points.map((point) => point.x));
   const [minY, maxY] = extent(points.map((point) => point.y));
-  const x = (value: number) => left + (value - minX) / (maxX - minX) * plotWidth;
-  const y = (value: number) => top + plotHeight - (value - minY) / (maxY - minY) * plotHeight;
+  const frame: PlotFrame = {
+    left,
+    top,
+    plotWidth,
+    plotHeight,
+    x: (value: number) => left + (value - minX) / (maxX - minX) * plotWidth,
+    y: (value: number) => top + plotHeight - (value - minY) / (maxY - minY) * plotHeight,
+  };
 
   context.clearRect(0, 0, width, height);
   context.fillStyle = palette.background;
@@ -137,20 +152,7 @@ export function drawPlot(
   context.lineWidth = 1;
   context.textBaseline = "middle";
 
-  for (let index = 0; index <= 4; index += 1) {
-    const ratio = index / 4;
-    const gridY = top + ratio * plotHeight;
-    context.strokeStyle = palette.grid;
-    context.globalAlpha = 0.35;
-    context.beginPath();
-    context.moveTo(left, gridY);
-    context.lineTo(left + plotWidth, gridY);
-    context.stroke();
-    context.globalAlpha = 1;
-    context.fillStyle = palette.muted;
-    context.textAlign = "right";
-    context.fillText(format(maxY - ratio * (maxY - minY)), left - 9, gridY);
-  }
+  drawGrid(context, frame, [minY, maxY], palette);
 
   context.fillStyle = palette.muted;
   context.textAlign = "center";
@@ -165,40 +167,85 @@ export function drawPlot(
   context.restore();
 
   for (const series of plot.series) {
-    const color = series.color || palette.signal;
-    if (plot.kind === "line") {
-      context.strokeStyle = color;
-      context.lineWidth = 2;
+    drawSeries(context, plot.kind, series, frame, palette);
+  }
+  drawLegend(context, plot, frame, width, palette);
+}
+
+function drawGrid(
+  context: CanvasRenderingContext2D,
+  frame: PlotFrame,
+  [minY, maxY]: [number, number],
+  palette: PlotPalette,
+): void {
+  for (let index = 0; index <= 4; index += 1) {
+    const ratio = index / 4;
+    const gridY = frame.top + ratio * frame.plotHeight;
+    context.strokeStyle = palette.grid;
+    context.globalAlpha = 0.35;
+    context.beginPath();
+    context.moveTo(frame.left, gridY);
+    context.lineTo(frame.left + frame.plotWidth, gridY);
+    context.stroke();
+    context.globalAlpha = 1;
+    context.fillStyle = palette.muted;
+    context.textAlign = "right";
+    context.fillText(format(maxY - ratio * (maxY - minY)), frame.left - 9, gridY);
+  }
+}
+
+function drawSeries(
+  context: CanvasRenderingContext2D,
+  kind: PlotSpec["kind"],
+  series: PlotSpec["series"][number],
+  frame: PlotFrame,
+  palette: PlotPalette,
+): void {
+  const color = series.color || palette.signal;
+  if (kind === "line") {
+    context.strokeStyle = color;
+    context.lineWidth = 2;
+    context.beginPath();
+    series.points.forEach((point, index) => {
+      if (index === 0) context.moveTo(frame.x(point.x), frame.y(point.y));
+      else context.lineTo(frame.x(point.x), frame.y(point.y));
+    });
+    context.stroke();
+  }
+  const radius = markerRadius(kind, series.points.length);
+  if (radius > 0) {
+    for (const point of series.points) {
+      context.fillStyle = point.color || color;
       context.beginPath();
-      series.points.forEach((point, index) => {
-        if (index === 0) context.moveTo(x(point.x), y(point.y));
-        else context.lineTo(x(point.x), y(point.y));
-      });
-      context.stroke();
-    }
-    const radius = plot.kind === "line" && series.points.length > 120 ? 0 : plot.kind === "line" ? 3 : 2;
-    if (radius > 0) {
-      for (const point of series.points) {
-        context.fillStyle = point.color || color;
-        context.beginPath();
-        context.arc(x(point.x), y(point.y), radius, 0, Math.PI * 2);
-        context.fill();
-      }
+      context.arc(frame.x(point.x), frame.y(point.y), radius, 0, Math.PI * 2);
+      context.fill();
     }
   }
+}
 
+function markerRadius(kind: PlotSpec["kind"], pointCount: number): number {
+  if (kind !== "line") return 2;
+  return pointCount > 120 ? 0 : 3;
+}
+
+function drawLegend(
+  context: CanvasRenderingContext2D,
+  plot: PlotSpec,
+  frame: PlotFrame,
+  width: number,
+  palette: PlotPalette,
+): void {
   const labelled = plot.series.filter((series) => series.label);
-  if (labelled.length) {
-    let legendX = left;
-    for (const series of labelled) {
-      context.fillStyle = series.color || palette.signal;
-      context.fillRect(legendX, 15, 10, 10);
-      context.fillStyle = palette.foreground;
-      context.textAlign = "left";
-      context.fillText(series.label ?? "", legendX + 15, 20);
-      legendX += 28 + context.measureText(series.label ?? "").width;
-      if (legendX > width - 140) break;
-    }
+  if (!labelled.length) return;
+  let legendX = frame.left;
+  for (const series of labelled) {
+    context.fillStyle = series.color || palette.signal;
+    context.fillRect(legendX, 15, 10, 10);
+    context.fillStyle = palette.foreground;
+    context.textAlign = "left";
+    context.fillText(series.label ?? "", legendX + 15, 20);
+    legendX += 28 + context.measureText(series.label ?? "").width;
+    if (legendX > width - 140) break;
   }
 }
 

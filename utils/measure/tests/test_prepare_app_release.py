@@ -30,8 +30,9 @@ def test_prepare_release_rejects_empty_release_notes_without_writes(tmp_path: Pa
     _write_release_files(tmp_path)
     original_config = _read(tmp_path, "home-assistant-app/powercalc_measure/config.yaml")
 
+    release_date = date(2026, 7, 15)
     with pytest.raises(ReleasePreparationError, match="Release notes file is empty"):
-        prepare_release(tmp_path, "0.2.0", date(2026, 7, 15), " \n\t")
+        prepare_release(tmp_path, "0.2.0", release_date, " \n\t")
 
     assert _read(tmp_path, "home-assistant-app/powercalc_measure/config.yaml") == original_config
 
@@ -39,30 +40,35 @@ def test_prepare_release_rejects_empty_release_notes_without_writes(tmp_path: Pa
 def test_prepare_release_rejects_version_that_is_not_a_container_tag(tmp_path: Path) -> None:
     _write_release_files(tmp_path)
 
+    release_date = date(2026, 7, 15)
     with pytest.raises(ReleasePreparationError, match="Invalid app version"):
-        prepare_release(tmp_path, "0.2.0+build.1", date(2026, 7, 15), "### Added\n\n- Change.")
+        prepare_release(tmp_path, "0.2.0+build.1", release_date, "### Added\n\n- Change.")
 
 
 @pytest.mark.parametrize("heading", ["# Release notes", "## What's changed"])
 def test_prepare_release_rejects_top_level_headings(tmp_path: Path, heading: str) -> None:
     _write_release_files(tmp_path)
 
+    release_date = date(2026, 7, 15)
+    release_notes = f"{heading}\n\n- Change"
     with pytest.raises(ReleasePreparationError, match="level-one or level-two headings"):
-        prepare_release(tmp_path, "0.2.0", date(2026, 7, 15), f"{heading}\n\n- Change")
+        prepare_release(tmp_path, "0.2.0", release_date, release_notes)
 
 
 def test_prepare_release_rejects_legacy_unreleased_notes(tmp_path: Path) -> None:
     _write_release_files(tmp_path, unreleased_notes="- Manually maintained duplicate notes.")
 
+    release_date = date(2026, 7, 15)
     with pytest.raises(ReleasePreparationError, match=r"Unreleased.*must remain empty"):
-        prepare_release(tmp_path, "0.2.0", date(2026, 7, 15), "### Added\n\n- Drafted note.")
+        prepare_release(tmp_path, "0.2.0", release_date, "### Added\n\n- Drafted note.")
 
 
 def test_prepare_release_rejects_inconsistent_current_versions(tmp_path: Path) -> None:
     _write_release_files(tmp_path, package_version="0.1.1")
 
+    release_date = date(2026, 7, 15)
     with pytest.raises(ReleasePreparationError, match="version files differ"):
-        prepare_release(tmp_path, "0.2.0", date(2026, 7, 15), "### Added\n\n- Change.")
+        prepare_release(tmp_path, "0.2.0", release_date, "### Added\n\n- Change.")
 
 
 def test_dry_run_prints_diff_without_writing_files(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
@@ -71,20 +77,17 @@ def test_dry_run_prints_diff_without_writing_files(tmp_path: Path, capsys: pytes
     notes_path.write_text("### Added\n\n- Drafted note.\n", encoding="utf-8")
     original_config = _read(tmp_path, "home-assistant-app/powercalc_measure/config.yaml")
 
-    assert (
-        main(
-            [
-                "0.2.0",
-                "--notes-file",
-                str(notes_path),
-                "--date",
-                "2026-07-15",
-                "--dry-run",
-                "--root",
-                str(tmp_path),
-            ],
-        )
-        == 0
+    main(
+        [
+            "0.2.0",
+            "--notes-file",
+            str(notes_path),
+            "--date",
+            "2026-07-15",
+            "--dry-run",
+            "--root",
+            str(tmp_path),
+        ],
     )
 
     output = capsys.readouterr().out

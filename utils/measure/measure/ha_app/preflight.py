@@ -108,7 +108,8 @@ class MeasurementPreflight:
         warnings = result.warnings + (
             tuple(diagnostic.messages) if diagnostic.status in {DiagnosticStatus.WARNING, DiagnosticStatus.POOR} else ()
         )
-        return replace(result, warnings=warnings, power_meter_diagnostic=diagnostic)
+        final_result: PreflightResult = replace(result, warnings=warnings, power_meter_diagnostic=diagnostic)
+        return final_result
 
     def _validate_power_meter(self, request: MeasurementRequest) -> None:
         if isinstance(request.power_meter, HassPowerMeterSpec):

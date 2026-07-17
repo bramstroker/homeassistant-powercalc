@@ -99,25 +99,22 @@ def test_request_normalizes_and_requires_dummy_load_description() -> None:
 
 @pytest.mark.parametrize("resistance", [0, -1])
 def test_request_rejects_non_positive_dummy_load_resistance(resistance: float) -> None:
+    payload = valid_request() | {
+        "dummy_load": {
+            "mode": "reuse",
+            "description": "60 W incandescent bulb",
+            "resistance": resistance,
+        },
+    }
     with pytest.raises(ValidationError, match="resistance"):
-        LightMeasurementRequest.model_validate(
-            valid_request()
-            | {
-                "dummy_load": {
-                    "mode": "reuse",
-                    "description": "60 W incandescent bulb",
-                    "resistance": resistance,
-                },
-            },
-        )
+        LightMeasurementRequest.model_validate(payload)
 
 
 def test_request_rejects_dummy_load_with_synthetic_power_meter() -> None:
+    power_meter = DummyPowerMeterSpec()
+    dummy_load = DummyLoadCalibrationRequest(description="test load")
     with pytest.raises(ValidationError, match="synthetic"):
-        AverageMeasurementRequest(
-            power_meter=DummyPowerMeterSpec(),
-            dummy_load=DummyLoadCalibrationRequest(description="test load"),
-        )
+        AverageMeasurementRequest(power_meter=power_meter, dummy_load=dummy_load)
 
 
 def test_cli_request_contains_only_resolved_measurement_input(mock_config_factory: MockConfigFactory) -> None:

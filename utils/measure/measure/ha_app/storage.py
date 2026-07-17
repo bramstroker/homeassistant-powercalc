@@ -37,6 +37,8 @@ from measure.runner.light_plan import (
 
 _LOGGER = logging.getLogger("measure")
 
+_DUMMY_LOAD_CALIBRATION_FILENAME = "dummy_load_calibration.json"
+
 
 class SessionStorage:
     """Persist session state and outputs below a confined data root."""
@@ -206,7 +208,7 @@ class SessionStorage:
         return settings
 
     def load_dummy_load_calibration(self) -> DummyLoadCalibration | None:
-        path = self.data_root / "dummy_load_calibration.json"
+        path = self.data_root / _DUMMY_LOAD_CALIBRATION_FILENAME
         if not path.exists():
             return None
         try:
@@ -217,13 +219,13 @@ class SessionStorage:
 
     def save_dummy_load_calibration(self, calibration: DummyLoadCalibration) -> DummyLoadCalibration:
         self._write_json(
-            self.data_root / "dummy_load_calibration.json",
+            self.data_root / _DUMMY_LOAD_CALIBRATION_FILENAME,
             calibration.model_dump(mode="json"),
         )
         return calibration
 
     def load_session_dummy_load_calibration(self, session_id: str) -> DummyLoadCalibration | None:
-        path = self.session_directory(session_id) / "dummy_load_calibration.json"
+        path = self.session_directory(session_id) / _DUMMY_LOAD_CALIBRATION_FILENAME
         if not path.exists():
             return None
         try:
@@ -238,7 +240,7 @@ class SessionStorage:
         calibration: DummyLoadCalibration,
     ) -> DummyLoadCalibration:
         self._write_json(
-            self.session_directory(session_id) / "dummy_load_calibration.json",
+            self.session_directory(session_id) / _DUMMY_LOAD_CALIBRATION_FILENAME,
             calibration.model_dump(mode="json"),
         )
         return calibration

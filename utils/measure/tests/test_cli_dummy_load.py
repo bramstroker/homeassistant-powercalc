@@ -42,7 +42,7 @@ def test_store_saves_and_loads_calibration_for_matching_power_meter(tmp_path: Pa
     calibration = store.save(request, 1_322.4)
 
     assert calibration.description == "40 W incandescent bulb"
-    assert calibration.resistance == 1_322.4
+    assert calibration.resistance == pytest.approx(1_322.4)
     assert datetime.fromisoformat(calibration.calibrated_at).tzinfo == UTC
     assert store.load(request) is None
     assert store.load(_request()) == calibration
@@ -58,7 +58,7 @@ def test_store_upgrades_legacy_scalar_for_current_power_meter(tmp_path: Path) ->
 
     assert calibration is not None
     assert calibration.description == "Legacy resistive dummy load"
-    assert calibration.resistance == 1_322.4
+    assert calibration.resistance == pytest.approx(1_322.4)
     assert not legacy_path.exists()
     stored = json.loads((tmp_path / "dummy_load_calibration.json").read_text(encoding="utf-8"))
     assert stored["power_meter_fingerprint"] == calibration.power_meter_fingerprint

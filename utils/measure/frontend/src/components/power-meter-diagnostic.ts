@@ -48,20 +48,34 @@ export class PowerMeterDiagnosticView extends LitElement {
           <h4>${this.heading}</h4>
           <span class="status ${diagnostic.status}">${this.statusLabel(diagnostic.status)}</span>
         </div>
-        ${diagnostic.success ? html`
-          <div class="metrics">
-            ${this.metric("Current reading", diagnostic.power == null ? "—" : `${diagnostic.power} W`)}
-            ${this.metric("Reported resolution", this.precision(diagnostic))}
-            ${this.metric("Slowest update", this.interval(diagnostic))}
-            ${this.metric("Reports observed", `${diagnostic.reports_observed} in ${diagnostic.duration_seconds.toFixed(0)} s`)}
-          </div>
-          <div class="checks">
-            ${this.check("Reported resolution", diagnostic.precision_status)}
-            ${this.check("Update frequency", diagnostic.update_interval_status)}
-          </div>
-        ` : html`<p class="failure" role="alert">${diagnostic.message ?? "The measurement device could not be validated."}</p>`}
-        ${messages.length ? html`<ul class="messages">${messages.map((message) => html`<li>${message}</li>`)}</ul>` : nothing}
+        ${diagnostic.success
+          ? this.renderReadings(diagnostic)
+          : html`<p class="failure" role="alert">${diagnostic.message ?? "The measurement device could not be validated."}</p>`}
+        ${messages.length ? this.renderMessages(messages) : nothing}
       </section>
+    `;
+  }
+
+  private renderReadings(diagnostic: PowerMeterDiagnostic) {
+    return html`
+      <div class="metrics">
+        ${this.metric("Current reading", diagnostic.power == null ? "—" : `${diagnostic.power} W`)}
+        ${this.metric("Reported resolution", this.precision(diagnostic))}
+        ${this.metric("Slowest update", this.interval(diagnostic))}
+        ${this.metric("Reports observed", `${diagnostic.reports_observed} in ${diagnostic.duration_seconds.toFixed(0)} s`)}
+      </div>
+      <div class="checks">
+        ${this.check("Reported resolution", diagnostic.precision_status)}
+        ${this.check("Update frequency", diagnostic.update_interval_status)}
+      </div>
+    `;
+  }
+
+  private renderMessages(messages: string[]) {
+    return html`
+      <ul class="messages">
+        ${messages.map((message) => html`<li>${message}</li>`)}
+      </ul>
     `;
   }
 

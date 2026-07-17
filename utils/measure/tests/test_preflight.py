@@ -98,8 +98,9 @@ def test_preflight_requires_voltage_sensor_for_dummy_load() -> None:
         dummy_load=DummyLoadCalibrationRequest(description="40 W incandescent bulb"),
     )
 
+    checker = preflight(base_entities())
     with pytest.raises(PreflightError, match="voltage sensor is required"):
-        preflight(base_entities()).validate(request)
+        checker.validate(request)
 
 
 def test_preflight_rejects_power_meter_without_dummy_load_voltage_support() -> None:
@@ -108,8 +109,9 @@ def test_preflight_rejects_power_meter_without_dummy_load_voltage_support() -> N
         dummy_load=DummyLoadCalibrationRequest(description="40 W incandescent bulb"),
     )
 
+    checker = preflight(base_entities(), voltage_supported=False)
     with pytest.raises(PreflightError, match="does not support voltage"):
-        preflight(base_entities(), voltage_supported=False).validate(request)
+        checker.validate(request)
 
 
 def test_preflight_includes_minimum_dummy_load_calibration_duration() -> None:

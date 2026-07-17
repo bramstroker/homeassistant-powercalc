@@ -16,7 +16,7 @@ CONFIG_PATH = Path("home-assistant-app/powercalc_measure/config.yaml")
 CHANGELOG_PATH = Path("home-assistant-app/powercalc_measure/CHANGELOG.md")
 PACKAGE_PATH = Path("frontend/package.json")
 PACKAGE_LOCK_PATH = Path("frontend/package-lock.json")
-VERSION_PATTERN = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?")
+VERSION_PATTERN = re.compile(r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?")
 CONFIG_VERSION_PATTERN = re.compile(
     rf"^(?P<prefix>version:\s*)(?P<quote>[\"']?)(?P<version>{VERSION_PATTERN.pattern})(?P=quote)\s*$",
     re.MULTILINE,
@@ -179,7 +179,7 @@ def _print_diff(changes: dict[Path, str], root: Path) -> None:
         )
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Prepare a Powercalc Measure release")
     parser.add_argument("version", help="New semantic version, for example 0.2.0")
     parser.add_argument(
@@ -201,19 +201,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         release_date = date.fromisoformat(args.date)
         release_notes = args.notes_file.read_text(encoding="utf-8")
         changes = prepare_release(args.root.resolve(), args.version, release_date, release_notes)
-    except (ReleasePreparationError, ValueError, OSError, json.JSONDecodeError) as error:
+    except (ValueError, OSError) as error:
         parser.error(str(error))
 
     if args.dry_run:
         _print_diff(changes, args.root.resolve())
-        return 0
+        return
 
     write_release(changes)
     print(f"Prepared Powercalc Measure app release {args.version}")
     for path in changes:
         print(f"- {path.relative_to(args.root.resolve())}")
-    return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

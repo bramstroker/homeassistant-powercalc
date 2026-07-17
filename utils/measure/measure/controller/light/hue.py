@@ -154,20 +154,29 @@ class HueLightController(LightController):
         return str(app_key) if app_key else None
 
     def _save_app_key(self, app_key: str) -> None:
-        config: dict[str, Any] = {}
-        if self._config_file_path.exists():
-            try:
-                loaded = json.loads(self._config_file_path.read_text(encoding="utf-8"))
-                if isinstance(loaded, dict):
-                    config = loaded
-            except (OSError, json.JSONDecodeError) as error:
-                raise LightControllerError(f"Could not read Hue bridge configuration: {error}") from error
+        config = self._load_bridge_config()
         config[self._bridge_ip] = {"username": app_key}
         try:
             self._config_file_path.parent.mkdir(parents=True, exist_ok=True)
             self._config_file_path.write_text(json.dumps(config), encoding="utf-8")
         except OSError as error:
             raise LightControllerError(f"Could not save Hue bridge configuration: {error}") from error
+
+    def _load_bridge_config(self) -> dict[str, dict[str, str]]:
+        """Return only well-formed bridge entries; anything else is dropped instead of rewritten."""
+        if not self._config_file_path.exists():
+            return {}
+        try:
+            loaded = json.loads(self._config_file_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise LightControllerError(f"Could not read Hue bridge configuration: {error}") from error
+        if not isinstance(loaded, dict):
+            return {}
+        return {
+            bridge_ip: {"username": entry["username"]}
+            for bridge_ip, entry in loaded.items()
+            if isinstance(bridge_ip, str) and isinstance(entry, dict) and isinstance(entry.get("username"), str)
+        }
 
     def _select_light(self, light: str) -> None:
         try:

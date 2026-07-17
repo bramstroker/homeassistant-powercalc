@@ -35,6 +35,7 @@ _EFFECT_COLORS = (
     "#f28bb7",
 )
 _LIGHT_MODE_ORDER = (LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS, LutMode.EFFECT)
+_POWER_AXIS_LABEL = "Power (W)"
 
 
 class PlotKind(StrEnum):
@@ -183,33 +184,9 @@ def _light_plot(path: Path, *, source: str, mode: LutMode, max_points: int | Non
         rows = list(reader)
 
     if mode is LutMode.EFFECT:
-        grouped: dict[str, list[PlotPoint]] = {}
-        for row in rows:
-            effect = str(row.get("effect", "")).strip()
-            point = _light_point(row, mode)
-            if effect and point is not None:
-                grouped.setdefault(effect, []).append(point)
-        if not grouped:
-            raise PlotDataError("no valid effect measurements found")
-        series = tuple(
-            PlotSeries(
-                label=effect,
-                color=_EFFECT_COLORS[index % len(_EFFECT_COLORS)],
-                points=_limit_scatter(points, max_points),
-            )
-            for index, (effect, points) in enumerate(grouped.items())
-        )
+        series = _effect_series(rows, max_points)
     else:
-        points = [point for row in rows if (point := _light_point(row, mode)) is not None]
-        if not points:
-            raise PlotDataError("no valid light measurements found")
-        series = (
-            PlotSeries(
-                label=None,
-                color=_DEFAULT_COLOR if mode is LutMode.BRIGHTNESS else None,
-                points=_limit_scatter(points, max_points),
-            ),
-        )
+        series = _single_light_series(rows, mode, max_points)
 
     title = {
         LutMode.BRIGHTNESS: "Brightness",
@@ -222,9 +199,45 @@ def _light_plot(path: Path, *, source: str, mode: LutMode, max_points: int | Non
         title=title,
         kind=PlotKind.SCATTER,
         x_label="Brightness",
-        y_label="Power (W)",
+        y_label=_POWER_AXIS_LABEL,
         source=source,
         series=series,
+    )
+
+
+def _effect_series(rows: list[dict[str, str | None]], max_points: int | None) -> tuple[PlotSeries, ...]:
+    grouped: dict[str, list[PlotPoint]] = {}
+    for row in rows:
+        effect = str(row.get("effect", "")).strip()
+        point = _light_point(row, LutMode.EFFECT)
+        if effect and point is not None:
+            grouped.setdefault(effect, []).append(point)
+    if not grouped:
+        raise PlotDataError("no valid effect measurements found")
+    return tuple(
+        PlotSeries(
+            label=effect,
+            color=_EFFECT_COLORS[index % len(_EFFECT_COLORS)],
+            points=_limit_scatter(points, max_points),
+        )
+        for index, (effect, points) in enumerate(grouped.items())
+    )
+
+
+def _single_light_series(
+    rows: list[dict[str, str | None]],
+    mode: LutMode,
+    max_points: int | None,
+) -> tuple[PlotSeries, ...]:
+    points = [point for row in rows if (point := _light_point(row, mode)) is not None]
+    if not points:
+        raise PlotDataError("no valid light measurements found")
+    return (
+        PlotSeries(
+            label=None,
+            color=_DEFAULT_COLOR if mode is LutMode.BRIGHTNESS else None,
+            points=_limit_scatter(points, max_points),
+        ),
     )
 
 
@@ -280,7 +293,7 @@ def _linear_plot(path: Path, *, source: str, max_points: int | None) -> PlotSpec
         title=title,
         kind=PlotKind.LINE,
         x_label=x_label,
-        y_label="Power (W)",
+        y_label=_POWER_AXIS_LABEL,
         source=source,
         series=(
             PlotSeries(
@@ -309,7 +322,7 @@ def _recorder_plot(path: Path, *, source: str, max_points: int | None) -> PlotSp
         title="Power recording",
         kind=PlotKind.LINE,
         x_label="Elapsed time (s)",
-        y_label="Power (W)",
+        y_label=_POWER_AXIS_LABEL,
         source=source,
         series=(
             PlotSeries(
