@@ -62,6 +62,10 @@ logging.basicConfig(
     ],
 )
 
+# homeassistant_api logs every websocket exchange at INFO; only surface those when debugging.
+if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
+    logging.getLogger("homeassistant_api").setLevel(logging.WARNING)
+
 
 MODEL_ID_EXAMPLES = {
     MeasureType.LIGHT: "LED1837R5",

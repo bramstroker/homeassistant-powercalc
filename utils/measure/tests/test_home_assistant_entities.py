@@ -113,20 +113,24 @@ def test_catalog_applies_one_selection_policy_and_enriches_entities() -> None:
     home_assistant.get_entity_data.assert_called_once_with()
 
 
-def test_catalog_loads_fresh_entity_data_for_every_snapshot() -> None:
+def test_catalog_loads_entity_data_once_per_instance() -> None:
+    """Interactive choices call load_snapshot on every keypress; it must not hit Home Assistant each time."""
     home_assistant = MagicMock(spec=HomeAssistantManager)
     home_assistant.get_entity_data.side_effect = (
         _entity_data(power_state="1.0"),
         _entity_data(power_state="2.0"),
     )
-    catalog = HomeAssistantEntityCatalog(home_assistant)
 
+    catalog = HomeAssistantEntityCatalog(home_assistant)
     first = catalog.load_snapshot().select(device_class=DeviceClass.POWER)
     second = catalog.load_snapshot().select(device_class=DeviceClass.POWER)
 
     assert first[0].state == "1.0"
-    assert second[0].state == "2.0"
-    assert home_assistant.get_entity_data.call_count == 2
+    assert second[0].state == "1.0"
+    assert home_assistant.get_entity_data.call_count == 1
+
+    fresh = HomeAssistantEntityCatalog(home_assistant).load_snapshot().select(device_class=DeviceClass.POWER)
+    assert fresh[0].state == "2.0"
 
 
 def test_snapshot_requires_exactly_one_entity_filter() -> None:

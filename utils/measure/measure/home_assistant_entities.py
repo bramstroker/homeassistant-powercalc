@@ -142,12 +142,23 @@ class EntityCatalogSnapshot:
 
 
 class HomeAssistantEntityCatalog:
-    """Build fresh, reusable selector snapshots from Home Assistant data."""
+    """Build reusable selector snapshots from Home Assistant data.
+
+    The snapshot is loaded once per catalog instance; create a new catalog to see fresh data.
+    Interactive question rendering re-evaluates choices on every keypress, so load_snapshot
+    must not hit Home Assistant each call.
+    """
 
     def __init__(self, home_assistant: HomeAssistantManager) -> None:
         self._home_assistant = home_assistant
+        self._snapshot: EntityCatalogSnapshot | None = None
 
     def load_snapshot(self) -> EntityCatalogSnapshot:
+        if self._snapshot is None:
+            self._snapshot = self._build_snapshot()
+        return self._snapshot
+
+    def _build_snapshot(self) -> EntityCatalogSnapshot:
         data = self._home_assistant.get_entity_data()
         registry = {entry.entity_id: entry for entry in data.entity_registry}
         devices = {

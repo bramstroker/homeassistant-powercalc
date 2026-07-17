@@ -57,6 +57,8 @@ def _configure_logging(debug: bool) -> None:
     level = logging.DEBUG if debug else logging.INFO
     logging.basicConfig(level=level, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     logging.getLogger("measure").setLevel(level)
+    # homeassistant_api logs every websocket exchange at INFO; only surface those when debugging.
+    logging.getLogger("homeassistant_api").setLevel(logging.DEBUG if debug else logging.WARNING)
 
 
 if __name__ == "__main__":
