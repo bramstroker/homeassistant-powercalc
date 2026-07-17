@@ -261,25 +261,7 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
         app_defaults = (await run_in_threadpool(_context(request).storage.load_settings)).measurement_defaults
         return CapabilitiesResponse(
             modes=list(supported_light_modes()),
-            defaults={
-                "sleep_time": app_defaults.sleep_time,
-                "sample_count": app_defaults.sample_count,
-                "sleep_time_sample": app_defaults.sleep_time_sample,
-                "max_retries": app_defaults.max_retries,
-                "max_nudges": app_defaults.max_nudges,
-                "bri_bri_steps": defaults.bri_bri_steps,
-                "ct_bri_steps": defaults.ct_bri_steps,
-                "ct_mired_steps": defaults.ct_mired_steps,
-                "hs_bri_steps": defaults.hs_bri_steps,
-                "hs_hue_steps": defaults.hs_hue_steps,
-                "hs_sat_steps": defaults.hs_sat_steps,
-                "min_brightness": defaults.min_brightness,
-                "sleep_initial": defaults.sleep_initial,
-                "sleep_standby": defaults.sleep_standby,
-                "effect_bri_steps": defaults.effect_bri_steps,
-                "measure_time_effect": defaults.measure_time_effect,
-                "measure_time_effect_min": defaults.measure_time_effect_min,
-            },
+            defaults={name: getattr(defaults, name) for name in PARAMETER_LIMITS} | app_defaults.model_dump(),
             limits={name: {"min": minimum, "max": maximum} for name, (minimum, maximum) in PARAMETER_LIMITS.items()},
         )
 

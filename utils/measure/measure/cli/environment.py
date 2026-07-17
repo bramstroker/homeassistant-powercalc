@@ -1,8 +1,9 @@
 import logging
+from typing import Any
 
 from decouple import Choices, UndefinedValueError, config
 
-from measure.const import parse_measure_type
+from measure.const import CT_BRI_STEPS_MANUAL, CT_MIRED_STEPS_MANUAL, PARAMETER_LIMITS, parse_measure_type
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import DEFAULT_LIGHT_TRANSITION_TIME, LightControllerType
@@ -16,19 +17,37 @@ _LOGGER = logging.getLogger("measure")
 _DEFAULTS = MeasurementParameters()
 
 
+def _clamp(name: str, value: float) -> Any:  # noqa: ANN401  # int env values must stay int; typing per call site
+    minimum, maximum = PARAMETER_LIMITS[name]
+    if minimum <= value <= maximum:
+        return value
+    clamped = min(max(value, minimum), maximum)
+    _LOGGER.warning(
+        "%s=%s is outside the allowed range [%s, %s]; using %s",
+        name.upper(),
+        value,
+        minimum,
+        maximum,
+        clamped,
+    )
+    return clamped
+
+
+def _bounded(name: str, *, cast: type = int) -> Any:  # noqa: ANN401  # int env values must stay int; typing per call site
+    """Read the env override (NAME uppercased), fall back to the shared tuning default, clamp to the table."""
+    return _clamp(name, config(name.upper(), default=getattr(_DEFAULTS, name), cast=cast))
+
+
 class CliEnvironment:
     @property
     def min_brightness(self) -> int:
-        return min(
-            max(
-                config(
-                    "MIN_BRIGHTNESS",
-                    default=config("START_BRIGHTNESS", default=_DEFAULTS.min_brightness, cast=int),
-                    cast=int,
-                ),
-                1,
+        return _clamp(
+            "min_brightness",
+            config(
+                "MIN_BRIGHTNESS",
+                default=config("START_BRIGHTNESS", default=_DEFAULTS.min_brightness, cast=int),
+                cast=int,
             ),
-            255,
         )
 
     @property
@@ -37,34 +56,31 @@ class CliEnvironment:
 
     @property
     def min_sat(self) -> int:
-        return min(max(config("MIN_SAT", default=_DEFAULTS.min_sat, cast=int), 1), 255)
+        return _bounded("min_sat")
 
     @property
     def max_sat(self) -> int:
-        return min(max(config("MAX_SAT", default=_DEFAULTS.max_sat, cast=int), 1), 255)
+        return _bounded("max_sat")
 
     @property
     def min_hue(self) -> int:
-        return min(max(config("MIN_HUE", default=_DEFAULTS.min_hue, cast=int), 1), 65535)
+        return _bounded("min_hue")
 
     @property
     def max_hue(self) -> int:
-        return min(max(config("MAX_HUE", default=_DEFAULTS.max_hue, cast=int), 1), 65535)
+        return _bounded("max_hue")
 
     @property
     def ct_bri_steps(self) -> int:
         if self.selected_power_meter == PowerMeterType.MANUAL:
-            return 15
-        # Capped so automated sessions cannot produce profiles coarser than step 10;
-        # manual meters get a coarser fixed step because hand-reading is laborious.
-        return min(config("CT_BRI_STEPS", default=5, cast=int), 10)
+            return CT_BRI_STEPS_MANUAL
+        return _bounded("ct_bri_steps")
 
     @property
     def ct_mired_steps(self) -> int:
         if self.selected_power_meter == PowerMeterType.MANUAL:
-            return 50
-        # Capped for the same profile-density reason as ct_bri_steps.
-        return min(config("CT_MIRED_STEPS", default=10, cast=int), 10)
+            return CT_MIRED_STEPS_MANUAL
+        return _bounded("ct_mired_steps")
 
     @property
     def bri_bri_steps(self) -> int:
@@ -104,7 +120,7 @@ class CliEnvironment:
 
     @property
     def effect_bri_steps(self) -> int:
-        return config("EFFECT_BRI_STEPS", default=_DEFAULTS.effect_bri_steps, cast=int)
+        return _bounded("effect_bri_steps")
 
     @property
     def selected_light_controller(self) -> LightControllerType:
@@ -152,19 +168,19 @@ class CliEnvironment:
 
     @property
     def sleep_initial(self) -> int:
-        return config("SLEEP_INITIAL", default=_DEFAULTS.sleep_initial, cast=int)
+        return _bounded("sleep_initial")
 
     @property
     def sleep_standby(self) -> int:
-        return config("SLEEP_STANDBY", default=_DEFAULTS.sleep_standby, cast=int)
+        return _bounded("sleep_standby")
 
     @property
     def sleep_time(self) -> float:
-        return config("SLEEP_TIME", default=_DEFAULTS.sleep_time, cast=float)
+        return _bounded("sleep_time", cast=float)
 
     @property
     def sleep_time_sample(self) -> int:
-        return config("SLEEP_TIME_SAMPLE", default=_DEFAULTS.sleep_time_sample, cast=int)
+        return _bounded("sleep_time_sample")
 
     @property
     def sleep_time_hue(self) -> int:
@@ -181,15 +197,12 @@ class CliEnvironment:
     @property
     def measure_time_effect(self) -> int:
         """Maximum seconds to measure each effect/brightness combination."""
-        return config("MEASURE_TIME_EFFECT", default=_DEFAULTS.measure_time_effect, cast=int)
+        return _bounded("measure_time_effect")
 
     @property
     def measure_time_effect_min(self) -> int:
         """Minimum seconds before effect measurement can stop on convergence."""
-        return min(
-            config("MEASURE_TIME_EFFECT_MIN", default=_DEFAULTS.measure_time_effect_min, cast=int),
-            self.measure_time_effect,
-        )
+        return min(_bounded("measure_time_effect_min"), self.measure_time_effect)
 
     @property
     def measure_time_effect_convergence_window(self) -> int:
@@ -238,17 +251,17 @@ class CliEnvironment:
 
     @property
     def max_retries(self) -> int:
-        return config("MAX_RETRIES", default=_DEFAULTS.max_retries, cast=int)
+        return _bounded("max_retries")
 
     @property
     def max_nudges(self) -> int:
-        return config("MAX_NUDGES", default=_DEFAULTS.max_nudges, cast=int)
+        return _bounded("max_nudges")
 
     @property
     def sample_count(self) -> int:
         if self.selected_power_meter == PowerMeterType.MANUAL:
             return 1
-        return config("SAMPLE_COUNT", default=_DEFAULTS.sample_count, cast=int)
+        return _bounded("sample_count")
 
     @property
     def selected_measure_type(self) -> str | None:

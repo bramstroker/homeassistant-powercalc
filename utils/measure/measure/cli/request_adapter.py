@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import Any
 
 from measure.cli.environment import CliEnvironment
@@ -114,40 +115,9 @@ def request_from_answers(
 
 
 def _parameters_from_environment(environment: CliEnvironment) -> MeasurementParameters:
+    # CliEnvironment exposes an identically named property for every tuning field.
     return MeasurementParameters(
-        min_brightness=environment.min_brightness,
-        max_brightness=environment.max_brightness,
-        min_sat=environment.min_sat,
-        max_sat=environment.max_sat,
-        min_hue=environment.min_hue,
-        max_hue=environment.max_hue,
-        ct_bri_steps=environment.ct_bri_steps,
-        ct_mired_steps=environment.ct_mired_steps,
-        bri_bri_steps=environment.bri_bri_steps,
-        hs_bri_steps=environment.hs_bri_steps,
-        hs_hue_steps=environment.hs_hue_steps,
-        hs_sat_steps=environment.hs_sat_steps,
-        effect_bri_steps=environment.effect_bri_steps,
-        measure_time_effect=environment.measure_time_effect,
-        measure_time_effect_min=environment.measure_time_effect_min,
-        measure_time_effect_convergence_window=environment.measure_time_effect_convergence_window,
-        measure_time_effect_convergence_abs=environment.measure_time_effect_convergence_abs,
-        measure_time_effect_convergence_rel=environment.measure_time_effect_convergence_rel,
-        sleep_initial=environment.sleep_initial,
-        sleep_standby=environment.sleep_standby,
-        sleep_time=environment.sleep_time,
-        sleep_time_sample=environment.sleep_time_sample,
-        sleep_time_hue=environment.sleep_time_hue,
-        sleep_time_sat=environment.sleep_time_sat,
-        sleep_time_ct=environment.sleep_time_ct,
-        sleep_time_effect_change=environment.sleep_time_effect_change,
-        sleep_time_nudge=environment.sleep_time_nudge,
-        pulse_time_nudge=environment.pulse_time_nudge,
-        sample_count=environment.sample_count,
-        max_retries=environment.max_retries,
-        max_nudges=environment.max_nudges,
-        prompt_resume=environment.prompt_resume,
-        csv_add_datetime_column=environment.csv_add_datetime_column,
+        **{field.name: getattr(environment, field.name) for field in dataclasses.fields(MeasurementParameters)},
     )
 
 

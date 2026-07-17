@@ -234,12 +234,18 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
         "hs_hue_steps": defaults.hs_hue_steps,
         "hs_sat_steps": defaults.hs_sat_steps,
         "min_brightness": defaults.min_brightness,
+        "min_sat": defaults.min_sat,
+        "max_sat": defaults.max_sat,
+        "min_hue": defaults.min_hue,
+        "max_hue": defaults.max_hue,
         "sleep_initial": defaults.sleep_initial,
         "sleep_standby": defaults.sleep_standby,
         "effect_bri_steps": defaults.effect_bri_steps,
         "measure_time_effect": defaults.measure_time_effect,
         "measure_time_effect_min": defaults.measure_time_effect_min,
     }
+    assert capabilities.json()["limits"]["ct_bri_steps"] == {"min": 1, "max": 10}
+    assert capabilities.json()["limits"]["min_sat"] == {"min": 1, "max": 255}
     assert [item["entity_id"] for item in powers.json()] == ["sensor.test_power"]
     assert powers.json()[0]["device_id"] == "meter-device"
     assert powers.json()[0]["model_id"] == "PM-001"

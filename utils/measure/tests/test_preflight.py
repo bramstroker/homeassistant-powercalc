@@ -223,12 +223,12 @@ def test_light_preflight_uses_device_color_temperature_range() -> None:
         power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
         controller=HassLightControllerSpec(entity_id="light.test"),
         modes={LutMode.COLOR_TEMP},
-        parameters={"ct_bri_steps": 100, "ct_mired_steps": 50},
+        parameters={"ct_bri_steps": 10, "ct_mired_steps": 10},
     )
 
     result = preflight(entities).validate(request)
 
-    assert result.estimated_variations == 12
+    assert result.estimated_variations == 297
 
 
 def test_light_preflight_uses_default_color_temperature_resolution() -> None:

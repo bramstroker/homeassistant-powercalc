@@ -7,14 +7,14 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator, model_validator
 
-from measure.const import PARAMETER_LIMITS, MeasureType
+from measure.const import MANUAL_PARAMETER_LIMIT_OVERRIDES, PARAMETER_LIMITS, MeasureType
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.spec import ChargingControllerSpec
 from measure.controller.fan.spec import FanControllerSpec
 from measure.controller.light.const import LutMode
 from measure.controller.light.spec import LightControllerSpec
 from measure.controller.media.spec import MediaControllerSpec
-from measure.powermeter.spec import DummyPowerMeterSpec, PowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, ManualPowerMeterSpec, PowerMeterSpec
 from measure.runner.const import DEFAULT_EXPORT_FILENAME
 from measure.tuning import MeasurementParameters
 
@@ -69,6 +69,10 @@ type DummyLoadRequest = Annotated[
 _BASE_PARAMETER_FIELDS = ("sleep_time", "sample_count", "sleep_time_sample", "max_retries", "max_nudges")
 _LIGHT_PARAMETER_FIELDS = (
     "min_brightness",
+    "min_sat",
+    "max_sat",
+    "min_hue",
+    "max_hue",
     "bri_bri_steps",
     "ct_bri_steps",
     "ct_mired_steps",
@@ -83,9 +87,13 @@ _LIGHT_PARAMETER_FIELDS = (
 )
 
 
-def _validate_parameter_limits(parameters: MeasurementParameters, names: Iterable[str]) -> None:
+def _validate_parameter_limits(
+    parameters: MeasurementParameters,
+    names: Iterable[str],
+    overrides: dict[str, tuple[float, float]] | None = None,
+) -> None:
     for name in names:
-        minimum, maximum = PARAMETER_LIMITS[name]
+        minimum, maximum = (overrides or {}).get(name, PARAMETER_LIMITS[name])
         number = getattr(parameters, name)
         if not minimum <= number <= maximum:
             raise ValueError(f"{name} must be between {minimum} and {maximum}")
@@ -154,13 +162,19 @@ class LightMeasurementRequest(BaseMeasurementRequest):
             raise ValueError(f"Unsupported measurement modes: {', '.join(sorted(unsupported))}")
         return value
 
-    @field_validator("parameters")
-    @classmethod
-    def validate_light_parameters(cls, value: MeasurementParameters) -> MeasurementParameters:
-        _validate_parameter_limits(value, _LIGHT_PARAMETER_FIELDS)
+    @model_validator(mode="after")
+    def validate_light_parameters(self) -> LightMeasurementRequest:
+        # Manual meters use a coarser fixed ct grid than the automated density guard allows.
+        overrides = MANUAL_PARAMETER_LIMIT_OVERRIDES if isinstance(self.power_meter, ManualPowerMeterSpec) else None
+        value = self.parameters
+        _validate_parameter_limits(value, _LIGHT_PARAMETER_FIELDS, overrides)
         if value.measure_time_effect_min > value.measure_time_effect:
             raise ValueError("measure_time_effect_min must not exceed measure_time_effect")
-        return value
+        if value.min_sat > value.max_sat:
+            raise ValueError("min_sat must not exceed max_sat")
+        if value.min_hue > value.max_hue:
+            raise ValueError("min_hue must not exceed max_hue")
+        return self
 
 
 class AverageMeasurementRequest(BaseMeasurementRequest):

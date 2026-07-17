@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from measure.cli.request_adapter import request_from_answers
-from measure.const import QUESTION_ENTITY_ID, QUESTION_MEASURE_DEVICE, MeasureType
+from measure.const import PARAMETER_LIMITS, QUESTION_ENTITY_ID, QUESTION_MEASURE_DEVICE, MeasureType
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import (
+    _BASE_PARAMETER_FIELDS,
+    _LIGHT_PARAMETER_FIELDS,
     AverageMeasurementRequest,
     DummyLoadCalibrationRequest,
     DummyLoadReuseRequest,
@@ -190,10 +192,15 @@ def test_request_preserves_subsecond_sleep_time() -> None:
         ({"max_retries": 101}, "max_retries"),
         ({"max_nudges": 21}, "max_nudges"),
         ({"min_brightness": 0}, "min_brightness"),
+        ({"min_sat": 0}, "min_sat"),
+        ({"max_hue": 65_536}, "max_hue"),
         ({"bri_bri_steps": 0}, "bri_bri_steps"),
-        ({"ct_mired_steps": 501}, "ct_mired_steps"),
+        ({"ct_bri_steps": 11}, "ct_bri_steps"),
+        ({"ct_mired_steps": 11}, "ct_mired_steps"),
         ({"hs_hue_steps": 65_536}, "hs_hue_steps"),
         ({"measure_time_effect": 10, "measure_time_effect_min": 20}, "measure_time_effect_min"),
+        ({"min_sat": 200, "max_sat": 50}, "min_sat must not exceed max_sat"),
+        ({"min_hue": 500, "max_hue": 100}, "min_hue must not exceed max_hue"),
     ],
 )
 def test_request_rejects_invalid_exposed_tuning(parameters: dict[str, int], message: str) -> None:
@@ -201,3 +208,29 @@ def test_request_rejects_invalid_exposed_tuning(parameters: dict[str, int], mess
 
     with pytest.raises(ValidationError, match=message):
         LightMeasurementRequest.model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    ("power_meter", "accepted"),
+    [
+        ({"type": "manual"}, True),
+        ({"type": "hass", "entity_id": "sensor.test_power"}, False),
+    ],
+)
+def test_manual_power_meter_allows_coarser_ct_grid(power_meter: dict[str, str], accepted: bool) -> None:
+    payload = valid_request() | {
+        "power_meter": power_meter,
+        "parameters": {"ct_bri_steps": 15, "ct_mired_steps": 50},
+    }
+
+    if accepted:
+        request = LightMeasurementRequest.model_validate(payload)
+        assert request.parameters.ct_bri_steps == 15
+        assert request.parameters.ct_mired_steps == 50
+    else:
+        with pytest.raises(ValidationError, match="ct_bri_steps"):
+            LightMeasurementRequest.model_validate(payload)
+
+
+def test_parameter_limits_cover_exactly_the_validated_fields() -> None:
+    assert set(_BASE_PARAMETER_FIELDS) | set(_LIGHT_PARAMETER_FIELDS) == set(PARAMETER_LIMITS)
