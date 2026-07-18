@@ -6,7 +6,12 @@ import time
 
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.execution import LightOperatingPoint
-from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError, SessionMeasurementService
+from measure.ha_app.coordinator import (
+    MeasurementCoordinator,
+    SessionConflictError,
+    SessionExecutionContext,
+    SessionMeasurementService,
+)
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
@@ -43,9 +48,9 @@ class CompletingService(SessionMeasurementService):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult:
-        directory = output_root / request.model_id
+        directory = context.artifact_directory
         directory.mkdir(parents=True)
         (directory / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
         control.progress(completed=1, total=1, mode="brightness", estimated_remaining="0s")
@@ -60,7 +65,7 @@ class BlockingService(SessionMeasurementService):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult:
         self.started.set()
         control.wait(60)
@@ -72,7 +77,7 @@ class SamplingService(SessionMeasurementService):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult:
         control.sample(4.2)
         return RunnerResult(model_json_data={})
@@ -83,7 +88,7 @@ class OperatingPointService(SessionMeasurementService):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult:
         control.operating_point(LightOperatingPoint(type="light", on=True, brightness=128))
         control.wait(60)
@@ -98,7 +103,7 @@ class CheckpointService(SessionMeasurementService):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult:
         control.phase("Preparing operator checkpoint")
         control.confirm("Place the device on its charger, then start the measurement.")

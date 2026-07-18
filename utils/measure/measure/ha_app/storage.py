@@ -193,6 +193,11 @@ class SessionStorage:
     def output_directory(self, session_id: str) -> Path:
         return self._contained(self.session_directory(session_id) / "output")
 
+    def artifact_directory(self, session_id: str, model_id: str) -> Path:
+        """Return the confined output directory for one session model."""
+
+        return self._contained(self.output_directory(session_id) / model_id)
+
     def load_settings(self) -> AppPreferences:
         path = self.data_root / "settings.json"
         if not path.exists():
@@ -253,7 +258,7 @@ class SessionStorage:
             return False
         if not isinstance(request, LightMeasurementRequest):
             return False
-        model_root = self.output_directory(session_id) / request.model_id
+        model_root = self.artifact_directory(session_id, request.model_id)
         for mode in request.modes:
             path = model_root / f"{mode.value}.csv"
             if self._has_complete_measurement_row(path, mode, request):

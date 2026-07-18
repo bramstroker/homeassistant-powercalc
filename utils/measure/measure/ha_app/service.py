@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 import re
 
 from measure.assembler import MeasurementAssembler
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import DummyLoadCalibrationStore, MeasurementExecution
-from measure.ha_app.coordinator import SessionMeasurementService
+from measure.ha_app.coordinator import SessionExecutionContext, SessionMeasurementService
 from measure.ha_app.interaction import SessionInteraction
 from measure.ha_app.session import SessionControl, SessionEventType, utc_now
 from measure.ha_app.storage import SessionStorage
@@ -86,7 +85,7 @@ class MeasurementService(SessionMeasurementService):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult:
         """Run with session logging and redact secrets from surfaced failures."""
 
@@ -97,7 +96,7 @@ class MeasurementService(SessionMeasurementService):
             _LOGGER.setLevel(logging.INFO)
         _LOGGER.addHandler(handler)
         try:
-            return self._run(request, control, output_root)
+            return self._run(request, control, context)
         except Exception as error:
             message = _redact(str(error), (self.home_assistant.token,))
             if message != str(error):
@@ -111,7 +110,7 @@ class MeasurementService(SessionMeasurementService):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult:
         control.checkpoint()
         if isinstance(request.power_meter, DummyPowerMeterSpec):
@@ -119,7 +118,7 @@ class MeasurementService(SessionMeasurementService):
         interaction = SessionInteraction(control)
         control.phase("Preparing measurement devices")
         calibration_store = (
-            SessionDummyLoadCalibrationStore(self.storage, output_root.parent.name)
+            SessionDummyLoadCalibrationStore(self.storage, context.session_id)
             if request.dummy_load is not None and self.storage is not None
             else None
         )
@@ -129,12 +128,11 @@ class MeasurementService(SessionMeasurementService):
             on_sample=control.sample,
             dummy_load_calibration_store=calibration_store,
         ).assemble(request)
-        output_directory = output_root / request.model_id
         control.phase("Starting measurement")
         control.emit(SessionEventType.STATE, {"state": "running"})
 
         execution = MeasurementExecution(
             measurement=prepared,
-            output_directory=output_directory,
+            output_directory=context.artifact_directory,
         )
         return execution.run()

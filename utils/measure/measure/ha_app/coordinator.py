@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import replace
+from dataclasses import dataclass, replace
 import logging
 from pathlib import Path
 from threading import Lock, Thread
@@ -31,6 +31,14 @@ class SessionConflictError(Exception):
     """Raised when an operation conflicts with the active session state."""
 
 
+@dataclass(frozen=True)
+class SessionExecutionContext:
+    """Explicit identity and artifact location for one session execution."""
+
+    session_id: str
+    artifact_directory: Path
+
+
 class SessionMeasurementService(Protocol):
     """Run one session without exposing its adapter composition to the coordinator."""
 
@@ -38,7 +46,7 @@ class SessionMeasurementService(Protocol):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult: ...
 
 
@@ -190,10 +198,14 @@ class MeasurementCoordinator:
         control: SessionControl,
     ) -> None:
         try:
+            context = SessionExecutionContext(
+                session_id=session_id,
+                artifact_directory=self.storage.artifact_directory(session_id, request.model_id),
+            )
             result = self.service_factory().run(
                 request,
                 control,
-                self.storage.output_directory(session_id),
+                context,
             )
         except MeasurementCancelledError:
             self._finish(SessionState.CANCELLED)
