@@ -19,24 +19,33 @@ COPY --from=ghcr.io/astral-sh/uv:0.11.29 /uv /uvx /bin/
 
 WORKDIR /app
 
-# Copy only the package inputs needed by the runtime image. In particular,
-# local credentials, measurement output, tests, and frontend tooling stay out.
-COPY pyproject.toml uv.lock README.md .VERSION ./
-COPY measure/ ./measure/
+# Install locked third-party dependencies before copying the project. Source
+# changes can then reuse this expensive layer.
+COPY pyproject.toml uv.lock ./
+RUN uv sync --locked --no-install-project
 
-# Create virtual environment and install dependencies
-RUN uv sync --locked
-
-# The CLI does not serve these files, but keeping one Python base avoids
-# dependency drift between the standalone and Home Assistant images.
-COPY --from=frontend-build /frontend/dist /app/measure/static
-
-# Set PATH to use the virtual environment
+# Use the managed environment in every final image and dependency stage.
 ENV PATH="/app/.venv/bin:$PATH"
 
-FROM python-runtime AS ha-app
+FROM python-runtime AS ha-app-dependencies
 
+RUN uv sync --locked --extra app --no-install-project
+
+FROM python-runtime AS cli-dependencies
+
+RUN apt-get update && apt-get install -y libgl1 tesseract-ocr && rm -rf /var/lib/apt/lists/* \
+    && uv sync --locked --extra cli --extra ocr --no-install-project
+
+FROM ha-app-dependencies AS ha-app
+
+# Copy only the project inputs needed by the final images. In particular,
+# local credentials, measurement output, tests, and frontend tooling stay out.
+COPY README.md .VERSION ./
+COPY measure/ ./measure/
 RUN uv sync --locked --extra app
+
+# Serve the compiled frontend from the Home Assistant app image.
+COPY --from=frontend-build /frontend/dist /app/measure/static
 
 ENV POWERCALC_MEASURE_DATA_ROOT=/data
 
@@ -51,12 +60,13 @@ HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
 ENTRYPOINT ["python", "-m", "measure.ha_app.main"]
 CMD ["--host", "0.0.0.0", "--port", "8099", "--data-root", "/data"]
 
-FROM python-runtime AS runtime
+FROM cli-dependencies AS runtime
 
 # Install direct-device and OCR capabilities only in the standalone CLI image.
 # The Home Assistant image stays limited to its entity-based adapters.
-RUN apt-get update && apt-get install -y libgl1 tesseract-ocr && rm -rf /var/lib/apt/lists/* \
-    && uv sync --locked --extra cli --extra ocr
+COPY README.md .VERSION ./
+COPY measure/ ./measure/
+RUN uv sync --locked --extra cli --extra ocr
 
 ENTRYPOINT ["python", "-m", "measure.measure"]
 
