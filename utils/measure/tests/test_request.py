@@ -47,6 +47,21 @@ def test_request_round_trip_preserves_typed_input() -> None:
     assert isinstance(restored.dummy_load, DummyLoadReuseRequest)
 
 
+def test_request_normalizes_profile_metadata() -> None:
+    request = LightMeasurementRequest.model_validate(
+        valid_request() | {"product_name": "  Test light  ", "measure_device": "  Test meter  "},
+    )
+
+    assert request.product_name == "Test light"
+    assert request.measure_device == "Test meter"
+
+
+@pytest.mark.parametrize("field", ["product_name", "measure_device"])
+def test_request_rejects_blank_required_profile_metadata(field: str) -> None:
+    with pytest.raises(ValidationError, match=field):
+        LightMeasurementRequest.model_validate(valid_request() | {field: "   "})
+
+
 def test_request_accepts_dummy_load_calibration() -> None:
     request = LightMeasurementRequest.model_validate(
         valid_request() | {"dummy_load": {"mode": "calibrate", "description": "60 W incandescent bulb"}},
