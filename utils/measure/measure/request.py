@@ -122,6 +122,11 @@ class BaseMeasurementRequest(BaseModel):
             raise ValueError("model_id contains unsafe characters")
         return value
 
+    @field_validator("product_name", "measure_device", mode="before")
+    @classmethod
+    def normalize_profile_metadata(cls, value: str) -> str:
+        return value.strip()
+
     @field_validator("parameters")
     @classmethod
     def validate_parameters(cls, value: MeasurementParameters) -> MeasurementParameters:
@@ -136,7 +141,7 @@ class BaseMeasurementRequest(BaseModel):
 
     @property
     def model_name(self) -> str:
-        return self.product_name.strip()
+        return self.product_name
 
     @property
     def generate_model_json(self) -> bool:
