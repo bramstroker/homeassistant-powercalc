@@ -68,6 +68,13 @@ MEASURE_FILES = frozenset(
         ".github/workflows/test-measure.yml",
     },
 )
+RELEASE_INFRASTRUCTURE_DIRECTORIES = (".github/scripts/release_draft/",)
+RELEASE_INFRASTRUCTURE_FILES = frozenset(
+    {
+        ".github/workflows/measure-release.yml",
+        ".github/workflows/prepare-measure-release.yml",
+    },
+)
 INCLUDE_LABEL = "measure-tool"
 EXCLUDE_LABELS = frozenset({"skip-changelog", "dependencies"})
 
@@ -88,10 +95,17 @@ class ReleaseDraftDriftError(ValueError):
     """Raised when prepared release notes differ from merged Measure pull requests."""
 
 
-def _touches_measure(client: GitHubClient, number: int) -> bool:
+def _touches_measure(files: list[str]) -> bool:
     return any(
         filename.startswith(MEASURE_DIRECTORIES) or filename in MEASURE_FILES
-        for filename in client.pull_request_files(number)
+        for filename in files
+    )
+
+
+def _only_touches_release_infrastructure(files: list[str]) -> bool:
+    return bool(files) and all(
+        filename.startswith(RELEASE_INFRASTRUCTURE_DIRECTORIES) or filename in RELEASE_INFRASTRUCTURE_FILES
+        for filename in files
     )
 
 
@@ -99,7 +113,10 @@ def _qualifies(client: GitHubClient, pull_request: dict[str, Any]) -> bool:
     labels = labels_of(pull_request)
     if labels & EXCLUDE_LABELS:
         return False
-    return INCLUDE_LABEL in labels or _touches_measure(client, pull_request["number"])
+    files = client.pull_request_files(pull_request["number"])
+    if _only_touches_release_infrastructure(files):
+        return False
+    return INCLUDE_LABEL in labels or _touches_measure(files)
 
 
 def _qualified_pull_requests_since(

@@ -15,10 +15,12 @@ class FakeClient:
         releases: list[dict[str, Any]],
         pull_requests: list[dict[str, Any]],
         *,
+        files_by_pull_request: dict[int, list[str]] | None = None,
         missing_refs: set[str] | None = None,
     ) -> None:
         self._releases = releases
         self._pull_requests = pull_requests
+        self._files_by_pull_request = files_by_pull_request or {}
         self._missing_refs = missing_refs or set()
         self.created: list[dict[str, Any]] = []
         self.updated: list[tuple[int, dict[str, Any]]] = []
@@ -41,7 +43,7 @@ class FakeClient:
         return self._pull_requests
 
     def pull_request_files(self, number: int) -> list[str]:
-        return ["utils/measure/measure/runner/runner.py"]
+        return self._files_by_pull_request.get(number, ["utils/measure/measure/runner/runner.py"])
 
     def create_release(self, payload: dict[str, Any]) -> dict[str, Any]:
         self.created.append(payload)
@@ -199,6 +201,61 @@ def test_release_verification_ignores_excluded_pull_requests() -> None:
 """
 
     entry.verify_release(client, changelog, "0.1.0", head_ref="master")
+
+
+def test_release_verification_ignores_release_infrastructure_only_pull_requests() -> None:
+    client = FakeClient(
+        [],
+        [
+            pull_request(10, "feat: Add measurement mode"),
+            pull_request(11, "fix: Repair release preparation"),
+        ],
+        files_by_pull_request={
+            11: [".github/workflows/prepare-measure-release.yml"],
+        },
+    )
+    changelog = """# Changelog
+
+## Unreleased
+
+## 0.1.0 - 2026-07-18
+
+### 🚀 Features
+
+- #10 feat: Add measurement mode @octocat
+
+## 0.0.1 - 2026-07-17
+
+- Initial release.
+"""
+
+    entry.verify_release(client, changelog, "0.1.0", head_ref="master")
+
+
+def test_release_verification_keeps_mixed_release_and_measure_pull_requests() -> None:
+    client = FakeClient(
+        [],
+        [pull_request(10, "fix: Repair release preparation and app metadata")],
+        files_by_pull_request={
+            10: [
+                ".github/workflows/prepare-measure-release.yml",
+                "utils/measure/home-assistant-app/powercalc_measure/config.yaml",
+            ],
+        },
+    )
+    changelog = """# Changelog
+
+## Unreleased
+
+## 0.1.0 - 2026-07-18
+
+## 0.0.1 - 2026-07-17
+
+- Initial release.
+"""
+
+    with pytest.raises(entry.ReleaseDraftDriftError, match="Repair release preparation and app metadata"):
+        entry.verify_release(client, changelog, "0.1.0", head_ref="master")
 
 
 def test_release_verification_accepts_explicit_previous_tag() -> None:
