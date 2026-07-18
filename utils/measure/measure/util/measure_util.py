@@ -224,11 +224,7 @@ class MeasureUtil:
         """Take one reading using the average-measurement mode selected for this run."""
         if measure_resistance:
             return self._take_resistance_reading()
-
-        if self.dummy_load_value:
-            return self._take_dummy_load_power_reading()
-
-        return self._take_power_reading()
+        return self._read_power(ignore_zero=True)
 
     def _sleep_before_next_average_reading(self, start_time: float, duration: int) -> bool:
         if not ((time.time() - start_time + self.config.sleep_time) < duration):
@@ -251,36 +247,6 @@ class MeasureUtil:
         _LOGGER.debug("Measured resistance: %.2f Ω; measured power: %.2f W, voltage: %.2f", resistance, power, voltage)
         return MeasurementResult(power=resistance, voltages=[voltage])
 
-    def _take_dummy_load_power_reading(self) -> MeasurementResult | None:
-        self.validate_dummy_load_support()
-
-        result = self.power_meter.get_power(include_voltage=True)
-        power, voltage = result.power, result.voltage
-
-        if voltage is None or voltage < 1:
-            raise ZeroReadingError("Voltage measurement returned zero")
-
-        assert self.dummy_load_value is not None
-        power -= (voltage**2) / self.dummy_load_value
-        if round(power, 2) <= 0:
-            raise DummyLoadMeasurementError(
-                "Dummy-load correction produced non-positive target power; verify the selected calibration and wiring",
-            )
-
-        _LOGGER.info("Measured power: %.2f W", power)
-        self._emit_sample(power)
-        return MeasurementResult(power=power, voltages=[voltage])
-
-    def _take_power_reading(self) -> MeasurementResult | None:
-        measurement = self.power_meter.get_power(include_voltage=self._include_voltage())
-        power = measurement.power
-        if round(power, 2) == 0:
-            _LOGGER.warning("Invalid measurement. Consumption: %.2f W; ignoring", power)
-            return None
-        _LOGGER.info("Measured power: %.2f W", power)
-        self._emit_sample(power)
-        return MeasurementResult(power=power, voltages=self._get_voltages(measurement))
-
     def take_measurement(
         self,
         start_timestamp: float | None = None,
@@ -293,14 +259,13 @@ class MeasureUtil:
         # Take multiple samples to reduce noise
         for i in range(1, self.config.sample_count + 1):
             _LOGGER.debug("Taking sample %d", i)
-            measurement, error = self._get_power_measurement()
-            if measurement:
-                result, error = self._validate_power_measurement(measurement, start_timestamp)
-                measurements.append(result.power)
-                voltages.extend(result.voltages)
-
-            if error:
+            try:
+                result = self._read_power(start_timestamp=start_timestamp)
+            except PowerMeterError as error:
                 return self._retry_measurement_or_raise(error, start_timestamp, retry_count)
+            assert result is not None
+            measurements.append(result.power)
+            voltages.extend(result.voltages)
 
             if self.config.sample_count > 1:
                 self._wait(self.config.sleep_time_sample)
@@ -313,53 +278,43 @@ class MeasureUtil:
         _LOGGER.info("Average measurement: %.3f W", average)
         return MeasurementResult(power=average, voltages=voltages)
 
-    def _get_power_measurement(self) -> tuple[PowerMeasurementResult | None, PowerMeterError | None]:
-        try:
-            include_voltage = self.dummy_load_value is not None or self._include_voltage()
-            measurement = self.power_meter.get_power(include_voltage=include_voltage)
-        except PowerMeterError as error:
-            return None, error
-
+    def _read_power(
+        self,
+        *,
+        start_timestamp: float | None = None,
+        ignore_zero: bool = False,
+    ) -> MeasurementResult | None:
+        """Read and validate one power sample for every measurement mode."""
+        include_voltage = self.dummy_load_value is not None or self._include_voltage()
+        measurement = self.power_meter.get_power(include_voltage=include_voltage)
         updated_at = dt.fromtimestamp(measurement.updated).strftime("%d-%m-%Y, %H:%M:%S")
         _LOGGER.debug("Measurement received (update_time=%s)", updated_at)
-        return measurement, None
-
-    def _validate_power_measurement(
-        self,
-        measurement: PowerMeasurementResult,
-        start_timestamp: float | None,
-    ) -> tuple[MeasurementResult, PowerMeterError | None]:
         if start_timestamp and measurement.updated < start_timestamp:
-            result = MeasurementResult(power=measurement.power, voltages=self._get_voltages(measurement))
-            return result, OutdatedMeasurementError(
+            raise OutdatedMeasurementError(
                 f"Power measurement is outdated. Aborting after {self.config.max_retries} successive retries",
             )
 
         power = measurement.power
         voltages = self._get_voltages(measurement)
-        error: PowerMeterError | None = None
-        if round(power, 2) <= 0:
-            error = ZeroReadingError("0 watt was read from the power meter")
-
         if self.dummy_load_value:
-            power, error = self._subtract_dummy_load(measurement)
+            voltage = measurement.voltage
+            if voltage is None or voltage < 1:
+                raise ZeroReadingError("0 Volt was read from the power meter")
+            power -= (voltage**2) / self.dummy_load_value
+            if round(power, 2) <= 0:
+                raise DummyLoadMeasurementError(
+                    "Dummy-load correction produced non-positive target power; "
+                    "verify the selected calibration and wiring",
+                )
+        elif round(power, 2) <= 0:
+            if ignore_zero:
+                _LOGGER.warning("Invalid measurement. Consumption: %.2f W; ignoring", power)
+                return None
+            raise ZeroReadingError("0 watt was read from the power meter")
 
-        if error is None:
-            self._emit_sample(power)
-        return MeasurementResult(power=power, voltages=voltages), error
-
-    def _subtract_dummy_load(self, measurement: PowerMeasurementResult) -> tuple[float, PowerMeterError | None]:
-        voltage = measurement.voltage
-        if voltage is None or voltage < 1:
-            return measurement.power, ZeroReadingError("0 Volt was read from the power meter")
-
-        assert self.dummy_load_value is not None
-        power = measurement.power - (voltage**2) / self.dummy_load_value
-        if round(power, 2) <= 0:
-            return power, DummyLoadMeasurementError(
-                "Dummy-load correction produced non-positive target power; verify the selected calibration and wiring",
-            )
-        return power, None
+        _LOGGER.info("Measured power: %.2f W", power)
+        self._emit_sample(power)
+        return MeasurementResult(power=power, voltages=voltages)
 
     def _retry_measurement_or_raise(
         self,
