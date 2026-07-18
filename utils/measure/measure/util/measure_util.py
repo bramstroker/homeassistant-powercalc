@@ -405,9 +405,13 @@ class MeasureUtil:
         first_trend = trend_direction(first_slope)
         second_trend = trend_direction(second_slope)
 
-        if first_trend == second_trend and first_trend != Trend.STEADY:
+        if first_trend == second_trend:
             return first_trend
-        return Trend.STEADY
+        if first_trend == Trend.STEADY:
+            return second_trend
+        if second_trend == Trend.STEADY:
+            return first_trend
+        return Trend.UNSTABLE
 
     @staticmethod
     def _linear_slope(values: list[float]) -> float:
