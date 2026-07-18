@@ -102,5 +102,6 @@ Do not use Lore-style commit trailers or decision-record commit formats unless e
 ## Pull Requests
 
 - Target upstream: `bramstroker/homeassistant-powercalc`
+- Use concise, human-readable PR titles without Conventional Commit prefixes or scopes so Release Drafter produces clean release notes
 - New profiles use the `power_profile` PR template
 - One device per PR
