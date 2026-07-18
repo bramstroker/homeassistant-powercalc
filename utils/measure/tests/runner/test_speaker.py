@@ -65,6 +65,10 @@ def test_run_reports_volume_and_muted_operating_points() -> None:
 
     runner.run(request, "")
 
+    interaction.confirm.assert_called_once_with(
+        "Speaker measurements can become very loud at higher volume levels. "
+        "Wear hearing protection or move to another room before starting.",
+    )
     interaction.phase.assert_any_call("Starting speaker measurement")
     interaction.phase.assert_any_call("Measuring speaker at 10% volume")
     # Progress must be reported before the first volume level so the UI leaves the preparing state.
