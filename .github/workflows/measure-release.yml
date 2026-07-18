@@ -45,6 +45,7 @@ jobs:
     permissions:
       contents: write
       actions: write
+      pull-requests: read
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -63,6 +64,13 @@ jobs:
             exit 0
           fi
           echo "version=${version}" >> "$GITHUB_OUTPUT"
+      - name: Verify release notes against merged Measure pull requests
+        if: steps.release.outputs.version != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_REF: ${{ github.sha }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: python3 .github/scripts/release_draft/update_measure_draft.py --verify "$VERSION"
       - name: Create release tag
         if: steps.release.outputs.version != ''
         env:

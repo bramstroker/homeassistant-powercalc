@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Maintain the rolling Powercalc Measure draft release.
+Maintain the rolling Powercalc Measure draft and verify prepared release notes.
 
 Runs on every push to master. The draft is rebuilt from all merged Measure
 pull requests since the current ``measure-v*`` tag. Rebuilding makes retries,
@@ -27,6 +27,9 @@ Requires:
 
 from __future__ import annotations
 
+import argparse
+from collections.abc import Sequence
+import difflib
 import os
 from pathlib import Path
 import re
@@ -48,6 +51,8 @@ from github_client import GitHubClient
 DRAFT_TAG = "measure-next"
 DRAFT_TITLE_PATTERN = "Powercalc Measure v{version} (unreleased)"
 CONFIG_PATH = Path("utils/measure/home-assistant-app/powercalc_measure/config.yaml")
+CHANGELOG_PATH = Path("utils/measure/home-assistant-app/powercalc_measure/CHANGELOG.md")
+VERSION_PATTERN = r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?"
 
 # Mirrors the measure-tool globs in .github/labeler.yml.
 MEASURE_DIRECTORIES = (
@@ -79,6 +84,10 @@ CATEGORIES = [
 SECTION_ORDER = [UNCATEGORIZED, *[category.title for category in CATEGORIES]]
 
 
+class ReleaseDraftDriftError(ValueError):
+    """Raised when prepared release notes differ from merged Measure pull requests."""
+
+
 def _touches_measure(client: GitHubClient, number: int) -> bool:
     return any(
         filename.startswith(MEASURE_DIRECTORIES) or filename in MEASURE_FILES
@@ -91,6 +100,93 @@ def _qualifies(client: GitHubClient, pull_request: dict[str, Any]) -> bool:
     if labels & EXCLUDE_LABELS:
         return False
     return INCLUDE_LABEL in labels or _touches_measure(client, pull_request["number"])
+
+
+def _qualified_pull_requests_since(
+    client: GitHubClient,
+    previous_tag: str,
+    head_ref: str,
+) -> list[dict[str, Any]]:
+    try:
+        base_sha = client.commit_sha(previous_tag)
+    except Exception as error:
+        raise ReleaseDraftDriftError(f"could not resolve previous tag {previous_tag}: {error}") from error
+    commit_shas = client.commit_shas_since(base_sha, head_ref)
+    return [
+        pull_request
+        for pull_request in client.merged_pull_requests(commit_shas)
+        if _qualifies(client, pull_request)
+    ]
+
+
+def _render_release_notes(pull_requests: list[dict[str, Any]]) -> str:
+    sections: dict[str, list[str]] = {UNCATEGORIZED: []}
+    for pull_request in pull_requests:
+        sections.setdefault(category_title(pull_request, CATEGORIES), []).append(format_entry(pull_request))
+    return render_sections(sections, SECTION_ORDER)
+
+
+def _changelog_release(changelog: str, target_version: str) -> tuple[str, str]:
+    normalized = changelog.replace("\r\n", "\n")
+    headings = list(re.finditer(r"^## (?P<title>.+?)[ \t]*$", normalized, re.MULTILINE))
+    target_pattern = re.compile(rf"{re.escape(target_version)}(?:\s+-\s+.+)?")
+    target_indexes = [
+        index
+        for index, heading in enumerate(headings)
+        if target_pattern.fullmatch(heading.group("title"))
+    ]
+    if not target_indexes:
+        raise ReleaseDraftDriftError(f"Changelog has no section for target version {target_version}")
+    if len(target_indexes) > 1:
+        raise ReleaseDraftDriftError(f"Changelog has multiple sections for target version {target_version}")
+
+    target_index = target_indexes[0]
+    if target_index + 1 >= len(headings):
+        raise ReleaseDraftDriftError(f"Changelog has no previous Measure release after {target_version}")
+    target = headings[target_index]
+    previous = headings[target_index + 1]
+    previous_match = re.fullmatch(rf"(?P<version>{VERSION_PATTERN})(?:\s+-\s+.+)?", previous.group("title"))
+    if previous_match is None:
+        raise ReleaseDraftDriftError(
+            f"The next changelog section after {target_version} is not a Measure version: {previous.group('title')!r}",
+        )
+    notes = normalized[target.end() : previous.start()].strip("\r\n")
+    return notes, f"measure-v{previous_match.group('version')}"
+
+
+def verify_release(
+    client: GitHubClient,
+    changelog: str,
+    target_version: str,
+    *,
+    head_ref: str,
+    previous_tag: str | None = None,
+) -> None:
+    """Verify prepared changelog notes against qualifying Measure pull requests."""
+
+    actual_notes, derived_previous_tag = _changelog_release(changelog, target_version)
+    boundary_tag = previous_tag or derived_previous_tag
+    if re.fullmatch(rf"measure-v{VERSION_PATTERN}", boundary_tag) is None:
+        raise ReleaseDraftDriftError(f"Invalid previous Measure tag: {boundary_tag}")
+    pull_requests = _qualified_pull_requests_since(client, boundary_tag, head_ref)
+    expected_notes = _render_release_notes(pull_requests).strip("\r\n")
+    if actual_notes == expected_notes:
+        return
+
+    difference = "\n".join(
+        difflib.unified_diff(
+            actual_notes.splitlines(),
+            expected_notes.splitlines(),
+            fromfile=f"CHANGELOG.md {target_version}",
+            tofile=f"merged Measure PRs since {boundary_tag}",
+            lineterm="",
+        ),
+    )
+    raise ReleaseDraftDriftError(
+        f"Measure changelog notes for {target_version} are out of date. "
+        "Regenerate the release from the current rolling draft before tagging.\n"
+        f"{difference}",
+    )
 
 
 def _current_version() -> tuple[int, int, int]:
@@ -107,19 +203,32 @@ def _rolling_draft(client: GitHubClient) -> dict[str, Any] | None:
     )
 
 
-def main() -> None:
+def main(argv: Sequence[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Maintain or verify the rolling Powercalc Measure release draft")
+    parser.add_argument("--verify", metavar="VERSION", help="Verify a prepared changelog release before tagging")
+    parser.add_argument("--previous-tag", help="Override the previous measure-v* tag derived from the changelog")
+    parser.add_argument("--changelog", type=Path, default=CHANGELOG_PATH, help=argparse.SUPPRESS)
+    parser.add_argument("--head-ref", help="Git ref containing merged pull requests; defaults to HEAD_REF or master")
+    args = parser.parse_args(argv)
     client = GitHubClient(os.environ["GITHUB_TOKEN"], os.environ["GITHUB_REPOSITORY"])
-    head_ref = os.environ.get("HEAD_REF", "master")
+    head_ref = args.head_ref or os.environ.get("HEAD_REF", "master")
+    if args.verify is not None:
+        try:
+            verify_release(
+                client,
+                args.changelog.read_text(encoding="utf-8"),
+                args.verify,
+                head_ref=head_ref,
+                previous_tag=args.previous_tag,
+            )
+        except (OSError, ReleaseDraftDriftError) as error:
+            parser.error(str(error))
+        print(f"Verified Measure {args.verify} notes against merged pull requests through {head_ref}")
+        return
+
     current = _current_version()
     current_version = format_version(current)
-    base_sha = client.commit_sha(f"measure-v{current_version}")
-    commit_shas = client.commit_shas_since(base_sha, head_ref)
-
-    pull_requests = [
-        pull_request
-        for pull_request in client.merged_pull_requests(commit_shas)
-        if _qualifies(client, pull_request)
-    ]
+    pull_requests = _qualified_pull_requests_since(client, f"measure-v{current_version}", head_ref)
     draft = _rolling_draft(client)
     if not pull_requests:
         if draft is not None:
@@ -129,19 +238,17 @@ def main() -> None:
             print(f"No merged Measure pull requests on {head_ref} since measure-v{current_version}")
         return
 
-    sections: dict[str, list[str]] = {UNCATEGORIZED: []}
     levels: list[int] = []
     for pull_request in pull_requests:
         entry = format_entry(pull_request)
         levels.append(bump_level(pull_request, CATEGORIES))
-        sections.setdefault(category_title(pull_request, CATEGORIES), []).append(entry)
         print(f"Adding {entry}")
 
     next_version = format_version(bump(current, max(levels)))
     payload = {
         "tag_name": DRAFT_TAG,
         "name": DRAFT_TITLE_PATTERN.format(version=next_version),
-        "body": render_sections(sections, SECTION_ORDER),
+        "body": _render_release_notes(pull_requests),
         "draft": True,
     }
     if draft is None:
