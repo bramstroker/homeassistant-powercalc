@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+import math
 from typing import Protocol
 
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION
+from measure.controller.charging.const import ATTR_BATTERY_LEVEL, BatteryLevelSourceType
 from measure.controller.charging.spec import (
     DummyChargingControllerSpec,
     HassChargingControllerSpec,
@@ -40,6 +42,8 @@ class ActiveSessionError(PreflightError):
 
 class EntityRecord(Protocol):
     entity_id: str
+    state: str
+    attribute_names: list[str]
     supported_modes: list[LutMode] | None
     effect_list: list[str] | None
     min_mired: int | None
@@ -188,7 +192,35 @@ class MeasurementPreflight:
             if isinstance(request.controller, HassChargingControllerSpec):
                 if not request.controller.entity_id.startswith(f"{domain}."):
                     raise PreflightError("Charging device type does not match the selected entity")
-                self._require_entity(request.controller.entity_id, domain, "Selected charging device is unavailable")
+                charging_entity = self._require_entity(
+                    request.controller.entity_id,
+                    domain,
+                    "Selected charging device is unavailable",
+                )
+                self._validate_charging_battery_source(request.controller, charging_entity)
+
+    def _validate_charging_battery_source(
+        self,
+        controller: HassChargingControllerSpec,
+        charging_entity: EntityRecord,
+    ) -> None:
+        if controller.battery_level_source_type == BatteryLevelSourceType.ATTRIBUTE:
+            attribute = controller.battery_level_attribute or ATTR_BATTERY_LEVEL
+            if attribute not in charging_entity.attribute_names:
+                raise PreflightError(f"Battery level attribute {attribute} is not available on the charging device")
+            return
+
+        battery_entity = self._require_entity(
+            controller.battery_level_entity_id,
+            EntityDomain.SENSOR,
+            "Selected battery level sensor is unavailable",
+        )
+        try:
+            level = float(battery_entity.state)
+        except ValueError, TypeError:
+            level = math.nan
+        if not math.isfinite(level) or not 0 <= level <= 100:
+            raise PreflightError("Battery level sensor must report a numeric percentage between 0 and 100")
 
     def _validate_light(self, request: LightMeasurementRequest) -> PreflightResult:
         if isinstance(request.controller, DummyLightControllerSpec):
@@ -233,7 +265,9 @@ class MeasurementPreflight:
             supported_modes=tuple(sorted(request.modes, key=str)),
         )
 
-    def _require_entity(self, entity_id: str | None, domain: EntityDomain, message: str) -> None:
-        available = {entity.entity_id for entity in self._load_entities(domain, None)}
-        if entity_id not in available:
+    def _require_entity(self, entity_id: str | None, domain: EntityDomain, message: str) -> EntityRecord:
+        available = {entity.entity_id: entity for entity in self._load_entities(domain, None)}
+        entity = available.get(entity_id or "")
+        if entity is None:
             raise PreflightError(message)
+        return entity
