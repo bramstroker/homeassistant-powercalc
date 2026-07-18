@@ -88,14 +88,12 @@ class MeasurementAssembler:
         *,
         home_assistant: HomeAssistantManager | None = None,
         tuya_device_key: str | None = None,
-        power_meter_decorator: Callable[[PowerMeter], PowerMeter] | None = None,
         on_sample: Callable[[float], None] | None = None,
         dummy_load_calibration_store: DummyLoadCalibrationStore | None = None,
     ) -> None:
         self._interaction = interaction
         self._home_assistant_manager = home_assistant
         self._tuya_device_key = tuya_device_key
-        self._power_meter_decorator = power_meter_decorator
         self._on_sample = on_sample
         self._dummy_load_calibration_store = dummy_load_calibration_store
 
@@ -103,8 +101,6 @@ class MeasurementAssembler:
         """Resolve a request once into a transport-independent runner graph."""
 
         power_meter = self.build_power_meter(request.power_meter)
-        if self._power_meter_decorator is not None:
-            power_meter = self._power_meter_decorator(power_meter)
         voltage_enabled = power_meter.has_voltage_support()
         parameters = request.parameters
         measure_util = MeasureUtil(
