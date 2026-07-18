@@ -145,6 +145,17 @@ def test_reports_invalid_artifact_without_hiding_other_plots(tmp_path: Path) -> 
     assert "color_temp.csv" in result.warnings[0]
 
 
+def test_reads_effect_csv_with_utf8_bom(tmp_path: Path) -> None:
+    effect = tmp_path / "effect.csv.gz"
+    with gzip.open(effect, "wt", encoding="utf-8-sig") as file:
+        file.write("effect,bri,watt\nnone,5,3.85\nnone,15,4.72\n")
+
+    plot = build_plot_from_file(effect)
+
+    assert plot.id == "effect"
+    assert [series.label for series in plot.series] == ["none"]
+
+
 def test_limits_line_plot_points_without_losing_extrema(tmp_path: Path) -> None:
     recording = tmp_path / "record.csv"
     recording.write_text(

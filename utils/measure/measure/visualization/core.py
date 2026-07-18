@@ -402,9 +402,10 @@ def _limit_line(points: Sequence[PlotPoint], max_points: int | None) -> tuple[Pl
 
 
 def _open_csv(path: Path) -> TextIO:
+    # utf-8-sig strips a leading BOM if present (some measurement CSVs carry one) and is otherwise identical to utf-8.
     if path.name.endswith(".gz"):
-        return gzip.open(path, "rt", encoding="utf-8", newline="")
-    return path.open(encoding="utf-8", newline="")
+        return gzip.open(path, "rt", encoding="utf-8-sig", newline="")
+    return path.open(encoding="utf-8-sig", newline="")
 
 
 def _finite_float(value: object) -> float | None:
