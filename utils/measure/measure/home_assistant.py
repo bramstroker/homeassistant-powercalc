@@ -12,7 +12,12 @@ import urllib.parse
 from homeassistant_api import AsyncWebsocketClient, Entity, EntityRegistryEntry, Group, State, WebsocketClient
 from homeassistant_api.errors import WebsocketError
 
-from measure.const import HASS_DEVICE_REGISTRY_LIST, HASS_ZEROCONF_SUBSCRIBE_DISCOVERY
+from measure.const import (
+    HASS_DEVICE_REGISTRY_LIST,
+    HASS_ENTITY_REGISTRY_LIST,
+    HASS_ENTITY_REGISTRY_UNIQUE_ID,
+    HASS_ZEROCONF_SUBSCRIBE_DISCOVERY,
+)
 
 
 class HomeAssistantDiscoveryError(RuntimeError):
@@ -122,6 +127,17 @@ class HomeAssistantWebsocketClient(WebsocketClient):
         """Return Home Assistant device registry entries."""
 
         return self.recv_result_list(self.send(HASS_DEVICE_REGISTRY_LIST))
+
+    def list_entity_registry(self) -> tuple[EntityRegistryEntry, ...]:
+        """Return entity registry entries with Home Assistant unique IDs normalized to strings."""
+
+        entries: list[EntityRegistryEntry] = []
+        for raw_entry in self.recv_result_list(self.send(HASS_ENTITY_REGISTRY_LIST)):
+            unique_id = raw_entry.get(HASS_ENTITY_REGISTRY_UNIQUE_ID)
+            if unique_id is not None and not isinstance(unique_id, str):
+                raw_entry = {**raw_entry, HASS_ENTITY_REGISTRY_UNIQUE_ID: str(unique_id)}
+            entries.append(EntityRegistryEntry.from_json(raw_entry))
+        return tuple(entries)
 
     def __del__(self) -> None:
         with contextlib.suppress(Exception):
