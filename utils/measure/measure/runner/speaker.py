@@ -43,11 +43,10 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
             f"Prepare to start measuring the power for {duration} seconds on each volume level "
             "starting with 10 until 100 (with steps of 10 between)",
         )
-        self.interaction.notify(
-            "WARNING: during the measurement session the volume will be increased to the maximum, "
-            "which can be harmful for your ears",
+        self.interaction.confirm(
+            "Speaker measurements can become very loud at higher volume levels. "
+            "Wear hearing protection or move to another room before starting.",
         )
-        self.interaction.confirm("Ready to start speaker measurement. Volume will increase to maximum.")
         self.interaction.phase("Starting speaker measurement")
         self.interaction.progress(0, 11, phase="Measuring volume levels", remaining_seconds=self._remaining_seconds(0))
 
