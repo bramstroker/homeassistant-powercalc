@@ -14,7 +14,7 @@ from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import LightOperatingPoint
 from measure.ha_app.api import create_app
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
-from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
+from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
@@ -580,6 +580,36 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     assert report["events"][-1]["data"]["state"] == "completed"
     assert report["files"][0]["name"] == "LCT010/brightness.csv"
     assert "test-token" not in diagnostics.text
+
+
+def test_diagnostics_retains_only_the_latest_thousand_events(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    assert test_client.post("/api/sessions", json=payload()).status_code == 201
+    coordinator = test_client.app.state.context.coordinator
+    assert coordinator._worker is not None  # noqa: SLF001
+    coordinator._worker.join(timeout=5)  # noqa: SLF001
+    assert coordinator.current is not None
+    events = tuple(
+        SessionEvent(
+            sequence=sequence,
+            type=SessionEventType.LOG,
+            created_at="2026-07-12T12:00:00Z",
+            data={"message": str(sequence)},
+        )
+        for sequence in range(1, 1002)
+    )
+    storage = test_client.app.state.context.storage
+
+    with patch.object(storage, "load_events", return_value=events) as load_events:
+        response = test_client.get("/api/session/current/diagnostics")
+
+    assert response.status_code == 200
+    load_events.assert_called_once_with(coordinator.current.id, limit=1001)
+    report = response.json()
+    assert len(report["events"]) == 1000
+    assert report["events"][0]["sequence"] == 2
+    assert report["events_truncated"] is True
+    assert report["event_limit"] == 1000
 
 
 def test_session_summary_is_exposed(tmp_path: Path) -> None:

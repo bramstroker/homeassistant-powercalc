@@ -306,15 +306,7 @@ def _linear_plot(path: Path, *, source: str, max_points: int | None) -> PlotSpec
 
 
 def _recorder_plot(path: Path, *, source: str, max_points: int | None) -> PlotSpec:
-    points: list[PlotPoint] = []
-    with _open_csv(path) as file:
-        for row in csv.reader(file):
-            if len(row) < 2:
-                continue
-            elapsed = _finite_float(row[0])
-            power = _finite_float(row[1])
-            if elapsed is not None and power is not None:
-                points.append(PlotPoint(x=elapsed, y=power))
+    points = _stream_recorder_points(path, max_points)
     if not points:
         raise PlotDataError("no valid recorder measurements found")
     return PlotSpec(
@@ -324,14 +316,80 @@ def _recorder_plot(path: Path, *, source: str, max_points: int | None) -> PlotSp
         x_label="Elapsed time (s)",
         y_label=_POWER_AXIS_LABEL,
         source=source,
-        series=(
-            PlotSeries(
-                label=None,
-                color=_DEFAULT_COLOR,
-                points=_limit_line(points, max_points),
-            ),
-        ),
+        series=(PlotSeries(label=None, color=_DEFAULT_COLOR, points=points),),
     )
+
+
+def _iter_recorder_points(path: Path) -> Iterable[PlotPoint]:
+    with _open_csv(path) as file:
+        for row in csv.reader(file):
+            if len(row) < 2:
+                continue
+            elapsed = _finite_float(row[0])
+            power = _finite_float(row[1])
+            if elapsed is not None and power is not None:
+                yield PlotPoint(x=elapsed, y=power)
+
+
+def _stream_recorder_points(path: Path, max_points: int | None) -> tuple[PlotPoint, ...]:
+    if max_points is None:
+        return tuple(_iter_recorder_points(path))
+
+    point_count = sum(1 for _ in _iter_recorder_points(path))
+    if point_count <= max_points:
+        return tuple(_iter_recorder_points(path))
+    return _downsample_recorder_points(path, point_count, max_points)
+
+
+def _downsample_recorder_points(path: Path, point_count: int, max_points: int) -> tuple[PlotPoint, ...]:
+    if max_points <= 1:
+        return tuple(point for index, point in enumerate(_iter_recorder_points(path)) if index == 0)
+    if max_points < 4:
+        selected_indexes = {round(index * (point_count - 1) / (max_points - 1)) for index in range(max_points)}
+        return tuple(point for index, point in enumerate(_iter_recorder_points(path)) if index in selected_indexes)
+    return _recorder_extrema(path, point_count, max_points)
+
+
+def _recorder_extrema(path: Path, point_count: int, max_points: int) -> tuple[PlotPoint, ...]:
+    bucket_count = max(1, (max_points - 2) // 2)
+    bucket_size = math.ceil((point_count - 2) / bucket_count)
+    selected: list[tuple[int, PlotPoint]] = []
+    bucket_minimum: tuple[int, PlotPoint] | None = None
+    bucket_maximum: tuple[int, PlotPoint] | None = None
+    current_bucket = -1
+    last: tuple[int, PlotPoint] | None = None
+    for index, point in enumerate(_iter_recorder_points(path)):
+        if index == 0:
+            selected.append((index, point))
+            continue
+        if index == point_count - 1:
+            last = (index, point)
+            continue
+        bucket_index = (index - 1) // bucket_size
+        if bucket_index != current_bucket:
+            _append_bucket_extrema(selected, bucket_minimum, bucket_maximum)
+            bucket_minimum = None
+            bucket_maximum = None
+            current_bucket = bucket_index
+        candidate = (index, point)
+        if bucket_minimum is None or point.y < bucket_minimum[1].y:
+            bucket_minimum = candidate
+        if bucket_maximum is None or point.y > bucket_maximum[1].y:
+            bucket_maximum = candidate
+    _append_bucket_extrema(selected, bucket_minimum, bucket_maximum)
+    if last is not None:
+        selected.append(last)
+    return tuple(point for _, point in selected[:max_points])
+
+
+def _append_bucket_extrema(
+    selected: list[tuple[int, PlotPoint]],
+    minimum: tuple[int, PlotPoint] | None,
+    maximum: tuple[int, PlotPoint] | None,
+) -> None:
+    if minimum is None or maximum is None:
+        return
+    selected.extend(sorted({minimum[0]: minimum, maximum[0]: maximum}.values()))
 
 
 def _preferred_file(files: Mapping[str, Path], name: str) -> tuple[Path, str] | None:
