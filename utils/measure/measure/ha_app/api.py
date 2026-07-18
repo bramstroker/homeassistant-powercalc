@@ -24,7 +24,7 @@ from measure.controller.light.const import LutMode
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import ImmediateInteraction
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
-from measure.ha_app.diagnostics import build_session_diagnostics
+from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
 from measure.ha_app.registry import FieldControl, measurement_definitions, supported_light_modes
@@ -430,11 +430,14 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
             _file_descriptor(context.storage.file_path(snapshot.id, name), name).model_dump()
             for name in context.storage.list_files(snapshot.id)
         ]
+        events = context.storage.load_events(snapshot.id, limit=DIAGNOSTIC_EVENT_LIMIT + 1)
+        events_truncated = len(events) > DIAGNOSTIC_EVENT_LIMIT
         payload = build_session_diagnostics(
             snapshot,
             context.storage.load_request(snapshot.id),
-            context.storage.load_events(snapshot.id, limit=None),
+            events[-DIAGNOSTIC_EVENT_LIMIT:],
             files,
+            events_truncated=events_truncated,
         )
         filename = f"powercalc-measure-diagnostics-{snapshot.id[:8]}.json"
         return Response(

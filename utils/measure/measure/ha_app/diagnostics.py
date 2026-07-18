@@ -8,6 +8,7 @@ from measure.request import MeasurementRequest
 from measure.version import measure_version
 
 REDACTED = "<redacted>"
+DIAGNOSTIC_EVENT_LIMIT = 1000
 _SENSITIVE_KEYS = frozenset({"password", "secret", "token"})
 _SENSITIVE_SUFFIXES = ("_ip", "_key", "_password", "_secret", "_token")
 _LOG_EVENT_TYPES = frozenset({SessionEventType.LOG, SessionEventType.WARNING, SessionEventType.CHECKPOINT})
@@ -18,6 +19,8 @@ def build_session_diagnostics(
     request: MeasurementRequest,
     events: Collection[SessionEvent],
     files: Collection[dict[str, object]],
+    *,
+    events_truncated: bool = False,
 ) -> dict[str, object]:
     """Build a shareable session report without credentials or network addresses."""
 
@@ -43,6 +46,8 @@ def build_session_diagnostics(
             sensitive_values,
         ),
         "events": _redact(event_data, sensitive_values),
+        "events_truncated": events_truncated,
+        "event_limit": DIAGNOSTIC_EVENT_LIMIT,
         "files": _redact(file_data, sensitive_values),
         "privacy": {
             "redacted": True,

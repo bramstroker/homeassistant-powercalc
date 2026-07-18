@@ -3,6 +3,7 @@ from __future__ import annotations
 import gzip
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 from measure.request import MeasurementRequest, parse_measurement_request
 from measure.visualization import PlotKind, build_plot_from_file, build_session_plots
@@ -124,6 +125,35 @@ def test_builds_recorder_time_series_and_ignores_invalid_rows(tmp_path: Path) ->
     assert result.plots[0].kind is PlotKind.LINE
     assert result.plots[0].x_label == "Elapsed time (s)"
     assert [(point.x, point.y) for point in result.plots[0].series[0].points] == [(0.0, 1.2), (2.0, 3.4)]
+
+
+def test_downsamples_large_recorder_files_while_streaming(tmp_path: Path) -> None:
+    recording = tmp_path / "record.csv"
+    recording.write_text(
+        "\n".join(f"{index},{999 if index == 10_000 else index % 20}" for index in range(20_000)),
+        encoding="utf-8",
+    )
+    request = parse_measurement_request(
+        {
+            "measure_type": "recorder",
+            "model_id": "measurement",
+            "power_meter": {"type": "dummy"},
+            "export_filename": "record.csv",
+        },
+    )
+
+    with patch("measure.visualization.core._limit_line", side_effect=AssertionError("full input was materialized")):
+        result = build_session_plots(
+            request,
+            {"measurement/record.csv": recording},
+            max_line_points=8,
+        )
+
+    points = result.plots[0].series[0].points
+    assert len(points) <= 8
+    assert points[0].x == 0
+    assert points[-1].x == 19_999
+    assert max(point.y for point in points) == 999
 
 
 def test_reports_invalid_artifact_without_hiding_other_plots(tmp_path: Path) -> None:
