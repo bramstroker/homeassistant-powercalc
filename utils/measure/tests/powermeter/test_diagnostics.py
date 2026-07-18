@@ -10,7 +10,7 @@ from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostics
 from measure.powermeter.hass import HassPowerMeter
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter, PowerMeterDiagnosticSample
-from measure.powermeter.spec import HassPowerMeterSpec, ShellyPowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec
 import pytest
 
 
@@ -26,16 +26,19 @@ class FakeClock:
 
 
 class SampledPowerMeter(PowerMeter):
-    def __init__(self, sample: Callable[[int], PowerMeterDiagnosticSample]) -> None:
+    def __init__(self, sample: Callable[[int], PowerMeterDiagnosticSample], *, supports_voltage: bool = False) -> None:
         self._sample = sample
+        self._supports_voltage = supports_voltage
         self.calls = 0
+        self.voltage_support_calls = 0
 
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
         sample = self.diagnostic_sample()
         return PowerMeasurementResult(power=sample.power, updated=sample.reported_at)
 
     def has_voltage_support(self) -> bool:
-        return False
+        self.voltage_support_calls += 1
+        return self._supports_voltage
 
     def diagnostic_sample(self) -> PowerMeterDiagnosticSample:
         sample = self._sample(self.calls)
@@ -156,6 +159,63 @@ def test_diagnostics_reuses_recent_result_unless_forced() -> None:
     assert second is first
     assert forced is not first
     assert meter.calls == 6
+
+
+@pytest.mark.parametrize(
+    ("spec", "supports_voltage"),
+    [
+        (HassPowerMeterSpec(entity_id="sensor.power"), True),
+        (ShellyPowerMeterSpec(device_ip="192.0.2.1"), False),
+    ],
+)
+def test_diagnostics_report_voltage_capability_from_the_probed_meter(
+    spec: HassPowerMeterSpec | ShellyPowerMeterSpec,
+    supports_voltage: bool,
+) -> None:
+    meter = SampledPowerMeter(
+        lambda _: PowerMeterDiagnosticSample(power=4.2, raw_value="4.2", reported_at=100),
+        supports_voltage=supports_voltage,
+    )
+    diagnostics = PowerMeterDiagnostics(lambda _: meter, duration=0)
+
+    result = diagnostics.evaluate(spec)
+
+    assert result.supports_voltage is supports_voltage
+    assert meter.voltage_support_calls == 1
+    assert meter.calls == 1
+
+
+def test_dummy_diagnostics_advertise_voltage_without_building_a_meter() -> None:
+    builder = MagicMock()
+
+    result = PowerMeterDiagnostics(builder).evaluate(DummyPowerMeterSpec())
+
+    assert result.supports_voltage is True
+    builder.assert_not_called()
+
+
+def test_diagnostics_retain_known_voltage_capability_when_sampling_fails() -> None:
+    def fail(_: int) -> PowerMeterDiagnosticSample:
+        raise RuntimeError("Could not read power")
+
+    meter = SampledPowerMeter(fail, supports_voltage=True)
+
+    result = PowerMeterDiagnostics(lambda _: meter, duration=0).evaluate(
+        ShellyPowerMeterSpec(device_ip="192.0.2.1"),
+    )
+
+    assert result.success is False
+    assert result.supports_voltage is True
+
+
+def test_diagnostics_leave_voltage_capability_unknown_when_building_fails() -> None:
+    def fail(_: object) -> PowerMeter:
+        raise RuntimeError("Could not connect")
+
+    result = PowerMeterDiagnostics(fail).evaluate(ShellyPowerMeterSpec(device_ip="192.0.2.1"))
+
+    assert result.success is False
+    assert result.supports_voltage is None
 
 
 def test_hass_diagnostic_sample_uses_raw_state_and_never_forces_an_update() -> None:

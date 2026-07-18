@@ -9,6 +9,7 @@ from measure.controller.light.const import LutMode
 from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.ha_app.preflight import ActiveSessionError, EntityRecord, MeasurementPreflight, PreflightError
+from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
@@ -35,7 +36,7 @@ def preflight(
     *,
     active: bool = False,
     writable: bool = True,
-    voltage_supported: bool = True,
+    voltage_supported: bool | None = True,
     developer_mode: bool = True,
 ) -> MeasurementPreflight:
     def verify() -> None:
@@ -46,7 +47,14 @@ def preflight(
         has_active_session=lambda: active,
         verify_storage=verify,
         load_entities=lambda domain, device_class: entities.get((domain, device_class), []),
-        supports_voltage=lambda _: voltage_supported,
+        diagnose_power_meter=lambda _: PowerMeterDiagnostic(
+            success=voltage_supported is not None,
+            status=DiagnosticStatus.GOOD if voltage_supported is not None else DiagnosticStatus.POOR,
+            precision_status=DiagnosticStatus.UNSUPPORTED,
+            update_interval_status=DiagnosticStatus.UNSUPPORTED,
+            supports_voltage=voltage_supported,
+            message="Could not inspect voltage capability" if voltage_supported is None else None,
+        ),
         developer_mode=developer_mode,
     )
 
@@ -113,6 +121,42 @@ def test_preflight_rejects_power_meter_without_dummy_load_voltage_support() -> N
 
     checker = preflight(base_entities(), voltage_supported=False)
     with pytest.raises(PreflightError, match="does not support voltage"):
+        checker.validate(request)
+
+
+def test_preflight_reports_unknown_dummy_load_voltage_capability() -> None:
+    request = AverageMeasurementRequest(
+        power_meter=ShellyPowerMeterSpec(device_ip="192.168.1.50"),
+        dummy_load=DummyLoadCalibrationRequest(description="40 W incandescent bulb"),
+    )
+
+    with pytest.raises(PreflightError, match="Could not inspect voltage capability"):
+        preflight(base_entities(), voltage_supported=None).validate(request)
+
+
+def test_dummy_load_sampling_failure_does_not_mask_controller_validation() -> None:
+    diagnostic = PowerMeterDiagnostic(
+        success=False,
+        supports_voltage=True,
+        status=DiagnosticStatus.POOR,
+        precision_status=DiagnosticStatus.UNSUPPORTED,
+        update_interval_status=DiagnosticStatus.UNSUPPORTED,
+        message="Could not read power",
+    )
+    checker = MeasurementPreflight(
+        has_active_session=lambda: False,
+        verify_storage=lambda: None,
+        load_entities=lambda domain, device_class: base_entities().get((domain, device_class), []),
+        diagnose_power_meter=lambda _: diagnostic,
+        developer_mode=True,
+    )
+    request = SpeakerMeasurementRequest(
+        power_meter=ShellyPowerMeterSpec(device_ip="192.168.1.50"),
+        controller=HassMediaControllerSpec(entity_id="media_player.missing"),
+        dummy_load=DummyLoadCalibrationRequest(description="40 W incandescent bulb"),
+    )
+
+    with pytest.raises(PreflightError, match="media player"):
         checker.validate(request)
 
 

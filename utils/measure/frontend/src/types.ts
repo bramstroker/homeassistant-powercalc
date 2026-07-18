@@ -279,6 +279,7 @@ export type DiagnosticStatus = "good" | "warning" | "poor" | "unsupported";
 export interface PowerMeterDiagnostic {
   success: boolean;
   power?: number | null;
+  supports_voltage?: boolean | null;
   status: DiagnosticStatus;
   precision_decimals?: number | null;
   max_report_interval_seconds?: number | null;
