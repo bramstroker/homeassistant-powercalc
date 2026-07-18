@@ -3,6 +3,8 @@ name: Test measure util
 on:
   workflow_dispatch:
   push:
+    branches:
+      - master
     paths:
       - 'utils/measure/**'
       - '.github/actions/build-measure-docker/**'

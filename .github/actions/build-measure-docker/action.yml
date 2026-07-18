@@ -39,3 +39,5 @@ runs:
         push: ${{ inputs.push }}
         tags: ${{ inputs.tags }}
         labels: ${{ inputs.labels }}
+        cache-from: type=gha,scope=measure-${{ inputs.target }}
+        cache-to: type=gha,mode=max,scope=measure-${{ inputs.target }}
