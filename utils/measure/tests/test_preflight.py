@@ -36,6 +36,7 @@ def preflight(
     active: bool = False,
     writable: bool = True,
     voltage_supported: bool = True,
+    developer_mode: bool = True,
 ) -> MeasurementPreflight:
     def verify() -> None:
         if not writable:
@@ -46,6 +47,7 @@ def preflight(
         verify_storage=verify,
         load_entities=lambda domain, device_class: entities.get((domain, device_class), []),
         supports_voltage=lambda _: voltage_supported,
+        developer_mode=developer_mode,
     )
 
 

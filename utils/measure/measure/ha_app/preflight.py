@@ -5,16 +5,20 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION
-from measure.controller.charging.spec import HassChargingControllerSpec, charging_entity_domain
-from measure.controller.fan.spec import HassFanControllerSpec
+from measure.controller.charging.spec import (
+    DummyChargingControllerSpec,
+    HassChargingControllerSpec,
+    charging_entity_domain,
+)
+from measure.controller.fan.spec import DummyFanControllerSpec, HassFanControllerSpec
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.controller.light.dummy import DummyLightController
-from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec
-from measure.controller.media.spec import HassMediaControllerSpec
+from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec, HueLightControllerSpec
+from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec
 from measure.home_assistant_entities import DeviceClass, EntityDomain
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
-from measure.powermeter.spec import HassPowerMeterSpec, PowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, PowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import (
     ChargingMeasurementRequest,
     DummyLoadCalibrationRequest,
@@ -65,16 +69,19 @@ class MeasurementPreflight:
         load_entities: EntityLoader,
         diagnose_power_meter: Callable[[PowerMeterSpec], PowerMeterDiagnostic] | None = None,
         supports_voltage: Callable[[PowerMeterSpec], bool] | None = None,
+        developer_mode: bool = False,
     ) -> None:
         self._has_active_session = has_active_session
         self._verify_storage = verify_storage
         self._load_entities = load_entities
         self._diagnose_power_meter = diagnose_power_meter
         self._supports_voltage = supports_voltage
+        self._developer_mode = developer_mode
 
     def validate(self, request: MeasurementRequest) -> PreflightResult:
         """Return warnings and estimates, or raise a typed preflight error."""
 
+        self._validate_adapters(request)
         if self._has_active_session():
             raise ActiveSessionError("A measurement session is already active")
         try:
@@ -113,6 +120,39 @@ class MeasurementPreflight:
             supported_modes=result.supported_modes,
             power_meter_diagnostic=diagnostic,
         )
+
+    def _validate_adapters(self, request: MeasurementRequest) -> None:
+        power_meter = request.power_meter
+        if isinstance(power_meter, DummyPowerMeterSpec):
+            if not self._developer_mode:
+                raise PreflightError("Dummy power meters require developer mode in the Home Assistant app")
+        elif not isinstance(power_meter, HassPowerMeterSpec | ShellyPowerMeterSpec):
+            label = power_meter.type.value.replace("_", " ").title()
+            raise PreflightError(f"{label} power meters are not supported by the Home Assistant app")
+
+        controller = None
+        if isinstance(
+            request,
+            LightMeasurementRequest | SpeakerMeasurementRequest | ChargingMeasurementRequest | FanMeasurementRequest,
+        ):
+            controller = request.controller
+        if controller is None:
+            return
+        if isinstance(
+            controller,
+            DummyLightControllerSpec | DummyMediaControllerSpec | DummyChargingControllerSpec | DummyFanControllerSpec,
+        ):
+            if not self._developer_mode:
+                raise PreflightError("Dummy controllers require developer mode in the Home Assistant app")
+            return
+        if isinstance(
+            controller,
+            HassLightControllerSpec | HassMediaControllerSpec | HassChargingControllerSpec | HassFanControllerSpec,
+        ):
+            return
+        if isinstance(controller, HueLightControllerSpec):
+            raise PreflightError("Hue light controllers are not supported by the Home Assistant app")
+        raise PreflightError(f"{type(controller).__name__} is not supported by the Home Assistant app")
 
     def _validate_power_meter(self, request: MeasurementRequest) -> None:
         if isinstance(request.power_meter, HassPowerMeterSpec):
