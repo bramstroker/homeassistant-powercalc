@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from ipaddress import IPv4Address, IPv6Address, ip_address
 import logging
@@ -89,7 +89,7 @@ class ShellyDiscoveryService:
         )
 
     @staticmethod
-    def _candidates(services: tuple[dict[str, object], ...]) -> list[_ShellyCandidate]:
+    def _candidates(services: Iterable[dict[str, object]]) -> list[_ShellyCandidate]:
         candidates: dict[str, _ShellyCandidate] = {}
         for service in services:
             service_type = service.get("type")

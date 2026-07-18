@@ -132,7 +132,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         if wait_message_printed:
             self.interaction.notify("Charging device started charging, starting measurements")
 
-    def _build_model_json_data(self, measurements: dict[int, list[float]]) -> dict:
+    def _build_model_json_data(self, measurements: dict[int, list[float]]) -> dict[str, object]:
         """Build the model JSON data from the measurements"""
         if self.charging_device_type is None:
             raise RuntimeError("Charging runner is not configured")

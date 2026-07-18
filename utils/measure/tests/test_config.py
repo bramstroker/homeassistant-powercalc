@@ -51,6 +51,12 @@ def test_cli_environment_preserves_value_normalization(monkeypatch: pytest.Monke
     assert config.selected_measure_type == MeasureType.AVERAGE
 
 
+def test_cli_environment_preserves_named_log_level(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LOG_LEVEL", "DEBUG")
+
+    assert CliEnvironment().log_level == "DEBUG"
+
+
 @pytest.mark.parametrize("name", _ENV_BACKED_LIMIT_FIELDS)
 def test_cli_environment_clamps_env_values_to_parameter_limits(
     name: str,

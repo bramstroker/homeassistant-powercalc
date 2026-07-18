@@ -9,6 +9,7 @@ import sys
 import threading
 from threading import Thread
 import time
+from typing import TextIO
 
 import cv2
 import numpy as np
@@ -45,7 +46,7 @@ class RateCounter:
     """Track and render the processing rate of the OCR loop."""
 
     def __init__(self) -> None:
-        self.start_time = None
+        self.start_time: float | None = None
         self.iterations: int = 0
 
     def start(self) -> RateCounter:
@@ -56,6 +57,8 @@ class RateCounter:
         self.iterations += 1
 
     def rate(self) -> float:
+        if self.start_time is None:
+            return 0.0
         elapsed_time = time.perf_counter() - self.start_time
         return self.iterations / elapsed_time
 
@@ -127,8 +130,8 @@ class OcrRegionSelection:
     """Manage the user-selected crop region used for OCR."""
 
     def __init__(self, video_stream: VideoStream) -> None:
-        self.selection = None
-        self.drag_start = None
+        self.selection: tuple[int, int, int, int] | None = None
+        self.drag_start: tuple[int, int] | None = None
         self.is_selecting = False
         self.stream = video_stream
 
@@ -140,8 +143,16 @@ class OcrRegionSelection:
         cv2.setMouseCallback(WINDOW_NAME, self.draw_rectangle)
 
     # Method to track mouse events
-    def draw_rectangle(self, event: int, x: int, y: int) -> None:
-        x, y = np.int16([x, y])
+    def draw_rectangle(
+        self,
+        event: int,
+        x: int,
+        y: int,
+        _flags: int,
+        _parameter: object | None,
+    ) -> None:
+        x = int(np.int16(x))
+        y = int(np.int16(y))
 
         if event == cv2.EVENT_LBUTTONDOWN:
             # Start selection
@@ -150,6 +161,7 @@ class OcrRegionSelection:
                 self.is_selecting = True
             # Confirm selection
             else:
+                assert self.drag_start is not None
                 x_start, y_start = self.drag_start
                 self.selection = (x_start, y_start, x, y)
                 self.is_selecting = False
@@ -200,6 +212,7 @@ class OcrRegionSelection:
         return self.selection is not None
 
     def get_cropped_frame(self, frame: np.ndarray) -> np.ndarray:
+        assert self.selection is not None
         return frame[
             self.selection[1] : self.selection[3],
             self.selection[0] : self.selection[2],
@@ -218,7 +231,7 @@ class OCR:
         self.stopped: bool = False
         self.region_selection = region_selection
         self.video_stream = video_stream
-        self.file = None
+        self.file: TextIO | None = None
 
     def start(self) -> OCR:
         Thread(target=self.do_ocr, args=()).start()
@@ -267,7 +280,8 @@ class OCR:
         self.file.flush()
 
     def stop_process(self) -> None:
-        self.file.close()
+        if self.file is not None:
+            self.file.close()
         self.stopped = True
 
     def render(self, frame: np.ndarray) -> np.ndarray:
