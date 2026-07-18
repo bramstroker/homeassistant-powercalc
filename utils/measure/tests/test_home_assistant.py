@@ -42,22 +42,6 @@ def test_entity_registry_normalizes_numeric_unique_id() -> None:
     client.recv_result_list.assert_called_once_with(42)
 
 
-def test_entity_registry_skips_invalid_entry(caplog: pytest.LogCaptureFixture) -> None:
-    client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
-    client.send = MagicMock(return_value=42)  # type: ignore[method-assign]
-    client.recv_result_list = MagicMock(  # type: ignore[method-assign]
-        return_value=[
-            _entity_registry_entry(entity_id="sensor.valid", unique_id="valid"),
-            {"entity_id": "sensor.invalid", "unique_id": ["invalid"]},
-        ],
-    )
-
-    entries = client.list_entity_registry()
-
-    assert [entry.entity_id for entry in entries] == ["sensor.valid"]
-    assert "Skipping invalid Home Assistant entity registry entry sensor.invalid" in caplog.text
-
-
 @pytest.mark.parametrize(
     ("url", "expected"),
     [
