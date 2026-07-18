@@ -21,7 +21,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     files: { state: true }, plotCollection: { state: true }, logs: { state: true }, settings: { state: true },
     samples: { state: true }, testingPowerMeter: { state: true }, powerMeterTestResult: { state: true },
     deviceEntities: { state: true }, deviceEntityErrors: { state: true },
-    dummyLoadCalibration: { state: true },
+    dummyLoadCalibration: { state: true }, dummyLoadCalibrationError: { state: true },
     shellyDiscoveryDevices: { state: true }, discoveringShellys: { state: true }, shellyDiscoveryError: { state: true },
     shellyDiscoveryAvailable: { state: true }, shellyDiscoveryMessage: { state: true },
   };
@@ -44,6 +44,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   powers: EntityDescriptor[] = [];
   voltages: EntityDescriptor[] = [];
   dummyLoadCalibration: DummyLoadCalibration | null = null;
+  dummyLoadCalibrationError = "";
   settings?: AppSettings;
   definitions: MeasureDefinition[] = [];
   deviceEntities: Record<string, EntityDescriptor[]> = {};
@@ -80,6 +81,8 @@ export class AppShell extends LitElement implements MeasureAppState {
     .sequence > li { position: relative; display: grid; gap: 0.45rem; min-width: 0; color: var(--muted); font: 700 0.68rem/1.15 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
     .sequence > li:not(:last-child)::after { content: ""; position: absolute; top: 10px; left: calc(20px + 0.45rem); width: calc(100% - 40px - 0.45rem); height: 2px; border-radius: 99px; background: var(--line); }
     .step-number { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid var(--line); border-radius: 50%; background: var(--canvas); color: var(--muted); font-size: 0.66rem; z-index: 1; }
+    .calibration-warning { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+    .calibration-warning button { flex: 0 0 auto; }
     .sequence > li.active { color: var(--ink); } .sequence > li.done { color: var(--signal-strong); }
     .sequence > li.active .step-number { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 16%, transparent); color: var(--on-signal); background: var(--signal); }
     .sequence > li.done .step-number { border-color: var(--signal); color: var(--on-signal); background: var(--signal); }
@@ -88,7 +91,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     .pulse { width: 40px; height: 40px; margin: 0 auto 1rem; border: 2px solid var(--line); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     footer { margin-top: 1rem; color: var(--muted); font-size: 0.72rem; text-align: right; }
-    @media (max-width: 700px) { .intro { grid-template-columns: 1fr; } h1 { grid-column: auto; } .sequence { max-width: 560px; } }
+    @media (max-width: 700px) { .intro { grid-template-columns: 1fr; } h1 { grid-column: auto; } .sequence { max-width: 560px; } .calibration-warning { align-items: flex-start; flex-direction: column; } }
     @media (max-width: 460px) { .shell { width: min(100% - 1.25rem, 980px); } .sequence { gap: 0.3rem; } .sequence > li { font-size: 0.58rem; letter-spacing: 0.04em; } .sequence > li:not(:last-child)::after { left: calc(20px + 0.3rem); width: calc(100% - 40px - 0.3rem); } }
   `];
 
@@ -115,6 +118,12 @@ export class AppShell extends LitElement implements MeasureAppState {
             </nav>
           </div>
         </header>
+        ${this.dummyLoadCalibrationError ? html`
+          <div class="notice calibration-warning" role="status">
+            <span>${this.dummyLoadCalibrationError}</span>
+            <button type="button" @click=${this.retryDummyLoadCalibration}>Retry</button>
+          </div>
+        ` : nothing}
         ${this.renderView()}
         <footer>Keep this app running while the measurement is in progress.</footer>
       </main>
@@ -296,6 +305,9 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
   private saveSettings(event: CustomEvent<AppSettings>): void {
     void this.controller.saveSettings(event.detail);
+  }
+  private retryDummyLoadCalibration(): void {
+    void this.controller.retryDummyLoadCalibration();
   }
   private stepClass(index: number): string {
     const current = this.currentStep();
