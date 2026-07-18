@@ -106,7 +106,7 @@ jobs:
         if: ${{ !inputs.dry_run }}
         working-directory: utils/measure
         run: |
-          uv run --extra dev pytest -qq tests/test_prepare_app_release.py
+          uv run --extra dev --extra cli pytest -qq tests/test_prepare_app_release.py
           ruby home-assistant-app/validate.rb
       - name: Commit and push release branch
         if: ${{ !inputs.dry_run }}
