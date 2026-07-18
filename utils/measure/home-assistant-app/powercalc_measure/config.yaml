@@ -1,5 +1,5 @@
 name: Powercalc Measure
-version: "0.0.1"
+version: "0.1.0"
 slug: powercalc_measure
 description: Create Powercalc power profiles from Home Assistant entities
 url: https://docs.powercalc.nl/contributing/measure/home-assistant-app/
