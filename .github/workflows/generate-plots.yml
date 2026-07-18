@@ -31,7 +31,7 @@ jobs:
             pyproject.toml
             uv.lock
       - name: Run visualization tool
-        run: uv --project utils/measure run --group visualize powercalc-visualize ./profile_library --force
+        run: uv --project utils/measure run --group visualize powercalc-visualize ./profile_library
       - uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10
         if: github.ref == 'refs/heads/master'
         with:
