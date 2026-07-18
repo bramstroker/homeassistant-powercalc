@@ -14,8 +14,7 @@ class KasaPowerMeter(PowerMeter):
 
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
         """Get a new power reading from the Kasa device. Optionally include voltage."""
-        loop = asyncio.get_event_loop()
-        power, voltage = loop.run_until_complete(self.async_read_power_meter())
+        power, voltage = asyncio.run(self.async_read_power_meter())
 
         if include_voltage:
             return PowerMeasurementResult(power=power, voltage=voltage, updated=time.time())
