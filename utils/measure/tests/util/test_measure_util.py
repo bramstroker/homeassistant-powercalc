@@ -41,8 +41,9 @@ def test_linear_slope_does_not_require_numpy(values: list[float], expected: floa
         ([6000.0 - 10.0 * index for index in range(20)], Trend.DECREASING),
         # The relative threshold keeps its sensitivity on low-ohm loads such as incandescent bulbs
         ([40.0 + 0.05 * index for index in range(20)], Trend.INCREASING),
-        # Halves disagreeing on direction means the load has settled
-        ([6000.0 + 10.0 * index for index in range(10)] + [6100.0 - 10.0 * index for index in range(10)], Trend.STEADY),
+        # Drift in only one half still means the load has not settled
+        ([6000.0 + 10.0 * index for index in range(10)] + [6100.0] * 10, Trend.INCREASING),
+        ([6100.0] * 10 + [6100.0 - 10.0 * index for index in range(10)], Trend.DECREASING),
     ],
 )
 def test_dummy_load_trend_uses_relative_threshold(averages: list[float], expected: Trend) -> None:
@@ -51,6 +52,12 @@ def test_dummy_load_trend_uses_relative_threshold(averages: list[float], expecte
 
 def test_dummy_load_trend_requires_twenty_samples() -> None:
     assert MeasureUtil.dummy_load_trend([6226.0] * 19) is None
+
+
+def test_dummy_load_trend_rejects_opposing_drift_as_unstable() -> None:
+    averages = [6000.0 + 10.0 * index for index in range(10)] + [6100.0 - 10.0 * index for index in range(10)]
+
+    assert MeasureUtil.dummy_load_trend(averages) is Trend.UNSTABLE
 
 
 def test_no_valid_average_readings_raise_typed_error(mock_config_factory: MockConfigFactory) -> None:

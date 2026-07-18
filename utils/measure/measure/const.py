@@ -65,6 +65,7 @@ class Trend(StrEnum):
     INCREASING = "increasing"
     DECREASING = "decreasing"
     STEADY = "steady"
+    UNSTABLE = "unstable"
 
 
 DUMMY_LOAD_MEASUREMENT_COUNT = 20
