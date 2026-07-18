@@ -22,13 +22,13 @@ uv manages the virtual environment and installs all dependencies declared by the
 ```
 cd utils/measure
 uv venv
-uv sync --extra dev
+uv sync --extra dev --extra app --extra cli
 ```
 
 Start the CLI with:
 
 ```
-uv run python -m measure.measure
+uv run --extra cli python -m measure.measure
 ```
 
 ### Visualize measurement output
@@ -56,7 +56,7 @@ See the [measurement tool architecture](../../docs/source/contributing/measure/a
 
 **Terminal 1 — backend** (from `utils/measure`):
 ```
-uv run python -m measure.ha_app.main \
+uv run --extra app python -m measure.ha_app.main \
   --host 127.0.0.1 --port 8099 \
   --data-root .dev-data \
   --hass-url ws://127.0.0.1:8123/api/websocket \

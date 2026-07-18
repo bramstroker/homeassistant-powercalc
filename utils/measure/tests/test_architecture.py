@@ -12,6 +12,11 @@ EXECUTION_BOUNDARIES = {
     Path("cli/request_adapter.py"),
     Path("ha_app/service.py"),
 }
+OPTIONAL_ADAPTER_MODULES = {
+    "measure.controller.light.hue",
+    "measure.powermeter.kasa",
+    "measure.powermeter.tuya",
+}
 
 
 def test_shared_modules_do_not_import_transport_packages() -> None:
@@ -90,6 +95,12 @@ def test_only_home_assistant_manager_constructs_websocket_clients() -> None:
     assert violations == []
 
 
+def test_assembler_imports_optional_adapters_only_when_selected() -> None:
+    imports = _top_level_imports(MEASURE_ROOT / "assembler.py")
+
+    assert not imports.intersection(OPTIONAL_ADAPTER_MODULES)
+
+
 def _call_name(node: ast.Call) -> str | None:
     if isinstance(node.func, ast.Name):
         return node.func.id
@@ -106,4 +117,15 @@ def _imports(path: Path) -> list[str]:
             imports.extend(alias.name for alias in node.names)
         elif isinstance(node, ast.ImportFrom) and node.module:
             imports.append(node.module)
+    return imports
+
+
+def _top_level_imports(path: Path) -> set[str]:
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    imports: set[str] = set()
+    for node in tree.body:
+        if isinstance(node, ast.Import):
+            imports.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imports.add(node.module)
     return imports

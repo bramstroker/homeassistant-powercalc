@@ -37,8 +37,8 @@ jobs:
       - name: Run tests
         run: |
           cd ./utils/measure
-          uv run --extra dev --extra cli ruff check measure tests prepare_app_release.py
-          MYPYPATH=. uv run --extra dev --extra cli mypy \
+          uv run --extra dev --extra app --extra cli ruff check measure tests prepare_app_release.py
+          MYPYPATH=. uv run --extra dev --extra app --extra cli mypy \
             --explicit-package-bases \
             --follow-imports=silent \
             --ignore-missing-imports \
@@ -78,7 +78,7 @@ jobs:
             measure/ha_app/preflight.py \
             measure/ha_app/api.py \
             measure/ha_app/main.py
-          uv run --extra dev --extra cli pytest \
+          uv run --extra dev --extra app --extra cli pytest \
             -qq \
             --durations=10 \
             -o console_output_style=count \

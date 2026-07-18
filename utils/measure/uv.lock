@@ -283,15 +283,6 @@ wheels = [
 ]
 
 [[package]]
-name = "chardet"
-version = "5.2.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f3/0d/f7b6ab21ec75897ed80c17d79b15951a719226b9fababf1e40ea74d69079/chardet-5.2.0.tar.gz", hash = "sha256:1b3b6ff479a8c414bc3fa2c0852995695c4a026dcd6d0633b2dd092ca39c1cf7", size = 2069618, upload-time = "2023-08-01T19:23:02.662Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/6f/f5fbc992a329ee4e0f288c1fe0e2ad9485ed064cac731ed2fe47dcc38cbf/chardet-5.2.0-py3-none-any.whl", hash = "sha256:e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970", size = 199385, upload-time = "2023-08-01T19:23:00.661Z" },
-]
-
-[[package]]
 name = "charset-normalizer"
 version = "3.4.2"
 source = { registry = "https://pypi.org/simple" }
@@ -597,7 +588,7 @@ name = "jinxed"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ansicon" },
+    { name = "ansicon", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/20/d0/59b2b80e7a52d255f9e0ad040d2e826342d05580c4b1d7d7747cfb8db731/jinxed-1.3.0.tar.gz", hash = "sha256:1593124b18a41b7a3da3b078471442e51dbad3d77b4d4f2b0c26ab6f7d660dbf", size = 80981, upload-time = "2024-07-31T22:39:18.854Z" }
 wheels = [
@@ -727,25 +718,23 @@ name = "measure"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "chardet" },
-    { name = "charset-normalizer" },
-    { name = "fastapi" },
     { name = "homeassistant-api" },
-    { name = "inquirer" },
-    { name = "pycryptodome" },
     { name = "pydantic" },
-    { name = "python-decouple" },
-    { name = "python-kasa" },
-    { name = "readchar" },
     { name = "requests" },
-    { name = "tuyapower" },
-    { name = "typing-extensions" },
-    { name = "uvicorn" },
 ]
 
 [package.optional-dependencies]
+app = [
+    { name = "fastapi" },
+    { name = "uvicorn" },
+]
 cli = [
     { name = "aiohue" },
+    { name = "inquirer" },
+    { name = "pycryptodome" },
+    { name = "python-decouple" },
+    { name = "python-kasa" },
+    { name = "tuyapower" },
 ]
 dev = [
     { name = "httpx2" },
@@ -769,31 +758,27 @@ visualize = [
 [package.metadata]
 requires-dist = [
     { name = "aiohue", marker = "extra == 'cli'", specifier = ">=4.8.1,<5" },
-    { name = "chardet", specifier = ">=5.1" },
-    { name = "charset-normalizer", specifier = ">=3.1" },
-    { name = "fastapi", specifier = ">=0.116" },
+    { name = "fastapi", marker = "extra == 'app'", specifier = ">=0.116" },
     { name = "homeassistant-api", specifier = "~=6.0" },
     { name = "httpx2", marker = "extra == 'dev'", specifier = ">=0.1" },
-    { name = "inquirer", specifier = ">=3.1" },
+    { name = "inquirer", marker = "extra == 'cli'", specifier = ">=3.1" },
     { name = "mypy", marker = "extra == 'dev'", specifier = "==2.3.0" },
     { name = "numpy", marker = "extra == 'ocr'", specifier = ">=2.4" },
     { name = "opencv-python-headless", marker = "extra == 'ocr'", specifier = ">=4.7" },
     { name = "pillow", marker = "extra == 'ocr'", specifier = ">=12.0" },
-    { name = "pycryptodome" },
+    { name = "pycryptodome", marker = "extra == 'cli'", specifier = ">=3.20" },
     { name = "pydantic", specifier = ">=2.13" },
     { name = "pytesseract", marker = "extra == 'ocr'", specifier = ">=0.3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.3" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.0" },
-    { name = "python-decouple", specifier = ">=3.4" },
-    { name = "python-kasa", specifier = ">=0.7" },
-    { name = "readchar", specifier = ">=4.0" },
+    { name = "python-decouple", marker = "extra == 'cli'", specifier = ">=3.4" },
+    { name = "python-kasa", marker = "extra == 'cli'", specifier = ">=0.7" },
     { name = "requests", specifier = ">=2.28" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.2" },
-    { name = "tuyapower", specifier = ">=0.2" },
-    { name = "typing-extensions", specifier = ">=4.6" },
-    { name = "uvicorn", specifier = ">=0.35" },
+    { name = "tuyapower", marker = "extra == 'cli'", specifier = ">=0.2" },
+    { name = "uvicorn", marker = "extra == 'app'", specifier = ">=0.35" },
 ]
-provides-extras = ["cli", "ocr", "dev"]
+provides-extras = ["app", "cli", "ocr", "dev"]
 
 [package.metadata.requires-dev]
 visualize = [{ name = "matplotlib", specifier = ">=3.11" }]
