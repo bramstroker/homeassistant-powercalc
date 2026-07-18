@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.1.1 - 2026-07-18
+
+- #4341 Auto-discover charging battery source @bramstroker
+
 ## 0.1.0 - 2026-07-18
 
 - #4322 Unify power reading validation @bramstroker
