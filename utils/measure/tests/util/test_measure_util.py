@@ -11,6 +11,7 @@ from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.util.measure_util import (
     AverageMeasurementState,
     DummyLoadMeasurementError,
+    MeasurementResult,
     MeasureUtil,
     NoValidReadingsError,
 )
@@ -86,6 +87,47 @@ def test_dummy_load_emits_corrected_sample(mock_config_factory: MockConfigFactor
     assert result.power == pytest.approx(10.0)
     assert samples
     assert all(sample == pytest.approx(10.0) for sample in samples)
+
+
+@patch("time.time")
+def test_average_measurement_uses_dummy_load_correction_pipeline(
+    mock_time: MagicMock,
+    mock_config_factory: MockConfigFactory,
+) -> None:
+    power_meter = MagicMock(PowerMeter)
+    power_meter.has_voltage_support.return_value = True
+    power_meter.get_power.return_value = PowerMeasurementResult(power=20.0, voltage=10.0, updated=0.0)
+    samples: list[float] = []
+    measure_util = MeasureUtil(power_meter, mock_config_factory(), on_sample=samples.append)
+    measure_util.set_dummy_load_resistance(10.0)
+    mock_time.side_effect = lambda: 100.0 if power_meter.get_power.call_count else 0.0
+
+    result = measure_util.take_average_measurement(duration=10)
+
+    assert result == MeasurementResult(power=10.0, voltages=[10.0])
+    assert samples == [10.0]
+    power_meter.get_power.assert_called_once_with(include_voltage=True)
+
+
+def test_measurement_retries_outdated_reading_without_emitting_it(mock_config_factory: MockConfigFactory) -> None:
+    power_meter = MagicMock(PowerMeter)
+    power_meter.get_power.side_effect = [
+        PowerMeasurementResult(power=5.0, updated=10.0),
+        PowerMeasurementResult(power=7.0, updated=30.0),
+    ]
+    samples: list[float] = []
+    measure_util = MeasureUtil(
+        power_meter,
+        mock_config_factory({"max_retries": 1, "sample_count": 1}),
+        wait=lambda _: None,
+        on_sample=samples.append,
+    )
+
+    result = measure_util.take_measurement(start_timestamp=20.0)
+
+    assert result == MeasurementResult(power=7.0, voltages=[])
+    assert samples == [7.0]
+    assert power_meter.get_power.call_count == 2
 
 
 def test_dummy_load_rejects_non_positive_corrected_power(mock_config_factory: MockConfigFactory) -> None:
