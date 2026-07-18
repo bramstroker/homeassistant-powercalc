@@ -25,13 +25,11 @@ def _assembler(
     *,
     home_assistant: HomeAssistantManager | None = None,
     tuya_device_key: str | None = None,
-    power_meter_decorator: MagicMock | None = None,
 ) -> MeasurementAssembler:
     return MeasurementAssembler(
         MagicMock(spec=RunInteraction),
         home_assistant=home_assistant,
         tuya_device_key=tuya_device_key,
-        power_meter_decorator=power_meter_decorator,
     )
 
 
@@ -115,15 +113,6 @@ def test_assembler_reads_tuya_key_from_cli_config_dependency() -> None:
         _assembler(tuya_device_key="device-key").assemble(request)
 
     power_meter.assert_called_once_with("device-id", "192.0.2.20", "device-key", "3.4")
-
-
-def test_assembler_applies_power_meter_decorator() -> None:
-    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
-    decorator = MagicMock(side_effect=lambda meter: meter)
-
-    _assembler(power_meter_decorator=decorator).assemble(request)
-
-    decorator.assert_called_once()
 
 
 def test_assembler_rejects_a_controller_for_the_wrong_measurement_type() -> None:
