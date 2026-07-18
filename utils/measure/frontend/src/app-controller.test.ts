@@ -23,7 +23,7 @@ function state(): MeasureAppState {
     view: "loading", errorMessage: "", busy: false, connectedToEvents: false,
     files: [], plotCollection: { partial: false, plots: [], warnings: [] },
     logs: [], samples: [], lights: [], powers: [], voltages: [], definitions: [],
-    dummyLoadCalibration: null,
+    dummyLoadCalibration: null, dummyLoadCalibrationError: "",
     deviceEntities: {}, deviceEntityErrors: {}, testingPowerMeter: false,
     shellyDiscoveryDevices: [], discoveringShellys: false, shellyDiscoveryError: "",
   };
@@ -79,6 +79,19 @@ describe("measure app controller", () => {
     await controller.boot();
 
     expect(appState.dummyLoadCalibration).toEqual(calibration);
+  });
+
+  it("surfaces calibration lookup failures without blocking boot", async () => {
+    const appState = state();
+    const controller = new MeasureAppController(appState, () => api({
+      getDummyLoadCalibration: async () => { throw new Error("Calibration API unavailable"); },
+    }), () => connection(), () => undefined);
+
+    await controller.boot();
+
+    expect(appState.view).toBe("setup");
+    expect(appState.dummyLoadCalibration).toBeNull();
+    expect(appState.dummyLoadCalibrationError).toContain("Calibration API unavailable");
   });
 
   it("loads files and plots for a persisted terminal session", async () => {
@@ -216,6 +229,36 @@ describe("measure app controller", () => {
 
     expect(calibrationCalls).toBe(2);
     expect(appState.dummyLoadCalibration?.description).toBe("Heater");
+  });
+
+  it("retains the previous calibration and can retry after a refresh failure", async () => {
+    const appState = state();
+    const calibration = {
+      description: "Heater",
+      resistance: 1200,
+      calibrated_at: "2026-07-16T11:00:00Z",
+    };
+    let calibrationResult: "success" | "failure" = "success";
+    const controller = new MeasureAppController(appState, () => api({
+      getDummyLoadCalibration: async () => {
+        if (calibrationResult === "failure") throw new Error("Calibration API unavailable");
+        return calibration;
+      },
+    }), () => connection(), () => undefined);
+    await controller.boot();
+    controller.openSettings();
+    calibrationResult = "failure";
+
+    await controller.saveSettings(settings);
+
+    expect(appState.dummyLoadCalibration).toEqual(calibration);
+    expect(appState.dummyLoadCalibrationError).toContain("Calibration API unavailable");
+
+    calibrationResult = "success";
+    await controller.retryDummyLoadCalibration();
+
+    expect(appState.dummyLoadCalibrationError).toBe("");
+    expect(appState.dummyLoadCalibration).toEqual(calibration);
   });
 
   it("ignores a validation result after the meter configuration changes", async () => {

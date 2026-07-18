@@ -39,6 +39,7 @@ export interface MeasureAppState {
   powers: EntityDescriptor[];
   voltages: EntityDescriptor[];
   dummyLoadCalibration: DummyLoadCalibration | null;
+  dummyLoadCalibrationError: string;
   settings?: AppSettings;
   definitions: MeasureDefinition[];
   deviceEntities: Record<string, EntityDescriptor[]>;
@@ -114,6 +115,7 @@ export class MeasureAppController {
         if (error instanceof ApiError && error.status === 404) return { state: "idle" } satisfies SessionSnapshot;
         throw error;
       });
+      const calibrationPromise = this.refreshDummyLoadCalibration();
       [
         this.state.capabilities,
         this.state.lights,
@@ -122,7 +124,6 @@ export class MeasureAppController {
         this.state.settings,
         this.state.snapshot,
         this.state.definitions,
-        this.state.dummyLoadCalibration,
       ] = await Promise.all([
         api.getCapabilities(),
         api.getEntitiesByDomain("light"),
@@ -131,8 +132,8 @@ export class MeasureAppController {
         api.getSettings(),
         currentPromise,
         api.getMeasureDefinitions(),
-        api.getDummyLoadCalibration().catch(() => null),
       ]);
+      await calibrationPromise;
       this.state.request = this.state.snapshot.request;
       if (this.state.request) await this.loadTypeEntities(this.state.request.measure_type);
       await this.routeSnapshot();
@@ -315,9 +316,9 @@ export class MeasureAppController {
     this.changed();
     try {
       this.state.settings = await this.api().saveSettings(settings);
-      [this.state.capabilities, this.state.dummyLoadCalibration] = await Promise.all([
+      [this.state.capabilities] = await Promise.all([
         this.api().getCapabilities(),
-        this.api().getDummyLoadCalibration().catch(() => null),
+        this.refreshDummyLoadCalibration(),
       ]);
       this.state.view = this.settingsReturnView;
     } catch (error) {
@@ -325,6 +326,20 @@ export class MeasureAppController {
     } finally {
       this.state.busy = false;
       this.changed();
+    }
+  }
+
+  async retryDummyLoadCalibration(): Promise<void> {
+    await this.refreshDummyLoadCalibration();
+    this.changed();
+  }
+
+  private async refreshDummyLoadCalibration(): Promise<void> {
+    try {
+      this.state.dummyLoadCalibration = await this.api().getDummyLoadCalibration();
+      this.state.dummyLoadCalibrationError = "";
+    } catch (error) {
+      this.state.dummyLoadCalibrationError = `Could not load the saved dummy-load calibration: ${message(error)}`;
     }
   }
 

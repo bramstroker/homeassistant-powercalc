@@ -1457,6 +1457,20 @@ describe("app shell", () => {
     expect(logo?.src).toContain("image/svg+xml");
   });
 
+  it("renders calibration lookup failures as a retryable warning", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.view = "setup";
+    element.dummyLoadCalibrationError = "Could not load the saved dummy-load calibration: API unavailable";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const warning = element.shadowRoot?.querySelector(".calibration-warning");
+    expect(warning?.getAttribute("role")).toBe("status");
+    expect(warning?.textContent).toContain("API unavailable");
+    expect(warning?.querySelector("button")?.textContent).toContain("Retry");
+  });
+
   it("does not restore a stale validation result after meter settings change", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;
