@@ -7,7 +7,7 @@ runner without any dependency install, exactly like the previous scripts.
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, cast
 import urllib.request
 
 API_ROOT = "https://api.github.com"
@@ -92,7 +92,10 @@ class GitHubClient:
         return self._paginate(f"/repos/{self.repository}/releases")
 
     def create_release(self, payload: dict[str, Any]) -> dict[str, Any]:
-        return self._request("POST", f"/repos/{self.repository}/releases", payload)
+        return cast(dict[str, Any], self._request("POST", f"/repos/{self.repository}/releases", payload))
 
     def update_release(self, release_id: int, payload: dict[str, Any]) -> dict[str, Any]:
-        return self._request("PATCH", f"/repos/{self.repository}/releases/{release_id}", payload)
+        return cast(dict[str, Any], self._request("PATCH", f"/repos/{self.repository}/releases/{release_id}", payload))
+
+    def delete_release(self, release_id: int) -> None:
+        self._request("DELETE", f"/repos/{self.repository}/releases/{release_id}")

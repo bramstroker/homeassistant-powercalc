@@ -14,13 +14,16 @@ on:
 
 permissions: {}
 
-# No concurrency group: a pending queued run would be cancelled by the next
-# master push, silently dropping its changelog entries. Parallel runs are
-# safe because draft updates are deduplicated per pull request number.
+concurrency:
+  # A newer queued run may replace an older pending one. That is safe because
+  # every run rebuilds the draft from the full history since the release tag.
+  group: measure-release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   update-draft:
     name: Update rolling draft
+    needs: tag-release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -30,10 +33,10 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
-      - name: Append merged Measure pull requests to the draft
+      - name: Rebuild draft from merged Measure pull requests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMIT_SHAS: ${{ toJSON(github.event.commits.*.id) }}
+          HEAD_REF: ${{ github.ref_name }}
         run: python3 .github/scripts/release_draft/update_measure_draft.py
 
   tag-release:

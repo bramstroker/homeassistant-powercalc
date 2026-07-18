@@ -279,16 +279,3 @@ jobs:
               --title "Powercalc Measure v${VERSION}" \
               --notes-file "$RUNNER_TEMP/measure-release-notes.md"
           fi
-      - name: Clear rolling draft
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY: ${{ github.repository }}
-        run: |
-          release_id=$(gh api "repos/${REPOSITORY}/releases" --paginate \
-            --jq '.[] | select(.draft == true and .tag_name == "measure-next") | .id' | head -n 1)
-          if [[ -n "$release_id" ]]; then
-            gh api -X DELETE "repos/${REPOSITORY}/releases/${release_id}"
-            echo "Removed rolling measure-next draft"
-          else
-            echo "No rolling measure-next draft to remove"
-          fi

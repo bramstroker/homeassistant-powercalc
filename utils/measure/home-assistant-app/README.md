@@ -40,7 +40,7 @@ To release:
 2. Run the **Prepare Measure Release** workflow. Leave the version empty to use the resolved version from the draft title, or pass one to override. Enable `dry_run` to preview and validate without creating a branch.
 3. Review and merge the generated release pull request. Everything after the merge is automatic.
 
-On merge, the **Measure Release** workflow detects the new changelog section, pushes the `measure-v0.2.0` tag, and dispatches the publish workflow on that tag. That builds both artifacts with distinct embedded versions (`v0.2.0:cli` for the CLI image, `v0.2.0:app` for the Home Assistant app), mirrors the app metadata to this repository after the images are pullable, creates the `v0.2.0` GitHub release here with the changelog notes, and finally deletes the rolling draft in the main repository so the next cycle starts empty. Measure pull requests merged while the publish pipeline is still running should be re-added to the fresh draft by hand if the draft deletion swallowed them.
+On merge, the **Measure Release** workflow detects the new changelog section, pushes the `measure-v0.2.0` tag, and dispatches the publish workflow on that tag. That builds both artifacts with distinct embedded versions (`v0.2.0:cli` for the CLI image, `v0.2.0:app` for the Home Assistant app), mirrors the app metadata to this repository after the images are pullable, and creates the `v0.2.0` GitHub release here with the changelog notes. The rolling draft in the main repository is rebuilt from Measure pull requests merged after the new tag, so concurrent merges cannot be lost while the publish pipeline is running.
 
 For local troubleshooting, export the draft body to a file and run from `utils/measure`:
 
