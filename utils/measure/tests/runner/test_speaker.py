@@ -77,3 +77,20 @@ def test_run_reports_volume_and_muted_operating_points() -> None:
         {"type": "speaker", "volume": 20, "muted": False},
     ]
     assert {"type": "speaker", "volume": 0, "muted": True} in points
+
+
+def test_cleanup_turns_off_speaker() -> None:
+    media_controller = MagicMock(MediaController)
+    runner = SpeakerRunner(MagicMock(MeasureUtil), MeasurementParameters(), media_controller)
+
+    runner.cleanup()
+
+    media_controller.turn_off.assert_called_once_with()
+
+
+def test_cleanup_does_not_surface_speaker_shutdown_failure() -> None:
+    media_controller = MagicMock(MediaController)
+    media_controller.turn_off.side_effect = RuntimeError("offline")
+    runner = SpeakerRunner(MagicMock(MeasureUtil), MeasurementParameters(), media_controller)
+
+    runner.cleanup()

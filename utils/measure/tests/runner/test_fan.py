@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock, call
 
+from measure.controller.fan.controller import FanController
 from measure.controller.fan.dummy import DummyFanController
 from measure.controller.fan.spec import DummyFanControllerSpec
 from measure.execution import RunInteraction
@@ -78,3 +79,20 @@ def test_run_reports_fan_percentage_operating_points(export_path: str) -> None:
     points = [call.args[0] for call in interaction.operating_point.call_args_list]
     assert points[0] == {"type": "fan", "percentage": 5, "on": True}
     assert points[-1] == {"type": "fan", "percentage": 100, "on": True}
+
+
+def test_cleanup_turns_off_fan() -> None:
+    fan_controller = MagicMock(FanController)
+    runner = FanRunner(MagicMock(MeasureUtil), fan_controller)
+
+    runner.cleanup()
+
+    fan_controller.turn_off.assert_called_once_with()
+
+
+def test_cleanup_does_not_surface_fan_shutdown_failure() -> None:
+    fan_controller = MagicMock(FanController)
+    fan_controller.turn_off.side_effect = RuntimeError("offline")
+    runner = FanRunner(MagicMock(MeasureUtil), fan_controller)
+
+    runner.cleanup()

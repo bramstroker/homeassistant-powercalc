@@ -126,3 +126,11 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
         except ZeroReadingError:
             _LOGGER.error("Measured 0 watt as standby power.")
             return MeasurementResult(power=0, voltages=[])
+
+    def cleanup(self) -> None:
+        """Stop playback after success, failure, or cancellation."""
+
+        try:
+            self.media_controller.turn_off()
+        except Exception:  # noqa: BLE001 - cleanup must not mask the measurement outcome
+            _LOGGER.warning("Could not turn off speaker during cleanup", exc_info=True)

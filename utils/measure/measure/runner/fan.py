@@ -73,3 +73,11 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
         _LOGGER.info("Waiting %d seconds to measure power", SLEEP_TIME_PERCENTAGE_CHANGE)
         self.interaction.wait(SLEEP_TIME_PERCENTAGE_CHANGE)
         return self.measure_util.take_average_measurement(MEASURE_DURATION_PER_STEP)
+
+    def cleanup(self) -> None:
+        """Turn off the fan after success, failure, or cancellation."""
+
+        try:
+            self.fan_controller.turn_off()
+        except Exception:  # noqa: BLE001 - cleanup must not mask the measurement outcome
+            _LOGGER.warning("Could not turn off fan during cleanup", exc_info=True)
