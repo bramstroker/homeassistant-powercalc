@@ -5,6 +5,7 @@ from threading import Lock
 from time import sleep
 from unittest.mock import MagicMock
 
+from measure.const import HASS_ENTITY_REGISTRY_LIST
 from measure.home_assistant import HomeAssistantManager, HomeAssistantWebsocketClient, normalize_hass_url
 import pytest
 
@@ -13,6 +14,48 @@ def test_client_uses_canonical_websocket_url() -> None:
     client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
 
     assert client.api_url == "ws://127.0.0.1:8123/api/websocket"
+
+
+def _entity_registry_entry(*, entity_id: str, unique_id: object) -> dict[str, object]:
+    return {
+        "created_at": "2026-07-18T12:00:00+00:00",
+        "entity_id": entity_id,
+        "has_entity_name": True,
+        "id": entity_id,
+        "modified_at": "2026-07-18T12:00:00+00:00",
+        "platform": "test",
+        "unique_id": unique_id,
+    }
+
+
+def test_entity_registry_normalizes_numeric_unique_id() -> None:
+    client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
+    client.send = MagicMock(return_value=42)  # type: ignore[method-assign]
+    client.recv_result_list = MagicMock(  # type: ignore[method-assign]
+        return_value=[_entity_registry_entry(entity_id="sensor.battery", unique_id=609369805)],
+    )
+
+    entries = client.list_entity_registry()
+
+    assert entries[0].unique_id == "609369805"
+    client.send.assert_called_once_with(HASS_ENTITY_REGISTRY_LIST)
+    client.recv_result_list.assert_called_once_with(42)
+
+
+def test_entity_registry_skips_invalid_entry(caplog: pytest.LogCaptureFixture) -> None:
+    client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
+    client.send = MagicMock(return_value=42)  # type: ignore[method-assign]
+    client.recv_result_list = MagicMock(  # type: ignore[method-assign]
+        return_value=[
+            _entity_registry_entry(entity_id="sensor.valid", unique_id="valid"),
+            {"entity_id": "sensor.invalid", "unique_id": ["invalid"]},
+        ],
+    )
+
+    entries = client.list_entity_registry()
+
+    assert [entry.entity_id for entry in entries] == ["sensor.valid"]
+    assert "Skipping invalid Home Assistant entity registry entry sensor.invalid" in caplog.text
 
 
 @pytest.mark.parametrize(

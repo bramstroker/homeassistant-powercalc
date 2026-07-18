@@ -4,6 +4,7 @@ import asyncio
 from collections.abc import Callable
 import contextlib
 from dataclasses import dataclass
+import logging
 from threading import RLock
 from types import TracebackType
 from typing import Any, Self
@@ -11,8 +12,17 @@ import urllib.parse
 
 from homeassistant_api import AsyncWebsocketClient, Entity, EntityRegistryEntry, Group, State, WebsocketClient
 from homeassistant_api.errors import WebsocketError
+from pydantic import ValidationError
 
-from measure.const import HASS_DEVICE_REGISTRY_LIST, HASS_ZEROCONF_SUBSCRIBE_DISCOVERY
+from measure.const import (
+    HASS_DEVICE_REGISTRY_LIST,
+    HASS_ENTITY_REGISTRY_ENTITY_ID,
+    HASS_ENTITY_REGISTRY_LIST,
+    HASS_ENTITY_REGISTRY_UNIQUE_ID,
+    HASS_ZEROCONF_SUBSCRIBE_DISCOVERY,
+)
+
+_LOGGER = logging.getLogger("measure")
 
 
 class HomeAssistantDiscoveryError(RuntimeError):
@@ -122,6 +132,24 @@ class HomeAssistantWebsocketClient(WebsocketClient):
         """Return Home Assistant device registry entries."""
 
         return self.recv_result_list(self.send(HASS_DEVICE_REGISTRY_LIST))
+
+    def list_entity_registry(self) -> tuple[EntityRegistryEntry, ...]:
+        """Return valid entity registry entries, normalizing malformed unique IDs."""
+
+        entries: list[EntityRegistryEntry] = []
+        for raw_entry in self.recv_result_list(self.send(HASS_ENTITY_REGISTRY_LIST)):
+            unique_id = raw_entry.get(HASS_ENTITY_REGISTRY_UNIQUE_ID)
+            if unique_id is not None and not isinstance(unique_id, str):
+                raw_entry = {**raw_entry, HASS_ENTITY_REGISTRY_UNIQUE_ID: str(unique_id)}
+            try:
+                entries.append(EntityRegistryEntry.from_json(raw_entry))
+            except ValidationError as error:
+                _LOGGER.warning(
+                    "Skipping invalid Home Assistant entity registry entry %s: %s",
+                    raw_entry.get(HASS_ENTITY_REGISTRY_ENTITY_ID, "unknown"),
+                    error,
+                )
+        return tuple(entries)
 
     def __del__(self) -> None:
         with contextlib.suppress(Exception):
