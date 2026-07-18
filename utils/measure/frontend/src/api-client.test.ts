@@ -74,6 +74,23 @@ describe("MeasureApiClient", () => {
     expect(powers).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
   });
 
+  it("loads the entity catalog with one request", async () => {
+    const catalog = {
+      lights: [{ entity_id: "light.desk", name: "Desk" }],
+      powers: [{ entity_id: "sensor.plug_power", name: "Plug power" }],
+      voltages: [{ entity_id: "sensor.plug_voltage", name: "Plug voltage" }],
+    };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(catalog));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getEntityCatalog()).resolves.toEqual(catalog);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/entity-catalog"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
   it("discovers Shelly power meters below the ingress prefix", async () => {
     const discovery = { available: true, message: null, devices: [] };
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(discovery));

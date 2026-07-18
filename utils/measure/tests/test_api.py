@@ -35,6 +35,7 @@ def entity(entity_id: str, state: str, **attributes: Any) -> SimpleNamespace:  #
 class FakeClient:
     def __init__(self) -> None:
         self.state_calls = 0
+        self.entity_data_calls = 0
 
     def close(self) -> None:
         return None
@@ -120,6 +121,7 @@ class FakeClient:
         }
 
     def get_entity_data(self) -> HomeAssistantEntityData:
+        self.entity_data_calls += 1
         return HomeAssistantEntityData(
             entities=self.get_entities(),  # type: ignore[arg-type]
             entity_registry=self.list_entity_registry(),  # type: ignore[arg-type]
@@ -264,6 +266,22 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
         response = test_client.get(f"/api/entities?domain={domain}")
         assert response.status_code == 200, domain
         assert [item["entity_id"] for item in response.json()] == [expected]
+
+
+def test_entity_catalog_categorizes_one_fresh_snapshot(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    home_assistant = test_client.app.state.context.home_assistant
+
+    response = test_client.get("/api/entity-catalog")
+
+    assert response.status_code == 200
+    assert home_assistant.entity_data_calls == 1
+    assert [item["entity_id"] for item in response.json()["lights"]] == ["light.test"]
+    assert [item["entity_id"] for item in response.json()["powers"]] == ["sensor.test_power"]
+    assert [item["entity_id"] for item in response.json()["voltages"]] == ["sensor.test_voltage"]
+
+    assert test_client.get("/api/entity-catalog").status_code == 200
+    assert home_assistant.entity_data_calls == 2
 
 
 def test_dummy_load_calibration_is_returned_only_for_the_configured_meter(tmp_path: Path) -> None:
