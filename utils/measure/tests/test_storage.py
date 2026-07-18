@@ -95,7 +95,7 @@ def test_storage_recovers_from_truncated_final_event(tmp_path: Path, caplog: pyt
 def test_running_session_becomes_resumable_after_restart(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
     storage.create(snapshot(SessionState.RUNNING), light_request())
-    output = storage.output_directory("a1b2-c3d4") / "LCT010"
+    output = storage.artifact_directory("a1b2-c3d4", "LCT010")
     output.mkdir()
     (output / "brightness.csv").write_text("bri,watt\n2,1.0\n", encoding="utf-8")
 
@@ -139,7 +139,7 @@ def test_every_orphaned_nonterminal_session_is_recovered(tmp_path: Path, state: 
 def test_interrupted_session_without_compatible_complete_row_fails(tmp_path: Path, contents: str) -> None:
     storage = SessionStorage(tmp_path)
     storage.create(snapshot(SessionState.RUNNING), light_request())
-    output = storage.output_directory("a1b2-c3d4") / "LCT010"
+    output = storage.artifact_directory("a1b2-c3d4", "LCT010")
     output.mkdir()
     (output / "brightness.csv").write_text(contents, encoding="utf-8")
 
@@ -162,7 +162,7 @@ def test_effect_output_is_recognized_as_resumable(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
     request = light_request().model_copy(update={"modes": {LutMode.EFFECT}})
     storage.create(snapshot(SessionState.RUNNING), request)
-    output = storage.output_directory("a1b2-c3d4") / "LCT010"
+    output = storage.artifact_directory("a1b2-c3d4", "LCT010")
     output.mkdir()
     (output / "effect.csv").write_text("effect,bri,watt\nnightlight,205,3.0\n", encoding="utf-8")
 
@@ -176,7 +176,7 @@ def test_effect_output_off_the_measurement_grid_is_not_resumable(tmp_path: Path)
     storage = SessionStorage(tmp_path)
     request = light_request().model_copy(update={"modes": {LutMode.EFFECT}})
     storage.create(snapshot(SessionState.RUNNING), request)
-    output = storage.output_directory("a1b2-c3d4") / "LCT010"
+    output = storage.artifact_directory("a1b2-c3d4", "LCT010")
     output.mkdir()
     # bri=200 is not produced by the effect brightness grid, so the runner could not resume it.
     (output / "effect.csv").write_text("effect,bri,watt\nnightlight,200,3.0\n", encoding="utf-8")

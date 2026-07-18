@@ -13,7 +13,7 @@ from measure.const import MeasureType
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import LightOperatingPoint
 from measure.ha_app.api import create_app
-from measure.ha_app.coordinator import MeasurementCoordinator, SessionMeasurementService
+from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
@@ -143,9 +143,9 @@ class CompletingService(SessionMeasurementService):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult:
-        directory = output_root / request.model_id
+        directory = context.artifact_directory
         directory.mkdir(parents=True)
         (directory / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
         control.log("Reading light.test with sensor.test_power")
@@ -159,7 +159,7 @@ class SummaryService(SessionMeasurementService):
         self,
         request: MeasurementRequest,
         control: SessionControl,
-        output_root: Path,
+        context: SessionExecutionContext,
     ) -> RunnerResult:
         control.progress(completed=30, total=30, mode="Averaging", estimated_remaining="0s")
         summary = {"Average power": "42.3 W", "Duration": "30 s"}
