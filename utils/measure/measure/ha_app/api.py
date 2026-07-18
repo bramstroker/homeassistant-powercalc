@@ -562,7 +562,6 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
             verify_storage=context.storage.verify_writable,
             load_entities=load_entities,
             diagnose_power_meter=context.power_meter_diagnostics.evaluate,
-            supports_voltage=lambda spec: context.build_power_meter(spec).has_voltage_support(),
             developer_mode=context.developer_mode,
         ).validate(payload)
     except ActiveSessionError as error:

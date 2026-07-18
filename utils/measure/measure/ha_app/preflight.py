@@ -72,14 +72,12 @@ class MeasurementPreflight:
         verify_storage: Callable[[], None],
         load_entities: EntityLoader,
         diagnose_power_meter: Callable[[PowerMeterSpec], PowerMeterDiagnostic] | None = None,
-        supports_voltage: Callable[[PowerMeterSpec], bool] | None = None,
         developer_mode: bool = False,
     ) -> None:
         self._has_active_session = has_active_session
         self._verify_storage = verify_storage
         self._load_entities = load_entities
         self._diagnose_power_meter = diagnose_power_meter
-        self._supports_voltage = supports_voltage
         self._developer_mode = developer_mode
 
     def validate(self, request: MeasurementRequest) -> PreflightResult:
@@ -94,6 +92,10 @@ class MeasurementPreflight:
             raise PreflightError("Persistent app storage is not writable") from error
 
         self._validate_power_meter(request)
+        diagnostic: PowerMeterDiagnostic | None = None
+        if request.dummy_load is not None and self._diagnose_power_meter is not None:
+            diagnostic = self._diagnose_power_meter(request.power_meter)
+            self._validate_dummy_load_voltage(diagnostic)
 
         if isinstance(request, LightMeasurementRequest):
             result = self._validate_light(request)
@@ -109,9 +111,9 @@ class MeasurementPreflight:
             )
             duration = (duration or 0) + DUMMY_LOAD_MEASUREMENT_COUNT * DUMMY_LOAD_MEASUREMENTS_DURATION
 
-        diagnostic: PowerMeterDiagnostic | None = None
         if self._diagnose_power_meter is not None:
-            diagnostic = self._diagnose_power_meter(request.power_meter)
+            if diagnostic is None:
+                diagnostic = self._diagnose_power_meter(request.power_meter)
             if not diagnostic.success:
                 raise PreflightError(diagnostic.message or "Could not read from the power meter")
             if diagnostic.status in {DiagnosticStatus.WARNING, DiagnosticStatus.POOR}:
@@ -171,9 +173,19 @@ class MeasurementPreflight:
             voltages = {entity.entity_id for entity in self._load_entities(None, DeviceClass.VOLTAGE)}
             if request.power_meter.voltage_entity_id not in voltages:
                 raise PreflightError("Selected voltage entity is unavailable or not measured in V")
-        if self._supports_voltage is not None and not self._supports_voltage(request.power_meter):
+
+    @staticmethod
+    def _validate_dummy_load_voltage(diagnostic: PowerMeterDiagnostic) -> None:
+        if diagnostic.supports_voltage is False:
             raise PreflightError(
                 "The selected power meter does not support voltage measurements required for dummy loads",
+            )
+        if diagnostic.supports_voltage is None:
+            if not diagnostic.success:
+                raise PreflightError(diagnostic.message or "Could not read from the power meter")
+            raise PreflightError(
+                "Could not determine whether the selected power meter supports voltage measurements "
+                "required for dummy loads",
             )
 
     def _validate_controller(self, request: MeasurementRequest) -> None:

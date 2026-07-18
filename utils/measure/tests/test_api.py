@@ -6,7 +6,7 @@ from pathlib import Path
 import time
 from types import SimpleNamespace
 from typing import Any
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
 from measure.const import MeasureType
@@ -18,6 +18,7 @@ from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
+from measure.powermeter.powermeter import PowerMeter, PowerMeterDiagnosticSample
 from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
@@ -348,6 +349,28 @@ def test_dummy_load_preflight_requires_voltage_and_includes_calibration_time(tmp
     assert "voltage sensor is required" in response.json()["message"]
 
 
+def test_shelly_dummy_load_preflight_builds_and_probes_the_meter_once(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    meter = MagicMock(spec=PowerMeter)
+    meter.has_voltage_support.return_value = True
+    meter.diagnostic_sample.return_value = PowerMeterDiagnosticSample(power=4.2, raw_value="4.2", reported_at=100)
+    builder = MagicMock(return_value=meter)
+    context.power_meter_diagnostics = PowerMeterDiagnostics(builder, duration=0)
+    request = payload() | {
+        "power_meter": {"type": "shelly", "device_ip": "192.0.2.1"},
+        "dummy_load": {"mode": "calibrate", "description": "40 W incandescent bulb"},
+    }
+
+    with patch.object(context, "build_power_meter", builder):
+        response = test_client.post("/api/preflight", json=request)
+
+    assert response.status_code == 200
+    builder.assert_called_once()
+    meter.has_voltage_support.assert_called_once_with()
+    meter.diagnostic_sample.assert_called_once_with()
+
+
 def test_app_closes_home_assistant_manager_at_shutdown(tmp_path: Path) -> None:
     app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
     home_assistant = MagicMock(spec=HomeAssistantManager)
@@ -366,6 +389,7 @@ def test_power_meter_test_endpoint(tmp_path: Path) -> None:
     assert dummy.status_code == 200
     assert dummy.json()["success"] is True
     assert dummy.json()["status"] == "unsupported"
+    assert dummy.json()["supports_voltage"] is True
 
     shelly = test_client.post("/api/settings/test-power-meter", json={"power_meter": "shelly", "shelly_ip": None})
     assert shelly.json()["success"] is False
@@ -383,6 +407,7 @@ def test_power_meter_test_endpoint(tmp_path: Path) -> None:
         json={"power_meter": "hass", "default_power_entity_id": "sensor.test_power"},
     )
     assert validated.json()["success"] is True
+    assert validated.json()["supports_voltage"] is False
     assert validated.json()["precision_decimals"] == 1
     assert validated.json()["update_interval_status"] == "poor"
 
@@ -438,8 +463,9 @@ def test_preflight_exposes_quality_warnings_and_start_reuses_diagnostics(tmp_pat
     assert response.json()["power_meter_diagnostic"]["precision_status"] == "good"
     assert response.json()["power_meter_diagnostic"]["update_interval_status"] == "poor"
     assert "did not report often enough" in response.json()["warnings"][0]
+    assert home_assistant.state_calls == 2
     assert test_client.post("/api/sessions", json=payload()).status_code == 201
-    assert home_assistant.state_calls == 1
+    assert home_assistant.state_calls == 2
 
 
 def test_preflight_rejects_unavailable_entity(tmp_path: Path) -> None:

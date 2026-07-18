@@ -29,6 +29,7 @@ class PowerMeterDiagnostic(BaseModel):
 
     success: bool
     power: float | None = None
+    supports_voltage: bool | None = None
     status: DiagnosticStatus
     precision_decimals: int | None = None
     max_report_interval_seconds: float | None = None
@@ -72,6 +73,7 @@ class PowerMeterDiagnostics:
         if isinstance(spec, DummyPowerMeterSpec):
             return PowerMeterDiagnostic(
                 success=True,
+                supports_voltage=True,
                 status=DiagnosticStatus.UNSUPPORTED,
                 precision_status=DiagnosticStatus.UNSUPPORTED,
                 update_interval_status=DiagnosticStatus.UNSUPPORTED,
@@ -92,20 +94,31 @@ class PowerMeterDiagnostics:
     def _evaluate_uncached(self, spec: PowerMeterSpec) -> PowerMeterDiagnostic:
         started = self._monotonic()
         samples: list[_ObservedSample] = []
+        supports_voltage: bool | None = None
         try:
             meter = self._build_power_meter(spec)
+            supports_voltage = meter.has_voltage_support()
             samples.append(_ObservedSample(meter.diagnostic_sample(), self._monotonic() - started))
             if not isinstance(spec, HassPowerMeterSpec):
-                return _summarize_direct(samples[0], duration=round(self._monotonic() - started, 1))
+                return _summarize_direct(
+                    samples[0],
+                    supports_voltage=supports_voltage,
+                    duration=round(self._monotonic() - started, 1),
+                )
             deadline = started + self._duration
             while (remaining := deadline - self._monotonic()) > 0:
                 self._wait(min(self._poll_interval, remaining))
                 samples.append(_ObservedSample(meter.diagnostic_sample(), self._monotonic() - started))
-            return _summarize(samples, duration=round(self._monotonic() - started, 1))
+            return _summarize(
+                samples,
+                supports_voltage=supports_voltage,
+                duration=round(self._monotonic() - started, 1),
+            )
         except Exception as error:  # noqa: BLE001 - diagnostics must surface adapter and parsing failures
             message = str(error) or "Could not read from the power meter"
             return PowerMeterDiagnostic(
                 success=False,
+                supports_voltage=supports_voltage,
                 status=DiagnosticStatus.POOR,
                 precision_status=DiagnosticStatus.UNSUPPORTED,
                 update_interval_status=DiagnosticStatus.UNSUPPORTED,
@@ -121,12 +134,18 @@ class _ObservedSample:
     observed_after: float
 
 
-def _summarize_direct(observation: _ObservedSample, *, duration: float) -> PowerMeterDiagnostic:
+def _summarize_direct(
+    observation: _ObservedSample,
+    *,
+    supports_voltage: bool,
+    duration: float,
+) -> PowerMeterDiagnostic:
     if not math.isfinite(observation.sample.power):
         raise ValueError("Power meter returned a non-finite reading")
     return PowerMeterDiagnostic(
         success=True,
         power=observation.sample.power,
+        supports_voltage=supports_voltage,
         status=DiagnosticStatus.GOOD,
         reports_observed=1,
         duration_seconds=duration,
@@ -136,7 +155,12 @@ def _summarize_direct(observation: _ObservedSample, *, duration: float) -> Power
     )
 
 
-def _summarize(samples: list[_ObservedSample], *, duration: float) -> PowerMeterDiagnostic:
+def _summarize(
+    samples: list[_ObservedSample],
+    *,
+    supports_voltage: bool,
+    duration: float,
+) -> PowerMeterDiagnostic:
     precision = min(_decimal_places(observation.sample.raw_value) for observation in samples)
     precision_status = DiagnosticStatus.GOOD if precision >= 1 else DiagnosticStatus.POOR
     update_status, max_interval, reports_observed = _report_cadence(samples, duration)
@@ -149,6 +173,7 @@ def _summarize(samples: list[_ObservedSample], *, duration: float) -> PowerMeter
     return PowerMeterDiagnostic(
         success=True,
         power=samples[-1].sample.power,
+        supports_voltage=supports_voltage,
         status=status,
         precision_decimals=precision,
         max_report_interval_seconds=round(max_interval, 2) if max_interval is not None else None,
