@@ -46,6 +46,7 @@ from measure.powermeter.powermeter import PowerMeter
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, PowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.tuning import MeasurementParameters
+from measure.version import measure_version
 from measure.visualization import PlotSpec, build_session_plots
 
 _LOGGER = logging.getLogger("measure")
@@ -184,7 +185,13 @@ def create_app(
         trusted_ingress_only=trusted_ingress_only,
         developer_mode=developer_mode,
     )
-    app = FastAPI(title="Powercalc Measure", version="0.1.0", docs_url=None, redoc_url=None, lifespan=_lifespan)
+    app = FastAPI(
+        title="Powercalc Measure",
+        version=measure_version(),
+        docs_url=None,
+        redoc_url=None,
+        lifespan=_lifespan,
+    )
     app.state.context = context
     app.include_router(_router())
 
