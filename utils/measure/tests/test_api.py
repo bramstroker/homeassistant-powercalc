@@ -22,6 +22,7 @@ from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
+from measure.version import measure_version
 import pytest
 
 
@@ -212,6 +213,13 @@ def client(tmp_path: Path, *, trusted_ingress_only: bool = False, developer_mode
     )
     app.state.context.coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
     return TestClient(app)
+
+
+def test_app_metadata_uses_the_runtime_measure_version(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+
+    assert test_client.app.version == measure_version()
+    assert test_client.get("/openapi.json").json()["info"]["version"] == measure_version()
 
 
 def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
