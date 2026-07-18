@@ -110,7 +110,7 @@ def test_assembler_reads_tuya_key_from_cli_config_dependency() -> None:
         ),
     )
 
-    with patch("measure.assembler.TuyaPowerMeter") as power_meter:
+    with patch("measure.powermeter.tuya.TuyaPowerMeter") as power_meter:
         power_meter.return_value.has_voltage_support.return_value = False
         _assembler(tuya_device_key="device-key").assemble(request)
 

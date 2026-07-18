@@ -36,6 +36,8 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 FROM python-runtime AS ha-app
 
+RUN uv sync --locked --extra app
+
 ENV POWERCALC_MEASURE_DATA_ROOT=/data
 
 EXPOSE 8099

@@ -40,7 +40,6 @@ from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.hass import HassPowerMeter
-from measure.powermeter.kasa import KasaPowerMeter
 from measure.powermeter.manual import ManualPowerMeter
 from measure.powermeter.mystrom import MyStromPowerMeter
 from measure.powermeter.ocr import OcrPowerMeter
@@ -59,7 +58,6 @@ from measure.powermeter.spec import (
     TuyaPowerMeterSpec,
 )
 from measure.powermeter.tasmota import TasmotaPowerMeter
-from measure.powermeter.tuya import TuyaPowerMeter
 from measure.request import (
     AverageMeasurementRequest,
     ChargingMeasurementRequest,
@@ -151,6 +149,8 @@ class MeasurementAssembler:
                 wait=self._interaction.wait,
             )
         if isinstance(spec, KasaPowerMeterSpec):
+            from measure.powermeter.kasa import KasaPowerMeter
+
             return KasaPowerMeter(spec.device_ip)
         if isinstance(spec, ManualPowerMeterSpec):
             return ManualPowerMeter()
@@ -165,6 +165,8 @@ class MeasurementAssembler:
         if isinstance(spec, TuyaPowerMeterSpec):
             if self._tuya_device_key is None:
                 raise PowerMeterError("Tuya device key is required")
+            from measure.powermeter.tuya import TuyaPowerMeter
+
             return TuyaPowerMeter(spec.device_id, spec.device_ip, self._tuya_device_key, spec.version)
         raise PowerMeterError(f"Unsupported power meter specification: {type(spec).__name__}")
 

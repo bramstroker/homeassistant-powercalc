@@ -56,8 +56,8 @@ From the repository:
 ```bash
 cd utils/measure
 uv venv
-uv sync
-uv run python -m measure.measure
+uv sync --extra cli
+uv run --extra cli python -m measure.measure
 ```
 
 Native runs write output to `utils/measure/export`.
@@ -139,7 +139,7 @@ With `POWER_METER=ocr`, the tool reads power values from a camera pointed at the
 
     ```bash
     cd utils/measure
-    uv sync --extra ocr
+    uv sync --extra cli --extra ocr
     ```
 
 3. Start the OCR stream, passing the location of the tesseract executable:
