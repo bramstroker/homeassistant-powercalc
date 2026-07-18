@@ -428,6 +428,45 @@ def test_preflight_rejects_unavailable_entity(tmp_path: Path) -> None:
     assert response.json()["code"] == "preflight_failed"
 
 
+def test_preflight_rejects_cli_only_power_meter_adapter(tmp_path: Path) -> None:
+    response = client(tmp_path).post(
+        "/api/preflight",
+        json={
+            "measure_type": "average",
+            "power_meter": {"type": "kasa", "device_ip": "192.0.2.1"},
+            "duration": 60,
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["message"] == "Kasa power meters are not supported by the Home Assistant app"
+
+
+def test_preflight_rejects_cli_only_controller_adapter(tmp_path: Path) -> None:
+    request = payload()
+    request["controller"] = {"type": "hue", "bridge_ip": "192.0.2.2", "light": "1"}
+
+    response = client(tmp_path).post("/api/preflight", json=request)
+
+    assert response.status_code == 422
+    assert response.json()["message"] == "Hue light controllers are not supported by the Home Assistant app"
+
+
+def test_preflight_allows_dummy_adapters_only_in_developer_mode(tmp_path: Path) -> None:
+    request = {
+        "measure_type": "average",
+        "power_meter": {"type": "dummy"},
+        "duration": 1,
+    }
+
+    rejected = client(tmp_path).post("/api/preflight", json=request)
+    accepted = client(tmp_path, developer_mode=True).post("/api/preflight", json=request)
+
+    assert rejected.status_code == 422
+    assert rejected.json()["message"] == "Dummy power meters require developer mode in the Home Assistant app"
+    assert accepted.status_code == 200
+
+
 @pytest.mark.parametrize("entity_id", ["sensor.unknown_power", "sensor.text_power"])
 def test_preflight_rejects_non_numeric_power_state(tmp_path: Path, entity_id: str) -> None:
     response = client(tmp_path).post(

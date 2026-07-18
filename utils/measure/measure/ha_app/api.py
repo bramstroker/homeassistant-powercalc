@@ -539,6 +539,7 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
             load_entities=load_entities,
             diagnose_power_meter=context.power_meter_diagnostics.evaluate,
             supports_voltage=lambda spec: context.build_power_meter(spec).has_voltage_support(),
+            developer_mode=context.developer_mode,
         ).validate(payload)
     except ActiveSessionError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
