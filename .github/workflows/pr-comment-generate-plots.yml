@@ -37,8 +37,8 @@ jobs:
             const { base, head } = context.payload.pull_request
             const rawFiles = execSync(`git diff --name-only ${base.sha} ${head.sha}`).toString()
             const files = rawFiles.split('\n').filter((file) => {
-              if (/^profile_library\\/.+\\/(brightness|color_temp|hs|effect)\\.csv\\.gz$/.test(file)) return true
-              if (!/^profile_library\\/.+\\/model\\.json$/.test(file) || !fs.existsSync(file)) return false
+              if (/^profile_library\/.+\/(brightness|color_temp|hs|effect)\.csv\.gz$/.test(file)) return true
+              if (!/^profile_library\/.+\/model\.json$/.test(file) || !fs.existsSync(file)) return false
               try {
                 const model = JSON.parse(fs.readFileSync(file, 'utf8'))
                 return model.calculation_strategy === 'linear' && Array.isArray(model.linear_config?.calibrate)
