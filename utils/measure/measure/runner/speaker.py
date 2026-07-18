@@ -102,7 +102,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
         )
 
     @staticmethod
-    def _build_model_json_data(summary: dict) -> dict:
+    def _build_model_json_data(summary: dict[int, float]) -> dict[str, object]:
         calibrate_list = [f"{volume} -> {summary[volume]}" for volume in summary]
 
         return {

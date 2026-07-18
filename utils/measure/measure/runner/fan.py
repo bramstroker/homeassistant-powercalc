@@ -57,7 +57,7 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
         return (20 - completed_steps) * (SLEEP_TIME_PERCENTAGE_CHANGE + MEASURE_DURATION_PER_STEP)
 
     @staticmethod
-    def _build_model_json_data(measurements: dict) -> dict:
+    def _build_model_json_data(measurements: dict[int, float]) -> dict[str, object]:
         calibrate_list = [f"{percentage} -> {power:.2f}" for percentage, power in measurements.items()]
 
         return {

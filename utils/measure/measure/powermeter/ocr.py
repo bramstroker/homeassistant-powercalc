@@ -22,10 +22,8 @@ class OcrPowerMeter(PowerMeter):
             raise UnsupportedFeatureError("Voltage measurement are not supported for OCR mode.")
 
         last_line = self.read_last_line()
-        (timestamp, power) = last_line.strip().split(";")
-        power = float(power)
-        timestamp = float(timestamp)
-        return PowerMeasurementResult(power=power, updated=timestamp)
+        timestamp_value, power_value = last_line.strip().split(";")
+        return PowerMeasurementResult(power=float(power_value), updated=float(timestamp_value))
 
     def read_last_line(self) -> str:
         try:
