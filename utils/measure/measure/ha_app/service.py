@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextvars import ContextVar
 import logging
 import re
 
@@ -16,6 +17,7 @@ from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
 
 _LOGGER = logging.getLogger("measure")
+_SESSION_LOG_CONTROL: ContextVar[SessionControl | None] = ContextVar("measure_session_log_control", default=None)
 
 
 class _SessionLogHandler(logging.Handler):
@@ -25,6 +27,8 @@ class _SessionLogHandler(logging.Handler):
         self.secrets = secrets
 
     def emit(self, record: logging.LogRecord) -> None:
+        if _SESSION_LOG_CONTROL.get() is not self.control:
+            return
         try:
             message = _redact(record.getMessage(), self.secrets)
             if record.levelno < logging.WARNING and message.startswith(("Changing light to:", "Measured power:")):
@@ -90,11 +94,8 @@ class MeasurementService(SessionMeasurementService):
         """Run with session logging and redact secrets from surfaced failures."""
 
         handler = _SessionLogHandler(control, (self.home_assistant.token,))
-        previous_level = _LOGGER.level
-        # Ensure at least INFO reaches the handler, but preserve DEBUG when enabled.
-        if previous_level == logging.NOTSET or previous_level > logging.INFO:
-            _LOGGER.setLevel(logging.INFO)
         _LOGGER.addHandler(handler)
+        context_token = _SESSION_LOG_CONTROL.set(control)
         try:
             return self._run(request, control, context)
         except Exception as error:
@@ -103,8 +104,8 @@ class MeasurementService(SessionMeasurementService):
                 raise RuntimeError(message) from None
             raise
         finally:
+            _SESSION_LOG_CONTROL.reset(context_token)
             _LOGGER.removeHandler(handler)
-            _LOGGER.setLevel(previous_level)
 
     def _run(
         self,

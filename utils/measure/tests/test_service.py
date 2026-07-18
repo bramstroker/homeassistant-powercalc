@@ -1,19 +1,30 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
+from threading import Barrier, Thread
 from unittest.mock import MagicMock, patch
 
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import HassLightControllerSpec
 from measure.ha_app.coordinator import SessionExecutionContext
 from measure.ha_app.service import MeasurementService, SessionDummyLoadCalibrationStore, _redact
-from measure.ha_app.session import SessionControl, SessionEventType, SessionSnapshot, SessionState, utc_now
+from measure.ha_app.session import (
+    SessionControl,
+    SessionEvent,
+    SessionEventType,
+    SessionSnapshot,
+    SessionState,
+    utc_now,
+)
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import DummyLoadCalibrationRequest, LightMeasurementRequest
 from measure.runner.runner import RunnerResult
+from measure.tuning import MeasurementParameters
+import pytest
 
 
 def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None:
@@ -25,24 +36,33 @@ def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None
         power_meter=HassPowerMeterSpec(entity_id="sensor.test_power"),
         generate_model=False,
         gzip=False,
-        parameters={"sleep_time": 0, "sleep_initial": 0, "bri_bri_steps": 255},
+        parameters=MeasurementParameters(sleep_time=0, sleep_initial=0, bri_bri_steps=255),
     )
-    progress = []
+    progress: list[SessionEvent] = []
     control = SessionControl()
     control.subscribe(progress.append)
+    logger = logging.getLogger("measure")
+    previous_level = logger.level
+    previous_handlers = list(logger.handlers)
+    logger.setLevel(logging.INFO)
 
-    with (
-        patch("measure.assembler.HassPowerMeter", return_value=DummyPowerMeter()),
-        patch("measure.assembler.HassLightController", return_value=DummyLightController()),
-    ):
-        result = MeasurementService(HomeAssistantManager("ws://supervisor/core/websocket", "token")).run(
-            request,
-            control,
-            SessionExecutionContext(
-                session_id="explicit-session",
-                artifact_directory=tmp_path / "custom-artifacts",
-            ),
-        )
+    try:
+        with (
+            patch("measure.assembler.HassPowerMeter", return_value=DummyPowerMeter()),
+            patch("measure.assembler.HassLightController", return_value=DummyLightController()),
+        ):
+            result = MeasurementService(HomeAssistantManager("ws://supervisor/core/websocket", "token")).run(
+                request,
+                control,
+                SessionExecutionContext(
+                    session_id="explicit-session",
+                    artifact_directory=tmp_path / "custom-artifacts",
+                ),
+            )
+        assert logger.level == logging.INFO
+        assert logger.handlers == previous_handlers
+    finally:
+        logger.setLevel(previous_level)
 
     assert result.model_json_data["device_type"] == "light"
     assert (tmp_path / "custom-artifacts" / "brightness.csv").is_file()
@@ -90,6 +110,89 @@ def test_service_uses_explicit_session_id_for_dummy_load_storage(tmp_path: Path)
         )
 
     calibration_store.assert_called_once_with(storage, "explicit-session-id")
+
+
+def test_service_preserves_logger_configuration_and_redacts_failure(tmp_path: Path) -> None:
+    logger = logging.getLogger("measure")
+    previous_level = logger.level
+    previous_handlers = list(logger.handlers)
+    logger.setLevel(logging.WARNING)
+    service = MeasurementService(HomeAssistantManager("ws://supervisor/core/websocket", "secret-token"))
+
+    def fail(*_: object) -> RunnerResult:
+        assert logger.level == logging.WARNING
+        raise RuntimeError("Authorization: Bearer secret-token")
+
+    try:
+        with (
+            patch.object(service, "_run", side_effect=fail),
+            pytest.raises(RuntimeError, match=r"Authorization: Bearer \[REDACTED\]"),
+        ):
+            service.run(
+                MagicMock(),
+                SessionControl(),
+                SessionExecutionContext(session_id="failed-session", artifact_directory=tmp_path),
+            )
+
+        assert logger.level == logging.WARNING
+        assert logger.handlers == previous_handlers
+    finally:
+        logger.setLevel(previous_level)
+
+
+def test_concurrent_services_capture_only_their_own_log_context(tmp_path: Path) -> None:
+    logger = logging.getLogger("measure")
+    previous_level = logger.level
+    previous_handlers = list(logger.handlers)
+    logger.setLevel(logging.INFO)
+    controls = (SessionControl(), SessionControl())
+    events: tuple[list[SessionEvent], list[SessionEvent]] = ([], [])
+    for control, session_events in zip(controls, events, strict=True):
+        control.subscribe(session_events.append)
+    services = (
+        MeasurementService(HomeAssistantManager("ws://supervisor/core/websocket", "token-a")),
+        MeasurementService(HomeAssistantManager("ws://supervisor/core/websocket", "token-b")),
+    )
+    barrier = Barrier(2)
+
+    def run(message: str) -> RunnerResult:
+        barrier.wait()
+        logger.info(message)
+        return MagicMock(spec=RunnerResult)
+
+    try:
+        with (
+            patch.object(services[0], "_run", side_effect=lambda *_: run("Session A")),
+            patch.object(services[1], "_run", side_effect=lambda *_: run("Session B")),
+        ):
+            threads = [
+                Thread(
+                    target=service.run,
+                    args=(
+                        MagicMock(),
+                        control,
+                        SessionExecutionContext(
+                            session_id=f"concurrent-{index}",
+                            artifact_directory=tmp_path / f"concurrent-{index}",
+                        ),
+                    ),
+                )
+                for index, (service, control) in enumerate(zip(services, controls, strict=True))
+            ]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+
+        messages = [
+            [event.data["message"] for event in session_events if event.type == SessionEventType.LOG]
+            for session_events in events
+        ]
+        assert messages == [["Session A"], ["Session B"]]
+        assert logger.level == logging.INFO
+        assert logger.handlers == previous_handlers
+    finally:
+        logger.setLevel(previous_level)
 
 
 def test_session_dummy_load_store_persists_for_resume_and_future_sessions(tmp_path: Path) -> None:
