@@ -2,10 +2,9 @@
 """
 Maintain the rolling Powercalc Measure draft release.
 
-Runs on every push to master. Each pushed commit is resolved to its merged
-pull request; when that pull request touches the Measure tool, a changelog
-line is appended to the body of the single rolling draft release with the
-`measure-next` tag.
+Runs on every push to master. The draft is rebuilt from all merged Measure
+pull requests since the current ``measure-v*`` tag. Rebuilding makes retries,
+queued workflow replacement, and overlapping pushes idempotent.
 
 The draft title carries the automatically resolved next version, following
 semantic versioning: breaking changes (a `!` conventional-commit marker or a
@@ -22,22 +21,18 @@ repository instead, driven by the Publish Measure Docker Image workflow.
 Requires:
 - Python 3.11+ (standard library only)
 - `GITHUB_TOKEN` with contents write and pull-requests read
-- `GITHUB_REPOSITORY` and `COMMIT_SHAS` (JSON array of pushed commit SHAs)
+- `GITHUB_REPOSITORY` and `HEAD_REF`
 - a repository checkout as the working directory (reads the app config)
 """
 
 from __future__ import annotations
 
-import json
 import os
 from pathlib import Path
 import re
 from typing import Any
 
 from changelog import (
-    MAJOR,
-    MINOR,
-    PATCH,
     UNCATEGORIZED,
     Category,
     bump,
@@ -46,7 +41,6 @@ from changelog import (
     format_entry,
     format_version,
     labels_of,
-    parse_sections,
     render_sections,
 )
 from github_client import GitHubClient
@@ -106,17 +100,6 @@ def _current_version() -> tuple[int, int, int]:
     return (int(match.group(1)), int(match.group(2)), int(match.group(3)))
 
 
-def _pending_level(draft_name: str, current: tuple[int, int, int]) -> int:
-    """Infer the bump level already accumulated in the draft from its title."""
-    match = re.search(r"v(\d+)\.(\d+)\.(\d+)", draft_name)
-    if match is not None:
-        pending = (int(match.group(1)), int(match.group(2)), int(match.group(3)))
-        for level in (MAJOR, MINOR, PATCH):
-            if bump(current, level) == pending:
-                return level
-    return PATCH
-
-
 def _rolling_draft(client: GitHubClient) -> dict[str, Any] | None:
     return next(
         (release for release in client.releases() if release["draft"] and release["tag_name"] == DRAFT_TAG),
@@ -126,36 +109,33 @@ def _rolling_draft(client: GitHubClient) -> dict[str, Any] | None:
 
 def main() -> None:
     client = GitHubClient(os.environ["GITHUB_TOKEN"], os.environ["GITHUB_REPOSITORY"])
-    commit_shas = json.loads(os.environ["COMMIT_SHAS"])
+    head_ref = os.environ.get("HEAD_REF", "master")
+    current = _current_version()
+    current_version = format_version(current)
+    base_sha = client.commit_sha(f"measure-v{current_version}")
+    commit_shas = client.commit_shas_since(base_sha, head_ref)
 
     pull_requests = [
         pull_request
         for pull_request in client.merged_pull_requests(commit_shas)
         if _qualifies(client, pull_request)
     ]
+    draft = _rolling_draft(client)
     if not pull_requests:
-        print("No merged Measure pull requests in this push")
+        if draft is not None:
+            client.delete_release(draft["id"])
+            print(f"Removed empty rolling draft after measure-v{current_version}")
+        else:
+            print(f"No merged Measure pull requests on {head_ref} since measure-v{current_version}")
         return
 
-    draft = _rolling_draft(client)
-    body = draft["body"] or "" if draft is not None else ""
-    sections = parse_sections(body)
-
-    current = _current_version()
-    levels = [] if draft is None else [_pending_level(draft["name"] or "", current)]
-    added = 0
+    sections: dict[str, list[str]] = {UNCATEGORIZED: []}
+    levels: list[int] = []
     for pull_request in pull_requests:
         entry = format_entry(pull_request)
         levels.append(bump_level(pull_request, CATEGORIES))
-        if f"- #{pull_request['number']} " in body:
-            print(f"Draft already lists #{pull_request['number']}")
-            continue
         sections.setdefault(category_title(pull_request, CATEGORIES), []).append(entry)
         print(f"Adding {entry}")
-        added += 1
-
-    if not added:
-        return
 
     next_version = format_version(bump(current, max(levels)))
     payload = {
@@ -166,10 +146,10 @@ def main() -> None:
     }
     if draft is None:
         client.create_release(payload)
-        print(f"Created rolling draft {DRAFT_TAG} for v{next_version} with {added} entries")
+        print(f"Created rolling draft {DRAFT_TAG} for v{next_version} with {len(pull_requests)} entries")
     else:
         client.update_release(draft["id"], payload)
-        print(f"Updated rolling draft {DRAFT_TAG} for v{next_version} with {added} new entries")
+        print(f"Rebuilt rolling draft {DRAFT_TAG} for v{next_version} with {len(pull_requests)} entries")
 
 
 if __name__ == "__main__":
