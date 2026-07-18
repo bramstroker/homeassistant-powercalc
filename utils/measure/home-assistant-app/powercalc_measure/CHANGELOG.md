@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.1.2 - 2026-07-18
+
+### 🐛 Bug Fixes
+
+- #4343 Tolerate malformed Home Assistant entity registry entries @bramstroker
+
 ## 0.1.1 - 2026-07-18
 
 - #4341 Auto-discover charging battery source @bramstroker
