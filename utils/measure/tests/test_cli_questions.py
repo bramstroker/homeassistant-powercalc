@@ -7,14 +7,7 @@ import inquirer
 from measure.cli.main import Measure
 from measure.cli.measurements import CLI_QUESTION_BUILDERS, measurement_questions
 from measure.const import QUESTION_DUMMY_LOAD, QUESTION_ENTITY_ID, QUESTION_MODEL_ID, MeasureType
-from measure.controller.charging.const import (
-    QUESTION_BATTERY_LEVEL_ATTRIBUTE,
-    QUESTION_BATTERY_LEVEL_ENTITY,
-    QUESTION_BATTERY_LEVEL_SOURCE_TYPE,
-    BatteryLevelSourceType,
-    ChargingControllerType,
-    ChargingDeviceType,
-)
+from measure.controller.charging.const import ChargingControllerType, ChargingDeviceType
 from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.media.const import MediaControllerType
@@ -218,7 +211,7 @@ def test_hass_controller_questions_list_domain_entities(
     assert question.choices == [entity_id]
 
 
-def test_hass_charging_questions_use_selected_device_and_battery_entities(
+def test_hass_charging_questions_use_selected_device(
     mock_config_factory: MockConfigFactory,
 ) -> None:
     environment = mock_config_factory({"selected_charging_controller": ChargingControllerType.HASS})
@@ -228,25 +221,12 @@ def test_hass_charging_questions_use_selected_device_and_battery_entities(
             EntityDomain.VACUUM,
             attributes=["battery_level", "status"],
         ),
-        _entity("sensor.vacuum_battery", EntityDomain.SENSOR, state="80"),
     )
     questions = measurement_questions(MeasureType.CHARGING, environment, entity_catalog)
 
     entity_question = next(question for question in questions if question.name == QUESTION_ENTITY_ID)
     entity_question.answers = {QUESTION_CHARGING_DEVICE_TYPE: ChargingDeviceType.VACUUM_ROBOT}
     assert entity_question.choices == ["vacuum.downstairs"]
-
-    attribute_question = next(question for question in questions if question.name == QUESTION_BATTERY_LEVEL_ATTRIBUTE)
-    attribute_question.answers = {
-        QUESTION_ENTITY_ID: "vacuum.downstairs",
-        QUESTION_BATTERY_LEVEL_SOURCE_TYPE: BatteryLevelSourceType.ATTRIBUTE,
-    }
-    assert attribute_question.choices == ["battery_level", "status"]
-    assert attribute_question.ignore is True
-
-    battery_entity_question = next(question for question in questions if question.name == QUESTION_BATTERY_LEVEL_ENTITY)
-    battery_entity_question.answers = {QUESTION_BATTERY_LEVEL_SOURCE_TYPE: BatteryLevelSourceType.ENTITY}
-    assert battery_entity_question.choices == ["sensor.vacuum_battery"]
 
 
 def test_hue_target_is_entered_directly(mock_config_factory: MockConfigFactory) -> None:

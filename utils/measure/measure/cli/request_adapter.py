@@ -12,14 +12,7 @@ from measure.const import (
     QUESTION_MODEL_NAME,
     MeasureType,
 )
-from measure.controller.charging.const import (
-    QUESTION_BATTERY_LEVEL_ATTRIBUTE,
-    QUESTION_BATTERY_LEVEL_ENTITY,
-    QUESTION_BATTERY_LEVEL_SOURCE_TYPE,
-    BatteryLevelSourceType,
-    ChargingControllerType,
-    ChargingDeviceType,
-)
+from measure.controller.charging.const import ChargingControllerType, ChargingDeviceType
 from measure.controller.charging.spec import DummyChargingControllerSpec, HassChargingControllerSpec
 from measure.controller.fan.const import FanControllerType
 from measure.controller.fan.spec import DummyFanControllerSpec, HassFanControllerSpec
@@ -194,11 +187,6 @@ def _charging_controller_spec(
     if selected == ChargingControllerType.HASS:
         return HassChargingControllerSpec(
             entity_id=_required_answer(answers, QUESTION_ENTITY_ID),
-            battery_level_source_type=BatteryLevelSourceType(
-                answers.get(QUESTION_BATTERY_LEVEL_SOURCE_TYPE, BatteryLevelSourceType.ATTRIBUTE),
-            ),
-            battery_level_attribute=_optional_answer(answers, QUESTION_BATTERY_LEVEL_ATTRIBUTE),
-            battery_level_entity_id=_optional_answer(answers, QUESTION_BATTERY_LEVEL_ENTITY),
         )
     raise ValueError(f"Unsupported CLI charging controller: {selected}")
 

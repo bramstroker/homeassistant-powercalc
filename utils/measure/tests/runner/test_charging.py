@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, call
 
-from measure.controller.charging.const import ChargingDeviceType
+from measure.controller.charging.const import ATTR_BATTERY_LEVEL, ChargingDeviceType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.spec import DummyChargingControllerSpec
 from measure.execution import RunInteraction
@@ -14,6 +14,7 @@ from measure.util.measure_util import MeasurementResult, MeasureUtil
 def test_run_reports_battery_and_charging_operating_points() -> None:
     controller = MagicMock(spec=ChargingController)
     controller.get_battery_level.side_effect = [99, 99, 100]
+    controller.battery_level_attribute = ATTR_BATTERY_LEVEL
     controller.is_charging.return_value = True
     measure_util = MagicMock(spec=MeasureUtil)
     measure_util.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
@@ -41,3 +42,28 @@ def test_run_reports_battery_and_charging_operating_points() -> None:
         {"type": "charging", "battery_level": 99, "charging": True},
         {"type": "charging", "battery_level": 100, "charging": True},
     ]
+
+
+def test_generated_profile_uses_discovered_battery_sensor_state() -> None:
+    controller = MagicMock(spec=ChargingController)
+    controller.battery_level_attribute = None
+    runner = ChargingRunner(MagicMock(spec=MeasureUtil), MeasurementParameters(), controller)
+    runner.charging_device_type = ChargingDeviceType.VACUUM_ROBOT
+
+    model_data = runner._build_model_json_data({50: [10.0]})  # noqa: SLF001
+
+    assert model_data["linear_config"] == {"calibrate": ["50 -> 10.0"]}
+
+
+def test_generated_profile_keeps_battery_level_attribute_fallback() -> None:
+    controller = MagicMock(spec=ChargingController)
+    controller.battery_level_attribute = ATTR_BATTERY_LEVEL
+    runner = ChargingRunner(MagicMock(spec=MeasureUtil), MeasurementParameters(), controller)
+    runner.charging_device_type = ChargingDeviceType.VACUUM_ROBOT
+
+    model_data = runner._build_model_json_data({50: [10.0]})  # noqa: SLF001
+
+    assert model_data["linear_config"] == {
+        "attribute": ATTR_BATTERY_LEVEL,
+        "calibrate": ["50 -> 10.0"],
+    }

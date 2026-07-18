@@ -1,7 +1,7 @@
 import logging
 import time
 
-from measure.controller.charging.const import ATTR_BATTERY_LEVEL, ChargingDeviceType
+from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import ChargingControllerError
 from measure.execution import ChargingOperatingPoint, ImmediateInteraction, RunInteraction
@@ -24,11 +24,8 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         parameters: MeasurementParameters,
         controller: ChargingController,
         interaction: RunInteraction | None = None,
-        battery_level_attribute: str | None = ATTR_BATTERY_LEVEL,
     ) -> None:
-        self.battery_level_entity: str | None = None
         self.config = parameters
-        self.battery_level_attribute = battery_level_attribute
         self.measure_util = measure_util
         self.controller = controller
         self.charging_device_type: ChargingDeviceType | None = None
@@ -144,8 +141,8 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         calculation_enabled_condition = "{{ is_state('[[entity]]', 'docked') }}"
 
         linear_config: dict[str, object] = {"calibrate": calibrate_list}
-        if self.battery_level_attribute is not None:
-            linear_config["attribute"] = self.battery_level_attribute
+        if self.controller.battery_level_attribute is not None:
+            linear_config["attribute"] = self.controller.battery_level_attribute
 
         return {
             "device_type": self.charging_device_type.value,

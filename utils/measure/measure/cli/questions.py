@@ -7,14 +7,7 @@ import inquirer
 from inquirer.questions import Question
 
 from measure.const import QUESTION_DUMMY_LOAD, QUESTION_ENTITY_ID, QUESTION_GENERATE_MODEL_JSON
-from measure.controller.charging.const import (
-    ATTR_BATTERY_LEVEL,
-    QUESTION_BATTERY_LEVEL_ATTRIBUTE,
-    QUESTION_BATTERY_LEVEL_ENTITY,
-    QUESTION_BATTERY_LEVEL_SOURCE_TYPE,
-    BatteryLevelSourceType,
-    ChargingDeviceType,
-)
+from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.spec import charging_entity_domain
 from measure.controller.light.const import LutMode
 from measure.home_assistant_entities import (
@@ -135,41 +128,11 @@ def hass_charging_controller_questions(entity_catalog: HomeAssistantEntityCatalo
         domain = EntityDomain(charging_entity_domain(device_type))
         return _entity_choices(entity_catalog.load_snapshot().select(domain=domain))
 
-    def attribute_choices(answers: dict[str, Any]) -> list[str]:
-        entity_id = answers.get(QUESTION_ENTITY_ID)
-        return entity_catalog.load_snapshot().attribute_names(str(entity_id)) if entity_id else []
-
     return [
         inquirer.List(
             name=QUESTION_ENTITY_ID,
             message="Select the charging device entity",
             choices=entity_choices,
-        ),
-        inquirer.List(
-            name=QUESTION_BATTERY_LEVEL_SOURCE_TYPE,
-            message="How is the battery level exposed?",
-            choices=[
-                ("As an attribute of the main entity", BatteryLevelSourceType.ATTRIBUTE),
-                ("As a separate entity", BatteryLevelSourceType.ENTITY),
-            ],
-        ),
-        inquirer.List(
-            name=QUESTION_BATTERY_LEVEL_ATTRIBUTE,
-            message="Select the battery level attribute",
-            choices=attribute_choices,
-            default=ATTR_BATTERY_LEVEL,
-            ignore=lambda answers: (
-                answers.get(QUESTION_BATTERY_LEVEL_SOURCE_TYPE) == BatteryLevelSourceType.ENTITY
-                or ATTR_BATTERY_LEVEL in attribute_choices(answers)
-            ),
-        ),
-        inquirer.List(
-            name=QUESTION_BATTERY_LEVEL_ENTITY,
-            message="Select the battery level entity",
-            choices=lambda _: _entity_choices(
-                entity_catalog.load_snapshot().select(domain=EntityDomain.SENSOR),
-            ),
-            ignore=lambda answers: answers.get(QUESTION_BATTERY_LEVEL_SOURCE_TYPE) == BatteryLevelSourceType.ATTRIBUTE,
         ),
     ]
 

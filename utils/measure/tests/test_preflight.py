@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from measure.controller.charging.const import BatteryLevelSourceType
 from measure.controller.charging.spec import HassChargingControllerSpec
 from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import LutMode
@@ -32,6 +31,7 @@ class Entity(EntityRecord):
     max_mired: int | None = None
     state: str = "available"
     attribute_names: list[str] = field(default_factory=list)
+    device_id: str | None = None
 
 
 def preflight(
@@ -235,45 +235,51 @@ def test_preflight_rejects_charging_type_entity_domain_mismatch() -> None:
         checker.validate(request)
 
 
-def test_preflight_rejects_missing_charging_battery_attribute() -> None:
-    request = ChargingMeasurementRequest(
+def _charging_request() -> ChargingMeasurementRequest:
+    return ChargingMeasurementRequest(
         power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
-        controller=HassChargingControllerSpec(entity_id="vacuum.test", battery_level_attribute="charge_percent"),
+        controller=HassChargingControllerSpec(entity_id="vacuum.test"),
         charging_device_type="vacuum_robot",
     )
 
-    with pytest.raises(PreflightError, match=r"charge_percent.*not available"):
-        preflight(base_entities()).validate(request)
+
+def test_preflight_rejects_missing_charging_battery_source() -> None:
+    """Neither a battery sensor on the device nor the battery_level attribute is available."""
+    entities = base_entities() | {("vacuum", None): [Entity("vacuum.test", attribute_names=[])]}
+
+    with pytest.raises(PreflightError, match=r"battery_level is not available"):
+        preflight(entities).validate(_charging_request())
 
 
-@pytest.mark.parametrize(
-    ("battery_entity", "entities", "message"),
-    [
-        ("sensor.missing", base_entities(), "battery level sensor is unavailable"),
-        (
-            "sensor.battery",
-            base_entities() | {("sensor", None): [Entity("sensor.battery", state="unknown")]},
-            "numeric percentage",
-        ),
-    ],
-)
-def test_preflight_rejects_invalid_charging_battery_sensor(
-    battery_entity: str,
-    entities: dict[tuple[str | None, str | None], list[Entity]],
-    message: str,
-) -> None:
-    request = ChargingMeasurementRequest(
-        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
-        controller=HassChargingControllerSpec(
-            entity_id="vacuum.test",
-            battery_level_source_type=BatteryLevelSourceType.ENTITY,
-            battery_level_entity_id=battery_entity,
-        ),
-        charging_device_type="vacuum_robot",
-    )
+def test_preflight_accepts_charging_with_related_battery_sensor() -> None:
+    """A battery sensor on the same device is used even without the battery_level attribute."""
+    entities = base_entities() | {
+        ("vacuum", None): [Entity("vacuum.test", attribute_names=[], device_id="vacuum-device")],
+        (None, "battery"): [Entity("sensor.vacuum_battery", state="80", device_id="vacuum-device")],
+    }
 
-    with pytest.raises(PreflightError, match=message):
-        preflight(entities).validate(request)
+    result = preflight(entities).validate(_charging_request())
+
+    assert result.warnings == ()
+    assert result.battery_level_entity_id == "sensor.vacuum_battery"
+    assert result.battery_level_attribute is None
+
+
+def test_preflight_reports_battery_level_attribute_fallback() -> None:
+    result = preflight(base_entities()).validate(_charging_request())
+
+    assert result.battery_level_entity_id is None
+    assert result.battery_level_attribute == "battery_level"
+
+
+def test_preflight_rejects_non_numeric_related_battery_sensor() -> None:
+    entities = base_entities() | {
+        ("vacuum", None): [Entity("vacuum.test", attribute_names=[], device_id="vacuum-device")],
+        (None, "battery"): [Entity("sensor.vacuum_battery", state="unknown", device_id="vacuum-device")],
+    }
+
+    with pytest.raises(PreflightError, match="numeric percentage"):
+        preflight(entities).validate(_charging_request())
 
 
 def test_light_preflight_accepts_dummy_controller_without_entity_checks() -> None:

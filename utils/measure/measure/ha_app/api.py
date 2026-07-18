@@ -71,6 +71,8 @@ class PreflightResponse(BaseModel):
     estimated_duration_seconds: int | None = None
     supported_modes: list[LutMode] | None = None
     power_meter_diagnostic: PowerMeterDiagnostic | None = None
+    battery_level_entity_id: str | None = None
+    battery_level_attribute: str | None = None
 
 
 class EntityCatalogResponse(BaseModel):
@@ -578,6 +580,8 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
         estimated_duration_seconds=result.estimated_duration_seconds,
         supported_modes=list(result.supported_modes) if result.supported_modes is not None else None,
         power_meter_diagnostic=result.power_meter_diagnostic,
+        battery_level_entity_id=result.battery_level_entity_id,
+        battery_level_attribute=result.battery_level_attribute,
     )
 
 
