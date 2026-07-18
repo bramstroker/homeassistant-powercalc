@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
+from measure.controller.charging.const import BatteryLevelSourceType
 from measure.controller.charging.spec import HassChargingControllerSpec
 from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import LutMode
@@ -28,6 +29,8 @@ class Entity(EntityRecord):
     effect_list: list[str] | None = None
     min_mired: int | None = None
     max_mired: int | None = None
+    state: str = "available"
+    attribute_names: list[str] = field(default_factory=list)
 
 
 def preflight(
@@ -58,8 +61,9 @@ def base_entities() -> dict[tuple[str | None, str | None], list[Entity]]:
         ("light", None): [Entity("light.test", [LutMode.BRIGHTNESS])],
         ("media_player", None): [Entity("media_player.test")],
         ("fan", None): [Entity("fan.test")],
-        ("vacuum", None): [Entity("vacuum.test")],
-        ("lawn_mower", None): [Entity("lawn_mower.test")],
+        ("vacuum", None): [Entity("vacuum.test", attribute_names=["battery_level"])],
+        ("lawn_mower", None): [Entity("lawn_mower.test", attribute_names=["battery_level"])],
+        ("sensor", None): [Entity("sensor.battery", state="75")],
     }
 
 
@@ -185,6 +189,47 @@ def test_preflight_rejects_charging_type_entity_domain_mismatch() -> None:
 
     with pytest.raises(PreflightError, match="does not match"):
         checker.validate(request)
+
+
+def test_preflight_rejects_missing_charging_battery_attribute() -> None:
+    request = ChargingMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=HassChargingControllerSpec(entity_id="vacuum.test", battery_level_attribute="charge_percent"),
+        charging_device_type="vacuum_robot",
+    )
+
+    with pytest.raises(PreflightError, match=r"charge_percent.*not available"):
+        preflight(base_entities()).validate(request)
+
+
+@pytest.mark.parametrize(
+    ("battery_entity", "entities", "message"),
+    [
+        ("sensor.missing", base_entities(), "battery level sensor is unavailable"),
+        (
+            "sensor.battery",
+            base_entities() | {("sensor", None): [Entity("sensor.battery", state="unknown")]},
+            "numeric percentage",
+        ),
+    ],
+)
+def test_preflight_rejects_invalid_charging_battery_sensor(
+    battery_entity: str,
+    entities: dict[tuple[str | None, str | None], list[Entity]],
+    message: str,
+) -> None:
+    request = ChargingMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=HassChargingControllerSpec(
+            entity_id="vacuum.test",
+            battery_level_source_type=BatteryLevelSourceType.ENTITY,
+            battery_level_entity_id=battery_entity,
+        ),
+        charging_device_type="vacuum_robot",
+    )
+
+    with pytest.raises(PreflightError, match=message):
+        preflight(entities).validate(request)
 
 
 def test_light_preflight_accepts_dummy_controller_without_entity_checks() -> None:

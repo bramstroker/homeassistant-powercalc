@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from measure.cli.request_adapter import request_from_answers
 from measure.const import PARAMETER_LIMITS, QUESTION_ENTITY_ID, QUESTION_MEASURE_DEVICE, MeasureType
+from measure.controller.charging.const import BatteryLevelSourceType
+from measure.controller.charging.spec import HassChargingControllerSpec
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import DummyPowerMeterSpec
@@ -132,6 +134,14 @@ def test_request_rejects_dummy_load_with_synthetic_power_meter() -> None:
     dummy_load = DummyLoadCalibrationRequest(description="test load")
     with pytest.raises(ValidationError, match="synthetic"):
         AverageMeasurementRequest(power_meter=power_meter, dummy_load=dummy_load)
+
+
+def test_charging_controller_requires_battery_sensor_for_entity_source() -> None:
+    with pytest.raises(ValidationError, match="battery_level_entity_id"):
+        HassChargingControllerSpec(
+            entity_id="vacuum.test",
+            battery_level_source_type=BatteryLevelSourceType.ENTITY,
+        )
 
 
 def test_cli_request_contains_only_resolved_measurement_input(mock_config_factory: MockConfigFactory) -> None:
