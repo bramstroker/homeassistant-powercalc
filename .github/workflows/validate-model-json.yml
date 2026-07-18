@@ -5,7 +5,7 @@ on:
     paths:
       - '**/model.json'
       - 'profile_library/model_schema.json'
-      - '.github/scripts/validate_model_json.py'
+      - '.github/scripts/profile_library/validate_model_json.py'
       - '.github/workflows/validate-model-json.yml'
 
 permissions:
@@ -57,7 +57,7 @@ jobs:
       - name: Validate model.json against schema
         working-directory: pr
         run: >-
-          python ../base/.github/scripts/validate_model_json.py
+          python ../base/.github/scripts/profile_library/validate_model_json.py
           --schema ../base/profile_library/model_schema.json
           --changed-files changed_files.json
           --report ../validation-result/model_json_validation_report.md

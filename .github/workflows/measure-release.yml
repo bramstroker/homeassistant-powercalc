@@ -34,7 +34,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMIT_SHAS: ${{ toJSON(github.event.commits.*.id) }}
-        run: python3 .github/scripts/update_measure_draft.py
+        run: python3 .github/scripts/release_draft/update_measure_draft.py
 
   tag-release:
     name: Tag and publish merged release

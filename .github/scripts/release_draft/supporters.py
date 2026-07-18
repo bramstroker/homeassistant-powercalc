@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 """
-Generate a markdown supporters section for Release Drafter,
+Generate a markdown supporters section for the integration release draft,
 using Buy Me a Coffee's supporters + subscriptions APIs.
 
+Imported directly by `update_integration_draft.py`, so it stays standard
+library only and needs no dependency install on the runner.
+
 Requires:
-- Python 3.13+
-- `requests` installed
+- Python 3.13+ (standard library only)
 """
 
 from __future__ import annotations
 
 from collections import defaultdict
+import json
 from typing import Any
-
-import requests
+import urllib.request
 
 SUPPORTERS_API = "https://api.powercalc.nl/supporters/one-time"
 SUBSCRIPTIONS_API = "https://api.powercalc.nl/supporters/subscriptions"
@@ -37,9 +39,9 @@ def _get(url: str) -> list[dict[str, Any]]:
     """
     Simple GET request helper.
     """
-    resp = requests.get(url, timeout=10)
-    resp.raise_for_status()
-    data: list[dict] = resp.json()
+    request = urllib.request.Request(url, headers={"Accept": "application/json"})  # noqa: S310 - fixed https API
+    with urllib.request.urlopen(request, timeout=10) as response:  # noqa: S310
+        data = json.loads(response.read())
     if not isinstance(data, list):
         return []
 
