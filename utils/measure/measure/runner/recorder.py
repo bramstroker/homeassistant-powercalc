@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 import time
 
-from measure.execution import ImmediateInteraction, MeasurementCancelledError, RunInteraction
+from measure.execution import ImmediateInteraction, RunInteraction
 from measure.request import RecorderMeasurementRequest, validate_export_filename
 from measure.runner.const import DEFAULT_EXPORT_FILENAME
 from measure.runner.runner import MeasurementRunner, RunnerResult
@@ -43,8 +43,8 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         start_time = time.time()
         voltages: list[float] = []
         recorded = 0
-        # Stopping a recorder (KeyboardInterrupt on the CLI, cancellation in the app) is the
-        # normal way to finish it, so we treat it as a successful completion, not a cancel.
+        # Ctrl-C is the CLI's normal recorder stop action. App cancellation remains a
+        # cancellation so its session state reflects the command the user issued.
         try:
             with csv_filepath.open("w", newline="") as csv_file:
                 writer = csv.writer(csv_file)
@@ -59,7 +59,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
                     # Open-ended recording: report the running sample count (total 0 = indeterminate).
                     self.interaction.progress(recorded, 0, phase="Recording")
                     self.interaction.wait(INTERVAL)
-        except KeyboardInterrupt, MeasurementCancelledError:
+        except KeyboardInterrupt:
             _LOGGER.info("Stopped recording")
 
         summary = {

@@ -89,8 +89,19 @@ Configured via `pyproject.toml`:
 - Use `@pytest.mark.parametrize` for test variants
 - We strive to 100% test coverage in the project. Make sure to run full test suite before submitting a PR.
 
+## Commit Messages
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) for every commit message, for example:
+
+- `fix(measure): stop controlled devices during cleanup`
+- `feat(measure): add a new measurement workflow`
+- `refactor(measure): centralize artifact path construction`
+
+Do not use Lore-style commit trailers or decision-record commit formats unless explicitly requested.
+
 ## Pull Requests
 
 - Target upstream: `bramstroker/homeassistant-powercalc`
+- Use concise, human-readable PR titles without Conventional Commit prefixes or scopes so Release Drafter produces clean release notes
 - New profiles use the `power_profile` PR template
 - One device per PR
