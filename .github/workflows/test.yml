@@ -32,6 +32,8 @@ jobs:
         run: uv sync --group dev
       - name: Prepare test env
         run: bash tests/setup.sh
+      - name: Run release draft engine tests
+        run: uv run pytest .github/scripts/release_draft/tests -qq
       - name: Run tests
         run: |
           uv run pytest \
