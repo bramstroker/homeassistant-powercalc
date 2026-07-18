@@ -1433,6 +1433,48 @@ describe("preflight power meter diagnostics", () => {
 });
 
 describe("app shell", () => {
+  it("shows the auto-discovered battery sensor in the charging preflight review", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.definitions = [{
+      measure_type: "charging",
+      label: "Charging device",
+      description: "Measure charging power.",
+      fields: [],
+      supports_profile: true,
+      supports_resume: false,
+    }];
+    element.request = {
+      measure_type: "charging",
+      model_id: "vacuum",
+      product_name: "Vacuum",
+      measure_device: "Shelly Plug S",
+      generate_model: true,
+      parameters: capabilities.defaults,
+      power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+      controller: { type: "hass", entity_id: "vacuum.robot" },
+      charging_device_type: "vacuum_robot",
+      resume_policy: "new",
+    };
+    element.preflight = {
+      valid: true,
+      warnings: [],
+      battery_level_entity_id: "sensor.robot_battery",
+      battery_level_attribute: null,
+    };
+    element.view = "review";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const review = element.shadowRoot?.querySelector("measure-preflight-view") as HTMLElement & {
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    await review.updateComplete;
+    expect(review.shadowRoot.textContent).toContain("Battery");
+    expect(review.shadowRoot.textContent).toContain("sensor.robot_battery");
+  });
+
   it("passes a workflow-specific confirmation action through review and ready states", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;

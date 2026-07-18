@@ -50,12 +50,15 @@ class FakeClient:
             SimpleNamespace(entity_id="sensor.test_power", device_id="meter-device"),
             SimpleNamespace(entity_id="sensor.test_voltage", device_id="meter-device"),
             SimpleNamespace(entity_id="light.test", device_id="light-device"),
+            SimpleNamespace(entity_id="vacuum.test", device_id="vacuum-device"),
+            SimpleNamespace(entity_id="sensor.vacuum_battery", device_id="vacuum-device"),
         ]
 
     def get_device_registry(self) -> list[dict[str, object]]:
         return [
             {"id": "meter-device", "model_id": "PM-001", "model": "Power Meter"},
             {"id": "light-device", "model_id": None, "model": "Hue White Ambiance"},
+            {"id": "vacuum-device", "model_id": None, "model": "Test Vacuum"},
         ]
 
     def get_entities(self) -> dict[str, SimpleNamespace]:
@@ -103,6 +106,13 @@ class FakeClient:
                         friendly_name="Test voltage",
                         device_class="voltage",
                         unit_of_measurement="V",
+                    ),
+                    "vacuum_battery": entity(
+                        "sensor.vacuum_battery",
+                        "80",
+                        friendly_name="Vacuum battery",
+                        device_class="battery",
+                        unit_of_measurement="%",
                     ),
                     "temperature": entity("sensor.temperature", "20", unit_of_measurement="°C"),
                     "unknown_power": entity(
@@ -347,6 +357,22 @@ def test_dummy_load_preflight_requires_voltage_and_includes_calibration_time(tmp
     response = test_client.post("/api/preflight", json=request)
     assert response.status_code == 422
     assert "voltage sensor is required" in response.json()["message"]
+
+
+def test_charging_preflight_returns_discovered_battery_sensor(tmp_path: Path) -> None:
+    response = client(tmp_path).post(
+        "/api/preflight",
+        json={
+            "measure_type": "charging",
+            "power_meter": {"type": "hass", "entity_id": "sensor.test_power"},
+            "controller": {"type": "hass", "entity_id": "vacuum.test"},
+            "charging_device_type": "vacuum_robot",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["battery_level_entity_id"] == "sensor.vacuum_battery"
+    assert response.json()["battery_level_attribute"] is None
 
 
 def test_shelly_dummy_load_preflight_builds_and_probes_the_meter_once(tmp_path: Path) -> None:

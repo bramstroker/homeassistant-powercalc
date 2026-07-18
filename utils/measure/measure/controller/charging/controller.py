@@ -4,6 +4,11 @@ from typing import Protocol
 
 
 class ChargingController(Protocol):
+    @property
+    def battery_level_attribute(self) -> str | None:
+        """Return the entity attribute used for profiles, or None for a sensor state."""
+        ...
+
     def get_battery_level(self) -> int:
         """Get actual battery level of the device"""
         ...

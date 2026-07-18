@@ -165,6 +165,8 @@ export interface PreflightResponse {
   estimated_duration_seconds?: number;
   supported_modes?: LutMode[];
   power_meter_diagnostic?: PowerMeterDiagnostic | null;
+  battery_level_entity_id?: string | null;
+  battery_level_attribute?: string | null;
 }
 
 export interface SessionProgress {

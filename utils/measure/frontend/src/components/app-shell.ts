@@ -223,6 +223,13 @@ export class AppShell extends LitElement implements MeasureAppState {
         label: "Power",
         value: this.request.power_meter.type === "hass" ? this.request.power_meter.entity_id : this.request.power_meter.type,
       });
+      if (this.request.measure_type === "charging" && this.preflight) {
+        const battery = this.preflight.battery_level_entity_id
+          ?? (this.preflight.battery_level_attribute && this.request.controller.type === "hass"
+            ? `${this.request.controller.entity_id} · ${this.preflight.battery_level_attribute} attribute`
+            : undefined);
+        if (battery) rows.push({ label: "Battery", value: battery });
+      }
       if (this.request.dummy_load) rows.push({ label: "Dummy load", value: this.dummyLoadSummary(this.request.dummy_load) });
       return rows;
     }

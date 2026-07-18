@@ -6,7 +6,7 @@ import math
 from typing import Protocol
 
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION
-from measure.controller.charging.const import ATTR_BATTERY_LEVEL, BatteryLevelSourceType
+from measure.controller.charging.const import ATTR_BATTERY_LEVEL
 from measure.controller.charging.spec import (
     DummyChargingControllerSpec,
     HassChargingControllerSpec,
@@ -42,6 +42,7 @@ class ActiveSessionError(PreflightError):
 
 class EntityRecord(Protocol):
     entity_id: str
+    device_id: str | None
     state: str
     attribute_names: list[str]
     supported_modes: list[LutMode] | None
@@ -60,6 +61,8 @@ class PreflightResult:
     estimated_duration_seconds: int | None = None
     supported_modes: tuple[LutMode, ...] | None = None
     power_meter_diagnostic: PowerMeterDiagnostic | None = None
+    battery_level_entity_id: str | None = None
+    battery_level_attribute: str | None = None
 
 
 class MeasurementPreflight:
@@ -100,8 +103,7 @@ class MeasurementPreflight:
         if isinstance(request, LightMeasurementRequest):
             result = self._validate_light(request)
         else:
-            self._validate_controller(request)
-            result = PreflightResult()
+            result = self._validate_controller(request)
 
         warnings = list(result.warnings)
         duration = result.estimated_duration_seconds
@@ -125,6 +127,8 @@ class MeasurementPreflight:
             estimated_duration_seconds=duration,
             supported_modes=result.supported_modes,
             power_meter_diagnostic=diagnostic,
+            battery_level_entity_id=result.battery_level_entity_id,
+            battery_level_attribute=result.battery_level_attribute,
         )
 
     def _validate_adapters(self, request: MeasurementRequest) -> None:
@@ -188,7 +192,7 @@ class MeasurementPreflight:
                 "required for dummy loads",
             )
 
-    def _validate_controller(self, request: MeasurementRequest) -> None:
+    def _validate_controller(self, request: MeasurementRequest) -> PreflightResult:
         if isinstance(request, SpeakerMeasurementRequest):
             if isinstance(request.controller, HassMediaControllerSpec):
                 self._require_entity(
@@ -209,30 +213,42 @@ class MeasurementPreflight:
                     domain,
                     "Selected charging device is unavailable",
                 )
-                self._validate_charging_battery_source(request.controller, charging_entity)
+                return self._validate_charging_battery_source(charging_entity)
+        return PreflightResult()
 
-    def _validate_charging_battery_source(
-        self,
-        controller: HassChargingControllerSpec,
-        charging_entity: EntityRecord,
-    ) -> None:
-        if controller.battery_level_source_type == BatteryLevelSourceType.ATTRIBUTE:
-            attribute = controller.battery_level_attribute or ATTR_BATTERY_LEVEL
-            if attribute not in charging_entity.attribute_names:
-                raise PreflightError(f"Battery level attribute {attribute} is not available on the charging device")
-            return
+    def _validate_charging_battery_source(self, charging_entity: EntityRecord) -> PreflightResult:
+        # Prefer a separate battery sensor on the same device (the modern HA default),
+        # falling back to the battery_level attribute when none is available.
+        battery_sensor = self._find_related_battery_sensor(charging_entity)
+        if battery_sensor is not None:
+            try:
+                level = float(battery_sensor.state)
+            except ValueError, TypeError:
+                level = math.nan
+            if not math.isfinite(level) or not 0 <= level <= 100:
+                raise PreflightError("Battery level sensor must report a numeric percentage between 0 and 100")
+            return PreflightResult(battery_level_entity_id=battery_sensor.entity_id)
 
-        battery_entity = self._require_entity(
-            controller.battery_level_entity_id,
-            EntityDomain.SENSOR,
-            "Selected battery level sensor is unavailable",
+        if ATTR_BATTERY_LEVEL in charging_entity.attribute_names:
+            return PreflightResult(battery_level_attribute=ATTR_BATTERY_LEVEL)
+        raise PreflightError(
+            f"No battery level sensor was found on the same device, and attribute "
+            f"{ATTR_BATTERY_LEVEL} is not available on the charging device",
         )
-        try:
-            level = float(battery_entity.state)
-        except ValueError, TypeError:
-            level = math.nan
-        if not math.isfinite(level) or not 0 <= level <= 100:
-            raise PreflightError("Battery level sensor must report a numeric percentage between 0 and 100")
+
+    def _find_related_battery_sensor(self, charging_entity: EntityRecord) -> EntityRecord | None:
+        """Return a battery sensor on the same device as the charging entity, if any."""
+
+        if charging_entity.device_id is None:
+            return None
+        return next(
+            (
+                sensor
+                for sensor in self._load_entities(None, DeviceClass.BATTERY)
+                if sensor.device_id == charging_entity.device_id
+            ),
+            None,
+        )
 
     def _validate_light(self, request: LightMeasurementRequest) -> PreflightResult:
         if isinstance(request.controller, DummyLightControllerSpec):

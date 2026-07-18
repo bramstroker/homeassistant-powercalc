@@ -30,10 +30,15 @@ class EntityDomain(StrEnum):
 class DeviceClass(StrEnum):
     POWER = "power"
     VOLTAGE = "voltage"
+    BATTERY = "battery"
 
     @property
     def unit_of_measurement(self) -> str:
-        return "W" if self is DeviceClass.POWER else "V"
+        return {
+            DeviceClass.POWER: "W",
+            DeviceClass.VOLTAGE: "V",
+            DeviceClass.BATTERY: "%",
+        }[self]
 
 
 class EntityDescriptor(BaseModel):

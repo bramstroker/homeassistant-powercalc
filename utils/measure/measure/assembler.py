@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from measure.controller.charging.const import ATTR_BATTERY_LEVEL, BatteryLevelSourceType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.dummy import DummyChargingController
 from measure.controller.charging.hass import HassChargingController
@@ -190,21 +189,12 @@ class MeasurementAssembler:
         if isinstance(request, AverageMeasurementRequest):
             return AverageRunner(measure_util, interaction=interaction)
         if isinstance(request, ChargingMeasurementRequest):
-            charging_spec = request.controller
-            charging_controller = self._charging_controller(charging_spec)
-            battery_level_attribute: str | None = ATTR_BATTERY_LEVEL
-            if isinstance(charging_spec, HassChargingControllerSpec):
-                battery_level_attribute = (
-                    charging_spec.battery_level_attribute or ATTR_BATTERY_LEVEL
-                    if charging_spec.battery_level_source_type == BatteryLevelSourceType.ATTRIBUTE
-                    else None
-                )
+            charging_controller = self._charging_controller(request.controller)
             return ChargingRunner(
                 measure_util,
                 parameters,
                 charging_controller,
                 interaction,
-                battery_level_attribute=battery_level_attribute,
             )
         if isinstance(request, FanMeasurementRequest):
             fan_controller = self._fan_controller(request.controller)
@@ -244,9 +234,6 @@ class MeasurementAssembler:
             return HassChargingController(
                 hass,
                 entity_id=spec.entity_id,
-                battery_level_source_type=spec.battery_level_source_type,
-                battery_level_attribute=spec.battery_level_attribute,
-                battery_level_entity_id=spec.battery_level_entity_id,
             )
         raise ValueError(f"Expected a charging controller specification, got {type(spec).__name__}")
 
