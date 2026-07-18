@@ -72,6 +72,12 @@ class PreflightResponse(BaseModel):
     power_meter_diagnostic: PowerMeterDiagnostic | None = None
 
 
+class EntityCatalogResponse(BaseModel):
+    lights: list[EntityDescriptor]
+    powers: list[EntityDescriptor]
+    voltages: list[EntityDescriptor]
+
+
 class SessionFile(BaseModel):
     name: str
     size: int
@@ -294,6 +300,17 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/dummy-load/calibration")
     async def dummy_load_calibration(request: Request) -> DummyLoadCalibration | None:
         return await run_in_threadpool(_matching_dummy_load_calibration, _context(request))
+
+    @router.get("/entity-catalog")
+    async def entity_catalog(request: Request) -> EntityCatalogResponse:
+        snapshot = await run_in_threadpool(
+            HomeAssistantEntityCatalog(_context(request).home_assistant).load_snapshot,
+        )
+        return EntityCatalogResponse(
+            lights=snapshot.select(domain=EntityDomain.LIGHT),
+            powers=snapshot.select(device_class=DeviceClass.POWER),
+            voltages=snapshot.select(device_class=DeviceClass.VOLTAGE),
+        )
 
     @router.get("/entities", responses={400: _ERROR})
     async def entities(

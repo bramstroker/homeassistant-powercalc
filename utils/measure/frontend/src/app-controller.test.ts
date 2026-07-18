@@ -48,6 +48,7 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
       messages: [],
     }),
     getShellyDevices: async () => ({ available: true, message: null, devices: [] }),
+    getEntityCatalog: async () => ({ lights: [], powers: [], voltages: [] }),
     getEntitiesByDomain: async () => [],
     getEntitiesByDeviceClass: async () => [],
     getDummyLoadCalibration: async () => null,
@@ -132,8 +133,18 @@ describe("measure app controller", () => {
 
   it("boots core data and lazily fetches entities for the selected measurement", async () => {
     const requestedDomains: string[] = [];
+    let catalogCalls = 0;
+    let deviceClassCalls = 0;
     const appState = state();
     const appApi = api({
+      getEntityCatalog: async () => {
+        catalogCalls += 1;
+        return {
+          lights: [{ entity_id: "light.desk", name: "Desk" }],
+          powers: [{ entity_id: "sensor.plug_power", name: "Plug power" }],
+          voltages: [{ entity_id: "sensor.plug_voltage", name: "Plug voltage" }],
+        };
+      },
       getMeasureDefinitions: async () => [{
         measure_type: "fan", label: "Fan", description: "Measure fan power.", supports_profile: true, supports_resume: false,
         fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
@@ -142,17 +153,26 @@ describe("measure app controller", () => {
         requestedDomains.push(domain);
         return [{ entity_id: "fan.bedroom", name: "Bedroom fan" }];
       },
+      getEntitiesByDeviceClass: async () => {
+        deviceClassCalls += 1;
+        return [];
+      },
     });
     const controller = new MeasureAppController(appState, () => appApi, () => connection(), () => undefined);
 
     await controller.boot();
     expect(appState.view).toBe("setup");
-    expect(requestedDomains).toEqual(["light"]);
+    expect(catalogCalls).toBe(1);
+    expect(appState.lights[0]?.entity_id).toBe("light.desk");
+    expect(appState.powers[0]?.entity_id).toBe("sensor.plug_power");
+    expect(appState.voltages[0]?.entity_id).toBe("sensor.plug_voltage");
+    expect(requestedDomains).toEqual([]);
+    expect(deviceClassCalls).toBe(0);
 
     controller.selectMeasureType("fan");
     expect(appState.selectedMeasureType).toBe("fan");
     await vi.waitFor(() => expect(appState.deviceEntities.fan?.[0]?.entity_id).toBe("fan.bedroom"));
-    expect(requestedDomains).toEqual(["light", "fan"]);
+    expect(requestedDomains).toEqual(["fan"]);
   });
 
   it("retains entity discovery errors and updates session state from the event port", async () => {

@@ -1145,6 +1145,7 @@ describe("app shell device entities", () => {
     const element = new AppShell();
     (element as unknown as { api: unknown }).api = {
       getCapabilities: async () => capabilities,
+      getEntityCatalog: async () => ({ lights: [], powers: [], voltages: [] }),
       getEntitiesByDeviceClass: async () => [],
       getSettings: async () => defaultSettings,
       getDummyLoadCalibration: async () => null,
@@ -1158,17 +1159,18 @@ describe("app shell device entities", () => {
 
     await (element as unknown as { boot: () => Promise<void> }).boot();
 
-    expect(requestedDomains).toEqual(["light"]);
+    expect(requestedDomains).toEqual([]);
     (element as unknown as { measureTypeSelected: (event: CustomEvent<"fan">) => void })
       .measureTypeSelected(new CustomEvent("measure-type-selected", { detail: "fan" }));
     await vi.waitFor(() => expect(element.deviceEntities.fan).toEqual([{ entity_id: "fan.bedroom", name: "Bedroom fan" }]));
-    expect(requestedDomains).toEqual(["light", "fan"]);
+    expect(requestedDomains).toEqual(["fan"]);
   });
 
   it("restores a generic request into the generic setup flow", async () => {
     const element = new AppShell();
     (element as unknown as { api: unknown }).api = {
       getCapabilities: async () => capabilities,
+      getEntityCatalog: async () => ({ lights: [], powers: [], voltages: [] }),
       getEntitiesByDeviceClass: async () => [],
       getSettings: async () => defaultSettings,
       getDummyLoadCalibration: async () => null,

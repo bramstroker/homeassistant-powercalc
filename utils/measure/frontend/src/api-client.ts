@@ -4,6 +4,7 @@ import type {
   Capabilities,
   DeviceClass,
   DummyLoadCalibration,
+  EntityCatalog,
   EntityDescriptor,
   MeasurementRequest,
   MeasureDefinition,
@@ -64,6 +65,10 @@ export class MeasureApiClient {
 
   getShellyDevices(): Promise<ShellyDiscoveryResponse> {
     return this.request("api/power-meters/shelly");
+  }
+
+  getEntityCatalog(): Promise<EntityCatalog> {
+    return this.request<EntityCatalog>("api/entity-catalog");
   }
 
   getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]> {

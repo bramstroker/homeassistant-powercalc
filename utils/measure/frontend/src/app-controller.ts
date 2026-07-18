@@ -5,6 +5,7 @@ import type {
   Capabilities,
   DeviceClass,
   DummyLoadCalibration,
+  EntityCatalog,
   EntityDescriptor,
   MeasureDefinition,
   MeasureType,
@@ -60,6 +61,7 @@ export interface MeasureAppApi {
   saveSettings(settings: AppSettings): Promise<AppSettings>;
   testPowerMeter(settings: AppSettings): Promise<PowerMeterDiagnostic>;
   getShellyDevices(): Promise<ShellyDiscoveryResponse>;
+  getEntityCatalog(): Promise<EntityCatalog>;
   getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]>;
   getEntitiesByDeviceClass(deviceClass: DeviceClass): Promise<EntityDescriptor[]>;
   getDummyLoadCalibration(): Promise<DummyLoadCalibration | null>;
@@ -116,23 +118,20 @@ export class MeasureAppController {
         throw error;
       });
       const calibrationPromise = this.refreshDummyLoadCalibration();
-      [
-        this.state.capabilities,
-        this.state.lights,
-        this.state.powers,
-        this.state.voltages,
-        this.state.settings,
-        this.state.snapshot,
-        this.state.definitions,
-      ] = await Promise.all([
+      const [capabilities, entities, settings, snapshot, definitions] = await Promise.all([
         api.getCapabilities(),
-        api.getEntitiesByDomain("light"),
-        api.getEntitiesByDeviceClass("power"),
-        api.getEntitiesByDeviceClass("voltage"),
+        api.getEntityCatalog(),
         api.getSettings(),
         currentPromise,
         api.getMeasureDefinitions(),
       ]);
+      this.state.capabilities = capabilities;
+      this.state.lights = entities.lights;
+      this.state.powers = entities.powers;
+      this.state.voltages = entities.voltages;
+      this.state.settings = settings;
+      this.state.snapshot = snapshot;
+      this.state.definitions = definitions;
       await calibrationPromise;
       this.state.request = this.state.snapshot.request;
       if (this.state.request) await this.loadTypeEntities(this.state.request.measure_type);

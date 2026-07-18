@@ -31,6 +31,12 @@ export interface EntityDescriptor {
   related_voltage_entity_id?: string;
 }
 
+export interface EntityCatalog {
+  lights: EntityDescriptor[];
+  powers: EntityDescriptor[];
+  voltages: EntityDescriptor[];
+}
+
 export interface MeasurementParameters {
   sleep_time: number;
   sample_count: number;
