@@ -26,6 +26,7 @@ export class RunningView extends LitElement {
   static readonly properties = {
     snapshot: { attribute: false },
     confirmationAction: { type: String },
+    warningConfirmation: { type: Boolean },
     connected: { type: Boolean },
     logs: { attribute: false },
     samples: { attribute: false },
@@ -36,6 +37,7 @@ export class RunningView extends LitElement {
 
   snapshot!: SessionSnapshot;
   confirmationAction = "";
+  warningConfirmation = false;
   connected = false;
   logs: string[] = [];
   samples: number[] = [];
@@ -88,9 +90,13 @@ export class RunningView extends LitElement {
     .preparation-track { position: relative; width: min(360px, 100%); height: 8px; margin-top: 0.4rem; overflow: hidden; border-radius: 99px; background: var(--track); }
     .preparation-bar { position: absolute; inset-block: 0; inset-inline-start: 0; width: 38%; border-radius: inherit; background: var(--signal); animation: prepare 1.35s ease-in-out infinite; }
     .ready-card { display: grid; justify-items: center; gap: 0.8rem; padding: clamp(1.5rem, 6vw, 3rem); border: 1px solid color-mix(in srgb, var(--good) 42%, var(--line)); border-radius: 16px; background: color-mix(in srgb, var(--good) 6%, var(--well)); text-align: center; }
+    .ready-card.warning { border-color: color-mix(in srgb, var(--warning) 58%, var(--line)); background: color-mix(in srgb, var(--warning) 8%, var(--well)); }
     .ready-announcement { display: grid; justify-items: center; gap: 0.8rem; }
     .ready-announcement h3, .ready-announcement p { margin: 0; }
     .ready-icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: color-mix(in srgb, var(--good) 16%, transparent); color: var(--good); font-size: 1.4rem; }
+    .ready-card.warning .ready-icon { width: 52px; height: 52px; border-radius: 14px; background: color-mix(in srgb, var(--warning) 15%, transparent); color: var(--warning); }
+    .ready-card.warning .ready-icon svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .ready-card.warning .ready-eyebrow { color: var(--warning); }
     .ready-message { max-width: 620px; color: var(--muted); line-height: 1.6; white-space: pre-line; }
     .ready-topline { display: flex; justify-content: flex-end; align-items: center; gap: 0.9rem; width: 100%; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -143,19 +149,25 @@ export class RunningView extends LitElement {
 
   private renderReady() {
     const message = this.snapshot.confirmation_message ?? "Preparation is complete. Start the measurement when the device is ready.";
+    const warning = this.warningConfirmation;
     return html`
       <section class="panel" aria-labelledby="running-title">
         <p class="eyebrow">03 / Measurement</p>
         <h2 id="running-title">Ready when you are</h2>
-        <div class="ready-card">
+        <div class="ready-card ${warning ? "warning" : ""}">
           <span class="ready-topline">
             ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>Log <span class="log-count">${this.logs.length}</span></button>` : nothing}
             <span class="connection ${this.connected ? "connected" : ""}">${this.connected ? "Live" : "Reconnecting"}</span>
           </span>
-          <div class="ready-announcement" role="status" aria-live="polite">
-            <span class="ready-icon" aria-hidden="true">✓</span>
-            <p class="eyebrow">Preparation complete</p>
-            <h3>Everything is ready</h3>
+          <div class="ready-announcement" role=${warning ? "alert" : "status"} aria-live=${warning ? "assertive" : "polite"}>
+            <span class="ready-icon" aria-hidden="true">${warning ? svg`
+              <svg viewBox="0 0 24 24">
+                <path d="M10.3 3.7 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"></path>
+                <path d="M12 9v4"></path><path d="M12 17h.01"></path>
+              </svg>
+            ` : "✓"}</span>
+            <p class="eyebrow ready-eyebrow">${warning ? "High volume warning" : "Preparation complete"}</p>
+            <h3>${warning ? "Protect your hearing" : "Everything is ready"}</h3>
             <p class="ready-message">${message}</p>
           </div>
           <button class="primary confirm" type="button" @click=${this.confirm} ?disabled=${this.busy}>${this.busy ? "Starting…" : this.confirmationAction || "Start measurement"}</button>

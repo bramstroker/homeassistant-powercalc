@@ -17,6 +17,7 @@ export const sharedStyles = css`
     --signal-strong: #93b5f4;
     --on-signal: #ffffff;
     --good: #61d4a3;
+    --warning: #f2b84b;
     --danger: #ff7b72;
     --radius: 14px;
     color-scheme: dark;

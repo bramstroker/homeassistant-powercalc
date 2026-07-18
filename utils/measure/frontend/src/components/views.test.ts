@@ -768,6 +768,28 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector("progress")).toBeNull();
   });
 
+  it("renders speaker confirmation as a high-volume warning", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; confirmationAction: string; warningConfirmation: boolean;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      confirmation_message: "Speaker measurements can become very loud.",
+    };
+    element.confirmationAction = "Start speaker measurement";
+    element.warningConfirmation = true;
+    document.body.append(element);
+    await element.updateComplete;
+
+    const warning = element.shadowRoot.querySelector(".ready-card.warning");
+    expect(warning).toBeTruthy();
+    expect(warning?.querySelector(".ready-announcement")?.getAttribute("role")).toBe("alert");
+    expect(warning?.textContent).toContain("High volume warning");
+    expect(warning?.textContent).toContain("Protect your hearing");
+    expect(warning?.querySelector(".ready-icon svg")).toBeTruthy();
+  });
+
   it("shows progress, phase, connection state, and cancellation", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot;
@@ -1445,8 +1467,46 @@ describe("app shell", () => {
     element.snapshot = { state: "awaiting_confirmation", request: element.request };
     element.view = "running";
     await element.updateComplete;
-    const running = element.shadowRoot?.querySelector("measure-running-view") as HTMLElement & { confirmationAction: string; updateComplete: Promise<boolean> };
+    const running = element.shadowRoot?.querySelector("measure-running-view") as HTMLElement & {
+      confirmationAction: string; warningConfirmation: boolean; updateComplete: Promise<boolean>;
+    };
     expect(running.confirmationAction).toBe("Start averaging");
+    expect(running.warningConfirmation).toBe(false);
+  });
+
+  it("marks speaker confirmation as a warning", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.definitions = [{
+      measure_type: "speaker",
+      label: "Speaker",
+      description: "Measure a speaker.",
+      fields: [],
+      supports_profile: true,
+      supports_resume: false,
+      confirmation_action: "Start speaker measurement",
+    }];
+    element.request = {
+      measure_type: "speaker",
+      model_id: "speaker",
+      product_name: "Speaker",
+      measure_device: "Shelly Plug S",
+      generate_model: true,
+      parameters: capabilities.defaults,
+      power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+      controller: { type: "dummy" },
+      disable_streaming: false,
+      resume_policy: "new",
+    };
+    element.snapshot = { state: "awaiting_confirmation", request: element.request };
+    element.view = "running";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const running = element.shadowRoot?.querySelector("measure-running-view") as HTMLElement & {
+      warningConfirmation: boolean; updateComplete: Promise<boolean>;
+    };
+    expect(running.warningConfirmation).toBe(true);
   });
 
   it("loads the Powercalc SVG logo", async () => {
