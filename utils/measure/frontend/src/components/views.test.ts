@@ -637,7 +637,12 @@ describe("setup type picker", () => {
     await element.updateComplete;
 
     const profileSection = [...element.shadowRoot.querySelectorAll("fieldset.section")][1];
-    const fields = [...(profileSection?.querySelectorAll<HTMLInputElement | HTMLSelectElement>(":scope > .profile-grid [name]") ?? [])];
+    // Query from the profile grid directly instead of using a `:scope >` selector.
+    // jsdom's selector engine does not resolve `:scope` against a context node that
+    // lives inside a shadow root, so those selectors match nothing under the app's
+    // shadow DOM even though browsers resolve them fine.
+    const profileGrid = profileSection?.querySelector(".profile-grid");
+    const fields = [...(profileGrid?.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[name]") ?? [])];
     expect(fields.map((field) => field.name)).toEqual(expectedFields);
 
     const entity = element.shadowRoot.querySelector(`select[name="${entityField}"]`) as HTMLSelectElement;
@@ -1067,9 +1072,18 @@ describe("setup view defaults", () => {
 
     const profileSection = [...element.shadowRoot.querySelectorAll("fieldset.section")][1];
     expect(profileSection).toBeTruthy();
-    expect(profileSection?.querySelector(".profile-grid")).toBeTruthy();
-    const profileFields = profileSection?.querySelectorAll<HTMLLabelElement>(":scope > .grid > label") ?? [];
-    const labels = [...profileFields].map((field) => field.querySelector(":scope > span")?.textContent?.trim());
+    const profileGrid = profileSection?.querySelector(".profile-grid");
+    expect(profileGrid).toBeTruthy();
+    // Walk the grid's direct children rather than using `:scope >` selectors, which
+    // jsdom cannot resolve against a context node inside a shadow root. This keeps
+    // the assertion scoped to the profile fields and excludes the nested advanced
+    // timing grid, exactly as the `:scope > .grid > label` selector intended.
+    const profileFields = [...(profileGrid?.children ?? [])].filter(
+      (child): child is HTMLLabelElement => child.tagName === "LABEL",
+    );
+    const labels = profileFields.map(
+      (field) => [...field.children].find((child) => child.tagName === "SPAN")?.textContent?.trim(),
+    );
     expect(labels).toEqual(["Light", "Number of lights", "Model ID", "Full product name"]);
     expect(element.shadowRoot.querySelector(".field-hint")?.textContent).toContain("complete marketed name");
   });
