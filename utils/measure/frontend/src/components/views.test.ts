@@ -1661,6 +1661,26 @@ describe("result view", () => {
     expect(button.textContent).toContain("Download all");
     button.click();
     expect(downloadAll).toHaveBeenCalledTimes(1);
+
+    const nextSteps = element.shadowRoot.querySelector(".contribution-next");
+    expect(nextSteps?.textContent).toContain("Contribute your measurement");
+    expect(nextSteps?.textContent).toContain("Download and inspect the generated files");
+    expect(nextSteps?.textContent).toContain("profile_library/<manufacturer>/<model>/");
+    const guide = nextSteps?.querySelector("a") as HTMLAnchorElement;
+    expect(guide.href).toBe("https://docs.powercalc.nl/contributing/measure/output/");
+    expect(guide.target).toBe("_blank");
+    expect(guide.rel).toContain("noopener");
+  });
+
+  it.each(["failed", "cancelled", "resumable"] as const)("does not suggest contribution for a %s session", async (state) => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".contribution-next")).toBeNull();
   });
 
   it("renders a summary readout for a file-less measurement", async () => {
@@ -1679,6 +1699,7 @@ describe("result view", () => {
     expect(element.shadowRoot.querySelector(".readout")?.textContent).toContain("42.3 W");
     expect(element.shadowRoot.querySelector("#result-title")?.textContent).toContain("Measurement complete");
     expect(element.shadowRoot.textContent).not.toContain("No downloadable files");
+    expect(element.shadowRoot.querySelector(".contribution-next")?.textContent).toContain("Use the measured result above in a Powercalc profile");
   });
 
   it("renders partial plots and offers a PNG download", async () => {
