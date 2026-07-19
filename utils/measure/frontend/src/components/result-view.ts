@@ -3,6 +3,9 @@ import type { PlotCollection, SessionFile, SessionSnapshot } from "../types";
 import { sharedStyles } from "../styles";
 import "./result-plot";
 
+const CONTRIBUTION_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/output/";
+const PROFILE_LIBRARY_PATH = "profile_library/<manufacturer>/<model>/";
+
 export class ResultView extends LitElement {
   static readonly properties = {
     snapshot: { attribute: false },
@@ -44,6 +47,14 @@ export class ResultView extends LitElement {
     .plots-header h3 { margin: 0; font-size: 1rem; }
     .plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1rem; }
     .plot-warning { margin-top: 0.75rem; }
+    .contribution-next { margin-top: 1.5rem; padding: clamp(1rem, 3vw, 1.35rem); border: 1px solid color-mix(in srgb, var(--signal) 48%, var(--line)); border-radius: 14px; background: color-mix(in srgb, var(--signal) 7%, var(--well)); }
+    .contribution-next h3 { margin: 0 0 0.35rem; font-size: 1.15rem; }
+    .contribution-next > p:not(.eyebrow) { margin: 0; color: var(--muted); }
+    .contribution-next ol { margin: 1rem 0; padding-left: 1.4rem; color: var(--ink); }
+    .contribution-next li { display: list-item; padding: 0.25rem 0 0.25rem 0.2rem; border: 0; }
+    .contribution-next code { color: var(--signal-strong); font-size: 0.88em; overflow-wrap: anywhere; }
+    .contribution-guide { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 40px; padding: 0.55rem 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-raised); text-decoration: none; }
+    .contribution-guide:hover { border-color: var(--signal); }
     ul { list-style: none; margin: 0.65rem 0 0; padding: 0; border-top: 1px solid var(--line); }
     li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--line); }
     li span { overflow-wrap: anywhere; } li small { color: var(--muted); }
@@ -69,6 +80,7 @@ export class ResultView extends LitElement {
         ${this.renderSummary()}
         ${this.renderPlots()}
         ${this.renderFiles()}
+        ${this.renderContribution(state)}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         <div class="diagnostics-download">
           <span>Session snapshot and logs for issue reporting.</span>
@@ -109,6 +121,28 @@ export class ResultView extends LitElement {
         </div>
       ` : nothing}
       ${warnings.map((warning) => html`<p class="notice plot-warning">${warning}</p>`)}
+    `;
+  }
+
+  private renderContribution(state: SessionSnapshot["state"]) {
+    if (state !== "completed") return nothing;
+    const firstStep = this.files.length
+      ? "Download and inspect the generated files."
+      : "Use the measured result above in a Powercalc profile.";
+    return html`
+      <section class="contribution-next" aria-labelledby="contribution-title">
+        <p class="eyebrow">What's next?</p>
+        <h3 id="contribution-title">Contribute your measurement</h3>
+        <p>Help other Powercalc users by adding this device to the shared profile library.</p>
+        <ol>
+          <li>${firstStep}</li>
+          <li>Place the profile under <code>${PROFILE_LIBRARY_PATH}</code>.</li>
+          <li>Open a pull request using the power profile template.</li>
+        </ol>
+        <a class="contribution-guide" href=${CONTRIBUTION_GUIDE_URL} target="_blank" rel="noopener noreferrer">
+          Read the contribution guide <span aria-hidden="true">↗</span>
+        </a>
+      </section>
     `;
   }
 
