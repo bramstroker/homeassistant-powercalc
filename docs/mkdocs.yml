@@ -28,7 +28,7 @@ theme:
         icon: material/toggle-switch
         name: Switch to light mode
   logo: img/logo.svg
-  favicon: img/logo.svg
+  favicon: img/logo_light.svg
 extra:
   generator: false
   analytics:
