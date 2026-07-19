@@ -22,7 +22,8 @@ env:
   APP_IMAGE_NAME: powercalc-measure-app
 
 jobs:
-  docker:
+  build-and-push-cli:
+    name: Build and push CLI Docker image
     if: github.event_name == 'push' || inputs.release_tag != ''
     runs-on: ubuntu-latest
     permissions:
