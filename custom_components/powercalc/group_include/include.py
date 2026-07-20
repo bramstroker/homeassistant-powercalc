@@ -9,9 +9,13 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
+    CONF_SENSOR_TYPE,
     DATA_CONFIGURED_ENTITIES,
     DATA_ENTITIES,
     DOMAIN,
+    ENTRY_DATA_ENERGY_ENTITY,
+    ENTRY_DATA_POWER_ENTITY,
+    SensorType,
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.power_profile import SUPPORTED_DOMAINS
@@ -53,7 +57,7 @@ async def find_entities(
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
 
-    source_entities = get_filtered_entity_list(hass, _build_filter(entity_filter))
+    source_entities = get_filtered_entity_list(hass, _build_filter(hass, entity_filter, include_non_powercalc))
 
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug("Source entities: %s", [entity.entity_id for entity in source_entities])
@@ -69,9 +73,6 @@ async def find_entities(
         existing = powercalc_entities.get(entity_id)
         if existing:
             resolved_entities.append(existing)
-            continue
-
-        if _should_skip_source_entity(source_entity, include_non_powercalc):
             continue
 
         real_sensor = _create_real_sensor(source_entity)
@@ -92,8 +93,31 @@ async def find_entities(
     return FindEntitiesResult(resolved_entities, discoverable_entities)
 
 
-def _should_skip_source_entity(source_entity: RegistryEntry, include_non_powercalc: bool) -> bool:
-    return source_entity.domain == sensor.DOMAIN and source_entity.platform != DOMAIN and not include_non_powercalc
+def _is_source_entity_eligible(
+    hass: HomeAssistant,
+    source_entity: RegistryEntry,
+    include_non_powercalc: bool,
+) -> bool:
+    """Return whether a registry entity is eligible for Powercalc discovery."""
+    if source_entity.platform != DOMAIN:
+        return include_non_powercalc or source_entity.domain != sensor.DOMAIN
+
+    # YAML-created Powercalc entities have no config entry and are classified by their runtime type later.
+    if source_entity.config_entry_id is None:
+        return True
+
+    config_entry = hass.config_entries.async_get_entry(source_entity.config_entry_id)
+    if config_entry is None:
+        return False
+
+    if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP:
+        return False
+
+    main_entity_ids = {
+        config_entry.data.get(ENTRY_DATA_POWER_ENTITY),
+        config_entry.data.get(ENTRY_DATA_ENERGY_ENTITY),
+    }
+    return source_entity.entity_id in main_entity_ids
 
 
 def _create_real_sensor(source_entity: RegistryEntry) -> Entity | None:
@@ -120,10 +144,15 @@ async def _is_discoverable_source_entity(hass: HomeAssistant, source_entity: Reg
     )
 
 
-def _build_filter(entity_filter: EntityFilter | None) -> EntityFilter:
+def _build_filter(
+    hass: HomeAssistant,
+    entity_filter: EntityFilter | None,
+    include_non_powercalc: bool,
+) -> EntityFilter:
     base_filter = CompositeFilter(
         [
             DomainFilter(SUPPORTED_DOMAINS),
+            LambdaFilter(lambda entity: _is_source_entity_eligible(hass, entity, include_non_powercalc)),
             LambdaFilter(lambda entity: entity.platform != "utility_meter"),
             LambdaFilter(lambda entity: not str(entity.unique_id).startswith("powercalc_standby_group")),
             LambdaFilter(lambda entity: "tracked_" not in str(entity.unique_id)),
