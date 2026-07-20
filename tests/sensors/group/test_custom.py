@@ -2198,54 +2198,22 @@ async def test_resolve_entity_ids_area_excludes_persisted_powercalc_derived_enti
     mock_registry(
         hass,
         {
-            "sensor.bedside_lamp_power": RegistryEntryWithDefaults(
-                entity_id="sensor.bedside_lamp_power",
-                unique_id="bedside_lamp_power",
+            entity_id: RegistryEntryWithDefaults(
+                entity_id=entity_id,
+                unique_id=entity_id,
                 platform=DOMAIN,
-                config_entry_id=sensor_entry.entry_id,
-                device_class=SensorDeviceClass.POWER,
+                config_entry_id=config_entry_id,
+                device_class=device_class,
                 area_id=area.id,
-            ),
-            "sensor.bedside_lamp_energy": RegistryEntryWithDefaults(
-                entity_id="sensor.bedside_lamp_energy",
-                unique_id="bedside_lamp_energy",
-                platform=DOMAIN,
-                config_entry_id=sensor_entry.entry_id,
-                device_class=SensorDeviceClass.ENERGY,
-                area_id=area.id,
-            ),
-            "sensor.bedside_lamp_energy_daily": RegistryEntryWithDefaults(
-                entity_id="sensor.bedside_lamp_energy_daily",
-                unique_id="bedside_lamp_energy_daily",
-                platform=DOMAIN,
-                config_entry_id=sensor_entry.entry_id,
-                device_class=SensorDeviceClass.ENERGY,
-                area_id=area.id,
-            ),
-            "sensor.bedroom_power": RegistryEntryWithDefaults(
-                entity_id="sensor.bedroom_power",
-                unique_id="bedroom_power",
-                platform=DOMAIN,
-                config_entry_id=group_entry.entry_id,
-                device_class=SensorDeviceClass.POWER,
-                area_id=area.id,
-            ),
-            "sensor.bedroom_energy": RegistryEntryWithDefaults(
-                entity_id="sensor.bedroom_energy",
-                unique_id="bedroom_energy",
-                platform=DOMAIN,
-                config_entry_id=group_entry.entry_id,
-                device_class=SensorDeviceClass.ENERGY,
-                area_id=area.id,
-            ),
-            "sensor.bedroom_energy_daily": RegistryEntryWithDefaults(
-                entity_id="sensor.bedroom_energy_daily",
-                unique_id="bedroom_energy_daily",
-                platform=DOMAIN,
-                config_entry_id=group_entry.entry_id,
-                device_class=SensorDeviceClass.ENERGY,
-                area_id=area.id,
-            ),
+            )
+            for entity_id, config_entry_id, device_class in (
+                ("sensor.bedside_lamp_power", sensor_entry.entry_id, SensorDeviceClass.POWER),
+                ("sensor.bedside_lamp_energy", sensor_entry.entry_id, SensorDeviceClass.ENERGY),
+                ("sensor.bedside_lamp_energy_daily", sensor_entry.entry_id, SensorDeviceClass.ENERGY),
+                ("sensor.bedroom_power", group_entry.entry_id, SensorDeviceClass.POWER),
+                ("sensor.bedroom_energy", group_entry.entry_id, SensorDeviceClass.ENERGY),
+                ("sensor.bedroom_energy_daily", group_entry.entry_id, SensorDeviceClass.ENERGY),
+            )
         },
     )
 
