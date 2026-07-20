@@ -1172,10 +1172,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "24fd57573ae45a89adc35b6a1a181546"
+          "hash": "51d6a5a799c60715b1116bb7fde6df41"
         },
         {
           "aliases": [
@@ -3757,10 +3757,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "8b04010a1b630d7730615409aad56421"
+          "hash": "e19b3d27b36c570fe2895510672c325e"
         },
         {
           "calculation_strategy": "lut",
@@ -6341,10 +6341,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "b7378729aac7ace210e2b4bbde61c97b"
+          "hash": "ad2149c3ca2e8960b71cd50283e6ccaa"
         }
       ],
       "device_types": [
@@ -10382,10 +10382,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "20ac44e35dd4a4ed0750d0aa4d5c3d59"
+          "hash": "0cb41dc8f835f3e1af0de0e78f5fab19"
         }
       ],
       "device_types": [
