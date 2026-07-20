@@ -84,6 +84,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     DUMMY_ENTITY_ID,
     ENTRY_DATA_ENERGY_ENTITY,
+    ENTRY_DATA_POWER_ENTITY,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_DEBUG_GROUP,
     SERVICE_GET_GROUP_ENTITIES,
@@ -2166,6 +2167,93 @@ async def test_resolve_entity_ids_area(hass: HomeAssistant, area_registry: AreaR
 
     resolved = await resolve_entity_ids_recursively(hass, config_entry, SensorDeviceClass.POWER)
     assert resolved == {"sensor.test_power"}
+
+
+async def test_resolve_entity_ids_area_excludes_persisted_powercalc_derived_entities(
+    hass: HomeAssistant,
+    area_registry: AreaRegistry,
+) -> None:
+    area = area_registry.async_get_or_create("Bedroom")
+
+    sensor_entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            ENTRY_DATA_POWER_ENTITY: "sensor.bedside_lamp_power",
+            ENTRY_DATA_ENERGY_ENTITY: "sensor.bedside_lamp_energy",
+        },
+        setup=False,
+    )
+    group_entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_AREA: area.id,
+            CONF_NAME: "Bedroom",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            ENTRY_DATA_ENERGY_ENTITY: "sensor.bedroom_energy",
+        },
+        setup=False,
+    )
+
+    mock_registry(
+        hass,
+        {
+            "sensor.bedside_lamp_power": RegistryEntryWithDefaults(
+                entity_id="sensor.bedside_lamp_power",
+                unique_id="bedside_lamp_power",
+                platform=DOMAIN,
+                config_entry_id=sensor_entry.entry_id,
+                device_class=SensorDeviceClass.POWER,
+                area_id=area.id,
+            ),
+            "sensor.bedside_lamp_energy": RegistryEntryWithDefaults(
+                entity_id="sensor.bedside_lamp_energy",
+                unique_id="bedside_lamp_energy",
+                platform=DOMAIN,
+                config_entry_id=sensor_entry.entry_id,
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+            "sensor.bedside_lamp_energy_daily": RegistryEntryWithDefaults(
+                entity_id="sensor.bedside_lamp_energy_daily",
+                unique_id="bedside_lamp_energy_daily",
+                platform=DOMAIN,
+                config_entry_id=sensor_entry.entry_id,
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+            "sensor.bedroom_power": RegistryEntryWithDefaults(
+                entity_id="sensor.bedroom_power",
+                unique_id="bedroom_power",
+                platform=DOMAIN,
+                config_entry_id=group_entry.entry_id,
+                device_class=SensorDeviceClass.POWER,
+                area_id=area.id,
+            ),
+            "sensor.bedroom_energy": RegistryEntryWithDefaults(
+                entity_id="sensor.bedroom_energy",
+                unique_id="bedroom_energy",
+                platform=DOMAIN,
+                config_entry_id=group_entry.entry_id,
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+            "sensor.bedroom_energy_daily": RegistryEntryWithDefaults(
+                entity_id="sensor.bedroom_energy_daily",
+                unique_id="bedroom_energy_daily",
+                platform=DOMAIN,
+                config_entry_id=group_entry.entry_id,
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+        },
+    )
+
+    resolved_power = await resolve_entity_ids_recursively(hass, group_entry, SensorDeviceClass.POWER)
+    assert resolved_power == {"sensor.bedside_lamp_power"}
+
+    resolved_energy = await resolve_entity_ids_recursively(hass, group_entry, SensorDeviceClass.ENERGY)
+    assert resolved_energy == {"sensor.bedside_lamp_energy"}
 
 
 async def test_resolve_entity_ids_skips_tasmota_yesterday_and_today(hass: HomeAssistant) -> None:
