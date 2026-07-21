@@ -1,0 +1,195 @@
+{
+  "author_info": {
+    "github": "buntwo",
+    "name": "buntwo"
+  },
+  "calculation_strategy": "composite",
+  "composite_config": [
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "attribute": "oscillating",
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": true
+          },
+          {
+            "attribute": "direction",
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": "reverse"
+          }
+        ]
+      },
+      "linear": {
+        "calibrate": [
+          "5 -> 4.70",
+          "10 -> 4.64",
+          "15 -> 5.34",
+          "20 -> 5.15",
+          "25 -> 5.34",
+          "30 -> 5.98",
+          "35 -> 6.21",
+          "40 -> 6.35",
+          "45 -> 6.19",
+          "50 -> 8.06",
+          "55 -> 10.34",
+          "60 -> 10.48",
+          "65 -> 10.44",
+          "70 -> 13.70",
+          "75 -> 17.43",
+          "80 -> 17.52",
+          "85 -> 17.50",
+          "90 -> 22.21",
+          "95 -> 28.77",
+          "100 -> 28.48"
+        ]
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "attribute": "oscillating",
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": true
+          },
+          {
+            "attribute": "direction",
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": "forward"
+          }
+        ]
+      },
+      "linear": {
+        "calibrate": [
+          "5 -> 4.59",
+          "10 -> 4.69",
+          "15 -> 5.17",
+          "20 -> 5.09",
+          "25 -> 5.17",
+          "30 -> 5.70",
+          "35 -> 6.06",
+          "40 -> 6.00",
+          "45 -> 6.08",
+          "50 -> 7.22",
+          "55 -> 9.61",
+          "60 -> 9.44",
+          "65 -> 9.54",
+          "70 -> 12.42",
+          "75 -> 16.02",
+          "80 -> 16.15",
+          "85 -> 15.82",
+          "90 -> 20.59",
+          "95 -> 27.94",
+          "100 -> 28.13"
+        ]
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "attribute": "oscillating",
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": false
+          },
+          {
+            "attribute": "direction",
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": "reverse"
+          }
+        ]
+      },
+      "linear": {
+        "calibrate": [
+          "5 -> 3.60",
+          "10 -> 3.60",
+          "15 -> 4.15",
+          "20 -> 4.13",
+          "25 -> 4.13",
+          "30 -> 4.83",
+          "35 -> 5.20",
+          "40 -> 5.20",
+          "45 -> 5.20",
+          "50 -> 6.94",
+          "55 -> 9.34",
+          "60 -> 9.33",
+          "65 -> 9.37",
+          "70 -> 12.36",
+          "75 -> 16.32",
+          "80 -> 16.22",
+          "85 -> 16.19",
+          "90 -> 20.97",
+          "95 -> 27.43",
+          "100 -> 27.37"
+        ]
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "attribute": "oscillating",
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": false
+          },
+          {
+            "attribute": "direction",
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": "forward"
+          }
+        ]
+      },
+      "linear": {
+        "calibrate": [
+          "5 -> 3.53",
+          "10 -> 3.53",
+          "15 -> 4.02",
+          "20 -> 4.08",
+          "25 -> 4.10",
+          "30 -> 4.76",
+          "35 -> 5.06",
+          "40 -> 5.07",
+          "45 -> 5.00",
+          "50 -> 6.25",
+          "55 -> 8.48",
+          "60 -> 8.50",
+          "65 -> 8.47",
+          "70 -> 11.30",
+          "75 -> 15.00",
+          "80 -> 15.03",
+          "85 -> 15.14",
+          "90 -> 19.83",
+          "95 -> 27.36",
+          "100 -> 27.36"
+        ]
+      }
+    }
+  ],
+  "created_at": "2026-07-20T21:56:29Z",
+  "device_type": "fan",
+  "max_voltage": 118.6,
+  "measure_description": "Four calibration curves measured with utils/measure script: forward and reverse direction, each with oscillation on and off",
+  "measure_device": "TP-Link Tapo P316M",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2,
+    "VERSION": "v1.22.0:docker"
+  },
+  "min_voltage": 116.6,
+  "name": "Purifier Cool TP07",
+  "standby_power": 1.13
+}
