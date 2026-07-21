@@ -1,7 +1,4 @@
 {
-  "aliases": [
-    "Dyson Purifier Cool TP07"
-  ],
   "author_info": {
     "github": "buntwo",
     "name": "buntwo"
@@ -193,6 +190,6 @@
     "VERSION": "v1.22.0:docker"
   },
   "min_voltage": 116.6,
-  "name": "Dyson Purifier Cool TP07",
+  "name": "Purifier Cool TP07",
   "standby_power": 1.13
 }
