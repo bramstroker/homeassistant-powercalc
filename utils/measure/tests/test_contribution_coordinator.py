@@ -17,8 +17,8 @@ from measure.contribution.models import (
     ContributionPreparedFile,
     ContributionPreview,
 )
-from measure.contribution.pr_text import deterministic_branch_name
 from measure.contribution.prepare import ProfilePreparer
+from measure.contribution.pull_request import deterministic_branch_name
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.ha_app.contribution import (
     ContributionApiError,

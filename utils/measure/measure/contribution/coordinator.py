@@ -18,13 +18,13 @@ from measure.contribution.models import (
     ContributionMetadata,
     ContributionSubmission,
 )
-from measure.contribution.pr_text import (
+from measure.contribution.prepare import ProfilePreparer
+from measure.contribution.pull_request import (
     conventional_commit_message,
     deterministic_branch_name,
     pull_request_body,
     pull_request_title,
 )
-from measure.contribution.prepare import ProfilePreparer
 
 
 class ContributionJobExpiredError(LookupError):

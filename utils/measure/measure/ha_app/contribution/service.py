@@ -26,14 +26,14 @@ from measure.contribution.models import (
     ContributionMetadata,
     ContributionPreview as ProfileContributionPreview,
 )
-from measure.contribution.pr_text import (
+from measure.contribution.prepare import ProfilePreparationError, ProfilePreparer
+from measure.contribution.pull_request import (
     conventional_commit_message,
     deterministic_branch_name,
     profile_pull_request_body,
     pull_request_body,
     pull_request_title,
 )
-from measure.contribution.prepare import ProfilePreparationError, ProfilePreparer
 from measure.ha_app.contribution.models import (
     SUPPORTED_MEASURE_TYPES,
     ContributionApiError,
