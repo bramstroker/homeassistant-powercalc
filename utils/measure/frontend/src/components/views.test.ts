@@ -1224,9 +1224,9 @@ describe("settings view", () => {
     [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Save token"))?.click();
     expect(await saved).toBe("ghp_secret");
 
-    element.contributionAuth = { connected: true, identity: { login: "octocat", name: "Mona" } };
+    element.contributionAuth = { connected: true, identity: { login: "octocat" } };
     await element.updateComplete;
-    expect(element.shadowRoot.textContent).toContain("Mona · octocat");
+    expect(element.shadowRoot.textContent).toContain("octocat");
     const disconnected = new Promise<void>((resolve) => element.addEventListener("github-disconnect", () => resolve()));
     (element.shadowRoot.querySelector("button.danger") as HTMLButtonElement).click();
     await disconnected;

@@ -1,3 +1,10 @@
+"""HTTP-facing layer over ``measure.contribution`` for the Home Assistant app.
+
+Adds what the API needs on top of the core engine: GitHub auth (PAT and OAuth
+device flow), draft/preview responses for the frontend, and the app-level
+``ContributionState`` persisted per install by ``ContributionApiCoordinator``.
+"""
+
 from __future__ import annotations
 
 from measure.ha_app.contribution.coordinator import ContributionApiCoordinator

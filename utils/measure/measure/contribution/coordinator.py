@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import base64
-from collections.abc import Sequence
 import json
 from pathlib import Path
 from uuid import uuid4
@@ -9,7 +8,7 @@ from uuid import uuid4
 from measure.clock import utc_now
 from measure.contribution.credentials import CredentialStore
 from measure.contribution.files import write_json_atomic
-from measure.contribution.github import REQUIRED_OAUTH_SCOPES, GitHubApiError, GitHubClient
+from measure.contribution.github import GitHubApiError, GitHubClient, missing_required_scopes
 from measure.contribution.models import (
     ContributionError,
     ContributionErrorCode,
@@ -29,14 +28,6 @@ from measure.contribution.pull_request import (
 
 class ContributionJobExpiredError(LookupError):
     """The referenced contribution job no longer exists; the preview must be refreshed."""
-
-
-def _granted_scopes(scopes: Sequence[str]) -> set[str]:
-    """The classic ``repo`` scope is a superset that implies ``public_repo``."""
-    granted = set(scopes)
-    if "repo" in granted:
-        granted.add("public_repo")
-    return granted
 
 
 class ContributionJobStore:
@@ -134,7 +125,7 @@ class ContributionJobCoordinator:
         user = client.fetch_authenticated_user()
         repository = client.repository
         uses_fork = user.login.casefold() != repository.owner.casefold()
-        missing_scopes = set(REQUIRED_OAUTH_SCOPES).difference(_granted_scopes(user.scopes))
+        missing_scopes = missing_required_scopes(user.scopes)
         if uses_fork and user.scopes_reported and missing_scopes:
             scopes = " and ".join(sorted(missing_scopes))
             raise GitHubApiError(

@@ -59,9 +59,6 @@ class ContributionApiError(Exception):
 
 class ContributionIdentity(BaseModel):
     login: str
-    name: str | None = None
-    avatar_url: str | None = None
-    html_url: str | None = None
 
 
 class ContributionAuthStatus(BaseModel):
@@ -100,7 +97,6 @@ class ContributionFile(BaseModel):
     name: str
     path: str
     size: int
-    media_type: str | None = None
     content: str | None = None
     rendered_json: Any | None = None
 

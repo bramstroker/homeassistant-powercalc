@@ -240,7 +240,7 @@ export class SettingsView extends LitElement {
             <div class="identity">
               <div>
                 <span class="field-hint">Connected as</span>
-                <strong>${identity ? (identity.name ? `${identity.name} · ${identity.login}` : identity.login) : "GitHub"}</strong>
+                <strong>${identity ? identity.login : "GitHub"}</strong>
                 ${this.contributionAuth.permissions_verified === false
                   ? html`<span class="field-hint">Identity verified. Fine-grained token permissions can only be confirmed during submission.</span>`
                   : nothing}

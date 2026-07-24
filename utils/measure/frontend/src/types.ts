@@ -268,9 +268,6 @@ export interface AppSettings {
 
 export interface ContributionIdentity {
   login: string;
-  name?: string | null;
-  avatar_url?: string | null;
-  html_url?: string | null;
 }
 
 export interface ContributionAuthState {

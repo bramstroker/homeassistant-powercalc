@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import base64
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 import os
 import re
@@ -18,6 +18,19 @@ UPSTREAM_BRANCH_ENV = "POWERCALC_GITHUB_BRANCH"
 API_BASE_URL = "https://api.github.com"
 GITHUB_LOGIN_URL = "https://github.com"
 REQUIRED_OAUTH_SCOPES = ("public_repo", "workflow")
+
+
+def granted_scopes(scopes: Sequence[str]) -> set[str]:
+    """The classic ``repo`` scope is a superset that implies ``public_repo``."""
+    granted = set(scopes)
+    if "repo" in granted:
+        granted.add("public_repo")
+    return granted
+
+
+def missing_required_scopes(scopes: Sequence[str]) -> set[str]:
+    """Required contribution scopes not covered by ``scopes``; empty when access suffices."""
+    return set(REQUIRED_OAUTH_SCOPES).difference(granted_scopes(scopes))
 
 
 class GitHubResponse(Protocol):

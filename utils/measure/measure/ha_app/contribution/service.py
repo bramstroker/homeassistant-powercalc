@@ -19,6 +19,7 @@ from measure.contribution.github import (
     GitHubApiError,
     GitHubClient,
     GitHubRepository,
+    missing_required_scopes,
 )
 from measure.contribution.models import (
     ContributionAuthor,
@@ -78,8 +79,7 @@ class SharedContributionService:
             user = GitHubClient(raw_token).fetch_authenticated_user()
         except GitHubApiError as error:
             raise ContributionApiError(ContributionApiErrorCode.AUTH_UNAVAILABLE, str(error)) from error
-        repository_access_granted = bool({"repo", "public_repo"}.intersection(user.scopes))
-        permission_granted = repository_access_granted and "workflow" in user.scopes
+        permission_granted = not missing_required_scopes(user.scopes)
         if user.scopes_reported and not permission_granted:
             raise ContributionApiError(
                 ContributionApiErrorCode.AUTH_UNAVAILABLE,
@@ -105,11 +105,12 @@ class SharedContributionService:
             data = GitHubClient().start_device_flow(client_id, REQUIRED_OAUTH_SCOPES)
         except GitHubApiError as error:
             raise ContributionApiError(ContributionApiErrorCode.AUTH_UNAVAILABLE, str(error)) from error
-        device_code = str(data["device_code"])
         complete_uri = data.get("verification_uri_complete")
+        # flow_id is assigned by the API coordinator; the device code must never
+        # reach clients (only the excluded device_code field may carry it).
         return DeviceFlowStartResponse(
-            flow_id=device_code,
-            device_code=device_code,
+            flow_id=None,
+            device_code=str(data["device_code"]),
             user_code=str(data["user_code"]),
             verification_uri=str(data["verification_uri"]),
             verification_uri_complete=str(complete_uri) if complete_uri is not None else None,
@@ -490,7 +491,7 @@ def _list_draft_files(artifact_root: Path) -> list[ContributionFile]:
     if not artifact_root.is_dir():
         return []
     return [
-        ContributionFile(name=path.name, path=path.name, size=path.stat().st_size, media_type=None)
+        ContributionFile(name=path.name, path=path.name, size=path.stat().st_size)
         for path in sorted(artifact_root.iterdir())
         if path.is_file() and not path.is_symlink()
     ]
@@ -507,7 +508,6 @@ def _build_preview_file(path: str, content: bytes) -> ContributionFile:
         name=Path(path).name,
         path=path,
         size=len(content),
-        media_type=None,
         content=text,
         rendered_json=rendered_json,
     )

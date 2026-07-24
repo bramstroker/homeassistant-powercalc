@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from measure.contribution.models import ContributionAuthor, ContributionMetadata
-from measure.contribution.prepare import ProfilePreparationError, ProfilePreparer
+from measure.contribution.prepare import JsonValidator, ProfilePreparationError, ProfilePreparer
 import pytest
 
 
@@ -20,6 +20,19 @@ def metadata(
         model_id=model_id,
         product_name=product_name,
         author=ContributionAuthor(name="Test User", github="test-user", email="test@example.com"),
+    )
+
+
+def make_preparer(tmp_path: Path, validator: JsonValidator | None = None) -> ProfilePreparer:
+    """Preparer over ``tmp_path / "profile_library"`` with a permissive schema and no-op validator."""
+    library = tmp_path / "profile_library"
+    library.mkdir(exist_ok=True)
+    schema = tmp_path / "model_schema.json"
+    schema.write_text("{}", encoding="utf-8")
+    return ProfilePreparer(
+        library_root=library,
+        model_schema_path=schema,
+        validator=validator or (lambda _instance, _schema: None),
     )
 
 
@@ -55,20 +68,28 @@ def write_library(path: Path) -> None:
     )
 
 
+def write_library_index(path: Path, *, full_name: str | None = None, model_aliases: list[str] | None = None) -> None:
+    manufacturer: dict[str, Any] = {
+        "name": "signify",
+        "aliases": ["Philips"],
+        "dir_name": "signify",
+        "models": [{"id": "LCT010", "name": "Existing lamp", **({"aliases": model_aliases} if model_aliases else {})}],
+    }
+    if full_name is not None:
+        manufacturer["full_name"] = full_name
+    (path / "library.json").write_text(json.dumps({"manufacturers": [manufacturer]}), encoding="utf-8")
+
+
 def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_unchanged(tmp_path: Path) -> None:
-    library = tmp_path / "profile_library"
-    schema = tmp_path / "model_schema.json"
     artifacts = tmp_path / "artifacts"
-    library.mkdir()
-    write_library(library)
-    schema.write_text("{}", encoding="utf-8")
+    write_library(tmp_path / "profile_library")
     write_profile_artifacts(artifacts)
     seen_model: dict[str, Any] = {}
 
     def validator(instance: dict[str, Any], _: dict[str, Any]) -> None:
         seen_model.update(instance)
 
-    preparer = ProfilePreparer(library_root=library, model_schema_path=schema, validator=validator)
+    preparer = make_preparer(tmp_path, validator)
     contribution_metadata = metadata(product_name="Hue test lamp")
     preview = preparer.prepare(artifacts, contribution_metadata)
 
@@ -88,18 +109,9 @@ def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_u
 
 
 def test_preparer_generates_new_manufacturer_manifest_without_adding_aliases(tmp_path: Path) -> None:
-    library = tmp_path / "profile_library"
-    schema = tmp_path / "model_schema.json"
     artifacts = tmp_path / "artifacts"
-    library.mkdir()
-    schema.write_text("{}", encoding="utf-8")
     write_profile_artifacts(artifacts)
-
-    preparer = ProfilePreparer(
-        library_root=library,
-        model_schema_path=schema,
-        validator=lambda _instance, _schema: None,
-    )
+    preparer = make_preparer(tmp_path)
 
     preview = preparer.prepare(artifacts, metadata("Acme"))
 
@@ -109,41 +121,25 @@ def test_preparer_generates_new_manufacturer_manifest_without_adding_aliases(tmp
 
 
 def test_preparer_allows_generated_linear_profile_without_csv(tmp_path: Path) -> None:
-    library = tmp_path / "profile_library"
-    schema = tmp_path / "model_schema.json"
     artifacts = tmp_path / "artifacts"
-    library.mkdir()
-    write_library(library)
-    schema.write_text("{}", encoding="utf-8")
+    write_library(tmp_path / "profile_library")
     artifacts.mkdir()
     (artifacts / "model.json").write_text(
         json.dumps({"name": "Speaker", "calculation_strategy": "linear"}),
         encoding="utf-8",
     )
 
-    preview = ProfilePreparer(
-        library_root=library,
-        model_schema_path=schema,
-        validator=lambda _instance, _schema: None,
-    ).prepare(artifacts, metadata(model_id="Speaker 1"))
+    preview = make_preparer(tmp_path).prepare(artifacts, metadata(model_id="Speaker 1"))
 
     assert [file.path for file in preview.files] == ["profile_library/signify/Speaker 1/model.json"]
 
 
 def test_preparer_blocks_collisions_and_warns_on_duplicates(tmp_path: Path) -> None:
-    library = tmp_path / "profile_library"
-    schema = tmp_path / "model_schema.json"
     artifacts = tmp_path / "artifacts"
-    library.mkdir()
-    write_library(library)
-    schema.write_text("{}", encoding="utf-8")
+    write_library(tmp_path / "profile_library")
     write_profile_artifacts(artifacts, name="Old lamp")
+    preparer = make_preparer(tmp_path)
 
-    preparer = ProfilePreparer(
-        library_root=library,
-        model_schema_path=schema,
-        validator=lambda _instance, _schema: None,
-    )
     preview = preparer.prepare(artifacts, metadata())
 
     assert preview.warnings == ("Possible duplicate profile: profile_library/signify/LCT010/model.json",)
@@ -153,33 +149,10 @@ def test_preparer_blocks_collisions_and_warns_on_duplicates(tmp_path: Path) -> N
 
 
 def test_preparer_uses_downloaded_library_index_for_aliases_and_collisions(tmp_path: Path) -> None:
-    library = tmp_path / "profile_library"
-    schema = tmp_path / "model_schema.json"
     artifacts = tmp_path / "artifacts"
-    library.mkdir()
-    schema.write_text("{}", encoding="utf-8")
-    (library / "library.json").write_text(
-        json.dumps(
-            {
-                "manufacturers": [
-                    {
-                        "name": "signify",
-                        "full_name": "Signify",
-                        "aliases": ["Philips"],
-                        "dir_name": "signify",
-                        "models": [{"id": "LCT010", "name": "Existing lamp", "aliases": ["Old lamp"]}],
-                    },
-                ],
-            },
-        ),
-        encoding="utf-8",
-    )
+    preparer = make_preparer(tmp_path)
+    write_library_index(tmp_path / "profile_library", full_name="Signify", model_aliases=["Old lamp"])
     write_profile_artifacts(artifacts)
-    preparer = ProfilePreparer(
-        library_root=library,
-        model_schema_path=schema,
-        validator=lambda _instance, _schema: None,
-    )
 
     preview = preparer.prepare(artifacts, metadata(model_id="LCT999"))
 
@@ -189,20 +162,12 @@ def test_preparer_uses_downloaded_library_index_for_aliases_and_collisions(tmp_p
 
 
 def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts(tmp_path: Path) -> None:
-    library = tmp_path / "profile_library"
-    schema = tmp_path / "model_schema.json"
     artifacts = tmp_path / "artifacts"
-    library.mkdir()
-    write_library(library)
-    schema.write_text("{}", encoding="utf-8")
+    write_library(tmp_path / "profile_library")
     write_profile_artifacts(artifacts)
     (artifacts / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
+    preparer = make_preparer(tmp_path)
 
-    preparer = ProfilePreparer(
-        library_root=library,
-        model_schema_path=schema,
-        validator=lambda _instance, _schema: None,
-    )
     preview = preparer.prepare(artifacts, metadata())
 
     assert [file.path for file in preview.files].count("profile_library/signify/LCT999/brightness.csv.gz") == 1
@@ -214,21 +179,13 @@ def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts
 
 
 def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None:
-    library = tmp_path / "profile_library"
-    schema = tmp_path / "model_schema.json"
     artifacts = tmp_path / "artifacts"
-    library.mkdir()
-    write_library(library)
-    schema.write_text("{}", encoding="utf-8")
+    write_library(tmp_path / "profile_library")
     write_profile_artifacts(artifacts)
     (artifacts / "brightness.csv.gz").unlink()
     raw_content = b"bri,watt\n1,1.0\n"
     (artifacts / "brightness.csv").write_bytes(raw_content)
-    preparer = ProfilePreparer(
-        library_root=library,
-        model_schema_path=schema,
-        validator=lambda _instance, _schema: None,
-    )
+    preparer = make_preparer(tmp_path)
 
     preview = preparer.prepare(artifacts, metadata())
     contents = dict(preparer.render_contents(artifacts, metadata(), preview))
@@ -237,32 +194,10 @@ def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None
 
 
 def test_preparer_blocks_case_insensitive_index_collisions(tmp_path: Path) -> None:
-    library = tmp_path / "profile_library"
-    schema = tmp_path / "model_schema.json"
     artifacts = tmp_path / "artifacts"
-    library.mkdir()
-    schema.write_text("{}", encoding="utf-8")
-    (library / "library.json").write_text(
-        json.dumps(
-            {
-                "manufacturers": [
-                    {
-                        "name": "signify",
-                        "aliases": ["Philips"],
-                        "dir_name": "signify",
-                        "models": [{"id": "LCT010", "name": "Existing lamp"}],
-                    },
-                ],
-            },
-        ),
-        encoding="utf-8",
-    )
+    preparer = make_preparer(tmp_path)
+    write_library_index(tmp_path / "profile_library")
     write_profile_artifacts(artifacts)
-    preparer = ProfilePreparer(
-        library_root=library,
-        model_schema_path=schema,
-        validator=lambda _instance, _schema: None,
-    )
 
     with pytest.raises(ProfilePreparationError, match="Refusing to overwrite"):
         preparer.prepare(artifacts, metadata(model_id="lct010"))
