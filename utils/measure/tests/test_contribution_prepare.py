@@ -23,14 +23,29 @@ def metadata(
     )
 
 
-def make_preparer(tmp_path: Path, validator: JsonValidator | None = None) -> ProfilePreparer:
-    """Preparer over ``tmp_path / "profile_library"`` with a permissive schema and no-op validator."""
+# The one manufacturer/model the library fixtures describe, whether they write it as
+# an on-disk profile tree (write_library) or as a downloaded index (write_library_index).
+EXISTING_DIRECTORY = "signify"
+EXISTING_MANUFACTURER = "Signify"
+EXISTING_ALIAS = "Philips"
+EXISTING_MODEL_ID = "LCT010"
+EXISTING_MODEL_NAME = "Existing lamp"
+EXISTING_MODEL_ALIAS = "Old lamp"
+
+
+def library_root(tmp_path: Path) -> Path:
+    """The profile library directory every fixture and preparer in this module shares."""
     library = tmp_path / "profile_library"
-    library.mkdir(exist_ok=True)
+    library.mkdir(parents=True, exist_ok=True)
+    return library
+
+
+def make_preparer(tmp_path: Path, validator: JsonValidator | None = None) -> ProfilePreparer:
+    """Preparer over ``library_root(tmp_path)`` with a permissive schema and no-op validator."""
     schema = tmp_path / "model_schema.json"
     schema.write_text("{}", encoding="utf-8")
     return ProfilePreparer(
-        library_root=library,
+        library_root=library_root(tmp_path),
         model_schema_path=schema,
         validator=validator or (lambda _instance, _schema: None),
     )
@@ -56,33 +71,41 @@ def write_profile_artifacts(path: Path, *, name: str = "New lamp") -> None:
         file.write("bri,watt\n1,1.0\n")
 
 
-def write_library(path: Path) -> None:
-    (path / "signify" / "LCT010").mkdir(parents=True)
-    (path / "signify" / "manufacturer.json").write_text(
-        json.dumps({"name": "Signify", "aliases": ["Philips"]}),
+def write_library(tmp_path: Path) -> None:
+    """Seed the existing profile as an on-disk library checkout."""
+    library = library_root(tmp_path)
+    profile = library / EXISTING_DIRECTORY / EXISTING_MODEL_ID
+    profile.mkdir(parents=True)
+    (library / EXISTING_DIRECTORY / "manufacturer.json").write_text(
+        json.dumps({"name": EXISTING_MANUFACTURER, "aliases": [EXISTING_ALIAS]}),
         encoding="utf-8",
     )
-    (path / "signify" / "LCT010" / "model.json").write_text(
-        json.dumps({"name": "Existing lamp", "aliases": ["Old lamp"]}),
+    (profile / "model.json").write_text(
+        json.dumps({"name": EXISTING_MODEL_NAME, "aliases": [EXISTING_MODEL_ALIAS]}),
         encoding="utf-8",
     )
 
 
-def write_library_index(path: Path, *, full_name: str | None = None, model_aliases: list[str] | None = None) -> None:
+def write_library_index(tmp_path: Path, *, full_name: bool = False, model_aliases: bool = False) -> None:
+    """Seed the same existing profile as a downloaded ``library.json`` index."""
+    model: dict[str, Any] = {"id": EXISTING_MODEL_ID, "name": EXISTING_MODEL_NAME}
+    if model_aliases:
+        model["aliases"] = [EXISTING_MODEL_ALIAS]
     manufacturer: dict[str, Any] = {
-        "name": "signify",
-        "aliases": ["Philips"],
-        "dir_name": "signify",
-        "models": [{"id": "LCT010", "name": "Existing lamp", **({"aliases": model_aliases} if model_aliases else {})}],
+        "name": EXISTING_DIRECTORY,
+        "aliases": [EXISTING_ALIAS],
+        "dir_name": EXISTING_DIRECTORY,
+        "models": [model],
     }
-    if full_name is not None:
-        manufacturer["full_name"] = full_name
-    (path / "library.json").write_text(json.dumps({"manufacturers": [manufacturer]}), encoding="utf-8")
+    if full_name:
+        manufacturer["full_name"] = EXISTING_MANUFACTURER
+    index = library_root(tmp_path) / "library.json"
+    index.write_text(json.dumps({"manufacturers": [manufacturer]}), encoding="utf-8")
 
 
 def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_unchanged(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
-    write_library(tmp_path / "profile_library")
+    write_library(tmp_path)
     write_profile_artifacts(artifacts)
     seen_model: dict[str, Any] = {}
 
@@ -122,7 +145,7 @@ def test_preparer_generates_new_manufacturer_manifest_without_adding_aliases(tmp
 
 def test_preparer_allows_generated_linear_profile_without_csv(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
-    write_library(tmp_path / "profile_library")
+    write_library(tmp_path)
     artifacts.mkdir()
     (artifacts / "model.json").write_text(
         json.dumps({"name": "Speaker", "calculation_strategy": "linear"}),
@@ -136,7 +159,7 @@ def test_preparer_allows_generated_linear_profile_without_csv(tmp_path: Path) ->
 
 def test_preparer_blocks_collisions_and_warns_on_duplicates(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
-    write_library(tmp_path / "profile_library")
+    write_library(tmp_path)
     write_profile_artifacts(artifacts, name="Old lamp")
     preparer = make_preparer(tmp_path)
 
@@ -150,9 +173,9 @@ def test_preparer_blocks_collisions_and_warns_on_duplicates(tmp_path: Path) -> N
 
 def test_preparer_uses_downloaded_library_index_for_aliases_and_collisions(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
-    preparer = make_preparer(tmp_path)
-    write_library_index(tmp_path / "profile_library", full_name="Signify", model_aliases=["Old lamp"])
+    write_library_index(tmp_path, full_name=True, model_aliases=True)
     write_profile_artifacts(artifacts)
+    preparer = make_preparer(tmp_path)
 
     preview = preparer.prepare(artifacts, metadata(model_id="LCT999"))
 
@@ -163,7 +186,7 @@ def test_preparer_uses_downloaded_library_index_for_aliases_and_collisions(tmp_p
 
 def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
-    write_library(tmp_path / "profile_library")
+    write_library(tmp_path)
     write_profile_artifacts(artifacts)
     (artifacts / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
     preparer = make_preparer(tmp_path)
@@ -180,7 +203,7 @@ def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts
 
 def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
-    write_library(tmp_path / "profile_library")
+    write_library(tmp_path)
     write_profile_artifacts(artifacts)
     (artifacts / "brightness.csv.gz").unlink()
     raw_content = b"bri,watt\n1,1.0\n"
@@ -195,9 +218,9 @@ def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None
 
 def test_preparer_blocks_case_insensitive_index_collisions(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
-    preparer = make_preparer(tmp_path)
-    write_library_index(tmp_path / "profile_library")
+    write_library_index(tmp_path)
     write_profile_artifacts(artifacts)
+    preparer = make_preparer(tmp_path)
 
     with pytest.raises(ProfilePreparationError, match="Refusing to overwrite"):
         preparer.prepare(artifacts, metadata(model_id="lct010"))

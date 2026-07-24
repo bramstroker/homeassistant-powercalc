@@ -20,17 +20,17 @@ GITHUB_LOGIN_URL = "https://github.com"
 REQUIRED_OAUTH_SCOPES = ("public_repo", "workflow")
 
 
-def granted_scopes(scopes: Sequence[str]) -> set[str]:
+def missing_required_scopes(scopes: Sequence[str]) -> set[str]:
+    """Required contribution scopes not covered by ``scopes``; empty when access suffices."""
+    return set(REQUIRED_OAUTH_SCOPES).difference(_granted_scopes(scopes))
+
+
+def _granted_scopes(scopes: Sequence[str]) -> set[str]:
     """The classic ``repo`` scope is a superset that implies ``public_repo``."""
     granted = set(scopes)
     if "repo" in granted:
         granted.add("public_repo")
     return granted
-
-
-def missing_required_scopes(scopes: Sequence[str]) -> set[str]:
-    """Required contribution scopes not covered by ``scopes``; empty when access suffices."""
-    return set(REQUIRED_OAUTH_SCOPES).difference(granted_scopes(scopes))
 
 
 class GitHubResponse(Protocol):
@@ -56,8 +56,6 @@ class GitHubTransport(Protocol):
 @dataclass(frozen=True)
 class GitHubUser:
     login: str
-    name: str | None = None
-    email: str | None = None
     scopes: tuple[str, ...] = ()
     scopes_reported: bool = False
 
@@ -138,8 +136,6 @@ class GitHubClient:
         scopes = tuple(scope.strip() for scope in scope_header.split(",") if scope.strip())
         return GitHubUser(
             login=str(data["login"]),
-            name=data.get("name"),
-            email=data.get("email"),
             scopes=scopes,
             scopes_reported="X-OAuth-Scopes" in headers,
         )

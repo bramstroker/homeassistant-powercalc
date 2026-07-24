@@ -88,15 +88,15 @@ class ContributionApiCoordinator:
 
     def start_device_flow(self) -> DeviceFlowStartResponse:
         client_id = self._require_oauth_client_id()
-        response = self._service_factory().start_device_flow(client_id)
+        start = self._service_factory().start_device_flow(client_id)
         flow_id = uuid4().hex
         with self._lock:
             self._prune_device_flows()
             self._device_flows[flow_id] = _DeviceFlow(
-                device_code=response.device_code,
-                expires_at=time.monotonic() + response.expires_in,
+                device_code=start.device_code,
+                expires_at=time.monotonic() + start.expires_in,
             )
-        return response.model_copy(update={"flow_id": flow_id})
+        return start.with_flow_id(flow_id)
 
     def poll_device_flow(self, flow_id: str) -> DeviceFlowPollResponse:
         client_id = self._require_oauth_client_id()

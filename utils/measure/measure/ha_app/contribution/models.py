@@ -76,8 +76,13 @@ class ConnectPatRequest(BaseModel):
     token: SecretStr = Field(min_length=1)
 
 
-class DeviceFlowStartResponse(BaseModel):
-    flow_id: str | None = None
+class DeviceFlowStart(BaseModel):
+    """What GitHub returns when a device flow starts, before the app assigns a public flow id.
+
+    ``device_code`` is the secret used to poll for the token; it is excluded from
+    serialization so it can never reach a client.
+    """
+
     device_code: str = Field(exclude=True)
     user_code: str
     verification_uri: str
@@ -85,6 +90,15 @@ class DeviceFlowStartResponse(BaseModel):
     expires_in: int
     interval: int
     message: str
+
+    def with_flow_id(self, flow_id: str) -> DeviceFlowStartResponse:
+        """Attach the app-assigned flow id clients poll with."""
+        # vars() rather than model_dump(): the latter drops the excluded device_code.
+        return DeviceFlowStartResponse(flow_id=flow_id, **vars(self))
+
+
+class DeviceFlowStartResponse(DeviceFlowStart):
+    flow_id: str
 
 
 class DeviceFlowPollResponse(BaseModel):
@@ -165,7 +179,7 @@ class ContributionService(Protocol):
 
     def disconnect(self) -> ContributionAuthStatus: ...
 
-    def start_device_flow(self, client_id: str) -> DeviceFlowStartResponse: ...
+    def start_device_flow(self, client_id: str) -> DeviceFlowStart: ...
 
     def poll_device_flow(self, client_id: str, device_code: str) -> DeviceFlowPollResponse: ...
 

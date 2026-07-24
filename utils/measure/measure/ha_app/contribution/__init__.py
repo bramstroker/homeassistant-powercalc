@@ -26,6 +26,7 @@ from measure.ha_app.contribution.models import (
     ContributionSubmissionResult,
     ContributionSubmitRequest,
     DeviceFlowPollResponse,
+    DeviceFlowStart,
     DeviceFlowStartResponse,
 )
 from measure.ha_app.contribution.service import SharedContributionService, create_contribution_service
@@ -49,6 +50,7 @@ __all__ = [
     "ContributionSubmissionResult",
     "ContributionSubmitRequest",
     "DeviceFlowPollResponse",
+    "DeviceFlowStart",
     "DeviceFlowStartResponse",
     "SharedContributionService",
     "create_contribution_service",

@@ -25,7 +25,7 @@ from measure.ha_app.contribution import (
     ContributionService,
     ContributionSubmissionResult,
     DeviceFlowPollResponse,
-    DeviceFlowStartResponse,
+    DeviceFlowStart,
     SharedContributionService,
 )
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
@@ -226,8 +226,8 @@ class FakeContributionService(ContributionService):
         self.username = None
         return ContributionAuthStatus(authenticated=False)
 
-    def start_device_flow(self, client_id: str) -> DeviceFlowStartResponse:
-        return DeviceFlowStartResponse(
+    def start_device_flow(self, client_id: str) -> DeviceFlowStart:
+        return DeviceFlowStart(
             device_code=f"{client_id}-device",
             user_code="ABCD-EFGH",
             verification_uri="https://github.com/login/device",
@@ -852,6 +852,24 @@ def test_contribution_pat_rejects_reported_insufficient_scope(tmp_path: Path) ->
         pytest.raises(ContributionApiError, match="must grant public repository and workflow access"),
     ):
         SharedContributionService(tmp_path).connect_pat(SecretStr("github_pat_test"))
+
+
+def test_contribution_device_flow_records_granted_scopes_without_claiming_verified(tmp_path: Path) -> None:
+    github = MagicMock()
+    github.poll_device_flow.return_value = {"access_token": "gho_test", "scope": "public_repo"}
+    github.fetch_authenticated_user.return_value = GitHubUser(
+        login="oauth-user",
+        scopes=("public_repo",),
+        scopes_reported=True,
+    )
+    with patch("measure.ha_app.contribution.service.GitHubClient", return_value=github):
+        service = SharedContributionService(tmp_path)
+        polled = service.poll_device_flow("client-id", "device-code")
+        status = service.auth_status()
+
+    assert polled.status == "authorized"
+    assert status.scopes == ["public_repo"]
+    assert status.permissions_verified is False
 
 
 def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

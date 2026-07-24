@@ -48,7 +48,7 @@ from measure.ha_app.contribution.models import (
     ContributionService,
     ContributionSubmissionResult,
     DeviceFlowPollResponse,
-    DeviceFlowStartResponse,
+    DeviceFlowStart,
 )
 from measure.request import MeasurementRequest
 
@@ -100,16 +100,13 @@ class SharedContributionService:
         self._credential_store.clear()
         return self.auth_status()
 
-    def start_device_flow(self, client_id: str) -> DeviceFlowStartResponse:
+    def start_device_flow(self, client_id: str) -> DeviceFlowStart:
         try:
             data = GitHubClient().start_device_flow(client_id, REQUIRED_OAUTH_SCOPES)
         except GitHubApiError as error:
             raise ContributionApiError(ContributionApiErrorCode.AUTH_UNAVAILABLE, str(error)) from error
         complete_uri = data.get("verification_uri_complete")
-        # flow_id is assigned by the API coordinator; the device code must never
-        # reach clients (only the excluded device_code field may carry it).
-        return DeviceFlowStartResponse(
-            flow_id=None,
+        return DeviceFlowStart(
             device_code=str(data["device_code"]),
             user_code=str(data["user_code"]),
             verification_uri=str(data["verification_uri"]),
@@ -146,13 +143,16 @@ class SharedContributionService:
         except GitHubApiError as auth_error:
             raise ContributionApiError(ContributionApiErrorCode.AUTH_UNAVAILABLE, str(auth_error)) from auth_error
         response_scopes = tuple(scope for scope in str(data.get("scope", "")).split() if scope)
+        # Record what GitHub actually granted. Claiming the required scopes here would
+        # mark the credential verified while submission later fails on a missing scope.
+        granted = user.scopes or response_scopes
         self._credential_store.save(
             StoredCredential(
                 kind="oauth",
                 token=token,
                 github_username=user.login,
-                scopes=user.scopes or response_scopes or REQUIRED_OAUTH_SCOPES,
-                permissions_verified=True,
+                scopes=granted,
+                permissions_verified=not missing_required_scopes(granted),
             ),
         )
         return DeviceFlowPollResponse(status="authorized", auth=self.auth_status())
