@@ -25,6 +25,13 @@ class ContributionAuthMethod(StrEnum):
 
 
 class ContributionState(StrEnum):
+    """UI-facing contribution state, one per app install, persisted by ``SessionStorage``.
+
+    Tracks where the user is in the preview/submit flow. The per-job source of truth
+    is ``measure.contribution.models.ContributionJobStatus``; this state adds the
+    app-only ``IDLE``/``PREVIEW_READY`` phases and drives the frontend.
+    """
+
     IDLE = "idle"
     PREVIEW_READY = "preview_ready"
     SUBMITTING = "submitting"
@@ -113,15 +120,12 @@ class ContributionSubmitRequest(ContributionPreviewRequest):
 
 class ContributionPreviewResponse(BaseModel):
     session_id: str
-    title: str
-    body: str
     eligible: bool
     reason: str | None = None
     repository: str = f"{UPSTREAM_OWNER}/{UPSTREAM_REPO}"
     fork_repository: str | None = None
     base_branch: str = UPSTREAM_BRANCH
     base_sha: str | None = None
-    default_branch: str | None = UPSTREAM_BRANCH
     manufacturer_name: str
     manufacturer_directory: str
     model_id: str
@@ -136,13 +140,12 @@ class ContributionPreviewResponse(BaseModel):
     pr_title: str
     pr_body: str
     branch_name: str
-    metadata: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
+    job_id: str | None = None
     warnings: list[str] = Field(default_factory=list)
 
 
 class ContributionSubmissionResult(BaseModel):
     status: Literal["success", "failed", "pending"] = "success"
-    url: str | None = None
     pull_request_url: str | None = None
     repository: str = f"{UPSTREAM_OWNER}/{UPSTREAM_REPO}"
     branch_name: str | None = None

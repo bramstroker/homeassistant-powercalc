@@ -117,9 +117,9 @@ class GitHubClient:
             accept_json=True,
         )
 
-    def validate_user(self) -> GitHubUser:
-        response = self._raw("GET", f"{self.api_base_url}/user")
-        data = self._decode_response(response)
+    def fetch_authenticated_user(self) -> GitHubUser:
+        response = self._send("GET", f"{self.api_base_url}/user")
+        data = self._decode_object(response)
         headers = response.headers
         scope_header = headers.get("X-OAuth-Scopes", "")
         scopes = tuple(scope.strip() for scope in scope_header.split(",") if scope.strip())
@@ -132,10 +132,10 @@ class GitHubClient:
         )
 
     def get_repository(self, owner: str, repo: str) -> dict[str, Any] | None:
-        response = self._raw("GET", f"{self.api_base_url}/repos/{owner}/{repo}")
+        response = self._send("GET", f"{self.api_base_url}/repos/{owner}/{repo}")
         if response.status_code == 404:
             return None
-        return self._decode_response(response)
+        return self._decode_object(response)
 
     def find_fork(self, username: str, repo: str | None = None) -> dict[str, Any] | None:
         repo = repo or self.repository.name
@@ -149,7 +149,7 @@ class GitHubClient:
 
     def create_fork(self, *, poll_attempts: int = 60, poll_interval: float = 2.0) -> dict[str, Any]:
         self._request("POST", f"{self.api_base_url}/repos/{self.repository.full_name}/forks")
-        user = self.validate_user()
+        user = self.fetch_authenticated_user()
         for _ in range(poll_attempts):
             repository = self.find_fork(user.login)
             if (
@@ -191,10 +191,10 @@ class GitHubClient:
             raise GitHubApiError(f"GitHub returned invalid base64 content for {path}") from error
 
     def get_ref(self, owner: str, repo: str, branch: str) -> dict[str, Any] | None:
-        response = self._raw("GET", f"{self.api_base_url}/repos/{owner}/{repo}/git/ref/heads/{branch}")
+        response = self._send("GET", f"{self.api_base_url}/repos/{owner}/{repo}/git/ref/heads/{branch}")
         if response.status_code == 404:
             return None
-        return self._decode_response(response)
+        return self._decode_object(response)
 
     def get_commit(self, owner: str, repo: str, sha: str) -> dict[str, Any]:
         return self._request("GET", f"{self.api_base_url}/repos/{owner}/{repo}/git/commits/{sha}")
@@ -206,7 +206,7 @@ class GitHubClient:
         the upstream objects. The coordinator creates its commit directly on the
         upstream parent, so the merge result itself is intentionally discarded.
         """
-        response = self._raw(
+        response = self._send(
             "POST",
             f"{self.api_base_url}/repos/{owner}/{repo}/merge-upstream",
             json={"branch": branch},
@@ -220,7 +220,7 @@ class GitHubClient:
             if message == "There are merge conflicts":
                 return
         try:
-            self._decode_response(response)
+            self._decode_object(response)
         except GitHubApiError as error:
             raise GitHubApiError(
                 f"GitHub could not fetch upstream into contribution branch {branch}: {error}",
@@ -288,7 +288,7 @@ class GitHubClient:
         )
 
     def find_pull_request(self, owner: str, repo: str, *, head: str, base: str) -> dict[str, Any] | None:
-        response = self._raw(
+        response = self._send(
             "GET",
             f"{self.api_base_url}/repos/{owner}/{repo}/pulls",
             params={"state": "open", "head": head, "base": base},
@@ -306,7 +306,7 @@ class GitHubClient:
         authenticated: bool = True,
         accept_json: bool = False,
     ) -> dict[str, Any]:
-        response = self._raw(
+        response = self._send(
             method,
             url,
             json=json,
@@ -314,9 +314,9 @@ class GitHubClient:
             authenticated=authenticated,
             accept_json=accept_json,
         )
-        return self._decode_response(response)
+        return self._decode_object(response)
 
-    def _raw(
+    def _send(
         self,
         method: str,
         url: str,
@@ -336,7 +336,7 @@ class GitHubClient:
         return self.transport.request(method, url, headers=headers, json=json, params=params, timeout=30)
 
     @classmethod
-    def _decode_response(cls, response: GitHubResponse) -> dict[str, Any]:
+    def _decode_object(cls, response: GitHubResponse) -> dict[str, Any]:
         data = cls._decode_json(response)
         if not isinstance(data, dict):
             raise GitHubApiError("GitHub response must be an object")

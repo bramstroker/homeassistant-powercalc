@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from measure.contribution.coordinator import (
-    ContributionCoordinator,
+    ContributionJobCoordinator,
     ContributionJobExpiredError,
     ContributionJobStore,
 )
@@ -22,10 +22,10 @@ from measure.contribution.prepare import ProfilePreparer
 
 __all__ = [
     "ContributionAuthor",
-    "ContributionCoordinator",
     "ContributionError",
     "ContributionErrorCode",
     "ContributionJob",
+    "ContributionJobCoordinator",
     "ContributionJobExpiredError",
     "ContributionJobStatus",
     "ContributionJobStore",

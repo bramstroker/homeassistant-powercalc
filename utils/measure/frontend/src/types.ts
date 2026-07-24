@@ -314,7 +314,6 @@ export interface ContributionDraft {
   fork_repository?: string | null;
   base_branch: string;
   base_sha?: string | null;
-  default_branch?: string | null;
   manufacturer_name: string;
   manufacturer_directory: string;
   model_id: string;
@@ -329,6 +328,7 @@ export interface ContributionDraft {
   pr_title: string;
   pr_body: string;
   branch_name: string;
+  job_id?: string | null;
 }
 
 export interface ContributionPreviewRequest {

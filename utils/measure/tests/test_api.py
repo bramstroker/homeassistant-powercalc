@@ -262,8 +262,6 @@ class FakeContributionService(ContributionService):
         assert payload is not None
         return ContributionPreviewResponse(
             session_id=session_id,
-            title=f"Add {request.product_name}",
-            body=f"Model {request.model_id}",
             eligible=True,
             manufacturer_name=payload.manufacturer_name,
             manufacturer_directory=payload.manufacturer_directory or "signify",
@@ -282,7 +280,7 @@ class FakeContributionService(ContributionService):
             pr_title="Add signify LCT010 power profile",
             pr_body="Body",
             branch_name="powercalc-profile-signify-lct010",
-            metadata={"model_id": request.model_id, "job_id": "job-1"},
+            job_id="job-1",
         )
 
     def submit(
@@ -294,7 +292,10 @@ class FakeContributionService(ContributionService):
         del preview, artifact_root
         self.submit_calls += 1
         time.sleep(0.05)
-        return ContributionSubmissionResult(url="https://github.com/example/pull/1", message="Contribution submitted")
+        return ContributionSubmissionResult(
+            pull_request_url="https://github.com/example/pull/1",
+            message="Contribution submitted",
+        )
 
 
 def payload() -> dict[str, object]:
@@ -841,7 +842,7 @@ def test_contribution_device_flow_reports_configuration_and_uses_injected_servic
 
 def test_contribution_pat_rejects_reported_insufficient_scope(tmp_path: Path) -> None:
     github = MagicMock()
-    github.validate_user.return_value = GitHubUser(
+    github.fetch_authenticated_user.return_value = GitHubUser(
         login="measure-user",
         scopes=("read:user",),
         scopes_reported=True,
@@ -891,7 +892,7 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
         },
     )
     assert preview.status_code == 200
-    assert preview.json()["title"] == "Add Test light"
+    assert preview.json()["pr_title"] == "Add signify LCT010 power profile"
     assert preview.json()["files"][0]["path"] == "profile_library/signify/LCT010/model.json"
     assert preview.json()["notes"] == "No aliases."
     assert service.preview_calls == 1

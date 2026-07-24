@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 import json
 from pathlib import Path
 import shutil
@@ -8,14 +9,9 @@ from typing import Any
 from pydantic import SecretStr, ValidationError
 
 from measure.contribution.coordinator import (
-    ContributionCoordinator as ProfileContributionCoordinator,
+    ContributionJobCoordinator,
     ContributionJobExpiredError,
     ContributionJobStore,
-    conventional_commit_message,
-    deterministic_branch,
-    human_pull_request_title,
-    profile_pull_request_body,
-    pull_request_body,
 )
 from measure.contribution.credentials import CredentialStore, StoredCredential
 from measure.contribution.github import (
@@ -29,6 +25,13 @@ from measure.contribution.models import (
     ContributionJob,
     ContributionMetadata,
     ContributionPreview as ProfileContributionPreview,
+)
+from measure.contribution.pr_text import (
+    conventional_commit_message,
+    deterministic_branch_name,
+    profile_pull_request_body,
+    pull_request_body,
+    pull_request_title,
 )
 from measure.contribution.prepare import ProfilePreparationError, ProfilePreparer
 from measure.ha_app.contribution.models import (
@@ -72,7 +75,7 @@ class SharedContributionService:
     def connect_pat(self, token: SecretStr) -> ContributionAuthStatus:
         raw_token = token.get_secret_value()
         try:
-            user = GitHubClient(raw_token).validate_user()
+            user = GitHubClient(raw_token).fetch_authenticated_user()
         except GitHubApiError as error:
             raise ContributionApiError(ContributionApiErrorCode.AUTH_UNAVAILABLE, str(error)) from error
         repository_access_granted = bool({"repo", "public_repo"}.intersection(user.scopes))
@@ -103,14 +106,13 @@ class SharedContributionService:
         except GitHubApiError as error:
             raise ContributionApiError(ContributionApiErrorCode.AUTH_UNAVAILABLE, str(error)) from error
         device_code = str(data["device_code"])
+        complete_uri = data.get("verification_uri_complete")
         return DeviceFlowStartResponse(
             flow_id=device_code,
             device_code=device_code,
             user_code=str(data["user_code"]),
             verification_uri=str(data["verification_uri"]),
-            verification_uri_complete=str(data["verification_uri_complete"])
-            if data.get("verification_uri_complete") is not None
-            else None,
+            verification_uri_complete=str(complete_uri) if complete_uri is not None else None,
             expires_in=int(data["expires_in"]),
             interval=int(data["interval"]),
             message=f"Enter code {data['user_code']} at {data['verification_uri']}",
@@ -139,7 +141,7 @@ class SharedContributionService:
                 "GitHub Device Flow did not return an access token",
             )
         try:
-            user = GitHubClient(token).validate_user()
+            user = GitHubClient(token).fetch_authenticated_user()
         except GitHubApiError as auth_error:
             raise ContributionApiError(ContributionApiErrorCode.AUTH_UNAVAILABLE, str(auth_error)) from auth_error
         response_scopes = tuple(scope for scope in str(data.get("scope", "")).split() if scope)
@@ -162,29 +164,13 @@ class SharedContributionService:
         artifact_root: Path,
         payload: ContributionPreviewRequest | None,
     ) -> ContributionPreviewResponse:
-        credential = self._credential_store.load()
-        if credential is None:
-            raise ContributionApiError(
-                ContributionApiErrorCode.AUTH_UNAVAILABLE,
-                "Connect GitHub before building a contribution preview",
-            )
-        client = GitHubClient(credential.token)
-        try:
-            preparer, base_sha = self._reference_preparer(client)
-        except GitHubApiError as error:
-            raise ContributionApiError(ContributionApiErrorCode.SUBMISSION_FAILED, str(error)) from error
-        coordinator = ProfileContributionCoordinator(
-            preparer=preparer,
-            credential_store=self._credential_store,
-            job_store=self._job_store,
-            github_client=client,
-        )
+        credential, client, preparer, base_sha = self._load_github_context("building a contribution preview")
         metadata = _metadata_from_request(request, payload, self.auth_status())
         try:
-            job = coordinator.create_job(artifact_root, metadata, base_sha=base_sha)
+            job = self._build_coordinator(preparer, client).create_job(artifact_root, metadata, base_sha=base_sha)
         except ProfilePreparationError as error:
             raise ContributionApiError(ContributionApiErrorCode.ARTIFACTS_REQUIRED, str(error)) from error
-        contents = preparer.prepared_contents(artifact_root, metadata, job.preview)
+        contents = preparer.render_contents(artifact_root, metadata, job.preview)
         return _preview_from_job(
             session_id=session_id,
             request=request,
@@ -202,23 +188,13 @@ class SharedContributionService:
         preview: ContributionPreviewResponse,
         artifact_root: Path,
     ) -> ContributionSubmissionResult:
-        job_id = preview.metadata.get("job_id")
-        if not isinstance(job_id, str) or not job_id:
+        job_id = preview.job_id
+        if not job_id:
             raise ContributionApiError(
                 ContributionApiErrorCode.PREVIEW_REQUIRED,
                 "Preview the current session before submitting it",
             )
-        credential = self._credential_store.load()
-        if credential is None:
-            raise ContributionApiError(
-                ContributionApiErrorCode.AUTH_UNAVAILABLE,
-                "Connect GitHub before submitting a contribution",
-            )
-        client = GitHubClient(credential.token)
-        try:
-            preparer, base_sha = self._reference_preparer(client)
-        except GitHubApiError as error:
-            raise ContributionApiError(ContributionApiErrorCode.SUBMISSION_FAILED, str(error)) from error
+        _credential, client, preparer, base_sha = self._load_github_context("submitting a contribution")
         try:
             job_before_submit = self._job_store.load(job_id)
         except KeyError:
@@ -231,14 +207,8 @@ class SharedContributionService:
         except ProfilePreparationError as error:
             raise ContributionApiError(ContributionApiErrorCode.ARTIFACTS_REQUIRED, str(error)) from error
         _validate_latest_preview(job_before_submit, latest_preview, base_sha)
-        coordinator = ProfileContributionCoordinator(
-            preparer=preparer,
-            credential_store=self._credential_store,
-            job_store=self._job_store,
-            github_client=client,
-        )
         try:
-            job = coordinator.submit(job_id, artifact_root)
+            job = self._build_coordinator(preparer, client).submit(job_id, artifact_root)
         except ContributionJobExpiredError as error:
             raise ContributionApiError(ContributionApiErrorCode.PREVIEW_REQUIRED, str(error)) from error
         if job.error is not None:
@@ -249,14 +219,33 @@ class SharedContributionService:
                 "Contribution submission did not return a pull request",
             )
         return ContributionSubmissionResult(
-            url=job.submission.pull_request_url,
             pull_request_url=job.submission.pull_request_url,
             repository=client.repository.full_name,
             branch_name=job.submission.branch,
             message="Contribution submitted",
         )
 
-    def _reference_preparer(self, client: GitHubClient) -> tuple[ProfilePreparer, str]:
+    def _load_github_context(self, action: str) -> tuple[StoredCredential, GitHubClient, ProfilePreparer, str]:
+        """Load the stored credential and build a preparer pinned to the current upstream sha."""
+        credential = self._credential_store.load()
+        if credential is None:
+            raise ContributionApiError(ContributionApiErrorCode.AUTH_UNAVAILABLE, f"Connect GitHub before {action}")
+        client = GitHubClient(credential.token)
+        try:
+            preparer, base_sha = self._build_reference_preparer(client)
+        except GitHubApiError as error:
+            raise ContributionApiError(ContributionApiErrorCode.SUBMISSION_FAILED, str(error)) from error
+        return credential, client, preparer, base_sha
+
+    def _build_coordinator(self, preparer: ProfilePreparer, client: GitHubClient) -> ContributionJobCoordinator:
+        return ContributionJobCoordinator(
+            preparer=preparer,
+            credential_store=self._credential_store,
+            job_store=self._job_store,
+            github_client=client,
+        )
+
+    def _build_reference_preparer(self, client: GitHubClient) -> tuple[ProfilePreparer, str]:
         repository = client.repository
         base_ref = client.get_ref(repository.owner, repository.name, repository.branch)
         if base_ref is None:
@@ -300,19 +289,29 @@ def _metadata_from_request(
             ContributionApiErrorCode.AUTH_UNAVAILABLE,
             "Connected GitHub account has no username",
         )
-    contributor = payload.contributor if payload is not None else auth.username or "Powercalc user"
-    manufacturer = payload.manufacturer_name if payload is not None else "Unknown"
-    model_id = payload.model_id if payload is not None else request.model_id
-    manufacturer_directory = payload.manufacturer_directory if payload is not None else None
+    if payload is not None:
+        manufacturer = payload.manufacturer_name
+        manufacturer_directory = payload.manufacturer_directory or None
+        model_id = payload.model_id
+        product_name: str | None = payload.product_name
+        contributor = payload.contributor
+        notes = payload.notes
+    else:
+        manufacturer = "Unknown"
+        manufacturer_directory = None
+        model_id = request.model_id
+        product_name = request.product_name
+        contributor = github_username
+        notes = ""
     try:
         return ContributionMetadata(
             manufacturer=manufacturer,
-            manufacturer_directory=manufacturer_directory or None,
+            manufacturer_directory=manufacturer_directory,
             model_id=model_id,
-            product_name=payload.product_name if payload is not None else request.product_name,
+            product_name=product_name,
             measure_type=request.measure_type.value,
             measure_device=request.measure_device,
-            notes=payload.notes if payload is not None else "",
+            notes=notes,
             author=ContributionAuthor(name=contributor, github=github_username),
         )
     except ValidationError as error:
@@ -326,30 +325,68 @@ def _validation_message(error: ValidationError) -> str:
     return f"Contribution details are invalid — {issues}"
 
 
-def _draft_from_request(
+@dataclass(frozen=True)
+class _PreviewContent:
+    """The preview fields that differ between a placeholder draft and a prepared job."""
+
+    manufacturer_name: str
+    manufacturer_directory: str
+    model_id: str
+    product_name: str
+    contributor: str
+    commit_message: str
+    pr_title: str
+    pr_body: str
+    branch_name: str
+    job_id: str | None
+    warnings: list[str]
+
+
+def draft_from_request(
     *,
     session_id: str,
     request: MeasurementRequest,
     artifact_root: Path,
     auth: ContributionAuthStatus,
 ) -> ContributionPreviewResponse:
-    files = _draft_files(artifact_root)
+    """Build a placeholder preview, before a contribution job exists."""
+    files = _list_draft_files(artifact_root)
     supported = request.measure_type in SUPPORTED_MEASURE_TYPES
     has_model = artifact_root.is_dir() and any(Path(file.path).name == "model.json" for file in files)
-    eligible = supported and has_model
     if not supported:
         reason = "Automatic contribution is available for light, speaker, fan, and charging profiles"
     elif not has_model:
         reason = "Contribution requires a generated model.json artifact"
     else:
         reason = None
-    return _preview_response(
+    content = _PreviewContent(
+        manufacturer_name="",
+        manufacturer_directory="",
+        model_id=request.model_id,
+        product_name=request.product_name,
+        contributor=auth.username or "",
+        commit_message=f"feat(profile): add {request.model_id}",
+        pr_title=f"Add {request.model_id} power profile",
+        pr_body=profile_pull_request_body(
+            manufacturer="Unknown",
+            model_id=request.model_id,
+            product_name=request.product_name,
+            measure_device=request.measure_device,
+            measure_type=request.measure_type.value,
+            notes="",
+            file_paths=[file.path for file in files],
+        ),
+        branch_name="",
+        job_id=None,
+        warnings=[],
+    )
+    return _build_preview_response(
         session_id=session_id,
         request=request,
         files=files,
-        eligible=eligible,
+        eligible=reason is None,
         reason=reason,
-        contributor=auth.username or "",
+        content=content,
     )
 
 
@@ -365,13 +402,26 @@ def _preview_from_job(
     repository: GitHubRepository,
 ) -> ContributionPreviewResponse:
     content_by_path = dict(contents)
-    return _preview_response(
+    content = _PreviewContent(
+        manufacturer_name=job.metadata.manufacturer,
+        manufacturer_directory=job.preview.manufacturer_directory,
+        model_id=job.metadata.model_id,
+        product_name=job.metadata.product_name or request.product_name,
+        contributor=job.metadata.author.name,
+        commit_message=conventional_commit_message(job.preview),
+        pr_title=pull_request_title(job.preview),
+        pr_body=pull_request_body(job),
+        branch_name=deterministic_branch_name(job.preview),
+        job_id=job.id,
+        warnings=list(job.preview.warnings),
+    )
+    return _build_preview_response(
         session_id=session_id,
         request=request,
-        files=[_preview_file(file.path, content_by_path[file.path]) for file in job.preview.files],
+        files=[_build_preview_file(file.path, content_by_path[file.path]) for file in job.preview.files],
         eligible=True,
         reason=None,
-        job=job,
+        content=content,
         notes=notes,
         base_sha=base_sha,
         fork_owner=fork_owner,
@@ -379,60 +429,27 @@ def _preview_from_job(
     )
 
 
-def _preview_response(
+def _build_preview_response(
     *,
     session_id: str,
     request: MeasurementRequest,
     files: list[ContributionFile],
     eligible: bool,
     reason: str | None,
-    job: ContributionJob | None = None,
-    contributor: str = "",
+    content: _PreviewContent,
     notes: str = "",
     base_sha: str | None = None,
     fork_owner: str | None = None,
     repository: GitHubRepository | None = None,
 ) -> ContributionPreviewResponse:
     repository = repository or GitHubRepository.from_environment()
-    if job is not None:
-        manufacturer_name = job.metadata.manufacturer
-        manufacturer_directory = job.preview.manufacturer_directory
-        model_id = job.metadata.model_id
-        product_name = job.metadata.product_name or request.product_name
-        contributor = job.metadata.author.name
-        warnings = list(job.preview.warnings)
-        commit_message = conventional_commit_message(job.preview)
-        pr_title = human_pull_request_title(job.preview)
-        pr_body = pull_request_body(job)
-        branch_name = deterministic_branch(job.preview)
-        job_id: str | None = job.id
-    else:
-        manufacturer_name = ""
-        manufacturer_directory = ""
-        model_id = request.model_id
-        product_name = request.product_name
-        warnings = []
-        subject = " ".join(part for part in (manufacturer_directory, model_id) if part)
-        commit_message = f"feat(profile): add {subject}"
-        pr_title = f"Add {subject} power profile"
-        pr_body = profile_pull_request_body(
-            manufacturer=manufacturer_name or "Unknown",
-            model_id=model_id,
-            product_name=product_name,
-            measure_device=request.measure_device,
-            measure_type=request.measure_type.value,
-            notes=notes,
-            file_paths=[file.path for file in files],
-        )
-        branch_name = ""
-        job_id = None
     controller = request.controller
     controller_data = controller.model_dump(mode="json") if controller is not None else {}
     controlled_entity = controller_data.get("entity_id")
     device_info: dict[str, str | int | float | bool | None] = {
-        "manufacturer": manufacturer_name,
-        "model_id": model_id,
-        "product_name": product_name,
+        "manufacturer": content.manufacturer_name,
+        "model_id": content.model_id,
+        "product_name": content.product_name,
         "measure_device": request.measure_device,
     }
     home_assistant_info: dict[str, str | int | float | bool | None] = {
@@ -441,45 +458,35 @@ def _preview_response(
     }
     return ContributionPreviewResponse(
         session_id=session_id,
-        title=pr_title,
-        body=pr_body,
         eligible=eligible,
         reason=reason,
         repository=repository.full_name,
         fork_repository=f"{fork_owner}/{repository.name}" if fork_owner else None,
         base_branch=repository.branch,
-        default_branch=repository.branch,
         base_sha=base_sha,
-        manufacturer_name=manufacturer_name,
-        manufacturer_directory=manufacturer_directory,
-        model_id=model_id,
-        product_name=product_name,
-        contributor=contributor,
+        manufacturer_name=content.manufacturer_name,
+        manufacturer_directory=content.manufacturer_directory,
+        model_id=content.model_id,
+        product_name=content.product_name,
+        contributor=content.contributor,
         device_info=device_info,
         home_assistant=home_assistant_info,
         notes=notes,
         files=files,
-        commit_message=commit_message,
-        pr_title=pr_title,
-        pr_body=pr_body,
-        branch_name=branch_name,
+        commit_message=content.commit_message,
+        pr_title=content.pr_title,
+        pr_body=content.pr_body,
+        branch_name=content.branch_name,
+        job_id=content.job_id,
         model_json=next(
             (file.rendered_json for file in files if Path(file.path).name == "model.json"),
             None,
         ),
-        metadata={
-            "job_id": job_id,
-            "base_sha": base_sha,
-            "measure_type": request.measure_type.value,
-            "model_id": model_id,
-            "product_name": product_name,
-            "measure_device": request.measure_device,
-        },
-        warnings=warnings,
+        warnings=content.warnings,
     )
 
 
-def _draft_files(artifact_root: Path) -> list[ContributionFile]:
+def _list_draft_files(artifact_root: Path) -> list[ContributionFile]:
     if not artifact_root.is_dir():
         return []
     return [
@@ -489,7 +496,7 @@ def _draft_files(artifact_root: Path) -> list[ContributionFile]:
     ]
 
 
-def _preview_file(path: str, content: bytes) -> ContributionFile:
+def _build_preview_file(path: str, content: bytes) -> ContributionFile:
     rendered_json: Any | None = None
     text: str | None = None
     if path.endswith(".json"):

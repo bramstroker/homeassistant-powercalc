@@ -10,6 +10,7 @@ from uuid import uuid4
 
 from pydantic import SecretStr
 
+from measure.clock import utc_now
 from measure.ha_app.contribution.models import (
     SUPPORTED_MEASURE_TYPES,
     ContributionApiError,
@@ -25,8 +26,8 @@ from measure.ha_app.contribution.models import (
     DeviceFlowPollResponse,
     DeviceFlowStartResponse,
 )
-from measure.ha_app.contribution.service import _draft_from_request, create_contribution_service
-from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionSnapshot, SessionState, utc_now
+from measure.ha_app.contribution.service import create_contribution_service, draft_from_request
+from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.request import MeasurementRequest
 
@@ -41,6 +42,15 @@ class _DeviceFlow:
 
 
 class ContributionApiCoordinator:
+    """API-facing orchestration of the contribution flow for one app install.
+
+    Locking: ``_lock`` protects ``_status`` and ``_device_flows``. Helpers whose
+    docstring says so (``_prune_device_flows``) must be called with the lock held;
+    every other method acquires it itself. ``submit`` deliberately releases the
+    lock while the service performs network I/O — the SUBMITTING state written
+    beforehand is what prevents concurrent submissions.
+    """
+
     def __init__(
         self,
         storage: SessionStorage,
@@ -55,30 +65,26 @@ class ContributionApiCoordinator:
         self._device_flows: dict[str, _DeviceFlow] = {}
         self._status = storage.load_contribution_status()
         if self._status.state == ContributionState.SUBMITTING:
-            self._status = self._status.model_copy(
-                update={
-                    "state": ContributionState.FAILED,
-                    "error": "App stopped during contribution submission; preview can be submitted again",
-                    "updated_at": utc_now(),
-                },
+            self._update_status(
+                state=ContributionState.FAILED,
+                error="App stopped during contribution submission; preview can be submitted again",
             )
-            storage.save_contribution_status(self._status)
 
     @property
     def device_flow_available(self) -> bool:
         return bool(self._oauth_client_id)
 
-    def auth_status(self) -> ContributionAuthStatus:
-        status = self._service_factory().auth_status()
+    def _with_device_flow(self, status: ContributionAuthStatus) -> ContributionAuthStatus:
         return status.model_copy(update={"device_flow_available": self.device_flow_available})
+
+    def auth_status(self) -> ContributionAuthStatus:
+        return self._with_device_flow(self._service_factory().auth_status())
 
     def connect_pat(self, token: SecretStr) -> ContributionAuthStatus:
-        status = self._service_factory().connect_pat(token)
-        return status.model_copy(update={"device_flow_available": self.device_flow_available})
+        return self._with_device_flow(self._service_factory().connect_pat(token))
 
     def disconnect(self) -> ContributionAuthStatus:
-        status = self._service_factory().disconnect()
-        return status.model_copy(update={"device_flow_available": self.device_flow_available})
+        return self._with_device_flow(self._service_factory().disconnect())
 
     def start_device_flow(self) -> DeviceFlowStartResponse:
         client_id = self._require_oauth_client_id()
@@ -106,11 +112,7 @@ class ContributionApiCoordinator:
         if response.status in {"authorized", "expired", "denied"}:
             with self._lock:
                 self._device_flows.pop(flow_id, None)
-        auth = (
-            response.auth.model_copy(update={"device_flow_available": self.device_flow_available})
-            if response.auth
-            else None
-        )
+        auth = self._with_device_flow(response.auth) if response.auth else None
         return response.model_copy(update={"auth": auth})
 
     def status(self) -> ContributionStatus:
@@ -120,7 +122,7 @@ class ContributionApiCoordinator:
     def draft(self, snapshot: SessionSnapshot) -> ContributionPreviewResponse:
         self._require_completed_session(snapshot)
         request = self._storage.load_request(snapshot.id)
-        return _draft_from_request(
+        return draft_from_request(
             session_id=snapshot.id,
             request=request,
             artifact_root=self._storage.artifact_directory(snapshot.id, request.model_id),
@@ -206,7 +208,7 @@ class ContributionApiCoordinator:
             )
         except Exception as error:
             _LOGGER.warning("Contribution submission failed: %s", error)
-            self._replace_status(
+            self._update_status(
                 state=ContributionState.FAILED,
                 error=str(error),
                 message="Contribution submission failed",
@@ -215,15 +217,13 @@ class ContributionApiCoordinator:
                 raise
             raise ContributionApiError(ContributionApiErrorCode.SUBMISSION_FAILED, str(error)) from error
         else:
-            self._replace_status(
+            self._update_status(
                 state=ContributionState.SUBMITTED,
-                submission_url=result.url,
+                submission_url=result.pull_request_url,
                 message=result.message,
                 error=None,
             )
-            return result.model_copy(
-                update={"pull_request_url": result.pull_request_url or result.url},
-            )
+            return result
 
     def _require_oauth_client_id(self) -> str:
         if not self._oauth_client_id:
@@ -240,7 +240,7 @@ class ContributionApiCoordinator:
         for flow_id in expired:
             del self._device_flows[flow_id]
 
-    def _replace_status(self, **updates: object) -> None:
+    def _update_status(self, **updates: object) -> None:
         with self._lock:
             self._status = self._status.model_copy(update=updates | {"updated_at": utc_now()})
             self._storage.save_contribution_status(self._status)

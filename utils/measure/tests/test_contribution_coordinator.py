@@ -4,10 +4,9 @@ from pathlib import Path
 from typing import Any
 
 from measure.contribution.coordinator import (
-    ContributionCoordinator,
+    ContributionJobCoordinator,
     ContributionJobExpiredError,
     ContributionJobStore,
-    deterministic_branch,
 )
 from measure.contribution.credentials import CredentialStore, StoredCredential
 from measure.contribution.github import GitHubClient, GitHubRepository, GitHubUser
@@ -18,6 +17,7 @@ from measure.contribution.models import (
     ContributionPreparedFile,
     ContributionPreview,
 )
+from measure.contribution.pr_text import deterministic_branch_name
 from measure.contribution.prepare import ProfilePreparer
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.ha_app.contribution import (
@@ -38,8 +38,8 @@ class FakeGitHubClient(GitHubClient):
         self.calls: list[str] = []
         self.user = GitHubUser(login="octo", scopes=("public_repo", "workflow"), scopes_reported=True)
 
-    def validate_user(self) -> GitHubUser:
-        self.calls.append("validate_user")
+    def fetch_authenticated_user(self) -> GitHubUser:
+        self.calls.append("fetch_authenticated_user")
         return self.user
 
     def find_fork(self, username: str, repo: str | None = None) -> dict[str, Any] | None:
@@ -109,7 +109,7 @@ class FakePreparer(ProfilePreparer):
     def prepare(self, artifact_directory: Path, metadata: ContributionMetadata) -> ContributionPreview:
         return self.preview
 
-    def prepared_contents(
+    def render_contents(
         self,
         artifact_directory: Path,
         metadata: ContributionMetadata,
@@ -133,7 +133,7 @@ def test_coordinator_persists_preview_and_submits_idempotently(tmp_path: Path) -
     credential_value = "secret"
     credential_store.save(StoredCredential(kind="pat", token=credential_value, github_username="octo"))
     github = FakeGitHubClient()
-    coordinator = ContributionCoordinator(
+    coordinator = ContributionJobCoordinator(
         preparer=FakePreparer(preview),
         credential_store=credential_store,
         job_store=ContributionJobStore(tmp_path / "jobs"),
@@ -149,7 +149,7 @@ def test_coordinator_persists_preview_and_submits_idempotently(tmp_path: Path) -
     assert submitted.submission.branch == "powercalc-profile-signify-lct999"
     assert submitted.submission.pull_request_url == "https://github.test/pr/1"
     assert submitted_again == submitted
-    assert github.calls.count("validate_user") == 1
+    assert github.calls.count("fetch_authenticated_user") == 1
     assert any(
         call.startswith("sync_fork_branch:octo:homeassistant-powercalc:powercalc-profile-signify-lct999")
         for call in github.calls
@@ -166,7 +166,7 @@ def test_coordinator_targets_configured_repository_and_branch(tmp_path: Path) ->
     credential_store = CredentialStore(tmp_path / "credentials.json")
     credential_store.save(StoredCredential(kind="pat", token="secret", github_username="octo"))  # noqa: S106
     github = FakeGitHubClient(GitHubRepository(owner="test-owner", name="powercalc-sandbox", branch="main"))
-    coordinator = ContributionCoordinator(
+    coordinator = ContributionJobCoordinator(
         preparer=FakePreparer(preview),
         credential_store=credential_store,
         job_store=ContributionJobStore(tmp_path / "jobs"),
@@ -208,7 +208,7 @@ def test_coordinator_uses_owned_target_without_trying_to_fork_it(tmp_path: Path)
     credential_store = CredentialStore(tmp_path / "credentials.json")
     credential_store.save(StoredCredential(kind="pat", token="secret", github_username="octo"))  # noqa: S106
     github = FakeGitHubClient(GitHubRepository(owner="octo", name="powercalc-sandbox", branch="main"))
-    coordinator = ContributionCoordinator(
+    coordinator = ContributionJobCoordinator(
         preparer=FakePreparer(preview),
         credential_store=credential_store,
         job_store=ContributionJobStore(tmp_path / "jobs"),
@@ -245,7 +245,7 @@ def test_coordinator_records_missing_credentials_failure(tmp_path: Path) -> None
         model_directory="LCT999",
         files=(ContributionPreparedFile(path="profile_library/signify/LCT999/model.json", size=20),),
     )
-    coordinator = ContributionCoordinator(
+    coordinator = ContributionJobCoordinator(
         preparer=FakePreparer(preview),
         credential_store=CredentialStore(tmp_path / "missing.json"),
         job_store=ContributionJobStore(tmp_path / "jobs"),
@@ -276,7 +276,7 @@ def test_coordinator_reports_missing_workflow_scope_before_writing_fork(tmp_path
     credential_store.save(StoredCredential(kind="oauth", token="secret", github_username="octo"))  # noqa: S106
     github = FakeGitHubClient()
     github.user = GitHubUser(login="octo", scopes=("public_repo",), scopes_reported=True)
-    coordinator = ContributionCoordinator(
+    coordinator = ContributionJobCoordinator(
         preparer=FakePreparer(preview),
         credential_store=credential_store,
         job_store=ContributionJobStore(tmp_path / "jobs"),
@@ -310,7 +310,7 @@ def test_coordinator_accepts_classic_repo_scope_as_public_repo(tmp_path: Path) -
     credential_store.save(StoredCredential(kind="pat", token="secret", github_username="octo"))  # noqa: S106
     github = FakeGitHubClient()
     github.user = GitHubUser(login="octo", scopes=("repo", "workflow"), scopes_reported=True)
-    coordinator = ContributionCoordinator(
+    coordinator = ContributionJobCoordinator(
         preparer=FakePreparer(preview),
         credential_store=credential_store,
         job_store=ContributionJobStore(tmp_path / "jobs"),
@@ -346,7 +346,7 @@ def test_coordinator_refreshes_existing_pull_request_with_new_commit(tmp_path: P
     credential_store = CredentialStore(tmp_path / "credentials.json")
     credential_store.save(StoredCredential(kind="pat", token="secret", github_username="octo"))  # noqa: S106
     github = ExistingPullRequestClient()
-    coordinator = ContributionCoordinator(
+    coordinator = ContributionJobCoordinator(
         preparer=FakePreparer(preview),
         credential_store=credential_store,
         job_store=ContributionJobStore(tmp_path / "jobs"),
@@ -376,7 +376,7 @@ def test_coordinator_refreshes_existing_pull_request_with_new_commit(tmp_path: P
 
 def test_coordinator_submit_of_unknown_job_reports_expired_preview(tmp_path: Path) -> None:
     preview = ContributionPreview(manufacturer_directory="signify", model_directory="LCT999", files=())
-    coordinator = ContributionCoordinator(
+    coordinator = ContributionJobCoordinator(
         preparer=FakePreparer(preview),
         credential_store=CredentialStore(tmp_path / "missing.json"),
         job_store=ContributionJobStore(tmp_path / "jobs"),
@@ -386,10 +386,10 @@ def test_coordinator_submit_of_unknown_job_reports_expired_preview(tmp_path: Pat
         coordinator.submit("0badc0ffee", tmp_path / "artifacts")
 
 
-def test_deterministic_branch_collapses_non_alphanumeric_runs() -> None:
+def test_deterministic_branch_name_collapses_non_alphanumeric_runs() -> None:
     preview = ContributionPreview(manufacturer_directory="ajax online", model_directory="AJ-100 (EU)+", files=())
 
-    assert deterministic_branch(preview) == "powercalc-profile-ajax-online-aj-100-eu"
+    assert deterministic_branch_name(preview) == "powercalc-profile-ajax-online-aj-100-eu"
 
 
 def test_contribution_author_rejects_blank_required_fields() -> None:

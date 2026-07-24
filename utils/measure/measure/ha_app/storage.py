@@ -12,6 +12,7 @@ import shutil
 from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
 
+from measure.clock import utc_now
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.dummy_load import DummyLoadCalibration
@@ -23,7 +24,6 @@ from measure.ha_app.session import (
     SessionEventType,
     SessionSnapshot,
     SessionState,
-    utc_now,
 )
 from measure.request import LightMeasurementRequest, MeasurementRequest, parse_measurement_request
 from measure.runner.light_plan import (

@@ -80,7 +80,7 @@ def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_u
     assert seen_model["author_info"] == {"name": "Test User", "github": "test-user", "email": "test@example.com"}
     assert seen_model["name"] == "Hue test lamp"
     assert "aliases" not in seen_model
-    prepared_contents = dict(preparer.prepared_contents(artifacts, contribution_metadata, preview))
+    prepared_contents = dict(preparer.render_contents(artifacts, contribution_metadata, preview))
     prepared_model = json.loads(prepared_contents[preview.files[0].path])
     assert prepared_model["name"] == "Hue test lamp"
     assert "aliases" not in prepared_model
@@ -104,7 +104,7 @@ def test_preparer_generates_new_manufacturer_manifest_without_adding_aliases(tmp
     preview = preparer.prepare(artifacts, metadata("Acme"))
 
     assert "profile_library/acme/manufacturer.json" in {file.path for file in preview.files}
-    contents = dict(preparer.prepared_contents(artifacts, metadata("Acme"), preview))
+    contents = dict(preparer.render_contents(artifacts, metadata("Acme"), preview))
     assert json.loads(contents["profile_library/acme/manufacturer.json"]) == {"name": "Acme", "aliases": []}
 
 
@@ -231,7 +231,7 @@ def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None
     )
 
     preview = preparer.prepare(artifacts, metadata())
-    contents = dict(preparer.prepared_contents(artifacts, metadata(), preview))
+    contents = dict(preparer.render_contents(artifacts, metadata(), preview))
 
     assert gzip.decompress(contents["profile_library/signify/LCT999/brightness.csv.gz"]) == raw_content
 

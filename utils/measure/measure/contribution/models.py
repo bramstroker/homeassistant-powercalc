@@ -16,6 +16,13 @@ class ContributionErrorCode(StrEnum):
 
 
 class ContributionJobStatus(StrEnum):
+    """Lifecycle of one contribution job, persisted per job in the ``ContributionJobStore``.
+
+    The app-level ``measure.ha_app.contribution.models.ContributionState`` is derived
+    from this plus UI context; this enum is the authoritative record of what happened
+    to a specific prepared submission.
+    """
+
     PREVIEWED = "previewed"
     SUBMITTING = "submitting"
     SUBMITTED = "submitted"

@@ -67,7 +67,7 @@ def test_github_client_validates_user_and_discovers_fork() -> None:
     )
     client = GitHubClient("token", transport=transport)
 
-    user = client.validate_user()
+    user = client.fetch_authenticated_user()
     assert user.login == "octo"
     assert user.scopes == ("read:user", "public_repo")
     assert user.scopes_reported is True
@@ -187,7 +187,7 @@ def test_github_client_raises_api_message() -> None:
     client = GitHubClient("token", transport=FakeTransport([Response(403, {"message": "rate limited"})]))
 
     with pytest.raises(GitHubApiError, match="rate limited"):
-        client.validate_user()
+        client.fetch_authenticated_user()
 
 
 def test_github_client_falls_back_to_blob_api_for_large_files() -> None:

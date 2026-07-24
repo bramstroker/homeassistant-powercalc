@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import base64
 from collections.abc import Sequence
-from datetime import UTC, datetime
 import json
 from pathlib import Path
 from uuid import uuid4
 
+from measure.clock import utc_now
 from measure.contribution.credentials import CredentialStore
 from measure.contribution.files import write_json_atomic
 from measure.contribution.github import REQUIRED_OAUTH_SCOPES, GitHubApiError, GitHubClient
@@ -16,8 +16,13 @@ from measure.contribution.models import (
     ContributionJob,
     ContributionJobStatus,
     ContributionMetadata,
-    ContributionPreview,
     ContributionSubmission,
+)
+from measure.contribution.pr_text import (
+    conventional_commit_message,
+    deterministic_branch_name,
+    pull_request_body,
+    pull_request_title,
 )
 from measure.contribution.prepare import ProfilePreparer
 
@@ -63,7 +68,7 @@ class ContributionJobStore:
         return self.root / f"{job_id}.json"
 
 
-class ContributionCoordinator:
+class ContributionJobCoordinator:
     def __init__(
         self,
         *,
@@ -85,7 +90,7 @@ class ContributionCoordinator:
         base_sha: str | None = None,
     ) -> ContributionJob:
         preview = self.preparer.prepare(artifact_directory, metadata)
-        now = _utc_now()
+        now = utc_now()
         job = self.job_store.save(
             ContributionJob(
                 id=uuid4().hex,
@@ -111,33 +116,22 @@ class ContributionCoordinator:
             return job
         credential = self.credential_store.load()
         if credential is None:
-            failed = self._fail(job, ContributionErrorCode.MISSING_CREDENTIALS, "GitHub credentials are required")
-            return self.job_store.save(failed)
+            return self._fail(job, ContributionErrorCode.MISSING_CREDENTIALS, "GitHub credentials are required")
         client = self.github_client or GitHubClient(credential.token)
-        submitting = job.model_copy(update={"status": ContributionJobStatus.SUBMITTING, "updated_at": _utc_now()})
-        self.job_store.save(submitting)
+        submitting = self._transition(job, ContributionJobStatus.SUBMITTING)
         try:
-            submission = self._submit_prepared(client, submitting, artifact_directory)
+            submission = self._submit_to_github(client, submitting, artifact_directory)
         except (GitHubApiError, KeyError, ValueError, OSError) as error:
-            return self.job_store.save(self._fail(submitting, ContributionErrorCode.GITHUB_ERROR, str(error)))
-        return self.job_store.save(
-            submitting.model_copy(
-                update={
-                    "status": ContributionJobStatus.SUBMITTED,
-                    "submission": submission,
-                    "updated_at": _utc_now(),
-                    "error": None,
-                },
-            ),
-        )
+            return self._fail(submitting, ContributionErrorCode.GITHUB_ERROR, str(error))
+        return self._transition(submitting, ContributionJobStatus.SUBMITTED, submission=submission, error=None)
 
-    def _submit_prepared(
+    def _submit_to_github(
         self,
         client: GitHubClient,
         job: ContributionJob,
         artifact_directory: Path,
     ) -> ContributionSubmission:
-        user = client.validate_user()
+        user = client.fetch_authenticated_user()
         repository = client.repository
         uses_fork = user.login.casefold() != repository.owner.casefold()
         missing_scopes = set(REQUIRED_OAUTH_SCOPES).difference(_granted_scopes(user.scopes))
@@ -155,7 +149,7 @@ class ContributionCoordinator:
                 fork = client.create_fork()
             fork_owner = str(fork["owner"]["login"])
             fork_repo = str(fork["name"])
-        branch = deterministic_branch(job.preview)
+        branch = deterministic_branch_name(job.preview)
         head = f"{fork_owner}:{branch}"
         base_ref = client.get_ref(repository.owner, repository.name, repository.branch)
         if base_ref is None:
@@ -179,7 +173,7 @@ class ContributionCoordinator:
         base_tree_sha = str(parent_commit["tree"]["sha"])
 
         tree_entries = []
-        for path, content in self.preparer.prepared_contents(artifact_directory, job.metadata, job.preview):
+        for path, content in self.preparer.render_contents(artifact_directory, job.metadata, job.preview):
             blob_sha = client.create_blob(fork_owner, fork_repo, base64.b64encode(content).decode("ascii"))
             tree_entries.append({"path": path, "mode": "100644", "type": "blob", "sha": blob_sha})
         tree_sha = client.create_tree(fork_owner, fork_repo, base_tree_sha, tuple(tree_entries))
@@ -203,7 +197,7 @@ class ContributionCoordinator:
         pull_request = existing_pull_request or client.create_pull_request(
             repository.owner,
             repository.name,
-            title=human_pull_request_title(job.preview),
+            title=pull_request_title(job.preview),
             head=head,
             base=repository.branch,
             body=pull_request_body(job),
@@ -242,92 +236,10 @@ class ContributionCoordinator:
             client.create_ref(fork_owner, fork_repo, branch, fork_base_sha)
         client.sync_fork_branch(fork_owner, fork_repo, branch)
 
-    @staticmethod
-    def _fail(job: ContributionJob, code: ContributionErrorCode, message: str) -> ContributionJob:
-        return job.model_copy(
-            update={
-                "status": ContributionJobStatus.FAILED,
-                "updated_at": _utc_now(),
-                "error": ContributionError(code=code, message=message),
-            },
+    def _transition(self, job: ContributionJob, status: ContributionJobStatus, **updates: object) -> ContributionJob:
+        return self.job_store.save(
+            job.model_copy(update={"status": status, "updated_at": utc_now(), **updates}),
         )
 
-
-def deterministic_branch(preview: ContributionPreview) -> str:
-    manufacturer = _branch_part(preview.manufacturer_directory)
-    model = _branch_part(preview.model_directory)
-    return f"powercalc-profile-{manufacturer}-{model}"
-
-
-def conventional_commit_message(preview: ContributionPreview) -> str:
-    return f"feat(profile): add {preview.manufacturer_directory} {preview.model_directory}"
-
-
-def human_pull_request_title(preview: ContributionPreview) -> str:
-    return f"Add {preview.manufacturer_directory} {preview.model_directory} power profile"
-
-
-def pull_request_body(job: ContributionJob) -> str:
-    return profile_pull_request_body(
-        manufacturer=job.metadata.manufacturer,
-        model_id=job.metadata.model_id,
-        product_name=job.metadata.product_name or job.preview.model_directory,
-        measure_device=job.metadata.measure_device,
-        measure_type=job.metadata.measure_type,
-        notes=job.metadata.notes,
-        file_paths=[file.path for file in job.preview.files],
-        warnings=job.preview.warnings,
-    )
-
-
-def profile_pull_request_body(
-    *,
-    manufacturer: str,
-    model_id: str,
-    product_name: str,
-    measure_device: str | None,
-    measure_type: str | None,
-    notes: str,
-    file_paths: Sequence[str],
-    warnings: Sequence[str] = (),
-) -> str:
-    device_lines = [
-        f"- Manufacturer: {manufacturer}",
-        f"- Model ID: {model_id}",
-        f"- Product name: {product_name}",
-    ]
-    if measure_device:
-        device_lines.append(f"- Measurement device: {measure_device}")
-    home_assistant = (
-        f"- Measure type: {measure_type}\n"
-        if measure_type
-        else "Generated by Powercalc Measure from a completed measurement session.\n"
-    )
-    files = "\n".join(f"- `{path}`" for path in file_paths) or "- None"
-    warning_lines = "\n".join(f"- {warning}" for warning in warnings) or "- None"
-    additional_info = notes or "Generated and validated by Powercalc Measure."
-    return (
-        "## Device information\n\n"
-        f"{'\n'.join(device_lines)}\n\n"
-        "## Home Assistant Device information\n\n"
-        f"{home_assistant}\n"
-        "## Checklist\n\n"
-        "- [x] I have created a single PR per device.\n"
-        "- [x] For lights, only generated gzipped lookup tables are included.\n"
-        "- [x] I reviewed the generated files and JSON in Powercalc Measure.\n\n"
-        "## Additional info\n\n"
-        f"{additional_info}\n\n"
-        "### Generated files\n\n"
-        f"{files}\n\n"
-        "### Duplicate warnings\n\n"
-        f"{warning_lines}\n"
-    )
-
-
-def _branch_part(value: str) -> str:
-    normalized = "".join(character if character.isalnum() else "-" for character in value.lower())
-    return "-".join(part for part in normalized.split("-") if part)
-
-
-def _utc_now() -> str:
-    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
+    def _fail(self, job: ContributionJob, code: ContributionErrorCode, message: str) -> ContributionJob:
+        return self._transition(job, ContributionJobStatus.FAILED, error=ContributionError(code=code, message=message))
