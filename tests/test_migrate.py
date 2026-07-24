@@ -1,9 +1,9 @@
 from datetime import timedelta
 from unittest.mock import AsyncMock, Mock, patch
 
-import attr
 from homeassistant.const import CONF_DEVICE, CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.issue_registry import IssueRegistry
 import pytest
@@ -282,7 +282,6 @@ async def test_migrate_config_entry_removes_split_helper_device(
     configured_device_id: str | None,
 ) -> None:
     """Test migration removes a helper-owned split with the 2026.8 API."""
-    device_registry = mock_device_registry(hass)
     source_entry = MockConfigEntry(domain="test")
     source_entry.add_to_hass(hass)
     powercalc_entry_data = {
@@ -295,16 +294,22 @@ async def test_migrate_config_entry_removes_split_helper_device(
     powercalc_entry = MockConfigEntry(domain=DOMAIN, data=powercalc_entry_data, version=8)
     powercalc_entry.add_to_hass(hass)
 
-    source_device = device_registry.async_get_or_create(
+    source_device = dr.DeviceEntry(
+        id="source-device",
         config_entry_id=source_entry.entry_id,
         identifiers={("test", "source")},
+        composite_device_id=COMPOSITE_ID,
     )
-    helper_device = device_registry.async_get_or_create(
+    helper_device = dr.DeviceEntry(
+        id="helper-device",
         config_entry_id=powercalc_entry.entry_id,
         identifiers={(DOMAIN, "helper")},
+        composite_device_id=COMPOSITE_ID,
     )
-    device_registry.devices[source_device.id] = attr.evolve(source_device, composite_device_id=COMPOSITE_ID)
-    device_registry.devices[helper_device.id] = attr.evolve(helper_device, composite_device_id=COMPOSITE_ID)
+    device_registry = mock_device_registry(
+        hass,
+        {source_device.id: source_device, helper_device.id: helper_device},
+    )
     helper_entity = entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,

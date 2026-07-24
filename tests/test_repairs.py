@@ -88,11 +88,13 @@ def split_devices(
 ) -> tuple[dr.DeviceEntry, dr.DeviceEntry]:
     """Create two devices split from the same pre-migration composite device."""
     device_1 = dr.DeviceEntry(
+        config_entry_id="test-entry-1",
         id="split-device-1",
         name="Split device 1",
         composite_device_id=COMPOSITE_ID,
     )
     device_2 = dr.DeviceEntry(
+        config_entry_id="test-entry-2",
         id="split-device-2",
         name="Split device 2",
         composite_device_id=COMPOSITE_ID,
