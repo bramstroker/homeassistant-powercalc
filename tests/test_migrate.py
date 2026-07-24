@@ -4,7 +4,6 @@ from unittest.mock import AsyncMock, Mock, patch
 import attr
 from homeassistant.const import CONF_DEVICE, CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.issue_registry import IssueRegistry
 import pytest
@@ -279,11 +278,11 @@ async def test_migrate_config_entry_removes_config_entry_from_device(
 @pytest.mark.skip(reason="Enable when Home Assistant 2026.8 is released")
 async def test_migrate_config_entry_removes_split_helper_device(
     hass: HomeAssistant,
-    device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     configured_device_id: str | None,
 ) -> None:
     """Test migration removes a helper-owned split with the 2026.8 API."""
+    device_registry = mock_device_registry(hass)
     source_entry = MockConfigEntry(domain="test")
     source_entry.add_to_hass(hass)
     powercalc_entry_data = {

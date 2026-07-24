@@ -1,4 +1,3 @@
-import attr
 from homeassistant.components.repairs import RepairsFlowManager
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID
@@ -6,7 +5,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er, issue_registry as ir
 from homeassistant.setup import async_setup_component
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import mock_device_registry
 
 from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, SensorType
 from custom_components.powercalc.const import (
@@ -86,26 +85,20 @@ async def test_invalid_repair_flow_data(
 @pytest.fixture
 def split_devices(
     hass: HomeAssistant,
-    device_registry: dr.DeviceRegistry,
 ) -> tuple[dr.DeviceEntry, dr.DeviceEntry]:
     """Create two devices split from the same pre-migration composite device."""
-    entry_1 = MockConfigEntry(domain="test_1")
-    entry_1.add_to_hass(hass)
-    entry_2 = MockConfigEntry(domain="test_2")
-    entry_2.add_to_hass(hass)
-    device_1 = device_registry.async_get_or_create(
-        config_entry_id=entry_1.entry_id,
-        identifiers={("test_1", "1")},
+    device_1 = dr.DeviceEntry(
+        id="split-device-1",
         name="Split device 1",
+        composite_device_id=COMPOSITE_ID,
     )
-    device_2 = device_registry.async_get_or_create(
-        config_entry_id=entry_2.entry_id,
-        identifiers={("test_2", "1")},
+    device_2 = dr.DeviceEntry(
+        id="split-device-2",
         name="Split device 2",
+        composite_device_id=COMPOSITE_ID,
     )
-    device_registry.devices[device_1.id] = attr.evolve(device_1, composite_device_id=COMPOSITE_ID)
-    device_registry.devices[device_2.id] = attr.evolve(device_2, composite_device_id=COMPOSITE_ID)
-    return device_registry.devices[device_1.id], device_registry.devices[device_2.id]
+    mock_device_registry(hass, {device_1.id: device_1, device_2.id: device_2})
+    return device_1, device_2
 
 
 @pytest.mark.skip(reason="Enable when Home Assistant 2026.8 is released")
@@ -217,7 +210,6 @@ async def test_composite_device_repair_aborts_when_entry_removed(
 
 async def _setup_powercalc_entry(hass: HomeAssistant, device_id: str | None) -> ConfigEntry:
     """Set up a fixed Powercalc sensor linked to a device when provided."""
-    hass.states.async_set("light.composite_test", "on")
     data = {
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_ENTITY_ID: "light.composite_test",

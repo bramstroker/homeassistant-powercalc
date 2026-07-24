@@ -30,20 +30,16 @@ from tests.common import create_mock_config_entry, mock_device, run_powercalc_se
 
 def test_regular_device_is_not_composite(
     hass: HomeAssistant,
-    device_registry: DeviceRegistry,
 ) -> None:
     """A regular device ID is not treated as a legacy composite device."""
-    config_entry = MockConfigEntry(domain="test")
-    config_entry.add_to_hass(hass)
-    device_entry = device_registry.async_get_or_create(
-        config_entry_id=config_entry.entry_id,
-        identifiers={("test", "regular-device")},
-    )
+    device_entry = DeviceEntry(id="regular-device")
+    mock_device_registry(hass, {device_entry.id: device_entry})
 
     assert not is_composite_device_id(hass, device_entry.id)
 
 
 def test_attach_configured_device_entry_keeps_source_entity_when_device_is_missing(hass: HomeAssistant) -> None:
+    mock_device_registry(hass)
     source_entity = SourceEntity(object_id="powercalc_dummy", entity_id=DUMMY_ENTITY_ID, domain="sensor")
 
     result = attach_configured_device_entry(hass, {CONF_DEVICE: "missing-device-id"}, source_entity)
