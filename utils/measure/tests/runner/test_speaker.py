@@ -88,7 +88,7 @@ def test_fast_test_mode_measures_only_volume_endpoints_without_waiting() -> None
     measure_util = MagicMock(MeasureUtil)
     measure_util.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
-    runner = SpeakerRunner(measure_util, MeasurementParameters(), media_controller, interaction)
+    runner = SpeakerRunner(measure_util, MeasurementParameters(fast_test_mode=True), media_controller, interaction)
     request = SpeakerMeasurementRequest(
         model_id="measurement",
         product_name="Measurement",

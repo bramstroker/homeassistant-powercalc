@@ -8,6 +8,7 @@ import type {
   ContributionPreview,
   ContributionPreviewRequest,
   ContributionResult,
+  ContributionStatus,
   ContributionSubmitRequest,
   ContributionTokenRequest,
   DeviceClass,
@@ -72,7 +73,11 @@ export class MeasureApiClient {
   }
 
   getContributionDeviceAuth(flowId: string): Promise<ContributionAuthDeviceStatus> {
-    return this.request(`api/contribution/auth/device/${encodeURIComponent(flowId)}`);
+    return this.request(`api/contribution/auth/device/${encodeURIComponent(flowId)}`, { method: "POST" });
+  }
+
+  getContributionStatus(): Promise<ContributionStatus> {
+    return this.request("api/contribution/status");
   }
 
   saveContributionToken(token: string): Promise<ContributionAuthState> {

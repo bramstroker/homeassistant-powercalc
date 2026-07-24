@@ -37,6 +37,7 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     getMeasureDefinitions: async () => [],
     getSettings: async () => settings,
     getContributionAuth: async () => ({ connected: false }),
+    getContributionStatus: async () => ({ state: "idle" as const }),
     startContributionDeviceAuth: async () => ({
       flow_id: "flow-1",
       user_code: "ABCD-EFGH",
@@ -217,6 +218,41 @@ describe("measure app controller", () => {
     expect(appState.contributionAuth?.identity?.login).toBe("octocat");
     expect(appState.contributionDraft?.files[0]?.path).toBe("profile_library/signify/LCT010/model.json");
     expect(appState.contributionPreview).toBeUndefined();
+  });
+
+  it("restores a persisted submitted contribution for the current session", async () => {
+    const appState = state();
+    const controller = new MeasureAppController(appState, () => api({
+      getCurrent: async () => ({ state: "completed", session_id: "session-1" }),
+      getContributionStatus: async () => ({
+        state: "submitted" as const,
+        session_id: "session-1",
+        submission_url: "https://github.com/pull/9",
+        message: "Contribution submitted",
+      }),
+    }), () => connection(), () => undefined);
+
+    await controller.boot();
+
+    expect(appState.contributionResult?.pull_request_url).toBe("https://github.com/pull/9");
+    expect(appState.contributionResult?.status).toBe("success");
+  });
+
+  it("ignores persisted contribution status from another session", async () => {
+    const appState = state();
+    const controller = new MeasureAppController(appState, () => api({
+      getCurrent: async () => ({ state: "completed", session_id: "session-2" }),
+      getContributionStatus: async () => ({
+        state: "failed" as const,
+        session_id: "session-1",
+        error: "Old failure",
+      }),
+    }), () => connection(), () => undefined);
+
+    await controller.boot();
+
+    expect(appState.contributionResult).toBeUndefined();
+    expect(appState.contributionError).toBe("");
   });
 
   it("runs device login, token fallback, disconnect, preview, and submit contribution actions", async () => {

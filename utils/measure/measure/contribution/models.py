@@ -37,13 +37,20 @@ class ContributionAuthor(BaseModel):
     github: str = Field(min_length=1, max_length=100)
     email: str | None = Field(default=None, max_length=200)
 
-    @field_validator("name", "github", "email")
+    @field_validator("name", "github")
     @classmethod
-    def normalize_text(cls, value: str | None) -> str | None:
+    def normalize_required_text(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("value is required")
+        return normalized
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: str | None) -> str | None:
         if value is None:
             return None
-        normalized = value.strip()
-        return normalized or None
+        return value.strip() or None
 
 
 class ContributionMetadata(BaseModel):
@@ -53,6 +60,8 @@ class ContributionMetadata(BaseModel):
     manufacturer_directory: str | None = Field(default=None, min_length=1, max_length=120)
     model_id: str = Field(min_length=1, max_length=120)
     product_name: str | None = Field(default=None, min_length=1, max_length=200)
+    measure_type: str | None = Field(default=None, max_length=50)
+    measure_device: str | None = Field(default=None, max_length=200)
     notes: str = Field(default="", max_length=2_000)
     author: ContributionAuthor
 

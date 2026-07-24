@@ -52,7 +52,7 @@ def test_fast_test_mode_skips_charging_waits_and_trickle_average() -> None:
     measure_util = MagicMock(spec=MeasureUtil)
     measure_util.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
-    runner = ChargingRunner(measure_util, MeasurementParameters(), controller, interaction)
+    runner = ChargingRunner(measure_util, MeasurementParameters(fast_test_mode=True), controller, interaction)
     request = ChargingMeasurementRequest(
         model_id="measurement",
         product_name="Measurement",

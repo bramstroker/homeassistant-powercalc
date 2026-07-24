@@ -9,6 +9,7 @@ import type {
   ContributionPreview,
   ContributionPreviewRequest,
   ContributionResult,
+  ContributionStatus,
   ContributionSubmitRequest,
   DeviceClass,
   DummyLoadCalibration,
@@ -78,6 +79,7 @@ export interface MeasureAppApi {
   getMeasureDefinitions(): Promise<MeasureDefinition[]>;
   getSettings(): Promise<AppSettings>;
   getContributionAuth(): Promise<ContributionAuthState>;
+  getContributionStatus(): Promise<ContributionStatus>;
   startContributionDeviceAuth(): Promise<ContributionDeviceFlow>;
   getContributionDeviceAuth(flowId: string): Promise<ContributionAuthDeviceStatus>;
   saveContributionToken(token: string): Promise<ContributionAuthState>;
@@ -567,12 +569,13 @@ export class MeasureAppController {
   }
 
   private async loadResultArtifacts(): Promise<void> {
-    const [files, plots, calibration, auth, contribution] = await Promise.allSettled([
+    const [files, plots, calibration, auth, contribution, contributionStatus] = await Promise.allSettled([
       this.api().getFiles(),
       this.api().getPlots(),
       this.api().getDummyLoadCalibration(),
       this.api().getContributionAuth(),
       this.api().getContributionDraft(),
+      this.api().getContributionStatus(),
     ]);
     this.state.files = files.status === "fulfilled" ? files.value : [];
     this.state.plotCollection = plots.status === "fulfilled"
@@ -587,6 +590,29 @@ export class MeasureAppController {
     } else {
       this.state.contributionDraft = undefined;
       this.state.contributionPreview = undefined;
+    }
+    if (contributionStatus.status === "fulfilled") this.restoreContributionStatus(contributionStatus.value);
+  }
+
+  /** Recover persisted contribution progress (e.g. after a reload or dropped connection mid-submit). */
+  private restoreContributionStatus(status: ContributionStatus): void {
+    if (!status.session_id || status.session_id !== this.state.snapshot?.session_id) return;
+    if (status.state === "preview_ready" && status.preview) {
+      this.state.contributionPreview = status.preview;
+      return;
+    }
+    if (status.state === "submitted" && status.submission_url && !this.state.contributionResult) {
+      if (status.preview) this.state.contributionPreview = status.preview;
+      this.state.contributionResult = {
+        status: "success",
+        pull_request_url: status.submission_url,
+        message: status.message ?? "Contribution submitted",
+      };
+      return;
+    }
+    if (status.state === "failed" && status.error && !this.state.contributionResult) {
+      if (status.preview) this.state.contributionPreview = status.preview;
+      this.state.contributionError = status.error;
     }
   }
 }

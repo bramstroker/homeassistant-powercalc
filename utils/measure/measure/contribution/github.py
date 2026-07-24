@@ -120,7 +120,7 @@ class GitHubClient:
     def validate_user(self) -> GitHubUser:
         response = self._raw("GET", f"{self.api_base_url}/user")
         data = self._decode_response(response)
-        headers = getattr(response, "headers", {})
+        headers = response.headers
         scope_header = headers.get("X-OAuth-Scopes", "")
         scopes = tuple(scope.strip() for scope in scope_header.split(",") if scope.strip())
         return GitHubUser(
@@ -171,10 +171,22 @@ class GitHubClient:
             f"{self.api_base_url}/repos/{owner}/{repo}/contents/{path}",
             params={"ref": ref},
         )
-        if data.get("encoding") != "base64" or not isinstance(data.get("content"), str):
+        if data.get("encoding") == "base64" and isinstance(data.get("content"), str) and data["content"].strip():
+            return self._decode_base64(data["content"], path)
+        # Files above 1 MB are not inlined by the contents API (encoding "none");
+        # fetch them through the blob API instead, which supports up to 100 MB.
+        blob_sha = data.get("sha")
+        if not isinstance(blob_sha, str) or not blob_sha:
+            raise GitHubApiError(f"GitHub did not return content or a blob sha for {path}")
+        blob = self._request("GET", f"{self.api_base_url}/repos/{owner}/{repo}/git/blobs/{blob_sha}")
+        if blob.get("encoding") != "base64" or not isinstance(blob.get("content"), str):
             raise GitHubApiError(f"GitHub did not return base64 content for {path}")
+        return self._decode_base64(blob["content"], path)
+
+    @staticmethod
+    def _decode_base64(content: str, path: str) -> bytes:
         try:
-            return base64.b64decode(data["content"], validate=False)
+            return base64.b64decode(content, validate=False)
         except ValueError as error:
             raise GitHubApiError(f"GitHub returned invalid base64 content for {path}") from error
 
@@ -281,15 +293,7 @@ class GitHubClient:
             f"{self.api_base_url}/repos/{owner}/{repo}/pulls",
             params={"state": "open", "head": head, "base": base},
         )
-        try:
-            data = response.json()
-        except ValueError as error:
-            raise GitHubApiError(f"GitHub returned invalid JSON with status {response.status_code}") from error
-        if not 200 <= response.status_code < 300:
-            message = data.get("message") if isinstance(data, dict) else None
-            raise GitHubApiError(str(message or f"GitHub request failed with status {response.status_code}"))
-        if not isinstance(data, list):
-            raise GitHubApiError("GitHub pull request response must be a list")
+        data = self._decode_list(response)
         return next((item for item in data if isinstance(item, dict)), None)
 
     def _request(
@@ -331,8 +335,22 @@ class GitHubClient:
             headers["Authorization"] = f"Bearer {self.token}"
         return self.transport.request(method, url, headers=headers, json=json, params=params, timeout=30)
 
+    @classmethod
+    def _decode_response(cls, response: GitHubResponse) -> dict[str, Any]:
+        data = cls._decode_json(response)
+        if not isinstance(data, dict):
+            raise GitHubApiError("GitHub response must be an object")
+        return data
+
+    @classmethod
+    def _decode_list(cls, response: GitHubResponse) -> list[Any]:
+        data = cls._decode_json(response)
+        if not isinstance(data, list):
+            raise GitHubApiError("GitHub response must be a list")
+        return data
+
     @staticmethod
-    def _decode_response(response: GitHubResponse) -> dict[str, Any]:
+    def _decode_json(response: GitHubResponse) -> object:
         try:
             data = response.json()
         except ValueError as error:
@@ -340,8 +358,6 @@ class GitHubClient:
         if not 200 <= response.status_code < 300:
             message = data.get("message") if isinstance(data, dict) else None
             raise GitHubApiError(str(message or f"GitHub request failed with status {response.status_code}"))
-        if not isinstance(data, dict):
-            raise GitHubApiError("GitHub response must be an object")
         return data
 
 

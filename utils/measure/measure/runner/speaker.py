@@ -38,7 +38,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
     ) -> RunnerResult:
         summary = {}
         voltages: list[float] = []
-        fast_test_mode = request.fast_test_mode
+        fast_test_mode = self.config.fast_test_mode
         duration = DURATION_PER_VOLUME_LEVEL
         volumes = FAST_TEST_VOLUMES if fast_test_mode else tuple(range(10, 101, 10))
         total_steps = len(volumes) + 1  # every volume level plus the muted baseline

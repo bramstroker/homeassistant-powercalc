@@ -234,3 +234,35 @@ def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None
     contents = dict(preparer.prepared_contents(artifacts, metadata(), preview))
 
     assert gzip.decompress(contents["profile_library/signify/LCT999/brightness.csv.gz"]) == raw_content
+
+
+def test_preparer_blocks_case_insensitive_index_collisions(tmp_path: Path) -> None:
+    library = tmp_path / "profile_library"
+    schema = tmp_path / "model_schema.json"
+    artifacts = tmp_path / "artifacts"
+    library.mkdir()
+    schema.write_text("{}", encoding="utf-8")
+    (library / "library.json").write_text(
+        json.dumps(
+            {
+                "manufacturers": [
+                    {
+                        "name": "signify",
+                        "aliases": ["Philips"],
+                        "dir_name": "signify",
+                        "models": [{"id": "LCT010", "name": "Existing lamp"}],
+                    },
+                ],
+            },
+        ),
+        encoding="utf-8",
+    )
+    write_profile_artifacts(artifacts)
+    preparer = ProfilePreparer(
+        library_root=library,
+        model_schema_path=schema,
+        validator=lambda _instance, _schema: None,
+    )
+
+    with pytest.raises(ProfilePreparationError, match="Refusing to overwrite"):
+        preparer.prepare(artifacts, metadata(model_id="lct010"))

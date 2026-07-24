@@ -292,7 +292,10 @@ export class ResultView extends LitElement {
         <form class="contribution-form" @submit=${this.previewContribution}>
           <div class="contribution-grid">
             ${this.input("manufacturer_name", "Manufacturer name", draft.manufacturer_name)}
-            ${this.input("manufacturer_directory", "Manufacturer directory", draft.manufacturer_directory)}
+            ${this.input("manufacturer_directory", "Manufacturer directory", draft.manufacturer_directory, {
+              required: false,
+              placeholder: "Derived from the manufacturer when left empty",
+            })}
             ${this.input("model_id", "Model ID", draft.model_id)}
             ${this.input("product_name", "Product name", draft.product_name)}
             ${this.input("contributor", "Contributor display", draft.contributor)}
@@ -431,8 +434,14 @@ ${preview.pr_body}</pre>
     return `${(bytes / 1_048_576).toFixed(1)} MB`;
   }
 
-  private input(name: keyof ContributionPreviewRequest, label: string, value: string) {
-    return html`<label><span>${label}</span><input name=${name} .value=${value} required autocomplete="off" /></label>`;
+  private input(
+    name: keyof ContributionPreviewRequest,
+    label: string,
+    value: string,
+    options: { required?: boolean; placeholder?: string } = {},
+  ) {
+    const { required = true, placeholder = "" } = options;
+    return html`<label><span>${label}</span><input name=${name} .value=${value} ?required=${required} placeholder=${placeholder} autocomplete="off" /></label>`;
   }
 
   private collectContribution(): ContributionPreviewRequest | null {

@@ -188,3 +188,25 @@ def test_github_client_raises_api_message() -> None:
 
     with pytest.raises(GitHubApiError, match="rate limited"):
         client.validate_user()
+
+
+def test_github_client_falls_back_to_blob_api_for_large_files() -> None:
+    encoded = base64.b64encode(b'{"large": true}').decode()
+    transport = FakeTransport(
+        [
+            Response(200, {"encoding": "none", "content": "", "sha": "blob-sha"}),
+            Response(200, {"encoding": "base64", "content": encoded}),
+        ],
+    )
+    client = GitHubClient("token", transport=transport)
+
+    assert client.get_file("owner", "repo", "profile_library/library.json", "base-sha") == b'{"large": true}'
+    assert transport.calls[1]["url"] == "https://api.github.com/repos/owner/repo/git/blobs/blob-sha"
+
+
+def test_github_client_reports_missing_blob_content() -> None:
+    transport = FakeTransport([Response(200, {"encoding": "none", "content": ""})])
+    client = GitHubClient("token", transport=transport)
+
+    with pytest.raises(GitHubApiError, match="did not return content or a blob sha"):
+        client.get_file("owner", "repo", "profile_library/library.json", "base-sha")

@@ -15,13 +15,13 @@ from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import LightOperatingPoint
 from measure.ha_app.api import create_app
 from measure.ha_app.contribution import (
+    ContributionApiCoordinator,
+    ContributionApiError,
     ContributionAuthMethod,
     ContributionAuthStatus,
-    ContributionCoordinator,
-    ContributionError,
     ContributionFile,
-    ContributionPreview,
     ContributionPreviewRequest,
+    ContributionPreviewResponse,
     ContributionService,
     ContributionSubmissionResult,
     DeviceFlowPollResponse,
@@ -256,11 +256,11 @@ class FakeContributionService(ContributionService):
         request: MeasurementRequest,
         artifact_root: Path,
         payload: ContributionPreviewRequest | None,
-    ) -> ContributionPreview:
+    ) -> ContributionPreviewResponse:
         del artifact_root
         self.preview_calls += 1
         assert payload is not None
-        return ContributionPreview(
+        return ContributionPreviewResponse(
             session_id=session_id,
             title=f"Add {request.product_name}",
             body=f"Model {request.model_id}",
@@ -288,7 +288,7 @@ class FakeContributionService(ContributionService):
     def submit(
         self,
         *,
-        preview: ContributionPreview,
+        preview: ContributionPreviewResponse,
         artifact_root: Path,
     ) -> ContributionSubmissionResult:
         del preview, artifact_root
@@ -799,7 +799,8 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
     assert set(paths["/api/dummy-load/calibration"]) == {"get"}
     assert set(paths["/api/contribution/auth"]) == {"get", "put", "delete"}
     assert set(paths["/api/contribution/auth/device"]) == {"post"}
-    assert set(paths["/api/contribution/auth/device/{flow_id}"]) == {"get"}
+    assert set(paths["/api/contribution/auth/device/{flow_id}"]) == {"post"}
+    assert set(paths["/api/contribution/status"]) == {"get"}
     assert set(paths["/api/session/current/contribution"]) == {"get", "post"}
     assert set(paths["/api/session/current/contribution/preview"]) == {"post"}
 
@@ -813,7 +814,7 @@ def test_contribution_device_flow_reports_configuration_and_uses_injected_servic
 
     service = FakeContributionService()
     context = test_client.app.state.context
-    context.contribution = ContributionCoordinator(
+    context.contribution = ContributionApiCoordinator(
         context.storage,
         service_factory=lambda: service,
         oauth_client_id="client-1",
@@ -824,12 +825,18 @@ def test_contribution_device_flow_reports_configuration_and_uses_injected_servic
     assert "device_code" not in started.json()
     flow_id = started.json()["flow_id"]
 
-    polled = test_client.get(f"/api/contribution/auth/device/{flow_id}")
+    polled = test_client.post(f"/api/contribution/auth/device/{flow_id}")
     assert polled.status_code == 200
     assert polled.json()["status"] == "authorized"
     assert polled.json()["auth"]["authenticated"] is True
     assert polled.json()["auth"]["username"] == "oauth-user"
     assert polled.json()["auth"]["device_flow_available"] is True
+
+    unknown = test_client.post("/api/contribution/auth/device/unknown-flow")
+    assert unknown.status_code == 404
+    assert unknown.json()["code"] == "flow_not_found"
+    completed = test_client.post(f"/api/contribution/auth/device/{flow_id}")
+    assert completed.status_code == 404
 
 
 def test_contribution_pat_rejects_reported_insufficient_scope(tmp_path: Path) -> None:
@@ -840,8 +847,8 @@ def test_contribution_pat_rejects_reported_insufficient_scope(tmp_path: Path) ->
         scopes_reported=True,
     )
     with (
-        patch("measure.ha_app.contribution.GitHubClient", return_value=github),
-        pytest.raises(ContributionError, match="must grant public repository and workflow access"),
+        patch("measure.ha_app.contribution.service.GitHubClient", return_value=github),
+        pytest.raises(ContributionApiError, match="must grant public repository and workflow access"),
     ):
         SharedContributionService(tmp_path).connect_pat(SecretStr("github_pat_test"))
 
@@ -852,7 +859,7 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     test_client = client(tmp_path)
     service = FakeContributionService()
     context = test_client.app.state.context
-    context.contribution = ContributionCoordinator(context.storage, service_factory=lambda: service)
+    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
 
     assert test_client.post("/api/sessions", json=payload()).status_code == 201
     assert context.coordinator._worker is not None  # noqa: SLF001
@@ -922,6 +929,12 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     assert submitted.json()["pull_request_url"] == "https://github.com/example/pull/1"
     assert service.submit_calls == 1
 
+    status = test_client.get("/api/contribution/status")
+    assert status.status_code == 200
+    assert status.json()["state"] == "submitted"
+    assert status.json()["submission_url"] == "https://github.com/example/pull/1"
+    assert status.json()["session_id"] == test_client.get("/api/session/current").json()["session_id"]
+
     files = test_client.get("/api/session/current/files").json()
     assert [item["name"] for item in files] == ["LCT010/brightness.csv"]
     diagnostics = test_client.get("/api/session/current/diagnostics")
@@ -933,7 +946,7 @@ def test_contribution_preview_rejects_unsupported_generated_session(tmp_path: Pa
     context = test_client.app.state.context
     service = FakeContributionService()
     context.coordinator = MeasurementCoordinator(context.storage, SummaryService)
-    context.contribution = ContributionCoordinator(context.storage, service_factory=lambda: service)
+    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
     run_payload = {
         "measure_type": MeasureType.AVERAGE,
         "model_id": "average-device",

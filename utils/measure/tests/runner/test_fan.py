@@ -7,13 +7,14 @@ from measure.execution import RunInteraction
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import FanMeasurementRequest
 from measure.runner.fan import FanRunner
+from measure.tuning import MeasurementParameters
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 
 
 def test_run(export_path: str) -> None:
     measure_util_mock = MagicMock(MeasureUtil)
     measure_util_mock.take_average_measurement.return_value = MeasurementResult(power=10.50, voltages=[])
-    runner = FanRunner(measure_util_mock, DummyFanController())
+    runner = FanRunner(measure_util_mock, MeasurementParameters(), DummyFanController())
     request = FanMeasurementRequest(
         model_id="measurement",
         product_name="Measurement",
@@ -60,7 +61,7 @@ def test_run_reports_fan_percentage_operating_points(export_path: str) -> None:
     measure_util = MagicMock(MeasureUtil)
     measure_util.take_average_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
-    runner = FanRunner(measure_util, DummyFanController(), interaction)
+    runner = FanRunner(measure_util, MeasurementParameters(), DummyFanController(), interaction)
     request = FanMeasurementRequest(
         model_id="measurement",
         product_name="Measurement",
@@ -85,7 +86,7 @@ def test_fast_test_mode_measures_only_fan_endpoints_without_waiting(export_path:
     measure_util = MagicMock(MeasureUtil)
     measure_util.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
-    runner = FanRunner(measure_util, DummyFanController(), interaction)
+    runner = FanRunner(measure_util, MeasurementParameters(fast_test_mode=True), DummyFanController(), interaction)
     request = FanMeasurementRequest(
         model_id="measurement",
         product_name="Measurement",
@@ -105,7 +106,7 @@ def test_fast_test_mode_measures_only_fan_endpoints_without_waiting(export_path:
 
 def test_cleanup_turns_off_fan() -> None:
     fan_controller = MagicMock(FanController)
-    runner = FanRunner(MagicMock(MeasureUtil), fan_controller)
+    runner = FanRunner(MagicMock(MeasureUtil), MeasurementParameters(), fan_controller)
 
     runner.cleanup()
 
@@ -115,6 +116,6 @@ def test_cleanup_turns_off_fan() -> None:
 def test_cleanup_does_not_surface_fan_shutdown_failure() -> None:
     fan_controller = MagicMock(FanController)
     fan_controller.turn_off.side_effect = RuntimeError("offline")
-    runner = FanRunner(MagicMock(MeasureUtil), fan_controller)
+    runner = FanRunner(MagicMock(MeasureUtil), MeasurementParameters(), fan_controller)
 
     runner.cleanup()

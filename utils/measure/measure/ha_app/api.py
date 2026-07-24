@@ -26,12 +26,13 @@ from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import ImmediateInteraction
 from measure.ha_app.contribution import (
     ConnectPatRequest,
+    ContributionApiCoordinator,
+    ContributionApiError,
+    ContributionApiErrorCode,
     ContributionAuthStatus,
-    ContributionCoordinator,
-    ContributionError,
-    ContributionErrorCode,
-    ContributionPreview,
     ContributionPreviewRequest,
+    ContributionPreviewResponse,
+    ContributionStatus,
     ContributionSubmissionResult,
     ContributionSubmitRequest,
     DeviceFlowPollResponse,
@@ -74,6 +75,18 @@ class ErrorResponse(BaseModel):
 
 # Shared OpenAPI documentation for the JSON error body returned by every failed request.
 _ERROR = {"model": ErrorResponse}
+
+_CONTRIBUTION_STATUS_CODES = {
+    ContributionApiErrorCode.AUTH_UNAVAILABLE: 401,
+    ContributionApiErrorCode.SESSION_REQUIRED: 404,
+    ContributionApiErrorCode.FLOW_NOT_FOUND: 404,
+    ContributionApiErrorCode.SESSION_NOT_READY: 409,
+    ContributionApiErrorCode.PREVIEW_REQUIRED: 409,
+    ContributionApiErrorCode.CONTRIBUTION_ACTIVE: 409,
+    ContributionApiErrorCode.ARTIFACTS_REQUIRED: 422,
+    ContributionApiErrorCode.INVALID_METADATA: 422,
+    ContributionApiErrorCode.SUBMISSION_FAILED: 502,
+}
 _NO_SESSION = "No measurement session"
 MeasurementRequestPayload = Annotated[MeasurementRequest, Body(discriminator="measure_type")]
 
@@ -158,7 +171,7 @@ class AppContext:
         self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
-        self.contribution = ContributionCoordinator(self.storage)
+        self.contribution = ContributionApiCoordinator(self.storage)
         self.coordinator = MeasurementCoordinator(
             self.storage,
             self._measurement_service,
@@ -274,17 +287,9 @@ def _register_error_handlers(app: FastAPI) -> None:
             content=ErrorResponse(code=code, message=detail).model_dump(),
         )
 
-    @app.exception_handler(ContributionError)
-    async def contribution_error(_: Request, error: ContributionError) -> JSONResponse:
-        status_code = {
-            ContributionErrorCode.AUTH_UNAVAILABLE: 401,
-            ContributionErrorCode.SESSION_REQUIRED: 404,
-            ContributionErrorCode.SESSION_NOT_READY: 409,
-            ContributionErrorCode.PREVIEW_REQUIRED: 409,
-            ContributionErrorCode.CONTRIBUTION_ACTIVE: 409,
-            ContributionErrorCode.ARTIFACTS_REQUIRED: 422,
-            ContributionErrorCode.SUBMISSION_FAILED: 502,
-        }[error.code]
+    @app.exception_handler(ContributionApiError)
+    async def contribution_error(_: Request, error: ContributionApiError) -> JSONResponse:
+        status_code = _CONTRIBUTION_STATUS_CODES.get(error.code, 500)
         return JSONResponse(
             status_code=status_code,
             content=ErrorResponse(code=error.code.value, message=str(error)).model_dump(),
@@ -514,12 +519,16 @@ def _register_contribution_routes(router: APIRouter) -> None:
     async def contribution_device_start(request: Request) -> DeviceFlowStartResponse:
         return await run_in_threadpool(_context(request).contribution.start_device_flow)
 
-    @router.get("/contribution/auth/device/{flow_id}", responses={401: _ERROR})
-    async def contribution_device_poll_alias(flow_id: str, request: Request) -> DeviceFlowPollResponse:
+    @router.post("/contribution/auth/device/{flow_id}", responses={401: _ERROR, 404: _ERROR})
+    async def contribution_device_poll(flow_id: str, request: Request) -> DeviceFlowPollResponse:
         return await run_in_threadpool(_context(request).contribution.poll_device_flow, flow_id)
 
+    @router.get("/contribution/status")
+    async def contribution_status(request: Request) -> ContributionStatus:
+        return _context(request).contribution.status()
+
     @router.get("/session/current/contribution", responses={404: _ERROR, 409: _ERROR})
-    async def current_contribution_draft(request: Request) -> ContributionPreview:
+    async def current_contribution_draft(request: Request) -> ContributionPreviewResponse:
         context = _context(request)
         snapshot = _require_current_session(context)
         return await run_in_threadpool(context.contribution.draft, snapshot)
@@ -531,7 +540,7 @@ def _register_contribution_routes(router: APIRouter) -> None:
     async def current_contribution_preview(
         payload: ContributionPreviewRequest,
         request: Request,
-    ) -> ContributionPreview:
+    ) -> ContributionPreviewResponse:
         context = _context(request)
         snapshot = _require_current_session(context)
         return await run_in_threadpool(context.contribution.preview, snapshot, payload)

@@ -356,6 +356,18 @@ export interface ContributionResult {
   pull_request_url?: string | null;
 }
 
+export type ContributionState = "idle" | "preview_ready" | "submitting" | "submitted" | "failed";
+
+export interface ContributionStatus {
+  state: ContributionState;
+  session_id?: string | null;
+  preview?: ContributionPreview | null;
+  submission_url?: string | null;
+  message?: string | null;
+  error?: string | null;
+  updated_at?: string | null;
+}
+
 export interface ShellyDiscoveryDevice {
   id: string;
   name: string;

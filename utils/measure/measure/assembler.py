@@ -198,7 +198,7 @@ class MeasurementAssembler:
             )
         if isinstance(request, FanMeasurementRequest):
             fan_controller = self._fan_controller(request.controller)
-            return FanRunner(measure_util, fan_controller, interaction)
+            return FanRunner(measure_util, parameters, fan_controller, interaction)
         raise ValueError(f"Unsupported measurement request: {type(request).__name__}")
 
     def _light_controller(self, spec: LightControllerSpec) -> LightController:

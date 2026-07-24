@@ -8,8 +8,8 @@ from measure.controller.light.const import LutMode
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
 from measure.ha_app.contribution import (
-    ContributionCoordinator,
-    ContributionPreview,
+    ContributionApiCoordinator,
+    ContributionPreviewResponse,
     ContributionState,
     ContributionStatus,
 )
@@ -223,7 +223,7 @@ def test_storage_round_trips_global_and_session_dummy_load_calibration(tmp_path:
 
 def test_contribution_state_recovers_interrupted_submission(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
-    preview = ContributionPreview(
+    preview = ContributionPreviewResponse(
         session_id="a1b2-c3d4",
         title="Add profile",
         body="Body",
@@ -248,7 +248,7 @@ def test_contribution_state_recovers_interrupted_submission(tmp_path: Path) -> N
         ),
     )
 
-    status = ContributionCoordinator(storage).status()
+    status = ContributionApiCoordinator(storage).status()
 
     assert status.state == ContributionState.FAILED
     assert status.session_id == "a1b2-c3d4"

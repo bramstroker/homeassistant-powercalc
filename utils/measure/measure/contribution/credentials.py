@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
-import os
 from pathlib import Path
-from typing import Any, Literal
+from typing import Literal
+
+from measure.contribution.files import write_json_atomic
 
 CredentialKind = Literal["oauth", "pat"]
 
@@ -53,7 +54,8 @@ class CredentialStore:
         )
 
     def save(self, credential: StoredCredential) -> None:
-        self._write_private_json(
+        write_json_atomic(
+            self.path,
             {
                 "kind": credential.kind,
                 "token": credential.token,
@@ -61,25 +63,8 @@ class CredentialStore:
                 "scopes": list(credential.scopes),
                 "permissions_verified": credential.permissions_verified,
             },
+            private=True,
         )
 
     def clear(self) -> None:
         self.path.unlink(missing_ok=True)
-
-    def _write_private_json(self, value: dict[str, Any]) -> None:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        temporary = self.path.with_name(f".{self.path.name}.tmp")
-        temporary.unlink(missing_ok=True)
-        flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
-        descriptor = os.open(temporary, flags, 0o600)
-        try:
-            with os.fdopen(descriptor, "w", encoding="utf-8") as file:
-                json.dump(value, file, indent=2, sort_keys=True)
-                file.flush()
-                os.fsync(file.fileno())
-            os.chmod(temporary, 0o600)
-            temporary.replace(self.path)
-            os.chmod(self.path, 0o600)
-        except Exception:
-            temporary.unlink(missing_ok=True)
-            raise

@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from measure.contribution.coordinator import ContributionCoordinator, ContributionJobStore
+from measure.contribution.coordinator import (
+    ContributionCoordinator,
+    ContributionJobExpiredError,
+    ContributionJobStore,
+)
 from measure.contribution.credentials import CredentialStore
 from measure.contribution.github import GitHubClient
 from measure.contribution.models import (
@@ -22,6 +26,7 @@ __all__ = [
     "ContributionError",
     "ContributionErrorCode",
     "ContributionJob",
+    "ContributionJobExpiredError",
     "ContributionJobStatus",
     "ContributionJobStore",
     "ContributionMetadata",

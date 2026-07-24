@@ -82,7 +82,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
                 _LOGGER.info("Measured power: %.2f W", result.power)
                 measurements[battery_level].append(result.power)
                 voltages.extend(result.voltages)
-                if not request.fast_test_mode:
+                if not self.config.fast_test_mode:
                     self.interaction.wait(self.config.sleep_time)
                 error_count = 0
             except ChargingControllerError as e:
@@ -90,7 +90,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
                 error_count += 1
                 if error_count > 10:
                     raise RunnerError("Too many errors occurred during measurements. aborting") from e
-                if not request.fast_test_mode:
+                if not self.config.fast_test_mode:
                     self.interaction.wait(self.config.sleep_time)
 
         self.interaction.notify("Done charging, start measurements for trickle charging..")
@@ -98,7 +98,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
 
         trickle_result = (
             self.measure_util.take_measurement(time.time())
-            if request.fast_test_mode
+            if self.config.fast_test_mode
             else self.measure_util.take_average_measurement(
                 TRICKLE_CHARGING_TIME,
                 on_progress=self._report_trickle_progress,

@@ -48,14 +48,7 @@ class ProfilePreparer:
         if unexpected:
             raise ProfilePreparationError(f"Unexpected artifact file(s): {', '.join(unexpected)}")
 
-        model = self._read_object(model_path)
-        if metadata.product_name is not None:
-            model["name"] = metadata.product_name
-        model["author_info"] = {
-            "name": metadata.author.name,
-            "github": metadata.author.github,
-            **({"email": metadata.author.email} if metadata.author.email else {}),
-        }
+        model = self._apply_metadata(self._read_object(model_path), metadata)
         if model.get("calculation_strategy") == "lut" and not csv_paths:
             raise ProfilePreparationError("At least one .csv.gz artifact is required for LUT profiles")
         self.validator(model, self._read_object(self.model_schema_path))
@@ -91,7 +84,16 @@ class ProfilePreparer:
         metadata: ContributionMetadata,
         preview: ContributionPreview,
     ) -> tuple[tuple[str, bytes], ...]:
-        model = self._read_object(artifact_directory / "model.json")
+        model = self._apply_metadata(self._read_object(artifact_directory / "model.json"), metadata)
+        result: list[tuple[str, bytes]] = []
+        for file in preview.files:
+            relative_path = Path(file.path)
+            content = self._prepared_file_content(relative_path, artifact_directory, model, metadata)
+            result.append((file.path, content))
+        return tuple(result)
+
+    @staticmethod
+    def _apply_metadata(model: dict[str, Any], metadata: ContributionMetadata) -> dict[str, Any]:
         if metadata.product_name is not None:
             model["name"] = metadata.product_name
         model["author_info"] = {
@@ -99,12 +101,7 @@ class ProfilePreparer:
             "github": metadata.author.github,
             **({"email": metadata.author.email} if metadata.author.email else {}),
         }
-        result: list[tuple[str, bytes]] = []
-        for file in preview.files:
-            relative_path = Path(file.path)
-            content = self._prepared_file_content(relative_path, artifact_directory, model, metadata)
-            result.append((file.path, content))
-        return tuple(result)
+        return model
 
     def _resolve_manufacturer_directory(self, manufacturer: str, requested_directory: str | None) -> str:
         requested = self._normalize(manufacturer)
@@ -154,15 +151,17 @@ class ProfilePreparer:
         if not index_path.exists():
             return
         index = self._read_object(index_path)
+        # Casefolded: GitHub hosting is case-sensitive, but "LCT001" and "lct001"
+        # would still be near-duplicate profiles in the library.
         existing_paths = {
-            f"profile_library/{manufacturer.get('dir_name')}/{model.get('id')}/model.json"
+            f"profile_library/{manufacturer.get('dir_name')}/{model.get('id')}/model.json".casefold()
             for manufacturer in index.get("manufacturers", [])
             if isinstance(manufacturer, dict)
             for model in manufacturer.get("models", [])
             if isinstance(model, dict)
         }
         for relative_path in relative_files:
-            if relative_path.as_posix() in existing_paths:
+            if relative_path.as_posix().casefold() in existing_paths:
                 raise ProfilePreparationError(f"Refusing to overwrite existing profile path: {relative_path}")
 
     def _duplicate_warnings(
@@ -245,7 +244,15 @@ class ProfilePreparer:
         if relative_path.name == "model.json":
             return json.dumps(model, indent=2, sort_keys=True).encode("utf-8") + b"\n"
         if relative_path.name == "manufacturer.json":
-            return json.dumps({"name": metadata.manufacturer, "aliases": []}, indent=2).encode("utf-8") + b"\n"
+            aliases: list[Any] = []
+            artifact_manifest = artifact_directory / "manufacturer.json"
+            if artifact_manifest.exists():
+                with artifact_manifest.open(encoding="utf-8") as file:
+                    existing = json.load(file)
+                if isinstance(existing, dict) and isinstance(existing.get("aliases"), list):
+                    aliases = existing["aliases"]
+            payload = {"name": metadata.manufacturer, "aliases": aliases}
+            return json.dumps(payload, indent=2, sort_keys=True).encode("utf-8") + b"\n"
         artifact_path = artifact_directory / relative_path.name
         if artifact_path.exists():
             return artifact_path.read_bytes()
