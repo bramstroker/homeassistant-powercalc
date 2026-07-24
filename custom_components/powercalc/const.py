@@ -25,6 +25,8 @@ BUILT_IN_LIBRARY_DIR = "powercalc_profiles"
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 
+ISSUE_COMPOSITE_DEVICE_ID = "composite_device_id"
+
 DATA_CONFIGURED_ENTITIES = "configured_entities"
 DATA_DISCOVERY_MANAGER = "discovery_manager"
 DATA_DOMAIN_ENTITIES = "domain_entities"

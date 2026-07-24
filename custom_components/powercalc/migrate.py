@@ -1,10 +1,10 @@
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_ENABLED, CONF_ID, CONF_PATH, EntityCategory
+from homeassistant.const import CONF_DEVICE, CONF_ENABLED, CONF_ID, CONF_PATH, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry, issue_registry as ir
-from homeassistant.helpers.helper_integration import async_remove_helper_config_entry_from_source_device
+import homeassistant.helpers.helper_integration as helper_integration
 from homeassistant.helpers.issue_registry import async_create_issue
 
 from custom_components.powercalc.const import (
@@ -74,13 +74,26 @@ def _remove_config_entry_from_devices(hass: HomeAssistant, config_entry: ConfigE
     Remove powercalc config entry from devices.
     See: https://developers.home-assistant.io/blog/2025/07/18/updated-pattern-for-helpers-linking-to-devices/
     """
-    device_reg = device_registry.async_get(hass)
-    for device_entry in device_registry.async_entries_for_config_entry(device_reg, config_entry.entry_id):
-        async_remove_helper_config_entry_from_source_device(
+    remove_helper_devices = getattr(helper_integration, "async_remove_helper_devices", None)
+    if remove_helper_devices is not None:
+        configured_device_id = config_entry.data.get(CONF_DEVICE, None)
+        remove_helper_devices(
             hass,
             helper_config_entry_id=config_entry.entry_id,
-            source_device_id=device_entry.id,
+            source_device_id=configured_device_id,
+            remove_all_devices=True,
         )
+        return
+
+    remove_legacy_link = getattr(helper_integration, "async_remove_helper_config_entry_from_source_device", None)
+    if remove_legacy_link is not None:
+        device_reg = device_registry.async_get(hass)
+        for device_entry in device_registry.async_entries_for_config_entry(device_reg, config_entry.entry_id):
+            remove_legacy_link(
+                hass,
+                helper_config_entry_id=config_entry.entry_id,
+                source_device_id=device_entry.id,
+            )
 
 
 def _migrate_power_template(data: dict) -> None:

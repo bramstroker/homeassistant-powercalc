@@ -562,6 +562,29 @@
     }
   },
   "issues": {
+    "composite_device_id": {
+      "fix_flow": {
+        "abort": {
+          "entry_removed": "Konfiguračný záznam Powercalc bol odstránený"
+        },
+        "error": {
+          "invalid_device": "Vyberte existujúce zariadenie alebo nechajte pole prázdne"
+        },
+        "step": {
+          "select_device": {
+            "data": {
+              "device": "Zariadenie"
+            },
+            "data_description": {
+              "device": "Zariadenie, ku ktorému majú byť priradené entity vytvorené touto konfiguráciou Powercalc"
+            },
+            "description": "Konfigurácia Powercalc {name} bola priradená k zariadeniu, ktoré Home Assistant rozdelil na viacero zariadení. Jej entity nemožno priradiť k starému ID zariadenia.\n\nVyberte zariadenie, ku ktorému majú byť tieto entity priradené, alebo nechajte pole prázdne, aby zostali bez zariadenia.",
+            "title": "Vyberte zariadenie pre {name}"
+          }
+        }
+      },
+      "title": "Zariadenie pre konfiguráciu Powercalc {name} je potrebné vybrať znova"
+    },
     "deprecated_platform_yaml": {
       "description": "Konfigurácia senzorov pomocou `sensor->platform` bola zastaraná. Musíte zmeniť konfiguráciu na `powercalc->sensors`. Kliknite na 'Viac informácií' pre ďalšie pokyny.",
       "title": "Konfigurácia Powercalc YAML bola presunutá"
