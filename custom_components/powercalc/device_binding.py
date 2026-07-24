@@ -12,7 +12,7 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_AREA
+from custom_components.powercalc.const import CONF_AREA, DUMMY_ENTITY_ID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +27,21 @@ def is_composite_device_id(hass: HomeAssistant, device_id: str) -> bool:
     if not callable(is_composite):
         return False
     return bool(is_composite(device_id))
+
+
+def attach_configured_device_entry(
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    source_entity: SourceEntity,
+) -> SourceEntity:
+    """Attach the configured device entry to a device-based source entity."""
+    if source_entity.entity_id != DUMMY_ENTITY_ID:
+        return source_entity
+
+    device_entry = get_device_entry(hass, sensor_config=sensor_config)
+    if device_entry:
+        return source_entity._replace(device_entry=device_entry)
+    return source_entity
 
 
 async def attach_entities_to_resolved_device(

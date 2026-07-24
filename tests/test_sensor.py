@@ -36,7 +36,6 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
@@ -56,7 +55,6 @@ from custom_components.powercalc.const import (
     CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
-    DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHOD_LEFT,
     SERVICE_ACTIVATE_PLAYBOOK,
     SERVICE_CALIBRATE_COST,
@@ -77,7 +75,6 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
-from custom_components.powercalc.sensor import _attach_configured_device_entry
 from tests.common import set_states
 
 from .common import (
@@ -724,11 +721,3 @@ async def test_entity_services_registered(hass: HomeAssistant) -> None:
         SERVICE_CHANGE_GUI_CONFIGURATION,
     ]
     assert sorted(powercalc_services.keys()) == sorted(expected_services)
-
-
-def test_attach_configured_device_entry_keeps_source_entity_when_device_is_missing(hass: HomeAssistant) -> None:
-    source_entity = SourceEntity(object_id="powercalc_dummy", entity_id=DUMMY_ENTITY_ID, domain=sensor.DOMAIN)
-
-    result = _attach_configured_device_entry(hass, {"device": "missing-device-id"}, source_entity)
-
-    assert result == source_entity

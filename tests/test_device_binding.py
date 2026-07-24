@@ -12,6 +12,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -23,7 +24,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SensorType,
 )
-from custom_components.powercalc.device_binding import is_composite_device_id
+from custom_components.powercalc.device_binding import attach_configured_device_entry, is_composite_device_id
 from tests.common import create_mock_config_entry, mock_device, run_powercalc_setup
 
 
@@ -40,6 +41,14 @@ def test_regular_device_is_not_composite(
     )
 
     assert not is_composite_device_id(hass, device_entry.id)
+
+
+def test_attach_configured_device_entry_keeps_source_entity_when_device_is_missing(hass: HomeAssistant) -> None:
+    source_entity = SourceEntity(object_id="powercalc_dummy", entity_id=DUMMY_ENTITY_ID, domain="sensor")
+
+    result = attach_configured_device_entry(hass, {CONF_DEVICE: "missing-device-id"}, source_entity)
+
+    assert result == source_entity
 
 
 async def test_entities_are_bound_to_source_device(
