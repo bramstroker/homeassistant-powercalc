@@ -108,6 +108,7 @@ def split_devices(
     return device_registry.devices[device_1.id], device_registry.devices[device_2.id]
 
 
+@pytest.mark.skip(reason="Enable when Home Assistant 2026.8 is released")
 @pytest.mark.usefixtures("split_devices")
 async def test_composite_device_creates_repair_issue(
     hass: HomeAssistant,
@@ -127,6 +128,7 @@ async def test_composite_device_creates_repair_issue(
     assert all(entity.device_id is None for entity in entities)
 
 
+@pytest.mark.skip(reason="Enable when Home Assistant 2026.8 is released")
 async def test_live_device_creates_no_repair_issue(
     hass: HomeAssistant,
     issue_registry: ir.IssueRegistry,
@@ -138,6 +140,7 @@ async def test_live_device_creates_no_repair_issue(
     assert issue_registry.async_get_issue(DOMAIN, _composite_issue_id(config_entry)) is None
 
 
+@pytest.mark.skip(reason="Enable when Home Assistant 2026.8 is released")
 @pytest.mark.usefixtures("split_devices")
 async def test_no_device_creates_no_repair_issue(
     hass: HomeAssistant,
@@ -149,6 +152,7 @@ async def test_no_device_creates_no_repair_issue(
     assert issue_registry.async_get_issue(DOMAIN, _composite_issue_id(config_entry)) is None
 
 
+@pytest.mark.skip(reason="Enable when Home Assistant 2026.8 is released")
 @pytest.mark.parametrize("pick_device", [True, False], ids=["pick_device", "unlink"])
 async def test_composite_device_repair_updates_device(
     hass: HomeAssistant,
@@ -174,6 +178,7 @@ async def test_composite_device_repair_updates_device(
     assert all(entity.device_id == selected_device_id for entity in entities)
 
 
+@pytest.mark.skip(reason="Enable when Home Assistant 2026.8 is released")
 @pytest.mark.parametrize("selected_device_id", [COMPOSITE_ID, "unknown-device"])
 @pytest.mark.usefixtures("split_devices")
 async def test_composite_device_repair_rejects_invalid_device(
@@ -194,6 +199,7 @@ async def test_composite_device_repair_rejects_invalid_device(
     assert config_entry.data[CONF_DEVICE] == COMPOSITE_ID
 
 
+@pytest.mark.skip(reason="Enable when Home Assistant 2026.8 is released")
 @pytest.mark.usefixtures("split_devices")
 async def test_composite_device_repair_aborts_when_entry_removed(
     hass: HomeAssistant,

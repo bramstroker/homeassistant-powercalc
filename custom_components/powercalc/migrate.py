@@ -76,11 +76,11 @@ def _remove_config_entry_from_devices(hass: HomeAssistant, config_entry: ConfigE
     """
     remove_helper_devices = getattr(helper_integration, "async_remove_helper_devices", None)
     if remove_helper_devices is not None:  # pragma: no cover
-        configured_device_id = config_entry.data.get(CONF_DEVICE)
+        configured_device_id = config_entry.data.get(CONF_DEVICE, None)
         remove_helper_devices(
             hass,
             helper_config_entry_id=config_entry.entry_id,
-            source_device_id=configured_device_id if isinstance(configured_device_id, str) else None,
+            source_device_id=configured_device_id,
             remove_all_devices=True,
         )
         return
