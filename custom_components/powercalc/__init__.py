@@ -545,11 +545,7 @@ def _async_handle_composite_device_issue(hass: HomeAssistant, entry: ConfigEntry
     """Report ambiguous legacy device IDs."""
     issue_id = _composite_device_issue_id(entry.entry_id)
     device_id = entry.data.get(CONF_DEVICE)
-    if not device_id:
-        ir.async_delete_issue(hass, DOMAIN, issue_id)
-        return
-
-    if not is_composite_device_id(hass, device_id):
+    if not device_id or not is_composite_device_id(hass, str(device_id)):
         ir.async_delete_issue(hass, DOMAIN, issue_id)
         return
 
