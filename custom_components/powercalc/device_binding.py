@@ -18,7 +18,10 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def is_composite_device_id(hass: HomeAssistant, device_id: str) -> bool:
-    """Return whether a device ID identifies a legacy composite device."""
+    """
+    Return whether a device ID identifies a legacy composite device.
+    Check for availability of async_is_composite_device_id, because this function is only available in HA >=2026.8
+    """
     device_reg = device_registry.async_get(hass)
     is_composite = getattr(device_reg, "async_is_composite_device_id", None)
     if not callable(is_composite):
