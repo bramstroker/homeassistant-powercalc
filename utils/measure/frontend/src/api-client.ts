@@ -2,6 +2,15 @@ import type {
   ApiErrorBody,
   AppSettings,
   Capabilities,
+  ContributionAuthDeviceStatus,
+  ContributionAuthState,
+  ContributionDeviceFlow,
+  ContributionPreview,
+  ContributionPreviewRequest,
+  ContributionResult,
+  ContributionStatus,
+  ContributionSubmitRequest,
+  ContributionTokenRequest,
   DeviceClass,
   DummyLoadCalibration,
   EntityCatalog,
@@ -53,6 +62,31 @@ export class MeasureApiClient {
 
   getSettings(): Promise<AppSettings> {
     return this.request("api/settings");
+  }
+
+  getContributionAuth(): Promise<ContributionAuthState> {
+    return this.request("api/contribution/auth");
+  }
+
+  startContributionDeviceAuth(): Promise<ContributionDeviceFlow> {
+    return this.request("api/contribution/auth/device", { method: "POST" });
+  }
+
+  getContributionDeviceAuth(flowId: string): Promise<ContributionAuthDeviceStatus> {
+    return this.request(`api/contribution/auth/device/${encodeURIComponent(flowId)}`, { method: "POST" });
+  }
+
+  getContributionStatus(): Promise<ContributionStatus> {
+    return this.request("api/contribution/status");
+  }
+
+  saveContributionToken(token: string): Promise<ContributionAuthState> {
+    const body: ContributionTokenRequest = { token };
+    return this.request("api/contribution/auth", { method: "PUT", body: JSON.stringify(body) });
+  }
+
+  disconnectContributionAuth(): Promise<ContributionAuthState> {
+    return this.request("api/contribution/auth", { method: "DELETE" });
   }
 
   saveSettings(settings: AppSettings): Promise<AppSettings> {
@@ -114,6 +148,18 @@ export class MeasureApiClient {
 
   getPlots(): Promise<PlotCollection> {
     return this.request<PlotCollection>("api/session/current/plots");
+  }
+
+  getContributionDraft(): Promise<ContributionPreview> {
+    return this.request("api/session/current/contribution");
+  }
+
+  previewContribution(request: ContributionPreviewRequest): Promise<ContributionPreview> {
+    return this.request("api/session/current/contribution/preview", { method: "POST", body: JSON.stringify(request) });
+  }
+
+  submitContribution(request: ContributionSubmitRequest): Promise<ContributionResult> {
+    return this.request("api/session/current/contribution", { method: "POST", body: JSON.stringify(request) });
   }
 
   fileUrl(name: string): string {

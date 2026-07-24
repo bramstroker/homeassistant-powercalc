@@ -64,6 +64,10 @@ uv run --extra app python -m measure.ha_app.main \
 ```
 Use the full Home Assistant WebSocket endpoint: `ws://<host>:8123/api/websocket` for a direct connection, or `ws://supervisor/core/websocket` from a Home Assistant add-on. `--hass-token` may be omitted if `SUPERVISOR_TOKEN` is exported instead. Session state and settings are written to `--data-root` (here `.dev-data`).
 
+GitHub device login requires a GitHub OAuth App with Device Flow enabled. Set its public client ID in `POWERCALC_GITHUB_CLIENT_ID` before starting the backend. Device login requests `public_repo` and `workflow`; the latter is needed to base a clean contribution branch on an upstream commit when the user's fork has stale workflow files. Without a client ID, the UI disables device login and retains the personal-access-token fallback.
+
+Automatic contributions target `bramstroker/homeassistant-powercalc` on `master` by default. For an isolated test repository, set `POWERCALC_GITHUB_REPOSITORY=owner/repository` and, when needed, `POWERCALC_GITHUB_BRANCH=main` before starting the backend. Both preview validation and pull-request submission use this target.
+
 **Terminal 2 — frontend** (from `utils/measure/frontend`):
 ```
 npm install

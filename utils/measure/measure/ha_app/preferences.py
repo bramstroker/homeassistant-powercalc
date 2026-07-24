@@ -38,4 +38,5 @@ class AppPreferences(BaseModel):
     default_measure_device: str | None = Field(default=None, max_length=200)
     power_meter: PowerMeterType = PowerMeterType.HASS
     shelly_ip: str | None = Field(default=None, max_length=255)
+    fast_test_mode: bool = False
     measurement_defaults: AppMeasurementDefaults = Field(default_factory=AppMeasurementDefaults)

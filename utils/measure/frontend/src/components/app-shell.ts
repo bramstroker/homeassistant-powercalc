@@ -3,7 +3,7 @@ import { MeasureApiClient, SessionEventStream } from "../api-client";
 import { MeasureAppController } from "../app-controller";
 import type { AppView, MeasureAppApi, MeasureAppState } from "../app-controller";
 import { LIGHT_TYPE } from "../measurement-kinds";
-import type { AppSettings, Capabilities, DummyLoadCalibration, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, ShellyDiscoveryDevice } from "../types";
+import type { AppSettings, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DummyLoadCalibration, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SettingsSection, ShellyDiscoveryDevice } from "../types";
 import type { ReviewMetric, ReviewRow } from "./preflight-view";
 import { sharedStyles } from "../styles";
 import "./preflight-view";
@@ -16,9 +16,12 @@ const POWERCALC_LOGO_URL = new URL("../assets/powercalc-logo.svg", import.meta.u
 
 export class AppShell extends LitElement implements MeasureAppState {
   static readonly properties = {
-    view: { state: true }, loadingMessage: { state: true }, errorMessage: { state: true }, busy: { state: true },
+    view: { state: true }, settingsSection: { state: true }, loadingMessage: { state: true }, errorMessage: { state: true }, busy: { state: true },
     connectedToEvents: { state: true }, snapshot: { state: true }, request: { state: true }, preflight: { state: true },
     files: { state: true }, plotCollection: { state: true }, logs: { state: true }, settings: { state: true },
+    contributionAuth: { state: true }, contributionDeviceFlow: { state: true }, contributionDeviceStatus: { state: true },
+    contributionDraft: { state: true }, contributionPreview: { state: true }, contributionResult: { state: true },
+    contributionBusy: { state: true }, contributionAuthBusy: { state: true }, contributionError: { state: true }, contributionAuthError: { state: true },
     samples: { state: true }, testingPowerMeter: { state: true }, powerMeterTestResult: { state: true },
     deviceEntities: { state: true }, deviceEntityErrors: { state: true },
     dummyLoadCalibration: { state: true }, dummyLoadCalibrationError: { state: true },
@@ -27,6 +30,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   };
 
   view: AppView = "loading";
+  settingsSection?: SettingsSection;
   loadingMessage = "Connecting to Home Assistant…";
   errorMessage = "";
   busy = false;
@@ -46,6 +50,16 @@ export class AppShell extends LitElement implements MeasureAppState {
   dummyLoadCalibration: DummyLoadCalibration | null = null;
   dummyLoadCalibrationError = "";
   settings?: AppSettings;
+  contributionAuth?: ContributionAuthState;
+  contributionDeviceFlow?: ContributionDeviceFlow;
+  contributionDeviceStatus?: ContributionAuthDeviceStatus;
+  contributionDraft?: ContributionPreview;
+  contributionPreview?: ContributionPreview;
+  contributionResult?: ContributionResult;
+  contributionBusy = false;
+  contributionAuthBusy = false;
+  contributionError = "";
+  contributionAuthError = "";
   definitions: MeasureDefinition[] = [];
   deviceEntities: Record<string, EntityDescriptor[]> = {};
   deviceEntityErrors: Record<string, string> = {};
@@ -148,14 +162,19 @@ export class AppShell extends LitElement implements MeasureAppState {
         .shellyDiscoveryDevices=${this.shellyDiscoveryDevices} .discoveringShellys=${this.discoveringShellys}
         .shellyDiscoveryError=${this.shellyDiscoveryError} .shellyDiscoveryAvailable=${this.shellyDiscoveryAvailable}
         .shellyDiscoveryMessage=${this.shellyDiscoveryMessage}
+        .contributionAuth=${this.contributionAuth} .contributionDeviceFlow=${this.contributionDeviceFlow}
+        .contributionDeviceStatus=${this.contributionDeviceStatus} .contributionAuthBusy=${this.contributionAuthBusy}
+        .contributionAuthError=${this.contributionAuthError} .initialSection=${this.settingsSection}
         @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter} @test-clear=${this.clearPowerMeterTestResult}
-        @shelly-discover=${this.discoverShellys}></measure-settings-view>`;
+        @shelly-discover=${this.discoverShellys} @github-device-start=${this.startContributionDeviceAuth}
+        @github-device-check=${this.checkContributionDeviceAuth} @github-token-save=${this.saveContributionToken}
+        @github-disconnect=${this.disconnectContributionAuth}></measure-settings-view>`;
     if (this.view === "review" && this.preflight && this.request) return html`
       <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .powerMeterDiagnostic=${this.preflight.power_meter_diagnostic} .canOverwrite=${this.reviewCanOverwrite()} .confirmationAction=${this.confirmationAction()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`
       <measure-running-view .snapshot=${this.snapshot} .confirmationAction=${this.confirmationAction()} .warningConfirmation=${this.confirmationIsWarning()} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
     if (this.view === "result" && this.snapshot) return html`
-      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .plotCollection=${this.plotCollection} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} @new=${this.newMeasurement} @resume=${this.resume}></measure-result-view>`;
+      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .plotCollection=${this.plotCollection} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} .contributionAuth=${this.contributionAuth} .contributionDraft=${this.contributionDraft} .contributionPreview=${this.contributionPreview} .contributionResult=${this.contributionResult} .contributionBusy=${this.contributionBusy} .contributionError=${this.contributionError} @new=${this.newMeasurement} @resume=${this.resume} @open-settings=${this.openSettings} @contribution-preview=${this.previewContribution} @contribution-submit=${this.submitContribution}></measure-result-view>`;
     return html`
       <measure-setup-view
         .capabilities=${this.capabilities} .definitions=${this.definitions}
@@ -305,8 +324,12 @@ export class AppShell extends LitElement implements MeasureAppState {
   private resume(): void {
     void this.controller.resume();
   }
-  private openSettings(): void {
-    this.controller.openSettings();
+  private openSettings(event?: Event): void {
+    const detail = (event as CustomEvent | undefined)?.detail;
+    const section = detail && typeof detail === "object" && "section" in detail
+      ? (detail as { section?: SettingsSection }).section
+      : undefined;
+    this.controller.openSettings(section);
   }
   private closeSettings(): void {
     this.controller.closeSettings();
@@ -319,6 +342,24 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
   private retryDummyLoadCalibration(): void {
     void this.controller.retryDummyLoadCalibration();
+  }
+  private startContributionDeviceAuth(): void {
+    void this.controller.startContributionDeviceAuth();
+  }
+  private checkContributionDeviceAuth(): void {
+    void this.controller.checkContributionDeviceAuth();
+  }
+  private saveContributionToken(event: CustomEvent<string>): void {
+    void this.controller.saveContributionToken(event.detail);
+  }
+  private disconnectContributionAuth(): void {
+    void this.controller.disconnectContributionAuth();
+  }
+  private previewContribution(event: CustomEvent<ContributionPreviewRequest>): void {
+    void this.controller.previewContribution(event.detail);
+  }
+  private submitContribution(event: CustomEvent<ContributionSubmitRequest>): void {
+    void this.controller.submitContribution(event.detail);
   }
   private stepClass(index: number): string {
     const current = this.currentStep();

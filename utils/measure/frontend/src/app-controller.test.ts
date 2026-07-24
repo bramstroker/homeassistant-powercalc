@@ -5,6 +5,7 @@ import type { PowerMeterDiagnostic, SessionEvent } from "./types";
 const measurementDefaults = { sleep_time: 1, sample_count: 2, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
 const settings = {
   default_power_entity_id: null, default_measure_device: null, power_meter: "hass" as const, shelly_ip: null,
+  fast_test_mode: false,
   measurement_defaults: measurementDefaults,
 };
 const capabilities = {
@@ -24,6 +25,7 @@ function state(): MeasureAppState {
     files: [], plotCollection: { partial: false, plots: [], warnings: [] },
     logs: [], samples: [], lights: [], powers: [], voltages: [], definitions: [],
     dummyLoadCalibration: null, dummyLoadCalibrationError: "",
+    contributionBusy: false, contributionAuthBusy: false, contributionError: "", contributionAuthError: "",
     deviceEntities: {}, deviceEntityErrors: {}, testingPowerMeter: false,
     shellyDiscoveryDevices: [], discoveringShellys: false, shellyDiscoveryError: "",
   };
@@ -34,6 +36,18 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     getCapabilities: async () => capabilities,
     getMeasureDefinitions: async () => [],
     getSettings: async () => settings,
+    getContributionAuth: async () => ({ connected: false }),
+    getContributionStatus: async () => ({ state: "idle" as const }),
+    startContributionDeviceAuth: async () => ({
+      flow_id: "flow-1",
+      user_code: "ABCD-EFGH",
+      verification_uri: "https://github.com/login/device",
+      expires_in: 900,
+      interval: 5,
+    }),
+    getContributionDeviceAuth: async () => ({ status: "pending" }),
+    saveContributionToken: async () => ({ connected: true, method: "token", identity: { login: "octocat" } }),
+    disconnectContributionAuth: async () => ({ connected: false }),
     saveSettings: async (value) => value,
     testPowerMeter: async () => ({
       success: true,
@@ -60,6 +74,46 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     resume: async () => ({ state: "running" }),
     getFiles: async () => [],
     getPlots: async () => ({ partial: false, plots: [], warnings: [] }),
+    getContributionDraft: async () => ({
+      eligible: false,
+      reason: "No profile output",
+      repository: "bramstroker/homeassistant-powercalc",
+      base_branch: "master",
+      manufacturer_name: "",
+      manufacturer_directory: "",
+      model_id: "",
+      product_name: "",
+      contributor: "",
+      device_info: {},
+      home_assistant: {},
+      notes: "",
+      files: [],
+      commit_message: "",
+      pr_title: "",
+      pr_body: "",
+      branch_name: "",
+      warnings: [],
+    }),
+    previewContribution: async (request) => ({
+      eligible: true,
+      repository: "bramstroker/homeassistant-powercalc",
+      base_branch: "master",
+      manufacturer_name: request.manufacturer_name,
+      manufacturer_directory: request.manufacturer_directory,
+      model_id: request.model_id,
+      product_name: request.product_name,
+      contributor: request.contributor,
+      device_info: {},
+      home_assistant: {},
+      notes: request.notes,
+      files: [],
+      commit_message: "Add measured profile",
+      pr_title: "Add measured profile",
+      pr_body: "",
+      branch_name: "measure/profile",
+      warnings: [],
+    }),
+    submitContribution: async () => ({ status: "success", pull_request_url: "https://github.com/pull/1" }),
     ...overrides,
   };
 }
@@ -129,6 +183,122 @@ describe("measure app controller", () => {
     expect(appState.files).toHaveLength(1);
     expect(appState.plotCollection).toEqual(plots);
     expect(appState.dummyLoadCalibration?.description).toBe("Calibrated load");
+  });
+
+  it("loads contribution auth and draft data for a completed session", async () => {
+    const appState = state();
+    const controller = new MeasureAppController(appState, () => api({
+      getCurrent: async () => ({ state: "completed" }),
+      getContributionAuth: async () => ({ connected: true, identity: { login: "octocat" }, method: "device" }),
+      getContributionDraft: async () => ({
+        eligible: true,
+        repository: "bramstroker/homeassistant-powercalc",
+        base_branch: "master",
+        manufacturer_name: "Signify",
+        manufacturer_directory: "signify",
+        model_id: "LCT010",
+        product_name: "Hue lamp",
+        contributor: "octocat",
+        device_info: { device: "light.desk" },
+        home_assistant: { version: "2026.7" },
+        notes: "Measured from HA app",
+        files: [{ path: "profile_library/signify/LCT010/model.json", rendered_json: { name: "Hue lamp" } }],
+        model_json: { name: "Hue lamp" },
+        commit_message: "Add Signify LCT010",
+        pr_title: "Add Signify LCT010",
+        pr_body: "Adds a measured profile.",
+        branch_name: "measure/signify-lct010",
+        warnings: [],
+      }),
+    }), () => connection(), () => undefined);
+
+    await controller.boot();
+
+    expect(appState.view).toBe("result");
+    expect(appState.contributionAuth?.identity?.login).toBe("octocat");
+    expect(appState.contributionDraft?.files[0]?.path).toBe("profile_library/signify/LCT010/model.json");
+    expect(appState.contributionPreview).toBeUndefined();
+  });
+
+  it("restores a persisted submitted contribution for the current session", async () => {
+    const appState = state();
+    const controller = new MeasureAppController(appState, () => api({
+      getCurrent: async () => ({ state: "completed", session_id: "session-1" }),
+      getContributionStatus: async () => ({
+        state: "submitted" as const,
+        session_id: "session-1",
+        submission_url: "https://github.com/pull/9",
+        message: "Contribution submitted",
+      }),
+    }), () => connection(), () => undefined);
+
+    await controller.boot();
+
+    expect(appState.contributionResult?.pull_request_url).toBe("https://github.com/pull/9");
+    expect(appState.contributionResult?.status).toBe("success");
+  });
+
+  it("ignores persisted contribution status from another session", async () => {
+    const appState = state();
+    const controller = new MeasureAppController(appState, () => api({
+      getCurrent: async () => ({ state: "completed", session_id: "session-2" }),
+      getContributionStatus: async () => ({
+        state: "failed" as const,
+        session_id: "session-1",
+        error: "Old failure",
+      }),
+    }), () => connection(), () => undefined);
+
+    await controller.boot();
+
+    expect(appState.contributionResult).toBeUndefined();
+    expect(appState.contributionError).toBe("");
+  });
+
+  it("runs device login, token fallback, disconnect, preview, and submit contribution actions", async () => {
+    const appState = state();
+    const controller = new MeasureAppController(appState, () => api({
+      getContributionDeviceAuth: async () => ({ status: "authorized", auth: { connected: true, identity: { login: "octocat" }, method: "device" } }),
+      previewContribution: async (request) => ({
+        eligible: true,
+        repository: "bramstroker/homeassistant-powercalc",
+        base_branch: "master",
+        manufacturer_name: request.manufacturer_name,
+        manufacturer_directory: request.manufacturer_directory,
+        model_id: request.model_id,
+        product_name: request.product_name,
+        contributor: request.contributor,
+        device_info: {},
+        home_assistant: {},
+        notes: request.notes,
+        files: [{ path: "profile_library/signify/LCT010/model.json", content: "{}" }],
+        model_json: {},
+        commit_message: "Add Signify LCT010",
+        pr_title: "Add Signify LCT010",
+        pr_body: "",
+        branch_name: "measure/signify-lct010",
+        warnings: [],
+      }),
+    }), () => connection(), () => undefined);
+
+    await controller.startContributionDeviceAuth();
+    expect(appState.contributionDeviceFlow?.flow_id).toBe("flow-1");
+
+    await controller.checkContributionDeviceAuth();
+    expect(appState.contributionAuth?.identity?.login).toBe("octocat");
+    expect(appState.contributionDeviceFlow).toBeUndefined();
+
+    await controller.saveContributionToken("token");
+    expect(appState.contributionAuth?.method).toBe("token");
+
+    await controller.previewContribution({ manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "No aliases." });
+    expect(appState.contributionPreview?.notes).toBe("No aliases.");
+
+    await controller.submitContribution({ manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "No aliases.", confirmed: true });
+    expect(appState.contributionResult?.pull_request_url).toBe("https://github.com/pull/1");
+
+    await controller.disconnectContributionAuth();
+    expect(appState.contributionAuth?.connected).toBe(false);
   });
 
   it("boots core data and lazily fetches entities for the selected measurement", async () => {
@@ -312,6 +482,28 @@ describe("measure app controller", () => {
 
     expect(appState.testingPowerMeter).toBe(false);
     expect(appState.powerMeterTestResult).toBeUndefined();
+  });
+
+  it("records the requested settings section so the GitHub shortcut lands on the GitHub tab", () => {
+    const appState = state();
+    appState.view = "result";
+    const controller = new MeasureAppController(appState, () => api(), () => connection(), () => undefined);
+
+    controller.openSettings("github");
+
+    expect(appState.view).toBe("settings");
+    expect(appState.settingsSection).toBe("github");
+  });
+
+  it("clears the requested settings section when opening settings without a target", () => {
+    const appState = state();
+    appState.view = "result";
+    appState.settingsSection = "github";
+    const controller = new MeasureAppController(appState, () => api(), () => connection(), () => undefined);
+
+    controller.openSettings();
+
+    expect(appState.settingsSection).toBeUndefined();
   });
 
   it("discovers Shellys when opening Shelly settings and exposes unavailable discovery", async () => {

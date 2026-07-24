@@ -1,6 +1,7 @@
 import type {
   BaseMeasurementRequest,
   Capabilities,
+  ChargingDeviceType,
   FormField,
   MeasureDefinition,
   MeasureType,
@@ -129,7 +130,7 @@ export function buildNonLightRequest(
       ...base,
       measure_type: "charging",
       controller: controller("charging_entity_id"),
-      charging_device_type: text(form, "charging_device_type") as "vacuum_robot" | "lawn_mower_robot",
+      charging_device_type: text(form, "charging_device_type") as ChargingDeviceType,
     };
     case "fan": return {
       ...base,

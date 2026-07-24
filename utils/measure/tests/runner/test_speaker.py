@@ -83,6 +83,41 @@ def test_run_reports_volume_and_muted_operating_points() -> None:
     assert {"type": "speaker", "volume": 0, "muted": True} in points
 
 
+def test_fast_test_mode_measures_only_volume_endpoints_without_waiting() -> None:
+    media_controller = MagicMock(MediaController)
+    measure_util = MagicMock(MeasureUtil)
+    measure_util.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    runner = SpeakerRunner(measure_util, MeasurementParameters(fast_test_mode=True), media_controller, interaction)
+    request = SpeakerMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyMediaControllerSpec(),
+        fast_test_mode=True,
+    )
+
+    result = runner.run(request, "")
+
+    # Only the two volume endpoints plus the muted baseline are measured.
+    assert result.model_json_data["linear_config"]["calibrate"] == ["10 -> 10.5", "100 -> 10.5", "0 -> 10.5"]
+    assert measure_util.take_measurement.call_count == 3
+    measure_util.take_average_measurement.assert_not_called()
+    interaction.wait.assert_not_called()
+    assert interaction.progress.call_args_list[0] == call(
+        0,
+        3,
+        phase="Measuring volume levels",
+        remaining_seconds=0,
+    )
+    assert interaction.progress.call_args_list[-1] == call(
+        3,
+        3,
+        phase="Measuring volume levels",
+        remaining_seconds=0,
+    )
+
+
 def test_cleanup_turns_off_speaker() -> None:
     media_controller = MagicMock(MediaController)
     runner = SpeakerRunner(MagicMock(MeasureUtil), MeasurementParameters(), media_controller)

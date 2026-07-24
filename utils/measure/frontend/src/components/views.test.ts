@@ -1,4 +1,4 @@
-import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, PowerMeterDiagnostic, SessionSnapshot } from "../types";
+import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, PowerMeterDiagnostic, SessionSnapshot, SettingsSection } from "../types";
 import { sharedStyles } from "../styles";
 import { AppShell } from "./app-shell";
 import "./result-view";
@@ -9,6 +9,7 @@ import "./setup-view";
 const measurementDefaults = { sleep_time: 1, sample_count: 5, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
 const defaultSettings: AppSettings = {
   default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null,
+  fast_test_mode: false,
   measurement_defaults: measurementDefaults,
 };
 const capabilities: Capabilities = {
@@ -1125,7 +1126,7 @@ describe("settings view", () => {
     await element.updateComplete;
 
     const sectionButtons = [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".settings-nav button")];
-    expect(sectionButtons.map((button) => button.textContent?.trim())).toEqual(["Power meter", "Measure tuning"]);
+    expect(sectionButtons.map((button) => button.textContent?.trim())).toEqual(["Power meter", "Measure tuning", "GitHub"]);
     expect(sectionButtons[0]?.classList.contains("active")).toBe(true);
     expect(element.shadowRoot.querySelector<HTMLElement>('[aria-labelledby="measure-tuning-title"]')?.hidden).toBe(true);
 
@@ -1151,6 +1152,108 @@ describe("settings view", () => {
     expect(settings.default_power_entity_id).toBe("sensor.plug_power");
     expect(settings.measurement_defaults).toEqual(measurementDefaults);
   });
+
+  it("shows fast test mode only in developer mode and saves the toggle", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      settings: AppSettings;
+      capabilities: Capabilities;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.settings = {
+      ...defaultSettings,
+      default_measure_device: "Synthetic meter",
+      power_meter: "dummy",
+    };
+    element.capabilities = capabilities;
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('input[name="fast_test_mode"]')).toBeNull();
+
+    element.capabilities = { ...capabilities, developer_mode: true };
+    await element.updateComplete;
+    const toggle = element.shadowRoot.querySelector('input[name="fast_test_mode"]') as HTMLInputElement;
+    expect(toggle).not.toBeNull();
+    expect(element.shadowRoot.textContent).toContain("output is not valid for contribution or real use");
+
+    toggle.checked = true;
+    const saved = new Promise<AppSettings>((resolve) => {
+      element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettings>).detail));
+    });
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+
+    expect((await saved).fast_test_mode).toBe(true);
+  });
+
+  it("renders GitHub device login, token fallback, identity, and disconnect", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      powers: EntityDescriptor[];
+      settings: AppSettings;
+      contributionAuth: { connected: boolean; identity?: { login: string; name?: string } };
+      contributionDeviceFlow: { flow_id: string; user_code: string; verification_uri: string; expires_in: number; interval: number };
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.powers = [];
+    element.settings = defaultSettings;
+    element.contributionAuth = { connected: false };
+    element.contributionDeviceFlow = {
+      flow_id: "flow-1",
+      user_code: "ABCD-EFGH",
+      verification_uri: "https://github.com/login/device",
+      expires_in: 900,
+      interval: 5,
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".settings-nav button")].find((button) => button.textContent?.includes("GitHub"))?.click();
+    await element.updateComplete;
+
+    expect(element.shadowRoot.textContent).toContain("ABCD-EFGH");
+    expect(element.shadowRoot.textContent).toContain("Personal access token fallback");
+    expect(element.shadowRoot.textContent).toContain("included in Home Assistant backups");
+    const started = new Promise<void>((resolve) => element.addEventListener("github-device-start", () => resolve()));
+    [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Start device login"))?.click();
+    await started;
+
+    const saved = new Promise<string>((resolve) => element.addEventListener("github-token-save", (event) => resolve((event as CustomEvent<string>).detail)));
+    const token = element.shadowRoot.querySelector('input[name="github_token"]') as HTMLInputElement;
+    token.value = "ghp_secret";
+    [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Save token"))?.click();
+    expect(await saved).toBe("ghp_secret");
+
+    element.contributionAuth = { connected: true, identity: { login: "octocat" } };
+    await element.updateComplete;
+    expect(element.shadowRoot.textContent).toContain("octocat");
+    const disconnected = new Promise<void>((resolve) => element.addEventListener("github-disconnect", () => resolve()));
+    (element.shadowRoot.querySelector("button.danger") as HTMLButtonElement).click();
+    await disconnected;
+  });
+
+  it("opens directly on the GitHub section when a section is requested", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      powers: EntityDescriptor[];
+      settings: AppSettings;
+      contributionAuth: { connected: boolean };
+      initialSection: SettingsSection;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.powers = [];
+    element.settings = defaultSettings;
+    element.contributionAuth = { connected: false };
+    element.initialSection = "github";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const githubNav = [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".settings-nav button")]
+      .find((button) => button.textContent?.includes("GitHub"));
+    expect(githubNav?.getAttribute("aria-current")).toBe("page");
+    const githubSection = element.shadowRoot.querySelector('[aria-labelledby="github-title"]');
+    expect(githubSection?.hasAttribute("hidden")).toBe(false);
+  });
 });
 
 describe("app shell device entities", () => {
@@ -1170,6 +1273,7 @@ describe("app shell device entities", () => {
       getEntityCatalog: async () => ({ lights: [], powers: [], voltages: [] }),
       getEntitiesByDeviceClass: async () => [],
       getSettings: async () => defaultSettings,
+      getContributionAuth: async () => ({ connected: false }),
       getDummyLoadCalibration: async () => null,
       getCurrent: async () => ({ state: "idle" }),
       getMeasureDefinitions: async () => [fanDefinition],
@@ -1177,6 +1281,7 @@ describe("app shell device entities", () => {
         requestedDomains.push(domain);
         return domain === "fan" ? [{ entity_id: "fan.bedroom", name: "Bedroom fan" }] : [];
       },
+      getContributionDraft: async () => ({ eligible: false }),
     };
 
     await (element as unknown as { boot: () => Promise<void> }).boot();
@@ -1195,6 +1300,7 @@ describe("app shell device entities", () => {
       getEntityCatalog: async () => ({ lights: [], powers: [], voltages: [] }),
       getEntitiesByDeviceClass: async () => [],
       getSettings: async () => defaultSettings,
+      getContributionAuth: async () => ({ connected: false }),
       getDummyLoadCalibration: async () => null,
       getCurrent: async () => ({
         state: "idle",
@@ -1212,6 +1318,7 @@ describe("app shell device entities", () => {
       }),
       getMeasureDefinitions: async () => [],
       getEntitiesByDomain: async () => [],
+      getContributionDraft: async () => ({ eligible: false }),
     };
 
     await (element as unknown as { boot: () => Promise<void> }).boot();
@@ -1662,14 +1769,139 @@ describe("result view", () => {
     button.click();
     expect(downloadAll).toHaveBeenCalledTimes(1);
 
+    const contribution = element.shadowRoot.querySelector(".contribution");
+    expect(contribution?.textContent).toContain("Contribute your measurement");
+    // Without an eligible GitHub draft, the manual method is selected by default.
     const nextSteps = element.shadowRoot.querySelector(".contribution-next");
-    expect(nextSteps?.textContent).toContain("Contribute your measurement");
     expect(nextSteps?.textContent).toContain("Download and inspect the generated files");
     expect(nextSteps?.textContent).toContain("profile_library/<manufacturer>/<model>/");
     const guide = nextSteps?.querySelector("a") as HTMLAnchorElement;
     expect(guide.href).toBe("https://docs.powercalc.nl/contributing/measure/output/");
     expect(guide.target).toBe("_blank");
     expect(guide.rel).toContain("noopener");
+  });
+
+  it("defaults to the GitHub method for an eligible draft and offers manual as an alternative", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      files: { name: string; size: number; media_type: string }[];
+      fileUrl: (name: string) => string;
+      downloadAll: () => void;
+      contributionAuth: { connected: boolean; identity: { login: string } };
+      contributionPreview: {
+        eligible: boolean;
+        repository: string;
+        base_branch: string;
+        manufacturer_name: string;
+        manufacturer_directory: string;
+        model_id: string;
+        product_name: string;
+        contributor: string;
+        device_info: Record<string, string>;
+        home_assistant: Record<string, string>;
+        notes: string;
+        files: { path: string; rendered_json: Record<string, string> }[];
+        model_json: Record<string, string>;
+        commit_message: string;
+        pr_title: string;
+        pr_body: string;
+        branch_name: string;
+        warnings: string[];
+      };
+      contributionResult: { status: string; pull_request_url: string };
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "completed" };
+    element.files = [{ name: "model.json", size: 5678, media_type: "application/json" }];
+    element.fileUrl = (name) => `/download/${name}`;
+    element.downloadAll = () => {};
+    element.contributionAuth = { connected: true, identity: { login: "octocat" } };
+    element.contributionPreview = {
+      eligible: true,
+      repository: "bramstroker/homeassistant-powercalc",
+      base_branch: "master",
+      manufacturer_name: "Signify",
+      manufacturer_directory: "signify",
+      model_id: "LCT010",
+      product_name: "Hue lamp",
+      contributor: "octocat",
+      device_info: { device: "light.desk" },
+      home_assistant: { version: "2026.7" },
+      notes: "Measured through the HA app.",
+      files: [{ path: "profile_library/signify/LCT010/model.json", rendered_json: { name: "Hue lamp" } }],
+      model_json: { name: "Hue lamp" },
+      commit_message: "Add Signify LCT010",
+      pr_title: "Add Signify LCT010",
+      pr_body: "Adds a measured profile.",
+      branch_name: "measure/signify-lct010",
+      warnings: [],
+    };
+    element.contributionResult = { status: "success", pull_request_url: "https://github.com/bramstroker/homeassistant-powercalc/pull/1" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".download-all")).toBeTruthy();
+    // GitHub is the default method for an eligible draft; the manual panel is not shown yet.
+    const cards = Array.from(element.shadowRoot.querySelectorAll(".method-card")) as HTMLButtonElement[];
+    expect(cards.map((card) => card.textContent)).toEqual([
+      expect.stringContaining("GitHub pull request"),
+      expect.stringContaining("Manual contribution"),
+      expect.stringContaining("Add to this installation"),
+    ]);
+    const [githubCard, manualCard, localCard] = cards as [HTMLButtonElement, HTMLButtonElement, HTMLButtonElement];
+    expect(githubCard.getAttribute("aria-checked")).toBe("true");
+    expect(localCard.disabled).toBe(true); // local install is not available yet
+    expect(element.shadowRoot.querySelector(".contribution-next")).toBeNull();
+    const automatic = element.shadowRoot.querySelector(".contribution-auto");
+    expect(automatic?.textContent).toContain("Connected to GitHub as octocat");
+    expect(automatic?.textContent).toContain("profile_library/signify/LCT010/model.json");
+    expect(automatic?.textContent).toContain("Add Signify LCT010");
+    expect(automatic?.textContent).not.toContain("aliases");
+
+    const previewed = new Promise<unknown>((resolve) => element.addEventListener("contribution-preview", (event) => resolve((event as CustomEvent).detail)));
+    (element.shadowRoot.querySelector('input[name="manufacturer_directory"]') as HTMLInputElement).value = "philips";
+    (element.shadowRoot.querySelector(".contribution-form") as HTMLFormElement).requestSubmit();
+    expect(await previewed).toMatchObject({ manufacturer_directory: "philips" });
+
+    const submit = element.shadowRoot.querySelector(".contribution-auto button.primary") as HTMLButtonElement;
+    expect(submit.disabled).toBe(true);
+    (element.shadowRoot.querySelector('input[name="confirm_contribution"]') as HTMLInputElement).click();
+    await element.updateComplete;
+    expect((element.shadowRoot.querySelector(".contribution-auto button.primary") as HTMLButtonElement).disabled).toBe(false);
+    const submitted = new Promise<unknown>((resolve) => element.addEventListener("contribution-submit", (event) => resolve((event as CustomEvent).detail)));
+    (element.shadowRoot.querySelector(".contribution-auto button.primary") as HTMLButtonElement).click();
+    expect(await submitted).toMatchObject({ confirmed: true, manufacturer_directory: "philips" });
+    expect((element.shadowRoot.querySelector(".success-link") as HTMLAnchorElement).href).toBe(element.contributionResult.pull_request_url);
+
+    // Switching to the manual method reveals the download guide instead of the GitHub form.
+    manualCard.click();
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector(".contribution-auto")).toBeNull();
+    expect(element.shadowRoot.querySelector(".contribution-next")?.textContent).toContain("Read the contribution guide");
+  });
+
+  it("asks to open settings on the GitHub section when GitHub is not connected", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      contributionAuth: { connected: boolean };
+      contributionDraft: { eligible: boolean; manufacturer_name: string; manufacturer_directory: string; model_id: string; product_name: string; contributor: string; notes: string; device_info: Record<string, string>; home_assistant: Record<string, string> };
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "completed" };
+    element.contributionAuth = { connected: false };
+    element.contributionDraft = {
+      eligible: true, manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010",
+      product_name: "Hue lamp", contributor: "", notes: "", device_info: {}, home_assistant: {},
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const opened = new Promise<unknown>((resolve) => element.addEventListener("open-settings", (event) => resolve((event as CustomEvent).detail)));
+    const button = [...element.shadowRoot.querySelectorAll<HTMLButtonElement>("button")].find((candidate) => candidate.textContent?.includes("Open GitHub settings"));
+    button?.click();
+    expect(await opened).toEqual({ section: "github" });
   });
 
   it.each(["failed", "cancelled", "resumable"] as const)("does not suggest contribution for a %s session", async (state) => {

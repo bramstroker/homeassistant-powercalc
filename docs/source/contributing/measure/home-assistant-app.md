@@ -47,6 +47,16 @@ Use **Test connection** to sample the configured meter before starting a long ru
 
 An update interval of two seconds or faster is recommended. Intervals above five seconds, no observed updates, or insufficient precision are reported as poor measurement quality. Directly polled Shelly meters are checked for connectivity and a valid reading; Home Assistant reporting cadence does not apply to them.
 
+## GitHub contribution setup
+
+GitHub authentication can be configured in **Settings** before starting a measurement. Device login is the recommended option and requests `public_repo` plus `workflow` access. Workflow access lets the app create a clean contribution branch from the latest upstream commit when the user's fork contains older GitHub Actions files. A personal access token with equivalent repository and workflow access is available as a fallback. The settings page shows the connected GitHub account and provides a disconnect action.
+
+The credential is stored separately in the app's private `/data` directory and is never included in session diagnostics. Home Assistant may include it in app backups. Disconnect locally and revoke the OAuth authorization or token in GitHub when it is no longer needed.
+
+After a completed light, speaker, fan, or charging measurement, the result page can prepare a profile contribution. Review the manufacturer, model, exact file list, JSON, commit message, and pull-request text before explicitly creating the pull request. The app creates or reuses your fork and submits one device to the Powercalc `master` branch.
+
+Manual contribution remains available at all times. You can still download every generated file and follow the contribution guide when GitHub is not configured, automatic contribution is unavailable, or an existing profile needs to be updated.
+
 ## Measurement safety
 
 !!! danger "The selected device is controlled automatically"
@@ -84,7 +94,7 @@ During the actual run, live and saved power readings show the target device cons
 4. Review preflight estimates, warnings, meter diagnostics, and advanced timing settings.
 5. Start the session. Complete the dummy-load calibration or reuse confirmation when enabled. Average, recorder, speaker, and charging measurements also pause for an explicit confirmation when the physical device must be prepared or the actual sampling period is about to begin.
 6. Follow live progress, current operating values, recent power samples, and session logs. You can close or reload the browser; the app owns the job and restores its persisted status when you return.
-7. Review plots and download generated CSV, model, or recording files from the result view.
+7. Review plots and download generated CSV, model, or recording files from the result view. For generated profiles, either prepare a GitHub pull request in the app or use the permanent manual-contribution option.
 
 Only one measurement runs at a time.
 
@@ -98,6 +108,8 @@ Light LUT measurements can resume compatible partial output. Resume with the sam
 
 Requests, session state, events, and output are stored in the app's private `/data` directory. Home Assistant includes this directory in app backups. The app does not mount or write to the Home Assistant configuration directory.
 
+Persisted GitHub credentials are also stored under `/data`, separately from preferences, sessions, and diagnostics. Treat app backups as sensitive while a GitHub account is connected.
+
 The result view provides:
 
 - raw measurement and generated model files;
@@ -106,6 +118,13 @@ The result view provides:
 - a diagnostics download containing the session snapshot, request, events, logs, and file inventory for issue reports.
 
 Entity IDs remain present in diagnostics because they are useful when troubleshooting entity selection and state updates. Download files through the authenticated ingress result view before removing the app or deleting its data.
+
+## Developer options
+
+Two options exist to exercise the measurement flow without physical hardware. Profiles produced with either are meaningless; keep both off for normal use.
+
+- **Synthetic test meter**: select it under **Settings → Power meter** to replace the real power sensor with a generated reading. It is separate from the calibrated resistive dummy-load feature and cannot be used to calibrate one.
+- **Developer mode**: enable it in the app's **Configuration** tab and restart the app to show a **Use virtual device** toggle on the light, speaker, charging, and fan setup forms. The toggle replaces the selected Home Assistant entity with a virtual (dummy) controller. Combine it with the synthetic test meter for a fully simulated run. When running the app outside the add-on, pass `--developer-mode` on the command line instead.
 
 ## Troubleshooting
 

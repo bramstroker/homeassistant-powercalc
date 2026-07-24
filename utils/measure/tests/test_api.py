@@ -10,9 +10,24 @@ from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
 from measure.const import MeasureType
+from measure.contribution.github import GitHubUser
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import LightOperatingPoint
 from measure.ha_app.api import create_app
+from measure.ha_app.contribution import (
+    ContributionApiCoordinator,
+    ContributionApiError,
+    ContributionAuthMethod,
+    ContributionAuthStatus,
+    ContributionFile,
+    ContributionPreviewRequest,
+    ContributionPreviewResponse,
+    ContributionService,
+    ContributionSubmissionResult,
+    DeviceFlowPollResponse,
+    DeviceFlowStart,
+    SharedContributionService,
+)
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
@@ -24,6 +39,7 @@ from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
 from measure.version import measure_version
+from pydantic import SecretStr
 import pytest
 
 
@@ -178,6 +194,108 @@ class SummaryService(SessionMeasurementService):
         control.progress(completed=30, total=30, mode="Averaging", estimated_remaining="0s")
         summary = {"Average power": "42.3 W", "Duration": "30 s"}
         return RunnerResult(model_json_data={}, summary=summary)
+
+
+class FakeContributionService(ContributionService):
+    def __init__(self) -> None:
+        self.preview_calls = 0
+        self.submit_calls = 0
+        self.username: str | None = None
+
+    def auth_status(self) -> ContributionAuthStatus:
+        if self.username is None:
+            return ContributionAuthStatus(authenticated=False)
+        return ContributionAuthStatus(
+            authenticated=True,
+            connected=True,
+            method=ContributionAuthMethod.PAT,
+            username=self.username,
+        )
+
+    def connect_pat(self, token: SecretStr) -> ContributionAuthStatus:
+        del token
+        self.username = "measure-user"
+        return ContributionAuthStatus(
+            authenticated=True,
+            connected=True,
+            method=ContributionAuthMethod.PAT,
+            username="measure-user",
+        )
+
+    def disconnect(self) -> ContributionAuthStatus:
+        self.username = None
+        return ContributionAuthStatus(authenticated=False)
+
+    def start_device_flow(self, client_id: str) -> DeviceFlowStart:
+        return DeviceFlowStart(
+            device_code=f"{client_id}-device",
+            user_code="ABCD-EFGH",
+            verification_uri="https://github.com/login/device",
+            expires_in=900,
+            interval=5,
+            message="Enter ABCD-EFGH",
+        )
+
+    def poll_device_flow(self, client_id: str, device_code: str) -> DeviceFlowPollResponse:
+        del client_id, device_code
+        self.username = "oauth-user"
+        return DeviceFlowPollResponse(
+            status="authorized",
+            auth=ContributionAuthStatus(
+                authenticated=True,
+                connected=True,
+                method=ContributionAuthMethod.OAUTH_DEVICE,
+                username="oauth-user",
+            ),
+        )
+
+    def build_preview(
+        self,
+        *,
+        session_id: str,
+        request: MeasurementRequest,
+        artifact_root: Path,
+        payload: ContributionPreviewRequest | None,
+    ) -> ContributionPreviewResponse:
+        del artifact_root
+        self.preview_calls += 1
+        assert payload is not None
+        return ContributionPreviewResponse(
+            session_id=session_id,
+            eligible=True,
+            manufacturer_name=payload.manufacturer_name,
+            manufacturer_directory=payload.manufacturer_directory or "signify",
+            model_id=payload.model_id,
+            product_name=payload.product_name,
+            contributor=payload.contributor,
+            notes=payload.notes,
+            files=[
+                ContributionFile(
+                    name="model.json",
+                    path="profile_library/signify/LCT010/model.json",
+                    size=20,
+                ),
+            ],
+            commit_message="feat(profile): add signify LCT010",
+            pr_title="Add signify LCT010 power profile",
+            pr_body="Body",
+            branch_name="powercalc-profile-signify-lct010",
+            job_id="job-1",
+        )
+
+    def submit(
+        self,
+        *,
+        preview: ContributionPreviewResponse,
+        artifact_root: Path,
+    ) -> ContributionSubmissionResult:
+        del preview, artifact_root
+        self.submit_calls += 1
+        time.sleep(0.05)
+        return ContributionSubmissionResult(
+            pull_request_url="https://github.com/example/pull/1",
+            message="Contribution submitted",
+        )
 
 
 def payload() -> dict[str, object]:
@@ -680,6 +798,203 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
     assert set(paths["/api/session/current/plots"]) == {"get"}
     assert set(paths["/api/session/current/files/{name}"]) == {"get"}
     assert set(paths["/api/dummy-load/calibration"]) == {"get"}
+    assert set(paths["/api/contribution/auth"]) == {"get", "put", "delete"}
+    assert set(paths["/api/contribution/auth/device"]) == {"post"}
+    assert set(paths["/api/contribution/auth/device/{flow_id}"]) == {"post"}
+    assert set(paths["/api/contribution/status"]) == {"get"}
+    assert set(paths["/api/session/current/contribution"]) == {"get", "post"}
+    assert set(paths["/api/session/current/contribution/preview"]) == {"post"}
+
+
+def test_contribution_device_flow_reports_configuration_and_uses_injected_service(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    unavailable = test_client.post("/api/contribution/auth/device")
+    assert unavailable.status_code == 401
+    assert unavailable.json()["code"] == "auth_unavailable"
+    assert test_client.get("/api/contribution/auth").json()["device_flow_available"] is False
+
+    service = FakeContributionService()
+    context = test_client.app.state.context
+    context.contribution = ContributionApiCoordinator(
+        context.storage,
+        service_factory=lambda: service,
+        oauth_client_id="client-1",
+    )
+
+    started = test_client.post("/api/contribution/auth/device")
+    assert started.status_code == 200
+    assert "device_code" not in started.json()
+    flow_id = started.json()["flow_id"]
+
+    polled = test_client.post(f"/api/contribution/auth/device/{flow_id}")
+    assert polled.status_code == 200
+    assert polled.json()["status"] == "authorized"
+    assert polled.json()["auth"]["authenticated"] is True
+    assert polled.json()["auth"]["username"] == "oauth-user"
+    assert polled.json()["auth"]["device_flow_available"] is True
+
+    unknown = test_client.post("/api/contribution/auth/device/unknown-flow")
+    assert unknown.status_code == 404
+    assert unknown.json()["code"] == "flow_not_found"
+    completed = test_client.post(f"/api/contribution/auth/device/{flow_id}")
+    assert completed.status_code == 404
+
+
+def test_contribution_pat_rejects_reported_insufficient_scope(tmp_path: Path) -> None:
+    github = MagicMock()
+    github.fetch_authenticated_user.return_value = GitHubUser(
+        login="measure-user",
+        scopes=("read:user",),
+        scopes_reported=True,
+    )
+    with (
+        patch("measure.ha_app.contribution.service.GitHubClient", return_value=github),
+        pytest.raises(ContributionApiError, match="must grant public repository and workflow access"),
+    ):
+        SharedContributionService(tmp_path).connect_pat(SecretStr("github_pat_test"))
+
+
+def test_contribution_device_flow_records_granted_scopes_without_claiming_verified(tmp_path: Path) -> None:
+    github = MagicMock()
+    github.poll_device_flow.return_value = {"access_token": "gho_test", "scope": "public_repo"}
+    github.fetch_authenticated_user.return_value = GitHubUser(
+        login="oauth-user",
+        scopes=("public_repo",),
+        scopes_reported=True,
+    )
+    with patch("measure.ha_app.contribution.service.GitHubClient", return_value=github):
+        service = SharedContributionService(tmp_path)
+        polled = service.poll_device_flow("client-id", "device-code")
+        status = service.auth_status()
+
+    assert polled.status == "authorized"
+    assert status.scopes == ["public_repo"]
+    assert status.permissions_verified is False
+
+
+def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("POWERCALC_GITHUB_REPOSITORY", "test-owner/powercalc-sandbox")
+    monkeypatch.setenv("POWERCALC_GITHUB_BRANCH", "main")
+    test_client = client(tmp_path)
+    service = FakeContributionService()
+    context = test_client.app.state.context
+    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
+
+    assert test_client.post("/api/sessions", json=payload()).status_code == 201
+    assert context.coordinator._worker is not None  # noqa: SLF001
+    context.coordinator._worker.join(timeout=5)  # noqa: SLF001
+
+    auth = test_client.put("/api/contribution/auth", json={"token": "github_pat_test"})
+    assert auth.status_code == 200
+    assert auth.json()["authenticated"] is True
+    assert auth.json()["username"] == "measure-user"
+    settings_path = tmp_path / "settings.json"
+    if settings_path.exists():
+        assert "github_pat_test" not in settings_path.read_text(encoding="utf-8")
+
+    draft = test_client.get("/api/session/current/contribution")
+    assert draft.status_code == 200
+    assert draft.json()["eligible"] is False
+    assert draft.json()["repository"] == "test-owner/powercalc-sandbox"
+    assert draft.json()["base_branch"] == "main"
+
+    preview = test_client.post(
+        "/api/session/current/contribution/preview",
+        json={
+            "manufacturer_name": "Signify",
+            "manufacturer_directory": "signify",
+            "model_id": "LCT010",
+            "product_name": "Test light",
+            "contributor": "measure-user",
+            "notes": "No aliases.",
+        },
+    )
+    assert preview.status_code == 200
+    assert preview.json()["pr_title"] == "Add signify LCT010 power profile"
+    assert preview.json()["files"][0]["path"] == "profile_library/signify/LCT010/model.json"
+    assert preview.json()["notes"] == "No aliases."
+    assert service.preview_calls == 1
+    assert service.submit_calls == 0
+
+    unconfirmed = test_client.post(
+        "/api/session/current/contribution",
+        json={
+            "manufacturer_name": "Signify",
+            "manufacturer_directory": "signify",
+            "model_id": "LCT010",
+            "product_name": "Test light",
+            "contributor": "measure-user",
+            "notes": "No aliases.",
+            "confirmed": False,
+        },
+    )
+    assert unconfirmed.status_code == 400
+    assert service.submit_calls == 0
+
+    submitted = test_client.post(
+        "/api/session/current/contribution",
+        json={
+            "manufacturer_name": "Signify",
+            "manufacturer_directory": "signify",
+            "model_id": "LCT010",
+            "product_name": "Test light",
+            "contributor": "measure-user",
+            "notes": "No aliases.",
+            "confirmed": True,
+        },
+    )
+    assert submitted.status_code == 200
+    assert submitted.json()["status"] == "success"
+    assert submitted.json()["pull_request_url"] == "https://github.com/example/pull/1"
+    assert service.submit_calls == 1
+
+    status = test_client.get("/api/contribution/status")
+    assert status.status_code == 200
+    assert status.json()["state"] == "submitted"
+    assert status.json()["submission_url"] == "https://github.com/example/pull/1"
+    assert status.json()["session_id"] == test_client.get("/api/session/current").json()["session_id"]
+
+    files = test_client.get("/api/session/current/files").json()
+    assert [item["name"] for item in files] == ["LCT010/brightness.csv"]
+    diagnostics = test_client.get("/api/session/current/diagnostics")
+    assert "github_pat_test" not in diagnostics.text
+
+
+def test_contribution_preview_rejects_unsupported_generated_session(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    service = FakeContributionService()
+    context.coordinator = MeasurementCoordinator(context.storage, SummaryService)
+    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
+    run_payload = {
+        "measure_type": MeasureType.AVERAGE,
+        "model_id": "average-device",
+        "power_meter": {"type": "hass", "entity_id": "sensor.test_power"},
+        "duration": 1,
+        "generate_model": True,
+    }
+    assert test_client.post("/api/sessions", json=run_payload).status_code == 201
+    assert context.coordinator._worker is not None  # noqa: SLF001
+    context.coordinator._worker.join(timeout=5)  # noqa: SLF001
+    artifact_root = context.storage.artifact_directory(context.coordinator.current.id, "average-device")
+    artifact_root.mkdir(parents=True)
+    (artifact_root / "model.json").write_text("{}", encoding="utf-8")
+
+    response = test_client.post(
+        "/api/session/current/contribution/preview",
+        json={
+            "manufacturer_name": "Acme",
+            "manufacturer_directory": "acme",
+            "model_id": "average-device",
+            "product_name": "Average device",
+            "contributor": "measure-user",
+            "notes": "",
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["code"] == "artifacts_required"
+    assert service.preview_calls == 0
 
 
 def test_plot_endpoint_rejects_active_session(tmp_path: Path) -> None:
@@ -749,6 +1064,7 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
         "default_measure_device": None,
         "power_meter": "hass",
         "shelly_ip": None,
+        "fast_test_mode": False,
         "measurement_defaults": {
             "sleep_time": 2.0,
             "sample_count": 1,
@@ -783,6 +1099,50 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
     effective_defaults = test_client.get("/api/capabilities").json()["defaults"]
     assert effective_defaults["sample_count"] == 4
     assert effective_defaults["sleep_time"] == pytest.approx(3.5)
+
+
+def test_fast_test_mode_requires_developer_mode_and_dummy_adapters(tmp_path: Path) -> None:
+    regular_client = client(tmp_path)
+    rejected = regular_client.put("/api/settings", json={"fast_test_mode": True})
+
+    assert rejected.status_code == 400
+    assert rejected.json()["message"] == "Fast test mode requires developer mode"
+
+    developer_client = client(tmp_path, developer_mode=True)
+    assert developer_client.put("/api/settings", json={"fast_test_mode": True}).status_code == 200
+    assert developer_client.get("/api/capabilities").json()["fast_test_mode"] is True
+
+    dummy_request = payload() | {
+        "controller": {"type": "dummy"},
+        "power_meter": {"type": "dummy"},
+    }
+    started = developer_client.post("/api/sessions", json=dummy_request)
+
+    assert started.status_code == 201
+    prepared = started.json()["request"]
+    assert prepared["fast_test_mode"] is True
+    assert prepared["parameters"]["fast_test_mode"] is True
+    assert prepared["parameters"]["sleep_time"] == 0
+    assert prepared["parameters"]["sleep_initial"] == 0
+    assert prepared["parameters"]["sleep_standby"] == 0
+
+
+def test_fast_test_mode_does_not_modify_real_measurement_requests(tmp_path: Path) -> None:
+    test_client = client(tmp_path, developer_mode=True)
+    assert test_client.put("/api/settings", json={"fast_test_mode": True}).status_code == 200
+
+    request = payload() | {
+        "fast_test_mode": True,
+        "parameters": payload()["parameters"] | {"sleep_time": 7},  # type: ignore[operator]
+    }
+    response = test_client.post("/api/preflight", json=request)
+
+    assert response.status_code == 200
+    started = test_client.post("/api/sessions", json=request)
+    assert started.status_code == 201
+    assert started.json()["request"]["fast_test_mode"] is False
+    assert started.json()["request"]["parameters"]["fast_test_mode"] is False
+    assert started.json()["request"]["parameters"]["sleep_time"] == 7
 
 
 def test_settings_rejects_invalid_entity(tmp_path: Path) -> None:
