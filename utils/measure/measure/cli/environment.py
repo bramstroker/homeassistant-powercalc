@@ -275,6 +275,11 @@ class CliEnvironment:
         return _bounded_int("max_nudges")
 
     @property
+    def fast_test_mode(self) -> bool:
+        """Fast test mode is controlled by the developer-only app setting."""
+        return False
+
+    @property
     def sample_count(self) -> int:
         if self.selected_power_meter == PowerMeterType.MANUAL:
             return 1

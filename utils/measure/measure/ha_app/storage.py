@@ -9,7 +9,7 @@ import logging
 import os
 from pathlib import Path
 import shutil
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
 
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
@@ -35,9 +35,13 @@ from measure.runner.light_plan import (
     variation_from_csv_row,
 )
 
+if TYPE_CHECKING:
+    from measure.ha_app.contribution import ContributionStatus
+
 _LOGGER = logging.getLogger("measure")
 
 _DUMMY_LOAD_CALIBRATION_FILENAME = "dummy_load_calibration.json"
+_CONTRIBUTION_STATUS_FILENAME = "contribution_status.json"
 
 
 class SessionStorage:
@@ -249,6 +253,21 @@ class SessionStorage:
             calibration.model_dump(mode="json"),
         )
         return calibration
+
+    def load_contribution_status(self) -> ContributionStatus:
+        from measure.ha_app.contribution import ContributionStatus
+
+        path = self.data_root / _CONTRIBUTION_STATUS_FILENAME
+        if not path.exists():
+            return ContributionStatus()
+        try:
+            return ContributionStatus.model_validate(self._read_json(path))
+        except (OSError, ValueError) as error:
+            _LOGGER.warning("Ignoring invalid contribution status: %s", error)
+            return ContributionStatus()
+
+    def save_contribution_status(self, status: ContributionStatus) -> None:
+        self._write_json(self.data_root / _CONTRIBUTION_STATUS_FILENAME, status.model_dump(mode="json"))
 
     def can_resume(self, session_id: str) -> bool:
         """Return whether the session has a complete row matching its persisted request."""

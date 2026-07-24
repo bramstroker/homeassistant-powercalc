@@ -178,6 +178,9 @@ export class SetupView extends LitElement {
             <h2 id="setup-title">Configure the measurement</h2>
           </div>
         </div>
+        ${this.capabilities?.fast_test_mode
+          ? html`<p class="notice" role="status"><strong>Fast test mode is enabled.</strong> Dummy light, fan, and charging runs use minimal waits and measurement points. Their output is for app testing only.</p>`
+          : nothing}
         ${this.powerMeterConfigured ? this.renderSetupContent() : this.renderPowerMeterRequired()}
       </section>
     `;

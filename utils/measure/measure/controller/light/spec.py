@@ -2,28 +2,25 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from measure.controller.light.const import DEFAULT_LIGHT_TRANSITION_TIME, LightControllerType
+from measure.controller.spec import BaseControllerSpec
 
 LIGHT_ENTITY_PATTERN = r"^light\.[a-z0-9_]+$"
 
 
-class _LightControllerSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-
-class DummyLightControllerSpec(_LightControllerSpec):
+class DummyLightControllerSpec(BaseControllerSpec):
     type: Literal[LightControllerType.DUMMY] = LightControllerType.DUMMY
 
 
-class HassLightControllerSpec(_LightControllerSpec):
+class HassLightControllerSpec(BaseControllerSpec):
     type: Literal[LightControllerType.HASS] = LightControllerType.HASS
     entity_id: str = Field(pattern=LIGHT_ENTITY_PATTERN)
     transition_time: int = DEFAULT_LIGHT_TRANSITION_TIME
 
 
-class HueLightControllerSpec(_LightControllerSpec):
+class HueLightControllerSpec(BaseControllerSpec):
     type: Literal[LightControllerType.HUE] = LightControllerType.HUE
     bridge_ip: str
     light: str

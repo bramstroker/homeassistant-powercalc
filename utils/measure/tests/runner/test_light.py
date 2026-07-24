@@ -63,6 +63,27 @@ def test_get_variations(mode: LutMode, expected_count: int) -> None:
     assert plan.variation_count == expected_count
 
 
+@pytest.mark.parametrize(
+    "mode,expected_count",
+    [
+        (LutMode.BRIGHTNESS, 2),
+        (LutMode.COLOR_TEMP, 4),
+        (LutMode.HS, 8),
+        (LutMode.EFFECT, 6),
+    ],
+)
+def test_fast_test_mode_uses_only_dimension_endpoints(mode: LutMode, expected_count: int) -> None:
+    controller = DummyLightController()
+    plan = build_light_plan(
+        {mode},
+        replace(_parameters(), fast_test_mode=True),
+        controller.get_light_info(),
+        controller.get_effect_list(),
+    )
+
+    assert plan.variation_count == expected_count
+
+
 def test_run(export_path: str) -> None:
     measure_util_mock = MagicMock(MeasureUtil)
     measure_util_mock.take_measurement.return_value = MeasurementResult(power=1, voltages=[])

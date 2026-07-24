@@ -7,6 +7,12 @@ from pathlib import Path
 from measure.controller.light.const import LutMode
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
+from measure.ha_app.contribution import (
+    ContributionCoordinator,
+    ContributionPreview,
+    ContributionState,
+    ContributionStatus,
+)
 from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot, SessionState, utc_now
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
@@ -213,6 +219,40 @@ def test_storage_round_trips_global_and_session_dummy_load_calibration(tmp_path:
 
     assert storage.load_dummy_load_calibration() == calibration
     assert storage.load_session_dummy_load_calibration("a1b2-c3d4") == calibration
+
+
+def test_contribution_state_recovers_interrupted_submission(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    preview = ContributionPreview(
+        session_id="a1b2-c3d4",
+        title="Add profile",
+        body="Body",
+        eligible=True,
+        manufacturer_name="Signify",
+        manufacturer_directory="signify",
+        model_id="LCT010",
+        product_name="Hue lamp",
+        contributor="measure-user",
+        files=[],
+        commit_message="feat(profile): add signify LCT010",
+        pr_title="Add signify LCT010 power profile",
+        pr_body="Body",
+        branch_name="powercalc-profile-signify-lct010",
+    )
+    storage.save_contribution_status(
+        ContributionStatus(
+            state=ContributionState.SUBMITTING,
+            session_id="a1b2-c3d4",
+            preview=preview,
+            updated_at="2026-07-12T12:00:00Z",
+        ),
+    )
+
+    status = ContributionCoordinator(storage).status()
+
+    assert status.state == ContributionState.FAILED
+    assert status.session_id == "a1b2-c3d4"
+    assert status.error == "App stopped during contribution submission; preview can be submitted again"
 
 
 def test_storage_ignores_invalid_dummy_load_calibration(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:

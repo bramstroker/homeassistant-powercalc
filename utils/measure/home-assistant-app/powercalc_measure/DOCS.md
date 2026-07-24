@@ -42,6 +42,14 @@ Open **Settings** in the app to configure the measurement device and reusable tu
 
 For Home Assistant sensors, the connection test checks that readings are available, have at least `0.1 W` resolution, and update frequently enough. Two seconds or faster is recommended; more than five seconds is considered unsuitable for reliable automated measurements.
 
+### GitHub contribution
+
+You can connect GitHub from the app's global **Settings** before measuring. Device login is recommended and requests public-repository plus workflow access so a contribution can be based on the latest upstream commit even when your fork is stale. A personal access token with equivalent access is available as a fallback. The connection is reused for later contributions until you disconnect it.
+
+After a completed light, speaker, fan, or charging measurement, the result page can prepare an automatic contribution. Review the manufacturer, model, exact files, generated JSON, commit message, and pull-request text before creating the pull request. The app creates or reuses your fork and submits one device to Powercalc.
+
+Manual contribution is always available. You can download the generated files and follow the contribution guide even when GitHub is disconnected, automatic submission fails, or the profile already exists.
+
 ### Resistive dummy loads
 
 Use a resistive dummy load when the target device consumes too little power for the configured meter to measure accurately. The feature requires the selected Home Assistant power sensor to have an associated voltage sensor reporting `V`, or a Shelly meter with voltage support. It is not available with the synthetic test meter.
@@ -56,7 +64,7 @@ A later session can reuse the stored calibration only after you explicitly confi
 
 Only one measurement can run at a time. **Cancel** requests a cooperative stop, so an in-flight device call or wait may finish first. Completed CSV rows are retained and may be resumable when the same measurement settings are used.
 
-Session state and output are stored in the app's private `/data` directory. Home Assistant includes this data in app backups. The result view shows plots for supported measurement output and lets you download raw files, individual plot images, and a session diagnostics bundle containing the request, snapshot, events, logs, and file inventory. No Home Assistant configuration directory is mounted into the app.
+Session state, output, and any persisted GitHub credential are stored in the app's private `/data` directory. Home Assistant includes this data in app backups. GitHub credentials are kept separate from settings, sessions, and diagnostics. The result view shows plots for supported measurement output and lets you download raw files, individual plot images, and a session diagnostics bundle containing the request, snapshot, events, logs, and file inventory. No Home Assistant configuration directory is mounted into the app.
 
 After an app or host restart, reopen the UI. An interrupted session is shown as resumable only when its stored output passes compatibility checks; otherwise it is reported as failed rather than incorrectly completed.
 

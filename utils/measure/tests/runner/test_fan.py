@@ -81,6 +81,28 @@ def test_run_reports_fan_percentage_operating_points(export_path: str) -> None:
     assert points[-1] == {"type": "fan", "percentage": 100, "on": True}
 
 
+def test_fast_test_mode_measures_only_fan_endpoints_without_waiting(export_path: str) -> None:
+    measure_util = MagicMock(MeasureUtil)
+    measure_util.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    runner = FanRunner(measure_util, DummyFanController(), interaction)
+    request = FanMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyFanControllerSpec(),
+        fast_test_mode=True,
+    )
+
+    result = runner.run(request, export_path)
+
+    assert result.model_json_data["linear_config"] == {"calibrate": ["5 -> 10.50", "100 -> 10.50"]}
+    assert measure_util.take_measurement.call_count == 2
+    measure_util.take_average_measurement.assert_not_called()
+    interaction.wait.assert_not_called()
+    assert interaction.progress.call_args_list[-1] == call(2, 2, phase="Measuring fan speeds", remaining_seconds=0)
+
+
 def test_cleanup_turns_off_fan() -> None:
     fan_controller = MagicMock(FanController)
     runner = FanRunner(MagicMock(MeasureUtil), fan_controller)
