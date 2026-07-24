@@ -119,6 +119,13 @@ The result view provides:
 
 Entity IDs remain present in diagnostics because they are useful when troubleshooting entity selection and state updates. Download files through the authenticated ingress result view before removing the app or deleting its data.
 
+## Developer options
+
+Two options exist to exercise the measurement flow without physical hardware. Profiles produced with either are meaningless; keep both off for normal use.
+
+- **Synthetic test meter**: select it under **Settings → Power meter** to replace the real power sensor with a generated reading. It is separate from the calibrated resistive dummy-load feature and cannot be used to calibrate one.
+- **Developer mode**: enable it in the app's **Configuration** tab and restart the app to show a **Use virtual device** toggle on the light, speaker, charging, and fan setup forms. The toggle replaces the selected Home Assistant entity with a virtual (dummy) controller. Combine it with the synthetic test meter for a fully simulated run. When running the app outside the add-on, pass `--developer-mode` on the command line instead.
+
 ## Troubleshooting
 
 ### A device or sensor is not listed
