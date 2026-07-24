@@ -1,0 +1,29 @@
+{
+  "author_info": {
+    "github": "bramski80",
+    "name": "test"
+  },
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-07-24T10:44:33Z",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "10 -> 75.46",
+      "100 -> 96.5",
+      "0 -> 30.69"
+    ]
+  },
+  "max_voltage": 233.0,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "fgdfgdfdfg",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 0,
+    "VERSION": "master"
+  },
+  "min_voltage": 233.0,
+  "name": "fsdffd",
+  "standby_power": 94.06
+}
