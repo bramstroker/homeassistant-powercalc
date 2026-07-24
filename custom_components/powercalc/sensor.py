@@ -88,7 +88,7 @@ from .const import (
     PowercalcDiscoveryType,
     SensorType,
 )
-from .device_binding import attach_entities_to_resolved_device
+from .device_binding import attach_entities_to_resolved_device, is_composite_device_id
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
@@ -720,13 +720,11 @@ def _attach_configured_device_entry(
     if source_entity.entity_id != DUMMY_ENTITY_ID or "device" not in sensor_config:
         return source_entity
 
-    device_registry = dr.async_get(hass)
     device_id = sensor_config["device"]
-    is_composite = getattr(device_registry, "async_is_composite_device_id", None)
-    if is_composite is not None and is_composite(device_id):
-        return source_entity  # pragma: no cover
+    if is_composite_device_id(hass, device_id):
+        return source_entity
 
-    device_entry = device_registry.async_get(device_id)
+    device_entry = dr.async_get(hass).async_get(device_id)
     if device_entry:
         return source_entity._replace(device_entry=device_entry)
     return source_entity

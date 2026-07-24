@@ -75,7 +75,7 @@ def _remove_config_entry_from_devices(hass: HomeAssistant, config_entry: ConfigE
     See: https://developers.home-assistant.io/blog/2025/07/18/updated-pattern-for-helpers-linking-to-devices/
     """
     remove_helper_devices = getattr(helper_integration, "async_remove_helper_devices", None)
-    if remove_helper_devices is not None:  # pragma: no cover
+    if remove_helper_devices is not None:
         configured_device_id = config_entry.data.get(CONF_DEVICE, None)
         remove_helper_devices(
             hass,

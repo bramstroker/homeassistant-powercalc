@@ -23,7 +23,7 @@ from homeassistant.const import (
     __version__ as HA_VERSION,  # noqa: N812
 )
 from homeassistant.core import Event, HassJob, HomeAssistant, ServiceCall, callback
-from homeassistant.helpers import device_registry as dr, issue_registry as ir
+from homeassistant.helpers import issue_registry as ir
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.entity_platform import async_get_platforms
@@ -109,6 +109,7 @@ from .const import (
     SensorType,
     UnitPrefix,
 )
+from .device_binding import is_composite_device_id
 from .discovery import DiscoveryManager, DiscoveryStatus, get_discovery_manager
 from .migrate import async_fix_legacy_profile_config_entry, async_migrate_config_entry
 from .power_profile.power_profile import DeviceType
@@ -548,13 +549,11 @@ def _async_handle_composite_device_issue(hass: HomeAssistant, entry: ConfigEntry
         ir.async_delete_issue(hass, DOMAIN, issue_id)
         return
 
-    device_reg = dr.async_get(hass)
-    is_composite = getattr(device_reg, "async_is_composite_device_id", None)
-    if is_composite is None or not is_composite(device_id):
+    if not is_composite_device_id(hass, device_id):
         ir.async_delete_issue(hass, DOMAIN, issue_id)
         return
 
-    ir.async_create_issue(  # pragma: no cover
+    ir.async_create_issue(
         hass,
         DOMAIN,
         issue_id,

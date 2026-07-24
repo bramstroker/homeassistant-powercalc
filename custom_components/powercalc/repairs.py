@@ -12,6 +12,7 @@ import voluptuous as vol
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import CONF_MODEL, CONF_SUB_PROFILE, DOMAIN, ISSUE_COMPOSITE_DEVICE_ID
+from custom_components.powercalc.device_binding import is_composite_device_id
 from custom_components.powercalc.flow_helper.schema import build_sub_profile_schema
 from custom_components.powercalc.power_profile.factory import get_power_profile
 
@@ -56,7 +57,7 @@ class SubProfileRepairFlow(RepairsFlow):
         )
 
 
-class CompositeDeviceIdRepairFlow(RepairsFlow):  # pragma: no cover
+class CompositeDeviceIdRepairFlow(RepairsFlow):
     """Handle selection of a device after Home Assistant split a legacy device."""
 
     def __init__(self, entry_id: str, entry_title: str) -> None:
@@ -79,11 +80,10 @@ class CompositeDeviceIdRepairFlow(RepairsFlow):  # pragma: no cover
             selected_device_id = user_input.get(CONF_DEVICE)
             if selected_device_id is not None:
                 device_reg = dr.async_get(self.hass)
-                is_composite = getattr(device_reg, "async_is_composite_device_id", None)
                 if (
                     not isinstance(selected_device_id, str)
                     or device_reg.async_get(selected_device_id) is None
-                    or (is_composite is not None and is_composite(selected_device_id))
+                    or is_composite_device_id(self.hass, selected_device_id)
                 ):
                     errors["base"] = "invalid_device"
 
@@ -122,7 +122,7 @@ async def async_create_fix_flow(
 
     config_entry_id = str(data["config_entry_id"])
     config_entry = hass.config_entries.async_get_entry(config_entry_id)
-    if issue_id == f"{ISSUE_COMPOSITE_DEVICE_ID}_{config_entry_id}":  # pragma: no cover
+    if issue_id == f"{ISSUE_COMPOSITE_DEVICE_ID}_{config_entry_id}":
         return CompositeDeviceIdRepairFlow(
             config_entry_id,
             config_entry.title if config_entry else "Unknown configuration",

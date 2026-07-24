@@ -23,7 +23,23 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SensorType,
 )
+from custom_components.powercalc.device_binding import is_composite_device_id
 from tests.common import create_mock_config_entry, mock_device, run_powercalc_setup
+
+
+def test_regular_device_is_not_composite(
+    hass: HomeAssistant,
+    device_registry: DeviceRegistry,
+) -> None:
+    """A regular device ID is not treated as a legacy composite device."""
+    config_entry = MockConfigEntry(domain="test")
+    config_entry.add_to_hass(hass)
+    device_entry = device_registry.async_get_or_create(
+        config_entry_id=config_entry.entry_id,
+        identifiers={("test", "regular-device")},
+    )
+
+    assert not is_composite_device_id(hass, device_entry.id)
 
 
 async def test_entities_are_bound_to_source_device(
