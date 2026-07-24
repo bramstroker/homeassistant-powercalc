@@ -15,6 +15,7 @@ from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
+    CONF_DEVICE,
     CONF_DOMAIN,
     CONF_ENABLED,
     EVENT_HOMEASSISTANT_STARTED,
@@ -22,6 +23,7 @@ from homeassistant.const import (
     __version__ as HA_VERSION,  # noqa: N812
 )
 from homeassistant.core import Event, HassJob, HomeAssistant, ServiceCall, callback
+from homeassistant.helpers import device_registry as dr, issue_registry as ir
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.entity_platform import async_get_platforms
@@ -98,6 +100,7 @@ from .const import (
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+    ISSUE_COMPOSITE_DEVICE_ID,
     MIN_HA_VERSION,
     SERVICE_CHANGE_GUI_CONFIGURATION,
     SERVICE_RELOAD,
@@ -443,6 +446,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
 
     await async_fix_legacy_profile_config_entry(hass, entry)
+    _async_handle_composite_device_issue(hass, entry)
     await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR, Platform.SELECT])
 
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
@@ -512,6 +516,8 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 
 async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
     """Called after a config entry is removed."""
+    ir.async_delete_issue(hass, DOMAIN, _composite_device_issue_id(config_entry.entry_id))
+
     discovery_manager = get_discovery_manager(hass)
     discovery_manager.remove_initialized_flow(config_entry)
 
@@ -527,6 +533,37 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     for entry in updated_entries:
         if entry.state == ConfigEntryState.LOADED:
             await hass.config_entries.async_reload(entry.entry_id)
+
+
+def _composite_device_issue_id(config_entry_id: str) -> str:
+    """Return the repair issue ID for a config entry using a composite device ID."""
+    return f"{ISSUE_COMPOSITE_DEVICE_ID}_{config_entry_id}"
+
+
+def _async_handle_composite_device_issue(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Report ambiguous legacy device IDs."""
+    issue_id = _composite_device_issue_id(entry.entry_id)
+    device_id = entry.data.get(CONF_DEVICE)
+    if not isinstance(device_id, str):
+        ir.async_delete_issue(hass, DOMAIN, issue_id)
+        return
+
+    device_reg = dr.async_get(hass)
+    is_composite = getattr(device_reg, "async_is_composite_device_id", None)
+    if is_composite is None or not is_composite(device_id):
+        ir.async_delete_issue(hass, DOMAIN, issue_id)
+        return
+
+    ir.async_create_issue(  # pragma: no cover
+        hass,
+        DOMAIN,
+        issue_id,
+        data={"config_entry_id": entry.entry_id},
+        is_fixable=True,
+        severity=ir.IssueSeverity.WARNING,
+        translation_key=ISSUE_COMPOSITE_DEVICE_ID,
+        translation_placeholders={"name": entry.title},
+    )
 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:

@@ -1,8 +1,10 @@
 from datetime import timedelta
 from unittest.mock import AsyncMock, Mock, patch
 
-from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, EntityCategory
+import attr
+from homeassistant.const import CONF_DEVICE, CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.issue_registry import IssueRegistry
 import pytest
@@ -46,6 +48,8 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.power_profile.library import ModelInfo
 from tests.common import migrate_legacy_entry, run_powercalc_setup
+
+COMPOSITE_ID = "composite00000000000000000000ab"
 
 
 async def test_legacy_discovery_config_raises_issue(hass: HomeAssistant, issue_registry: IssueRegistry) -> None:
@@ -269,6 +273,55 @@ async def test_migrate_config_entry_removes_config_entry_from_device(
     assert entity_entry
     assert entity_entry.device_id == device_entry.id
     assert mock_entry.version == PowercalcConfigFlow.VERSION
+
+
+@pytest.mark.parametrize("configured_device_id", [None, COMPOSITE_ID], ids=["source_entity", "configured_device"])
+@pytest.mark.skip(reason="Enable when Home Assistant 2026.8 is released")
+async def test_migrate_config_entry_removes_split_helper_device(
+    hass: HomeAssistant,
+    device_registry: dr.DeviceRegistry,
+    entity_registry: er.EntityRegistry,
+    configured_device_id: str | None,
+) -> None:
+    """Test migration removes a helper-owned split with the 2026.8 API."""
+    source_entry = MockConfigEntry(domain="test")
+    source_entry.add_to_hass(hass)
+    powercalc_entry_data = {
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_ENTITY_ID: "switch.source_switch",
+        CONF_FIXED: {CONF_POWER: 50},
+    }
+    if configured_device_id is not None:
+        powercalc_entry_data[CONF_DEVICE] = configured_device_id
+    powercalc_entry = MockConfigEntry(domain=DOMAIN, data=powercalc_entry_data, version=8)
+    powercalc_entry.add_to_hass(hass)
+
+    source_device = device_registry.async_get_or_create(
+        config_entry_id=source_entry.entry_id,
+        identifiers={("test", "source")},
+    )
+    helper_device = device_registry.async_get_or_create(
+        config_entry_id=powercalc_entry.entry_id,
+        identifiers={(DOMAIN, "helper")},
+    )
+    device_registry.devices[source_device.id] = attr.evolve(source_device, composite_device_id=COMPOSITE_ID)
+    device_registry.devices[helper_device.id] = attr.evolve(helper_device, composite_device_id=COMPOSITE_ID)
+    helper_entity = entity_registry.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        "test_power",
+        config_entry=powercalc_entry,
+        device_id=helper_device.id,
+    )
+
+    await async_migrate_entry(hass, powercalc_entry)
+
+    assert device_registry.async_get(source_device.id)
+    assert device_registry.async_get(helper_device.id) is None
+    migrated_entity = entity_registry.async_get(helper_entity.entity_id)
+    assert migrated_entity
+    assert migrated_entity.device_id is None
+    assert powercalc_entry.version == PowercalcConfigFlow.VERSION
 
 
 @pytest.mark.parametrize(

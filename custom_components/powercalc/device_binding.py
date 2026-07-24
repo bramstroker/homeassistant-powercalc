@@ -53,7 +53,11 @@ def get_device_entry(
     if device_id is None and config_entry is not None:
         device_id = config_entry.data.get(CONF_DEVICE)
     if device_id is not None:
-        return device_registry.async_get(hass).async_get(device_id)
+        device_reg = device_registry.async_get(hass)
+        is_composite = getattr(device_reg, "async_is_composite_device_id", None)
+        if is_composite is not None and is_composite(device_id):
+            return None  # pragma: no cover
+        return device_reg.async_get(device_id)
 
     if source_entity:
         return source_entity.device_entry or async_entity_id_to_device(hass, source_entity.entity_id)

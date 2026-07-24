@@ -721,7 +721,12 @@ def _attach_configured_device_entry(
         return source_entity
 
     device_registry = dr.async_get(hass)
-    device_entry = device_registry.async_get(sensor_config["device"])
+    device_id = sensor_config["device"]
+    is_composite = getattr(device_registry, "async_is_composite_device_id", None)
+    if is_composite is not None and is_composite(device_id):
+        return source_entity  # pragma: no cover
+
+    device_entry = device_registry.async_get(device_id)
     if device_entry:
         return source_entity._replace(device_entry=device_entry)
     return source_entity
