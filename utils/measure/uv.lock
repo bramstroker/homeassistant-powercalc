@@ -754,6 +754,7 @@ dependencies = [
 [package.optional-dependencies]
 app = [
     { name = "fastapi" },
+    { name = "python-kasa" },
     { name = "uvicorn" },
 ]
 cli = [
@@ -801,6 +802,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.3" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.0" },
     { name = "python-decouple", marker = "extra == 'cli'", specifier = ">=3.4" },
+    { name = "python-kasa", marker = "extra == 'app'", specifier = ">=0.7" },
     { name = "python-kasa", marker = "extra == 'cli'", specifier = ">=0.7" },
     { name = "requests", specifier = ">=2.28" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.2" },

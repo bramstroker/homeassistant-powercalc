@@ -8,7 +8,7 @@ import "./setup-view";
 
 const measurementDefaults = { sleep_time: 1, sample_count: 5, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
 const defaultSettings: AppSettings = {
-  default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null,
+  default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null, kasa_ip: null,
   fast_test_mode: false,
   measurement_defaults: measurementDefaults,
 };
@@ -581,6 +581,27 @@ describe("setup type picker", () => {
     (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
 
     expect((await submitted).power_meter).toEqual({ type: "shelly", device_ip: "192.0.2.20" });
+  });
+
+  it("includes the configured Kasa adapter in the submitted request", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string; kasaIp: string;
+      selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.definitions = definitions;
+    element.capabilities = capabilities;
+    element.powerMeter = "kasa";
+    element.kasaIp = "192.0.2.30";
+    element.selectedType = "average";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
+    });
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+
+    expect((await submitted).power_meter).toEqual({ type: "kasa", device_ip: "192.0.2.30" });
   });
 
   it("renders an entity dropdown for a device domain when entities are available", async () => {
@@ -1508,6 +1529,43 @@ describe("settings power meter test", () => {
 
     expect(element.shadowRoot.querySelector('input[name="shelly_ip"]')).toBeTruthy();
     expect((element.shadowRoot.querySelector('input[name="shelly_ip"]') as HTMLInputElement).value).toBe("10.0.0.5");
+  });
+
+  it("collects the Kasa address without offering discovery", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      powers: EntityDescriptor[]; settings: AppSettings; testResult?: PowerMeterDiagnostic;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.powers = [];
+    element.settings = { ...defaultSettings, default_measure_device: "Kasa KP115" };
+    element.testResult = goodPowerMeterDiagnostic;
+    const discover = vi.fn();
+    element.addEventListener("shelly-discover", discover);
+    const saved = new Promise<AppSettings>((resolve) => {
+      element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettings>).detail));
+    });
+    document.body.append(element);
+    await element.updateComplete;
+
+    const meterSelect = element.shadowRoot.querySelector('select[name="power_meter"]') as HTMLSelectElement;
+    meterSelect.value = "kasa";
+    meterSelect.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+    expect(discover).not.toHaveBeenCalled();
+    // Selecting a direct meter invalidates the earlier Home Assistant sensor result.
+    expect(element.shadowRoot.querySelector("measure-power-meter-diagnostic")).toBeNull();
+    expect(element.shadowRoot.querySelector('select[name="discovered_shelly"]')).toBeNull();
+
+    const kasaIp = element.shadowRoot.querySelector('input[name="kasa_ip"]') as HTMLInputElement;
+    kasaIp.value = "192.0.2.30";
+    kasaIp.dispatchEvent(new Event("input"));
+    await element.updateComplete;
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+
+    const settings = await saved;
+    expect(settings.power_meter).toBe("kasa");
+    expect(settings.kasa_ip).toBe("192.0.2.30");
+    expect(settings.shelly_ip).toBeNull();
   });
 
   it("discovers Shellys automatically and selects only compatible devices", async () => {

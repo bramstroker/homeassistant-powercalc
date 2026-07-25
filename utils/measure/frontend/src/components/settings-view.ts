@@ -28,6 +28,7 @@ export class SettingsView extends LitElement {
     shellyDiscoveryAvailable: { attribute: false },
     shellyDiscoveryMessage: { attribute: false },
     shellyIp: { state: true },
+    kasaIp: { state: true },
   };
 
   powers: EntityDescriptor[] = [];
@@ -53,6 +54,7 @@ export class SettingsView extends LitElement {
   shellyDiscoveryAvailable?: boolean;
   shellyDiscoveryMessage?: string | null;
   private shellyIp?: string;
+  private kasaIp?: string;
   private readonly form = createRef<HTMLFormElement>();
 
   static readonly styles = [sharedStyles, css`
@@ -177,10 +179,12 @@ export class SettingsView extends LitElement {
                   <select name="power_meter" @change=${this.powerMeterChanged}>
                     <option value="hass" ?selected=${powerMeter === "hass"}>Home Assistant sensor</option>
                     <option value="shelly" ?selected=${powerMeter === "shelly"}>Shelly plug</option>
+                    <option value="kasa" ?selected=${powerMeter === "kasa"}>Kasa smart plug</option>
                     <option value="dummy" ?selected=${powerMeter === "dummy"}>Synthetic test meter</option>
                   </select>
                 </label>
                 ${powerMeter === "shelly" ? this.renderShellyFields() : nothing}
+                ${powerMeter === "kasa" ? this.renderKasaFields() : nothing}
                 ${powerMeter === "hass" ? html`<label>
                   <span>Power sensor</span>
                   <select name="default_power_entity_id" required @change=${this.powerMeterSettingsChanged}>
@@ -189,7 +193,7 @@ export class SettingsView extends LitElement {
                   </select>
                 </label>` : nothing}
                 ${powerMeter === "hass" ? html`<p class="quality-requirements">For reliable profiles, use a sensor with at least 0.1 W reported resolution and updates every 5 seconds or faster. Updates within 2 seconds are recommended.</p>` : nothing}
-                ${powerMeter === "shelly" ? html`<p class="quality-requirements">Powercalc polls this device directly, so Home Assistant sensor resolution and update-frequency checks do not apply.</p>` : nothing}
+                ${powerMeter === "shelly" || powerMeter === "kasa" ? html`<p class="quality-requirements">Powercalc polls this device directly, so Home Assistant sensor resolution and update-frequency checks do not apply.</p>` : nothing}
                 ${powerMeter === "dummy" ? nothing : this.renderTestRow()}
               </div>
             </section>
@@ -385,6 +389,16 @@ export class SettingsView extends LitElement {
     </label>`;
   }
 
+  private renderKasaFields() {
+    const address = this.kasaIp ?? this.settings?.kasa_ip ?? "";
+    return html`
+      <label>
+        <span>Kasa IP address</span>
+        <input name="kasa_ip" .value=${address} required autocomplete="off" placeholder="192.168.1.50" @input=${this.kasaIpChanged} />
+        <small class="field-hint">Enter the IP address of a Kasa plug with energy monitoring, such as a KP115 or HS110. Give it a static lease in your router so it stays reachable.</small>
+      </label>`;
+  }
+
   private shellyDeviceLabel(device: ShellyDiscoveryDevice): string {
     const identity = [device.name, device.model, device.generation === null ? null : `Gen ${device.generation}`, device.ip_address]
       .filter((part): part is string => Boolean(part))
@@ -400,12 +414,14 @@ export class SettingsView extends LitElement {
     const powerMeterValue = data.get("power_meter");
     const powerMeter = (typeof powerMeterValue === "string" ? powerMeterValue : "hass") as AppSettings["power_meter"];
     const shellyIp = data.get("shelly_ip");
+    const kasaIp = data.get("kasa_ip");
     const measureDevice = data.get("default_measure_device");
     return {
       default_power_entity_id: typeof value === "string" && value ? value : null,
       default_measure_device: typeof measureDevice === "string" && measureDevice.trim() ? measureDevice.trim() : null,
       power_meter: powerMeter,
       shelly_ip: powerMeter === "shelly" && typeof shellyIp === "string" ? shellyIp.trim() || null : null,
+      kasa_ip: powerMeter === "kasa" && typeof kasaIp === "string" ? kasaIp.trim() || null : null,
       fast_test_mode: data.get("fast_test_mode") === "on",
       measurement_defaults: {
         sleep_time: this.number(data, "sleep_time"),
@@ -447,7 +463,7 @@ export class SettingsView extends LitElement {
   private powerMeterChanged(event: Event): void {
     this.clearTestResult();
     // Keep the choice in local state so an app-shell re-render can't clobber the
-    // in-progress form (which would reset the meter type and typed Shelly IP).
+    // in-progress form (which would reset the meter type and typed device IP).
     this.meter = (event.currentTarget as HTMLSelectElement).value as AppSettings["power_meter"];
     if (this.meter === "shelly") this.discoverShellys();
   }
@@ -458,6 +474,11 @@ export class SettingsView extends LitElement {
 
   private shellyIpChanged(event: Event): void {
     this.shellyIp = (event.currentTarget as HTMLInputElement).value;
+    this.powerMeterSettingsChanged();
+  }
+
+  private kasaIpChanged(event: Event): void {
+    this.kasaIp = (event.currentTarget as HTMLInputElement).value;
     this.powerMeterSettingsChanged();
   }
 

@@ -16,7 +16,13 @@ from measure.controller.light.spec import DummyLightControllerSpec, HassLightCon
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.home_assistant_entities import DeviceClass, EntityDomain
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
-from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, PowerMeterSpec, ShellyPowerMeterSpec
+from measure.powermeter.spec import (
+    DummyPowerMeterSpec,
+    HassPowerMeterSpec,
+    KasaPowerMeterSpec,
+    PowerMeterSpec,
+    ShellyPowerMeterSpec,
+)
 from measure.request import (
     ChargingMeasurementRequest,
     DummyLoadCalibrationRequest,
@@ -132,7 +138,7 @@ class MeasurementPreflight:
         if isinstance(power_meter, DummyPowerMeterSpec):
             if not self._developer_mode:
                 raise PreflightError("Dummy power meters require developer mode in the Home Assistant app")
-        elif not isinstance(power_meter, HassPowerMeterSpec | ShellyPowerMeterSpec):
+        elif not isinstance(power_meter, HassPowerMeterSpec | ShellyPowerMeterSpec | KasaPowerMeterSpec):
             label = power_meter.type.value.replace("_", " ").title()
             raise PreflightError(f"{label} power meters are not supported by the Home Assistant app")
 

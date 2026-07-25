@@ -13,7 +13,7 @@ from measure.const import MeasureType
 from measure.contribution.github import GitHubUser
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import LightOperatingPoint
-from measure.ha_app.api import create_app
+from measure.ha_app.api import _power_meter_spec, create_app
 from measure.ha_app.contribution import (
     ContributionApiCoordinator,
     ContributionApiError,
@@ -34,7 +34,7 @@ from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
 from measure.powermeter.powermeter import PowerMeter, PowerMeterDiagnosticSample
-from measure.powermeter.spec import HassPowerMeterSpec
+from measure.powermeter.spec import HassPowerMeterSpec, KasaPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
@@ -514,6 +514,35 @@ def test_shelly_dummy_load_preflight_builds_and_probes_the_meter_once(tmp_path: 
     meter.diagnostic_sample.assert_called_once_with()
 
 
+def test_kasa_settings_round_trip_into_a_power_meter_spec(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+
+    stored = test_client.put("/api/settings", json={"power_meter": "kasa", "kasa_ip": "192.0.2.30"})
+
+    assert stored.status_code == 200
+    assert test_client.get("/api/settings").json()["kasa_ip"] == "192.0.2.30"
+    settings = test_client.app.state.context.storage.load_settings()
+    assert _power_meter_spec(settings) == KasaPowerMeterSpec(device_ip="192.0.2.30")
+
+
+def test_kasa_preflight_builds_and_probes_the_meter(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    meter = MagicMock(spec=PowerMeter)
+    meter.has_voltage_support.return_value = True
+    meter.diagnostic_sample.return_value = PowerMeterDiagnosticSample(power=4.2, raw_value="4.2", reported_at=100)
+    builder = MagicMock(return_value=meter)
+    context.power_meter_diagnostics = PowerMeterDiagnostics(builder, duration=0)
+    request = payload() | {"power_meter": {"type": "kasa", "device_ip": "192.0.2.1"}}
+
+    with patch.object(context, "build_power_meter", builder):
+        response = test_client.post("/api/preflight", json=request)
+
+    assert response.status_code == 200
+    builder.assert_called_once()
+    assert builder.call_args.args[0] == KasaPowerMeterSpec(device_ip="192.0.2.1")
+
+
 def test_app_closes_home_assistant_manager_at_shutdown(tmp_path: Path) -> None:
     app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
     home_assistant = MagicMock(spec=HomeAssistantManager)
@@ -537,6 +566,10 @@ def test_power_meter_test_endpoint(tmp_path: Path) -> None:
     shelly = test_client.post("/api/settings/test-power-meter", json={"power_meter": "shelly", "shelly_ip": None})
     assert shelly.json()["success"] is False
     assert shelly.json()["message"] == "Enter the Shelly IP address first"
+
+    kasa = test_client.post("/api/settings/test-power-meter", json={"power_meter": "kasa", "kasa_ip": None})
+    assert kasa.json()["success"] is False
+    assert kasa.json()["message"] == "Enter the Kasa IP address first"
 
     hass = test_client.post(
         "/api/settings/test-power-meter",
@@ -628,13 +661,13 @@ def test_preflight_rejects_cli_only_power_meter_adapter(tmp_path: Path) -> None:
         "/api/preflight",
         json={
             "measure_type": "average",
-            "power_meter": {"type": "kasa", "device_ip": "192.0.2.1"},
+            "power_meter": {"type": "tasmota", "device_ip": "192.0.2.1"},
             "duration": 60,
         },
     )
 
     assert response.status_code == 422
-    assert response.json()["message"] == "Kasa power meters are not supported by the Home Assistant app"
+    assert response.json()["message"] == "Tasmota power meters are not supported by the Home Assistant app"
 
 
 def test_preflight_rejects_cli_only_controller_adapter(tmp_path: Path) -> None:
@@ -1103,6 +1136,7 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
         "default_measure_device": None,
         "power_meter": "hass",
         "shelly_ip": None,
+        "kasa_ip": None,
         "fast_test_mode": False,
         "measurement_defaults": {
             "sleep_time": 2.0,
@@ -1134,6 +1168,7 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
     reloaded = test_client.get("/api/settings").json()
     assert reloaded["default_power_entity_id"] == "sensor.test_power"
     assert reloaded["default_measure_device"] == "Shelly Plug S"
+    assert reloaded["kasa_ip"] is None
     assert reloaded["measurement_defaults"]["sample_count"] == 4
     effective_defaults = test_client.get("/api/capabilities").json()["defaults"]
     assert effective_defaults["sample_count"] == 4

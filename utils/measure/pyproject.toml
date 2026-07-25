@@ -17,6 +17,7 @@ dependencies = [
 [project.optional-dependencies]
 app = [
     "fastapi>=0.116",
+    "python-kasa>=0.7",
     "uvicorn>=0.35",
 ]
 cli = [
