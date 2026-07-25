@@ -12,13 +12,17 @@
           {
             "attribute": "oscillating",
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": [
+              "[[entity]]"
+            ],
             "state": true
           },
           {
             "attribute": "direction",
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": [
+              "[[entity]]"
+            ],
             "state": "reverse"
           }
         ]
@@ -55,13 +59,17 @@
           {
             "attribute": "oscillating",
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": [
+              "[[entity]]"
+            ],
             "state": true
           },
           {
             "attribute": "direction",
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": [
+              "[[entity]]"
+            ],
             "state": "forward"
           }
         ]
@@ -98,13 +106,17 @@
           {
             "attribute": "oscillating",
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": [
+              "[[entity]]"
+            ],
             "state": false
           },
           {
             "attribute": "direction",
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": [
+              "[[entity]]"
+            ],
             "state": "reverse"
           }
         ]
@@ -141,13 +153,17 @@
           {
             "attribute": "oscillating",
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": [
+              "[[entity]]"
+            ],
             "state": false
           },
           {
             "attribute": "direction",
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": [
+              "[[entity]]"
+            ],
             "state": "forward"
           }
         ]
