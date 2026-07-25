@@ -86,8 +86,8 @@ class MeasurementDefinition:
     confirmation_action: str | None = None
     #: Present the confirmation as a warning, for a measurement that makes noise or mess.
     confirmation_is_warning: bool = False
-    #: Placeholder shown in the profile fields, to steer the naming this type expects.
-    model_id_example: str = "WSP002"
+    #: Placeholders steering the profile fields, taken from real entries in the profile library.
+    model_id_example: str = ""
     product_name_example: str = ""
     fields: tuple[FormFieldDefinition, ...] = ()
     #: Tuning parameters this measure type exposes, in the order they are shown.
@@ -269,6 +269,8 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         kind=MeasureType.SPEAKER,
         description="Measure power across media-player volume levels.",
         icon="🔊",
+        model_id_example="B7W64E",
+        product_name_example="Amazon Echo Dot (Gen4)",
         confirmation_action="Start speaker measurement",
         confirmation_is_warning=True,
         parameters=(
@@ -327,6 +329,8 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         kind=MeasureType.CHARGING,
         description="Measure charging power against battery level.",
         icon="🔋",
+        model_id_example="s6_maxv",
+        product_name_example="Roborock S6 MaxV",
         confirmation_action="Start charging measurement",
         parameters=(READING_INTERVAL, *POINT_SAMPLING),
         fields=(
@@ -360,6 +364,8 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         kind=MeasureType.FAN,
         description="Measure fan power across percentage levels.",
         icon="🌀",
+        model_id_example="TP07",
+        product_name_example="Dyson Purifier Cool TP07",
         parameters=(READING_INTERVAL,),
         fields=(POWER_FIELD, _controller("fan_entity_id", "Fan", "fan")),
     ),

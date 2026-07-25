@@ -108,6 +108,8 @@ export class SetupView extends LitElement {
     .checks { display: flex; flex-wrap: wrap; gap: 0.6rem; }
     .check { display: flex; grid-template-columns: none; align-items: center; gap: 0.5rem; min-height: 42px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); }
     .check input { min-height: auto; width: auto; accent-color: var(--signal); }
+    /* A checkbox pill has no caption above it, so pin it to the input line of its row. */
+    .profile-grid > .check { align-self: end; }
     details { border-top: 1px solid var(--line); padding-top: 1rem; }
     summary { width: fit-content; color: var(--signal-strong); cursor: pointer; font-weight: 700; }
     details .grid { margin-top: 1rem; }
@@ -265,7 +267,7 @@ export class SetupView extends LitElement {
           <div class="grid profile-grid">
             ${fields.filter((field) => field.control !== "multi_select").map((field) => this.genericField(field, run))}
             ${definition.supports_profile
-              ? this.textField("model_id", "Model ID", this.modelId(run), `e.g. ${definition.model_id_example}`, true)
+              ? this.textField("model_id", "Model ID", this.modelId(run), definition.model_id_example && `e.g. ${definition.model_id_example}`, true)
               : nothing}
             ${definition.supports_profile
               ? this.textField("product_name", "Full product name", run?.product_name ?? "", definition.product_name_example || definition.label, true, FULL_PRODUCT_NAME_HINT)
