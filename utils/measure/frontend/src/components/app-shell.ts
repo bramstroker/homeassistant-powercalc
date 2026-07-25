@@ -2,8 +2,8 @@ import { LitElement, css, html, nothing } from "lit";
 import { MeasureApiClient, SessionEventStream } from "../api-client";
 import { MeasureAppController } from "../app-controller";
 import type { AppView, MeasureAppApi, MeasureAppState } from "../app-controller";
-import { LIGHT_TYPE } from "../measurement-kinds";
-import type { AppSettings, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DummyLoadCalibration, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SettingsSection, ShellyDiscoveryDevice } from "../types";
+import { requestFieldValue } from "../measurement-kinds";
+import type { AppSettings, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DummyLoadCalibration, EntityDescriptor, FormField, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SettingsSection, ShellyDiscoveryDevice } from "../types";
 import type { ReviewMetric, ReviewRow } from "./preflight-view";
 import { sharedStyles } from "../styles";
 import "./preflight-view";
@@ -167,8 +167,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         .contributionAuthError=${this.contributionAuthError} .initialSection=${this.settingsSection}
         @back=${this.closeSettings} @save=${this.saveSettings} @test=${this.testPowerMeter} @test-clear=${this.clearPowerMeterTestResult}
         @shelly-discover=${this.discoverShellys} @github-device-start=${this.startContributionDeviceAuth}
-        @github-device-check=${this.checkContributionDeviceAuth} @github-token-save=${this.saveContributionToken}
-        @github-disconnect=${this.disconnectContributionAuth}></measure-settings-view>`;
+        @github-token-save=${this.saveContributionToken} @github-disconnect=${this.disconnectContributionAuth}></measure-settings-view>`;
     if (this.view === "review" && this.preflight && this.request) return html`
       <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .powerMeterDiagnostic=${this.preflight.power_meter_diagnostic} .canOverwrite=${this.reviewCanOverwrite()} .confirmationAction=${this.confirmationAction()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`
@@ -213,46 +212,70 @@ export class AppShell extends LitElement implements MeasureAppState {
     return this.definitions.find((definition) => definition.measure_type === type)?.supports_resume ?? false;
   }
 
+  /** Headline numbers, shown for whichever of them preflight was able to estimate. */
   private reviewMetrics(): ReviewMetric[] {
-    if (this.request?.measure_type !== LIGHT_TYPE || !this.preflight) return [];
-    const duration = this.preflight.estimated_duration_seconds;
-    return [
-      { label: "Variations", value: String(this.preflight.estimated_variations ?? "—") },
+    if (!this.request || !this.preflight) return [];
+    const { estimated_variations: variations, estimated_duration_seconds: duration } = this.preflight;
+    if (variations === undefined && duration === undefined) return [];
+    const metrics: ReviewMetric[] = [
+      { label: "Variations", value: String(variations ?? "—") },
       { label: "Estimated time", value: duration === undefined ? "—" : this.duration(duration) },
-      { label: "Modes", value: String(this.request.modes.length) },
     ];
+    for (const [field, values] of this.multiSelections()) {
+      metrics.push({ label: field.label, value: String(values.length) });
+    }
+    return metrics;
   }
 
   private reviewSummary(): ReviewRow[] {
-    if (this.request?.measure_type === LIGHT_TYPE) {
-      const rows: ReviewRow[] = [
-        { label: "Model", value: `${this.request.product_name} (${this.request.model_id})` },
-        { label: "Light", value: this.request.controller.type === "hass" ? this.request.controller.entity_id : this.request.controller.type },
-        { label: "Power", value: this.request.power_meter.type === "hass" ? this.request.power_meter.entity_id : this.request.power_meter.type },
-        { label: "Modes", value: this.request.modes.join(", ") },
-      ];
-      if (this.request.dummy_load) rows.push({ label: "Dummy load", value: this.dummyLoadSummary(this.request.dummy_load) });
-      return rows;
+    const request = this.request;
+    if (!request) return [];
+    const definition = this.definitionFor(request.measure_type);
+    const rows: ReviewRow[] = [{ label: "Type", value: definition?.label ?? request.measure_type }];
+    if (definition?.supports_profile) rows.push({ label: "Model", value: `${request.product_name} (${request.model_id})` });
+    if (request.measure_device) rows.push({ label: "Device", value: request.measure_device });
+    // Name the controller with the label the server gave its field — "Light", "Media player", …
+    const controller = definition?.fields.find((field) => field.role === "controller");
+    const entity = controller && requestFieldValue(request, controller);
+    if (controller) {
+      rows.push({ label: controller.label, value: typeof entity === "string" && entity ? entity : "Virtual device" });
     }
-    if (this.request) {
-      const label = this.definitions.find((definition) => definition.measure_type === this.request?.measure_type)?.label ?? this.request.measure_type;
-      const rows: ReviewRow[] = [{ label: "Type", value: label }];
-      if (this.request.measure_device) rows.push({ label: "Device", value: this.request.measure_device });
-      rows.push({
-        label: "Power",
-        value: this.request.power_meter.type === "hass" ? this.request.power_meter.entity_id : this.request.power_meter.type,
+    rows.push({
+      label: "Power",
+      value: request.power_meter.type === "hass" ? request.power_meter.entity_id : request.power_meter.type,
+    });
+    for (const [field, values] of this.multiSelections()) {
+      rows.push({ label: field.label, value: values.join(", ") });
+    }
+    const battery = this.batterySource(request);
+    if (battery) rows.push({ label: "Battery", value: battery });
+    if (request.dummy_load) rows.push({ label: "Dummy load", value: this.dummyLoadSummary(request.dummy_load) });
+    return rows;
+  }
+
+  /** Multi-select fields of the pending request, paired with what it selected. */
+  private multiSelections(): [FormField, string[]][] {
+    const request = this.request;
+    if (!request) return [];
+    return (this.definitionFor(request.measure_type)?.fields ?? [])
+      .filter((field) => field.control === "multi_select")
+      .flatMap((field) => {
+        const values = requestFieldValue(request, field);
+        return Array.isArray(values) ? [[field, values] as [FormField, string[]]] : [];
       });
-      if (this.request.measure_type === "charging" && this.preflight) {
-        const battery = this.preflight.battery_level_entity_id
-          ?? (this.preflight.battery_level_attribute && this.request.controller.type === "hass"
-            ? `${this.request.controller.entity_id} · ${this.preflight.battery_level_attribute} attribute`
-            : undefined);
-        if (battery) rows.push({ label: "Battery", value: battery });
-      }
-      if (this.request.dummy_load) rows.push({ label: "Dummy load", value: this.dummyLoadSummary(this.request.dummy_load) });
-      return rows;
-    }
-    return [];
+  }
+
+  /** Where the battery level is read from, when preflight found one. */
+  private batterySource(request: MeasurementRequest): string | undefined {
+    if (!this.preflight) return undefined;
+    if (this.preflight.battery_level_entity_id) return this.preflight.battery_level_entity_id;
+    const { controller } = request as { controller?: { type: string; entity_id?: string } };
+    if (!this.preflight.battery_level_attribute || controller?.type !== "hass") return undefined;
+    return `${controller.entity_id} · ${this.preflight.battery_level_attribute} attribute`;
+  }
+
+  private definitionFor(type: MeasureType): MeasureDefinition | undefined {
+    return this.definitions.find((definition) => definition.measure_type === type);
   }
 
   private reviewCanOverwrite(): boolean {
@@ -265,7 +288,8 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
 
   private confirmationIsWarning(): boolean {
-    return (this.snapshot?.request?.measure_type ?? this.request?.measure_type) === "speaker";
+    const type = this.snapshot?.request?.measure_type ?? this.request?.measure_type;
+    return this.definitions.find((definition) => definition.measure_type === type)?.confirmation_is_warning ?? false;
   }
 
   private duration(seconds: number): string {
@@ -345,9 +369,6 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
   private startContributionDeviceAuth(): void {
     void this.controller.startContributionDeviceAuth();
-  }
-  private checkContributionDeviceAuth(): void {
-    void this.controller.checkContributionDeviceAuth();
   }
   private saveContributionToken(event: CustomEvent<string>): void {
     void this.controller.saveContributionToken(event.detail);

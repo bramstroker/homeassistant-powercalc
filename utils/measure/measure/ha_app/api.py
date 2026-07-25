@@ -42,7 +42,7 @@ from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictEr
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
-from measure.ha_app.registry import FieldControl, measurement_definitions, supported_light_modes
+from measure.ha_app.registry import FieldControl, FieldRole, measurement_definitions
 from measure.ha_app.service import MeasurementService
 from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionEvent, SessionSnapshot, SessionState
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
@@ -121,7 +121,6 @@ class SessionPlots(BaseModel):
 
 
 class CapabilitiesResponse(BaseModel):
-    modes: list[LutMode]
     defaults: dict[str, int | float]
     limits: dict[str, dict[str, int | float]]
     developer_mode: bool = False
@@ -132,12 +131,15 @@ class FormFieldOption(BaseModel):
     value: str
     label: str
     entity_domain: str | None = None
+    enables: list[str] = Field(default_factory=list)
 
 
 class FormField(BaseModel):
     name: str
     label: str
     control: FieldControl
+    role: FieldRole = FieldRole.ATTRIBUTE
+    narrowed_by: str | None = None
     required: bool = True
     entity_domains: list[str] = Field(default_factory=list)
     options: list[FormFieldOption] = Field(default_factory=list)
@@ -146,12 +148,26 @@ class FormField(BaseModel):
     maximum: int | float | None = None
 
 
+class MeasureParameter(BaseModel):
+    name: str
+    label: str
+    hint: str = ""
+    step: str = "1"
+    group: str = ""
+    requires_multiple: str | None = None
+
+
 class MeasureDefinition(BaseModel):
     measure_type: MeasureType
     label: str
     description: str
+    icon: str
     confirmation_action: str | None
+    confirmation_is_warning: bool = False
+    model_id_example: str = ""
+    product_name_example: str = ""
     fields: list[FormField]
+    parameters: list[MeasureParameter] = Field(default_factory=list)
     supports_profile: bool
     supports_resume: bool
 
@@ -319,7 +335,6 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
         defaults = MeasurementParameters()
         settings = await run_in_threadpool(context.storage.load_settings)
         return CapabilitiesResponse(
-            modes=list(supported_light_modes()),
             defaults={name: getattr(defaults, name) for name in PARAMETER_LIMITS}
             | settings.measurement_defaults.model_dump(),
             limits={name: {"min": minimum, "max": maximum} for name, (minimum, maximum) in PARAMETER_LIMITS.items()},
@@ -575,12 +590,19 @@ def _measure_definitions() -> list[MeasureDefinition]:
             measure_type=definition.kind,
             label=definition.label,
             description=definition.description,
+            icon=definition.icon,
             confirmation_action=definition.confirmation_action,
+            confirmation_is_warning=definition.confirmation_is_warning,
+            model_id_example=definition.model_id_example,
+            product_name_example=definition.product_name_example,
+            parameters=[MeasureParameter(**vars(parameter)) for parameter in definition.parameters],
             fields=[
                 FormField(
                     name=field.name,
                     label=field.label,
                     control=field.control,
+                    role=field.role,
+                    narrowed_by=field.narrowed_by,
                     required=field.required,
                     entity_domains=list(field.entity_domains),
                     options=[
@@ -588,6 +610,7 @@ def _measure_definitions() -> list[MeasureDefinition]:
                             value=option.value,
                             label=option.label,
                             entity_domain=option.entity_domain,
+                            enables=list(option.enables),
                         )
                         for option in field.options
                     ],

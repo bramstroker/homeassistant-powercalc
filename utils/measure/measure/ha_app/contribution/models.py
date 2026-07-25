@@ -101,10 +101,14 @@ class DeviceFlowStartResponse(DeviceFlowStart):
     flow_id: str
 
 
+DeviceFlowPollStatus = Literal["pending", "slow_down", "authorized", "expired", "denied"]
+
+
 class DeviceFlowPollResponse(BaseModel):
-    status: str
+    status: DeviceFlowPollStatus
     auth: ContributionAuthStatus | None = None
     message: str | None = None
+    retry_after: int | None = Field(default=None, ge=1)
 
 
 class ContributionFile(BaseModel):

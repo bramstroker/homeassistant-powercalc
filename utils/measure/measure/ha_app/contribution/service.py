@@ -122,10 +122,16 @@ class SharedContributionService:
         except GitHubApiError as error:
             raise ContributionApiError(ContributionApiErrorCode.AUTH_UNAVAILABLE, str(error)) from error
         oauth_error = data.get("error")
-        if oauth_error in {"authorization_pending", "slow_down"}:
+        if oauth_error == "authorization_pending":
             return DeviceFlowPollResponse(
                 status="pending",
                 message=str(data.get("error_description") or "Authorization pending"),
+            )
+        if oauth_error == "slow_down":
+            return DeviceFlowPollResponse(
+                status="slow_down",
+                message=str(data.get("error_description") or "Authorization pending"),
+                retry_after=_positive_integer(data.get("interval")),
             )
         if oauth_error in {"expired_token", "access_denied"}:
             return DeviceFlowPollResponse(
@@ -277,6 +283,19 @@ class SharedContributionService:
 
 def create_contribution_service(data_root: Path) -> ContributionService:
     return SharedContributionService(data_root)
+
+
+def _positive_integer(value: object) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value if value > 0 else None
+    if isinstance(value, str):
+        stripped = value.strip()
+        if stripped.isdecimal():
+            parsed = int(stripped)
+            return parsed if parsed > 0 else None
+    return None
 
 
 def _metadata_from_request(

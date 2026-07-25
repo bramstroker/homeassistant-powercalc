@@ -359,7 +359,6 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     lights = test_client.get("/api/entities?domain=light")
 
     assert capabilities.status_code == 200
-    assert capabilities.json()["modes"] == ["brightness", "color_temp", "hs", "effect"]
     defaults = MeasurementParameters()
     assert capabilities.json()["defaults"] == {
         "sleep_time": defaults.sleep_time,
@@ -584,8 +583,8 @@ def test_measure_definitions_and_average_request(tmp_path: Path) -> None:
     fields = {field["name"]: field for field in charging["fields"]}
     assert "entity_domain" not in fields["charging_entity_id"]
     assert fields["charging_device_type"]["options"] == [
-        {"value": "vacuum_robot", "label": "Vacuum robot", "entity_domain": "vacuum"},
-        {"value": "lawn_mower_robot", "label": "Lawn mower robot", "entity_domain": "lawn_mower"},
+        {"value": "vacuum_robot", "label": "Vacuum robot", "entity_domain": "vacuum", "enables": []},
+        {"value": "lawn_mower_robot", "label": "Lawn mower robot", "entity_domain": "lawn_mower", "enables": []},
     ]
 
     payload = {
@@ -870,6 +869,46 @@ def test_contribution_device_flow_records_granted_scopes_without_claiming_verifi
     assert polled.status == "authorized"
     assert status.scopes == ["public_repo"]
     assert status.permissions_verified is False
+
+
+@pytest.mark.parametrize("interval", [7, "7"])
+def test_contribution_device_flow_slow_down_reports_retry_after(tmp_path: Path, interval: int | str) -> None:
+    github = MagicMock()
+    github.poll_device_flow.return_value = {
+        "error": "slow_down",
+        "error_description": "Slow down",
+        "interval": interval,
+    }
+
+    with patch("measure.ha_app.contribution.service.GitHubClient", return_value=github):
+        polled = SharedContributionService(tmp_path).poll_device_flow("client-id", "device-code")
+
+    assert polled.status == "slow_down"
+    assert polled.message == "Slow down"
+    assert polled.retry_after == 7
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"error": "authorization_pending"},
+        {"error": "slow_down"},
+        {"error": "slow_down", "interval": 0},
+        {"error": "slow_down", "interval": "soon"},
+    ],
+)
+def test_contribution_device_flow_pending_or_invalid_slow_down_has_no_retry_after(
+    tmp_path: Path,
+    payload: dict[str, object],
+) -> None:
+    github = MagicMock()
+    github.poll_device_flow.return_value = payload
+
+    with patch("measure.ha_app.contribution.service.GitHubClient", return_value=github):
+        polled = SharedContributionService(tmp_path).poll_device_flow("client-id", "device-code")
+
+    assert polled.status == ("slow_down" if payload["error"] == "slow_down" else "pending")
+    assert polled.retry_after is None
 
 
 def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

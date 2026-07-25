@@ -13,7 +13,6 @@ const defaultSettings: AppSettings = {
   measurement_defaults: measurementDefaults,
 };
 const capabilities: Capabilities = {
-  modes: ["brightness", "color_temp", "hs", "effect"],
   defaults: {
     ...measurementDefaults,
     bri_bri_steps: 1, ct_bri_steps: 5, ct_mired_steps: 10,
@@ -36,6 +35,55 @@ const goodPowerMeterDiagnostic: PowerMeterDiagnostic = {
   messages: ["The sensor meets the recommended update frequency."],
 };
 
+const modeParameter = (name: string, label: string) => ({ name, label, group: "Profile resolution" });
+
+const lightDefinition: MeasureDefinition = {
+  measure_type: "light",
+  label: "Light bulb(s)",
+  description: "Build a lookup-table power profile for a light.",
+  icon: "💡",
+  model_id_example: "LWA017",
+  product_name_example: "Philips Hue White Ambiance A60 E27",
+  parameters: [
+    { name: "sleep_time", label: "Settle time (seconds)", hint: "Wait after changing the light before reading power.", step: "0.1", group: "Sampling" },
+    { name: "sample_count", label: "Samples per point", hint: "More samples reduce noise but increase measurement time.", group: "Sampling" },
+    { name: "sleep_time_sample", label: "Time between samples (seconds)", hint: "Only used when taking more than one sample.", group: "Sampling", requires_multiple: "sample_count" },
+    { name: "min_brightness", label: "Minimum brightness", group: "Sampling" },
+    { name: "sleep_initial", label: "Initial stabilization (seconds)", group: "Sampling" },
+    { name: "sleep_standby", label: "Standby stabilization (seconds)", group: "Sampling" },
+    modeParameter("bri_bri_steps", "Brightness mode step"),
+    modeParameter("ct_bri_steps", "Color temperature brightness step"),
+    modeParameter("ct_mired_steps", "Color temperature mired step"),
+    modeParameter("hs_bri_steps", "HS brightness step"),
+    modeParameter("hs_hue_steps", "HS hue step"),
+    modeParameter("hs_sat_steps", "HS saturation step"),
+    modeParameter("effect_bri_steps", "Effect brightness step"),
+    modeParameter("measure_time_effect_min", "Minimum time per effect (seconds)"),
+    modeParameter("measure_time_effect", "Maximum time per effect (seconds)"),
+  ],
+  fields: [
+    { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, entity_domains: ["sensor"], options: [] },
+    { name: "light_entity_id", role: "controller", label: "Light", control: "entity", required: true, entity_domains: ["light"], options: [] },
+    {
+      name: "modes",
+      role: "attribute",
+      label: "Lookup-table modes",
+      control: "multi_select",
+      narrowed_by: "light_entity_id",
+      required: true,
+      options: [
+        { value: "brightness", label: "Brightness", enables: ["bri_bri_steps"] },
+        { value: "color_temp", label: "Color temperature", enables: ["ct_bri_steps", "ct_mired_steps"] },
+        { value: "hs", label: "Hue & saturation", enables: ["hs_bri_steps", "hs_hue_steps", "hs_sat_steps"] },
+        { value: "effect", label: "Effect", enables: ["effect_bri_steps", "measure_time_effect_min", "measure_time_effect"] },
+      ],
+    },
+    { name: "multiple_light_count", role: "attribute", label: "Number of lights", control: "number", required: true, options: [], default: 1, minimum: 1, maximum: 100 },
+  ],
+  supports_profile: true,
+  supports_resume: true,
+};
+
 const lights: EntityDescriptor[] = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"] }];
 
 it("uses dark native form controls so iOS select indicators remain visible", () => {
@@ -49,8 +97,9 @@ describe("setup view", () => {
       lights: EntityDescriptor[];
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
+      definitions: MeasureDefinition[];
       selectedType: string;
-      selectedLightId: string;
+      selectedEntities: Record<string, string>;
       defaultMeasureDevice: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
@@ -59,8 +108,9 @@ describe("setup view", () => {
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
-    element.selectedLightId = "light.desk";
+    element.selectedEntities = { light_entity_id: "light.desk" };
     document.body.append(element);
     await element.updateComplete;
 
@@ -68,15 +118,12 @@ describe("setup view", () => {
     expect(element.shadowRoot.textContent).toContain("Brightness");
     expect(element.shadowRoot.querySelector("details")?.open).toBe(false);
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
-    expect(element.shadowRoot.querySelector<HTMLElement>(".effect-settings")?.hidden).toBe(true);
     expect((element.shadowRoot.querySelector('input[name="sleep_time"]') as HTMLInputElement).value).toBe("1");
     expect((element.shadowRoot.querySelector('input[name="sleep_time_sample"]') as HTMLInputElement).disabled).toBe(false);
     expect((element.shadowRoot.querySelector('input[name="bri_bri_steps"]') as HTMLInputElement).value).toBe("1");
-    expect((element.shadowRoot.querySelector('input[name="ct_bri_steps"]') as HTMLInputElement).value).toBe("5");
-    expect((element.shadowRoot.querySelector('input[name="ct_mired_steps"]') as HTMLInputElement).value).toBe("10");
-    expect((element.shadowRoot.querySelector('input[name="hs_bri_steps"]') as HTMLInputElement).value).toBe("32");
-    expect((element.shadowRoot.querySelector('input[name="hs_hue_steps"]') as HTMLInputElement).value).toBe("2731");
-    expect((element.shadowRoot.querySelector('input[name="hs_sat_steps"]') as HTMLInputElement).value).toBe("32");
+    // The desk lamp supports brightness only, so no other mode's parameters are offered at all.
+    const unsupported = ["ct_bri_steps", "ct_mired_steps", "hs_bri_steps", "hs_hue_steps", "hs_sat_steps", "effect_bri_steps", "measure_time_effect"];
+    expect(unsupported.filter((name) => element.shadowRoot.querySelector(`input[name="${name}"]`))).toEqual([]);
 
     const light = element.shadowRoot.querySelector('select[name="light_entity_id"]') as HTMLSelectElement;
     light.value = "light.desk";
@@ -91,6 +138,7 @@ describe("setup view", () => {
       lights: EntityDescriptor[];
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
+      definitions: MeasureDefinition[];
       selectedType: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
@@ -99,6 +147,7 @@ describe("setup view", () => {
     element.lights = [{ entity_id: "light.rgb", name: "RGB lamp", supported_modes: ["brightness", "color_temp", "hs"] }];
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
@@ -113,8 +162,9 @@ describe("setup view", () => {
       lights: EntityDescriptor[];
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
+      definitions: MeasureDefinition[];
       selectedType: string;
-      selectedLightId: string;
+      selectedEntities: Record<string, string>;
       defaultPowerEntityId: string;
       defaultMeasureDevice: string;
       updateComplete: Promise<boolean>;
@@ -129,8 +179,9 @@ describe("setup view", () => {
       related_voltage_entity_id: "sensor.plug_voltage",
     }];
     element.voltages = [{ entity_id: "sensor.plug_voltage", name: "Plug voltage", unit: "V" }];
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
-    element.selectedLightId = "light.rgb";
+    element.selectedEntities = { light_entity_id: "light.rgb" };
     element.defaultPowerEntityId = "sensor.plug_power";
     element.defaultMeasureDevice = "Shelly Plug S";
     document.body.append(element);
@@ -166,6 +217,7 @@ describe("setup view", () => {
       lights: EntityDescriptor[];
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
+      definitions: MeasureDefinition[];
       selectedType: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
@@ -174,6 +226,7 @@ describe("setup view", () => {
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
@@ -187,6 +240,7 @@ describe("setup view", () => {
       lights: EntityDescriptor[];
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
+      definitions: MeasureDefinition[];
       selectedType: string;
       defaultMeasureDevice: string;
       updateComplete: Promise<boolean>;
@@ -196,6 +250,7 @@ describe("setup view", () => {
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
     element.defaultMeasureDevice = "Shelly Plug S";
     document.body.append(element);
@@ -222,8 +277,12 @@ describe("setup view", () => {
 
   it("submits a dummy fan controller when the developer virtual-device toggle is on", async () => {
     const fanDefinition: MeasureDefinition = {
-      measure_type: "fan", label: "Fan", description: "Measure fan power.",
-      fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
+      measure_type: "fan",
+        icon: "🌀",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }], label: "Fan", description: "Measure fan power.",
+      fields: [{ name: "fan_entity_id", role: "controller", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
       supports_profile: true, supports_resume: false,
     };
     const element = document.createElement("measure-setup-view") as HTMLElement & {
@@ -263,6 +322,7 @@ describe("setup view", () => {
       lights: EntityDescriptor[];
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
+      definitions: MeasureDefinition[];
       selectedType: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
@@ -271,6 +331,7 @@ describe("setup view", () => {
     element.lights = [{ entity_id: "light.effect", name: "Effect lamp", supported_modes: ["brightness", "effect"], effect_list: ["colorloop"] }];
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
@@ -279,27 +340,36 @@ describe("setup view", () => {
     expect(labels).toContain("Effect");
     const checkedModes = [...element.shadowRoot.querySelectorAll<HTMLInputElement>('input[name="modes"]:checked')].map((input) => input.value);
     expect(checkedModes).toContain("effect");
-    const effectSettings = element.shadowRoot.querySelector<HTMLElement>(".effect-settings");
-    expect(effectSettings?.hidden).toBe(false);
+    const parameter = (name: string) => element.shadowRoot.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+    expect(parameter("effect_bri_steps")).toBeTruthy();
+    expect(parameter("measure_time_effect")).toBeTruthy();
 
     const effect = element.shadowRoot.querySelector<HTMLInputElement>('input[name="modes"][value="effect"]');
     if (!effect) throw new Error("Expected effect mode input");
     effect.checked = false;
     effect.dispatchEvent(new Event("change"));
-    expect(effectSettings?.hidden).toBe(true);
-    expect((effectSettings?.querySelector("input") as HTMLInputElement).disabled).toBe(true);
+    // Deselecting a mode re-renders from state rather than mutating the DOM in place.
+    await element.updateComplete;
+    // Every mode's parameters disappear with it, so none of them can be submitted by accident.
+    expect(parameter("effect_bri_steps")).toBeNull();
+    expect(parameter("measure_time_effect")).toBeNull();
+    expect(parameter("bri_bri_steps")).toBeTruthy();
   });
 });
 
 const definitions: MeasureDefinition[] = [
-  { measure_type: "light", label: "Light bulb(s)", description: "Build a lookup-table power profile for a light.", fields: [], supports_profile: true, supports_resume: true },
+  lightDefinition,
   {
     measure_type: "average",
+        icon: "📊",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }],
     label: "Average",
     description: "Measure average power for a fixed duration.",
     fields: [
-      { name: "power_entity_id", label: "Power sensor", control: "entity", required: true, options: [] },
-      { name: "duration", label: "Duration (seconds)", control: "number", required: true, options: [], default: 60 },
+      { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, options: [] },
+      { name: "duration", role: "attribute", label: "Duration (seconds)", control: "number", required: true, options: [], default: 60 },
     ],
     supports_profile: false,
     supports_resume: false,
@@ -516,11 +586,15 @@ describe("setup type picker", () => {
   it("renders an entity dropdown for a device domain when entities are available", async () => {
     const fanDefinition: MeasureDefinition = {
       measure_type: "fan",
+        icon: "🌀",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }],
       label: "Fan",
       description: "Measure fan power across percentage levels.",
       fields: [
-        { name: "power_entity_id", label: "Power sensor", control: "entity", required: true, options: [] },
-        { name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] },
+        { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, options: [] },
+        { name: "fan_entity_id", role: "controller", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] },
       ],
       supports_profile: true,
       supports_resume: false,
@@ -549,10 +623,14 @@ describe("setup type picker", () => {
       type: "fan" as const,
       definition: {
         measure_type: "fan" as const,
+        icon: "🌀",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }],
         label: "Fan",
         description: "Measure fan power across percentage levels.",
         fields: [
-          { name: "fan_entity_id", label: "Fan", control: "entity" as const, required: true, entity_domains: ["fan"], options: [] },
+          { name: "fan_entity_id", role: "controller" as const, label: "Fan", control: "entity" as const, required: true, entity_domains: ["fan"], options: [] },
         ],
         supports_profile: true,
         supports_resume: false,
@@ -567,11 +645,15 @@ describe("setup type picker", () => {
       type: "speaker" as const,
       definition: {
         measure_type: "speaker" as const,
+        icon: "🔊",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }],
         label: "Speaker",
         description: "Measure power across media-player volume levels.",
         fields: [
-          { name: "media_player_entity_id", label: "Media player", control: "entity" as const, required: true, entity_domains: ["media_player"], options: [] },
-          { name: "disable_streaming", label: "Disable automatic pink-noise streaming", control: "boolean" as const, required: false, default: false, options: [] },
+          { name: "media_player_entity_id", role: "controller" as const, label: "Media player", control: "entity" as const, required: true, entity_domains: ["media_player"], options: [] },
+          { name: "disable_streaming", role: "attribute" as const, label: "Disable automatic pink-noise streaming", control: "boolean" as const, required: false, default: false, options: [] },
         ],
         supports_profile: true,
         supports_resume: false,
@@ -586,11 +668,16 @@ describe("setup type picker", () => {
       type: "charging" as const,
       definition: {
         measure_type: "charging" as const,
+        icon: "🔋",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }, { name: "sample_count", label: "Samples per reading", hint: "More samples reduce noise but increase measurement time.", group: "Sampling" }, { name: "sleep_time_sample", label: "Time between samples (seconds)", hint: "Only used when taking more than one sample.", group: "Sampling", requires_multiple: "sample_count" }],
         label: "Charging device",
         description: "Measure charging power against battery level.",
         fields: [
           {
             name: "charging_device_type",
+            role: "attribute" as const,
             label: "Charging device type",
             control: "select" as const,
             required: true,
@@ -601,6 +688,8 @@ describe("setup type picker", () => {
           },
           {
             name: "charging_entity_id",
+            role: "controller" as const,
+            narrowed_by: "charging_device_type",
             label: "Charging device",
             control: "entity" as const,
             required: true,
@@ -656,8 +745,12 @@ describe("setup type picker", () => {
 
   it("shows entity discovery failures instead of silently enabling free-text input", async () => {
     const fanDefinition: MeasureDefinition = {
-      measure_type: "fan", label: "Fan", description: "Measure fan power.",
-      fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
+      measure_type: "fan",
+        icon: "🌀",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }], label: "Fan", description: "Measure fan power.",
+      fields: [{ name: "fan_entity_id", role: "controller", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
       supports_profile: false, supports_resume: false,
     };
     const element = document.createElement("measure-setup-view") as HTMLElement & {
@@ -679,17 +772,21 @@ describe("setup type picker", () => {
 
   it("filters charging entities by the selected device type", async () => {
     const chargingDefinition: MeasureDefinition = {
-      measure_type: "charging", label: "Charging device", description: "Measure charging power.",
+      measure_type: "charging",
+        icon: "🔋",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }, { name: "sample_count", label: "Samples per reading", hint: "More samples reduce noise but increase measurement time.", group: "Sampling" }, { name: "sleep_time_sample", label: "Time between samples (seconds)", hint: "Only used when taking more than one sample.", group: "Sampling", requires_multiple: "sample_count" }], label: "Charging device", description: "Measure charging power.",
       fields: [
         {
-          name: "charging_device_type", label: "Device type", control: "select", required: true,
+          name: "charging_device_type", role: "attribute", label: "Device type", control: "select", required: true,
           options: [
             { value: "vacuum_robot", label: "Vacuum", entity_domain: "vacuum" },
             { value: "lawn_mower_robot", label: "Lawn mower", entity_domain: "lawn_mower" },
           ],
         },
         {
-          name: "charging_entity_id", label: "Charging device", control: "entity", required: true,
+          name: "charging_entity_id", role: "controller", narrowed_by: "charging_device_type", label: "Charging device", control: "entity", required: true,
           entity_domains: ["vacuum", "lawn_mower"], options: [],
         },
       ],
@@ -991,6 +1088,7 @@ describe("setup view defaults", () => {
       voltages: EntityDescriptor[];
       defaultPowerEntityId: string;
       defaultMeasureDevice: string;
+      definitions: MeasureDefinition[];
       selectedType: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
@@ -1001,6 +1099,7 @@ describe("setup view defaults", () => {
     element.voltages = [];
     element.defaultPowerEntityId = "sensor.plug_power";
     element.defaultMeasureDevice = "Shelly Plug S";
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
@@ -1021,6 +1120,7 @@ describe("setup view defaults", () => {
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
       defaultPowerEntityId: string;
+      definitions: MeasureDefinition[];
       selectedType: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
@@ -1036,6 +1136,7 @@ describe("setup view defaults", () => {
       { entity_id: "sensor.strip_mains", name: "Strip voltage", unit: "V", device_id: "strip-device" },
     ];
     element.defaultPowerEntityId = "sensor.plug_power";
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
@@ -1053,6 +1154,7 @@ describe("setup view defaults", () => {
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
       defaultPowerEntityId: string;
+      definitions: MeasureDefinition[];
       selectedType: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
@@ -1062,6 +1164,7 @@ describe("setup view defaults", () => {
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", device_id: "plug-device", model_id: "WSP002" }];
     element.voltages = [];
     element.defaultPowerEntityId = "sensor.plug_power";
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
@@ -1081,6 +1184,7 @@ describe("setup view defaults", () => {
       lights: EntityDescriptor[];
       powers: EntityDescriptor[];
       voltages: EntityDescriptor[];
+      definitions: MeasureDefinition[];
       selectedType: string;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
@@ -1089,6 +1193,7 @@ describe("setup view defaults", () => {
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power" }];
     element.voltages = [];
+    element.definitions = [lightDefinition];
     element.selectedType = "light";
     document.body.append(element);
     await element.updateComplete;
@@ -1192,12 +1297,26 @@ describe("settings view", () => {
       settings: AppSettings;
       contributionAuth: { connected: boolean; identity?: { login: string; name?: string } };
       contributionDeviceFlow: { flow_id: string; user_code: string; verification_uri: string; expires_in: number; interval: number };
+      contributionDeviceStatus: { status: "pending" | "expired"; message?: string };
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
     element.powers = [];
     element.settings = defaultSettings;
     element.contributionAuth = { connected: false };
+    document.body.append(element);
+    await element.updateComplete;
+
+    [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".settings-nav button")].find((button) => button.textContent?.includes("GitHub"))?.click();
+    await element.updateComplete;
+
+    expect(element.shadowRoot.textContent).toContain("Connect GitHub");
+    expect(element.shadowRoot.textContent).toContain("Use a personal access token instead");
+    expect(element.shadowRoot.textContent).toContain("included in Home Assistant backups");
+    const started = new Promise<void>((resolve) => element.addEventListener("github-device-start", () => resolve()));
+    [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Connect GitHub"))?.click();
+    await started;
+
     element.contributionDeviceFlow = {
       flow_id: "flow-1",
       user_code: "ABCD-EFGH",
@@ -1205,18 +1324,21 @@ describe("settings view", () => {
       expires_in: 900,
       interval: 5,
     };
-    document.body.append(element);
     await element.updateComplete;
+    expect((element.shadowRoot.querySelector(".device-code") as HTMLInputElement).value).toBe("ABCD-EFGH");
+    expect(element.shadowRoot.textContent).toContain("Continue on GitHub");
+    expect(element.shadowRoot.textContent).toContain("connect automatically");
+    expect(element.shadowRoot.textContent).not.toContain("Check login");
+    expect((element.shadowRoot.querySelector(".github-link") as HTMLAnchorElement).href).toBe("https://github.com/login/device");
 
-    [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".settings-nav button")].find((button) => button.textContent?.includes("GitHub"))?.click();
+    [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Copy code"))?.click();
     await element.updateComplete;
+    expect(element.shadowRoot.textContent).toContain("Select the code and copy it manually");
 
-    expect(element.shadowRoot.textContent).toContain("ABCD-EFGH");
-    expect(element.shadowRoot.textContent).toContain("Personal access token fallback");
-    expect(element.shadowRoot.textContent).toContain("included in Home Assistant backups");
-    const started = new Promise<void>((resolve) => element.addEventListener("github-device-start", () => resolve()));
-    [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Start device login"))?.click();
-    await started;
+    element.contributionDeviceStatus = { status: "expired", message: "This code expired." };
+    await element.updateComplete;
+    expect(element.shadowRoot.textContent).toContain("This code expired.");
+    expect(element.shadowRoot.textContent).toContain("Get a new code");
 
     const saved = new Promise<string>((resolve) => element.addEventListener("github-token-save", (event) => resolve((event as CustomEvent<string>).detail)));
     const token = element.shadowRoot.querySelector('input[name="github_token"]') as HTMLInputElement;
@@ -1259,10 +1381,14 @@ describe("settings view", () => {
 describe("app shell device entities", () => {
   it("loads device entities only after their measurement type is selected", async () => {
     const fanDefinition: MeasureDefinition = {
-      measure_type: "fan", label: "Fan", description: "Measure fan power across percentage levels.",
+      measure_type: "fan",
+        icon: "🌀",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }], label: "Fan", description: "Measure fan power across percentage levels.",
       fields: [
-        { name: "power_entity_id", label: "Power sensor", control: "entity", required: true, options: [], entity_domains: ["sensor"] },
-        { name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] },
+        { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, options: [], entity_domains: ["sensor"] },
+        { name: "fan_entity_id", role: "controller", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] },
       ],
       supports_profile: true, supports_resume: false,
     };
@@ -1545,6 +1671,10 @@ describe("app shell", () => {
     const element = document.createElement("powercalc-measure-app") as AppShell;
     element.definitions = [{
       measure_type: "charging",
+        icon: "🔋",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }, { name: "sample_count", label: "Samples per reading", hint: "More samples reduce noise but increase measurement time.", group: "Sampling" }, { name: "sleep_time_sample", label: "Time between samples (seconds)", hint: "Only used when taking more than one sample.", group: "Sampling", requires_multiple: "sample_count" }],
       label: "Charging device",
       description: "Measure charging power.",
       fields: [],
@@ -1587,6 +1717,10 @@ describe("app shell", () => {
     const element = document.createElement("powercalc-measure-app") as AppShell;
     element.definitions = [{
       measure_type: "average",
+        icon: "📊",
+        model_id_example: "WSP002",
+        product_name_example: "",
+        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }],
       label: "Average",
       description: "Measure average power.",
       fields: [],
@@ -1628,12 +1762,17 @@ describe("app shell", () => {
     const element = document.createElement("powercalc-measure-app") as AppShell;
     element.definitions = [{
       measure_type: "speaker",
+      icon: "🔊",
+      model_id_example: "WSP002",
+      product_name_example: "",
+      parameters: [],
       label: "Speaker",
       description: "Measure a speaker.",
       fields: [],
       supports_profile: true,
       supports_resume: false,
       confirmation_action: "Start speaker measurement",
+      confirmation_is_warning: true,
     }];
     element.request = {
       measure_type: "speaker",

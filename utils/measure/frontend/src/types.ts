@@ -65,7 +65,6 @@ export interface MeasurementParameters {
 export type MeasureDefaults = MeasurementParameters;
 
 export interface Capabilities {
-  modes: LutMode[];
   defaults: MeasureDefaults;
   limits?: Record<string, { min: number; max: number }>;
   developer_mode?: boolean;
@@ -74,26 +73,58 @@ export interface Capabilities {
 
 export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan";
 
+/** Where a submitted field value lands in the measurement request. Mirrors `FieldRole` server-side. */
+export type FieldRole = "attribute" | "controller" | "power_meter";
+
+export interface FormFieldOption {
+  value: string;
+  label: string;
+  entity_domain?: string | null;
+  /** Measurement parameters that only apply while this option is selected. */
+  enables?: string[];
+}
+
 export interface FormField {
   name: string;
   label: string;
-  control: "entity" | "number" | "text" | "boolean" | "select";
+  control: "entity" | "number" | "text" | "boolean" | "select" | "multi_select";
+  role: FieldRole;
+  /** Controller field whose selected entity limits this field's options to what it supports. */
+  narrowed_by?: string | null;
   required: boolean;
   entity_domains?: string[];
-  options: { value: string; label: string; entity_domain?: string | null }[];
+  options: FormFieldOption[];
   default?: string | number | boolean | null;
   minimum?: number | null;
   maximum?: number | null;
+}
+
+/** A tuning parameter as one measure type presents it. Bounds come from `Capabilities.limits`. */
+export interface MeasureParameter {
+  name: string;
+  label: string;
+  hint?: string;
+  step?: string;
+  /** Heading this parameter is grouped under, repeated on each member of the group. */
+  group?: string;
+  /** Only applies while the named parameter is greater than one. */
+  requires_multiple?: string | null;
 }
 
 export interface MeasureDefinition {
   measure_type: MeasureType;
   label: string;
   description: string;
+  icon: string;
   fields: FormField[];
+  parameters: MeasureParameter[];
   supports_profile: boolean;
   supports_resume: boolean;
   confirmation_action?: string | null;
+  confirmation_is_warning?: boolean;
+  /** Placeholders shown in the profile fields, to steer the naming this type expects. */
+  model_id_example: string;
+  product_name_example: string;
 }
 
 export interface BaseMeasurementRequest {
@@ -155,14 +186,13 @@ export interface SpeakerMeasurementRequest extends BaseMeasurementRequest { meas
 export interface ChargingMeasurementRequest extends BaseMeasurementRequest { measure_type: "charging"; controller: ChargingControllerSpec; charging_device_type: ChargingDeviceType; }
 export interface FanMeasurementRequest extends BaseMeasurementRequest { measure_type: "fan"; controller: FanControllerSpec; }
 
-export type NonLightMeasurementRequest =
+export type MeasurementRequest =
+  | LightMeasurementRequest
   | AverageMeasurementRequest
   | RecorderMeasurementRequest
   | SpeakerMeasurementRequest
   | ChargingMeasurementRequest
   | FanMeasurementRequest;
-
-export type MeasurementRequest = LightMeasurementRequest | NonLightMeasurementRequest;
 
 export interface PreflightResponse {
   valid: boolean;
@@ -289,9 +319,10 @@ export interface ContributionDeviceFlow {
 }
 
 export interface ContributionAuthDeviceStatus {
-  status: "pending" | "authorized" | "expired" | "denied";
+  status: "pending" | "slow_down" | "authorized" | "expired" | "denied";
   auth?: ContributionAuthState | null;
   message?: string | null;
+  retry_after?: number | null;
 }
 
 export interface ContributionTokenRequest {

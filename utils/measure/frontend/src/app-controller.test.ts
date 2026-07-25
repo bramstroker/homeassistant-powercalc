@@ -256,9 +256,14 @@ describe("measure app controller", () => {
   });
 
   it("runs device login, token fallback, disconnect, preview, and submit contribution actions", async () => {
+    vi.useFakeTimers();
     const appState = state();
+    let devicePolls = 0;
     const controller = new MeasureAppController(appState, () => api({
-      getContributionDeviceAuth: async () => ({ status: "authorized", auth: { connected: true, identity: { login: "octocat" }, method: "device" } }),
+      getContributionDeviceAuth: async () => {
+        devicePolls += 1;
+        return { status: "authorized", auth: { connected: true, identity: { login: "octocat" }, method: "device" } };
+      },
       previewContribution: async (request) => ({
         eligible: true,
         repository: "bramstroker/homeassistant-powercalc",
@@ -283,8 +288,12 @@ describe("measure app controller", () => {
 
     await controller.startContributionDeviceAuth();
     expect(appState.contributionDeviceFlow?.flow_id).toBe("flow-1");
+    expect(appState.contributionDeviceStatus?.status).toBe("pending");
+    expect(devicePolls).toBe(0);
 
-    await controller.checkContributionDeviceAuth();
+    await vi.advanceTimersByTimeAsync(4_999);
+    expect(devicePolls).toBe(0);
+    await vi.advanceTimersByTimeAsync(1);
     expect(appState.contributionAuth?.identity?.login).toBe("octocat");
     expect(appState.contributionDeviceFlow).toBeUndefined();
 
@@ -299,6 +308,68 @@ describe("measure app controller", () => {
 
     await controller.disconnectContributionAuth();
     expect(appState.contributionAuth?.connected).toBe(false);
+    controller.dispose();
+    vi.useRealTimers();
+  });
+
+  it("backs off automatic device polling and stops when the code expires", async () => {
+    vi.useFakeTimers();
+    const appState = state();
+    let devicePolls = 0;
+    const controller = new MeasureAppController(appState, () => api({
+      startContributionDeviceAuth: async () => ({
+        flow_id: "flow-1",
+        user_code: "ABCD-EFGH",
+        verification_uri: "https://github.com/login/device",
+        expires_in: 16,
+        interval: 5,
+      }),
+      getContributionDeviceAuth: async () => {
+        devicePolls += 1;
+        if (devicePolls === 1) return { status: "slow_down" };
+        return { status: "pending" };
+      },
+    }), () => connection(), () => undefined);
+
+    await controller.startContributionDeviceAuth();
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(devicePolls).toBe(1);
+
+    await vi.advanceTimersByTimeAsync(9_999);
+    expect(devicePolls).toBe(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(devicePolls).toBe(2);
+
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(appState.contributionDeviceStatus?.status).toBe("expired");
+    await vi.advanceTimersByTimeAsync(30_000);
+    expect(devicePolls).toBe(2);
+
+    controller.dispose();
+    vi.useRealTimers();
+  });
+
+  it("uses GitHub's retry interval and cancels polling on disposal", async () => {
+    vi.useFakeTimers();
+    const appState = state();
+    let devicePolls = 0;
+    const controller = new MeasureAppController(appState, () => api({
+      getContributionDeviceAuth: async () => {
+        devicePolls += 1;
+        return { status: "slow_down", retry_after: 12 };
+      },
+    }), () => connection(), () => undefined);
+
+    await controller.startContributionDeviceAuth();
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(devicePolls).toBe(1);
+    await vi.advanceTimersByTimeAsync(11_999);
+    expect(devicePolls).toBe(1);
+
+    controller.dispose();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(devicePolls).toBe(1);
+    vi.useRealTimers();
   });
 
   it("boots core data and lazily fetches entities for the selected measurement", async () => {
@@ -316,8 +387,12 @@ describe("measure app controller", () => {
         };
       },
       getMeasureDefinitions: async () => [{
-        measure_type: "fan", label: "Fan", description: "Measure fan power.", supports_profile: true, supports_resume: false,
-        fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
+        measure_type: "fan",
+    icon: "🌀",
+    model_id_example: "WSP002",
+    product_name_example: "",
+    parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }], label: "Fan", description: "Measure fan power.", supports_profile: true, supports_resume: false,
+        fields: [{ name: "fan_entity_id", role: "controller", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
       }],
       getEntitiesByDomain: async (domain) => {
         requestedDomains.push(domain);
@@ -351,8 +426,12 @@ describe("measure app controller", () => {
     const appApi = api({
       getCurrent: async () => ({ state: "running" }),
       getMeasureDefinitions: async () => [{
-        measure_type: "fan", label: "Fan", description: "Measure fan power.", supports_profile: true, supports_resume: false,
-        fields: [{ name: "fan_entity_id", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
+        measure_type: "fan",
+    icon: "🌀",
+    model_id_example: "WSP002",
+    product_name_example: "",
+    parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }], label: "Fan", description: "Measure fan power.", supports_profile: true, supports_resume: false,
+        fields: [{ name: "fan_entity_id", role: "controller", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
       }],
       getEntitiesByDomain: async (domain) => {
         if (domain === "fan") throw new Error("Entity API failed");

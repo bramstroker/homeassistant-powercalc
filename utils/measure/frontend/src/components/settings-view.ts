@@ -21,6 +21,7 @@ export class SettingsView extends LitElement {
     contributionDeviceStatus: { attribute: false },
     contributionAuthBusy: { type: Boolean },
     contributionAuthError: { type: String },
+    githubCopyStatus: { state: true },
     shellyDiscoveryDevices: { attribute: false },
     discoveringShellys: { type: Boolean },
     shellyDiscoveryError: { type: String },
@@ -45,6 +46,7 @@ export class SettingsView extends LitElement {
   contributionDeviceStatus?: ContributionAuthDeviceStatus;
   contributionAuthBusy = false;
   contributionAuthError = "";
+  private githubCopyStatus = "";
   shellyDiscoveryDevices: ShellyDiscoveryDevice[] = [];
   discoveringShellys = false;
   shellyDiscoveryError = "";
@@ -92,18 +94,31 @@ export class SettingsView extends LitElement {
     .discovery-status { margin: 0; color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
     .discovery-status.error { color: var(--danger); }
     .github-card { display: grid; gap: 0.8rem; padding: 0.85rem; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in srgb, var(--field) 70%, transparent); }
+    .github-card > button, .device-flow > button { justify-self: start; }
     .identity { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-    .identity strong, .code { color: var(--ink); }
-    .code { font: 700 1.2rem/1 ui-monospace, monospace; letter-spacing: 0.12em; }
-    .github-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; }
-    .github-actions a { color: var(--signal-strong); font-weight: 700; }
+    .identity strong, .device-code { color: var(--ink); }
+    .device-flow { display: grid; gap: 0.85rem; }
+    .device-step { display: grid; gap: 0.45rem; }
+    .device-step p { margin: 0; }
+    .device-code-row { display: grid; grid-template-columns: minmax(0, 220px) auto; gap: 0.65rem; align-items: center; }
+    .device-code {
+      width: 100%; min-height: 44px; padding: 0.65rem 0.75rem; border: 1px solid var(--line); border-radius: 9px;
+      background: var(--canvas); font: 700 1.2rem/1 ui-monospace, monospace; letter-spacing: 0.12em; text-align: center;
+    }
+    .github-link {
+      justify-self: start; min-height: 44px; padding: 0.65rem 0.85rem; border: 1px solid var(--signal); border-radius: 9px;
+      display: inline-flex; align-items: center; background: var(--signal); color: var(--on-signal); font-weight: 750; text-decoration: none;
+    }
+    .github-link:hover { filter: brightness(1.08); }
+    .token-fallback summary { cursor: pointer; color: var(--ink); font-weight: 700; }
+    .token-fallback label { margin-top: 0.8rem; }
     .token-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.65rem; align-items: end; }
     @media (max-width: 700px) {
       .settings-layout { grid-template-columns: 1fr; }
       .settings-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 520px) {
-      .grid, .token-row { grid-template-columns: 1fr; }
+      .grid, .token-row, .device-code-row { grid-template-columns: 1fr; }
       .settings-nav { grid-template-columns: 1fr; }
     }
   `];
@@ -248,17 +263,8 @@ export class SettingsView extends LitElement {
               <button class="danger" type="button" @click=${this.disconnectGithub} ?disabled=${this.contributionAuthBusy}>Disconnect</button>
             </div>
           ` : html`
-            <p class="muted">Use device login for the least typing. If device login is unavailable, paste a GitHub token with repository contribution access.</p>
-            <div class="github-actions">
-              <button
-                type="button"
-                @click=${this.startGithubDeviceLogin}
-                ?disabled=${this.contributionAuthBusy || this.contributionAuth?.device_flow_available === false}
-              >
-                ${this.contributionAuthBusy ? "Starting…" : "Start device login"}
-              </button>
-              ${this.renderDeviceFlow()}
-            </div>
+            <p class="muted">Connect GitHub to contribute measured profiles. You only need to do this once.</p>
+            ${this.renderDeviceFlow()}
             ${this.contributionAuth?.device_flow_available === false
               ? html`<p class="field-hint">Device login is not configured for this app build. Use a personal access token.</p>`
               : nothing}
@@ -272,29 +278,70 @@ export class SettingsView extends LitElement {
   }
 
   private renderDeviceFlow() {
-    if (!this.contributionDeviceFlow) return nothing;
+    if (!this.contributionDeviceFlow) {
+      return html`
+        <button
+          type="button"
+          @click=${this.startGithubDeviceLogin}
+          ?disabled=${this.contributionAuthBusy || this.contributionAuth?.device_flow_available === false}
+        >
+          ${this.contributionAuthBusy ? "Starting…" : "Connect GitHub"}
+        </button>
+      `;
+    }
     const status = this.contributionDeviceStatus;
+    if (status?.status === "expired" || status?.status === "denied") {
+      return html`
+        <div class="device-flow">
+          <p class="field-hint error" role="alert">${status.message ?? "GitHub authorization did not complete."}</p>
+          <button type="button" @click=${this.startGithubDeviceLogin} ?disabled=${this.contributionAuthBusy}>
+            ${this.contributionAuthBusy ? "Starting…" : "Get a new code"}
+          </button>
+        </div>
+      `;
+    }
+    const validMinutes = Math.max(1, Math.ceil(this.contributionDeviceFlow.expires_in / 60));
     return html`
-      <span class="code" aria-label="GitHub device code">${this.contributionDeviceFlow.user_code}</span>
-      <a href=${this.contributionDeviceFlow.verification_uri_complete ?? this.contributionDeviceFlow.verification_uri} target="_blank" rel="noopener noreferrer">Open GitHub</a>
-      <button type="button" @click=${this.checkGithubDeviceLogin} ?disabled=${this.contributionAuthBusy}>Check login</button>
-      ${status?.status === "pending" ? html`<span class="field-hint" role="status">${status.message ?? "Waiting for GitHub authorization."}</span>` : nothing}
-      ${status?.status === "expired" || status?.status === "denied" ? html`<span class="field-hint error" role="alert">${status.message ?? "GitHub authorization did not complete."}</span>` : nothing}
+      <div class="device-flow">
+        <div class="device-step">
+          <p><strong>1. Copy this code</strong></p>
+          <div class="device-code-row">
+            <input
+              class="device-code"
+              aria-label="GitHub device code"
+              readonly
+              .value=${this.contributionDeviceFlow.user_code}
+              @focus=${this.selectGithubCode}
+            />
+            <button type="button" @click=${this.copyGithubCode}>Copy code</button>
+          </div>
+          ${this.githubCopyStatus ? html`<span class="field-hint" role="status" aria-live="polite">${this.githubCopyStatus}</span>` : nothing}
+        </div>
+        <div class="device-step">
+          <p><strong>2. Authorize Powercalc</strong></p>
+          <a class="github-link" href=${this.contributionDeviceFlow.verification_uri} target="_blank" rel="noopener noreferrer">Continue on GitHub ↗</a>
+          <span class="field-hint">Paste the code on GitHub. It is valid for up to ${validMinutes} minutes.</span>
+        </div>
+        <span class="field-hint" role="status" aria-live="polite">
+          ${status?.message ?? "Waiting for GitHub authorization… This page will connect automatically when you finish."}
+        </span>
+      </div>
     `;
   }
 
   private renderTokenFallback() {
     return html`
-      <div class="github-card">
+      <details class="github-card token-fallback">
+        <summary>Use a personal access token instead</summary>
         <label>
-          <span>Personal access token fallback</span>
+          <span>Personal access token</span>
           <div class="token-row">
             <input name="github_token" type="password" autocomplete="off" placeholder="ghp_…" @keydown=${this.tokenKeydown} />
             <button type="button" @click=${this.saveGithubToken} ?disabled=${this.contributionAuthBusy}>Save token</button>
           </div>
           <small class="field-hint">Use only when device login is unavailable.</small>
         </label>
-      </div>
+      </details>
     `;
   }
 
@@ -431,11 +478,25 @@ export class SettingsView extends LitElement {
   }
 
   private startGithubDeviceLogin(): void {
+    this.githubCopyStatus = "";
     this.dispatchEvent(new CustomEvent("github-device-start", { bubbles: true, composed: true }));
   }
 
-  private checkGithubDeviceLogin(): void {
-    this.dispatchEvent(new CustomEvent("github-device-check", { bubbles: true, composed: true }));
+  private selectGithubCode(event: Event): void {
+    (event.currentTarget as HTMLInputElement).select();
+  }
+
+  private async copyGithubCode(): Promise<void> {
+    const code = this.contributionDeviceFlow?.user_code;
+    if (!code) return;
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard API is unavailable");
+      await navigator.clipboard.writeText(code);
+      this.githubCopyStatus = "Code copied.";
+    } catch {
+      this.githubCopyStatus = "Couldn’t copy automatically. Select the code and copy it manually.";
+      this.shadowRoot?.querySelector<HTMLInputElement>(".device-code")?.select();
+    }
   }
 
   private saveGithubToken(): void {

@@ -123,6 +123,10 @@ export class MeasureAppController {
   private settingsReturnView: AppView = "setup";
   private powerMeterTestVersion = 0;
   private shellyDiscoveryVersion = 0;
+  private contributionDeviceFlowVersion = 0;
+  private contributionDevicePollInterval = 0;
+  private contributionDeviceExpiresAt = 0;
+  private contributionDevicePollTimer?: ReturnType<typeof setTimeout>;
 
   constructor(
     private readonly state: MeasureAppState,
@@ -133,6 +137,8 @@ export class MeasureAppController {
 
   dispose(): void {
     this.shellyDiscoveryVersion += 1;
+    this.stopContributionDevicePolling();
+    this.state.contributionAuthBusy = false;
     this.eventConnection?.close();
   }
 
@@ -365,37 +371,106 @@ export class MeasureAppController {
   }
 
   async startContributionDeviceAuth(): Promise<void> {
+    this.stopContributionDevicePolling();
+    const version = this.contributionDeviceFlowVersion;
     this.state.contributionAuthBusy = true;
     this.state.contributionAuthError = "";
+    this.state.contributionDeviceFlow = undefined;
     this.state.contributionDeviceStatus = undefined;
     this.changed();
     try {
-      this.state.contributionDeviceFlow = await this.api().startContributionDeviceAuth();
+      const flow = await this.api().startContributionDeviceAuth();
+      if (version !== this.contributionDeviceFlowVersion) return;
+      this.state.contributionDeviceFlow = flow;
+      this.state.contributionDeviceStatus = {
+        status: "pending",
+        message: "Waiting for GitHub authorization…",
+      };
+      this.contributionDevicePollInterval = Math.max(1, flow.interval);
+      this.contributionDeviceExpiresAt = Date.now() + Math.max(0, flow.expires_in) * 1_000;
+      this.scheduleContributionDevicePoll(version);
     } catch (error) {
+      if (version !== this.contributionDeviceFlowVersion) return;
       this.state.contributionAuthError = message(error);
     } finally {
-      this.state.contributionAuthBusy = false;
-      this.changed();
+      if (version === this.contributionDeviceFlowVersion) {
+        this.state.contributionAuthBusy = false;
+        this.changed();
+      }
     }
   }
 
-  async checkContributionDeviceAuth(): Promise<void> {
+  private async pollContributionDeviceAuth(version: number): Promise<void> {
     const flowId = this.state.contributionDeviceFlow?.flow_id;
-    if (!flowId) return;
-    this.state.contributionAuthBusy = true;
-    this.state.contributionAuthError = "";
-    this.changed();
+    if (!flowId || version !== this.contributionDeviceFlowVersion) return;
+    if (Date.now() >= this.contributionDeviceExpiresAt) {
+      this.expireContributionDeviceFlow();
+      return;
+    }
     try {
       const status = await this.api().getContributionDeviceAuth(flowId);
+      if (version !== this.contributionDeviceFlowVersion || flowId !== this.state.contributionDeviceFlow?.flow_id) return;
       this.state.contributionDeviceStatus = status;
       if (status.auth) this.state.contributionAuth = status.auth;
-      if (status.status === "authorized") this.state.contributionDeviceFlow = undefined;
+      this.state.contributionAuthError = "";
+      if (status.status === "authorized") {
+        this.state.contributionDeviceFlow = undefined;
+        this.stopContributionDevicePolling();
+        this.changed();
+      } else if (status.status === "pending" || status.status === "slow_down") {
+        if (status.status === "slow_down") {
+          this.contributionDevicePollInterval = validRetryAfter(status.retry_after)
+            ? Math.max(this.contributionDevicePollInterval, status.retry_after)
+            : this.contributionDevicePollInterval + 5;
+        }
+        this.scheduleContributionDevicePoll(version);
+      }
     } catch (error) {
+      if (version !== this.contributionDeviceFlowVersion || flowId !== this.state.contributionDeviceFlow?.flow_id) return;
+      if (error instanceof ApiError && error.status === 404) {
+        this.expireContributionDeviceFlow();
+        return;
+      }
       this.state.contributionAuthError = message(error);
+      this.scheduleContributionDevicePoll(version);
     } finally {
-      this.state.contributionAuthBusy = false;
-      this.changed();
+      if (version === this.contributionDeviceFlowVersion) this.changed();
     }
+  }
+
+  private scheduleContributionDevicePoll(version: number): void {
+    this.clearContributionDevicePollTimer();
+    if (version !== this.contributionDeviceFlowVersion || !this.state.contributionDeviceFlow) return;
+    const remaining = this.contributionDeviceExpiresAt - Date.now();
+    if (remaining <= 0) {
+      this.expireContributionDeviceFlow();
+      return;
+    }
+    const delay = Math.min(this.contributionDevicePollInterval * 1_000, remaining);
+    this.contributionDevicePollTimer = setTimeout(() => {
+      this.contributionDevicePollTimer = undefined;
+      void this.pollContributionDeviceAuth(version);
+    }, delay);
+  }
+
+  private expireContributionDeviceFlow(): void {
+    this.clearContributionDevicePollTimer();
+    this.state.contributionDeviceStatus = {
+      status: "expired",
+      message: "This GitHub code expired. Request a new code to continue.",
+    };
+    this.changed();
+  }
+
+  private stopContributionDevicePolling(): void {
+    this.contributionDeviceFlowVersion += 1;
+    this.clearContributionDevicePollTimer();
+  }
+
+  private clearContributionDevicePollTimer(): void {
+    if (this.contributionDevicePollTimer === undefined) return;
+    clearTimeout(this.contributionDevicePollTimer);
+    this.contributionDevicePollTimer = undefined;
   }
 
   async saveContributionToken(token: string): Promise<void> {
@@ -404,6 +479,7 @@ export class MeasureAppController {
     this.changed();
     try {
       this.state.contributionAuth = await this.api().saveContributionToken(token);
+      this.stopContributionDevicePolling();
       this.state.contributionDeviceFlow = undefined;
       this.state.contributionDeviceStatus = undefined;
     } catch (error) {
@@ -420,6 +496,7 @@ export class MeasureAppController {
     this.changed();
     try {
       this.state.contributionAuth = await this.api().disconnectContributionAuth();
+      this.stopContributionDevicePolling();
       this.state.contributionDeviceFlow = undefined;
       this.state.contributionDeviceStatus = undefined;
     } catch (error) {
@@ -627,4 +704,8 @@ function isTerminal(state: SessionSnapshot["state"]): boolean {
 
 function message(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong. Try again.";
+}
+
+function validRetryAfter(value: number | null | undefined): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0;
 }

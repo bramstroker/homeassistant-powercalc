@@ -5,25 +5,33 @@ import type {
   DummyLoadCalibration,
   DummyLoadSpec,
   EntityDescriptor,
-  LutMode,
-  LightMeasurementRequest,
+  FormField,
+  FormFieldOption,
+  MeasureDefaults,
   MeasureDefinition,
+  MeasureParameter,
+  MeasurementParameters,
   MeasureType,
   MeasurementRequest,
-  NonLightMeasurementRequest,
   PowerMeterSpec,
 } from "../types";
 import {
-  buildNonLightRequest,
-  CONTROLLER_ENTITY_FIELDS,
+  buildMeasurementRequest,
   deviceFields,
+  enabledParameters,
   entityDomain,
+  gatedParameters,
   entityDomains,
-  LIGHT_TYPE,
-  measurementIcon,
+  fieldOptions,
+  narrowingField,
   requestFieldValue,
 } from "../measurement-kinds";
 import { sharedStyles } from "../styles";
+
+function formText(form: FormData, name: string): string {
+  const value = form.get(name);
+  return typeof value === "string" ? value.trim() : "";
+}
 
 const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging.";
 
@@ -47,9 +55,10 @@ export class SetupView extends LitElement {
     busy: { type: Boolean },
     errorMessage: { type: String },
     selectedType: { state: true },
-    selectedLightId: { state: true },
-    selectedDeviceEntityId: { state: true },
-    selectedChargingType: { state: true },
+    selectedEntities: { state: true },
+    selectValues: { state: true },
+    multiSelection: { state: true },
+    parameterValues: { state: true },
     dummyLoadEnabled: { state: true },
     dummyLoadMode: { state: true },
     dummyController: { state: true },
@@ -73,9 +82,10 @@ export class SetupView extends LitElement {
   busy = false;
   errorMessage = "";
   selectedType?: MeasureType;
-  selectedLightId = "";
-  selectedDeviceEntityId = "";
-  selectedChargingType = "";
+  selectedEntities: Record<string, string> = {};
+  selectValues: Record<string, string> = {};
+  multiSelection: Record<string, string[]> = {};
+  parameterValues: Record<string, string> = {};
   dummyLoadEnabled = false;
   dummyLoadMode: DummyLoadSpec["mode"] = "calibrate";
   dummyController = false;
@@ -102,7 +112,6 @@ export class SetupView extends LitElement {
     summary { width: fit-content; color: var(--signal-strong); cursor: pointer; font-weight: 700; }
     details .grid { margin-top: 1rem; }
     .advanced-heading { grid-column: 1 / -1; margin: 0.25rem 0 -0.25rem; color: var(--signal-strong); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
-    .effect-settings { grid-column: 1 / -1; }
     .context { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
     .context p { margin-bottom: 0; }
 
@@ -189,8 +198,7 @@ export class SetupView extends LitElement {
   private renderSetupContent() {
     return html`
       ${this.selectedType ? this.renderChip(this.selectedType) : this.renderPicker()}
-      ${this.selectedType === LIGHT_TYPE ? this.renderLightForm() : nothing}
-      ${this.selectedType && this.selectedType !== LIGHT_TYPE ? this.renderGenericForm(this.selectedType) : nothing}
+      ${this.selectedType ? this.renderMeasurementForm(this.selectedType) : nothing}
     `;
   }
 
@@ -213,7 +221,7 @@ export class SetupView extends LitElement {
       <div class="type-grid" role="list">
         ${this.definitions.map((definition) => html`
           <button type="button" class="type-card" role="listitem" @click=${() => this.selectType(definition.measure_type)}>
-            <span class="type-icon" aria-hidden="true">${measurementIcon(definition.measure_type)}</span>
+            <span class="type-icon" aria-hidden="true">${definition.icon}</span>
             <span class="type-label">${definition.label}</span>
             <span class="type-desc">${definition.description}</span>
           </button>
@@ -226,7 +234,7 @@ export class SetupView extends LitElement {
     const definition = this.definition(type);
     return html`
       <div class="type-chip">
-        <span class="type-icon" aria-hidden="true">${measurementIcon(type)}</span>
+        <span class="type-icon" aria-hidden="true">${definition?.icon ?? ""}</span>
         <span class="chip-body">
           <strong>${definition?.label ?? type}</strong>
           ${definition ? html`<span class="type-desc">${definition.description}</span>` : nothing}
@@ -236,95 +244,15 @@ export class SetupView extends LitElement {
     `;
   }
 
-  private renderLightForm() {
-    if (!this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
-    const defaults = this.capabilities.defaults;
-    const request = this.initialRequest?.measure_type === LIGHT_TYPE ? this.initialRequest : undefined;
-    const modes = this.availableModes(request);
-    const selectedModes = request?.modes.length ? request.modes : modes;
-    return html`
-      <form @submit=${this.submitLight}>
-        <fieldset class="section">
-          <legend>Measurement device</legend>
-          ${this.renderPowerMeterSummary()}
-          ${this.renderDummyLoadSection(request?.dummy_load)}
-        </fieldset>
-
-        <fieldset class="section">
-          <legend>Light profile</legend>
-          ${this.renderDummyControllerToggle()}
-          <div class="grid profile-grid">
-            ${this.dummyController
-              ? nothing
-              : this.entitySelect("light_entity_id", "Light", this.lights, request?.controller.type === "hass" ? request.controller.entity_id : "", true)}
-            ${this.numberField("multiple_light_count", "Number of lights", request?.multiple_light_count ?? 1, 1, 100)}
-            ${this.textField("model_id", "Model ID", this.modelId(request), "e.g. LWA017", true)}
-            ${this.textField(
-              "product_name",
-              "Full product name",
-              request?.product_name,
-              "e.g. Philips Hue White Ambiance A60 E27",
-              true,
-              FULL_PRODUCT_NAME_HINT,
-            )}
-          </div>
-
-          <fieldset>
-            <legend>Lookup-table modes</legend>
-            <div class="checks">
-              ${modes.map((mode) => html`
-                <label class="check">
-                  <input type="checkbox" name="modes" value=${mode} .checked=${selectedModes.includes(mode)} @change=${this.modesChanged} />
-                  ${this.modeLabel(mode)}
-                </label>
-              `)}
-            </div>
-          </fieldset>
-
-          <details>
-            <summary>Advanced timing & quality</summary>
-            <div class="grid">
-              <label><span>Previous measurement</span><select name="resume_policy">
-                <option value="new" ?selected=${(request?.resume_policy ?? "new") === "new"}>Keep it and start a new session</option>
-                <option value="overwrite" ?selected=${request?.resume_policy === "overwrite"}>Delete it and start over</option>
-              </select></label>
-              <p class="advanced-heading">Sampling</p>
-              ${this.numberField("sleep_time", "Settle time (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, { step: "0.1", hint: "Wait after changing the light before reading power." })}
-              ${this.numberField("sample_count", "Samples per point", request?.parameters.sample_count ?? defaults.sample_count, 1, 100, { hint: "More samples reduce noise but increase measurement time.", onInput: this.sampleCountChanged })}
-              ${this.numberField("sleep_time_sample", "Time between samples (seconds)", request?.parameters.sleep_time_sample ?? defaults.sleep_time_sample, 0, 120, { hint: "Only used when taking more than one sample.", disabled: (request?.parameters.sample_count ?? defaults.sample_count) <= 1 })}
-              ${this.numberField("min_brightness", "Minimum brightness", request?.parameters.min_brightness ?? defaults.min_brightness, 1, 255, { hint: "Increase this when the light does not turn on at its lowest level." })}
-              ${this.numberField("sleep_initial", "Initial stabilization (seconds)", request?.parameters.sleep_initial ?? defaults.sleep_initial, 0, 3600)}
-              ${this.numberField("sleep_standby", "Standby stabilization (seconds)", request?.parameters.sleep_standby ?? defaults.sleep_standby, 0, 3600)}
-              <p class="advanced-heading">Profile resolution</p>
-              ${this.numberField("bri_bri_steps", "Brightness mode step", request?.parameters.bri_bri_steps ?? defaults.bri_bri_steps, 1, 255, { hint: "Native brightness increment (1–255).", disabled: !selectedModes.includes("brightness") })}
-              ${this.numberField("ct_bri_steps", "Color temperature brightness step", request?.parameters.ct_bri_steps ?? defaults.ct_bri_steps, 1, 255, { hint: "Native brightness increment used while measuring color temperature.", disabled: !selectedModes.includes("color_temp") })}
-              ${this.numberField("ct_mired_steps", "Color temperature mired step", request?.parameters.ct_mired_steps ?? defaults.ct_mired_steps, 1, 500, { hint: "Native color-temperature increment in mired.", disabled: !selectedModes.includes("color_temp") })}
-              ${this.numberField("hs_bri_steps", "HS brightness step", request?.parameters.hs_bri_steps ?? defaults.hs_bri_steps, 1, 255, { hint: "Native brightness increment used for hue and saturation.", disabled: !selectedModes.includes("hs") })}
-              ${this.numberField("hs_hue_steps", "HS hue step", request?.parameters.hs_hue_steps ?? defaults.hs_hue_steps, 1, 65535, { hint: "Native Home Assistant hue increment (0–65535).", disabled: !selectedModes.includes("hs") })}
-              ${this.numberField("hs_sat_steps", "HS saturation step", request?.parameters.hs_sat_steps ?? defaults.hs_sat_steps, 1, 255, { hint: "Native saturation increment (1–255).", disabled: !selectedModes.includes("hs") })}
-              <div class="grid effect-settings" ?hidden=${!selectedModes.includes("effect")}>
-                <p class="advanced-heading">Effect mode</p>
-                ${this.numberField("effect_bri_steps", "Effect brightness step", request?.parameters.effect_bri_steps ?? defaults.effect_bri_steps, 1, 255, { hint: "Native brightness increment between long-running effect samples.", disabled: !selectedModes.includes("effect") })}
-                ${this.numberField("measure_time_effect_min", "Minimum time per effect (seconds)", request?.parameters.measure_time_effect_min ?? defaults.measure_time_effect_min, 1, 3600, { hint: "An effect can stop after this time once its average converges.", disabled: !selectedModes.includes("effect") })}
-                ${this.numberField("measure_time_effect", "Maximum time per effect (seconds)", request?.parameters.measure_time_effect ?? defaults.measure_time_effect, 1, 3600, { hint: "Upper time limit for every effect and brightness combination.", disabled: !selectedModes.includes("effect") })}
-              </div>
-            </div>
-          </details>
-        </fieldset>
-
-        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
-        <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? "Checking setup…" : "Check setup"}</button></div>
-      </form>
-    `;
-  }
-
-  private renderGenericForm(type: MeasureType) {
+  private renderMeasurementForm(type: MeasureType) {
     const definition = this.definition(type);
     if (!definition || !this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
-    const run = this.nonLightRequest();
+    const run = this.initialRequest?.measure_type === type ? this.initialRequest : undefined;
     const fields = deviceFields(definition);
+    // A multi-select needs the room of its own fieldset; the rest are grid cells.
+    const blocks = fields.filter((field) => field.control === "multi_select");
     return html`
-      <form @submit=${this.submitGeneric}>
+      <form @submit=${this.submitMeasurement}>
         <fieldset class="section">
           <legend>Measurement device</legend>
           ${this.renderPowerMeterSummary()}
@@ -333,17 +261,20 @@ export class SetupView extends LitElement {
 
         <fieldset class="section">
           <legend>${definition.label}</legend>
-          ${definition.fields.some((field) => CONTROLLER_ENTITY_FIELDS.has(field.name)) ? this.renderDummyControllerToggle() : nothing}
+          ${definition.fields.some((field) => field.role === "controller") ? this.renderDummyControllerToggle() : nothing}
           <div class="grid profile-grid">
-            ${fields.map((field) => this.genericField(field, run))}
-            ${definition.supports_profile ? this.textField("model_id", "Model ID", this.modelId(run), "e.g. WSP002", true) : nothing}
+            ${fields.filter((field) => field.control !== "multi_select").map((field) => this.genericField(field, run))}
             ${definition.supports_profile
-              ? this.textField("product_name", "Full product name", run?.product_name ?? "", definition.label, true, FULL_PRODUCT_NAME_HINT)
+              ? this.textField("model_id", "Model ID", this.modelId(run), `e.g. ${definition.model_id_example}`, true)
+              : nothing}
+            ${definition.supports_profile
+              ? this.textField("product_name", "Full product name", run?.product_name ?? "", definition.product_name_example || definition.label, true, FULL_PRODUCT_NAME_HINT)
               : nothing}
           </div>
+          ${blocks.map((field) => this.multiSelectField(field, run))}
         </fieldset>
 
-        ${this.renderGenericTuning(type, run)}
+        ${this.renderTuning(definition, run)}
 
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? "Checking setup…" : "Check setup"}</button></div>
@@ -462,25 +393,60 @@ export class SetupView extends LitElement {
     `;
   }
 
-  private renderGenericTuning(type: MeasureType, request?: NonLightMeasurementRequest) {
+  /**
+   * Advanced tuning section, built from the parameters the server says this type exposes.
+   * A parameter that some option claims is shown only while that option is selected.
+   */
+  private renderTuning(definition: MeasureDefinition, request?: MeasurementRequest) {
     if (!this.capabilities) return nothing;
-    const defaults = this.capabilities.defaults;
-    const supportsPointSamples = type === "charging" || type === "recorder";
+    const gated = gatedParameters(definition);
+    const active = this.activeParameters(definition, request);
+    const shown = definition.parameters.filter((parameter) => !gated.has(parameter.name) || active.has(parameter.name));
     return html`<details>
       <summary>Advanced timing & quality</summary>
       <div class="grid">
-        ${this.numberField("sleep_time", "Reading interval (seconds)", request?.parameters.sleep_time ?? defaults.sleep_time, 0, 120, { step: "0.1", hint: "Delay between repeated power readings and retries." })}
-        ${supportsPointSamples
-          ? this.numberField("sample_count", "Samples per reading", request?.parameters.sample_count ?? defaults.sample_count, 1, 100, { hint: "More samples reduce noise but increase measurement time.", onInput: this.sampleCountChanged })
-          : nothing}
-        ${supportsPointSamples
-          ? this.numberField("sleep_time_sample", "Time between samples (seconds)", request?.parameters.sleep_time_sample ?? defaults.sleep_time_sample, 0, 120, { hint: "Only used when taking more than one sample.", disabled: (request?.parameters.sample_count ?? defaults.sample_count) <= 1 })
-          : nothing}
-        ${type === "speaker"
-          ? this.numberField("sleep_standby", "Standby stabilization (seconds)", request?.parameters.sleep_standby ?? defaults.sleep_standby, 0, 3600)
-          : nothing}
+        ${definition.supports_resume ? this.resumePolicyField(request) : nothing}
+        ${shown.map((parameter, index) => html`
+          ${parameter.group && parameter.group !== shown[index - 1]?.group
+            ? html`<p class="advanced-heading">${parameter.group}</p>`
+            : nothing}
+          ${this.parameterField(parameter, request)}
+        `)}
       </div>
     </details>`;
+  }
+
+  private parameterField(parameter: MeasureParameter, request?: MeasurementRequest) {
+    const required = parameter.requires_multiple;
+    return this.numberField(parameter.name, parameter.label, this.parameterValue(parameter.name, request), {
+      step: parameter.step,
+      hint: parameter.hint,
+      disabled: required ? Number(this.parameterValue(required, request)) <= 1 : false,
+      // Re-render when a parameter that gates another one changes, so the gate keeps up.
+      onInput: this.gatesAnother(parameter.name) ? this.parameterChanged : null,
+    });
+  }
+
+  private resumePolicyField(request?: MeasurementRequest) {
+    return html`<label><span>Previous measurement</span><select name="resume_policy">
+      <option value="new" ?selected=${(request?.resume_policy ?? "new") === "new"}>Keep it and start a new session</option>
+      <option value="overwrite" ?selected=${request?.resume_policy === "overwrite"}>Delete it and start over</option>
+    </select></label>`;
+  }
+
+  /** What the field should show: what the user typed, else the previous run's, else the default. */
+  private parameterValue(name: string, request?: MeasurementRequest): string {
+    const stored = request?.parameters[name as keyof MeasurementParameters] ?? this.capabilities?.defaults[name as keyof MeasureDefaults];
+    return this.parameterValues[name] ?? String(stored ?? "");
+  }
+
+  private gatesAnother(name: string): boolean {
+    return this.definitions.some((definition) => definition.parameters.some((parameter) => parameter.requires_multiple === name));
+  }
+
+  private parameterChanged(event: Event): void {
+    const input = event.currentTarget as HTMLInputElement;
+    this.parameterValues = { ...this.parameterValues, [input.name]: input.value };
   }
 
   private textField(name: string, label: string, value = "", placeholder = "", required = false, hint = "") {
@@ -494,57 +460,56 @@ export class SetupView extends LitElement {
   private numberField(
     name: string,
     label: string,
-    value: number,
-    fallbackMin: number,
-    fallbackMax: number,
-    options: { step?: string; hint?: string; disabled?: boolean; onInput?: (event: Event) => void } = {},
+    value: string,
+    options: { step?: string; hint?: string; disabled?: boolean; onInput?: ((event: Event) => void) | null } = {},
   ) {
     const { step = "1", hint = "", disabled = false, onInput = null } = options;
-    // Bounds come from the capabilities endpoint so the form cannot drift from
-    // server-side validation; the literals only cover fields without server limits.
-    const { min, max } = this.capabilities?.limits?.[name] ?? { min: fallbackMin, max: fallbackMax };
+    // Bounds come from the capabilities endpoint so the form cannot drift from server-side validation.
+    const { min, max } = this.capabilities?.limits?.[name] ?? {};
     return html`<label>
       <span>${label}</span>
-      <input type="number" name=${name} .value=${String(value)} min=${min} max=${max} step=${step} required ?disabled=${disabled} @input=${onInput} />
+      <input type="number" name=${name} .value=${value} min=${min ?? nothing} max=${max ?? nothing} step=${step} required ?disabled=${disabled} @input=${onInput} />
       ${hint ? html`<small class="field-hint">${hint}</small>` : nothing}
     </label>`;
   }
 
   private entitySelect(name: string, label: string, entities: EntityDescriptor[], selected = "", required = false) {
     return html`
-      <label><span>${label}</span><select name=${name} ?required=${required} @change=${this.entityChanged(name)}>
+      <label><span>${label}</span><select name=${name} ?required=${required} @change=${this.entityChanged}>
         <option value="">${required ? "Select an entity" : "None"}</option>
         ${entities.map((entity) => html`<option value=${entity.entity_id} ?selected=${entity.entity_id === selected}>${entity.name} · ${entity.entity_id}</option>`)}
       </select></label>
     `;
   }
 
-  private genericField(field: MeasureDefinition["fields"][number], run?: NonLightMeasurementRequest) {
+  private genericField(field: MeasureDefinition["fields"][number], run?: MeasurementRequest) {
     if (!this.selectedType) return nothing;
     const definition = this.definition(this.selectedType);
     if (!definition) return nothing;
     const name = field.name;
-    if (this.dummyController && CONTROLLER_ENTITY_FIELDS.has(name)) return nothing;
-    const stored = run && requestFieldValue(run, name);
+    if (this.dummyController && field.role === "controller") return nothing;
+    const stored = run && requestFieldValue(run, field);
     if (field.control === "boolean") {
       return html`<label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
     }
     if (field.control === "entity") {
       const value = (stored ?? field.default ?? "").toString();
-      const chargingOptions = definition.fields.find((candidate) => candidate.name === "charging_device_type")?.options ?? [];
-      const selectedType = this.selectedChargingType
-        || (run?.measure_type === "charging" ? run.charging_device_type : chargingOptions[0]?.value);
-      const domains = name === "charging_entity_id" ? [entityDomain(definition, field, selectedType)].filter((domain): domain is string => Boolean(domain)) : this.fieldDomains(field);
+      const source = narrowingField(definition, field);
+      const domains = source
+        ? [entityDomain(definition, field, this.selectValue(source, run))].filter((domain): domain is string => Boolean(domain))
+        : this.fieldDomains(field);
       const failed = domains.find((domain) => this.deviceEntityErrors[domain]);
       if (failed) {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
       }
-      const entities = domains.flatMap((domain) => this.deviceEntities[domain] ?? []);
+      const entities = this.entitiesIn(domains);
       return this.entitySelect(name, field.label, entities, value, field.required);
     }
     if (field.control === "select") {
       const value = (stored ?? field.default ?? "").toString();
-      return html`<label><span>${field.label}</span><select name=${name} ?required=${field.required} @change=${name === "charging_device_type" ? this.chargingTypeChanged : null}>
+      // Re-render when this select narrows another field, so that field's entities follow.
+      const narrows = definition.fields.some((candidate) => candidate.narrowed_by === name);
+      return html`<label><span>${field.label}</span><select name=${name} ?required=${field.required} @change=${narrows ? this.selectChanged : null}>
         ${field.options.map((option) => html`<option value=${option.value} ?selected=${option.value === value}>${option.label}</option>`)}
       </select></label>`;
     }
@@ -565,24 +530,34 @@ export class SetupView extends LitElement {
     return field.entity_domains ?? [];
   }
 
-  private modeLabel(mode: LutMode): string {
-    return { brightness: "Brightness", color_temp: "Color temperature", hs: "Hue & saturation", effect: "Effect" }[mode];
+  private multiSelectField(field: FormField, request?: MeasurementRequest) {
+    const selected = this.selectedOptions(field, request);
+    return html`
+      <fieldset>
+        <legend>${field.label}</legend>
+        <div class="checks">
+          ${this.availableOptions(field, request).map((option) => html`
+            <label class="check">
+              <input
+                type="checkbox"
+                name=${field.name}
+                value=${option.value}
+                .checked=${selected.includes(option.value)}
+                @change=${this.multiSelectChanged(field)}
+              />
+              ${option.label}
+            </label>
+          `)}
+        </div>
+      </fieldset>
+    `;
   }
 
-  private modesChanged(): void {
-    const effectEnabled = Boolean(this.shadowRoot?.querySelector<HTMLInputElement>('input[name="modes"][value="effect"]')?.checked);
-    const settings = this.shadowRoot?.querySelector<HTMLElement>(".effect-settings");
-    if (!settings) return;
-    settings.hidden = !effectEnabled;
-    settings.querySelectorAll<HTMLInputElement>("input").forEach((input) => {
-      input.disabled = !effectEnabled;
-    });
-  }
-
-  private sampleCountChanged(event: Event): void {
-    const count = Number((event.currentTarget as HTMLInputElement).value);
-    const interval = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="sleep_time_sample"]');
-    if (interval) interval.disabled = count <= 1;
+  private multiSelectChanged(field: FormField): () => void {
+    return () => {
+      const boxes = [...(this.shadowRoot?.querySelectorAll<HTMLInputElement>(`input[name="${field.name}"]`) ?? [])];
+      this.multiSelection = { ...this.multiSelection, [field.name]: boxes.filter((box) => box.checked).map((box) => box.value) };
+    };
   }
 
   private dummyLoadEnabledChanged(event: Event): void {
@@ -598,17 +573,50 @@ export class SetupView extends LitElement {
     this.dummyController = (event.currentTarget as HTMLInputElement).checked;
   }
 
-  private availableModes(request?: LightMeasurementRequest): LutMode[] {
-    const supported = this.capabilities?.modes ?? [];
-    if (this.dummyController) return supported;
-    const lightId = this.selectedLightId || (request?.controller.type === "hass" ? request.controller.entity_id : "");
-    const entityModes = this.lights.find((entity) => entity.entity_id === lightId)?.supported_modes;
-    return entityModes?.length ? supported.filter((mode) => entityModes.includes(mode)) : supported;
+  /** Options a field offers right now, narrowed by the capabilities of the entity it names. */
+  private availableOptions(field: FormField, request?: MeasurementRequest): FormFieldOption[] {
+    // A virtual device stands in for any real one, so it supports everything on offer.
+    if (this.dummyController) return field.options;
+    return fieldOptions(field, this.narrowingEntity(field, request));
   }
 
-  private nonLightRequest(): NonLightMeasurementRequest | undefined {
-    const request = this.initialRequest;
-    return request && request.measure_type !== LIGHT_TYPE ? request as NonLightMeasurementRequest : undefined;
+  /** Currently selected values: what the user picked, else the previous run's, else everything offered. */
+  private selectedOptions(field: FormField, request?: MeasurementRequest): string[] {
+    const available = this.availableOptions(field, request).map((option) => option.value);
+    const stored = request && requestFieldValue(request, field);
+    const chosen = this.multiSelection[field.name] ?? (Array.isArray(stored) && stored.length ? stored : available);
+    return available.filter((value) => chosen.includes(value));
+  }
+
+  /** Parameters the selected options activate; every other parameter stays disabled. */
+  private activeParameters(definition: MeasureDefinition, request?: MeasurementRequest): ReadonlySet<string> {
+    const active = new Set<string>();
+    for (const field of definition.fields.filter((candidate) => candidate.control === "multi_select")) {
+      for (const name of enabledParameters(field, this.selectedOptions(field, request))) active.add(name);
+    }
+    return active;
+  }
+
+  private narrowingEntity(field: FormField, request?: MeasurementRequest): EntityDescriptor | undefined {
+    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
+    const source = field.narrowed_by ? definition?.fields.find((candidate) => candidate.name === field.narrowed_by) : undefined;
+    if (!source) return undefined;
+    const selected = this.selectedEntityId(source, request);
+    return this.entityChoices(source).find((entity) => entity.entity_id === selected);
+  }
+
+  /** Entities offered for a controller field. Lights arrive with the startup catalog, other domains on demand. */
+  private entityChoices(field: FormField): EntityDescriptor[] {
+    return this.entitiesIn(this.fieldDomains(field));
+  }
+
+  private entitiesIn(domains: string[]): EntityDescriptor[] {
+    return domains.flatMap((domain) => (domain === "light" ? this.lights : this.deviceEntities[domain] ?? []));
+  }
+
+  private selectedEntityId(field: FormField, request?: MeasurementRequest): string {
+    const stored = request && requestFieldValue(request, field);
+    return this.selectedEntities[field.name] || (typeof stored === "string" ? stored : "");
   }
 
   private selectType(type: MeasureType): void {
@@ -623,27 +631,49 @@ export class SetupView extends LitElement {
     this.selectedType = undefined;
   }
 
-  private lightChanged(event: Event): void {
-    this.selectedLightId = (event.currentTarget as HTMLSelectElement).value;
+
+
+  private entityChanged(event: Event): void {
+    const select = event.currentTarget as HTMLSelectElement;
+    this.selectedEntities = { ...this.selectedEntities, [select.name]: select.value };
   }
 
-  private deviceChanged(event: Event): void {
-    this.selectedDeviceEntityId = (event.currentTarget as HTMLSelectElement).value;
-  }
 
-  private entityChanged(name: string): ((event: Event) => void) | null {
-    if (name === "light_entity_id") return this.lightChanged;
-    return this.deviceChanged;
-  }
 
   private openSettings(): void {
     this.dispatchEvent(new CustomEvent("open-settings", { bubbles: true, composed: true }));
   }
 
-  private chargingTypeChanged(event: Event): void {
-    this.selectedChargingType = (event.currentTarget as HTMLSelectElement).value;
-    const definition = this.definition("charging");
+  /**
+   * Catch an entity that does not match the domain its narrowing field currently calls for —
+   * stale options can survive a change of that field until the entity list reloads.
+   */
+  private narrowedEntityMismatch(definition: MeasureDefinition, form: FormData): string | undefined {
+    for (const field of definition.fields) {
+      const source = narrowingField(definition, field);
+      if (!source || field.role !== "controller") continue;
+      const expected = entityDomain(definition, field, formText(form, source.name));
+      const chosen = formText(form, field.name);
+      if (!expected || !chosen.startsWith(`${expected}.`)) {
+        return `Select a ${expected ?? "matching"} entity for the chosen ${source.label.toLowerCase()}.`;
+      }
+    }
+    return undefined;
+  }
+
+  private selectChanged(event: Event): void {
+    const select = event.currentTarget as HTMLSelectElement;
+    this.selectValues = { ...this.selectValues, [select.name]: select.value };
+    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
     if (definition) this.dispatchEvent(new CustomEvent("entity-domains-requested", { detail: entityDomains(definition), bubbles: true, composed: true }));
+  }
+
+  /** Value a narrowing select currently holds: the user's choice, else the previous run's, else its first option. */
+  private selectValue(field: FormField, request?: MeasurementRequest): string | undefined {
+    const stored = request && requestFieldValue(request, field);
+    return this.selectValues[field.name]
+      ?? (typeof stored === "string" ? stored : undefined)
+      ?? field.options[0]?.value;
   }
 
   private definition(type: MeasureType): MeasureDefinition | undefined {
@@ -657,67 +687,12 @@ export class SetupView extends LitElement {
   private modelId(request?: MeasurementRequest): string {
     if (request?.model_id) return request.model_id;
     const requestEntityId = request && "controller" in request && request.controller.type === "hass" ? request.controller.entity_id : "";
-    const entityId = this.selectedType === LIGHT_TYPE ? this.selectedLightId || requestEntityId : this.selectedDeviceEntityId || requestEntityId;
+    const entityId = Object.values(this.selectedEntities).find(Boolean) || requestEntityId;
     const entities = [...this.lights, ...Object.values(this.deviceEntities).flat()];
     return entities.find((entity) => entity.entity_id === entityId)?.model_id ?? "";
   }
 
-  private submitLight(event: SubmitEvent): void {
-    event.preventDefault();
-    if (!this.capabilities) return;
-    const defaults = this.capabilities.defaults;
-    const data = new FormData(event.currentTarget as HTMLFormElement);
-    const modes = data.getAll("modes") as LutMode[];
-    if (modes.length === 0) {
-      this.errorMessage = "Select at least one lookup-table mode.";
-      return;
-    }
-    const text = (name: string): string => {
-      const value = data.get(name);
-      return typeof value === "string" ? value : "";
-    };
-    const number = (name: string) => Number(text(name));
-    const numberOrDefault = (name: keyof typeof defaults): number => {
-      const value = text(name);
-      return value === "" ? defaults[name] : Number(value);
-    };
-    const request: LightMeasurementRequest = {
-      measure_type: LIGHT_TYPE,
-      model_id: text("model_id").trim(),
-      product_name: text("product_name").trim(),
-      measure_device: this.defaultMeasureDevice,
-      controller: this.dummyController ? { type: "dummy" } : { type: "hass", entity_id: text("light_entity_id") },
-      power_meter: this.powerMeterSpec(),
-      modes,
-      generate_model: true,
-      gzip: true,
-      multiple_light_count: number("multiple_light_count"),
-      parameters: {
-        sleep_time: numberOrDefault("sleep_time"),
-        sample_count: numberOrDefault("sample_count"),
-        sleep_time_sample: numberOrDefault("sleep_time_sample"),
-        max_retries: defaults.max_retries,
-        max_nudges: defaults.max_nudges,
-        bri_bri_steps: numberOrDefault("bri_bri_steps"),
-        ct_bri_steps: numberOrDefault("ct_bri_steps"),
-        ct_mired_steps: numberOrDefault("ct_mired_steps"),
-        hs_bri_steps: numberOrDefault("hs_bri_steps"),
-        hs_hue_steps: numberOrDefault("hs_hue_steps"),
-        hs_sat_steps: numberOrDefault("hs_sat_steps"),
-        min_brightness: numberOrDefault("min_brightness"),
-        sleep_initial: numberOrDefault("sleep_initial"),
-        sleep_standby: numberOrDefault("sleep_standby"),
-        effect_bri_steps: numberOrDefault("effect_bri_steps"),
-        measure_time_effect: numberOrDefault("measure_time_effect"),
-        measure_time_effect_min: numberOrDefault("measure_time_effect_min"),
-      },
-      resume_policy: (text("resume_policy") || "new") as LightMeasurementRequest["resume_policy"],
-      dummy_load: this.dummyLoadSpec(data),
-    };
-    this.dispatchEvent(new CustomEvent("preflight", { detail: request, bubbles: true, composed: true }));
-  }
-
-  private submitGeneric(event: SubmitEvent): void {
+  private submitMeasurement(event: SubmitEvent): void {
     event.preventDefault();
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
     if (!definition || !this.capabilities) return;
@@ -729,7 +704,15 @@ export class SetupView extends LitElement {
       this.errorMessage = `Could not load ${failedDomain} entities. Retry before starting the measurement.`;
       return;
     }
-    const request = buildNonLightRequest(
+    // A checkbox group submits nothing at all when it is empty, so require it here.
+    const empty = definition.fields.find(
+      (field) => field.control === "multi_select" && field.required && form.getAll(field.name).length === 0,
+    );
+    if (empty) {
+      this.errorMessage = `Select at least one ${empty.label.toLowerCase().replace(/s$/, "")}.`;
+      return;
+    }
+    const request = buildMeasurementRequest(
       definition,
       form,
       this.capabilities,
@@ -738,13 +721,10 @@ export class SetupView extends LitElement {
       this.dummyController,
     );
     request.dummy_load = this.dummyLoadSpec(form);
-    if (request.measure_type === "charging" && request.controller.type !== "dummy") {
-      const chargingField = definition.fields.find((field) => field.name === "charging_entity_id");
-      const expectedDomain = chargingField && entityDomain(definition, chargingField, request.charging_device_type);
-      if (!expectedDomain || request.controller.type !== "hass" || !request.controller.entity_id.startsWith(`${expectedDomain}.`)) {
-        this.errorMessage = `Select a ${expectedDomain ?? "matching"} entity for the chosen charging device type.`;
-        return;
-      }
+    const mismatch = this.dummyController ? undefined : this.narrowedEntityMismatch(definition, form);
+    if (mismatch) {
+      this.errorMessage = mismatch;
+      return;
     }
     this.dispatchEvent(new CustomEvent("preflight", { detail: request, bubbles: true, composed: true }));
   }
