@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.2.1 - 2026-07-25
+
+### 🐛 Bug Fixes
+
+- #4376 Fix cache issues causing app to serve old stale UI @bramstroker
+
 ## 0.2.0 - 2026-07-25
 
 ### 🚀 Features
