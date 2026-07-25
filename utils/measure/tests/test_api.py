@@ -349,6 +349,25 @@ def test_app_metadata_uses_the_runtime_measure_version(tmp_path: Path) -> None:
 
     assert test_client.app.version == measure_version()
     assert test_client.get("/openapi.json").json()["info"]["version"] == measure_version()
+    assert test_client.get("/api/capabilities").json()["runtime_version"] == measure_version()
+
+
+def test_index_is_not_cached(tmp_path: Path) -> None:
+    static_root = tmp_path / "static"
+    static_root.mkdir()
+    (static_root / "index.html").write_text("<!doctype html>", encoding="utf-8")
+    test_client = TestClient(
+        create_app(
+            data_root=tmp_path,
+            hass_token="test-token",  # noqa: S106
+            static_root=static_root,
+        ),
+    )
+
+    response = test_client.get("/")
+
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store, max-age=0"
 
 
 def test_capabilities_and_entity_filters(tmp_path: Path) -> None:

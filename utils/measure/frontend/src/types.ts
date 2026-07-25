@@ -65,6 +65,7 @@ export interface MeasurementParameters {
 export type MeasureDefaults = MeasurementParameters;
 
 export interface Capabilities {
+  runtime_version: string;
   defaults: MeasureDefaults;
   limits?: Record<string, { min: number; max: number }>;
   developer_mode?: boolean;

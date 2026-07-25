@@ -86,6 +86,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     .topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
     .brand { display: flex; align-items: center; gap: 0.7rem; color: var(--muted); font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.16em; text-transform: uppercase; }
     .brand-logo { width: 20px; height: 24px; object-fit: contain; }
+    .version { color: var(--muted); font: 500 0.68rem/1 ui-monospace, monospace; letter-spacing: normal; text-transform: none; white-space: nowrap; }
     .intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr); gap: 1.25rem clamp(1.5rem, 5vw, 4rem); align-items: end; padding-top: clamp(1.5rem, 4vw, 2.5rem); }
     h1 { grid-column: 1 / -1; margin: 0; font-size: clamp(2rem, 3.4vw, 3rem); line-height: 1; letter-spacing: -0.04em; }
     .subtitle { max-width: 540px; margin: 0.8rem 0 0; color: var(--muted); font-size: 1rem; line-height: 1.6; }
@@ -117,7 +118,13 @@ export class AppShell extends LitElement implements MeasureAppState {
       <main class="shell">
         <header>
           <div class="topbar">
-            <div class="brand"><img class="brand-logo" src=${POWERCALC_LOGO_URL} alt="" />Powercalc Measure</div>
+            <div class="brand">
+              <img class="brand-logo" src=${POWERCALC_LOGO_URL} alt="" />
+              <span>Powercalc Measure</span>
+              ${this.capabilities?.runtime_version
+                ? html`<span class="version">Version ${this.displayVersion()}</span>`
+                : nothing}
+            </div>
             <button class="settings-toggle" type="button" @click=${this.openSettings} ?disabled=${this.view === "loading" || this.view === "settings"}>Settings</button>
           </div>
           <div class="intro">
@@ -147,6 +154,10 @@ export class AppShell extends LitElement implements MeasureAppState {
   private renderLoading() {
     return html`
       <section class="panel loading" aria-live="polite"><div><div class="pulse" aria-hidden="true"></div><p>${this.loadingMessage}</p>${this.errorMessage ? this.renderRetry() : nothing}</div></section>`;
+  }
+
+  private displayVersion(): string {
+    return this.capabilities?.runtime_version.replace(/:app$/, "") ?? "";
   }
 
   private renderRetry() {
