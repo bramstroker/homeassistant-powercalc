@@ -7,17 +7,13 @@ from typing import Protocol
 
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION
 from measure.controller.charging.const import ATTR_BATTERY_LEVEL
-from measure.controller.charging.spec import (
-    DummyChargingControllerSpec,
-    HassChargingControllerSpec,
-    charging_entity_domain,
-)
-from measure.controller.fan.spec import DummyFanControllerSpec, HassFanControllerSpec
+from measure.controller.charging.spec import HassChargingControllerSpec, charging_entity_domain
+from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec, HueLightControllerSpec
-from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec
+from measure.controller.media.spec import HassMediaControllerSpec
 from measure.home_assistant_entities import DeviceClass, EntityDomain
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, PowerMeterSpec, ShellyPowerMeterSpec
@@ -140,18 +136,10 @@ class MeasurementPreflight:
             label = power_meter.type.value.replace("_", " ").title()
             raise PreflightError(f"{label} power meters are not supported by the Home Assistant app")
 
-        controller = None
-        if isinstance(
-            request,
-            LightMeasurementRequest | SpeakerMeasurementRequest | ChargingMeasurementRequest | FanMeasurementRequest,
-        ):
-            controller = request.controller
+        controller = request.controller
         if controller is None:
             return
-        if isinstance(
-            controller,
-            DummyLightControllerSpec | DummyMediaControllerSpec | DummyChargingControllerSpec | DummyFanControllerSpec,
-        ):
+        if controller.is_dummy:
             if not self._developer_mode:
                 raise PreflightError("Dummy controllers require developer mode in the Home Assistant app")
             return

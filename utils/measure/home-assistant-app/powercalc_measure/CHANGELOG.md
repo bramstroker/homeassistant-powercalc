@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### 🚀 Features
+
+- Add optional automatic GitHub contribution for generated power profiles while retaining manual downloads and submission.
+
 ## 0.1.2 - 2026-07-18
 
 ### 🐛 Bug Fixes

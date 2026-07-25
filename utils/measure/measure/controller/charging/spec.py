@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from measure.controller.charging.const import ChargingControllerType, ChargingDeviceType
+from measure.controller.spec import BaseControllerSpec
 
 
 def charging_entity_domain(device_type: ChargingDeviceType) -> str:
@@ -16,15 +17,11 @@ def charging_entity_domain(device_type: ChargingDeviceType) -> str:
     }[device_type]
 
 
-class _ChargingControllerSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-
-class DummyChargingControllerSpec(_ChargingControllerSpec):
+class DummyChargingControllerSpec(BaseControllerSpec):
     type: Literal[ChargingControllerType.DUMMY] = ChargingControllerType.DUMMY
 
 
-class HassChargingControllerSpec(_ChargingControllerSpec):
+class HassChargingControllerSpec(BaseControllerSpec):
     type: Literal[ChargingControllerType.HASS] = ChargingControllerType.HASS
     entity_id: str = Field(pattern=r"^(vacuum|lawn_mower)\.[a-z0-9_]+$")
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
+from dataclasses import replace
 import json
 import logging
 import mimetypes
@@ -23,11 +24,25 @@ from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LutMode
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import ImmediateInteraction
+from measure.ha_app.contribution import (
+    ConnectPatRequest,
+    ContributionApiCoordinator,
+    ContributionApiError,
+    ContributionApiErrorCode,
+    ContributionAuthStatus,
+    ContributionPreviewRequest,
+    ContributionPreviewResponse,
+    ContributionStatus,
+    ContributionSubmissionResult,
+    ContributionSubmitRequest,
+    DeviceFlowPollResponse,
+    DeviceFlowStartResponse,
+)
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
-from measure.ha_app.registry import FieldControl, measurement_definitions, supported_light_modes
+from measure.ha_app.registry import FieldControl, FieldRole, measurement_definitions
 from measure.ha_app.service import MeasurementService
 from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionEvent, SessionSnapshot, SessionState
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
@@ -60,6 +75,18 @@ class ErrorResponse(BaseModel):
 
 # Shared OpenAPI documentation for the JSON error body returned by every failed request.
 _ERROR = {"model": ErrorResponse}
+
+_CONTRIBUTION_STATUS_CODES = {
+    ContributionApiErrorCode.AUTH_UNAVAILABLE: 401,
+    ContributionApiErrorCode.SESSION_REQUIRED: 404,
+    ContributionApiErrorCode.FLOW_NOT_FOUND: 404,
+    ContributionApiErrorCode.SESSION_NOT_READY: 409,
+    ContributionApiErrorCode.PREVIEW_REQUIRED: 409,
+    ContributionApiErrorCode.CONTRIBUTION_ACTIVE: 409,
+    ContributionApiErrorCode.ARTIFACTS_REQUIRED: 422,
+    ContributionApiErrorCode.INVALID_METADATA: 422,
+    ContributionApiErrorCode.SUBMISSION_FAILED: 502,
+}
 _NO_SESSION = "No measurement session"
 MeasurementRequestPayload = Annotated[MeasurementRequest, Body(discriminator="measure_type")]
 
@@ -94,22 +121,25 @@ class SessionPlots(BaseModel):
 
 
 class CapabilitiesResponse(BaseModel):
-    modes: list[LutMode]
     defaults: dict[str, int | float]
     limits: dict[str, dict[str, int | float]]
     developer_mode: bool = False
+    fast_test_mode: bool = False
 
 
 class FormFieldOption(BaseModel):
     value: str
     label: str
     entity_domain: str | None = None
+    enables: list[str] = Field(default_factory=list)
 
 
 class FormField(BaseModel):
     name: str
     label: str
     control: FieldControl
+    role: FieldRole = FieldRole.ATTRIBUTE
+    narrowed_by: str | None = None
     required: bool = True
     entity_domains: list[str] = Field(default_factory=list)
     options: list[FormFieldOption] = Field(default_factory=list)
@@ -118,12 +148,26 @@ class FormField(BaseModel):
     maximum: int | float | None = None
 
 
+class MeasureParameter(BaseModel):
+    name: str
+    label: str
+    hint: str = ""
+    step: str = "1"
+    group: str = ""
+    requires_multiple: str | None = None
+
+
 class MeasureDefinition(BaseModel):
     measure_type: MeasureType
     label: str
     description: str
+    icon: str
     confirmation_action: str | None
+    confirmation_is_warning: bool = False
+    model_id_example: str = ""
+    product_name_example: str = ""
     fields: list[FormField]
+    parameters: list[MeasureParameter] = Field(default_factory=list)
     supports_profile: bool
     supports_resume: bool
 
@@ -143,6 +187,7 @@ class AppContext:
         self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
+        self.contribution = ContributionApiCoordinator(self.storage)
         self.coordinator = MeasurementCoordinator(
             self.storage,
             self._measurement_service,
@@ -258,6 +303,14 @@ def _register_error_handlers(app: FastAPI) -> None:
             content=ErrorResponse(code=code, message=detail).model_dump(),
         )
 
+    @app.exception_handler(ContributionApiError)
+    async def contribution_error(_: Request, error: ContributionApiError) -> JSONResponse:
+        status_code = _CONTRIBUTION_STATUS_CODES.get(error.code, 500)
+        return JSONResponse(
+            status_code=status_code,
+            content=ErrorResponse(code=error.code.value, message=str(error)).model_dump(),
+        )
+
     @app.exception_handler(Exception)
     async def internal_error(_: Request, error: Exception) -> JSONResponse:
         _LOGGER.exception("Unhandled measure app request error", exc_info=error)
@@ -271,19 +324,22 @@ def _router() -> APIRouter:
     router = APIRouter(prefix="/api")
     _register_measurement_routes(router)
     _register_session_routes(router)
+    _register_contribution_routes(router)
     return router
 
 
 def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/capabilities")
     async def capabilities(request: Request) -> CapabilitiesResponse:
+        context = _context(request)
         defaults = MeasurementParameters()
-        app_defaults = (await run_in_threadpool(_context(request).storage.load_settings)).measurement_defaults
+        settings = await run_in_threadpool(context.storage.load_settings)
         return CapabilitiesResponse(
-            modes=list(supported_light_modes()),
-            defaults={name: getattr(defaults, name) for name in PARAMETER_LIMITS} | app_defaults.model_dump(),
+            defaults={name: getattr(defaults, name) for name in PARAMETER_LIMITS}
+            | settings.measurement_defaults.model_dump(),
             limits={name: {"min": minimum, "max": maximum} for name, (minimum, maximum) in PARAMETER_LIMITS.items()},
-            developer_mode=_context(request).developer_mode,
+            developer_mode=context.developer_mode,
+            fast_test_mode=context.developer_mode and settings.fast_test_mode,
         )
 
     @router.get("/measure-definitions")
@@ -296,7 +352,10 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
 
     @router.put("/settings", responses={400: _ERROR})
     async def update_settings(payload: AppPreferences, request: Request) -> AppPreferences:
-        return await run_in_threadpool(_context(request).storage.save_settings, payload)
+        context = _context(request)
+        if payload.fast_test_mode and not context.developer_mode:
+            raise HTTPException(status_code=400, detail="Fast test mode requires developer mode")
+        return await run_in_threadpool(context.storage.save_settings, payload)
 
     @router.post("/settings/test-power-meter")
     async def test_power_meter(payload: AppPreferences, request: Request) -> PowerMeterDiagnostic:
@@ -336,14 +395,17 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
 
     @router.post("/preflight", responses={409: _ERROR, 422: _ERROR})
     async def preflight(payload: MeasurementRequestPayload, request: Request) -> PreflightResponse:
-        return await run_in_threadpool(_preflight, _context(request), payload)
+        context = _context(request)
+        prepared = await run_in_threadpool(_apply_fast_test_mode, context, payload)
+        return await run_in_threadpool(_preflight, context, prepared)
 
     @router.post("/sessions", status_code=201, responses={409: _ERROR, 422: _ERROR})
     async def start_session(payload: MeasurementRequestPayload, request: Request) -> dict[str, object]:
         context = _context(request)
-        await run_in_threadpool(_preflight, context, payload)
+        prepared = await run_in_threadpool(_apply_fast_test_mode, context, payload)
+        await run_in_threadpool(_preflight, context, prepared)
         try:
-            snapshot = context.coordinator.start(payload)
+            snapshot = context.coordinator.start(prepared)
         except SessionConflictError as error:
             raise HTTPException(status_code=409, detail=str(error)) from error
         return _snapshot_response(context, snapshot)
@@ -455,6 +517,62 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         return StreamingResponse(_event_stream(request, context), media_type="text/event-stream")
 
 
+def _register_contribution_routes(router: APIRouter) -> None:
+    @router.get("/contribution/auth")
+    async def contribution_auth_status(request: Request) -> ContributionAuthStatus:
+        return await run_in_threadpool(_context(request).contribution.auth_status)
+
+    @router.put("/contribution/auth")
+    async def contribution_connect_pat(payload: ConnectPatRequest, request: Request) -> ContributionAuthStatus:
+        return await run_in_threadpool(_context(request).contribution.connect_pat, payload.token)
+
+    @router.delete("/contribution/auth")
+    async def contribution_disconnect(request: Request) -> ContributionAuthStatus:
+        return await run_in_threadpool(_context(request).contribution.disconnect)
+
+    @router.post("/contribution/auth/device", responses={401: _ERROR})
+    async def contribution_device_start(request: Request) -> DeviceFlowStartResponse:
+        return await run_in_threadpool(_context(request).contribution.start_device_flow)
+
+    @router.post("/contribution/auth/device/{flow_id}", responses={401: _ERROR, 404: _ERROR})
+    async def contribution_device_poll(flow_id: str, request: Request) -> DeviceFlowPollResponse:
+        return await run_in_threadpool(_context(request).contribution.poll_device_flow, flow_id)
+
+    @router.get("/contribution/status")
+    async def contribution_status(request: Request) -> ContributionStatus:
+        return _context(request).contribution.status()
+
+    @router.get("/session/current/contribution", responses={404: _ERROR, 409: _ERROR})
+    async def current_contribution_draft(request: Request) -> ContributionPreviewResponse:
+        context = _context(request)
+        snapshot = _require_current_session(context)
+        return await run_in_threadpool(context.contribution.draft, snapshot)
+
+    @router.post(
+        "/session/current/contribution/preview",
+        responses={404: _ERROR, 409: _ERROR, 422: _ERROR, 502: _ERROR},
+    )
+    async def current_contribution_preview(
+        payload: ContributionPreviewRequest,
+        request: Request,
+    ) -> ContributionPreviewResponse:
+        context = _context(request)
+        snapshot = _require_current_session(context)
+        return await run_in_threadpool(context.contribution.preview, snapshot, payload)
+
+    @router.post(
+        "/session/current/contribution",
+        responses={401: _ERROR, 404: _ERROR, 409: _ERROR, 502: _ERROR},
+    )
+    async def current_contribution_submit(
+        payload: ContributionSubmitRequest,
+        request: Request,
+    ) -> ContributionSubmissionResult:
+        context = _context(request)
+        snapshot = _require_current_session(context)
+        return await run_in_threadpool(context.contribution.submit, snapshot, payload)
+
+
 def _context(request: Request) -> AppContext:
     return cast(AppContext, request.app.state.context)
 
@@ -472,12 +590,19 @@ def _measure_definitions() -> list[MeasureDefinition]:
             measure_type=definition.kind,
             label=definition.label,
             description=definition.description,
+            icon=definition.icon,
             confirmation_action=definition.confirmation_action,
+            confirmation_is_warning=definition.confirmation_is_warning,
+            model_id_example=definition.model_id_example,
+            product_name_example=definition.product_name_example,
+            parameters=[MeasureParameter(**vars(parameter)) for parameter in definition.parameters],
             fields=[
                 FormField(
                     name=field.name,
                     label=field.label,
                     control=field.control,
+                    role=field.role,
+                    narrowed_by=field.narrowed_by,
                     required=field.required,
                     entity_domains=list(field.entity_domains),
                     options=[
@@ -485,6 +610,7 @@ def _measure_definitions() -> list[MeasureDefinition]:
                             value=option.value,
                             label=option.label,
                             entity_domain=option.entity_domain,
+                            enables=list(option.enables),
                         )
                         for option in field.options
                     ],
@@ -583,6 +709,36 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
         battery_level_entity_id=result.battery_level_entity_id,
         battery_level_attribute=result.battery_level_attribute,
     )
+
+
+def _apply_fast_test_mode(context: AppContext, request: MeasurementRequest) -> MeasurementRequest:
+    settings = context.storage.load_settings()
+    controller = request.controller
+    supported_dummy_controller = controller is not None and controller.is_dummy
+    enabled = (
+        context.developer_mode
+        and settings.fast_test_mode
+        and isinstance(request.power_meter, DummyPowerMeterSpec)
+        and supported_dummy_controller
+    )
+    parameters = replace(request.parameters, fast_test_mode=False)
+    if enabled:
+        parameters = replace(
+            request.parameters,
+            fast_test_mode=True,
+            sleep_time=0,
+            sleep_time_sample=0,
+            sample_count=1,
+            sleep_initial=0,
+            sleep_standby=0,
+            sleep_time_hue=0,
+            sleep_time_sat=0,
+            sleep_time_ct=0,
+            sleep_time_effect_change=0,
+            measure_time_effect=1,
+            measure_time_effect_min=1,
+        )
+    return request.model_copy(update={"fast_test_mode": enabled, "parameters": parameters})
 
 
 def _is_active(snapshot: SessionSnapshot | None) -> bool:

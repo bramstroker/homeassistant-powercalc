@@ -2,20 +2,17 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from measure.controller.fan.const import FanControllerType
+from measure.controller.spec import BaseControllerSpec
 
 
-class _FanControllerSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-
-class DummyFanControllerSpec(_FanControllerSpec):
+class DummyFanControllerSpec(BaseControllerSpec):
     type: Literal[FanControllerType.DUMMY] = FanControllerType.DUMMY
 
 
-class HassFanControllerSpec(_FanControllerSpec):
+class HassFanControllerSpec(BaseControllerSpec):
     type: Literal[FanControllerType.HASS] = FanControllerType.HASS
     entity_id: str = Field(pattern=r"^fan\.[a-z0-9_]+$")
 

@@ -5,11 +5,12 @@ import logging
 import re
 
 from measure.assembler import MeasurementAssembler
+from measure.clock import utc_now
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import DummyLoadCalibrationStore, MeasurementExecution
 from measure.ha_app.coordinator import SessionExecutionContext, SessionMeasurementService
 from measure.ha_app.interaction import SessionInteraction
-from measure.ha_app.session import SessionControl, SessionEventType, utc_now
+from measure.ha_app.session import SessionControl, SessionEventType
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.spec import DummyPowerMeterSpec

@@ -14,6 +14,7 @@ from measure.controller.fan.spec import FanControllerSpec
 from measure.controller.light.const import LutMode
 from measure.controller.light.spec import LightControllerSpec
 from measure.controller.media.spec import MediaControllerSpec
+from measure.controller.spec import BaseControllerSpec
 from measure.powermeter.spec import DummyPowerMeterSpec, ManualPowerMeterSpec, PowerMeterSpec
 from measure.runner.const import DEFAULT_EXPORT_FILENAME
 from measure.tuning import MeasurementParameters
@@ -111,8 +112,12 @@ class BaseMeasurementRequest(BaseModel):
     power_meter: PowerMeterSpec
     parameters: MeasurementParameters = Field(default_factory=MeasurementParameters)
     generate_model: bool = False
+    fast_test_mode: bool = False
     resume_policy: ResumePolicy = ResumePolicy.NEW
     dummy_load: DummyLoadRequest | None = None
+    # Measure types that drive a device (light/speaker/charging/fan) narrow this to their
+    # own required, discriminated controller spec; average/recorder leave it as None.
+    controller: BaseControllerSpec | None = None
 
     @field_validator("model_id")
     @classmethod
@@ -184,11 +189,13 @@ class LightMeasurementRequest(BaseMeasurementRequest):
 
 class AverageMeasurementRequest(BaseMeasurementRequest):
     measure_type: Literal[MeasureType.AVERAGE] = MeasureType.AVERAGE
+    controller: None = None
     duration: int = Field(default=60, ge=1, le=86_400)
 
 
 class RecorderMeasurementRequest(BaseMeasurementRequest):
     measure_type: Literal[MeasureType.RECORDER] = MeasureType.RECORDER
+    controller: None = None
     export_filename: str = Field(default=DEFAULT_EXPORT_FILENAME, min_length=1, max_length=200)
 
     @field_validator("export_filename")

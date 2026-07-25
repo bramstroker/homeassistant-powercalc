@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
-from datetime import UTC, datetime
 from enum import StrEnum
 from threading import Event, Lock
 from typing import Any, cast
 
+from measure.clock import utc_now
 from measure.execution import MeasurementCancelledError, OperatingPoint
 
 
@@ -88,10 +88,6 @@ class SessionSnapshot:
         data = asdict(self)
         data["progress"] = self.progress
         return data
-
-
-def utc_now() -> str:
-    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 @dataclass

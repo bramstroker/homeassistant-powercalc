@@ -3,7 +3,8 @@ from __future__ import annotations
 from collections.abc import Collection, Iterable
 import platform
 
-from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot, utc_now
+from measure.clock import utc_now
+from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot
 from measure.request import MeasurementRequest
 from measure.version import measure_version
 

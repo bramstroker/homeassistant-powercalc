@@ -197,7 +197,8 @@ def _variations_for_mode(
     if mode == LutMode.BRIGHTNESS:
         return [
             Variation(bri=bri)
-            for bri in _inclusive_range(
+            for bri in _measurement_range(
+                parameters,
                 parameters.min_brightness,
                 parameters.max_brightness,
                 parameters.bri_bri_steps,
@@ -208,12 +209,14 @@ def _variations_for_mode(
         max_mired = round(light_info.max_mired)
         return [
             ColorTempVariation(bri=bri, ct=mired)
-            for bri in _inclusive_range(
+            for bri in _measurement_range(
+                parameters,
                 parameters.min_brightness,
                 parameters.max_brightness,
                 parameters.ct_bri_steps,
             )
-            for mired in _inclusive_range(
+            for mired in _measurement_range(
+                parameters,
                 min_mired,
                 max_mired,
                 parameters.ct_mired_steps,
@@ -222,17 +225,20 @@ def _variations_for_mode(
     if mode == LutMode.HS:
         return [
             HsVariation(bri=bri, hue=hue, sat=sat)
-            for bri in _inclusive_range(
+            for bri in _measurement_range(
+                parameters,
                 parameters.min_brightness,
                 parameters.max_brightness,
                 parameters.hs_bri_steps,
             )
-            for sat in _inclusive_range(
+            for sat in _measurement_range(
+                parameters,
                 parameters.min_sat,
                 parameters.max_sat,
                 parameters.hs_sat_steps,
             )
-            for hue in _inclusive_range(
+            for hue in _measurement_range(
+                parameters,
                 parameters.min_hue,
                 parameters.max_hue,
                 parameters.hs_hue_steps,
@@ -244,7 +250,8 @@ def _variations_for_mode(
         return [
             EffectVariation(bri=bri, effect=effect)
             for effect in effects
-            for bri in _inclusive_range(
+            for bri in _measurement_range(
+                parameters,
                 max(parameters.min_brightness, 5),
                 parameters.max_brightness,
                 parameters.effect_bri_steps,
@@ -257,6 +264,12 @@ def _inclusive_range(start: int, end: int, step: int) -> list[int]:
     values = list(range(start, end, step))
     values.append(end)
     return values
+
+
+def _measurement_range(parameters: MeasurementParameters, start: int, end: int, step: int) -> list[int]:
+    if parameters.fast_test_mode:
+        return [start] if start == end else [start, end]
+    return _inclusive_range(start, end, step)
 
 
 def _step_time(mode: LutMode, parameters: MeasurementParameters) -> float:

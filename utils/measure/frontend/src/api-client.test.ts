@@ -44,6 +44,63 @@ describe("MeasureApiClient", () => {
     );
   });
 
+  it("uses the contribution auth endpoints below the ingress prefix", async () => {
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(response({ connected: false }))
+      .mockResolvedValueOnce(response({ flow_id: "flow-1", user_code: "ABCD-EFGH", verification_uri: "https://github.com/login/device", expires_in: 900, interval: 5 }))
+      .mockResolvedValueOnce(response({ status: "authorized", auth: { connected: true, identity: { login: "octocat" } } }))
+      .mockResolvedValueOnce(response({ connected: true, identity: { login: "octocat" } }))
+      .mockResolvedValueOnce(response({ connected: false }));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await client.getContributionAuth();
+    await client.startContributionDeviceAuth();
+    await client.getContributionDeviceAuth("flow 1");
+    await client.saveContributionToken("secret");
+    await client.disconnectContributionAuth();
+
+    expect(fetcher).toHaveBeenNthCalledWith(1, new URL("http://ha.local/prefix/api/contribution/auth"), expect.anything());
+    expect(fetcher).toHaveBeenNthCalledWith(2, new URL("http://ha.local/prefix/api/contribution/auth/device"), expect.objectContaining({ method: "POST" }));
+    expect(fetcher).toHaveBeenNthCalledWith(3, new URL("http://ha.local/prefix/api/contribution/auth/device/flow%201"), expect.anything());
+    expect(fetcher).toHaveBeenNthCalledWith(4, new URL("http://ha.local/prefix/api/contribution/auth"), expect.objectContaining({ method: "PUT" }));
+    expect(fetcher).toHaveBeenNthCalledWith(5, new URL("http://ha.local/prefix/api/contribution/auth"), expect.objectContaining({ method: "DELETE" }));
+  });
+
+  it("uses the current-session contribution endpoints below the ingress prefix", async () => {
+    const preview = {
+      eligible: true,
+      repository: "bramstroker/homeassistant-powercalc",
+      base_branch: "master",
+      manufacturer_name: "Signify",
+      manufacturer_directory: "signify",
+      model_id: "LCT010",
+      product_name: "Hue lamp",
+      contributor: "octocat",
+      device_info: {},
+      home_assistant: {},
+      notes: "",
+      files: [],
+      commit_message: "Add Signify LCT010",
+      pr_title: "Add Signify LCT010",
+      pr_body: "",
+      branch_name: "measure/signify-lct010",
+      warnings: [],
+    };
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(response(preview))
+      .mockResolvedValueOnce(response(preview))
+      .mockResolvedValueOnce(response({ status: "success", pull_request_url: "https://github.com/pull/1" }));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await client.getContributionDraft();
+    await client.previewContribution({ manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "" });
+    await client.submitContribution({ manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "", confirmed: true });
+
+    expect(fetcher).toHaveBeenNthCalledWith(1, new URL("http://ha.local/prefix/api/session/current/contribution"), expect.anything());
+    expect(fetcher).toHaveBeenNthCalledWith(2, new URL("http://ha.local/prefix/api/session/current/contribution/preview"), expect.objectContaining({ method: "POST" }));
+    expect(fetcher).toHaveBeenNthCalledWith(3, new URL("http://ha.local/prefix/api/session/current/contribution"), expect.objectContaining({ method: "POST" }));
+  });
+
   it("loads the matching dummy-load calibration below the ingress prefix", async () => {
     const calibration = {
       description: "60 W incandescent bulb",

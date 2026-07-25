@@ -1,3 +1,5 @@
+export type SettingsSection = "power_meter" | "measure_tuning" | "github";
+
 export type SessionState =
   | "idle"
   | "validating"
@@ -12,6 +14,9 @@ export type SessionState =
 
 export type LutMode = "brightness" | "color_temp" | "hs" | "effect";
 export type DeviceClass = "power" | "voltage";
+export type ChargingDeviceType = "vacuum_robot" | "lawn_mower_robot";
+export type ResumePolicy = "new" | "resume" | "overwrite";
+export type PowerMeterKind = PowerMeterSpec["type"];
 
 export type OperatingPoint =
   | { type: "light"; on: boolean; brightness?: number; color_temp_mired?: number; hue?: number; saturation?: number; effect?: string }
@@ -60,34 +65,66 @@ export interface MeasurementParameters {
 export type MeasureDefaults = MeasurementParameters;
 
 export interface Capabilities {
-  modes: LutMode[];
   defaults: MeasureDefaults;
   limits?: Record<string, { min: number; max: number }>;
   developer_mode?: boolean;
+  fast_test_mode?: boolean;
 }
 
 export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan";
 
+/** Where a submitted field value lands in the measurement request. Mirrors `FieldRole` server-side. */
+export type FieldRole = "attribute" | "controller" | "power_meter";
+
+export interface FormFieldOption {
+  value: string;
+  label: string;
+  entity_domain?: string | null;
+  /** Measurement parameters that only apply while this option is selected. */
+  enables?: string[];
+}
+
 export interface FormField {
   name: string;
   label: string;
-  control: "entity" | "number" | "text" | "boolean" | "select";
+  control: "entity" | "number" | "text" | "boolean" | "select" | "multi_select";
+  role: FieldRole;
+  /** Controller field whose selected entity limits this field's options to what it supports. */
+  narrowed_by?: string | null;
   required: boolean;
   entity_domains?: string[];
-  options: { value: string; label: string; entity_domain?: string | null }[];
+  options: FormFieldOption[];
   default?: string | number | boolean | null;
   minimum?: number | null;
   maximum?: number | null;
+}
+
+/** A tuning parameter as one measure type presents it. Bounds come from `Capabilities.limits`. */
+export interface MeasureParameter {
+  name: string;
+  label: string;
+  hint?: string;
+  step?: string;
+  /** Heading this parameter is grouped under, repeated on each member of the group. */
+  group?: string;
+  /** Only applies while the named parameter is greater than one. */
+  requires_multiple?: string | null;
 }
 
 export interface MeasureDefinition {
   measure_type: MeasureType;
   label: string;
   description: string;
+  icon: string;
   fields: FormField[];
+  parameters: MeasureParameter[];
   supports_profile: boolean;
   supports_resume: boolean;
   confirmation_action?: string | null;
+  confirmation_is_warning?: boolean;
+  /** Placeholders shown in the profile fields, to steer the naming this type expects. */
+  model_id_example: string;
+  product_name_example: string;
 }
 
 export interface BaseMeasurementRequest {
@@ -96,7 +133,7 @@ export interface BaseMeasurementRequest {
   measure_device: string;
   generate_model: boolean;
   parameters: MeasurementParameters;
-  resume_policy: "new" | "resume" | "overwrite";
+  resume_policy: ResumePolicy;
   power_meter: PowerMeterSpec;
   dummy_load?: DummyLoadSpec | null;
 }
@@ -146,17 +183,16 @@ export interface LightMeasurementRequest extends BaseMeasurementRequest {
 export interface AverageMeasurementRequest extends BaseMeasurementRequest { measure_type: "average"; duration: number; }
 export interface RecorderMeasurementRequest extends BaseMeasurementRequest { measure_type: "recorder"; export_filename: string; }
 export interface SpeakerMeasurementRequest extends BaseMeasurementRequest { measure_type: "speaker"; controller: MediaControllerSpec; disable_streaming: boolean; }
-export interface ChargingMeasurementRequest extends BaseMeasurementRequest { measure_type: "charging"; controller: ChargingControllerSpec; charging_device_type: "vacuum_robot" | "lawn_mower_robot"; }
+export interface ChargingMeasurementRequest extends BaseMeasurementRequest { measure_type: "charging"; controller: ChargingControllerSpec; charging_device_type: ChargingDeviceType; }
 export interface FanMeasurementRequest extends BaseMeasurementRequest { measure_type: "fan"; controller: FanControllerSpec; }
 
-export type NonLightMeasurementRequest =
+export type MeasurementRequest =
+  | LightMeasurementRequest
   | AverageMeasurementRequest
   | RecorderMeasurementRequest
   | SpeakerMeasurementRequest
   | ChargingMeasurementRequest
   | FanMeasurementRequest;
-
-export type MeasurementRequest = LightMeasurementRequest | NonLightMeasurementRequest;
 
 export interface PreflightResponse {
   valid: boolean;
@@ -254,9 +290,110 @@ export type SessionEvent = RegularSessionEvent | OperatingPointSessionEvent;
 export interface AppSettings {
   default_power_entity_id: string | null;
   default_measure_device: string | null;
-  power_meter: "hass" | "shelly" | "dummy" | null;
+  power_meter: PowerMeterKind | null;
   shelly_ip: string | null;
+  fast_test_mode: boolean;
   measurement_defaults: AppMeasurementDefaults;
+}
+
+export interface ContributionIdentity {
+  login: string;
+}
+
+export interface ContributionAuthState {
+  connected: boolean;
+  device_flow_available?: boolean;
+  identity?: ContributionIdentity | null;
+  method?: "device" | "token" | null;
+  scopes?: string[];
+  permissions_verified?: boolean;
+}
+
+export interface ContributionDeviceFlow {
+  flow_id: string;
+  user_code: string;
+  verification_uri: string;
+  verification_uri_complete?: string | null;
+  expires_in: number;
+  interval: number;
+}
+
+export interface ContributionAuthDeviceStatus {
+  status: "pending" | "slow_down" | "authorized" | "expired" | "denied";
+  auth?: ContributionAuthState | null;
+  message?: string | null;
+  retry_after?: number | null;
+}
+
+export interface ContributionTokenRequest {
+  token: string;
+}
+
+export interface ContributionDraftFile {
+  path: string;
+  content?: string | null;
+  rendered_json?: unknown;
+}
+
+export interface ContributionDraft {
+  eligible: boolean;
+  reason?: string | null;
+  repository: string;
+  fork_repository?: string | null;
+  base_branch: string;
+  base_sha?: string | null;
+  manufacturer_name: string;
+  manufacturer_directory: string;
+  model_id: string;
+  product_name: string;
+  contributor: string;
+  device_info: Record<string, string | number | boolean | null>;
+  home_assistant: Record<string, string | number | boolean | null>;
+  notes: string;
+  files: ContributionDraftFile[];
+  model_json?: unknown;
+  commit_message: string;
+  pr_title: string;
+  pr_body: string;
+  branch_name: string;
+  job_id?: string | null;
+}
+
+export interface ContributionPreviewRequest {
+  manufacturer_name: string;
+  manufacturer_directory: string;
+  model_id: string;
+  product_name: string;
+  contributor: string;
+  notes: string;
+}
+
+export interface ContributionPreview extends ContributionDraft {
+  warnings: string[];
+}
+
+export interface ContributionSubmitRequest extends ContributionPreviewRequest {
+  confirmed: true;
+}
+
+export interface ContributionResult {
+  status: "success" | "failed" | "pending";
+  message?: string | null;
+  repository?: string | null;
+  branch_name?: string | null;
+  pull_request_url?: string | null;
+}
+
+export type ContributionState = "idle" | "preview_ready" | "submitting" | "submitted" | "failed";
+
+export interface ContributionStatus {
+  state: ContributionState;
+  session_id?: string | null;
+  preview?: ContributionPreview | null;
+  submission_url?: string | null;
+  message?: string | null;
+  error?: string | null;
+  updated_at?: string | null;
 }
 
 export interface ShellyDiscoveryDevice {
@@ -277,6 +414,7 @@ export interface ShellyDiscoveryResponse {
 }
 
 export type DiagnosticStatus = "good" | "warning" | "poor" | "unsupported";
+export type PrecisionStatus = "good" | "poor" | "unsupported";
 
 export interface PowerMeterDiagnostic {
   success: boolean;
@@ -287,7 +425,7 @@ export interface PowerMeterDiagnostic {
   max_report_interval_seconds?: number | null;
   reports_observed: number;
   duration_seconds: number;
-  precision_status: "good" | "poor" | "unsupported";
+  precision_status: PrecisionStatus;
   update_interval_status: DiagnosticStatus;
   messages: string[];
   message?: string | null;

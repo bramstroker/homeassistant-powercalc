@@ -1,142 +1,153 @@
 import type {
   BaseMeasurementRequest,
   Capabilities,
+  EntityDescriptor,
   FormField,
+  FormFieldOption,
+  LutMode,
   MeasureDefinition,
-  MeasureType,
-  NonLightMeasurementRequest,
+  MeasurementParameters,
+  MeasurementRequest,
   PowerMeterSpec,
 } from "./types";
 
-export const LIGHT_TYPE = "light" as const;
+/** A single submitted form value, before it is placed in a request. */
+type FieldValue = string | number | boolean | string[];
 
-/** Entity fields that select the device controller and can be replaced by a dummy controller. */
-export const CONTROLLER_ENTITY_FIELDS: ReadonlySet<string> = new Set([
-  "media_player_entity_id",
-  "charging_entity_id",
-  "fan_entity_id",
-]);
-
-interface MeasurementKindMetadata {
-  icon: string;
-}
-
-export const MEASUREMENT_KINDS: Record<MeasureType, MeasurementKindMetadata> = {
-  light: { icon: "💡" },
-  speaker: { icon: "🔊" },
-  recorder: { icon: "⏺" },
-  average: { icon: "📊" },
-  charging: { icon: "🔋" },
-  fan: { icon: "🌀" },
-};
-
-export function measurementIcon(type: MeasureType): string {
-  return MEASUREMENT_KINDS[type].icon;
-}
-
+/** Fields the device form renders itself; the power meter has its own dedicated section. */
 export function deviceFields(definition: MeasureDefinition): FormField[] {
-  return definition.fields.filter((field) => field.name !== "power_entity_id");
+  return definition.fields.filter((field) => field.role !== "power_meter");
 }
 
-export function requestFieldValue(request: NonLightMeasurementRequest, name: string): string | number | boolean | undefined {
-  switch (request.measure_type) {
-    case "average": return name === "duration" ? request.duration : undefined;
-    case "recorder": return name === "export_filename" ? request.export_filename : undefined;
-    case "speaker": return speakerFieldValue(request, name);
-    case "charging": return chargingFieldValue(request, name);
-    case "fan": return name === "fan_entity_id" ? hassEntityId(request.controller) : undefined;
-  }
+/**
+ * Value a previous run stored for a form field, so the form can be prefilled.
+ * The inverse of the assignment {@link buildMeasurementRequest} performs.
+ */
+export function requestFieldValue(request: MeasurementRequest, field: FormField): FieldValue | undefined {
+  if (field.role === "controller") return controllerEntityId(request);
+  const value = (request as unknown as Record<string, unknown>)[field.name];
+  return isFieldValue(value) ? value : undefined;
 }
 
-function speakerFieldValue(request: Extract<NonLightMeasurementRequest, { measure_type: "speaker" }>, name: string): string | boolean | undefined {
-  if (name === "media_player_entity_id") return hassEntityId(request.controller);
-  return name === "disable_streaming" ? request.disable_streaming : undefined;
+function controllerEntityId(request: MeasurementRequest): string | undefined {
+  const { controller } = request as { controller?: { type: string; entity_id?: string } };
+  return controller?.type === "hass" ? controller.entity_id : undefined;
 }
 
-function chargingFieldValue(request: Extract<NonLightMeasurementRequest, { measure_type: "charging" }>, name: string): string | undefined {
-  if (name === "charging_entity_id") return hassEntityId(request.controller);
-  return name === "charging_device_type" ? request.charging_device_type : undefined;
+function isFieldValue(value: unknown): value is FieldValue {
+  if (Array.isArray(value)) return value.every((entry) => typeof entry === "string");
+  return typeof value === "string" || typeof value === "number" || typeof value === "boolean";
 }
 
-function hassEntityId(controller: { type: string; entity_id?: string }): string | undefined {
-  return controller.type === "hass" ? controller.entity_id : undefined;
+/**
+ * Options a field offers right now. A field can declare that a controller entity narrows
+ * it, in which case only the options that entity reports as supported are offered.
+ */
+export function fieldOptions(field: FormField, selectedEntity?: EntityDescriptor): FormFieldOption[] {
+  const supported = field.narrowed_by ? selectedEntity?.supported_modes : undefined;
+  if (!supported?.length) return field.options;
+  return field.options.filter((option) => supported.includes(option.value as LutMode));
 }
 
+/**
+ * Every parameter that some option claims. A parameter outside this set always applies;
+ * one inside it only applies while the option that claims it is selected.
+ */
+export function gatedParameters(definition: MeasureDefinition): ReadonlySet<string> {
+  return new Set(definition.fields.flatMap((field) => field.options.flatMap((option) => option.enables ?? [])));
+}
+
+/** Measurement parameters the currently selected options activate; the rest stay hidden. */
+export function enabledParameters(field: FormField, selected: readonly string[]): ReadonlySet<string> {
+  return new Set(
+    field.options
+      .filter((option) => selected.includes(option.value))
+      .flatMap((option) => option.enables ?? []),
+  );
+}
+
+/** The field, if any, whose current value constrains this one. */
+export function narrowingField(definition: MeasureDefinition, field: FormField): FormField | undefined {
+  return field.narrowed_by ? definition.fields.find((candidate) => candidate.name === field.narrowed_by) : undefined;
+}
+
+/** Domain an entity field accepts, taken from the option selected in the field that narrows it. */
 export function entityDomain(definition: MeasureDefinition, field: FormField, selectedOption?: string): string | undefined {
-  if (field.name === "charging_entity_id") {
-    const options = definition.fields.find((candidate) => candidate.name === "charging_device_type")?.options ?? [];
-    return options.find((option) => option.value === selectedOption)?.entity_domain ?? undefined;
-  }
+  const source = narrowingField(definition, field);
+  if (source) return source.options.find((option) => option.value === selectedOption)?.entity_domain ?? undefined;
   return field.entity_domains?.[0];
 }
 
 export function entityDomains(definition: MeasureDefinition, values?: FormData): string[] {
   return definition.fields
-    .filter((field) => field.control === "entity" && field.name !== "power_entity_id" && field.name !== "light_entity_id")
+    .filter((field) => field.role === "controller")
     .flatMap((field) => {
-      if (field.name !== "charging_entity_id") return field.entity_domains ?? [];
-      const options = definition.fields.find((candidate) => candidate.name === "charging_device_type")?.options ?? [];
-      if (values) return [entityDomain(definition, field, text(values, "charging_device_type"))];
-      return options.map((option) => option.entity_domain);
+      const source = narrowingField(definition, field);
+      if (!source) return field.entity_domains ?? [];
+      // Without a submitted value every option is still reachable, so offer all their domains.
+      if (values) return [entityDomain(definition, field, text(values, source.name))];
+      return source.options.map((option) => option.entity_domain);
     })
-    .filter((domain): domain is string => Boolean(domain));
+    // Lights already arrive with the startup catalog, so they are never fetched on demand.
+    .filter((domain): domain is string => Boolean(domain) && domain !== "light");
 }
 
-export function buildNonLightRequest(
+/**
+ * Build a request purely from what the server declared about the measure type.
+ *
+ * Every field carries a role: the controller field becomes the discriminated controller
+ * spec, the power meter comes from the client's own configuration, and every other field
+ * sets the request attribute of the same name. Adding a measure type therefore needs no
+ * change here — only a registry entry server-side.
+ */
+export function buildMeasurementRequest(
   definition: MeasureDefinition,
   form: FormData,
   capabilities: Capabilities,
   powerMeter: PowerMeterSpec,
   measureDevice: string,
   dummyController = false,
-): NonLightMeasurementRequest {
-  if (definition.measure_type === LIGHT_TYPE) throw new Error("Light requests use the specialized form");
-
-  const controller = (entityField: string): { type: "dummy" } | { type: "hass"; entity_id: string } =>
-    dummyController ? { type: "dummy" } : { type: "hass", entity_id: text(form, entityField) };
-
-  const parameter = (name: keyof Capabilities["defaults"]): number => {
-    const value = form.get(name);
-    return typeof value === "string" && value !== "" ? Number(value) : capabilities.defaults[name];
-  };
-
+): MeasurementRequest {
   const base: BaseMeasurementRequest = {
     model_id: text(form, "model_id") || "measurement",
     product_name: text(form, "product_name") || definition.label,
     measure_device: measureDevice,
     power_meter: powerMeter,
     generate_model: definition.supports_profile,
-    parameters: {
-      ...capabilities.defaults,
-      sleep_time: parameter("sleep_time"),
-      sample_count: parameter("sample_count"),
-      sleep_time_sample: parameter("sleep_time_sample"),
-      sleep_standby: parameter("sleep_standby"),
-    },
-    resume_policy: "new",
+    parameters: submittedParameters(definition, form, capabilities),
+    // Only a resumable type offers the choice; the rest fall through to a fresh session.
+    resume_policy: (text(form, "resume_policy") || "new") as BaseMeasurementRequest["resume_policy"],
   };
 
-  switch (definition.measure_type) {
-    case "average": return { ...base, measure_type: "average", duration: number(form, "duration") };
-    case "recorder": return { ...base, measure_type: "recorder", export_filename: text(form, "export_filename") };
-    case "speaker": return {
-      ...base,
-      measure_type: "speaker",
-      controller: controller("media_player_entity_id"),
-      disable_streaming: form.has("disable_streaming"),
-    };
-    case "charging": return {
-      ...base,
-      measure_type: "charging",
-      controller: controller("charging_entity_id"),
-      charging_device_type: text(form, "charging_device_type") as "vacuum_robot" | "lawn_mower_robot",
-    };
-    case "fan": return {
-      ...base,
-      measure_type: "fan",
-      controller: controller("fan_entity_id"),
-    };
+  const declared: Record<string, unknown> = {};
+  for (const field of definition.fields) {
+    if (field.role === "power_meter") continue;
+    if (field.role === "controller") {
+      declared.controller = dummyController ? { type: "dummy" } : { type: "hass", entity_id: text(form, field.name) };
+      continue;
+    }
+    declared[field.name] = formValue(form, field);
   }
+
+  // The server validates the assembled payload against its own discriminated model.
+  return { ...base, ...declared, measure_type: definition.measure_type } as MeasurementRequest;
+}
+
+/** The tuning parameters this type declares, taken from the form where the user set one. */
+function submittedParameters(definition: MeasureDefinition, form: FormData, capabilities: Capabilities): MeasurementParameters {
+  const parameters: Record<string, number> = { ...capabilities.defaults };
+  for (const { name } of definition.parameters) {
+    const value = form.get(name);
+    if (typeof value === "string" && value !== "") parameters[name] = Number(value);
+  }
+  return parameters as unknown as MeasurementParameters;
+}
+
+/** Read one submitted field, coerced to the type its declared control produces. */
+function formValue(form: FormData, field: FormField): FieldValue {
+  if (field.control === "boolean") return form.has(field.name);
+  if (field.control === "multi_select") return form.getAll(field.name).map(String);
+  return field.control === "number" ? number(form, field.name) : text(form, field.name);
 }
 
 function text(form: FormData, name: string): string {

@@ -85,6 +85,22 @@ profile_library/acme/manufacturer.json
 !!! important
     Never edit or include `profile_library/library.json`. It is generated automatically.
 
+## Contribute from the Home Assistant app
+
+Completed light, speaker, fan, and charging measurements that generated a valid `model.json` can prepare and open a pull request directly from the result page.
+
+1. Open **Settings → GitHub** in Powercalc Measure.
+2. Connect your GitHub account with the device login, or supply a personal access token with public-repository access.
+3. Return to the completed measurement and select **Create pull request automatically**.
+4. Confirm the manufacturer and model details, then review the exact files, generated JSON, commit message, and pull-request text.
+5. Select **Create pull request** only after the preview is correct.
+
+The app reuses your existing fork or creates one when needed. It then creates a focused branch and commit and opens a pull request against Powercalc. An existing profile with the same manufacturer and model is not replaced automatically; use the manual process when proposing an update.
+
+GitHub credentials are stored in the app's private data so the connection can be configured before measuring and reused. Home Assistant may include that data in app backups. Disconnect the account from Powercalc Measure and revoke the authorization in GitHub when it is no longer needed.
+
+The automatic workflow is optional. Downloading the files and contributing manually always remains available, including when GitHub is not configured or automatic contribution is blocked.
+
 ## Create a pull request with GitHub Desktop
 
 This route does not require command-line Git.
