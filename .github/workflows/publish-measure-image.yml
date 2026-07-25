@@ -95,6 +95,14 @@ jobs:
           persist-credentials: false
       - name: Validate app metadata
         run: ruby utils/measure/home-assistant-app/validate.rb
+      - name: Validate GitHub OAuth app configuration
+        env:
+          POWERCALC_GITHUB_CLIENT_ID: ${{ vars.POWERCALC_GITHUB_CLIENT_ID }}
+        run: |
+          if [[ -z "$POWERCALC_GITHUB_CLIENT_ID" ]]; then
+            echo "Repository variable POWERCALC_GITHUB_CLIENT_ID must contain the public client ID of a GitHub OAuth app with Device Flow enabled" >&2
+            exit 1
+          fi
       - name: Run Home Assistant app linter
         uses: frenck/action-addon-linter@f995494fd84fae6310d23617e66d0e37de4f14eb # v2.21.0
         with:
@@ -143,6 +151,7 @@ jobs:
           arch: ${{ matrix.arch }}
           build-args: |
             FINAL_STAGE=ha-app
+            POWERCALC_GITHUB_CLIENT_ID=${{ vars.POWERCALC_GITHUB_CLIENT_ID }}
           cache-gha-scope: powercalc-measure-app
           container-registry-password: ${{ secrets.GITHUB_TOKEN }}
           context: ./utils/measure

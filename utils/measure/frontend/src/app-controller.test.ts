@@ -9,6 +9,7 @@ const settings = {
   measurement_defaults: measurementDefaults,
 };
 const capabilities = {
+  runtime_version: "v0.2.1:app",
   modes: ["brightness" as const],
   defaults: {
     ...measurementDefaults,

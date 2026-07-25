@@ -127,6 +127,7 @@ class SessionPlots(BaseModel):
 
 
 class CapabilitiesResponse(BaseModel):
+    runtime_version: str
     defaults: dict[str, int | float]
     limits: dict[str, dict[str, int | float]]
     developer_mode: bool = False
@@ -275,7 +276,10 @@ def create_app(
 
         @app.get("/", include_in_schema=False)
         async def index() -> FileResponse:
-            return FileResponse(assets / "index.html")
+            return FileResponse(
+                assets / "index.html",
+                headers={"Cache-Control": "no-store, max-age=0"},
+            )
 
     return app
 
@@ -341,6 +345,7 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
         defaults = MeasurementParameters()
         settings = await run_in_threadpool(context.storage.load_settings)
         return CapabilitiesResponse(
+            runtime_version=measure_version(),
             defaults={name: getattr(defaults, name) for name in PARAMETER_LIMITS}
             | settings.measurement_defaults.model_dump(),
             limits={name: {"min": minimum, "max": maximum} for name, (minimum, maximum) in PARAMETER_LIMITS.items()},
