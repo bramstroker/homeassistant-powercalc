@@ -4,7 +4,7 @@ import type { PowerMeterDiagnostic, SessionEvent } from "./types";
 
 const measurementDefaults = { sleep_time: 1, sample_count: 2, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
 const settings = {
-  default_power_entity_id: null, default_measure_device: null, power_meter: "hass" as const, shelly_ip: null,
+  default_power_entity_id: null, default_measure_device: null, power_meter: "hass" as const, shelly_ip: null, kasa_ip: null,
   fast_test_mode: false,
   measurement_defaults: measurementDefaults,
 };

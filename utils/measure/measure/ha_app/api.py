@@ -58,7 +58,13 @@ from measure.powermeter.const import PowerMeterType
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic, PowerMeterDiagnostics
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.powermeter import PowerMeter
-from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, PowerMeterSpec, ShellyPowerMeterSpec
+from measure.powermeter.spec import (
+    DummyPowerMeterSpec,
+    HassPowerMeterSpec,
+    KasaPowerMeterSpec,
+    PowerMeterSpec,
+    ShellyPowerMeterSpec,
+)
 from measure.request import MeasurementRequest
 from measure.tuning import MeasurementParameters
 from measure.version import measure_version
@@ -651,6 +657,10 @@ def _power_meter_spec(settings: AppPreferences) -> PowerMeterSpec:
         if not settings.shelly_ip:
             raise PowerMeterError("Enter the Shelly IP address first")
         return ShellyPowerMeterSpec(device_ip=settings.shelly_ip)
+    if settings.power_meter == PowerMeterType.KASA:
+        if not settings.kasa_ip:
+            raise PowerMeterError("Enter the Kasa IP address first")
+        return KasaPowerMeterSpec(device_ip=settings.kasa_ip)
     if not settings.default_power_entity_id:
         raise PowerMeterError("Select a power sensor first")
     return HassPowerMeterSpec(entity_id=settings.default_power_entity_id)

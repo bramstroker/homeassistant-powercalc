@@ -180,7 +180,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         .lights=${this.lights} .powers=${this.powers} .voltages=${this.voltages} .deviceEntities=${this.deviceEntities} .deviceEntityErrors=${this.deviceEntityErrors}
         .initialType=${this.pendingType()} .initialRequest=${this.request}
         .dummyLoadCalibration=${this.dummyLoadCalibration}
-        .defaultPowerEntityId=${this.settings?.default_power_entity_id ?? ""} .defaultMeasureDevice=${this.settings?.default_measure_device ?? ""} .powerMeter=${this.settings?.power_meter ?? "hass"} .shellyIp=${this.settings?.shelly_ip ?? ""}
+        .defaultPowerEntityId=${this.settings?.default_power_entity_id ?? ""} .defaultMeasureDevice=${this.settings?.default_measure_device ?? ""} .powerMeter=${this.settings?.power_meter ?? "hass"} .shellyIp=${this.settings?.shelly_ip ?? ""} .kasaIp=${this.settings?.kasa_ip ?? ""}
         .powerMeterConfigured=${this.powerMeterConfigured()}
         .busy=${this.busy} .errorMessage=${this.errorMessage}
         @preflight=${this.runPreflight} @measure-type-selected=${this.measureTypeSelected} @entity-domains-requested=${this.entityDomainsRequested} @open-settings=${this.openSettings}></measure-setup-view>`;
@@ -191,6 +191,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     if (!this.settings.default_measure_device) return false;
     if (this.settings.power_meter === "hass") return Boolean(this.settings.default_power_entity_id);
     if (this.settings.power_meter === "shelly") return Boolean(this.settings.shelly_ip);
+    if (this.settings.power_meter === "kasa") return Boolean(this.settings.kasa_ip);
     return this.settings.power_meter === "dummy";
   }
 

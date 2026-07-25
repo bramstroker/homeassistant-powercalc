@@ -23,9 +23,14 @@ class KasaPowerMeter(PowerMeter):
     async def async_read_power_meter(self) -> tuple[float, float | None]:
         from kasa import Module
 
-        await self._smartplug.update()
-        energy = self._smartplug.modules[Module.Energy]
-        return float(energy.current_consumption), float(energy.voltage)
+        try:
+            await self._smartplug.update()
+            energy = self._smartplug.modules[Module.Energy]
+            return float(energy.current_consumption), float(energy.voltage)
+        finally:
+            # Each reading runs its own event loop, so the device connection must not outlive it.
+            # A stream kept open here would belong to a closed loop on the next reading.
+            await self._smartplug.disconnect()
 
     def has_voltage_support(self) -> bool:
         return True

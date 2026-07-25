@@ -160,7 +160,8 @@ export interface AppMeasurementDefaults {
 export type PowerMeterSpec =
   | { type: "dummy" }
   | { type: "hass"; entity_id: string; voltage_entity_id?: string | null; call_update_entity?: boolean }
-  | { type: "shelly"; device_ip: string; timeout?: number };
+  | { type: "shelly"; device_ip: string; timeout?: number }
+  | { type: "kasa"; device_ip: string };
 
 export type LightControllerSpec =
   | { type: "dummy" }
@@ -292,6 +293,7 @@ export interface AppSettings {
   default_measure_device: string | null;
   power_meter: PowerMeterKind | null;
   shelly_ip: string | null;
+  kasa_ip: string | null;
   fast_test_mode: boolean;
   measurement_defaults: AppMeasurementDefaults;
 }
