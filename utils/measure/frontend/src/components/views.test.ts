@@ -13,6 +13,7 @@ const defaultSettings: AppSettings = {
   measurement_defaults: measurementDefaults,
 };
 const capabilities: Capabilities = {
+  runtime_version: "v0.2.1:app",
   defaults: {
     ...measurementDefaults,
     bri_bri_steps: 1, ct_bri_steps: 5, ct_mired_steps: 10,
@@ -1432,8 +1433,11 @@ describe("app shell device entities", () => {
     };
 
     await (element as unknown as { boot: () => Promise<void> }).boot();
+    document.body.append(element);
+    await element.updateComplete;
 
     expect(requestedDomains).toEqual([]);
+    expect(element.shadowRoot?.querySelector(".version")?.textContent).toBe("Version v0.2.1");
     (element as unknown as { measureTypeSelected: (event: CustomEvent<"fan">) => void })
       .measureTypeSelected(new CustomEvent("measure-type-selected", { detail: "fan" }));
     await vi.waitFor(() => expect(element.deviceEntities.fan).toEqual([{ entity_id: "fan.bedroom", name: "Bedroom fan" }]));

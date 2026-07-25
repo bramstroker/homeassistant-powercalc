@@ -38,6 +38,8 @@ RUN apt-get update && apt-get install -y libgl1 tesseract-ocr && rm -rf /var/lib
 
 FROM ha-app-dependencies AS ha-app
 
+ARG POWERCALC_GITHUB_CLIENT_ID
+
 # Copy only the project inputs needed by the final images. In particular,
 # local credentials, measurement output, tests, and frontend tooling stay out.
 COPY README.md .VERSION ./
@@ -48,6 +50,7 @@ RUN uv sync --locked --extra app
 COPY --from=frontend-build /frontend/dist /app/measure/static
 
 ENV POWERCALC_MEASURE_DATA_ROOT=/data
+ENV POWERCALC_GITHUB_CLIENT_ID=${POWERCALC_GITHUB_CLIENT_ID}
 
 EXPOSE 8099
 
