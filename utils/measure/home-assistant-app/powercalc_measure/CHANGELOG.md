@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.2.0 - 2026-07-25
+
+### 🚀 Features
+
+- #4347 Guide users from measurement results to profile contributions @bramstroker
+- #4369 Implement automatic github PR generation @bramstroker
+- #4372 Add support to use direct TpLink Kasa connection @bramstroker
+
 ## 0.1.2 - 2026-07-18
 
 ### 🐛 Bug Fixes
