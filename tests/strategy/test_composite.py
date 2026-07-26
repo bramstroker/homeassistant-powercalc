@@ -370,6 +370,75 @@ async def test_composite_strategy_from_library_profile(hass: HomeAssistant) -> N
     assert_entity_state(hass, "sensor.test_power", "0.82")
 
 
+async def test_nested_conditions_from_library_profile(hass: HomeAssistant) -> None:
+    """Nested conditions in a library profile must be normalized the same way YAML configuration is.
+
+    A scalar entity_id was iterated character by character, making every condition raise,
+    and a nested condition omitting entity_id did not default to the source entity.
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/4378
+    """
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "fan.test",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("composite_nested"),
+        },
+    )
+
+    await set_states(hass, [("fan.test", STATE_ON, {"oscillating": True, "direction": "reverse"})])
+    assert_entity_state(hass, "sensor.test_power", "20.00")
+
+    await set_states(hass, [("fan.test", STATE_ON, {"oscillating": True, "direction": "forward"})])
+    assert_entity_state(hass, "sensor.test_power", "15.00")
+
+    await set_states(hass, [("fan.test", STATE_ON, {"oscillating": False, "direction": "forward"})])
+    assert_entity_state(hass, "sensor.test_power", "5.00")
+
+
+async def test_nested_condition_omit_entity_id(hass: HomeAssistant) -> None:
+    await set_states(hass, [("media_player.test", STATE_PAUSED, {"source": "HDMI1"})])
+    sensor_config = {
+        CONF_ENTITY_ID: "media_player.test",
+        CONF_COMPOSITE: [
+            {
+                CONF_CONDITION: {
+                    "condition": "and",
+                    "conditions": [
+                        {"condition": "state", "state": STATE_PLAYING},
+                        {"condition": "state", "attribute": "source", "state": "HDMI1"},
+                    ],
+                },
+                CONF_FIXED: {CONF_POWER: 20},
+            },
+            {
+                CONF_FIXED: {CONF_POWER: 2},
+            },
+        ],
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    assert_entity_state(hass, "sensor.test_power", "2.00")
+
+    await set_states(hass, [("media_player.test", STATE_PLAYING, {"source": "HDMI1"})])
+    assert_entity_state(hass, "sensor.test_power", "20.00")
+
+    await set_states(hass, [("media_player.test", STATE_PLAYING, {"source": "HDMI2"})])
+    assert_entity_state(hass, "sensor.test_power", "2.00")
+
+
+async def test_invalid_composite_config_in_profile(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("composite_invalid"),
+        },
+    )
+
+    assert not hass.states.get("sensor.test_power")
+
+
 async def test_composite_mode_sum(hass: HomeAssistant) -> None:
     await set_states(hass, [("sensor.test", 50)])
     sensor_config = {

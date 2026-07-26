@@ -7,7 +7,7 @@ from enum import StrEnum
 import logging
 from typing import Any
 
-from homeassistant.const import CONF_ATTRIBUTE, CONF_CONDITION, CONF_ENTITY_ID, STATE_OFF
+from homeassistant.const import CONF_ATTRIBUTE, CONF_CONDITION, CONF_CONDITIONS, CONF_ENTITY_ID, STATE_OFF
 from homeassistant.core import HomeAssistant, State
 from homeassistant.exceptions import ConditionError
 from homeassistant.helpers.condition import ConditionCheckerType
@@ -41,14 +41,52 @@ class CompositeMode(StrEnum):
     SUM_ALL = "sum_all"
 
 
+class ConditionType(StrEnum):
+    """Condition types supported by the composite strategy.
+
+    Home Assistant has no constants for these, it uses string literals itself.
+    """
+
+    AND = "and"
+    DEVICE = "device"
+    NOT = "not"
+    NUMERIC_STATE = "numeric_state"
+    OR = "or"
+    STATE = "state"
+    TEMPLATE = "template"
+
+
+COMPOUND_CONDITIONS = (ConditionType.AND, ConditionType.OR, ConditionType.NOT)
+ENTITY_CONDITIONS = (ConditionType.STATE, ConditionType.NUMERIC_STATE)
+
 DEFAULT_MODE = CompositeMode.STOP_AT_FIRST
 
 
 def make_entity_id_optional(schema: vol.Schema) -> vol.Schema:
     """Make entity_id optional in schema."""
-    schema = schema.schema
-    schema[vol.Optional(CONF_ENTITY_ID)] = schema.pop(vol.Required(CONF_ENTITY_ID))  # type: ignore[index, attr-defined]
-    return vol.Schema(schema)
+    # Copy, the schemas we get passed here are module level globals of Home Assistant itself
+    schema_dict = dict(schema.schema)
+    schema_dict[vol.Optional(CONF_ENTITY_ID)] = schema_dict.pop(vol.Required(CONF_ENTITY_ID))
+    return vol.Schema(schema_dict)
+
+
+def get_compound_schema(condition_type: ConditionType) -> vol.Schema:
+    """Return the schema for and/or/not conditions.
+
+    Home Assistant's own compound schemas recurse into `cv.CONDITION_SCHEMA`, which requires entity_id.
+    We recurse into our own schema instead, so entity_id stays optional at any nesting level
+    and can be defaulted to the source entity.
+    """
+    return vol.Schema(
+        {
+            **cv.CONDITION_BASE_SCHEMA,
+            vol.Required(CONF_CONDITION): condition_type.value,
+            vol.Required(CONF_CONDITIONS): vol.All(
+                cv.ensure_list,
+                [lambda value: CONDITION_SCHEMA(value)],
+            ),
+        },
+    )
 
 
 def get_numeric_state_schema() -> vol.Schema:
@@ -86,13 +124,13 @@ CONDITION_SCHEMA: vol.Schema = vol.Schema(
             cv.key_value_schemas(
                 CONF_CONDITION,
                 {
-                    "and": cv.AND_CONDITION_SCHEMA,
-                    "device": cv.DEVICE_CONDITION_SCHEMA,
-                    "not": cv.NOT_CONDITION_SCHEMA,
-                    "numeric_state": get_numeric_state_schema(),
-                    "or": cv.OR_CONDITION_SCHEMA,
-                    "state": get_state_schema,
-                    "template": cv.TEMPLATE_CONDITION_SCHEMA,
+                    ConditionType.AND: get_compound_schema(ConditionType.AND),
+                    ConditionType.DEVICE: cv.DEVICE_CONDITION_SCHEMA,
+                    ConditionType.NOT: get_compound_schema(ConditionType.NOT),
+                    ConditionType.NUMERIC_STATE: get_numeric_state_schema(),
+                    ConditionType.OR: get_compound_schema(ConditionType.OR),
+                    ConditionType.STATE: get_state_schema,
+                    ConditionType.TEMPLATE: cv.TEMPLATE_CONDITION_SCHEMA,
                 },
             ),
         ),

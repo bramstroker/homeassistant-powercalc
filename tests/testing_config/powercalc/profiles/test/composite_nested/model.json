@@ -1,0 +1,56 @@
+{
+  "calculation_strategy": "composite",
+  "composite_config": [
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "attribute": "oscillating",
+            "condition": "state",
+            "entity_id": "fan.test",
+            "state": true
+          },
+          {
+            "condition": "state",
+            "attribute": "direction",
+            "state": "reverse"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 20
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "attribute": "oscillating",
+            "condition": "state",
+            "entity_id": "fan.test",
+            "state": true
+          },
+          {
+            "condition": "state",
+            "attribute": "direction",
+            "state": "forward"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 15
+      }
+    },
+    {
+      "fixed": {
+        "power": 5
+      }
+    }
+  ],
+  "device_type": "fan",
+  "measure_device": "Test fan",
+  "measure_method": "manual",
+  "name": "Test fan"
+}
