@@ -577,6 +577,20 @@
       }
     }
   },
+  "exceptions": {
+    "invalid_integration_method": {
+      "message": "Metodo di integrazione non valido \"{method}\". Deve essere uno tra: {allowed_methods}."
+    },
+    "no_sub_profile_support": {
+      "message": "{entity_id} non supporta il cambio di sottoprofili. Questa azione è disponibile solo per i sensori che hanno sottoprofili e senza selezione automatica del sottoprofilo."
+    },
+    "not_a_playbook_sensor": {
+      "message": "{entity_id} non è un sensore con playbook. Questa azione è disponibile solo per i sensori che usano la strategia playbook."
+    },
+    "unknown_sub_profile": {
+      "message": "\"{profile}\" non è un sottoprofilo conosciuto. Sottoprofili disponibili: {known_profiles}."
+    }
+  },
   "issues": {
     "composite_device_id": {
       "fix_flow": {

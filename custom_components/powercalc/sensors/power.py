@@ -31,7 +31,7 @@ from homeassistant.core import (
     State,
     callback,
 )
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import issue_registry as ir, start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
@@ -828,7 +828,11 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         """Ensure we are dealing with a playbook sensor."""
         assert self._strategy_instance is not None
         if not isinstance(self._strategy_instance, PlaybookStrategy):
-            raise HomeAssistantError("supported only playbook enabled sensors")
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="not_a_playbook_sensor",
+                translation_placeholders={"entity_id": self.entity_id},
+            )
         return self._strategy_instance
 
     async def async_will_remove_from_hass(self) -> None:
@@ -847,13 +851,22 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             or not await self._power_profile.has_sub_profiles
             or self._power_profile.sub_profile_select
         ):
-            raise HomeAssistantError(
-                "This is only supported for sensors having sub profiles, and no automatic profile selection",
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="no_sub_profile_support",
+                translation_placeholders={"entity_id": self.entity_id},
             )
 
         known_profiles = [profile[0] for profile in await self._power_profile.get_sub_profiles()]
         if profile not in known_profiles:
-            raise HomeAssistantError(f"{profile} is not a possible sub profile")
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="unknown_sub_profile",
+                translation_placeholders={
+                    "profile": profile,
+                    "known_profiles": ", ".join(known_profiles),
+                },
+            )
 
         await self._select_new_sub_profile(profile)
 

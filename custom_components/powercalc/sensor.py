@@ -112,6 +112,10 @@ _LOGGER = logging.getLogger(__name__)
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
+# Powercalc sensors are calculated from state changes and never poll, so updates
+# don't have to be serialized.
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_platform(
     hass: HomeAssistant,

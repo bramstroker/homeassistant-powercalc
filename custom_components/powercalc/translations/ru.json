@@ -577,6 +577,20 @@
       }
     }
   },
+  "exceptions": {
+    "invalid_integration_method": {
+      "message": "Недопустимый метод интегрирования «{method}». Допустимые значения: {allowed_methods}."
+    },
+    "no_sub_profile_support": {
+      "message": "{entity_id} не поддерживает переключение подпрофилей. Это действие доступно только для сенсоров с подпрофилями и без автоматического выбора подпрофиля."
+    },
+    "not_a_playbook_sensor": {
+      "message": "{entity_id} не является сенсором с плейбуком. Это действие доступно только для сенсоров, использующих стратегию playbook."
+    },
+    "unknown_sub_profile": {
+      "message": "«{profile}» не является известным подпрофилем. Доступные подпрофили: {known_profiles}."
+    }
+  },
   "issues": {
     "composite_device_id": {
       "fix_flow": {
