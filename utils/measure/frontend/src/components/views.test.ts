@@ -1354,8 +1354,8 @@ describe("settings view", () => {
     expect((element.shadowRoot.querySelector(".github-link") as HTMLAnchorElement).href).toBe("https://github.com/login/device");
 
     [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Copy code"))?.click();
-    await element.updateComplete;
-    expect(element.shadowRoot.textContent).toContain("Select the code and copy it manually");
+    await vi.waitFor(() => expect(element.shadowRoot.textContent).toContain("Select the code and copy it manually"));
+    expect(element.shadowRoot.textContent).not.toContain("Code copied.");
 
     element.contributionDeviceStatus = { status: "expired", message: "This code expired." };
     await element.updateComplete;
@@ -1374,6 +1374,56 @@ describe("settings view", () => {
     const disconnected = new Promise<void>((resolve) => element.addEventListener("github-disconnect", () => resolve()));
     (element.shadowRoot.querySelector("button.danger") as HTMLButtonElement).click();
     await disconnected;
+  });
+
+  it("copies the device code through execCommand when the clipboard API is unavailable", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      settings: AppSettings;
+      contributionAuth: { connected: boolean };
+      contributionDeviceFlow: { flow_id: string; user_code: string; verification_uri: string; expires_in: number; interval: number };
+      initialSection: SettingsSection;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.settings = defaultSettings;
+    element.contributionAuth = { connected: false };
+    element.initialSection = "github";
+    element.contributionDeviceFlow = {
+      flow_id: "flow-1",
+      user_code: "BA41-1016",
+      verification_uri: "https://github.com/login/device",
+      expires_in: 900,
+      interval: 5,
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    // Insecure context: navigator.clipboard is not exposed at all, as inside the http ingress panel.
+    const clipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+    Object.defineProperty(navigator, "clipboard", { value: undefined, configurable: true });
+    let copied = "";
+    const execCommand = vi.fn(() => {
+      copied = document.querySelector("textarea")?.value ?? "";
+      return true;
+    });
+    Object.defineProperty(document, "execCommand", { value: execCommand, configurable: true });
+
+    const copyButton = [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Copy code"));
+    copyButton?.click();
+    await vi.waitFor(() => expect(element.shadowRoot.textContent).toContain("Code copied."));
+    expect(execCommand).toHaveBeenCalledWith("copy");
+    expect(copied).toBe("BA41-1016");
+    expect(document.querySelector("textarea")).toBeNull();
+
+    // A rejecting clipboard API (blocked by permissions policy or an unfocused document) also falls back.
+    const writeText = vi.fn().mockRejectedValue(new DOMException("Write permission denied.", "NotAllowedError"));
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    execCommand.mockClear();
+    copyButton?.click();
+    await vi.waitFor(() => expect(execCommand).toHaveBeenCalledWith("copy"));
+    expect(writeText).toHaveBeenCalledWith("BA41-1016");
+
+    if (clipboard) Object.defineProperty(navigator, "clipboard", clipboard);
   });
 
   it("opens directly on the GitHub section when a section is requested", async () => {
