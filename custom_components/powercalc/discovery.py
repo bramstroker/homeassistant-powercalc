@@ -483,7 +483,7 @@ class DiscoveryManager:
         source_entity: SourceEntity,
         log_identifier: str,
         power_profiles: list[PowerProfile] | None,
-        extra_discovery_data: dict | None,
+        extra_discovery_data: dict[str, Any] | None,
     ) -> None:
         """Dispatch the discovery flow for a given entity."""
 
@@ -566,7 +566,7 @@ class DiscoveryManager:
 
         return entities
 
-    def _find_entity_ids_in_yaml_config(self, search_dict: dict) -> list[str]:
+    def _find_entity_ids_in_yaml_config(self, search_dict: ConfigType) -> list[str]:
         """Takes a dict with nested lists and dicts,
         and searches all dicts for a key of the field
         provided.
@@ -575,7 +575,7 @@ class DiscoveryManager:
         self._extract_entity_ids(search_dict, found_entity_ids)
         return found_entity_ids
 
-    def _extract_entity_ids(self, search_dict: dict, found_entity_ids: list[str]) -> None:
+    def _extract_entity_ids(self, search_dict: ConfigType, found_entity_ids: list[str]) -> None:
         """Helper function to recursively extract entity IDs."""
         for key, value in search_dict.items():
             if key == CONF_ENTITY_ID:
@@ -585,7 +585,7 @@ class DiscoveryManager:
             elif isinstance(value, list):
                 self._process_list_items(value, found_entity_ids)
 
-    def _process_list_items(self, items: list, found_entity_ids: list[str]) -> None:
+    def _process_list_items(self, items: list[Any], found_entity_ids: list[str]) -> None:
         """Helper function to process list items."""
         for item in items:
             if isinstance(item, dict):

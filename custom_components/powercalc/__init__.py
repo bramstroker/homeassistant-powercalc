@@ -408,7 +408,7 @@ async def setup_yaml_sensors(
     config: ConfigType,
     domain_config: ConfigType,
 ) -> None:
-    sensors: list = domain_config.get(CONF_SENSORS, [])
+    sensors: list[ConfigType] = domain_config.get(CONF_SENSORS, [])
     primary_sensors = []
     secondary_sensors = []
 

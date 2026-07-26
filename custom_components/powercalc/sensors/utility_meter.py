@@ -44,7 +44,7 @@ GENERAL_TARIFF = "general"
 def create_utility_meters(
     hass: HomeAssistant,
     energy_sensor: EnergySensor,
-    sensor_config: dict,
+    sensor_config: ConfigType,
     config_entry: ConfigEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create the utility meters."""
@@ -101,7 +101,7 @@ def should_create_utility_meter(
 def create_meters_for_type(
     hass: HomeAssistant,
     energy_sensor: EnergySensor,
-    sensor_config: dict,
+    sensor_config: ConfigType,
     config_entry: ConfigEntry | None,
     unique_id: str | None,
     meter_type: str,
@@ -153,7 +153,7 @@ def create_tariff_meters(
     energy_sensor: EnergySensor,
     entity_id: str,
     name: str,
-    sensor_config: dict,
+    sensor_config: ConfigType,
     config_entry: ConfigEntry | None,
     meter_type: str,
     unique_id: str | None,
@@ -183,7 +183,7 @@ def create_tariff_meters(
 
 def create_tariff_select(
     config_entry: ConfigEntry | None,
-    tariffs: list,
+    tariffs: list[str],
     hass: HomeAssistant,
     name: str,
     unique_id: str | None,
@@ -220,7 +220,7 @@ def create_utility_meter(
     source_entity: str,
     entity_id: str,
     name: str,
-    sensor_config: dict,
+    sensor_config: ConfigType,
     meter_type: str,
     unique_id: str | None = None,
     tariff: str | None = None,

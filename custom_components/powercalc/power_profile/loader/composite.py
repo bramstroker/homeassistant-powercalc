@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from custom_components.powercalc.power_profile.loader.protocol import Loader
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy
@@ -53,7 +54,7 @@ class CompositeLoader(Loader):
             for model in await loader.get_model_listing(manufacturer, device_types, discovery_by)
         }
 
-    async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
+    async def load_model(self, manufacturer: str, model: str) -> tuple[dict[str, Any], str] | None:
         for loader in self.loaders:
             result = await loader.load_model(manufacturer, model)
             if result:

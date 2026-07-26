@@ -14,6 +14,7 @@ from homeassistant.helpers.condition import ConditionCheckerType
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
+from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
 from custom_components.powercalc.const import (
@@ -272,7 +273,7 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
 
     def resolve_track_templates_from_condition(
         self,
-        condition_config: dict,
+        condition_config: ConfigType,
         templates: list[str | TrackTemplate],
     ) -> None:
         """Resolve track templates from condition config."""
@@ -289,6 +290,6 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
 
 @dataclass
 class SubStrategy:
-    condition_config: dict | None
+    condition_config: ConfigType | None
     condition: ConditionCheckerType | None
     strategy: PowerCalculationStrategyInterface

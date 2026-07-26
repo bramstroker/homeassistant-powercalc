@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from inspect import isawaitable
 import logging
 from typing import Any
@@ -107,7 +107,7 @@ MENU_OPTIONS = [
 ]
 
 # Order matters: async_step() delegates to the first handler that defines the requested step.
-FLOW_HANDLERS: dict[FlowType, dict] = {
+FLOW_HANDLERS: dict[FlowType, dict[str, type[Any]]] = {
     FlowType.GLOBAL_CONFIGURATION: {
         "config": GlobalConfigurationConfigFlow,
         "options": GlobalConfigurationOptionsFlow,
@@ -179,7 +179,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     def persist_config_entry(self) -> ConfigFlowResult:
         pass  # pragma: no cover
 
-    def _async_step(self, step: Step) -> Callable:
+    def _async_step(self, step: Step) -> Callable[[dict[str, Any] | None], Awaitable[ConfigFlowResult]]:
         """Generate a step handler."""
 
         async def _async_step(

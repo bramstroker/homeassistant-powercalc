@@ -80,7 +80,7 @@ class PowerCalculatorStrategyFactory:
 
     async def create(
         self,
-        config: dict,
+        config: ConfigType,
         strategy: str,
         power_profile: PowerProfile | None,
         source_entity: SourceEntity,
@@ -116,7 +116,7 @@ class PowerCalculatorStrategyFactory:
     def _create_linear(
         self,
         source_entity: SourceEntity,
-        config: dict,
+        config: ConfigType,
         power_profile: PowerProfile | None,
     ) -> LinearStrategy:
         """Create the linear strategy."""
@@ -132,7 +132,7 @@ class PowerCalculatorStrategyFactory:
     def _create_fixed(
         self,
         source_entity: SourceEntity,
-        config: dict,
+        config: ConfigType,
         power_profile: PowerProfile | None,
     ) -> FixedStrategy:
         """Create the fixed strategy."""
@@ -165,7 +165,7 @@ class PowerCalculatorStrategyFactory:
 
         return LutStrategy(source_entity, self._lut_registry, power_profile)
 
-    def _create_wled(self, source_entity: SourceEntity, config: dict) -> WledStrategy:
+    def _create_wled(self, source_entity: SourceEntity, config: ConfigType) -> WledStrategy:
         """Create the WLED strategy."""
         wled_config = self._get_strategy_config(CalculationStrategy.WLED, config, None)
         return WledStrategy(
@@ -190,7 +190,7 @@ class PowerCalculatorStrategyFactory:
         source_entity: SourceEntity,
         power_profile: PowerProfile | None,
     ) -> CompositeStrategy:
-        composite_config: list | dict | None = config.get(CONF_COMPOSITE)
+        composite_config: list[ConfigType] | ConfigType | None = config.get(CONF_COMPOSITE)
         if composite_config is None:
             if power_profile and power_profile.composite_config:
                 composite_config = self._validate_composite_config(power_profile.composite_config)
@@ -231,7 +231,7 @@ class PowerCalculatorStrategyFactory:
         return CompositeStrategy(self._hass, strategies, mode)
 
     @staticmethod
-    def _validate_composite_config(composite_config: list | dict) -> list | dict:
+    def _validate_composite_config(composite_config: list[ConfigType] | ConfigType) -> list[ConfigType] | ConfigType:
         """Validate the composite configuration of a library profile.
 
         Configuration from YAML and the config flow is already validated by the sensor schema.
@@ -239,7 +239,7 @@ class PowerCalculatorStrategyFactory:
         for example entity_id to a list and value_template to a Template instance.
         """
         try:
-            return cast(list | dict, COMPOSITE_SCHEMA(composite_config))
+            return cast(list[ConfigType] | ConfigType, COMPOSITE_SCHEMA(composite_config))
         except vol.Invalid as err:
             raise StrategyConfigurationError(f"Invalid composite configuration in profile: {err}") from err
 

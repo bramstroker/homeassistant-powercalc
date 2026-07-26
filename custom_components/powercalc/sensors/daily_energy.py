@@ -125,10 +125,10 @@ def create_daily_fixed_energy_sensor(
 
 async def create_daily_fixed_energy_power_sensor(
     hass: HomeAssistant,
-    sensor_config: dict,
+    sensor_config: ConfigType,
     source_entity: SourceEntity,
 ) -> VirtualPowerSensor | None:
-    mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
+    mode_config: ConfigType = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
 
     if mode_config.get(CONF_ON_TIME) != timedelta(days=1):
         return None
