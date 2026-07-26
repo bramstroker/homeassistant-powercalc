@@ -108,6 +108,11 @@ library = [
     "jsonschema>=4.0",
     "pytablewriter==1.2.1",
 ]
+profile-library = [
+    "aiofiles>=25.1.0",
+    "gitpython>=3.1.57",
+    "httpx>=0.28.1",
+]
 dev = [
     "prek",
     "ruff>=0.15.0",

@@ -227,7 +227,7 @@ class MeasureUtil:
         return self._read_power(ignore_zero=True)
 
     def _sleep_before_next_average_reading(self, start_time: float, duration: int) -> bool:
-        if not ((time.time() - start_time + self.config.sleep_time) < duration):
+        if (time.time() - start_time + self.config.sleep_time) >= duration:
             return False
         self._wait(self.config.sleep_time)
         return True

@@ -409,33 +409,50 @@ export class MeasureAppController {
     }
     try {
       const status = await this.api().getContributionDeviceAuth(flowId);
-      if (version !== this.contributionDeviceFlowVersion || flowId !== this.state.contributionDeviceFlow?.flow_id) return;
-      this.state.contributionDeviceStatus = status;
-      if (status.auth) this.state.contributionAuth = status.auth;
-      this.state.contributionAuthError = "";
-      if (status.status === "authorized") {
-        this.state.contributionDeviceFlow = undefined;
-        this.stopContributionDevicePolling();
-        this.changed();
-      } else if (status.status === "pending" || status.status === "slow_down") {
-        if (status.status === "slow_down") {
-          this.contributionDevicePollInterval = validRetryAfter(status.retry_after)
-            ? Math.max(this.contributionDevicePollInterval, status.retry_after)
-            : this.contributionDevicePollInterval + 5;
-        }
-        this.scheduleContributionDevicePoll(version);
-      }
+      if (this.isStaleContributionDevicePoll(version, flowId)) return;
+      this.applyContributionDeviceStatus(status, version);
     } catch (error) {
-      if (version !== this.contributionDeviceFlowVersion || flowId !== this.state.contributionDeviceFlow?.flow_id) return;
-      if (error instanceof ApiError && error.status === 404) {
-        this.expireContributionDeviceFlow();
-        return;
-      }
-      this.state.contributionAuthError = message(error);
-      this.scheduleContributionDevicePoll(version);
+      if (this.isStaleContributionDevicePoll(version, flowId)) return;
+      this.handleContributionDevicePollError(error, version);
     } finally {
       if (version === this.contributionDeviceFlowVersion) this.changed();
     }
+  }
+
+  /** A poll result is stale when the flow was restarted or replaced while the request was in flight. */
+  private isStaleContributionDevicePoll(version: number, flowId: string): boolean {
+    return version !== this.contributionDeviceFlowVersion || flowId !== this.state.contributionDeviceFlow?.flow_id;
+  }
+
+  private applyContributionDeviceStatus(status: ContributionAuthDeviceStatus, version: number): void {
+    this.state.contributionDeviceStatus = status;
+    if (status.auth) this.state.contributionAuth = status.auth;
+    this.state.contributionAuthError = "";
+
+    if (status.status === "authorized") {
+      this.state.contributionDeviceFlow = undefined;
+      this.stopContributionDevicePolling();
+      this.changed();
+      return;
+    }
+
+    if (status.status !== "pending" && status.status !== "slow_down") return;
+
+    if (status.status === "slow_down") {
+      this.contributionDevicePollInterval = validRetryAfter(status.retry_after)
+        ? Math.max(this.contributionDevicePollInterval, status.retry_after)
+        : this.contributionDevicePollInterval + 5;
+    }
+    this.scheduleContributionDevicePoll(version);
+  }
+
+  private handleContributionDevicePollError(error: unknown, version: number): void {
+    if (error instanceof ApiError && error.status === 404) {
+      this.expireContributionDeviceFlow();
+      return;
+    }
+    this.state.contributionAuthError = message(error);
+    this.scheduleContributionDevicePoll(version);
   }
 
   private scheduleContributionDevicePoll(version: number): void {

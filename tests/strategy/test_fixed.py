@@ -141,22 +141,22 @@ async def test_states_power_with_attributes(hass: HomeAssistant) -> None:
 
 
 async def test_validation_error_when_no_power_supplied(hass: HomeAssistant) -> None:
+    strategy = FixedStrategy(
+        power=None,
+        per_state_power=None,
+        source_entity=create_source_entity("media_player.test", hass),
+    )
     with pytest.raises(StrategyConfigurationError):
-        strategy = FixedStrategy(
-            power=None,
-            per_state_power=None,
-            source_entity=create_source_entity("media_player.test", hass),
-        )
         await strategy.validate_config()
 
 
 async def test_validation_error_state_power_only_entity_domain(hass: HomeAssistant) -> None:
+    strategy = FixedStrategy(
+        power=20,
+        per_state_power=None,
+        source_entity=create_source_entity("vacuum.test", hass),
+    )
     with pytest.raises(StrategyConfigurationError):
-        strategy = FixedStrategy(
-            power=20,
-            per_state_power=None,
-            source_entity=create_source_entity("vacuum.test", hass),
-        )
         await strategy.validate_config()
 
 

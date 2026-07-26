@@ -123,16 +123,16 @@ def test_service_preserves_logger_configuration_and_redacts_failure(tmp_path: Pa
         assert logger.level == logging.WARNING
         raise RuntimeError("Authorization: Bearer secret-token")
 
+    request = MagicMock()
+    session_control = SessionControl()
+    execution_context = SessionExecutionContext(session_id="failed-session", artifact_directory=tmp_path)
+
     try:
         with (
             patch.object(service, "_run", side_effect=fail),
             pytest.raises(RuntimeError, match=r"Authorization: Bearer \[REDACTED\]"),
         ):
-            service.run(
-                MagicMock(),
-                SessionControl(),
-                SessionExecutionContext(session_id="failed-session", artifact_directory=tmp_path),
-            )
+            service.run(request, session_control, execution_context)
 
         assert logger.level == logging.WARNING
         assert logger.handlers == previous_handlers

@@ -84,7 +84,7 @@ jobs:
         env:
           VERSION: ${{ steps.draft.outputs.version }}
         run: >-
-          uv run python prepare_app_release.py "$VERSION"
+          uv run --locked python prepare_app_release.py "$VERSION"
           --notes-file "$RUNNER_TEMP/measure-release-notes.md"
           --dry-run
       - name: Check out release branch
@@ -100,13 +100,13 @@ jobs:
         env:
           VERSION: ${{ steps.draft.outputs.version }}
         run: >-
-          uv run python prepare_app_release.py "$VERSION"
+          uv run --locked python prepare_app_release.py "$VERSION"
           --notes-file "$RUNNER_TEMP/measure-release-notes.md"
       - name: Validate prepared release files
         if: ${{ !inputs.dry_run }}
         working-directory: utils/measure
         run: |
-          uv run --extra dev --extra cli pytest -qq tests/test_prepare_app_release.py
+          uv run --locked --extra dev --extra cli pytest -qq tests/test_prepare_app_release.py
           ruby home-assistant-app/validate.rb
       - name: Commit and push release branch
         if: ${{ !inputs.dry_run }}

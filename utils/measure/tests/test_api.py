@@ -898,11 +898,13 @@ def test_contribution_pat_rejects_reported_insufficient_scope(tmp_path: Path) ->
         scopes=("read:user",),
         scopes_reported=True,
     )
+    service = SharedContributionService(tmp_path)
+    token = SecretStr("github_pat_test")
     with (
         patch("measure.ha_app.contribution.service.GitHubClient", return_value=github),
         pytest.raises(ContributionApiError, match="must grant public repository and workflow access"),
     ):
-        SharedContributionService(tmp_path).connect_pat(SecretStr("github_pat_test"))
+        service.connect_pat(token)
 
 
 def test_contribution_device_flow_records_granted_scopes_without_claiming_verified(tmp_path: Path) -> None:

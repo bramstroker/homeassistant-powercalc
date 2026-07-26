@@ -193,45 +193,55 @@ class LibraryFlow:
         if not self.flow.selected_profile:
             return self.flow.async_abort(reason="model_not_supported")  # pragma: no cover
 
-        if Step.LIBRARY_CUSTOM_FIELDS not in self.flow.handled_steps and self.flow.selected_profile.has_custom_fields:
+        profile_step = await self._async_next_profile_step(self.flow.selected_profile)
+        if profile_step:
+            return profile_step
+
+        strategy_step = await self._async_next_strategy_step(self.flow.selected_profile)
+        if strategy_step:
+            return strategy_step
+
+        return await self.flow.flow_handlers[FlowType.GROUP].async_step_assign_groups()  # type: ignore[no-any-return]
+
+    async def _async_next_profile_step(self, profile: PowerProfile) -> ConfigFlowResult | None:
+        """Return the next step needed to complete the profile itself, or None when nothing is left to ask."""
+        handled_steps = self.flow.handled_steps
+
+        if Step.LIBRARY_CUSTOM_FIELDS not in handled_steps and profile.has_custom_fields:
             return await self.async_step_library_custom_fields()
 
-        if (
-            Step.AVAILABILITY_ENTITY not in self.flow.handled_steps
-            and self.flow.selected_profile.discovery_by == DiscoveryBy.DEVICE
-        ):
+        if Step.AVAILABILITY_ENTITY not in handled_steps and profile.discovery_by == DiscoveryBy.DEVICE:
             result = await self.async_step_availability_entity()
             if result:
                 return result
 
-        if (
-            Step.SUB_PROFILE not in self.flow.handled_steps
-            and await self.flow.selected_profile.requires_manual_sub_profile_selection
-        ):
+        if Step.SUB_PROFILE not in handled_steps and await profile.requires_manual_sub_profile_selection:
             return await self.async_step_sub_profile()
 
+        return None
+
+    async def _async_next_strategy_step(self, profile: PowerProfile) -> ConfigFlowResult | None:
+        """Return the next step needed to configure the calculation strategy, or None when nothing is left to ask."""
+        handled_steps = self.flow.handled_steps
+        virtual_power_flow = self.flow.flow_handlers[FlowType.VIRTUAL_POWER]
+
         if (
-            Step.SMART_SWITCH not in self.flow.handled_steps
-            and self.flow.selected_profile.device_type == DeviceType.SMART_SWITCH
-            and self.flow.selected_profile.calculation_strategy == CalculationStrategy.FIXED
+            Step.SMART_SWITCH not in handled_steps
+            and profile.device_type == DeviceType.SMART_SWITCH
+            and profile.calculation_strategy == CalculationStrategy.FIXED
         ):
             return await self.async_step_smart_switch()
 
-        if (
-            Step.FIXED not in self.flow.handled_steps and self.flow.selected_profile.needs_fixed_config
-        ):  # pragma: no cover
-            return await self.flow.flow_handlers[FlowType.VIRTUAL_POWER].async_step_fixed()  # type: ignore[no-any-return]
+        if Step.FIXED not in handled_steps and profile.needs_fixed_config:  # pragma: no cover
+            return await virtual_power_flow.async_step_fixed()  # type: ignore[no-any-return]
 
-        if Step.LINEAR not in self.flow.handled_steps and self.flow.selected_profile.needs_linear_config:
-            return await self.flow.flow_handlers[FlowType.VIRTUAL_POWER].async_step_linear()  # type: ignore[no-any-return]
+        if Step.LINEAR not in handled_steps and profile.needs_linear_config:
+            return await virtual_power_flow.async_step_linear()  # type: ignore[no-any-return]
 
-        if (
-            Step.MULTI_SWITCH not in self.flow.handled_steps
-            and self.flow.selected_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH
-        ):
-            return await self.flow.flow_handlers[FlowType.VIRTUAL_POWER].async_step_multi_switch()  # type: ignore[no-any-return]
+        if Step.MULTI_SWITCH not in handled_steps and profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
+            return await virtual_power_flow.async_step_multi_switch()  # type: ignore[no-any-return]
 
-        return await self.flow.flow_handlers[FlowType.GROUP].async_step_assign_groups()  # type: ignore[no-any-return]
+        return None
 
     async def async_step_library_custom_fields(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the flow for custom fields."""

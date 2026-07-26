@@ -254,21 +254,18 @@ def test_matcher_model_id_no_device_entry() -> None:
 def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
     hass: HomeAssistant,
 ) -> None:
-    with pytest.raises(PowercalcSetupError):
-        power_profile = PowerProfile(
-            hass,
-            manufacturer="Foo",
-            model="Bar",
-            directory="",
-            json_data={
-                "sub_profile_select": {
-                    "matchers": [{"type": "invalid_type"}],
-                    "default": "henkie",
-                },
+    power_profile = PowerProfile(
+        hass,
+        manufacturer="Foo",
+        model="Bar",
+        directory="",
+        json_data={
+            "sub_profile_select": {
+                "matchers": [{"type": "invalid_type"}],
+                "default": "henkie",
             },
-        )
-        SubProfileSelector(
-            hass,
-            power_profile.sub_profile_select,
-            SourceEntity(entity_id="light.test", domain="light", object_id="test"),
-        )
+        },
+    )
+    source_entity = SourceEntity(entity_id="light.test", domain="light", object_id="test")
+    with pytest.raises(PowercalcSetupError):
+        SubProfileSelector(hass, power_profile.sub_profile_select, source_entity)

@@ -13,9 +13,9 @@ class MyStromPowerMeter(PowerMeter):
         self._device_ip = device_ip
 
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
-        """Get a new power reading from the MyStrom device. Optionally include voltage (FIXME: not yet implemented)."""
+        """Get a new power reading from the MyStrom device. Voltage readings are not supported."""
         if include_voltage:
-            # FIXME: Not yet implemented # noqa: FIX001
+            # The MyStrom /report endpoint only exposes power, so voltage cannot be derived from it.
             raise UnsupportedFeatureError("Voltage measurement is not yet implemented for MyStrom devices.")
 
         r = requests.get(

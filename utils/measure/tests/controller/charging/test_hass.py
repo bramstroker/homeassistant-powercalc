@@ -114,8 +114,9 @@ def test_get_battery_level_no_sensor_no_attribute_error() -> None:
     client.get_entity.return_value = MagicMock(
         state=State(entity_id="vacuum.test", state="docked", attributes={}),
     )
+    controller = _get_instance(client=client)
     with pytest.raises(BatteryLevelRetrievalError):
-        _get_instance(client=client).get_battery_level()
+        controller.get_battery_level()
 
 
 def test_get_battery_level_sensor_invalid_state() -> None:
@@ -125,8 +126,9 @@ def test_get_battery_level_sensor_invalid_state() -> None:
     client.get_entity.return_value = MagicMock(
         state=State(entity_id="sensor.test_battery_level", state="unknown", attributes={}),
     )
+    controller = _get_instance(client=client)
     with pytest.raises(BatteryLevelRetrievalError):
-        _get_instance(client=client).get_battery_level()
+        controller.get_battery_level()
 
 
 def test_is_charging() -> None:

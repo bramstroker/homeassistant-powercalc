@@ -157,8 +157,7 @@ def test_invalid_rpc_status_is_rejected(
 
 def test_connection_error_is_raised_on_request_exception() -> None:
     with patch("requests.get", side_effect=RequestException), pytest.raises(ApiConnectionError):
-        pm = ShellyPowerMeter(DEFAULT_SHELLY_IP)
-        pm.get_power()
+        ShellyPowerMeter(DEFAULT_SHELLY_IP)
 
 
 def test_connection_error_is_raised_on_invalid_status_code(mock_requests_get_factory: MockRequestsGetFactory) -> None:
@@ -169,5 +168,4 @@ def test_connection_error_is_raised_on_invalid_status_code(mock_requests_get_fac
     )
 
     with pytest.raises(ApiConnectionError):
-        pm = ShellyPowerMeter(DEFAULT_SHELLY_IP)
-        pm.get_power()
+        ShellyPowerMeter(DEFAULT_SHELLY_IP)

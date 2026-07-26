@@ -58,8 +58,9 @@ def test_request_normalizes_profile_metadata() -> None:
 
 @pytest.mark.parametrize("field", ["product_name", "measure_device"])
 def test_request_rejects_blank_required_profile_metadata(field: str) -> None:
+    payload = valid_request() | {field: "   "}
     with pytest.raises(ValidationError, match=field):
-        LightMeasurementRequest.model_validate(valid_request() | {field: "   "})
+        LightMeasurementRequest.model_validate(payload)
 
 
 def test_request_accepts_dummy_load_calibration() -> None:

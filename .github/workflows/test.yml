@@ -29,14 +29,14 @@ jobs:
             pyproject.toml
             uv.lock
       - name: Install dependencies
-        run: uv sync --group dev
+        run: uv sync --locked --group dev
       - name: Prepare test env
         run: bash tests/setup.sh
       - name: Run release draft engine tests
-        run: uv run pytest .github/scripts/release_draft/tests -qq
+        run: uv run --locked pytest .github/scripts/release_draft/tests -qq
       - name: Run tests
         run: |
-          uv run pytest \
+          uv run --locked pytest \
             -qq \
             --timeout=9 \
             --durations=10 \
@@ -45,7 +45,7 @@ jobs:
             -o console_output_style=count \
             -p no:sugar \
             tests
-          uv run coverage lcov
+          uv run --locked coverage lcov
       - name: Upload Coverage Results
         uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2
         with:

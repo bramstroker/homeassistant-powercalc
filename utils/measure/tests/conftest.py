@@ -45,6 +45,13 @@ def _mock_hass_config() -> Iterator[None]:
 
 
 @pytest.fixture(autouse=True)
+def _clear_github_app_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep the GitHub app configuration out of the tests, so a developer shell cannot change the outcome."""
+    for name in ("POWERCALC_GITHUB_CLIENT_ID", "POWERCALC_GITHUB_REPOSITORY", "POWERCALC_GITHUB_BRANCH"):
+        monkeypatch.delenv(name, raising=False)
+
+
+@pytest.fixture(autouse=True)
 def clean_export_directory() -> None:
     export_dir = os.path.join(PROJECT_DIR, "export")
     if not os.path.exists(export_dir):

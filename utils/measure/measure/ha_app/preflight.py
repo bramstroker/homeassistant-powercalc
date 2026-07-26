@@ -97,10 +97,7 @@ class MeasurementPreflight:
             raise PreflightError("Persistent app storage is not writable") from error
 
         self._validate_power_meter(request)
-        diagnostic: PowerMeterDiagnostic | None = None
-        if request.dummy_load is not None and self._diagnose_power_meter is not None:
-            diagnostic = self._diagnose_power_meter(request.power_meter)
-            self._validate_dummy_load_voltage(diagnostic)
+        diagnostic = self._diagnose_dummy_load(request)
 
         if isinstance(request, LightMeasurementRequest):
             result = self._validate_light(request)
@@ -115,13 +112,7 @@ class MeasurementPreflight:
             )
             duration = (duration or 0) + DUMMY_LOAD_MEASUREMENT_COUNT * DUMMY_LOAD_MEASUREMENTS_DURATION
 
-        if self._diagnose_power_meter is not None:
-            if diagnostic is None:
-                diagnostic = self._diagnose_power_meter(request.power_meter)
-            if not diagnostic.success:
-                raise PreflightError(diagnostic.message or "Could not read from the power meter")
-            if diagnostic.status in {DiagnosticStatus.WARNING, DiagnosticStatus.POOR}:
-                warnings.extend(diagnostic.messages)
+        diagnostic = self._collect_power_meter_diagnostic(request, diagnostic, warnings)
 
         return PreflightResult(
             warnings=tuple(warnings),
@@ -132,6 +123,33 @@ class MeasurementPreflight:
             battery_level_entity_id=result.battery_level_entity_id,
             battery_level_attribute=result.battery_level_attribute,
         )
+
+    def _diagnose_dummy_load(self, request: MeasurementRequest) -> PowerMeterDiagnostic | None:
+        """Diagnose the power meter upfront when a dummy load is used, so its voltage support can be validated."""
+        if request.dummy_load is None or self._diagnose_power_meter is None:
+            return None
+
+        diagnostic = self._diagnose_power_meter(request.power_meter)
+        self._validate_dummy_load_voltage(diagnostic)
+        return diagnostic
+
+    def _collect_power_meter_diagnostic(
+        self,
+        request: MeasurementRequest,
+        diagnostic: PowerMeterDiagnostic | None,
+        warnings: list[str],
+    ) -> PowerMeterDiagnostic | None:
+        """Diagnose the power meter when not done yet and translate the result into an error or warnings."""
+        if self._diagnose_power_meter is None:
+            return diagnostic
+
+        if diagnostic is None:
+            diagnostic = self._diagnose_power_meter(request.power_meter)
+        if not diagnostic.success:
+            raise PreflightError(diagnostic.message or "Could not read from the power meter")
+        if diagnostic.status in {DiagnosticStatus.WARNING, DiagnosticStatus.POOR}:
+            warnings.extend(diagnostic.messages)
+        return diagnostic
 
     def _validate_adapters(self, request: MeasurementRequest) -> None:
         power_meter = request.power_meter

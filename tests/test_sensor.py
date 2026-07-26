@@ -1,6 +1,6 @@
 from datetime import timedelta
 import logging
-from unittest.mock import AsyncMock, patch
+from unittest.mock import MagicMock, patch
 
 from homeassistant.components import light, sensor
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
@@ -227,7 +227,7 @@ async def test_create_nested_handles_exception(hass: HomeAssistant, caplog: pyte
 
     with patch(
         "custom_components.powercalc.sensor.attach_entities_to_resolved_device",
-        new=AsyncMock(side_effect=SensorConfigurationError("My custom error message")),
+        new=MagicMock(side_effect=SensorConfigurationError("My custom error message")),
     ):
         await run_powercalc_setup(
             hass,

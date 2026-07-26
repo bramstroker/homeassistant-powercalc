@@ -39,8 +39,8 @@ jobs:
       - name: Run tests
         run: |
           cd ./utils/measure
-          uv run --extra dev --extra app --extra cli ruff check measure tests prepare_app_release.py
-          MYPYPATH=. uv run --extra dev --extra app --extra cli mypy \
+          uv run --locked --extra dev --extra app --extra cli ruff check measure tests prepare_app_release.py
+          MYPYPATH=. uv run --locked --extra dev --extra app --extra cli mypy \
             --strict \
             --explicit-package-bases \
             --follow-imports=silent \
@@ -48,13 +48,13 @@ jobs:
             --config-file ../../pyproject.toml \
             prepare_app_release.py \
             measure
-          uv run --extra dev --extra app --extra cli pytest \
+          uv run --locked --extra dev --extra app --extra cli pytest \
             -qq \
             --durations=10 \
             -o console_output_style=count \
             -p no:sugar \
             tests
-          uv run --extra dev --group visualize pytest -q tests/test_visualization_renderer.py
+          uv run --locked --extra dev --group visualize pytest -q tests/test_visualization_renderer.py
 
   docker:
     runs-on: "ubuntu-latest"

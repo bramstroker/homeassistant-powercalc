@@ -17,12 +17,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      # No dependency cache here: this job publishes the site, so a poisoned cache could alter the deployment.
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
-          python-version: 3.x
-      - run: pip install zensical
-        working-directory: docs
-      - run: zensical build --clean
+          version: '0.11.32'
+          enable-cache: false
+      - run: uv run --locked --only-group docs --no-build zensical build --clean
         working-directory: docs
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4

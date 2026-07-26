@@ -146,25 +146,25 @@ async def test_find_estimated_current_entity_by_device_class(
 async def test_exception_is_raised_when_no_estimated_current_entity_found(
     hass: HomeAssistant,
 ) -> None:
-    with pytest.raises(StrategyConfigurationError):
-        mock_registry(
-            hass,
-            {
-                "light.test": RegistryEntryWithDefaults(
-                    entity_id="light.test",
-                    unique_id="1234",
-                    platform="light",
-                    device_id="wled-device-id",
-                ),
-            },
-        )
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntryWithDefaults(
+                entity_id="light.test",
+                unique_id="1234",
+                platform="light",
+                device_id="wled-device-id",
+            ),
+        },
+    )
 
-        strategy = WledStrategy(
-            config={CONF_VOLTAGE: 5, CONF_POWER_FACTOR: 0.9},
-            light_entity=create_source_entity("light.test", hass),
-            hass=hass,
-            standby_power=0.1,
-        )
+    strategy = WledStrategy(
+        config={CONF_VOLTAGE: 5, CONF_POWER_FACTOR: 0.9},
+        light_entity=create_source_entity("light.test", hass),
+        hass=hass,
+        standby_power=0.1,
+    )
+    with pytest.raises(StrategyConfigurationError):
         await strategy.find_estimated_current_entity()
 
 

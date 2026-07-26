@@ -44,7 +44,7 @@ def attach_configured_device_entry(
     return source_entity
 
 
-async def attach_entities_to_resolved_device(
+def attach_entities_to_resolved_device(
     config_entry: ConfigEntry | None,
     entities_to_add: list[Entity],
     hass: HomeAssistant,

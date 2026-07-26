@@ -12,6 +12,9 @@ from measure.contribution.models import ContributionMetadata, ContributionPrepar
 
 JsonValidator = Callable[[dict[str, Any], dict[str, Any]], None]
 
+MODEL_JSON = "model.json"
+MANUFACTURER_JSON = "manufacturer.json"
+
 
 class ProfilePreparationError(ValueError):
     pass
@@ -40,7 +43,7 @@ class ProfilePreparer:
     def prepare(self, artifact_directory: Path, metadata: ContributionMetadata) -> ContributionPreview:
         artifact_directory = artifact_directory.resolve()
         csv_names = self._artifact_csv_names(artifact_directory)
-        model = self._apply_metadata(self._read_object(artifact_directory / "model.json"), metadata)
+        model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
         if model.get("calculation_strategy") == "lut" and not csv_names:
             raise ProfilePreparationError("At least one .csv.gz artifact is required for LUT profiles")
         self.validator(model, self._read_object(self.model_schema_path))
@@ -50,9 +53,9 @@ class ProfilePreparer:
             metadata.manufacturer_directory,
         )
         profile_directory = Path("profile_library") / manufacturer_directory / metadata.model_id
-        relative_files = [profile_directory / name for name in ("model.json", *csv_names)]
+        relative_files = [profile_directory / name for name in (MODEL_JSON, *csv_names)]
         if not self._manufacturer_exists(manufacturer_directory):
-            relative_files.append(profile_directory.parent / "manufacturer.json")
+            relative_files.append(profile_directory.parent / MANUFACTURER_JSON)
         self._block_collisions(relative_files)
 
         return ContributionPreview(
@@ -71,7 +74,7 @@ class ProfilePreparer:
         metadata: ContributionMetadata,
         preview: ContributionPreview,
     ) -> tuple[tuple[str, bytes], ...]:
-        model = self._apply_metadata(self._read_object(artifact_directory / "model.json"), metadata)
+        model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
         return tuple(
             (file.path, self._render_file_content(Path(file.path), artifact_directory, model, metadata))
             for file in preview.files
@@ -83,10 +86,10 @@ class ProfilePreparer:
         if not artifact_directory.is_dir():
             raise ProfilePreparationError("Artifact directory does not exist")
         names = {path.name for path in artifact_directory.iterdir() if path.is_file() and not path.is_symlink()}
-        if "model.json" not in names:
+        if MODEL_JSON not in names:
             raise ProfilePreparationError("model.json is required")
         csv_names = {name for name in names if name.endswith((".csv", ".csv.gz"))}
-        unexpected = sorted(names - csv_names - {"model.json", "manufacturer.json"})
+        unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON})
         if unexpected:
             raise ProfilePreparationError(f"Unexpected artifact file(s): {', '.join(unexpected)}")
         return tuple(sorted({f"{name.removesuffix('.gz')}.gz" for name in csv_names}))
@@ -218,9 +221,9 @@ class ProfilePreparer:
         model: dict[str, Any],
         metadata: ContributionMetadata,
     ) -> bytes:
-        if relative_path.name == "model.json":
+        if relative_path.name == MODEL_JSON:
             return _dump_json(model)
-        if relative_path.name == "manufacturer.json":
+        if relative_path.name == MANUFACTURER_JSON:
             return _dump_json({"name": metadata.manufacturer, "aliases": self._artifact_aliases(artifact_directory)})
         artifact_path = artifact_directory / relative_path.name
         if artifact_path.exists():
@@ -231,7 +234,7 @@ class ProfilePreparer:
         raise ProfilePreparationError(f"Artifact file is missing: {relative_path.name}")
 
     def _artifact_aliases(self, artifact_directory: Path) -> list[Any]:
-        manifest = artifact_directory / "manufacturer.json"
+        manifest = artifact_directory / MANUFACTURER_JSON
         if not manifest.exists():
             return []
         aliases = self._read_object(manifest).get("aliases")

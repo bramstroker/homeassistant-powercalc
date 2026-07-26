@@ -14,6 +14,7 @@ STREAM_URL = "https://powercalc.s3.eu-west-1.amazonaws.com/g_pink.mp3"
 SLEEP_PRE_MEASURE = 2
 SLEEP_MUTE = 5
 FAST_TEST_VOLUMES = (10, 100)
+VOLUME_MEASUREMENT_PHASE = "Measuring volume levels"
 
 _LOGGER = logging.getLogger("measure")
 
@@ -55,7 +56,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
         self.interaction.progress(
             0,
             total_steps,
-            phase="Measuring volume levels",
+            phase=VOLUME_MEASUREMENT_PHASE,
             remaining_seconds=self._remaining_seconds(0, len(volumes), fast_test_mode),
         )
 
@@ -78,7 +79,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
             self.interaction.progress(
                 completed_steps,
                 total_steps,
-                phase="Measuring volume levels",
+                phase=VOLUME_MEASUREMENT_PHASE,
                 remaining_seconds=self._remaining_seconds(completed_steps, len(volumes), fast_test_mode),
             )
 
@@ -92,7 +93,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
         result = self._measure(duration, fast_test_mode)
         summary[0] = result.power
         voltages.extend(result.voltages)
-        self.interaction.progress(total_steps, total_steps, phase="Measuring volume levels", remaining_seconds=0)
+        self.interaction.progress(total_steps, total_steps, phase=VOLUME_MEASUREMENT_PHASE, remaining_seconds=0)
 
         self.media_controller.set_volume(10)
         self.interaction.operating_point(SpeakerOperatingPoint(type="speaker", volume=10, muted=False))
