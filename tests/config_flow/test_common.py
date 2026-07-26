@@ -1,10 +1,12 @@
 from typing import Any
 
+from homeassistant.data_entry_flow import section
 import pytest
 import voluptuous as vol
 
 from custom_components.powercalc.flow_helper.common import (
     fill_schema_defaults,
+    flatten_sections,
     unwrap_choose_selector,
     wrap_choose_selector,
 )
@@ -209,6 +211,38 @@ def test_wrap_choose_selector_returns_same_dict_on_no_match() -> None:
     form_data = {"foo": "bar"}
     result = wrap_choose_selector(form_data, "wrap", {"power": "power"})
     assert result is form_data
+
+
+def _section_schema() -> vol.Schema:
+    return vol.Schema(
+        {
+            vol.Optional("power"): int,
+            vol.Optional("advanced"): section(vol.Schema({vol.Optional("nested"): int}), {"collapsed": True}),
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "user_input,expected",
+    [
+        # Nested section values are merged back to the top level
+        ({"power": 100, "advanced": {"nested": 5}}, {"power": 100, "nested": 5}),
+        # Input without any section keys is returned as a flat copy
+        ({"power": 100}, {"power": 100}),
+        # A section key holding a non dict value is kept as-is
+        ({"advanced": "not_a_dict"}, {"advanced": "not_a_dict"}),
+        # Empty user input short circuits
+        ({}, {}),
+    ],
+)
+def test_flatten_sections(user_input: dict[str, Any], expected: dict[str, Any]) -> None:
+    assert flatten_sections(user_input, _section_schema()) == expected
+
+
+def test_flatten_sections_returns_input_when_empty() -> None:
+    """Empty user input is handed back untouched, callers may pass None-ish values."""
+    user_input: dict[str, Any] = {}
+    assert flatten_sections(user_input, _section_schema()) is user_input
 
 
 def _find_marker(schema: vol.Schema, name: str) -> vol.Marker:

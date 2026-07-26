@@ -13,6 +13,8 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
     EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
@@ -529,6 +531,50 @@ async def test_outlier_filtering(hass: HomeAssistant, caplog: pytest.LogCaptureF
         ],
     )
     assert "Rejecting power value 7000000 as outlier for energy integration" in caplog.text
+
+
+@pytest.mark.parametrize("interruption", [STATE_UNAVAILABLE, STATE_UNKNOWN, "foo"])
+async def test_outlier_filtering_handles_non_numeric_states(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+    freezer: FrozenDateTimeFactory,
+    interruption: str,
+) -> None:
+    """A non numeric power state must pass through the outlier filter untouched.
+
+    It also must not clear the pending rejection: when the source recovers, the substitution
+    of the previously rejected outlier still has to happen.
+    """
+    caplog.set_level(logging.DEBUG)
+
+    power_sensor_id = "sensor.test_power"
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_POWER_SENSOR_ID: power_sensor_id,
+            CONF_ENERGY_FILTER_OUTLIER_ENABLED: True,
+        },
+    )
+
+    async def advance_and_set(value: str) -> None:
+        freezer.tick(timedelta(seconds=15))
+        await set_states(hass, [(power_sensor_id, value, {ATTR_UNIT_OF_MEASUREMENT: "W"})])
+
+    for value in ["4.4", "4.1", "4.6", "4.2", "4.5", "4.4", "4.5", "4.1", "4.0", "4.2"]:
+        await advance_and_set(value)
+
+    energy_before = float(hass.states.get("sensor.test_energy").state)
+
+    # Spike, then the source drops out before returning to the baseline
+    await advance_and_set("6553.5")
+    await advance_and_set(interruption)
+    await advance_and_set("4.0")
+
+    energy_after = float(hass.states.get("sensor.test_energy").state)
+
+    assert "Rejecting power value 6553.5 as outlier for energy integration" in caplog.text
+    assert energy_after - energy_before < 0.001
 
 
 async def test_outlier_filtering_does_not_leak_energy(
