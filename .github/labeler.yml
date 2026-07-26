@@ -6,6 +6,10 @@ documentation:
   - changed-files:
     - any-glob-to-any-file: docs/**
 
+translations:
+  - changed-files:
+    - any-glob-to-any-file: custom_components/powercalc/translations/**
+
 enhancement:
  - head-branch: ['^feat', 'feature']
 
