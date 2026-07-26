@@ -50,6 +50,7 @@ from custom_components.powercalc.const import (
     CONF_SUB_GROUPS,
     CONF_TEMPLATE,
     CONF_WILDCARD,
+    DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
     SensorType,
@@ -1383,6 +1384,27 @@ async def test_irrelevant_entity_domains_are_skipped(hass: HomeAssistant, caplog
 
     assert "scene.test" not in caplog.text
     assert "event.test" not in caplog.text
+
+
+async def test_powercalc_entity_with_stale_config_entry_is_skipped(hass: HomeAssistant) -> None:
+    """A Powercalc entity referencing a removed config entry must not be included."""
+    mock_registry(
+        hass,
+        {
+            "sensor.stale_power": RegistryEntryWithDefaults(
+                entity_id="sensor.stale_power",
+                unique_id="1111",
+                platform=DOMAIN,
+                config_entry_id="non-existing-config-entry",
+                device_class=SensorDeviceClass.POWER,
+            ),
+        },
+    )
+
+    result = await find_entities(hass)
+
+    assert not result.resolved
+    assert not result.discoverable
 
 
 async def test_prevent_duplicate_entities_when_using_include_all(

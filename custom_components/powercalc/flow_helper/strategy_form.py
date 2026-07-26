@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from custom_components.powercalc.configuration.normalization import normalize_state_trigger
 from custom_components.powercalc.const import (
     CONF_FIXED_VALUE,
     CONF_PLAYBOOK_ID,
@@ -65,10 +66,8 @@ def unwrap_strategy_user_input(strategy: CalculationStrategy, user_input: dict[s
     """Unwrap form-only selector wrappers and normalize strategy user input."""
     if strategy == CalculationStrategy.FIXED:
         unwrap_choose_selector(user_input, CONF_FIXED_VALUE, fixed_choice_key_from_validated_value)
-    if CONF_STATE_TRIGGER in user_input and isinstance(user_input[CONF_STATE_TRIGGER], list):
-        user_input[CONF_STATE_TRIGGER] = {
-            item[CONF_STATE]: item[CONF_PLAYBOOK_ID] for item in user_input[CONF_STATE_TRIGGER]
-        }
+    if CONF_STATE_TRIGGER in user_input:
+        user_input[CONF_STATE_TRIGGER] = normalize_state_trigger(user_input[CONF_STATE_TRIGGER])
     return user_input
 
 
