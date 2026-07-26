@@ -32,7 +32,7 @@ from homeassistant.const import (
     EntityCategory,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.template import Template
 from homeassistant.util import dt
@@ -741,7 +741,7 @@ async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profi
     await set_states(hass, [("light.test", STATE_ON)])
     await run_powercalc_setup(hass)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(ServiceValidationError) as exc_info:
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SWITCH_SUB_PROFILE,
@@ -751,6 +751,7 @@ async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profi
             },
             blocking=True,
         )
+    assert exc_info.value.translation_key == "no_sub_profile_support"
 
 
 async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
@@ -786,7 +787,7 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
     )
     await run_powercalc_setup(hass)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(ServiceValidationError) as exc_info:
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SWITCH_SUB_PROFILE,
@@ -796,6 +797,7 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
             },
             blocking=True,
         )
+    assert exc_info.value.translation_key == "unknown_sub_profile"
 
 
 async def test_availability_entity(hass: HomeAssistant) -> None:

@@ -577,6 +577,20 @@
       }
     }
   },
+  "exceptions": {
+    "invalid_integration_method": {
+      "message": "Ogiltig integrationsmetod \"{method}\". Måste vara en av: {allowed_methods}."
+    },
+    "no_sub_profile_support": {
+      "message": "{entity_id} stöder inte byte av underprofiler. Den här åtgärden är endast tillgänglig för sensorer som har underprofiler och saknar automatiskt val av underprofil."
+    },
+    "not_a_playbook_sensor": {
+      "message": "{entity_id} är inte en playbook-sensor. Den här åtgärden är endast tillgänglig för sensorer som använder playbook-strategin."
+    },
+    "unknown_sub_profile": {
+      "message": "\"{profile}\" är inte en känd underprofil. Tillgängliga underprofiler: {known_profiles}."
+    }
+  },
   "issues": {
     "composite_device_id": {
       "fix_flow": {

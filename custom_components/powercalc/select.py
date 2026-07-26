@@ -19,6 +19,9 @@ from custom_components.powercalc.const import DATA_ENTITY_TYPES, EntityType
 SIGNAL_CREATE_SELECT_ENTITIES = "powercalc_create_select_entities_{}"
 DATA_PENDING_SELECT_ENTITIES = "powercalc_pending_select_entities"
 
+# The tariff select doesn't poll, so updates don't have to be serialized.
+PARALLEL_UPDATES = 0
+
 
 def _key(entry: ConfigEntry | None) -> str:
     return entry.entry_id if entry else ""

@@ -11,7 +11,7 @@ from homeassistant.const import (
     STATE_PLAYING,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
@@ -155,8 +155,9 @@ async def test_services_raises_error_on_non_playbook_sensor(
         get_simple_fixed_config("switch.test"),
     )
     await set_states(hass, [("switch.test", STATE_ON)])
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(ServiceValidationError) as exc_info:
         await _activate_playbook(hass, "playbook1")
+    assert exc_info.value.translation_key == "not_a_playbook_sensor"
 
 
 async def test_stop_service_raises_error_on_non_playbook_sensor(
@@ -167,7 +168,7 @@ async def test_stop_service_raises_error_on_non_playbook_sensor(
         get_simple_fixed_config("switch.test"),
     )
     await set_states(hass, [("switch.test", STATE_ON)])
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(ServiceValidationError):
         await _stop_playbook(hass)
 
 
@@ -179,7 +180,7 @@ async def test_get_active_playbook_raises_error_on_non_playbook_sensor(
         get_simple_fixed_config("switch.test"),
     )
     await set_states(hass, [("switch.test", STATE_ON)])
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(ServiceValidationError):
         await _get_active_playbook(hass)
 
 

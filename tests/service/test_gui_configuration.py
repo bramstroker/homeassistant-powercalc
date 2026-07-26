@@ -2,7 +2,7 @@ import uuid
 
 from homeassistant.const import CONF_ENTITY_ID, CONF_MODE, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.typing import ConfigType
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -70,8 +70,9 @@ async def test_change_gui_configuration(hass: HomeAssistant) -> None:
 async def test_error_on_invalid_integration_method(hass: HomeAssistant) -> None:
     await run_powercalc_setup(hass)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(ServiceValidationError) as exc_info:
         await call_service(hass, CONF_ENERGY_INTEGRATION_METHOD, "foo")
+    assert exc_info.value.translation_key == "invalid_integration_method"
 
 
 async def call_service(hass: HomeAssistant, field: str, value: str) -> None:

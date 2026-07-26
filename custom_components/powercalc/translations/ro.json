@@ -577,6 +577,20 @@
       }
     }
   },
+  "exceptions": {
+    "invalid_integration_method": {
+      "message": "Metodă de integrare nevalidă \"{method}\". Trebuie să fie una dintre: {allowed_methods}."
+    },
+    "no_sub_profile_support": {
+      "message": "{entity_id} nu acceptă schimbarea subprofilurilor. Această acțiune este disponibilă doar pentru senzorii care au subprofiluri și fără selectare automată a subprofilului."
+    },
+    "not_a_playbook_sensor": {
+      "message": "{entity_id} nu este un senzor cu playbook. Această acțiune este disponibilă doar pentru senzorii care folosesc strategia playbook."
+    },
+    "unknown_sub_profile": {
+      "message": "\"{profile}\" nu este un subprofil cunoscut. Subprofiluri disponibile: {known_profiles}."
+    }
+  },
   "issues": {
     "composite_device_id": {
       "fix_flow": {

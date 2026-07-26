@@ -577,6 +577,20 @@
       }
     }
   },
+  "exceptions": {
+    "invalid_integration_method": {
+      "message": "Invalid integration method \"{method}\". Must be one of: {allowed_methods}."
+    },
+    "no_sub_profile_support": {
+      "message": "{entity_id} does not support switching sub profiles. This action is only available for sensors which have sub profiles and no automatic sub profile selection."
+    },
+    "not_a_playbook_sensor": {
+      "message": "{entity_id} is not a playbook enabled sensor. This action is only available for sensors using the playbook strategy."
+    },
+    "unknown_sub_profile": {
+      "message": "\"{profile}\" is not a known sub profile. Available sub profiles: {known_profiles}."
+    }
+  },
   "issues": {
     "composite_device_id": {
       "fix_flow": {

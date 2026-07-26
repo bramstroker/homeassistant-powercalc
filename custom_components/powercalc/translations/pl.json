@@ -577,6 +577,20 @@
       }
     }
   },
+  "exceptions": {
+    "invalid_integration_method": {
+      "message": "Nieprawidłowa metoda całkowania \"{method}\". Musi być jedną z: {allowed_methods}."
+    },
+    "no_sub_profile_support": {
+      "message": "{entity_id} nie obsługuje przełączania podprofili. Ta akcja jest dostępna tylko dla sensorów posiadających podprofile i bez automatycznego wyboru podprofilu."
+    },
+    "not_a_playbook_sensor": {
+      "message": "{entity_id} nie jest sensorem obsługującym playbook. Ta akcja jest dostępna tylko dla sensorów używających strategii playbook."
+    },
+    "unknown_sub_profile": {
+      "message": "\"{profile}\" nie jest znanym podprofilem. Dostępne podprofile: {known_profiles}."
+    }
+  },
   "issues": {
     "composite_device_id": {
       "fix_flow": {

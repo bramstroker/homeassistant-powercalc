@@ -577,6 +577,20 @@
       }
     }
   },
+  "exceptions": {
+    "invalid_integration_method": {
+      "message": "Neplatná metoda integrace \"{method}\". Musí být jedna z: {allowed_methods}."
+    },
+    "no_sub_profile_support": {
+      "message": "{entity_id} nepodporuje přepínání podprofilů. Tato akce je dostupná pouze pro senzory, které mají podprofily a nemají automatický výběr podprofilu."
+    },
+    "not_a_playbook_sensor": {
+      "message": "{entity_id} není senzor s podporou playbooku. Tato akce je dostupná pouze pro senzory používající strategii playbook."
+    },
+    "unknown_sub_profile": {
+      "message": "\"{profile}\" není známý podprofil. Dostupné podprofily: {known_profiles}."
+    }
+  },
   "issues": {
     "composite_device_id": {
       "fix_flow": {

@@ -1,5 +1,5 @@
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import ServiceValidationError
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 
@@ -42,7 +42,14 @@ async def change_gui_configuration(hass: HomeAssistant, call: ServiceCall) -> No
         value = cv.boolean(value)
 
     if field == CONF_ENERGY_INTEGRATION_METHOD and value not in ENERGY_INTEGRATION_METHODS:
-        raise HomeAssistantError(f"Invalid integration method {value}")
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="invalid_integration_method",
+            translation_placeholders={
+                "method": str(value),
+                "allowed_methods": ", ".join(ENERGY_INTEGRATION_METHODS),
+            },
+        )
 
     apply_field_to_config_entries(hass, field, value)
 
