@@ -10,6 +10,16 @@ Instructions for AI coding agents working on this project.
 - `tests/` — pytest test suite mirroring source structure
 - `docs/source/` — documentation (Zensical)
 
+## Token Discipline
+
+- Treat an explicit token budget as a hard aggregate limit across the primary agent and all child agents.
+- Estimate aggregate token usage before delegating, and prefer direct execution when delegation would materially multiply context.
+- Do not use subagents for bulk translation or other high-volume content generation unless the user explicitly requests delegation.
+- When subagents are necessary, give them compact standalone briefs instead of inherited conversation history, especially for large-file tasks.
+- Extract and process only the relevant data instead of repeatedly loading complete files or large diffs into model context.
+- Limit QA to one targeted review pass unless validation fails or the user requests deeper review.
+- At 80% of the stated budget, stop starting new work or agents and prioritize completing validation. If completion no longer fits, stop and report the remaining work.
+
 ## Documentation
 
 Documentation is built with **Zensical**, not raw MkDocs.

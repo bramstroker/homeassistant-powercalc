@@ -10,7 +10,7 @@
       "already_configured": "El sensor ya está configurado, especifique un identificador único"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
+      "cost_price_mandatory": "Debe proporcionar un precio de energía o un sensor de precio de energía.",
       "daily_energy_mandatory": "Debes proveer al menos un valor o valor en plantilla",
       "entity_mandatory": "El sensor ya está configurado, especifique un identificador único",
       "fixed_mandatory": "Debes proveer al menos uno de los siguientes: potencia, potencia en plantilla, o potencia en un estado",
@@ -49,7 +49,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Crear contadores eléctricos",
-          "daily_energy_value": "Daily energy value",
+          "daily_energy_value": "Valor diario de energía",
           "name": "Nombre",
           "on_time": "Tiempo encendido",
           "start_time": "Hora de inicio",
@@ -81,7 +81,7 @@
         "data": {
           "name": "Nombre",
           "create_energy_sensor": "Crear sensor de energía",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Crear sensor de costos",
           "create_utility_meters": "Crear contadores eléctricos",
           "domain": "Dominio de entidad",
           "exclude_entities": "Excluir entidades"
@@ -90,10 +90,10 @@
       },
       "fixed": {
         "data": {
-          "fixed_value": "Fixed value"
+          "fixed_value": "Valor de potencia"
         },
         "data_description": {
-          "fixed_value": "Fixed value in Watts when the entity is ON"
+          "fixed_value": "Valor de potencia en vatios cuando la entidad está ENCENDIDA"
         },
         "description": "Definir un valor de potencia fijo para tu entidad. Vea la [documentación]({docs_uri}) para más información. Alternativamente, puedes definir un valor de potencia por estado. Por ejemplo: \n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Configuración fija"
@@ -115,13 +115,13 @@
             "name": "Crear sensores",
             "data": {
               "create_energy_sensors": "Crear sensores de energía",
-              "create_cost_sensors": "Create cost sensors",
+              "create_cost_sensors": "Crear sensores de costos",
               "create_standby_group": "Crear grupo de modo de espera",
               "create_utility_meters": "Crear contadores eléctricos"
             },
             "data_description": {
               "create_energy_sensors": "Si powercalc necesita crear sensores kWh",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_cost_sensors": "Si powercalc necesita crear sensores de costos. Requiere que se configure un precio de energía en los siguientes pasos",
               "create_standby_group": "Crear un grupo que sume todo el consumo de energía en modo de espera y el autoconsumo de los dispositivos IoT",
               "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc."
             }
@@ -129,14 +129,14 @@
           "advanced": {
             "name": "Avanzado",
             "data": {
-              "enable_analytics": "Enable anonymous analytics",
+              "enable_analytics": "Habilitar análisis anónimos",
               "ignore_unavailable_state": "Ignorar estados no disponibles",
               "include_non_powercalc_sensors": "Incluye sensores no powercalc",
               "disable_extended_attributes": "Deshabilitar atributos extendidos",
               "disable_library_download": "Deshabilitar descarga de biblioteca remota"
             },
             "data_description": {
-              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "enable_analytics": "Permita que Powercalc envíe estadísticas de uso agregadas y anónimas para ayudar a mejorar la integración.",
               "ignore_unavailable_state": "Mantener los sensores de Powercalc disponibles, incluso cuando la entidad original no esté disponible",
               "include_non_powercalc_sensors": "Controlar si quieres incluir sensores no powercalc en grupos",
               "disable_extended_attributes": "Deshabilitar todos los atributos extras que powercalc añade a la potencia, energía y estados de entidad de grupo. Esto ayudará a mantener la base de datos pequeña",
@@ -146,45 +146,45 @@
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Consulte la [documentación]({docs_uri}) para obtener más información",
+        "title": "Opciones de costos",
+        "description": "Configura el precio de la energía usado para calcular los sensores de coste. Proporciona un precio fijo o un sensor que indique el precio actual por kWh. Consulte la [documentación]({docs_uri}) para obtener más información",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Precios",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Precio fijo de la energía.",
+              "energy_price_multiplier": "Multiplicador del precio de la energía",
+              "energy_price_sensor": "Sensor de precio de la energía",
+              "energy_price_surcharge": "Recargo por el precio de la energía"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "Un precio fijo por kWh en su moneda local",
+              "energy_price_multiplier": "Multiplicador aplicado después del recargo. Utilice esto para impuestos o tarifas basados ​​en porcentajes, por ejemplo 1,21 para 21%.",
+              "energy_price_sensor": "Un sensor que proporciona el precio actual de la energía por kWh (por ejemplo, a partir de una integración dinámica de tarifas). Deje el precio fijo vacío para usar este sensor",
+              "energy_price_surcharge": "Monto fijo adicional por kWh agregado al precio fijo o valor del sensor de precio"
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "Nombrar",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "Patrón de nombre descriptivo del sensor de costos",
+              "cost_sensor_naming": "Patrón de nombre del sensor de costos"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "Patrón para el nombre descriptivo del sensor de costos. El nombre de la fuente se inserta en la posición del marcador de posición.",
+              "cost_sensor_naming": "Patrón utilizado para crear el nombre del sensor de costos y la identificación de la entidad. El nombre de la fuente se inserta en la posición del marcador de posición."
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "Aplicar sensores de costos",
+        "description": "Cambió la configuración de los sensores de costos globales. ¿Quiere aplicar este cambio a todos los sensores powercalc existentes que se crearon a través del GUI?",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "Aplicar a sensores existentes"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "Actualice todos los sensores powercalc GUI existentes para que coincidan con la nueva configuración de sensores de costo"
         }
       },
       "global_configuration_discovery": {
@@ -218,13 +218,13 @@
           "group_energy_update_interval": "Intervalo de actualización de energía de grupo",
           "group_power_update_interval": "Intervalo de actualización de potencia de grupo",
           "energy_update_interval": "Intervalo de actualización de energía",
-          "power_update_interval": "Power update interval"
+          "power_update_interval": "Intervalo de actualización de potencia"
         },
         "data_description": {
           "group_energy_update_interval": "Intervalo en el que se actualizan los sensores de energía de grupo. En segundos. Establecer a 0 para deshabilitar",
           "group_power_update_interval": "Intervalo en el que se actualizan los sensores de potencia de grupo. En segundos. Establecer a 0 para deshabilitar",
           "energy_update_interval": "Intervalo en el que se actualizan los sensores de energía. En segundos. Establecer a 0 para deshabilitar",
-          "power_update_interval": "Interval at which energy sensors are force updated. In seconds. Set to 0 to disable"
+          "power_update_interval": "Intervalo en el que se fuerzan la actualización de los sensores de energía. En segundos. Establecer en 0 para desactivar"
         }
       },
       "global_configuration_utility_meter": {
@@ -286,7 +286,7 @@
       "group_subtract": {
         "data": {
           "create_energy_sensor": "Crear sensor de energía",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Crear sensor de costos",
           "create_utility_meters": "Crear contadores eléctricos",
           "entity_id": "Entidad base",
           "name": "Nombre",
@@ -303,7 +303,7 @@
           "main_power_sensor": "Sensor de potencia general",
           "group_tracked_auto": "Entidades añadidas automáticamente",
           "create_energy_sensor": "Crear sensor de energía",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Crear sensor de costos",
           "create_utility_meters": "Crear contadores eléctricos"
         },
         "data_description": {
@@ -340,12 +340,12 @@
         "title": "Biblioteca"
       },
       "library_custom_fields": {
-        "title": "Profile configuration",
+        "title": "Configuración de perfil",
         "data": {
-          "power_factor": "Power Factor"
+          "power_factor": "Factor de potencia"
         },
         "data_description": {
-          "power_factor": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters."
+          "power_factor": "Relación entre potencia real y potencia aparente. Utilice 0,6 para computadoras/electrónica, 0,7 para cargas mixtas, 1,0 para cargas resistivas como calentadores."
         }
       },
       "library_multi_profile": {
@@ -367,7 +367,7 @@
           "attribute": "Especifique el atributo. Cuando se deja vacío será el brillo para las luces y porcentaje para los ventiladores",
           "calibrate": "Pon un valor de calibración en cada línea. Ejemplo\n\n1: 20"
         },
-        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
+        "description": "Defina las opciones de cálculo de potencia lineal. Consulte la [documentación]({docs_uri}) para obtener más información. Utilice valores de calibración o potencia mínima/máxima que permitan más puntos de control.",
         "title": "Configuración lineal"
       },
       "manufacturer": {
@@ -405,7 +405,7 @@
           "power": "Potencia para un solo interruptor cuando se enciende",
           "power_off": "Potencia para un solo interruptor cuando se apaga"
         },
-        "description": "Define the Multi switch power calculation options. See the [documentation]({docs_uri}) for more information.",
+        "description": "Defina las opciones de cálculo de potencia del interruptor múltiple. Consulte la [documentación]({docs_uri}) para obtener más información.",
         "title": "Configuración multiinterruptor"
       },
       "playbook": {
@@ -420,7 +420,7 @@
           "repeat": "Alternar cuando quieras seguir repitiendo la reproducción una vez completada",
           "states_trigger": "Dispara una reproducción basada en un cambio de estado. Ejemplo\n\nreproduciendo: programa1"
         },
-        "description": "Define the playbook options. See the [documentation]({docs_uri}) for more information.",
+        "description": "Defina las opciones del libro de jugadas. Consulte la [documentación]({docs_uri}) para obtener más información.",
         "title": "Configuración de Reproducciones"
       },
       "power_advanced": {
@@ -474,18 +474,18 @@
         "description": "Crear un sensor de coste para un sensor de energía existente. El precio de la energía se toma de la configuración global de Powercalc.",
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "Anulación de precio",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Precio fijo de la energía.",
+              "energy_price_multiplier": "Multiplicador del precio de la energía",
+              "energy_price_sensor": "Sensor de precio de la energía",
+              "energy_price_surcharge": "Recargo por el precio de la energía"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "Un precio fijo por kWh en su moneda local. Dejar vacío para utilizar el precio global de la energía.",
+              "energy_price_multiplier": "Multiplicador aplicado después del recargo. Utilice esto para impuestos o tarifas basados ​​en porcentajes, por ejemplo 1,21 para el 21%. Déjelo vacío para usar el multiplicador global.",
+              "energy_price_sensor": "Un sensor que proporciona el precio actual de la energía por kWh (por ejemplo, a partir de una integración dinámica de tarifas). Deje el precio fijo vacío para usar este sensor",
+              "energy_price_surcharge": "Monto fijo adicional por kWh agregado al precio fijo o valor del sensor de precio. Dejar vacío para utilizar el recargo global"
             }
           }
         },
@@ -500,10 +500,10 @@
       },
       "sub_profile_per_device": {
         "data": {
-          "sub_profile": "Sub profile"
+          "sub_profile": "Subperfil"
         },
-        "description": "This device has a model with multiple sub profiles. {remarks}",
-        "title": "Sub profile config"
+        "description": "Este dispositivo tiene un modelo con múltiples subperfiles. {remarks}",
+        "title": "Configuración del subperfil"
       },
       "smart_switch": {
         "data": {
@@ -550,7 +550,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Crear sensor de energía",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Crear sensor de costos",
           "create_utility_meters": "Crear contadores eléctricos",
           "entity_id": "Entidad de origen",
           "mode": "Estrategia de cálculo",
@@ -602,12 +602,12 @@
       "title": "Es necesario volver a seleccionar el dispositivo de la configuración de Powercalc {name}"
     },
     "deprecated_platform_yaml": {
-      "description": "La configuración de los sensores usando `sensor->plataform` está ahora obsoleta. Necesita cambiar su configuración a `powercalc->sensores`. Haga clic en 'Learn more' para más instrucciones.",
+      "description": "La configuración de los sensores mediante `sensor->platform` está obsoleta. Debe cambiar su configuración a `powercalc->sensors`. Haga clic en 'Más información' para obtener más instrucciones.",
       "title": "La configuración de Powercalc YAML se ha movido"
     },
     "legacy_config": {
       "title": "La configuración YAML de descubrimiento ha cambiado",
-      "description": "Su configuración YAML para {type} necesita ser actualizada a la nueva estructura. Haga clic en 'Learn more' para más información."
+      "description": "Su configuración YAML para {type} debe actualizarse a la nueva estructura. Haga clic en 'Más información' para obtener más información."
     },
     "sub_profile": {
       "fix_flow": {
@@ -629,7 +629,7 @@
       "model_not_support": "Modelo no soportado"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
+      "cost_price_mandatory": "Debe proporcionar un precio de energía o un sensor de precio de energía.",
       "fixed_mandatory": "Debe suministrar al menos uno de: potencia, plantilla de potencia o estados de potencia",
       "fixed_states_power_only": "Esta entidad sólo puede funcionar con 'states_power' no 'power'",
       "group_mandatory": "Debes definir como mínimo subgrupos o potencia y entidades de energía",
@@ -661,7 +661,7 @@
         "title": "Opciones básicas",
         "data": {
           "create_energy_sensor": "Crear sensor de energía",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Crear sensor de costos",
           "create_utility_meters": "Crear contadores eléctricos",
           "entity_id": "Entidad de origen",
           "name": "Nombre",
@@ -678,7 +678,7 @@
       "daily_energy": {
         "title": "Opciones de energía diarias",
         "data": {
-          "daily_energy_value": "Daily energy value",
+          "daily_energy_value": "Valor diario de energía",
           "name": "Nombre",
           "on_time": "Tiempo encendido",
           "start_time": "Hora de inicio",
@@ -708,7 +708,7 @@
       "fixed": {
         "title": "Opciones fijas",
         "data": {
-          "fixed_value": "Fixed value",
+          "fixed_value": "Valor fijo",
           "self_usage_included": "Uso propio incluido"
         },
         "data_description": {
@@ -731,13 +731,13 @@
             "name": "Crear sensores",
             "data": {
               "create_energy_sensors": "Crear sensores de energía",
-              "create_cost_sensors": "Create cost sensors",
+              "create_cost_sensors": "Crear sensores de costos",
               "create_standby_group": "Crear grupo de modo de espera",
               "create_utility_meters": "Crear contadores eléctricos"
             },
             "data_description": {
               "create_energy_sensors": "Si powercalc necesita crear sensores kWh",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_cost_sensors": "Si powercalc necesita crear sensores de costos. Requiere que se configure un precio de energía en los siguientes pasos",
               "create_standby_group": "Crear un grupo que sume todo el consumo de energía en modo de espera y el autoconsumo de los dispositivos IoT",
               "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc."
             }
@@ -745,14 +745,14 @@
           "advanced": {
             "name": "Avanzado",
             "data": {
-              "enable_analytics": "Enable anonymous analytics",
+              "enable_analytics": "Habilitar análisis anónimos",
               "ignore_unavailable_state": "Ignorar estado no disponible",
               "include_non_powercalc_sensors": "Incluir sensores que no son powercalc",
               "disable_extended_attributes": "Deshabilitar atributos extendidos",
               "disable_library_download": "Deshabilitar descarga de biblioteca remota"
             },
             "data_description": {
-              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
+              "enable_analytics": "Permita que Powercalc envíe estadísticas de uso agregadas y anónimas para ayudar a mejorar la integración.",
               "ignore_unavailable_state": "Mantener los sensores de Powercalc disponibles, incluso cuando la entidad original no esté disponible",
               "include_non_powercalc_sensors": "Controlar si quieres incluir sensores no powercalc en grupos",
               "disable_extended_attributes": "Deshabilitar todos los atributos extras que powercalc añade a la potencia, energía y estados de entidad de grupo. Esto ayudará a mantener la base de datos pequeña",
@@ -762,45 +762,45 @@
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Consulte la [documentación]({docs_uri}) para obtener más información",
+        "title": "Opciones de costos",
+        "description": "Configura el precio de la energía usado para calcular los sensores de coste. Proporciona un precio fijo o un sensor que indique el precio actual por kWh. Consulte la [documentación]({docs_uri}) para obtener más información",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Precios",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Precio fijo de la energía.",
+              "energy_price_multiplier": "Multiplicador del precio de la energía",
+              "energy_price_sensor": "Sensor de precio de la energía",
+              "energy_price_surcharge": "Recargo por el precio de la energía"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "Un precio fijo por kWh en su moneda local",
+              "energy_price_multiplier": "Multiplicador aplicado después del recargo. Utilice esto para impuestos o tarifas basados ​​en porcentajes, por ejemplo 1,21 para 21%.",
+              "energy_price_sensor": "Un sensor que proporciona el precio actual de la energía por kWh (por ejemplo, a partir de una integración dinámica de tarifas). Deje el precio fijo vacío para usar este sensor",
+              "energy_price_surcharge": "Monto fijo adicional por kWh agregado al precio fijo o valor del sensor de precio"
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "Nombrar",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "Patrón de nombre descriptivo del sensor de costos",
+              "cost_sensor_naming": "Patrón de nombre del sensor de costos"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "Patrón para el nombre descriptivo del sensor de costos. El nombre de la fuente se inserta en la posición del marcador de posición.",
+              "cost_sensor_naming": "Patrón utilizado para crear el nombre del sensor de costos y la identificación de la entidad. El nombre de la fuente se inserta en la posición del marcador de posición."
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "Aplicar sensores de costos",
+        "description": "Cambió la configuración de los sensores de costos globales. ¿Quiere aplicar este cambio a todos los sensores powercalc existentes que se crearon a través del GUI?",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "Aplicar a sensores existentes"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "Actualice todos los sensores powercalc GUI existentes para que coincidan con la nueva configuración de sensores de costo"
         }
       },
       "global_configuration_discovery": {
@@ -835,13 +835,13 @@
           "group_energy_update_interval": "Intervalo de actualización de energía del grupo",
           "group_power_update_interval": "Intervalo de actualización de potencia del grupo",
           "energy_update_interval": "Intervalo de actualización de energía",
-          "power_update_interval": "Power update interval"
+          "power_update_interval": "Intervalo de actualización de potencia"
         },
         "data_description": {
           "group_energy_update_interval": "Intervalo en el que se actualizan los sensores de energía de grupo. En segundos. Establecer a 0 para deshabilitar",
           "group_power_update_interval": "Intervalo en el que se actualizan los sensores de potencia de grupo. En segundos. Establecer a 0 para deshabilitar",
           "energy_update_interval": "Intervalo en el que se actualizan los sensores de energía. En segundos. Establecer a 0 para deshabilitar",
-          "power_update_interval": "Interval at which power sensors are force updated. In seconds. Set to 0 to disable"
+          "power_update_interval": "Intervalo en el que se fuerza la actualización de los sensores de potencia. En segundos. Establecer en 0 para desactivar"
         }
       },
       "global_configuration_utility_meter": {
@@ -909,7 +909,7 @@
           "main_power_sensor": "Sensor de potencia general",
           "group_tracked_auto": "Entidades añadidas automáticamente",
           "create_energy_sensor": "Crear sensor de energía",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Crear sensor de costos",
           "create_utility_meters": "Crear contadores eléctricos"
         },
         "data_description": {
@@ -945,7 +945,7 @@
           "real_power": "Opciones de potencia real",
           "utility_meter_options": "Opciones de contador eléctrico",
           "wled": "Opciones de WLED",
-          "cost_options": "Cost options"
+          "cost_options": "Opciones de costos"
         }
       },
       "library_options": {
@@ -1011,18 +1011,18 @@
         },
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "Anulación de precio",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Precio fijo de la energía.",
+              "energy_price_multiplier": "Multiplicador del precio de la energía",
+              "energy_price_sensor": "Sensor de precio de la energía",
+              "energy_price_surcharge": "Recargo por el precio de la energía"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "Un precio fijo por kWh en su moneda local. Dejar vacío para utilizar el precio global de la energía.",
+              "energy_price_multiplier": "Multiplicador aplicado después del recargo. Utilice esto para impuestos o tarifas basados ​​en porcentajes, por ejemplo 1,21 para el 21%. Déjelo vacío para usar el multiplicador global.",
+              "energy_price_sensor": "Un sensor que proporciona el precio actual de la energía por kWh (por ejemplo, a partir de una integración dinámica de tarifas). Deje el precio fijo vacío para usar este sensor",
+              "energy_price_surcharge": "Monto fijo adicional por kWh agregado al precio fijo o valor del sensor de precio. Dejar vacío para utilizar el recargo global"
             }
           }
         },
@@ -1050,34 +1050,34 @@
       },
       "cost_options": {
         "data": {
-          "energy_price": "Fixed energy price",
-          "energy_price_multiplier": "Energy price multiplier",
-          "energy_price_sensor": "Energy price sensor",
-          "energy_price_surcharge": "Energy price surcharge"
+          "energy_price": "Precio fijo de la energía.",
+          "energy_price_multiplier": "Multiplicador del precio de la energía",
+          "energy_price_sensor": "Sensor de precio de la energía",
+          "energy_price_surcharge": "Recargo por el precio de la energía"
         },
         "data_description": {
-          "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+          "energy_price": "Un precio fijo por kWh en su moneda local. Dejar vacío para utilizar el precio global de la energía.",
+          "energy_price_multiplier": "Multiplicador aplicado después del recargo. Utilice esto para impuestos o tarifas basados ​​en porcentajes, por ejemplo 1,21 para el 21%. Déjelo vacío para usar el multiplicador global.",
+          "energy_price_sensor": "Un sensor que proporciona el precio actual de la energía por kWh (por ejemplo, a partir de una integración dinámica de tarifas). Deje el precio fijo vacío para usar este sensor",
+          "energy_price_surcharge": "Monto fijo adicional por kWh agregado al precio fijo o valor del sensor de precio. Dejar vacío para utilizar el recargo global"
         },
-        "description": "Override the globally configured energy price for this sensor only. Leave all fields empty to keep using the global price. See [documentation]({docs_uri}) for more info",
-        "title": "Cost options"
+        "description": "Anule el precio de energía configurado globalmente solo para este sensor. Deje todos los campos vacíos para seguir usando el precio global. Consulte [documentación]({docs_uri}) para obtener más información.",
+        "title": "Opciones de costos"
       }
     }
   },
   "selector": {
     "daily_energy_value": {
       "choices": {
-        "value": "Value",
-        "value_template": "Value template"
+        "value": "Valor fijo",
+        "value_template": "Plantilla"
       }
     },
     "fixed_value": {
       "choices": {
-        "power": "Power",
-        "power_template": "Power template",
-        "states_power": "States power"
+        "power": "Valor fijo",
+        "power_template": "Plantilla",
+        "states_power": "Mapeo de estados"
       }
     }
   },
@@ -1103,14 +1103,14 @@
       "name": "Crear sensor de energía"
     },
     "calibrate_cost": {
-      "description": "Sets the cost sensor to a given monetary value.",
+      "description": "Establece el sensor de costos en un valor monetario determinado.",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "El valor a establecer.",
+          "name": "Valor"
         }
       },
-      "name": "Calibrate cost sensor"
+      "name": "Calibrar sensor de costos"
     },
     "calibrate_utility_meter": {
       "description": "Calibra un sensor de contador eléctrico.",
@@ -1137,8 +1137,8 @@
       "name": "Cambio configuración gráfica"
     },
     "debug_group": {
-      "description": "Get a debug overview of a group power or energy sensor including current member values.",
-      "name": "Debug group"
+      "description": "Obtenga una descripción general de depuración de un sensor de energía o potencia de grupo, incluidos los valores actuales de los miembros.",
+      "name": "Depurar grupo"
     },
     "get_active_playbook": {
       "description": "Obtener reproducción ejecutándose actualmente",
@@ -1167,8 +1167,8 @@
       "name": "Restablecer sensor de energía"
     },
     "reset_cost": {
-      "description": "Reset a cost sensor to zero.",
-      "name": "Reset cost sensor"
+      "description": "Restablecer un sensor de costos a cero.",
+      "name": "Restablecer sensor de costos"
     },
     "stop_playbook": {
       "description": "Detener reproducción activa.",
