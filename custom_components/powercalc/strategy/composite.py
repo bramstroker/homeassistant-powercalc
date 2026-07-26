@@ -189,22 +189,29 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
 
         total = Decimal(0)
         for sub_strategy in self.strategies:
-            strategy = sub_strategy.strategy
-
-            if sub_strategy.condition and not self._condition_matches(sub_strategy.condition, entity_state):
+            value = await self._calculate_sub_strategy(sub_strategy, entity_state)
+            if value is None:
                 continue
-
-            if isinstance(strategy, PlaybookStrategy):
-                await self.activate_playbook(strategy)
-
-            if entity_state.state != STATE_OFF or strategy.can_calculate_standby():
-                value = await strategy.calculate(entity_state)
-                if value is not None:
-                    if self.mode == CompositeMode.STOP_AT_FIRST:
-                        return value
-                    total += value
+            if self.mode == CompositeMode.STOP_AT_FIRST:
+                return value
+            total += value
 
         return total if self.mode == CompositeMode.SUM_ALL else None
+
+    async def _calculate_sub_strategy(self, sub_strategy: SubStrategy, entity_state: State) -> Decimal | None:
+        """Calculate the power for a single sub strategy. Returns None when the sub strategy must be skipped."""
+        strategy = sub_strategy.strategy
+
+        if sub_strategy.condition and not self._condition_matches(sub_strategy.condition, entity_state):
+            return None
+
+        if isinstance(strategy, PlaybookStrategy):
+            await self.activate_playbook(strategy)
+
+        if entity_state.state == STATE_OFF and not strategy.can_calculate_standby():
+            return None
+
+        return await strategy.calculate(entity_state)
 
     def _condition_matches(self, condition: ConditionCheckerType, entity_state: State) -> bool:
         try:

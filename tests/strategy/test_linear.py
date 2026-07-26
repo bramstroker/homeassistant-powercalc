@@ -166,12 +166,9 @@ async def test_no_battery_entity_for_vacuum(
         },
     )
 
+    source_entity = create_source_entity("vacuum.test", hass)
     with pytest.raises(StrategyConfigurationError, match="No battery entity found for vacuum cleaner"):
-        await _create_strategy_instance(
-            hass,
-            create_source_entity("vacuum.test", hass),
-            {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
-        )
+        await _create_strategy_instance(hass, source_entity, {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100})
 
 
 async def test_custom_attribute(hass: HomeAssistant) -> None:
@@ -215,23 +212,17 @@ async def test_error_on_non_number_state(
 async def test_validate_raises_exception_not_allowed_domain(
     hass: HomeAssistant,
 ) -> None:
+    source_entity = create_source_entity("sensor.test", hass)
     with pytest.raises(StrategyConfigurationError):
-        await _create_strategy_instance(
-            hass,
-            create_source_entity("sensor.test", hass),
-            {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
-        )
+        await _create_strategy_instance(hass, source_entity, {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100})
 
 
 async def test_validate_raises_exception_when_min_power_higher_than_max(
     hass: HomeAssistant,
 ) -> None:
+    source_entity = create_source_entity("light.test", hass)
     with pytest.raises(StrategyConfigurationError):
-        await _create_strategy_instance(
-            hass,
-            create_source_entity("light.test", hass),
-            {CONF_MIN_POWER: 150, CONF_MAX_POWER: 100},
-        )
+        await _create_strategy_instance(hass, source_entity, {CONF_MIN_POWER: 150, CONF_MAX_POWER: 100})
 
 
 async def test_lower_value_than_calibration_table_defines(hass: HomeAssistant) -> None:
@@ -301,12 +292,9 @@ async def test_media_player_volume_level(hass: HomeAssistant) -> None:
 async def test_error_is_raised_on_unsupported_entity_domain(
     hass: HomeAssistant,
 ) -> None:
+    source_entity = create_source_entity("input_boolean.test", hass)
     with pytest.raises(StrategyConfigurationError):
-        await _create_strategy_instance(
-            hass,
-            create_source_entity("input_boolean.test", hass),
-            {CONF_MAX_POWER: 255},
-        )
+        await _create_strategy_instance(hass, source_entity, {CONF_MAX_POWER: 255})
 
 
 async def test_value_entity_not_found(

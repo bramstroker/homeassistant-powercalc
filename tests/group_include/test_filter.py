@@ -117,7 +117,7 @@ def test_label_filter(
 
     if expect_exception:
         with pytest.raises(SensorConfigurationError):
-            LabelFilter(hass, label).is_valid(entry)
+            LabelFilter(hass, label)
         return
 
     assert LabelFilter(hass, label).is_valid(entry) == expected_result
@@ -170,7 +170,7 @@ def test_floor_filter(
     )
     if expect_exception:
         with pytest.raises(SensorConfigurationError):
-            FloorFilter(hass, floor).is_valid(entry)
+            FloorFilter(hass, floor)
         return
 
     assert FloorFilter(hass, floor).is_valid(entry) == expected_result
@@ -233,7 +233,7 @@ def test_category_filter(
 
     if expect_exception:
         with pytest.raises(SensorConfigurationError):
-            CategoryFilter(filter_categories).is_valid(entry)
+            CategoryFilter(filter_categories)
         return
 
     assert CategoryFilter(filter_categories).is_valid(entry) == expected_result
@@ -343,7 +343,7 @@ def test_area_filter(
     )
     if expect_exception:
         with pytest.raises(SensorConfigurationError):
-            AreaFilter(hass, area).is_valid(entry)
+            AreaFilter(hass, area)
         return
 
     assert AreaFilter(hass, area).is_valid(entry) == expected_result

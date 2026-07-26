@@ -134,8 +134,9 @@ def test_preflight_reports_unknown_dummy_load_voltage_capability() -> None:
         dummy_load=DummyLoadCalibrationRequest(description="40 W incandescent bulb"),
     )
 
+    validator = preflight(base_entities(), voltage_supported=None)
     with pytest.raises(PreflightError, match="Could not inspect voltage capability"):
-        preflight(base_entities(), voltage_supported=None).validate(request)
+        validator.validate(request)
 
 
 def test_dummy_load_sampling_failure_does_not_mask_controller_validation() -> None:
@@ -247,8 +248,10 @@ def test_preflight_rejects_missing_charging_battery_source() -> None:
     """Neither a battery sensor on the device nor the battery_level attribute is available."""
     entities = base_entities() | {("vacuum", None): [Entity("vacuum.test", attribute_names=[])]}
 
+    validator = preflight(entities)
+    request = _charging_request()
     with pytest.raises(PreflightError, match=r"battery_level is not available"):
-        preflight(entities).validate(_charging_request())
+        validator.validate(request)
 
 
 def test_preflight_accepts_charging_with_related_battery_sensor() -> None:
@@ -278,8 +281,10 @@ def test_preflight_rejects_non_numeric_related_battery_sensor() -> None:
         (None, "battery"): [Entity("sensor.vacuum_battery", state="unknown", device_id="vacuum-device")],
     }
 
+    validator = preflight(entities)
+    request = _charging_request()
     with pytest.raises(PreflightError, match="numeric percentage"):
-        preflight(entities).validate(_charging_request())
+        validator.validate(request)
 
 
 def test_light_preflight_accepts_dummy_controller_without_entity_checks() -> None:

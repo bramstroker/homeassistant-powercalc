@@ -25,7 +25,7 @@ jobs:
           cache-dependency-glob: |
             pyproject.toml
             uv.lock
-      - run: uv sync
+      - run: uv sync --locked
       - uses: j178/prek-action@5337cb91e0fa35a7ff31b9ca345126d8bbbcdf16 # v2
         with:
           cache: true

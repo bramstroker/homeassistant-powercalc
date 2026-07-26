@@ -203,8 +203,9 @@ async def test_download_profile_exception_unexpected_status_code(
         repeat=True,
     )
 
+    profile_dir = get_test_profile_dir("download")
     with pytest.raises(ProfileDownloadError):
-        await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"), "test_download")
+        await remote_loader.download_profile("signify", "LCA001", profile_dir, "test_download")
 
 
 async def test_exception_is_raised_on_connection_error(
@@ -213,8 +214,9 @@ async def test_exception_is_raised_on_connection_error(
 ) -> None:
     mock_aioresponse.get(f"{ENDPOINT_DOWNLOAD}/signify/LCA001?hash=test_download", exception=ClientError("test"))
 
+    profile_dir = get_test_profile_dir("download")
     with pytest.raises(ProfileDownloadError):
-        await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"), "test_download")
+        await remote_loader.download_profile("signify", "LCA001", profile_dir, "test_download")
 
 
 async def test_exception_is_raised_on_github_resource_unavailable(

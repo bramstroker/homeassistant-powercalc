@@ -212,7 +212,7 @@ async def _async_setup_entities(
         _LOGGER.error(err)
         return
 
-    await attach_entities_to_resolved_device(config_entry, entities.new, hass, None, config)
+    attach_entities_to_resolved_device(config_entry, entities.new, hass, None, config)
 
     entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
     for entity in entities_to_add:
@@ -623,6 +623,30 @@ async def create_group_if_needed(
     )
 
 
+def _add_power_and_energy_sensor(
+    hass: HomeAssistant,
+    sensor_config: dict,
+    source_entity: SourceEntity,
+    power_sensor: PowerSensor,
+    entities_to_add: list[Entity],
+) -> EnergySensor | None:
+    """Add the power sensor and, when configured, the energy sensor tracking it."""
+    entities_to_add.append(power_sensor)
+
+    if not (
+        sensor_config.get(CONF_CREATE_ENERGY_SENSOR)
+        or sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION)
+        or CONF_ENERGY_SENSOR_ID in sensor_config
+    ):
+        return None
+
+    energy_sensor = create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
+    entities_to_add.append(energy_sensor)
+    if isinstance(power_sensor, VirtualPowerSensor):
+        power_sensor.set_energy_sensor_attribute(energy_sensor.entity_id)
+    return energy_sensor
+
+
 async def create_individual_sensors(
     hass: HomeAssistant,
     sensor_config: dict,
@@ -663,23 +687,14 @@ async def create_individual_sensors(
             power_sensor = await create_power_sensor(hass, sensor_config, source_entity, config_entry)
         except PowercalcSetupError:
             return EntitiesBucket()
-        entities_to_add.append(power_sensor)
-        if (
-            sensor_config.get(CONF_CREATE_ENERGY_SENSOR)
-            or sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION)
-            or CONF_ENERGY_SENSOR_ID in sensor_config
-        ):
-            energy_sensor = create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
-            entities_to_add.append(energy_sensor)
-            if isinstance(power_sensor, VirtualPowerSensor):
-                power_sensor.set_energy_sensor_attribute(energy_sensor.entity_id)
+        energy_sensor = _add_power_and_energy_sensor(hass, sensor_config, source_entity, power_sensor, entities_to_add)
 
     if energy_sensor:
         entities_to_add.extend(
             create_energy_related_sensors(hass, sensor_config, energy_sensor, source_entity, config_entry),
         )
 
-    await attach_entities_to_resolved_device(config_entry, entities_to_add, hass, source_entity, sensor_config)
+    attach_entities_to_resolved_device(config_entry, entities_to_add, hass, source_entity, sensor_config)
     hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
         {source_entity.entity_id: [(entity, context.is_yaml) for entity in entities_to_add]},
     )

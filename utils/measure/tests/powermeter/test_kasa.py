@@ -31,8 +31,9 @@ def test_disconnects_when_a_reading_fails() -> None:
     with patch("measure.powermeter.kasa.IotPlug", return_value=plug):
         meter = KasaPowerMeter("192.0.2.1")
 
+    read_power_meter = meter.async_read_power_meter()
     with pytest.raises(OSError, match="device unreachable"):
-        asyncio.run(meter.async_read_power_meter())
+        asyncio.run(read_power_meter)
     plug.disconnect.assert_awaited_once_with()
 
 

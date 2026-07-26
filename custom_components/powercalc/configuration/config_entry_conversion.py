@@ -38,6 +38,29 @@ def _convert_template(config: ConfigType, source_key: str, target_key: str, hass
         config[target_key] = Template(config.pop(source_key), hass)
 
 
+def _convert_daily_fixed_energy(sensor_config: ConfigType, hass: HomeAssistant) -> None:
+    daily_fixed_config = dict(sensor_config[CONF_DAILY_FIXED_ENERGY])
+    _convert_template(daily_fixed_config, CONF_VALUE_TEMPLATE, CONF_VALUE, hass)
+    on_time = daily_fixed_config.get(CONF_ON_TIME)
+    daily_fixed_config[CONF_ON_TIME] = (
+        timedelta(hours=on_time["hours"], minutes=on_time["minutes"], seconds=on_time["seconds"])
+        if on_time
+        else timedelta(days=1)
+    )
+    sensor_config[CONF_DAILY_FIXED_ENERGY] = daily_fixed_config
+
+
+def _convert_fixed(sensor_config: ConfigType, hass: HomeAssistant) -> None:
+    fixed_config = dict(sensor_config[CONF_FIXED])
+    _convert_template(fixed_config, CONF_POWER_TEMPLATE, CONF_POWER, hass)
+    if CONF_STATES_POWER in fixed_config:
+        fixed_config[CONF_STATES_POWER] = {
+            key: Template(value, hass) if isinstance(value, str) and "{{" in value else value
+            for key, value in normalize_states_power(fixed_config[CONF_STATES_POWER]).items()
+        }
+    sensor_config[CONF_FIXED] = fixed_config
+
+
 def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeAssistant) -> ConfigType:
     """Convert the config entry structure to the sensor config used to create the entities."""
     sensor_config = dict(config_entry.data)
@@ -49,25 +72,10 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
         sensor_config[CONF_FORCE_ENERGY_SENSOR_CREATION] = True
 
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
-        daily_fixed_config = dict(sensor_config[CONF_DAILY_FIXED_ENERGY])
-        _convert_template(daily_fixed_config, CONF_VALUE_TEMPLATE, CONF_VALUE, hass)
-        on_time = daily_fixed_config.get(CONF_ON_TIME)
-        daily_fixed_config[CONF_ON_TIME] = (
-            timedelta(hours=on_time["hours"], minutes=on_time["minutes"], seconds=on_time["seconds"])
-            if on_time
-            else timedelta(days=1)
-        )
-        sensor_config[CONF_DAILY_FIXED_ENERGY] = daily_fixed_config
+        _convert_daily_fixed_energy(sensor_config, hass)
 
     if CONF_FIXED in sensor_config:
-        fixed_config = dict(sensor_config[CONF_FIXED])
-        _convert_template(fixed_config, CONF_POWER_TEMPLATE, CONF_POWER, hass)
-        if CONF_STATES_POWER in fixed_config:
-            fixed_config[CONF_STATES_POWER] = {
-                key: Template(value, hass) if isinstance(value, str) and "{{" in value else value
-                for key, value in normalize_states_power(fixed_config[CONF_STATES_POWER]).items()
-            }
-        sensor_config[CONF_FIXED] = fixed_config
+        _convert_fixed(sensor_config, hass)
 
     if CONF_LINEAR in sensor_config:
         sensor_config[CONF_LINEAR] = dict(sensor_config[CONF_LINEAR])

@@ -113,12 +113,12 @@ async def test_get_model_listing(hass: HomeAssistant) -> None:
         {DeviceType.SMART_SWITCH},
     )
     assert ("light20", "IKEA Control outlet") in await loader.get_model_listing("tp-link", {DeviceType.LIGHT})
-    assert {
+    assert await loader.get_model_listing("tp-link", None) == {
         ("HS300", "IKEA Control outlet"),
         ("HS400", "IKEA Control outlet"),
         ("hs500", "IKEA Control outlet"),
         ("light20", "IKEA Control outlet"),
-    } == await loader.get_model_listing("tp-link", None)
+    }
     assert ("HS400", "IKEA Control outlet") in await loader.get_model_listing("tp-link", {DeviceType.SMART_SWITCH})
     assert ("HS400", "IKEA Control outlet") not in await loader.get_model_listing("tp-link", {DeviceType.LIGHT})
     assert ("test", "Fixed mode profile") in await loader.get_model_listing("Tasmota", {DeviceType.LIGHT})

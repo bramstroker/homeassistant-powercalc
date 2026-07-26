@@ -167,8 +167,9 @@ def test_preparer_blocks_collisions_and_warns_on_duplicates(tmp_path: Path) -> N
 
     assert preview.warnings == ("Possible duplicate profile: profile_library/signify/LCT010/model.json",)
 
+    collision_metadata = metadata(model_id="LCT010")
     with pytest.raises(ProfilePreparationError, match="Refusing to overwrite"):
-        preparer.prepare(artifacts, metadata(model_id="LCT010"))
+        preparer.prepare(artifacts, collision_metadata)
 
 
 def test_preparer_uses_downloaded_library_index_for_aliases_and_collisions(tmp_path: Path) -> None:
@@ -180,8 +181,9 @@ def test_preparer_uses_downloaded_library_index_for_aliases_and_collisions(tmp_p
     preview = preparer.prepare(artifacts, metadata(model_id="LCT999"))
 
     assert preview.manufacturer_directory == "signify"
+    collision_metadata = metadata(model_id="LCT010")
     with pytest.raises(ProfilePreparationError, match="Refusing to overwrite"):
-        preparer.prepare(artifacts, metadata(model_id="LCT010"))
+        preparer.prepare(artifacts, collision_metadata)
 
 
 def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts(tmp_path: Path) -> None:
@@ -197,8 +199,9 @@ def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts
     assert "profile_library/signify/LCT999/brightness.csv" not in {file.path for file in preview.files}
 
     (artifacts / "debug.txt").write_text("not a profile artifact", encoding="utf-8")
+    profile_metadata = metadata()
     with pytest.raises(ProfilePreparationError, match="Unexpected artifact"):
-        preparer.prepare(artifacts, metadata())
+        preparer.prepare(artifacts, profile_metadata)
 
 
 def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None:
@@ -222,5 +225,6 @@ def test_preparer_blocks_case_insensitive_index_collisions(tmp_path: Path) -> No
     write_profile_artifacts(artifacts)
     preparer = make_preparer(tmp_path)
 
+    collision_metadata = metadata(model_id="lct010")
     with pytest.raises(ProfilePreparationError, match="Refusing to overwrite"):
-        preparer.prepare(artifacts, metadata(model_id="lct010"))
+        preparer.prepare(artifacts, collision_metadata)

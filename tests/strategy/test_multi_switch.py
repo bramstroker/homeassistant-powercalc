@@ -114,11 +114,7 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
     ],
 )
 async def test_strategy_configuration_error(hass: HomeAssistant, config: ConfigType) -> None:
+    factory = PowerCalculatorStrategyFactory(hass)
+    source_entity = create_source_entity("switch.test1", hass)
     with pytest.raises(StrategyConfigurationError):
-        factory = PowerCalculatorStrategyFactory(hass)
-        await factory.create(
-            config,
-            CalculationStrategy.MULTI_SWITCH,
-            None,
-            create_source_entity("switch.test1", hass),
-        )
+        await factory.create(config, CalculationStrategy.MULTI_SWITCH, None, source_entity)

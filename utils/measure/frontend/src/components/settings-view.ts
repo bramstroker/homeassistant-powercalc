@@ -250,29 +250,39 @@ export class SettingsView extends LitElement {
     return html`<measure-power-meter-diagnostic .diagnostic=${this.testResult}></measure-power-meter-diagnostic>`;
   }
 
-  private renderGithubSection() {
+  private renderGithubIdentity() {
     const identity = this.contributionAuth?.identity;
+    const permissionsHint = this.contributionAuth?.permissions_verified === false
+      ? html`<span class="field-hint">Identity verified. Fine-grained token permissions can only be confirmed during submission.</span>`
+      : nothing;
+    return html`
+      <div class="identity">
+        <div>
+          <span class="field-hint">Connected as</span>
+          <strong>${identity ? identity.login : "GitHub"}</strong>
+          ${permissionsHint}
+        </div>
+        <button class="danger" type="button" @click=${this.disconnectGithub} ?disabled=${this.contributionAuthBusy}>Disconnect</button>
+      </div>
+    `;
+  }
+
+  private renderGithubConnect() {
+    const deviceFlowHint = this.contributionAuth?.device_flow_available === false
+      ? html`<p class="field-hint">Device login is not configured for this app build. Use a personal access token.</p>`
+      : nothing;
+    return html`
+      <p class="muted">Connect GitHub to contribute measured profiles. You only need to do this once.</p>
+      ${this.renderDeviceFlow()}
+      ${deviceFlowHint}
+    `;
+  }
+
+  private renderGithubSection() {
     return html`
       <div class="section-fields">
         <div class="github-card">
-          ${this.contributionAuth?.connected ? html`
-            <div class="identity">
-              <div>
-                <span class="field-hint">Connected as</span>
-                <strong>${identity ? identity.login : "GitHub"}</strong>
-                ${this.contributionAuth.permissions_verified === false
-                  ? html`<span class="field-hint">Identity verified. Fine-grained token permissions can only be confirmed during submission.</span>`
-                  : nothing}
-              </div>
-              <button class="danger" type="button" @click=${this.disconnectGithub} ?disabled=${this.contributionAuthBusy}>Disconnect</button>
-            </div>
-          ` : html`
-            <p class="muted">Connect GitHub to contribute measured profiles. You only need to do this once.</p>
-            ${this.renderDeviceFlow()}
-            ${this.contributionAuth?.device_flow_available === false
-              ? html`<p class="field-hint">Device login is not configured for this app build. Use a personal access token.</p>`
-              : nothing}
-          `}
+          ${this.contributionAuth?.connected ? this.renderGithubIdentity() : this.renderGithubConnect()}
         </div>
         ${this.contributionAuth?.connected ? nothing : this.renderTokenFallback()}
         <p class="notice">GitHub credentials are stored by the measure app and can be included in Home Assistant backups. Disconnect GitHub before sharing or exporting backups you do not control.</p>

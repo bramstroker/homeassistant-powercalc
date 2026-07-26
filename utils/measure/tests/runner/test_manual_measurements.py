@@ -29,8 +29,10 @@ def test_recorder_reports_start_phase_after_confirmation(tmp_path: Path) -> None
     interaction.wait.side_effect = MeasurementCancelledError
     runner = RecorderRunner(measure_util, interaction)
 
+    request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    export_directory = str(tmp_path)
     with pytest.raises(MeasurementCancelledError):
-        runner.run(RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec()), str(tmp_path))
+        runner.run(request, export_directory)
 
     interaction.confirm.assert_called_once_with("Ready to start recording. Stop the measurement when you are finished.")
     interaction.phase.assert_called_once_with("Starting recording")

@@ -74,6 +74,9 @@ export interface Capabilities {
 
 export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan";
 
+/** A plain value as it travels between the app and the API: form field values, device info, metadata. */
+export type PrimitiveValue = string | number | boolean | null;
+
 /** Where a submitted field value lands in the measurement request. Mirrors `FieldRole` server-side. */
 export type FieldRole = "attribute" | "controller" | "power_meter";
 
@@ -95,7 +98,7 @@ export interface FormField {
   required: boolean;
   entity_domains?: string[];
   options: FormFieldOption[];
-  default?: string | number | boolean | null;
+  default?: PrimitiveValue;
   minimum?: number | null;
   maximum?: number | null;
 }
@@ -350,8 +353,8 @@ export interface ContributionDraft {
   model_id: string;
   product_name: string;
   contributor: string;
-  device_info: Record<string, string | number | boolean | null>;
-  home_assistant: Record<string, string | number | boolean | null>;
+  device_info: Record<string, PrimitiveValue>;
+  home_assistant: Record<string, PrimitiveValue>;
   notes: string;
   files: ContributionDraftFile[];
   model_json?: unknown;
