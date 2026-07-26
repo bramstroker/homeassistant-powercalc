@@ -10,7 +10,7 @@
       "already_configured": "Сенсор уже настроен, укажите уникальный unique_id"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
+      "cost_price_mandatory": "Вы должны предоставить либо цену на энергию, либо датчик цены на энергию.",
       "daily_energy_mandatory": "Необходимо указать хотя бы одно из: Значение или Шаблон значения",
       "entity_mandatory": "Выбор объекта обязателен для любой стратегии, кроме playbook",
       "fixed_mandatory": "Необходимо указать хотя бы одно из: Мощность, Шаблон мощности или Мощность по состояниям",
@@ -49,7 +49,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Создать счётчики",
-          "daily_energy_value": "Daily energy value",
+          "daily_energy_value": "Суточное значение энергии",
           "name": "Название",
           "on_time": "Время работы",
           "start_time": "Время начала",
@@ -81,7 +81,7 @@
         "data": {
           "name": "Название",
           "create_energy_sensor": "Создать сенсор энергии",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Создать датчик затрат",
           "create_utility_meters": "Создать счётчики",
           "domain": "Домен объекта",
           "exclude_entities": "Исключить объекты"
@@ -90,10 +90,10 @@
       },
       "fixed": {
         "data": {
-          "fixed_value": "Fixed value"
+          "fixed_value": "Значение мощности"
         },
         "data_description": {
-          "fixed_value": "Fixed value in Watts when the entity is ON"
+          "fixed_value": "Значение мощности в ваттах, когда объект ВКЛЮЧЕН"
         },
         "description": "Определите фиксированное значение мощности для вашего объекта. См. [документацию]({docs_uri}) для подробностей. Альтернативно можно указать мощность для каждого состояния. Например:\n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Фиксированная конфигурация"
@@ -115,13 +115,13 @@
             "name": "Создание датчиков",
             "data": {
               "create_energy_sensors": "Создавать сенсоры энергии",
-              "create_cost_sensors": "Create cost sensors",
+              "create_cost_sensors": "Создайте датчики затрат",
               "create_standby_group": "Создать группу ожидания",
               "create_utility_meters": "Создавать счётчики"
             },
             "data_description": {
               "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_cost_sensors": "Нужно ли powercalc создавать датчики затрат. Требуется настроить цену на электроэнергию на следующих шагах.",
               "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
               "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами"
             }
@@ -146,45 +146,45 @@
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Дополнительные сведения см. в [документации]({docs_uri})",
+        "title": "Варианты стоимости",
+        "description": "Настройте цену энергии, используемую для расчета датчиков стоимости. Укажите фиксированную цену или датчик, который предоставляет текущую цену за кВт⋅ч. Дополнительные сведения см. в [документации]({docs_uri})",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Цены",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Фиксированная цена на энергию",
+              "energy_price_multiplier": "Мультипликатор цен на энергию",
+              "energy_price_sensor": "Датчик цен на энергию",
+              "energy_price_surcharge": "Надбавка к цене на электроэнергию"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "Фиксированная цена за kWh в вашей местной валюте.",
+              "energy_price_multiplier": "Множитель применяется после надбавки. Используйте это значение для налогов и сборов, основанных на процентах, например 1,21 для 21 %.",
+              "energy_price_sensor": "Датчик, который предоставляет текущую цену на электроэнергию по kWh (например, в результате динамической интеграции тарифов). Оставьте фиксированную цену пустой, чтобы использовать этот датчик.",
+              "energy_price_surcharge": "Дополнительная фиксированная сумма за каждый kWh, добавленная к фиксированной цене или значению датчика цены."
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "Именование",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "Шаблон понятного имени датчика затрат",
+              "cost_sensor_naming": "Шаблон имени датчика стоимости"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "Шаблон понятного имени датчика стоимости. Имя источника вставляется в позицию заполнителя.",
+              "cost_sensor_naming": "Шаблон, используемый для создания имени датчика затрат и идентификатора объекта. Имя источника вставляется в позицию заполнителя."
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "Примените датчики затрат",
+        "description": "Вы изменили настройку глобальных датчиков затрат. Хотите ли вы применить это изменение ко всем существующим датчикам powercalc, созданным с помощью GUI?",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "Применить к существующим датчикам"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "Обновите каждый существующий датчик расчета мощности GUI, чтобы он соответствовал новым настройкам датчиков затрат."
         }
       },
       "global_configuration_discovery": {
@@ -286,7 +286,7 @@
       "group_subtract": {
         "data": {
           "create_energy_sensor": "Создать сенсор энергии",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Создать датчик затрат",
           "create_utility_meters": "Создать счётчики",
           "entity_id": "Базовый объект",
           "name": "Название",
@@ -303,7 +303,7 @@
           "main_power_sensor": "Сенсор общей мощности",
           "group_tracked_auto": "Автоматическое добавление объектов",
           "create_energy_sensor": "Создать сенсор энергии",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Создать датчик затрат",
           "create_utility_meters": "Создать счётчики"
         },
         "data_description": {
@@ -340,12 +340,12 @@
         "title": "Библиотека"
       },
       "library_custom_fields": {
-        "title": "Profile configuration",
+        "title": "Конфигурация профиля",
         "data": {
-          "power_factor": "Power Factor"
+          "power_factor": "Коэффициент мощности"
         },
         "data_description": {
-          "power_factor": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters."
+          "power_factor": "Отношение реальной мощности к полной мощности. Используйте 0,6 для компьютеров/электроники, 0,7 для смешанных нагрузок, 1,0 для резистивных нагрузок, таких как обогреватели."
         }
       },
       "library_multi_profile": {
@@ -367,7 +367,7 @@
           "attribute": "Укажите атрибут. Если оставить пустым, будет использоваться яркость для светильников, громкость для колонок и процент для вентиляторов",
           "calibrate": "Укажите калибровочное значение на каждой строке. Пример\n\n1: 20"
         },
-        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
+        "description": "Определите параметры расчета линейной мощности. Дополнительную информацию смотрите в [документации]({docs_uri}). Используйте минимальную/максимальную мощность или значения калибровки, что позволяет иметь больше точек контроля.",
         "title": "Линейная конфигурация"
       },
       "manufacturer": {
@@ -405,7 +405,7 @@
           "power": "Мощность одного выключателя во включённом состоянии",
           "power_off": "Мощность одного выключателя в выключенном состоянии"
         },
-        "description": "Define the Multi switch power calculation options. See the [documentation]({docs_uri}) for more information.",
+        "description": "Определите параметры расчета мощности мультипереключателя. Дополнительную информацию смотрите в [документации]({docs_uri}).",
         "title": "Конфигурация мультивыключателя"
       },
       "playbook": {
@@ -420,7 +420,7 @@
           "repeat": "Включите, если хотите повторять сценарий после его завершения",
           "states_trigger": "Запуск сценария по изменению состояния. Пример\n\nplaying: program1"
         },
-        "description": "Define the playbook options. See the [documentation]({docs_uri}) for more information.",
+        "description": "Определите параметры плейбука. Дополнительную информацию смотрите в [документации]({docs_uri}).",
         "title": "Конфигурация сценариев"
       },
       "power_advanced": {
@@ -474,18 +474,18 @@
         "description": "Создать датчик стоимости для существующего датчика энергии. Цена энергии берется из глобальной конфигурации Powercalc.",
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "Переопределение цены",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Фиксированная цена на энергию",
+              "energy_price_multiplier": "Мультипликатор цен на энергию",
+              "energy_price_sensor": "Датчик цен на энергию",
+              "energy_price_surcharge": "Надбавка к цене на электроэнергию"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "Фиксированная цена за kWh в вашей местной валюте. Оставьте пустым, чтобы использовать глобальную цену на энергоносители.",
+              "energy_price_multiplier": "Множитель применяется после надбавки. Используйте это значение для налогов и сборов, основанных на процентах, например 1,21 для 21%. Оставьте пустым, чтобы использовать глобальный множитель",
+              "energy_price_sensor": "Датчик, который предоставляет текущую цену на электроэнергию по kWh (например, в результате динамической интеграции тарифов). Оставьте фиксированную цену пустой, чтобы использовать этот датчик.",
+              "energy_price_surcharge": "Дополнительная фиксированная сумма за каждый kWh добавляется к фиксированной цене или значению датчика цены. Оставьте пустым, чтобы использовать глобальную надбавку"
             }
           }
         },
@@ -550,7 +550,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Создать сенсор энергии",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Создать датчик затрат",
           "create_utility_meters": "Создать счётчики",
           "entity_id": "Исходный объект",
           "mode": "Стратегия расчёта",
@@ -629,7 +629,7 @@
       "model_not_support": "Модель не поддерживается"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
+      "cost_price_mandatory": "Вы должны предоставить либо цену на энергию, либо датчик цены на энергию.",
       "fixed_mandatory": "Необходимо указать хотя бы одно из: Мощность, Шаблон мощности или Мощность по состояниям",
       "fixed_states_power_only": "Этот объект может работать только с 'states_power', а не 'power'",
       "group_mandatory": "Необходимо определить хотя бы подгруппы или объекты мощности и энергии",
@@ -661,7 +661,7 @@
         "title": "Основные параметры",
         "data": {
           "create_energy_sensor": "Создать сенсор энергии",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Создать датчик затрат",
           "create_utility_meters": "Создать счётчики",
           "entity_id": "Исходный объект",
           "name": "Название",
@@ -678,7 +678,7 @@
       "daily_energy": {
         "title": "Параметры суточной энергии",
         "data": {
-          "daily_energy_value": "Daily energy value",
+          "daily_energy_value": "Суточное значение энергии",
           "name": "Название",
           "on_time": "Время работы",
           "start_time": "Время начала",
@@ -708,7 +708,7 @@
       "fixed": {
         "title": "Фиксированные параметры",
         "data": {
-          "fixed_value": "Fixed value",
+          "fixed_value": "Фиксированное значение",
           "self_usage_included": "Включено собственное потребление"
         },
         "data_description": {
@@ -731,13 +731,13 @@
             "name": "Создание датчиков",
             "data": {
               "create_energy_sensors": "Создавать сенсоры энергии",
-              "create_cost_sensors": "Create cost sensors",
+              "create_cost_sensors": "Создайте датчики затрат",
               "create_standby_group": "Создать группу ожидания",
               "create_utility_meters": "Создавать счётчики"
             },
             "data_description": {
               "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
+              "create_cost_sensors": "Нужно ли powercalc создавать датчики затрат. Требуется настроить цену на электроэнергию на следующих шагах.",
               "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
               "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами"
             }
@@ -762,45 +762,45 @@
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. Дополнительные сведения см. в [документации]({docs_uri})",
+        "title": "Варианты стоимости",
+        "description": "Настройте цену энергии, используемую для расчета датчиков стоимости. Укажите фиксированную цену или датчик, который предоставляет текущую цену за кВт⋅ч. Дополнительные сведения см. в [документации]({docs_uri})",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Цены",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Фиксированная цена на энергию",
+              "energy_price_multiplier": "Мультипликатор цен на энергию",
+              "energy_price_sensor": "Датчик цен на энергию",
+              "energy_price_surcharge": "Надбавка к цене на электроэнергию"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "Фиксированная цена за kWh в вашей местной валюте.",
+              "energy_price_multiplier": "Множитель применяется после надбавки. Используйте это значение для налогов и сборов, основанных на процентах, например 1,21 для 21 %.",
+              "energy_price_sensor": "Датчик, который предоставляет текущую цену на электроэнергию по kWh (например, в результате динамической интеграции тарифов). Оставьте фиксированную цену пустой, чтобы использовать этот датчик.",
+              "energy_price_surcharge": "Дополнительная фиксированная сумма за каждый kWh, добавленная к фиксированной цене или значению датчика цены."
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "Именование",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "Шаблон понятного имени датчика затрат",
+              "cost_sensor_naming": "Шаблон имени датчика стоимости"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "Шаблон понятного имени датчика стоимости. Имя источника вставляется в позицию заполнителя.",
+              "cost_sensor_naming": "Шаблон, используемый для создания имени датчика затрат и идентификатора объекта. Имя источника вставляется в позицию заполнителя."
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "Примените датчики затрат",
+        "description": "Вы изменили настройку глобальных датчиков затрат. Хотите ли вы применить это изменение ко всем существующим датчикам powercalc, созданным с помощью GUI?",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "Применить к существующим датчикам"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "Обновите каждый существующий датчик расчета мощности GUI, чтобы он соответствовал новым настройкам датчиков затрат."
         }
       },
       "global_configuration_discovery": {
@@ -909,7 +909,7 @@
           "main_power_sensor": "Сенсор общей мощности",
           "group_tracked_auto": "Автоматическое добавление объектов",
           "create_energy_sensor": "Создать сенсор энергии",
-          "create_cost_sensor": "Create cost sensor",
+          "create_cost_sensor": "Создать датчик затрат",
           "create_utility_meters": "Создать счётчики"
         },
         "data_description": {
@@ -945,7 +945,7 @@
           "real_power": "Параметры реальной мощности",
           "utility_meter_options": "Параметры счётчиков",
           "wled": "Параметры WLED",
-          "cost_options": "Cost options"
+          "cost_options": "Варианты стоимости"
         }
       },
       "library_options": {
@@ -1011,18 +1011,18 @@
         },
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "Переопределение цены",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Фиксированная цена на энергию",
+              "energy_price_multiplier": "Мультипликатор цен на энергию",
+              "energy_price_sensor": "Датчик цен на энергию",
+              "energy_price_surcharge": "Надбавка к цене на электроэнергию"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "Фиксированная цена за kWh в вашей местной валюте. Оставьте пустым, чтобы использовать глобальную цену на энергоносители.",
+              "energy_price_multiplier": "Множитель применяется после надбавки. Используйте это значение для налогов и сборов, основанных на процентах, например 1,21 для 21%. Оставьте пустым, чтобы использовать глобальный множитель",
+              "energy_price_sensor": "Датчик, который предоставляет текущую цену на электроэнергию по kWh (например, в результате динамической интеграции тарифов). Оставьте фиксированную цену пустой, чтобы использовать этот датчик.",
+              "energy_price_surcharge": "Дополнительная фиксированная сумма за каждый kWh добавляется к фиксированной цене или значению датчика цены. Оставьте пустым, чтобы использовать глобальную надбавку"
             }
           }
         },
@@ -1050,34 +1050,34 @@
       },
       "cost_options": {
         "data": {
-          "energy_price": "Fixed energy price",
-          "energy_price_multiplier": "Energy price multiplier",
-          "energy_price_sensor": "Energy price sensor",
-          "energy_price_surcharge": "Energy price surcharge"
+          "energy_price": "Фиксированная цена на энергию",
+          "energy_price_multiplier": "Мультипликатор цен на энергию",
+          "energy_price_sensor": "Датчик цен на энергию",
+          "energy_price_surcharge": "Надбавка к цене на электроэнергию"
         },
         "data_description": {
-          "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+          "energy_price": "Фиксированная цена за kWh в вашей местной валюте. Оставьте пустым, чтобы использовать глобальную цену на энергоносители.",
+          "energy_price_multiplier": "Множитель применяется после надбавки. Используйте это значение для налогов и сборов, основанных на процентах, например 1,21 для 21%. Оставьте пустым, чтобы использовать глобальный множитель",
+          "energy_price_sensor": "Датчик, который предоставляет текущую цену на электроэнергию по kWh (например, в результате динамической интеграции тарифов). Оставьте фиксированную цену пустой, чтобы использовать этот датчик.",
+          "energy_price_surcharge": "Дополнительная фиксированная сумма за каждый kWh добавляется к фиксированной цене или значению датчика цены. Оставьте пустым, чтобы использовать глобальную надбавку"
         },
-        "description": "Override the globally configured energy price for this sensor only. Leave all fields empty to keep using the global price. See [documentation]({docs_uri}) for more info",
-        "title": "Cost options"
+        "description": "Переопределить глобально настроенную цену энергии только для этого датчика. Оставьте все поля пустыми, чтобы продолжать использовать глобальную цену. См. [документацию]({docs_uri}) для получения дополнительной информации.",
+        "title": "Варианты стоимости"
       }
     }
   },
   "selector": {
     "daily_energy_value": {
       "choices": {
-        "value": "Value",
-        "value_template": "Value template"
+        "value": "Фиксированное значение",
+        "value_template": "Шаблон"
       }
     },
     "fixed_value": {
       "choices": {
-        "power": "Power",
-        "power_template": "Power template",
-        "states_power": "States power"
+        "power": "Фиксированное значение",
+        "power_template": "Шаблон",
+        "states_power": "Сопоставление состояний"
       }
     }
   },
@@ -1103,14 +1103,14 @@
       "name": "Калибровать сенсор энергии"
     },
     "calibrate_cost": {
-      "description": "Sets the cost sensor to a given monetary value.",
+      "description": "Устанавливает датчик стоимости на заданное денежное значение.",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "Значение, которое необходимо установить.",
+          "name": "Значение"
         }
       },
-      "name": "Calibrate cost sensor"
+      "name": "Калибровка датчика стоимости"
     },
     "calibrate_utility_meter": {
       "description": "Калибровать сенсор счётчика.",
@@ -1137,8 +1137,8 @@
       "name": "Изменить конфигурацию GUI"
     },
     "debug_group": {
-      "description": "Get a debug overview of a group power or energy sensor including current member values.",
-      "name": "Debug group"
+      "description": "Получите обзор отладки группового датчика мощности или энергии, включая текущие значения элементов.",
+      "name": "Группа отладки"
     },
     "get_active_playbook": {
       "description": "Получить текущий запущенный сценарий",
@@ -1167,8 +1167,8 @@
       "name": "Сбросить сенсор энергии"
     },
     "reset_cost": {
-      "description": "Reset a cost sensor to zero.",
-      "name": "Reset cost sensor"
+      "description": "Сбросьте датчик стоимости на ноль.",
+      "name": "Сбросить датчик стоимости"
     },
     "stop_playbook": {
       "description": "Остановить текущий активный сценарий.",
