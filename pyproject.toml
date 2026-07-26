@@ -52,7 +52,8 @@ show_error_codes = true
 follow_imports = "silent"
 local_partial_types = true
 strict_equality = true
-no_implicit_optional = false
+extra_checks = true
+no_implicit_reexport = true
 warn_incomplete_stub = true
 warn_redundant_casts = true
 warn_unused_configs = true
@@ -69,10 +70,6 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = "homeassistant.components.*"
 ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "custom_components.powercalc.config_flow"
-disable_error_code = "return-value"
 
 [tool.coverage.paths]
 source = ["custom_components/powercalc", "utils", "tests"]

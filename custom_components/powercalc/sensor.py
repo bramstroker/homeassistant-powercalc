@@ -31,7 +31,6 @@ from homeassistant.helpers.issue_registry import IssueSeverity, async_create_iss
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 import voluptuous as vol
 
-from . import DATA_GROUP_ENTITIES
 from .analytics.analytics import collect_analytics
 from .common import (
     SourceEntity,
@@ -59,6 +58,7 @@ from .const import (
     DATA_DOMAIN_ENTITIES,
     DATA_ENTITIES,
     DATA_ENTITY_TYPES,
+    DATA_GROUP_ENTITIES,
     DATA_HAS_GROUP_INCLUDE,
     DATA_SENSOR_TYPES,
     DATA_SOURCE_DOMAINS,

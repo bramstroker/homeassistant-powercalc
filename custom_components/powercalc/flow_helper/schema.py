@@ -1,5 +1,5 @@
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
+from homeassistant.components.utility_meter.const import CONF_METER_TYPE, METER_TYPES
 from homeassistant.const import UnitOfPower
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector

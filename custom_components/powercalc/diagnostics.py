@@ -5,7 +5,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.reload import async_integration_yaml_config
 
-from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, SensorType
+from custom_components.powercalc.const import CONF_SENSOR_TYPE, DOMAIN, SensorType
 from custom_components.powercalc.sensors.group.config_entry_utils import get_entries_excluding_global_config
 from custom_components.powercalc.sensors.group.custom import resolve_entity_ids_recursively
 
