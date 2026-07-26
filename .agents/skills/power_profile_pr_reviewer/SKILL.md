@@ -1,3 +1,8 @@
+---
+name: power-profile-pr-reviewer
+description: Review pull requests that add or modify PowerCalc power profiles under profile_library. Use for validating profile schema and repository conventions, checking calculation-strategy data and measurement credibility, comparing similar profiles, and producing concise, actionable review feedback.
+---
+
 # SKILL: PowerCalc Power Profile PR Reviewer
 
 ## Skill ID
