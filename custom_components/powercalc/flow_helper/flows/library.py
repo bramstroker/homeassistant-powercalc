@@ -6,10 +6,6 @@ from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import selector, translation
 import voluptuous as vol
 
-from custom_components.powercalc import (
-    DOMAIN,
-    DeviceType,
-)
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_FIXED,
@@ -20,6 +16,7 @@ from custom_components.powercalc.const import (
     CONF_SELF_USAGE_INCLUDED,
     CONF_SUB_PROFILE,
     CONF_VARIABLES,
+    DOMAIN,
     DUMMY_ENTITY_ID,
     LIBRARY_URL,
     CalculationStrategy,
@@ -44,6 +41,7 @@ from custom_components.powercalc.power_profile.library import ModelInfo, Profile
 from custom_components.powercalc.power_profile.power_profile import (
     DEVICE_TYPE_DOMAIN,
     DOMAIN_DEVICE_TYPE_MAPPING,
+    DeviceType,
     DiscoveryBy,
     PowerProfile,
 )

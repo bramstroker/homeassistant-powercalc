@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 import re
-from typing import NamedTuple, Protocol
+from typing import Any, NamedTuple, Protocol
 
 from homeassistant.core import HomeAssistant, State
 
@@ -50,7 +50,7 @@ class SubProfileSelector:
         """Get additional list of entities to track for state changes."""
         return [entity_id for matcher in self._matchers for entity_id in matcher.get_tracking_entities()]
 
-    def _create_matcher(self, matcher_config: dict) -> SubProfileMatcher:
+    def _create_matcher(self, matcher_config: dict[str, Any]) -> SubProfileMatcher:
         """Create a matcher from json config. Can be extended for more matchers in the future."""
         matcher_type: SubProfileMatcherType = matcher_config["type"]
         match matcher_type:
@@ -81,7 +81,7 @@ class SubProfileSelector:
 
 class SubProfileSelectConfig(NamedTuple):
     default: str
-    matchers: list[dict] | None = None
+    matchers: list[dict[str, Any]] | None = None
 
 
 class SubProfileMatcher(Protocol):

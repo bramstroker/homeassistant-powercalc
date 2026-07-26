@@ -33,7 +33,7 @@ def create_subtract_group_sensors(
     validate_config(config)
     group_name = str(config.get(CONF_NAME))
     base_entity_id = str(config.get(CONF_ENTITY_ID))
-    subtract_entities = cast(list, config.get(CONF_SUBTRACT_ENTITIES))
+    subtract_entities = cast(list[str], config.get(CONF_SUBTRACT_ENTITIES))
 
     name = generate_power_sensor_name(config, group_name)
     unique_id = config.get(CONF_UNIQUE_ID, generate_unique_id(config))

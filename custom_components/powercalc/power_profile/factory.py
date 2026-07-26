@@ -4,6 +4,7 @@ import logging
 import os
 
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -24,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def get_power_profile(
     hass: HomeAssistant,
-    config: dict,
+    config: ConfigType,
     source_entity: SourceEntity | None = None,
     model_info: ModelInfo | None = None,
     log_errors: bool = True,

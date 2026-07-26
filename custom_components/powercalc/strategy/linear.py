@@ -157,7 +157,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         return sorted(calibration_list, key=lambda tup: tup[0])
 
-    def get_entity_value_range(self) -> tuple:
+    def get_entity_value_range(self) -> tuple[int, int]:
         """Get the min/max range for a given entity domain."""
         if self.get_initialized_value_entity().domain == light.DOMAIN:
             return 0, 255

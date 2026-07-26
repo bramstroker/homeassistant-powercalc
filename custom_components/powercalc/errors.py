@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.entity import Entity
 
 
 class PowercalcSetupError(HomeAssistantError):
@@ -19,7 +20,7 @@ class SensorAlreadyConfiguredError(SensorConfigurationError):
     def __init__(
         self,
         source_entity_id: str,
-        existing_entities: list,
+        existing_entities: list[Entity],
     ) -> None:
         self.existing_entities = existing_entities
         super().__init__(
@@ -27,7 +28,7 @@ class SensorAlreadyConfiguredError(SensorConfigurationError):
             "When you want to configure it twice make sure to give it a unique_id",
         )
 
-    def get_existing_entities(self) -> list:
+    def get_existing_entities(self) -> list[Entity]:
         return self.existing_entities
 
 

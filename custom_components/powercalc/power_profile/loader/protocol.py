@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Any, Protocol
 
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy
 
@@ -25,7 +25,7 @@ class Loader(Protocol):
     ) -> set[tuple[str, str]]:
         """Get listing of available models and display names for a given manufacturer."""
 
-    async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
+    async def load_model(self, manufacturer: str, model: str) -> tuple[dict[str, Any], str] | None:
         """Load and optionally download a model profile."""
 
     async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:

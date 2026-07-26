@@ -71,12 +71,16 @@ class _EffectEntry:
     table: EffectTableType
 
 
+# manufacturer, model, lookup mode, sub profile
+_CacheKey = tuple[str, str, LookupMode, str | None]
+
+
 class LutRegistry:
     def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
-        self._lut_entries: dict[tuple, _LutEntry] = {}
-        self._effect_entries: dict[tuple, _EffectEntry] = {}
-        self._supported_modes: dict[tuple, set[LookupMode]] = {}
+        self._lut_entries: dict[_CacheKey, _LutEntry] = {}
+        self._effect_entries: dict[_CacheKey, _EffectEntry] = {}
+        self._supported_modes: dict[tuple[str, str, str], set[LookupMode]] = {}
 
     async def get_lookup_entry(
         self,
@@ -121,7 +125,7 @@ class LutRegistry:
         return supported_modes
 
     @staticmethod
-    def _cache_key(power_profile: PowerProfile, lookup_mode: LookupMode) -> tuple:
+    def _cache_key(power_profile: PowerProfile, lookup_mode: LookupMode) -> _CacheKey:
         return power_profile.manufacturer, power_profile.model, lookup_mode, power_profile.sub_profile
 
     @classmethod

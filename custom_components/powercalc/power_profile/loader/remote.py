@@ -53,7 +53,7 @@ class RemoteLoader(Loader):
 
     def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
-        self.library_contents: dict = {}
+        self.library_contents: dict[str, Any] = {}
         self.model_infos: dict[str, LibraryModel] = {}
         self.manufacturer_models: dict[str, list[LibraryModel]] = {}
         self.model_lookup: dict[str, dict[str, list[LibraryModel]]] = {}
@@ -287,7 +287,7 @@ class RemoteLoader(Loader):
         model: str,
         force_update: bool = False,
         retry_count: int = 0,
-    ) -> tuple[dict, str] | None:
+    ) -> tuple[dict[str, Any], str] | None:
         """Load a model, downloading it if necessary, with retry logic."""
         model_info = self._get_library_model(manufacturer, model)
         storage_path = self.get_storage_path(manufacturer, model)
@@ -362,7 +362,7 @@ class RemoteLoader(Loader):
         """Check profile paths from the executor."""
         return os.path.exists(model_path), os.path.exists(storage_path)
 
-    async def _load_model_json(self, model_path: str) -> dict:
+    async def _load_model_json(self, model_path: str) -> dict[str, Any]:
         """Load the JSON data from the model file."""
 
         def _load_json() -> dict[str, Any]:
@@ -377,7 +377,7 @@ class RemoteLoader(Loader):
         manufacturer: str,
         model: str,
         retry_count: int,
-    ) -> tuple[dict, str] | None:
+    ) -> tuple[dict[str, Any], str] | None:
         """Handle JSON decode errors with retry logic."""
         _LOGGER.error("model.json file is not valid JSON for manufacturer: %s, model: %s", manufacturer, model)
         if retry_count < 2:

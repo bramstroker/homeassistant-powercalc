@@ -97,7 +97,7 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
         global_config.update(get_global_gui_configuration(global_config_entry))
 
     # Then override with YAML configuration if available
-    yaml_config: dict = config.get(DOMAIN, {})
+    yaml_config: ConfigType = config.get(DOMAIN, {})
     if yaml_config:
         global_config.update(yaml_config)
 

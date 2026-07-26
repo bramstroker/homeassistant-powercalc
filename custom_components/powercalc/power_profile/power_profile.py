@@ -126,7 +126,7 @@ class PowerProfile:
         model: str,
         directory: str,
         json_data: ConfigType,
-        sub_profiles: list[tuple[str, dict]] | None = None,
+        sub_profiles: list[tuple[str, dict[str, Any]]] | None = None,
     ) -> None:
         self._manufacturer = manufacturer
         self._model = model.replace("#slash#", "/")
@@ -230,9 +230,9 @@ class PowerProfile:
         return config
 
     @property
-    def composite_config(self) -> list | None:
+    def composite_config(self) -> list[ConfigType] | None:
         """Get configuration to set up composite strategy."""
-        return cast(list, self._json_data.get("composite_config"))
+        return cast(list[ConfigType], self._json_data.get("composite_config"))
 
     @property
     def playbook_config(self) -> ConfigType | None:
@@ -356,7 +356,7 @@ class PowerProfile:
             return "remarks_smart_dimmer"
         return None
 
-    async def get_sub_profiles(self) -> list[tuple[str, dict]]:
+    async def get_sub_profiles(self) -> list[tuple[str, dict[str, Any]]]:
         """Get listing of possible sub profiles and their corresponding JSON data."""
         return self._sub_profiles
 

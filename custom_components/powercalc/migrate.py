@@ -6,6 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry, issue_registry as ir
 import homeassistant.helpers.helper_integration as helper_integration
 from homeassistant.helpers.issue_registry import async_create_issue
+from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -96,19 +97,19 @@ def _remove_config_entry_from_devices(hass: HomeAssistant, config_entry: ConfigE
             )
 
 
-def _migrate_power_template(data: dict) -> None:
+def _migrate_power_template(data: ConfigType) -> None:
     conf_fixed = data.get(CONF_FIXED, {})
     if CONF_POWER in conf_fixed and CONF_POWER_TEMPLATE in conf_fixed:
         conf_fixed.pop(CONF_POWER, None)
 
 
-def _migrate_playbook_trigger(data: dict) -> None:
+def _migrate_playbook_trigger(data: ConfigType) -> None:
     conf_playbook = data.get(CONF_PLAYBOOK, {})
     if CONF_STATES_TRIGGER in conf_playbook:
         data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
 
 
-def _migrate_global_discovery_config(data: dict) -> None:
+def _migrate_global_discovery_config(data: ConfigType) -> None:
     deprecated_keys = [
         CONF_ENABLE_AUTODISCOVERY_DEPRECATED,
         CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES_DEPRECATED,
@@ -128,7 +129,7 @@ def _migrate_global_discovery_config(data: dict) -> None:
         data.pop(key, None)
 
 
-def _migrate_playbooks(data: dict) -> None:
+def _migrate_playbooks(data: ConfigType) -> None:
     conf_playbook = data.get(CONF_PLAYBOOK, {})
     if CONF_PLAYBOOKS in conf_playbook:
         data[CONF_PLAYBOOK][CONF_PLAYBOOKS] = [
@@ -136,7 +137,7 @@ def _migrate_playbooks(data: dict) -> None:
         ]
 
 
-def _migrate_states_power(data: dict) -> None:
+def _migrate_states_power(data: ConfigType) -> None:
     conf_fixed = data.get(CONF_FIXED, {})
     if CONF_STATES_POWER in conf_fixed and isinstance(conf_fixed[CONF_STATES_POWER], dict):
         data[CONF_FIXED][CONF_STATES_POWER] = [
@@ -144,7 +145,7 @@ def _migrate_states_power(data: dict) -> None:
         ]
 
 
-def _migrate_invalid_power_sensor_category(data: dict) -> None:
+def _migrate_invalid_power_sensor_category(data: ConfigType) -> None:
     if data.get(CONF_POWER_SENSOR_CATEGORY) == EntityCategory.CONFIG:
         data.pop(CONF_POWER_SENSOR_CATEGORY)
 
@@ -182,7 +183,7 @@ async def async_fix_legacy_profile_config_entry(hass: HomeAssistant, config_entr
     )
 
 
-def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dict, yaml_config: dict) -> None:
+def handle_legacy_discovery_config(hass: HomeAssistant, global_config: ConfigType, yaml_config: ConfigType) -> None:
     """Handle legacy discovery config. Might be removed in future Powercalc version"""
     discovery_options = global_config.setdefault(CONF_DISCOVERY, {})
     deprecated_map = {
@@ -219,7 +220,11 @@ def handle_legacy_discovery_config(hass: HomeAssistant, global_config: dict, yam
     )
 
 
-def handle_legacy_update_interval_config(hass: HomeAssistant, global_config: dict, yaml_config: dict) -> None:
+def handle_legacy_update_interval_config(
+    hass: HomeAssistant,
+    global_config: ConfigType,
+    yaml_config: ConfigType,
+) -> None:
     """Handle legacy group update interval config. Might be removed in future Powercalc version"""
 
     has_legacy_config = False

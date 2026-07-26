@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from homeassistant.components.sensor import PLATFORM_SCHEMA as SENSOR_PLATFORM_SCHEMA
 from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
@@ -162,7 +164,7 @@ SENSOR_CONFIG = {
 }
 
 
-def build_nested_configuration_schema(schema: dict, iteration: int = 0) -> dict:
+def build_nested_configuration_schema(schema: dict[Any, Any], iteration: int = 0) -> dict[Any, Any]:
     if iteration == MAX_GROUP_NESTING_LEVEL:
         return schema
     iteration += 1

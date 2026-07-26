@@ -97,7 +97,7 @@ def async_cache[R](func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[...,
     Returns:
         A decorated asynchronous function with caching.
     """
-    cache: dict[tuple[tuple[Any, ...], frozenset], R] = {}
+    cache: dict[tuple[tuple[Any, ...], frozenset[Any]], R] = {}
 
     @wraps(func)
     async def wrapper(*args: Any, **kwargs: Any) -> R:  # noqa: ANN401
@@ -124,7 +124,7 @@ def clear_async_cache(func: Callable[..., Coroutine[Any, Any, Any]]) -> None:
         cache_clear()
 
 
-def collect_placeholders(data: list | str | dict[str, Any]) -> set[str]:
+def collect_placeholders(data: list[Any] | str | dict[str, Any]) -> set[str]:
     found: set[str] = set()
     if isinstance(data, dict):
         for v in data.values():
@@ -138,9 +138,9 @@ def collect_placeholders(data: list | str | dict[str, Any]) -> set[str]:
 
 
 def replace_placeholders(
-    data: list | str | dict[str, Any],
+    data: list[Any] | str | dict[str, Any],
     replacements: dict[str, str],
-) -> list | str | dict[str, Any]:
+) -> list[Any] | str | dict[str, Any]:
     """Replace placeholders in a dictionary with values from a replacement dictionary."""
     if isinstance(data, dict):
         for key, value in data.items():
