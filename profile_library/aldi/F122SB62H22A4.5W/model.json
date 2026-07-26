@@ -1,0 +1,21 @@
+{
+  "author_info": {
+    "github": "rugk",
+    "name": "rugk"
+  },
+  "calculation_strategy": "lut",
+  "created_at": "2026-07-26T19:19:57Z",
+  "device_type": "light",
+  "max_voltage": 238.4,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Basalt direct Shelly",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.2.1:app"
+  },
+  "min_voltage": 235.7,
+  "name": "LIGHTWAY smart home LED-lamp - filament",
+  "standby_power": 2.98
+}
