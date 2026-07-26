@@ -1362,10 +1362,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
-          "hash": "12913c146371fe0a2b9f386046cd1f0f"
+          "hash": "6135cea77f7d32aec4a5646dd461871b"
         },
         {
           "calculation_strategy": "fixed",
@@ -20001,10 +20001,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "ceb603b38d6ba3905b3d3e1cf6738668"
+          "hash": "f4756a1109913ce568c7f640740be28f"
         },
         {
           "calculation_strategy": "lut",
