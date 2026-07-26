@@ -562,6 +562,29 @@
     }
   },
   "issues": {
+    "composite_device_id": {
+      "fix_flow": {
+        "abort": {
+          "entry_removed": "The Powercalc configuration entry has been removed"
+        },
+        "error": {
+          "invalid_device": "Select an existing device or leave the field empty"
+        },
+        "step": {
+          "select_device": {
+            "data": {
+              "device": "Device"
+            },
+            "data_description": {
+              "device": "The device the entities created by this Powercalc configuration should be linked to"
+            },
+            "description": "The Powercalc configuration {name} was linked to a device that Home Assistant has split into multiple devices. Its entities cannot be linked to the old device ID.\n\nSelect the device these entities should be linked to, or leave the field empty to leave them without a device.",
+            "title": "Select device for {name}"
+          }
+        }
+      },
+      "title": "Device for Powercalc configuration {name} needs to be selected again"
+    },
     "deprecated_platform_yaml": {
       "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
       "title": "Powercalc YAML configuration has moved"

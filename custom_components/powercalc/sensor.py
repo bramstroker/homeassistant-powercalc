@@ -20,7 +20,6 @@ from homeassistant.const import (
 from homeassistant.core import Event, HomeAssistant, SupportsResponse, callback
 from homeassistant.helpers import entity_platform
 import homeassistant.helpers.config_validation as cv
-import homeassistant.helpers.device_registry as dr
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 import homeassistant.helpers.entity_registry as er
@@ -88,7 +87,7 @@ from .const import (
     PowercalcDiscoveryType,
     SensorType,
 )
-from .device_binding import attach_entities_to_resolved_device
+from .device_binding import attach_configured_device_entry, attach_entities_to_resolved_device
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
@@ -636,7 +635,7 @@ async def create_individual_sensors(
     source_entity = create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     # For device-based profiles, attach the device entry to the source entity
-    source_entity = _attach_configured_device_entry(hass, sensor_config, source_entity)
+    source_entity = attach_configured_device_entry(hass, sensor_config, source_entity)
 
     used_unique_ids = hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS, [])
 
@@ -712,23 +711,8 @@ async def _create_daily_fixed_energy_sensors(
     return energy_sensor
 
 
-def _attach_configured_device_entry(
-    hass: HomeAssistant,
-    sensor_config: dict,
-    source_entity: SourceEntity,
-) -> SourceEntity:
-    if source_entity.entity_id != DUMMY_ENTITY_ID or "device" not in sensor_config:
-        return source_entity
-
-    device_registry = dr.async_get(hass)
-    device_entry = device_registry.async_get(sensor_config["device"])
-    if device_entry:
-        return source_entity._replace(device_entry=device_entry)
-    return source_entity
-
-
 def check_entity_not_already_configured(
-    sensor_config: dict,
+    sensor_config: ConfigType,
     source_entity: SourceEntity,
     hass: HomeAssistant,
     used_unique_ids: list[str],

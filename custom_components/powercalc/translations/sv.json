@@ -562,6 +562,29 @@
     }
   },
   "issues": {
+    "composite_device_id": {
+      "fix_flow": {
+        "abort": {
+          "entry_removed": "Konfigurationsposten för Powercalc har tagits bort"
+        },
+        "error": {
+          "invalid_device": "Välj en befintlig enhet eller lämna fältet tomt"
+        },
+        "step": {
+          "select_device": {
+            "data": {
+              "device": "Enhet"
+            },
+            "data_description": {
+              "device": "Enheten som entiteterna som skapats av denna Powercalc-konfiguration ska länkas till"
+            },
+            "description": "Powercalc-konfigurationen {name} var länkad till en enhet som Home Assistant har delat upp i flera enheter. Dess entiteter kan inte länkas till det gamla enhets-ID:t.\n\nVälj den enhet som dessa entiteter ska länkas till, eller lämna fältet tomt för att lämna dem utan en enhet.",
+            "title": "Välj enhet för {name}"
+          }
+        }
+      },
+      "title": "Enheten för Powercalc-konfigurationen {name} måste väljas igen"
+    },
     "deprecated_platform_yaml": {
       "description": "Att konfigurera sensorer med sensor->plattform har fasats ut. Du behöver ändra din konfiguration till powercalc->sensorer. Klicka på 'Läs mer' för ytterligare instruktioner.",
       "title": "Powercalc YAML konfiguration har flyttats"

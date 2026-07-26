@@ -562,6 +562,29 @@
     }
   },
   "issues": {
+    "composite_device_id": {
+      "fix_flow": {
+        "abort": {
+          "entry_removed": "Intrarea de configurare Powercalc a fost eliminată"
+        },
+        "error": {
+          "invalid_device": "Selectează un dispozitiv existent sau lasă câmpul necompletat"
+        },
+        "step": {
+          "select_device": {
+            "data": {
+              "device": "Dispozitiv"
+            },
+            "data_description": {
+              "device": "Dispozitivul la care trebuie asociate entitățile create de această configurație Powercalc"
+            },
+            "description": "Configurația Powercalc {name} era asociată unui dispozitiv pe care Home Assistant l-a împărțit în mai multe dispozitive. Entitățile sale nu pot fi asociate vechiului ID de dispozitiv.\n\nSelectează dispozitivul la care trebuie asociate aceste entități sau lasă câmpul necompletat pentru a le lăsa fără dispozitiv.",
+            "title": "Selectează dispozitivul pentru {name}"
+          }
+        }
+      },
+      "title": "Dispozitivul pentru configurația Powercalc {name} trebuie selectat din nou"
+    },
     "deprecated_platform_yaml": {
       "description": "Configurarea senzorilor folosind `senzor->platform` a fost retrasă. Trebuie să vă schimbați configurația la `powercalc->senzori`. Faceți clic pe 'Aflați mai multe' pentru instrucțiuni suplimentare.",
       "title": "Configurația Powercalc YAML a fost mutată"

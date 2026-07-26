@@ -562,6 +562,29 @@
     }
   },
   "issues": {
+    "composite_device_id": {
+      "fix_flow": {
+        "abort": {
+          "entry_removed": "Het Powercalc-configuratie-item is verwijderd"
+        },
+        "error": {
+          "invalid_device": "Selecteer een bestaand apparaat of laat het veld leeg"
+        },
+        "step": {
+          "select_device": {
+            "data": {
+              "device": "Apparaat"
+            },
+            "data_description": {
+              "device": "Het apparaat waaraan de entiteiten die door deze Powercalc-configuratie zijn aangemaakt, moeten worden gekoppeld"
+            },
+            "description": "De Powercalc-configuratie {name} was gekoppeld aan een apparaat dat Home Assistant heeft opgesplitst in meerdere apparaten. De entiteiten kunnen niet aan de oude apparaat-ID worden gekoppeld.\n\nSelecteer het apparaat waaraan deze entiteiten moeten worden gekoppeld, of laat het veld leeg om ze niet aan een apparaat te koppelen.",
+            "title": "Selecteer apparaat voor {name}"
+          }
+        }
+      },
+      "title": "Het apparaat voor Powercalc-configuratie {name} moet opnieuw worden geselecteerd"
+    },
     "deprecated_platform_yaml": {
       "description": "Configuratie middels `sensor->platform` is verouderd. Verander je configratie naar `powercalc->sensors`. Klik op 'Meer informatie' voor verder uitleg.",
       "title": "Powercalc YAML configuratie is verplaatst"
