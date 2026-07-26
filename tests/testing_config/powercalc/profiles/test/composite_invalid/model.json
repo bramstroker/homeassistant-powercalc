@@ -1,0 +1,24 @@
+{
+  "calculation_strategy": "composite",
+  "composite_config": [
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "not a valid entity id",
+            "state": "on"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 10
+      }
+    }
+  ],
+  "device_type": "light",
+  "measure_device": "Test light",
+  "measure_method": "manual",
+  "name": "Test light"
+}
