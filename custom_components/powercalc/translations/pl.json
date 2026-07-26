@@ -7,8 +7,7 @@
   },
   "config": {
     "abort": {
-      "already_configured": "Czujnik jest już skonfigurowany, podaj unikatowy identyfikator",
-      "cost_no_global_price": "Nie skonfigurowano jeszcze ceny energii. Ustaw cenę energii w globalnej konfiguracji Powercalc przed utworzeniem czujnika kosztów. Zobacz [dokumentację]({url})."
+      "already_configured": "Czujnik jest już skonfigurowany, podaj unikatowy identyfikator"
     },
     "error": {
       "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
@@ -473,6 +472,23 @@
           "name": "Bazowa nazwa czujnika kosztów. Pełna nazwa encji jest ustawiana zgodnie z ustawieniem cost_sensor_naming"
         },
         "description": "Utwórz czujnik kosztów dla istniejącego czujnika energii. Cena energii jest pobierana z globalnej konfiguracji Powercalc.",
+        "sections": {
+          "cost_pricing": {
+            "name": "Price override",
+            "data": {
+              "energy_price": "Fixed energy price",
+              "energy_price_multiplier": "Energy price multiplier",
+              "energy_price_sensor": "Energy price sensor",
+              "energy_price_surcharge": "Energy price surcharge"
+            },
+            "data_description": {
+              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
+              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
+              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+            }
+          }
+        },
         "title": "Utwórz czujnik kosztów"
       },
       "sub_profile": {
@@ -928,7 +944,8 @@
           "multi_switch": "Opcje wieloprzełącznika",
           "real_power": "Opcje rzeczywistej mocy",
           "utility_meter_options": "Opcje licznika mediów",
-          "wled": "Opcje WLED"
+          "wled": "Opcje WLED",
+          "cost_options": "Cost options"
         }
       },
       "library_options": {
@@ -986,13 +1003,30 @@
         }
       },
       "cost": {
-        "title": "Opcje kosztów",
         "data": {
           "energy_sensor_id": "Czujnik energii"
         },
         "data_description": {
           "energy_sensor_id": "Istniejący czujnik energii (kWh), dla którego mają zostać obliczone koszty"
-        }
+        },
+        "sections": {
+          "cost_pricing": {
+            "name": "Price override",
+            "data": {
+              "energy_price": "Fixed energy price",
+              "energy_price_multiplier": "Energy price multiplier",
+              "energy_price_sensor": "Energy price sensor",
+              "energy_price_surcharge": "Energy price surcharge"
+            },
+            "data_description": {
+              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
+              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
+              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+            }
+          }
+        },
+        "title": "Opcje kosztów"
       },
       "utility_meter_options": {
         "title": "Opcje licznika mediów",
@@ -1013,6 +1047,22 @@
           "power_factor": "Współczynnik mocy (cos φ)",
           "voltage": "Napięcie"
         }
+      },
+      "cost_options": {
+        "data": {
+          "energy_price": "Fixed energy price",
+          "energy_price_multiplier": "Energy price multiplier",
+          "energy_price_sensor": "Energy price sensor",
+          "energy_price_surcharge": "Energy price surcharge"
+        },
+        "data_description": {
+          "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
+          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
+          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
+          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+        },
+        "description": "Override the globally configured energy price for this sensor only. Leave all fields empty to keep using the global price. See [documentation]({docs_uri}) for more info",
+        "title": "Cost options"
       }
     }
   },
