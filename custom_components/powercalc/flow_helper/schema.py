@@ -52,8 +52,11 @@ SCHEMA_COST_SENSOR_TOGGLE = vol.Schema(
 
 SECTION_COST_PRICING = "cost_pricing"
 SECTION_COST_NAMING = "cost_naming"
+COST_DOCS_URI = "https://docs.powercalc.nl/sensor-types/cost-sensor/"
 
-SCHEMA_GLOBAL_COST_PRICING = vol.Schema(
+# The pricing fields are used both for the global energy price and for the per sensor
+# price override, so they are defined once and reused by both schemas.
+SCHEMA_COST_PRICING = vol.Schema(
     {
         vol.Optional(CONF_ENERGY_PRICE): NumberSelector(
             selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
@@ -80,13 +83,13 @@ SCHEMA_GLOBAL_COST_NAMING = vol.Schema(
 # Presented in the GUI as two collapsible sections (pricing and naming).
 SCHEMA_GLOBAL_COST = vol.Schema(
     {
-        vol.Required(SECTION_COST_PRICING): section(SCHEMA_GLOBAL_COST_PRICING),
+        vol.Required(SECTION_COST_PRICING): section(SCHEMA_COST_PRICING),
         vol.Required(SECTION_COST_NAMING): section(SCHEMA_GLOBAL_COST_NAMING, {"collapsed": True}),
     },
 )
 
 # Flat variant with all cost keys, used to merge/clear the (un)nested user input.
-SCHEMA_GLOBAL_COST_FLAT = SCHEMA_GLOBAL_COST_PRICING.extend(SCHEMA_GLOBAL_COST_NAMING.schema)
+SCHEMA_GLOBAL_COST_FLAT = SCHEMA_COST_PRICING.extend(SCHEMA_GLOBAL_COST_NAMING.schema)
 
 # Shown when the global create_cost_sensors toggle is flipped, to optionally propagate the
 # change to all existing GUI sensors.

@@ -34,6 +34,7 @@ class Step(StrEnum):
     DAILY_ENERGY = "daily_energy"
     REAL_POWER = "real_power"
     COST = "cost"
+    COST_OPTIONS = "cost_options"
     MANUFACTURER = "manufacturer"
     MENU_LIBRARY = "menu_library"
     MENU_GROUP = "menu_group"

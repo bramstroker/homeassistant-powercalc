@@ -53,6 +53,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, flatten_sections
 from custom_components.powercalc.flow_helper.schema import (
+    COST_DOCS_URI,
     SCHEMA_COST_APPLY,
     SCHEMA_ENERGY_OPTIONS,
     SCHEMA_GLOBAL_COST,
@@ -327,7 +328,7 @@ class GlobalConfigurationFlow:
             schema=SCHEMA_GLOBAL_COST,
             form_kwarg={
                 "description_placeholders": {
-                    "docs_uri": "https://docs.powercalc.nl/sensor-types/cost-sensor/",
+                    "docs_uri": COST_DOCS_URI,
                 },
             },
         )

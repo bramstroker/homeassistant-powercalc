@@ -31,6 +31,7 @@ import voluptuous as vol
 
 from .common import SourceEntity, create_source_entity
 from .const import (
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -47,7 +48,7 @@ from .const import (
     SensorType,
 )
 from .errors import ModelNotSupportedError, StrategyConfigurationError
-from .flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults
+from .flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults, flatten_sections
 from .flow_helper.flows.cost import CostConfigFlow, CostOptionsFlow
 from .flow_helper.flows.daily_energy import (
     SCHEMA_DAILY_ENERGY_OPTIONS,
@@ -74,6 +75,8 @@ from .flow_helper.flows.virtual_power import (
 )
 from .flow_helper.profile_preview import async_setup_preview as async_setup_powercalc_preview
 from .flow_helper.schema import (
+    COST_DOCS_URI,
+    SCHEMA_COST_PRICING,
     SCHEMA_COST_SENSOR_TOGGLE,
     SCHEMA_ENERGY_SENSOR_TOGGLE,
     SCHEMA_SENSOR_ENERGY_OPTIONS,
@@ -554,6 +557,9 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         if self.selected_sensor_type == SensorType.GROUP:
             menu.extend(self.flow_handlers[FlowType.GROUP].build_group_menu())
 
+        if self.sensor_config.get(CONF_CREATE_COST_SENSOR):
+            menu.append(Step.COST_OPTIONS)
+
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             menu.append(Step.UTILITY_METER_OPTIONS)
 
@@ -589,22 +595,37 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             Step.UTILITY_METER_OPTIONS,
         )
 
+    async def async_step_cost_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Handle the per sensor energy price override."""
+        return await self.async_handle_options_step(
+            user_input,
+            SCHEMA_COST_PRICING,
+            Step.COST_OPTIONS,
+            form_kwarg={"description_placeholders": {"docs_uri": COST_DOCS_URI}},
+        )
+
     async def async_handle_options_step(
         self,
         user_input: dict[str, Any] | None,
         schema: vol.Schema,
         step: Step,
         form_kwarg: dict[str, Any] | None = None,
+        validate: Callable[[dict[str, Any]], dict[str, str] | None] | None = None,
     ) -> ConfigFlowResult:
         """
         Generic handler for all the option steps.
         processes user input against the select schema.
         And finally persist the changes on the config entry
+
+        An optional `validate` callback receives the user input with any collapsible sections
+        flattened, and returns errors to show on the form.
         """
         errors: dict[str, str] | None = {}
         schema = fill_schema_defaults(schema, self.sensor_config)
         if user_input is not None:
-            errors = await self.process_all_options(user_input, schema)
+            errors = validate(flatten_sections(user_input, schema)) if validate else None
+            if not errors:
+                errors = await self.process_all_options(user_input, schema)
             if not errors:
                 return self.persist_config_entry()
         return self.async_show_form(step_id=step, data_schema=schema, errors=errors, **(form_kwarg or {}))

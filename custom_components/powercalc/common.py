@@ -18,6 +18,8 @@ from .const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
     CONF_DAILY_FIXED_ENERGY,
+    CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_SENSOR,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
     CONF_MULTI_SWITCH,
     CONF_POWER_SENSOR_ID,
@@ -47,6 +49,11 @@ EXCLUDE_FROM_PARENT_CONFIG = (
     CONF_FORCE_ENERGY_SENSOR_CREATION,
 )
 ENTITY_ID_OPTIONAL_KEYS = (CONF_DAILY_FIXED_ENERGY, CONF_POWER_SENSOR_ID, CONF_MULTI_SWITCH)
+
+# Groups of keys where a deeper config level replaces the whole group, instead of merging
+# key by key. A sensor defining `energy_price` must fully override a global
+# `energy_price_sensor`, otherwise the merged config would contain both price sources.
+MUTUALLY_EXCLUSIVE_KEY_GROUPS = ((CONF_ENERGY_PRICE, CONF_ENERGY_PRICE_SENSOR),)
 
 
 def is_number(value: str) -> bool:
@@ -167,15 +174,26 @@ def _merge_config_levels(configs: tuple[dict, ...]) -> dict:
     """Merge config levels while keeping deepest-level-only fields local."""
     num_configs = len(configs)
 
-    merged_config = {}
+    merged_config: dict = {}
     for i, config in enumerate(configs, 1):
         config_copy = config.copy()
         if i < num_configs:
             for key in EXCLUDE_FROM_PARENT_CONFIG:
                 config_copy.pop(key, None)
 
+        _drop_overridden_alternatives(merged_config, config_copy)
         merged_config.update(config_copy)
     return merged_config
+
+
+def _drop_overridden_alternatives(merged_config: dict, config: dict) -> None:
+    """Drop the alternatives of a mutually exclusive key group set by a shallower config level."""
+    for group in MUTUALLY_EXCLUSIVE_KEY_GROUPS:
+        if not any(key in config for key in group):
+            continue
+        for key in group:
+            if key not in config:
+                merged_config.pop(key, None)
 
 
 def _apply_sensor_creation_defaults(config: dict) -> None:
