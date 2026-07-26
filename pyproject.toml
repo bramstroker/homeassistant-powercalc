@@ -112,7 +112,6 @@ profile-library = [
     "aiofiles>=25.1.0",
     "gitpython>=3.1.57",
     "httpx>=0.28.1",
-    "jsonschema>=4.0",
 ]
 dev = [
     "prek",

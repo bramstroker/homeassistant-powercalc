@@ -1661,7 +1661,6 @@ profile-library = [
     { name = "aiofiles" },
     { name = "gitpython" },
     { name = "httpx" },
-    { name = "jsonschema" },
 ]
 
 [package.metadata]
@@ -1691,7 +1690,6 @@ profile-library = [
     { name = "aiofiles", specifier = ">=25.1.0" },
     { name = "gitpython", specifier = ">=3.1.57" },
     { name = "httpx", specifier = ">=0.28.1" },
-    { name = "jsonschema", specifier = ">=4.0" },
 ]
 
 [[package]]
