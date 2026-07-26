@@ -7,7 +7,9 @@ from typing import TYPE_CHECKING, Any
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_NAME
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
+from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 import voluptuous as vol
 
 from custom_components.powercalc.const import (
@@ -18,7 +20,8 @@ from custom_components.powercalc.const import (
     DOMAIN_CONFIG,
     SensorType,
 )
-from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step
+from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, flatten_sections
+from custom_components.powercalc.flow_helper.schema import SCHEMA_COST_PRICING, SECTION_COST_PRICING
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -30,6 +33,7 @@ SCHEMA_COST_OPTIONS = vol.Schema(
         vol.Required(CONF_ENERGY_SENSOR_ID): selector.EntitySelector(
             selector.EntitySelectorConfig(domain="sensor", device_class=SensorDeviceClass.ENERGY),
         ),
+        vol.Optional(SECTION_COST_PRICING): section(SCHEMA_COST_PRICING, {"collapsed": True}),
     },
 )
 
@@ -47,23 +51,33 @@ def is_global_price_configured(hass: HomeAssistant) -> bool:
     return bool(global_config.get(CONF_ENERGY_PRICE) or global_config.get(CONF_ENERGY_PRICE_SENSOR))
 
 
+def validate_price_configured(hass: HomeAssistant, user_input: dict[str, Any]) -> dict[str, str] | None:
+    """Ensure a price is available, either overridden on the sensor itself or globally."""
+    if user_input.get(CONF_ENERGY_PRICE) or user_input.get(CONF_ENERGY_PRICE_SENSOR):
+        return None
+    if is_global_price_configured(hass):
+        return None
+    return {"base": "cost_price_mandatory"}
+
+
 class CostConfigFlow:
     def __init__(self, flow: PowercalcConfigFlow) -> None:
         self.flow: PowercalcConfigFlow = flow
 
     async def async_step_cost(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the flow for a standalone cost sensor."""
-        if not is_global_price_configured(self.flow.hass):
-            return self.flow.async_abort(
-                reason="cost_no_global_price",
-                description_placeholders={"url": "https://docs.powercalc.nl/sensor-types/cost-sensor/"},
-            )
-
         self.flow.selected_sensor_type = SensorType.COST
         return await self.flow.handle_form_step(
-            PowercalcFormStep(step=Step.COST, schema=SCHEMA_COST),
+            PowercalcFormStep(step=Step.COST, schema=SCHEMA_COST, validate_user_input=self.validate),
             user_input,
         )
+
+    def validate(self, user_input: dict[str, Any]) -> dict[str, Any]:
+        """Flatten the pricing section and reject the input when no price is available."""
+        user_input = flatten_sections(user_input, SCHEMA_COST)
+        if validate_price_configured(self.flow.hass, user_input):
+            raise SchemaFlowError("cost_price_mandatory")
+        return user_input
 
 
 class CostOptionsFlow:
@@ -72,4 +86,9 @@ class CostOptionsFlow:
 
     async def async_step_cost(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the cost sensor options flow."""
-        return await self.flow.async_handle_options_step(user_input, SCHEMA_COST_OPTIONS, Step.COST)
+        return await self.flow.async_handle_options_step(
+            user_input,
+            SCHEMA_COST_OPTIONS,
+            Step.COST,
+            validate=lambda flat_input: validate_price_configured(self.flow.hass, flat_input),
+        )

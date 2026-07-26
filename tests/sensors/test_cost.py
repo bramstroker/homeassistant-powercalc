@@ -155,6 +155,78 @@ async def test_cost_sensor_fixed_price_with_surcharge_and_multiplier(hass: HomeA
     _assert_cost(hass, 3.6)
 
 
+async def test_sensor_price_overrides_global_price(hass: HomeAssistant) -> None:
+    """A fixed price on the sensor takes precedence over the global fixed price."""
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True, CONF_ENERGY_PRICE: 0.50},
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])  # +10 kWh * 0.50
+    _assert_cost(hass, 5.0)
+
+
+async def test_sensor_price_sensor_overrides_global_fixed_price(hass: HomeAssistant) -> None:
+    """A price sensor on the sensor replaces the globally configured fixed price."""
+    await set_states(hass, [("sensor.energy_price", "0.30")])
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True, CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price"},
+        {CONF_ENERGY_PRICE: 0.25},
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])  # +10 kWh * 0.30
+    _assert_cost(hass, 3.0)
+
+
+async def test_sensor_fixed_price_overrides_global_price_sensor(hass: HomeAssistant) -> None:
+    """A fixed price on the sensor replaces the globally configured price sensor."""
+    await set_states(hass, [("sensor.energy_price", "0.30")])
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True, CONF_ENERGY_PRICE: 0.10},
+        {CONF_ENERGY_PRICE_SENSOR: "sensor.energy_price"},
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])  # +10 kWh * 0.10
+    _assert_cost(hass, 1.0)
+
+    # The global price sensor must no longer influence this sensor.
+    await set_states(hass, [("sensor.energy_price", "5.00")])
+    await set_states(hass, [("sensor.existing_energy", "20", _KWH)])  # +10 kWh * 0.10
+    _assert_cost(hass, 2.0)
+
+
+async def test_sensor_surcharge_and_multiplier_override_global(hass: HomeAssistant) -> None:
+    """Surcharge and multiplier fall back to the global value individually."""
+    await _setup_cost_sensor(
+        hass,
+        {CONF_CREATE_COST_SENSOR: True, CONF_ENERGY_PRICE_SURCHARGE: 0.15},
+        {
+            CONF_ENERGY_PRICE: 0.25,
+            CONF_ENERGY_PRICE_SURCHARGE: 0.05,
+            CONF_ENERGY_PRICE_MULTIPLIER: 1.2,
+        },
+    )
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])  # 10 kWh * (0.25 + 0.15) * 1.2
+    _assert_cost(hass, 4.8)
+
+
+async def test_sensor_price_without_global_price(hass: HomeAssistant) -> None:
+    """A cost sensor can be created from a sensor level price alone, without a global price."""
+    await _setup_cost_sensor(hass, {CONF_CREATE_COST_SENSOR: True, CONF_ENERGY_PRICE: 0.25}, {})
+
+    await set_states(hass, [("sensor.existing_energy", "0", _KWH)])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])  # +10 kWh * 0.25
+    _assert_cost(hass, 2.5)
+
+
 @pytest.mark.parametrize(
     "unit,baseline,reading,expected_cost",
     [

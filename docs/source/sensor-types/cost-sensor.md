@@ -8,7 +8,8 @@ Assistant currency as unit of measurement, so it can be used on dashboards and i
 
 The energy price is configured **globally**, either as a fixed price or by pointing to a
 sensor which provides the current price per kWh (for example a dynamic tariff
-integration such as Nordpool, Tibber or Frank Energie).
+integration such as Nordpool, Tibber or Frank Energie). Individual sensors can
+[override](#per-sensor-energy-price) that price.
 
 ## Configuring the energy price
 
@@ -60,6 +61,46 @@ The effective price is calculated as:
 (energy_price or energy_price_sensor + energy_price_surcharge) * energy_price_multiplier
 ```
 
+## Per sensor energy price
+
+Every pricing option can also be set on an individual sensor, overriding the global
+configuration for that sensor only. This is useful when part of your consumption is
+billed differently, for example an EV charger on a separate tariff or a device running
+on self-produced solar power.
+
+```yaml
+powercalc:
+  energy_price: 0.25
+sensor:
+  - platform: powercalc
+    entity_id: switch.ev_charger
+    create_cost_sensor: true
+    energy_price: 0.15
+```
+
+The following keys are supported per sensor: `energy_price`, `energy_price_sensor`,
+`energy_price_surcharge` and `energy_price_multiplier`.
+
+The **price source** is resolved as a whole: as soon as a sensor defines `energy_price`
+or `energy_price_sensor`, it fully replaces the globally configured price source. So a
+sensor with a fixed `energy_price` ignores a global `energy_price_sensor`, and vice
+versa. `energy_price_surcharge` and `energy_price_multiplier` are independent and fall
+back to the global value individually when not set on the sensor.
+
+A price only configured on the sensor also works when no global price is set at all:
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: switch.ev_charger
+    create_cost_sensor: true
+    energy_price_sensor: sensor.ev_tariff
+```
+
+In the GUI the same options are available under **Cost options** in the options flow of
+a sensor which has cost sensors enabled, and directly on the creation form of a
+[standalone cost sensor](#cost-sensor-for-an-existing-energy-sensor).
+
 ## Enabling cost sensors
 
 Similar to energy sensors and utility meters, cost sensor creation can be toggled
@@ -100,9 +141,10 @@ created by Powercalc, for example an energy sensor from a smart plug or utility
 integration. In the GUI, add a new Powercalc sensor and choose **Cost sensor (from
 existing energy sensor)**, then select the energy sensor and give it a name.
 
-This requires an energy price to be configured in the [global
-configuration](../configuration/global-configuration.md) first. When no price is
-configured yet, the flow will point you to set one up before continuing.
+The price comes from the [global
+configuration](../configuration/global-configuration.md), unless you fill in the
+**Price override** section on the form. When neither is set, the form asks you to supply
+a price before continuing.
 
 The same can be configured in YAML with a `cost` block. The `name` is optional; when
 omitted it is derived from the tracked energy sensor:
@@ -111,6 +153,17 @@ omitted it is derived from the tracked energy sensor:
 powercalc:
   sensors:
     - name: Fridge
+      cost:
+        energy_sensor_id: sensor.fridge_energy
+```
+
+A [per sensor price](#per-sensor-energy-price) can be set alongside the `cost` block:
+
+```yaml
+powercalc:
+  sensors:
+    - name: Fridge
+      energy_price: 0.15
       cost:
         energy_sensor_id: sensor.fridge_energy
 ```
@@ -171,7 +224,8 @@ cost sensors and utility meters are enabled.
 
 The cost sensor reacts to changes of the energy sensor. On every update it takes the
 amount of energy consumed since the previous update and multiplies it by the price that
-is valid **at that moment**. When `energy_price_surcharge` is configured, it is added to
+is valid **at that moment**, using the sensor's own price when it has one and the global
+price otherwise. When `energy_price_surcharge` is configured, it is added to
 the fixed price or dynamic price sensor value. When `energy_price_multiplier` is
 configured, it is applied after the surcharge. When you use a dynamic price sensor, a
 price change settles the energy consumed up to that point at the **previous** price
