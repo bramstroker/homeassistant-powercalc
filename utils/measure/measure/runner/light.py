@@ -39,7 +39,12 @@ from measure.tuning import MeasurementParameters
 from measure.util.measure_util import AverageMeasurementConvergence, MeasurementResult, MeasureUtil
 
 CSV_WRITE_BUFFER = 50
-MAX_ALLOWED_0_READINGS = 50
+MAX_CONSECUTIVE_ZERO_READINGS = 5
+ZERO_READING_ABORT_MESSAGE = (
+    "Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load. "
+    "Verify the device is on and connected, raise the minimum brightness, measure multiple identical lights together, "
+    "add a resistive dummy load, or use a more sensitive meter."
+)
 
 _LOGGER = logging.getLogger("measure")
 
@@ -61,6 +66,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         self.lut_modes: set[LutMode] | None = None
         self.num_lights: int = 1
         self.num_0_readings: int = 0
+        self.skipped_zero_readings: int = 0
         self.light_info: LightInfo | None = None
         self.plan: LightMeasurementPlan | None = None
         self.active_plan: LightMeasurementPlan | None = None
@@ -201,54 +207,40 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             self.interaction.phase(f"Stabilizing light before the first reading ({self.config.sleep_initial} s)")
             self._wait(self.config.sleep_initial)
 
-            self.interaction.progress(
-                completed=len(all_variations) - len(remaining_variations),
-                total=len(all_variations),
-                phase=mode.value,
-                remaining_seconds=self.calculate_time_left_seconds(mode, all_variations, remaining_variations),
-            )
+            self._report_progress(mode, all_variations, remaining_variations)
             previous_variation = None
             for count, variation in enumerate(measurement_info.variations):
-                self._log_progress(mode, count, variation, all_variations, remaining_variations)
-                _LOGGER.info("Changing light to: %s", variation)
-                self._checkpoint()
-                variation_start_time = time.time()
-                self._change_light_with_retry(mode, variation)
-                self.wait(variation, previous_variation)
-
-                previous_variation = variation
-
-                try:
+                while True:
+                    self._log_progress(mode, count, variation, all_variations, remaining_variations)
+                    _LOGGER.info("Changing light to: %s", variation)
                     self._checkpoint()
-                    measurement_result = self.take_power_measurement(mode, variation_start_time)
-                except OutdatedMeasurementError:
-                    measurement_result = self.nudge_and_remeasure(mode, variation)
-                except ZeroReadingError as error:
-                    self.num_0_readings += 1
-                    _LOGGER.warning("Discarding measurement: %s", error)
-                    if self.num_0_readings > MAX_ALLOWED_0_READINGS:
-                        raise RunnerError(
-                            "Aborting measurement session. Received too many 0 readings",
-                        ) from error
-                    continue
-                except PowerMeterError as error:
-                    raise RunnerError(f"Aborting measurement session: {error}") from error
-                _LOGGER.info("Measured power: %.2f", measurement_result.power)
-                self._checkpoint()
-                csv_writer.write_measurement(variation, measurement_result.power)
-                voltages.extend(measurement_result.voltages)
-                remaining_variations.remove(variation)
-                self.interaction.progress(
-                    completed=len(all_variations) - len(remaining_variations),
-                    total=len(all_variations),
-                    phase=mode.value,
-                    remaining_seconds=self.calculate_time_left_seconds(
-                        mode,
-                        all_variations,
-                        remaining_variations,
-                        variation,
-                    ),
-                )
+                    variation_start_time = time.time()
+                    self._change_light_with_retry(mode, variation)
+                    self.wait(variation, previous_variation)
+
+                    previous_variation = variation
+
+                    try:
+                        self._checkpoint()
+                        measurement_result = self.take_power_measurement(mode, variation_start_time)
+                    except OutdatedMeasurementError:
+                        measurement_result = self.nudge_and_remeasure(mode, variation)
+                    except ZeroReadingError as error:
+                        self._record_zero_reading()
+                        self._report_progress(mode, all_variations, remaining_variations, variation)
+                        _LOGGER.warning("Discarding measurement: %s", error)
+                        self._raise_for_repeated_zero_readings(error)
+                        continue
+                    except PowerMeterError as error:
+                        raise RunnerError(f"Aborting measurement session: {error}") from error
+                    self.num_0_readings = 0
+                    _LOGGER.info("Measured power: %.2f", measurement_result.power)
+                    self._checkpoint()
+                    csv_writer.write_measurement(variation, measurement_result.power)
+                    voltages.extend(measurement_result.voltages)
+                    remaining_variations.remove(variation)
+                    self._report_progress(mode, all_variations, remaining_variations, variation)
+                    break
 
             _LOGGER.info(
                 "Hooray! measurements finished. Exported CSV file %s",
@@ -280,6 +272,35 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         time_left = self.calculate_time_left(mode, all_variations, remaining_variations, variation)
         progress_percentage = ((len(all_variations) - len(remaining_variations)) / len(all_variations)) * 100
         _LOGGER.info("Progress: %d%%, Estimated time left: %s", progress_percentage, time_left)
+
+    def _report_progress(
+        self,
+        mode: LutMode,
+        all_variations: list[Variation],
+        remaining_variations: list[Variation],
+        current_variation: Variation | None = None,
+    ) -> None:
+        completed_variations = len(all_variations) - len(remaining_variations)
+        self.interaction.progress(
+            completed=completed_variations,
+            total=len(all_variations),
+            phase=mode.value,
+            remaining_seconds=self.calculate_time_left_seconds(
+                mode,
+                all_variations,
+                remaining_variations,
+                current_variation,
+            ),
+            skipped=self.skipped_zero_readings,
+        )
+
+    def _record_zero_reading(self) -> None:
+        self.num_0_readings += 1
+        self.skipped_zero_readings += 1
+
+    def _raise_for_repeated_zero_readings(self, error: ZeroReadingError) -> None:
+        if self.num_0_readings >= MAX_CONSECUTIVE_ZERO_READINGS:
+            raise RunnerError(ZERO_READING_ABORT_MESSAGE) from error
 
     def _change_light_with_retry(self, mode: LutMode, variation: Variation) -> None:
         for _ in range(5):
@@ -440,16 +461,15 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                 self.interaction.operating_point(self._operating_point(mode, variation))
                 # Wait a longer amount of time for the PM to settle
                 self._wait(self.config.sleep_time_nudge)
-                return self.take_power_measurement(mode, variation_start_time)
+                result = self.take_power_measurement(mode, variation_start_time)
+                self.num_0_readings = 0
+                return result
             except OutdatedMeasurementError:
                 continue
             except ZeroReadingError as error:
-                self.num_0_readings += 1
+                self._record_zero_reading()
                 _LOGGER.warning("Discarding measurement: %s", error)
-                if self.num_0_readings > MAX_ALLOWED_0_READINGS:
-                    raise RunnerError(
-                        "Aborting measurement session. Received too many 0 readings",
-                    ) from error
+                self._raise_for_repeated_zero_readings(error)
                 continue
         raise OutdatedMeasurementError(
             f"Power measurement is outdated. Aborting after {self.config.max_nudges} nudge attempts",

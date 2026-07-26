@@ -219,8 +219,9 @@ export class RunningView extends LitElement {
                   <progress max="100" aria-label="Recording"></progress>`;
     }
     const percent = progress.percent ?? (progress.total ? progress.completed / progress.total * 100 : 0);
-    return html`<div class="value" aria-label="${Math.round(percent)} percent complete">${Math.round(percent)}<small>%</small></div>
-                <progress max="100" .value=${percent}>${Math.round(percent)}%</progress>`;
+    const percentLabel = percent > 0 && Math.round(percent) === 0 ? "<1" : String(Math.round(percent));
+    return html`<div class="value" aria-label="${percentLabel} percent complete">${percentLabel}<small>%</small></div>
+                <progress max="100" .value=${percent}>${percentLabel}%</progress>`;
   }
 
   private renderMetrics(openEnded: boolean, progress: SessionProgress) {
@@ -232,6 +233,7 @@ export class RunningView extends LitElement {
       <div class="metrics">
         <div class="metric"><span>Mode</span><strong>${this.snapshot.mode ?? "—"}</strong></div>
         <div class="metric"><span>${progressLabel}</span><strong>${openEnded ? progress.completed : html`${progress.completed} / ${progress.total}`}</strong></div>
+        ${progress.skipped ? html`<div class="metric"><span>Skipped</span><strong>${progress.skipped}</strong></div>` : nothing}
         <div class="metric"><span>Remaining</span><strong>${openEnded ? "Until stopped" : this.remaining(progress.estimated_remaining_seconds)}</strong></div>
       </div>
     `;

@@ -24,9 +24,23 @@ class SessionInteraction(RunInteraction):
     def phase(self, message: str) -> None:
         self.control.phase(message)
 
-    def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
+    def progress(
+        self,
+        completed: int,
+        total: int,
+        *,
+        phase: str,
+        remaining_seconds: float | None = None,
+        skipped: int = 0,
+    ) -> None:
         remaining = "" if remaining_seconds is None else f"{int(remaining_seconds)}s"
-        self.control.progress(completed=completed, total=total, mode=phase, estimated_remaining=remaining)
+        self.control.progress(
+            completed=completed,
+            total=total,
+            mode=phase,
+            estimated_remaining=remaining,
+            skipped=skipped,
+        )
 
     def wait(self, seconds: float) -> None:
         self.control.wait(seconds)

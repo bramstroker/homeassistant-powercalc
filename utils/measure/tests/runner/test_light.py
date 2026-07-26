@@ -1,5 +1,5 @@
 import csv
-from dataclasses import replace
+from dataclasses import dataclass, replace
 import os.path
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -9,11 +9,13 @@ from measure.controller.light.const import LutMode
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.execution import RunInteraction
+from measure.powermeter.errors import ZeroReadingError
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import LightMeasurementRequest
 from measure.runner.const import QUESTION_MODE
-from measure.runner.light import EffectVariation, LightRunner
-from measure.runner.light_plan import build_light_plan
+from measure.runner.errors import RunnerError
+from measure.runner.light import EffectVariation, LightRunner, MeasurementRunInput
+from measure.runner.light_plan import LightMeasurementPlan, LightModePlan, Variation, build_light_plan
 from measure.tuning import MeasurementParameters
 from measure.util.measure_util import AverageMeasurementConvergence, MeasurementResult, MeasureUtil
 import pytest
@@ -28,6 +30,51 @@ def _parameters() -> MeasurementParameters:
         hs_hue_steps=2731,
         hs_sat_steps=32,
     )
+
+
+def _zero_sleep_parameters() -> MeasurementParameters:
+    return replace(
+        _parameters(),
+        sleep_initial=0,
+        sleep_time=0,
+        sleep_time_ct=0,
+        sleep_time_hue=0,
+        sleep_time_sat=0,
+        sleep_time_effect_change=0,
+    )
+
+
+@dataclass
+class _BrightnessRun:
+    runner: LightRunner
+    measurement_info: MeasurementRunInput
+    all_variations: list[Variation]
+    remaining_variations: list[Variation]
+    measure_util: MagicMock
+
+    def execute(self) -> None:
+        self.runner.run_mode(self.measurement_info, self.all_variations, self.remaining_variations)
+
+
+def _brightness_run(tmp_path: Path, variations: list[Variation]) -> _BrightnessRun:
+    measure_util_mock = MagicMock(MeasureUtil)
+    interaction = MagicMock(spec=RunInteraction)
+    runner = LightRunner(measure_util_mock, _zero_sleep_parameters(), DummyLightController(), interaction)
+    runner.gzip = False
+    runner.light_info = runner.light_controller.get_light_info()
+    runner.active_plan = LightMeasurementPlan(
+        modes=[LightModePlan(mode=LutMode.BRIGHTNESS, variations=variations)],
+        effects=[],
+    )
+    all_variations = variations.copy()
+    remaining_variations = variations.copy()
+    measurement_info = MeasurementRunInput(
+        mode=LutMode.BRIGHTNESS,
+        csv_file=str(tmp_path / "brightness.csv"),
+        variations=variations.copy(),
+        is_resuming=False,
+    )
+    return _BrightnessRun(runner, measurement_info, all_variations, remaining_variations, measure_util_mock)
 
 
 @pytest.mark.parametrize(
@@ -111,6 +158,66 @@ def test_run(export_path: str) -> None:
     points = [call.args[0] for call in interaction.operating_point.call_args_list]
     assert points[0] == {"type": "light", "on": True, "brightness": 1}
     assert points[-1] == {"type": "light", "on": True, "brightness": 255}
+
+
+def test_zero_reading_retries_current_variation_and_reports_skipped_progress(tmp_path: Path) -> None:
+    variations = [Variation(1), Variation(2)]
+    run = _brightness_run(tmp_path, variations)
+    run.measure_util.take_measurement.side_effect = [
+        ZeroReadingError("0 watt was read from the power meter"),
+        MeasurementResult(power=1, voltages=[]),
+        MeasurementResult(power=2, voltages=[]),
+    ]
+
+    run.execute()
+
+    with open(run.measurement_info.csv_file, newline="") as csv_file:
+        rows = list(csv.reader(csv_file))
+    assert rows == [["bri", "watt"], ["1", "1.0"], ["2", "2.0"]]
+    skipped_progress = run.runner.interaction.progress.call_args_list[1]
+    assert skipped_progress.kwargs["completed"] == 0
+    assert skipped_progress.kwargs["total"] == 2
+    assert skipped_progress.kwargs["skipped"] == 1
+    assert run.runner.interaction.progress.call_args_list[-1].kwargs["completed"] == 2
+    assert run.runner.interaction.progress.call_args_list[-1].kwargs["total"] == 2
+
+
+def test_zero_reading_counter_resets_after_valid_measurement(tmp_path: Path) -> None:
+    variations = [Variation(1), Variation(2)]
+    run = _brightness_run(tmp_path, variations)
+    run.measure_util.take_measurement.side_effect = [
+        ZeroReadingError("first low reading"),
+        MeasurementResult(power=1, voltages=[]),
+        ZeroReadingError("second low reading"),
+        ZeroReadingError("third low reading"),
+        ZeroReadingError("fourth low reading"),
+        ZeroReadingError("fifth low reading"),
+        MeasurementResult(power=2, voltages=[]),
+    ]
+
+    run.execute()
+
+    with open(run.measurement_info.csv_file, newline="") as csv_file:
+        rows = list(csv.reader(csv_file))
+    assert rows[-2:] == [["1", "1.0"], ["2", "2.0"]]
+
+
+def test_repeated_zero_readings_fail_fast_with_actionable_error(tmp_path: Path) -> None:
+    variations = [Variation(1), Variation(2)]
+    run = _brightness_run(tmp_path, variations)
+    run.measure_util.take_measurement.side_effect = ZeroReadingError("0 watt was read from the power meter")
+
+    with pytest.raises(RunnerError) as error:
+        run.execute()
+
+    message = str(error.value)
+    assert "repeated 0 W readings" in message
+    assert "power meter may not resolve this low load" in message
+    assert "raise the minimum brightness" in message
+    assert "multiple identical lights" in message
+    assert "resistive dummy load" in message
+    assert run.measure_util.take_measurement.call_count == 5
+    assert run.runner.interaction.progress.call_args_list[-1].kwargs["skipped"] == 5
 
 
 def test_cleanup_turns_off_light() -> None:

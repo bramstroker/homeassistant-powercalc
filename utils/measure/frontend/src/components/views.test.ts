@@ -935,6 +935,22 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector(".diagnostics-download")?.textContent).toContain("snapshot and logs");
   });
 
+  it("shows sub-one-percent progress and skipped readings", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", mode: "brightness", progress: { completed: 1, total: 300, skipped: 1 } };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".value")?.textContent).toContain("<1%");
+    expect(element.shadowRoot.querySelector("progress")?.value).toBeCloseTo(1 / 300 * 100);
+    expect(element.shadowRoot.textContent).toContain("1 / 300");
+    expect(element.shadowRoot.textContent).toContain("Skipped");
+  });
+
   it("draws a live power chart from streamed samples", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot; samples: number[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;

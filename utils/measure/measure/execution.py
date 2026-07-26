@@ -64,7 +64,15 @@ class RunInteraction(Protocol):
     def phase(self, message: str) -> None:
         """Report the current activity when numeric progress is unavailable."""
 
-    def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
+    def progress(
+        self,
+        completed: int,
+        total: int,
+        *,
+        phase: str,
+        remaining_seconds: float | None = None,
+        skipped: int = 0,
+    ) -> None:
         """Report measurement progress. ``total`` of 0 means the run is open-ended."""
 
     def wait(self, seconds: float) -> None:
@@ -96,7 +104,15 @@ class ImmediateInteraction(RunInteraction):
     def phase(self, message: str) -> None:
         return
 
-    def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
+    def progress(
+        self,
+        completed: int,
+        total: int,
+        *,
+        phase: str,
+        remaining_seconds: float | None = None,
+        skipped: int = 0,
+    ) -> None:
         return
 
     def wait(self, seconds: float) -> None:
