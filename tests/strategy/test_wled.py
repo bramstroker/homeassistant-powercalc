@@ -61,13 +61,13 @@ async def test_can_calculate_power(
     assert strategy.can_calculate_standby()
 
     state = State("sensor.test_estimated_current", "50.0")
-    assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(state))
+    assert float(await strategy.calculate(state)) == pytest.approx(0.225, 0.01)
 
     state = State("light.test", STATE_OFF)
     assert await strategy.calculate(state) == 0.1
 
     state = State("light.test", STATE_ON)
-    assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(state))
+    assert float(await strategy.calculate(state)) == pytest.approx(0.225, 0.01)
 
 
 async def test_calculate_returns_none_when_dependent_state_is_missing(

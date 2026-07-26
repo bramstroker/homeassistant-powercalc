@@ -360,14 +360,15 @@ async def test_unsupported_color_mode(
 
 
 async def test_validation_fails_for_non_light_entities(hass: HomeAssistant) -> None:
+    source_entity = create_source_entity("sensor")
+
     with pytest.raises(StrategyConfigurationError):
-        strategy = await _create_lut_strategy(
+        await _create_lut_strategy(
             hass,
             "signify",
             "LCT010",
-            source_entity=create_source_entity("sensor"),
+            source_entity=source_entity,
         )
-        await strategy.validate_config()
 
 
 async def test_sensor_unavailable_for_unsupported_color_mode(

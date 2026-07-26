@@ -160,11 +160,11 @@ def test_default_calculation_strategy_lut(hass: HomeAssistant) -> None:
 
 
 async def test_error_when_sub_profile_not_exists(hass: HomeAssistant) -> None:
+    library = await ProfileLibrary.factory(hass)
+    model_info = ModelInfo("yeelight", "YLDL01YL/ambilight_boo")
+
     with pytest.raises(ModelNotSupportedError):
-        library = await ProfileLibrary.factory(hass)
-        await library.get_profile(
-            ModelInfo("yeelight", "YLDL01YL/ambilight_boo"),
-        )
+        await library.get_profile(model_info)
 
 
 async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
