@@ -520,13 +520,42 @@ export class SettingsView extends LitElement {
   private async copyGithubCode(): Promise<void> {
     const code = this.contributionDeviceFlow?.user_code;
     if (!code) return;
-    try {
-      if (!navigator.clipboard?.writeText) throw new Error("Clipboard API is unavailable");
-      await navigator.clipboard.writeText(code);
+    if (await this.writeToClipboard(code)) {
       this.githubCopyStatus = "Code copied.";
+      return;
+    }
+    this.githubCopyStatus = "Couldn’t copy automatically. Select the code and copy it manually.";
+    this.shadowRoot?.querySelector<HTMLInputElement>(".device-code")?.select();
+  }
+
+  // The async clipboard API only exists in a secure context. Home Assistant is usually reached over
+  // plain http on the local network, so inside the ingress panel we have to fall back to execCommand.
+  private async writeToClipboard(code: string): Promise<boolean> {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+        return true;
+      }
     } catch {
-      this.githubCopyStatus = "Couldn’t copy automatically. Select the code and copy it manually.";
-      this.shadowRoot?.querySelector<HTMLInputElement>(".device-code")?.select();
+      // Permission or focus problem, try the legacy path below.
+    }
+    return this.legacyCopy(code);
+  }
+
+  private legacyCopy(code: string): boolean {
+    const scratch = document.createElement("textarea");
+    scratch.value = code;
+    scratch.setAttribute("readonly", "");
+    scratch.style.cssText = "position:fixed;top:-1000px;opacity:0";
+    document.body.append(scratch);
+    try {
+      scratch.select();
+      scratch.setSelectionRange(0, code.length);
+      return document.execCommand("copy");
+    } catch {
+      return false;
+    } finally {
+      scratch.remove();
     }
   }
 
