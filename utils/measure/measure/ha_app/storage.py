@@ -155,6 +155,7 @@ class SessionStorage:
                 updated_at=str(state["updated_at"]),
                 completed=int(state.get("completed", 0)),
                 total=int(state.get("total", 0)),
+                skipped=int(state.get("skipped", 0)),
                 phase=state.get("phase"),
                 confirmation_message=state.get("confirmation_message"),
                 mode=state.get("mode"),

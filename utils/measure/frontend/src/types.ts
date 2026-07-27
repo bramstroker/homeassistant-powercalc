@@ -213,6 +213,7 @@ export interface PreflightResponse {
 export interface SessionProgress {
   completed: number;
   total: number;
+  skipped?: number;
   percent?: number;
   estimated_remaining_seconds?: number | null;
 }
@@ -270,6 +271,7 @@ export interface SessionEventData {
   power?: number;
   completed?: number;
   total?: number;
+  skipped?: number;
   mode?: string;
   estimated_remaining?: string;
   state?: SessionState;

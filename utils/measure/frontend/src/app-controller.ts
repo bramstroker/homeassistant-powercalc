@@ -619,7 +619,7 @@ export class MeasureAppController {
   }
 
   private consumeEvent(event: SessionEvent): void {
-    if ((event.type === "log" || event.type === "checkpoint") && event.data.message) {
+    if ((event.type === "log" || event.type === "warning" || event.type === "checkpoint") && event.data.message) {
       this.state.logs = [...this.state.logs.slice(-39), event.data.message];
     }
     if (event.type === "sample" && typeof event.data.power === "number") {

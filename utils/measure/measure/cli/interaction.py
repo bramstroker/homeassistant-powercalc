@@ -24,7 +24,15 @@ class ConsoleInteraction(RunInteraction):
     def phase(self, message: str) -> None:
         return
 
-    def progress(self, completed: int, total: int, *, phase: str, remaining_seconds: float | None = None) -> None:
+    def progress(
+        self,
+        completed: int,
+        total: int,
+        *,
+        phase: str,
+        remaining_seconds: float | None = None,
+        skipped: int = 0,
+    ) -> None:
         return
 
     def wait(self, seconds: float) -> None:
