@@ -42,7 +42,7 @@ CSV_WRITE_BUFFER = 50
 MAX_CONSECUTIVE_ZERO_READINGS = 5
 ZERO_READING_ABORT_MESSAGE = (
     "Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load. "
-    "Verify the device is on and connected, raise the minimum brightness, measure multiple identical lights together, "
+    "Verify the device is on and connected, measure multiple identical lights together, "
     "add a resistive dummy load, or use a more sensitive meter."
 )
 
