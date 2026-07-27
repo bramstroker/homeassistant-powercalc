@@ -75,6 +75,7 @@ export class RunningView extends LitElement {
     .log-head button { min-height: 32px; padding: 0.3rem 0.6rem; }
     .log { flex: 1; overflow: auto; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); font: 0.8rem/1.6 ui-monospace, monospace; color: var(--muted); }
     .log p { margin: 0; }
+    .log p.warning { color: var(--warning); }
     .chart { position: relative; margin-top: 1.4rem; }
     .chart-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
     .chart-head span { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -134,7 +135,7 @@ export class RunningView extends LitElement {
           </div>
           ${preparing ? this.renderPreparation() : this.renderMeasurement(openEnded, progress)}
         </div>
-        ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
+        ${this.renderLatestWarning()}
         ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
         <div class="diagnostics-download">
           <span>Session snapshot and logs for issue reporting.</span>
@@ -172,7 +173,7 @@ export class RunningView extends LitElement {
           </div>
           <button class="primary confirm" type="button" @click=${this.confirm} ?disabled=${this.busy}>${this.busy ? "Starting…" : this.confirmationAction || "Start measurement"}</button>
         </div>
-        ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
+        ${this.renderLatestWarning()}
         ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
         <div class="diagnostics-download">
           <span>Session snapshot and logs for issue reporting.</span>
@@ -219,8 +220,9 @@ export class RunningView extends LitElement {
                   <progress max="100" aria-label="Recording"></progress>`;
     }
     const percent = progress.percent ?? (progress.total ? progress.completed / progress.total * 100 : 0);
-    return html`<div class="value" aria-label="${Math.round(percent)} percent complete">${Math.round(percent)}<small>%</small></div>
-                <progress max="100" .value=${percent}>${Math.round(percent)}%</progress>`;
+    const percentLabel = percent > 0 && Math.round(percent) === 0 ? "<1" : String(Math.round(percent));
+    return html`<div class="value" aria-label="${percentLabel} percent complete">${percentLabel}<small>%</small></div>
+                <progress max="100" .value=${percent}>${percentLabel}%</progress>`;
   }
 
   private renderMetrics(openEnded: boolean, progress: SessionProgress) {
@@ -232,6 +234,7 @@ export class RunningView extends LitElement {
       <div class="metrics">
         <div class="metric"><span>Mode</span><strong>${this.snapshot.mode ?? "—"}</strong></div>
         <div class="metric"><span>${progressLabel}</span><strong>${openEnded ? progress.completed : html`${progress.completed} / ${progress.total}`}</strong></div>
+        ${progress.skipped ? html`<div class="metric"><span>Skipped</span><strong>${progress.skipped}</strong></div>` : nothing}
         <div class="metric"><span>Remaining</span><strong>${openEnded ? "Until stopped" : this.remaining(progress.estimated_remaining_seconds)}</strong></div>
       </div>
     `;
@@ -346,7 +349,13 @@ export class RunningView extends LitElement {
   }
 
   private logLine(log: string) {
-    return html`<p>${log}</p>`;
+    const warning = this.snapshot.warnings?.includes(log) ?? false;
+    return html`<p class=${warning ? "warning" : ""}>${log}</p>`;
+  }
+
+  private renderLatestWarning() {
+    const warning = this.snapshot.warnings?.at(-1);
+    return warning ? html`<div class="notice warning" role="alert">${warning}</div>` : nothing;
   }
 
   private toggleLog(): void {

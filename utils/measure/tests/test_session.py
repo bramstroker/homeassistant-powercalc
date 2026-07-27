@@ -29,6 +29,18 @@ def test_events_are_sequenced_and_delivered() -> None:
     assert events[0].type == SessionEventType.PHASE
     assert events[0].data == {"message": "Preparing measurement devices"}
     assert events[1].data["completed"] == 1
+    assert events[1].data["skipped"] == 0
+
+
+def test_progress_event_includes_skipped_readings() -> None:
+    control = SessionControl()
+    events = []
+    control.subscribe(events.append)
+
+    control.progress(completed=2, total=12, mode="brightness", estimated_remaining="10s", skipped=1)
+
+    assert events[0].type == SessionEventType.PROGRESS
+    assert events[0].data["skipped"] == 1
 
 
 def test_sample_emits_rounded_power_reading() -> None:

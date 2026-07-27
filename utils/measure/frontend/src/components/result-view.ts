@@ -4,6 +4,7 @@ import { sharedStyles } from "../styles";
 import "./result-plot";
 
 const CONTRIBUTION_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/output/";
+const TROUBLESHOOTING_URL = "https://docs.powercalc.nl/contributing/measure/troubleshooting/";
 const PROFILE_LIBRARY_PATH = "profile_library/<manufacturer>/<model>/";
 
 // Contribution methods. Add a new entry here (e.g. "local") to expose another way to
@@ -123,6 +124,7 @@ export class ResultView extends LitElement {
   render() {
     const state = this.snapshot.state;
     const error = typeof this.snapshot.error === "string" ? this.snapshot.error : this.snapshot.error?.message;
+    const showArtifacts = state !== "failed";
     return html`
       <section class="panel" aria-labelledby="result-title">
         <p class="eyebrow">04 / Result</p>
@@ -130,11 +132,11 @@ export class ResultView extends LitElement {
           <div class="status-mark ${state}" aria-hidden="true">${this.statusMark(state)}</div>
           <div><h2 id="result-title">${this.resultTitle(state)}</h2><p class="muted">${this.description(state)}</p></div>
         </div>
-        ${error ? html`<p class="notice error" role="alert">${error}</p>` : nothing}
-        ${this.renderSummary()}
-        ${this.renderPlots()}
-        ${this.renderFiles()}
-        ${this.renderContributionSection(state)}
+        ${error ? html`<p class="notice error" role="alert">${this.renderError(error)}</p>` : nothing}
+        ${showArtifacts ? this.renderSummary() : nothing}
+        ${showArtifacts ? this.renderPlots() : nothing}
+        ${showArtifacts ? this.renderFiles() : nothing}
+        ${showArtifacts ? this.renderContributionSection(state) : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         <div class="diagnostics-download">
           <span>Session snapshot and logs for issue reporting.</span>
@@ -146,6 +148,12 @@ export class ResultView extends LitElement {
         </div>
       </section>
     `;
+  }
+
+  private renderError(error: string) {
+    if (!error.includes(TROUBLESHOOTING_URL)) return error;
+    const [before, after] = error.split(TROUBLESHOOTING_URL, 2);
+    return html`${before}<a href=${TROUBLESHOOTING_URL} target="_blank" rel="noopener noreferrer">Troubleshooting guide</a>${after}`;
   }
 
   private renderFiles() {
@@ -425,6 +433,7 @@ ${preview.pr_body}</pre>
   private description(state: SessionSnapshot["state"]): string {
     if (state === "completed") return this.summaryEntries().length ? "Here is the measured result." : "The complete output is ready to inspect or download.";
     if (state === "resumable") return "Compatible output was found. Continue from the last complete variation.";
+    if (state === "failed") return "Review the guidance below, correct the problem, and start a new measurement.";
     return "Any complete output rows have been kept safely.";
   }
 

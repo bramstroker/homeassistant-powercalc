@@ -771,6 +771,7 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[s
         "progress": {
             "completed": snapshot.completed,
             "total": snapshot.total,
+            "skipped": snapshot.skipped,
             "percent": snapshot.progress,
             "estimated_remaining_seconds": _duration_seconds(snapshot.estimated_remaining),
         },
