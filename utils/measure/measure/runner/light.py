@@ -43,7 +43,8 @@ MAX_CONSECUTIVE_ZERO_READINGS = 5
 ZERO_READING_ABORT_MESSAGE = (
     "Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load. "
     "Verify the device is on and connected, measure multiple identical lights together, "
-    "add a resistive dummy load, or use a more sensitive meter."
+    "add a resistive dummy load, or use a more sensitive meter. "
+    "See https://docs.powercalc.nl/contributing/measure/troubleshooting/ for troubleshooting guidance."
 )
 
 _LOGGER = logging.getLogger("measure")

@@ -450,6 +450,10 @@ describe("measure app controller", () => {
 
     onEvent?.({ sequence: 1, type: "sample", data: { power: 12.5 }, snapshot: { state: "running" } });
     expect(appState.samples).toEqual([12.5]);
+
+    const warning = "Discarding measurement: 0 watt was read from the power meter";
+    onEvent?.({ sequence: 2, type: "warning", data: { message: warning }, snapshot: { state: "running", warnings: [warning] } });
+    expect(appState.logs).toEqual([warning]);
   });
 
   it("reloads effective capabilities after saving measurement defaults", async () => {

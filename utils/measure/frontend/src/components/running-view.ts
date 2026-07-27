@@ -75,6 +75,7 @@ export class RunningView extends LitElement {
     .log-head button { min-height: 32px; padding: 0.3rem 0.6rem; }
     .log { flex: 1; overflow: auto; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); font: 0.8rem/1.6 ui-monospace, monospace; color: var(--muted); }
     .log p { margin: 0; }
+    .log p.warning { color: var(--warning); }
     .chart { position: relative; margin-top: 1.4rem; }
     .chart-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
     .chart-head span { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -134,7 +135,7 @@ export class RunningView extends LitElement {
           </div>
           ${preparing ? this.renderPreparation() : this.renderMeasurement(openEnded, progress)}
         </div>
-        ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
+        ${this.renderLatestWarning()}
         ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
         <div class="diagnostics-download">
           <span>Session snapshot and logs for issue reporting.</span>
@@ -172,7 +173,7 @@ export class RunningView extends LitElement {
           </div>
           <button class="primary confirm" type="button" @click=${this.confirm} ?disabled=${this.busy}>${this.busy ? "Starting…" : this.confirmationAction || "Start measurement"}</button>
         </div>
-        ${this.snapshot.warnings?.length ? html`<div class="notice" role="status">${this.snapshot.warnings.at(-1)}</div>` : nothing}
+        ${this.renderLatestWarning()}
         ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
         <div class="diagnostics-download">
           <span>Session snapshot and logs for issue reporting.</span>
@@ -348,7 +349,13 @@ export class RunningView extends LitElement {
   }
 
   private logLine(log: string) {
-    return html`<p>${log}</p>`;
+    const warning = this.snapshot.warnings?.includes(log) ?? false;
+    return html`<p class=${warning ? "warning" : ""}>${log}</p>`;
+  }
+
+  private renderLatestWarning() {
+    const warning = this.snapshot.warnings?.at(-1);
+    return warning ? html`<div class="notice warning" role="alert">${warning}</div>` : nothing;
   }
 
   private toggleLog(): void {

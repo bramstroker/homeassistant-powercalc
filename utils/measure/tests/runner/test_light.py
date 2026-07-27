@@ -213,9 +213,9 @@ def test_repeated_zero_readings_fail_fast_with_actionable_error(tmp_path: Path) 
     message = str(error.value)
     assert "repeated 0 W readings" in message
     assert "power meter may not resolve this low load" in message
-    assert "raise the minimum brightness" in message
     assert "multiple identical lights" in message
     assert "resistive dummy load" in message
+    assert "https://docs.powercalc.nl/contributing/measure/troubleshooting/" in message
     assert run.measure_util.take_measurement.call_count == 5
     assert run.runner.interaction.progress.call_args_list[-1].kwargs["skipped"] == 5
 

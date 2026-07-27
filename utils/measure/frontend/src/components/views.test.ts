@@ -1091,6 +1091,25 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector(".log-overlay")?.textContent).toContain("Second log");
   });
 
+  it("presents discarded readings as warnings in the page and log panel", async () => {
+    const warning = "Discarding measurement: 0 watt was read from the power meter";
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; logs: string[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", progress: { completed: 0, total: 2 }, warnings: [warning] };
+    element.logs = [warning];
+    document.body.append(element);
+    await element.updateComplete;
+
+    const notice = element.shadowRoot.querySelector(".notice.warning");
+    expect(notice?.getAttribute("role")).toBe("alert");
+    expect(notice?.textContent).toContain(warning);
+
+    (element.shadowRoot.querySelector(".log-toggle") as HTMLButtonElement).click();
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector(".log p.warning")?.textContent).toContain(warning);
+  });
+
   it("auto-scrolls the log container when new log lines arrive", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot;
@@ -1959,6 +1978,36 @@ describe("result view", () => {
     expect(diagnostics.textContent).toBe("Download diagnostics");
     expect(diagnostics.href).toBe(element.diagnosticsUrl);
     expect(element.shadowRoot.querySelector(".diagnostics-download")?.textContent).toContain("snapshot and logs");
+  });
+
+  it("keeps failed results focused on the actionable error", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      files: { name: string; size: number; media_type: string }[];
+      plotCollection: { partial: boolean; plots: never[]; warnings: string[] };
+      diagnosticsUrl: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "failed",
+      error: "Use a more sensitive meter. See https://docs.powercalc.nl/contributing/measure/troubleshooting/ for troubleshooting guidance.",
+    };
+    element.files = [{ name: "brightness.csv", size: 10, media_type: "text/csv" }];
+    element.plotCollection = { partial: true, plots: [], warnings: ["Could not plot brightness.csv"] };
+    element.diagnosticsUrl = "http://ha.local/ingress/api/session/current/diagnostics";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".notice.error")?.textContent).toContain("Use a more sensitive meter.");
+    const troubleshootingLink = element.shadowRoot.querySelector(".notice.error a") as HTMLAnchorElement;
+    expect(troubleshootingLink.textContent).toBe("Troubleshooting guide");
+    expect(troubleshootingLink.href).toBe("https://docs.powercalc.nl/contributing/measure/troubleshooting/");
+    expect(element.shadowRoot.textContent).toContain("correct the problem");
+    expect(element.shadowRoot.textContent).not.toContain("Could not plot");
+    expect(element.shadowRoot.textContent).not.toContain("Generated files");
+    expect(element.shadowRoot.textContent).not.toContain("Download all");
+    expect(element.shadowRoot.querySelector(".diagnostics-download a")).toBeTruthy();
   });
 
   it("shows a download-all action for generated files", async () => {
