@@ -2,7 +2,7 @@
   "name": "Zigbee Switch 1 Gang",
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "measure_device": "Shelly Gen 3",
+  "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "measure_description": "Measured via Powercalc Measure Tool",
   "created_at": "2026-07-27T15:17:25Z",
