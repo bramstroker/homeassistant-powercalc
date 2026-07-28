@@ -2,7 +2,7 @@
   "name": "Zigbee Switch 1 Gang No Neutral",
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "measure_device": "Custom Measurement",
+  "measure_device": "Shelly Plug S",
   "measure_method": "manual",
   "measure_description": "No neutral line version. Switch self-consumption: 0.1W standby, 0.3W operating. Total load depends on the connected lamp and must be configured separately.",
   "created_at": "2026-07-28T15:06:00Z",
