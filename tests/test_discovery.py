@@ -839,6 +839,29 @@ async def test_discovery_by_device(
     assert len(mock_calls) == 1
 
 
+async def test_composite_devices_are_ignored_for_device_discovery(
+    hass: HomeAssistant,
+) -> None:
+    regular_device = DeviceEntry(id="regular-device", manufacturer="test", model="regular")
+    composite_device = DeviceEntry(id="composite-device", manufacturer="test", model="composite")
+    mock_device_registry(
+        hass,
+        {
+            regular_device.id: regular_device,
+            composite_device.id: composite_device,
+        },
+    )
+    discovery_manager = DiscoveryManager(hass, {})
+
+    with patch(
+        "custom_components.powercalc.discovery.is_composite_device_id",
+        side_effect=lambda _hass, device_id: device_id == composite_device.id,
+    ):
+        devices = await discovery_manager.get_devices()
+
+    assert devices == [regular_device]
+
+
 async def test_powercalc_sensors_are_ignored_for_discovery(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
