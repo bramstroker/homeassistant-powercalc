@@ -75,7 +75,7 @@ def test_wled_unique_id() -> None:
         mock_instance = power_profile_mock.return_value
         type(mock_instance).calculation_strategy = PropertyMock(return_value=CalculationStrategy.WLED)
 
-        device_entry = DeviceEntry(id="123456")
+        device_entry = DeviceEntry(config_entry_id="test", id="123456")
         source_entity = SourceEntity("wled", "light.wled", "light", device_entry=device_entry)
         unique_id = get_or_create_unique_id({}, source_entity, mock_instance)
         assert unique_id == "pc_123456"
@@ -124,7 +124,12 @@ def test_get_related_entity_by_translation_key(hass: HomeAssistant) -> None:
         },
     )
 
-    source_entity = SourceEntity("test", "light.test", "light", device_entry=DeviceEntry(id="device_1"))
+    source_entity = SourceEntity(
+        "test",
+        "light.test",
+        "light",
+        device_entry=DeviceEntry(config_entry_id="test", id="device_1"),
+    )
     result = get_related_entity_by_translation_key(hass, source_entity, "power")
 
     assert result == "sensor.test_power"
@@ -180,7 +185,7 @@ def test_resolve_related_entity_placeholder_unknown_device_class(hass: HomeAssis
     assert not resolve_related_entity_placeholder(
         hass,
         f"{PLACEHOLDER_ENTITY_BY_DEVICE_CLASS}foo",
-        SourceEntity("test", "light.test", "light", device_entry=DeviceEntry(id="device_1")),
+        SourceEntity("test", "light.test", "light", device_entry=DeviceEntry(config_entry_id="test", id="device_1")),
     )
 
 
@@ -188,7 +193,7 @@ def test_resolve_related_entity_placeholder_unknown_placeholder(hass: HomeAssist
     assert not resolve_related_entity_placeholder(
         hass,
         "whatever",
-        SourceEntity("test", "light.test", "light", device_entry=DeviceEntry(id="device_1")),
+        SourceEntity("test", "light.test", "light", device_entry=DeviceEntry(config_entry_id="test", id="device_1")),
     )
 
 

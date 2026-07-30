@@ -338,16 +338,19 @@ async def test_exclude_device_types(
         hass,
         {
             "switch-device": DeviceEntry(
+                config_entry_id="test",
                 id="switch-device",
                 manufacturer="shelly",
                 model="SHPLG-S",
             ),
             "light-device": DeviceEntry(
+                config_entry_id="test",
                 id="light-device",
                 manufacturer="signify",
                 model="LCT010",
             ),
             "cover-device": DeviceEntry(
+                config_entry_id="test",
                 id="cover-device",
                 manufacturer="eq-3",
                 model="HmIP-FROLL",
@@ -441,6 +444,7 @@ async def test_load_model_with_slashes(
 
 async def test_get_power_profile_by_source_device_returns_none_without_required_entries(hass: HomeAssistant) -> None:
     device_entry = DeviceEntry(
+        config_entry_id="test",
         id="test-device",
         manufacturer="test",
         model="discovery_type_device",
@@ -743,7 +747,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
                 platform="switch",
                 device_id="a",
             ),
-            DeviceEntry(id="a", manufacturer="foo", model="bar"),
+            DeviceEntry(config_entry_id="test", id="a", manufacturer="foo", model="bar"),
             ModelInfo("foo", "bar", None),
         ),
         (
@@ -753,7 +757,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
                 platform="switch",
                 device_id="a",
             ),
-            DeviceEntry(id="b", manufacturer="foo", model="bar"),
+            DeviceEntry(config_entry_id="test", id="b", manufacturer="foo", model="bar"),
             None,
         ),
         (
@@ -763,7 +767,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
                 platform="switch",
                 device_id="a",
             ),
-            DeviceEntry(id="a", manufacturer="foo", model="bar", model_id="barry"),
+            DeviceEntry(config_entry_id="test", id="a", manufacturer="foo", model="bar", model_id="barry"),
             ModelInfo("foo", "bar", "barry"),
         ),
     ],
@@ -837,6 +841,34 @@ async def test_discovery_by_device(
     assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery_type_device"
     assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_ABC123"
     assert len(mock_calls) == 1
+
+
+async def test_composite_devices_are_ignored_for_device_discovery(
+    hass: HomeAssistant,
+) -> None:
+    regular_device = DeviceEntry(config_entry_id="test", id="regular-device", manufacturer="test", model="regular")
+    composite_device = DeviceEntry(
+        config_entry_id="test",
+        id="composite-device",
+        manufacturer="test",
+        model="composite",
+    )
+    mock_device_registry(
+        hass,
+        {
+            regular_device.id: regular_device,
+            composite_device.id: composite_device,
+        },
+    )
+    discovery_manager = DiscoveryManager(hass, {})
+
+    with patch(
+        "custom_components.powercalc.discovery.is_composite_device_id",
+        side_effect=lambda _hass, device_id: device_id == composite_device.id,
+    ):
+        devices = await discovery_manager.get_devices()
+
+    assert devices == [regular_device]
 
 
 async def test_powercalc_sensors_are_ignored_for_discovery(
@@ -1074,11 +1106,13 @@ async def test_discovery_compatible_integrations(
         hass,
         {
             "hue-device-id": DeviceEntry(
+                config_entry_id="test",
                 id="hue-device-id",
                 manufacturer="test",
                 model="compatible_integrations",
             ),
             "other-device-id": DeviceEntry(
+                config_entry_id="test",
                 id="other-device-id",
                 manufacturer="test",
                 model="compatible_integrations",

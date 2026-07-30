@@ -33,6 +33,7 @@ from .const import (
     MANUFACTURER_WLED,
     CalculationStrategy,
 )
+from .device_binding import is_composite_device_id
 from .group_include.filter import (
     CategoryFilter,
     CompositeFilter,
@@ -386,7 +387,11 @@ class DiscoveryManager:
 
     async def get_devices(self) -> list[dr.DeviceEntry]:
         """Fetch device entries."""
-        return list(dr.async_get(self.hass).devices.values())
+        return [
+            device
+            for device in dr.async_get(self.hass).devices.values()
+            if not is_composite_device_id(self.hass, device.id)
+        ]
 
     def enable(self) -> None:
         """Enable the discovery."""
