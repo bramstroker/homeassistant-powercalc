@@ -217,7 +217,7 @@ async def test_matcher_model_id(
         custom_directory=get_test_profile_dir("sub_profile_match_model_id"),
     )
 
-    device_entry = DeviceEntry(id="abc", model_id=model_id)
+    device_entry = DeviceEntry(config_entry_id="test", id="abc", model_id=model_id)
     source_entity = SourceEntity(
         entity_id="light.test",
         domain="light",

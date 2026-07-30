@@ -337,11 +337,13 @@ async def test_include_skips_unsupported_entities(hass: HomeAssistant, caplog: p
         hass,
         {
             "device-a": DeviceEntry(
+                config_entry_id="test",
                 id="device-a",
                 manufacturer="signify",
                 model="LCT012",
             ),
             "device-b": DeviceEntry(
+                config_entry_id="test",
                 id="device-b",
                 manufacturer="signify",
                 model="Room",
@@ -520,12 +522,14 @@ async def test_include_filter_domain(
         hass,
         {
             "light-device-id": DeviceEntry(
+                config_entry_id="test",
                 id="light-device-id",
                 manufacturer="Signify",
                 model="LCT012",
                 area_id=area.id,
             ),
             "switch-device-id": DeviceEntry(
+                config_entry_id="test",
                 id="switch-device-id",
                 manufacturer="Shelly",
                 model="Shelly Plug S",
