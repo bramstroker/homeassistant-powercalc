@@ -92,6 +92,7 @@ def test_merge_configuration(
                 name=None,
             ),
             DeviceEntry(
+                config_entry_id="test",
                 name="My awesome switchy",
             ),
             "My awesome switchy",
@@ -107,6 +108,7 @@ def test_merge_configuration(
                 original_name="Television",
             ),
             DeviceEntry(
+                config_entry_id="test",
                 name="Livingroom-SmartPlug",
             ),
             "Livingroom-SmartPlug Television",
@@ -120,7 +122,9 @@ def test_merge_configuration(
                 has_entity_name=True,
                 name=None,
             ),
-            DeviceEntry(),
+            DeviceEntry(
+                config_entry_id="test",
+            ),
             "my_switch",
         ),
     ],

@@ -41,6 +41,7 @@ async def test_variable_replaced(hass: HomeAssistant) -> None:
         hass,
         {
             "device_1": DeviceEntry(
+                config_entry_id="test",
                 id="device_1",
             ),
         },
@@ -82,6 +83,7 @@ async def test_exception_raised_when_entity_not_found(hass: HomeAssistant, caplo
         hass,
         {
             "device_1": DeviceEntry(
+                config_entry_id="test",
                 id="device_1",
             ),
         },

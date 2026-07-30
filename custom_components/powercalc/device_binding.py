@@ -60,6 +60,7 @@ def attach_entities_to_resolved_device(
     for entity in entities_to_add:
         try:
             entity.device_entry = device_entry
+            setattr(entity, "_powercalc_device_entry", device_entry)  # noqa: B010
         except AttributeError:  # pragma: no cover
             _LOGGER.error("%s: Cannot set device id on entity", entity.entity_id)
 

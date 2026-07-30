@@ -106,7 +106,6 @@ def test_entity_pick_filter_by_device(hass: HomeAssistant) -> None:
         "device_123",
         "Test Manufacturer",
         "Test Model",
-        config_entries=set(),
         identifiers={("powercalc", "device_123")},
         name="Test Device",
     )

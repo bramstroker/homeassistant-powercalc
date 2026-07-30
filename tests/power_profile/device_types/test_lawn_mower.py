@@ -57,6 +57,7 @@ async def test_lawn_mower(
         hass,
         {
             "device_1": DeviceEntry(
+                config_entry_id="test",
                 id="device_1",
             ),
         },
