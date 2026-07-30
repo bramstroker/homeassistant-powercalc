@@ -50,6 +50,7 @@ async def test_vacuum_robot(
         hass,
         {
             "device_1": DeviceEntry(
+                config_entry_id="test",
                 id="device_1",
             ),
         },
@@ -106,6 +107,7 @@ async def test_with_tapering_playbook(hass: HomeAssistant) -> None:
         hass,
         {
             "device_1": DeviceEntry(
+                config_entry_id="test",
                 id="device_1",
             ),
         },

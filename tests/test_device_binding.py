@@ -32,7 +32,7 @@ def test_regular_device_is_not_composite(
     hass: HomeAssistant,
 ) -> None:
     """A regular device ID is not treated as a legacy composite device."""
-    device_entry = DeviceEntry(id="regular-device")
+    device_entry = DeviceEntry(config_entry_id="test", id="regular-device")
     mock_device_registry(hass, {device_entry.id: device_entry})
 
     assert not is_composite_device_id(hass, device_entry.id)
@@ -216,8 +216,18 @@ async def test_entities_are_bound_to_source_device3(
 async def test_configured_device_takes_precedence_over_source_device(
     hass: HomeAssistant,
 ) -> None:
-    source_device = DeviceEntry(id="source-device", manufacturer="source", model="Source Device")
-    configured_device = DeviceEntry(id="configured-device", manufacturer="configured", model="Configured Device")
+    source_device = DeviceEntry(
+        config_entry_id="test",
+        id="source-device",
+        manufacturer="source",
+        model="Source Device",
+    )
+    configured_device = DeviceEntry(
+        config_entry_id="test",
+        id="configured-device",
+        manufacturer="configured",
+        model="Configured Device",
+    )
     mock_device_registry(
         hass,
         {

@@ -39,7 +39,7 @@ class BaseEntity(Entity):
         bind_entity_to_registry_metadata(
             self.hass,
             self.entity_id,
-            cast(DeviceEntry | None, getattr(self, "device_entry", None)),
+            cast(DeviceEntry | None, getattr(self, "_powercalc_device_entry", None)),
             cast(ConfigType | None, getattr(self, "_sensor_config", None)),
         )
 
