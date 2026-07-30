@@ -214,7 +214,13 @@ def mock_device(
     **kwargs: Any,  # noqa: ANN401
 ) -> DeviceEntry:
     """Register a single mocked device, replacing any prior mocked registry."""
-    entry = DeviceEntry(id=device_id, manufacturer=manufacturer, model=model, **kwargs)
+    config_entry_id = kwargs.pop("config_entry_id", None)
+    if config_entry_id is None:
+        config_entry = MockConfigEntry(domain="test")
+        config_entry.add_to_hass(hass)
+        config_entry_id = config_entry.entry_id
+
+    entry = DeviceEntry(config_entry_id=config_entry_id, id=device_id, manufacturer=manufacturer, model=model, **kwargs)
     mock_device_registry(hass, {device_id: entry})
     return entry
 

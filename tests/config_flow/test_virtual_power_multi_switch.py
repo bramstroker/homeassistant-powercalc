@@ -239,6 +239,7 @@ async def test_light_switches_selectable(hass: HomeAssistant) -> None:
     """
     device_id = "abcdef"
     device_entry = DeviceEntry(
+        config_entry_id="test",
         id=device_id,
         manufacturer="test",
         model="multi_switch",
@@ -322,6 +323,7 @@ def mock_device_with_switches(
 ) -> DeviceEntry:
     device_id = "abcdef"
     device_entry = DeviceEntry(
+        config_entry_id="test",
         id=device_id,
         manufacturer=manufacturer,
         model=model,

@@ -718,6 +718,7 @@ async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
         hass,
         {
             "test-device": DeviceEntry(
+                config_entry_id="test",
                 manufacturer="test",
                 name="Test Device",
                 model="discovery_type_device",

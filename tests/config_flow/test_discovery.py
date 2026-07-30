@@ -71,6 +71,7 @@ async def test_discovery_flow_remarks_are_shown(hass: HomeAssistant) -> None:
 async def _setup_ups_discovery_flow(hass: HomeAssistant) -> tuple[SourceEntity, data_entry_flow.FlowResult]:
     """Set up UPS device with translation key entities and initialize discovery flow."""
     device_entry = DeviceEntry(
+        config_entry_id="test",
         name="UPS",
         id="ups-device",
         manufacturer="test",
@@ -125,6 +126,7 @@ async def test_discovery_flow_remarks_are_hidden_when_translation_key_entities_r
 
 async def test_discovery_flow_uses_device_name_as_source_placeholder(hass: HomeAssistant) -> None:
     device_entry = DeviceEntry(
+        config_entry_id="test",
         name="FooBar",
         id="youless-device",
         manufacturer="test",
@@ -152,6 +154,7 @@ async def test_discovery_flow_uses_device_name_as_source_placeholder(hass: HomeA
 
 async def test_discovery_flow_remarks_are_shown_when_translation_key_entity_missing(hass: HomeAssistant) -> None:
     device_entry = DeviceEntry(
+        config_entry_id="test",
         name="UPS",
         id="ups-device",
         manufacturer="test",
@@ -302,6 +305,7 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
 
 async def test_discovery_by_device(hass: HomeAssistant) -> None:
     device_entry = DeviceEntry(
+        config_entry_id="test",
         name="FooBar",
         id="youless-device",
         manufacturer="test",

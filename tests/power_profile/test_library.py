@@ -229,7 +229,12 @@ def test_compute_replacement_variables_raises_clear_error_when_related_entity_mi
     expected_message: str,
 ) -> None:
     library = ProfileLibrary(hass, loader=LocalLoader(hass, ""))
-    source_entity = SourceEntity("test", "switch.test", "switch", device_entry=DeviceEntry(id="device_1"))
+    source_entity = SourceEntity(
+        "test",
+        "switch.test",
+        "switch",
+        device_entry=DeviceEntry(config_entry_id="test", id="device_1"),
+    )
 
     with pytest.raises(LibraryError, match=expected_message):
         library.compute_replacement_variables({placeholder}, {}, source_entity)
