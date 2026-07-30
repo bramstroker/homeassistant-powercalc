@@ -1258,11 +1258,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "hs",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "08240de4036a3ac73c5c82982ea62b8b"
+          "hash": "0cb41dc8f835f3e1af0de0e78f5fab19"
         },
         {
           "aliases": [
@@ -1362,10 +1362,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "6135cea77f7d32aec4a5646dd461871b"
+          "hash": "12913c146371fe0a2b9f386046cd1f0f"
         },
         {
           "calculation_strategy": "fixed",
@@ -3216,10 +3216,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "24fd57573ae45a89adc35b6a1a181546"
+          "hash": "51d6a5a799c60715b1116bb7fde6df41"
         },
         {
           "aliases": [
@@ -4104,11 +4104,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "hs",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "7a12ce1ccc7d04822c72c686efa8181f"
+          "hash": "ad2149c3ca2e8960b71cd50283e6ccaa"
         }
       ],
       "device_types": [
@@ -9487,10 +9487,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "3303fcefd764e978900f746c8cf173fa"
+          "hash": "f17ea8c1dc716fcf69ae3d4a2577635b"
         },
         {
           "calculation_strategy": "lut",
@@ -10534,10 +10534,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "91cc8b3b3a9adda4d2970b5159635904"
+          "hash": "3857dba79736baf73915fc4957ea3253"
         },
         {
           "aliases": [
@@ -11645,10 +11645,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "55bfa5221dfb08bd46f1bd9ec0f126a8"
+          "hash": "98e386d61cda021e9bf9d0134260d82f"
         },
         {
           "calculation_strategy": "lut",
@@ -11702,10 +11702,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "aaae42fccedc2f90620e829f2355dfb3"
+          "hash": "a6bc34f5bf108a2959f79463bd4e8ffe"
         },
         {
           "aliases": [
@@ -12575,10 +12575,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "7c1f46dedf73ed5e763ecb3a8a051453"
+          "hash": "f753679ee37bd27ba025ea4717ea481e"
         },
         {
           "aliases": [
@@ -13194,10 +13194,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "a95f6c413177e0059c1b32a22d439c57"
+          "hash": "38ec6ec8fe56f55e5da478c4fb774bcf"
         },
         {
           "aliases": [
@@ -13262,10 +13262,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "c0c5d612320637ac7930a9bd95ff4b69"
+          "hash": "1548c246f3d6e79b167c56c1cf4b4294"
         },
         {
           "aliases": [
@@ -18360,10 +18360,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "9927d2ba8eccef5f1ece61cea8b61c37"
+          "hash": "d3fd4b6463a8f50891539274ba4e8a1e"
         }
       ],
       "device_types": [
@@ -19164,6 +19164,26 @@
       "dir_name": "bseed",
       "models": [
         {
+          "name": "Zigbee Switch 1 Gang No Neutral",
+          "device_type": "smart_switch",
+          "calculation_strategy": "fixed",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "created_at": "2026-07-28T15:06:00Z",
+          "standby_power": 0.1,
+          "standby_power_on": 0.3,
+          "author_info": {
+            "name": "Maxik933",
+            "github": "Maxik933"
+          },
+          "id": "zigbee_switch_1_gang_no_neutral",
+          "manufacturer": "bseed",
+          "updated_at": "2026-07-30T18:14:04",
+          "max_power": 0.3,
+          "sub_profile_count": 0,
+          "hash": "fabc915d95ab7c564f5d7dabd57a1d0b"
+        },
+        {
           "name": "Zigbee Switch 1 Gang",
           "device_type": "smart_switch",
           "calculation_strategy": "fixed",
@@ -19557,10 +19577,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "f96b3fd0e7606dc83212fb758a4a6811"
+          "hash": "3f41e34317346db133dd4232cdad79ea"
         }
       ],
       "device_types": [
@@ -19797,10 +19817,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "9969116fcf0e2c677ed9f462a488d485"
+          "hash": "71c8875394f747fb35013b1ebab67211"
         },
         {
           "calculation_strategy": "lut",
@@ -19883,11 +19903,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "hs",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "a23d75edfc1e7ea021bf5b515801268e"
+          "hash": "e19b3d27b36c570fe2895510672c325e"
         },
         {
           "calculation_strategy": "lut",
@@ -19914,10 +19934,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "ed2a322331bde3233565c2b7edba4d92"
+          "hash": "be7a890101c27878946fbc1863a38678"
         },
         {
           "calculation_strategy": "lut",
@@ -19973,10 +19993,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "e79272cccafb1637f34b0d271fa3e941"
+          "hash": "f653b33866e75d1f820eaf1441c433f5"
         },
         {
           "calculation_strategy": "lut",
@@ -20147,10 +20167,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "effect",
-            "color_temp"
+            "color_temp",
+            "effect"
           ],
-          "hash": "516fe8e31f926892f942111bf547bd58"
+          "hash": "96b36d43556fae919943b19b48ea9854"
         }
       ],
       "device_types": [
