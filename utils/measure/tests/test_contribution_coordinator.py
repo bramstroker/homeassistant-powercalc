@@ -11,12 +11,13 @@ from measure.contribution.github import GitHubClient, GitHubRepository, GitHubUs
 from measure.contribution.models import (
     ContributionAuthor,
     ContributionJob,
+    ContributionJobStatus,
     ContributionMetadata,
     ContributionPreparedFile,
     ContributionPreview,
 )
 from measure.contribution.prepare import ProfilePreparer
-from measure.contribution.pull_request import deterministic_branch_name
+from measure.contribution.pull_request import deterministic_branch_name, pull_request_body
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.ha_app.contribution import (
     ContributionApiError,
@@ -390,6 +391,33 @@ def test_deterministic_branch_name_collapses_non_alphanumeric_runs() -> None:
     assert deterministic_branch_name(preview) == "powercalc-profile-ajax-online-aj-100-eu"
 
 
+def test_pull_request_body_reports_the_integration_of_the_measured_entity() -> None:
+    metadata = ContributionMetadata(
+        manufacturer="Philips",
+        model_id="LCT999",
+        measure_type="light",
+        integration="hue",
+        author=ContributionAuthor(name="Test User", github="test-user"),
+    )
+    job = ContributionJob(
+        id="job-1",
+        status=ContributionJobStatus.PREVIEWED,
+        metadata=metadata,
+        preview=ContributionPreview(manufacturer_directory="signify", model_directory="LCT999", files=()),
+        created_at="2026-07-16T12:00:00Z",
+        updated_at="2026-07-16T12:00:00Z",
+    )
+
+    without_integration = job.model_copy(
+        update={"metadata": metadata.model_copy(update={"integration": None})},
+    )
+
+    body = pull_request_body(job)
+
+    assert "## Home Assistant Device information\n\n- Measure type: light\n- Integration: hue\n" in body
+    assert "- Integration:" not in pull_request_body(without_integration)
+
+
 def test_contribution_author_rejects_blank_required_fields() -> None:
     with pytest.raises(ValueError, match="value is required"):
         ContributionAuthor(name="   ", github="octo")
@@ -421,10 +449,11 @@ def test_metadata_from_request_maps_validation_errors_to_invalid_metadata() -> N
         _metadata_from_request(request, payload, auth)
     assert info.value.code == ContributionApiErrorCode.INVALID_METADATA
 
-    metadata = _metadata_from_request(request, payload.model_copy(update={"manufacturer_directory": ""}), auth)
+    metadata = _metadata_from_request(request, payload.model_copy(update={"manufacturer_directory": ""}), auth, "hue")
     assert metadata.manufacturer_directory is None
     assert metadata.measure_type == "light"
     assert metadata.measure_device == "Test meter"
+    assert metadata.integration == "hue"
 
 
 def test_submit_preview_validation_rejects_base_or_content_drift() -> None:

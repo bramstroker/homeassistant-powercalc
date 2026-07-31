@@ -61,11 +61,11 @@ class FakeClient:
 
     def list_entity_registry(self) -> list[SimpleNamespace]:
         return [
-            SimpleNamespace(entity_id="sensor.test_power", device_id="meter-device"),
-            SimpleNamespace(entity_id="sensor.test_voltage", device_id="meter-device"),
-            SimpleNamespace(entity_id="light.test", device_id="light-device"),
-            SimpleNamespace(entity_id="vacuum.test", device_id="vacuum-device"),
-            SimpleNamespace(entity_id="sensor.vacuum_battery", device_id="vacuum-device"),
+            SimpleNamespace(entity_id="sensor.test_power", device_id="meter-device", platform="shelly"),
+            SimpleNamespace(entity_id="sensor.test_voltage", device_id="meter-device", platform="shelly"),
+            SimpleNamespace(entity_id="light.test", device_id="light-device", platform="hue"),
+            SimpleNamespace(entity_id="vacuum.test", device_id="vacuum-device", platform="roborock"),
+            SimpleNamespace(entity_id="sensor.vacuum_battery", device_id="vacuum-device", platform="roborock"),
         ]
 
     def get_device_registry(self) -> list[dict[str, object]]:
@@ -254,6 +254,7 @@ class FakeContributionService(ContributionService):
         request: MeasurementRequest,
         artifact_root: Path,
         payload: ContributionPreviewRequest | None,
+        integration: str | None = None,
     ) -> ContributionPreviewResponse:
         del artifact_root
         self.preview_calls += 1
@@ -261,6 +262,7 @@ class FakeContributionService(ContributionService):
         return ContributionPreviewResponse(
             session_id=session_id,
             eligible=True,
+            home_assistant={"integration": integration},
             manufacturer_name=payload.manufacturer_name,
             manufacturer_directory=payload.manufacturer_directory or "signify",
             model_id=payload.model_id,
@@ -435,6 +437,17 @@ def test_entity_catalog_categorizes_one_fresh_snapshot(tmp_path: Path) -> None:
 
     assert test_client.get("/api/entity-catalog").status_code == 200
     assert home_assistant.entity_data_calls == 2
+
+
+def test_entity_integration_is_resolved_and_stays_optional(tmp_path: Path) -> None:
+    context = client(tmp_path).app.state.context
+
+    assert context.entity_integration("light.test") == "hue"
+    assert context.entity_integration("light.unknown") is None
+
+    context.home_assistant = MagicMock(spec=HomeAssistantManager)
+    context.home_assistant.get_entity_data.side_effect = OSError("Home Assistant is unreachable")
+    assert context.entity_integration("light.test") is None
 
 
 def test_dummy_load_calibration_is_returned_only_for_the_configured_meter(tmp_path: Path) -> None:
@@ -969,7 +982,11 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     test_client = client(tmp_path)
     service = FakeContributionService()
     context = test_client.app.state.context
-    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
+    context.contribution = ContributionApiCoordinator(
+        context.storage,
+        service_factory=lambda: service,
+        resolve_integration=context.entity_integration,
+    )
 
     assert test_client.post("/api/sessions", json=payload()).status_code == 201
     assert context.coordinator._worker is not None  # noqa: SLF001
@@ -988,6 +1005,8 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     assert draft.json()["eligible"] is False
     assert draft.json()["repository"] == "test-owner/powercalc-sandbox"
     assert draft.json()["base_branch"] == "main"
+    assert draft.json()["home_assistant"]["integration"] == "hue"
+    assert "- Integration: hue" in draft.json()["pr_body"]
 
     preview = test_client.post(
         "/api/session/current/contribution/preview",
@@ -1004,6 +1023,7 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     assert preview.json()["pr_title"] == "Add signify LCT010 power profile"
     assert preview.json()["files"][0]["path"] == "profile_library/signify/LCT010/model.json"
     assert preview.json()["notes"] == "No aliases."
+    assert preview.json()["home_assistant"]["integration"] == "hue"
     assert service.preview_calls == 1
     assert service.submit_calls == 0
 
