@@ -1,1202 +1,1202 @@
 {
   "common": {
-    "source_entity": "Source entity",
-    "source_device": "Source device",
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "source_entity": "Forrásentitás",
+    "source_device": "Forráseszköz",
+    "remarks_smart_switch": "Ez a profil csak készenléti teljesítményértékeket tartalmaz. \n Ha egy eszköz bekapcsolva állandó teljesítményt vesz fel, ezt az értéket a konfiguráció következő lépésében adhatja meg",
+    "remarks_smart_dimmer": "Ez a profil csak készenléti teljesítményértékeket tartalmaz. \n A következő lépésben megadhatja a csatlakoztatott lámpa értékeit"
   },
   "config": {
     "abort": {
-      "already_configured": "Sensor is already configured, specify a unique_id"
+      "already_configured": "Az érzékelő már be van állítva, adjon meg egy egyedi azonosítót (unique_id)"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
-      "daily_energy_mandatory": "You must supply at least one of Value or Value template",
-      "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-      "group_mandatory": "You must define at least subgroups or power and energy-entities",
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
-      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
-      "lut_wrong_domain": "Only light entities can use the LUT mode",
-      "playbook_mandatory": "You need to specify at least one playbook",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "cost_price_mandatory": "Adjon meg egy energiaárat vagy energiaár-érzékelőt",
+      "daily_energy_mandatory": "Adja meg legalább a value vagy value_template egyikét",
+      "entity_mandatory": "A playbook stratégián kívül minden stratégiához entitást kell választani",
+      "fixed_mandatory": "Adja meg legalább a power, power_template vagy states_power egyikét",
+      "fixed_states_power_only": "Ez az entitás csak a „states_power” beállítással működik, a „power” beállítással nem",
+      "group_mandatory": "Adjon meg legalább alcsoportokat, illetve energia- vagy teljesítményentitásokat",
+      "linear_mandatory": "Adja meg legalább a max_power vagy a calibrate értéket",
+      "linear_min_higher_as_max": "A maximális teljesítmény nem lehet kisebb a minimális teljesítménynél",
+      "linear_unsupported_domain": "Az entitás tartománya lineáris módban nem támogatott. A tartománynak fan, light vagy media_player értékűnek kell lennie. A calibrate beállítás azonban használható",
+      "lut_unsupported_color_mode": "A LUT-profil nem támogatja a lámpa egyik színmódját. További információért tekintse meg a naplókat",
+      "lut_wrong_domain": "LUT-módot csak light entitások használhatnak",
+      "playbook_mandatory": "Adjon meg legalább egy playbookot",
+      "unknown": "Ismeretlen hiba történt. További információért tekintse meg a naplókat"
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Csoport(ok) kiválasztása",
+          "new_group": "Új csoport"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Új csoport létrehozásához adjon meg egy egyéni csoportnevet"
         },
-        "title": "Assign to group"
+        "title": "Hozzárendelés csoporthoz"
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Availability entity"
+          "availability_entity": "Elérhetőségi entitás"
         },
         "data_description": {
-          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+          "availability_entity": "Ha ez az entitás nem érhető el, a Powercalc-érzékelője sem lesz elérhető"
         },
-        "title": "Availability entity",
-        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+        "title": "Elérhetőségi entitás",
+        "description": "Ez a profil eszközönként értendő. Válassza ki a Powercalc-érzékelő elérhetőségének meghatározására használt entitást"
       },
       "daily_energy": {
         "data": {
-          "create_utility_meters": "Create utility meters",
-          "daily_energy_value": "Daily energy value",
-          "name": "Name",
-          "on_time": "On time",
-          "start_time": "Start time",
-          "unit_of_measurement": "Unit of measurement",
-          "update_frequency": "Update frequency",
-          "value": "Value",
-          "value_template": "Value template"
+          "create_utility_meters": "Közüzemi mérők létrehozása",
+          "daily_energy_value": "Napi energiaérték",
+          "name": "Név",
+          "on_time": "Bekapcsolási idő",
+          "start_time": "Kezdési idő",
+          "unit_of_measurement": "Mértékegység",
+          "update_frequency": "Frissítési gyakoriság",
+          "value": "Érték",
+          "value_template": "Értéksablon"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Üresen hagyva az alapértelmezés 1 nap, vagyis mindig bekapcsolva",
+          "update_frequency": "Az érzékelő állapotfrissítései közötti idő másodpercben"
         },
-        "title": "Create a daily fixed sensor"
+        "title": "Napi rögzített érzékelő létrehozása"
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Energiabeállítások",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_integration_method": "Integrációs módszer",
+          "energy_sensor_unit_prefix": "Mértékegység-előtag",
+          "energy_filter_outlier_enabled": "Kiugró értékek szűrése",
+          "energy_filter_outlier_max_step": "A kiugróérték-szűrő maximális lépése"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "A kiugró értékek szűrésének engedélyezése az energiaérzékelőben",
+          "energy_filter_outlier_max_step": "A kiugróérték-szűrő által várt maximális teljesítménylépés wattban"
         }
       },
       "group_domain": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "name": "Név",
+          "create_energy_sensor": "Energiaérzékelő létrehozása",
+          "create_cost_sensor": "Költségérzékelő létrehozása",
+          "create_utility_meters": "Közüzemi mérők létrehozása",
+          "domain": "Entitástartomány",
+          "exclude_entities": "Entitások kizárása"
         },
-        "title": "Create a domain based group sensor"
+        "title": "Tartományalapú csoportérzékelő létrehozása"
       },
       "fixed": {
         "data": {
-          "fixed_value": "Power value"
+          "fixed_value": "Teljesítményérték"
         },
         "data_description": {
-          "fixed_value": "Power value in Watts when the entity is ON"
+          "fixed_value": "Az entitás bekapcsolt állapotában mért teljesítmény wattban"
         },
-        "description": "Define a fixed power value for your entity. See the [documentation]({docs_uri}) for more info",
-        "title": "Fixed config"
+        "description": "Adja meg az entitás rögzített teljesítményértékét. További információért tekintse meg a [dokumentációt]({docs_uri})",
+        "title": "Rögzített beállítások"
       },
       "global_configuration": {
-        "title": "Global configuration",
-        "description": "Setup global configuration for Powercalc. For more information see the [documentation]({docs_uri}). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "title": "Globális beállítások",
+        "description": "Állítsa be a Powercalc globális beállításait. További információért tekintse meg a [dokumentációt]({docs_uri}). Az energiaérzékelők és közüzemi mérők további beállításai a következő lépésekben adhatók meg.",
         "sections": {
           "power_options": {
-            "name": "Power sensor",
+            "name": "Teljesítményérzékelő",
             "data": {
-              "power_sensor_naming": "Power sensor name pattern",
-              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-              "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_naming": "Teljesítményérzékelő névmintája",
+              "power_sensor_friendly_naming": "Teljesítményérzékelő megjelenítési névmintája",
+              "power_sensor_category": "Teljesítményérzékelő kategóriája",
+              "power_sensor_precision": "Teljesítményérzékelő pontossága"
             }
           },
           "features": {
-            "name": "Create sensors",
+            "name": "Érzékelők létrehozása",
             "data": {
-              "create_energy_sensors": "Create energy sensors",
-              "create_cost_sensors": "Create cost sensors",
-              "create_standby_group": "Create standby group",
-              "create_utility_meters": "Create utility meters"
+              "create_energy_sensors": "Energiaérzékelők létrehozása",
+              "create_cost_sensors": "Költségérzékelők létrehozása",
+              "create_standby_group": "Készenléti csoport létrehozása",
+              "create_utility_meters": "Közüzemi mérők létrehozása"
             },
             "data_description": {
-              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+              "create_energy_sensors": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőket",
+              "create_cost_sensors": "Meghatározza, hogy a Powercalc létrehozzon-e költségérzékelőket. Ehhez a következő lépésekben energiaárat kell beállítani",
+              "create_standby_group": "Csoport létrehozása, amely összegzi az összes készenléti teljesítményfelvételt és az IoT-eszközök saját fogyasztását",
+              "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal"
             }
           },
           "advanced": {
-            "name": "Advanced",
+            "name": "Fejlett",
             "data": {
-              "enable_analytics": "Enable anonymous analytics",
-              "ignore_unavailable_state": "Ignore unavailable state",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "disable_extended_attributes": "Disable extended attributes",
-              "disable_library_download": "Disable remote library download"
+              "enable_analytics": "Engedélyezze az anonim elemzést",
+              "ignore_unavailable_state": "Az elérhetetlen állapot figyelmen kívül hagyása",
+              "include_non_powercalc_sensors": "Nem Powercalc-érzékelők bevonása",
+              "disable_extended_attributes": "A kiterjesztett attribútumok letiltása",
+              "disable_library_download": "Távoli könyvtár letöltésének letiltása"
             },
             "data_description": {
-              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
-              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-              "disable_library_download": "Disable the Powercalc library download feature"
+              "enable_analytics": "Engedélyezze a Powercalc számára, hogy névtelen, összesített használati statisztikákat küldjön az integráció javítása érdekében",
+              "ignore_unavailable_state": "Tartsa elérhetővé a Powercalc-érzékelőket, még akkor is, ha a forrásentitás nem elérhető",
+              "include_non_powercalc_sensors": "Adja meg, hogy kíván-e nem Powercalc-érzékelőket csoportokba foglalni",
+              "disable_extended_attributes": "Tiltsa le az összes extra attribútumot, amelyet a Powercalc hozzáad a teljesítmény, az energia és a csoportentitásállapotokhoz. Ez segít kicsiben tartani az adatbázis méretét",
+              "disable_library_download": "Tiltsa le a Powercalc-könyvtár letöltési funkcióját"
             }
           }
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. See [documentation]({docs_uri}) for more info",
+        "title": "Költségbeállítások",
+        "description": "Konfigurálja a költségérzékelők kiszámításához használt energiaárat. Adjon meg egy fix árat vagy egy érzékelőt, amely az aktuális árat biztosítja kWh-nként. További információért lásd a [dokumentációt]({docs_uri}).",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Árképzés",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Rögzített energiaár",
+              "energy_price_multiplier": "Energiaár szorzó",
+              "energy_price_sensor": "Energiaár érzékelő",
+              "energy_price_surcharge": "Energiaár felár"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "Rögzített kWh-nkénti ár a helyi pénznemben",
+              "energy_price_multiplier": "A felár után alkalmazott szorzó. Százalékos adókhoz vagy díjakhoz használható, például 21% esetén 1,21",
+              "energy_price_sensor": "Egy érzékelő, amely biztosítja az aktuális energiaárat kWh-nként (pl. dinamikus tarifaintegrációból). Hagyja üresen a rögzített árat az érzékelő használatához",
+              "energy_price_surcharge": "További fix összeg kWh-enként hozzáadva a rögzített árhoz vagy az árérzékelő értékéhez"
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "Elnevezés",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "Költségérzékelő megjelenítési nevének mintája",
+              "cost_sensor_naming": "Költségérzékelő névmintája"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "Minta a költségérzékelő megjelenítési nevéhez. A forrás neve beszúrásra kerül a helyőrző pozícióba",
+              "cost_sensor_naming": "A költségérzékelő nevének és entitásazonosítójának felépítéséhez használt minta. A forrás neve beszúrásra kerül a helyőrző pozícióba"
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "Költségérzékelők alkalmazása",
+        "description": "Módosította a globális költségérzékelők beállítását. Alkalmazni kívánja ezt a módosítást az összes létező Powercalc-érzékelőre, amelyet a felhasználói felület segítségével hoztak létre?",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "Alkalmazza a meglévő érzékelőkre"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "Minden, a felhasználói felületen létrehozott Powercalc-érzékelő frissítése az új költségérzékelő-beállításnak megfelelően"
         }
       },
       "global_configuration_discovery": {
-        "title": "Discovery options",
-        "description": "Powercalc can scan your system for devices and entities that have power profiles in the built-in library. The options below let you fine-tune this behavior.",
+        "title": "Felderítési beállítások",
+        "description": "A Powercalc megkeresheti a rendszerben azokat az eszközöket és entitásokat, amelyekhez teljesítményprofil található a beépített könyvtárban. Az alábbi beállításokkal finomhangolhatja ezt a működést.",
         "data": {
-          "enabled": "Enable discovery",
-          "exclude_device_types": "Excluded device types",
-          "exclude_self_usage": "Exclude self-usage"
+          "enabled": "Felfedezés engedélyezése",
+          "exclude_device_types": "Kizárt eszköztípusok",
+          "exclude_self_usage": "Az önhasználat kizárása"
         },
         "data_description": {
-          "exclude_device_types": "Exclude one or more specific device types from discovery.",
-          "exclude_self_usage": "Exclude self-usage profiles for smart switches."
+          "exclude_device_types": "Egy vagy több adott eszköztípus kizárása a felderítésből.",
+          "exclude_self_usage": "Az intelligens kapcsolók önhasználati profiljainak kizárása."
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
+        "title": "Energiabeállítások",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "Energiaintegrációs módszer",
+          "energy_sensor_category": "Energiaérzékelő kategória",
+          "energy_sensor_friendly_naming": "Energiaérzékelő megjelenítési nevének mintája",
+          "energy_sensor_naming": "Energiaérzékelő névminta",
+          "energy_sensor_precision": "Energiaérzékelő pontosság",
+          "energy_sensor_unit_prefix": "Energiaérzékelő egység előtag"
         }
       },
       "global_configuration_throttling": {
-        "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
+        "title": "Frissítési időközök",
+        "description": "Állítsa be a frissítési időközöket a különböző érzékelőtípusokhoz. További információért lásd a [dokumentációt]({docs_uri}).",
         "data": {
-          "group_energy_update_interval": "Group energy update interval",
-          "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval",
-          "power_update_interval": "Power update interval"
+          "group_energy_update_interval": "Csoport energia frissítési intervallum",
+          "group_power_update_interval": "Csoportos teljesítmény frissítési időköz",
+          "energy_update_interval": "Energia frissítési intervallum",
+          "power_update_interval": "Energiafrissítési időköz"
         },
         "data_description": {
-          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
-          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
-          "power_update_interval": "Interval at which energy sensors are force updated. In seconds. Set to 0 to disable"
+          "group_energy_update_interval": "A csoport energiaérzékelőinek frissítési időköze másodpercben. A letiltáshoz állítsa 0-ra",
+          "group_power_update_interval": "A csoport teljesítményérzékelőinek frissítési időköze másodpercben. A letiltáshoz állítsa 0-ra",
+          "energy_update_interval": "Az energiaérzékelők frissítési időköze másodpercben. A letiltáshoz állítsa 0-ra",
+          "power_update_interval": "Az energiaérzékelők kényszerfrissítési időköze másodpercben. A letiltáshoz állítsa 0-ra"
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
+        "title": "Közüzemi mérő beállításai",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "Közüzemi mérő nettó fogyasztása",
+          "utility_meter_tariffs": "Közüzemi mérő tarifái",
+          "utility_meter_types": "Közüzemi mérő típusai"
         }
       },
       "group_custom": {
         "data": {
-          "name": "Name"
+          "name": "Név"
         },
         "sections": {
           "members": {
-            "name": "Members",
+            "name": "Tagok",
             "data": {
-              "group_member_sensors": "Member powercalc sensors",
-              "group_member_devices": "Member devices",
-              "group_power_entities": "Additional power entities",
-              "group_energy_entities": "Additional energy entities",
-              "sub_groups": "Sub groups",
-              "area": "Area",
-              "floor": "Floor"
+              "group_member_sensors": "Tag Powercalc-érzékelők",
+              "group_member_devices": "Tageszközök",
+              "group_power_entities": "További teljesítményentitások",
+              "group_energy_entities": "További energiaentitások",
+              "sub_groups": "Alcsoportok",
+              "area": "Terület",
+              "floor": "Emelet"
             },
             "data_description": {
-              "group_member_sensors": "Powercalc sensors to include in the group",
-              "group_member_devices": "Add power and energy entities from the selected devices to the group",
-              "group_power_entities": "Additional power sensors (W) from your HA installation to include",
-              "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-              "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-              "area": "Adds all power sensors from the specified area",
-              "floor": "Adds all power sensors from the specified floor"
+              "group_member_sensors": "A csoportba felveendő Powercalc-érzékelők",
+              "group_member_devices": "Adja hozzá a kiválasztott eszközök teljesítmény- és energiaentitásait a csoporthoz",
+              "group_power_entities": "További teljesítményérzékelők (W) a Home Assistant-telepítésből",
+              "group_energy_entities": "További energiaérzékelők (kWh) a Home Assistant-telepítésből",
+              "sub_groups": "A kiválasztott alcsoportokban található összes érzékelő szintén hozzáadódik ehhez a csoporthoz",
+              "area": "Hozzáadja az összes teljesítményérzékelőt a megadott területről",
+              "floor": "Hozzáadja az összes teljesítményérzékelőt a megadott emeletről"
             }
           },
           "options": {
-            "name": "Options",
+            "name": "Beállítások",
             "data": {
-              "device": "Device",
-              "hide_members": "Hide members",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "force_calculate_group_energy": "Force calculate energy",
-              "group_energy_start_at_zero": "Start at zero",
-              "create_energy_sensor": "Create energy sensor",
-              "create_utility_meters": "Create utility meters"
+              "device": "Eszköz",
+              "hide_members": "Tagok elrejtése",
+              "include_non_powercalc_sensors": "Nem Powercalc-érzékelők bevonása",
+              "force_calculate_group_energy": "Energia kiszámításának kényszerítése",
+              "group_energy_start_at_zero": "Indítás nulláról",
+              "create_energy_sensor": "Energiaérzékelő létrehozása",
+              "create_utility_meters": "Közüzemi mérők létrehozása"
             },
             "data_description": {
-              "device": "Add the group entities powercalc creates to an existing device",
-              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-              "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
-              "create_energy_sensor": "Whether powercalc needs to create a kWh sensor"
+              "device": "Adja hozzá a Powercalc által létrehozott csoportentitásokat egy meglévő eszközhöz",
+              "include_non_powercalc_sensors": "Szabályozza, hogy a terület opció használatakor szerepeljenek-e nem Powercalc-érzékelők",
+              "force_calculate_group_energy": "A Powercalc alapértelmezés szerint a tagérzékelők energiaérzékelőit összegzi. Kapcsolja be ezt a beállítást egy Riemann-összeg érzékelő létrehozásának kikényszerítéséhez",
+              "group_energy_start_at_zero": "Ha engedélyezve van, az energiaérzékelő nulláról indul az érzékelő létrehozásakor. Ellenkező esetben az összes jelenlegi tag energiaérzékelő állapotát összegzi",
+              "create_energy_sensor": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőt"
             }
           }
         },
-        "title": "Create a group sensor"
+        "title": "Csoportérzékelő létrehozása"
       },
       "group_subtract": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "subtract_entities": "Subtract entities"
+          "create_energy_sensor": "Energiaérzékelő létrehozása",
+          "create_cost_sensor": "Költségérzékelő létrehozása",
+          "create_utility_meters": "Közüzemi mérők létrehozása",
+          "entity_id": "Alap entitás",
+          "name": "Név",
+          "subtract_entities": "Entitások kivonása"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "Az alap entitás, amelyből le kell vonni a teljesítményt",
+          "subtract_entities": "Válassza ki az összes entitást, amelyet ki szeretne vonni az alapentitásból"
         },
-        "title": "Subtract group sensor"
+        "title": "Csoportérzékelő kivonása"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Hálózati teljesítményérzékelő",
+          "group_tracked_auto": "Az entitások automatikusan hozzáadva",
+          "create_energy_sensor": "Energiaérzékelő létrehozása",
+          "create_cost_sensor": "Költségérzékelő létrehozása",
+          "create_utility_meters": "Közüzemi mérők létrehozása"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Válassza ki a teljes teljesítményfelvételt tartalmazó teljesítményérzékelőt. Ha üresen hagyja, csak a követett teljesítmény érzékelője jön létre",
+          "group_tracked_auto": "A Powercalc automatikusan hozzáadja az összes teljesítményérzékelőt a követett csoporthoz, kihagyva a Powercalc-csoportokat. Tiltsa le ezt, ha manuálisan szeretné meghatározni a nyomon követett entitásokat",
+          "create_energy_sensor": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőt",
+          "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal"
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "Csoportérzékelő létrehozása az összes követett és nem követett teljesítményhez",
+        "title": "Követett teljesítményérzékelő létrehozása"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Nyomon követett entitások"
         },
-        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
-        "title": "Select power entities"
+        "description": "Válassza ki az összes teljesítményérzékelőt, amely a nyomon követett fogyasztás részét képezi. Már automatikusan feltöltve van, de manuálisan beállíthatja",
+        "title": "Teljesítményentitások kiválasztása"
       },
       "group_tracked_untracked_auto": {
         "data": {
-          "exclude_entities": "Exclude entities"
+          "exclude_entities": "Entitások kizárása"
         },
-        "description": "Exclude specific entities from the auto tracked group",
-        "title": "Auto tracked configuration"
+        "description": "Adott entitások kizárása az automatikusan követett csoportból",
+        "title": "Automatikusan követett konfiguráció"
       },
       "library": {
         "data": {
-          "confirm_autodisovered_model": "Confirm model"
+          "confirm_autodisovered_model": "Erősítse meg a modellt"
         },
         "data_description": {
-          "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
+          "confirm_autodisovered_model": "Ha úgy dönt, hogy nem erősíti meg, megadhatja saját maga a gyártót és a modellt"
         },
-        "description": "{source}\n\nManufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}",
-        "title": "Library"
+        "description": "{source}\n\nA készülék automatikusan észlelte a „{manufacturer}” gyártót és a „{model}” modellt.{remarks}",
+        "title": "Könyvtár"
       },
       "library_custom_fields": {
-        "title": "Profile configuration",
+        "title": "Profil beállításai",
         "data": {
-          "power_factor": "Power Factor"
+          "power_factor": "Teljesítménytényező"
         },
         "data_description": {
-          "power_factor": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters."
+          "power_factor": "A valós teljesítmény és a látszólagos teljesítmény aránya. Használjon 0,6-ot számítógépekhez/elektronikához, 0,7-et vegyes terhelésekhez, 1,0-t az ellenállásos terhelésekhez, például fűtőtestekhez."
         }
       },
       "library_multi_profile": {
         "data": {
-          "model": "Select model"
+          "model": "Válasszon modellt"
         },
-        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
-        "title": "Library"
+        "description": "A készülék automatikusan észlelte a „{manufacturer}” gyártót és a „{model}” modellt. Az entitáshoz több profil is található, amelyek potenciálisan használhatók. Kérjük, keresse meg eszköze pontos modelljét a [Powercalc-könyvtárban]({library_link}), és válassza ki a megfelelőt",
+        "title": "Könyvtár"
       },
       "linear": {
         "data": {
-          "attribute": "Attribute",
-          "calibrate": "Calibration values",
-          "gamma_curve": "Gamma curve",
-          "max_power": "Max power",
-          "min_power": "Min power"
+          "attribute": "Attribútum",
+          "calibrate": "Kalibrációs értékek",
+          "gamma_curve": "Gammagörbe",
+          "max_power": "Maximális teljesítmény",
+          "min_power": "Minimális teljesítmény"
         },
         "data_description": {
-          "attribute": "Specify the attribute. When left empty will be brightness for lights, volume for speakers, and percentage for fans",
-          "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
+          "attribute": "Adja meg az attribútumot. Ha üresen hagyja, a fényerősség, a hangszórók hangereje és a ventilátorok százalékos értéke",
+          "calibrate": "Minden sorba írjon egy kalibrációs értéket. Példa\n\n1:20"
         },
-        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
-        "title": "Linear config"
+        "description": "Határozza meg a lineáris teljesítményszámítási lehetőségeket. További információért lásd a [dokumentációt]({docs_uri}). Használjon min/max teljesítményt vagy kalibrációs értékeket, amelyek több vezérlési pontot tesznek lehetővé.",
+        "title": "Lineáris beállítások"
       },
       "manufacturer": {
         "data": {
-          "manufacturer": "Manufacturer"
+          "manufacturer": "Gyártó"
         },
-        "description": "Select the device manufacturer",
-        "title": "Manufacturer config"
+        "description": "Válassza ki az eszköz gyártóját",
+        "title": "Gyártó beállítása"
       },
       "model": {
         "data": {
-          "model": "Model ID"
+          "model": "Modellazonosító"
         },
-        "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
-        "title": "Model config"
+        "description": "Válassza ki a készülék modelljét. További információért tekintse meg a támogatott modellek [listáját]({supported_models_link}).",
+        "title": "Modell beállítása"
       },
       "menu_group": {
         "menu_options": {
-          "group_custom": "Standard",
-          "group_domain": "Domain based",
-          "group_subtract": "Subtract",
-          "group_tracked_untracked": "Tracked/untracked power"
+          "group_custom": "Normál",
+          "group_domain": "Tartományalapú",
+          "group_subtract": "Kivonás",
+          "group_tracked_untracked": "Követett/nem követett teljesítmény"
         },
-        "title": "Choose the group type",
-        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensor. Choose standard group otherwise"
+        "title": "Válassza ki a csoport típusát",
+        "description": "Válassza ki a létrehozni kívánt csoportérzékelő típusát. Válassza a tartomány alapú csoportot, ha egy adott tartomány összes entitását szeretné csoportosítani, vagy hozzon létre egy érzékelőt, amely összegzi az összes energiaérzékelőt. Ellenkező esetben válasszon szabványos csoportot"
       },
       "multi_switch": {
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Entitások váltása",
+          "power": "Bekapcsolt teljesítmény",
+          "power_off": "Kikapcsolt teljesítmény"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "entities": "Válassza ki az összes olyan kapcsolót, amely a több kapcsoló részét képezi",
+          "power": "Egy kapcsoló teljesítménye bekapcsolt állapotban",
+          "power_off": "Egy kapcsoló teljesítménye kikapcsolt állapotban"
         },
-        "description": "Define the Multi switch power calculation options. See the [documentation]({docs_uri}) for more information.",
-        "title": "Multi switch config"
+        "description": "Határozza meg a több kapcsoló teljesítmény számítási beállításait. További információért lásd a [dokumentációt]({docs_uri}).",
+        "title": "Többkapcsolós beállítások"
       },
       "playbook": {
         "data": {
-          "autostart": "Autostart",
-          "playbooks": "Playbooks",
-          "repeat": "Repeat",
-          "states_trigger": "State trigger"
+          "autostart": "Automatikus indítás",
+          "playbooks": "Playbookok",
+          "repeat": "Ismétlés",
+          "states_trigger": "Állapotindító"
         },
         "data_description": {
-          "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "repeat": "Toggle when you want to keep repeating the playbook after it completes",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "autostart": "Adja meg a Home Assistant indításakor elindítandó playbookot, például: \"program1\"",
+          "repeat": "Kapcsolja be, ha a playbookot a befejeződése után ismételni szeretné",
+          "states_trigger": "Playbook indítása állapotváltozás alapján. Példa:\n\nplaying: program1"
         },
-        "description": "Define the playbook options. See the [documentation]({docs_uri}) for more information.",
-        "title": "Playbook config"
+        "description": "Adja meg a playbook beállításait. További információért tekintse meg a [dokumentációt]({docs_uri}).",
+        "title": "Playbook beállításai"
       },
       "power_advanced": {
         "data": {
-          "calculation_enabled_condition": "Calculation enabled condition",
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix",
-          "energy_filter_outlier_enabled": "Energy filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "multiply_factor": "Multiply factor",
-          "multiply_factor_standby": "Multiply factor standby",
-          "unavailable_power": "Unavailable power"
+          "calculation_enabled_condition": "Számítást engedélyező feltétel",
+          "energy_integration_method": "Energiaintegrációs módszer",
+          "energy_sensor_unit_prefix": "Energiaérzékelő egység előtag",
+          "energy_filter_outlier_enabled": "Energiaérzékelő kiugró értékeinek szűrése",
+          "energy_filter_outlier_max_step": "Kiugróérték-szűrő maximális lépése",
+          "ignore_unavailable_state": "Az elérhetetlen állapot figyelmen kívül hagyása",
+          "multiply_factor": "Szorzótényező",
+          "multiply_factor_standby": "Készenléti teljesítmény szorzása",
+          "unavailable_power": "Teljesítmény nem elérhető állapotban"
         },
         "data_description": {
-          "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
-          "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
-          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
-          "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
+          "calculation_enabled_condition": "A konfigurált teljesítményszámítási stratégia csak akkor kerül végrehajtásra, ha ez a sablon igaz vagy 1-re van kiértékelve, ellenkező esetben a teljesítményérzékelő 0-t jelenít meg.",
+          "energy_filter_outlier_enabled": "Engedélyezze a kiugró értékek szűrését az energiaérzékelőben",
+          "energy_filter_outlier_max_step": "Maximális várható lépés teljesítményértékekben (wattban) a kiugró szűrőhöz",
+          "ignore_unavailable_state": "Kapcsolja be, ha a teljesítményérzékelőnek akkor is elérhetőnek kell maradnia, amikor a forrásentitás nem érhető el",
+          "multiply_factor": "A számított teljesítményt megszorozza ezzel az aránnyal. Hasznos lehet a light csoportok számára",
+          "multiply_factor_standby": "A szorzótényező alkalmazása a készenléti teljesítményre is",
+          "unavailable_power": "A forrásentitás nem elérhető állapotában használandó teljesítmény wattban"
         },
-        "description": "The options below are for advanced powercalc configuration. Most users will not use this so you may skip these",
-        "title": "Advanced options"
+        "description": "Az alábbi lehetőségek a speciális Powercalc-konfigurációra vonatkoznak. A legtöbb felhasználó nem fogja ezt használni, ezért ezeket kihagyhatja",
+        "title": "Speciális beállítások"
       },
       "real_power": {
         "data": {
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Power sensor id",
-          "name": "Name",
-          "device": "Device"
+          "create_utility_meters": "Közüzemi mérők létrehozása",
+          "entity_id": "Teljesítményérzékelő azonosító",
+          "name": "Név",
+          "device": "Eszköz"
         },
         "data_description": {
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting",
-          "device": "Add the created energy sensor to an specific device"
+          "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal",
+          "name": "Az energiaérzékelő és a közüzemi mérő alapneve. A teljes entitásnevet az energy_sensor_naming beállítás határozza meg",
+          "device": "Adja hozzá a létrehozott energiaérzékelőt egy adott eszközhöz"
         },
-        "description": "Currently specific settings can only be configured globally",
-        "title": "Create an energy sensor for an existing power sensor"
+        "description": "Jelenleg bizonyos beállítások csak globálisan konfigurálhatók",
+        "title": "Energiaérzékelő létrehozása meglévő teljesítményérzékelőhöz"
       },
       "cost": {
         "data": {
-          "energy_sensor_id": "Energy sensor",
-          "name": "Name"
+          "energy_sensor_id": "Energiaérzékelő",
+          "name": "Név"
         },
         "data_description": {
-          "energy_sensor_id": "The existing energy sensor (kWh) to calculate the cost for. This can be a sensor from any integration, not only Powercalc",
-          "name": "Base name for the cost sensor. The full entity name is set according to the cost_sensor_naming setting"
+          "energy_sensor_id": "A meglévő energiaérzékelő (kWh) a költségek kiszámításához. Ez lehet bármilyen integráció érzékelője, nem csak a Powercalc",
+          "name": "A költségérzékelő alapneve. Az entitás teljes neve a cost_sensor_naming beállítás szerint van beállítva"
         },
-        "description": "Create a cost sensor for an existing energy sensor. The energy price is taken from the Powercalc global configuration, unless you override it below.",
+        "description": "Költségérzékelő létrehozása meglévő energiaérzékelőhöz. Az energiaár a Powercalc globális beállításaiból származik, hacsak alább felül nem írja.",
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "Ár felülbírálása",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Rögzített energiaár",
+              "energy_price_multiplier": "Energiaár szorzó",
+              "energy_price_sensor": "Energiaár érzékelő",
+              "energy_price_surcharge": "Energiaár felár"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "Fix ár kWh-nként az Ön helyi pénznemében. Hagyja üresen a globális energiaár használatához",
+              "energy_price_multiplier": "A pótdíj után alkalmazott szorzó. Használja ezt százalékalapú adók vagy díjak esetén, például 1,21 21%-hoz. Hagyja üresen a globális szorzó használatához",
+              "energy_price_sensor": "Egy érzékelő, amely biztosítja az aktuális energiaárat kWh-nként (pl. dinamikus tarifaintegrációból). Hagyja üresen a rögzített árat az érzékelő használatához",
+              "energy_price_surcharge": "További fix összeg kWh-enként hozzáadva a rögzített árhoz vagy az árérzékelő értékéhez. Hagyja üresen a globális felár használatához"
             }
           }
         },
-        "title": "Create a cost sensor"
+        "title": "Költségérzékelő létrehozása"
       },
       "sub_profile": {
         "data": {
-          "sub_profile": "Sub profile"
+          "sub_profile": "Alprofil"
         },
-        "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"{remarks}",
-        "title": "Sub profile config"
+        "description": "Ennek az eszköznek több alprofillal rendelkező modellje van. Válasszon egyet, amely megfelel az eszköz következő entitásának:\n\n\"{entity_id}\"{remarks}",
+        "title": "Alprofil konfigurációja"
       },
       "sub_profile_per_device": {
         "data": {
-          "sub_profile": "Sub profile"
+          "sub_profile": "Alprofil"
         },
-        "description": "This device has a model with multiple sub profiles. {remarks}",
-        "title": "Sub profile config"
+        "description": "Ennek az eszköznek több alprofillal rendelkező modellje van. {remarks}",
+        "title": "Alprofil konfigurációja"
       },
       "smart_switch": {
         "data": {
-          "power": "Power",
-          "self_usage_included": "Self usage included"
+          "power": "Teljesítmény",
+          "self_usage_included": "Az önhasználatot tartalmazza"
         },
         "data_description": {
-          "power": "A fixed power value in Watts for the connected appliance",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
+          "power": "A csatlakoztatott készülék rögzített teljesítményértéke wattban",
+          "self_usage_included": "A teljesítményérték magában foglalja-e az intelligens kapcsoló által fogyasztott energiát. Ha kihagyja, a Powercalc hozzáadja az intelligens kapcsoló önhasználatát a teljesítményértékhez, amely {self_usage_power}W"
         },
-        "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
-        "title": "Smart switch config"
+        "description": "Határozza meg a csatlakoztatott készülék energiafogyasztását. Ha nem használ meghatározott mennyiségű energiát, kihagyhatja ezt a lépést. A Powercalc beállít egy teljesítményérzékelőt magának az intelligens kapcsolónak a használatához",
+        "title": "Okoskapcsoló beállításai"
       },
       "user": {
         "data": {
-          "sensor_type": "Sensor type"
+          "sensor_type": "Érzékelő típusa"
         },
         "menu_options": {
-          "cost": "Cost sensor (from existing energy sensor)",
-          "daily_energy": "Daily energy",
-          "group": "group",
-          "global_configuration": "Global configuration",
-          "menu_group": "Group",
-          "menu_library": "Virtual power (library)",
-          "real_power": "Energy from real power sensor",
-          "virtual_power": "Virtual power (manual)"
+          "cost": "Költségérzékelő (a meglévő energiaérzékelőből)",
+          "daily_energy": "Napi energia",
+          "group": "Csoport",
+          "global_configuration": "Globális beállítások",
+          "menu_group": "Csoport",
+          "menu_library": "Virtuális teljesítmény (könyvtár)",
+          "real_power": "Valódi teljesítményérzékelőből származó energia",
+          "virtual_power": "Virtuális teljesítmény (kézi)"
         },
-        "title": "Choose your sensor type"
+        "title": "Válassza ki az érzékelő típusát"
       },
       "utility_meter_options": {
-        "title": "Utility meter options",
-        "description": "Define the settings for utility meter creation here",
+        "title": "Közüzemi mérő beállításai",
+        "description": "Itt adja meg a közüzemi mérő létrehozásának beállításait",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
-          "utility_meter_types": "Cycles",
-          "utility_meter_tariffs": "Tariffs"
+          "utility_meter_net_consumption": "Nettó fogyasztás",
+          "utility_meter_types": "Ciklusok",
+          "utility_meter_tariffs": "Tarifák"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
-          "utility_meter_types": "Create utility meters for specified cycles",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_net_consumption": "Engedélyezze ezt, ha a forrást nettó mérőként szeretné kezelni. Ez lehetővé teszi, hogy a számláló mind pozitív, mind negatív irányba menjen.",
+          "utility_meter_types": "Közüzemi mérők létrehozása a kiválasztott ciklusokhoz",
+          "utility_meter_tariffs": "A támogatott tarifák listája, hagyja üresen, ha csak egyetlen tarifára van szükség."
         }
       },
       "virtual_power": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Source entity",
-          "mode": "Calculation strategy",
-          "name": "Name",
-          "standby_power": "Standby power"
+          "create_energy_sensor": "Energiaérzékelő létrehozása",
+          "create_cost_sensor": "Költségérzékelő létrehozása",
+          "create_utility_meters": "Közüzemi mérők létrehozása",
+          "entity_id": "Forrásentitás",
+          "mode": "Számítási stratégia",
+          "name": "Név",
+          "standby_power": "Készenléti teljesítmény"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "entity_id": "Entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
+          "create_energy_sensor": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőt",
+          "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal",
+          "entity_id": "Az entitás, amelyen a virtuális teljesítmény alapul, a teljesítményérzékelő figyeli ennek az entitásnak az állapotváltozásait a frissítésre",
+          "name": "Ha üresen hagyja, a név a forrásentitástól származik",
+          "standby_power": "Adja meg az eszköz kikapcsolt állapotban felvett teljesítményét"
         },
-        "description": "See the readme for more information about the possible strategies and configuration options. Either source entity or name is required, or both.",
-        "title": "Create a virtual power sensor"
+        "description": "A lehetséges stratégiákról és konfigurációs beállításokról a README-ben olvashat. A forrásentitás, a név vagy mindkettő megadása kötelező.",
+        "title": "Virtuális teljesítményérzékelő létrehozása"
       },
       "wled": {
         "data": {
-          "power_factor": "Power factor",
-          "voltage": "Voltage"
+          "power_factor": "Teljesítménytényező",
+          "voltage": "Feszültség"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see {docs_uri}",
-        "title": "WLED config"
+        "description": "Győződjön meg arról, hogy engedélyezte a fényerő-korlátozót a WLED szoftverben. Lásd még: {docs_uri}",
+        "title": "WLED beállításai"
       }
     }
   },
   "exceptions": {
     "invalid_integration_method": {
-      "message": "Invalid integration method \"{method}\". Must be one of: {allowed_methods}."
+      "message": "Érvénytelen „{method}” integrációs metódus. A következők egyikének kell lennie: {allowed_methods}."
     },
     "no_sub_profile_support": {
-      "message": "{entity_id} does not support switching sub profiles. This action is only available for sensors which have sub profiles and no automatic sub profile selection."
+      "message": "A {entity_id} nem támogatja az alprofilok közötti váltást. Ez a művelet csak olyan érzékelők esetében érhető el, amelyek alprofillal rendelkeznek, és nincs automatikus alprofil kiválasztása."
     },
     "not_a_playbook_sensor": {
-      "message": "{entity_id} is not a playbook enabled sensor. This action is only available for sensors using the playbook strategy."
+      "message": "A {entity_id} nem playbook-kompatibilis érzékelő. Ez a művelet csak a playbook stratégiát használó érzékelők számára érhető el."
     },
     "unknown_sub_profile": {
-      "message": "\"{profile}\" is not a known sub profile. Available sub profiles: {known_profiles}."
+      "message": "A \"{profile}\" nem ismert alprofil. Elérhető alprofilok: {known_profiles}."
     }
   },
   "issues": {
     "composite_device_id": {
       "fix_flow": {
         "abort": {
-          "entry_removed": "The Powercalc configuration entry has been removed"
+          "entry_removed": "A Powercalc-konfigurációs bejegyzés eltávolítva"
         },
         "error": {
-          "invalid_device": "Select an existing device or leave the field empty"
+          "invalid_device": "Válasszon ki egy meglévő eszközt, vagy hagyja üresen a mezőt"
         },
         "step": {
           "select_device": {
             "data": {
-              "device": "Device"
+              "device": "Eszköz"
             },
             "data_description": {
-              "device": "The device the entities created by this Powercalc configuration should be linked to"
+              "device": "Az eszköz, amelyhez a Powercalc-konfigurációval létrehozott entitásokat kapcsolni kell"
             },
-            "description": "The Powercalc configuration {name} was linked to a device that Home Assistant has split into multiple devices. Its entities cannot be linked to the old device ID.\n\nSelect the device these entities should be linked to, or leave the field empty to leave them without a device.",
-            "title": "Select device for {name}"
+            "description": "A Powercalc-konfiguráció {name} egy olyan eszközhöz volt kapcsolva, amelyet a Home Assistant több eszközre osztott fel. Entitásai nem kapcsolhatók a régi eszközazonosítóhoz.\n\nVálassza ki azt az eszközt, amelyhez ezek az entitások kapcsolódnak, vagy hagyja üresen a mezőt, ha eszköz nélkül hagyja őket.",
+            "title": "Válassza ki a készüléket a {name} számára"
           }
         }
       },
-      "title": "Device for Powercalc configuration {name} needs to be selected again"
+      "title": "A(z) {name} Powercalc-konfiguráció eszközét újra ki kell választani"
     },
     "deprecated_platform_yaml": {
-      "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
-      "title": "Powercalc YAML configuration has moved"
+      "description": "Az érzékelők „sensor->platform” alatti beállítása elavult. Helyezze át a konfigurációt a „powercalc->sensors” alá. További útmutatásért kattintson a További információ lehetőségre.",
+      "title": "A Powercalc YAML-konfigurációja áthelyezésre került"
     },
     "legacy_config": {
-      "title": "YAML configuration changed",
-      "description": "Your YAML configuration for {type} needs to be updated to the new structure. Click learn more for further information."
+      "title": "A YAML konfiguráció megváltozott",
+      "description": "A {type} YAML konfigurációját frissíteni kell az új szerkezetre. További információkért kattintson a További információ gombra."
     },
     "sub_profile": {
       "fix_flow": {
         "step": {
           "sub_profile": {
-            "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"\n\nManufacturer: {manufacturer}\nModel: {model}{remarks}",
-            "title": "Select correct sub profile",
+            "description": "Ennek az eszköznek több alprofillal rendelkező modellje van. Válasszon egyet, amely megfelel az eszköz következő entitásának:\n\n\"{entity_id}\"\n\nGyártó: {manufacturer}\nModell: {model}{remarks}",
+            "title": "Válassza ki a megfelelő alprofilt",
             "data": {
-              "sub_profile": "Sub profile"
+              "sub_profile": "Alprofil"
             }
           }
         }
       },
-      "title": "Sub profile selection required for {entry}"
+      "title": "Alprofil kiválasztása szükséges a {entry} számára"
     }
   },
   "options": {
     "abort": {
-      "model_not_support": "Model not supported"
+      "model_not_support": "A modell nem támogatott"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-      "group_mandatory": "You must define at least subgroups or power and energy-entities",
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
-      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "cost_price_mandatory": "Adja meg az energiaárat vagy az energiaár-érzékelőt",
+      "fixed_mandatory": "Adja meg legalább a power, power_template vagy states_power egyikét",
+      "fixed_states_power_only": "Ez az entitás csak a 'states_power'-vel működik, nem a 'power'-val",
+      "group_mandatory": "Meg kell határoznia legalább alcsoportokat vagy teljesítmény- és energia-entitásokat",
+      "linear_mandatory": "A max_power vagy a calibrate közül legalább egyet meg kell adnia",
+      "linear_min_higher_as_max": "A maximális teljesítmény nem lehet kisebb a minimális teljesítménynél",
+      "linear_unsupported_domain": "Az entitás tartománya lineáris módban nem támogatott. A tartománynak fan, light vagy media_player értékűnek kell lennie. A calibrate beállítás azonban használható",
+      "unknown": "Ismeretlen hiba történt, további információkért tekintse meg a naplókat"
     },
     "step": {
       "advanced_options": {
-        "title": "Advanced options",
+        "title": "Speciális beállítások",
         "data": {
-          "calculation_enabled_condition": "Calculation enabled condition",
-          "energy_integration_method": "Energy integration method",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "multiply_factor": "Multiply factor",
-          "multiply_factor_standby": "Multiply factor standby",
-          "unavailable_power": "Unavailable power"
+          "calculation_enabled_condition": "Számítást engedélyező feltétel",
+          "energy_integration_method": "Energiaintegrációs módszer",
+          "ignore_unavailable_state": "Az elérhetetlen állapot figyelmen kívül hagyása",
+          "multiply_factor": "Szorzótényező",
+          "multiply_factor_standby": "Készenléti teljesítmény szorzása",
+          "unavailable_power": "Teljesítmény nem elérhető állapotban"
         },
         "data_description": {
-          "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
-          "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
-          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
-          "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
+          "calculation_enabled_condition": "A konfigurált teljesítményszámítási stratégia csak akkor kerül végrehajtásra, ha ez a sablon igaz vagy 1-re van kiértékelve, ellenkező esetben a teljesítményérzékelő 0-t jelenít meg.",
+          "ignore_unavailable_state": "Kapcsolja be, ha a teljesítményérzékelőnek akkor is elérhetőnek kell maradnia, amikor a forrásentitás nem érhető el",
+          "multiply_factor": "A számított teljesítményt megszorozza ezzel az aránnyal. Hasznos lehet a light csoportok számára",
+          "multiply_factor_standby": "A szorzótényező alkalmazása a készenléti teljesítményre is",
+          "unavailable_power": "A forrásentitás nem elérhető állapotában használandó teljesítmény wattban"
         }
       },
       "basic_options": {
-        "title": "Basic options",
+        "title": "Alapbeállítások",
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Source entity",
-          "name": "Name",
-          "standby_power": "Standby power"
+          "create_energy_sensor": "Energiaérzékelő létrehozása",
+          "create_cost_sensor": "Költségérzékelő létrehozása",
+          "create_utility_meters": "Közüzemi mérők létrehozása",
+          "entity_id": "Forrásentitás",
+          "name": "Név",
+          "standby_power": "Készenléti teljesítmény"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "entity_id": "Entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
+          "create_energy_sensor": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőt",
+          "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal",
+          "entity_id": "Az entitás, amelyen a virtuális teljesítmény alapul, a teljesítményérzékelő figyeli ennek az entitásnak az állapotváltozásait a frissítésre",
+          "name": "Ha üresen hagyja, a név a forrásentitástól származik",
+          "standby_power": "Adja meg az eszköz kikapcsolt állapotban felvett teljesítményét"
         }
       },
       "daily_energy": {
-        "title": "Daily energy options",
+        "title": "Napi energiabeállítások",
         "data": {
-          "daily_energy_value": "Daily energy value",
-          "name": "Name",
-          "on_time": "On time",
-          "start_time": "Start time",
-          "unit_of_measurement": "Unit of measurement",
-          "update_frequency": "Update frequency",
-          "value": "Value",
-          "value_template": "Value template"
+          "daily_energy_value": "Napi energiaérték",
+          "name": "Név",
+          "on_time": "Bekapcsolási idő",
+          "start_time": "Kezdés időpontja",
+          "unit_of_measurement": "Mértékegység",
+          "update_frequency": "Frissítési gyakoriság",
+          "value": "Érték",
+          "value_template": "Értéksablon"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Üresen hagyva az alapértelmezés 1 nap, vagyis mindig bekapcsolva",
+          "update_frequency": "az érzékelő állapotfrissítései közötti idő másodpercben"
         }
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Energiabeállítások",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_integration_method": "Integrációs módszer",
+          "energy_sensor_unit_prefix": "Mértékegység előtag",
+          "energy_filter_outlier_enabled": "Kiugró értékek szűrése",
+          "energy_filter_outlier_max_step": "Kiugróérték-szűrő maximális lépése"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "Engedélyezze a kiugró értékek szűrését az energiaérzékelőben",
+          "energy_filter_outlier_max_step": "Maximális várható lépés teljesítményértékekben (wattban) a kiugró szűrőhöz"
         }
       },
       "fixed": {
-        "title": "Fixed options",
+        "title": "Rögzített beállítások",
         "data": {
-          "fixed_value": "Fixed value",
-          "self_usage_included": "Self usage included"
+          "fixed_value": "Rögzített érték",
+          "self_usage_included": "Az önhasználatot tartalmazza"
         },
         "data_description": {
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself."
+          "self_usage_included": "A teljesítményérték magában foglalja-e az intelligens kapcsoló által fogyasztott energiát."
         }
       },
       "global_configuration": {
-        "title": "Basic options",
+        "title": "Alapbeállítások",
         "sections": {
           "power_options": {
-            "name": "Power sensor",
+            "name": "Teljesítményérzékelő",
             "data": {
-              "power_sensor_naming": "Power sensor name pattern",
-              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-              "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_naming": "A teljesítményérzékelő névmintája",
+              "power_sensor_friendly_naming": "Teljesítményérzékelő megjelenítési nevének mintája",
+              "power_sensor_category": "Teljesítményérzékelő kategória",
+              "power_sensor_precision": "Teljesítményérzékelő pontossága"
             }
           },
           "features": {
-            "name": "Create sensors",
+            "name": "Érzékelők létrehozása",
             "data": {
-              "create_energy_sensors": "Create energy sensors",
-              "create_cost_sensors": "Create cost sensors",
-              "create_standby_group": "Create standby group",
-              "create_utility_meters": "Create utility meters"
+              "create_energy_sensors": "Energiaérzékelők létrehozása",
+              "create_cost_sensors": "Költségérzékelők létrehozása",
+              "create_standby_group": "Készenléti csoport létrehozása",
+              "create_utility_meters": "Közüzemi mérők létrehozása"
             },
             "data_description": {
-              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+              "create_energy_sensors": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőket",
+              "create_cost_sensors": "Meghatározza, hogy a Powercalc létrehozzon-e költségérzékelőket. Ehhez a következő lépésekben energiaárat kell beállítani",
+              "create_standby_group": "Csoport létrehozása, amely összegzi az összes készenléti teljesítményfelvételt és az IoT-eszközök saját fogyasztását",
+              "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal"
             }
           },
           "advanced": {
-            "name": "Advanced",
+            "name": "Fejlett",
             "data": {
-              "enable_analytics": "Enable anonymous analytics",
-              "ignore_unavailable_state": "Ignore unavailable state",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "disable_extended_attributes": "Disable extended attributes",
-              "disable_library_download": "Disable remote library download"
+              "enable_analytics": "Engedélyezze az anonim elemzést",
+              "ignore_unavailable_state": "Az elérhetetlen állapot figyelmen kívül hagyása",
+              "include_non_powercalc_sensors": "Nem Powercalc-érzékelők bevonása",
+              "disable_extended_attributes": "A kiterjesztett attribútumok letiltása",
+              "disable_library_download": "Távoli könyvtár letöltésének letiltása"
             },
             "data_description": {
-              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
-              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-              "disable_library_download": "Disable the Powercalc library download feature"
+              "enable_analytics": "Engedélyezze a Powercalc számára, hogy névtelen, összesített használati statisztikákat küldjön az integráció javítása érdekében",
+              "ignore_unavailable_state": "Tartsa elérhetővé a Powercalc-érzékelőket, még akkor is, ha a forrásentitás nem elérhető",
+              "include_non_powercalc_sensors": "Adja meg, hogy kíván-e nem Powercalc-érzékelőket csoportokba foglalni",
+              "disable_extended_attributes": "Tiltsa le az összes extra attribútumot, amelyet a Powercalc hozzáad a teljesítmény, az energia és a csoportentitásállapotokhoz. Ez segít kicsiben tartani az adatbázis méretét",
+              "disable_library_download": "Tiltsa le a Powercalc-könyvtár letöltési funkcióját"
             }
           }
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. See [documentation]({docs_uri}) for more info",
+        "title": "Költségbeállítások",
+        "description": "Konfigurálja a költségérzékelők kiszámításához használt energiaárat. Adjon meg egy fix árat vagy egy érzékelőt, amely az aktuális árat biztosítja kWh-nként. További információért lásd a [dokumentációt]({docs_uri}).",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Árképzés",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Rögzített energiaár",
+              "energy_price_multiplier": "Energiaár szorzó",
+              "energy_price_sensor": "Energiaár érzékelő",
+              "energy_price_surcharge": "Energiaár felár"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "Rögzített kWh-nkénti ár a helyi pénznemben",
+              "energy_price_multiplier": "A felár után alkalmazott szorzó. Százalékos adókhoz vagy díjakhoz használható, például 21% esetén 1,21",
+              "energy_price_sensor": "Egy érzékelő, amely biztosítja az aktuális energiaárat kWh-nként (pl. dinamikus tarifaintegrációból). Hagyja üresen a rögzített árat az érzékelő használatához",
+              "energy_price_surcharge": "További fix összeg kWh-enként hozzáadva a rögzített árhoz vagy az árérzékelő értékéhez"
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "Elnevezés",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "Költségérzékelő megjelenítési nevének mintája",
+              "cost_sensor_naming": "Költségérzékelő névmintája"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "Minta a költségérzékelő megjelenítési nevéhez. A forrás neve beszúrásra kerül a helyőrző pozícióba",
+              "cost_sensor_naming": "A költségérzékelő nevének és entitásazonosítójának felépítéséhez használt minta. A forrás neve beszúrásra kerül a helyőrző pozícióba"
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "Költségérzékelők alkalmazása",
+        "description": "Módosította a globális költségérzékelők beállítását. Alkalmazni kívánja ezt a módosítást az összes létező Powercalc-érzékelőre, amelyet a felhasználói felület segítségével hoztak létre?",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "Alkalmazza a meglévő érzékelőkre"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "Minden, a felhasználói felületen létrehozott Powercalc-érzékelő frissítése az új költségérzékelő-beállításnak megfelelően"
         }
       },
       "global_configuration_discovery": {
-        "title": "Discovery options",
-        "description": "Manage discovery setting. See [documentation]({docs_uri}) for more info",
+        "title": "Felderítési beállítások",
+        "description": "Felfedezési beállítások kezelése. További információért lásd a [dokumentációt]({docs_uri}).",
         "data": {
-          "enabled": "Enable discovery",
-          "exclude_device_types": "Excluded device types",
-          "exclude_self_usage": "Exclude self-usage"
+          "enabled": "Felfedezés engedélyezése",
+          "exclude_device_types": "Kizárt eszköztípusok",
+          "exclude_self_usage": "Az önhasználat kizárása"
         },
         "data_description": {
-          "exclude_device_types": "Exclude one or more specific device types from discovery.",
-          "exclude_self_usage": "Exclude self-usage profiles for smart switches."
+          "exclude_device_types": "Egy vagy több adott eszköztípus kizárása a felderítésből.",
+          "exclude_self_usage": "Az intelligens kapcsolók önhasználati profiljainak kizárása."
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
-        "description": "Define the default settings for energy sensors here. See [documentation]({docs_uri}) for more information",
+        "title": "Energiabeállítások",
+        "description": "Itt határozhatja meg az energiaérzékelők alapértelmezett beállításait. További információért lásd a [dokumentációt]({docs_uri}).",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "Energiaintegrációs módszer",
+          "energy_sensor_category": "Energiaérzékelő kategória",
+          "energy_sensor_friendly_naming": "Energiaérzékelő megjelenítési nevének mintája",
+          "energy_sensor_naming": "Energiaérzékelő névminta",
+          "energy_sensor_precision": "Energiaérzékelő pontosság",
+          "energy_sensor_unit_prefix": "Energiaérzékelő egység előtag"
         }
       },
       "global_configuration_throttling": {
-        "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
+        "title": "Frissítési időközök",
+        "description": "Állítsa be a frissítési időközöket a különböző érzékelőtípusokhoz. További információért lásd a [dokumentációt]({docs_uri}).",
         "data": {
-          "group_energy_update_interval": "Group energy update interval",
-          "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval",
-          "power_update_interval": "Power update interval"
+          "group_energy_update_interval": "Csoport energia frissítési intervallum",
+          "group_power_update_interval": "Csoportos teljesítmény frissítési időköz",
+          "energy_update_interval": "Energia frissítési intervallum",
+          "power_update_interval": "Energiafrissítési időköz"
         },
         "data_description": {
-          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
-          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
-          "power_update_interval": "Interval at which power sensors are force updated. In seconds. Set to 0 to disable"
+          "group_energy_update_interval": "A csoport energiaérzékelőinek frissítési időköze másodpercben. A letiltáshoz állítsa 0-ra",
+          "group_power_update_interval": "A csoport teljesítményérzékelőinek frissítési időköze másodpercben. A letiltáshoz állítsa 0-ra",
+          "energy_update_interval": "Az energiaérzékelők frissítési időköze másodpercben. A letiltáshoz állítsa 0-ra",
+          "power_update_interval": "A teljesítményérzékelők kényszerfrissítési időköze másodpercben. A letiltáshoz állítsa 0-ra"
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
-        "description": "Define the default settings for utility meters here. See [documentation]({docs_uri}) for more information",
+        "title": "Közüzemi mérő beállításai",
+        "description": "Itt adja meg a közüzemi mérők alapértelmezett beállításait. További információért lásd a [dokumentációt]({docs_uri}).",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "Közüzemi mérő nettó fogyasztása",
+          "utility_meter_tariffs": "Közüzemi mérő tarifái",
+          "utility_meter_types": "Közüzemi mérő típusai"
         }
       },
       "group_custom": {
-        "title": "Group options",
+        "title": "Csoportbeállítások",
         "sections": {
           "members": {
-            "name": "Members",
+            "name": "Tagok",
             "data": {
-              "group_member_sensors": "Member powercalc sensors",
-              "group_member_devices": "Member devices",
-              "group_power_entities": "Additional power entities",
-              "group_energy_entities": "Additional energy entities",
-              "sub_groups": "Sub groups",
-              "area": "Area",
-              "floor": "Floor"
+              "group_member_sensors": "Tag Powercalc-érzékelők",
+              "group_member_devices": "Tageszközök",
+              "group_power_entities": "További teljesítményentitások",
+              "group_energy_entities": "További energiaentitások",
+              "sub_groups": "Alcsoportok",
+              "area": "Terület",
+              "floor": "Emelet"
             },
             "data_description": {
-              "group_member_sensors": "Powercalc sensors to include in the group",
-              "group_member_devices": "Add power and energy entities from the selected devices to the group",
-              "group_power_entities": "Additional power sensors (W) from your HA installation to include",
-              "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-              "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-              "area": "Adds all power sensors from the specified area",
-              "floor": "Adds all power sensors from the specified floor"
+              "group_member_sensors": "A csoportba felveendő Powercalc-érzékelők",
+              "group_member_devices": "Adja hozzá a kiválasztott eszközök teljesítmény- és energiaentitásait a csoporthoz",
+              "group_power_entities": "További teljesítményérzékelők (W) a Home Assistant-telepítésből",
+              "group_energy_entities": "További energiaérzékelők (kWh) a Home Assistant-telepítésből",
+              "sub_groups": "A kiválasztott alcsoportokban található összes érzékelő szintén hozzáadódik ehhez a csoporthoz",
+              "area": "Hozzáadja az összes teljesítményérzékelőt a megadott területről",
+              "floor": "Hozzáadja az összes teljesítményérzékelőt a megadott emeletről"
             }
           },
           "options": {
-            "name": "Options",
+            "name": "Beállítások",
             "data": {
-              "device": "Device",
-              "hide_members": "Hide members",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "force_calculate_group_energy": "Force calculate energy"
+              "device": "Eszköz",
+              "hide_members": "Tagok elrejtése",
+              "include_non_powercalc_sensors": "Nem Powercalc-érzékelők bevonása",
+              "force_calculate_group_energy": "Energia kiszámításának kényszerítése"
             },
             "data_description": {
-              "device": "Add the group entities powercalc creates to an existing device",
-              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor"
+              "device": "Adja hozzá a Powercalc által létrehozott csoportentitásokat egy meglévő eszközhöz",
+              "include_non_powercalc_sensors": "Szabályozza, hogy a terület opció használatakor szerepeljenek-e nem Powercalc-érzékelők",
+              "force_calculate_group_energy": "A Powercalc alapértelmezés szerint a tagérzékelők energiaérzékelőit összegzi. Kapcsolja be ezt a beállítást egy Riemann-összeg érzékelő létrehozásának kikényszerítéséhez"
             }
           }
         }
       },
       "group_subtract": {
         "data": {
-          "entity_id": "Base entity",
-          "subtract_entities": "Subtract entities"
+          "entity_id": "Alap entitás",
+          "subtract_entities": "Entitások kivonása"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "Az alap entitás, amelyből le kell vonni a teljesítményt",
+          "subtract_entities": "Válassza ki az összes entitást, amelyet ki szeretne vonni az alapentitásból"
         },
-        "title": "Group options"
+        "title": "Csoportbeállítások"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Hálózati teljesítményérzékelő",
+          "group_tracked_auto": "Az entitások automatikusan hozzáadva",
+          "create_energy_sensor": "Energiaérzékelő létrehozása",
+          "create_cost_sensor": "Költségérzékelő létrehozása",
+          "create_utility_meters": "Közüzemi mérők létrehozása"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Válassza ki a teljes teljesítményfelvételt tartalmazó teljesítményérzékelőt. Ha üresen hagyja, csak a követett teljesítmény érzékelője jön létre",
+          "group_tracked_auto": "A Powercalc automatikusan hozzáadja az összes teljesítményérzékelőt a követett csoporthoz, kihagyva a Powercalc-csoportokat. Tiltsa le ezt, ha manuálisan szeretné meghatározni a nyomon követett entitásokat",
+          "create_energy_sensor": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőt",
+          "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal"
         },
-        "title": "Tracked/untracked group options"
+        "title": "Követett/nem követett csoport beállításai"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Nyomon követett entitások"
         },
-        "title": "Select power entities"
+        "title": "Teljesítményentitások kiválasztása"
       },
       "init": {
         "menu_options": {
-          "advanced_options": "Advanced options",
-          "basic_options": "Basic options",
-          "cost": "Cost options",
-          "daily_energy": "Daily energy options",
-          "energy_options": "Energy options",
-          "fixed": "Fixed options",
-          "group_custom": "Group options",
-          "group_subtract": "Group options",
-          "group_tracked_untracked": "Group options",
-          "group_tracked_untracked_manual": "Tracked entities",
-          "library_options": "Library options",
-          "linear": "Linear options",
-          "playbook": "Playbook options",
-          "multi_switch": "Multi switch options",
-          "real_power": "Real power options",
-          "utility_meter_options": "Utility meter options",
-          "wled": "WLED options",
-          "cost_options": "Cost options"
+          "advanced_options": "Speciális beállítások",
+          "basic_options": "Alapbeállítások",
+          "cost": "Költségbeállítások",
+          "daily_energy": "Napi energiabeállítások",
+          "energy_options": "Energiabeállítások",
+          "fixed": "Rögzített beállítások",
+          "group_custom": "Csoportbeállítások",
+          "group_subtract": "Csoportbeállítások",
+          "group_tracked_untracked": "Csoportbeállítások",
+          "group_tracked_untracked_manual": "Nyomon követett entitások",
+          "library_options": "Könyvtári beállítások",
+          "linear": "Lineáris beállítások",
+          "playbook": "Playbook beállításai",
+          "multi_switch": "Többkapcsolós beállítások",
+          "real_power": "Valós teljesítmény beállításai",
+          "utility_meter_options": "Közüzemi mérő beállításai",
+          "wled": "WLED beállításai",
+          "cost_options": "Költségbeállítások"
         }
       },
       "library_options": {
-        "title": "Library options",
-        "description": "Currently the following library profile is selected: \n manufacturer: {manufacturer}\n model: {model}\n\nIf you want to change the profile, click next."
+        "title": "Könyvtári beállítások",
+        "description": "Jelenleg a következő könyvtári profil van kiválasztva: \n gyártó: {manufacturer}\n modell: {model}\n\nHa módosítani szeretné a profilt, kattintson a Tovább gombra."
       },
       "linear": {
-        "title": "Linear options",
+        "title": "Lineáris beállítások",
         "data": {
-          "attribute": "Attribute",
-          "calibrate": "Calibration values",
-          "gamma_curve": "Gamma curve",
-          "max_power": "Max power",
-          "min_power": "Min power"
+          "attribute": "Attribútum",
+          "calibrate": "Kalibrációs értékek",
+          "gamma_curve": "Gammagörbe",
+          "max_power": "Maximális teljesítmény",
+          "min_power": "Minimális teljesítmény"
         },
         "data_description": {
-          "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
-          "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
+          "attribute": "Adja meg az attribútumot. Ha üresen marad, a fényerősség a lámpáknál, a százalékos pedig a ventilátoroknál",
+          "calibrate": "Minden sorba írjon egy kalibrációs értéket. Példa\n\n1:20"
         }
       },
       "multi_switch": {
-        "title": "Multi switch options",
+        "title": "Többkapcsolós beállítások",
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Entitások váltása",
+          "power": "Bekapcsolt teljesítmény",
+          "power_off": "Kikapcsolt teljesítmény"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "entities": "Válassza ki az összes olyan kapcsolót, amely a több kapcsoló részét képezi",
+          "power": "Egy kapcsoló teljesítménye bekapcsolt állapotban",
+          "power_off": "Egy kapcsoló teljesítménye kikapcsolt állapotban"
         }
       },
       "playbook": {
-        "title": "Playbook options",
+        "title": "Playbook beállításai",
         "data": {
-          "autostart": "Autostart",
-          "playbooks": "Playbooks",
-          "repeat": "Repeat",
-          "states_trigger": "State trigger"
+          "autostart": "Automatikus indítás",
+          "playbooks": "Playbookok",
+          "repeat": "Ismétlés",
+          "states_trigger": "Állapotindító"
         },
         "data_description": {
-          "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "repeat": "Toggle when you want to keep repeating the playbook after it completes",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "autostart": "Adja meg a Home Assistant indításakor elindítandó playbookot, például: \"program1\"",
+          "repeat": "Kapcsolja be, ha a playbookot a befejeződése után ismételni szeretné",
+          "states_trigger": "Playbook indítása állapotváltozás alapján. Példa:\n\nplaying: program1"
         }
       },
       "real_power": {
-        "title": "Real power options",
+        "title": "Valós teljesítmény beállításai",
         "data": {
-          "device": "Device"
+          "device": "Eszköz"
         },
         "data_description": {
-          "device": "Add the created energy sensor to an specific device"
+          "device": "Adja hozzá a létrehozott energiaérzékelőt egy adott eszközhöz"
         }
       },
       "cost": {
         "data": {
-          "energy_sensor_id": "Energy sensor"
+          "energy_sensor_id": "Energiaérzékelő"
         },
         "data_description": {
-          "energy_sensor_id": "The existing energy sensor (kWh) to calculate the cost for"
+          "energy_sensor_id": "A meglévő energiaérzékelő (kWh) a költségek kiszámításához"
         },
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "Ár felülbírálása",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Rögzített energiaár",
+              "energy_price_multiplier": "Energiaár szorzó",
+              "energy_price_sensor": "Energiaár érzékelő",
+              "energy_price_surcharge": "Energiaár felár"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "Fix ár kWh-nként az Ön helyi pénznemében. Hagyja üresen a globális energiaár használatához",
+              "energy_price_multiplier": "A pótdíj után alkalmazott szorzó. Használja ezt százalékalapú adók vagy díjak esetén, például 1,21 21%-hoz. Hagyja üresen a globális szorzó használatához",
+              "energy_price_sensor": "Egy érzékelő, amely biztosítja az aktuális energiaárat kWh-nként (pl. dinamikus tarifaintegrációból). Hagyja üresen a rögzített árat az érzékelő használatához",
+              "energy_price_surcharge": "További fix összeg kWh-enként hozzáadva a rögzített árhoz vagy az árérzékelő értékéhez. Hagyja üresen a globális felár használatához"
             }
           }
         },
-        "title": "Cost options"
+        "title": "Költségbeállítások"
       },
       "utility_meter_options": {
-        "title": "Utility meter options",
+        "title": "Közüzemi mérő beállításai",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
-          "utility_meter_types": "Cycles",
-          "utility_meter_tariffs": "Tariffs"
+          "utility_meter_net_consumption": "Nettó fogyasztás",
+          "utility_meter_types": "Ciklusok",
+          "utility_meter_tariffs": "Tarifák"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
-          "utility_meter_types": "Create utility meters for specified cycles",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_net_consumption": "Engedélyezze ezt, ha a forrást nettó mérőként szeretné kezelni. Ez lehetővé teszi, hogy a számláló mind pozitív, mind negatív irányba menjen.",
+          "utility_meter_types": "Közüzemi mérők létrehozása a kiválasztott ciklusokhoz",
+          "utility_meter_tariffs": "A támogatott tarifák listája, hagyja üresen, ha csak egyetlen tarifára van szükség."
         }
       },
       "wled": {
-        "title": "WLED options",
+        "title": "WLED beállításai",
         "data": {
-          "power_factor": "Power factor",
-          "voltage": "Voltage"
+          "power_factor": "Teljesítménytényező",
+          "voltage": "Feszültség"
         }
       },
       "cost_options": {
         "data": {
-          "energy_price": "Fixed energy price",
-          "energy_price_multiplier": "Energy price multiplier",
-          "energy_price_sensor": "Energy price sensor",
-          "energy_price_surcharge": "Energy price surcharge"
+          "energy_price": "Rögzített energiaár",
+          "energy_price_multiplier": "Energiaár szorzó",
+          "energy_price_sensor": "Energiaár érzékelő",
+          "energy_price_surcharge": "Energiaár felár"
         },
         "data_description": {
-          "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+          "energy_price": "Fix ár kWh-nként az Ön helyi pénznemében. Hagyja üresen a globális energiaár használatához",
+          "energy_price_multiplier": "A pótdíj után alkalmazott szorzó. Használja ezt százalékalapú adók vagy díjak esetén, például 1,21 21%-hoz. Hagyja üresen a globális szorzó használatához",
+          "energy_price_sensor": "Egy érzékelő, amely biztosítja az aktuális energiaárat kWh-nként (pl. dinamikus tarifaintegrációból). Hagyja üresen a rögzített árat az érzékelő használatához",
+          "energy_price_surcharge": "További fix összeg kWh-enként hozzáadva a rögzített árhoz vagy az árérzékelő értékéhez. Hagyja üresen a globális felár használatához"
         },
-        "description": "Override the globally configured energy price for this sensor only. Leave all fields empty to keep using the global price. See [documentation]({docs_uri}) for more info",
-        "title": "Cost options"
+        "description": "Csak ehhez az érzékelőhöz írja felül a globálisan konfigurált energiaárat. Hagyja üresen az összes mezőt a globális ár használatához. További információért lásd a [dokumentációt]({docs_uri}).",
+        "title": "Költségbeállítások"
       }
     }
   },
   "selector": {
     "daily_energy_value": {
       "choices": {
-        "value": "Fixed value",
-        "value_template": "Template"
+        "value": "Rögzített érték",
+        "value_template": "Sablon"
       }
     },
     "fixed_value": {
       "choices": {
-        "power": "Fixed value",
-        "power_template": "Template",
-        "states_power": "State mapping"
+        "power": "Rögzített érték",
+        "power_template": "Sablon",
+        "states_power": "Állapottérképezés"
       }
     }
   },
   "services": {
     "activate_playbook": {
-      "description": "Start execution of a playbook.",
+      "description": "Playbook végrehajtásának indítása.",
       "fields": {
         "playbook_id": {
-          "description": "Playbook identifier.",
+          "description": "A playbook azonosítója.",
           "name": "Playbook"
         }
       },
-      "name": "Activate playbook"
+      "name": "Playbook aktiválása"
     },
     "calibrate_energy": {
-      "description": "Sets the energy sensor to a given kWh value.",
+      "description": "Beállítja az energiaérzékelőt egy adott kWh értékre.",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "A beállítandó érték.",
+          "name": "Mező"
         }
       },
-      "name": "Calibrate energy sensor"
+      "name": "Energiaérzékelő kalibrálása"
     },
     "calibrate_cost": {
-      "description": "Sets the cost sensor to a given monetary value.",
+      "description": "Beállítja a költségérzékelőt egy adott pénzbeli értékre.",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "A beállítandó érték.",
+          "name": "Érték"
         }
       },
-      "name": "Calibrate cost sensor"
+      "name": "Költségérzékelő kalibrálása"
     },
     "calibrate_utility_meter": {
-      "description": "Calibrates a utility meter sensor.",
+      "description": "Egy közüzemi mérőérzékelőt kalibrál.",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "A beállítandó érték.",
+          "name": "Érték"
         }
       },
-      "name": "Calibrate utility meter"
+      "name": "Közüzemi mérő kalibrálása"
     },
     "change_gui_config": {
-      "description": "Batch change configuration of all Powercalc config entries",
+      "description": "Az összes Powercalc-konfigurációs bejegyzés kötegelt módosítása",
       "fields": {
         "field": {
-          "description": "The field you'd like to change",
-          "name": "Value"
+          "description": "A módosítandó mező",
+          "name": "Érték"
         },
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "A beállítandó érték.",
+          "name": "Érték"
         }
       },
-      "name": "Change GUI config"
+      "name": "Felhasználói felület konfigurációjának módosítása"
     },
     "debug_group": {
-      "description": "Get a debug overview of a group power or energy sensor including current member values.",
-      "name": "Debug group"
+      "description": "A csoport teljesítmény- vagy energiaérzékelőjének hibakeresési áttekintése, beleértve az aktuális tagértékeket.",
+      "name": "Csoport hibakeresése"
     },
     "get_active_playbook": {
-      "description": "Get current running playbook",
-      "name": "Get active playbook"
+      "description": "Az aktuálisan futó playbook lekérése",
+      "name": "Aktív playbook lekérése"
     },
     "get_group_entities": {
-      "description": "Retrieve all entity id's of a group energy or power sensor",
-      "name": "Get group entities"
+      "description": "A csoport energia- vagy teljesítményérzékelő összes entitásazonosítójának lekérése",
+      "name": "Csoportentitások lekérése"
     },
     "increase_daily_energy": {
-      "description": "Increases the sensor with a given amount.",
+      "description": "Adott mennyiséggel növeli az érzékelőt.",
       "fields": {
         "value": {
-          "description": "Amount to add to the sensor.",
-          "name": "Value"
+          "description": "Az érzékelőhöz hozzáadandó összeg.",
+          "name": "Érték"
         }
       },
-      "name": "Increase daily energy sensor"
+      "name": "Napi energiaérzékelő növelése"
     },
     "reload": {
-      "description": "Reload Powercalc configuration and entities",
-      "name": "Reload"
+      "description": "Töltse be újra a Powercalc-konfigurációt és entitásokat",
+      "name": "Újratöltés"
     },
     "reset_energy": {
-      "description": "Reset an energy sensor to zero kWh.",
-      "name": "Reset energy sensor"
+      "description": "Az energiaérzékelő kWh-értékének nullázása.",
+      "name": "Energiaérzékelő nullázása"
     },
     "reset_cost": {
-      "description": "Reset a cost sensor to zero.",
-      "name": "Reset cost sensor"
+      "description": "Állítson vissza egy költségérzékelőt nullára.",
+      "name": "Költségérzékelő visszaállítása"
     },
     "stop_playbook": {
-      "description": "Stop currently active playbook.",
-      "name": "Stop playbook"
+      "description": "A jelenleg aktív playbook leállítása.",
+      "name": "Playbook leállítása"
     },
     "switch_sub_profile": {
-      "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
+      "description": "A könyvtár egyes profiljaihoz különböző alprofilok tartoznak. Ez a szolgáltatás lehetővé teszi, hogy egy másikra váltson.",
       "fields": {
         "profile": {
-          "name": "Sub profile",
-          "description": "Define one of the possible sub profiles"
+          "name": "Alprofil",
+          "description": "Határozza meg az egyik lehetséges alprofilt"
         }
       },
-      "name": "Switch to another sub profile"
+      "name": "Váltás másik alprofilra"
     }
   }
 }

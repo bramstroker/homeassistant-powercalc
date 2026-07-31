@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from bisect import bisect_left
 from collections.abc import Mapping
 from csv import reader

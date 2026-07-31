@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.powermeter.shelly_client import ShellyClient, ShellyDevice, ShellyProbeError

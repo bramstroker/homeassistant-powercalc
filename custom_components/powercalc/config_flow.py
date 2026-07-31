@@ -1,7 +1,5 @@
 """Config flow for Powercalc integration."""
 
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from collections.abc import Awaitable, Callable
 from inspect import isawaitable
@@ -33,6 +31,7 @@ from .common import SourceEntity, create_source_entity
 from .const import (
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_PRICE_SENSOR,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -76,12 +75,12 @@ from .flow_helper.flows.virtual_power import (
 from .flow_helper.profile_preview import async_setup_preview as async_setup_powercalc_preview
 from .flow_helper.schema import (
     COST_DOCS_URI,
-    SCHEMA_COST_PRICING,
     SCHEMA_COST_SENSOR_TOGGLE,
     SCHEMA_ENERGY_SENSOR_TOGGLE,
     SCHEMA_SENSOR_ENERGY_OPTIONS,
     SCHEMA_UTILITY_METER_OPTIONS,
     SCHEMA_UTILITY_METER_TOGGLE,
+    build_cost_pricing_schema,
 )
 from .power_profile.factory import get_power_profile
 from .power_profile.power_profile import SUPPORTED_DOMAINS, DeviceType, DiscoveryBy, PowerProfile
@@ -599,7 +598,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         """Handle the per sensor energy price override."""
         return await self.async_handle_options_step(
             user_input,
-            SCHEMA_COST_PRICING,
+            build_cost_pricing_schema(self.hass, self.sensor_config.get(CONF_ENERGY_PRICE_SENSOR)),
             Step.COST_OPTIONS,
             form_kwarg={"description_placeholders": {"docs_uri": COST_DOCS_URI}},
         )

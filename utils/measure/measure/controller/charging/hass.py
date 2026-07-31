@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from measure.controller.charging.const import ATTR_BATTERY_LEVEL
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import BatteryLevelRetrievalError

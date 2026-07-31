@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from homeassistant_api.errors import HomeassistantAPIError
 
 from measure.controller.errors import ControllerError

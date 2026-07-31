@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Callable
 from datetime import datetime, time, timedelta
 from decimal import Decimal

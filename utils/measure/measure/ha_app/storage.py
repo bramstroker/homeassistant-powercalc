@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import deque
 from collections.abc import Collection
 import csv
@@ -9,7 +7,7 @@ import logging
 import os
 from pathlib import Path
 import shutil
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 from uuid import uuid4
 
 from measure.clock import utc_now
@@ -17,6 +15,7 @@ from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.dummy_load import DummyLoadCalibration
 from measure.execution import OperatingPoint
+from measure.ha_app.contribution.models import ContributionStatus
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
@@ -34,9 +33,6 @@ from measure.runner.light_plan import (
     build_light_plan,
     variation_from_csv_row,
 )
-
-if TYPE_CHECKING:
-    from measure.ha_app.contribution import ContributionStatus
 
 _LOGGER = logging.getLogger("measure")
 
@@ -256,8 +252,6 @@ class SessionStorage:
         return calibration
 
     def load_contribution_status(self) -> ContributionStatus:
-        from measure.ha_app.contribution import ContributionStatus
-
         path = self.data_root / _CONTRIBUTION_STATUS_FILENAME
         if not path.exists():
             return ContributionStatus()

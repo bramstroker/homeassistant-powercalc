@@ -1,7 +1,5 @@
 """Convert config entry data to runtime sensor configuration."""
 
-from __future__ import annotations
-
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry

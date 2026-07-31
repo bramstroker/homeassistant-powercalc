@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 import math
