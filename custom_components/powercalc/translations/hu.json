@@ -1,123 +1,123 @@
 {
   "common": {
-    "source_entity": "Source entity",
-    "source_device": "Source device",
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "source_entity": "Forrásentitás",
+    "source_device": "Forráseszköz",
+    "remarks_smart_switch": "Ez a profil csak készenléti energiaértékeket biztosít. \n Ha egy készülék bekapcsolva állandó mennyiségű energiát fogyaszt, ezt az értéket a konfigurációs folyamat következő lépésében adhatja meg",
+    "remarks_smart_dimmer": "Ez a profil csak készenléti energiaértékeket biztosít. \n A következő lépésben megadhatja a csatlakoztatott lámpa értékeit"
   },
   "config": {
     "abort": {
-      "already_configured": "Sensor is already configured, specify a unique_id"
+      "already_configured": "Az érzékelő már be van állítva, adjon meg egy egyedi azonosítót (unique_id)"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
-      "daily_energy_mandatory": "You must supply at least one of Value or Value template",
-      "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-      "group_mandatory": "You must define at least subgroups or power and energy-entities",
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
-      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
-      "lut_wrong_domain": "Only light entities can use the LUT mode",
-      "playbook_mandatory": "You need to specify at least one playbook",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "cost_price_mandatory": "Adjon meg egy energiaárat vagy energiaár-érzékelőt",
+      "daily_energy_mandatory": "Adja meg legalább a Value vagy a Value template egyikét",
+      "entity_mandatory": "A playbook stratégián kívül minden stratégiához entitást kell választani",
+      "fixed_mandatory": "Adja meg legalább a Power, a Power template vagy a States power egyikét",
+      "fixed_states_power_only": "Ez az entitás csak a „states_power” beállítással működik, a „power” beállítással nem",
+      "group_mandatory": "Adjon meg legalább alcsoportokat, illetve energia- vagy teljesítményentitásokat",
+      "linear_mandatory": "Adja meg legalább a max_power vagy a calibrate értéket",
+      "linear_min_higher_as_max": "A maximális teljesítmény nem lehet kisebb a minimális teljesítménynél",
+      "linear_unsupported_domain": "Lineáris módban ez az entitástartomány nem támogatott. A támogatott tartományok: fan, light és mediaplayer. Használhatja helyette a kalibrálást",
+      "lut_unsupported_color_mode": "A LUT-profil nem támogatja a lámpa egyik színmódját. További információért tekintse meg a naplókat",
+      "lut_wrong_domain": "LUT-módot csak light entitások használhatnak",
+      "playbook_mandatory": "Adjon meg legalább egy playbookot",
+      "unknown": "Ismeretlen hiba történt. További információért tekintse meg a naplókat"
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Csoport(ok) kiválasztása",
+          "new_group": "Új csoport"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Új csoport létrehozásához adjon meg egy egyéni csoportnevet"
         },
-        "title": "Assign to group"
+        "title": "Hozzárendelés csoporthoz"
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Availability entity"
+          "availability_entity": "Elérhetőségi entitás"
         },
         "data_description": {
-          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+          "availability_entity": "Ha ez az entitás nem érhető el, a Powercalc érzékelője sem lesz elérhető"
         },
-        "title": "Availability entity",
-        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+        "title": "Elérhetőségi entitás",
+        "description": "Ez a profil eszközönként értendő. Válassza ki a Powercalc érzékelő elérhetőségének meghatározására használt entitást"
       },
       "daily_energy": {
         "data": {
-          "create_utility_meters": "Create utility meters",
-          "daily_energy_value": "Daily energy value",
-          "name": "Name",
-          "on_time": "On time",
-          "start_time": "Start time",
-          "unit_of_measurement": "Unit of measurement",
-          "update_frequency": "Update frequency",
-          "value": "Value",
-          "value_template": "Value template"
+          "create_utility_meters": "Segédmérők létrehozása",
+          "daily_energy_value": "Napi energiaérték",
+          "name": "Név",
+          "on_time": "Bekapcsolási idő",
+          "start_time": "Kezdési idő",
+          "unit_of_measurement": "Mértékegység",
+          "update_frequency": "Frissítési gyakoriság",
+          "value": "Érték",
+          "value_template": "Értéksablon"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Üresen hagyva az alapértelmezés 1 nap, vagyis mindig bekapcsolva",
+          "update_frequency": "Az érzékelő állapotfrissítései közötti idő másodpercben"
         },
-        "title": "Create a daily fixed sensor"
+        "title": "Napi rögzített érzékelő létrehozása"
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Energiabeállítások",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_integration_method": "Integrációs módszer",
+          "energy_sensor_unit_prefix": "Mértékegység-előtag",
+          "energy_filter_outlier_enabled": "Kiugró értékek szűrése",
+          "energy_filter_outlier_max_step": "A kiugróérték-szűrő maximális lépése"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "A kiugró értékek szűrésének engedélyezése az energiaérzékelőben",
+          "energy_filter_outlier_max_step": "A kiugróérték-szűrő által várt maximális teljesítménylépés wattban"
         }
       },
       "group_domain": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "name": "Név",
+          "create_energy_sensor": "Energiaérzékelő létrehozása",
+          "create_cost_sensor": "Költségérzékelő létrehozása",
+          "create_utility_meters": "Segédmérők létrehozása",
+          "domain": "Entitástartomány",
+          "exclude_entities": "Entitások kizárása"
         },
-        "title": "Create a domain based group sensor"
+        "title": "Tartományalapú csoportérzékelő létrehozása"
       },
       "fixed": {
         "data": {
-          "fixed_value": "Power value"
+          "fixed_value": "Teljesítményérték"
         },
         "data_description": {
-          "fixed_value": "Power value in Watts when the entity is ON"
+          "fixed_value": "Az entitás bekapcsolt állapotában mért teljesítmény wattban"
         },
-        "description": "Define a fixed power value for your entity. See the [documentation]({docs_uri}) for more info",
-        "title": "Fixed config"
+        "description": "Adja meg az entitás rögzített teljesítményértékét. További információért tekintse meg a [dokumentációt]({docs_uri})",
+        "title": "Rögzített beállítások"
       },
       "global_configuration": {
-        "title": "Global configuration",
-        "description": "Setup global configuration for Powercalc. For more information see the [documentation]({docs_uri}). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "title": "Globális beállítások",
+        "description": "Állítsa be a Powercalc globális beállításait. További információért tekintse meg a [dokumentációt]({docs_uri}). Az energiaérzékelők és segédmérők további beállításai a következő lépésekben adhatók meg.",
         "sections": {
           "power_options": {
-            "name": "Power sensor",
+            "name": "Teljesítményérzékelő",
             "data": {
-              "power_sensor_naming": "Power sensor name pattern",
-              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-              "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_naming": "Teljesítményérzékelő névmintája",
+              "power_sensor_friendly_naming": "Teljesítményérzékelő felhasználóbarát névmintája",
+              "power_sensor_category": "Teljesítményérzékelő kategóriája",
+              "power_sensor_precision": "Teljesítményérzékelő pontossága"
             }
           },
           "features": {
-            "name": "Create sensors",
+            "name": "Érzékelők létrehozása",
             "data": {
-              "create_energy_sensors": "Create energy sensors",
-              "create_cost_sensors": "Create cost sensors",
-              "create_standby_group": "Create standby group",
-              "create_utility_meters": "Create utility meters"
+              "create_energy_sensors": "Energiaérzékelők létrehozása",
+              "create_cost_sensors": "Költségérzékelők létrehozása",
+              "create_standby_group": "Készenléti csoport létrehozása",
+              "create_utility_meters": "Segédmérők létrehozása"
             },
             "data_description": {
               "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
