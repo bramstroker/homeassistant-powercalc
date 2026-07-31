@@ -11,17 +11,17 @@
     },
     "error": {
       "cost_price_mandatory": "必须提供能源价格或能源价格传感器",
-      "daily_energy_mandatory": "必须至少提供 Value 或 Value template 其中一项",
-      "entity_mandatory": "除 playbook 外的所有策略都必须选择实体",
-      "fixed_mandatory": "必须至少提供 Power、Power template 或 States power 其中一项",
-      "fixed_states_power_only": "此实体只能使用 states_power，不能使用 power",
+      "daily_energy_mandatory": "必须至少提供“值”或“值模板”中的一项",
+      "entity_mandatory": "除运行方案 (playbook) 外，所有策略都必须选择实体",
+      "fixed_mandatory": "必须至少提供“功率”“功率模板”或“状态功率”中的一项",
+      "fixed_states_power_only": "此实体只能使用 'states_power'，不能使用 'power'",
       "group_mandatory": "必须定义至少一个子组，或功率和能源实体",
       "linear_mandatory": "必须至少提供 max_power 或 calibrate 其中一项",
       "linear_min_higher_as_max": "最大功率不能低于最小功率",
       "linear_unsupported_domain": "线性模式不支持此实体域。必须是 fan、light 或 mediaplayer 之一，但仍可使用校准选项",
       "lut_unsupported_color_mode": "LUT 配置文件不支持灯具的一种颜色模式。详情请查看日志",
       "lut_wrong_domain": "只有 light 实体可以使用 LUT 模式",
-      "playbook_mandatory": "必须指定至少一个 playbook",
+      "playbook_mandatory": "必须指定至少一个运行方案 (playbook)",
       "unknown": "发生未知错误，详情请查看日志"
     },
     "flow_title": "{name} ({manufacturer} {model})",
@@ -48,7 +48,7 @@
       },
       "daily_energy": {
         "data": {
-          "create_utility_meters": "创建实用电表",
+          "create_utility_meters": "创建公用事业计量表",
           "daily_energy_value": "每日能源值",
           "name": "名称",
           "on_time": "开启时间",
@@ -81,8 +81,8 @@
         "data": {
           "name": "名称",
           "create_energy_sensor": "创建能源传感器",
-          "create_cost_sensor": "创建成本传感器",
-          "create_utility_meters": "创建实用电表",
+          "create_cost_sensor": "创建费用传感器",
+          "create_utility_meters": "创建公用事业计量表",
           "domain": "实体域",
           "exclude_entities": "排除实体"
         },
@@ -100,7 +100,7 @@
       },
       "global_configuration": {
         "title": "全局配置",
-        "description": "设置 Powercalc 全局配置。更多信息请参阅[文档]({docs_uri})。能源传感器和实用电表的其他选项可在接下来的步骤中提供。",
+        "description": "设置 Powercalc 全局配置。更多信息请参阅[文档]({docs_uri})。能源传感器和公用事业计量表的其他选项可在接下来的步骤中提供。",
         "sections": {
           "power_options": {
             "name": "功率传感器",
@@ -115,1088 +115,1088 @@
             "name": "创建传感器",
             "data": {
               "create_energy_sensors": "创建能源传感器",
-              "create_cost_sensors": "创建成本传感器",
+              "create_cost_sensors": "创建费用传感器",
               "create_standby_group": "创建待机组",
-              "create_utility_meters": "创建实用电表"
+              "create_utility_meters": "创建公用事业计量表"
             },
             "data_description": {
-              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+              "create_energy_sensors": "是否让 Powercalc 创建 kWh 传感器",
+              "create_cost_sensors": "是否让 Powercalc 创建费用传感器。需要在后续步骤中配置能源价格",
+              "create_standby_group": "创建一个汇总所有待机功耗及物联网设备自身功耗的组",
+              "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表"
             }
           },
           "advanced": {
-            "name": "Advanced",
+            "name": "高级",
             "data": {
-              "enable_analytics": "Enable anonymous analytics",
-              "ignore_unavailable_state": "Ignore unavailable state",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "disable_extended_attributes": "Disable extended attributes",
-              "disable_library_download": "Disable remote library download"
+              "enable_analytics": "启用匿名分析",
+              "ignore_unavailable_state": "忽略不可用状态",
+              "include_non_powercalc_sensors": "包括非 Powercalc 传感器",
+              "disable_extended_attributes": "禁用扩展属性",
+              "disable_library_download": "禁用远程配置文件库下载"
             },
             "data_description": {
-              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
-              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-              "disable_library_download": "Disable the Powercalc library download feature"
+              "enable_analytics": "允许 Powercalc 发送匿名汇总的使用统计信息，以帮助改进此集成",
+              "ignore_unavailable_state": "即使源实体不可用，也让 Powercalc 传感器保持可用",
+              "include_non_powercalc_sensors": "控制是否在组中包括非 Powercalc 传感器",
+              "disable_extended_attributes": "禁用 Powercalc 添加到功率、能源及组实体状态中的所有额外属性。这有助于减小数据库大小",
+              "disable_library_download": "禁用 Powercalc 配置文件库下载功能"
             }
           }
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. See [documentation]({docs_uri}) for more info",
+        "title": "费用选项",
+        "description": "配置用于计算费用传感器的能源价格。请提供固定价格，或提供当前每 kWh 价格的传感器。详情请参阅[文档]({docs_uri})",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "价格",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "固定能源价格",
+              "energy_price_multiplier": "能源价格乘数",
+              "energy_price_sensor": "能源价格传感器",
+              "energy_price_surcharge": "能源价格附加费"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "以本地货币表示的每 kWh 固定价格",
+              "energy_price_multiplier": "在附加费后应用的乘数。可用于按百分比计算的税费，例如 21% 对应 1.21",
+              "energy_price_sensor": "提供当前每 kWh 能源价格的传感器（例如来自动态电价集成）。将固定价格留空即可使用此传感器",
+              "energy_price_surcharge": "添加到固定价格或价格传感器值中的每 kWh 固定附加金额"
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "命名",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "费用传感器友好名称模式",
+              "cost_sensor_naming": "费用传感器名称模式"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "费用传感器友好名称的模式。源名称会插入占位符所在位置",
+              "cost_sensor_naming": "用于生成费用传感器名称和实体 ID 的模式。源名称会插入占位符所在位置"
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "应用费用传感器设置",
+        "description": "全局费用传感器设置已更改。是否将此更改应用于通过图形界面创建的所有现有 Powercalc 传感器？",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "应用于现有传感器"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "更新通过图形界面创建的所有现有 Powercalc 传感器，使其使用新的费用传感器设置"
         }
       },
       "global_configuration_discovery": {
-        "title": "Discovery options",
-        "description": "Powercalc can scan your system for devices and entities that have power profiles in the built-in library. The options below let you fine-tune this behavior.",
+        "title": "发现选项",
+        "description": "Powercalc 可以扫描系统中在内置配置文件库里有功率配置文件的设备和实体。以下选项可用于微调此行为。",
         "data": {
-          "enabled": "Enable discovery",
-          "exclude_device_types": "Excluded device types",
-          "exclude_self_usage": "Exclude self-usage"
+          "enabled": "启用发现",
+          "exclude_device_types": "排除的设备类型",
+          "exclude_self_usage": "排除自身功耗"
         },
         "data_description": {
-          "exclude_device_types": "Exclude one or more specific device types from discovery.",
-          "exclude_self_usage": "Exclude self-usage profiles for smart switches."
+          "exclude_device_types": "从发现中排除一个或多个指定的设备类型。",
+          "exclude_self_usage": "排除智能开关的自身功耗配置文件。"
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
+        "title": "能源选项",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "能源积分方法",
+          "energy_sensor_category": "能源传感器类别",
+          "energy_sensor_friendly_naming": "能源传感器友好名称模式",
+          "energy_sensor_naming": "能源传感器名称模式",
+          "energy_sensor_precision": "能源传感器精度",
+          "energy_sensor_unit_prefix": "能源传感器单位前缀"
         }
       },
       "global_configuration_throttling": {
-        "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
+        "title": "更新频率限制选项",
+        "description": "设置不同传感器类型的更新间隔。详情请参阅[文档]({docs_uri})",
         "data": {
-          "group_energy_update_interval": "Group energy update interval",
-          "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval",
-          "power_update_interval": "Power update interval"
+          "group_energy_update_interval": "组能源更新间隔",
+          "group_power_update_interval": "组功率更新间隔",
+          "energy_update_interval": "能源更新间隔",
+          "power_update_interval": "功率更新间隔"
         },
         "data_description": {
-          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
-          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
-          "power_update_interval": "Interval at which energy sensors are force updated. In seconds. Set to 0 to disable"
+          "group_energy_update_interval": "组能源传感器的更新间隔（秒）。设为 0 可禁用",
+          "group_power_update_interval": "组功率传感器的更新间隔（秒）。设为 0 可禁用",
+          "energy_update_interval": "能源传感器的更新间隔（秒）。设为 0 可禁用",
+          "power_update_interval": "强制更新能源传感器的间隔（秒）。设为 0 可禁用"
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
+        "title": "公用事业计量表选项",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "公用事业计量表净消耗量",
+          "utility_meter_tariffs": "公用事业计量表费率",
+          "utility_meter_types": "公用事业计量表类型"
         }
       },
       "group_custom": {
         "data": {
-          "name": "Name"
+          "name": "名称"
         },
         "sections": {
           "members": {
-            "name": "Members",
+            "name": "成员",
             "data": {
-              "group_member_sensors": "Member powercalc sensors",
-              "group_member_devices": "Member devices",
-              "group_power_entities": "Additional power entities",
-              "group_energy_entities": "Additional energy entities",
-              "sub_groups": "Sub groups",
-              "area": "Area",
-              "floor": "Floor"
+              "group_member_sensors": "成员 Powercalc 传感器",
+              "group_member_devices": "成员设备",
+              "group_power_entities": "其他功率实体",
+              "group_energy_entities": "其他能源实体",
+              "sub_groups": "子组",
+              "area": "区域",
+              "floor": "楼层"
             },
             "data_description": {
-              "group_member_sensors": "Powercalc sensors to include in the group",
-              "group_member_devices": "Add power and energy entities from the selected devices to the group",
-              "group_power_entities": "Additional power sensors (W) from your HA installation to include",
-              "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-              "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-              "area": "Adds all power sensors from the specified area",
-              "floor": "Adds all power sensors from the specified floor"
+              "group_member_sensors": "要包括在组中的 Powercalc 传感器",
+              "group_member_devices": "将所选设备中的功率和能源实体添加到组",
+              "group_power_entities": "要包括的 Home Assistant 中的其他功率传感器 (W)",
+              "group_energy_entities": "要包括的 Home Assistant 中的其他能源传感器 (kWh)",
+              "sub_groups": "所选子组中包含的所有传感器也会添加到此组",
+              "area": "添加指定区域中的所有功率传感器",
+              "floor": "添加指定楼层中的所有功率传感器"
             }
           },
           "options": {
-            "name": "Options",
+            "name": "选项",
             "data": {
-              "device": "Device",
-              "hide_members": "Hide members",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "force_calculate_group_energy": "Force calculate energy",
-              "group_energy_start_at_zero": "Start at zero",
-              "create_energy_sensor": "Create energy sensor",
-              "create_utility_meters": "Create utility meters"
+              "device": "设备",
+              "hide_members": "隐藏成员",
+              "include_non_powercalc_sensors": "包括非 Powercalc 传感器",
+              "force_calculate_group_energy": "强制计算能源",
+              "group_energy_start_at_zero": "从零开始",
+              "create_energy_sensor": "创建能源传感器",
+              "create_utility_meters": "创建公用事业计量表"
             },
             "data_description": {
-              "device": "Add the group entities powercalc creates to an existing device",
-              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-              "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
-              "create_energy_sensor": "Whether powercalc needs to create a kWh sensor"
+              "device": "将 Powercalc 创建的组实体添加到现有设备",
+              "include_non_powercalc_sensors": "控制使用区域选项时是否包括非 Powercalc 传感器",
+              "force_calculate_group_energy": "默认情况下，Powercalc 会汇总成员的能源传感器。启用此选项可强制创建黎曼和积分传感器",
+              "group_energy_start_at_zero": "启用后，能源传感器在创建时将从零开始。否则，它会汇总所有成员能源传感器的当前状态值",
+              "create_energy_sensor": "是否让 Powercalc 创建 kWh 传感器"
             }
           }
         },
-        "title": "Create a group sensor"
+        "title": "创建组传感器"
       },
       "group_subtract": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "subtract_entities": "Subtract entities"
+          "create_energy_sensor": "创建能源传感器",
+          "create_cost_sensor": "创建费用传感器",
+          "create_utility_meters": "创建公用事业计量表",
+          "entity_id": "基础实体",
+          "name": "名称",
+          "subtract_entities": "减去实体"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "要从中减去功率的基础实体",
+          "subtract_entities": "选择要从基础实体中减去的所有实体"
         },
-        "title": "Subtract group sensor"
+        "title": "创建相减组传感器"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "总电源功率传感器",
+          "group_tracked_auto": "自动添加实体",
+          "create_energy_sensor": "创建能源传感器",
+          "create_cost_sensor": "创建费用传感器",
+          "create_utility_meters": "创建公用事业计量表"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "选择包含总功耗的功率传感器。留空时只会创建已跟踪功率传感器",
+          "group_tracked_auto": "Powercalc 会自动将所有功率传感器添加到已跟踪组，并跳过 Powercalc 组。如需手动定义已跟踪实体，请禁用此选项",
+          "create_energy_sensor": "是否让 Powercalc 创建 kWh 传感器",
+          "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表"
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "为所有已跟踪和未跟踪功率创建组传感器",
+        "title": "创建已跟踪功率传感器"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "已跟踪实体"
         },
-        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
-        "title": "Select power entities"
+        "description": "选择属于已跟踪用电量的所有功率传感器。此列表已自动填充，但可以手动调整",
+        "title": "选择功率实体"
       },
       "group_tracked_untracked_auto": {
         "data": {
-          "exclude_entities": "Exclude entities"
+          "exclude_entities": "排除实体"
         },
-        "description": "Exclude specific entities from the auto tracked group",
-        "title": "Auto tracked configuration"
+        "description": "从自动跟踪组中排除指定实体",
+        "title": "自动跟踪配置"
       },
       "library": {
         "data": {
-          "confirm_autodisovered_model": "Confirm model"
+          "confirm_autodisovered_model": "确认型号"
         },
         "data_description": {
-          "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
+          "confirm_autodisovered_model": "如果不确认，可以自行输入制造商和型号"
         },
-        "description": "{source}\n\nManufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}",
-        "title": "Library"
+        "description": "{source}\n\n已自动检测到设备的制造商“{manufacturer}”和型号“{model}”。{remarks}",
+        "title": "配置文件库"
       },
       "library_custom_fields": {
-        "title": "Profile configuration",
+        "title": "配置文件设置",
         "data": {
-          "power_factor": "Power Factor"
+          "power_factor": "功率因数"
         },
         "data_description": {
-          "power_factor": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters."
+          "power_factor": "有功功率与视在功率的比值。计算机/电子设备可使用 0.6，混合负载可使用 0.7，加热器等阻性负载可使用 1.0。"
         }
       },
       "library_multi_profile": {
         "data": {
-          "model": "Select model"
+          "model": "选择型号"
         },
-        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
-        "title": "Library"
+        "description": "已自动检测到设备的制造商“{manufacturer}”和型号“{model}”。找到多个可能适用于此实体的配置文件。请在 [Powercalc 配置文件库]({library_link})中查找设备的确切型号并选择正确的配置文件",
+        "title": "配置文件库"
       },
       "linear": {
         "data": {
-          "attribute": "Attribute",
-          "calibrate": "Calibration values",
-          "gamma_curve": "Gamma curve",
-          "max_power": "Max power",
-          "min_power": "Min power"
+          "attribute": "属性",
+          "calibrate": "校准值",
+          "gamma_curve": "伽马曲线",
+          "max_power": "最大功率",
+          "min_power": "最小功率"
         },
         "data_description": {
-          "attribute": "Specify the attribute. When left empty will be brightness for lights, volume for speakers, and percentage for fans",
-          "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
+          "attribute": "指定属性。留空时，灯具使用亮度，扬声器使用音量，风扇使用百分比",
+          "calibrate": "每行输入一个校准值。例如\n\n1: 20"
         },
-        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
-        "title": "Linear config"
+        "description": "定义线性功率计算选项。详情请参阅[文档]({docs_uri})。可以使用最小/最大功率，也可以使用能提供更多控制点的校准值。",
+        "title": "线性配置"
       },
       "manufacturer": {
         "data": {
-          "manufacturer": "Manufacturer"
+          "manufacturer": "制造商"
         },
-        "description": "Select the device manufacturer",
-        "title": "Manufacturer config"
+        "description": "选择设备制造商",
+        "title": "制造商配置"
       },
       "model": {
         "data": {
-          "model": "Model ID"
+          "model": "型号 ID"
         },
-        "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
-        "title": "Model config"
+        "description": "选择设备型号。详情请参阅支持型号[列表]({supported_models_link})",
+        "title": "型号配置"
       },
       "menu_group": {
         "menu_options": {
-          "group_custom": "Standard",
-          "group_domain": "Domain based",
-          "group_subtract": "Subtract",
-          "group_tracked_untracked": "Tracked/untracked power"
+          "group_custom": "标准",
+          "group_domain": "基于域",
+          "group_subtract": "相减",
+          "group_tracked_untracked": "已跟踪/未跟踪功率"
         },
-        "title": "Choose the group type",
-        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensor. Choose standard group otherwise"
+        "title": "选择组类型",
+        "description": "选择要创建的组传感器类型。如需对指定域的所有实体进行分组，或创建汇总所有能源传感器的传感器，请选择“基于域”；否则请选择“标准”"
       },
       "multi_switch": {
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "开关实体",
+          "power": "开启功率",
+          "power_off": "关闭功率"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "entities": "选择属于多路开关的所有独立开关",
+          "power": "单个开关开启时的功率",
+          "power_off": "单个开关关闭时的功率"
         },
-        "description": "Define the Multi switch power calculation options. See the [documentation]({docs_uri}) for more information.",
-        "title": "Multi switch config"
+        "description": "定义多路开关功率计算选项。详情请参阅[文档]({docs_uri})。",
+        "title": "多路开关配置"
       },
       "playbook": {
         "data": {
-          "autostart": "Autostart",
-          "playbooks": "Playbooks",
-          "repeat": "Repeat",
-          "states_trigger": "State trigger"
+          "autostart": "自动启动",
+          "playbooks": "运行方案",
+          "repeat": "重复",
+          "states_trigger": "状态触发器"
         },
         "data_description": {
-          "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "repeat": "Toggle when you want to keep repeating the playbook after it completes",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "autostart": "指定 Home Assistant 启动时要运行的方案，例如“program1”",
+          "repeat": "如需在运行方案完成后继续重复运行，请启用此选项",
+          "states_trigger": "根据状态变化触发运行方案。例如\n\nplaying: program1"
         },
-        "description": "Define the playbook options. See the [documentation]({docs_uri}) for more information.",
-        "title": "Playbook config"
+        "description": "定义运行方案选项。详情请参阅[文档]({docs_uri})。",
+        "title": "运行方案配置"
       },
       "power_advanced": {
         "data": {
-          "calculation_enabled_condition": "Calculation enabled condition",
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix",
-          "energy_filter_outlier_enabled": "Energy filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "multiply_factor": "Multiply factor",
-          "multiply_factor_standby": "Multiply factor standby",
-          "unavailable_power": "Unavailable power"
+          "calculation_enabled_condition": "启用计算的条件",
+          "energy_integration_method": "能源积分方法",
+          "energy_sensor_unit_prefix": "能源传感器单位前缀",
+          "energy_filter_outlier_enabled": "过滤能源异常值",
+          "energy_filter_outlier_max_step": "异常值过滤器最大步长",
+          "ignore_unavailable_state": "忽略不可用状态",
+          "multiply_factor": "乘数",
+          "multiply_factor_standby": "将乘数应用于待机功率",
+          "unavailable_power": "不可用时的功率"
         },
         "data_description": {
-          "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
-          "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
-          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
-          "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
+          "calculation_enabled_condition": "仅当此模板的计算结果为 true 或 1 时，才会执行已配置的功率计算策略；否则功率传感器将显示 0",
+          "energy_filter_outlier_enabled": "启用能源传感器异常值过滤",
+          "energy_filter_outlier_max_step": "异常值过滤器允许的功率值最大步长（瓦）",
+          "ignore_unavailable_state": "如需在源实体不可用时仍让功率传感器保持可用，请启用此设置",
+          "multiply_factor": "将计算出的功率乘以此系数。可用于灯具组",
+          "multiply_factor_standby": "是否也将乘数应用于待机功率",
+          "unavailable_power": "源实体处于不可用状态时记录的功率（瓦）"
         },
-        "description": "The options below are for advanced powercalc configuration. Most users will not use this so you may skip these",
-        "title": "Advanced options"
+        "description": "以下是 Powercalc 高级配置选项。大多数用户无需使用，可以跳过",
+        "title": "高级选项"
       },
       "real_power": {
         "data": {
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Power sensor id",
-          "name": "Name",
-          "device": "Device"
+          "create_utility_meters": "创建公用事业计量表",
+          "entity_id": "功率传感器 ID",
+          "name": "名称",
+          "device": "设备"
         },
         "data_description": {
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting",
-          "device": "Add the created energy sensor to an specific device"
+          "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表",
+          "name": "能源传感器和公用事业计量表的基础名称。完整实体名称将根据 energy_sensor_naming 设置生成",
+          "device": "将创建的能源传感器添加到指定设备"
         },
-        "description": "Currently specific settings can only be configured globally",
-        "title": "Create an energy sensor for an existing power sensor"
+        "description": "目前这些设置只能进行全局配置",
+        "title": "为现有功率传感器创建能源传感器"
       },
       "cost": {
         "data": {
-          "energy_sensor_id": "Energy sensor",
-          "name": "Name"
+          "energy_sensor_id": "能源传感器",
+          "name": "名称"
         },
         "data_description": {
-          "energy_sensor_id": "The existing energy sensor (kWh) to calculate the cost for. This can be a sensor from any integration, not only Powercalc",
-          "name": "Base name for the cost sensor. The full entity name is set according to the cost_sensor_naming setting"
+          "energy_sensor_id": "要据其计算费用的现有能源传感器 (kWh)。可以是来自任何集成的传感器，不限于 Powercalc",
+          "name": "费用传感器的基础名称。完整实体名称根据 cost_sensor_naming 设置生成"
         },
-        "description": "Create a cost sensor for an existing energy sensor. The energy price is taken from the Powercalc global configuration, unless you override it below.",
+        "description": "为现有能源传感器创建费用传感器。除非在下方覆盖，否则能源价格来自 Powercalc 全局配置。",
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "覆盖价格",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "固定能源价格",
+              "energy_price_multiplier": "能源价格乘数",
+              "energy_price_sensor": "能源价格传感器",
+              "energy_price_surcharge": "能源价格附加费"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "以本地货币表示的每 kWh 固定价格。留空则使用全局能源价格",
+              "energy_price_multiplier": "在附加费后应用的乘数。可用于按百分比计算的税费，例如 21% 对应 1.21。留空则使用全局乘数",
+              "energy_price_sensor": "提供当前每 kWh 能源价格的传感器（例如来自动态电价集成）。将固定价格留空即可使用此传感器",
+              "energy_price_surcharge": "添加到固定价格或价格传感器值中的每 kWh 固定附加金额。留空则使用全局附加费"
             }
           }
         },
-        "title": "Create a cost sensor"
+        "title": "创建费用传感器"
       },
       "sub_profile": {
         "data": {
-          "sub_profile": "Sub profile"
+          "sub_profile": "子配置文件"
         },
-        "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"{remarks}",
-        "title": "Sub profile config"
+        "description": "此设备型号有多个子配置文件。请选择与此设备的以下实体对应的子配置文件：\n\n“{entity_id}”{remarks}",
+        "title": "子配置文件设置"
       },
       "sub_profile_per_device": {
         "data": {
-          "sub_profile": "Sub profile"
+          "sub_profile": "子配置文件"
         },
-        "description": "This device has a model with multiple sub profiles. {remarks}",
-        "title": "Sub profile config"
+        "description": "此设备型号有多个子配置文件。{remarks}",
+        "title": "子配置文件设置"
       },
       "smart_switch": {
         "data": {
-          "power": "Power",
-          "self_usage_included": "Self usage included"
+          "power": "功率",
+          "self_usage_included": "包括自身功耗"
         },
         "data_description": {
-          "power": "A fixed power value in Watts for the connected appliance",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
+          "power": "所连接电器的固定功率值（瓦）",
+          "self_usage_included": "功率值是否包括智能开关自身消耗的功率。如果不包括，Powercalc 会将智能开关自身功耗 {self_usage_power} W 添加到功率值中"
         },
-        "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
-        "title": "Smart switch config"
+        "description": "定义所连接电器的功耗。如果其功率不固定，可以跳过此步骤。Powercalc 将为智能开关自身功耗设置功率传感器",
+        "title": "智能开关配置"
       },
       "user": {
         "data": {
-          "sensor_type": "Sensor type"
+          "sensor_type": "传感器类型"
         },
         "menu_options": {
-          "cost": "Cost sensor (from existing energy sensor)",
-          "daily_energy": "Daily energy",
-          "group": "group",
-          "global_configuration": "Global configuration",
-          "menu_group": "Group",
-          "menu_library": "Virtual power (library)",
-          "real_power": "Energy from real power sensor",
-          "virtual_power": "Virtual power (manual)"
+          "cost": "费用传感器（基于现有能源传感器）",
+          "daily_energy": "每日能源",
+          "group": "组",
+          "global_configuration": "全局配置",
+          "menu_group": "组",
+          "menu_library": "虚拟功率（配置文件库）",
+          "real_power": "基于实际功率传感器的能源",
+          "virtual_power": "虚拟功率（手动）"
         },
-        "title": "Choose your sensor type"
+        "title": "选择传感器类型"
       },
       "utility_meter_options": {
-        "title": "Utility meter options",
-        "description": "Define the settings for utility meter creation here",
+        "title": "公用事业计量表选项",
+        "description": "在此定义公用事业计量表的创建设置",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
-          "utility_meter_types": "Cycles",
-          "utility_meter_tariffs": "Tariffs"
+          "utility_meter_net_consumption": "净消耗量",
+          "utility_meter_types": "周期",
+          "utility_meter_tariffs": "费率"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
-          "utility_meter_types": "Create utility meters for specified cycles",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_net_consumption": "如果要将源视为净计量表，请启用此选项。这样计数器便可同时采用正值和负值。",
+          "utility_meter_types": "为指定周期创建公用事业计量表",
+          "utility_meter_tariffs": "支持的费率列表。如果只需要一种费率，请留空。"
         }
       },
       "virtual_power": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Source entity",
-          "mode": "Calculation strategy",
-          "name": "Name",
-          "standby_power": "Standby power"
+          "create_energy_sensor": "创建能源传感器",
+          "create_cost_sensor": "创建费用传感器",
+          "create_utility_meters": "创建公用事业计量表",
+          "entity_id": "源实体",
+          "mode": "计算策略",
+          "name": "名称",
+          "standby_power": "待机功率"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "entity_id": "Entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
+          "create_energy_sensor": "是否让 Powercalc 创建 kWh 传感器",
+          "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表",
+          "entity_id": "虚拟功率所基于的实体。功率传感器会监听此实体的状态变化并随之更新",
+          "name": "留空则使用源实体的名称",
+          "standby_power": "定义设备处于关闭状态时消耗的功率"
         },
-        "description": "See the readme for more information about the possible strategies and configuration options. Either source entity or name is required, or both.",
-        "title": "Create a virtual power sensor"
+        "description": "有关可用策略和配置选项的更多信息，请参阅自述文件。必须提供源实体或名称，也可以两者都提供。",
+        "title": "创建虚拟功率传感器"
       },
       "wled": {
         "data": {
-          "power_factor": "Power factor",
-          "voltage": "Voltage"
+          "power_factor": "功率因数",
+          "voltage": "电压"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see {docs_uri}",
-        "title": "WLED config"
+        "description": "请确保在 WLED 软件中启用亮度限制器。另请参阅 {docs_uri}",
+        "title": "WLED 配置"
       }
     }
   },
   "exceptions": {
     "invalid_integration_method": {
-      "message": "Invalid integration method \"{method}\". Must be one of: {allowed_methods}."
+      "message": "积分方法“{method}”无效。必须是以下值之一：{allowed_methods}。"
     },
     "no_sub_profile_support": {
-      "message": "{entity_id} does not support switching sub profiles. This action is only available for sensors which have sub profiles and no automatic sub profile selection."
+      "message": "{entity_id} 不支持切换子配置文件。此操作仅适用于有子配置文件且未自动选择子配置文件的传感器。"
     },
     "not_a_playbook_sensor": {
-      "message": "{entity_id} is not a playbook enabled sensor. This action is only available for sensors using the playbook strategy."
+      "message": "{entity_id} 不是已启用运行方案的传感器。此操作仅适用于使用运行方案策略的传感器。"
     },
     "unknown_sub_profile": {
-      "message": "\"{profile}\" is not a known sub profile. Available sub profiles: {known_profiles}."
+      "message": "“{profile}”不是已知的子配置文件。可用的子配置文件：{known_profiles}。"
     }
   },
   "issues": {
     "composite_device_id": {
       "fix_flow": {
         "abort": {
-          "entry_removed": "The Powercalc configuration entry has been removed"
+          "entry_removed": "Powercalc 配置条目已移除"
         },
         "error": {
-          "invalid_device": "Select an existing device or leave the field empty"
+          "invalid_device": "选择现有设备或将此字段留空"
         },
         "step": {
           "select_device": {
             "data": {
-              "device": "Device"
+              "device": "设备"
             },
             "data_description": {
-              "device": "The device the entities created by this Powercalc configuration should be linked to"
+              "device": "此 Powercalc 配置所创建的实体应关联到的设备"
             },
-            "description": "The Powercalc configuration {name} was linked to a device that Home Assistant has split into multiple devices. Its entities cannot be linked to the old device ID.\n\nSelect the device these entities should be linked to, or leave the field empty to leave them without a device.",
-            "title": "Select device for {name}"
+            "description": "Powercalc 配置 {name} 原先关联的设备已被 Home Assistant 拆分为多个设备。其实体无法继续关联到旧设备 ID。\n\n请选择这些实体应关联到的设备，或将此字段留空以不关联任何设备。",
+            "title": "为 {name} 选择设备"
           }
         }
       },
-      "title": "Device for Powercalc configuration {name} needs to be selected again"
+      "title": "需要为 Powercalc 配置 {name} 重新选择设备"
     },
     "deprecated_platform_yaml": {
-      "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
-      "title": "Powercalc YAML configuration has moved"
+      "description": "已弃用使用 `sensor->platform` 配置传感器。需要将配置改为 `powercalc->sensors`。点击“了解更多”查看进一步说明。",
+      "title": "Powercalc YAML 配置位置已更改"
     },
     "legacy_config": {
-      "title": "YAML configuration changed",
-      "description": "Your YAML configuration for {type} needs to be updated to the new structure. Click learn more for further information."
+      "title": "YAML 配置已更改",
+      "description": "{type} 的 YAML 配置需要更新为新结构。点击“了解更多”查看详情。"
     },
     "sub_profile": {
       "fix_flow": {
         "step": {
           "sub_profile": {
-            "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"\n\nManufacturer: {manufacturer}\nModel: {model}{remarks}",
-            "title": "Select correct sub profile",
+            "description": "此设备型号有多个子配置文件。请选择与此设备的以下实体对应的子配置文件：\n\n“{entity_id}”\n\n制造商：{manufacturer}\n型号：{model}{remarks}",
+            "title": "选择正确的子配置文件",
             "data": {
-              "sub_profile": "Sub profile"
+              "sub_profile": "子配置文件"
             }
           }
         }
       },
-      "title": "Sub profile selection required for {entry}"
+      "title": "{entry} 需要选择子配置文件"
     }
   },
   "options": {
     "abort": {
-      "model_not_support": "Model not supported"
+      "model_not_support": "不支持此型号"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-      "group_mandatory": "You must define at least subgroups or power and energy-entities",
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
-      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "cost_price_mandatory": "必须提供能源价格或能源价格传感器",
+      "fixed_mandatory": "必须至少提供功率、功率模板或状态功率中的一项",
+      "fixed_states_power_only": "此实体只能使用 'states_power'，不能使用 'power'",
+      "group_mandatory": "必须至少定义一个子组，或定义功率和能源实体",
+      "linear_mandatory": "必须至少提供 max_power 或 calibrate 中的一项",
+      "linear_min_higher_as_max": "最大功率不能低于最小功率",
+      "linear_unsupported_domain": "线性模式不支持此实体域。必须是 fan、light 或 mediaplayer 之一，但仍可使用 calibrate 选项",
+      "unknown": "发生未知错误，详情请查看日志"
     },
     "step": {
       "advanced_options": {
-        "title": "Advanced options",
+        "title": "高级选项",
         "data": {
-          "calculation_enabled_condition": "Calculation enabled condition",
-          "energy_integration_method": "Energy integration method",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "multiply_factor": "Multiply factor",
-          "multiply_factor_standby": "Multiply factor standby",
-          "unavailable_power": "Unavailable power"
+          "calculation_enabled_condition": "启用计算的条件",
+          "energy_integration_method": "能源积分方法",
+          "ignore_unavailable_state": "忽略不可用状态",
+          "multiply_factor": "乘数",
+          "multiply_factor_standby": "将乘数应用于待机功率",
+          "unavailable_power": "不可用时的功率"
         },
         "data_description": {
-          "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
-          "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
-          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
-          "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
+          "calculation_enabled_condition": "仅当此模板的计算结果为 true 或 1 时，才会执行已配置的功率计算策略；否则功率传感器将显示 0",
+          "ignore_unavailable_state": "如需在源实体不可用时仍让功率传感器保持可用，请启用此设置",
+          "multiply_factor": "将计算出的功率乘以此系数。可用于灯具组",
+          "multiply_factor_standby": "是否也将乘数应用于待机功率",
+          "unavailable_power": "源实体处于不可用状态时记录的功率（瓦）"
         }
       },
       "basic_options": {
-        "title": "Basic options",
+        "title": "基本选项",
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Source entity",
-          "name": "Name",
-          "standby_power": "Standby power"
+          "create_energy_sensor": "创建能源传感器",
+          "create_cost_sensor": "创建费用传感器",
+          "create_utility_meters": "创建公用事业计量表",
+          "entity_id": "源实体",
+          "name": "名称",
+          "standby_power": "待机功率"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "entity_id": "Entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
+          "create_energy_sensor": "是否让 Powercalc 创建 kWh 传感器",
+          "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表",
+          "entity_id": "虚拟功率所基于的实体。功率传感器会监听此实体的状态变化并随之更新",
+          "name": "留空则使用源实体的名称",
+          "standby_power": "定义设备处于关闭状态时消耗的功率"
         }
       },
       "daily_energy": {
-        "title": "Daily energy options",
+        "title": "每日能源选项",
         "data": {
-          "daily_energy_value": "Daily energy value",
-          "name": "Name",
-          "on_time": "On time",
-          "start_time": "Start time",
-          "unit_of_measurement": "Unit of measurement",
-          "update_frequency": "Update frequency",
-          "value": "Value",
-          "value_template": "Value template"
+          "daily_energy_value": "每日能源值",
+          "name": "名称",
+          "on_time": "开启时间",
+          "start_time": "开始时间",
+          "unit_of_measurement": "测量单位",
+          "update_frequency": "更新频率",
+          "value": "值",
+          "value_template": "值模板"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "留空时默认为 1 天，即始终开启",
+          "update_frequency": "传感器状态更新之间的时间（秒）"
         }
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "能源选项",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_integration_method": "积分方法",
+          "energy_sensor_unit_prefix": "单位前缀",
+          "energy_filter_outlier_enabled": "过滤异常值",
+          "energy_filter_outlier_max_step": "异常值过滤器最大步长"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "启用能源传感器异常值过滤",
+          "energy_filter_outlier_max_step": "异常值过滤器允许的功率值最大步长（瓦）"
         }
       },
       "fixed": {
-        "title": "Fixed options",
+        "title": "固定功率选项",
         "data": {
-          "fixed_value": "Fixed value",
-          "self_usage_included": "Self usage included"
+          "fixed_value": "固定值",
+          "self_usage_included": "包括自身功耗"
         },
         "data_description": {
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself."
+          "self_usage_included": "功率值是否包括智能开关自身消耗的功率。"
         }
       },
       "global_configuration": {
-        "title": "Basic options",
+        "title": "基本选项",
         "sections": {
           "power_options": {
-            "name": "Power sensor",
+            "name": "功率传感器",
             "data": {
-              "power_sensor_naming": "Power sensor name pattern",
-              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-              "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_naming": "功率传感器名称模式",
+              "power_sensor_friendly_naming": "功率传感器友好名称模式",
+              "power_sensor_category": "功率传感器类别",
+              "power_sensor_precision": "功率传感器精度"
             }
           },
           "features": {
-            "name": "Create sensors",
+            "name": "创建传感器",
             "data": {
-              "create_energy_sensors": "Create energy sensors",
-              "create_cost_sensors": "Create cost sensors",
-              "create_standby_group": "Create standby group",
-              "create_utility_meters": "Create utility meters"
+              "create_energy_sensors": "创建能源传感器",
+              "create_cost_sensors": "创建费用传感器",
+              "create_standby_group": "创建待机组",
+              "create_utility_meters": "创建公用事业计量表"
             },
             "data_description": {
-              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+              "create_energy_sensors": "是否让 Powercalc 创建 kWh 传感器",
+              "create_cost_sensors": "是否让 Powercalc 创建费用传感器。需要在后续步骤中配置能源价格",
+              "create_standby_group": "创建一个汇总所有待机功耗及物联网设备自身功耗的组",
+              "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表"
             }
           },
           "advanced": {
-            "name": "Advanced",
+            "name": "高级",
             "data": {
-              "enable_analytics": "Enable anonymous analytics",
-              "ignore_unavailable_state": "Ignore unavailable state",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "disable_extended_attributes": "Disable extended attributes",
-              "disable_library_download": "Disable remote library download"
+              "enable_analytics": "启用匿名分析",
+              "ignore_unavailable_state": "忽略不可用状态",
+              "include_non_powercalc_sensors": "包括非 Powercalc 传感器",
+              "disable_extended_attributes": "禁用扩展属性",
+              "disable_library_download": "禁用远程配置文件库下载"
             },
             "data_description": {
-              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
-              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-              "disable_library_download": "Disable the Powercalc library download feature"
+              "enable_analytics": "允许 Powercalc 发送匿名汇总的使用统计信息，以帮助改进此集成",
+              "ignore_unavailable_state": "即使源实体不可用，也让 Powercalc 传感器保持可用",
+              "include_non_powercalc_sensors": "控制是否在组中包括非 Powercalc 传感器",
+              "disable_extended_attributes": "禁用 Powercalc 添加到功率、能源及组实体状态中的所有额外属性。这有助于减小数据库大小",
+              "disable_library_download": "禁用 Powercalc 配置文件库下载功能"
             }
           }
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. See [documentation]({docs_uri}) for more info",
+        "title": "费用选项",
+        "description": "配置用于计算费用传感器的能源价格。请提供固定价格，或提供当前每 kWh 价格的传感器。详情请参阅[文档]({docs_uri})",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "价格",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "固定能源价格",
+              "energy_price_multiplier": "能源价格乘数",
+              "energy_price_sensor": "能源价格传感器",
+              "energy_price_surcharge": "能源价格附加费"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "以本地货币表示的每 kWh 固定价格",
+              "energy_price_multiplier": "在附加费后应用的乘数。可用于按百分比计算的税费，例如 21% 对应 1.21",
+              "energy_price_sensor": "提供当前每 kWh 能源价格的传感器（例如来自动态电价集成）。将固定价格留空即可使用此传感器",
+              "energy_price_surcharge": "添加到固定价格或价格传感器值中的每 kWh 固定附加金额"
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "命名",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "费用传感器友好名称模式",
+              "cost_sensor_naming": "费用传感器名称模式"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "费用传感器友好名称的模式。源名称会插入占位符所在位置",
+              "cost_sensor_naming": "用于生成费用传感器名称和实体 ID 的模式。源名称会插入占位符所在位置"
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "应用费用传感器设置",
+        "description": "全局费用传感器设置已更改。是否将此更改应用于通过图形界面创建的所有现有 Powercalc 传感器？",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "应用于现有传感器"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "更新通过图形界面创建的所有现有 Powercalc 传感器，使其使用新的费用传感器设置"
         }
       },
       "global_configuration_discovery": {
-        "title": "Discovery options",
-        "description": "Manage discovery setting. See [documentation]({docs_uri}) for more info",
+        "title": "发现选项",
+        "description": "管理发现设置。详情请参阅[文档]({docs_uri})",
         "data": {
-          "enabled": "Enable discovery",
-          "exclude_device_types": "Excluded device types",
-          "exclude_self_usage": "Exclude self-usage"
+          "enabled": "启用发现",
+          "exclude_device_types": "排除的设备类型",
+          "exclude_self_usage": "排除自身功耗"
         },
         "data_description": {
-          "exclude_device_types": "Exclude one or more specific device types from discovery.",
-          "exclude_self_usage": "Exclude self-usage profiles for smart switches."
+          "exclude_device_types": "从发现中排除一个或多个指定的设备类型。",
+          "exclude_self_usage": "排除智能开关的自身功耗配置文件。"
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
-        "description": "Define the default settings for energy sensors here. See [documentation]({docs_uri}) for more information",
+        "title": "能源选项",
+        "description": "在此定义能源传感器的默认设置。详情请参阅[文档]({docs_uri})",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "能源积分方法",
+          "energy_sensor_category": "能源传感器类别",
+          "energy_sensor_friendly_naming": "能源传感器友好名称模式",
+          "energy_sensor_naming": "能源传感器名称模式",
+          "energy_sensor_precision": "能源传感器精度",
+          "energy_sensor_unit_prefix": "能源传感器单位前缀"
         }
       },
       "global_configuration_throttling": {
-        "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
+        "title": "更新频率限制选项",
+        "description": "设置不同传感器类型的更新间隔。详情请参阅[文档]({docs_uri})",
         "data": {
-          "group_energy_update_interval": "Group energy update interval",
-          "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval",
-          "power_update_interval": "Power update interval"
+          "group_energy_update_interval": "组能源更新间隔",
+          "group_power_update_interval": "组功率更新间隔",
+          "energy_update_interval": "能源更新间隔",
+          "power_update_interval": "功率更新间隔"
         },
         "data_description": {
-          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
-          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
-          "power_update_interval": "Interval at which power sensors are force updated. In seconds. Set to 0 to disable"
+          "group_energy_update_interval": "组能源传感器的更新间隔（秒）。设为 0 可禁用",
+          "group_power_update_interval": "组功率传感器的更新间隔（秒）。设为 0 可禁用",
+          "energy_update_interval": "能源传感器的更新间隔（秒）。设为 0 可禁用",
+          "power_update_interval": "强制更新功率传感器的间隔（秒）。设为 0 可禁用"
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
-        "description": "Define the default settings for utility meters here. See [documentation]({docs_uri}) for more information",
+        "title": "公用事业计量表选项",
+        "description": "在此定义公用事业计量表的默认设置。详情请参阅[文档]({docs_uri})",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "公用事业计量表净消耗量",
+          "utility_meter_tariffs": "公用事业计量表费率",
+          "utility_meter_types": "公用事业计量表类型"
         }
       },
       "group_custom": {
-        "title": "Group options",
+        "title": "组选项",
         "sections": {
           "members": {
-            "name": "Members",
+            "name": "成员",
             "data": {
-              "group_member_sensors": "Member powercalc sensors",
-              "group_member_devices": "Member devices",
-              "group_power_entities": "Additional power entities",
-              "group_energy_entities": "Additional energy entities",
-              "sub_groups": "Sub groups",
-              "area": "Area",
-              "floor": "Floor"
+              "group_member_sensors": "成员 Powercalc 传感器",
+              "group_member_devices": "成员设备",
+              "group_power_entities": "其他功率实体",
+              "group_energy_entities": "其他能源实体",
+              "sub_groups": "子组",
+              "area": "区域",
+              "floor": "楼层"
             },
             "data_description": {
-              "group_member_sensors": "Powercalc sensors to include in the group",
-              "group_member_devices": "Add power and energy entities from the selected devices to the group",
-              "group_power_entities": "Additional power sensors (W) from your HA installation to include",
-              "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-              "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-              "area": "Adds all power sensors from the specified area",
-              "floor": "Adds all power sensors from the specified floor"
+              "group_member_sensors": "要包括在组中的 Powercalc 传感器",
+              "group_member_devices": "将所选设备中的功率和能源实体添加到组",
+              "group_power_entities": "要包括的 Home Assistant 中的其他功率传感器 (W)",
+              "group_energy_entities": "要包括的 Home Assistant 中的其他能源传感器 (kWh)",
+              "sub_groups": "所选子组中包含的所有传感器也会添加到此组",
+              "area": "添加指定区域中的所有功率传感器",
+              "floor": "添加指定楼层中的所有功率传感器"
             }
           },
           "options": {
-            "name": "Options",
+            "name": "选项",
             "data": {
-              "device": "Device",
-              "hide_members": "Hide members",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "force_calculate_group_energy": "Force calculate energy"
+              "device": "设备",
+              "hide_members": "隐藏成员",
+              "include_non_powercalc_sensors": "包括非 Powercalc 传感器",
+              "force_calculate_group_energy": "强制计算能源"
             },
             "data_description": {
-              "device": "Add the group entities powercalc creates to an existing device",
-              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor"
+              "device": "将 Powercalc 创建的组实体添加到现有设备",
+              "include_non_powercalc_sensors": "控制使用区域选项时是否包括非 Powercalc 传感器",
+              "force_calculate_group_energy": "默认情况下，Powercalc 会汇总成员的能源传感器。启用此选项可强制创建黎曼和积分传感器"
             }
           }
         }
       },
       "group_subtract": {
         "data": {
-          "entity_id": "Base entity",
-          "subtract_entities": "Subtract entities"
+          "entity_id": "基础实体",
+          "subtract_entities": "减去实体"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "要从中减去功率的基础实体",
+          "subtract_entities": "选择要从基础实体中减去的所有实体"
         },
-        "title": "Group options"
+        "title": "组选项"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "总电源功率传感器",
+          "group_tracked_auto": "自动添加实体",
+          "create_energy_sensor": "创建能源传感器",
+          "create_cost_sensor": "创建费用传感器",
+          "create_utility_meters": "创建公用事业计量表"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "选择包含总功耗的功率传感器。留空时只会创建已跟踪功率传感器",
+          "group_tracked_auto": "Powercalc 会自动将所有功率传感器添加到已跟踪组，并跳过 Powercalc 组。如需手动定义已跟踪实体，请禁用此选项",
+          "create_energy_sensor": "是否让 Powercalc 创建 kWh 传感器",
+          "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表"
         },
-        "title": "Tracked/untracked group options"
+        "title": "已跟踪/未跟踪组选项"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "已跟踪实体"
         },
-        "title": "Select power entities"
+        "title": "选择功率实体"
       },
       "init": {
         "menu_options": {
-          "advanced_options": "Advanced options",
-          "basic_options": "Basic options",
-          "cost": "Cost options",
-          "daily_energy": "Daily energy options",
-          "energy_options": "Energy options",
-          "fixed": "Fixed options",
-          "group_custom": "Group options",
-          "group_subtract": "Group options",
-          "group_tracked_untracked": "Group options",
-          "group_tracked_untracked_manual": "Tracked entities",
-          "library_options": "Library options",
-          "linear": "Linear options",
-          "playbook": "Playbook options",
-          "multi_switch": "Multi switch options",
-          "real_power": "Real power options",
-          "utility_meter_options": "Utility meter options",
-          "wled": "WLED options",
-          "cost_options": "Cost options"
+          "advanced_options": "高级选项",
+          "basic_options": "基本选项",
+          "cost": "费用选项",
+          "daily_energy": "每日能源选项",
+          "energy_options": "能源选项",
+          "fixed": "固定功率选项",
+          "group_custom": "组选项",
+          "group_subtract": "组选项",
+          "group_tracked_untracked": "组选项",
+          "group_tracked_untracked_manual": "已跟踪实体",
+          "library_options": "配置文件库选项",
+          "linear": "线性选项",
+          "playbook": "运行方案选项",
+          "multi_switch": "多路开关选项",
+          "real_power": "实际功率选项",
+          "utility_meter_options": "公用事业计量表选项",
+          "wled": "WLED 选项",
+          "cost_options": "费用选项"
         }
       },
       "library_options": {
-        "title": "Library options",
-        "description": "Currently the following library profile is selected: \n manufacturer: {manufacturer}\n model: {model}\n\nIf you want to change the profile, click next."
+        "title": "配置文件库选项",
+        "description": "当前选择了以下配置文件库中的配置文件：\n 制造商：{manufacturer}\n 型号：{model}\n\n如需更改配置文件，请点击“下一步”。"
       },
       "linear": {
-        "title": "Linear options",
+        "title": "线性选项",
         "data": {
-          "attribute": "Attribute",
-          "calibrate": "Calibration values",
-          "gamma_curve": "Gamma curve",
-          "max_power": "Max power",
-          "min_power": "Min power"
+          "attribute": "属性",
+          "calibrate": "校准值",
+          "gamma_curve": "伽马曲线",
+          "max_power": "最大功率",
+          "min_power": "最小功率"
         },
         "data_description": {
-          "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
-          "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
+          "attribute": "指定属性。留空时，灯具使用亮度，风扇使用百分比",
+          "calibrate": "每行输入一个校准值。例如\n\n1: 20"
         }
       },
       "multi_switch": {
-        "title": "Multi switch options",
+        "title": "多路开关选项",
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "开关实体",
+          "power": "开启功率",
+          "power_off": "关闭功率"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "entities": "选择属于多路开关的所有独立开关",
+          "power": "单个开关开启时的功率",
+          "power_off": "单个开关关闭时的功率"
         }
       },
       "playbook": {
-        "title": "Playbook options",
+        "title": "运行方案选项",
         "data": {
-          "autostart": "Autostart",
-          "playbooks": "Playbooks",
-          "repeat": "Repeat",
-          "states_trigger": "State trigger"
+          "autostart": "自动启动",
+          "playbooks": "运行方案",
+          "repeat": "重复",
+          "states_trigger": "状态触发器"
         },
         "data_description": {
-          "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "repeat": "Toggle when you want to keep repeating the playbook after it completes",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "autostart": "指定 Home Assistant 启动时要运行的方案，例如“program1”",
+          "repeat": "如需在运行方案完成后继续重复运行，请启用此选项",
+          "states_trigger": "根据状态变化触发运行方案。例如\n\nplaying: program1"
         }
       },
       "real_power": {
-        "title": "Real power options",
+        "title": "实际功率选项",
         "data": {
-          "device": "Device"
+          "device": "设备"
         },
         "data_description": {
-          "device": "Add the created energy sensor to an specific device"
+          "device": "将创建的能源传感器添加到指定设备"
         }
       },
       "cost": {
         "data": {
-          "energy_sensor_id": "Energy sensor"
+          "energy_sensor_id": "能源传感器"
         },
         "data_description": {
-          "energy_sensor_id": "The existing energy sensor (kWh) to calculate the cost for"
+          "energy_sensor_id": "要据其计算费用的现有能源传感器 (kWh)"
         },
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "覆盖价格",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "固定能源价格",
+              "energy_price_multiplier": "能源价格乘数",
+              "energy_price_sensor": "能源价格传感器",
+              "energy_price_surcharge": "能源价格附加费"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "以本地货币表示的每 kWh 固定价格。留空则使用全局能源价格",
+              "energy_price_multiplier": "在附加费后应用的乘数。可用于按百分比计算的税费，例如 21% 对应 1.21。留空则使用全局乘数",
+              "energy_price_sensor": "提供当前每 kWh 能源价格的传感器（例如来自动态电价集成）。将固定价格留空即可使用此传感器",
+              "energy_price_surcharge": "添加到固定价格或价格传感器值中的每 kWh 固定附加金额。留空则使用全局附加费"
             }
           }
         },
-        "title": "Cost options"
+        "title": "费用选项"
       },
       "utility_meter_options": {
-        "title": "Utility meter options",
+        "title": "公用事业计量表选项",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
-          "utility_meter_types": "Cycles",
-          "utility_meter_tariffs": "Tariffs"
+          "utility_meter_net_consumption": "净消耗量",
+          "utility_meter_types": "周期",
+          "utility_meter_tariffs": "费率"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
-          "utility_meter_types": "Create utility meters for specified cycles",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_net_consumption": "如果要将源视为净计量表，请启用此选项。这样计数器便可同时采用正值和负值。",
+          "utility_meter_types": "为指定周期创建公用事业计量表",
+          "utility_meter_tariffs": "支持的费率列表。如果只需要一种费率，请留空。"
         }
       },
       "wled": {
-        "title": "WLED options",
+        "title": "WLED 选项",
         "data": {
-          "power_factor": "Power factor",
-          "voltage": "Voltage"
+          "power_factor": "功率因数",
+          "voltage": "电压"
         }
       },
       "cost_options": {
         "data": {
-          "energy_price": "Fixed energy price",
-          "energy_price_multiplier": "Energy price multiplier",
-          "energy_price_sensor": "Energy price sensor",
-          "energy_price_surcharge": "Energy price surcharge"
+          "energy_price": "固定能源价格",
+          "energy_price_multiplier": "能源价格乘数",
+          "energy_price_sensor": "能源价格传感器",
+          "energy_price_surcharge": "能源价格附加费"
         },
         "data_description": {
-          "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+          "energy_price": "以本地货币表示的每 kWh 固定价格。留空则使用全局能源价格",
+          "energy_price_multiplier": "在附加费后应用的乘数。可用于按百分比计算的税费，例如 21% 对应 1.21。留空则使用全局乘数",
+          "energy_price_sensor": "提供当前每 kWh 能源价格的传感器（例如来自动态电价集成）。将固定价格留空即可使用此传感器",
+          "energy_price_surcharge": "添加到固定价格或价格传感器值中的每 kWh 固定附加金额。留空则使用全局附加费"
         },
-        "description": "Override the globally configured energy price for this sensor only. Leave all fields empty to keep using the global price. See [documentation]({docs_uri}) for more info",
-        "title": "Cost options"
+        "description": "仅为此传感器覆盖全局能源价格。将所有字段留空可继续使用全局价格。详情请参阅[文档]({docs_uri})",
+        "title": "费用选项"
       }
     }
   },
   "selector": {
     "daily_energy_value": {
       "choices": {
-        "value": "Fixed value",
-        "value_template": "Template"
+        "value": "固定值",
+        "value_template": "模板"
       }
     },
     "fixed_value": {
       "choices": {
-        "power": "Fixed value",
-        "power_template": "Template",
-        "states_power": "State mapping"
+        "power": "固定值",
+        "power_template": "模板",
+        "states_power": "状态映射"
       }
     }
   },
   "services": {
     "activate_playbook": {
-      "description": "Start execution of a playbook.",
+      "description": "开始执行运行方案。",
       "fields": {
         "playbook_id": {
-          "description": "Playbook identifier.",
-          "name": "Playbook"
+          "description": "运行方案标识符。",
+          "name": "运行方案"
         }
       },
-      "name": "Activate playbook"
+      "name": "启动运行方案"
     },
     "calibrate_energy": {
-      "description": "Sets the energy sensor to a given kWh value.",
+      "description": "将能源传感器设置为指定的 kWh 值。",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "要设置的值。",
+          "name": "值"
         }
       },
-      "name": "Calibrate energy sensor"
+      "name": "校准能源传感器"
     },
     "calibrate_cost": {
-      "description": "Sets the cost sensor to a given monetary value.",
+      "description": "将费用传感器设置为指定的金额。",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "要设置的值。",
+          "name": "值"
         }
       },
-      "name": "Calibrate cost sensor"
+      "name": "校准费用传感器"
     },
     "calibrate_utility_meter": {
-      "description": "Calibrates a utility meter sensor.",
+      "description": "校准公用事业计量表传感器。",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "要设置的值。",
+          "name": "值"
         }
       },
-      "name": "Calibrate utility meter"
+      "name": "校准公用事业计量表"
     },
     "change_gui_config": {
-      "description": "Batch change configuration of all Powercalc config entries",
+      "description": "批量更改所有 Powercalc 配置条目的设置",
       "fields": {
         "field": {
-          "description": "The field you'd like to change",
-          "name": "Value"
+          "description": "要更改的字段",
+          "name": "值"
         },
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "要设置的值。",
+          "name": "值"
         }
       },
-      "name": "Change GUI config"
+      "name": "更改图形界面配置"
     },
     "debug_group": {
-      "description": "Get a debug overview of a group power or energy sensor including current member values.",
-      "name": "Debug group"
+      "description": "获取组功率或能源传感器的调试概览，包括当前成员值。",
+      "name": "调试组"
     },
     "get_active_playbook": {
-      "description": "Get current running playbook",
-      "name": "Get active playbook"
+      "description": "获取当前运行的方案",
+      "name": "获取活动运行方案"
     },
     "get_group_entities": {
-      "description": "Retrieve all entity id's of a group energy or power sensor",
-      "name": "Get group entities"
+      "description": "检索组能源或功率传感器中的所有实体 ID",
+      "name": "获取组实体"
     },
     "increase_daily_energy": {
-      "description": "Increases the sensor with a given amount.",
+      "description": "将传感器的值增加指定数值。",
       "fields": {
         "value": {
-          "description": "Amount to add to the sensor.",
-          "name": "Value"
+          "description": "要添加到传感器的数值。",
+          "name": "值"
         }
       },
-      "name": "Increase daily energy sensor"
+      "name": "增加每日能源传感器值"
     },
     "reload": {
-      "description": "Reload Powercalc configuration and entities",
-      "name": "Reload"
+      "description": "重新加载 Powercalc 配置和实体",
+      "name": "重新加载"
     },
     "reset_energy": {
-      "description": "Reset an energy sensor to zero kWh.",
-      "name": "Reset energy sensor"
+      "description": "将能源传感器重置为 0 kWh。",
+      "name": "重置能源传感器"
     },
     "reset_cost": {
-      "description": "Reset a cost sensor to zero.",
-      "name": "Reset cost sensor"
+      "description": "将费用传感器重置为零。",
+      "name": "重置费用传感器"
     },
     "stop_playbook": {
-      "description": "Stop currently active playbook.",
-      "name": "Stop playbook"
+      "description": "停止当前活动的运行方案。",
+      "name": "停止运行方案"
     },
     "switch_sub_profile": {
-      "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
+      "description": "配置文件库中的某些配置文件有多个子配置文件。此操作可切换到其他子配置文件。",
       "fields": {
         "profile": {
-          "name": "Sub profile",
-          "description": "Define one of the possible sub profiles"
+          "name": "子配置文件",
+          "description": "指定一个可用的子配置文件"
         }
       },
-      "name": "Switch to another sub profile"
+      "name": "切换到其他子配置文件"
     }
   }
 }
