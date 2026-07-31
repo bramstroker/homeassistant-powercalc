@@ -38,6 +38,7 @@ class SourceEntity(NamedTuple):
     supported_color_modes: list[ColorMode] | None = None
     entity_entry: er.RegistryEntry | None = None
     device_entry: dr.DeviceEntry | None = None
+    config_entry_id: str | None = None
 
 
 EXCLUDE_FROM_PARENT_CONFIG = (

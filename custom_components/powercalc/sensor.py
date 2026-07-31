@@ -85,7 +85,10 @@ from .const import (
     PowercalcDiscoveryType,
     SensorType,
 )
-from .device_binding import attach_configured_device_entry, attach_entities_to_resolved_device
+from .device_binding import (
+    attach_configured_device_entry,
+    attach_entities_to_resolved_device,
+)
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,

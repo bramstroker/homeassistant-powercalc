@@ -384,6 +384,16 @@
         "description": "Wählen Sie das Gerätemodell. Siehe in der [list]({supported_models_link}) der unterstützten Modelle für weitere Informationen",
         "title": "Modelnummer Konfiguration"
       },
+      "select_device": {
+        "data": {
+          "device": "Gerät"
+        },
+        "data_description": {
+          "device": "Das Gerät, mit dem die Powercalc-Entitäten verknüpft werden sollen"
+        },
+        "description": "Wählen Sie das Gerät aus, mit dem der Powercalc-Sensor verknüpft werden soll.",
+        "title": "Gerät auswählen"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Standardgruppe",

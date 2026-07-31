@@ -4,11 +4,7 @@ from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
-from homeassistant.helpers.selector import (
-    EntityWithDeviceFilterSelectorConfig,
-    NumberSelector,
-    NumberSelectorMode,
-)
+from homeassistant.helpers.selector import NumberSelector, NumberSelectorMode
 from homeassistant.util.unit_conversion import EnergyConverter
 import voluptuous as vol
 
@@ -134,11 +130,10 @@ def build_cost_pricing_schema(hass: HomeAssistant, current_entity_id: str | None
     if units is None:
         return SCHEMA_COST_PRICING
 
-    entity_filter: EntityWithDeviceFilterSelectorConfig = {"domain": SENSOR_DOMAIN, "unit_of_measurement": units}
     schema: vol.Schema = SCHEMA_COST_PRICING.extend(
         {
             vol.Optional(CONF_ENERGY_PRICE_SENSOR): selector.EntitySelector(
-                selector.EntitySelectorConfig(filter=entity_filter),
+                selector.EntitySelectorConfig(filter={"domain": SENSOR_DOMAIN, "unit_of_measurement": units}),
             ),
         },
     )

@@ -384,6 +384,16 @@
         "description": "Välj enhetsmodell Se i [list]({supported_models_link}) För modeller som stöds eller mer information",
         "title": "Konfiguration för modell"
       },
+      "select_device": {
+        "data": {
+          "device": "Enhet"
+        },
+        "data_description": {
+          "device": "Enheten som Powercalc-entiteterna ska länkas till"
+        },
+        "description": "Välj enheten som Powercalc-sensorn ska länkas till.",
+        "title": "Välj enhet"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Standardgrupp",

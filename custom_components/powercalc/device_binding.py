@@ -29,6 +29,20 @@ def is_composite_device_id(hass: HomeAssistant, device_id: str) -> bool:
     return bool(is_composite(device_id))
 
 
+def get_first_device_for_config_entry(hass: HomeAssistant, config_entry_id: str) -> DeviceEntry | None:
+    """Return the first non-composite device belonging to a config entry."""
+    return next(iter(get_devices_for_config_entry(hass, config_entry_id)), None)
+
+
+def get_devices_for_config_entry(hass: HomeAssistant, config_entry_id: str) -> list[DeviceEntry]:
+    """Return all non-composite devices belonging to a config entry."""
+    return [
+        device
+        for device in device_registry.async_get(hass).devices.values()
+        if device.config_entry_id == config_entry_id and not is_composite_device_id(hass, device.id)
+    ]
+
+
 def attach_configured_device_entry(
     hass: HomeAssistant,
     sensor_config: ConfigType,
@@ -85,7 +99,7 @@ def get_device_entry(
             return None
         return device_registry.async_get(hass).async_get(device_id)
 
-    if source_entity:
+    if source_entity and not source_entity.config_entry_id:
         return source_entity.device_entry or async_entity_id_to_device(hass, source_entity.entity_id)
 
     return None

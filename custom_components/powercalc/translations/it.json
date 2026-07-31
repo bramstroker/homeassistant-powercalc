@@ -384,6 +384,16 @@
         "description": "Seleziona il modello del dispositivo. Vedi la [list]({supported_models_link}) dei modelli supportati per maggiori informazioni",
         "title": "Configurazione modello"
       },
+      "select_device": {
+        "data": {
+          "device": "Dispositivo"
+        },
+        "data_description": {
+          "device": "Il dispositivo a cui devono essere collegate le entità Powercalc"
+        },
+        "description": "Seleziona il dispositivo a cui deve essere collegato il sensore Powercalc.",
+        "title": "Seleziona dispositivo"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Gruppo standard",

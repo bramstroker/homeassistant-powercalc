@@ -384,6 +384,16 @@
         "description": "选择设备型号。详情请参阅支持型号[列表]({supported_models_link})",
         "title": "型号配置"
       },
+      "select_device": {
+        "data": {
+          "device": "设备"
+        },
+        "data_description": {
+          "device": "Powercalc 实体应关联到的设备"
+        },
+        "description": "选择 Powercalc 传感器应关联到的设备。",
+        "title": "选择设备"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "标准",

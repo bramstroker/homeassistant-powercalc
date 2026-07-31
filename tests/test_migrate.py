@@ -269,6 +269,34 @@ async def test_migrate_config_entry_removes_split_helper_device(
     assert powercalc_entry.version == PowercalcConfigFlow.VERSION
 
 
+async def test_migrate_config_entry_removes_legacy_device_link(hass: HomeAssistant) -> None:
+    """Test migration removes the legacy device link on older HA versions."""
+    powercalc_entry = MockConfigEntry(domain=DOMAIN, version=8)
+    powercalc_entry.add_to_hass(hass)
+    device_entry = dr.DeviceEntry(
+        id="source-device",
+        config_entry_id=powercalc_entry.entry_id,
+        identifiers={("test", "source")},
+    )
+    mock_device_registry(hass, {device_entry.id: device_entry})
+    remove_legacy_link = Mock()
+
+    with (
+        patch("custom_components.powercalc.migrate.helper_integration.async_remove_helper_devices", None),
+        patch(
+            "custom_components.powercalc.migrate.helper_integration.async_remove_helper_config_entry_from_source_device",
+            remove_legacy_link,
+        ),
+    ):
+        await async_migrate_entry(hass, powercalc_entry)
+
+    remove_legacy_link.assert_called_once_with(
+        hass,
+        helper_config_entry_id=powercalc_entry.entry_id,
+        source_device_id=device_entry.id,
+    )
+
+
 @pytest.mark.parametrize(
     ("input_model", "migrated_profile", "expected_model", "expect_update"),
     [

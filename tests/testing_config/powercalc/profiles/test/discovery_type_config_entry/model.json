@@ -1,0 +1,12 @@
+{
+  "name": "Config entry discovery test",
+  "device_type": "generic_iot",
+  "discovery_by": "config_entry",
+  "measure_method": "manual",
+  "measure_device": "Test fixture",
+  "calculation_strategy": "fixed",
+  "created_at": "2026-07-31T00:00:00Z",
+  "fixed_config": {
+    "power": 5
+  }
+}

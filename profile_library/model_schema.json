@@ -175,10 +175,11 @@
     "discovery_by": {
       "type": "string",
       "enum": [
+        "config_entry",
         "device",
         "entity"
       ],
-      "description": "Whether to discover the profile by device or entity"
+      "description": "Whether to discover the profile by config entry, device, or entity"
     },
     "fields": {
       "type": "object",

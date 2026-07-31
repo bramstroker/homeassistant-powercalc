@@ -384,6 +384,16 @@
         "description": "Vyberte model zariadenia. Pozrite si [list]({supported_models_link}) podporovaných modelov, kde nájdete ďalšie informácie",
         "title": "Konfigurácia modelu"
       },
+      "select_device": {
+        "data": {
+          "device": "Zariadenie"
+        },
+        "data_description": {
+          "device": "Zariadenie, ku ktorému majú byť priradené entity Powercalc"
+        },
+        "description": "Vyberte zariadenie, ku ktorému má byť priradený senzor Powercalc.",
+        "title": "Vyberte zariadenie"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Štandard skupina",
