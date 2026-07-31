@@ -1258,11 +1258,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "brightness",
             "color_temp",
-            "brightness"
+            "hs"
           ],
-          "hash": "0cb41dc8f835f3e1af0de0e78f5fab19"
+          "hash": "1624c25a933852aa23da5aa2e3f53aa0"
         },
         {
           "aliases": [
@@ -1362,10 +1362,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
-          "hash": "12913c146371fe0a2b9f386046cd1f0f"
+          "hash": "6135cea77f7d32aec4a5646dd461871b"
         },
         {
           "calculation_strategy": "fixed",
@@ -3216,10 +3216,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "brightness"
+            "brightness",
+            "color_temp"
           ],
-          "hash": "51d6a5a799c60715b1116bb7fde6df41"
+          "hash": "24fd57573ae45a89adc35b6a1a181546"
         },
         {
           "aliases": [
@@ -4104,11 +4104,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "brightness",
             "color_temp",
-            "brightness"
+            "hs"
           ],
-          "hash": "ad2149c3ca2e8960b71cd50283e6ccaa"
+          "hash": "0ea41b10b1367b9a55058514e0791d28"
         }
       ],
       "device_types": [
@@ -4519,6 +4519,39 @@
             "brightness"
           ],
           "hash": "d8f11b19dc20a675e907cdfe168ce5c3"
+        },
+        {
+          "aliases": [
+            "1011"
+          ],
+          "author_info": {
+            "github": "Maxik933",
+            "name": "Maxik933"
+          },
+          "calculation_strategy": "lut",
+          "created_at": "2026-07-29T13:40:01Z",
+          "device_type": "light",
+          "max_voltage": 234.2,
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.2.1:app"
+          },
+          "min_voltage": 231.7,
+          "name": "Matter Smart RGBTW Lampe, Wifi E27 800 Lumen",
+          "standby_power": 0.29,
+          "id": "LS0101911261",
+          "manufacturer": "linkind",
+          "updated_at": "2026-07-30T19:31:52",
+          "max_power": 8.93,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "hs",
+            "color_temp"
+          ],
+          "hash": "a6bbe9c62d19521a9a3ab6a04216f85f"
         }
       ],
       "device_types": [
@@ -19903,11 +19936,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "brightness",
             "color_temp",
-            "brightness"
+            "hs"
           ],
-          "hash": "e19b3d27b36c570fe2895510672c325e"
+          "hash": "473c7a0bef33f4a9bcabc37718f641a0"
         },
         {
           "calculation_strategy": "lut",
