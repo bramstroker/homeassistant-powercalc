@@ -24,6 +24,7 @@ from measure.contribution.models import (
     ContributionJob,
     ContributionMetadata,
     ContributionPreview as ProfileContributionPreview,
+    DeviceInfo,
 )
 from measure.contribution.prepare import ProfilePreparationError, ProfilePreparer
 from measure.contribution.pull_request import (
@@ -168,9 +169,10 @@ class SharedContributionService:
         request: MeasurementRequest,
         artifact_root: Path,
         payload: ContributionPreviewRequest | None,
+        integration: str | None = None,
     ) -> ContributionPreviewResponse:
         credential, client, preparer, base_sha = self._load_github_context("building a contribution preview")
-        metadata = _metadata_from_request(request, payload, self.auth_status())
+        metadata = _metadata_from_request(request, payload, self.auth_status(), integration)
         try:
             job = self._build_coordinator(preparer, client).create_job(artifact_root, metadata, base_sha=base_sha)
         except ProfilePreparationError as error:
@@ -300,6 +302,7 @@ def _metadata_from_request(
     request: MeasurementRequest,
     payload: ContributionPreviewRequest | None,
     auth: ContributionAuthStatus,
+    integration: str | None = None,
 ) -> ContributionMetadata:
     github_username = auth.username
     if not github_username:
@@ -329,6 +332,7 @@ def _metadata_from_request(
             product_name=product_name,
             measure_type=request.measure_type.value,
             measure_device=request.measure_device,
+            integration=integration,
             notes=notes,
             author=ContributionAuthor(name=contributor, github=github_username),
         )
@@ -352,6 +356,7 @@ class _PreviewContent:
     model_id: str
     product_name: str
     contributor: str
+    integration: str | None
     commit_message: str
     pr_title: str
     pr_body: str
@@ -366,6 +371,7 @@ def draft_from_request(
     request: MeasurementRequest,
     artifact_root: Path,
     auth: ContributionAuthStatus,
+    integration: str | None = None,
 ) -> ContributionPreviewResponse:
     """Build a placeholder preview, before a contribution job exists."""
     files = _list_draft_files(artifact_root)
@@ -383,12 +389,16 @@ def draft_from_request(
         model_id=request.model_id,
         product_name=request.product_name,
         contributor=auth.username or "",
+        integration=integration,
         commit_message=f"feat(profile): add {request.model_id}",
         pr_title=f"Add {request.model_id} power profile",
         pr_body=profile_pull_request_body(
-            manufacturer="Unknown",
-            model_id=request.model_id,
-            product_name=request.product_name,
+            DeviceInfo(
+                manufacturer="Unknown",
+                model_id=request.model_id,
+                product_name=request.product_name,
+                integration=integration,
+            ),
             measure_device=request.measure_device,
             measure_type=request.measure_type.value,
             notes="",
@@ -426,6 +436,7 @@ def _preview_from_job(
         model_id=job.metadata.model_id,
         product_name=job.metadata.product_name or request.product_name,
         contributor=job.metadata.author.name,
+        integration=job.metadata.integration,
         commit_message=conventional_commit_message(job.preview),
         pr_title=pull_request_title(job.preview),
         pr_body=pull_request_body(job),
@@ -461,9 +472,6 @@ def _build_preview_response(
     repository: GitHubRepository | None = None,
 ) -> ContributionPreviewResponse:
     repository = repository or GitHubRepository.from_environment()
-    controller = request.controller
-    controller_data = controller.model_dump(mode="json") if controller is not None else {}
-    controlled_entity = controller_data.get("entity_id")
     device_info: dict[str, str | int | float | bool | None] = {
         "manufacturer": content.manufacturer_name,
         "model_id": content.model_id,
@@ -472,7 +480,8 @@ def _build_preview_response(
     }
     home_assistant_info: dict[str, str | int | float | bool | None] = {
         "measure_type": request.measure_type.value,
-        "controlled_entity": str(controlled_entity) if controlled_entity else None,
+        "controlled_entity": request.controlled_entity_id,
+        "integration": content.integration,
     }
     return ContributionPreviewResponse(
         session_id=session_id,

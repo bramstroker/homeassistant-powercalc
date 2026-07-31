@@ -193,11 +193,20 @@ class AppContext:
         self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
-        self.contribution = ContributionApiCoordinator(self.storage)
+        self.contribution = ContributionApiCoordinator(self.storage, resolve_integration=self.entity_integration)
         self.coordinator = MeasurementCoordinator(
             self.storage,
             self._measurement_service,
         )
+
+    def entity_integration(self, entity_id: str) -> str | None:
+        """Look up which integration provides an entity; contribution details stay usable without it."""
+        try:
+            entity = HomeAssistantEntityCatalog(self.home_assistant).load_snapshot().get(entity_id)
+        except Exception as error:  # noqa: BLE001 - the integration is optional context for a pull request
+            _LOGGER.warning("Could not resolve the integration for %s: %s", entity_id, error)
+            return None
+        return entity.integration if entity is not None else None
 
     def _measurement_service(self) -> MeasurementService:
         return MeasurementService(

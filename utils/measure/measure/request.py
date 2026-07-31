@@ -143,6 +143,12 @@ class BaseMeasurementRequest(BaseModel):
         return self
 
     @property
+    def controlled_entity_id(self) -> str | None:
+        """Home Assistant entity driven during the measurement, when the controller uses one."""
+        entity_id = getattr(self.controller, "entity_id", None)
+        return str(entity_id) if entity_id else None
+
+    @property
     def model_name(self) -> str:
         return self.product_name
 

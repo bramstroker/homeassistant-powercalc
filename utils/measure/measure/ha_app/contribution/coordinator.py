@@ -54,10 +54,12 @@ class ContributionApiCoordinator:
         storage: SessionStorage,
         *,
         service_factory: Callable[[], ContributionService] | None = None,
+        resolve_integration: Callable[[str], str | None] | None = None,
         oauth_client_id: str | None = None,
     ) -> None:
         self._storage = storage
         self._service_factory = service_factory or (lambda: create_contribution_service(storage.data_root))
+        self._resolve_integration = resolve_integration
         self._oauth_client_id = oauth_client_id if oauth_client_id is not None else os.environ.get(_OAUTH_CLIENT_ID_ENV)
         self._lock = Lock()
         self._device_flows: dict[str, _DeviceFlow] = {}
@@ -125,6 +127,7 @@ class ContributionApiCoordinator:
             request=request,
             artifact_root=self._storage.artifact_directory(snapshot.id, request.model_id),
             auth=self.auth_status(),
+            integration=self._integration(request),
         )
 
     def preview(
@@ -146,6 +149,7 @@ class ContributionApiCoordinator:
             request=request,
             artifact_root=artifact_root,
             payload=payload,
+            integration=self._integration(request),
         )
         with self._lock:
             self._status = ContributionStatus(
@@ -222,6 +226,13 @@ class ContributionApiCoordinator:
                 error=None,
             )
             return result
+
+    def _integration(self, request: MeasurementRequest) -> str | None:
+        """Return the Home Assistant integration providing the measured entity, when it can be resolved."""
+        entity_id = request.controlled_entity_id
+        if entity_id is None or self._resolve_integration is None:
+            return None
+        return self._resolve_integration(entity_id)
 
     def _require_oauth_client_id(self) -> str:
         if not self._oauth_client_id:
