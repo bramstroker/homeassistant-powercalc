@@ -66,9 +66,8 @@ export class RunningView extends LitElement {
     .metric span { display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
     .metric strong { display: block; margin-top: 0.25rem; font: 600 1rem/1.3 ui-monospace, monospace; }
     .topline-right { display: inline-flex; align-items: center; gap: 0.9rem; }
-    .log-toggle { min-height: 30px; padding: 0.25rem 0.7rem; border-radius: 999px; font: 700 0.68rem/1 ui-monospace, monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: transparent; }
-    .log-toggle:hover:not(:disabled) { color: var(--ink); }
-    .log-count { color: var(--signal-strong); }
+    .log-toggle { display: inline-flex; align-items: center; gap: 0.55rem; min-height: 44px; padding: 0.55rem 0.75rem 0.55rem 0.9rem; border-radius: 999px; font: 700 0.78rem/1 ui-monospace, monospace; color: var(--ink); background: var(--surface-raised); }
+    .log-count { display: inline-grid; place-items: center; min-width: 1.6rem; min-height: 1.6rem; padding: 0 0.4rem; border-radius: 999px; color: var(--signal-strong); background: color-mix(in srgb, var(--signal) 16%, var(--well)); font-size: 0.7rem; }
     .log-overlay { position: fixed; top: 0; right: 0; bottom: 0; z-index: 60; display: flex; flex-direction: column; width: min(400px, 92vw); padding: 1rem; background: color-mix(in srgb, var(--surface) 96%, transparent); border-left: 1px solid var(--line); box-shadow: -18px 0 40px rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); }
     .log-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
     .log-head span { color: var(--muted); font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.12em; text-transform: uppercase; }
@@ -129,7 +128,7 @@ export class RunningView extends LitElement {
           <div class="topline">
             <span class="muted" aria-live="polite">${this.snapshot.phase ?? "Preparing measurement"}</span>
             <span class="topline-right">
-              ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>Log <span class="log-count">${this.logs.length}</span></button>` : nothing}
+              ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>View log <span class="log-count">${this.logs.length}</span></button>` : nothing}
               <span class="connection ${this.connected ? "connected" : ""}" role="status">${this.connected ? "Live" : "Reconnecting"}</span>
             </span>
           </div>
@@ -157,7 +156,7 @@ export class RunningView extends LitElement {
         <h2 id="running-title">Ready when you are</h2>
         <div class="ready-card ${warning ? "warning" : ""}">
           <span class="ready-topline">
-            ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>Log <span class="log-count">${this.logs.length}</span></button>` : nothing}
+            ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>View log <span class="log-count">${this.logs.length}</span></button>` : nothing}
             <span class="connection ${this.connected ? "connected" : ""}">${this.connected ? "Live" : "Reconnecting"}</span>
           </span>
           <div class="ready-announcement" role=${warning ? "alert" : "status"} aria-live=${warning ? "assertive" : "polite"}>

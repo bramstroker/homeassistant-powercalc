@@ -1083,6 +1083,7 @@ describe("running view", () => {
 
     expect(element.shadowRoot.querySelector(".log-overlay")).toBeNull();
     const toggle = element.shadowRoot.querySelector(".log-toggle") as HTMLButtonElement;
+    expect(toggle.textContent).toContain("View log");
     expect(toggle.textContent).toContain("2");
 
     toggle.click();
