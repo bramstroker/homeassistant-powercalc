@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 
 from measure.ha_app.diagnostics import REDACTED, build_session_diagnostics

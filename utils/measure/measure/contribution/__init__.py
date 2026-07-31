@@ -7,8 +7,6 @@ commit, pull request). This package is UI-agnostic; ``measure.ha_app.contributio
 wraps it with the HTTP-facing auth flows, drafts, and app-level state.
 """
 
-from __future__ import annotations
-
 from measure.contribution.coordinator import (
     ContributionJobCoordinator,
     ContributionJobExpiredError,

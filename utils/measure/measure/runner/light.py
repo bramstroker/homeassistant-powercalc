@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import csv
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt

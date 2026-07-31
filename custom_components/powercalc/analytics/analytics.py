@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from asyncio import timeout
 from collections import Counter
 from collections.abc import Hashable

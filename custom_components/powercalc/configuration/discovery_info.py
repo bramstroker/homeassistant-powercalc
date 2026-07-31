@@ -1,7 +1,5 @@
 """Normalize discovery info into sensor configuration."""
 
-from __future__ import annotations
-
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 

@@ -1,7 +1,5 @@
 """Text rendered into the profile-library pull request: branch name, commit message, title, and body."""
 
-from __future__ import annotations
-
 from collections.abc import Sequence
 
 from measure.contribution.models import ContributionJob, ContributionPreview

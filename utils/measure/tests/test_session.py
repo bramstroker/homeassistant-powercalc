@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from threading import Event, Thread
 
 from measure.execution import FanOperatingPoint, MeasurementCancelledError

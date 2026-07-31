@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from contextvars import ContextVar
 import logging
 import re

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 
 from measure.powermeter.errors import UnsupportedFeatureError

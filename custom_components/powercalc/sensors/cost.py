@@ -1,10 +1,8 @@
-from __future__ import annotations
-
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 import logging
-from typing import TYPE_CHECKING
 
 from homeassistant.components.sensor import ATTR_LAST_RESET, SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.const import (
@@ -40,11 +38,7 @@ from .abstract import (
     generate_cost_sensor_name,
 )
 from .energy import EnergySensor, resolve_existing_energy_sensor
-
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from .utility_meter import VirtualUtilityMeter
+from .utility_meter import VirtualUtilityMeter
 
 COST_ICON = "mdi:cash"
 ATTR_LAST_ENERGY = "last_energy"

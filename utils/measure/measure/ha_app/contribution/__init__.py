@@ -5,8 +5,6 @@ device flow), draft/preview responses for the frontend, and the app-level
 ``ContributionState`` persisted per install by ``ContributionApiCoordinator``.
 """
 
-from __future__ import annotations
-
 from measure.ha_app.contribution.coordinator import ContributionApiCoordinator
 from measure.ha_app.contribution.models import (
     SUPPORTED_MEASURE_TYPES,

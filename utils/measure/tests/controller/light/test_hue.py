@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from contextlib import closing
 import json
 from pathlib import Path

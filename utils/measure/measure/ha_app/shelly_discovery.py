@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import asyncio
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass

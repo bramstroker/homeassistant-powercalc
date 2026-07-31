@@ -1,7 +1,5 @@
 """Sensor configuration schemas."""
 
-from __future__ import annotations
-
 from typing import Any
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA as SENSOR_PLATFORM_SCHEMA

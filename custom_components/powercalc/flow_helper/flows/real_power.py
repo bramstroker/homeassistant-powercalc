@@ -1,7 +1,5 @@
 """Real-power logic for the config flow."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.sensor import SensorDeviceClass
