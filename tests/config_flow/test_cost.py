@@ -14,6 +14,7 @@ from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_COST_SENSOR,
     CONF_ENERGY_PRICE,
+    CONF_ENERGY_PRICE_SENSOR,
     CONF_ENERGY_SENSOR_ID,
     CONF_FIXED,
     CONF_MODE,
@@ -22,7 +23,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from custom_components.powercalc.flow_helper.schema import SECTION_COST_PRICING
+from custom_components.powercalc.flow_helper.schema import SECTION_COST_PRICING, build_cost_pricing_schema
 from tests.common import create_mock_config_entry, run_powercalc_setup, set_states
 from tests.config_flow.common import (
     handle_options_flow_update,
@@ -205,3 +206,52 @@ async def test_cost_options_flow(hass: HomeAssistant) -> None:
     )
 
     assert entry.data[CONF_ENERGY_SENSOR_ID] == "sensor.other_energy"
+
+
+def _price_sensor_selector_config(hass: HomeAssistant, current_entity_id: str | None = None) -> dict:
+    """Return the selector config of the energy price sensor field."""
+    schema = build_cost_pricing_schema(hass, current_entity_id)
+    return schema.schema[CONF_ENERGY_PRICE_SENSOR].config  # type: ignore[no-any-return]
+
+
+@pytest.mark.parametrize(
+    "unit",
+    ["€/kWh", "EUR/kWh", "ct/kWh", "EUR/MWh"],
+)
+async def test_energy_price_sensor_selector_filters_on_price_units(hass: HomeAssistant, unit: str) -> None:
+    """The picker lists price sensors by their `<currency>/<energy>` unit.
+
+    Filtering on the `monetary` device class instead listed only cost sensors, since price
+    sensors have no device class at all, see #4422.
+    """
+    await set_states(hass, [("sensor.energy_price", "0.32", {ATTR_UNIT_OF_MEASUREMENT: unit})])
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])
+
+    config = _price_sensor_selector_config(hass)
+
+    assert config["filter"] == [{"domain": ["sensor"], ATTR_UNIT_OF_MEASUREMENT: [unit]}]
+    assert "device_class" not in config
+
+
+async def test_energy_price_sensor_selector_is_unfiltered_without_price_sensors(hass: HomeAssistant) -> None:
+    """Without any price sensor to filter on, all sensors are listed rather than none."""
+    await set_states(hass, [("sensor.existing_energy", "10", _KWH)])
+
+    config = _price_sensor_selector_config(hass)
+
+    assert config["domain"] == ["sensor"]
+    assert "filter" not in config
+
+
+async def test_energy_price_sensor_selector_keeps_configured_sensor_visible(hass: HomeAssistant) -> None:
+    """A configured price sensor without a price unit disables the filter.
+
+    Otherwise the options flow would hide the very sensor that is currently in use.
+    """
+    await set_states(hass, [("sensor.energy_price", "0.32", {ATTR_UNIT_OF_MEASUREMENT: "€/kWh"})])
+    await set_states(hass, [("sensor.unitless_price", "0.32", {})])
+
+    config = _price_sensor_selector_config(hass, "sensor.unitless_price")
+
+    assert config["domain"] == ["sensor"]
+    assert "filter" not in config
