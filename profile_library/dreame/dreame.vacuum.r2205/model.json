@@ -137,7 +137,7 @@
     "VERSION": "v0.2.1:app"
   },
   "min_voltage": 227.5,
-  "name": "Dreame D10 plus",
+  "name": "Robot Vacuum Cleaner",
   "standby_power": 2.6,
   "author_info": {
     "name": "Maxik933",
