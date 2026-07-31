@@ -29,7 +29,6 @@ import voluptuous as vol
 
 from .common import SourceEntity, create_source_entity
 from .const import (
-    CONF_CONFIG_ENTRY_ID,
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_PRICE_SENSOR,
@@ -47,7 +46,7 @@ from .const import (
     CalculationStrategy,
     SensorType,
 )
-from .device_binding import get_first_device_for_config_entry
+from .device_binding import attach_configured_device_entry
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults, flatten_sections
 from .flow_helper.flows.cost import CostConfigFlow, CostOptionsFlow
@@ -456,29 +455,21 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     @callback
     def persist_config_entry(self) -> ConfigFlowResult:
         """Create the config entry."""
-        self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
-        self.sensor_config.update({CONF_NAME: self.name})
+        entry_data: ConfigType = {
+            **self.sensor_config,
+            CONF_SENSOR_TYPE: self.selected_sensor_type,
+            CONF_NAME: self.name,
+        }
 
         if self.source_entity_id:
-            self.sensor_config.update({CONF_ENTITY_ID: self.source_entity_id})
+            entry_data[CONF_ENTITY_ID] = self.source_entity_id
 
-        if (
-            self.selected_profile
-            and self.source_entity
-            and self.source_entity.device_entry
-            and self.selected_profile.discovery_by == DiscoveryBy.DEVICE
-        ):
-            self.sensor_config.update({CONF_DEVICE: self.source_entity.device_entry.id})
+        profile = self.selected_profile
+        source_entity = self.source_entity
+        if profile and source_entity and profile.discovery_by == DiscoveryBy.DEVICE and source_entity.device_entry:
+            entry_data[CONF_DEVICE] = source_entity.device_entry.id
 
-        if (
-            self.selected_profile
-            and self.source_entity
-            and self.source_entity.config_entry_id
-            and self.selected_profile.discovery_by == DiscoveryBy.CONFIG_ENTRY
-        ):
-            self.sensor_config.update({CONF_CONFIG_ENTRY_ID: self.source_entity.config_entry_id})
-
-        return self.async_create_entry(title=str(self.name), data=self.sensor_config)
+        return self.async_create_entry(title=str(self.name), data=entry_data)
 
 
 class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
@@ -516,16 +507,14 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
         self.sensor_config = dict(self.config_entry.data)
         if self.source_entity_id:
-            self.source_entity = create_source_entity(
-                self.source_entity_id,
+            self.source_entity = attach_configured_device_entry(
                 self.hass,
+                self.sensor_config,
+                create_source_entity(
+                    self.source_entity_id,
+                    self.hass,
+                ),
             )
-            if config_entry_id := self.sensor_config.get(CONF_CONFIG_ENTRY_ID):
-                config_entry_id = str(config_entry_id)
-                self.source_entity = self.source_entity._replace(
-                    config_entry_id=config_entry_id,
-                    device_entry=get_first_device_for_config_entry(self.hass, config_entry_id),
-                )
             result = await self.initialize_library_profile()
             if result:
                 return result

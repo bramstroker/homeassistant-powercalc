@@ -11,7 +11,6 @@ from custom_components.powercalc.common import SourceEntity, create_source_entit
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
-    CONF_CONFIG_ENTRY_ID,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
@@ -409,7 +408,6 @@ async def test_discovery_by_config_entry(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
-        CONF_CONFIG_ENTRY_ID: "source-entry",
         CONF_DEVICE: "device-4",
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,

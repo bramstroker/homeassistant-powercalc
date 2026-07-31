@@ -40,7 +40,6 @@ from .configuration.config_entry_conversion import convert_config_entry_to_senso
 from .configuration.discovery_info import convert_discovery_info_to_sensor_config
 from .configuration.sensor_config import PLATFORM_SCHEMA as PLATFORM_SCHEMA
 from .const import (
-    CONF_CONFIG_ENTRY_ID,
     CONF_COST,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
@@ -89,7 +88,6 @@ from .const import (
 from .device_binding import (
     attach_configured_device_entry,
     attach_entities_to_resolved_device,
-    get_first_device_for_config_entry,
 )
 from .errors import (
     PowercalcSetupError,
@@ -664,13 +662,6 @@ async def create_individual_sensors(
     """Create entities (power, energy, utility meters) which track the appliance."""
 
     source_entity = create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
-
-    if config_entry_id := sensor_config.get(CONF_CONFIG_ENTRY_ID):
-        config_entry_id = str(config_entry_id)
-        source_entity = source_entity._replace(
-            config_entry_id=config_entry_id,
-            device_entry=get_first_device_for_config_entry(hass, config_entry_id),
-        )
 
     # For device-based profiles, attach the device entry to the source entity
     source_entity = attach_configured_device_entry(hass, sensor_config, source_entity)
