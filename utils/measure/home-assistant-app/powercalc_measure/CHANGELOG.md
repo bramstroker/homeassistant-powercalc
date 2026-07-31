@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 0.3.0 - 2026-07-31
+
+- #4428 Cleanup typing @bramstroker
+
+### 🚀 Features
+
+- #4430 Add support for Shelly password authentication @bramstroker
+- #4432 Add integration of controlled entity to PR body @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4384 Fix sonarcloud issues @bramstroker
+- #4392 Handle repeated zero readings in the measure app @bramstroker
+- #4393 Copy github code was not always working @bramstroker
+
 ## 0.2.1 - 2026-07-25
 
 ### 🐛 Bug Fixes
