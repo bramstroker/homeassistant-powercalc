@@ -439,11 +439,19 @@ class LibraryFlow:
 
     def _get_library_discovery_by(self) -> DiscoveryBy | None:
         """Determine whether listing should be filtered by discovery mode."""
-        if self.flow.source_entity and self.flow.source_entity.config_entry_id:
+        source_entity = self.flow.source_entity
+        if not source_entity:
+            return None
+
+        if source_entity.config_entry_id:
             return DiscoveryBy.CONFIG_ENTRY
-        if self.flow.source_entity and self.flow.source_entity.entity_id == DUMMY_ENTITY_ID:
-            return DiscoveryBy.DEVICE
-        return None
+        if source_entity.entity_id != DUMMY_ENTITY_ID:
+            return None
+
+        profile = self.flow.selected_profile
+        if profile and profile.discovery_by == DiscoveryBy.CONFIG_ENTRY:
+            return DiscoveryBy.CONFIG_ENTRY
+        return DiscoveryBy.DEVICE
 
 
 class LibraryConfigFlow(LibraryFlow):
