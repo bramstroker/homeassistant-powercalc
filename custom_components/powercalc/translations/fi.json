@@ -1,123 +1,123 @@
 {
   "common": {
-    "source_entity": "Source entity",
-    "source_device": "Source device",
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "source_entity": "Lähde-entiteetti",
+    "source_device": "Lähdelaite",
+    "remarks_smart_switch": "Tämä profiili sisältää vain valmiustilan tehoarvot. \n Jos laite kuluttaa käynnissä ollessaan kiinteän määrän tehoa, voit antaa arvon määrityksen seuraavassa vaiheessa",
+    "remarks_smart_dimmer": "Tämä profiili sisältää vain valmiustilan tehoarvot. \n Seuraavassa vaiheessa voit halutessasi antaa liitetyn valon arvot"
   },
   "config": {
     "abort": {
-      "already_configured": "Sensor is already configured, specify a unique_id"
+      "already_configured": "Anturi on jo määritetty, anna yksilöllinen tunniste (unique_id)"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
-      "daily_energy_mandatory": "You must supply at least one of Value or Value template",
-      "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-      "group_mandatory": "You must define at least subgroups or power and energy-entities",
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
-      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
-      "lut_wrong_domain": "Only light entities can use the LUT mode",
-      "playbook_mandatory": "You need to specify at least one playbook",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "cost_price_mandatory": "Anna joko energian hinta tai energian hintaa tarjoava anturi",
+      "daily_energy_mandatory": "Anna vähintään Value tai Value template",
+      "entity_mandatory": "Entiteetti on valittava kaikille muille strategioille paitsi playbook-strategialle",
+      "fixed_mandatory": "Anna vähintään Power, Power template tai States power",
+      "fixed_states_power_only": "Tämä entiteetti toimii vain states_power-asetuksella, ei power-asetuksella",
+      "group_mandatory": "Määritä vähintään aliryhmät tai teho- ja energiaentiteetit",
+      "linear_mandatory": "Anna vähintään max_power tai calibrate",
+      "linear_min_higher_as_max": "Enimmäisteho ei voi olla pienempi kuin vähimmäisteho",
+      "linear_unsupported_domain": "Entiteetin toimialuetta ei tueta lineaarisessa tilassa. Sallitut ovat fan, light ja mediaplayer. Voit kuitenkin käyttää kalibrointia",
+      "lut_unsupported_color_mode": "LUT-profiili ei tue yhtä valosi väritiloista. Katso lisätietoja lokista",
+      "lut_wrong_domain": "Vain light-entiteetit voivat käyttää LUT-tilaa",
+      "playbook_mandatory": "Määritä vähintään yksi playbook",
+      "unknown": "Tuntematon virhe. Katso lisätietoja lokista"
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Valitse ryhmä(t)",
+          "new_group": "Uusi ryhmä"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Luo uusi ryhmä kirjoittamalla mukautettu ryhmän nimi"
         },
-        "title": "Assign to group"
+        "title": "Liitä ryhmään"
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Availability entity"
+          "availability_entity": "Saatavuusentiteetti"
         },
         "data_description": {
-          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+          "availability_entity": "Kun tämä entiteetti ei ole käytettävissä, myös powercalc-anturi ei ole käytettävissä"
         },
-        "title": "Availability entity",
-        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+        "title": "Saatavuusentiteetti",
+        "description": "Tämä profiili koskee laitetta. Valitse entiteetti, jonka avulla powercalc-anturin saatavuus määritetään"
       },
       "daily_energy": {
         "data": {
-          "create_utility_meters": "Create utility meters",
-          "daily_energy_value": "Daily energy value",
-          "name": "Name",
-          "on_time": "On time",
-          "start_time": "Start time",
-          "unit_of_measurement": "Unit of measurement",
-          "update_frequency": "Update frequency",
-          "value": "Value",
-          "value_template": "Value template"
+          "create_utility_meters": "Luo hyötymittarit",
+          "daily_energy_value": "Päivittäinen energia-arvo",
+          "name": "Nimi",
+          "on_time": "Päälläoloaika",
+          "start_time": "Aloitusaika",
+          "unit_of_measurement": "Mittayksikkö",
+          "update_frequency": "Päivitystaajuus",
+          "value": "Arvo",
+          "value_template": "Arvomalli"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Tyhjänä oletus on yksi päivä eli aina päällä",
+          "update_frequency": "Aika sekunteina anturin tilapäivitysten välillä"
         },
-        "title": "Create a daily fixed sensor"
+        "title": "Luo päivittäinen kiinteä anturi"
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Energia-asetukset",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_integration_method": "Integrointimenetelmä",
+          "energy_sensor_unit_prefix": "Yksikköetuliite",
+          "energy_filter_outlier_enabled": "Suodata poikkeamat",
+          "energy_filter_outlier_max_step": "Poikkeamasuodattimen enimmäisaskel"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "Ota energia-anturin poikkeavien arvojen suodatus käyttöön",
+          "energy_filter_outlier_max_step": "Poikkeamasuodattimen tehoarvoille (watteina) sallima enimmäisaskel"
         }
       },
       "group_domain": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "name": "Nimi",
+          "create_energy_sensor": "Luo energia-anturi",
+          "create_cost_sensor": "Luo kustannusanturi",
+          "create_utility_meters": "Luo hyötymittarit",
+          "domain": "Entiteetin toimialue",
+          "exclude_entities": "Ohita entiteetit"
         },
-        "title": "Create a domain based group sensor"
+        "title": "Luo toimialueeseen perustuva ryhmäanturi"
       },
       "fixed": {
         "data": {
-          "fixed_value": "Power value"
+          "fixed_value": "Tehoarvo"
         },
         "data_description": {
-          "fixed_value": "Power value in Watts when the entity is ON"
+          "fixed_value": "Tehoarvo watteina, kun entiteetti on päällä"
         },
-        "description": "Define a fixed power value for your entity. See the [documentation]({docs_uri}) for more info",
-        "title": "Fixed config"
+        "description": "Määritä entiteetin kiinteä tehoarvo. Katso lisätietoja [dokumentaatiosta]({docs_uri})",
+        "title": "Kiinteät asetukset"
       },
       "global_configuration": {
-        "title": "Global configuration",
-        "description": "Setup global configuration for Powercalc. For more information see the [documentation]({docs_uri}). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "title": "Yleiset asetukset",
+        "description": "Määritä Powercalcin yleiset asetukset. Katso lisätietoja [dokumentaatiosta]({docs_uri}). Energia-antureiden ja hyötymittareiden lisäasetukset annetaan seuraavissa vaiheissa.",
         "sections": {
           "power_options": {
-            "name": "Power sensor",
+            "name": "Tehoanturi",
             "data": {
-              "power_sensor_naming": "Power sensor name pattern",
-              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-              "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_naming": "Tehoanturin nimimalli",
+              "power_sensor_friendly_naming": "Tehoanturin käyttäjäystävällisen nimen malli",
+              "power_sensor_category": "Tehoanturin luokka",
+              "power_sensor_precision": "Tehoanturin tarkkuus"
             }
           },
           "features": {
-            "name": "Create sensors",
+            "name": "Luo anturit",
             "data": {
-              "create_energy_sensors": "Create energy sensors",
-              "create_cost_sensors": "Create cost sensors",
-              "create_standby_group": "Create standby group",
-              "create_utility_meters": "Create utility meters"
+              "create_energy_sensors": "Luo energia-anturit",
+              "create_cost_sensors": "Luo kustannusanturit",
+              "create_standby_group": "Luo valmiustilaryhmä",
+              "create_utility_meters": "Luo hyötymittarit"
             },
             "data_description": {
               "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
