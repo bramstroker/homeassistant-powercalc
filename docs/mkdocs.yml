@@ -156,6 +156,7 @@ nav:
   - 'Cookbook':
       - 'cookbook/index.md'
       - 'cookbook/hvac.md'
+      - 'cookbook/peak-offpeak-tariffs.md'
       - 'cookbook/ups.md'
   - 'Contributing':
       - 'contributing/index.md'

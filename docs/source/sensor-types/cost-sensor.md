@@ -244,11 +244,9 @@ converted to a per-kWh price before it is applied. The cost sensor also adopts t
 currency from the price sensor's unit (for example `€/kWh` results in a `€` cost
 sensor), falling back to the Home Assistant currency when the price sensor has no unit.
 
-## Limitations / tariffs
+## Peak and off-peak tariffs
 
-Fixed per-tariff prices (for example a different fixed `peak` and `offpeak` price used
-together with utility meter [tariffs](utility-meter.md#tariffs)) are **not** supported
-yet. If your utility uses different tariffs throughout the day, use a price sensor that
-already reflects the currently active tariff price — the accumulate-at-consumption
-behavior then yields the correct multi-tariff cost without any extra configuration.
-Native support for fixed per-tariff prices is planned for a future release.
+Powercalc does not yet have native fields for separate fixed `peak` and `offpeak`
+prices. See the [peak and off-peak tariff cookbook](../cookbook/peak-offpeak-tariffs.md)
+to implement this with a Home Assistant template sensor. Native support for fixed
+per-tariff prices is planned for a future release.
