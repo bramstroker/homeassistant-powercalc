@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from measure.const import MEASURE_TYPE_LABELS, MeasureType, parse_measure_type
 from measure.ha_app.registry import MEASUREMENT_REGISTRY
 

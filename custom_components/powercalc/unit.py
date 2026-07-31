@@ -1,7 +1,5 @@
 """Shared helpers for parsing numeric state values and converting between units."""
 
-from __future__ import annotations
-
 from decimal import Decimal, DecimalException
 import logging
 

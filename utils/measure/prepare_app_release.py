@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations
-
 import argparse
 from collections.abc import Sequence
 from datetime import UTC, date, datetime

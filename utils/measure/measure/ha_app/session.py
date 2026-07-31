@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum

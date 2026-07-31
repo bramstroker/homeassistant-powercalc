@@ -1,7 +1,5 @@
 """Normalize persisted configuration shapes to runtime mappings."""
 
-from __future__ import annotations
-
 from typing import Any
 
 from homeassistant.const import CONF_ID, CONF_PATH

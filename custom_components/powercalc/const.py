@@ -1,7 +1,5 @@
 """The Powercalc constants."""
 
-from __future__ import annotations
-
 from enum import StrEnum
 from typing import Literal
 
@@ -18,7 +16,7 @@ from homeassistant.const import (
     EntityCategory,
 )
 
-MIN_HA_VERSION = "2026.1.0"
+MIN_HA_VERSION = "2026.3.0"
 
 BUILT_IN_LIBRARY_DIR = "powercalc_profiles"
 

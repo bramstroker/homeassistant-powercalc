@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from measure.execution import OperatingPoint, RunInteraction
 from measure.ha_app.session import SessionControl
 

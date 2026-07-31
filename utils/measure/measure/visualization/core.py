@@ -1,7 +1,5 @@
 """Build frontend-neutral plot specifications from measurement artifacts."""
 
-from __future__ import annotations
-
 from collections.abc import Iterable, Mapping, Sequence
 import colorsys
 import csv

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from measure.cli.request_adapter import request_from_answers
 from measure.const import QUESTION_MEASURE_DEVICE, MeasureType
 from measure.controller.light.const import LightControllerType, LutMode

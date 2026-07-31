@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from measure.controller.fan.controller import FanController
 
 
