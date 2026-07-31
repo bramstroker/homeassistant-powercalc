@@ -1,9 +1,15 @@
-from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.const import CONF_METER_TYPE, METER_TYPES
-from homeassistant.const import UnitOfPower
+from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, UnitOfPower
+from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
-from homeassistant.helpers.selector import NumberSelector, NumberSelectorMode
+from homeassistant.helpers.selector import (
+    EntityWithDeviceFilterSelectorConfig,
+    NumberSelector,
+    NumberSelectorMode,
+)
+from homeassistant.util.unit_conversion import EnergyConverter
 import voluptuous as vol
 
 from custom_components.powercalc.const import (
@@ -61,8 +67,10 @@ SCHEMA_COST_PRICING = vol.Schema(
         vol.Optional(CONF_ENERGY_PRICE): NumberSelector(
             selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
         ),
+        # Unfiltered fallback. Prefer `build_cost_pricing_schema()` when a `hass` instance is
+        # available, it narrows this picker down to the price sensors actually present.
         vol.Optional(CONF_ENERGY_PRICE_SENSOR): selector.EntitySelector(
-            selector.EntitySelectorConfig(domain="sensor", device_class=SensorDeviceClass.MONETARY),
+            selector.EntitySelectorConfig(domain=SENSOR_DOMAIN),
         ),
         vol.Optional(CONF_ENERGY_PRICE_SURCHARGE): NumberSelector(
             selector.NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"),
@@ -80,13 +88,72 @@ SCHEMA_GLOBAL_COST_NAMING = vol.Schema(
     },
 )
 
-# Presented in the GUI as two collapsible sections (pricing and naming).
-SCHEMA_GLOBAL_COST = vol.Schema(
-    {
-        vol.Required(SECTION_COST_PRICING): section(SCHEMA_COST_PRICING),
-        vol.Required(SECTION_COST_NAMING): section(SCHEMA_GLOBAL_COST_NAMING, {"collapsed": True}),
-    },
-)
+
+def is_energy_price_unit(unit: str | None) -> bool:
+    """Check whether a unit of measurement expresses a price per unit of energy.
+
+    Price sensors use `<currency>/<energy unit>`, for example `€/kWh`, `EUR/kWh` or `ct/MWh`.
+    The currency part is free form (currency codes, symbols and cents are all in the wild), so
+    only the energy denominator is validated, mirroring what the cost sensor accepts at runtime.
+    """
+    if not unit or "/" not in unit:
+        return False
+    currency, _, denominator = unit.rpartition("/")
+    return bool(currency.strip()) and denominator.strip() in EnergyConverter.VALID_UNITS
+
+
+def _energy_price_units(hass: HomeAssistant, current_entity_id: str | None) -> list[str] | None:
+    """Collect the price units to filter the energy price sensor picker on.
+
+    Returns None when the picker must not be filtered at all. The Home Assistant frontend
+    matches this filter on the exact unit string and hides entities without a unit, so filtering
+    is only safe when we can be sure it does not hide a sensor the user needs: the units are
+    taken from the sensors actually present rather than from a hardcoded list of currencies, and
+    an already configured price sensor which would not survive the filter disables it entirely.
+    """
+    if current_entity_id:
+        current_state = hass.states.get(current_entity_id)
+        if not current_state or not is_energy_price_unit(current_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)):
+            return None
+
+    units = {
+        unit
+        for state in hass.states.async_all(SENSOR_DOMAIN)
+        if is_energy_price_unit(unit := state.attributes.get(ATTR_UNIT_OF_MEASUREMENT))
+    }
+    return sorted(units) or None
+
+
+def build_cost_pricing_schema(hass: HomeAssistant, current_entity_id: str | None = None) -> vol.Schema:
+    """Return the pricing schema with the energy price sensor picker limited to price sensors.
+
+    `current_entity_id` is the price sensor already configured, if any, so an options flow never
+    hides the current selection.
+    """
+    units = _energy_price_units(hass, current_entity_id)
+    if units is None:
+        return SCHEMA_COST_PRICING
+
+    entity_filter: EntityWithDeviceFilterSelectorConfig = {"domain": SENSOR_DOMAIN, "unit_of_measurement": units}
+    schema: vol.Schema = SCHEMA_COST_PRICING.extend(
+        {
+            vol.Optional(CONF_ENERGY_PRICE_SENSOR): selector.EntitySelector(
+                selector.EntitySelectorConfig(filter=entity_filter),
+            ),
+        },
+    )
+    return schema
+
+
+def build_global_cost_schema(hass: HomeAssistant, current_entity_id: str | None = None) -> vol.Schema:
+    """Return the global cost schema, presented in the GUI as two sections (pricing and naming)."""
+    return vol.Schema(
+        {
+            vol.Required(SECTION_COST_PRICING): section(build_cost_pricing_schema(hass, current_entity_id)),
+            vol.Required(SECTION_COST_NAMING): section(SCHEMA_GLOBAL_COST_NAMING, {"collapsed": True}),
+        },
+    )
+
 
 # Flat variant with all cost keys, used to merge/clear the (un)nested user input.
 SCHEMA_GLOBAL_COST_FLAT = SCHEMA_COST_PRICING.extend(SCHEMA_GLOBAL_COST_NAMING.schema)
