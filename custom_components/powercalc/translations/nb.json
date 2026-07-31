@@ -2,7 +2,7 @@
   "common": {
     "source_entity": "Kildeentitet",
     "source_device": "Kildeenhet",
-    "remarks_smart_switch": "Denne profilen inneholder bare effektverdier for standby. \n Hvis du har et apparat som bruker en fast mengde strøm når det er slått på, kan du oppgi denne verdien i neste trinn i konfigurasjonen",
+    "remarks_smart_switch": "Denne profilen inneholder bare effektverdier for standby. \n Hvis du har et apparat med fast effekt når det er slått på, kan du angi denne verdien i neste trinn i konfigurasjonen",
     "remarks_smart_dimmer": "Denne profilen inneholder bare effektverdier for standby. \n I neste trinn kan du valgfritt oppgi verdiene for det tilkoblede lyset"
   },
   "config": {
@@ -11,16 +11,16 @@
     },
     "error": {
       "cost_price_mandatory": "Du må oppgi enten en energipris eller en energipris-sensor",
-      "daily_energy_mandatory": "Du må oppgi minst én av Value eller Value template",
-      "entity_mandatory": "Du må velge en enhet for alle strategier unntatt playbook",
-      "fixed_mandatory": "Du må oppgi minst én av Power, Power template eller States power",
-      "fixed_states_power_only": "Denne enheten kan bare bruke «states_power», ikke «power»",
-      "group_mandatory": "Du må definere minst undergrupper eller effekt- og energienheter",
+      "daily_energy_mandatory": "Du må oppgi minst én av value eller value_template",
+      "entity_mandatory": "Du må velge en entitet for alle strategier unntatt playbook",
+      "fixed_mandatory": "Du må oppgi minst én av power, power_template eller states_power",
+      "fixed_states_power_only": "Denne entiteten kan bare bruke «states_power», ikke «power»",
+      "group_mandatory": "Du må definere minst undergrupper eller effekt- og energientiteter",
       "linear_mandatory": "Du må oppgi minst én av max_power eller calibrate",
       "linear_min_higher_as_max": "Maksimal effekt kan ikke være lavere enn minimal effekt",
-      "linear_unsupported_domain": "Enhetsdomenet støttes ikke i lineær modus. Må være ett av: fan, light eller mediaplayer. Du kan likevel bruke kalibrering",
+      "linear_unsupported_domain": "Entitetsdomenet støttes ikke i lineær modus. Det må være ett av følgende: fan, light eller media_player. Du kan likevel bruke calibrate",
       "lut_unsupported_color_mode": "LUT-profilen støtter ikke én av fargemodusene til lyset ditt. Se loggen for mer informasjon",
-      "lut_wrong_domain": "Bare light-enheter kan bruke LUT-modus",
+      "lut_wrong_domain": "Bare entiteter i light-domenet kan bruke LUT-modus",
       "playbook_mandatory": "Du må oppgi minst én playbook",
       "unknown": "Ukjent feil oppstod. Se loggen for mer informasjon"
     },
@@ -38,17 +38,17 @@
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Tilgjengelighetsenhet"
+          "availability_entity": "Tilgjengelighetsentitet"
         },
         "data_description": {
-          "availability_entity": "Når denne enheten ikke er tilgjengelig, vil Powercalc-sensoren heller ikke være tilgjengelig"
+          "availability_entity": "Når denne entiteten ikke er tilgjengelig, vil Powercalc-sensoren heller ikke være tilgjengelig"
         },
-        "title": "Tilgjengelighetsenhet",
+        "title": "Tilgjengelighetsentitet",
         "description": "Denne profilen gjelder per enhet. Velg enheten som skal brukes til å bestemme tilgjengeligheten til Powercalc-sensoren"
       },
       "daily_energy": {
         "data": {
-          "create_utility_meters": "Opprett energimålere",
+          "create_utility_meters": "Opprett forbruksmålere",
           "daily_energy_value": "Daglig energiverdi",
           "name": "Navn",
           "on_time": "På-tid",
@@ -82,9 +82,9 @@
           "name": "Navn",
           "create_energy_sensor": "Opprett energisensor",
           "create_cost_sensor": "Opprett kostnadssensor",
-          "create_utility_meters": "Opprett energimålere",
-          "domain": "Enhetsdomene",
-          "exclude_entities": "Ekskluder enheter"
+          "create_utility_meters": "Opprett forbruksmålere",
+          "domain": "Entitetsdomene",
+          "exclude_entities": "Ekskluder entiteter"
         },
         "title": "Opprett en domenebasert gruppesensor"
       },
@@ -93,14 +93,14 @@
           "fixed_value": "Effektverdi"
         },
         "data_description": {
-          "fixed_value": "Effektverdi i watt når enheten er PÅ"
+          "fixed_value": "Effektverdi i watt når entiteten er PÅ"
         },
-        "description": "Definer en fast effektverdi for enheten. Se [dokumentasjonen]({docs_uri}) for mer informasjon",
+        "description": "Definer en fast effektverdi for entiteten. Se [dokumentasjonen]({docs_uri}) for mer informasjon",
         "title": "Faste innstillinger"
       },
       "global_configuration": {
         "title": "Globale innstillinger",
-        "description": "Konfigurer globale innstillinger for Powercalc. Se [dokumentasjonen]({docs_uri}) for mer informasjon. Flere innstillinger for energisensorer og energimålere kan angis i de neste trinnene.",
+        "description": "Konfigurer globale innstillinger for Powercalc. Se [dokumentasjonen]({docs_uri}) for mer informasjon. Flere innstillinger for energisensorer og forbruksmålere kan angis i de neste trinnene.",
         "sections": {
           "power_options": {
             "name": "Effektsensor",
@@ -117,1086 +117,1086 @@
               "create_energy_sensors": "Opprett energisensorer",
               "create_cost_sensors": "Opprett kostnadssensorer",
               "create_standby_group": "Opprett standbygruppe",
-              "create_utility_meters": "Opprett energimålere"
+              "create_utility_meters": "Opprett forbruksmålere"
             },
             "data_description": {
-              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+              "create_energy_sensors": "Om Powercalc trenger å lage kWh-sensorer",
+              "create_cost_sensors": "Om Powercalc trenger å lage kostnadssensorer. Krever en energipris som skal konfigureres i de neste trinnene",
+              "create_standby_group": "Opprett en gruppe som summerer alt effektforbruk i standby og egenbruk av IoT-enheter",
+              "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser"
             }
           },
           "advanced": {
-            "name": "Advanced",
+            "name": "Avansert",
             "data": {
-              "enable_analytics": "Enable anonymous analytics",
-              "ignore_unavailable_state": "Ignore unavailable state",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "disable_extended_attributes": "Disable extended attributes",
-              "disable_library_download": "Disable remote library download"
+              "enable_analytics": "Aktiver anonym analyse",
+              "ignore_unavailable_state": "Ignorer utilgjengelig tilstand",
+              "include_non_powercalc_sensors": "Inkluder sensorer som ikke er fra Powercalc",
+              "disable_extended_attributes": "Deaktiver utvidede attributter",
+              "disable_library_download": "Deaktiver nedlasting av eksternt bibliotek"
             },
             "data_description": {
-              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
-              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-              "disable_library_download": "Disable the Powercalc library download feature"
+              "enable_analytics": "Tillat Powercalc å sende anonym, aggregert bruksstatistikk for å forbedre integrasjonen",
+              "ignore_unavailable_state": "Hold Powercalc-sensorer tilgjengelige, selv når kildeentiteten er utilgjengelig",
+              "include_non_powercalc_sensors": "Kontroller om du vil inkludere ikke-Powercalc-sensorer i grupper",
+              "disable_extended_attributes": "Deaktiver alle ekstra attributter Powercalc legger til effekt-, energi- og gruppeentitetstilstander. Dette vil bidra til å holde databasestørrelsen liten",
+              "disable_library_download": "Deaktiver funksjonen for nedlasting av Powercalc-biblioteket"
             }
           }
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. See [documentation]({docs_uri}) for more info",
+        "title": "Kostnadsalternativer",
+        "description": "Konfigurer energiprisen som brukes til å beregne kostnadssensorer. Oppgi enten en fast pris eller en sensor som gir gjeldende pris per kWh. Se [dokumentasjon]({docs_uri}) for mer informasjon",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Prissetting",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Fast energipris",
+              "energy_price_multiplier": "Energiprismultiplikator",
+              "energy_price_sensor": "Energiprissensor",
+              "energy_price_surcharge": "Energipristillegg"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "En fast pris per kWh i din lokale valuta",
+              "energy_price_multiplier": "Multiplikator brukt etter tilleggsavgiften. Bruk dette for prosentbaserte skatter eller avgifter, for eksempel 1,21 for 21 %",
+              "energy_price_sensor": "En sensor som gir gjeldende energipris per kWh (f.eks. fra en dynamisk tariffintegrasjon). La fastprisen stå tom for å bruke denne sensoren",
+              "energy_price_surcharge": "Ekstra fast beløp per kWh lagt til fastpris eller prissensorverdi"
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "Navngivning",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "Mønster for visningsnavn på kostnadssensor",
+              "cost_sensor_naming": "Navnemønster for kostnadssensor"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "Mønster for det visningsnavnet på kostnadssensoren. Kildenavnet settes inn på plassholderposisjonen",
+              "cost_sensor_naming": "Mønster som brukes til å bygge kostnadssensornavnet og entitets-ID. Kildenavnet settes inn på plassholderposisjonen"
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "Bruk kostnadssensorer",
+        "description": "Du endret innstillingen for globale kostnadssensorer. Vil du bruke denne endringen på alle eksisterende Powercalc-sensorer som ble opprettet gjennom GUI?",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "Bruk på eksisterende sensorer"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "Oppdater hver eksisterende GUI Powercalc sensor for å matche den nye kostnadssensorinnstillingen"
         }
       },
       "global_configuration_discovery": {
-        "title": "Discovery options",
-        "description": "Powercalc can scan your system for devices and entities that have power profiles in the built-in library. The options below let you fine-tune this behavior.",
+        "title": "Oppdagelsesalternativer",
+        "description": "Powercalc kan skanne systemet etter enheter og entiteter med effektprofiler i det innebygde biblioteket. Innstillingene nedenfor lar deg finjustere denne oppførselen.",
         "data": {
-          "enabled": "Enable discovery",
-          "exclude_device_types": "Excluded device types",
-          "exclude_self_usage": "Exclude self-usage"
+          "enabled": "Aktiver oppdagelse",
+          "exclude_device_types": "Ekskluderte enhetstyper",
+          "exclude_self_usage": "Ekskluder selvbruk"
         },
         "data_description": {
-          "exclude_device_types": "Exclude one or more specific device types from discovery.",
-          "exclude_self_usage": "Exclude self-usage profiles for smart switches."
+          "exclude_device_types": "Ekskluder én eller flere spesifikke enhetstyper fra oppdagelse.",
+          "exclude_self_usage": "Ekskluder selvbruksprofiler for smarte brytere."
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
+        "title": "Energialternativer",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "Metode for energiintegrasjon",
+          "energy_sensor_category": "Energisensorkategori",
+          "energy_sensor_friendly_naming": "Mønster for visningsnavn på energisensor",
+          "energy_sensor_naming": "Navnemønster for energisensor",
+          "energy_sensor_precision": "Presisjon for energisensor",
+          "energy_sensor_unit_prefix": "Enhetsprefiks for energisensor"
         }
       },
       "global_configuration_throttling": {
-        "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
+        "title": "Oppdateringsintervaller",
+        "description": "Still inn oppdateringsintervaller for de forskjellige sensortypene. Se [dokumentasjon]({docs_uri}) for mer informasjon",
         "data": {
-          "group_energy_update_interval": "Group energy update interval",
-          "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval",
-          "power_update_interval": "Power update interval"
+          "group_energy_update_interval": "Gruppeenergioppdateringsintervall",
+          "group_power_update_interval": "Gruppeeffektoppdateringsintervall",
+          "energy_update_interval": "Energioppdateringsintervall",
+          "power_update_interval": "Strømoppdateringsintervall"
         },
         "data_description": {
-          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
-          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
-          "power_update_interval": "Interval at which energy sensors are force updated. In seconds. Set to 0 to disable"
+          "group_energy_update_interval": "Intervall hvor gruppeenergisensorer oppdateres. På sekunder. Sett til 0 for å deaktivere",
+          "group_power_update_interval": "Intervall hvor gruppeeffektsensorer oppdateres. På sekunder. Sett til 0 for å deaktivere",
+          "energy_update_interval": "Intervall for oppdatering av energisensorer. På sekunder. Sett til 0 for å deaktivere",
+          "power_update_interval": "Intervall for oppdatering av effektsensorer, i sekunder. Sett til 0 for å deaktivere"
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
+        "title": "Innstillinger for forbruksmåler",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "Bruksmåler netto forbruk",
+          "utility_meter_tariffs": "Tariffer for forbruksmåler",
+          "utility_meter_types": "Bruksmålertyper"
         }
       },
       "group_custom": {
         "data": {
-          "name": "Name"
+          "name": "Navn"
         },
         "sections": {
           "members": {
-            "name": "Members",
+            "name": "Medlemmer",
             "data": {
-              "group_member_sensors": "Member powercalc sensors",
-              "group_member_devices": "Member devices",
-              "group_power_entities": "Additional power entities",
-              "group_energy_entities": "Additional energy entities",
-              "sub_groups": "Sub groups",
-              "area": "Area",
-              "floor": "Floor"
+              "group_member_sensors": "Powercalc-medlemssensorer",
+              "group_member_devices": "Medlemsenheter",
+              "group_power_entities": "Ytterligere effektentiteter",
+              "group_energy_entities": "Ytterligere energientiteter",
+              "sub_groups": "Undergrupper",
+              "area": "Område",
+              "floor": "Etasje"
             },
             "data_description": {
-              "group_member_sensors": "Powercalc sensors to include in the group",
-              "group_member_devices": "Add power and energy entities from the selected devices to the group",
-              "group_power_entities": "Additional power sensors (W) from your HA installation to include",
-              "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-              "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-              "area": "Adds all power sensors from the specified area",
-              "floor": "Adds all power sensors from the specified floor"
+              "group_member_sensors": "Powercalc-sensorer som skal inkluderes i gruppen",
+              "group_member_devices": "Legg til effekt- og energientiteter fra de valgte enhetene i gruppen",
+              "group_power_entities": "Ekstra effektsensorer (W) fra din HA-installasjon inkludert",
+              "group_energy_entities": "Ekstra energisensorer (kWh) fra din HA-installasjon for å inkludere",
+              "sub_groups": "Alle sensorene i de valgte undergruppene blir også lagt til i denne gruppen",
+              "area": "Legger til alle effektsensorer fra det angitte området",
+              "floor": "Legger til alle effektsensorer fra spesifisert etasje"
             }
           },
           "options": {
-            "name": "Options",
+            "name": "Alternativer",
             "data": {
-              "device": "Device",
-              "hide_members": "Hide members",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "force_calculate_group_energy": "Force calculate energy",
-              "group_energy_start_at_zero": "Start at zero",
-              "create_energy_sensor": "Create energy sensor",
-              "create_utility_meters": "Create utility meters"
+              "device": "Enhet",
+              "hide_members": "Skjul medlemmer",
+              "include_non_powercalc_sensors": "Inkluder sensorer som ikke er fra Powercalc",
+              "force_calculate_group_energy": "Tving energiberegning",
+              "group_energy_start_at_zero": "Start på null",
+              "create_energy_sensor": "Opprett energisensor",
+              "create_utility_meters": "Opprett forbruksmålere"
             },
             "data_description": {
-              "device": "Add the group entities powercalc creates to an existing device",
-              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
-              "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
-              "create_energy_sensor": "Whether powercalc needs to create a kWh sensor"
+              "device": "Legg til gruppeentitetene Powercalc oppretter, på en eksisterende enhet",
+              "include_non_powercalc_sensors": "Kontroller om ikke-Powercalc-sensorer skal inkluderes når du bruker områdealternativet",
+              "force_calculate_group_energy": "Som standard summerer Powercalc energisensorene fra medlemssensorene. Slå på dette alternativet for å tvinge frem en Riemann-sum-sensor",
+              "group_energy_start_at_zero": "Når dette er aktivert, starter energisensoren på null når den opprettes. Ellers summeres de gjeldende tilstandene til alle energisensorene som er medlemmer",
+              "create_energy_sensor": "Om Powercalc trenger å lage en kWh-sensor"
             }
           }
         },
-        "title": "Create a group sensor"
+        "title": "Opprett en gruppesensor"
       },
       "group_subtract": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "subtract_entities": "Subtract entities"
+          "create_energy_sensor": "Opprett energisensor",
+          "create_cost_sensor": "Opprett kostnadssensor",
+          "create_utility_meters": "Opprett forbruksmålere",
+          "entity_id": "Basisentitet",
+          "name": "Navn",
+          "subtract_entities": "Trekk fra entiteter"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "Grunnentiteten å trekke effekten fra",
+          "subtract_entities": "Velg alle entitetene du vil trekke fra basisentiteten"
         },
-        "title": "Subtract group sensor"
+        "title": "Trekk fra gruppesensor"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Strømsensor",
+          "group_tracked_auto": "Entiteter automatisk lagt til",
+          "create_energy_sensor": "Opprett energisensor",
+          "create_cost_sensor": "Opprett kostnadssensor",
+          "create_utility_meters": "Opprett forbruksmålere"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Velg effektsensoren som inneholder ditt totale effektforbruk. Når den står tom, vil bare en sporet effektsensor opprettes",
+          "group_tracked_auto": "Powercalc vil automatisk legge til alle effektsensorer til den sporede gruppen, og hoppe over Powercalc-grupper. Deaktiver dette når du ønsker å manuelt definere de sporede entitetene",
+          "create_energy_sensor": "Om Powercalc trenger å lage en kWh-sensor",
+          "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser"
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "Opprett en gruppesensor for all sporet og usporet effekt",
+        "title": "Opprett en sporet effektsensor"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Sporede entiteter"
         },
-        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
-        "title": "Select power entities"
+        "description": "Velg alle effektsensorene som inngår i det sporede forbruket. Listen fylles ut automatisk, men kan justeres manuelt",
+        "title": "Velg effektentiteter"
       },
       "group_tracked_untracked_auto": {
         "data": {
-          "exclude_entities": "Exclude entities"
+          "exclude_entities": "Ekskluder entiteter"
         },
-        "description": "Exclude specific entities from the auto tracked group",
-        "title": "Auto tracked configuration"
+        "description": "Ekskluder spesifikke entiteter fra den automatisk sporede gruppen",
+        "title": "Autosporet konfigurasjon"
       },
       "library": {
         "data": {
-          "confirm_autodisovered_model": "Confirm model"
+          "confirm_autodisovered_model": "Bekreft modellen"
         },
         "data_description": {
-          "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
+          "confirm_autodisovered_model": "Hvis du velger å ikke bekrefte, kan du selv angi produsenten og modellen"
         },
-        "description": "{source}\n\nManufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}",
-        "title": "Library"
+        "description": "{source}\n\nProdusent \"{manufacturer}\" og modell \"{model}\" ble automatisk oppdaget for enheten din.{remarks}",
+        "title": "Bibliotek"
       },
       "library_custom_fields": {
-        "title": "Profile configuration",
+        "title": "Profilkonfigurasjon",
         "data": {
-          "power_factor": "Power Factor"
+          "power_factor": "Effektfaktor"
         },
         "data_description": {
-          "power_factor": "Ratio of real power to apparent power. Use 0.6 for computers/electronics, 0.7 for mixed loads, 1.0 for resistive loads like heaters."
+          "power_factor": "Forholdet mellom aktiv effekt og tilsynelatende effekt. Bruk 0,6 for datamaskiner/elektronikk, 0,7 for blandede belastninger og 1,0 for resistive belastninger som varmeovner."
         }
       },
       "library_multi_profile": {
         "data": {
-          "model": "Select model"
+          "model": "Velg modell"
         },
-        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
-        "title": "Library"
+        "description": "Produsenten «{manufacturer}» og modellen «{model}» ble oppdaget automatisk for enheten din. Det finnes flere profiler som kanskje kan brukes. Slå opp den nøyaktige enhetsmodellen i [Powercalc-biblioteket]({library_link}), og velg riktig profil",
+        "title": "Bibliotek"
       },
       "linear": {
         "data": {
-          "attribute": "Attribute",
-          "calibrate": "Calibration values",
-          "gamma_curve": "Gamma curve",
-          "max_power": "Max power",
-          "min_power": "Min power"
+          "attribute": "Attributt",
+          "calibrate": "Kalibreringsverdier",
+          "gamma_curve": "Gammakurve",
+          "max_power": "Maks effekt",
+          "min_power": "Min. effekt"
         },
         "data_description": {
-          "attribute": "Specify the attribute. When left empty will be brightness for lights, volume for speakers, and percentage for fans",
-          "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
+          "attribute": "Spesifiser attributtet. Når det står tomt, vil lysstyrken for lysene, volum for høyttalerne og prosentandelen for viftene være",
+          "calibrate": "Sett en kalibreringsverdi på hver linje. Eksempel\n\n1:20"
         },
-        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
-        "title": "Linear config"
+        "description": "Definer alternativene for lineær effektberegning. Se [dokumentasjonen]({docs_uri}) for mer informasjon. Bruk enten min/maks effekt eller kalibreringsverdier som gir mulighet for flere kontrollpunkter.",
+        "title": "Lineær konfigurasjon"
       },
       "manufacturer": {
         "data": {
-          "manufacturer": "Manufacturer"
+          "manufacturer": "Produsent"
         },
-        "description": "Select the device manufacturer",
-        "title": "Manufacturer config"
+        "description": "Velg enhetsprodusenten",
+        "title": "Produsentkonfigurasjon"
       },
       "model": {
         "data": {
-          "model": "Model ID"
+          "model": "Modell-ID"
         },
-        "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
-        "title": "Model config"
+        "description": "Velg enhetsmodell. Se [listen]({supported_models_link}) over støttede modeller for mer informasjon",
+        "title": "Modellkonfigurasjon"
       },
       "menu_group": {
         "menu_options": {
           "group_custom": "Standard",
-          "group_domain": "Domain based",
-          "group_subtract": "Subtract",
-          "group_tracked_untracked": "Tracked/untracked power"
+          "group_domain": "Domenebasert",
+          "group_subtract": "Subtrahere",
+          "group_tracked_untracked": "Sporet/usporet effekt"
         },
-        "title": "Choose the group type",
-        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensor. Choose standard group otherwise"
+        "title": "Velg gruppetype",
+        "description": "Velg typen gruppesensor du vil opprette. Velg en domenebasert gruppe for å gruppere alle entiteter i et bestemt domene, eller for å opprette en sensor som summerer alle energisensorene dine. Velg ellers en standardgruppe"
       },
       "multi_switch": {
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Bryterentitet",
+          "power": "Effekt når på",
+          "power_off": "Effekt når av"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "entities": "Velg alle de individuelle bryterne som er en del av multibryteren",
+          "power": "Strøm for en enkelt bryter når den er slått på",
+          "power_off": "Strøm for en enkelt bryter når den er slått av"
         },
-        "description": "Define the Multi switch power calculation options. See the [documentation]({docs_uri}) for more information.",
-        "title": "Multi switch config"
+        "description": "Definer alternativene for multibrytereffektberegning. Se [dokumentasjonen]({docs_uri}) for mer informasjon.",
+        "title": "Konfigurasjon for multibryter"
       },
       "playbook": {
         "data": {
           "autostart": "Autostart",
-          "playbooks": "Playbooks",
-          "repeat": "Repeat",
-          "states_trigger": "State trigger"
+          "playbooks": "Playbooker",
+          "repeat": "Gjenta",
+          "states_trigger": "Tilstandsutløser"
         },
         "data_description": {
-          "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "repeat": "Toggle when you want to keep repeating the playbook after it completes",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "autostart": "Angir at en bestemt playbook skal startes når HA starter, for eksempel 'program1'",
+          "repeat": "Aktiver dette for å gjenta playbooken etter at den er fullført",
+          "states_trigger": "Utløs en playbook basert på en tilstandsendring. Eksempel\n\nplaying: program1"
         },
-        "description": "Define the playbook options. See the [documentation]({docs_uri}) for more information.",
-        "title": "Playbook config"
+        "description": "Definer playbook-alternativene. Se [dokumentasjonen]({docs_uri}) for mer informasjon.",
+        "title": "Playbook-konfigurasjon"
       },
       "power_advanced": {
         "data": {
-          "calculation_enabled_condition": "Calculation enabled condition",
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix",
-          "energy_filter_outlier_enabled": "Energy filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "multiply_factor": "Multiply factor",
-          "multiply_factor_standby": "Multiply factor standby",
-          "unavailable_power": "Unavailable power"
+          "calculation_enabled_condition": "Beregning aktivert tilstand",
+          "energy_integration_method": "Metode for energiintegrasjon",
+          "energy_sensor_unit_prefix": "Enhetsprefiks for energisensor",
+          "energy_filter_outlier_enabled": "Filtrer avvik i energisensor",
+          "energy_filter_outlier_max_step": "Maksimalt trinn for avviksfilter",
+          "ignore_unavailable_state": "Ignorer utilgjengelig tilstand",
+          "multiply_factor": "Multipliser faktor",
+          "multiply_factor_standby": "Multipliser faktor standby",
+          "unavailable_power": "Utilgjengelig effekt"
         },
         "data_description": {
-          "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter",
-          "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
-          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
-          "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
+          "calculation_enabled_condition": "Den konfigurerte effektberegningsstrategien kjøres bare når denne malen evalueres til true eller 1. Ellers viser effektsensoren 0",
+          "energy_filter_outlier_enabled": "Aktiver filtrering av avviksverdier i energisensoren",
+          "energy_filter_outlier_max_step": "Største forventede trinn i effektverdier (i watt) for avviksfilteret",
+          "ignore_unavailable_state": "Aktiver dette hvis effektsensoren skal forbli tilgjengelig selv om kildeentiteten er utilgjengelig",
+          "multiply_factor": "Multipliserer den beregnede effekten med denne faktoren. Kan være nyttig for lysgrupper",
+          "multiply_factor_standby": "Om du også skal bruke multiplikasjonsfaktor på standbyeffekt",
+          "unavailable_power": "Effekt i W som skal registreres når kildeentiteten har tilstanden utilgjengelig"
         },
-        "description": "The options below are for advanced powercalc configuration. Most users will not use this so you may skip these",
-        "title": "Advanced options"
+        "description": "Alternativene nedenfor er for avansert Powercalc-konfigurasjon. De fleste brukere vil ikke bruke dette, så du kan hoppe over disse",
+        "title": "Avanserte alternativer"
       },
       "real_power": {
         "data": {
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Power sensor id",
-          "name": "Name",
-          "device": "Device"
+          "create_utility_meters": "Opprett forbruksmålere",
+          "entity_id": "Effektsensor-ID",
+          "name": "Navn",
+          "device": "Enhet"
         },
         "data_description": {
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting",
-          "device": "Add the created energy sensor to an specific device"
+          "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser",
+          "name": "Basisnavn for energi- og forbruksmåleren. Det fullstendige entitetsnavnet angis i henhold til innstillingen energy_sensor_naming",
+          "device": "Legg til den opprettede energisensoren til en bestemt enhet"
         },
-        "description": "Currently specific settings can only be configured globally",
-        "title": "Create an energy sensor for an existing power sensor"
+        "description": "For øyeblikket kan spesifikke innstillinger bare konfigureres globalt",
+        "title": "Opprett en energisensor for en eksisterende effektsensor"
       },
       "cost": {
         "data": {
-          "energy_sensor_id": "Energy sensor",
-          "name": "Name"
+          "energy_sensor_id": "Energisensor",
+          "name": "Navn"
         },
         "data_description": {
-          "energy_sensor_id": "The existing energy sensor (kWh) to calculate the cost for. This can be a sensor from any integration, not only Powercalc",
-          "name": "Base name for the cost sensor. The full entity name is set according to the cost_sensor_naming setting"
+          "energy_sensor_id": "Den eksisterende energisensoren (kWh) som kostnaden skal beregnes for. Dette kan være en sensor fra hvilken som helst integrasjon, ikke bare Powercalc",
+          "name": "Basisnavn for kostnadssensoren. Det fullstendige entitetsnavnet angis i henhold til innstillingen cost_sensor_naming"
         },
-        "description": "Create a cost sensor for an existing energy sensor. The energy price is taken from the Powercalc global configuration, unless you override it below.",
+        "description": "Opprett en kostnadssensor for en eksisterende energisensor. Energiprisen er hentet fra Powercalc globale konfigurasjon, med mindre du overstyrer den nedenfor.",
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "Prisoverstyring",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Fast energipris",
+              "energy_price_multiplier": "Energiprismultiplikator",
+              "energy_price_sensor": "Energiprissensor",
+              "energy_price_surcharge": "Energipristillegg"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "En fast pris per kWh i din lokale valuta. La stå tomt for å bruke den globale energiprisen",
+              "energy_price_multiplier": "Multiplikator brukt etter tilleggsavgiften. Bruk dette for prosentbaserte skatter eller avgifter, for eksempel 1,21 for 21 %. La stå tomt for å bruke den globale multiplikatoren",
+              "energy_price_sensor": "En sensor som gir gjeldende energipris per kWh (f.eks. fra en dynamisk tariffintegrasjon). La fastprisen stå tom for å bruke denne sensoren",
+              "energy_price_surcharge": "Ekstra fast beløp per kWh lagt til fastpris eller prissensorverdi. La stå tomt for å bruke den globale tilleggsavgiften"
             }
           }
         },
-        "title": "Create a cost sensor"
+        "title": "Opprett en kostnadssensor"
       },
       "sub_profile": {
         "data": {
-          "sub_profile": "Sub profile"
+          "sub_profile": "Underprofil"
         },
-        "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"{remarks}",
-        "title": "Sub profile config"
+        "description": "Denne enheten har en modell med flere underprofiler. Velg den som samsvarer med følgende entitet for denne enheten:\n\n\"{entity_id}\"{remarks}",
+        "title": "Konfigurasjon av underprofil"
       },
       "sub_profile_per_device": {
         "data": {
-          "sub_profile": "Sub profile"
+          "sub_profile": "Underprofil"
         },
-        "description": "This device has a model with multiple sub profiles. {remarks}",
-        "title": "Sub profile config"
+        "description": "Denne enheten har en modell med flere underprofiler. {remarks}",
+        "title": "Konfigurasjon av underprofil"
       },
       "smart_switch": {
         "data": {
-          "power": "Power",
-          "self_usage_included": "Self usage included"
+          "power": "Effekt",
+          "self_usage_included": "Selvbruk inkludert"
         },
         "data_description": {
-          "power": "A fixed power value in Watts for the connected appliance",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
+          "power": "En fast effektverdi i watt for det tilkoblede apparatet",
+          "self_usage_included": "Om effektverdien inkluderer effekten som forbrukes av selve smartbryteren. Når du utelater den, vil Powercalc legge til selvbruken til smartbryteren til effektverdien, som er {self_usage_power}W"
         },
-        "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
-        "title": "Smart switch config"
+        "description": "Angi effektforbruket til det tilkoblede apparatet. Hvis apparatet ikke har fast effekt, kan du hoppe over dette trinnet. Powercalc konfigurerer en effektsensor for smartbryterens egetforbruk",
+        "title": "Smart bryterkonfigurasjon"
       },
       "user": {
         "data": {
-          "sensor_type": "Sensor type"
+          "sensor_type": "Sensortype"
         },
         "menu_options": {
-          "cost": "Cost sensor (from existing energy sensor)",
-          "daily_energy": "Daily energy",
-          "group": "group",
-          "global_configuration": "Global configuration",
-          "menu_group": "Group",
-          "menu_library": "Virtual power (library)",
-          "real_power": "Energy from real power sensor",
-          "virtual_power": "Virtual power (manual)"
+          "cost": "Kostnadssensor (fra eksisterende energisensor)",
+          "daily_energy": "Daglig energi",
+          "group": "gruppe",
+          "global_configuration": "Global konfigurasjon",
+          "menu_group": "Gruppe",
+          "menu_library": "Virtuell effekt (bibliotek)",
+          "real_power": "Energi fra målt effektsensor",
+          "virtual_power": "Virtuell effekt (manuell)"
         },
-        "title": "Choose your sensor type"
+        "title": "Velg sensortype"
       },
       "utility_meter_options": {
-        "title": "Utility meter options",
-        "description": "Define the settings for utility meter creation here",
+        "title": "Innstillinger for forbruksmåler",
+        "description": "Angi innstillingene for oppretting av forbruksmålere her",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
-          "utility_meter_types": "Cycles",
-          "utility_meter_tariffs": "Tariffs"
+          "utility_meter_net_consumption": "Netto forbruk",
+          "utility_meter_types": "Sykluser",
+          "utility_meter_tariffs": "Tariffer"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
-          "utility_meter_types": "Create utility meters for specified cycles",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_net_consumption": "Aktiver dette for å behandle kilden som en nettomåler. Da kan telleren gå både i positiv og negativ retning.",
+          "utility_meter_types": "Opprett forbruksmålere for spesifiserte sykluser",
+          "utility_meter_tariffs": "En liste over støttede tariffer, la stå tom hvis bare en enkelt tariff er nødvendig."
         }
       },
       "virtual_power": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Source entity",
-          "mode": "Calculation strategy",
-          "name": "Name",
-          "standby_power": "Standby power"
+          "create_energy_sensor": "Opprett energisensor",
+          "create_cost_sensor": "Opprett kostnadssensor",
+          "create_utility_meters": "Opprett forbruksmålere",
+          "entity_id": "Kildeentitet",
+          "mode": "Beregningsstrategi",
+          "name": "Navn",
+          "standby_power": "Standbyeffekt"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "entity_id": "Entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
+          "create_energy_sensor": "Om Powercalc trenger å lage en kWh-sensor",
+          "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser",
+          "entity_id": "Entiteten den virtuelle effekten er basert på. Effektsensoren oppdateres når tilstanden til denne entiteten endres",
+          "name": "Hvis du lar det stå tomt, hentes navnet fra kildeentiteten",
+          "standby_power": "Definer mengden effekt enheten bruker når den er i AV-tilstand"
         },
-        "description": "See the readme for more information about the possible strategies and configuration options. Either source entity or name is required, or both.",
-        "title": "Create a virtual power sensor"
+        "description": "Se README-filen for mer informasjon om tilgjengelige strategier og konfigurasjonsinnstillinger. Kildeentitet, navn eller begge deler er påkrevd.",
+        "title": "Opprett en virtuell effektsensor"
       },
       "wled": {
         "data": {
-          "power_factor": "Power factor",
-          "voltage": "Voltage"
+          "power_factor": "Effektfaktor",
+          "voltage": "Spenning"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see {docs_uri}",
-        "title": "WLED config"
+        "description": "Sørg for å aktivere lysstyrkebegrenser i WLED-programvaren. Se også {docs_uri}",
+        "title": "WLED-konfigurasjon"
       }
     }
   },
   "exceptions": {
     "invalid_integration_method": {
-      "message": "Invalid integration method \"{method}\". Must be one of: {allowed_methods}."
+      "message": "Ugyldig integreringsmetode \"{method}\". Må være en av: {allowed_methods}."
     },
     "no_sub_profile_support": {
-      "message": "{entity_id} does not support switching sub profiles. This action is only available for sensors which have sub profiles and no automatic sub profile selection."
+      "message": "{entity_id} støtter ikke bytte av underprofiler. Denne handlingen er kun tilgjengelig for sensorer som har underprofiler og ingen automatisk underprofilvalg."
     },
     "not_a_playbook_sensor": {
-      "message": "{entity_id} is not a playbook enabled sensor. This action is only available for sensors using the playbook strategy."
+      "message": "{entity_id} er ikke en playbook-aktivert sensor. Denne handlingen er bare tilgjengelig for sensorer som bruker playbook-strategien."
     },
     "unknown_sub_profile": {
-      "message": "\"{profile}\" is not a known sub profile. Available sub profiles: {known_profiles}."
+      "message": "\"{profile}\" er ikke en kjent underprofil. Tilgjengelige underprofiler: {known_profiles}."
     }
   },
   "issues": {
     "composite_device_id": {
       "fix_flow": {
         "abort": {
-          "entry_removed": "The Powercalc configuration entry has been removed"
+          "entry_removed": "Powercalc-konfigurasjonsoppføringen er fjernet"
         },
         "error": {
-          "invalid_device": "Select an existing device or leave the field empty"
+          "invalid_device": "Velg en eksisterende enhet eller la feltet stå tomt"
         },
         "step": {
           "select_device": {
             "data": {
-              "device": "Device"
+              "device": "Enhet"
             },
             "data_description": {
-              "device": "The device the entities created by this Powercalc configuration should be linked to"
+              "device": "Enheten som entitetene opprettet av denne Powercalc-konfigurasjonen skal knyttes til"
             },
-            "description": "The Powercalc configuration {name} was linked to a device that Home Assistant has split into multiple devices. Its entities cannot be linked to the old device ID.\n\nSelect the device these entities should be linked to, or leave the field empty to leave them without a device.",
-            "title": "Select device for {name}"
+            "description": "Powercalc-konfigurasjonen {name} var knyttet til en enhet som Home Assistant har delt opp i flere enheter. Entitetene kan ikke knyttes til den gamle enhets-ID-en.\n\nVelg enheten disse entitetene skal knyttes til, eller la feltet stå tomt for å la dem være uten en enhet.",
+            "title": "Velg enhet for {name}"
           }
         }
       },
-      "title": "Device for Powercalc configuration {name} needs to be selected again"
+      "title": "Enhet for Powercalc-konfigurasjon {name} må velges på nytt"
     },
     "deprecated_platform_yaml": {
-      "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
-      "title": "Powercalc YAML configuration has moved"
+      "description": "Konfigurasjon av sensorer med `sensor->platform` er avviklet. Du må endre konfigurasjonen til `powercalc->sensors`. Klikk på «Les mer» for flere instruksjoner.",
+      "title": "Powercalc YAML-konfigurasjonen har flyttet"
     },
     "legacy_config": {
-      "title": "YAML configuration changed",
-      "description": "Your YAML configuration for {type} needs to be updated to the new structure. Click learn more for further information."
+      "title": "YAML-konfigurasjonen endret",
+      "description": "YAML-konfigurasjonen for {type} må oppdateres til den nye strukturen. Klikk på «Les mer» for mer informasjon."
     },
     "sub_profile": {
       "fix_flow": {
         "step": {
           "sub_profile": {
-            "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entity_id}\"\n\nManufacturer: {manufacturer}\nModel: {model}{remarks}",
-            "title": "Select correct sub profile",
+            "description": "Denne enheten har en modell med flere underprofiler. Velg den som samsvarer med følgende entitet for denne enheten:\n\n\"{entity_id}\"\n\nProdusent: {manufacturer}\nModell: {model}{remarks}",
+            "title": "Velg riktig underprofil",
             "data": {
-              "sub_profile": "Sub profile"
+              "sub_profile": "Underprofil"
             }
           }
         }
       },
-      "title": "Sub profile selection required for {entry}"
+      "title": "Underprofilvalg kreves for {entry}"
     }
   },
   "options": {
     "abort": {
-      "model_not_support": "Model not supported"
+      "model_not_support": "Modellen støttes ikke"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-      "group_mandatory": "You must define at least subgroups or power and energy-entities",
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
-      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "cost_price_mandatory": "Du må oppgi enten en energipris eller en energiprissensor",
+      "fixed_mandatory": "Du må oppgi minst én av power, power_template eller states_power",
+      "fixed_states_power_only": "Denne entiteten kan bare bruke 'states_power', ikke 'power'",
+      "group_mandatory": "Du må definere minst undergrupper eller effekt- og energientiteter",
+      "linear_mandatory": "Du må oppgi minst én av max_power eller calibrate",
+      "linear_min_higher_as_max": "Maks effekt kan ikke være lavere enn min effekt",
+      "linear_unsupported_domain": "Entitetsdomenet støttes ikke i lineær modus. Det må være ett av følgende: fan, light eller media_player. Du kan likevel bruke calibrate",
+      "unknown": "Ukjent feil oppstod. Se loggene for mer informasjon"
     },
     "step": {
       "advanced_options": {
-        "title": "Advanced options",
+        "title": "Avanserte alternativer",
         "data": {
-          "calculation_enabled_condition": "Calculation enabled condition",
-          "energy_integration_method": "Energy integration method",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "multiply_factor": "Multiply factor",
-          "multiply_factor_standby": "Multiply factor standby",
-          "unavailable_power": "Unavailable power"
+          "calculation_enabled_condition": "Beregning aktivert tilstand",
+          "energy_integration_method": "Metode for energiintegrasjon",
+          "ignore_unavailable_state": "Ignorer utilgjengelig tilstand",
+          "multiply_factor": "Multipliser faktor",
+          "multiply_factor_standby": "Multipliser faktor standby",
+          "unavailable_power": "Utilgjengelig effekt"
         },
         "data_description": {
-          "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
-          "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
-          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
-          "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
+          "calculation_enabled_condition": "Den konfigurerte effektberegningsstrategien kjøres bare når denne malen evalueres til true eller 1. Ellers viser effektsensoren 0",
+          "ignore_unavailable_state": "Aktiver dette hvis effektsensoren skal forbli tilgjengelig selv om kildeentiteten er utilgjengelig",
+          "multiply_factor": "Multipliserer den beregnede effekten med denne faktoren. Kan være nyttig for lysgrupper",
+          "multiply_factor_standby": "Om du også skal bruke multiplikasjonsfaktor på standbyeffekt",
+          "unavailable_power": "Effekt i W som skal registreres når kildeentiteten har tilstanden utilgjengelig"
         }
       },
       "basic_options": {
-        "title": "Basic options",
+        "title": "Grunnleggende alternativer",
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Source entity",
-          "name": "Name",
-          "standby_power": "Standby power"
+          "create_energy_sensor": "Opprett energisensor",
+          "create_cost_sensor": "Opprett kostnadssensor",
+          "create_utility_meters": "Opprett forbruksmålere",
+          "entity_id": "Kildeentitet",
+          "name": "Navn",
+          "standby_power": "Standbyeffekt"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "entity_id": "Entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
+          "create_energy_sensor": "Om Powercalc trenger å lage en kWh-sensor",
+          "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser",
+          "entity_id": "Entiteten den virtuelle effekten er basert på. Effektsensoren oppdateres når tilstanden til denne entiteten endres",
+          "name": "Hvis du lar det stå tomt, hentes navnet fra kildeentiteten",
+          "standby_power": "Definer mengden effekt enheten bruker når den er i AV-tilstand"
         }
       },
       "daily_energy": {
-        "title": "Daily energy options",
+        "title": "Daglige energialternativer",
         "data": {
-          "daily_energy_value": "Daily energy value",
-          "name": "Name",
-          "on_time": "On time",
-          "start_time": "Start time",
-          "unit_of_measurement": "Unit of measurement",
-          "update_frequency": "Update frequency",
-          "value": "Value",
-          "value_template": "Value template"
+          "daily_energy_value": "Daglig energiverdi",
+          "name": "Navn",
+          "on_time": "På-tid",
+          "start_time": "Starttid",
+          "unit_of_measurement": "Måleenhet",
+          "update_frequency": "Oppdateringsfrekvens",
+          "value": "Verdi",
+          "value_template": "Verdimal"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Hvis feltet står tomt, brukes én dag som standard, altså alltid på",
+          "update_frequency": "tid i sekunder mellom tilstandsoppdateringer av sensoren"
         }
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Energialternativer",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_integration_method": "Integrasjonsmetode",
+          "energy_sensor_unit_prefix": "Enhetsprefiks",
+          "energy_filter_outlier_enabled": "Filtrer avvik",
+          "energy_filter_outlier_max_step": "Maksimalt trinn for avviksfilter"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "Aktiver filtrering av avviksverdier i energisensoren",
+          "energy_filter_outlier_max_step": "Største forventede trinn i effektverdier (i watt) for avviksfilteret"
         }
       },
       "fixed": {
-        "title": "Fixed options",
+        "title": "Faste alternativer",
         "data": {
-          "fixed_value": "Fixed value",
-          "self_usage_included": "Self usage included"
+          "fixed_value": "Fast verdi",
+          "self_usage_included": "Selvbruk inkludert"
         },
         "data_description": {
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself."
+          "self_usage_included": "Om effektverdien inkluderer effekten som forbrukes av selve smartbryteren."
         }
       },
       "global_configuration": {
-        "title": "Basic options",
+        "title": "Grunnleggende alternativer",
         "sections": {
           "power_options": {
-            "name": "Power sensor",
+            "name": "Strømsensor",
             "data": {
-              "power_sensor_naming": "Power sensor name pattern",
-              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-              "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_naming": "Navnemønster for effektsensor",
+              "power_sensor_friendly_naming": "Mønster for visningsnavn på effektsensor",
+              "power_sensor_category": "Strømsensorkategori",
+              "power_sensor_precision": "Kraftsensor presisjon"
             }
           },
           "features": {
-            "name": "Create sensors",
+            "name": "Opprett sensorer",
             "data": {
-              "create_energy_sensors": "Create energy sensors",
-              "create_cost_sensors": "Create cost sensors",
-              "create_standby_group": "Create standby group",
-              "create_utility_meters": "Create utility meters"
+              "create_energy_sensors": "Opprett energisensorer",
+              "create_cost_sensors": "Opprett kostnadssensorer",
+              "create_standby_group": "Opprett standby-gruppe",
+              "create_utility_meters": "Opprett forbruksmålere"
             },
             "data_description": {
-              "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-              "create_cost_sensors": "Whether powercalc needs to create cost sensors. Requires an energy price to be configured in the next steps",
-              "create_standby_group": "Create group which sums all standby power consumption and self-usage of IOT devices",
-              "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+              "create_energy_sensors": "Om Powercalc trenger å lage kWh-sensorer",
+              "create_cost_sensors": "Om Powercalc trenger å lage kostnadssensorer. Krever en energipris som skal konfigureres i de neste trinnene",
+              "create_standby_group": "Opprett en gruppe som summerer alt effektforbruk i standby og egenbruk av IoT-enheter",
+              "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser"
             }
           },
           "advanced": {
-            "name": "Advanced",
+            "name": "Avansert",
             "data": {
-              "enable_analytics": "Enable anonymous analytics",
-              "ignore_unavailable_state": "Ignore unavailable state",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "disable_extended_attributes": "Disable extended attributes",
-              "disable_library_download": "Disable remote library download"
+              "enable_analytics": "Aktiver anonym analyse",
+              "ignore_unavailable_state": "Ignorer utilgjengelig tilstand",
+              "include_non_powercalc_sensors": "Inkluder sensorer som ikke er fra Powercalc",
+              "disable_extended_attributes": "Deaktiver utvidede attributter",
+              "disable_library_download": "Deaktiver nedlasting av eksternt bibliotek"
             },
             "data_description": {
-              "enable_analytics": "Allow Powercalc to send anonymous, aggregated usage statistics to help improve the integration",
-              "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-              "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups",
-              "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-              "disable_library_download": "Disable the Powercalc library download feature"
+              "enable_analytics": "Tillat Powercalc å sende anonym, aggregert bruksstatistikk for å forbedre integrasjonen",
+              "ignore_unavailable_state": "Hold Powercalc-sensorer tilgjengelige, selv når kildeentiteten er utilgjengelig",
+              "include_non_powercalc_sensors": "Kontroller om du vil inkludere ikke-Powercalc-sensorer i grupper",
+              "disable_extended_attributes": "Deaktiver alle ekstra attributter Powercalc legger til effekt-, energi- og gruppeentitetstilstander. Dette vil bidra til å holde databasestørrelsen liten",
+              "disable_library_download": "Deaktiver funksjonen for nedlasting av Powercalc-biblioteket"
             }
           }
         }
       },
       "global_configuration_cost": {
-        "title": "Cost options",
-        "description": "Configure the energy price used to calculate cost sensors. Provide either a fixed price or a sensor which provides the current price per kWh. See [documentation]({docs_uri}) for more info",
+        "title": "Kostnadsalternativer",
+        "description": "Konfigurer energiprisen som brukes til å beregne kostnadssensorer. Oppgi enten en fast pris eller en sensor som gir gjeldende pris per kWh. Se [dokumentasjon]({docs_uri}) for mer informasjon",
         "sections": {
           "cost_pricing": {
-            "name": "Pricing",
+            "name": "Prissetting",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Fast energipris",
+              "energy_price_multiplier": "Energiprismultiplikator",
+              "energy_price_sensor": "Energiprissensor",
+              "energy_price_surcharge": "Energipristillegg"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value"
+              "energy_price": "En fast pris per kWh i din lokale valuta",
+              "energy_price_multiplier": "Multiplikator brukt etter tilleggsavgiften. Bruk dette for prosentbaserte skatter eller avgifter, for eksempel 1,21 for 21 %",
+              "energy_price_sensor": "En sensor som gir gjeldende energipris per kWh (f.eks. fra en dynamisk tariffintegrasjon). La fastprisen stå tom for å bruke denne sensoren",
+              "energy_price_surcharge": "Ekstra fast beløp per kWh lagt til fastpris eller prissensorverdi"
             }
           },
           "cost_naming": {
-            "name": "Naming",
+            "name": "Navngivning",
             "data": {
-              "cost_sensor_friendly_naming": "Cost sensor friendly name pattern",
-              "cost_sensor_naming": "Cost sensor name pattern"
+              "cost_sensor_friendly_naming": "Mønster for visningsnavn på kostnadssensor",
+              "cost_sensor_naming": "Navnemønster for kostnadssensor"
             },
             "data_description": {
-              "cost_sensor_friendly_naming": "Pattern for the friendly name of the cost sensor. The source name is inserted at the placeholder position",
-              "cost_sensor_naming": "Pattern used to build the cost sensor name and entity id. The source name is inserted at the placeholder position"
+              "cost_sensor_friendly_naming": "Mønster for det visningsnavnet på kostnadssensoren. Kildenavnet settes inn på plassholderposisjonen",
+              "cost_sensor_naming": "Mønster som brukes til å bygge kostnadssensornavnet og entitets-ID. Kildenavnet settes inn på plassholderposisjonen"
             }
           }
         }
       },
       "global_configuration_cost_apply": {
-        "title": "Apply cost sensors",
-        "description": "You changed the global cost sensors setting. Do you want to apply this change to all existing powercalc sensors that were created through the GUI?",
+        "title": "Bruk kostnadssensorer",
+        "description": "Du endret innstillingen for globale kostnadssensorer. Vil du bruke denne endringen på alle eksisterende Powercalc-sensorer som ble opprettet gjennom GUI?",
         "data": {
-          "apply_to_all": "Apply to existing sensors"
+          "apply_to_all": "Bruk på eksisterende sensorer"
         },
         "data_description": {
-          "apply_to_all": "Update every existing GUI powercalc sensor to match the new cost sensors setting"
+          "apply_to_all": "Oppdater hver eksisterende GUI Powercalc sensor for å matche den nye kostnadssensorinnstillingen"
         }
       },
       "global_configuration_discovery": {
-        "title": "Discovery options",
-        "description": "Manage discovery setting. See [documentation]({docs_uri}) for more info",
+        "title": "Oppdagelsesalternativer",
+        "description": "Administrer oppdagelsesinnstilling. Se [dokumentasjon]({docs_uri}) for mer informasjon",
         "data": {
-          "enabled": "Enable discovery",
-          "exclude_device_types": "Excluded device types",
-          "exclude_self_usage": "Exclude self-usage"
+          "enabled": "Aktiver oppdagelse",
+          "exclude_device_types": "Ekskluderte enhetstyper",
+          "exclude_self_usage": "Ekskluder selvbruk"
         },
         "data_description": {
-          "exclude_device_types": "Exclude one or more specific device types from discovery.",
-          "exclude_self_usage": "Exclude self-usage profiles for smart switches."
+          "exclude_device_types": "Ekskluder én eller flere spesifikke enhetstyper fra oppdagelse.",
+          "exclude_self_usage": "Ekskluder selvbruksprofiler for smarte brytere."
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
-        "description": "Define the default settings for energy sensors here. See [documentation]({docs_uri}) for more information",
+        "title": "Energialternativer",
+        "description": "Definer standardinnstillingene for energisensorer her. Se [dokumentasjon]({docs_uri}) for mer informasjon",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "Metode for energiintegrasjon",
+          "energy_sensor_category": "Energisensorkategori",
+          "energy_sensor_friendly_naming": "Mønster for visningsnavn på energisensor",
+          "energy_sensor_naming": "Navnemønster for energisensor",
+          "energy_sensor_precision": "Presisjon for energisensor",
+          "energy_sensor_unit_prefix": "Enhetsprefiks for energisensor"
         }
       },
       "global_configuration_throttling": {
-        "title": "Throttling options",
-        "description": "Set update intervals for the different sensor types. See [documentation]({docs_uri}) for more info",
+        "title": "Oppdateringsintervaller",
+        "description": "Still inn oppdateringsintervaller for de forskjellige sensortypene. Se [dokumentasjon]({docs_uri}) for mer informasjon",
         "data": {
-          "group_energy_update_interval": "Group energy update interval",
-          "group_power_update_interval": "Group power update interval",
-          "energy_update_interval": "Energy update interval",
-          "power_update_interval": "Power update interval"
+          "group_energy_update_interval": "Gruppeenergioppdateringsintervall",
+          "group_power_update_interval": "Gruppeeffektoppdateringsintervall",
+          "energy_update_interval": "Energioppdateringsintervall",
+          "power_update_interval": "Strømoppdateringsintervall"
         },
         "data_description": {
-          "group_energy_update_interval": "Interval at which group energy sensors are updated. In seconds. Set to 0 to disable",
-          "group_power_update_interval": "Interval at which group power sensors are updated. In seconds. Set to 0 to disable",
-          "energy_update_interval": "Interval at which energy sensors are updated. In seconds. Set to 0 to disable",
-          "power_update_interval": "Interval at which power sensors are force updated. In seconds. Set to 0 to disable"
+          "group_energy_update_interval": "Intervall hvor gruppeenergisensorer oppdateres. På sekunder. Sett til 0 for å deaktivere",
+          "group_power_update_interval": "Intervall hvor gruppeeffektsensorer oppdateres. På sekunder. Sett til 0 for å deaktivere",
+          "energy_update_interval": "Intervall for oppdatering av energisensorer. På sekunder. Sett til 0 for å deaktivere",
+          "power_update_interval": "Intervall for oppdatering av effektsensorer, i sekunder. Sett til 0 for å deaktivere"
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
-        "description": "Define the default settings for utility meters here. See [documentation]({docs_uri}) for more information",
+        "title": "Innstillinger for forbruksmåler",
+        "description": "Definer standardinnstillingene for forbruksmålere her. Se [dokumentasjon]({docs_uri}) for mer informasjon",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "Bruksmåler netto forbruk",
+          "utility_meter_tariffs": "Tariffer for forbruksmåler",
+          "utility_meter_types": "Bruksmålertyper"
         }
       },
       "group_custom": {
-        "title": "Group options",
+        "title": "Gruppealternativer",
         "sections": {
           "members": {
-            "name": "Members",
+            "name": "Medlemmer",
             "data": {
-              "group_member_sensors": "Member powercalc sensors",
-              "group_member_devices": "Member devices",
-              "group_power_entities": "Additional power entities",
-              "group_energy_entities": "Additional energy entities",
-              "sub_groups": "Sub groups",
-              "area": "Area",
-              "floor": "Floor"
+              "group_member_sensors": "Powercalc-medlemssensorer",
+              "group_member_devices": "Medlemsenheter",
+              "group_power_entities": "Ytterligere effektentiteter",
+              "group_energy_entities": "Ytterligere energientiteter",
+              "sub_groups": "Undergrupper",
+              "area": "Område",
+              "floor": "Etasje"
             },
             "data_description": {
-              "group_member_sensors": "Powercalc sensors to include in the group",
-              "group_member_devices": "Add power and energy entities from the selected devices to the group",
-              "group_power_entities": "Additional power sensors (W) from your HA installation to include",
-              "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-              "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-              "area": "Adds all power sensors from the specified area",
-              "floor": "Adds all power sensors from the specified floor"
+              "group_member_sensors": "Powercalc-sensorer som skal inkluderes i gruppen",
+              "group_member_devices": "Legg til effekt- og energientiteter fra de valgte enhetene i gruppen",
+              "group_power_entities": "Ekstra effektsensorer (W) fra din HA-installasjon inkludert",
+              "group_energy_entities": "Ekstra energisensorer (kWh) fra din HA-installasjon for å inkludere",
+              "sub_groups": "Alle sensorene i de valgte undergruppene blir også lagt til i denne gruppen",
+              "area": "Legger til alle effektsensorer fra det angitte området",
+              "floor": "Legger til alle effektsensorer fra spesifisert etasje"
             }
           },
           "options": {
-            "name": "Options",
+            "name": "Alternativer",
             "data": {
-              "device": "Device",
-              "hide_members": "Hide members",
-              "include_non_powercalc_sensors": "Include non powercalc sensors",
-              "force_calculate_group_energy": "Force calculate energy"
+              "device": "Enhet",
+              "hide_members": "Skjul medlemmer",
+              "include_non_powercalc_sensors": "Inkluder sensorer som ikke er fra Powercalc",
+              "force_calculate_group_energy": "Tving energiberegning"
             },
             "data_description": {
-              "device": "Add the group entities powercalc creates to an existing device",
-              "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-              "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor"
+              "device": "Legg til gruppeentitetene Powercalc oppretter, på en eksisterende enhet",
+              "include_non_powercalc_sensors": "Kontroller om ikke-Powercalc-sensorer skal inkluderes når du bruker områdealternativet",
+              "force_calculate_group_energy": "Som standard summerer Powercalc energisensorene fra medlemssensorene. Slå på dette alternativet for å tvinge frem en Riemann-sum-sensor"
             }
           }
         }
       },
       "group_subtract": {
         "data": {
-          "entity_id": "Base entity",
-          "subtract_entities": "Subtract entities"
+          "entity_id": "Basisentitet",
+          "subtract_entities": "Trekk fra entiteter"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "Grunnentiteten å trekke effekten fra",
+          "subtract_entities": "Velg alle entitetene du vil trekke fra basisentiteten"
         },
-        "title": "Group options"
+        "title": "Gruppealternativer"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Strømsensor",
+          "group_tracked_auto": "Entiteter automatisk lagt til",
+          "create_energy_sensor": "Opprett energisensor",
+          "create_cost_sensor": "Opprett kostnadssensor",
+          "create_utility_meters": "Opprett forbruksmålere"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Velg effektsensoren som inneholder ditt totale effektforbruk. Når den står tom, vil bare en sporet effektsensor opprettes",
+          "group_tracked_auto": "Powercalc vil automatisk legge til alle effektsensorer til den sporede gruppen, og hoppe over Powercalc-grupper. Deaktiver dette når du ønsker å manuelt definere de sporede entitetene",
+          "create_energy_sensor": "Om Powercalc trenger å lage en kWh-sensor",
+          "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser"
         },
-        "title": "Tracked/untracked group options"
+        "title": "Alternativer for sporede/usporede grupper"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Sporede entiteter"
         },
-        "title": "Select power entities"
+        "title": "Velg effektentiteter"
       },
       "init": {
         "menu_options": {
-          "advanced_options": "Advanced options",
-          "basic_options": "Basic options",
-          "cost": "Cost options",
-          "daily_energy": "Daily energy options",
-          "energy_options": "Energy options",
-          "fixed": "Fixed options",
-          "group_custom": "Group options",
-          "group_subtract": "Group options",
-          "group_tracked_untracked": "Group options",
-          "group_tracked_untracked_manual": "Tracked entities",
-          "library_options": "Library options",
-          "linear": "Linear options",
-          "playbook": "Playbook options",
-          "multi_switch": "Multi switch options",
-          "real_power": "Real power options",
-          "utility_meter_options": "Utility meter options",
-          "wled": "WLED options",
-          "cost_options": "Cost options"
+          "advanced_options": "Avanserte alternativer",
+          "basic_options": "Grunnleggende alternativer",
+          "cost": "Kostnadsalternativer",
+          "daily_energy": "Daglige energialternativer",
+          "energy_options": "Energialternativer",
+          "fixed": "Faste alternativer",
+          "group_custom": "Gruppealternativer",
+          "group_subtract": "Gruppealternativer",
+          "group_tracked_untracked": "Gruppealternativer",
+          "group_tracked_untracked_manual": "Sporede entiteter",
+          "library_options": "Alternativer for bibliotek",
+          "linear": "Lineære alternativer",
+          "playbook": "Playbook-alternativer",
+          "multi_switch": "Alternativer for flere brytere",
+          "real_power": "Innstillinger for målt effekt",
+          "utility_meter_options": "Innstillinger for forbruksmåler",
+          "wled": "WLED-innstillinger",
+          "cost_options": "Kostnadsalternativer"
         }
       },
       "library_options": {
-        "title": "Library options",
-        "description": "Currently the following library profile is selected: \n manufacturer: {manufacturer}\n model: {model}\n\nIf you want to change the profile, click next."
+        "title": "Alternativer for bibliotek",
+        "description": "For øyeblikket er følgende bibliotekprofil valgt: \n produsent: {manufacturer}\n modell: {model}\n\nHvis du vil endre profilen, klikker du på neste."
       },
       "linear": {
-        "title": "Linear options",
+        "title": "Lineære alternativer",
         "data": {
-          "attribute": "Attribute",
-          "calibrate": "Calibration values",
-          "gamma_curve": "Gamma curve",
-          "max_power": "Max power",
-          "min_power": "Min power"
+          "attribute": "Attributt",
+          "calibrate": "Kalibreringsverdier",
+          "gamma_curve": "Gammakurve",
+          "max_power": "Maks effekt",
+          "min_power": "Min. effekt"
         },
         "data_description": {
-          "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
-          "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
+          "attribute": "Spesifiser attributtet. Når det står tomt vil lysstyrken for lys og prosentandel for vifter være",
+          "calibrate": "Sett en kalibreringsverdi på hver linje. Eksempel\n\n1:20"
         }
       },
       "multi_switch": {
-        "title": "Multi switch options",
+        "title": "Alternativer for flere brytere",
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Bryterentitet",
+          "power": "Effekt når på",
+          "power_off": "Effekt når av"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "entities": "Velg alle de individuelle bryterne som er en del av multibryteren",
+          "power": "Strøm for en enkelt bryter når den er slått på",
+          "power_off": "Strøm for en enkelt bryter når den er slått av"
         }
       },
       "playbook": {
-        "title": "Playbook options",
+        "title": "Playbook-alternativer",
         "data": {
           "autostart": "Autostart",
-          "playbooks": "Playbooks",
-          "repeat": "Repeat",
-          "states_trigger": "State trigger"
+          "playbooks": "Playbooker",
+          "repeat": "Gjenta",
+          "states_trigger": "Tilstandsutløser"
         },
         "data_description": {
-          "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-          "repeat": "Toggle when you want to keep repeating the playbook after it completes",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "autostart": "Angir at en bestemt playbook skal startes når HA starter, for eksempel 'program1'",
+          "repeat": "Aktiver dette for å gjenta playbooken etter at den er fullført",
+          "states_trigger": "Utløs en playbook basert på en tilstandsendring. Eksempel\n\nplaying: program1"
         }
       },
       "real_power": {
-        "title": "Real power options",
+        "title": "Innstillinger for målt effekt",
         "data": {
-          "device": "Device"
+          "device": "Enhet"
         },
         "data_description": {
-          "device": "Add the created energy sensor to an specific device"
+          "device": "Legg til den opprettede energisensoren til en bestemt enhet"
         }
       },
       "cost": {
         "data": {
-          "energy_sensor_id": "Energy sensor"
+          "energy_sensor_id": "Energisensor"
         },
         "data_description": {
-          "energy_sensor_id": "The existing energy sensor (kWh) to calculate the cost for"
+          "energy_sensor_id": "Den eksisterende energisensoren (kWh) som kostnaden skal beregnes for"
         },
         "sections": {
           "cost_pricing": {
-            "name": "Price override",
+            "name": "Prisoverstyring",
             "data": {
-              "energy_price": "Fixed energy price",
-              "energy_price_multiplier": "Energy price multiplier",
-              "energy_price_sensor": "Energy price sensor",
-              "energy_price_surcharge": "Energy price surcharge"
+              "energy_price": "Fast energipris",
+              "energy_price_multiplier": "Energiprismultiplikator",
+              "energy_price_sensor": "Energiprissensor",
+              "energy_price_surcharge": "Energipristillegg"
             },
             "data_description": {
-              "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-              "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-              "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-              "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+              "energy_price": "En fast pris per kWh i din lokale valuta. La stå tomt for å bruke den globale energiprisen",
+              "energy_price_multiplier": "Multiplikator brukt etter tilleggsavgiften. Bruk dette for prosentbaserte skatter eller avgifter, for eksempel 1,21 for 21 %. La stå tomt for å bruke den globale multiplikatoren",
+              "energy_price_sensor": "En sensor som gir gjeldende energipris per kWh (f.eks. fra en dynamisk tariffintegrasjon). La fastprisen stå tom for å bruke denne sensoren",
+              "energy_price_surcharge": "Ekstra fast beløp per kWh lagt til fastpris eller prissensorverdi. La stå tomt for å bruke den globale tilleggsavgiften"
             }
           }
         },
-        "title": "Cost options"
+        "title": "Kostnadsalternativer"
       },
       "utility_meter_options": {
-        "title": "Utility meter options",
+        "title": "Innstillinger for forbruksmåler",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
-          "utility_meter_types": "Cycles",
-          "utility_meter_tariffs": "Tariffs"
+          "utility_meter_net_consumption": "Netto forbruk",
+          "utility_meter_types": "Sykluser",
+          "utility_meter_tariffs": "Tariffer"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
-          "utility_meter_types": "Create utility meters for specified cycles",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_net_consumption": "Aktiver dette for å behandle kilden som en nettomåler. Da kan telleren gå både i positiv og negativ retning.",
+          "utility_meter_types": "Opprett forbruksmålere for spesifiserte sykluser",
+          "utility_meter_tariffs": "En liste over støttede tariffer, la stå tom hvis bare en enkelt tariff er nødvendig."
         }
       },
       "wled": {
-        "title": "WLED options",
+        "title": "WLED-innstillinger",
         "data": {
-          "power_factor": "Power factor",
-          "voltage": "Voltage"
+          "power_factor": "Effektfaktor",
+          "voltage": "Spenning"
         }
       },
       "cost_options": {
         "data": {
-          "energy_price": "Fixed energy price",
-          "energy_price_multiplier": "Energy price multiplier",
-          "energy_price_sensor": "Energy price sensor",
-          "energy_price_surcharge": "Energy price surcharge"
+          "energy_price": "Fast energipris",
+          "energy_price_multiplier": "Energiprismultiplikator",
+          "energy_price_sensor": "Energiprissensor",
+          "energy_price_surcharge": "Energipristillegg"
         },
         "data_description": {
-          "energy_price": "A fixed price per kWh in your local currency. Leave empty to use the global energy price",
-          "energy_price_multiplier": "Multiplier applied after the surcharge. Use this for percentage-based taxes or fees, for example 1.21 for 21%. Leave empty to use the global multiplier",
-          "energy_price_sensor": "A sensor which provides the current energy price per kWh (e.g. from a dynamic tariff integration). Leave the fixed price empty to use this sensor",
-          "energy_price_surcharge": "Additional fixed amount per kWh added to the fixed price or price sensor value. Leave empty to use the global surcharge"
+          "energy_price": "En fast pris per kWh i din lokale valuta. La stå tomt for å bruke den globale energiprisen",
+          "energy_price_multiplier": "Multiplikator brukt etter tilleggsavgiften. Bruk dette for prosentbaserte skatter eller avgifter, for eksempel 1,21 for 21 %. La stå tomt for å bruke den globale multiplikatoren",
+          "energy_price_sensor": "En sensor som gir gjeldende energipris per kWh (f.eks. fra en dynamisk tariffintegrasjon). La fastprisen stå tom for å bruke denne sensoren",
+          "energy_price_surcharge": "Ekstra fast beløp per kWh lagt til fastpris eller prissensorverdi. La stå tomt for å bruke den globale tilleggsavgiften"
         },
-        "description": "Override the globally configured energy price for this sensor only. Leave all fields empty to keep using the global price. See [documentation]({docs_uri}) for more info",
-        "title": "Cost options"
+        "description": "Overstyr den globalt konfigurerte energiprisen kun for denne sensoren. La alle feltene stå tomme for å fortsette å bruke den globale prisen. Se [dokumentasjon]({docs_uri}) for mer informasjon",
+        "title": "Kostnadsalternativer"
       }
     }
   },
   "selector": {
     "daily_energy_value": {
       "choices": {
-        "value": "Fixed value",
-        "value_template": "Template"
+        "value": "Fast verdi",
+        "value_template": "Mal"
       }
     },
     "fixed_value": {
       "choices": {
-        "power": "Fixed value",
-        "power_template": "Template",
-        "states_power": "State mapping"
+        "power": "Fast verdi",
+        "power_template": "Mal",
+        "states_power": "Tilstandseffektkartlegging"
       }
     }
   },
   "services": {
     "activate_playbook": {
-      "description": "Start execution of a playbook.",
+      "description": "Start kjøring av en playbook.",
       "fields": {
         "playbook_id": {
-          "description": "Playbook identifier.",
+          "description": "Playbook-ID.",
           "name": "Playbook"
         }
       },
-      "name": "Activate playbook"
+      "name": "Aktiver playbook"
     },
     "calibrate_energy": {
-      "description": "Sets the energy sensor to a given kWh value.",
+      "description": "Stiller energisensoren til en gitt kWh-verdi.",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "Verdien som skal angis.",
+          "name": "Verdi"
         }
       },
-      "name": "Calibrate energy sensor"
+      "name": "Kalibrer energisensor"
     },
     "calibrate_cost": {
-      "description": "Sets the cost sensor to a given monetary value.",
+      "description": "Setter kostnadssensoren til en gitt pengeverdi.",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "Verdien som skal angis.",
+          "name": "Verdi"
         }
       },
-      "name": "Calibrate cost sensor"
+      "name": "Kalibrer kostnadssensor"
     },
     "calibrate_utility_meter": {
-      "description": "Calibrates a utility meter sensor.",
+      "description": "Kalibrerer en forbruksmålersensor.",
       "fields": {
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "Verdien som skal angis.",
+          "name": "Verdi"
         }
       },
-      "name": "Calibrate utility meter"
+      "name": "Kalibrer forbruksmåler"
     },
     "change_gui_config": {
-      "description": "Batch change configuration of all Powercalc config entries",
+      "description": "Endre konfigurasjonen for alle Powercalc-konfigurasjonsoppføringer samlet",
       "fields": {
         "field": {
-          "description": "The field you'd like to change",
-          "name": "Value"
+          "description": "Feltet du ønsker å endre",
+          "name": "Verdi"
         },
         "value": {
-          "description": "The value to set.",
-          "name": "Value"
+          "description": "Verdien som skal angis.",
+          "name": "Verdi"
         }
       },
-      "name": "Change GUI config"
+      "name": "Endre GUI-konfigurasjon"
     },
     "debug_group": {
-      "description": "Get a debug overview of a group power or energy sensor including current member values.",
-      "name": "Debug group"
+      "description": "Få en feilsøkingsoversikt over en gruppeeffekt- eller energisensor inkludert gjeldende medlemsverdier.",
+      "name": "Feilsøk gruppe"
     },
     "get_active_playbook": {
-      "description": "Get current running playbook",
-      "name": "Get active playbook"
+      "description": "Hent playbooken som kjører",
+      "name": "Hent aktiv playbook"
     },
     "get_group_entities": {
-      "description": "Retrieve all entity id's of a group energy or power sensor",
-      "name": "Get group entities"
+      "description": "Hent alle entitets-ID-er for en gruppeenergi- eller effektsensor",
+      "name": "Hent gruppeentiteter"
     },
     "increase_daily_energy": {
-      "description": "Increases the sensor with a given amount.",
+      "description": "Øker sensoren med en gitt mengde.",
       "fields": {
         "value": {
-          "description": "Amount to add to the sensor.",
-          "name": "Value"
+          "description": "Mengde å legge til sensoren.",
+          "name": "Verdi"
         }
       },
-      "name": "Increase daily energy sensor"
+      "name": "Øk den daglige energisensoren"
     },
     "reload": {
-      "description": "Reload Powercalc configuration and entities",
-      "name": "Reload"
+      "description": "Last inn Powercalc-konfigurasjon og entiteter på nytt",
+      "name": "Last inn på nytt"
     },
     "reset_energy": {
-      "description": "Reset an energy sensor to zero kWh.",
-      "name": "Reset energy sensor"
+      "description": "Tilbakestill en energisensor til null kWh.",
+      "name": "Tilbakestill energisensoren"
     },
     "reset_cost": {
-      "description": "Reset a cost sensor to zero.",
-      "name": "Reset cost sensor"
+      "description": "Tilbakestill en kostnadssensor til null.",
+      "name": "Tilbakestill kostnadssensor"
     },
     "stop_playbook": {
-      "description": "Stop currently active playbook.",
-      "name": "Stop playbook"
+      "description": "Stopp den aktive playbooken.",
+      "name": "Stopp playbook"
     },
     "switch_sub_profile": {
-      "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
+      "description": "Noen profiler i biblioteket har forskjellige underprofiler. Denne tjenesten lar deg bytte til en annen.",
       "fields": {
         "profile": {
-          "name": "Sub profile",
-          "description": "Define one of the possible sub profiles"
+          "name": "Underprofil",
+          "description": "Definer en av de mulige underprofilene"
         }
       },
-      "name": "Switch to another sub profile"
+      "name": "Bytt til en annen underprofil"
     }
   }
 }
