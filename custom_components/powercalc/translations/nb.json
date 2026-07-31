@@ -1,123 +1,123 @@
 {
   "common": {
-    "source_entity": "Source entity",
-    "source_device": "Source device",
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "source_entity": "Kildeentitet",
+    "source_device": "Kildeenhet",
+    "remarks_smart_switch": "Denne profilen inneholder bare effektverdier for standby. \n Hvis du har et apparat som bruker en fast mengde strøm når det er slått på, kan du oppgi denne verdien i neste trinn i konfigurasjonen",
+    "remarks_smart_dimmer": "Denne profilen inneholder bare effektverdier for standby. \n I neste trinn kan du valgfritt oppgi verdiene for det tilkoblede lyset"
   },
   "config": {
     "abort": {
-      "already_configured": "Sensor is already configured, specify a unique_id"
+      "already_configured": "Sensoren er allerede konfigurert. Angi en unik ID (unique_id)"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
-      "daily_energy_mandatory": "You must supply at least one of Value or Value template",
-      "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-      "group_mandatory": "You must define at least subgroups or power and energy-entities",
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
-      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
-      "lut_wrong_domain": "Only light entities can use the LUT mode",
-      "playbook_mandatory": "You need to specify at least one playbook",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "cost_price_mandatory": "Du må oppgi enten en energipris eller en energipris-sensor",
+      "daily_energy_mandatory": "Du må oppgi minst én av Value eller Value template",
+      "entity_mandatory": "Du må velge en enhet for alle strategier unntatt playbook",
+      "fixed_mandatory": "Du må oppgi minst én av Power, Power template eller States power",
+      "fixed_states_power_only": "Denne enheten kan bare bruke «states_power», ikke «power»",
+      "group_mandatory": "Du må definere minst undergrupper eller effekt- og energienheter",
+      "linear_mandatory": "Du må oppgi minst én av max_power eller calibrate",
+      "linear_min_higher_as_max": "Maksimal effekt kan ikke være lavere enn minimal effekt",
+      "linear_unsupported_domain": "Enhetsdomenet støttes ikke i lineær modus. Må være ett av: fan, light eller mediaplayer. Du kan likevel bruke kalibrering",
+      "lut_unsupported_color_mode": "LUT-profilen støtter ikke én av fargemodusene til lyset ditt. Se loggen for mer informasjon",
+      "lut_wrong_domain": "Bare light-enheter kan bruke LUT-modus",
+      "playbook_mandatory": "Du må oppgi minst én playbook",
+      "unknown": "Ukjent feil oppstod. Se loggen for mer informasjon"
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Velg gruppe(r)",
+          "new_group": "Ny gruppe"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Skriv inn et egendefinert gruppenavn for å opprette en ny gruppe"
         },
-        "title": "Assign to group"
+        "title": "Tildel til gruppe"
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Availability entity"
+          "availability_entity": "Tilgjengelighetsenhet"
         },
         "data_description": {
-          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+          "availability_entity": "Når denne enheten ikke er tilgjengelig, vil Powercalc-sensoren heller ikke være tilgjengelig"
         },
-        "title": "Availability entity",
-        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+        "title": "Tilgjengelighetsenhet",
+        "description": "Denne profilen gjelder per enhet. Velg enheten som skal brukes til å bestemme tilgjengeligheten til Powercalc-sensoren"
       },
       "daily_energy": {
         "data": {
-          "create_utility_meters": "Create utility meters",
-          "daily_energy_value": "Daily energy value",
-          "name": "Name",
-          "on_time": "On time",
-          "start_time": "Start time",
-          "unit_of_measurement": "Unit of measurement",
-          "update_frequency": "Update frequency",
-          "value": "Value",
-          "value_template": "Value template"
+          "create_utility_meters": "Opprett energimålere",
+          "daily_energy_value": "Daglig energiverdi",
+          "name": "Navn",
+          "on_time": "På-tid",
+          "start_time": "Starttid",
+          "unit_of_measurement": "Måleenhet",
+          "update_frequency": "Oppdateringsfrekvens",
+          "value": "Verdi",
+          "value_template": "Verdimal"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Hvis feltet er tomt, er standarden én dag, altså alltid på",
+          "update_frequency": "Tid i sekunder mellom tilstandsoppdateringer av sensoren"
         },
-        "title": "Create a daily fixed sensor"
+        "title": "Opprett en daglig fast sensor"
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "Energiinnstillinger",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_integration_method": "Integrasjonsmetode",
+          "energy_sensor_unit_prefix": "Enhetsprefiks",
+          "energy_filter_outlier_enabled": "Filtrer avvik",
+          "energy_filter_outlier_max_step": "Maksimal trinnstørrelse for avviksfilter"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "Aktiver filtrering av avviksverdier i energisensoren",
+          "energy_filter_outlier_max_step": "Største forventede trinn i effektverdier (i watt) for avviksfilteret"
         }
       },
       "group_domain": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "name": "Navn",
+          "create_energy_sensor": "Opprett energisensor",
+          "create_cost_sensor": "Opprett kostnadssensor",
+          "create_utility_meters": "Opprett energimålere",
+          "domain": "Enhetsdomene",
+          "exclude_entities": "Ekskluder enheter"
         },
-        "title": "Create a domain based group sensor"
+        "title": "Opprett en domenebasert gruppesensor"
       },
       "fixed": {
         "data": {
-          "fixed_value": "Power value"
+          "fixed_value": "Effektverdi"
         },
         "data_description": {
-          "fixed_value": "Power value in Watts when the entity is ON"
+          "fixed_value": "Effektverdi i watt når enheten er PÅ"
         },
-        "description": "Define a fixed power value for your entity. See the [documentation]({docs_uri}) for more info",
-        "title": "Fixed config"
+        "description": "Definer en fast effektverdi for enheten. Se [dokumentasjonen]({docs_uri}) for mer informasjon",
+        "title": "Faste innstillinger"
       },
       "global_configuration": {
-        "title": "Global configuration",
-        "description": "Setup global configuration for Powercalc. For more information see the [documentation]({docs_uri}). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "title": "Globale innstillinger",
+        "description": "Konfigurer globale innstillinger for Powercalc. Se [dokumentasjonen]({docs_uri}) for mer informasjon. Flere innstillinger for energisensorer og energimålere kan angis i de neste trinnene.",
         "sections": {
           "power_options": {
-            "name": "Power sensor",
+            "name": "Effektsensor",
             "data": {
-              "power_sensor_naming": "Power sensor name pattern",
-              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-              "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_naming": "Navnemønster for effektsensor",
+              "power_sensor_friendly_naming": "Mønster for visningsnavn på effektsensor",
+              "power_sensor_category": "Kategori for effektsensor",
+              "power_sensor_precision": "Presisjon for effektsensor"
             }
           },
           "features": {
-            "name": "Create sensors",
+            "name": "Opprett sensorer",
             "data": {
-              "create_energy_sensors": "Create energy sensors",
-              "create_cost_sensors": "Create cost sensors",
-              "create_standby_group": "Create standby group",
-              "create_utility_meters": "Create utility meters"
+              "create_energy_sensors": "Opprett energisensorer",
+              "create_cost_sensors": "Opprett kostnadssensorer",
+              "create_standby_group": "Opprett standbygruppe",
+              "create_utility_meters": "Opprett energimålere"
             },
             "data_description": {
               "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
