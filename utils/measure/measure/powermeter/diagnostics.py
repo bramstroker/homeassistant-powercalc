@@ -65,7 +65,13 @@ class PowerMeterDiagnostics:
         self._cache: dict[str, tuple[float, PowerMeterDiagnostic]] = {}
         self._lock = RLock()
 
-    def evaluate(self, spec: PowerMeterSpec, *, force: bool = False) -> PowerMeterDiagnostic:
+    def evaluate(
+        self,
+        spec: PowerMeterSpec,
+        *,
+        force: bool = False,
+        build_power_meter: Callable[[PowerMeterSpec], PowerMeter] | None = None,
+    ) -> PowerMeterDiagnostic:
         """Return fresh diagnostics, or a recent equivalent result."""
 
         if isinstance(spec, DummyPowerMeterSpec):
@@ -84,17 +90,21 @@ class PowerMeterDiagnostics:
             cached = self._cache.get(cache_key)
             if not force and cached is not None and now - cached[0] <= self._cache_ttl:
                 return cached[1]
-            result = self._evaluate_uncached(spec)
+            result = self._evaluate_uncached(spec, build_power_meter or self._build_power_meter)
             if result.success:
                 self._cache[cache_key] = (self._monotonic(), result)
             return result
 
-    def _evaluate_uncached(self, spec: PowerMeterSpec) -> PowerMeterDiagnostic:
+    def _evaluate_uncached(
+        self,
+        spec: PowerMeterSpec,
+        build_power_meter: Callable[[PowerMeterSpec], PowerMeter],
+    ) -> PowerMeterDiagnostic:
         started = self._monotonic()
         samples: list[_ObservedSample] = []
         supports_voltage: bool | None = None
         try:
-            meter = self._build_power_meter(spec)
+            meter = build_power_meter(spec)
             supports_voltage = meter.has_voltage_support()
             samples.append(_ObservedSample(meter.diagnostic_sample(), self._monotonic() - started))
             if not isinstance(spec, HassPowerMeterSpec):

@@ -1155,6 +1155,8 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
         "default_measure_device": None,
         "power_meter": "hass",
         "shelly_ip": None,
+        "shelly_username": "admin",
+        "shelly_password_configured": False,
         "kasa_ip": None,
         "fast_test_mode": False,
         "measurement_defaults": {
@@ -1192,6 +1194,32 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
     effective_defaults = test_client.get("/api/capabilities").json()["defaults"]
     assert effective_defaults["sample_count"] == 4
     assert effective_defaults["sleep_time"] == pytest.approx(3.5)
+
+
+def test_settings_store_shelly_password_separately_and_never_return_it(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    payload = {
+        "power_meter": "shelly",
+        "shelly_ip": "192.0.2.30",
+        "shelly_username": "measurement",
+        "shelly_password": "device-password",
+    }
+
+    saved = test_client.put("/api/settings", json=payload)
+
+    assert saved.status_code == 200
+    assert saved.json()["shelly_password_configured"] is True
+    assert "shelly_password" not in saved.json()
+    assert "device-password" not in (tmp_path / "settings.json").read_text(encoding="utf-8")
+    assert (tmp_path / "shelly_credentials.json").stat().st_mode & 0o777 == 0o600
+
+    preserved = test_client.put("/api/settings", json=payload | {"shelly_password": None})
+    assert preserved.json()["shelly_password_configured"] is True
+    assert "device-password" not in test_client.get("/api/settings").text
+
+    cleared = test_client.put("/api/settings", json=payload | {"shelly_password": None, "clear_shelly_password": True})
+    assert cleared.json()["shelly_password_configured"] is False
+    assert not (tmp_path / "shelly_credentials.json").exists()
 
 
 def test_fast_test_mode_requires_developer_mode_and_dummy_adapters(tmp_path: Path) -> None:

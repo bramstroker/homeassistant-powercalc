@@ -110,6 +110,9 @@ class Measure:
                 tuya_device_key=(
                     self.config.tuya_device_key if self.config.selected_power_meter == PowerMeterType.TUYA else None
                 ),
+                shelly_password=(
+                    self.config.shelly_password if self.config.selected_power_meter == PowerMeterType.SHELLY else None
+                ),
             ).assemble(request)
             model_id = str(answers.get(QUESTION_MODEL_ID, "generic"))
             execution = MeasurementExecution(

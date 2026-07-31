@@ -12,6 +12,7 @@ from measure.ha_app.contribution import (
     ContributionStatus,
 )
 from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot, SessionState, utc_now
+from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import LightMeasurementRequest
@@ -200,6 +201,21 @@ def test_settings_recover_from_corrupt_file(tmp_path: Path, caplog: pytest.LogCa
 
     assert settings.default_power_entity_id is None
     assert "using defaults" in caplog.text
+
+
+def test_storage_persists_shelly_credentials_privately(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+
+    storage.save_shelly_credentials(ShellyCredentials(password="device-password"))  # noqa: S106
+
+    credential_path = tmp_path / "shelly_credentials.json"
+    assert storage.load_shelly_credentials() == ShellyCredentials(password="device-password")  # noqa: S106
+    assert credential_path.stat().st_mode & 0o777 == 0o600
+    assert not (tmp_path / "settings.json").exists()
+
+    storage.clear_shelly_credentials()
+    assert storage.load_shelly_credentials() is None
+    assert not credential_path.exists()
 
 
 def test_storage_round_trips_global_and_session_dummy_load_calibration(tmp_path: Path) -> None:

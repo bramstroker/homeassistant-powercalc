@@ -51,6 +51,7 @@ export class SetupView extends LitElement {
     defaultMeasureDevice: { type: String },
     powerMeter: { type: String },
     shellyIp: { type: String },
+    shellyUsername: { type: String },
     kasaIp: { type: String },
     powerMeterConfigured: { type: Boolean },
     busy: { type: Boolean },
@@ -79,6 +80,7 @@ export class SetupView extends LitElement {
   defaultMeasureDevice = "";
   powerMeter: AppSettings["power_meter"] = "hass";
   shellyIp = "";
+  shellyUsername = "admin";
   kasaIp = "";
   powerMeterConfigured = true;
   busy = false;
@@ -738,7 +740,7 @@ export class SetupView extends LitElement {
 
   private powerMeterSpec(): PowerMeterSpec {
     if (this.powerMeter === "dummy") return { type: "dummy" };
-    if (this.powerMeter === "shelly") return { type: "shelly", device_ip: this.shellyIp };
+    if (this.powerMeter === "shelly") return { type: "shelly", device_ip: this.shellyIp, username: this.shellyUsername };
     if (this.powerMeter === "kasa") return { type: "kasa", device_ip: this.kasaIp };
     return {
       type: "hass",

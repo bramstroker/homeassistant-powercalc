@@ -6,6 +6,7 @@ import time
 from typing import Any, TypeGuard
 
 import requests
+from requests.auth import AuthBase, HTTPBasicAuth, HTTPDigestAuth
 
 from measure.powermeter.const import (
     SHELLY_GEN1_STATUS_ENDPOINT,
@@ -20,6 +21,7 @@ from measure.powermeter.powermeter import PowerMeasurementResult
 class ShellyProbeFailure(StrEnum):
     UNREACHABLE = "unreachable"
     AUTH_REQUIRED = "auth_required"
+    AUTH_FAILED = "auth_failed"
     HTTP_ERROR = "http_error"
     INVALID_RESPONSE = "invalid_response"
     NO_POWER_COMPONENT = "no_power_component"
@@ -93,19 +95,30 @@ class ShellyClient:
         ip_address: str,
         timeout: int,
         *,
+        username: str = "admin",
+        password: str | None = None,
         http_get: Callable[..., requests.Response] | None = None,
     ) -> None:
         self._base_url = f"http://{ip_address}"
         self._timeout = timeout
+        self._username = username
+        self._password = password
+        self._authentication: AuthBase | None = None
         self._http_get = http_get or requests.get
 
     def probe(self) -> ShellyDevice:
         info = self._get_device_info()
         if info.auth_required:
-            raise ShellyProbeError(
-                ShellyProbeFailure.AUTH_REQUIRED,
-                "Authentication is enabled and is not supported yet",
-                device_info=info,
+            if not self._password:
+                raise ShellyProbeError(
+                    ShellyProbeFailure.AUTH_REQUIRED,
+                    "Authentication is enabled; enter the Shelly password",
+                    device_info=info,
+                )
+            self._authentication = (
+                HTTPBasicAuth(self._username, self._password)
+                if info.generation == 1
+                else HTTPDigestAuth("admin", self._password)
             )
 
         try:
@@ -173,11 +186,13 @@ class ShellyClient:
 
     def _request_json(self, endpoint: str, description: str) -> object:
         try:
-            response = self._http_get(
-                f"{self._base_url}{endpoint}",
-                timeout=self._timeout,
-                allow_redirects=False,
-            )
+            request_options: dict[str, object] = {
+                "timeout": self._timeout,
+                "allow_redirects": False,
+            }
+            if self._authentication is not None:
+                request_options["auth"] = self._authentication
+            response = self._http_get(f"{self._base_url}{endpoint}", **request_options)
         except requests.RequestException as error:
             raise ShellyProbeError(
                 ShellyProbeFailure.UNREACHABLE,
@@ -185,9 +200,15 @@ class ShellyClient:
             ) from error
 
         if response.status_code in {401, 403}:
+            authenticated = self._authentication is not None
+            message = (
+                "The Shelly username or password is incorrect"
+                if authenticated
+                else "Authentication is enabled; enter the Shelly password"
+            )
             raise ShellyProbeError(
-                ShellyProbeFailure.AUTH_REQUIRED,
-                "Authentication is enabled and is not supported yet",
+                ShellyProbeFailure.AUTH_FAILED if authenticated else ShellyProbeFailure.AUTH_REQUIRED,
+                message,
             )
         if response.status_code != 200:
             raise ShellyProbeError(

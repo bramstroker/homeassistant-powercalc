@@ -49,6 +49,7 @@ class OcrPowerMeterSpec(_PowerMeterSpec):
 class ShellyPowerMeterSpec(_PowerMeterSpec):
     type: Literal[PowerMeterType.SHELLY] = PowerMeterType.SHELLY
     device_ip: str
+    username: str = Field(default="admin", min_length=1, max_length=50)
     timeout: int = 5
 
 
