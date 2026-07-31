@@ -588,12 +588,11 @@ class LibraryConfigFlow(LibraryFlow):
 
     def _get_profile_source(self, profile: PowerProfile) -> str:
         """Build the autodiscovery source description."""
-        if (
-            profile.discovery_by == DiscoveryBy.CONFIG_ENTRY
-            and self.flow.source_entity
-            and self.flow.source_entity.config_entry_id
-        ):
-            return self.flow.source_entity.name or self.flow.source_entity.config_entry_id
+        source_entity = self.flow.source_entity
+        if source_entity and profile.discovery_by == DiscoveryBy.CONFIG_ENTRY:
+            config_entry_id = source_entity.config_entry_id
+            if config_entry_id:
+                return source_entity.name or config_entry_id
 
         translations = translation.async_get_cached_translations(
             self.flow.hass,
@@ -601,13 +600,10 @@ class LibraryConfigFlow(LibraryFlow):
             "common",
             DOMAIN,
         )
-        if (
-            profile.discovery_by == DiscoveryBy.DEVICE
-            and self.flow.source_entity
-            and self.flow.source_entity.device_entry
-        ):
+        device_entry = source_entity.device_entry if source_entity else None
+        if profile.discovery_by == DiscoveryBy.DEVICE and device_entry:
             label = translations.get(f"component.{DOMAIN}.common.source_device")
-            return f"{label}: {self.flow.source_entity.device_entry.name}"
+            return f"{label}: {device_entry.name}"
 
         return f"{translations.get(f'component.{DOMAIN}.common.source_entity')}: {self.flow.source_entity_id}"
 
