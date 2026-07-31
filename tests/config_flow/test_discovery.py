@@ -1,6 +1,7 @@
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.selector import SelectSelector
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
@@ -10,6 +11,7 @@ from custom_components.powercalc.common import SourceEntity, create_source_entit
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
+    CONF_CONFIG_ENTRY_ID,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
@@ -361,3 +363,61 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
     }
 
     assert hass.states.get("sensor.foobar_device_power")
+
+
+async def test_discovery_by_config_entry(hass: HomeAssistant) -> None:
+    devices = {
+        f"device-{index}": DeviceEntry(
+            config_entry_id="source-entry",
+            name=f"Device {index}",
+            id=f"device-{index}",
+            manufacturer="test",
+            model="discovery_type_config_entry",
+        )
+        for index in range(6)
+    }
+    mock_device_registry(hass, devices)
+    source_entity = SourceEntity(
+        object_id="source-entry",
+        name="Shared integration",
+        entity_id=DUMMY_ENTITY_ID,
+        domain="sensor",
+        device_entry=devices["device-0"],
+        config_entry_id="source-entry",
+    )
+    power_profile = await get_power_profile(
+        hass,
+        {},
+        source_entity,
+        ModelInfo("test", "discovery_type_config_entry"),
+    )
+
+    result = await initialize_discovery_flow(hass, source_entity, power_profile)
+    assert result["description_placeholders"]["source"] == "Shared integration"
+
+    result = await confirm_auto_discovered_model(hass, result)
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.SELECT_DEVICE
+    device_selector = result["data_schema"].schema[CONF_DEVICE]
+    assert [option["value"] for option in device_selector.config["options"]] == list(devices)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_DEVICE: "device-4"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_CONFIG_ENTRY_ID: "source-entry",
+        CONF_DEVICE: "device-4",
+        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_MANUFACTURER: "test",
+        CONF_MODEL: "discovery_type_config_entry",
+        CONF_NAME: "Shared integration",
+    }
+    assert hass.states.get("sensor.shared_integration_power")
+    registry_entry = er.async_get(hass).async_get("sensor.shared_integration_power")
+    assert registry_entry
+    assert registry_entry.device_id == "device-4"

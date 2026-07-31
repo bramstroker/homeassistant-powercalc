@@ -384,6 +384,16 @@
         "description": "Selecteer het model. Zie de [lijst]({supported_models_link}) van ondersteunde apparaten voor meer informatie",
         "title": "Model configuratie"
       },
+      "select_device": {
+        "data": {
+          "device": "Apparaat"
+        },
+        "data_description": {
+          "device": "Het apparaat waaraan de Powercalc-entiteiten moeten worden gekoppeld"
+        },
+        "description": "Selecteer het apparaat waaraan de Powercalc-sensor moet worden gekoppeld.",
+        "title": "Apparaat selecteren"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Standaard groep",

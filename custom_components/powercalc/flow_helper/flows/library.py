@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.config_entries import ConfigFlowResult
+from homeassistant.const import CONF_DEVICE
 from homeassistant.helpers import selector, translation
 import voluptuous as vol
 
@@ -19,6 +20,7 @@ from custom_components.powercalc.const import (
     LIBRARY_URL,
     CalculationStrategy,
 )
+from custom_components.powercalc.device_binding import get_devices_for_config_entry
 from custom_components.powercalc.discovery import (
     get_power_profile_by_source_device,
     get_power_profile_by_source_entity,
@@ -206,6 +208,9 @@ class LibraryFlow:
         if Step.LIBRARY_CUSTOM_FIELDS not in handled_steps and profile.has_custom_fields:
             return await self.async_step_library_custom_fields()
 
+        if Step.SELECT_DEVICE not in handled_steps and profile.discovery_by == DiscoveryBy.CONFIG_ENTRY:
+            return await self.async_step_select_device()
+
         if Step.AVAILABILITY_ENTITY not in handled_steps and profile.discovery_by == DiscoveryBy.DEVICE:
             result = await self.async_step_availability_entity()
             if result:
@@ -215,6 +220,35 @@ class LibraryFlow:
             return await self.async_step_sub_profile()
 
         return None
+
+    async def async_step_select_device(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Ask which device should receive the entities created for a config-entry profile."""
+        assert self.flow.source_entity is not None
+        assert self.flow.source_entity.config_entry_id is not None
+        devices = get_devices_for_config_entry(self.flow.hass, self.flow.source_entity.config_entry_id)
+        return await self.flow.handle_form_step(
+            PowercalcFormStep(
+                step=Step.SELECT_DEVICE,
+                schema=vol.Schema(
+                    {
+                        vol.Required(CONF_DEVICE): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=[
+                                    selector.SelectOptionDict(
+                                        value=device.id,
+                                        label=device.name_by_user or device.name or device.id,
+                                    )
+                                    for device in devices
+                                ],
+                                mode=selector.SelectSelectorMode.DROPDOWN,
+                            ),
+                        ),
+                    },
+                ),
+                next_step=Step.POST_LIBRARY,
+            ),
+            user_input,
+        )
 
     async def _async_next_strategy_step(self, profile: PowerProfile) -> ConfigFlowResult | None:
         """Return the next step needed to configure the calculation strategy, or None when nothing is left to ask."""
@@ -395,7 +429,7 @@ class LibraryFlow:
 
     def _get_library_device_types(self) -> set[DeviceType] | None:
         """Determine which device types should be shown in the library selectors."""
-        if self._get_library_discovery_by() == DiscoveryBy.DEVICE:
+        if self._get_library_discovery_by() in (DiscoveryBy.CONFIG_ENTRY, DiscoveryBy.DEVICE):
             return None
 
         if self.flow.source_entity:
@@ -405,6 +439,8 @@ class LibraryFlow:
 
     def _get_library_discovery_by(self) -> DiscoveryBy | None:
         """Determine whether listing should be filtered by discovery mode."""
+        if self.flow.source_entity and self.flow.source_entity.config_entry_id:
+            return DiscoveryBy.CONFIG_ENTRY
         if self.flow.source_entity and self.flow.source_entity.entity_id == DUMMY_ENTITY_ID:
             return DiscoveryBy.DEVICE
         return None
@@ -544,6 +580,13 @@ class LibraryConfigFlow(LibraryFlow):
 
     def _get_profile_source(self, profile: PowerProfile) -> str:
         """Build the autodiscovery source description."""
+        if (
+            profile.discovery_by == DiscoveryBy.CONFIG_ENTRY
+            and self.flow.source_entity
+            and self.flow.source_entity.config_entry_id
+        ):
+            return self.flow.source_entity.name or self.flow.source_entity.config_entry_id
+
         translations = translation.async_get_cached_translations(
             self.flow.hass,
             self.flow.hass.config.language,

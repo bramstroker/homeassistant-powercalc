@@ -384,6 +384,16 @@
         "description": "Sélectionnez le modèle d'appareil. Consultez la [liste]({supported_models_link}) des modèles pris en charge pour plus d'informations",
         "title": "Configuration du modèle"
       },
+      "select_device": {
+        "data": {
+          "device": "Appareil"
+        },
+        "data_description": {
+          "device": "L’appareil auquel les entités Powercalc doivent être associées"
+        },
+        "description": "Sélectionnez l’appareil auquel le capteur Powercalc doit être associé.",
+        "title": "Sélectionner un appareil"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Groupe standard",

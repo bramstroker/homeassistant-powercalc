@@ -29,6 +29,7 @@ import voluptuous as vol
 
 from .common import SourceEntity, create_source_entity
 from .const import (
+    CONF_CONFIG_ENTRY_ID,
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_PRICE_SENSOR,
@@ -46,6 +47,7 @@ from .const import (
     CalculationStrategy,
     SensorType,
 )
+from .device_binding import get_first_device_for_config_entry
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults, flatten_sections
 from .flow_helper.flows.cost import CostConfigFlow, CostOptionsFlow
@@ -468,6 +470,14 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         ):
             self.sensor_config.update({CONF_DEVICE: self.source_entity.device_entry.id})
 
+        if (
+            self.selected_profile
+            and self.source_entity
+            and self.source_entity.config_entry_id
+            and self.selected_profile.discovery_by == DiscoveryBy.CONFIG_ENTRY
+        ):
+            self.sensor_config.update({CONF_CONFIG_ENTRY_ID: self.source_entity.config_entry_id})
+
         return self.async_create_entry(title=str(self.name), data=self.sensor_config)
 
 
@@ -510,6 +520,12 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 self.source_entity_id,
                 self.hass,
             )
+            if config_entry_id := self.sensor_config.get(CONF_CONFIG_ENTRY_ID):
+                config_entry_id = str(config_entry_id)
+                self.source_entity = self.source_entity._replace(
+                    config_entry_id=config_entry_id,
+                    device_entry=get_first_device_for_config_entry(self.hass, config_entry_id),
+                )
             result = await self.initialize_library_profile()
             if result:
                 return result

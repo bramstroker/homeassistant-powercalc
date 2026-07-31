@@ -20,6 +20,7 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
     RegistryEntryWithDefaults,
     async_fire_time_changed,
     mock_device_registry,
@@ -841,6 +842,37 @@ async def test_discovery_by_device(
     assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery_type_device"
     assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_ABC123"
     assert len(mock_calls) == 1
+
+
+async def test_discovery_by_config_entry(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    source_entry = MockConfigEntry(domain="test", title="Shared integration")
+    source_entry.add_to_hass(hass)
+    mock_device_registry(
+        hass,
+        {
+            f"device-{index}": DeviceEntry(
+                config_entry_id=source_entry.entry_id,
+                id=f"device-{index}",
+                manufacturer="test",
+                model="discovery_type_config_entry",
+            )
+            for index in range(6)
+        },
+    )
+
+    await run_powercalc_setup(hass)
+
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 1
+    assert mock_calls[0][1] == (DOMAIN,)
+    assert mock_calls[0][2]["context"] == {CONF_SOURCE: SOURCE_INTEGRATION_DISCOVERY}
+    assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == DUMMY_ENTITY_ID
+    assert mock_calls[0][2]["data"][CONF_MANUFACTURER] == "test"
+    assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery_type_config_entry"
+    assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == f"pc_config_entry_{source_entry.entry_id}"
 
 
 async def test_composite_devices_are_ignored_for_device_discovery(
