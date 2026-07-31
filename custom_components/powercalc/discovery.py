@@ -31,7 +31,7 @@ from .const import (
     MANUFACTURER_WLED,
     CalculationStrategy,
 )
-from .device_binding import is_composite_device_id
+from .device_binding import get_first_device_for_config_entry, is_composite_device_id
 from .group_include.filter import (
     CategoryFilter,
     CompositeFilter,
@@ -47,7 +47,7 @@ from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import SUPPORTED_DOMAINS, DeviceType, DiscoveryBy, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
-_DiscoverySourceT = TypeVar("_DiscoverySourceT", er.RegistryEntry, dr.DeviceEntry)
+_DiscoverySourceT = TypeVar("_DiscoverySourceT", er.RegistryEntry, dr.DeviceEntry, ConfigEntry)
 
 
 def get_discovery_manager(hass: HomeAssistant) -> DiscoveryManager:
@@ -163,6 +163,13 @@ class DiscoveryManager:
         _LOGGER.debug("Start device discovery")
         await self.perform_discovery(self.get_devices, self.create_device_source, DiscoveryBy.DEVICE)
 
+        _LOGGER.debug("Start config entry discovery")
+        await self.perform_discovery(
+            self.get_config_entries,
+            self.create_config_entry_source,
+            DiscoveryBy.CONFIG_ENTRY,
+        )
+
         _LOGGER.debug("Done auto discovery")
         self._status = DiscoveryStatus.FINISHED
 
@@ -198,13 +205,16 @@ class DiscoveryManager:
     ) -> None:
         """Generalized discovery procedure for entities and devices."""
         for source in await source_provider():
-            log_identifier = str(getattr(source, "entity_id", getattr(source, "id", "unknown")))
+            log_identifier = str(
+                getattr(source, "entity_id", getattr(source, "id", getattr(source, "entry_id", "unknown"))),
+            )
             try:
-                model_info = await self.extract_model_info_from_device_info(source)
+                source_entity = await source_creator(source)
+                model_info = await self.extract_model_info_from_device_info(
+                    source_entity.entity_entry or source_entity.device_entry,
+                )
                 if not model_info:
                     continue
-
-                source_entity = await source_creator(source)
 
                 power_profiles = await self.discover_entity(source_entity, model_info, discovery_type)
                 if not power_profiles:
@@ -261,9 +271,25 @@ class DiscoveryManager:
             device_entry=device_entry,
         )
 
+    async def create_config_entry_source(self, config_entry: ConfigEntry) -> SourceEntity:
+        """Create a source representing all devices belonging to a config entry."""
+        device_entry = get_first_device_for_config_entry(self.hass, config_entry.entry_id)
+        return SourceEntity(
+            object_id=config_entry.entry_id,
+            name=config_entry.title,
+            entity_id=DUMMY_ENTITY_ID,
+            domain="sensor",
+            device_entry=device_entry,
+            config_entry_id=config_entry.entry_id,
+        )
+
     @staticmethod
     def create_unique_id(source: SourceEntity, discovery_type: DiscoveryBy, power_profile: PowerProfile | None) -> str:
         """Generate a unique ID based on source and type."""
+        if discovery_type == DiscoveryBy.CONFIG_ENTRY:
+            config_entry_id = source.config_entry_id or source.object_id
+            return f"pc_config_entry_{config_entry_id}"
+
         if discovery_type == DiscoveryBy.DEVICE:
             device_id = source.object_id
             if source.device_entry:
@@ -389,6 +415,19 @@ class DiscoveryManager:
             device
             for device in dr.async_get(self.hass).devices.values()
             if not is_composite_device_id(self.hass, device.id)
+        ]
+
+    async def get_config_entries(self) -> list[ConfigEntry]:
+        """Fetch config entries which have at least one non-composite device."""
+        config_entry_ids = {
+            device.config_entry_id
+            for device in dr.async_get(self.hass).devices.values()
+            if not is_composite_device_id(self.hass, device.id)
+        }
+        return [
+            entry
+            for entry in self.hass.config_entries.async_entries()
+            if entry.domain != DOMAIN and entry.entry_id in config_entry_ids
         ]
 
     def enable(self) -> None:

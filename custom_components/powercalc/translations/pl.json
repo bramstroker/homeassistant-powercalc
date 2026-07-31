@@ -384,6 +384,16 @@
         "description": "Wybierz model urządzenia. Zobacz [listę]({supported_models_link}) obsługiwanych modeli, aby uzyskać więcej informacji",
         "title": "Konfiguracja modelu"
       },
+      "select_device": {
+        "data": {
+          "device": "Urządzenie"
+        },
+        "data_description": {
+          "device": "Urządzenie, z którym mają zostać powiązane encje Powercalc"
+        },
+        "description": "Wybierz urządzenie, z którym ma zostać powiązany czujnik Powercalc.",
+        "title": "Wybierz urządzenie"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Standardowa grupa",

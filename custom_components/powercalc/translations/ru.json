@@ -384,6 +384,16 @@
         "description": "Выберите модель устройства. См. [список]({supported_models_link}) поддерживаемых моделей для подробностей",
         "title": "Выбор модели"
       },
+      "select_device": {
+        "data": {
+          "device": "Устройство"
+        },
+        "data_description": {
+          "device": "Устройство, к которому следует привязать сущности Powercalc"
+        },
+        "description": "Выберите устройство, к которому следует привязать датчик Powercalc.",
+        "title": "Выберите устройство"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Стандартная",

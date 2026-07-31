@@ -384,6 +384,16 @@
         "description": "Válassza ki a készülék modelljét. További információért tekintse meg a támogatott modellek [listáját]({supported_models_link}).",
         "title": "Modell beállítása"
       },
+      "select_device": {
+        "data": {
+          "device": "Eszköz"
+        },
+        "data_description": {
+          "device": "Az eszköz, amelyhez a Powercalc-entitásokat hozzá kell rendelni"
+        },
+        "description": "Válassza ki azt az eszközt, amelyhez a Powercalc-érzékelőt hozzá kell rendelni.",
+        "title": "Eszköz kiválasztása"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Normál",

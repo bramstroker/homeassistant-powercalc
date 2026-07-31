@@ -38,6 +38,18 @@ def test_regular_device_is_not_composite(
     assert not is_composite_device_id(hass, device_entry.id)
 
 
+def test_device_is_not_composite_when_detection_is_unavailable(
+    hass: HomeAssistant,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A device is not composite on HA versions without the detection API."""
+    device_entry = DeviceEntry(config_entry_id="test", id="regular-device")
+    mock_device_registry(hass, {device_entry.id: device_entry})
+    monkeypatch.setattr(DeviceRegistry, "async_is_composite_device_id", None)
+
+    assert not is_composite_device_id(hass, device_entry.id)
+
+
 def test_attach_configured_device_entry_keeps_source_entity_when_device_is_missing(hass: HomeAssistant) -> None:
     mock_device_registry(hass)
     source_entity = SourceEntity(object_id="powercalc_dummy", entity_id=DUMMY_ENTITY_ID, domain="sensor")

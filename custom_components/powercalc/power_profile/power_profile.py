@@ -66,6 +66,7 @@ class DeviceType(StrEnum):
 
 
 class DiscoveryBy(StrEnum):
+    CONFIG_ENTRY = "config_entry"
     DEVICE = "device"
     ENTITY = "entity"
 

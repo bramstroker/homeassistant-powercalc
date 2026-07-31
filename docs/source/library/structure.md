@@ -38,7 +38,7 @@ Below is a comprehensive table of all fields that can be used in a `model.json` 
 | `config_flow_discovery_remarks`   | string           | No | Remarks to show in the GUI config flow on first step of discovery                                                                       |
 | `config_flow_sub_profile_remarks` | string           | No | Remarks to show in the GUI config flow on sub profile selection step                                                                    |
 | `description`                     | string           | No | A short description of the device                                                                                                       |
-| `discovery_by`                    | string           | No | Whether to discover the profile by device or entity                                                                                     |
+| `discovery_by`                    | string           | No | Whether to discover the profile by config entry, device, or entity                                                                       |
 | `fields`                          | array of objects | No | Custom fields for the profile, more about it explained in [Variables](variables.md)                                                     |
 | `fixed_config`                    | object           | No | Configuration for [fixed](../strategies/fixed.md) calculation strategy                                                                  |
 | `is_dumb_bulb`                    | boolean          | No | Indicates if the profile is for a dumb light bulb without smart capabilities                                                            |
@@ -102,6 +102,14 @@ To avoid this, you can set:
 
 This enables **per-device** discovery, which is more reliable.
 It is especially recommended for device types using `sensor` domain entities: [network](device-types/network.md), [power_meter](device-types/power-meter.md), and [generic_iot](device-types/generic-iot.md).
+
+When one integration config entry creates several similar devices but should result in only one Powercalc discovery, use:
+
+```json
+"discovery_by": "config_entry"
+```
+
+This enables **per-config-entry** discovery. Powercalc uses the first device belonging to the config entry to determine the manufacturer and model.
 
 ---
 

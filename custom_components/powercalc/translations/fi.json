@@ -384,6 +384,16 @@
         "description": "Valitse laitteen malli. Katso [luettelo]({supported_models_link}) tuetuista malleista saadaksesi lisätietoja",
         "title": "Mallin määritys"
       },
+      "select_device": {
+        "data": {
+          "device": "Laite"
+        },
+        "data_description": {
+          "device": "Laite, johon Powercalc-entiteetit liitetään"
+        },
+        "description": "Valitse laite, johon Powercalc-anturi liitetään.",
+        "title": "Valitse laite"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Tavallinen",

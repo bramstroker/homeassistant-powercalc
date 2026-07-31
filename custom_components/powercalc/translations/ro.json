@@ -384,6 +384,16 @@
         "description": "Selectați modelul dispozitivului. Consultați [list]({supported_models_link}) modelelor acceptate pentru mai multe informații",
         "title": "Configurare Model"
       },
+      "select_device": {
+        "data": {
+          "device": "Dispozitiv"
+        },
+        "data_description": {
+          "device": "Dispozitivul la care trebuie asociate entitățile Powercalc"
+        },
+        "description": "Selectați dispozitivul la care trebuie asociat senzorul Powercalc.",
+        "title": "Selectați dispozitivul"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Grup standard",

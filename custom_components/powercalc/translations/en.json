@@ -384,6 +384,16 @@
         "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
         "title": "Model config"
       },
+      "select_device": {
+        "data": {
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "The device the Powercalc entities should be linked to"
+        },
+        "description": "Select the device to which the Powercalc sensor should be linked.",
+        "title": "Select device"
+      },
       "menu_group": {
         "menu_options": {
           "group_custom": "Standard",
