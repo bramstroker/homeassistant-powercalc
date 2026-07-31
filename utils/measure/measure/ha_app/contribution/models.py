@@ -192,6 +192,7 @@ class ContributionService(Protocol):
         request: MeasurementRequest,
         artifact_root: Path,
         payload: ContributionPreviewRequest | None,
+        integration: str | None = None,
     ) -> ContributionPreviewResponse: ...
 
     def submit(

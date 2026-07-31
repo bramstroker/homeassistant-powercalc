@@ -43,8 +43,8 @@ def _battery_sensor_data(battery_state: str = "80") -> HomeAssistantEntityData:
             ),
         },
         entity_registry=[
-            SimpleNamespace(entity_id="vacuum.test", device_id="vacuum-device"),
-            SimpleNamespace(entity_id="sensor.test_battery_level", device_id="vacuum-device"),
+            SimpleNamespace(entity_id="vacuum.test", device_id="vacuum-device", platform="roborock"),
+            SimpleNamespace(entity_id="sensor.test_battery_level", device_id="vacuum-device", platform="roborock"),
         ],
         device_registry=[{"id": "vacuum-device", "model": "Test Vacuum"}],
     )

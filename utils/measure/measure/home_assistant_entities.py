@@ -49,6 +49,8 @@ class EntityDescriptor(BaseModel):
     domain: EntityDomain
     device_class: DeviceClass | None = None
     device_id: str | None = None
+    #: Home Assistant integration providing the entity, as shown on the device page.
+    integration: str | None = None
     model_id: str | None = None
     state: str
     unit: str | None = None
@@ -202,6 +204,7 @@ def _describe_entity(
         domain=domain,
         device_class=device_class,
         device_id=device_id,
+        integration=str(registry_entry.platform) if registry_entry is not None and registry_entry.platform else None,
         model_id=str(model_id) if model_id else None,
         state=str(entity.state.state),
         unit=str(unit) if unit else None,

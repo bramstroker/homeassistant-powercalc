@@ -67,6 +67,8 @@ class ContributionMetadata(BaseModel):
     product_name: str | None = Field(default=None, min_length=1, max_length=200)
     measure_type: str | None = Field(default=None, max_length=50)
     measure_device: str | None = Field(default=None, max_length=200)
+    #: Home Assistant integration the measured entity is provided by.
+    integration: str | None = Field(default=None, max_length=100)
     notes: str = Field(default="", max_length=2_000)
     author: ContributionAuthor
 
@@ -100,6 +102,18 @@ class ContributionMetadata(BaseModel):
     @classmethod
     def normalize_notes(cls, value: str) -> str:
         return value.strip()
+
+
+class DeviceInfo(BaseModel):
+    """Identity of the device under measurement, as rendered into the pull request."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    manufacturer: str
+    model_id: str
+    product_name: str
+    #: Home Assistant integration the measured entity is provided by.
+    integration: str | None = None
 
 
 class ContributionPreparedFile(BaseModel):
