@@ -85,12 +85,14 @@ class MeasurementAssembler:
         *,
         home_assistant: HomeAssistantManager | None = None,
         tuya_device_key: str | None = None,
+        shelly_password: str | None = None,
         on_sample: Callable[[float], None] | None = None,
         dummy_load_calibration_store: DummyLoadCalibrationStore | None = None,
     ) -> None:
         self._interaction = interaction
         self._home_assistant_manager = home_assistant
         self._tuya_device_key = tuya_device_key
+        self._shelly_password = shelly_password
         self._on_sample = on_sample
         self._dummy_load_calibration_store = dummy_load_calibration_store
 
@@ -152,7 +154,12 @@ class MeasurementAssembler:
         if isinstance(spec, OcrPowerMeterSpec):
             return OcrPowerMeter()
         if isinstance(spec, ShellyPowerMeterSpec):
-            return ShellyPowerMeter(spec.device_ip, spec.timeout)
+            return ShellyPowerMeter(
+                spec.device_ip,
+                spec.timeout,
+                username=spec.username,
+                password=self._shelly_password,
+            )
         if isinstance(spec, TasmotaPowerMeterSpec):
             return TasmotaPowerMeter(spec.device_ip)
         if isinstance(spec, TuyaPowerMeterSpec):

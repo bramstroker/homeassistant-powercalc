@@ -80,9 +80,12 @@ class MeasurementService(SessionMeasurementService):
         self,
         home_assistant: HomeAssistantManager,
         storage: SessionStorage | None = None,
+        *,
+        shelly_password: str | None = None,
     ) -> None:
         self.home_assistant = home_assistant
         self.storage = storage
+        self.shelly_password = shelly_password
 
     def run(
         self,
@@ -92,13 +95,14 @@ class MeasurementService(SessionMeasurementService):
     ) -> RunnerResult:
         """Run with session logging and redact secrets from surfaced failures."""
 
-        handler = _SessionLogHandler(control, (self.home_assistant.token,))
+        secrets = (self.home_assistant.token, self.shelly_password or "")
+        handler = _SessionLogHandler(control, secrets)
         _LOGGER.addHandler(handler)
         context_token = _SESSION_LOG_CONTROL.set(control)
         try:
             return self._run(request, control, context)
         except Exception as error:
-            message = _redact(str(error), (self.home_assistant.token,))
+            message = _redact(str(error), secrets)
             if message != str(error):
                 raise RuntimeError(message) from None
             raise
@@ -125,6 +129,7 @@ class MeasurementService(SessionMeasurementService):
         prepared = MeasurementAssembler(
             interaction,
             home_assistant=self.home_assistant,
+            shelly_password=self.shelly_password,
             on_sample=control.sample,
             dummy_load_calibration_store=calibration_store,
         ).assemble(request)

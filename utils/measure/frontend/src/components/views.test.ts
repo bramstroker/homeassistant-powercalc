@@ -1,4 +1,4 @@
-import type { AppSettings, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, PowerMeterDiagnostic, SessionSnapshot, SettingsSection } from "../types";
+import type { AppSettings, AppSettingsUpdate, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, PowerMeterDiagnostic, SessionSnapshot, SettingsSection } from "../types";
 import { sharedStyles } from "../styles";
 import { AppShell } from "./app-shell";
 import "./result-view";
@@ -581,7 +581,7 @@ describe("setup type picker", () => {
     });
     (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
 
-    expect((await submitted).power_meter).toEqual({ type: "shelly", device_ip: "192.0.2.20" });
+    expect((await submitted).power_meter).toEqual({ type: "shelly", device_ip: "192.0.2.20", username: "admin" });
   });
 
   it("includes the configured Kasa adapter in the submitted request", async () => {
@@ -1677,18 +1677,57 @@ describe("settings power meter test", () => {
 
     element.shellyDiscoveryDevices = [
       { id: "plug", name: "Kitchen plug", model: "S3PL-00112EU", generation: 3, ip_address: "10.0.0.8", supported: true, reason: null, auth_required: false },
-      { id: "auth", name: "Locked plug", model: null, generation: 2, ip_address: "10.0.0.9", supported: false, reason: "Authentication is not supported yet.", auth_required: true },
+      { id: "auth", name: "Locked plug", model: null, generation: 2, ip_address: "10.0.0.9", supported: false, reason: "Authentication is enabled; enter the Shelly password.", auth_required: true },
     ];
     await element.updateComplete;
 
     const discovered = element.shadowRoot.querySelector('select[name="discovered_shelly"]') as HTMLSelectElement;
     expect(discovered.options[1]?.textContent).toContain("Kitchen plug");
-    expect(discovered.options[2]?.textContent).toContain("Authentication is not supported yet.");
-    expect(discovered.options[2]?.disabled).toBe(true);
+    expect(discovered.options[2]?.textContent).toContain("Authentication is enabled");
+    expect(discovered.options[2]?.disabled).toBe(false);
     discovered.value = "10.0.0.8";
     discovered.dispatchEvent(new Event("change"));
     await element.updateComplete;
     expect((element.shadowRoot.querySelector('input[name="shelly_ip"]') as HTMLInputElement).value).toBe("10.0.0.8");
+  });
+
+  it("submits Shelly credentials without losing a typed password on rerender", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      settings: AppSettings; testResult?: PowerMeterDiagnostic;
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.settings = {
+      ...defaultSettings,
+      default_measure_device: "Shelly Plug",
+      power_meter: "shelly",
+      shelly_ip: "10.0.0.9",
+      shelly_username: "admin",
+      shelly_password_configured: true,
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const username = element.shadowRoot.querySelector('input[name="shelly_username"]') as HTMLInputElement;
+    const password = element.shadowRoot.querySelector('input[name="shelly_password"]') as HTMLInputElement;
+    username.value = "measurement";
+    username.dispatchEvent(new Event("input"));
+    password.value = "device-password";
+    password.dispatchEvent(new Event("input"));
+
+    element.testResult = goodPowerMeterDiagnostic;
+    await element.updateComplete;
+    expect((element.shadowRoot.querySelector('input[name="shelly_password"]') as HTMLInputElement).value).toBe("device-password");
+
+    const saved = new Promise<AppSettingsUpdate>((resolve) => {
+      element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettingsUpdate>).detail));
+    });
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+
+    expect(await saved).toMatchObject({
+      shelly_username: "measurement",
+      shelly_password: "device-password",
+      clear_shelly_password: false,
+    });
   });
 
   it("renders Shelly discovery loading, empty, unavailable, and error states with refresh", async () => {

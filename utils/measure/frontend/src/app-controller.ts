@@ -2,6 +2,7 @@ import { ApiError } from "./api-client";
 import { entityDomains } from "./measurement-kinds";
 import type {
   AppSettings,
+  AppSettingsUpdate,
   Capabilities,
   ContributionAuthDeviceStatus,
   ContributionAuthState,
@@ -84,8 +85,8 @@ export interface MeasureAppApi {
   getContributionDeviceAuth(flowId: string): Promise<ContributionAuthDeviceStatus>;
   saveContributionToken(token: string): Promise<ContributionAuthState>;
   disconnectContributionAuth(): Promise<ContributionAuthState>;
-  saveSettings(settings: AppSettings): Promise<AppSettings>;
-  testPowerMeter(settings: AppSettings): Promise<PowerMeterDiagnostic>;
+  saveSettings(settings: AppSettingsUpdate): Promise<AppSettings>;
+  testPowerMeter(settings: AppSettingsUpdate): Promise<PowerMeterDiagnostic>;
   getShellyDevices(): Promise<ShellyDiscoveryResponse>;
   getEntityCatalog(): Promise<EntityCatalog>;
   getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]>;
@@ -293,7 +294,7 @@ export class MeasureAppController {
     this.changed();
   }
 
-  async testPowerMeter(settings: AppSettings): Promise<void> {
+  async testPowerMeter(settings: AppSettingsUpdate): Promise<void> {
     const version = ++this.powerMeterTestVersion;
     this.state.testingPowerMeter = true;
     this.state.powerMeterTestResult = undefined;
@@ -351,7 +352,7 @@ export class MeasureAppController {
     }
   }
 
-  async saveSettings(settings: AppSettings): Promise<void> {
+  async saveSettings(settings: AppSettingsUpdate): Promise<void> {
     this.state.busy = true;
     this.state.errorMessage = "";
     this.changed();

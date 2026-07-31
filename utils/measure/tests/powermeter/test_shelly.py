@@ -4,6 +4,7 @@ from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureErro
 from measure.powermeter.shelly import ShellyPowerMeter
 import pytest
 from requests import RequestException
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
 from tests.conftest import MockRequestsGetFactory
 
@@ -36,6 +37,54 @@ def test_api_gen1(mock_requests_get_factory: MockRequestsGetFactory) -> None:
     power = pm.get_power()
     assert power.power == 20.00
     assert power.updated == 1733039773
+
+
+def test_api_gen1_uses_basic_authentication(mock_requests_get_factory: MockRequestsGetFactory) -> None:
+    requests_get = mock_requests_get_factory(
+        {
+            SHELLY_ENDPOINT: ({"gen": 1, "auth": True}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/status": ({"meters": [{"power": 20.0, "timestamp": 1733039773}]}, 200),
+        },
+    )
+
+    power_meter = ShellyPowerMeter(DEFAULT_SHELLY_IP, username="measurement", password="secret")  # noqa: S106
+
+    protected_call = requests_get.mock_calls[1]
+    authentication = protected_call.kwargs["auth"]
+    assert isinstance(authentication, HTTPBasicAuth)
+    assert authentication.username == "measurement"
+    assert authentication.password == "secret"  # noqa: S105
+    assert power_meter.get_power().power == pytest.approx(20.0)
+
+
+def test_api_gen2_uses_digest_authentication(mock_requests_get_factory: MockRequestsGetFactory) -> None:
+    requests_get = mock_requests_get_factory(
+        {
+            SHELLY_ENDPOINT: ({"gen": 2, "auth_en": True}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Shelly.GetStatus": ({"switch:0": {"apower": 20.0}}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Switch.GetStatus?id=0": ({"apower": 20.0}, 200),
+        },
+    )
+
+    power_meter = ShellyPowerMeter(DEFAULT_SHELLY_IP, username="ignored", password="secret")  # noqa: S106
+
+    authentication = requests_get.mock_calls[1].kwargs["auth"]
+    assert isinstance(authentication, HTTPDigestAuth)
+    assert authentication.username == "admin"
+    assert authentication.password == "secret"  # noqa: S105
+    assert power_meter.get_power().power == pytest.approx(20.0)
+
+
+def test_api_rejects_incorrect_credentials(mock_requests_get_factory: MockRequestsGetFactory) -> None:
+    mock_requests_get_factory(
+        {
+            SHELLY_ENDPOINT: ({"gen": 2, "auth_en": True}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Shelly.GetStatus": ({}, 401),
+        },
+    )
+
+    with pytest.raises(ApiConnectionError, match="username or password is incorrect"):
+        ShellyPowerMeter(DEFAULT_SHELLY_IP, password="incorrect")  # noqa: S106
 
 
 def test_api_gen2_switch_endpoint(mock_requests_get_factory: MockRequestsGetFactory) -> None:

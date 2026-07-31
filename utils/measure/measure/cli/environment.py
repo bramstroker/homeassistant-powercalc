@@ -305,6 +305,17 @@ class CliEnvironment:
         return _config_value("SHELLY_IP", converter=str)
 
     @property
+    def shelly_username(self) -> str:
+        return _config_value("SHELLY_USERNAME", default="admin", converter=str)
+
+    @property
+    def shelly_password(self) -> str | None:
+        try:
+            return _config_value("SHELLY_PASSWORD", converter=str)
+        except UndefinedValueError:
+            return None
+
+    @property
     def shelly_timeout(self) -> int:
         return _config_value("SHELLY_TIMEOUT", default=5, converter=int)
 

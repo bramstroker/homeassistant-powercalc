@@ -5,7 +5,7 @@ from measure.controller.fan.spec import DummyFanControllerSpec
 from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec
 from measure.execution import RunInteraction
 from measure.home_assistant import HomeAssistantManager
-from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, TuyaPowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec, TuyaPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
     DummyLoadReuseRequest,
@@ -23,11 +23,13 @@ def _assembler(
     *,
     home_assistant: HomeAssistantManager | None = None,
     tuya_device_key: str | None = None,
+    shelly_password: str | None = None,
 ) -> MeasurementAssembler:
     return MeasurementAssembler(
         MagicMock(spec=RunInteraction),
         home_assistant=home_assistant,
         tuya_device_key=tuya_device_key,
+        shelly_password=shelly_password,
     )
 
 
@@ -111,6 +113,27 @@ def test_assembler_reads_tuya_key_from_cli_config_dependency() -> None:
         _assembler(tuya_device_key="device-key").assemble(request)
 
     power_meter.assert_called_once_with("device-id", "192.0.2.20", "device-key", "3.4")
+
+
+def test_assembler_reads_shelly_password_from_secret_dependency() -> None:
+    request = AverageMeasurementRequest(
+        power_meter=ShellyPowerMeterSpec(
+            device_ip="192.0.2.30",
+            username="measurement",
+            timeout=10,
+        ),
+    )
+
+    with patch("measure.assembler.ShellyPowerMeter") as power_meter:
+        power_meter.return_value.has_voltage_support.return_value = False
+        _assembler(shelly_password="device-password").assemble(request)  # noqa: S106
+
+    power_meter.assert_called_once_with(
+        "192.0.2.30",
+        10,
+        username="measurement",
+        password="device-password",  # noqa: S106
+    )
 
 
 def test_assembler_rejects_a_controller_for_the_wrong_measurement_type() -> None:

@@ -1,6 +1,6 @@
 import { LitElement, css, html, nothing } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
-import type { AppSettings, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, EntityDescriptor, PowerMeterDiagnostic, SettingsSection, ShellyDiscoveryDevice } from "../types";
+import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, EntityDescriptor, PowerMeterDiagnostic, SettingsSection, ShellyDiscoveryDevice } from "../types";
 import { sharedStyles } from "../styles";
 import "./power-meter-diagnostic";
 
@@ -28,6 +28,9 @@ export class SettingsView extends LitElement {
     shellyDiscoveryAvailable: { attribute: false },
     shellyDiscoveryMessage: { attribute: false },
     shellyIp: { state: true },
+    shellyUsername: { state: true },
+    shellyPassword: { state: true },
+    clearShellyPassword: { state: true },
     kasaIp: { state: true },
   };
 
@@ -54,6 +57,9 @@ export class SettingsView extends LitElement {
   shellyDiscoveryAvailable?: boolean;
   shellyDiscoveryMessage?: string | null;
   private shellyIp?: string;
+  private shellyUsername?: string;
+  private shellyPassword = "";
+  private clearShellyPassword = false;
   private kasaIp?: string;
   private readonly form = createRef<HTMLFormElement>();
 
@@ -375,7 +381,24 @@ export class SettingsView extends LitElement {
         <span>Shelly IP address</span>
         <input name="shelly_ip" .value=${address} required autocomplete="off" placeholder="192.168.1.50" @input=${this.shellyIpChanged} />
         <small class="field-hint">Select a discovered device above or enter its IP address manually.</small>
-      </label>`;
+      </label>
+      <div class="grid">
+        <label>
+          <span>Shelly username</span>
+          <input name="shelly_username" .value=${this.shellyUsername ?? this.settings?.shelly_username ?? "admin"} required autocomplete="username" maxlength="50" @input=${this.shellyUsernameChanged} />
+          <small class="field-hint">Gen1 devices may use a custom username. Gen2 and newer always use admin.</small>
+        </label>
+        <label>
+          <span>Shelly password</span>
+          <input name="shelly_password" type="password" .value=${this.shellyPassword} autocomplete="new-password" maxlength="255" placeholder=${this.settings?.shelly_password_configured ? "Saved password (leave blank to keep)" : "Optional"} @input=${this.shellyPasswordChanged} />
+          <small class="field-hint">Stored privately in the app and never returned by the API.</small>
+        </label>
+      </div>
+      ${this.settings?.shelly_password_configured ? html`
+        <label class="check">
+          <input name="clear_shelly_password" type="checkbox" .checked=${this.clearShellyPassword} @change=${this.clearShellyPasswordChanged} />
+          <span>Remove the saved Shelly password</span>
+        </label>` : nothing}`;
   }
 
   private renderShellyDiscovery(selectedAddress: string) {
@@ -392,8 +415,8 @@ export class SettingsView extends LitElement {
         ${this.shellyDiscoveryDevices.map((device) => html`
           <option
             value=${device.ip_address}
-            ?selected=${device.supported && device.ip_address === selectedAddress}
-            ?disabled=${!device.supported}
+            ?selected=${(device.supported || device.auth_required) && device.ip_address === selectedAddress}
+            ?disabled=${!device.supported && !device.auth_required}
           >${this.shellyDeviceLabel(device)}</option>`)}
       </select>
     </label>`;
@@ -416,7 +439,7 @@ export class SettingsView extends LitElement {
     return device.supported ? identity : `${identity} — ${device.reason ?? "Not supported"}`;
   }
 
-  private collect(): AppSettings | null {
+  private collect(): AppSettingsUpdate | null {
     const element = this.form.value;
     if (!element) return null;
     const data = new FormData(element);
@@ -424,6 +447,8 @@ export class SettingsView extends LitElement {
     const powerMeterValue = data.get("power_meter");
     const powerMeter = (typeof powerMeterValue === "string" ? powerMeterValue : "hass") as AppSettings["power_meter"];
     const shellyIp = data.get("shelly_ip");
+    const shellyUsername = data.get("shelly_username");
+    const shellyPassword = data.get("shelly_password");
     const kasaIp = data.get("kasa_ip");
     const measureDevice = data.get("default_measure_device");
     return {
@@ -431,6 +456,10 @@ export class SettingsView extends LitElement {
       default_measure_device: typeof measureDevice === "string" && measureDevice.trim() ? measureDevice.trim() : null,
       power_meter: powerMeter,
       shelly_ip: powerMeter === "shelly" && typeof shellyIp === "string" ? shellyIp.trim() || null : null,
+      shelly_username: typeof shellyUsername === "string" && shellyUsername.trim() ? shellyUsername.trim() : "admin",
+      shelly_password_configured: this.settings?.shelly_password_configured ?? false,
+      shelly_password: powerMeter === "shelly" && typeof shellyPassword === "string" ? shellyPassword || null : null,
+      clear_shelly_password: data.get("clear_shelly_password") === "on",
       kasa_ip: powerMeter === "kasa" && typeof kasaIp === "string" ? kasaIp.trim() || null : null,
       fast_test_mode: data.get("fast_test_mode") === "on",
       measurement_defaults: {
@@ -460,14 +489,14 @@ export class SettingsView extends LitElement {
     event.preventDefault();
     const settings = this.collect();
     if (!settings) return;
-    this.dispatchEvent(new CustomEvent<AppSettings>("save", { detail: settings, bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<AppSettingsUpdate>("save", { detail: settings, bubbles: true, composed: true }));
   }
 
   private test(): void {
     const settings = this.collect();
     if (!settings) return;
     this.testResult = undefined;
-    this.dispatchEvent(new CustomEvent<AppSettings>("test", { detail: settings, bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<AppSettingsUpdate>("test", { detail: settings, bubbles: true, composed: true }));
   }
 
   private powerMeterChanged(event: Event): void {
@@ -484,6 +513,23 @@ export class SettingsView extends LitElement {
 
   private shellyIpChanged(event: Event): void {
     this.shellyIp = (event.currentTarget as HTMLInputElement).value;
+    this.powerMeterSettingsChanged();
+  }
+
+  private shellyUsernameChanged(event: Event): void {
+    this.shellyUsername = (event.currentTarget as HTMLInputElement).value;
+    this.powerMeterSettingsChanged();
+  }
+
+  private shellyPasswordChanged(event: Event): void {
+    this.shellyPassword = (event.currentTarget as HTMLInputElement).value;
+    this.clearShellyPassword = false;
+    this.powerMeterSettingsChanged();
+  }
+
+  private clearShellyPasswordChanged(event: Event): void {
+    this.clearShellyPassword = (event.currentTarget as HTMLInputElement).checked;
+    if (this.clearShellyPassword) this.shellyPassword = "";
     this.powerMeterSettingsChanged();
   }
 

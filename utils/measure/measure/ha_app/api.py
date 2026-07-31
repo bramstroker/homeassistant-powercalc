@@ -38,11 +38,12 @@ from measure.ha_app.contribution import (
 )
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
-from measure.ha_app.preferences import AppPreferences
+from measure.ha_app.preferences import AppPreferences, AppSettingsResponse, AppSettingsUpdate
 from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
 from measure.ha_app.registry import FieldControl, FieldRole, measurement_definitions
 from measure.ha_app.service import MeasurementService
 from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionEvent, SessionSnapshot, SessionState
+from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantManager
@@ -199,12 +200,21 @@ class AppContext:
         )
 
     def _measurement_service(self) -> MeasurementService:
-        return MeasurementService(self.home_assistant, self.storage)
+        return MeasurementService(
+            self.home_assistant,
+            self.storage,
+            shelly_password=self.shelly_password(),
+        )
+
+    def shelly_password(self) -> str | None:
+        credentials = self.storage.load_shelly_credentials()
+        return credentials.password if credentials is not None else None
 
     def build_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:
         return MeasurementAssembler(
             ImmediateInteraction(),
             home_assistant=self.home_assistant,
+            shelly_password=self.shelly_password(),
         ).build_power_meter(spec)
 
 
@@ -356,18 +366,18 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
         return _measure_definitions()
 
     @router.get("/settings")
-    async def get_settings(request: Request) -> AppPreferences:
-        return await run_in_threadpool(_context(request).storage.load_settings)
+    async def get_settings(request: Request) -> AppSettingsResponse:
+        return await run_in_threadpool(_settings_response, _context(request))
 
     @router.put("/settings", responses={400: _ERROR})
-    async def update_settings(payload: AppPreferences, request: Request) -> AppPreferences:
+    async def update_settings(payload: AppSettingsUpdate, request: Request) -> AppSettingsResponse:
         context = _context(request)
         if payload.fast_test_mode and not context.developer_mode:
             raise HTTPException(status_code=400, detail="Fast test mode requires developer mode")
-        return await run_in_threadpool(context.storage.save_settings, payload)
+        return await run_in_threadpool(_save_settings, context, payload)
 
     @router.post("/settings/test-power-meter")
-    async def test_power_meter(payload: AppPreferences, request: Request) -> PowerMeterDiagnostic:
+    async def test_power_meter(payload: AppSettingsUpdate, request: Request) -> PowerMeterDiagnostic:
         return await run_in_threadpool(_test_power_meter, _context(request), payload)
 
     @router.get("/power-meters/shelly")
@@ -636,10 +646,26 @@ def _measure_definitions() -> list[MeasureDefinition]:
     ]
 
 
-def _test_power_meter(context: AppContext, settings: AppPreferences) -> PowerMeterDiagnostic:
+def _settings_response(context: AppContext) -> AppSettingsResponse:
+    settings = context.storage.load_settings()
+    return AppSettingsResponse.model_validate(
+        settings.model_dump() | {"shelly_password_configured": context.shelly_password() is not None},
+    )
+
+
+def _save_settings(context: AppContext, update: AppSettingsUpdate) -> AppSettingsResponse:
+    if update.clear_shelly_password:
+        context.storage.clear_shelly_credentials()
+    elif update.shelly_password:
+        context.storage.save_shelly_credentials(ShellyCredentials(password=update.shelly_password))
+    context.storage.save_settings(update.preferences())
+    return _settings_response(context)
+
+
+def _test_power_meter(context: AppContext, settings: AppSettingsUpdate) -> PowerMeterDiagnostic:
     """Validate connectivity and measurement quality for the configured meter."""
     try:
-        spec = _power_meter_spec(settings)
+        spec = _power_meter_spec(settings.preferences())
     except PowerMeterError as error:
         message = str(error)
         return PowerMeterDiagnostic(
@@ -650,7 +676,16 @@ def _test_power_meter(context: AppContext, settings: AppPreferences) -> PowerMet
             messages=[message],
             message=message,
         )
-    return context.power_meter_diagnostics.evaluate(spec, force=True)
+    password = None if settings.clear_shelly_password else settings.shelly_password or context.shelly_password()
+    return context.power_meter_diagnostics.evaluate(
+        spec,
+        force=True,
+        build_power_meter=lambda power_meter_spec: MeasurementAssembler(
+            ImmediateInteraction(),
+            home_assistant=context.home_assistant,
+            shelly_password=password,
+        ).build_power_meter(power_meter_spec),
+    )
 
 
 def _power_meter_spec(settings: AppPreferences) -> PowerMeterSpec:
@@ -659,7 +694,7 @@ def _power_meter_spec(settings: AppPreferences) -> PowerMeterSpec:
     if settings.power_meter == PowerMeterType.SHELLY:
         if not settings.shelly_ip:
             raise PowerMeterError("Enter the Shelly IP address first")
-        return ShellyPowerMeterSpec(device_ip=settings.shelly_ip)
+        return ShellyPowerMeterSpec(device_ip=settings.shelly_ip, username=settings.shelly_username)
     if settings.power_meter == PowerMeterType.KASA:
         if not settings.kasa_ip:
             raise PowerMeterError("Enter the Kasa IP address first")
