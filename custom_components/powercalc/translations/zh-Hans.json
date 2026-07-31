@@ -1,123 +1,123 @@
 {
   "common": {
-    "source_entity": "Source entity",
-    "source_device": "Source device",
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "source_entity": "源实体",
+    "source_device": "源设备",
+    "remarks_smart_switch": "此配置文件仅提供待机功率值。\n 如果设备开启时消耗固定功率，可以在配置流程的下一步提供该值",
+    "remarks_smart_dimmer": "此配置文件仅提供待机功率值。\n 下一步可以选择提供连接灯具的功率值"
   },
   "config": {
     "abort": {
-      "already_configured": "Sensor is already configured, specify a unique_id"
+      "already_configured": "传感器已配置，请指定唯一 ID（unique_id）"
     },
     "error": {
-      "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
-      "daily_energy_mandatory": "You must supply at least one of Value or Value template",
-      "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-      "group_mandatory": "You must define at least subgroups or power and energy-entities",
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
-      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
-      "lut_wrong_domain": "Only light entities can use the LUT mode",
-      "playbook_mandatory": "You need to specify at least one playbook",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "cost_price_mandatory": "必须提供能源价格或能源价格传感器",
+      "daily_energy_mandatory": "必须至少提供 Value 或 Value template 其中一项",
+      "entity_mandatory": "除 playbook 外的所有策略都必须选择实体",
+      "fixed_mandatory": "必须至少提供 Power、Power template 或 States power 其中一项",
+      "fixed_states_power_only": "此实体只能使用 states_power，不能使用 power",
+      "group_mandatory": "必须定义至少一个子组，或功率和能源实体",
+      "linear_mandatory": "必须至少提供 max_power 或 calibrate 其中一项",
+      "linear_min_higher_as_max": "最大功率不能低于最小功率",
+      "linear_unsupported_domain": "线性模式不支持此实体域。必须是 fan、light 或 mediaplayer 之一，但仍可使用校准选项",
+      "lut_unsupported_color_mode": "LUT 配置文件不支持灯具的一种颜色模式。详情请查看日志",
+      "lut_wrong_domain": "只有 light 实体可以使用 LUT 模式",
+      "playbook_mandatory": "必须指定至少一个 playbook",
+      "unknown": "发生未知错误，详情请查看日志"
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "选择组",
+          "new_group": "新建组"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "填写自定义组名以创建新组"
         },
-        "title": "Assign to group"
+        "title": "分配到组"
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Availability entity"
+          "availability_entity": "可用性实体"
         },
         "data_description": {
-          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+          "availability_entity": "当此实体不可用时，Powercalc 传感器也将不可用"
         },
-        "title": "Availability entity",
-        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+        "title": "可用性实体",
+        "description": "此配置文件按设备设置。请选择用于确定 Powercalc 传感器可用性的实体"
       },
       "daily_energy": {
         "data": {
-          "create_utility_meters": "Create utility meters",
-          "daily_energy_value": "Daily energy value",
-          "name": "Name",
-          "on_time": "On time",
-          "start_time": "Start time",
-          "unit_of_measurement": "Unit of measurement",
-          "update_frequency": "Update frequency",
-          "value": "Value",
-          "value_template": "Value template"
+          "create_utility_meters": "创建实用电表",
+          "daily_energy_value": "每日能源值",
+          "name": "名称",
+          "on_time": "开启时间",
+          "start_time": "开始时间",
+          "unit_of_measurement": "测量单位",
+          "update_frequency": "更新频率",
+          "value": "值",
+          "value_template": "值模板"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "留空时默认为 1 天，即始终开启",
+          "update_frequency": "传感器状态更新之间的时间（秒）"
         },
-        "title": "Create a daily fixed sensor"
+        "title": "创建每日固定传感器"
       },
       "energy_options": {
-        "title": "Energy options",
+        "title": "能源选项",
         "data": {
-          "energy_integration_method": "Integration method",
-          "energy_sensor_unit_prefix": "Unit prefix",
-          "energy_filter_outlier_enabled": "Filter outliers",
-          "energy_filter_outlier_max_step": "Outlier filter max step"
+          "energy_integration_method": "积分方法",
+          "energy_sensor_unit_prefix": "单位前缀",
+          "energy_filter_outlier_enabled": "过滤异常值",
+          "energy_filter_outlier_max_step": "异常值过滤器最大步长"
         },
         "data_description": {
-          "energy_filter_outlier_enabled": "Enable filtering of outlier values in the energy sensor",
-          "energy_filter_outlier_max_step": "Maximum expected step in power values (in watts) for the outlier filter"
+          "energy_filter_outlier_enabled": "启用能源传感器异常值过滤",
+          "energy_filter_outlier_max_step": "异常值过滤器允许的功率值最大步长（瓦）"
         }
       },
       "group_domain": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_cost_sensor": "Create cost sensor",
-          "create_utility_meters": "Create utility meters",
-          "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "name": "名称",
+          "create_energy_sensor": "创建能源传感器",
+          "create_cost_sensor": "创建成本传感器",
+          "create_utility_meters": "创建实用电表",
+          "domain": "实体域",
+          "exclude_entities": "排除实体"
         },
-        "title": "Create a domain based group sensor"
+        "title": "创建基于域的组传感器"
       },
       "fixed": {
         "data": {
-          "fixed_value": "Power value"
+          "fixed_value": "功率值"
         },
         "data_description": {
-          "fixed_value": "Power value in Watts when the entity is ON"
+          "fixed_value": "实体开启时的功率值（瓦）"
         },
-        "description": "Define a fixed power value for your entity. See the [documentation]({docs_uri}) for more info",
-        "title": "Fixed config"
+        "description": "为实体定义固定功率值。更多信息请参阅[文档]({docs_uri})",
+        "title": "固定配置"
       },
       "global_configuration": {
-        "title": "Global configuration",
-        "description": "Setup global configuration for Powercalc. For more information see the [documentation]({docs_uri}). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "title": "全局配置",
+        "description": "设置 Powercalc 全局配置。更多信息请参阅[文档]({docs_uri})。能源传感器和实用电表的其他选项可在接下来的步骤中提供。",
         "sections": {
           "power_options": {
-            "name": "Power sensor",
+            "name": "功率传感器",
             "data": {
-              "power_sensor_naming": "Power sensor name pattern",
-              "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-              "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_naming": "功率传感器名称模式",
+              "power_sensor_friendly_naming": "功率传感器友好名称模式",
+              "power_sensor_category": "功率传感器类别",
+              "power_sensor_precision": "功率传感器精度"
             }
           },
           "features": {
-            "name": "Create sensors",
+            "name": "创建传感器",
             "data": {
-              "create_energy_sensors": "Create energy sensors",
-              "create_cost_sensors": "Create cost sensors",
-              "create_standby_group": "Create standby group",
-              "create_utility_meters": "Create utility meters"
+              "create_energy_sensors": "创建能源传感器",
+              "create_cost_sensors": "创建成本传感器",
+              "create_standby_group": "创建待机组",
+              "create_utility_meters": "创建实用电表"
             },
             "data_description": {
               "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
