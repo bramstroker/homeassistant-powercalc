@@ -10,8 +10,8 @@ import pytest
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 import voluptuous as vol
 
-from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.config_flow import Step
+from custom_components.powercalc.common import SourceEntity, create_source_entity
+from custom_components.powercalc.config_flow import PowercalcConfigFlow, Step
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_CREATE_ENERGY_SENSOR,
@@ -28,9 +28,10 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
+from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL, LibraryConfigFlow
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
+from custom_components.powercalc.power_profile.power_profile import DiscoveryBy
 from custom_components.test.light import MockLight
 from tests.common import create_mock_config_entry, create_mock_light_entity, mock_device
 from tests.config_flow.common import (
@@ -461,6 +462,33 @@ async def test_source_entity_not_visible_in_options_when_discovery_by_device(has
     result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert CONF_ENTITY_ID not in result["data_schema"].schema
+
+
+@pytest.mark.parametrize(
+    ("source_entity", "expected_discovery_by"),
+    [
+        (None, None),
+        (
+            SourceEntity(
+                object_id="source-entry",
+                entity_id=DUMMY_ENTITY_ID,
+                domain="sensor",
+                config_entry_id="source-entry",
+            ),
+            DiscoveryBy.CONFIG_ENTRY,
+        ),
+    ],
+    ids=["no_source", "config_entry"],
+)
+def test_library_discovery_filter(
+    source_entity: SourceEntity | None,
+    expected_discovery_by: DiscoveryBy | None,
+) -> None:
+    """The library listing is filtered using the active discovery context."""
+    flow = PowercalcConfigFlow()
+    flow.source_entity = source_entity
+
+    assert LibraryConfigFlow(flow)._get_library_discovery_by() == expected_discovery_by  # noqa: SLF001
 
 
 async def test_profile_with_custom_fields(
