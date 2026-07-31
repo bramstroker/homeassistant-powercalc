@@ -3,7 +3,7 @@ from measure.const import QUESTION_MEASURE_DEVICE, MeasureType
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.light.spec import HueLightControllerSpec
 from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, PowerMeterType
-from measure.powermeter.spec import HassPowerMeterSpec, TuyaPowerMeterSpec
+from measure.powermeter.spec import HassPowerMeterSpec, ShellyPowerMeterSpec, TuyaPowerMeterSpec
 from measure.request import ResumePolicy
 from measure.runner.const import QUESTION_DURATION, QUESTION_MODE
 
@@ -47,6 +47,24 @@ def test_tuya_key_stays_in_cli_config(mock_config_factory: MockConfigFactory) ->
         version="3.4",
     )
     assert "device-key" not in request.model_dump_json()
+
+
+def test_shelly_password_stays_in_cli_config(mock_config_factory: MockConfigFactory) -> None:
+    environment = mock_config_factory()
+    environment.selected_power_meter = PowerMeterType.SHELLY
+    environment.shelly_ip = "192.0.2.30"
+    environment.shelly_username = "measurement"
+    environment.shelly_password = "device-password"  # noqa: S105
+    environment.shelly_timeout = 10
+
+    request = request_from_answers(MeasureType.AVERAGE, {QUESTION_DURATION: 60}, environment)
+
+    assert request.power_meter == ShellyPowerMeterSpec(
+        device_ip="192.0.2.30",
+        username="measurement",
+        timeout=10,
+    )
+    assert "device-password" not in request.model_dump_json()
 
 
 def test_cli_resume_setting_becomes_request_policy(mock_config_factory: MockConfigFactory) -> None:

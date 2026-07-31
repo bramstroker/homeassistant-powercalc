@@ -1,6 +1,7 @@
 import type {
   ApiErrorBody,
   AppSettings,
+  AppSettingsUpdate,
   Capabilities,
   ContributionAuthDeviceStatus,
   ContributionAuthState,
@@ -89,11 +90,11 @@ export class MeasureApiClient {
     return this.request("api/contribution/auth", { method: "DELETE" });
   }
 
-  saveSettings(settings: AppSettings): Promise<AppSettings> {
+  saveSettings(settings: AppSettingsUpdate): Promise<AppSettings> {
     return this.request("api/settings", { method: "PUT", body: JSON.stringify(settings) });
   }
 
-  testPowerMeter(settings: AppSettings): Promise<PowerMeterDiagnostic> {
+  testPowerMeter(settings: AppSettingsUpdate): Promise<PowerMeterDiagnostic> {
     return this.request("api/settings/test-power-meter", { method: "POST", body: JSON.stringify(settings) });
   }
 

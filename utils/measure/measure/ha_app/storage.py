@@ -24,6 +24,7 @@ from measure.ha_app.session import (
     SessionSnapshot,
     SessionState,
 )
+from measure.ha_app.shelly_credentials import ShellyCredentials, ShellyCredentialStore
 from measure.request import LightMeasurementRequest, MeasurementRequest, parse_measurement_request
 from measure.runner.light_plan import (
     CSV_HEADERS,
@@ -38,6 +39,7 @@ _LOGGER = logging.getLogger("measure")
 
 _DUMMY_LOAD_CALIBRATION_FILENAME = "dummy_load_calibration.json"
 _CONTRIBUTION_STATUS_FILENAME = "contribution_status.json"
+_SHELLY_CREDENTIALS_FILENAME = "shelly_credentials.json"
 
 
 class SessionStorage:
@@ -212,6 +214,19 @@ class SessionStorage:
     def save_settings(self, settings: AppPreferences) -> AppPreferences:
         self._write_json(self.data_root / "settings.json", settings.model_dump(mode="json"))
         return settings
+
+    def load_shelly_credentials(self) -> ShellyCredentials | None:
+        try:
+            return ShellyCredentialStore(self.data_root / _SHELLY_CREDENTIALS_FILENAME).load()
+        except (OSError, ValueError) as error:
+            _LOGGER.warning("Could not load persisted Shelly credentials: %s", error)
+            return None
+
+    def save_shelly_credentials(self, credentials: ShellyCredentials) -> None:
+        ShellyCredentialStore(self.data_root / _SHELLY_CREDENTIALS_FILENAME).save(credentials)
+
+    def clear_shelly_credentials(self) -> None:
+        ShellyCredentialStore(self.data_root / _SHELLY_CREDENTIALS_FILENAME).clear()
 
     def load_dummy_load_calibration(self) -> DummyLoadCalibration | None:
         path = self.data_root / _DUMMY_LOAD_CALIBRATION_FILENAME

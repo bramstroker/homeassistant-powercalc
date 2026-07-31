@@ -131,7 +131,11 @@ def _power_meter_spec(environment: CliEnvironment, answers: dict[str, Any]) -> P
     if selected == PowerMeterType.OCR:
         return OcrPowerMeterSpec()
     if selected == PowerMeterType.SHELLY:
-        return ShellyPowerMeterSpec(device_ip=environment.shelly_ip, timeout=environment.shelly_timeout)
+        return ShellyPowerMeterSpec(
+            device_ip=environment.shelly_ip,
+            username=environment.shelly_username,
+            timeout=environment.shelly_timeout,
+        )
     if selected == PowerMeterType.TASMOTA:
         return TasmotaPowerMeterSpec(device_ip=environment.tasmota_device_ip)
     if selected == PowerMeterType.TUYA:

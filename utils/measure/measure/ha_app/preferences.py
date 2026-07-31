@@ -36,6 +36,23 @@ class AppPreferences(BaseModel):
     default_measure_device: str | None = Field(default=None, max_length=200)
     power_meter: PowerMeterType = PowerMeterType.HASS
     shelly_ip: str | None = Field(default=None, max_length=255)
+    shelly_username: str = Field(default="admin", min_length=1, max_length=50)
     kasa_ip: str | None = Field(default=None, max_length=255)
     fast_test_mode: bool = False
     measurement_defaults: AppMeasurementDefaults = Field(default_factory=AppMeasurementDefaults)
+
+
+class AppSettingsUpdate(AppPreferences):
+    """Settings accepted from the UI, including write-only credential changes."""
+
+    shelly_password: str | None = Field(default=None, max_length=255)
+    clear_shelly_password: bool = False
+
+    def preferences(self) -> AppPreferences:
+        return AppPreferences.model_validate(self.model_dump())
+
+
+class AppSettingsResponse(AppPreferences):
+    """Public settings state which never returns the Shelly password."""
+
+    shelly_password_configured: bool = False
