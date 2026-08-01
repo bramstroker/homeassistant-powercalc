@@ -46,7 +46,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.common import migrate_legacy_entry, mock_devices, run_powercalc_setup
+from tests.common import migrate_legacy_entry, mock_devices, requires_composite_devices, run_powercalc_setup
 
 COMPOSITE_ID = "composite00000000000000000000ab"
 
@@ -216,6 +216,7 @@ async def test_migrate_config_entry_keeps_diagnostic_power_sensor_category(hass:
     assert mock_entry.data[CONF_POWER_SENSOR_CATEGORY] == EntityCategory.DIAGNOSTIC
 
 
+@requires_composite_devices
 @pytest.mark.parametrize("configured_device_id", [None, COMPOSITE_ID], ids=["source_entity", "configured_device"])
 async def test_migrate_config_entry_removes_split_helper_device(
     hass: HomeAssistant,
@@ -271,6 +272,7 @@ async def test_migrate_config_entry_removes_split_helper_device(
     assert powercalc_entry.version == PowercalcConfigFlow.VERSION
 
 
+@requires_composite_devices
 async def test_migrate_config_entry_removes_legacy_device_link(hass: HomeAssistant) -> None:
     """Test migration removes the legacy device link on older HA versions."""
     powercalc_entry = MockConfigEntry(domain=DOMAIN, version=8)

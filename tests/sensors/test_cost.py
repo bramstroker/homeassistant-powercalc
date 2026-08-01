@@ -586,7 +586,9 @@ async def test_utility_meter_cost_sensor_accumulates(hass: HomeAssistant) -> Non
     meter_cost_id = "sensor.sensor_existing_energy_daily_cost"
     meter_id = "sensor.existing_energy_daily"
     for value in ("10", "20", "30", "40"):
-        await set_states(hass, [("sensor.existing_energy", value, _KWH)])
+        # energy -> utility meter -> cost sensor, so the change needs more than one pass
+        # of the event loop to reach the cost sensor on HA <2026.7.
+        await set_states(hass, [("sensor.existing_energy", value, _KWH)], block_count=2)
 
     # The meter tracked 30 kWh (10 -> 40); its cost sensor prices the utility-meter
     # cycle from zero: (30 kWh) * 0.25 = 7.5.
