@@ -7,7 +7,7 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.label_registry import LabelRegistry
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
+from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults
 
 from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
 from custom_components.powercalc.errors import SensorConfigurationError
@@ -28,7 +28,7 @@ from custom_components.powercalc.group_include.filter import (
     create_composite_filter,
     create_filter,
 )
-from tests.common import mock_device, set_states
+from tests.common import mock_device, mock_entities_in_registry, set_states
 
 
 @pytest.mark.parametrize(
@@ -365,19 +365,11 @@ async def test_group_filter(
     entity_id: str,
     expected_result: bool,
 ) -> None:
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "group.some_group": RegistryEntryWithDefaults(
-                entity_id="group.some_group",
-                unique_id="def",
-                platform="test",
-            ),
-            "group.other_group": RegistryEntryWithDefaults(
-                entity_id="group.other_group",
-                unique_id="ghi",
-                platform="test",
-            ),
+            "group.some_group": {"unique_id": "def", "platform": "test"},
+            "group.other_group": {"unique_id": "ghi", "platform": "test"},
         },
     )
 

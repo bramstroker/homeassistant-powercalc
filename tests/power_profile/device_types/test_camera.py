@@ -1,10 +1,9 @@
 from homeassistant.core import HomeAssistant
 
 from tests.common import assert_entity_state, run_powercalc_setup, set_states
-from tests.conftest import MockEntityWithModel
 
 
-async def test_reolink_e1_pro(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+async def test_reolink_e1_pro(hass: HomeAssistant) -> None:
     camera_id = "camera.test_camera"
 
     power_sensor_id = "sensor.test_camera_power"

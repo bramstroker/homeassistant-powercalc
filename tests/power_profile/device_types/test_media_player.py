@@ -10,13 +10,17 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_STANDBY_POWER,
 )
-from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
-from tests.conftest import MockEntityWithModel
+from tests.common import (
+    assert_entity_state,
+    get_test_profile_dir,
+    mock_device_with_entities,
+    run_powercalc_setup,
+    set_states,
+)
 
 
 async def test_media_player(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test that media player can be setup from profile library
@@ -25,8 +29,9 @@ async def test_media_player(
     manufacturer = "Google Inc."
     model = "Google Nest Mini"
 
-    mock_entity_with_model_information(
-        entity_id=entity_id,
+    mock_device_with_entities(
+        hass,
+        entity_ids=entity_id,
         manufacturer=manufacturer,
         model=model,
     )

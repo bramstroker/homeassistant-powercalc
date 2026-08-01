@@ -1,5 +1,6 @@
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
+import pytest
 
 from custom_components.powercalc import CONF_SENSOR_TYPE
 from custom_components.powercalc.const import (
@@ -16,16 +17,11 @@ from tests.common import (
     run_powercalc_setup,
     set_states,
 )
-from tests.conftest import MockEntityWithModel
 
 
-async def test_power_meter(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
-) -> None:
-    """
-    Test that multi switch can be setup from profile library
-    """
+@pytest.mark.parametrize("profile_dir", ["power_meter", "power_meter_legacy"])
+async def test_power_meter(hass: HomeAssistant, profile_dir: str) -> None:
+    """Test that a power meter can be setup from the profile library, in both profile formats"""
     sensor_id = "sensor.pm_mini"
     power_sensor_id = "sensor.pm_mini_device_power"
 
@@ -33,29 +29,7 @@ async def test_power_meter(
         hass,
         {
             CONF_ENTITY_ID: sensor_id,
-            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("power_meter"),
-        },
-    )
-
-    await set_states(hass, [(sensor_id, "50.00")])
-    assert_entity_state(hass, power_sensor_id, "0.30")
-
-
-async def test_power_meter_legacy(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
-) -> None:
-    """
-    Test that multi switch can be setup from profile library
-    """
-    sensor_id = "sensor.pm_mini"
-    power_sensor_id = "sensor.pm_mini_device_power"
-
-    await run_powercalc_setup(
-        hass,
-        {
-            CONF_ENTITY_ID: sensor_id,
-            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("power_meter_legacy"),
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir(profile_dir),
         },
     )
 

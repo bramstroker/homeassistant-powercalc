@@ -8,14 +8,14 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_SENSOR_TYPE,
+    STATE_ON,
     Platform,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.selector import SelectSelector
-from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults, mock_registry
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 import voluptuous as vol
 
 from custom_components.powercalc import SensorType
@@ -54,13 +54,14 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.flow_helper.flows.group import SECTION_GROUP_MEMBERS, SECTION_GROUP_OPTIONS
 from custom_components.powercalc.sensors.group.config_entry_utils import add_to_associated_groups
-from custom_components.test.light import MockLight
 from tests.common import (
+    assert_entity_state,
     create_mock_config_entry,
-    create_mock_light_entity,
+    create_mock_group_entry,
     create_mocked_virtual_power_sensor_entry,
     migrate_legacy_entry,
     mock_device,
+    mock_entities_in_registry,
     run_powercalc_setup,
     set_states,
 )
@@ -158,23 +159,11 @@ async def test_create_energy_sensor_enabled(hass: HomeAssistant) -> None:
 async def test_add_device_members_to_group(hass: HomeAssistant) -> None:
     mock_device(hass, "my-device", "Mock", "Device", name="My device")
 
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "sensor.balcony_power": RegistryEntryWithDefaults(
-                entity_id="sensor.balcony_power",
-                unique_id="1111",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-                device_id="my-device",
-            ),
-            "sensor.balcony_energy": RegistryEntryWithDefaults(
-                entity_id="sensor.balcony_energy",
-                unique_id="2222",
-                platform="sensor",
-                device_class=SensorDeviceClass.ENERGY,
-                device_id="my-device",
-            ),
+            "sensor.balcony_power": {"device_class": SensorDeviceClass.POWER, "device_id": "my-device"},
+            "sensor.balcony_energy": {"device_class": SensorDeviceClass.ENERGY, "device_id": "my-device"},
         },
     )
 
@@ -202,25 +191,19 @@ async def test_add_device_members_to_group(hass: HomeAssistant) -> None:
     }
 
     await set_states(hass, [("sensor.balcony_power", 5), ("sensor.balcony_energy", 5)])
-    power_state = hass.states.get("sensor.my_group_sensor_power")
-    assert power_state
-    assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.balcony_power"}
+    assert_entity_state(hass, "sensor.my_group_sensor_power", attributes={CONF_ENTITIES: {"sensor.balcony_power"}})
 
-    energy_state = hass.states.get("sensor.my_group_sensor_energy")
-    assert energy_state
-    assert energy_state.attributes.get(CONF_ENTITIES) == {"sensor.balcony_energy"}
+    assert_entity_state(hass, "sensor.my_group_sensor_energy", attributes={CONF_ENTITIES: {"sensor.balcony_energy"}})
 
 
 async def test_group_include_area(
     hass: HomeAssistant,
-    entity_registry: EntityRegistry,
     area_registry: AreaRegistry,
 ) -> None:
     # Create light entity and add to group My area
-    light = MockLight("test")
-    await create_mock_light_entity(hass, light)
     area = area_registry.async_get_or_create("My area")
-    entity_registry.async_update_entity(light.entity_id, area_id=area.id)
+    mock_entities_in_registry(hass, {"light.test": {"area_id": area.id}})
+    await set_states(hass, [("light.test", STATE_ON)])
 
     result = await goto_virtual_power_strategy_step(
         hass,
@@ -271,9 +254,7 @@ async def test_group_include_area(
     }
 
     await set_states(hass, [("sensor.test_power", 5)])
-    power_state = hass.states.get("sensor.my_group_sensor_power")
-    assert power_state
-    assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
+    assert_entity_state(hass, "sensor.my_group_sensor_power", attributes={CONF_ENTITIES: {"sensor.test_power"}})
 
     energy_state = hass.states.get("sensor.my_group_sensor_energy")
     assert energy_state
@@ -292,16 +273,10 @@ async def test_group_include_floor(
     area = area_registry.async_get_or_create("My area")
     area_registry.async_update(area.id, floor_id=floor.floor_id)
 
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "sensor.test_power": RegistryEntryWithDefaults(
-                entity_id="sensor.test_power",
-                unique_id="1111",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-                area_id=area.id,
-            ),
+            "sensor.test_power": {"device_class": SensorDeviceClass.POWER, "area_id": area.id},
         },
     )
 
@@ -320,18 +295,15 @@ async def test_group_include_floor(
     assert result["data"][CONF_FLOOR] == floor.floor_id
 
     await set_states(hass, [("sensor.test_power", 5)])
-    power_state = hass.states.get("sensor.my_floor_group_power")
-    assert power_state
-    assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
+    assert_entity_state(hass, "sensor.my_floor_group_power", attributes={CONF_ENTITIES: {"sensor.test_power"}})
 
 
 async def test_can_unset_area(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
     area_registry.async_get_or_create("My area")
-    config_entry = await create_mock_config_entry(
+    config_entry = await create_mock_group_entry(
         hass,
+        "TestArea",
         {
-            CONF_SENSOR_TYPE: SensorType.GROUP,
-            CONF_NAME: "TestArea",
             CONF_AREA: "My area",
         },
         setup=False,
@@ -362,22 +334,11 @@ async def test_include_area_powercalc_only(
     area_registry: AreaRegistry,
 ) -> None:
     area = area_registry.async_get_or_create("My area")
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "switch.switch": RegistryEntryWithDefaults(
-                entity_id="switch.switch",
-                unique_id="1111",
-                platform="switch",
-                area_id=area.id,
-            ),
-            "sensor.existing_power": RegistryEntryWithDefaults(
-                entity_id="sensor.existing_power",
-                unique_id="3333",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-                area_id=area.id,
-            ),
+            "switch.switch": {"area_id": area.id},
+            "sensor.existing_power": {"device_class": SensorDeviceClass.POWER, "area_id": area.id},
         },
     )
 
@@ -401,9 +362,7 @@ async def test_include_area_powercalc_only(
     assert not result["data"][CONF_INCLUDE_NON_POWERCALC_SENSORS]
 
     await set_states(hass, [("sensor.test_power", 5)])
-    power_state = hass.states.get("sensor.my_group_sensor_power")
-    assert power_state
-    assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
+    assert_entity_state(hass, "sensor.my_group_sensor_power", attributes={CONF_ENTITIES: {"sensor.test_power"}})
 
 
 async def test_can_select_existing_powercalc_entry_as_group_member(
@@ -504,10 +463,12 @@ async def test_real_power_entry_selectable_as_group_member(
     )
 
     await set_states(hass, [("sensor.real_power", "25.00")])
-    group_state = hass.states.get("sensor.my_group_sensor_power")
-    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.virtualpower1_power", "sensor.real_power"}
-    assert group_state
-    assert group_state.state == "75.00"
+    assert_entity_state(
+        hass,
+        "sensor.my_group_sensor_power",
+        "75.00",
+        attributes={ATTR_ENTITIES: {"sensor.virtualpower1_power", "sensor.real_power"}},
+    )
 
 
 async def test_group_error_mandatory(hass: HomeAssistant) -> None:
@@ -619,11 +580,10 @@ async def test_migrate_config_entry_from_version_2(hass: HomeAssistant) -> None:
 
 
 async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistant) -> None:
-    await create_mock_config_entry(
+    await create_mock_group_entry(
         hass,
+        "TestGroup",
         {
-            CONF_SENSOR_TYPE: SensorType.GROUP,
-            CONF_NAME: "TestGroup",
             CONF_GROUP_TYPE: GroupType.CUSTOM,
         },
         setup=False,

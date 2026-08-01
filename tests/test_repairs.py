@@ -5,7 +5,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er, issue_registry as ir
 from homeassistant.setup import async_setup_component
 import pytest
-from pytest_homeassistant_custom_component.common import mock_device_registry
 
 from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, SensorType
 from custom_components.powercalc.const import (
@@ -16,7 +15,7 @@ from custom_components.powercalc.const import (
     ISSUE_COMPOSITE_DEVICE_ID,
 )
 from custom_components.powercalc.repairs import async_create_fix_flow
-from tests.common import create_mock_config_entry
+from tests.common import create_mock_config_entry, mock_devices
 
 COMPOSITE_ID = "composite00000000000000000000ab"
 
@@ -87,20 +86,22 @@ def split_devices(
     hass: HomeAssistant,
 ) -> tuple[dr.DeviceEntry, dr.DeviceEntry]:
     """Create two devices split from the same pre-migration composite device."""
-    device_1 = dr.DeviceEntry(
-        config_entry_id="test-entry-1",
-        id="split-device-1",
-        name="Split device 1",
-        composite_device_id=COMPOSITE_ID,
+    devices = mock_devices(
+        hass,
+        {
+            "split-device-1": {
+                "config_entry_id": "test-entry-1",
+                "name": "Split device 1",
+                "composite_device_id": COMPOSITE_ID,
+            },
+            "split-device-2": {
+                "config_entry_id": "test-entry-2",
+                "name": "Split device 2",
+                "composite_device_id": COMPOSITE_ID,
+            },
+        },
     )
-    device_2 = dr.DeviceEntry(
-        config_entry_id="test-entry-2",
-        id="split-device-2",
-        name="Split device 2",
-        composite_device_id=COMPOSITE_ID,
-    )
-    mock_device_registry(hass, {device_1.id: device_1, device_2.id: device_2})
-    return device_1, device_2
+    return devices["split-device-1"], devices["split-device-2"]
 
 
 @pytest.mark.usefixtures("split_devices")

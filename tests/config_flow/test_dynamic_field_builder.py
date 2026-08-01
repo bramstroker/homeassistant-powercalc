@@ -2,12 +2,11 @@ from typing import Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import EntitySelector, NumberSelector
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
-from tests.common import mock_device
+from tests.common import mock_device, mock_entities_in_registry
 
 
 def test_build_schema(hass: HomeAssistant) -> None:
@@ -110,21 +109,11 @@ def test_entity_pick_filter_by_device(hass: HomeAssistant) -> None:
         name="Test Device",
     )
 
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "sensor.test1": RegistryEntryWithDefaults(
-                entity_id="sensor.test1",
-                unique_id="unique_test1",
-                platform="test_platform",
-                device_id="device_123",
-            ),
-            "switch.test2": RegistryEntryWithDefaults(
-                entity_id="switch.test2",
-                unique_id="unique_test2",
-                platform="test_platform",
-                device_id="device_123",
-            ),
+            "sensor.test1": {"unique_id": "unique_test1", "platform": "test_platform", "device_id": "device_123"},
+            "switch.test2": {"unique_id": "unique_test2", "platform": "test_platform", "device_id": "device_123"},
         },
     )
 

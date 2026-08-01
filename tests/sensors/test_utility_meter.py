@@ -13,16 +13,12 @@ from homeassistant.components.utility_meter.sensor import (
     CONF_UNIQUE_ID,
     PAUSED,
 )
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_ENTITY_ID, CONF_NAME, UnitOfEnergy
+from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_ENTITY_ID, CONF_NAME, STATE_OFF, UnitOfEnergy
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.setup import async_setup_component
 import homeassistant.util.dt as dt_util
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    RegistryEntryWithDefaults,
-    mock_registry,
-)
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
@@ -42,17 +38,17 @@ from custom_components.powercalc.const import (
 )
 from tests.common import (
     assert_entity_state,
-    create_input_boolean,
     create_mock_config_entry,
     create_mocked_virtual_power_sensor_entry,
     mock_device,
+    mock_entities_in_registry,
     run_powercalc_setup,
     set_states,
 )
 
 
 async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass)
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
 
     assert await async_setup_component(hass, utility_meter.DOMAIN, {})
 
@@ -70,15 +66,17 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
 
     assert_entity_state(hass, "select.test_energy_daily", "peak")
 
-    peak_sensor = hass.states.get("sensor.test_energy_daily_peak")
-    assert peak_sensor
-    assert peak_sensor.attributes[ATTR_TARIFF] == "peak"
-    assert peak_sensor.attributes[ATTR_STATUS] == COLLECTING
+    assert_entity_state(
+        hass,
+        "sensor.test_energy_daily_peak",
+        attributes={ATTR_TARIFF: "peak", ATTR_STATUS: COLLECTING},
+    )
 
-    offpeak_sensor = hass.states.get("sensor.test_energy_daily_offpeak")
-    assert offpeak_sensor
-    assert offpeak_sensor.attributes[ATTR_TARIFF] == "offpeak"
-    assert offpeak_sensor.attributes[ATTR_STATUS] == PAUSED
+    assert_entity_state(
+        hass,
+        "sensor.test_energy_daily_offpeak",
+        attributes={ATTR_TARIFF: "offpeak", ATTR_STATUS: PAUSED},
+    )
 
     general_sensor_daily = hass.states.get("sensor.test_energy_daily")
     assert general_sensor_daily
@@ -89,11 +87,9 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "select.test_energy_daily", "peak")
 
     await set_states(hass, [("select.test_energy_daily", "offpeak")])
-    peak_sensor = hass.states.get("sensor.test_energy_daily_peak")
-    assert peak_sensor.attributes[ATTR_STATUS] == PAUSED
+    assert_entity_state(hass, "sensor.test_energy_daily_peak", attributes={ATTR_STATUS: PAUSED})
 
-    offpeak_sensor = hass.states.get("sensor.test_energy_daily_offpeak")
-    assert offpeak_sensor.attributes[ATTR_STATUS] == COLLECTING
+    assert_entity_state(hass, "sensor.test_energy_daily_offpeak", attributes={ATTR_STATUS: COLLECTING})
 
 
 async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
@@ -144,27 +140,12 @@ async def test_utility_meter_is_not_created_twice(
     power_sensor_id = "sensor.test_power"
     energy_sensor_id = "sensor.test_energy"
     utility_meter_id = "sensor.test_energy_daily"
-    entity_registry = mock_registry(
+    entity_registry = mock_entities_in_registry(
         hass,
         {
-            power_sensor_id: RegistryEntryWithDefaults(
-                entity_id=power_sensor_id,
-                unique_id="1234",
-                name="Test power",
-                platform="powercalc",
-            ),
-            energy_sensor_id: RegistryEntryWithDefaults(
-                entity_id=energy_sensor_id,
-                unique_id="1234_energy",
-                name="Test energy",
-                platform="powercalc",
-            ),
-            utility_meter_id: RegistryEntryWithDefaults(
-                entity_id=utility_meter_id,
-                unique_id="1234_energy_daily",
-                name="Test energy daily",
-                platform="powercalc",
-            ),
+            power_sensor_id: {"name": "Test power", "platform": "powercalc"},
+            energy_sensor_id: {"unique_id": "1234_energy", "name": "Test energy", "platform": "powercalc"},
+            utility_meter_id: {"unique_id": "1234_energy_daily", "name": "Test energy daily", "platform": "powercalc"},
         },
     )
 
@@ -224,48 +205,46 @@ async def test_rounding_digits(hass: HomeAssistant, entity_registry: EntityRegis
     assert registry_entry
     assert registry_entry.options == {"sensor": {"suggested_display_precision": 2}}
 
-    state = hass.states.get("sensor.test_energy_daily")
-    assert state
-    assert state.attributes[ATTR_UNIT_OF_MEASUREMENT] == UnitOfEnergy.KILO_WATT_HOUR
-    assert state.state == "2.00"
+    assert_entity_state(
+        hass,
+        "sensor.test_energy_daily",
+        "2.00",
+        attributes={ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+    )
 
 
-async def test_regression(hass: HomeAssistant) -> None:
-    # - entity_id: switch.gerateschranke_licht_servodrive
-    # name: Geräteschrank
-    # power_sensor_id: sensor.gerateschranke_licht_servodrive_power
-    # - entity_id: switch.gerateschranke_frei
-    #  name: Geräteschrank unbenutzt
-    #  power_sensor_id: sensor.gerateschranke_frei_power
+async def test_utility_meters_not_duplicated_for_shared_energy_sensor(hass: HomeAssistant) -> None:
+    """Two power sensors on one device resolve to the same related energy sensor.
+
+    Only one set of utility meters must be created for it, not one set per configured sensor.
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/1799
+    """
     power_sensor_id = "sensor.test_power"
     power_sensor2_id = "sensor.test2_power"
     energy_sensor_id = "sensor.test_energy"
     device_id = "some_device"
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            power_sensor_id: RegistryEntryWithDefaults(
-                entity_id=power_sensor_id,
-                unique_id="29742725-6F34-49F2-91DE-589951306E9F",
-                name="Test power",
-                platform="sensor",
-                device_id=device_id,
-            ),
-            power_sensor2_id: RegistryEntryWithDefaults(
-                entity_id=power_sensor_id,
-                unique_id="A1CBB81F-A958-482B-A10E-1DAA0652796A",
-                name="Test power2",
-                platform="sensor",
-                device_id=device_id,
-            ),
-            energy_sensor_id: RegistryEntryWithDefaults(
-                entity_id=energy_sensor_id,
-                unique_id="4FA9B62F-E957-4366-B7DA-832C1D5F742D",
-                name="Test energy",
-                platform="sensor",
-                device_id=device_id,
-                device_class=SensorDeviceClass.ENERGY,
-            ),
+            power_sensor_id: {
+                "unique_id": "29742725-6F34-49F2-91DE-589951306E9F",
+                "name": "Test power",
+                "platform": "sensor",
+                "device_id": device_id,
+            },
+            power_sensor2_id: {
+                "unique_id": "A1CBB81F-A958-482B-A10E-1DAA0652796A",
+                "name": "Test power2",
+                "platform": "sensor",
+                "device_id": device_id,
+            },
+            energy_sensor_id: {
+                "unique_id": "4FA9B62F-E957-4366-B7DA-832C1D5F742D",
+                "name": "Test energy",
+                "platform": "sensor",
+                "device_id": device_id,
+                "device_class": SensorDeviceClass.ENERGY,
+            },
         },
     )
 
@@ -287,6 +266,17 @@ async def test_regression(hass: HomeAssistant) -> None:
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
+
+    assert sorted(hass.states.async_entity_ids("sensor")) == [
+        "sensor.all_standby_energy",
+        "sensor.all_standby_energy_daily",
+        "sensor.all_standby_energy_monthly",
+        "sensor.all_standby_energy_weekly",
+        "sensor.all_standby_power",
+        "sensor.test_energy_daily",
+        "sensor.test_energy_monthly",
+        "sensor.test_energy_weekly",
+    ]
 
 
 async def test_net_consumption_option(hass: HomeAssistant) -> None:

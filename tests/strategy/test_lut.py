@@ -423,32 +423,26 @@ async def test_fallback_color_temp_to_hs(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "sensor.test_power", "1.42")
 
 
-async def test_warning_is_logged_when_color_mode_is_missing(
+@pytest.mark.parametrize(
+    "attributes",
+    [
+        pytest.param({ATTR_BRIGHTNESS: 100}, id="color mode missing"),
+        pytest.param({ATTR_BRIGHTNESS: 100, ATTR_COLOR_MODE: None}, id="color mode none"),
+    ],
+)
+async def test_warning_is_logged_when_color_mode_is_unknown(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
+    attributes: dict,
 ) -> None:
     """
-    Test that a warning is logged when the color_mode attribute is missing.
+    Test that a warning is logged when the color_mode attribute is missing or none.
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2323
     """
     caplog.set_level(logging.WARNING)
     strategy = await _create_lut_strategy(hass, "signify", "LCT010")
 
-    state = State("light.test", STATE_ON, {ATTR_BRIGHTNESS: 100})
-    assert not await strategy.calculate(state)
-    assert "color mode unknown" in caplog.text
-
-
-async def test_warning_is_logged_when_color_mode_is_none(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    """
-    Test that a warning is logged when the color_mode attribute is none.
-    See: https://github.com/bramstroker/homeassistant-powercalc/issues/2323
-    """
-    caplog.set_level(logging.WARNING)
-    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
-
-    state = State("light.test", STATE_ON, {ATTR_BRIGHTNESS: 100, ATTR_COLOR_MODE: None})
-    assert not await strategy.calculate(state)
+    assert not await strategy.calculate(State("light.test", STATE_ON, attributes))
     assert "color mode unknown" in caplog.text
 
 

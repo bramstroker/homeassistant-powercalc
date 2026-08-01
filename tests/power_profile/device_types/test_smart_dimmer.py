@@ -12,14 +12,18 @@ from custom_components.powercalc.const import (
     CONF_MIN_POWER,
     DOMAIN,
 )
-from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    get_test_profile_dir,
+    mock_device_with_entities,
+    run_powercalc_setup,
+    set_states,
+)
 from tests.config_flow.common import confirm_auto_discovered_model, handle_options_flow_update
-from tests.conftest import MockEntityWithModel
 
 
 async def test_smart_dimmer_power_input_yaml(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test a smart dimmer can be setup with YAML and a linear power value for the light provided by the user
@@ -52,7 +56,6 @@ async def test_smart_dimmer_power_input_yaml(
 
 async def test_smart_dimmer_power_input_yaml_omit_linear_config(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test a smart dimmer can be setup with YAML omitting the linear power value for the light
@@ -78,7 +81,6 @@ async def test_smart_dimmer_power_input_yaml_omit_linear_config(
 
 async def test_smart_dimmer_power_input_gui_config_flow(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test a smart dimmer can be setup with GUI and a fixed power value for the light configured by the user
@@ -89,8 +91,9 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     manufacturer = "test"
     model = "smart_dimmer"
 
-    mock_entity_with_model_information(
-        entity_id=light_entity_id,
+    mock_device_with_entities(
+        hass,
+        entity_ids=light_entity_id,
         manufacturer=manufacturer,
         model=model,
     )

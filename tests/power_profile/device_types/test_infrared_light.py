@@ -16,15 +16,14 @@ from custom_components.powercalc.const import (
 from tests.common import (
     assert_entity_state,
     get_test_profile_dir,
+    mock_device_with_entities,
     run_powercalc_setup,
     set_states,
 )
-from tests.conftest import MockEntityWithModel
 
 
 async def test_infrared_light(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Infrared capable light with several sub profiles
@@ -35,7 +34,8 @@ async def test_infrared_light(
     manufacturer = "LIFX"
     model = "LIFX A19 Night Vision"
 
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         light_id,
         manufacturer,
         model,
