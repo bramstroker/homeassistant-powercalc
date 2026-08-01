@@ -1,4 +1,3 @@
-import asyncio
 from datetime import timedelta
 from typing import Any
 
@@ -748,7 +747,7 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
         Step.GLOBAL_CONFIGURATION,
         {CONF_POWER_SENSOR_PRECISION: 4},
     )
-    await asyncio.sleep(0.1)
+    await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.test_power", "50.0000")
 

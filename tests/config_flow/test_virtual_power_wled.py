@@ -17,9 +17,8 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from custom_components.test.light import MockLight
 import custom_components.test.sensor as test_sensor_platform
-from tests.common import create_mock_config_entry, create_mock_light_entity
+from tests.common import create_mock_config_entry, mock_entities_in_registry, set_states
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     assert_default_virtual_power_entry_data,
@@ -71,8 +70,8 @@ async def test_wled_options_flow(hass: HomeAssistant) -> None:
 
 
 async def _create_wled_entities(hass: HomeAssistant) -> None:
-    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
-    await create_mock_light_entity(hass, light_entity)
+    mock_entities_in_registry(hass, {"light.test": {"unique_id": DEFAULT_UNIQUE_ID}})
+    await set_states(hass, [("light.test", STATE_ON)])
 
     estimated_current_entity = test_sensor_platform.MockSensor(
         name="test_estimated_current",

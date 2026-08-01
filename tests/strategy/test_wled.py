@@ -9,8 +9,6 @@ from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.setup import async_setup_component
 import pytest
 from pytest_homeassistant_custom_component.common import (
-    RegistryEntryWithDefaults,
-    mock_registry,
     setup_test_component_platform,
 )
 
@@ -25,15 +23,20 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
 import custom_components.test.sensor as test_sensor_platform
-from tests.common import assert_entity_state, mock_device, run_powercalc_setup, set_states
-from tests.conftest import MockEntityWithModel
+from tests.common import (
+    assert_entity_state,
+    mock_device,
+    mock_device_with_entities,
+    mock_entities_in_registry,
+    run_powercalc_setup,
+    set_states,
+)
 
 
 async def test_can_calculate_power(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
-    mock_entity_with_model_information("light.test")
+    mock_device_with_entities(hass, "light.test")
     await set_states(hass, [("light.test", STATE_ON)])
     light_source_entity = create_source_entity("light.test", hass)
 
@@ -73,19 +76,11 @@ async def test_can_calculate_power(
 async def test_calculate_returns_none_when_dependent_state_is_missing(
     hass: HomeAssistant,
 ) -> None:
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.test": RegistryEntryWithDefaults(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-            ),
-            "sensor.test_estimated_current": RegistryEntryWithDefaults(
-                entity_id="sensor.test_estimated_current",
-                unique_id="5678",
-                platform="sensor",
-            ),
+            "light.test": {},
+            "sensor.test_estimated_current": {},
         },
     )
     light_source_entity = create_source_entity("light.test", hass)
@@ -113,23 +108,15 @@ async def test_find_estimated_current_entity_by_device_class(
     """
     mock_device(hass, "wled-device-id", "WLED", "WLED")
 
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.test": RegistryEntryWithDefaults(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-                device_id="wled-device-id",
-            ),
-            "sensor.test_current": RegistryEntryWithDefaults(
-                entity_id="sensor.test_current",
-                unique_id="1234",
-                platform="sensor",
-                device_id="wled-device-id",
-                unit_of_measurement="mA",
-                original_device_class=SensorDeviceClass.CURRENT,
-            ),
+            "light.test": {"device_id": "wled-device-id"},
+            "sensor.test_current": {
+                "device_id": "wled-device-id",
+                "unit_of_measurement": "mA",
+                "original_device_class": SensorDeviceClass.CURRENT,
+            },
         },
     )
 
@@ -146,15 +133,10 @@ async def test_find_estimated_current_entity_by_device_class(
 async def test_exception_is_raised_when_no_estimated_current_entity_found(
     hass: HomeAssistant,
 ) -> None:
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.test": RegistryEntryWithDefaults(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-                device_id="wled-device-id",
-            ),
+            "light.test": {"device_id": "wled-device-id"},
         },
     )
 
@@ -171,43 +153,22 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
 async def test_wled_autodiscovery_flow(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     caplog.set_level(logging.ERROR)
     mock_device(hass, "wled-device", "WLED", "FOSS")
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.test": RegistryEntryWithDefaults(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-                device_id="wled-device",
-            ),
-            "light.test_master": RegistryEntryWithDefaults(
-                entity_id="light.test_master",
-                unique_id="1234-master",
-                platform="light",
-                original_name="Master",
-                device_id="wled-device",
-            ),
-            "light.test_segment1": RegistryEntryWithDefaults(
-                entity_id="light.test_segment1",
-                unique_id="1234-segment",
-                platform="light",
-                original_name="WLED Segment1",
-                device_id="wled-device",
-            ),
-            "light.test_segment_1_2": RegistryEntryWithDefaults(
-                entity_id="light.test_segment_1_2",
-                unique_id="1234-segment",
-                platform="light",
-                device_id="wled-device",
-            ),
-            "sensor.test_current": RegistryEntryWithDefaults(
-                entity_id="sensor.test_current",
-                unique_id="1234",
-                platform="sensor",
-                device_id="wled-device",
-                unit_of_measurement="mA",
-                original_device_class=SensorDeviceClass.CURRENT,
-            ),
+            "light.test": {"device_id": "wled-device"},
+            "light.test_master": {"unique_id": "1234-master", "original_name": "Master", "device_id": "wled-device"},
+            "light.test_segment1": {
+                "unique_id": "1234-segment",
+                "original_name": "WLED Segment1",
+                "device_id": "wled-device",
+            },
+            "light.test_segment_1_2": {"unique_id": "1234-segment", "device_id": "wled-device"},
+            "sensor.test_current": {
+                "device_id": "wled-device",
+                "unit_of_measurement": "mA",
+                "original_device_class": SensorDeviceClass.CURRENT,
+            },
         },
     )
 
@@ -238,23 +199,15 @@ async def test_yaml_configuration(hass: HomeAssistant) -> None:
     Also check standby power can be calculated by the WLED strategy
     """
     mock_device(hass, "wled-device", "WLED", "FOSS")
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.test": RegistryEntryWithDefaults(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-                device_id="wled-device",
-            ),
-            "sensor.test_current": RegistryEntryWithDefaults(
-                entity_id="sensor.test_current",
-                unique_id="1234",
-                platform="sensor",
-                device_id="wled-device",
-                unit_of_measurement="mA",
-                original_device_class=SensorDeviceClass.CURRENT,
-            ),
+            "light.test": {"device_id": "wled-device"},
+            "sensor.test_current": {
+                "device_id": "wled-device",
+                "unit_of_measurement": "mA",
+                "original_device_class": SensorDeviceClass.CURRENT,
+            },
         },
     )
 
@@ -283,23 +236,15 @@ async def test_estimated_current_sensor_unavailable(hass: HomeAssistant, caplog:
 
     mock_device(hass, "wled-device-id", "WLED", "WLED")
 
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.test": RegistryEntryWithDefaults(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-                device_id="wled-device-id",
-            ),
-            "sensor.test_current": RegistryEntryWithDefaults(
-                entity_id="sensor.test_current",
-                unique_id="1234",
-                platform="sensor",
-                device_id="wled-device-id",
-                unit_of_measurement="mA",
-                original_device_class=SensorDeviceClass.CURRENT,
-            ),
+            "light.test": {"device_id": "wled-device-id"},
+            "sensor.test_current": {
+                "device_id": "wled-device-id",
+                "unit_of_measurement": "mA",
+                "original_device_class": SensorDeviceClass.CURRENT,
+            },
         },
     )
 

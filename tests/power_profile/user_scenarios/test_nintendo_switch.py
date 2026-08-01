@@ -1,9 +1,5 @@
-from datetime import timedelta
-
 from homeassistant.const import CONF_ENTITY_ID, STATE_HOME, STATE_NOT_HOME, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
-from homeassistant.util import dt
-from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.powercalc.const import (
     CONF_DELAY,
@@ -12,7 +8,7 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
 )
-from tests.common import assert_entity_state, run_powercalc_setup, set_states
+from tests.common import assert_entity_state, async_advance_time, run_powercalc_setup, set_states
 
 
 async def test_nintendo_switch(hass: HomeAssistant) -> None:
@@ -53,6 +49,6 @@ async def test_nintendo_switch(hass: HomeAssistant) -> None:
     assert_entity_state(hass, power_sensor_id, "12.00")
 
     # After 10 seconds the device goes into sleep mode, check the sleep power is set on the power sensor
-    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=3000))
+    await async_advance_time(hass, 3000, block=False)
 
     assert_entity_state(hass, power_sensor_id, "0.00")

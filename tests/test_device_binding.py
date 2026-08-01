@@ -2,14 +2,12 @@ import logging
 
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry, DeviceEntryDisabler, DeviceRegistry
+from homeassistant.helpers.device_registry import DeviceEntryDisabler, DeviceRegistry
 import homeassistant.helpers.entity_registry as er
 import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    RegistryEntryWithDefaults,
     mock_device_registry,
-    mock_registry,
 )
 
 from custom_components.powercalc.common import SourceEntity
@@ -25,15 +23,20 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.device_binding import attach_configured_device_entry, is_composite_device_id
-from tests.common import create_mock_config_entry, mock_device, run_powercalc_setup
+from tests.common import (
+    create_mock_config_entry,
+    mock_device,
+    mock_devices,
+    mock_entities_in_registry,
+    run_powercalc_setup,
+)
 
 
 def test_regular_device_is_not_composite(
     hass: HomeAssistant,
 ) -> None:
     """A regular device ID is not treated as a legacy composite device."""
-    device_entry = DeviceEntry(config_entry_id="test", id="regular-device")
-    mock_device_registry(hass, {device_entry.id: device_entry})
+    device_entry = mock_device(hass, "regular-device", manufacturer=None, model=None)
 
     assert not is_composite_device_id(hass, device_entry.id)
 
@@ -43,8 +46,7 @@ def test_device_is_not_composite_when_detection_is_unavailable(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """A device is not composite on HA versions without the detection API."""
-    device_entry = DeviceEntry(config_entry_id="test", id="regular-device")
-    mock_device_registry(hass, {device_entry.id: device_entry})
+    device_entry = mock_device(hass, "regular-device", manufacturer=None, model=None)
     monkeypatch.setattr(DeviceRegistry, "async_is_composite_device_id", None)
 
     assert not is_composite_device_id(hass, device_entry.id)
@@ -131,21 +133,11 @@ async def test_entities_are_bound_to_source_device2(
 
     mock_device(hass, device_id, "shelly", "Plug S")
 
-    entity_reg = mock_registry(
+    entity_reg = mock_entities_in_registry(
         hass,
         {
-            switch_id: RegistryEntryWithDefaults(
-                entity_id=switch_id,
-                unique_id="1234",
-                platform="switch",
-                device_id=device_id,
-            ),
-            power_sensor_id: RegistryEntryWithDefaults(
-                entity_id=power_sensor_id,
-                unique_id="12345",
-                platform="sensor",
-                device_id=device_id,
-            ),
+            switch_id: {"platform": "switch", "device_id": device_id},
+            power_sensor_id: {"platform": "sensor", "device_id": device_id},
         },
     )
 
@@ -170,23 +162,15 @@ async def test_entities_are_bound_to_disabled_source_device(
 
     mock_device(hass, device_id, "signify", "LCA001", disabled_by=DeviceEntryDisabler.USER)
 
-    entity_reg = mock_registry(
+    entity_reg = mock_entities_in_registry(
         hass,
         {
-            light_id: RegistryEntryWithDefaults(
-                entity_id=light_id,
-                disabled_by=er.RegistryEntryDisabler.DEVICE,
-                unique_id="1234",
-                platform="light",
-                device_id=device_id,
-            ),
-            power_sensor_id: RegistryEntryWithDefaults(
-                entity_id=power_sensor_id,
-                disabled_by=er.RegistryEntryDisabler.DEVICE,
-                unique_id="1234",
-                platform="powercalc",
-                device_id=device_id,
-            ),
+            light_id: {"disabled_by": er.RegistryEntryDisabler.DEVICE, "platform": "light", "device_id": device_id},
+            power_sensor_id: {
+                "disabled_by": er.RegistryEntryDisabler.DEVICE,
+                "platform": "powercalc",
+                "device_id": device_id,
+            },
         },
     )
 
@@ -228,35 +212,23 @@ async def test_entities_are_bound_to_source_device3(
 async def test_configured_device_takes_precedence_over_source_device(
     hass: HomeAssistant,
 ) -> None:
-    source_device = DeviceEntry(
-        config_entry_id="test",
-        id="source-device",
-        manufacturer="source",
-        model="Source Device",
-    )
-    configured_device = DeviceEntry(
-        config_entry_id="test",
-        id="configured-device",
-        manufacturer="configured",
-        model="Configured Device",
-    )
-    mock_device_registry(
+    devices = mock_devices(
         hass,
         {
-            source_device.id: source_device,
-            configured_device.id: configured_device,
+            "source-device": {"manufacturer": "source", "model": "Source Device"},
+            "configured-device": {"manufacturer": "configured", "model": "Configured Device"},
         },
     )
+    source_device = devices["source-device"]
+    configured_device = devices["configured-device"]
 
-    entity_registry = mock_registry(
+    entity_registry = mock_entities_in_registry(
         hass,
         {
-            "switch.configured_precedence": RegistryEntryWithDefaults(
-                entity_id="switch.configured_precedence",
-                unique_id="configured-precedence-source",
-                platform="switch",
-                device_id=source_device.id,
-            ),
+            "switch.configured_precedence": {
+                "unique_id": "configured-precedence-source",
+                "device_id": source_device.id,
+            },
         },
     )
 

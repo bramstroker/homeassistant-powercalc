@@ -3,17 +3,18 @@ from homeassistant.components.lawn_mower import LawnMowerActivity
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
-from pytest_homeassistant_custom_component.common import (
-    RegistryEntryWithDefaults,
-    mock_device_registry,
-    mock_registry,
-)
 
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
 )
-from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    get_test_profile_dir,
+    mock_devices,
+    mock_entities_in_registry,
+    run_powercalc_setup,
+    set_states,
+)
 
 
 async def test_lawn_mower(
@@ -28,38 +29,28 @@ async def test_lawn_mower(
     battery_id = "sensor.mymower_battery"
     power_sensor_id = "sensor.mymower_power"
 
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            mower_id: RegistryEntryWithDefaults(
-                entity_id=mower_id,
-                unique_id="unique_mower_1",
-                platform="test",
-                device_id="device_1",
-            ),
-            battery_id: RegistryEntryWithDefaults(
-                entity_id=battery_id,
-                unique_id="unique_battery_1",
-                platform="test",
-                device_id="device_1",
-                device_class=SensorDeviceClass.BATTERY,
-            ),
-            charging_id: RegistryEntryWithDefaults(
-                entity_id=charging_id,
-                unique_id="unique_charging_1",
-                platform="test",
-                device_id="device_1",
-                device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
-            ),
+            mower_id: {"unique_id": "unique_mower_1", "platform": "test", "device_id": "device_1"},
+            battery_id: {
+                "unique_id": "unique_battery_1",
+                "platform": "test",
+                "device_id": "device_1",
+                "device_class": SensorDeviceClass.BATTERY,
+            },
+            charging_id: {
+                "unique_id": "unique_charging_1",
+                "platform": "test",
+                "device_id": "device_1",
+                "device_class": BinarySensorDeviceClass.BATTERY_CHARGING,
+            },
         },
     )
-    mock_device_registry(
+    mock_devices(
         hass,
         {
-            "device_1": DeviceEntry(
-                config_entry_id="test",
-                id="device_1",
-            ),
+            "device_1": {},
         },
     )
 

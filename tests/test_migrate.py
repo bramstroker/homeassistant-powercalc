@@ -7,7 +7,7 @@ from homeassistant.helpers import device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.issue_registry import IssueRegistry
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_device_registry
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
     CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
@@ -46,7 +46,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.common import migrate_legacy_entry, run_powercalc_setup
+from tests.common import migrate_legacy_entry, mock_devices, run_powercalc_setup
 
 COMPOSITE_ID = "composite00000000000000000000ab"
 
@@ -235,22 +235,24 @@ async def test_migrate_config_entry_removes_split_helper_device(
     powercalc_entry = MockConfigEntry(domain=DOMAIN, data=powercalc_entry_data, version=8)
     powercalc_entry.add_to_hass(hass)
 
-    source_device = dr.DeviceEntry(
-        id="source-device",
-        config_entry_id=source_entry.entry_id,
-        identifiers={("test", "source")},
-        composite_device_id=COMPOSITE_ID,
-    )
-    helper_device = dr.DeviceEntry(
-        id="helper-device",
-        config_entry_id=powercalc_entry.entry_id,
-        identifiers={(DOMAIN, "helper")},
-        composite_device_id=COMPOSITE_ID,
-    )
-    device_registry = mock_device_registry(
+    devices = mock_devices(
         hass,
-        {source_device.id: source_device, helper_device.id: helper_device},
+        {
+            "source-device": {
+                "config_entry_id": source_entry.entry_id,
+                "identifiers": {("test", "source")},
+                "composite_device_id": COMPOSITE_ID,
+            },
+            "helper-device": {
+                "config_entry_id": powercalc_entry.entry_id,
+                "identifiers": {(DOMAIN, "helper")},
+                "composite_device_id": COMPOSITE_ID,
+            },
+        },
     )
+    device_registry = dr.async_get(hass)
+    source_device = devices["source-device"]
+    helper_device = devices["helper-device"]
     helper_entity = entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
@@ -273,12 +275,10 @@ async def test_migrate_config_entry_removes_legacy_device_link(hass: HomeAssista
     """Test migration removes the legacy device link on older HA versions."""
     powercalc_entry = MockConfigEntry(domain=DOMAIN, version=8)
     powercalc_entry.add_to_hass(hass)
-    device_entry = dr.DeviceEntry(
-        id="source-device",
-        config_entry_id=powercalc_entry.entry_id,
-        identifiers={("test", "source")},
-    )
-    mock_device_registry(hass, {device_entry.id: device_entry})
+    device_entry = mock_devices(
+        hass,
+        {"source-device": {"config_entry_id": powercalc_entry.entry_id, "identifiers": {("test", "source")}}},
+    )["source-device"]
     remove_legacy_link = Mock()
 
     with (

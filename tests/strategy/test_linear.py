@@ -15,7 +15,6 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
@@ -28,8 +27,14 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.linear import LinearStrategy
-from tests.common import assert_entity_state, create_mock_config_entry, mock_device, set_states
-from tests.conftest import MockEntityWithModel
+from tests.common import (
+    assert_entity_state,
+    create_mock_config_entry,
+    mock_device,
+    mock_device_with_entities,
+    mock_entities_in_registry,
+    set_states,
+)
 
 
 async def test_light_max_power_only(hass: HomeAssistant) -> None:
@@ -113,22 +118,11 @@ async def test_light_calibrate(hass: HomeAssistant) -> None:
 def _setup_vacuum_test(hass: HomeAssistant) -> None:
     """Set up the vacuum device and entities for testing."""
     mock_device(hass, "vacuum-device", "test", "test")
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "vacuum.test": RegistryEntryWithDefaults(
-                entity_id="vacuum.test",
-                unique_id="1111",
-                platform="test",
-                device_id="vacuum-device",
-            ),
-            "sensor.test_battery": RegistryEntryWithDefaults(
-                entity_id="sensor.test_battery",
-                unique_id="2222",
-                platform="sensor",
-                device_id="vacuum-device",
-                original_device_class=SensorDeviceClass.BATTERY,
-            ),
+            "vacuum.test": {"platform": "test", "device_id": "vacuum-device"},
+            "sensor.test_battery": {"device_id": "vacuum-device", "original_device_class": SensorDeviceClass.BATTERY},
         },
     )
 
@@ -153,18 +147,7 @@ async def test_no_battery_entity_for_vacuum(
     hass: HomeAssistant,
 ) -> None:
     # Use a modified setup without the battery entity
-    mock_device(hass, "vacuum-device", "test", "test")
-    mock_registry(
-        hass,
-        {
-            "vacuum.test": RegistryEntryWithDefaults(
-                entity_id="vacuum.test",
-                unique_id="1111",
-                platform="test",
-                device_id="vacuum-device",
-            ),
-        },
-    )
+    mock_device_with_entities(hass, "vacuum.test", "test", "test", platform="test")
 
     source_entity = create_source_entity("vacuum.test", hass)
     with pytest.raises(StrategyConfigurationError, match="No battery entity found for vacuum cleaner"):
@@ -261,9 +244,8 @@ async def _create_strategy_instance(
 
 async def test_config_entry_with_calibrate_list(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
-    mock_entity_with_model_information("light.test")
+    mock_device_with_entities(hass, "light.test")
 
     await create_mock_config_entry(
         hass,

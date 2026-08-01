@@ -20,7 +20,13 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import assert_entity_state, create_mock_config_entry, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    create_mock_config_entry,
+    mock_device_with_entities,
+    run_powercalc_setup,
+    set_states,
+)
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
@@ -28,7 +34,6 @@ from tests.config_flow.common import (
     initialize_options_flow,
     select_menu_item,
 )
-from tests.conftest import MockEntityWithModel
 
 
 @pytest.mark.parametrize(
@@ -42,13 +47,13 @@ from tests.conftest import MockEntityWithModel
 )
 async def test_smart_switch_flow(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     user_input: dict[str, Any],
     expected_fixed_power: float,
 ) -> None:
     await run_powercalc_setup(hass)
 
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "switch.test",
         "test",
         "smart_switch_without_pm",

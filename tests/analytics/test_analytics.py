@@ -11,7 +11,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
 import pytest
-from pytest_homeassistant_custom_component.common import async_fire_time_changed
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
 from custom_components.powercalc import (
@@ -38,7 +37,7 @@ from custom_components.powercalc.const import (
     PowerProfileSource,
     SensorType,
 )
-from tests.common import create_mock_config_entry, get_simple_fixed_config, run_powercalc_setup
+from tests.common import async_advance_time, create_mock_config_entry, get_simple_fixed_config, run_powercalc_setup
 
 MOCK_PAYLOAD = {
     "test": "data",
@@ -63,7 +62,6 @@ def enable_analytics(hass: HomeAssistant) -> Generator[None]:
 async def test_send_analytics_success(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
-    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test the send_analytics method with a successful response."""
 
@@ -85,11 +83,7 @@ async def test_send_analytics_success(
         },
     )
 
-    async_fire_time_changed(
-        hass,
-        dt.utcnow() + timedelta(minutes=20),
-    )
-    await hass.async_block_till_done()
+    await async_advance_time(hass, timedelta(minutes=20))
 
     assert len(aioclient_mock.mock_calls) == 1
     mock_call = aioclient_mock.mock_calls[0]

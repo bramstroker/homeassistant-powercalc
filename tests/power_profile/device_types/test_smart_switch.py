@@ -15,14 +15,18 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     DOMAIN,
 )
-from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    get_test_profile_dir,
+    mock_device_with_entities,
+    run_powercalc_setup,
+    set_states,
+)
 from tests.config_flow.common import confirm_auto_discovered_model, handle_options_flow_update
-from tests.conftest import MockEntityWithModel
 
 
 async def test_smart_switch_with_yaml(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test that smart plug can be setup from profile library
@@ -31,8 +35,9 @@ async def test_smart_switch_with_yaml(
     manufacturer = "Shelly"
     model = "Shelly Plug S"
 
-    mock_entity_with_model_information(
-        entity_id=switch_id,
+    mock_device_with_entities(
+        hass,
+        entity_ids=switch_id,
         manufacturer=manufacturer,
         model=model,
     )
@@ -60,7 +65,6 @@ async def test_smart_switch_with_yaml(
 
 async def test_smart_switch_power_input_yaml(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test a smart switch can be setup with YAML and a fixed power value for the appliance configured by the user
@@ -71,8 +75,9 @@ async def test_smart_switch_power_input_yaml(
     manufacturer = "IKEA"
     model = "Smart Control Outlet"
 
-    mock_entity_with_model_information(
-        entity_id=switch_id,
+    mock_device_with_entities(
+        hass,
+        entity_ids=switch_id,
         manufacturer=manufacturer,
         model=model,
     )
@@ -101,7 +106,6 @@ async def test_smart_switch_power_input_yaml(
 
 async def test_gui_smart_switch_without_builtin_powermeter(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test setting up smart switch with relay, but without a built-in powermeter
@@ -111,7 +115,6 @@ async def test_gui_smart_switch_without_builtin_powermeter(
 
     result = await start_discovery_flow(
         hass,
-        mock_entity_with_model_information,
         switch_id,
         manufacturer="test",
         model="smart_switch_without_pm",
@@ -145,7 +148,6 @@ async def test_gui_smart_switch_without_builtin_powermeter(
 
 async def test_gui_smart_switch_with_builtin_powermeter(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test setting up smart switch with relay, but with a built-in powermeter
@@ -155,7 +157,6 @@ async def test_gui_smart_switch_with_builtin_powermeter(
 
     result = await start_discovery_flow(
         hass,
-        mock_entity_with_model_information,
         switch_id,
         manufacturer="test",
         model="smart_switch_with_pm",
@@ -175,11 +176,11 @@ async def test_gui_smart_switch_with_builtin_powermeter(
 
 async def test_hue_smart_plug_is_discovered(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
 ) -> None:
-    mock_entity_with_model_information(
-        entity_id="switch.smartplug",
+    mock_device_with_entities(
+        hass,
+        entity_ids="switch.smartplug",
         manufacturer="signify",
         model="LOM002",
         platform="hue",
@@ -194,13 +195,13 @@ async def test_hue_smart_plug_is_discovered(
 
 async def start_discovery_flow(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     entity_id: str,
     manufacturer: str,
     model: str,
 ) -> FlowResult:
-    mock_entity_with_model_information(
-        entity_id=entity_id,
+    mock_device_with_entities(
+        hass,
+        entity_ids=entity_id,
         manufacturer=manufacturer,
         model=model,
     )

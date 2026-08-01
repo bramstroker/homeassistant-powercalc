@@ -6,9 +6,8 @@ import json
 import logging
 import os
 import shutil
-from typing import Any, Protocol, cast
+from typing import Any, cast
 from unittest.mock import AsyncMock, Mock, patch
-import uuid
 
 from _pytest.fixtures import SubRequest
 import aiohttp
@@ -19,8 +18,6 @@ from homeassistant.core import HomeAssistant
 import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    RegistryEntryWithDefaults,
-    mock_registry,
 )
 
 from custom_components.powercalc.const import (
@@ -31,7 +28,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
-from tests.common import get_test_config_dir, mock_device
+from tests.common import get_test_config_dir
 
 # Remove this once aioresponses supports aiohttp 3.14+.
 # See https://github.com/pnuckowski/aioresponses/issues/289.
@@ -124,58 +121,6 @@ def mock_flow_init(hass: HomeAssistant) -> Generator:
         return_value=AsyncMock(),
     ) as mock_init:
         yield mock_init
-
-
-class MockEntityWithModel(Protocol):
-    def __call__(
-        self,
-        entity_id: str | list[str],
-        manufacturer: str = "signify",
-        model: str = "LCT010",
-        model_id: str | None = None,
-        **entity_reg_kwargs: Any,  # noqa: ANN401
-    ) -> None: ...
-
-
-@pytest.fixture
-def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithModel:
-    def _mock_entity_with_model_information(
-        entity_id: str,
-        manufacturer: str = "signify",
-        model: str = "LCT010",
-        model_id: str | None = None,
-        **entity_reg_kwargs: Any,  # noqa: ANN401
-    ) -> None:
-        device_id = str(uuid.uuid4())
-        if "device_id" in entity_reg_kwargs:
-            device_id = entity_reg_kwargs["device_id"]
-            del entity_reg_kwargs["device_id"]
-
-        unique_id = str(uuid.uuid4())
-        if "unique_id" in entity_reg_kwargs:
-            unique_id = entity_reg_kwargs["unique_id"]
-            del entity_reg_kwargs["unique_id"]
-
-        platform = "foo"
-        if "platform" in entity_reg_kwargs:
-            platform = entity_reg_kwargs["platform"]
-            del entity_reg_kwargs["platform"]
-
-        mock_entries: dict[str, Any] = {}
-        entity_ids = entity_id if isinstance(entity_id, list) else [entity_id]
-        for entity_id in entity_ids:
-            mock_entries[entity_id] = RegistryEntryWithDefaults(
-                entity_id=entity_id,
-                unique_id=unique_id + "_" + entity_id,
-                platform=platform,
-                device_id=device_id,
-                **entity_reg_kwargs,
-            )
-
-        mock_registry(hass, mock_entries)
-        mock_device(hass, device_id, manufacturer, model, model_id=model_id)
-
-    return _mock_entity_with_model_information
 
 
 @pytest.fixture(autouse=True)
