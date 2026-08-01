@@ -79,6 +79,7 @@ from .flow_helper.schema import (
     SCHEMA_COST_SENSOR_TOGGLE,
     SCHEMA_ENERGY_SENSOR_TOGGLE,
     SCHEMA_SENSOR_ENERGY_OPTIONS,
+    SCHEMA_STANDBY_ENERGY_SENSOR_TOGGLE,
     SCHEMA_UTILITY_METER_OPTIONS,
     SCHEMA_UTILITY_METER_TOGGLE,
     build_cost_pricing_schema,
@@ -735,6 +736,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         return schema.extend(  # type: ignore[no-any-return]
             {
                 **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+                **SCHEMA_STANDBY_ENERGY_SENSOR_TOGGLE.schema,
                 **SCHEMA_COST_SENSOR_TOGGLE.schema,
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
             },

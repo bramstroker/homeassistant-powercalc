@@ -756,6 +756,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
                 power = Decimal(sleep_power.get(CONF_POWER) or 0)
                 if self._multiply_factor_standby and self._multiply_factor:
                     power *= Decimal(self._multiply_factor)
+                self._standby_sensors[self.entity_id] = power
                 self._update_power_and_write_state(power)
 
             self._sleep_power_timer = async_call_later(
@@ -777,6 +778,11 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             standby_power *= Decimal(self._multiply_factor)
 
         return standby_power
+
+    @property
+    def current_standby_power(self) -> Decimal:
+        """Return the standby portion of the current power value."""
+        return cast(Decimal, self._standby_sensors.get(self.entity_id, Decimal(0)))
 
     async def is_calculation_enabled(self, entity_state: State) -> bool:
         """Check if calculation is enabled based on the condition template."""

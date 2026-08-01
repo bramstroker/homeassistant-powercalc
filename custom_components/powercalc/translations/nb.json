@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Opprett energisensor",
+          "create_standby_energy_sensor": "Opprett energisensor for standby",
           "create_cost_sensor": "Opprett kostnadssensor",
           "create_utility_meters": "Opprett forbruksmålere",
           "entity_id": "Kildeentitet",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Om Powercalc trenger å lage en kWh-sensor",
+          "create_standby_energy_sensor": "Om Powercalc skal opprette en kWh-sensor som bare sporer forbruk i standby",
           "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser",
           "entity_id": "Entiteten den virtuelle effekten er basert på. Effektsensoren oppdateres når tilstanden til denne entiteten endres",
           "name": "Hvis du lar det stå tomt, hentes navnet fra kildeentiteten",
@@ -685,6 +687,7 @@
         "title": "Grunnleggende alternativer",
         "data": {
           "create_energy_sensor": "Opprett energisensor",
+          "create_standby_energy_sensor": "Opprett energisensor for standby",
           "create_cost_sensor": "Opprett kostnadssensor",
           "create_utility_meters": "Opprett forbruksmålere",
           "entity_id": "Kildeentitet",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Om Powercalc trenger å lage en kWh-sensor",
+          "create_standby_energy_sensor": "Om Powercalc skal opprette en kWh-sensor som bare sporer forbruk i standby",
           "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser",
           "entity_id": "Entiteten den virtuelle effekten er basert på. Effektsensoren oppdateres når tilstanden til denne entiteten endres",
           "name": "Hvis du lar det stå tomt, hentes navnet fra kildeentiteten",

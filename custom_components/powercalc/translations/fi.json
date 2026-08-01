@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Luo energia-anturi",
+          "create_standby_energy_sensor": "Luo valmiustilan energia-anturi",
           "create_cost_sensor": "Luo kustannusanturi",
           "create_utility_meters": "Luo kulutusmittarit",
           "entity_id": "Lähde-entiteetti",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Määrittää, luoko Powercalc kWh-anturin",
+          "create_standby_energy_sensor": "Luodaanko Powercalcilla kWh-anturi, joka seuraa vain valmiustilan kulutusta",
           "create_utility_meters": "Anna Powercalcin luoda kulutusmittarit, joiden jaksot ovat esimerkiksi päivä ja tunti",
           "entity_id": "Entiteetti, johon virtuaalinen teho perustuu, tehoanturi kuuntelee tämän entiteetin tilamuutoksia päivitettäväksi",
           "name": "Jos kenttä jätetään tyhjäksi, nimi otetaan lähde-entiteetistä",
@@ -685,6 +687,7 @@
         "title": "Perusvaihtoehdot",
         "data": {
           "create_energy_sensor": "Luo energia-anturi",
+          "create_standby_energy_sensor": "Luo valmiustilan energia-anturi",
           "create_cost_sensor": "Luo kustannusanturi",
           "create_utility_meters": "Luo kulutusmittarit",
           "entity_id": "Lähde-entiteetti",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Määrittää, luoko Powercalc kWh-anturin",
+          "create_standby_energy_sensor": "Luodaanko Powercalcilla kWh-anturi, joka seuraa vain valmiustilan kulutusta",
           "create_utility_meters": "Anna Powercalcin luoda kulutusmittarit, joiden jaksot ovat esimerkiksi päivä ja tunti",
           "entity_id": "Entiteetti, johon virtuaalinen teho perustuu, tehoanturi kuuntelee tämän entiteetin tilamuutoksia päivitettäväksi",
           "name": "Jos kenttä jätetään tyhjäksi, nimi otetaan lähde-entiteetistä",

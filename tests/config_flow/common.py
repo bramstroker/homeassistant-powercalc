@@ -17,6 +17,7 @@ from custom_components.powercalc.config_flow import (
 )
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_STANDBY_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_FILTER_OUTLIER_ENABLED,
     CONF_ENERGY_INTEGRATION_METHOD,
@@ -375,6 +376,7 @@ def assert_default_virtual_power_entry_data(
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: strategy,
             CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_STANDBY_ENERGY_SENSOR: False,
             CONF_CREATE_UTILITY_METERS: False,
             CONF_NAME: "test",
             CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_LEFT,

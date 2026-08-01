@@ -14,6 +14,7 @@ from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_STANDBY_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
     CONF_FIXED_VALUE,
@@ -55,6 +56,7 @@ from custom_components.powercalc.flow_helper.profile_preview import PREVIEW_NAME
 from custom_components.powercalc.flow_helper.schema import (
     SCHEMA_ENERGY_SENSOR_TOGGLE,
     SCHEMA_SENSOR_ENERGY_OPTIONS,
+    SCHEMA_STANDBY_ENERGY_SENSOR_TOGGLE,
     SCHEMA_UTILITY_METER_TOGGLE,
 )
 from custom_components.powercalc.flow_helper.strategy_form import (
@@ -90,6 +92,7 @@ SCHEMA_POWER_OPTIONS = vol.Schema(
     {
         vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float),
         **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+        **SCHEMA_STANDBY_ENERGY_SENSOR_TOGGLE.schema,
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 )
@@ -356,7 +359,9 @@ class VirtualPowerFlow:
             return self.flow.persist_config_entry()
 
         schema = SCHEMA_POWER_ADVANCED
-        if self.flow.sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
+        if self.flow.sensor_config.get(CONF_CREATE_ENERGY_SENSOR) or self.flow.sensor_config.get(
+            CONF_CREATE_STANDBY_ENERGY_SENSOR,
+        ):
             schema = schema.extend(SCHEMA_SENSOR_ENERGY_OPTIONS.schema)
 
         return await self.flow.handle_form_step(

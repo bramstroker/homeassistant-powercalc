@@ -14,6 +14,7 @@ from custom_components.powercalc.const import (
     CONF_COST_SENSOR_NAMING,
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_STANDBY_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_FILTER_OUTLIER_ENABLED,
     CONF_ENERGY_FILTER_OUTLIER_MAX,
@@ -43,6 +44,12 @@ SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
 SCHEMA_ENERGY_SENSOR_TOGGLE = vol.Schema(
     {
         vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): selector.BooleanSelector(),
+    },
+)
+
+SCHEMA_STANDBY_ENERGY_SENSOR_TOGGLE = vol.Schema(
+    {
+        vol.Optional(CONF_CREATE_STANDBY_ENERGY_SENSOR, default=False): selector.BooleanSelector(),
     },
 )
 

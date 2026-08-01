@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Crear sensor de energía",
+          "create_standby_energy_sensor": "Crear sensor de energía en espera",
           "create_cost_sensor": "Crear sensor de costos",
           "create_utility_meters": "Crear contadores eléctricos",
           "entity_id": "Entidad de origen",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Si powercalc necesita crear un sensor de kWh",
+          "create_standby_energy_sensor": "Si Powercalc debe crear un sensor de kWh que registre solo el consumo en espera",
           "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc.",
           "entity_id": "entidad en la que se basa la potencia virtual, el sensor de energía escuchará los cambios de estado de esta entidad para ser actualizada",
           "name": "Dejar en blanco utilizará el nombre del dispositivo original",
@@ -685,6 +687,7 @@
         "title": "Opciones básicas",
         "data": {
           "create_energy_sensor": "Crear sensor de energía",
+          "create_standby_energy_sensor": "Crear sensor de energía en espera",
           "create_cost_sensor": "Crear sensor de costos",
           "create_utility_meters": "Crear contadores eléctricos",
           "entity_id": "Entidad de origen",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Si powercalc necesita crear un sensor de kWh",
+          "create_standby_energy_sensor": "Si Powercalc debe crear un sensor de kWh que registre solo el consumo en espera",
           "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc.",
           "entity_id": "entidad en la que se basa la potencia virtual, el sensor de potencia escuchará los cambios de estado de esta entidad para ser actualizada",
           "name": "Dejar en blanco utilizará el nombre del dispositivo original",

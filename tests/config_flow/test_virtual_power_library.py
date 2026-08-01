@@ -15,6 +15,7 @@ from custom_components.powercalc.config_flow import PowercalcConfigFlow, Step
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_STANDBY_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_FILTER_OUTLIER_ENABLED,
     CONF_ENERGY_INTEGRATION_METHOD,
@@ -525,6 +526,7 @@ async def test_profile_with_custom_fields(
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_CREATE_ENERGY_SENSOR: True,
+        CONF_CREATE_STANDBY_ENERGY_SENSOR: False,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_ENERGY_INTEGRATION_METHOD: DEFAULT_ENERGY_INTEGRATION_METHOD,
         CONF_ENERGY_FILTER_OUTLIER_ENABLED: False,

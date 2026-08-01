@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Skapa energisensor",
+          "create_standby_energy_sensor": "Skapa energisensor för vänteläge",
           "create_cost_sensor": "Skapa kostnadssensor",
           "create_utility_meters": "Skapa bruksmätare",
           "entity_id": "Källentitet",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Ska powercalc skapa en kWh sensor",
+          "create_standby_energy_sensor": "Om Powercalc ska skapa en kWh-sensor som endast spårar förbrukning i vänteläge",
           "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykel dag, timme etc.",
           "entity_id": "Entitet den virtuella effekten är baserad på, effektsensorn kommer lyssna på förändringar på denna entitet",
           "name": "Lämnas tom kommer namn tas från källentiteten",
@@ -685,6 +687,7 @@
         "title": "Grundläggande inställningar",
         "data": {
           "create_energy_sensor": "Skapa energisensor",
+          "create_standby_energy_sensor": "Skapa energisensor för vänteläge",
           "create_cost_sensor": "Skapa kostnadssensor",
           "create_utility_meters": "Skapa bruksmätare",
           "entity_id": "Källentitet",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Om powercalc behöver skapa en kWh-sensor",
+          "create_standby_energy_sensor": "Om Powercalc ska skapa en kWh-sensor som endast spårar förbrukning i vänteläge",
           "create_utility_meters": "Låt powercalc skapa verktygsmätare, som cyklar dagligen, varje timme etc.",
           "entity_id": "Entiteten som den virtuella effekten baseras på. Effektsensorn lyssnar på tillståndsändringar från denna entitet för att uppdateras",
           "name": "Om du lämnar tomt kommer namnet från källenheten",
