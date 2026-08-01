@@ -1,0 +1,21 @@
+{
+  "name": "Smart light switch - 1 gang",
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "manual",
+  "measure_description": "No neutral line version. Switch self-consumption: 0.1W standby, 0.3W operating. Total load depends on the connected lamp and must be configured separately.",
+  "created_at": "2026-08-01T15:00:00Z",
+  "updated_at": "2026-08-01T15:00:00Z",
+  "standby_power": 0.1,
+  "standby_power_on": 0.3,
+  "aliases": [
+    "Smart light switch - 1 gang",
+    "TS0011",
+    "Zigbee Switch 1 Gang No Neutral"
+  ],
+  "author_info": {
+    "name": "Maxik933",
+    "github": "Maxik933"
+  }
+}
