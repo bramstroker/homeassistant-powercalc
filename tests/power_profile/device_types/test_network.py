@@ -5,8 +5,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVA
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, DUMMY_ENTITY_ID
-from tests.common import assert_entity_state, run_powercalc_setup, set_states
-from tests.conftest import MockEntityWithModel
+from tests.common import assert_entity_state, mock_device_with_entities, run_powercalc_setup, set_states
 
 
 async def test_network_device(hass: HomeAssistant) -> None:
@@ -39,14 +38,14 @@ async def test_network_device(hass: HomeAssistant) -> None:
 
 async def test_router_discovery_by_device(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
 ) -> None:
     """
     Test that smart plug can be setup from profile library
     """
 
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "switch.freebox",
         "test",
         "network_router",

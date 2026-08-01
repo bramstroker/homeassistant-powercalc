@@ -17,12 +17,10 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.util import dt
 import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
-    async_fire_time_changed,
     mock_device_registry,
     mock_registry,
 )
@@ -57,31 +55,47 @@ from custom_components.powercalc.discovery import (
     get_power_profile_by_source_entity,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo
-from custom_components.test.light import MockLight
-from tests.common import mock_device, set_states
 
-from .common import assert_entity_state, create_mock_config_entry, create_mock_light_entity, run_powercalc_setup
+from .common import (
+    assert_entity_state,
+    async_advance_time,
+    create_mock_config_entry,
+    mock_device,
+    mock_device_with_entities,
+    mock_devices,
+    mock_entities_in_registry,
+    run_powercalc_setup,
+    set_states,
+)
 from .config_flow.test_global_configuration import create_mock_global_config_entry
-from .conftest import MockEntityWithModel
 
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
+LIGHT_ATTRIBUTES = {ATTR_SUPPORTED_COLOR_MODES: [ColorMode.BRIGHTNESS], ATTR_COLOR_MODE: ColorMode.BRIGHTNESS}
 
 
 async def test_autodiscovery(hass: HomeAssistant, mock_flow_init: AsyncMock) -> None:
     """Test that models are automatically discovered and power sensors created"""
 
-    lighta = MockLight("testa")
-    lighta.manufacturer = "lidl"
-    lighta.model = "HG06106C"
-
-    lightb = MockLight("testb")
-    lightb.manufacturer = "signify"
-    lightb.model = "LCA001"
-
-    lightc = MockLight("testc")
-    lightc.manufacturer = "lidl"
-    lightc.model = "NONEXISTING"
-    await create_mock_light_entity(hass, [lighta, lightb, lightc])
+    mock_devices(
+        hass,
+        {
+            "testa-device": {"manufacturer": "lidl", "model": "HG06106C"},
+            "testb-device": {"manufacturer": "signify", "model": "LCA001"},
+            "testc-device": {"manufacturer": "lidl", "model": "NONEXISTING"},
+        },
+    )
+    mock_entities_in_registry(
+        hass,
+        {
+            "light.testa": {"device_id": "testa-device"},
+            "light.testb": {"device_id": "testb-device"},
+            "light.testc": {"device_id": "testc-device"},
+        },
+    )
+    await set_states(
+        hass,
+        [(f"light.test{suffix}", STATE_ON, LIGHT_ATTRIBUTES) for suffix in ("a", "b", "c")],
+    )
 
     await run_powercalc_setup(hass)
 
@@ -98,9 +112,9 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init: AsyncMock) -> 
 async def test_discovery_skipped_when_confirmed_by_user(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "light.test",
         "lidl",
         "HG06106C",
@@ -128,11 +142,10 @@ async def test_discovery_skipped_when_confirmed_by_user(
 
 async def test_autodiscovery_disabled(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """Test that power sensors are not automatically added when auto discovery is disabled"""
 
-    mock_entity_with_model_information("light.testa", "lidl", "HG06106C")
+    mock_device_with_entities(hass, "light.testa", "lidl", "HG06106C")
 
     await run_powercalc_setup(hass, {}, {CONF_DISCOVERY: {CONF_ENABLED: False}})
 
@@ -143,7 +156,6 @@ async def test_autodiscovery_disabled(
 async def test_autodiscovery_skipped_for_lut_with_subprofiles(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Lights which can be autodiscovered and have sub profiles need to be skipped
@@ -152,7 +164,8 @@ async def test_autodiscovery_skipped_for_lut_with_subprofiles(
     """
     caplog.set_level(logging.ERROR)
 
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "light.testa",
         "Yeelight",
         "strip6",
@@ -168,9 +181,8 @@ async def test_autodiscovery_skipped_for_lut_with_subprofiles(
 async def test_manually_configured_light_overrides_autodiscovered(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
-    mock_entity_with_model_information("light.testing", "signify", "LCA001")
+    mock_device_with_entities(hass, "light.testing", "signify", "LCA001")
     await set_states(hass, [("light.testing", STATE_ON)])
     await run_powercalc_setup(
         hass,
@@ -185,11 +197,11 @@ async def test_manually_configured_light_overrides_autodiscovered(
 async def test_config_entry_overrides_autodiscovered(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     caplog.set_level(logging.ERROR)
 
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "light.testing",
         "signify",
         "LWA017",
@@ -272,7 +284,6 @@ async def test_config_entry_overrides_autodiscovered(
 )
 async def test_autodiscover_skipped(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
     entity_id: str,
     manufacturer: str,
@@ -280,7 +291,8 @@ async def test_autodiscover_skipped(
     extra_kwargs: dict,
 ) -> None:
     """Test that auto discovery skips entities based on various conditions."""
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         entity_id,
         manufacturer,
         model,
@@ -294,31 +306,13 @@ async def test_autodiscover_skipped(
 
 async def test_autodiscover_continues_when_one_entity_fails(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Auto discovery should continue when one entity fails to load model information"""
 
     caplog.set_level(logging.ERROR)
 
-    mock_device(hass, "signify-device", "signify", "LCT010")
-    mock_registry(
-        hass,
-        {
-            "light.test1": RegistryEntryWithDefaults(
-                entity_id="light.test1",
-                unique_id="1234",
-                platform="light",
-                device_id="signify-device",
-            ),
-            "light.test2": RegistryEntryWithDefaults(
-                entity_id="light.test2",
-                unique_id="1235",
-                platform="light",
-                device_id="signify-device",
-            ),
-        },
-    )
+    mock_device_with_entities(hass, ["light.test1", "light.test2"])
     with patch(
         "custom_components.powercalc.power_profile.library.ProfileLibrary.find_models",
         new_callable=AsyncMock,
@@ -330,55 +324,24 @@ async def test_autodiscover_continues_when_one_entity_fails(
 
 async def test_exclude_device_types(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
 ) -> None:
     """Test that entities with excluded device types are not considered for discovery"""
 
-    mock_device_registry(
+    mock_devices(
         hass,
         {
-            "switch-device": DeviceEntry(
-                config_entry_id="test",
-                id="switch-device",
-                manufacturer="shelly",
-                model="SHPLG-S",
-            ),
-            "light-device": DeviceEntry(
-                config_entry_id="test",
-                id="light-device",
-                manufacturer="signify",
-                model="LCT010",
-            ),
-            "cover-device": DeviceEntry(
-                config_entry_id="test",
-                id="cover-device",
-                manufacturer="eq-3",
-                model="HmIP-FROLL",
-            ),
+            "switch-device": {"manufacturer": "shelly", "model": "SHPLG-S"},
+            "light-device": {"manufacturer": "signify", "model": "LCT010"},
+            "cover-device": {"manufacturer": "eq-3", "model": "HmIP-FROLL"},
         },
     )
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.test": RegistryEntryWithDefaults(
-                entity_id="light.test",
-                unique_id="1111",
-                platform="hue",
-                device_id="light-device",
-            ),
-            "switch.test": RegistryEntryWithDefaults(
-                entity_id="switch.test",
-                unique_id="2222",
-                platform="shelly",
-                device_id="switch-device",
-            ),
-            "cover.test": RegistryEntryWithDefaults(
-                entity_id="cover.test",
-                unique_id="3333",
-                platform="shelly",
-                device_id="cover-device",
-            ),
+            "light.test": {"platform": "hue", "device_id": "light-device"},
+            "switch.test": {"platform": "shelly", "device_id": "switch-device"},
+            "cover.test": {"platform": "shelly", "device_id": "cover-device"},
         },
     )
 
@@ -400,11 +363,11 @@ async def test_exclude_device_types(
 
 async def test_exclude_self_usage(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
 ) -> None:
     """Test that entities with excluded device types are not considered for discovery"""
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "switch.test",
         "test",
         "smart_switch_with_pm_new",
@@ -425,12 +388,12 @@ async def test_exclude_self_usage(
 
 async def test_load_model_with_slashes(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Discovered model with slashes should not be treated as a sub lut profile
     """
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "light.testa",
         "ikea",
         "TRADFRI bulb E14 W op/ch 400lm",
@@ -444,22 +407,11 @@ async def test_load_model_with_slashes(
 
 
 async def test_get_power_profile_by_source_device_returns_none_without_required_entries(hass: HomeAssistant) -> None:
-    device_entry = DeviceEntry(
-        config_entry_id="test",
-        id="test-device",
-        manufacturer="test",
-        model="discovery_type_device",
-    )
-    mock_device_registry(hass, {device_entry.id: device_entry})
-    mock_registry(
+    device_entry = mock_device(hass, model="discovery_type_device")
+    mock_entities_in_registry(
         hass,
         {
-            "sensor.test": RegistryEntryWithDefaults(
-                entity_id="sensor.test",
-                unique_id="test-entity",
-                device_id=device_entry.id,
-                platform="test",
-            ),
+            "sensor.test": {"unique_id": "test-entity", "device_id": device_entry.id, "platform": "test"},
         },
     )
 
@@ -534,13 +486,12 @@ async def test_discover_entity(
     model_info: ModelInfo,
     expected_manufacturer: str | None,
     expected_model: str | None,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test the autodiscovery lookup from the library by manufacturer and model information
     A given entity_entry is trying to be matched in the library and a PowerProfile instance returned when it is matched
     """
-    mock_entity_with_model_information(entity_id, model_info.manufacturer, model_info.model, model_info.model_id)
+    mock_device_with_entities(hass, entity_id, model_info.manufacturer, model_info.model, model_info.model_id)
 
     source_entity = create_source_entity(entity_id, hass)
     power_profile = await get_power_profile_by_source_entity(hass, source_entity)
@@ -555,7 +506,6 @@ async def test_discover_entity(
 
 async def test_same_entity_is_not_discovered_twice(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
 ) -> None:
     await create_mock_config_entry(
@@ -571,7 +521,7 @@ async def test_same_entity_is_not_discovered_twice(
         setup=False,
     )
 
-    mock_entity_with_model_information("light.test", "signify", "LCT010")
+    mock_device_with_entities(hass, "light.test", "signify", "LCT010")
 
     await run_powercalc_setup(hass)
 
@@ -581,7 +531,6 @@ async def test_same_entity_is_not_discovered_twice(
 
 async def test_wled_not_discovered_twice(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
 ) -> None:
     await create_mock_config_entry(
@@ -605,7 +554,7 @@ async def test_wled_not_discovered_twice(
         setup=False,
     )
 
-    mock_entity_with_model_information("light.test", "WLED", "FOSS")
+    mock_device_with_entities(hass, "light.test", "WLED", "FOSS")
 
     await run_powercalc_setup(hass)
 
@@ -615,10 +564,9 @@ async def test_wled_not_discovered_twice(
 
 async def test_wled_skipped_when_light_device_type_excluded(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
 ) -> None:
-    mock_entity_with_model_information("light.test", "WLED", "FOSS")
+    mock_device_with_entities(hass, "light.test", "WLED", "FOSS")
 
     await run_powercalc_setup(
         hass,
@@ -632,7 +580,6 @@ async def test_wled_skipped_when_light_device_type_excluded(
 
 async def test_govee_segment_lights_skipped(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
 ) -> None:
     """
@@ -641,33 +588,29 @@ async def test_govee_segment_lights_skipped(
     """
     mock_device(hass, "govee-device", "Govee", "H6076")
 
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.floor_lamp_livingroom": RegistryEntryWithDefaults(
-                entity_id="light.floor_lamp_livingroom",
-                unique_id="gv2mqtt-F23DD0C844866B65",
-                platform="mqtt",
-                device_id="govee-device",
-            ),
-            "light.floor_lamp_livingroom_segment_001": RegistryEntryWithDefaults(
-                entity_id="light.floor_lamp_livingroom_segment_001",
-                unique_id="gv2mqtt-F23DD0C844866B65-0",
-                platform="mqtt",
-                device_id="govee-device",
-            ),
-            "light.floor_lamp_livingroom_segment_002": RegistryEntryWithDefaults(
-                entity_id="light.floor_lamp_livingroom_segment_002",
-                unique_id="gv2mqtt-F23DD0C844866B65-1",
-                platform="mqtt",
-                device_id="govee-device",
-            ),
-            "light.floor_lamp_livingroom_segment_003": RegistryEntryWithDefaults(
-                entity_id="light.floor_lamp_livingroom_segment_003",
-                unique_id="gv2mqtt-F23DD0C844866B65-2",
-                platform="mqtt",
-                device_id="govee-device",
-            ),
+            "light.floor_lamp_livingroom": {
+                "unique_id": "gv2mqtt-F23DD0C844866B65",
+                "platform": "mqtt",
+                "device_id": "govee-device",
+            },
+            "light.floor_lamp_livingroom_segment_001": {
+                "unique_id": "gv2mqtt-F23DD0C844866B65-0",
+                "platform": "mqtt",
+                "device_id": "govee-device",
+            },
+            "light.floor_lamp_livingroom_segment_002": {
+                "unique_id": "gv2mqtt-F23DD0C844866B65-1",
+                "platform": "mqtt",
+                "device_id": "govee-device",
+            },
+            "light.floor_lamp_livingroom_segment_003": {
+                "unique_id": "gv2mqtt-F23DD0C844866B65-2",
+                "platform": "mqtt",
+                "device_id": "govee-device",
+            },
         },
     )
 
@@ -680,11 +623,10 @@ async def test_govee_segment_lights_skipped(
 async def test_get_power_profile_empty_manufacturer(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     caplog.set_level(logging.ERROR)
 
-    mock_entity_with_model_information("light.test", "", "some model")
+    mock_device_with_entities(hass, "light.test", "", "some model")
 
     source_entity = create_source_entity("light.test", hass)
     profile = await get_power_profile_by_source_entity(hass, source_entity)
@@ -696,12 +638,12 @@ async def test_get_power_profile_empty_manufacturer(
 async def test_no_power_sensors_are_created_for_ignored_config_entries(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     caplog.set_level(logging.DEBUG)
 
     unique_id = "abc"
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "light.test",
         "Signify",
         "LCT010",
@@ -788,19 +730,18 @@ async def test_get_model_information(
 
 async def test_interval_based_rediscovery(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.DEBUG)
 
-    mock_entity_with_model_information("light.test", "signify", "LCT010")
+    mock_device_with_entities(hass, "light.test", "signify", "LCT010")
 
     await run_powercalc_setup(hass)
 
-    async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=2))
+    await async_advance_time(hass, timedelta(hours=2), block=False)
     await hass.async_block_till_done(True)
 
-    async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=2))
+    await async_advance_time(hass, timedelta(hours=2), block=False)
     await hass.async_block_till_done(True)
 
     assert len([record for record in caplog.records if "Start auto discovery" in record.message]) == 3
@@ -808,12 +749,11 @@ async def test_interval_based_rediscovery(
 
 async def test_update_profile_service(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.DEBUG)
 
-    mock_entity_with_model_information("light.test", "signify", "LCT010")
+    mock_device_with_entities(hass, "light.test", "signify", "LCT010")
 
     await run_powercalc_setup(hass)
 
@@ -850,15 +790,14 @@ async def test_discovery_by_config_entry(
 ) -> None:
     source_entry = MockConfigEntry(domain="test", title="Shared integration")
     source_entry.add_to_hass(hass)
-    mock_device_registry(
+    mock_devices(
         hass,
         {
-            f"device-{index}": DeviceEntry(
-                config_entry_id=source_entry.entry_id,
-                id=f"device-{index}",
-                manufacturer="test",
-                model="discovery_type_config_entry",
-            )
+            f"device-{index}": {
+                "config_entry_id": source_entry.entry_id,
+                "manufacturer": "test",
+                "model": "discovery_type_config_entry",
+            }
             for index in range(6)
         },
     )
@@ -878,20 +817,15 @@ async def test_discovery_by_config_entry(
 async def test_composite_devices_are_ignored_for_device_discovery(
     hass: HomeAssistant,
 ) -> None:
-    regular_device = DeviceEntry(config_entry_id="test", id="regular-device", manufacturer="test", model="regular")
-    composite_device = DeviceEntry(
-        config_entry_id="test",
-        id="composite-device",
-        manufacturer="test",
-        model="composite",
-    )
-    mock_device_registry(
+    mocked_devices = mock_devices(
         hass,
         {
-            regular_device.id: regular_device,
-            composite_device.id: composite_device,
+            "regular-device": {"manufacturer": "test", "model": "regular"},
+            "composite-device": {"manufacturer": "test", "model": "composite"},
         },
     )
+    regular_device = mocked_devices["regular-device"]
+    composite_device = mocked_devices["composite-device"]
     discovery_manager = DiscoveryManager(hass, {})
 
     with patch(
@@ -909,21 +843,11 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
 ) -> None:
     """Powercalc sensors should not be considered for discovery"""
     mock_device(hass, "my-device", "test", "generic-iot")
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "sensor.test_powercalc": RegistryEntryWithDefaults(
-                entity_id="sensor.test_powercalc",
-                unique_id="1111",
-                platform="powercalc",
-                device_id="my-device",
-            ),
-            "sensor.test_other": RegistryEntryWithDefaults(
-                entity_id="sensor.test_other",
-                unique_id="2222",
-                platform="other-platform",
-                device_id="my-device",
-            ),
+            "sensor.test_powercalc": {"platform": "powercalc", "device_id": "my-device"},
+            "sensor.test_other": {"platform": "other-platform", "device_id": "my-device"},
         },
     )
 
@@ -1010,10 +934,9 @@ async def test_get_entities(
 
 async def test_discovery_enable_runtime(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     mock_flow_init: AsyncMock,
 ) -> None:
-    mock_entity_with_model_information("light.test", "signify", "LCT010")
+    mock_device_with_entities(hass, "light.test", "signify", "LCT010")
 
     entry = await create_mock_global_config_entry(
         hass,
@@ -1038,11 +961,10 @@ async def test_discovery_enable_runtime(
 
 async def test_discovery_disable_runtime(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.DEBUG)
-    mock_entity_with_model_information("light.test", "signify", "LCT010")
+    mock_device_with_entities(hass, "light.test", "signify", "LCT010")
 
     entry = await create_mock_global_config_entry(
         hass,
@@ -1062,7 +984,7 @@ async def test_discovery_disable_runtime(
     assert len(flows) == 0
 
     caplog.clear()
-    async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=2))
+    await async_advance_time(hass, timedelta(hours=2), block=False)
     await hass.async_block_till_done(True)
 
     assert "Start auto discovery" not in caplog.text
@@ -1077,10 +999,9 @@ async def test_discovery_disable_runtime(
 )
 async def test_discovery_disabled(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     global_config: dict[str, Any],
 ) -> None:
-    mock_entity_with_model_information("light.test", "signify", "LCT010")
+    mock_device_with_entities(hass, "light.test", "signify", "LCT010")
 
     await run_powercalc_setup(hass, {}, global_config)
 
@@ -1113,42 +1034,21 @@ async def test_discovery_process_is_locked(hass: HomeAssistant, caplog: pytest.L
 async def test_discovery_compatible_integrations(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """Test that only entities with compatible integrations are discovered."""
 
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.hue_light": RegistryEntryWithDefaults(
-                entity_id="light.hue_light",
-                unique_id="1111",
-                platform="hue",
-                device_id="hue-device-id",
-            ),
-            "light.other_light": RegistryEntryWithDefaults(
-                entity_id="light.other_light",
-                unique_id="2222",
-                platform="other",
-                device_id="other-device-id",
-            ),
+            "light.hue_light": {"platform": "hue", "device_id": "hue-device-id"},
+            "light.other_light": {"platform": "other", "device_id": "other-device-id"},
         },
     )
-    mock_device_registry(
+    mock_devices(
         hass,
         {
-            "hue-device-id": DeviceEntry(
-                config_entry_id="test",
-                id="hue-device-id",
-                manufacturer="test",
-                model="compatible_integrations",
-            ),
-            "other-device-id": DeviceEntry(
-                config_entry_id="test",
-                id="other-device-id",
-                manufacturer="test",
-                model="compatible_integrations",
-            ),
+            "hue-device-id": {"manufacturer": "test", "model": "compatible_integrations"},
+            "other-device-id": {"manufacturer": "test", "model": "compatible_integrations"},
         },
     )
 

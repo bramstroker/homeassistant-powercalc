@@ -1,13 +1,19 @@
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import assert_entity_state, get_test_profile_dir, mock_device, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    get_test_profile_dir,
+    mock_device,
+    mock_entities_in_registry,
+    run_powercalc_setup,
+    set_states,
+)
 
 
 async def test_translation_key_standby_sub_profile(
@@ -17,23 +23,16 @@ async def test_translation_key_standby_sub_profile(
     Regression for dual-light devices where only one sub-profile should contribute standby power.
     """
     device_id = "device-with-nightlight"
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "light.test": RegistryEntryWithDefaults(
-                entity_id="light.test",
-                unique_id="main",
-                platform="test",
-                device_id=device_id,
-                translation_key="main",
-            ),
-            "light.test_nightlight": RegistryEntryWithDefaults(
-                entity_id="light.test_nightlight",
-                unique_id="nightlight",
-                platform="test",
-                device_id=device_id,
-                translation_key="nightlight",
-            ),
+            "light.test": {"unique_id": "main", "platform": "test", "device_id": device_id, "translation_key": "main"},
+            "light.test_nightlight": {
+                "unique_id": "nightlight",
+                "platform": "test",
+                "device_id": device_id,
+                "translation_key": "nightlight",
+            },
         },
     )
     mock_device(hass, device_id, "test", "translation_key_standby_sub_profile")

@@ -9,12 +9,10 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from tests.common import assert_entity_state, run_powercalc_setup, set_states
-from tests.conftest import MockEntityWithModel
 
 
 async def test_media_player_idle(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/3492

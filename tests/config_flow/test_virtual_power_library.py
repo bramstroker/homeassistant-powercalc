@@ -4,10 +4,8 @@ from homeassistant import data_entry_flow
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.selector import SelectSelector
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
@@ -33,8 +31,14 @@ from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_A
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.powercalc.power_profile.power_profile import DiscoveryBy
-from custom_components.test.light import MockLight
-from tests.common import create_mock_config_entry, create_mock_light_entity, mock_device
+from tests.common import (
+    create_mock_config_entry,
+    mock_device,
+    mock_device_with_entities,
+    mock_devices,
+    mock_entities_in_registry,
+    set_states,
+)
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     confirm_auto_discovered_model,
@@ -46,14 +50,13 @@ from tests.config_flow.common import (
     select_menu_item,
     set_virtual_power_configuration,
 )
-from tests.conftest import MockEntityWithModel
 
 
 async def test_manually_setup_from_library(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "light.test",
         "ikea",
         "LED1545G12",
@@ -83,10 +86,10 @@ async def test_manually_setup_from_library(
 
 async def test_manual_setup_from_library_skips_to_manufacturer_step(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """Test that the flow skips to the manufacturer step if the model is not found in the library."""
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         "light.test",
         "ikea",
         "LEEEEE",
@@ -109,8 +112,8 @@ async def test_manual_setup_from_library_skips_to_manufacturer_step(
 async def test_manufacturer_listing_is_filtered_by_entity_domain(
     hass: HomeAssistant,
 ) -> None:
-    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
-    await create_mock_light_entity(hass, light_entity)
+    mock_entities_in_registry(hass, {"light.test": {"unique_id": DEFAULT_UNIQUE_ID}})
+    await set_states(hass, [("light.test", STATE_ON)])
 
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
 
@@ -200,22 +203,15 @@ async def test_composite_library_profile_options_flow_builds_menu(
 ) -> None:
     mock_device(hass, "vacuum1", "roborock", "rockrobo.vacuum.v1")
 
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "vacuum.robi": RegistryEntryWithDefaults(
-                entity_id="vacuum.robi",
-                unique_id="1111",
-                device_id="vacuum1",
-                platform="test",
-            ),
-            "sensor.robi_battery": RegistryEntryWithDefaults(
-                entity_id="sensor.robi_battery",
-                unique_id="2222",
-                device_id="vacuum1",
-                device_class=SensorDeviceClass.BATTERY,
-                platform="test",
-            ),
+            "vacuum.robi": {"device_id": "vacuum1", "platform": "test"},
+            "sensor.robi_battery": {
+                "device_id": "vacuum1",
+                "device_class": SensorDeviceClass.BATTERY,
+                "platform": "test",
+            },
         },
     )
 
@@ -322,15 +318,14 @@ async def test_device_discovered_entry_keeps_device_type_filter_in_library_optio
 
 
 async def test_config_entry_discovered_entry_keeps_discovery_filter_in_library_options(hass: HomeAssistant) -> None:
-    mock_device_registry(
+    mock_devices(
         hass,
         {
-            "selected-device": DeviceEntry(
-                config_entry_id="source-entry",
-                id="selected-device",
-                manufacturer="test",
-                model="discovery_type_config_entry",
-            ),
+            "selected-device": {
+                "config_entry_id": "source-entry",
+                "manufacturer": "test",
+                "model": "discovery_type_config_entry",
+            },
         },
     )
     entry = await create_mock_config_entry(
@@ -494,12 +489,12 @@ def test_library_discovery_filter(
 
 async def test_profile_with_custom_fields(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.ERROR)
 
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         ["sensor.test", "sensor.foobar"],
         "test",
         "custom_fields",
@@ -547,21 +542,11 @@ async def test_manual_library_flow_autodiscovers_device_profile_with_custom_fiel
     hass: HomeAssistant,
 ) -> None:
     mock_device(hass, "test-device", "test", "device_custom_fields")
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "switch.test_device": RegistryEntryWithDefaults(
-                entity_id="switch.test_device",
-                unique_id="test-switch",
-                platform="test",
-                device_id="test-device",
-            ),
-            "sensor.test_dependency": RegistryEntryWithDefaults(
-                entity_id="sensor.test_dependency",
-                unique_id="test-dependency",
-                platform="test",
-                device_id="test-device",
-            ),
+            "switch.test_device": {"unique_id": "test-switch", "platform": "test", "device_id": "test-device"},
+            "sensor.test_dependency": {"unique_id": "test-dependency", "platform": "test", "device_id": "test-device"},
         },
     )
 
@@ -579,21 +564,11 @@ async def test_manual_library_flow_defers_device_profile_custom_field_validation
     hass: HomeAssistant,
 ) -> None:
     mock_device(hass, "test-device", "test", "device_custom_fields")
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "switch.test_device": RegistryEntryWithDefaults(
-                entity_id="switch.test_device",
-                unique_id="test-switch",
-                platform="test",
-                device_id="test-device",
-            ),
-            "sensor.test_dependency": RegistryEntryWithDefaults(
-                entity_id="sensor.test_dependency",
-                unique_id="test-dependency",
-                platform="test",
-                device_id="test-device",
-            ),
+            "switch.test_device": {"unique_id": "test-switch", "platform": "test", "device_id": "test-device"},
+            "sensor.test_dependency": {"unique_id": "test-dependency", "platform": "test", "device_id": "test-device"},
         },
     )
 
@@ -671,7 +646,6 @@ async def test_sub_profile_selection_omitted(hass: HomeAssistant) -> None:
 
 async def test_sub_profile_selection_discovery_by_device(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test that sub profile selection is available when discovery_by is device
@@ -679,7 +653,7 @@ async def test_sub_profile_selection_discovery_by_device(
     see: https://github.com/bramstroker/homeassistant-powercalc/issues/3866
     """
 
-    mock_entity_with_model_information("switch.test", "test", "discovery_type_device_sub_profile")
+    mock_device_with_entities(hass, "switch.test", "test", "discovery_type_device_sub_profile")
 
     source_entity = create_source_entity("switch.test", hass)
     result = await initialize_discovery_flow(hass, source_entity)
@@ -716,10 +690,10 @@ async def test_discovery_flow_documentation_url_in_remarks(hass: HomeAssistant) 
 
 async def test_custom_fields_documentation_url_placeholder(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """When model.json has documentation_url, the custom fields step should include it in description_placeholders."""
-    mock_entity_with_model_information(
+    mock_device_with_entities(
+        hass,
         ["sensor.test", "sensor.load"],
         "test",
         "ups",
@@ -744,21 +718,11 @@ async def test_options_flow_initializes_profile_with_custom_fields(
     hass: HomeAssistant,
 ) -> None:
     mock_device(hass, "test-device", "test", "device_custom_fields")
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "switch.test_device": RegistryEntryWithDefaults(
-                entity_id="switch.test_device",
-                unique_id="test-switch",
-                platform="test",
-                device_id="test-device",
-            ),
-            "sensor.test_dependency": RegistryEntryWithDefaults(
-                entity_id="sensor.test_dependency",
-                unique_id="test-dependency",
-                platform="test",
-                device_id="test-device",
-            ),
+            "switch.test_device": {"unique_id": "test-switch", "platform": "test", "device_id": "test-device"},
+            "sensor.test_dependency": {"unique_id": "test-dependency", "platform": "test", "device_id": "test-device"},
         },
     )
 
@@ -782,15 +746,10 @@ async def test_options_flow_initializes_profile_with_custom_fields(
 
 
 async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
-    mock_device_registry(
+    mock_devices(
         hass,
         {
-            "test-device": DeviceEntry(
-                config_entry_id="test",
-                manufacturer="test",
-                name="Test Device",
-                model="discovery_type_device",
-            ),
+            "test-device": {"manufacturer": "test", "name": "Test Device", "model": "discovery_type_device"},
         },
     )
 

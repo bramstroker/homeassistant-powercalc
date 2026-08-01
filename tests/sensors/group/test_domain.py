@@ -6,10 +6,6 @@ from homeassistant.const import (
     CONF_NAME,
 )
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import (
-    RegistryEntryWithDefaults,
-    mock_registry,
-)
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -21,50 +17,22 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from tests.common import (
+    assert_entity_state,
     create_mock_config_entry,
+    mock_entities_in_registry,
 )
 
 
 async def test_domain_group_all(hass: HomeAssistant) -> None:
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "sensor.a_power": RegistryEntryWithDefaults(
-                entity_id="sensor.a_power",
-                unique_id="1111",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-            ),
-            "sensor.b_power": RegistryEntryWithDefaults(
-                entity_id="sensor.b_power",
-                unique_id="2222",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-            ),
-            "sensor.c_power": RegistryEntryWithDefaults(
-                entity_id="sensor.c_power",
-                unique_id="3333",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-            ),
-            "sensor.d_power": RegistryEntryWithDefaults(
-                entity_id="sensor.c_power",
-                unique_id="4444",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-            ),
-            "sensor.a_energy": RegistryEntryWithDefaults(
-                entity_id="sensor.a_energy",
-                unique_id="5555",
-                platform="sensor",
-                device_class=SensorDeviceClass.ENERGY,
-            ),
-            "sensor.b_energy": RegistryEntryWithDefaults(
-                entity_id="sensor.b_energy",
-                unique_id="6666",
-                platform="sensor",
-                device_class=SensorDeviceClass.ENERGY,
-            ),
+            "sensor.a_power": {"device_class": SensorDeviceClass.POWER},
+            "sensor.b_power": {"device_class": SensorDeviceClass.POWER},
+            "sensor.c_power": {"device_class": SensorDeviceClass.POWER},
+            "sensor.d_power": {"device_class": SensorDeviceClass.POWER},
+            "sensor.a_energy": {"device_class": SensorDeviceClass.ENERGY},
+            "sensor.b_energy": {"device_class": SensorDeviceClass.ENERGY},
         },
     )
 
@@ -80,17 +48,25 @@ async def test_domain_group_all(hass: HomeAssistant) -> None:
         },
     )
 
-    group_power_state = hass.states.get("sensor.groupall_power")
-    assert group_power_state
-    assert group_power_state.attributes.get(ATTR_ENTITIES) == {
-        "sensor.a_power",
-        "sensor.b_power",
-        "sensor.c_power",
-    }
+    assert_entity_state(
+        hass,
+        "sensor.groupall_power",
+        attributes={
+            ATTR_ENTITIES: {
+                "sensor.a_power",
+                "sensor.b_power",
+                "sensor.c_power",
+            },
+        },
+    )
 
-    group_energy_state = hass.states.get("sensor.groupall_energy")
-    assert group_energy_state
-    assert group_energy_state.attributes.get(ATTR_ENTITIES) == {
-        "sensor.a_energy",
-        "sensor.b_energy",
-    }
+    assert_entity_state(
+        hass,
+        "sensor.groupall_energy",
+        attributes={
+            ATTR_ENTITIES: {
+                "sensor.a_energy",
+                "sensor.b_energy",
+            },
+        },
+    )

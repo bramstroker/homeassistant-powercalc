@@ -11,18 +11,16 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType, 
 from tests.common import assert_entity_state, get_test_config_dir, get_test_profile_dir, run_powercalc_setup, set_states
 
 
-async def test_broken_lib_by_identical_model_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = LocalLoader(hass, get_test_profile_dir("double_model"))
+@pytest.mark.parametrize("profile_dir", ["double_model", "double_alias"])
+async def test_broken_lib_by_double_entry(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+    profile_dir: str,
+) -> None:
+    loader = LocalLoader(hass, get_test_profile_dir(profile_dir))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
-    assert "Double entry manufacturer/model in custom library:" in caplog.text
-
-
-async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = LocalLoader(hass, get_test_profile_dir("double_alias"))
-    with caplog.at_level(logging.ERROR):
-        await loader.initialize()
-        assert "Double entry manufacturer/model in custom library" in caplog.text
+    assert "Double entry manufacturer/model in custom library" in caplog.text
 
 
 async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:

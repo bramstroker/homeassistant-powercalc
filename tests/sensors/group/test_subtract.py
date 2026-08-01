@@ -139,10 +139,6 @@ async def test_friendly_naming(hass: HomeAssistant) -> None:
         },
     )
 
-    power_state = hass.states.get("sensor.test_powercalc_power")
-    assert power_state
-    assert power_state.attributes["friendly_name"] == "test Powercalc Power"
+    assert_entity_state(hass, "sensor.test_powercalc_power", attributes={"friendly_name": "test Powercalc Power"})
 
-    energy_state = hass.states.get("sensor.test_powercalc_energy")
-    assert energy_state
-    assert energy_state.attributes["friendly_name"] == "test Powercalc Energy"
+    assert_entity_state(hass, "sensor.test_powercalc_energy", attributes={"friendly_name": "test Powercalc Energy"})

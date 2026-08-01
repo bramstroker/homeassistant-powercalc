@@ -8,6 +8,7 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
+    STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
@@ -44,21 +45,19 @@ from custom_components.powercalc.const import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SensorType,
 )
-from tests.common import set_states
+from tests.common import create_mock_group_entry, mock_device_with_entities, set_states
 
 from .common import (
     assert_entity_state,
-    create_input_boolean,
     create_mock_config_entry,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
     run_powercalc_setup,
 )
-from .conftest import MockEntityWithModel
 
 
 async def test_domain_groups(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
-    await create_input_boolean(hass)
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
 
     domain_config = {
         CONF_DISCOVERY: {
@@ -76,9 +75,7 @@ async def test_domain_groups(hass: HomeAssistant, entity_registry: EntityRegistr
         domain_config,
     )
 
-    group_state = hass.states.get("sensor.all_input_boolean_power")
-    assert group_state
-    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_power"}
+    assert_entity_state(hass, "sensor.all_input_boolean_power", attributes={ATTR_ENTITIES: {"sensor.test_power"}})
 
     assert_entity_state(hass, "sensor.all_light_power", STATE_UNAVAILABLE)
 
@@ -109,12 +106,11 @@ async def test_unload_entry(hass: HomeAssistant, entity_registry: EntityRegistry
 
 async def test_domain_group_with_utility_meter(
     hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/939
     """
-    mock_entity_with_model_information("light.testb", "signify", "LCA001")
+    mock_device_with_entities(hass, "light.testb", "signify", "LCA001")
 
     await create_mock_config_entry(
         hass,
@@ -183,15 +179,12 @@ async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
     power_entry = await create_mocked_virtual_power_sensor_entry(hass, "Power")
 
     none_entries = [
-        await create_mock_config_entry(
+        await create_mock_group_entry(
             hass,
-            {
-                CONF_SENSOR_TYPE: SensorType.GROUP,
-                CONF_NAME: "None",
-                CONF_GROUP_MEMBER_SENSORS: [power_entry.entry_id],
-            },
             "None",
-            "None",
+            {CONF_GROUP_MEMBER_SENSORS: [power_entry.entry_id]},
+            unique_id="None",
+            title="None",
         )
         for _ in range(10)
     ]

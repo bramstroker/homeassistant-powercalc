@@ -10,7 +10,6 @@ from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.template import Template
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, PLACEHOLDER_ENTITY_BY_DEVICE_CLASS, CalculationStrategy
@@ -25,7 +24,7 @@ from custom_components.powercalc.helpers import (
     resolve_related_entity_placeholder,
 )
 from custom_components.powercalc.unit import evaluate_to_decimal
-from tests.common import get_test_profile_dir
+from tests.common import get_test_profile_dir, mock_entities_in_registry
 
 
 @pytest.mark.parametrize(
@@ -104,23 +103,11 @@ def test_get_related_entity_by_device_class_no_device_id(hass: HomeAssistant, ca
 
 
 def test_get_related_entity_by_translation_key(hass: HomeAssistant) -> None:
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "sensor.test_power": RegistryEntryWithDefaults(
-                entity_id="sensor.test_power",
-                unique_id="1234",
-                platform="test",
-                device_id="device_1",
-                translation_key="power",
-            ),
-            "sensor.test_energy": RegistryEntryWithDefaults(
-                entity_id="sensor.test_energy",
-                unique_id="5678",
-                platform="test",
-                device_id="device_1",
-                translation_key="energy",
-            ),
+            "sensor.test_power": {"platform": "test", "device_id": "device_1", "translation_key": "power"},
+            "sensor.test_energy": {"platform": "test", "device_id": "device_1", "translation_key": "energy"},
         },
     )
 
@@ -169,16 +156,14 @@ def test_resolve_related_entity_placeholder_no_source_entity(hass: HomeAssistant
 
 
 def test_resolve_related_entity_placeholder_unknown_device_class(hass: HomeAssistant) -> None:
-    mock_registry(
+    mock_entities_in_registry(
         hass,
         {
-            "sensor.test_battery": RegistryEntryWithDefaults(
-                entity_id="sensor.test_battery",
-                unique_id="1234",
-                platform="test",
-                device_id="device_1",
-                device_class=SensorDeviceClass.BATTERY,
-            ),
+            "sensor.test_battery": {
+                "platform": "test",
+                "device_id": "device_1",
+                "device_class": SensorDeviceClass.BATTERY,
+            },
         },
     )
 

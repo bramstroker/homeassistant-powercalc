@@ -1,32 +1,29 @@
 from collections.abc import Mapping
+from datetime import timedelta
 import os
 from typing import Any
 import uuid
 
 from homeassistant import config_entries
-from homeassistant.components import input_boolean, light
-from homeassistant.components.light import ColorMode
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_PLATFORM,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
-    STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
+from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
+    async_fire_time_changed,
     mock_device_registry,
     mock_registry,
-    setup_test_component_platform,
 )
 
 from custom_components.powercalc import (
@@ -47,63 +44,10 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-import custom_components.test.light as test_light_platform
 
 type StateDefinition = (
     tuple[str, StateType] | tuple[str, StateType, Mapping[str, Any]] | tuple[str, StateType, Mapping[str, Any], bool]
 )
-
-
-async def create_mock_light_entity(
-    hass: HomeAssistant,
-    entities: test_light_platform.MockLight | list[test_light_platform.MockLight],
-) -> None:
-    """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
-    entity_registry = er.async_get(hass)
-    device_registry = dr.async_get(hass)
-
-    if not isinstance(entities, list):
-        entities = [entities]
-
-    setup_test_component_platform(hass, light.DOMAIN, entities)
-
-    assert await async_setup_component(
-        hass,
-        light.DOMAIN,
-        {light.DOMAIN: {CONF_PLATFORM: "test"}},
-    )
-    await hass.async_block_till_done()
-
-    # Bind to device
-    for entity in entities:
-        config_entry = MockConfigEntry(domain="test")
-        config_entry.add_to_hass(hass)
-        device_entry = device_registry.async_get_or_create(
-            config_entry_id=config_entry.entry_id,
-            connections={("dummy", entity.unique_id)},
-            manufacturer=entity.manufacturer,
-            model=entity.model,
-        )
-
-        entity_registry.async_get_or_create(
-            "light",
-            "test",
-            entity.unique_id,
-            device_id=device_entry.id,
-        )
-        await hass.async_block_till_done()
-
-
-def create_discoverable_light(
-    name: str,
-    unique_id: str = "99f899fefes",
-) -> test_light_platform.MockLight:
-    light = test_light_platform.MockLight(name, STATE_ON, unique_id)
-    light.manufacturer = "lidl"
-    light.model = "HG06462A"
-    light.supported_color_modes = [ColorMode.BRIGHTNESS]
-    light.brightness = 125
-    return light
 
 
 async def run_powercalc_setup(
@@ -132,25 +76,6 @@ async def run_powercalc_setup(
     await hass.async_block_till_done()
 
     hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
-    await hass.async_block_till_done()
-
-
-async def create_input_boolean(hass: HomeAssistant, name: str = "test") -> None:
-    assert await async_setup_component(
-        hass,
-        input_boolean.DOMAIN,
-        {"input_boolean": {name: None}},
-    )
-    await hass.async_block_till_done()
-
-
-async def create_input_booleans(hass: HomeAssistant, names: list[str]) -> None:
-    config = {"input_boolean": dict.fromkeys(names)}
-    assert await async_setup_component(
-        hass,
-        input_boolean.DOMAIN,
-        config,
-    )
     await hass.async_block_till_done()
 
 
@@ -206,23 +131,114 @@ async def create_mock_config_entry(
     return config_entry
 
 
+async def create_mock_group_entry(
+    hass: HomeAssistant,
+    name: str,
+    entry_data: dict | None = None,
+    **kwargs: Any,  # noqa: ANN401
+) -> MockConfigEntry:
+    """Add a Powercalc group config entry named `name`."""
+    return await create_mock_config_entry(
+        hass,
+        {CONF_SENSOR_TYPE: SensorType.GROUP, CONF_NAME: name, **(entry_data or {})},
+        **kwargs,
+    )
+
+
+def mock_devices(
+    hass: HomeAssistant,
+    devices: Mapping[str, Mapping[str, Any] | None],
+) -> dict[str, DeviceEntry]:
+    """Register mocked devices, replacing any prior mocked registry.
+
+    Keys are device ids, values the extra `DeviceEntry` kwargs. Entries without an explicit
+    `config_entry_id` share a single mock config entry. Devices cannot be registered one by one,
+    every call replaces the whole registry, so pass all of them at once.
+    """
+    shared_config_entry_id: str | None = None
+    entries: dict[str, DeviceEntry] = {}
+    for device_id, device_kwargs in devices.items():
+        kwargs = dict(device_kwargs or {})
+        if "config_entry_id" not in kwargs:
+            if shared_config_entry_id is None:
+                config_entry = MockConfigEntry(domain="test")
+                config_entry.add_to_hass(hass)
+                shared_config_entry_id = config_entry.entry_id
+            kwargs["config_entry_id"] = shared_config_entry_id
+        entries[device_id] = DeviceEntry(id=device_id, **kwargs)
+
+    mock_device_registry(hass, entries)
+    return entries
+
+
 def mock_device(
     hass: HomeAssistant,
     device_id: str = "test-device",
-    manufacturer: str = "test",
-    model: str = "test",
+    manufacturer: str | None = "test",
+    model: str | None = "test",
     **kwargs: Any,  # noqa: ANN401
 ) -> DeviceEntry:
-    """Register a single mocked device, replacing any prior mocked registry."""
-    config_entry_id = kwargs.pop("config_entry_id", None)
-    if config_entry_id is None:
-        config_entry = MockConfigEntry(domain="test")
-        config_entry.add_to_hass(hass)
-        config_entry_id = config_entry.entry_id
+    """Register a single mocked device, replacing any prior mocked registry.
 
-    entry = DeviceEntry(config_entry_id=config_entry_id, id=device_id, manufacturer=manufacturer, model=model, **kwargs)
-    mock_device_registry(hass, {device_id: entry})
-    return entry
+    Use `mock_devices` when a test needs more than one device.
+    """
+    return mock_devices(hass, {device_id: {"manufacturer": manufacturer, "model": model, **kwargs}})[device_id]
+
+
+def mock_entities_in_registry(
+    hass: HomeAssistant,
+    entities: Mapping[str, Mapping[str, Any] | None],
+) -> EntityRegistry:
+    """Register mocked entities, replacing any prior mocked registry.
+
+    Keys are entity ids, values the extra `RegistryEntryWithDefaults` kwargs. `platform` defaults
+    to the domain of the entity id and `unique_id` is derived from it, so a test only needs to spell
+    out the fields it actually cares about.
+    """
+    entries = {}
+    for entity_id, entity_kwargs in entities.items():
+        kwargs = dict(entity_kwargs or {})
+        kwargs.setdefault("platform", split_entity_id(entity_id)[0])
+        kwargs.setdefault("unique_id", entity_id)
+        entries[entity_id] = RegistryEntryWithDefaults(entity_id=entity_id, **kwargs)
+
+    return mock_registry(hass, entries)
+
+
+def mock_device_with_entities(
+    hass: HomeAssistant,
+    entity_ids: str | list[str],
+    manufacturer: str = "signify",
+    model: str = "LCT010",
+    model_id: str | None = None,
+    **entity_kwargs: Any,  # noqa: ANN401
+) -> None:
+    """Register entities on a single device carrying manufacturer/model info, so discovery can match a profile.
+
+    Replaces both registries, so call it once per test and use `mock_devices` /
+    `mock_entities_in_registry` directly when a test needs several devices or per-entity kwargs.
+    """
+    device_id = "model-device"
+    mock_devices(hass, {device_id: {"manufacturer": manufacturer, "model": model, "model_id": model_id}})
+
+    if isinstance(entity_ids, str):
+        entity_ids = [entity_ids]
+    unique_id = entity_kwargs.pop("unique_id", None)
+    mock_entities_in_registry(
+        hass,
+        {
+            entity_id: {
+                "platform": "foo",
+                "device_id": device_id,
+                # Keep unique ids distinct when one explicit id is shared by several entities.
+                **(
+                    {"unique_id": f"{unique_id}_{entity_id}" if len(entity_ids) > 1 else unique_id} if unique_id else {}
+                ),
+                **entity_kwargs,
+            }
+            for entity_id in entity_ids
+        },
+    )
 
 
 async def migrate_legacy_entry(
@@ -266,24 +282,14 @@ def mock_sensors_in_registry(
     power_entities: list[str] | None = None,
     energy_entities: list[str] | None = None,
 ) -> EntityRegistry:
-    entries = {}
-    for entity_id in power_entities or []:
-        entries[entity_id] = RegistryEntryWithDefaults(
-            entity_id=entity_id,
-            name=entity_id,
-            unique_id=entity_id,
-            platform="sensor",
-            device_class=SensorDeviceClass.POWER,
-        )
-    for entity_id in energy_entities or []:
-        entries[entity_id] = RegistryEntryWithDefaults(
-            entity_id=entity_id,
-            name=entity_id,
-            unique_id=entity_id,
-            platform="sensor",
-            device_class=SensorDeviceClass.ENERGY,
-        )
-    return mock_registry(hass, entries)
+    """Register power and/or energy sensors, named after their entity id."""
+    return mock_entities_in_registry(
+        hass,
+        {
+            **{eid: {"name": eid, "device_class": SensorDeviceClass.POWER} for eid in power_entities or []},
+            **{eid: {"name": eid, "device_class": SensorDeviceClass.ENERGY} for eid in energy_entities or []},
+        },
+    )
 
 
 async def set_states(hass: HomeAssistant, states: list[StateDefinition], block_count: int = 1) -> None:
@@ -301,11 +307,31 @@ async def set_states(hass: HomeAssistant, states: list[StateDefinition], block_c
         await hass.async_block_till_done()
 
 
+async def async_advance_time(hass: HomeAssistant, delta: timedelta | float, block: bool = True) -> None:
+    """Fire a time changed event `delta` into the future, a plain number meaning seconds.
+
+    Pass `block=False` for the rare test that must inspect state before pending jobs are flushed.
+    """
+    if not isinstance(delta, timedelta):
+        delta = timedelta(seconds=delta)
+    async_fire_time_changed(hass, dt.utcnow() + delta)
+    if block:
+        await hass.async_block_till_done()
+
+
 def assert_entity_state(
     hass: HomeAssistant,
     entity_id: str,
-    expected_state: StateType,
+    expected_state: StateType = None,
+    attributes: Mapping[str, Any] | None = None,
 ) -> None:
+    """Assert an entity exists and, when given, that its state and attributes match.
+
+    Pass `expected_state=None` to only assert on the attributes.
+    """
     state = hass.states.get(entity_id)
-    assert state
-    assert state.state == expected_state
+    assert state, f"Entity {entity_id} not found"
+    if expected_state is not None:
+        assert state.state == expected_state
+    for attribute, expected in (attributes or {}).items():
+        assert state.attributes.get(attribute) == expected, f"Attribute {attribute} of {entity_id} does not match"

@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_EFFECT, ColorMode
 from homeassistant.const import (
     CONF_CONDITION,
@@ -13,12 +11,6 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.util import dt
-from pytest_homeassistant_custom_component.common import (
-    RegistryEntryWithDefaults,
-    async_fire_time_changed,
-    mock_registry,
-)
 
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
@@ -41,27 +33,16 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.strategy.composite import CompositeMode
 from tests.common import (
     assert_entity_state,
+    async_advance_time,
     get_test_profile_dir,
-    mock_device,
+    mock_device_with_entities,
     run_powercalc_setup,
     set_states,
 )
 
 
 async def test_composite(hass: HomeAssistant) -> None:
-    mock_device(hass, "my-device-id", "foo", "bar")
-
-    mock_registry(
-        hass,
-        {
-            "light.test": RegistryEntryWithDefaults(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-                device_id="my-device-id",
-            ),
-        },
-    )
+    mock_device_with_entities(hass, "light.test", "foo", "bar")
 
     sensor_config = {
         CONF_ENTITY_ID: "light.test",
@@ -271,11 +252,11 @@ async def test_playbook(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "sensor.dishwasher_power", "1.60")
 
     await set_states(hass, [(dishwasher_mode_entity, "Cycle Active")])
-    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=3))
+    await async_advance_time(hass, 3, block=False)
 
     assert_entity_state(hass, "sensor.dishwasher_power", "20.00")
 
-    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=5))
+    await async_advance_time(hass, 5, block=False)
 
     assert_entity_state(hass, "sensor.dishwasher_power", "40.00")
 
