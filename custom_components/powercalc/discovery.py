@@ -31,7 +31,7 @@ from .const import (
     MANUFACTURER_WLED,
     CalculationStrategy,
 )
-from .device_binding import get_first_device_for_config_entry, is_composite_device_id
+from .device_binding import get_config_entry_ids, get_first_device_for_config_entry, is_composite_device_id
 from .group_include.filter import (
     CategoryFilter,
     CompositeFilter,
@@ -420,9 +420,10 @@ class DiscoveryManager:
     async def get_config_entries(self) -> list[ConfigEntry]:
         """Fetch config entries which have at least one non-composite device."""
         config_entry_ids = {
-            device.config_entry_id
+            config_entry_id
             for device in dr.async_get(self.hass).devices.values()
             if not is_composite_device_id(self.hass, device.id)
+            for config_entry_id in get_config_entry_ids(device)
         }
         return [
             entry

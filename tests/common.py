@@ -18,6 +18,7 @@ from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
+import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     RegistryEntryWithDefaults,
@@ -47,6 +48,13 @@ from custom_components.powercalc.const import (
 
 type StateDefinition = (
     tuple[str, StateType] | tuple[str, StateType, Mapping[str, Any]] | tuple[str, StateType, Mapping[str, Any], bool]
+)
+
+_HAS_SINGLE_CONFIG_ENTRY = hasattr(DeviceEntry, "config_entry_id")
+
+requires_composite_devices = pytest.mark.skipif(
+    not hasattr(DeviceEntry, "composite_device_id"),
+    reason="Composite devices were only split off in HA >=2026.8",
 )
 
 
@@ -145,6 +153,21 @@ async def create_mock_group_entry(
     )
 
 
+def build_device_entry(**kwargs: Any) -> DeviceEntry:  # noqa: ANN401
+    """Build a `DeviceEntry` from HA >=2026.8 style kwargs.
+
+    HA >=2026.8 stores a single `config_entry_id` on the device. Older versions, which Powercalc
+    still supports, track a set of `config_entries` plus a `primary_config_entry` instead.
+    """
+    if not _HAS_SINGLE_CONFIG_ENTRY:
+        config_entry_id = kwargs.pop("config_entry_id", None)
+        if config_entry_id is not None:
+            kwargs["config_entries"] = {config_entry_id}
+            kwargs["primary_config_entry"] = config_entry_id
+
+    return DeviceEntry(**kwargs)
+
+
 def mock_devices(
     hass: HomeAssistant,
     devices: Mapping[str, Mapping[str, Any] | None],
@@ -165,7 +188,7 @@ def mock_devices(
                 config_entry.add_to_hass(hass)
                 shared_config_entry_id = config_entry.entry_id
             kwargs["config_entry_id"] = shared_config_entry_id
-        entries[device_id] = DeviceEntry(id=device_id, **kwargs)
+        entries[device_id] = build_device_entry(id=device_id, **kwargs)
 
     mock_device_registry(hass, entries)
     return entries

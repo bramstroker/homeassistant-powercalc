@@ -2,7 +2,6 @@ from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.selector import SelectSelector
 from pytest_homeassistant_custom_component.common import mock_device_registry
 import voluptuous as vol
@@ -24,6 +23,7 @@ from custom_components.powercalc.discovery import get_power_profile_by_source_en
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
 from tests.common import (
+    build_device_entry,
     create_mock_config_entry,
     get_test_profile_dir,
     mock_device,
@@ -307,7 +307,7 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
 
 async def test_discovery_by_config_entry(hass: HomeAssistant) -> None:
     devices = {
-        f"device-{index}": DeviceEntry(
+        f"device-{index}": build_device_entry(
             config_entry_id="source-entry",
             name=f"Device {index}",
             id=f"device-{index}",

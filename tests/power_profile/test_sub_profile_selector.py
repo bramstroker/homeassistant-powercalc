@@ -1,6 +1,5 @@
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 import pytest
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults
@@ -14,7 +13,7 @@ from custom_components.powercalc.power_profile.sub_profile_selector import (
     ModelIdMatcher,
     SubProfileSelector,
 )
-from tests.common import get_test_profile_dir
+from tests.common import build_device_entry, get_test_profile_dir
 
 
 async def test_matcher_attribute(hass: HomeAssistant) -> None:
@@ -217,7 +216,7 @@ async def test_matcher_model_id(
         custom_directory=get_test_profile_dir("sub_profile_match_model_id"),
     )
 
-    device_entry = DeviceEntry(config_entry_id="test", id="abc", model_id=model_id)
+    device_entry = build_device_entry(config_entry_id="test", id="abc", model_id=model_id)
     source_entity = SourceEntity(
         entity_id="light.test",
         domain="light",

@@ -4,7 +4,6 @@ from unittest.mock import AsyncMock, patch
 
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
 import pytest
 
 from custom_components.powercalc import CONF_DISABLE_LIBRARY_DOWNLOAD
@@ -16,6 +15,7 @@ from custom_components.powercalc.power_profile.loader.local import LocalLoader
 from custom_components.powercalc.power_profile.loader.remote import RemoteLoader
 from tests.common import (
     assert_entity_state,
+    build_device_entry,
     get_test_profile_dir,
     mock_device_with_entities,
     run_powercalc_setup,
@@ -235,7 +235,7 @@ def test_compute_replacement_variables_raises_clear_error_when_related_entity_mi
         "test",
         "switch.test",
         "switch",
-        device_entry=DeviceEntry(config_entry_id="test", id="device_1"),
+        device_entry=build_device_entry(config_entry_id="test", id="device_1"),
     )
 
     with pytest.raises(LibraryError, match=expected_message):
