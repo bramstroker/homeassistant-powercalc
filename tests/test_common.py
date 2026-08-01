@@ -14,6 +14,7 @@ from custom_components.powercalc.common import (
     get_wrapped_entity_name,
 )
 from custom_components.powercalc.const import CONF_CREATE_COST_SENSOR, CONF_CREATE_ENERGY_SENSOR
+from tests.common import build_device_entry
 
 
 @pytest.mark.parametrize(
@@ -91,7 +92,7 @@ def test_merge_configuration(
                 has_entity_name=True,
                 name=None,
             ),
-            DeviceEntry(
+            build_device_entry(
                 config_entry_id="test",
                 name="My awesome switchy",
             ),
@@ -107,7 +108,7 @@ def test_merge_configuration(
                 name=None,
                 original_name="Television",
             ),
-            DeviceEntry(
+            build_device_entry(
                 config_entry_id="test",
                 name="Livingroom-SmartPlug",
             ),
@@ -122,7 +123,7 @@ def test_merge_configuration(
                 has_entity_name=True,
                 name=None,
             ),
-            DeviceEntry(
+            build_device_entry(
                 config_entry_id="test",
             ),
             "my_switch",

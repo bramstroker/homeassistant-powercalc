@@ -59,6 +59,7 @@ from custom_components.powercalc.power_profile.library import ModelInfo
 from .common import (
     assert_entity_state,
     async_advance_time,
+    build_device_entry,
     create_mock_config_entry,
     mock_device,
     mock_device_with_entities,
@@ -690,7 +691,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
                 platform="switch",
                 device_id="a",
             ),
-            DeviceEntry(config_entry_id="test", id="a", manufacturer="foo", model="bar"),
+            build_device_entry(config_entry_id="test", id="a", manufacturer="foo", model="bar"),
             ModelInfo("foo", "bar", None),
         ),
         (
@@ -700,7 +701,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
                 platform="switch",
                 device_id="a",
             ),
-            DeviceEntry(config_entry_id="test", id="b", manufacturer="foo", model="bar"),
+            build_device_entry(config_entry_id="test", id="b", manufacturer="foo", model="bar"),
             None,
         ),
         (
@@ -710,7 +711,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
                 platform="switch",
                 device_id="a",
             ),
-            DeviceEntry(config_entry_id="test", id="a", manufacturer="foo", model="bar", model_id="barry"),
+            build_device_entry(config_entry_id="test", id="a", manufacturer="foo", model="bar", model_id="barry"),
             ModelInfo("foo", "bar", "barry"),
         ),
     ],

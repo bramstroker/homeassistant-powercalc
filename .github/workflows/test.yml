@@ -51,3 +51,63 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           path-to-lcov: coverage.lcov
+
+  ha-versions:
+    runs-on: "ubuntu-latest"
+    name: Determine supported HA versions
+    outputs:
+      versions: ${{ steps.matrix.outputs.versions }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Build version matrix
+        id: matrix
+        run: python3 .github/scripts/ha_version_matrix.py >> "$GITHUB_OUTPUT"
+
+  tests-ha-compat:
+    runs-on: "ubuntu-latest"
+    needs: ha-versions
+    if: needs.ha-versions.outputs.versions != '[]'
+    name: Run tests (HA ${{ matrix.target.ha_version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.ha-versions.outputs.versions) }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            pyproject.toml
+            uv.lock
+          # Test every release on the oldest Python it supports, so a future Python
+          # release does not get handed to a Home Assistant that predates it.
+          python-version: ${{ matrix.target.python_version }}
+      - name: Install dependencies
+        run: uv sync --locked --group dev
+      - name: Pin Home Assistant version
+        env:
+          HA_VERSION: ${{ matrix.target.ha_version }}
+        # pytest-homeassistant-custom-component pins an exact homeassistant version,
+        # so resolving it against the requested release picks the matching plugin.
+        # --no-config skips the override-dependencies from pyproject.toml, which are
+        # pinned against the locked release and conflict with older ones. --python is
+        # required because UV_PYTHON, set by setup-uv, otherwise wins over .venv here.
+        run: uv pip install --no-config --python .venv "homeassistant==${HA_VERSION}" pytest-homeassistant-custom-component
+      - name: Prepare test env
+        run: bash tests/setup.sh
+      - name: Run tests
+        run: |
+          uv run --no-sync pytest \
+            -qq \
+            --timeout=9 \
+            --durations=10 \
+            -o console_output_style=count \
+            -p no:sugar \
+            tests

@@ -47,7 +47,7 @@ def test_device_is_not_composite_when_detection_is_unavailable(
 ) -> None:
     """A device is not composite on HA versions without the detection API."""
     device_entry = mock_device(hass, "regular-device", manufacturer=None, model=None)
-    monkeypatch.setattr(DeviceRegistry, "async_is_composite_device_id", None)
+    monkeypatch.setattr(DeviceRegistry, "async_is_composite_device_id", None, raising=False)
 
     assert not is_composite_device_id(hass, device_entry.id)
 

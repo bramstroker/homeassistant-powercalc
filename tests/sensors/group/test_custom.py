@@ -166,7 +166,9 @@ async def test_grouped_power_sensor(hass: HomeAssistant, entity_registry: Entity
         },
     )
 
-    await set_states(hass, [("input_boolean.test1", STATE_OFF)], block_count=0)
+    # input_boolean -> member power sensor -> group sensor, so the change needs more than
+    # one pass of the event loop to reach the group on HA <2026.7.
+    await set_states(hass, [("input_boolean.test1", STATE_OFF)], block_count=2)
 
     assert_entity_state(hass, "sensor.testgroup_power", "50.00")
 
