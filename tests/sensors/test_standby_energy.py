@@ -29,14 +29,14 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CalculationStrategy,
 )
-from tests.common import assert_entity_state, create_input_boolean, run_powercalc_setup, set_states
+from tests.common import assert_entity_state, run_powercalc_setup, set_states
 
 
 async def test_standby_energy_sensor_tracks_only_standby_consumption(
     hass: HomeAssistant,
     freezer: FrozenDateTimeFactory,
 ) -> None:
-    await create_input_boolean(hass)
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
     await run_powercalc_setup(
         hass,
         {
@@ -74,7 +74,7 @@ async def test_standby_energy_sensor_updates_at_interval_without_source_state_ch
     hass: HomeAssistant,
     freezer: FrozenDateTimeFactory,
 ) -> None:
-    await create_input_boolean(hass)
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
     await run_powercalc_setup(
         hass,
         {
@@ -96,7 +96,7 @@ async def test_standby_energy_sensor_updates_at_interval_without_source_state_ch
 
 
 async def test_standby_energy_sensor_custom_naming(hass: HomeAssistant) -> None:
-    await create_input_boolean(hass)
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
     await run_powercalc_setup(
         hass,
         {
@@ -116,7 +116,7 @@ async def test_standby_energy_sensor_is_excluded_from_energy_group(
     hass: HomeAssistant,
     freezer: FrozenDateTimeFactory,
 ) -> None:
-    await create_input_boolean(hass)
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
     await run_powercalc_setup(
         hass,
         {
