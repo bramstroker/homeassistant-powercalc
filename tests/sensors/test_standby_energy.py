@@ -58,15 +58,15 @@ async def test_standby_energy_sensor_tracks_only_standby_consumption(
     assert not hass.states.get("sensor.test_energy")
 
     freezer.tick(timedelta(hours=1))
-    await set_states(hass, [("input_boolean.test", STATE_ON)])
+    await set_states(hass, [("input_boolean.test", STATE_ON)], block_count=2)
     assert_entity_state(hass, "sensor.test_standby_energy", "0.0005")
 
     freezer.tick(timedelta(hours=1))
-    await set_states(hass, [("input_boolean.test", STATE_OFF)])
+    await set_states(hass, [("input_boolean.test", STATE_OFF)], block_count=2)
     assert_entity_state(hass, "sensor.test_standby_energy", "0.0005")
 
     freezer.tick(timedelta(hours=1))
-    await set_states(hass, [("input_boolean.test", STATE_ON)])
+    await set_states(hass, [("input_boolean.test", STATE_ON)], block_count=2)
     assert_entity_state(hass, "sensor.test_standby_energy", "0.0010")
 
 
@@ -134,7 +134,7 @@ async def test_standby_energy_sensor_is_excluded_from_energy_group(
     )
 
     freezer.tick(timedelta(hours=1))
-    await set_states(hass, [("input_boolean.test", STATE_ON)])
+    await set_states(hass, [("input_boolean.test", STATE_ON)], block_count=3)
 
     group_energy = hass.states.get("sensor.test_group_energy")
     assert group_energy
