@@ -210,7 +210,7 @@ def test_request_preserves_subsecond_sleep_time() -> None:
 
 
 @pytest.mark.parametrize(
-    ("parameters", "message"),
+    "parameters, message",
     [
         ({"sleep_time_sample": -1}, "sleep_time_sample"),
         ({"max_retries": 101}, "max_retries"),
@@ -235,7 +235,7 @@ def test_request_rejects_invalid_exposed_tuning(parameters: dict[str, int], mess
 
 
 @pytest.mark.parametrize(
-    ("power_meter", "accepted"),
+    "power_meter, accepted",
     [
         ({"type": "manual"}, True),
         ({"type": "hass", "entity_id": "sensor.test_power"}, False),

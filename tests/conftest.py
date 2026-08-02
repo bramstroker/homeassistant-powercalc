@@ -64,10 +64,9 @@ def set_logging_levels(request: SubRequest) -> None:
 
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(request: SubRequest) -> Generator:
+def auto_enable_custom_integrations(request: SubRequest) -> None:
     if "hass" in request.fixturenames:
         request.getfixturevalue("enable_custom_integrations")
-    yield
 
 
 @pytest.fixture(autouse=True)

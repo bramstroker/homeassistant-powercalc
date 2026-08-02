@@ -49,6 +49,6 @@ async def get_yaml_configuration(hass: HomeAssistant) -> ConfigType:
     try:
         yaml_config = await async_integration_yaml_config(hass, DOMAIN)
         return yaml_config.get(DOMAIN, {})  # type: ignore
-    except Exception as err:  # noqa: BLE001  # pragma: nocover
-        _LOGGER.error("Could not retrieve YAML config: %s", err)
+    except Exception:  # pragma: nocover
+        _LOGGER.exception("Could not retrieve YAML config")
         return {}

@@ -48,7 +48,7 @@ def test_evaluate_to_decimal(
 
 @patch("homeassistant.helpers.template.Template.async_render", side_effect=TemplateError(Exception()))
 def test_evaluate_to_decimal_template_error(
-    _: object,
+    mock_async_render: object,
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

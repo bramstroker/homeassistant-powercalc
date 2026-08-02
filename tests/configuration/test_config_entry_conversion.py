@@ -92,7 +92,7 @@ def test_top_level_templates_and_time_deltas_are_converted(hass: HomeAssistant) 
 
 
 @pytest.mark.parametrize(
-    ("sensor_type", "data", "expected"),
+    "sensor_type, data, expected",
     [
         (
             SensorType.GROUP,

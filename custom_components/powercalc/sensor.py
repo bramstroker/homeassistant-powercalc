@@ -538,11 +538,8 @@ async def handle_nested_entity(
             ),
         )
         entities_to_add.extend_items(child_entities)
-    except SensorConfigurationError as exception:
-        _LOGGER.error(
-            "Group state might be misbehaving because there was an error with an entity",
-            exc_info=exception,
-        )
+    except SensorConfigurationError:
+        _LOGGER.exception("Group state might be misbehaving because there was an error with an entity")
 
 
 async def add_discovered_entities(

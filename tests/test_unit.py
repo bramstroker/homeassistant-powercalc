@@ -8,7 +8,7 @@ from custom_components.powercalc.unit import convert_to_decimal
 
 
 @pytest.mark.parametrize(
-    ("value", "from_unit", "to_unit", "expected"),
+    "value, from_unit, to_unit, expected",
     [
         # Successful conversions
         (1, UnitOfEnergy.WATT_HOUR, UnitOfEnergy.KILO_WATT_HOUR, Decimal("0.001")),

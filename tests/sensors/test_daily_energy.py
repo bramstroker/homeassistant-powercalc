@@ -446,7 +446,7 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize(
-    ("restored_state", "expected_state"),
+    "restored_state, expected_state",
     [
         pytest.param("0.5", "0.5000", id="numeric"),
         # A state that cannot be converted to a decimal must fall back to zero rather than raise.

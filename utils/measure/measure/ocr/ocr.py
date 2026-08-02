@@ -263,8 +263,8 @@ class OCR:
                         self.measurement = measurement
                         self.write_result(self.measurement)
                     time.sleep(OCR_SLEEP)
-                except Exception as e:  # noqa: BLE001
-                    _LOGGER.error("OCR error: %s", e)
+                except Exception:
+                    _LOGGER.exception("OCR error")
 
     def write_result(self, measurement: Decimal) -> None:
         if self.file is None:

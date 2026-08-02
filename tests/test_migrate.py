@@ -300,7 +300,7 @@ async def test_migrate_config_entry_removes_legacy_device_link(hass: HomeAssista
 
 
 @pytest.mark.parametrize(
-    ("input_model", "migrated_profile", "expected_model", "expect_update"),
+    "input_model, migrated_profile, expected_model, expect_update",
     [
         ("33955", ModelInfo("eglo", "900053"), "900053", True),
         ("33955/default", ModelInfo("eglo", "900053"), "900053/default", True),

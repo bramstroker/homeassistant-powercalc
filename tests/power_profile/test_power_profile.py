@@ -389,7 +389,7 @@ async def test_needs_fixed_power(hass: HomeAssistant, json_data: dict[str, Any],
 
 
 @pytest.mark.parametrize(
-    ("json_data", "expected_sensor_config"),
+    "json_data, expected_sensor_config",
     [
         (
             {"only_self_usage": True},

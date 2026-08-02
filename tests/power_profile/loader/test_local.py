@@ -33,20 +33,20 @@ async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pyt
 @pytest.mark.parametrize(
     "manufacturer,search,expected",
     [
-        ["tp-link", {"HS300"}, ["HS300"]],
-        ["TP-link", {"HS300"}, ["HS300"]],
-        ["tp-link", {"hs300"}, ["HS300"]],
-        ["TP-link", {"hs300"}, ["HS300"]],
-        ["tp-link", {"HS400"}, ["HS400"]],  # alias
-        ["tp-link", {"hs400"}, ["HS400"]],  # alias
-        ["tp-link", {"Hs500"}, ["hs500"]],  # alias
-        ["tp-link", {"bla"}, []],
-        ["foo", {"bar"}, []],
-        ["casing", {"CaSinG- Test"}, ["CaSinG- Test"]],
-        ["casing", {"CasinG- test"}, ["CaSinG- Test"]],
-        ["casing", {"CASING- TEST"}, ["CaSinG- Test"]],
-        ["hidden-directories", {".test"}, []],
-        ["hidden-directories", {".hidden_model"}, []],
+        ("tp-link", {"HS300"}, ["HS300"]),
+        ("TP-link", {"HS300"}, ["HS300"]),
+        ("tp-link", {"hs300"}, ["HS300"]),
+        ("TP-link", {"hs300"}, ["HS300"]),
+        ("tp-link", {"HS400"}, ["HS400"]),  # alias
+        ("tp-link", {"hs400"}, ["HS400"]),  # alias
+        ("tp-link", {"Hs500"}, ["hs500"]),  # alias
+        ("tp-link", {"bla"}, []),
+        ("foo", {"bar"}, []),
+        ("casing", {"CaSinG- Test"}, ["CaSinG- Test"]),
+        ("casing", {"CasinG- test"}, ["CaSinG- Test"]),
+        ("casing", {"CASING- TEST"}, ["CaSinG- Test"]),
+        ("hidden-directories", {".test"}, []),
+        ("hidden-directories", {".hidden_model"}, []),
     ],
 )
 async def test_find_model(hass: HomeAssistant, manufacturer: str, search: set[str], expected: str | None) -> None:
@@ -77,9 +77,9 @@ async def test_load_model_returns_none_when_model_not_found(hass: HomeAssistant)
 @pytest.mark.parametrize(
     "manufacturer,expected",
     [
-        ["tp-link", {"tp-link"}],
-        ["TP-Link", {"tp-link"}],
-        ["foo", set()],
+        ("tp-link", {"tp-link"}),
+        ("TP-Link", {"tp-link"}),
+        ("foo", set()),
     ],
 )
 async def test_find_manufacturers(hass: HomeAssistant, manufacturer: str, expected: str | None) -> None:

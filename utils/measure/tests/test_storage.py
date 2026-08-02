@@ -159,7 +159,7 @@ def test_file_path_rejects_traversal(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
     storage.create(snapshot(), light_request())
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Path escapes session output directory"):
         storage.file_path("a1b2-c3d4", "../../secret")
 
 

@@ -938,8 +938,8 @@ class PreviousStateStore:
                 instance.states[group] = {
                     entity_id: State.from_dict(json_state) for (entity_id, json_state) in entities.items()
                 }
-        except HomeAssistantError as exc:  # pragma: no cover
-            _LOGGER.error("Error loading previous energy sensor states", exc_info=exc)
+        except HomeAssistantError:  # pragma: no cover
+            _LOGGER.exception("Error loading previous energy sensor states")
 
         instance.async_setup_dump()
 
@@ -983,8 +983,8 @@ class PreviousStateStore:
         """Save the current states to storage."""
         try:
             await self.store.async_save(self.states)
-        except HomeAssistantError as exc:  # pragma: no cover
-            _LOGGER.error("Error saving current states", exc_info=exc)
+        except HomeAssistantError:  # pragma: no cover
+            _LOGGER.exception("Error saving current states")
 
     @callback
     def async_setup_dump(self) -> None:

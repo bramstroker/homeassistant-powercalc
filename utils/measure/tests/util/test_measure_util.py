@@ -19,7 +19,7 @@ from tests.conftest import MockConfigFactory
 
 
 @pytest.mark.parametrize(
-    ("values", "expected"),
+    "values, expected",
     [
         ([1.0, 2.0, 3.0], 1.0),
         ([3.0, 2.0, 1.0], -1.0),
@@ -31,7 +31,7 @@ def test_linear_slope_does_not_require_numpy(values: list[float], expected: floa
 
 
 @pytest.mark.parametrize(
-    ("averages", "expected"),
+    "averages, expected",
     [
         # Sub-threshold drift on a high-ohm load (0.5 Ω/sample on ~6.2 kΩ) is meter noise, not a trend
         ([6226.0 + 0.5 * index for index in range(20)], Trend.STEADY),

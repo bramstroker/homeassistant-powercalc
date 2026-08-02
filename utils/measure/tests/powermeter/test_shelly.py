@@ -183,11 +183,11 @@ def test_multiple_power_components_are_rejected(mock_requests_get_factory: MockR
 
 @pytest.mark.parametrize(
     "status_payload",
-    (
+    [
         [],
         {"switch:invalid": {"apower": 1.0}},
         {"switch:0": {"apower": "1.0"}},
-    ),
+    ],
 )
 def test_invalid_rpc_status_is_rejected(
     mock_requests_get_factory: MockRequestsGetFactory,

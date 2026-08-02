@@ -88,7 +88,7 @@ from tests.common import (
 
 
 @pytest.mark.parametrize(
-    ("case", "expected_type", "expected_value"),
+    "case, expected_type, expected_value",
     [
         ("template", Template, None),
         ("template_string", Template, None),

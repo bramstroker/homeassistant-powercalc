@@ -104,15 +104,15 @@ def test_github_repository_loads_repository_and_branch_from_environment() -> Non
 
 
 @pytest.mark.parametrize(
-    "environment",
+    "environment, expected_error",
     [
-        {"POWERCALC_GITHUB_REPOSITORY": "missing-repository"},
-        {"POWERCALC_GITHUB_REPOSITORY": "owner/repo/extra"},
-        {"POWERCALC_GITHUB_BRANCH": "../unsafe"},
+        ({"POWERCALC_GITHUB_REPOSITORY": "missing-repository"}, "must use the owner/repository format"),
+        ({"POWERCALC_GITHUB_REPOSITORY": "owner/repo/extra"}, "must use the owner/repository format"),
+        ({"POWERCALC_GITHUB_BRANCH": "../unsafe"}, "contains an invalid branch name"),
     ],
 )
-def test_github_repository_rejects_invalid_environment(environment: dict[str, str]) -> None:
-    with pytest.raises(ValueError):
+def test_github_repository_rejects_invalid_environment(environment: dict[str, str], expected_error: str) -> None:
+    with pytest.raises(ValueError, match=expected_error):
         GitHubRepository.from_environment(environment)
 
 

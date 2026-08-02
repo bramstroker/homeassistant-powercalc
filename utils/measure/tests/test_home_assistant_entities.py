@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 from measure.controller.light.const import LutMode
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
 from measure.home_assistant_entities import DeviceClass, EntityDomain, HomeAssistantEntityCatalog
+import pytest
 
 
 def _entity(entity_id: str, state: str, **attributes: object) -> SimpleNamespace:
@@ -137,16 +138,8 @@ def test_snapshot_requires_exactly_one_entity_filter() -> None:
     home_assistant.get_entity_data.return_value = _entity_data()
     snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
 
-    try:
+    with pytest.raises(ValueError, match="Specify exactly one entity filter"):
         snapshot.select()
-    except ValueError as error:
-        assert str(error) == "Specify exactly one entity filter"
-    else:
-        raise AssertionError("select() accepted no entity filter")
 
-    try:
+    with pytest.raises(ValueError, match="Specify exactly one entity filter"):
         snapshot.select(domain=EntityDomain.LIGHT, device_class=DeviceClass.POWER)
-    except ValueError as error:
-        assert str(error) == "Specify exactly one entity filter"
-    else:
-        raise AssertionError("select() accepted both entity filters")

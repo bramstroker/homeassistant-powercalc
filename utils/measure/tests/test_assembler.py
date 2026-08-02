@@ -34,7 +34,7 @@ def _assembler(
 
 
 @pytest.mark.parametrize(
-    ("measurement_request", "runner_type"),
+    "measurement_request, runner_type",
     [
         (
             LightMeasurementRequest(

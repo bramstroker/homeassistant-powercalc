@@ -70,12 +70,19 @@ target-version = "py314"
 exclude = ["utils/measure/playground", ".github", "docs"]
 
 [tool.ruff.lint]
-select = ["A", "ANN", "ASYNC", "B", "BLE", "C", "C4", "COM", "E", "F", "FIX", "FURB", "G", "ICN", "I", "INP", "ISC", "LOG", "N", "NPY", "PERF", "PIE", "PT001", "PT018", "PYI", "Q", "RET", "RUF", "S", "SIM", "SLF", "SLOT", "T10", "T20", "TID", "UP", "W"]
-ignore = ["S101"]
+select = ["A", "ANN", "ASYNC", "B", "BLE", "C", "C4", "COM", "E", "F", "FAST", "FIX", "FLY", "FURB", "G", "ICN", "I", "INP", "ISC", "LOG", "N", "NPY", "PERF", "PIE", "PLE", "PT", "PYI", "Q", "RET", "RSE", "RUF", "S", "SIM", "SLF", "SLOT", "T10", "T20", "TID", "UP", "W", "YTT"]
+# COM812 is enforced by the formatter itself; keeping it selected only causes
+# the formatter-conflict warning. COM818 (bare tuple) stays enabled.
+ignore = ["S101", "COM812"]
 
 [tool.ruff.lint.per-file-ignores]
 "utils/measure/**.py" = ["T201"]
 "tests/**.py" = ["ASYNC230"]
+
+[tool.ruff.lint.flake8-pytest-style]
+# The test suite consistently declares parametrize names as a single csv string
+# ("a,b,c") rather than a tuple, so match that instead of ruff's tuple default.
+parametrize-names-type = "csv"
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10

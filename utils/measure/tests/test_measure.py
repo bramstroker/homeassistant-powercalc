@@ -149,7 +149,7 @@ def test_take_measurement_tracks_voltage_range(mock_config_factory: MockConfigFa
 
 
 @pytest.mark.parametrize(
-    ("absolute_threshold", "relative_threshold", "snapshots", "expected"),
+    "absolute_threshold, relative_threshold, snapshots, expected",
     [
         pytest.param(0.1, 0.01, [(0, 10.0), (19, 10.0)], False, id="before-min"),
         pytest.param(0.1, 0.01, [(5, 10.0), (20, 10.09)], True, id="abs-stable"),
