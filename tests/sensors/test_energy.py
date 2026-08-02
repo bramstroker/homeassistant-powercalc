@@ -275,7 +275,7 @@ async def test_real_energy_sensor_error_on_non_existing_entity(
 
 
 @pytest.mark.parametrize(
-    ("domain_config", "expected_unit"),
+    "domain_config, expected_unit",
     [
         pytest.param({CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE}, UnitOfEnergy.WATT_HOUR, id="none"),
         # Without an explicit prefix it defaults to k, so a W power sensor yields a kWh energy sensor.

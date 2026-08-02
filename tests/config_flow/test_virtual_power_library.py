@@ -461,7 +461,7 @@ async def test_source_entity_not_visible_in_options_when_discovery_by_device(has
 
 
 @pytest.mark.parametrize(
-    ("source_entity", "expected_discovery_by"),
+    "source_entity, expected_discovery_by",
     [
         (None, None),
         (

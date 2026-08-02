@@ -55,7 +55,6 @@ def clean_export_directory() -> None:
     if not os.path.exists(export_dir):
         os.makedirs(export_dir)
     shutil.rmtree(export_dir)
-    yield
 
 
 @pytest.fixture

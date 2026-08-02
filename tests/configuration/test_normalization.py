@@ -12,7 +12,7 @@ from custom_components.powercalc.const import CONF_PLAYBOOK_ID, CONF_POWER, CONF
 
 
 @pytest.mark.parametrize(
-    ("states_power", "expected"),
+    "states_power, expected",
     [
         (
             [{CONF_STATE: "playing", CONF_POWER: 10}, {CONF_STATE: "paused", CONF_POWER: 5}],
@@ -31,7 +31,7 @@ async def test_normalize_states_power(
 
 
 @pytest.mark.parametrize(
-    ("playbooks", "expected"),
+    "playbooks, expected",
     [
         ([{CONF_ID: "program1", CONF_PATH: "program1.csv"}], {"program1": "program1.csv"}),
         ({"program1": "program1.csv"}, {"program1": "program1.csv"}),
@@ -44,7 +44,7 @@ async def test_normalize_playbooks(playbooks: dict[str, str] | list[dict[str, st
 
 
 @pytest.mark.parametrize(
-    ("state_trigger", "expected"),
+    "state_trigger, expected",
     [
         ([{CONF_STATE: "playing", CONF_PLAYBOOK_ID: "program1"}], {"playing": "program1"}),
         ({"playing": "program1"}, {"playing": "program1"}),

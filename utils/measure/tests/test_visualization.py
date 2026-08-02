@@ -72,7 +72,7 @@ def test_prefers_plain_csv_when_compressed_copy_is_also_present(tmp_path: Path) 
 
 
 @pytest.mark.parametrize(
-    ("device_type", "title", "x_label"),
+    "device_type, title, x_label",
     [
         ("smart_speaker", "Speaker calibration", "Volume (%)"),
         ("fan", "Fan calibration", "Fan speed (%)"),

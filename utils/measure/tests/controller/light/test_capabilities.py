@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    ("supported_color_modes", "effects", "expected"),
+    "supported_color_modes, effects, expected",
     [
         (["color_temp"], ["candle"], [LutMode.COLOR_TEMP, LutMode.EFFECT]),
         (

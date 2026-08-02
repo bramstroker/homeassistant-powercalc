@@ -65,7 +65,7 @@ async def test_no_sub_profile_repair_raised(hass: HomeAssistant, issue_registry:
 
 
 @pytest.mark.parametrize(
-    ("issue_data", "error"),
+    "issue_data, error",
     [
         (None, "Missing config entry ID for repair flow"),
         ({"config_entry_id": "missing"}, "Unknown config entry: missing"),

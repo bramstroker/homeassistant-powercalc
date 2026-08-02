@@ -56,7 +56,7 @@ def payload_mock() -> Generator[None]:
 @pytest.fixture(autouse=True)
 def enable_analytics(hass: HomeAssistant) -> Generator[None]:
     hass.data[DOMAIN] = {DOMAIN_CONFIG: {CONF_ENABLE_ANALYTICS: True}}
-    yield
+    return
 
 
 async def test_send_analytics_success(

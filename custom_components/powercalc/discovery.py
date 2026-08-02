@@ -236,12 +236,11 @@ class DiscoveryManager:
                     continue
 
                 self._init_entity_discovery(model_info, unique_id, source_entity, log_identifier, power_profiles, {})
-            except Exception as err:  # noqa: BLE001
-                _LOGGER.error(
-                    "%s: Error during %s discovery: %s",
+            except Exception:
+                _LOGGER.exception(
+                    "%s: Error during %s discovery",
                     log_identifier,
                     discovery_type,
-                    err,
                 )
 
     async def discover_entity(

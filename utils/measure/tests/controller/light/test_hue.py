@@ -162,7 +162,7 @@ def test_replaces_an_unauthorized_registration(monkeypatch: pytest.MonkeyPatch, 
 
 
 @pytest.mark.parametrize(
-    ("target", "mode", "kwargs", "expected"),
+    "target, mode, kwargs, expected",
     [
         ("light:1", LutMode.BRIGHTNESS, {"bri": 100}, {"on": True, "bri": 100}),
         ("light:1", LutMode.COLOR_TEMP, {"bri": 100, "ct": 250}, {"on": True, "bri": 100, "ct": 250}),

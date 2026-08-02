@@ -160,7 +160,7 @@ def test_diagnostics_reuses_recent_result_unless_forced() -> None:
 
 
 @pytest.mark.parametrize(
-    ("spec", "supports_voltage"),
+    "spec, supports_voltage",
     [
         (HassPowerMeterSpec(entity_id="sensor.power"), True),
         (ShellyPowerMeterSpec(device_ip="192.0.2.1"), False),

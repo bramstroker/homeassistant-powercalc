@@ -70,7 +70,7 @@ def test_every_measure_type_has_an_explicit_cli_builder() -> None:
 
 
 @pytest.mark.parametrize(
-    ("measure_type", "expected_names"),
+    "measure_type, expected_names",
     [
         (
             MeasureType.LIGHT,
@@ -176,7 +176,7 @@ def test_hass_voltage_selector_prefills_the_sensor_from_the_same_device(
 
 
 @pytest.mark.parametrize(
-    ("measure_type", "controller_setting", "controller_type", "domain", "entity_id"),
+    "measure_type, controller_setting, controller_type, domain, entity_id",
     [
         (
             MeasureType.SPEAKER,

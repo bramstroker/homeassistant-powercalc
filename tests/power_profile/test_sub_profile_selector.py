@@ -111,7 +111,7 @@ async def test_matcher_integration(
 
 
 @pytest.mark.parametrize(
-    ("registry_entry", "expected_profile"),
+    "registry_entry, expected_profile",
     [
         (
             RegistryEntryWithDefaults(

@@ -235,8 +235,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     try:
         await repair_none_config_entries_issue(hass)
-    except Exception as e:  # pragma: no cover
-        _LOGGER.error("problem while cleaning up None entities", exc_info=e)  # pragma: no cover
+    except Exception:  # pragma: no cover
+        _LOGGER.exception("problem while cleaning up None entities")  # pragma: no cover
 
     await init_analytics(hass)
 
@@ -579,8 +579,8 @@ async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
             object.__setattr__(entry, "unique_id", unique_id)
             hass.config_entries._entries._index_entry(entry)  # noqa: SLF001
             await hass.config_entries.async_remove(entry.entry_id)
-        except Exception as e:  # pragma: no cover
-            _LOGGER.error("problem while cleaning up None entities", exc_info=e)  # pragma: no cover
+        except Exception:  # pragma: no cover
+            _LOGGER.exception("problem while cleaning up None entities")  # pragma: no cover
 
 
 def _notify_message(
