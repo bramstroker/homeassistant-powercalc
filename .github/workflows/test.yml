@@ -104,7 +104,7 @@ jobs:
         run: bash tests/setup.sh
       - name: Run tests
         run: |
-          uv run --no-sync pytest \
+          uv run --no-sync --no-build pytest \
             -qq \
             --timeout=9 \
             --durations=10 \

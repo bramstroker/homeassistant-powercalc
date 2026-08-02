@@ -833,7 +833,7 @@ async def test_composite_devices_are_ignored_for_device_discovery(
         "custom_components.powercalc.discovery.is_composite_device_id",
         side_effect=lambda _hass, device_id: device_id == composite_device.id,
     ):
-        devices = await discovery_manager.get_devices()
+        devices = discovery_manager.get_devices()
 
     assert devices == [regular_device]
 
@@ -929,7 +929,7 @@ async def test_get_entities(
 ) -> None:
     mock_registry(hass, {entity_entry.entity_id: entity_entry for entity_entry in entity_entries})
     discovery_manager = DiscoveryManager(hass, {})
-    entity_ids = [entity.entity_id for entity in await discovery_manager.get_entities()]
+    entity_ids = [entity.entity_id for entity in discovery_manager.get_entities()]
     assert entity_ids == expected_entities
 
 

@@ -181,7 +181,7 @@ def mock_requests_get_factory() -> Iterator[MockRequestsGetFactory]:
         mock_request.stop()
 
 
-@pytest.fixture()
+@pytest.fixture
 def export_path(tmp_path: str) -> str:
     export_dir = tmp_path / "export"
     export_dir.mkdir(parents=True, exist_ok=True)
