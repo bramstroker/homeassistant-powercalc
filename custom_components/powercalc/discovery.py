@@ -1,4 +1,4 @@
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from enum import StrEnum
 import logging
@@ -199,17 +199,17 @@ class DiscoveryManager:
 
     async def perform_discovery(
         self,
-        source_provider: Callable[[], Awaitable[list[_DiscoverySourceT]]],
-        source_creator: Callable[[_DiscoverySourceT], Awaitable[SourceEntity]],
+        source_provider: Callable[[], list[_DiscoverySourceT]],
+        source_creator: Callable[[_DiscoverySourceT], SourceEntity],
         discovery_type: DiscoveryBy,
     ) -> None:
         """Generalized discovery procedure for entities and devices."""
-        for source in await source_provider():
+        for source in source_provider():
             log_identifier = str(
                 getattr(source, "entity_id", getattr(source, "id", getattr(source, "entry_id", "unknown"))),
             )
             try:
-                source_entity = await source_creator(source)
+                source_entity = source_creator(source)
                 model_info = await self.extract_model_info_from_device_info(
                     source_entity.entity_entry or source_entity.device_entry,
                 )
@@ -256,12 +256,12 @@ class DiscoveryManager:
 
         return await self.find_power_profiles(model_info, source_entity, discovery_type)
 
-    async def create_entity_source(self, entity_entry: er.RegistryEntry) -> SourceEntity:
+    def create_entity_source(self, entity_entry: er.RegistryEntry) -> SourceEntity:
         """Create SourceEntity for an entity."""
         return create_source_entity(entity_entry.entity_id, self.hass)
 
     @staticmethod
-    async def create_device_source(device_entry: dr.DeviceEntry) -> SourceEntity:
+    def create_device_source(device_entry: dr.DeviceEntry) -> SourceEntity:
         """Create SourceEntity for a device."""
         return SourceEntity(
             object_id=device_entry.name_by_user or device_entry.name or "",
@@ -271,7 +271,7 @@ class DiscoveryManager:
             device_entry=device_entry,
         )
 
-    async def create_config_entry_source(self, config_entry: ConfigEntry) -> SourceEntity:
+    def create_config_entry_source(self, config_entry: ConfigEntry) -> SourceEntity:
         """Create a source representing all devices belonging to a config entry."""
         device_entry = get_first_device_for_config_entry(self.hass, config_entry.entry_id)
         return SourceEntity(
@@ -379,7 +379,7 @@ class DiscoveryManager:
             and not re.search("master|segment", str(entity_entry.entity_id), flags=re.IGNORECASE)
         )
 
-    async def get_entities(self) -> list[er.RegistryEntry]:
+    def get_entities(self) -> list[er.RegistryEntry]:
         """Get all entities from entity registry which qualifies for discovery."""
 
         def _check_already_configured(entity: er.RegistryEntry) -> bool:
@@ -409,7 +409,7 @@ class DiscoveryManager:
         )
         return get_filtered_entity_list(self.hass, NotFilter(entity_filter))
 
-    async def get_devices(self) -> list[dr.DeviceEntry]:
+    def get_devices(self) -> list[dr.DeviceEntry]:
         """Fetch device entries."""
         return [
             device
@@ -417,7 +417,7 @@ class DiscoveryManager:
             if not is_composite_device_id(self.hass, device.id)
         ]
 
-    async def get_config_entries(self) -> list[ConfigEntry]:
+    def get_config_entries(self) -> list[ConfigEntry]:
         """Fetch config entries which have at least one non-composite device."""
         config_entry_ids = {
             config_entry_id

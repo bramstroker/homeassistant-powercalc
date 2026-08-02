@@ -1125,7 +1125,8 @@ def test_plot_endpoint_marks_terminal_incomplete_session_as_partial(tmp_path: Pa
     coordinator = test_client.app.state.context.coordinator
     assert coordinator._worker is not None  # noqa: SLF001
     coordinator._worker.join(timeout=5)  # noqa: SLF001
-    assert coordinator.current is not None and coordinator.current.state is SessionState.COMPLETED
+    assert coordinator.current is not None
+    assert coordinator.current.state is SessionState.COMPLETED
     coordinator._snapshot = replace(coordinator.current, state=SessionState.CANCELLED)  # noqa: SLF001
 
     response = test_client.get("/api/session/current/plots")

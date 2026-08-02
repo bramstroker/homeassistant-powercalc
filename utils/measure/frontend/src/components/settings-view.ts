@@ -394,11 +394,16 @@ export class SettingsView extends LitElement {
           <small class="field-hint">Stored privately in the app and never returned by the API.</small>
         </label>
       </div>
-      ${this.settings?.shelly_password_configured ? html`
-        <label class="check">
-          <input name="clear_shelly_password" type="checkbox" .checked=${this.clearShellyPassword} @change=${this.clearShellyPasswordChanged} />
-          <span>Remove the saved Shelly password</span>
-        </label>` : nothing}`;
+      ${this.renderClearShellyPassword()}`;
+  }
+
+  private renderClearShellyPassword() {
+    if (!this.settings?.shelly_password_configured) return nothing;
+    return html`
+      <label class="check">
+        <input name="clear_shelly_password" type="checkbox" .checked=${this.clearShellyPassword} @change=${this.clearShellyPasswordChanged} />
+        <span>Remove the saved Shelly password</span>
+      </label>`;
   }
 
   private renderShellyDiscovery(selectedAddress: string) {
