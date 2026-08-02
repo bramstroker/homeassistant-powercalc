@@ -11,32 +11,51 @@
     "python"
   ],
   "dependencyDashboard": false,
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "automergeStrategy": "squash",
   "packageRules": [
     {
-      "groupName": "GitHub Actions",
-      "matchManagers": [
-        "github-actions"
-      ]
-    },
-    {
+      "description": "All non-major updates: one PR, automerged when CI is green",
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch",
-      "matchPackagePatterns": [
+      "matchPackageNames": [
         "*"
       ],
       "matchUpdateTypes": [
         "minor",
         "patch"
-      ]
+      ],
+      "automerge": true
     },
     {
+      "description": "GitHub Actions: digests and non-major automerged",
       "matchManagers": [
-        "pip_requirements"
+        "github-actions"
       ],
-      "matchFileNames": [
-        "pyproject.toml"
+      "matchUpdateTypes": [
+        "digest",
+        "pin",
+        "patch",
+        "minor"
       ],
-      "enabled": true
+      "groupName": "GitHub Actions",
+      "automerge": true
+    },
+    {
+      "description": "HA test harness tracks upstream releases, no soak time",
+      "matchPackageNames": [
+        "pytest-homeassistant-custom-component",
+        "homeassistant-stubs"
+      ],
+      "minimumReleaseAge": "0"
+    },
+    {
+      "description": "Majors always get a human",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
     }
   ]
 }

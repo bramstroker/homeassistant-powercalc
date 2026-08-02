@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - '**/*.csv.gz'
+      - '.github/scripts/lut_validator/**'
       - '.github/workflows/validate-lut-files.yml'
       - 'utils/library/scan_lut_quality.py'
 
