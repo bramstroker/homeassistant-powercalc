@@ -111,7 +111,7 @@ from custom_components.powercalc.sensors.abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from custom_components.powercalc.sensors.energy import EnergySensor, VirtualEnergySensor
+from custom_components.powercalc.sensors.energy import EnergySensor, VirtualEnergySensor, VirtualStandbyEnergySensor
 from custom_components.powercalc.sensors.energy_related import create_energy_related_sensors
 from custom_components.powercalc.sensors.power import PowerSensor
 from custom_components.powercalc.unit import (
@@ -233,6 +233,7 @@ def filter_entity_list_by_class(
     filter_list = default_filters.copy() if default_filters else []
     filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
     filter_list.append(lambda elm: isinstance(elm, class_name))
+    filter_list.append(lambda elm: not isinstance(elm, VirtualStandbyEnergySensor))
     return {
         x.entity_id
         for x in filter(

@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Créer un capteur d'énergie",
+          "create_standby_energy_sensor": "Créer un capteur d’énergie en veille",
           "create_cost_sensor": "Créer un capteur de coût",
           "create_utility_meters": "Créer un compteur d'électricité",
           "entity_id": "Entité source",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Si powercalc doit créer un capteur kWh",
+          "create_standby_energy_sensor": "Indique si Powercalc doit créer un capteur kWh qui suit uniquement la consommation en veille",
           "create_utility_meters": "Laissez powercalc créer des compteurs de services publics, qui effectuent un cycle quotidien, horaire, etc.",
           "entity_id": "Entité sur laquelle la puissance virtuelle est basée, le capteur de puissance écoutera les changements d'état de cette entité à mettre à jour",
           "name": "Laisser vide prendra le nom de l'entité source",
@@ -685,6 +687,7 @@
         "title": "Options de base",
         "data": {
           "create_energy_sensor": "Créer un capteur d'énergie",
+          "create_standby_energy_sensor": "Créer un capteur d’énergie en veille",
           "create_cost_sensor": "Créer un capteur de coût",
           "create_utility_meters": "Créer un compteur d'électricité",
           "entity_id": "Entité source",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Indique si Powercalc doit créer un capteur kWh",
+          "create_standby_energy_sensor": "Indique si Powercalc doit créer un capteur kWh qui suit uniquement la consommation en veille",
           "create_utility_meters": "Laisser Powercalc créer des compteurs de services publics, avec des cycles quotidiens, horaires, etc.",
           "entity_id": "Entité sur laquelle la puissance virtuelle est basée ; le capteur de puissance écoutera les changements d'état de cette entité pour se mettre à jour",
           "name": "Si vous laissez vide, le nom de l'entité source sera utilisé",

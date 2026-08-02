@@ -6,6 +6,7 @@ import voluptuous as vol
 from custom_components.powercalc.const import (
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_STANDBY_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -15,6 +16,7 @@ from custom_components.powercalc.const import (
 
 ALLOWED_CONFIG_KEYS = [
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_STANDBY_ENERGY_SENSOR,
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -35,6 +37,7 @@ async def change_gui_configuration(hass: HomeAssistant, call: ServiceCall) -> No
 
     if field in [
         CONF_CREATE_ENERGY_SENSOR,
+        CONF_CREATE_STANDBY_ENERGY_SENSOR,
         CONF_CREATE_COST_SENSOR,
         CONF_CREATE_UTILITY_METERS,
         CONF_IGNORE_UNAVAILABLE_STATE,

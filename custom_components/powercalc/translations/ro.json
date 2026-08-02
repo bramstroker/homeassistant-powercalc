@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Creați un senzor de energie",
+          "create_standby_energy_sensor": "Creați un senzor de energie în standby",
           "create_cost_sensor": "Creați un senzor de cost",
           "create_utility_meters": "Creați contoare",
           "entity_id": "Entitatea sursă",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Dacă powercalc trebuie să creeze un senzor kWh",
+          "create_standby_energy_sensor": "Dacă Powercalc trebuie să creeze un senzor kWh care urmărește doar consumul în standby",
           "create_utility_meters": "Permiteți Powercalc să creeze contoare care se resetează zilnic, orar etc.",
           "entity_id": "entitate pe care se bazează puterea virtuală, senzorul de putere va asculta modificările de stare ale acestei entități pentru a fi actualizate",
           "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",
@@ -685,6 +687,7 @@
         "title": "Opțiuni de bază",
         "data": {
           "create_energy_sensor": "Creați un senzor de energie",
+          "create_standby_energy_sensor": "Creați un senzor de energie în standby",
           "create_cost_sensor": "Creați un senzor de cost",
           "create_utility_meters": "Creați contoare",
           "entity_id": "Entitatea sursă",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Dacă Powercalc trebuie să creeze un senzor kWh",
+          "create_standby_energy_sensor": "Dacă Powercalc trebuie să creeze un senzor kWh care urmărește doar consumul în standby",
           "create_utility_meters": "Permiteți Powercalc să creeze contoare de utilitate care se resetează zilnic, orar etc.",
           "entity_id": "entitatea pe care se bazează puterea virtuală; senzorul de putere va asculta modificările de stare ale acestei entități pentru a se actualiza",
           "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",

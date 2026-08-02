@@ -13,6 +13,24 @@ powercalc:
 
 You can also set this option per sensor in YAML or when you use the GUI you can toggle this in the options.
 
+## Standby energy
+
+For virtual power sensors, you can create an additional energy sensor which tracks only the
+standby portion of the calculated power. Enable **Create standby energy sensor** in the GUI,
+or set `create_standby_energy_sensor` in YAML:
+
+```yaml
+powercalc:
+  sensors:
+    - entity_id: light.example
+      create_standby_energy_sensor: true
+```
+
+The sensor is disabled by default and is named `<device> standby energy`. It uses the same
+integration method, precision, unit prefix, and update interval as the regular energy sensor.
+The regular energy sensor still includes standby consumption; the standby sensor is a separate
+breakdown and is excluded from Powercalc group energy totals to prevent double counting.
+
 ## Resetting energy sensor
 
 Powercalc provides an action [`powercalc.reset_energy`](../actions/reset-energy.md) which you can call to reset energy sensors to 0 kWh.

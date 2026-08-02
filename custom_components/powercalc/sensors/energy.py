@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 import inspect
 import logging
@@ -46,8 +46,10 @@ from .abstract import (
     BaseEntity,
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
+    generate_standby_energy_sensor_entity_id,
+    generate_standby_energy_sensor_name,
 )
-from .power import PowerSensor, RealPowerSensor
+from .power import PowerSensor, RealPowerSensor, VirtualPowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -85,6 +87,46 @@ def create_energy_sensor(
 
     # Create a new virtual energy sensor based on the virtual power sensor
     return _create_virtual_energy_sensor(hass, sensor_config, power_sensor, source_entity)
+
+
+def create_standby_energy_sensor(
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    power_sensor: VirtualPowerSensor,
+    source_entity: SourceEntity,
+) -> VirtualStandbyEnergySensor:
+    """Create an energy sensor which only integrates standby power."""
+    name = generate_standby_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME), source_entity)
+    unique_id = f"{power_sensor.unique_id}_standby_energy" if power_sensor.unique_id is not None else None
+    entity_id = generate_standby_energy_sensor_entity_id(
+        hass,
+        sensor_config,
+        source_entity,
+        unique_id=unique_id,
+    )
+    entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
+    unit_prefix = get_unit_prefix(hass, sensor_config, power_sensor)
+
+    _LOGGER.debug(
+        "Creating standby energy sensor (entity_id=%s, source_entity=%s, unit_prefix=%s)",
+        entity_id,
+        power_sensor.entity_id,
+        unit_prefix,
+    )
+
+    return VirtualStandbyEnergySensor(
+        hass=hass,
+        source_entity=power_sensor.entity_id,
+        unique_id=unique_id,
+        entity_id=entity_id,
+        entity_category=entity_category,
+        name=name,
+        unit_prefix=unit_prefix,
+        powercalc_source_entity=source_entity.entity_id,
+        powercalc_source_domain=source_entity.domain,
+        sensor_config=sensor_config,
+        power_sensor=power_sensor,
+    )
 
 
 def resolve_existing_energy_sensor(hass: HomeAssistant, energy_sensor_id: str) -> RealEnergySensor:
@@ -410,6 +452,78 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         _LOGGER.debug("%s: Calibrate energy sensor to: %s", self.entity_id, value)
         self._state = Decimal(value)
         self.async_write_ha_state()
+
+
+class VirtualStandbyEnergySensor(VirtualEnergySensor):
+    """Energy sensor integrating only the standby portion of a virtual power sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        source_entity: str,
+        entity_id: str,
+        sensor_config: ConfigType,
+        power_sensor: VirtualPowerSensor,
+        powercalc_source_entity: str | None = None,
+        powercalc_source_domain: str | None = None,
+        unique_id: str | None = None,
+        entity_category: EntityCategory | None = None,
+        name: str | None = None,
+        unit_prefix: str | None = None,
+    ) -> None:
+        self._power_sensor = power_sensor
+        self._last_standby_power = power_sensor.current_standby_power
+        super().__init__(
+            hass=hass,
+            source_entity=source_entity,
+            entity_id=entity_id,
+            sensor_config=sensor_config,
+            powercalc_source_entity=powercalc_source_entity,
+            powercalc_source_domain=powercalc_source_domain,
+            unique_id=unique_id,
+            entity_category=entity_category,
+            name=name,
+            unit_prefix=unit_prefix,
+        )
+
+    async def async_added_to_hass(self) -> None:
+        """Initialize standby tracking before registering integration callbacks."""
+        self._last_standby_power = self._power_sensor.current_standby_power
+        await super().async_added_to_hass()
+
+    def _integrate_on_state_change(
+        self,
+        old_timestamp: datetime | None,
+        new_timestamp: datetime | None,
+        old_state: State | None,
+        new_state: State | None,
+    ) -> None:
+        """Replace total power states with their standby component before integrating."""
+        current_standby_power = self._power_sensor.current_standby_power
+        old_state = self._state_with_power(old_state, self._last_standby_power)
+        new_state = self._state_with_power(new_state, current_standby_power)
+        self._last_standby_power = current_standby_power
+        super()._integrate_on_state_change(old_timestamp, new_timestamp, old_state, new_state)
+
+    def _schedule_max_sub_interval_exceeded_if_state_is_numeric(self, source_state: State | None) -> None:
+        """Schedule periodic integration using standby power rather than total power."""
+        super()._schedule_max_sub_interval_exceeded_if_state_is_numeric(
+            self._state_with_power(source_state, self._power_sensor.current_standby_power),
+        )
+
+    @staticmethod
+    def _state_with_power(state: State | None, power: Decimal) -> State | None:
+        if state is None or state.state in UNAVAILABLE_STATES:
+            return state
+        return State(
+            state.entity_id,
+            str(power),
+            state.attributes,
+            last_changed=state.last_changed,
+            last_reported=state.last_reported,
+            last_updated=state.last_updated,
+            context=state.context,
+        )
 
 
 class RealEnergySensor(EnergySensor):

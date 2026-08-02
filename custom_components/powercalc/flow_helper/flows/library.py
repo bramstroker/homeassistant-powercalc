@@ -29,6 +29,7 @@ from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFo
 from custom_components.powercalc.flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from custom_components.powercalc.flow_helper.schema import (
     SCHEMA_ENERGY_SENSOR_TOGGLE,
+    SCHEMA_STANDBY_ENERGY_SENSOR_TOGGLE,
     SCHEMA_UTILITY_METER_TOGGLE,
     build_sub_profile_schema,
 )
@@ -58,6 +59,7 @@ SCHEMA_POWER_AUTODISCOVERED = vol.Schema(
 SCHEMA_POWER_OPTIONS_LIBRARY = vol.Schema(
     {
         **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+        **SCHEMA_STANDBY_ENERGY_SENSOR_TOGGLE.schema,
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 )

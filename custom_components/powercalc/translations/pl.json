@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Utwórz sensor energii",
+          "create_standby_energy_sensor": "Utwórz czujnik energii w trybie czuwania",
           "create_cost_sensor": "Utwórz czujnik kosztów",
           "create_utility_meters": "Utwórz liczniki mediów",
           "entity_id": "Encja źródłowa",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Czy Powercalc musi utworzyć sensor kWh",
+          "create_standby_energy_sensor": "Czy Powercalc ma utworzyć czujnik kWh śledzący tylko zużycie w trybie czuwania",
           "create_utility_meters": "Pozwól Powercalc stworzyć liczniki mediów, które pracują w cyklach dziennych, godzinowych itp.",
           "entity_id": "Encja źródłowa, na której opiera się wirtualna moc; sensor mocy, który ma być aktualizowany będzie nasłuchiwał zmian stanu tej encji",
           "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",
@@ -685,6 +687,7 @@
         "title": "Opcje podstawowe",
         "data": {
           "create_energy_sensor": "Utwórz sensor energii",
+          "create_standby_energy_sensor": "Utwórz czujnik energii w trybie czuwania",
           "create_cost_sensor": "Utwórz czujnik kosztów",
           "create_utility_meters": "Utwórz liczniki mediów",
           "entity_id": "Encja źródłowa",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Czy powercalc musi utworzyć czujnik kWh",
+          "create_standby_energy_sensor": "Czy Powercalc ma utworzyć czujnik kWh śledzący tylko zużycie w trybie czuwania",
           "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
           "entity_id": "Encja źródłowa, na której opiera się wirtualna moc; sensor mocy będzie nasłuchiwał zmiany stanu tej encji dla swojej aktualizacji",
           "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",

@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "创建能源传感器",
+          "create_standby_energy_sensor": "创建待机能耗传感器",
           "create_cost_sensor": "创建费用传感器",
           "create_utility_meters": "创建公用事业计量表",
           "entity_id": "源实体",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "是否让 Powercalc 创建 kWh 传感器",
+          "create_standby_energy_sensor": "是否让 Powercalc 创建一个仅跟踪待机能耗的 kWh 传感器",
           "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表",
           "entity_id": "虚拟功率所基于的实体。功率传感器会监听此实体的状态变化并随之更新",
           "name": "留空则使用源实体的名称",
@@ -685,6 +687,7 @@
         "title": "基本选项",
         "data": {
           "create_energy_sensor": "创建能源传感器",
+          "create_standby_energy_sensor": "创建待机能耗传感器",
           "create_cost_sensor": "创建费用传感器",
           "create_utility_meters": "创建公用事业计量表",
           "entity_id": "源实体",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "是否让 Powercalc 创建 kWh 传感器",
+          "create_standby_energy_sensor": "是否让 Powercalc 创建一个仅跟踪待机能耗的 kWh 传感器",
           "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表",
           "entity_id": "虚拟功率所基于的实体。功率传感器会监听此实体的状态变化并随之更新",
           "name": "留空则使用源实体的名称",

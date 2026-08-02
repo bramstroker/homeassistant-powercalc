@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Creëer energie sensoren",
+          "create_standby_energy_sensor": "Stand-by-energiesensor maken",
           "create_cost_sensor": "Maak een kostensensor",
           "create_utility_meters": "Creëer utiliteit meters",
           "entity_id": "Bron entiteit",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Laat Powercalc een kWh meter maken",
+          "create_standby_energy_sensor": "Of Powercalc een kWh-sensor moet maken die alleen het stand-byverbruik bijhoudt",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
           "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
@@ -685,6 +687,7 @@
         "title": "Basisopties",
         "data": {
           "create_energy_sensor": "Creëer energie sensoren",
+          "create_standby_energy_sensor": "Stand-by-energiesensor maken",
           "create_cost_sensor": "Maak een kostensensor",
           "create_utility_meters": "Creëer utiliteit meters",
           "entity_id": "Bron entiteit",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Laat powercalc een kWh meter maken",
+          "create_standby_energy_sensor": "Of Powercalc een kWh-sensor moet maken die alleen het stand-byverbruik bijhoudt",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
           "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",

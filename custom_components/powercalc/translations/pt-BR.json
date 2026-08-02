@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Criar sensor de consumo",
+          "create_standby_energy_sensor": "Criar sensor de energia em espera",
           "create_cost_sensor": "Criar sensor de custo",
           "create_utility_meters": "Criar medidores de utilidade",
           "entity_id": "Entidade de origem",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
+          "create_standby_energy_sensor": "Se o Powercalc deve criar um sensor de kWh que rastreia apenas o consumo em espera",
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "entity_id": "entidade na qual a energia virtual é baseada, o sensor de energia escutará as mudanças de estado desta entidade para serem atualizadas",
           "name": "Deixar em branco levará o nome da entidade de origem",
@@ -685,6 +687,7 @@
         "title": "Opções básicas",
         "data": {
           "create_energy_sensor": "Criar sensor de consumo",
+          "create_standby_energy_sensor": "Criar sensor de energia em espera",
           "create_cost_sensor": "Criar sensor de custo",
           "create_utility_meters": "Criar medidores de utilidade",
           "entity_id": "Entidade de origem",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
+          "create_standby_energy_sensor": "Se o Powercalc deve criar um sensor de kWh que rastreia apenas o consumo em espera",
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "entity_id": "entidade onde a potência virtual se baseia, o sensor de potência acompanhará as mudanças de estado desta entidade para ser atualizado",
           "name": "Deixar em branco usará o nome da entidade de origem",

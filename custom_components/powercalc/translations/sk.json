@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Vytvoriť snímač energie",
+          "create_standby_energy_sensor": "Vytvoriť snímač energie v pohotovostnom režime",
           "create_cost_sensor": "Vytvorte cenový senzor",
           "create_utility_meters": "Vytvorte merače spotreby",
           "entity_id": "Zdrojová entita",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh snímač",
+          "create_standby_energy_sensor": "Či má Powercalc vytvoriť snímač kWh, ktorý sleduje iba spotrebu v pohotovostnom režime",
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "entity_id": "entita, na ktorej je založená virtuálna sila, bude snímač výkonu počúvať zmeny stavu tejto entity, aby sa aktualizoval",
           "name": "Ak ponecháte prázdne, názov sa prevezme zo zdrojovej entity",
@@ -685,6 +687,7 @@
         "title": "Základné možnosti",
         "data": {
           "create_energy_sensor": "Vytvoriť snímač energie",
+          "create_standby_energy_sensor": "Vytvoriť snímač energie v pohotovostnom režime",
           "create_cost_sensor": "Vytvorte cenový senzor",
           "create_utility_meters": "Vytvorte merače spotreby",
           "entity_id": "Zdrojová entita",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh senzor",
+          "create_standby_energy_sensor": "Či má Powercalc vytvoriť snímač kWh, ktorý sleduje iba spotrebu v pohotovostnom režime",
           "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
           "entity_id": "entita, na ktorej je založená virtuálna sila, bude snímač výkonu počúvať zmeny stavu tejto entity, aby sa aktualizoval",
           "name": "Ak ponecháte prázdne, názov sa prevezme zo zdrojovej entity",

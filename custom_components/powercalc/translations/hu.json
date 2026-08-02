@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Energiaérzékelő létrehozása",
+          "create_standby_energy_sensor": "Készenléti energiaérzékelő létrehozása",
           "create_cost_sensor": "Költségérzékelő létrehozása",
           "create_utility_meters": "Közüzemi mérők létrehozása",
           "entity_id": "Forrásentitás",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőt",
+          "create_standby_energy_sensor": "Létrehozzon-e a Powercalc egy kWh-érzékelőt, amely csak a készenléti fogyasztást követi",
           "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal",
           "entity_id": "Az entitás, amelyen a virtuális teljesítmény alapul, a teljesítményérzékelő figyeli ennek az entitásnak az állapotváltozásait a frissítésre",
           "name": "Ha üresen hagyja, a név a forrásentitástól származik",
@@ -685,6 +687,7 @@
         "title": "Alapbeállítások",
         "data": {
           "create_energy_sensor": "Energiaérzékelő létrehozása",
+          "create_standby_energy_sensor": "Készenléti energiaérzékelő létrehozása",
           "create_cost_sensor": "Költségérzékelő létrehozása",
           "create_utility_meters": "Közüzemi mérők létrehozása",
           "entity_id": "Forrásentitás",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőt",
+          "create_standby_energy_sensor": "Létrehozzon-e a Powercalc egy kWh-érzékelőt, amely csak a készenléti fogyasztást követi",
           "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal",
           "entity_id": "Az entitás, amelyen a virtuális teljesítmény alapul, a teljesítményérzékelő figyeli ennek az entitásnak az állapotváltozásait a frissítésre",
           "name": "Ha üresen hagyja, a név a forrásentitástól származik",

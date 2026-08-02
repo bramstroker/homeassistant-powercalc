@@ -560,6 +560,7 @@
       "virtual_power": {
         "data": {
           "create_energy_sensor": "Energiesensor erstellen",
+          "create_standby_energy_sensor": "Standby-Energiesensor erstellen",
           "create_cost_sensor": "Kostensensor erstellen",
           "create_utility_meters": "Utilitymeter erstellen",
           "entity_id": "Quell-Entität",
@@ -569,6 +570,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Ob Powercalc einen kWh Sensor erstellen soll",
+          "create_standby_energy_sensor": "Ob Powercalc einen kWh-Sensor erstellen soll, der nur den Standby-Verbrauch erfasst",
           "create_utility_meters": "Powercalc soll utility-Meter erstellen, die täglich, stündlich usw. zyklisch sind",
           "entity_id": "Entität, auf der die virtuelle Leistung basiert; der Leistungssensor wird auf Zustandsänderungen dieser Entität reagieren, um aktualisiert zu werden",
           "name": "Leer lassen wird den Namen von der Quell-Entität übernehmen",
@@ -685,6 +687,7 @@
         "title": "Grundeinstellungen",
         "data": {
           "create_energy_sensor": "Energiessensor erstellen",
+          "create_standby_energy_sensor": "Standby-Energiesensor erstellen",
           "create_cost_sensor": "Kostensensor erstellen",
           "create_utility_meters": "Utilitymeter erstellen",
           "entity_id": "Quell-Entität",
@@ -693,6 +696,7 @@
         },
         "data_description": {
           "create_energy_sensor": "Ob Powercalc einen kWh Sensor erstellen soll",
+          "create_standby_energy_sensor": "Ob Powercalc einen kWh-Sensor erstellen soll, der nur den Standby-Verbrauch erfasst",
           "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten.",
           "entity_id": "Entität, auf der die virtuelle Leistung basiert; der Leistungssensor wird auf Zustandsänderungen dieser Entität reagieren, um aktualisiert zu werden",
           "name": "Leer lassen wird den Namen von der Quell-Entität übernehmen",
