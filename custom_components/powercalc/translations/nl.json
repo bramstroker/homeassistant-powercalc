@@ -10,7 +10,7 @@
       "already_configured": "Sensor is reeds geconfigureerd, specifieer een uniek ID"
     },
     "error": {
-      "cost_price_mandatory": "U moet een energieprijs of een energieprijssensor aanleveren",
+      "cost_price_mandatory": "U moet een energieprijs of een sensor van de energieprijs leveren",
       "daily_energy_mandatory": "Je moet minimaal waarde of waarde template opgeven",
       "entity_mandatory": "Je moet verplicht een entiteit opgeven voor iedere andere strategie dan playbook",
       "fixed_mandatory": "Je dient minimaal een van de volgende velden te definiëren: Vermogen, Vermogen template of Vermogen per status",
