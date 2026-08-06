@@ -53,6 +53,7 @@ from custom_components.powercalc.const import (
     CONF_SENSOR_TYPE,
     CONF_VOLTAGE,
     CONF_WLED,
+    DISCOVERY_INTEGRATION_NAME,
     DOMAIN,
     DUMMY_ENTITY_ID,
     SensorType,
@@ -116,6 +117,7 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init: AsyncMock) -> 
     assert len(mock_calls) == 2
     assert mock_calls[0][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
     assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == "light.testa"
+    assert mock_calls[0][2]["data"][DISCOVERY_INTEGRATION_NAME] == "Test Components"
     assert mock_calls[1][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
     assert mock_calls[1][2]["data"][CONF_ENTITY_ID] == "light.testb"
 
@@ -789,6 +791,7 @@ async def test_discovery_by_device(
     assert mock_calls[0][1] == (DOMAIN,)
     assert mock_calls[0][2]["context"] == {CONF_SOURCE: SOURCE_INTEGRATION_DISCOVERY}
     assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == DUMMY_ENTITY_ID
+    assert mock_calls[0][2]["data"][DISCOVERY_INTEGRATION_NAME] == "Test Components"
     assert mock_calls[0][2]["data"][CONF_MANUFACTURER] == "test"
     assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery_type_device"
     assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_ABC123"
@@ -820,6 +823,7 @@ async def test_discovery_by_config_entry(
     assert mock_calls[0][1] == (DOMAIN,)
     assert mock_calls[0][2]["context"] == {CONF_SOURCE: SOURCE_INTEGRATION_DISCOVERY}
     assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == DUMMY_ENTITY_ID
+    assert mock_calls[0][2]["data"][DISCOVERY_INTEGRATION_NAME] == "Test Components"
     assert mock_calls[0][2]["data"][CONF_MANUFACTURER] == "test"
     assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery_type_config_entry"
     assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == f"pc_config_entry_{source_entry.entry_id}"

@@ -38,6 +38,7 @@ from .const import (
     CONF_POWER,
     CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
+    DISCOVERY_INTEGRATION_NAME,
     DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
@@ -400,6 +401,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         self.source_entity_id = self.source_entity.entity_id
         self.name = self.source_entity.name
+        integration_name = discovery_info.pop(DISCOVERY_INTEGRATION_NAME, None)
 
         power_profiles: list[PowerProfile] = []
         if DISCOVERY_POWER_PROFILES in discovery_info:
@@ -410,7 +412,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         self.sensor_config = discovery_info.copy()
 
         self.context["title_placeholders"] = {
-            "name": self.name or "",
+            "name": f"{self.name} - {integration_name}" if integration_name else self.name or "",
             "manufacturer": str(self.sensor_config.get(CONF_MANUFACTURER)),
             "model": str(self.sensor_config.get(CONF_MODEL)),
         }

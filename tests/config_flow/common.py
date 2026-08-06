@@ -26,6 +26,7 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_MODEL,
     CONF_SENSOR_TYPE,
+    DISCOVERY_INTEGRATION_NAME,
     DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     ENERGY_INTEGRATION_METHOD_LEFT,
@@ -254,6 +255,7 @@ async def initialize_discovery_flow(
     discovery_data = {
         CONF_NAME: "test",
         CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
+        DISCOVERY_INTEGRATION_NAME: "Test Components",
         DISCOVERY_SOURCE_ENTITY: source_entity,
     }
 

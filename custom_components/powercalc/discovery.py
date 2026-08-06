@@ -9,13 +9,14 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER, ConfigEntry
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant
 from homeassistant.helpers import discovery_flow
 import homeassistant.helpers.device_registry as dr
 from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.loader import IntegrationNotFound, async_get_integration
 
 from .common import SourceEntity, create_source_entity
 from .const import (
@@ -24,6 +25,7 @@ from .const import (
     CONF_MODEL,
     CONF_SENSORS,
     DATA_DISCOVERY_MANAGER,
+    DISCOVERY_INTEGRATION_NAME,
     DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
@@ -264,7 +266,14 @@ class DiscoveryManager:
                     )
                     continue
 
-                self._init_entity_discovery(model_info, unique_id, source_entity, log_identifier, power_profiles, {})
+                await self._init_entity_discovery(
+                    model_info,
+                    unique_id,
+                    source_entity,
+                    log_identifier,
+                    power_profiles,
+                    {},
+                )
             except Exception:
                 _LOGGER.exception(
                     "%s: Error during %s discovery",
@@ -403,7 +412,7 @@ class DiscoveryManager:
             )
             return
 
-        self._init_entity_discovery(
+        await self._init_entity_discovery(
             model_info,
             unique_id,
             source_entity,
@@ -563,8 +572,7 @@ class DiscoveryManager:
 
         return await self.get_model_information_from_device(device_entry)
 
-    @callback
-    def _init_entity_discovery(
+    async def _init_entity_discovery(
         self,
         model_info: ModelInfo,
         unique_id: str,
@@ -577,6 +585,7 @@ class DiscoveryManager:
 
         discovery_data: dict[str, Any] = {
             CONF_ENTITY_ID: source_entity.entity_id,
+            DISCOVERY_INTEGRATION_NAME: await self._get_integration_name(source_entity),
             DISCOVERY_SOURCE_ENTITY: source_entity,
             CONF_UNIQUE_ID: unique_id,
         }
@@ -608,6 +617,27 @@ class DiscoveryManager:
             context={"source": SOURCE_INTEGRATION_DISCOVERY},
             data=discovery_data,
         )
+
+    async def _get_integration_name(self, source_entity: SourceEntity) -> str | None:
+        """Return the display name of the integration which owns the discovery source."""
+        config_entry_id = source_entity.config_entry_id
+        if config_entry_id is None and source_entity.entity_entry:
+            config_entry_id = source_entity.entity_entry.config_entry_id
+        if config_entry_id is None and source_entity.device_entry:
+            config_entry_id = next(iter(get_config_entry_ids(source_entity.device_entry)), None)
+        if config_entry_id is None:
+            return None
+
+        config_entry = self.hass.config_entries.async_get_entry(config_entry_id)
+        if config_entry is None:
+            return None
+
+        try:
+            integration = await async_get_integration(self.hass, config_entry.domain)
+        except IntegrationNotFound:
+            _LOGGER.debug("Unable to resolve integration name for domain %s", config_entry.domain)
+            return None
+        return integration.name
 
     @property
     def status(self) -> DiscoveryStatus:
