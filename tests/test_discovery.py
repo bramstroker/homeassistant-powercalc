@@ -11,7 +11,15 @@ from homeassistant.components.light import (
     ColorMode,
 )
 from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_INTEGRATION_DISCOVERY
-from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, CONF_SOURCE, CONF_UNIQUE_ID, STATE_ON
+from homeassistant.const import (
+    CONF_DEVICE,
+    CONF_ENABLED,
+    CONF_ENTITY_ID,
+    CONF_NAME,
+    CONF_SOURCE,
+    CONF_UNIQUE_ID,
+    STATE_ON,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -65,12 +73,14 @@ from .common import (
     mock_device_with_entities,
     mock_devices,
     mock_entities_in_registry,
+    requires_composite_devices,
     run_powercalc_setup,
     set_states,
 )
 from .config_flow.test_global_configuration import create_mock_global_config_entry
 
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
+COMPOSITE_DEVICE_ID = "composite00000000000000000000ab"
 LIGHT_ATTRIBUTES = {ATTR_SUPPORTED_COLOR_MODES: [ColorMode.BRIGHTNESS], ATTR_COLOR_MODE: ColorMode.BRIGHTNESS}
 
 
@@ -836,6 +846,72 @@ async def test_composite_devices_are_ignored_for_device_discovery(
         devices = discovery_manager.get_devices()
 
     assert devices == [regular_device]
+
+
+def _mock_split_devices(hass: HomeAssistant) -> None:
+    """Mock two devices split off from the same pre-migration composite device."""
+    mock_devices(
+        hass,
+        {
+            f"split-device-{index}": {
+                "config_entry_id": f"source-entry-{index}",
+                "manufacturer": "test",
+                "model": "discovery_type_device",
+                "composite_device_id": COMPOSITE_DEVICE_ID,
+            }
+            for index in range(2)
+        },
+    )
+
+
+@requires_composite_devices
+@pytest.mark.parametrize(
+    "configured_device_id",
+    [COMPOSITE_DEVICE_ID, "split-device-0"],
+    ids=["composite_device", "repaired_split_device"],
+)
+async def test_no_discovery_for_devices_split_from_configured_composite_device(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+    configured_device_id: str,
+) -> None:
+    """Devices split from a composite device must not be discovered when it is already setup.
+
+    The entry either still references the composite device ID, or one of the split devices after the
+    user resolved the composite device repair. Both represent the same physical device.
+    """
+    _mock_split_devices(hass)
+
+    await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Composite device",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "discovery_type_device",
+            CONF_DEVICE: configured_device_id,
+        },
+        unique_id=f"pc_{COMPOSITE_DEVICE_ID}",
+    )
+
+    await run_powercalc_setup(hass)
+
+    assert not mock_flow_init.mock_calls
+
+
+@requires_composite_devices
+async def test_discovery_for_devices_split_from_unconfigured_composite_device(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """Split devices must still be discovered when no Powercalc entry exists for the composite."""
+    _mock_split_devices(hass)
+
+    await run_powercalc_setup(hass)
+
+    unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
+    assert unique_ids == {"pc_split-device-0", "pc_split-device-1"}
 
 
 async def test_powercalc_sensors_are_ignored_for_discovery(
