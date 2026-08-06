@@ -53,6 +53,9 @@ async def test_discovery_flow(
     source_entity = create_source_entity(DEFAULT_ENTITY_ID, hass)
     result = await initialize_discovery_flow(hass, source_entity)
 
+    progress = hass.config_entries.flow.async_get(result["flow_id"])
+    assert progress["context"]["title_placeholders"]["name"] == "test - Test Components"
+
     # Confirm selected manufacturer/model
     result = await confirm_auto_discovered_model(hass, result)
 
