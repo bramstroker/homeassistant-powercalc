@@ -31,6 +31,29 @@ def is_composite_device_id(hass: HomeAssistant, device_id: str) -> bool:
     return bool(is_composite(device_id))
 
 
+def get_composite_split_devices(hass: HomeAssistant, device_id: str) -> list[DeviceEntry]:
+    """
+    Return all devices split off from the same legacy composite device as the given device.
+    Accepts either the composite device ID itself, or the ID of one of the split devices.
+    Returns an empty list when the device is unrelated to a composite device, or when running on
+    HA <2026.8, which does not split composite devices at all.
+    """
+    device_reg = device_registry.async_get(hass)
+    get_split_devices = getattr(device_reg, "async_get_devices_for_composite_device_id", None)
+    if not callable(get_split_devices):
+        return []
+
+    if split_devices := list(get_split_devices(device_id)):
+        return split_devices
+
+    # Not a composite ID itself, so it may be one of the devices split off from a composite.
+    device = device_reg.async_get(device_id)
+    composite_device_id = getattr(device, "composite_device_id", None) if device else None
+    if not composite_device_id:
+        return []
+    return list(get_split_devices(composite_device_id))
+
+
 def get_config_entry_ids(device: DeviceEntry) -> set[str]:
     """
     Return the config entry IDs a device belongs to.

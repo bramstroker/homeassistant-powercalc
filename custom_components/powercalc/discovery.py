@@ -8,7 +8,7 @@ from typing import Any, TypeVar
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER, ConfigEntry
-from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID
+from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers import discovery_flow
 import homeassistant.helpers.device_registry as dr
@@ -31,7 +31,12 @@ from .const import (
     MANUFACTURER_WLED,
     CalculationStrategy,
 )
-from .device_binding import get_config_entry_ids, get_first_device_for_config_entry, is_composite_device_id
+from .device_binding import (
+    get_composite_split_devices,
+    get_config_entry_ids,
+    get_first_device_for_config_entry,
+    is_composite_device_id,
+)
 from .group_include.filter import (
     CategoryFilter,
     CompositeFilter,
@@ -180,6 +185,8 @@ class DiscoveryManager:
                 continue  # pragma: no cover
 
             self.initialized_flows.add(entry.unique_id)
+            self._initialize_configured_device(entry)
+
             entity_id = entry.data.get(CONF_ENTITY_ID)
             if not entity_id or entity_id == DUMMY_ENTITY_ID:
                 continue
@@ -188,6 +195,23 @@ class DiscoveryManager:
             if entity and entity.device_entry:
                 self.initialized_flows.add(f"pc_{entity.device_entry.id}")
             self.initialized_flows.add(entity_id)
+
+    def _initialize_configured_device(self, entry: ConfigEntry) -> None:
+        """Mark the device a config entry was setup for as already setup.
+
+        HA >=2026.8 splits devices belonging to multiple config entries into one device per entry.
+        The entry may hold the composite device ID, which no longer resolves to a registered device,
+        or one of the split devices after the user resolved the composite device repair. Either way
+        all devices split off from that composite represent the same physical device the user already
+        configured, so none of them should be discovered again.
+        """
+        device_id = entry.data.get(CONF_DEVICE)
+        if not device_id:
+            return
+
+        self.initialized_flows.add(f"pc_{device_id}")
+        for device in get_composite_split_devices(self.hass, str(device_id)):
+            self.initialized_flows.add(f"pc_{device.id}")
 
     def remove_initialized_flow(self, entry: ConfigEntry) -> None:
         """Remove a flow from the initialized flows."""
