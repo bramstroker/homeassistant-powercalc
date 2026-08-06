@@ -40,7 +40,7 @@ from custom_components.powercalc import (
     DeviceType,
     DiscoveryManager,
 )
-from custom_components.powercalc.common import create_source_entity
+from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
@@ -120,6 +120,14 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init: AsyncMock) -> 
     assert mock_calls[0][2]["data"][DISCOVERY_INTEGRATION_NAME] == "Test Components"
     assert mock_calls[1][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
     assert mock_calls[1][2]["data"][CONF_ENTITY_ID] == "light.testb"
+
+
+async def test_integration_name_is_none_without_config_entry(hass: HomeAssistant) -> None:
+    source_entity = SourceEntity(object_id="test", entity_id="light.test", domain="light")
+
+    integration_name = await DiscoveryManager(hass, {})._get_integration_name(source_entity)  # noqa: SLF001
+
+    assert integration_name is None
 
 
 async def test_discovery_skipped_when_confirmed_by_user(

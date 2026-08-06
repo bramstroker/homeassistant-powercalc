@@ -41,7 +41,7 @@ def get_composite_split_devices(hass: HomeAssistant, device_id: str) -> list[Dev
     device_reg = device_registry.async_get(hass)
     get_split_devices = getattr(device_reg, "async_get_devices_for_composite_device_id", None)
     if not callable(get_split_devices):
-        return []
+        return []  # pragma: no cover
 
     if split_devices := list(get_split_devices(device_id)):
         return split_devices
@@ -62,7 +62,7 @@ def get_config_entry_ids(device: DeviceEntry) -> set[str]:
     """
     if _HAS_SINGLE_CONFIG_ENTRY:
         return {device.config_entry_id}
-    return set(getattr(device, "config_entries", set()))
+    return set(getattr(device, "config_entries", set()))  # pragma: no cover
 
 
 def get_first_device_for_config_entry(hass: HomeAssistant, config_entry_id: str) -> DeviceEntry | None:

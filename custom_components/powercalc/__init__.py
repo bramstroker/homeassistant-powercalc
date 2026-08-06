@@ -212,7 +212,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     global_config = get_global_configuration(hass, config)
 
-    discovery_manager = await create_discovery_manager_instance(hass, config, global_config)
+    discovery_manager = create_discovery_manager_instance(hass, config, global_config)
     hass.data[DOMAIN] = {
         DATA_DISCOVERY_MANAGER: discovery_manager,
         DOMAIN_CONFIG: global_config,
@@ -224,6 +224,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DATA_STANDBY_POWER_SENSORS: {},
         DATA_ANALYTICS: {},
     }
+
+    await discovery_manager.setup()
 
     register_services(hass)
 
@@ -272,7 +274,7 @@ async def init_analytics(hass: HomeAssistant) -> None:
     hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, start_schedule)
 
 
-async def create_discovery_manager_instance(
+def create_discovery_manager_instance(
     hass: HomeAssistant,
     ha_config: ConfigType,
     global_powercalc_config: ConfigType,
@@ -284,15 +286,13 @@ async def create_discovery_manager_instance(
     exclude_self_usage = discovery_config.get(CONF_EXCLUDE_SELF_USAGE, False)
     enable_autodiscovery = discovery_config.get(CONF_ENABLED, True)
 
-    manager = DiscoveryManager(
+    return DiscoveryManager(
         hass,
         ha_config,
         exclude_device_types=exclude_device_types,
         exclude_self_usage_profiles=exclude_self_usage,
         enabled=enable_autodiscovery,
     )
-    await manager.setup()
-    return manager
 
 
 def register_services(hass: HomeAssistant) -> None:
