@@ -16,6 +16,6 @@
     "VERSION": "v0.3.0:app"
   },
   "min_voltage": 224.2,
-  "name": "Yeelight Smart LED Bulb W4 Lite (Color)",
+  "name": "Smart LED Bulb W4 Lite (Color)",
   "standby_power": 0.45
 }
