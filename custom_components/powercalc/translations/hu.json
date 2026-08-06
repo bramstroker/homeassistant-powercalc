@@ -971,6 +971,7 @@
           "playbook": "Playbook beállításai",
           "multi_switch": "Többkapcsolós beállítások",
           "real_power": "Valós teljesítmény beállításai",
+          "select_device": "Eszköz",
           "utility_meter_options": "Közüzemi mérő beállításai",
           "wled": "WLED beállításai",
           "cost_options": "Költségbeállítások"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Könyvtári beállítások",
         "description": "Jelenleg a következő könyvtári profil van kiválasztva: \n gyártó: {manufacturer}\n modell: {model}\n\nHa módosítani szeretné a profilt, kattintson a Tovább gombra."
+      },
+      "select_device": {
+        "data": {
+          "device": "Eszköz"
+        },
+        "data_description": {
+          "device": "Az eszköz, amelyhez a Powercalc-entitásokat hozzá kell rendelni"
+        },
+        "description": "Válassza ki azt az eszközt, amelyhez a Powercalc-érzékelőt hozzá kell rendelni.",
+        "title": "Eszköz kiválasztása"
       },
       "linear": {
         "title": "Lineáris beállítások",

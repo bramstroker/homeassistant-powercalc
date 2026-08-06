@@ -551,12 +551,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
         menu = [Step.BASIC_OPTIONS]
         if self.selected_sensor_type == SensorType.VIRTUAL_POWER:
-            if self.strategy and self.should_add_strategy_option_to_menu():
-                strategy_step = STRATEGY_STEP_MAPPING[self.strategy]
-                menu.append(strategy_step)
-            if self.selected_profile:
-                menu.append(Step.LIBRARY_OPTIONS)
-            menu.append(Step.ADVANCED_OPTIONS)
+            menu.extend(self.build_virtual_power_menu())
         if self.selected_sensor_type == SensorType.DAILY_ENERGY:
             menu.append(Step.DAILY_ENERGY)
         if self.selected_sensor_type == SensorType.REAL_POWER:
@@ -571,6 +566,29 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             menu.append(Step.UTILITY_METER_OPTIONS)
 
         return menu
+
+    def build_virtual_power_menu(self) -> list[Step]:
+        """Build the options menu entries specific to virtual power sensors."""
+        menu: list[Step] = []
+        if self.strategy and self.should_add_strategy_option_to_menu():
+            menu.append(STRATEGY_STEP_MAPPING[self.strategy])
+        if self.selected_profile:
+            menu.append(Step.LIBRARY_OPTIONS)
+        if self.should_add_select_device_to_menu():
+            menu.append(Step.SELECT_DEVICE)
+        menu.append(Step.ADVANCED_OPTIONS)
+        return menu
+
+    def should_add_select_device_to_menu(self) -> bool:
+        """Check whether the device selection should be added to the menu."""
+        if not self.selected_profile:
+            return False
+
+        if self.selected_profile.discovery_by == DiscoveryBy.CONFIG_ENTRY:
+            # Only devices of the source config entry are selectable, so there must be something to choose from.
+            return len(self.flow_handlers[FlowType.LIBRARY].get_selectable_devices()) > 1
+
+        return True
 
     def should_add_strategy_option_to_menu(self) -> bool:
         """Check whether the strategy option should be added to the menu."""

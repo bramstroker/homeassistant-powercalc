@@ -4,7 +4,8 @@ from homeassistant import data_entry_flow
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.selector import SelectSelector
+from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.selector import DeviceSelector, SelectSelector
 import pytest
 import voluptuous as vol
 
@@ -235,6 +236,7 @@ async def test_composite_library_profile_options_flow_builds_menu(
     assert result["menu_options"] == [
         Step.BASIC_OPTIONS,
         Step.LIBRARY_OPTIONS,
+        Step.SELECT_DEVICE,
         Step.ADVANCED_OPTIONS,
     ]
 
@@ -352,6 +354,173 @@ async def test_config_entry_discovered_entry_keeps_discovery_filter_in_library_o
     option_values = [option["value"] for option in model_select.config["options"]]
     assert "discovery_type_config_entry" in option_values
     assert "discovery_type_device" not in option_values
+
+
+async def test_change_device_from_options_flow(hass: HomeAssistant) -> None:
+    """The device selected during setup must be changeable from the options flow."""
+    mock_devices(
+        hass,
+        {
+            f"device-{index}": {
+                "config_entry_id": "source-entry",
+                "name": f"Device {index}",
+                "manufacturer": "test",
+                "model": "discovery_type_config_entry",
+            }
+            for index in range(3)
+        },
+    )
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_DEVICE: "device-0",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "discovery_type_config_entry",
+            CONF_NAME: "Shared integration",
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.SELECT_DEVICE)
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    device_select: SelectSelector = result["data_schema"].schema[CONF_DEVICE]
+    assert [option["value"] for option in device_select.config["options"]] == [
+        "device-0",
+        "device-1",
+        "device-2",
+    ]
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_DEVICE: "device-2"},
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_DEVICE] == "device-2"
+
+    registry_entry = er.async_get(hass).async_get("sensor.shared_integration_power")
+    assert registry_entry
+    assert registry_entry.device_id == "device-2"
+
+
+@pytest.mark.parametrize("configured_device", ["selected-device", "removed-device"])
+async def test_select_device_omitted_from_options_menu_when_no_alternative_device(
+    hass: HomeAssistant,
+    configured_device: str,
+) -> None:
+    """Only offer the device selection when there is something to choose from."""
+    mock_devices(
+        hass,
+        {
+            "selected-device": {
+                "config_entry_id": "source-entry",
+                "manufacturer": "test",
+                "model": "discovery_type_config_entry",
+            },
+        },
+    )
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_DEVICE: configured_device,
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "discovery_type_config_entry",
+        },
+    )
+
+    result = await hass.config_entries.options.async_init(entry.entry_id, data=None)
+
+    assert result["type"] == data_entry_flow.FlowResultType.MENU
+    assert Step.SELECT_DEVICE not in result["menu_options"]
+
+
+async def test_change_device_from_options_flow_discovery_by_device(hass: HomeAssistant) -> None:
+    """The source device of a device discovered profile must be changeable from the options flow."""
+    mock_devices(
+        hass,
+        {
+            "device-a": {"manufacturer": "test", "model": "discovery_type_device"},
+            "device-b": {"manufacturer": "test", "model": "discovery_type_device"},
+        },
+    )
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_DEVICE: "device-a",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "discovery_type_device",
+            CONF_NAME: "Some switch",
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.SELECT_DEVICE)
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert isinstance(result["data_schema"].schema[vol.Required(CONF_DEVICE)], DeviceSelector)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_DEVICE: "device-b"},
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_DEVICE] == "device-b"
+
+    registry_entry = er.async_get(hass).async_get("sensor.some_switch_device_power")
+    assert registry_entry
+    assert registry_entry.device_id == "device-b"
+
+
+async def test_change_device_from_options_flow_discovery_by_entity(hass: HomeAssistant) -> None:
+    """Entity discovered profiles can be linked to another device, and unlinked again."""
+    mock_devices(
+        hass,
+        {
+            "source-device": {"manufacturer": "signify", "model": "LCT010"},
+            "other-device": {"manufacturer": "signify", "model": "LCT010"},
+        },
+    )
+    mock_entities_in_registry(hass, {"light.test": {"device_id": "source-device", "platform": "hue"}})
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010",
+            CONF_NAME: "Test",
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.SELECT_DEVICE)
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert isinstance(result["data_schema"].schema[vol.Optional(CONF_DEVICE)], DeviceSelector)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_DEVICE: "other-device"},
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_DEVICE] == "other-device"
+
+    # Submitting the form without a device unlinks it again, so the source entity device is used.
+    result = await initialize_options_flow(hass, entry, Step.SELECT_DEVICE)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], user_input={})
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert CONF_DEVICE not in entry.data
 
 
 async def test_change_sub_profile_options_flow(hass: HomeAssistant) -> None:

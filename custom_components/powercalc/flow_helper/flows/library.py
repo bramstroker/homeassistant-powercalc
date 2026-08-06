@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_DEVICE
 from homeassistant.helpers import selector, translation
+from homeassistant.helpers.device_registry import DeviceEntry
 import voluptuous as vol
 
 from custom_components.powercalc.const import (
@@ -20,7 +21,7 @@ from custom_components.powercalc.const import (
     LIBRARY_URL,
     CalculationStrategy,
 )
-from custom_components.powercalc.device_binding import get_devices_for_config_entry
+from custom_components.powercalc.device_binding import get_devices_for_config_entry, get_related_devices
 from custom_components.powercalc.discovery import (
     get_power_profile_by_source_device,
     get_power_profile_by_source_entity,
@@ -225,32 +226,53 @@ class LibraryFlow:
 
     async def async_step_select_device(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Ask which device should receive the entities created for a config-entry profile."""
-        assert self.flow.source_entity is not None
-        assert self.flow.source_entity.config_entry_id is not None
-        devices = get_devices_for_config_entry(self.flow.hass, self.flow.source_entity.config_entry_id)
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=Step.SELECT_DEVICE,
-                schema=vol.Schema(
-                    {
-                        vol.Required(CONF_DEVICE): selector.SelectSelector(
-                            selector.SelectSelectorConfig(
-                                options=[
-                                    selector.SelectOptionDict(
-                                        value=device.id,
-                                        label=device.name_by_user or device.name or device.id,
-                                    )
-                                    for device in devices
-                                ],
-                                mode=selector.SelectSelectorMode.DROPDOWN,
-                            ),
-                        ),
-                    },
-                ),
+                schema=self.build_select_device_schema(),
                 next_step=Step.POST_LIBRARY,
             ),
             user_input,
         )
+
+    def build_select_device_schema(self) -> vol.Schema:
+        """Build the schema to select the device the Powercalc entities should be linked to."""
+        discovery_by = self.flow.selected_profile.discovery_by if self.flow.selected_profile else DiscoveryBy.ENTITY
+
+        if discovery_by == DiscoveryBy.CONFIG_ENTRY:
+            # The entities can only be linked to one of the devices of the source config entry.
+            return vol.Schema(
+                {
+                    vol.Required(CONF_DEVICE): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=[
+                                selector.SelectOptionDict(
+                                    value=device.id,
+                                    label=device.name_by_user or device.name or device.id,
+                                )
+                                for device in self.get_selectable_devices()
+                            ],
+                            mode=selector.SelectSelectorMode.DROPDOWN,
+                        ),
+                    ),
+                },
+            )
+
+        # For device discovery the device is also the source of the profile, so it cannot be cleared.
+        # For entity discovery clearing it falls back to the device of the source entity.
+        marker = vol.Required if discovery_by == DiscoveryBy.DEVICE else vol.Optional
+        return vol.Schema({marker(CONF_DEVICE): selector.DeviceSelector()})
+
+    def get_selectable_devices(self) -> list[DeviceEntry]:
+        """Return the devices belonging to the same config entry as the source of the profile."""
+        config_entry_id = self.flow.source_entity.config_entry_id if self.flow.source_entity else None
+        if config_entry_id:
+            return get_devices_for_config_entry(self.flow.hass, config_entry_id)
+
+        # The options flow has no reference to the source config entry anymore,
+        # so resolve the candidates from the currently configured device instead.
+        device_id: str | None = self.flow.sensor_config.get(CONF_DEVICE)
+        return get_related_devices(self.flow.hass, device_id) if device_id else []
 
     async def _async_next_strategy_step(self, profile: PowerProfile) -> ConfigFlowResult | None:
         """Return the next step needed to configure the calculation strategy, or None when nothing is left to ask."""
@@ -640,6 +662,14 @@ class LibraryOptionsFlow(LibraryFlow):
     def __init__(self, flow: PowercalcOptionsFlow) -> None:
         super().__init__(flow)
         self.flow: PowercalcOptionsFlow = flow
+
+    async def async_step_select_device(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Change the device the Powercalc entities are linked to."""
+        return await self.flow.async_handle_options_step(
+            user_input,
+            self.build_select_device_schema(),
+            Step.SELECT_DEVICE,
+        )
 
     async def async_step_library_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the basic options flow."""

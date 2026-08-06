@@ -971,6 +971,7 @@
           "playbook": "Options du playbook",
           "multi_switch": "Options du multi-interrupteur",
           "real_power": "Options de puissance réelle",
+          "select_device": "Appareil",
           "utility_meter_options": "Options des compteurs de services publics",
           "wled": "Options WLED",
           "cost_options": "Options de coût"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Options de bibliothèque",
         "description": "Le profil de bibliothèque suivant est actuellement sélectionné : \n fabricant : {manufacturer}\n modèle : {model}\n\nSi vous souhaitez changer de profil, cliquez sur Suivant."
+      },
+      "select_device": {
+        "data": {
+          "device": "Appareil"
+        },
+        "data_description": {
+          "device": "L’appareil auquel les entités Powercalc doivent être associées"
+        },
+        "description": "Sélectionnez l’appareil auquel le capteur Powercalc doit être associé.",
+        "title": "Sélectionner un appareil"
       },
       "linear": {
         "title": "Options linéaires",

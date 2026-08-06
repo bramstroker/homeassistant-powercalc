@@ -971,6 +971,7 @@
           "playbook": "Opțiuni de playbook",
           "multi_switch": "Opțiuni de comutare multiplă",
           "real_power": "Opțiuni de putere reală",
+          "select_device": "Dispozitiv",
           "utility_meter_options": "Opțiuni de contor de utilitate",
           "wled": "Opțiuni WLED",
           "cost_options": "Opțiuni de cost"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Opțiuni de bibliotecă",
         "description": "În prezent este selectat următorul profil de bibliotecă: \n producator: {manufacturer}\n model: {model}\n\nDacă doriți să schimbați profilul, faceți clic pe următorul."
+      },
+      "select_device": {
+        "data": {
+          "device": "Dispozitiv"
+        },
+        "data_description": {
+          "device": "Dispozitivul la care trebuie asociate entitățile Powercalc"
+        },
+        "description": "Selectați dispozitivul la care trebuie asociat senzorul Powercalc.",
+        "title": "Selectați dispozitivul"
       },
       "linear": {
         "title": "Opțiuni liniare",

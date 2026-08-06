@@ -971,6 +971,7 @@
           "playbook": "Playbook-alternativ",
           "multi_switch": "Alternativ för flera switchar",
           "real_power": "Verkliga kraftalternativ",
+          "select_device": "Enhet",
           "utility_meter_options": "Alternativ för verktygsmätare",
           "wled": "WLED alternativ",
           "cost_options": "Kostnadsalternativ"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Biblioteksalternativ",
         "description": "För närvarande är följande biblioteksprofil vald: \n tillverkare: {manufacturer}\n modell: {model}\n\nOm du vill ändra profilen klickar du på nästa."
+      },
+      "select_device": {
+        "data": {
+          "device": "Enhet"
+        },
+        "data_description": {
+          "device": "Enheten som Powercalc-entiteterna ska länkas till"
+        },
+        "description": "Välj enheten som Powercalc-sensorn ska länkas till.",
+        "title": "Välj enhet"
       },
       "linear": {
         "title": "Linjära alternativ",

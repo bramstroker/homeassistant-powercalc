@@ -971,6 +971,7 @@
           "playbook": "Playbook-indstillinger",
           "multi_switch": "Indstillinger for multikontakt",
           "real_power": "Indstillinger for fysisk effekt",
+          "select_device": "Enhed",
           "utility_meter_options": "Indstillinger for forbrugsmålere",
           "wled": "WLED-indstillinger",
           "cost_options": "Omkostningsindstillinger"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Biblioteksindstillinger",
         "description": "I øjeblikket er følgende biblioteksprofil valgt: \n producent: {manufacturer}\n model: {model}\n\nHvis du vil ændre profilen, skal du klikke på næste."
+      },
+      "select_device": {
+        "data": {
+          "device": "Enhed"
+        },
+        "data_description": {
+          "device": "Den enhed, som Powercalc-entiteterne skal knyttes til"
+        },
+        "description": "Vælg den enhed, som Powercalc-sensoren skal knyttes til.",
+        "title": "Vælg enhed"
       },
       "linear": {
         "title": "Lineære indstillinger",

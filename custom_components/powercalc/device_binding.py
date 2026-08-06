@@ -79,6 +79,18 @@ def get_devices_for_config_entry(hass: HomeAssistant, config_entry_id: str) -> l
     ]
 
 
+def get_related_devices(hass: HomeAssistant, device_id: str) -> list[DeviceEntry]:
+    """Return all non-composite devices belonging to the same config entry as the given device."""
+    device = device_registry.async_get(hass).async_get(device_id)
+    if device is None:
+        return []
+
+    devices: dict[str, DeviceEntry] = {}
+    for config_entry_id in get_config_entry_ids(device):
+        devices.update({related.id: related for related in get_devices_for_config_entry(hass, config_entry_id)})
+    return list(devices.values())
+
+
 def attach_configured_device_entry(
     hass: HomeAssistant,
     sensor_config: ConfigType,

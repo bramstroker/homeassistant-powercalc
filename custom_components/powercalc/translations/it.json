@@ -971,6 +971,7 @@
           "playbook": "Opzioni del playbook",
           "multi_switch": "Opzioni multiinterruttore",
           "real_power": "Opzioni di potenza reale",
+          "select_device": "Dispositivo",
           "utility_meter_options": "Opzioni del contatore di utilità",
           "wled": "Opzioni WLED",
           "cost_options": "Opzioni di costo"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Opzioni della libreria",
         "description": "Attualmente è selezionato il seguente profilo libreria: \n produttore: {manufacturer}\n modello: {model}\n\nSe desideri modificare il profilo, fai clic su Avanti."
+      },
+      "select_device": {
+        "data": {
+          "device": "Dispositivo"
+        },
+        "data_description": {
+          "device": "Il dispositivo a cui devono essere collegate le entità Powercalc"
+        },
+        "description": "Seleziona il dispositivo a cui deve essere collegato il sensore Powercalc.",
+        "title": "Seleziona dispositivo"
       },
       "linear": {
         "title": "Opzioni lineari",
