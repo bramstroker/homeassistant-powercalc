@@ -7,6 +7,9 @@ class Loader(Protocol):
     async def initialize(self) -> None:
         """Initialize the loader."""
 
+    def get_discovery_ignored_domains(self) -> set[str]:
+        """Get integration domains excluded from discovery."""
+
     async def get_manufacturer_listing(
         self,
         device_types: set[DeviceType] | None,
