@@ -1060,3 +1060,68 @@ async def test_discovery_compatible_integrations(
     assert len(mock_calls) == 1
     assert mock_calls[0][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
     assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == "light.hue_light"
+
+
+async def test_discovery_ignored_domain_filters_entities(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """Entities provided by a globally ignored integration must not be discovered."""
+    mock_entities_in_registry(
+        hass,
+        {
+            "light.ignored": {"platform": "ignored", "device_id": "ignored-device"},
+            "light.allowed": {"platform": "hue", "device_id": "allowed-device"},
+        },
+    )
+    mock_devices(
+        hass,
+        {
+            "ignored-device": {"manufacturer": "test", "model": "compatible_integrations"},
+            "allowed-device": {"manufacturer": "test", "model": "compatible_integrations"},
+        },
+    )
+
+    with patch(
+        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_ignored_domains",
+        return_value={"ignored"},
+    ):
+        await run_powercalc_setup(hass)
+
+    assert len(mock_flow_init.mock_calls) == 1
+    assert mock_flow_init.mock_calls[0][2]["data"][CONF_ENTITY_ID] == "light.allowed"
+
+
+async def test_discovery_ignored_domain_filters_devices(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """Devices belonging to a globally ignored integration must not be discovered."""
+    ignored_entry = MockConfigEntry(domain="ignored")
+    ignored_entry.add_to_hass(hass)
+    allowed_entry = MockConfigEntry(domain="allowed")
+    allowed_entry.add_to_hass(hass)
+    mock_devices(
+        hass,
+        {
+            "ignored-device": {
+                "config_entry_id": ignored_entry.entry_id,
+                "manufacturer": "test",
+                "model": "discovery_type_device",
+            },
+            "allowed-device": {
+                "config_entry_id": allowed_entry.entry_id,
+                "manufacturer": "test",
+                "model": "discovery_type_device",
+            },
+        },
+    )
+
+    with patch(
+        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_ignored_domains",
+        return_value={"ignored"},
+    ):
+        await run_powercalc_setup(hass)
+
+    assert len(mock_flow_init.mock_calls) == 1
+    assert mock_flow_init.mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_allowed-device"

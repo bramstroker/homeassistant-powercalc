@@ -14,6 +14,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
 import pytest
 
+from custom_components.powercalc.const import LIBRARY_DISCOVERY_IGNORED_DOMAINS
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
@@ -143,6 +144,12 @@ async def test_get_manufacturer_listing(remote_loader: RemoteLoader) -> None:
     assert ("signify", "Signify") in manufacturers
     assert len(manufacturers) > 40
     assert ("signify", "Signify") in await remote_loader.get_manufacturer_listing(None, DiscoveryBy.DEVICE)
+
+
+async def test_get_discovery_ignored_domains(remote_loader: RemoteLoader) -> None:
+    remote_loader.library_contents[LIBRARY_DISCOVERY_IGNORED_DOMAINS] = ["ignored", "other"]
+
+    assert remote_loader.get_discovery_ignored_domains() == {"ignored", "other"}
 
 
 async def test_get_model_listing(remote_loader: RemoteLoader) -> None:

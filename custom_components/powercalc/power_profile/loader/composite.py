@@ -15,6 +15,10 @@ class CompositeLoader(Loader):
         for loader in self.loaders:
             await loader.initialize()
 
+    def get_discovery_ignored_domains(self) -> set[str]:
+        """Get all integration domains excluded by the combined libraries."""
+        return {domain for loader in self.loaders for domain in loader.get_discovery_ignored_domains()}
+
     async def get_manufacturer_listing(
         self,
         device_types: set[DeviceType] | None,

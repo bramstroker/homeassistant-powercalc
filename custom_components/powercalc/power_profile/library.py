@@ -52,6 +52,11 @@ class ProfileLibrary:
     async def initialize(self) -> None:
         await self._loader.initialize()
 
+    @property
+    def discovery_ignored_domains(self) -> set[str]:
+        """Get integration domains globally excluded from discovery."""
+        return self._loader.get_discovery_ignored_domains()
+
     @staticmethod
     @singleton("powercalc_library")
     async def factory(hass: HomeAssistant) -> ProfileLibrary:

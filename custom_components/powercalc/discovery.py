@@ -204,11 +204,16 @@ class DiscoveryManager:
         discovery_type: DiscoveryBy,
     ) -> None:
         """Generalized discovery procedure for entities and devices."""
+        library = await self._get_library()
+        ignored_domains = library.discovery_ignored_domains
         for source in source_provider():
             log_identifier = str(
                 getattr(source, "entity_id", getattr(source, "id", getattr(source, "entry_id", "unknown"))),
             )
             try:
+                if self._is_domain_ignored(source, ignored_domains):
+                    _LOGGER.debug("%s: Integration domain is ignored, skipping discovery", log_identifier)
+                    continue
                 source_entity = source_creator(source)
                 model_info = await self.extract_model_info_from_device_info(
                     source_entity.entity_entry or source_entity.device_entry,
@@ -339,6 +344,23 @@ class DiscoveryManager:
             power_profiles.append(profile)
 
         return power_profiles
+
+    def _is_domain_ignored(self, source: _DiscoverySourceT, ignored_domains: set[str]) -> bool:
+        """Return whether a discovery source belongs to a globally ignored integration domain."""
+        if not ignored_domains:
+            return False
+
+        if isinstance(source, er.RegistryEntry):
+            return source.platform in ignored_domains
+        if isinstance(source, ConfigEntry):
+            return source.domain in ignored_domains
+
+        config_entry_id = next(iter(source.config_entries), None)
+        if config_entry_id is None:  # pragma: no cover
+            return False
+
+        config_entry = self.hass.config_entries.async_get_entry(config_entry_id)
+        return config_entry is not None and config_entry.domain in ignored_domains
 
     async def init_wled_flow(self, model_info: ModelInfo, source_entity: SourceEntity) -> None:
         """Initialize the discovery flow for a WLED light."""

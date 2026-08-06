@@ -31,6 +31,7 @@ DATA_DIR = f"{PROJECT_ROOT}/profile_library"
 REPO_OWNER = "bramstroker"
 REPO_NAME = "homeassistant-powercalc"
 MAX_CONCURRENT_FILE_TASKS = 50
+DISCOVERY_IGNORED_DOMAINS: list[str] = []
 
 @dataclass
 class Author:
@@ -92,6 +93,7 @@ async def generate_library_json(model_listing: list[dict]) -> None:
         manufacturer["models"].append(mapped_dict)
 
     json_data = {
+        "discovery_ignored_domains": DISCOVERY_IGNORED_DOMAINS,
         "manufacturers": list(manufacturers.values()),
     }
 
