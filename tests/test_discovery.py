@@ -1012,41 +1012,41 @@ async def test_removing_entry_releases_all_related_device_discovery_keys(hass: H
     discovery_manager.initialize_existing_entries()
     linked_device = dr.async_get(hass).async_get("linked-device-1")
     assert linked_device is not None
-    source_entity = discovery_manager.create_device_source(linked_device)
+    candidate = next(discovery_manager._create_device_candidates([linked_device]))  # noqa: SLF001
 
-    assert discovery_manager._is_already_discovered(source_entity, "pc_linked-device-1")  # noqa: SLF001
+    assert discovery_manager._is_already_discovered(candidate, "pc_linked-device-1")  # noqa: SLF001
 
     discovery_manager.remove_initialized_flow(entry)
 
-    assert not discovery_manager._is_already_discovered(source_entity, "pc_linked-device-1")  # noqa: SLF001
+    assert not discovery_manager._is_already_discovered(candidate, "pc_linked-device-1")  # noqa: SLF001
 
 
 @requires_linked_devices
-async def test_discovery_for_devices_sharing_identifiers_without_configured_device(
+async def test_discovery_deduplicates_devices_sharing_identifiers(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    """Devices sharing identifiers must still be discovered when none of them is setup yet."""
+    """Only one representation of a linked physical device should be discovered."""
     _mock_linked_devices(hass)
 
     await run_powercalc_setup(hass)
 
     unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
-    assert unique_ids == {"pc_linked-device-0", "pc_linked-device-1"}
+    assert unique_ids == {"pc_linked-device-0"}
 
 
 @requires_composite_devices
-async def test_discovery_for_devices_split_from_unconfigured_composite_device(
+async def test_discovery_deduplicates_devices_split_from_unconfigured_composite(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    """Split devices must still be discovered when no Powercalc entry exists for the composite."""
+    """Only one split representation of an unconfigured composite device should be discovered."""
     _mock_split_devices(hass)
 
     await run_powercalc_setup(hass)
 
     unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
-    assert unique_ids == {"pc_split-device-0", "pc_split-device-1"}
+    assert unique_ids == {"pc_split-device-0"}
 
 
 async def test_powercalc_sensors_are_ignored_for_discovery(
@@ -1377,11 +1377,11 @@ async def test_discovery_ignored_domain_filters_entities(
     assert mock_flow_init.mock_calls[0][2]["data"][CONF_ENTITY_ID] == "light.allowed"
 
 
-async def test_discovery_ignored_domain_filters_devices(
+async def test_discovery_ignored_domain_is_fallback_for_unrelated_devices(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    """Devices belonging to a globally ignored integration must not be discovered."""
+    """An ignored integration remains eligible when it is the only representation of a device."""
     ignored_entry = MockConfigEntry(domain="ignored")
     ignored_entry.add_to_hass(hass)
     allowed_entry = MockConfigEntry(domain="allowed")
@@ -1408,5 +1408,81 @@ async def test_discovery_ignored_domain_filters_devices(
     ):
         await run_powercalc_setup(hass)
 
-    assert len(mock_flow_init.mock_calls) == 1
-    assert mock_flow_init.mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_allowed-device"
+    unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
+    assert unique_ids == {"pc_ignored-device", "pc_allowed-device"}
+
+
+@requires_linked_devices
+async def test_discovery_prefers_non_ignored_device_representation(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """A matching non-ignored integration should win over an ignored representation."""
+    ignored_entry = MockConfigEntry(domain="ignored")
+    ignored_entry.add_to_hass(hass)
+    allowed_entry = MockConfigEntry(domain="allowed")
+    allowed_entry.add_to_hass(hass)
+    mock_devices(
+        hass,
+        {
+            "ignored-device": {
+                "config_entry_id": ignored_entry.entry_id,
+                "manufacturer": "test",
+                "model": "discovery_type_device",
+                "connections": {(dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff")},
+            },
+            "allowed-device": {
+                "config_entry_id": allowed_entry.entry_id,
+                "manufacturer": "test",
+                "model": "discovery_type_device",
+                "connections": {(dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff")},
+            },
+        },
+    )
+
+    with patch(
+        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_ignored_domains",
+        return_value={"ignored"},
+    ):
+        await run_powercalc_setup(hass)
+
+    unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
+    assert unique_ids == {"pc_allowed-device"}
+
+
+@requires_linked_devices
+async def test_discovery_uses_ignored_device_when_preferred_representation_has_no_profile(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """An ignored representation should be the fallback when preferred devices do not match a profile."""
+    ignored_entry = MockConfigEntry(domain="ignored")
+    ignored_entry.add_to_hass(hass)
+    allowed_entry = MockConfigEntry(domain="allowed")
+    allowed_entry.add_to_hass(hass)
+    mock_devices(
+        hass,
+        {
+            "ignored-device": {
+                "config_entry_id": ignored_entry.entry_id,
+                "manufacturer": "test",
+                "model": "discovery_type_device",
+                "connections": {(dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff")},
+            },
+            "allowed-device": {
+                "config_entry_id": allowed_entry.entry_id,
+                "manufacturer": "test",
+                "model": "unsupported",
+                "connections": {(dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff")},
+            },
+        },
+    )
+
+    with patch(
+        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_ignored_domains",
+        return_value={"ignored"},
+    ):
+        await run_powercalc_setup(hass)
+
+    unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
+    assert unique_ids == {"pc_ignored-device"}

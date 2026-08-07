@@ -312,9 +312,15 @@ class DiscoveryManager:
         """Discover profiles and create flows for normalized candidates."""
         library = await self._get_library()
         ignored_domains = library.discovery_ignored_domains
-        for candidate in candidates:
+        ordered_candidates = sorted(
+            candidates,
+            key=lambda candidate: (
+                candidate.discovery_type == DiscoveryBy.DEVICE and bool(candidate.integration_domains & ignored_domains)
+            ),
+        )
+        for candidate in ordered_candidates:
             try:
-                if candidate.integration_domains & ignored_domains:
+                if candidate.discovery_type != DiscoveryBy.DEVICE and candidate.integration_domains & ignored_domains:
                     _LOGGER.debug(
                         "%s: Integration domain is ignored, skipping discovery",
                         candidate.log_identifier,
@@ -339,7 +345,7 @@ class DiscoveryManager:
                     candidate, match.power_profiles[0] if match.power_profiles else None
                 )
 
-                if self._is_already_discovered(source_entity, unique_id):
+                if self._is_already_discovered(candidate, unique_id):
                     _LOGGER.debug(
                         "%s: Already setup with discovery, skipping new discovery (unique_id=%s)",
                         candidate.log_identifier,
@@ -852,13 +858,18 @@ class DiscoveryManager:
                 if isinstance(item, dict | list):
                     yield from self._iter_entity_ids(item)
 
-    def _is_already_discovered(self, source_entity: SourceEntity, unique_id: str) -> bool:
+    def _is_already_discovered(self, candidate: DiscoveryCandidate, unique_id: str) -> bool:
         """Prevent duplicate discovery flows."""
+        source_entity = candidate.source_entity
         unique_ids_to_check = {
             key for key in (unique_id, source_entity.entity_id, source_entity.unique_id) if key is not None
         }
         if unique_id.startswith("pc_"):
             unique_ids_to_check.add(unique_id[3:])
+
+        if candidate.discovery_type == DiscoveryBy.DEVICE and source_entity.device_entry:
+            unique_ids_to_check.update(get_related_device_ids(self.hass, source_entity.device_entry.id))
+
         unique_ids_to_check.update({f"pc_{uid}" for uid in unique_ids_to_check})
 
         return not (
