@@ -10,6 +10,11 @@
 
 Keep unrelated working-tree changes intact.
 
+## Git conventions
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) for commit
+messages, for example: `refactor: simplify discovery flow`.
+
 ## Change-specific rules
 
 ### Translations
