@@ -31,7 +31,7 @@ DATA_DIR = f"{PROJECT_ROOT}/profile_library"
 REPO_OWNER = "bramstroker"
 REPO_NAME = "homeassistant-powercalc"
 MAX_CONCURRENT_FILE_TASKS = 50
-DISCOVERY_IGNORED_DOMAINS: list[str] = []
+DISCOVERY_IGNORED_DOMAINS: list[str] = ["unifi"]
 
 @dataclass
 class Author:
