@@ -16,6 +16,6 @@
     "VERSION": "v0.3.0:app"
   },
   "min_voltage": 119.45,
-  "name": "Lightinginside Matter RGBCW A19 E26 Smart Bulb",
+  "name": "Matter RGBCW A19 E26 Smart Bulb",
   "standby_power": 0.22
 }
