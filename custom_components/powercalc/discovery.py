@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from enum import StrEnum
@@ -9,12 +10,12 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER, ConfigEntry
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant
+from homeassistant.core import CALLBACK_TYPE, HassJob, HomeAssistant
 from homeassistant.helpers import discovery_flow
 import homeassistant.helpers.device_registry as dr
 from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
-from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers.event import async_call_later, async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.loader import IntegrationNotFound, async_get_integration
 
@@ -36,8 +37,8 @@ from .const import (
 from .device_binding import (
     get_config_entry_ids,
     get_first_device_for_config_entry,
+    get_non_composite_devices,
     get_related_device_ids,
-    is_composite_device_id,
 )
 from .group_include.filter import (
     CategoryFilter,
@@ -51,10 +52,23 @@ from .group_include.filter import (
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import SUPPORTED_DOMAINS, DeviceType, DiscoveryBy, PowerProfile
+from .power_profile.loader.protocol import ModelMetadata
+from .power_profile.power_profile import (
+    SUPPORTED_DOMAINS,
+    DeviceType,
+    DiscoveryBy,
+    PowerProfile,
+    is_device_type_supported_for_entity,
+)
 
 _LOGGER = logging.getLogger(__name__)
 _DiscoverySourceT = TypeVar("_DiscoverySourceT", er.RegistryEntry, dr.DeviceEntry, ConfigEntry)
+
+# Give Home Assistant a moment to settle before the first scan. Discovery walks the whole entity
+# and device registry, which other integrations are still filling while they set up. Starting a
+# little later keeps startup responsive and lets one pass see a more complete picture.
+DISCOVERY_DELAY = timedelta(seconds=10)
+REDISCOVERY_INTERVAL = timedelta(hours=2)
 
 
 def get_discovery_manager(hass: HomeAssistant) -> DiscoveryManager:
@@ -72,7 +86,7 @@ async def _get_power_profile_by_source(
 ) -> PowerProfile | None:
     """Look up a power profile for a source entity, discovered either by entity or by device."""
     discovery_manager = get_discovery_manager(hass)
-    model_info = await discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry)
+    model_info = discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry)
     if not model_info:
         return None
     profiles = await discovery_manager.find_power_profiles(model_info, source_entity, discovery_by)
@@ -114,41 +128,82 @@ class DiscoveryManager:
     ) -> None:
         self.hass = hass
         self.ha_config = ha_config
-        self.power_profiles: dict[str, PowerProfile | None] = {}
-        self.manually_configured_entities: list[str] | None = None
+        self.manually_configured_entities: set[str] | None = None
         self.initialized_flows: set[str] = set()
         self.library: ProfileLibrary | None = None
         self._exclude_device_types = exclude_device_types or []
         self._exclude_self_usage_profiles = exclude_self_usage_profiles or False
-        self._cancel_rediscover_interval: CALLBACK_TYPE | None = None
+        self._cancel_library_update_interval: CALLBACK_TYPE | None = None
+        self._cancel_initial_discovery: CALLBACK_TYPE | None = None
+        # Model info per device id, only valid for the duration of a single discovery run.
+        self._device_model_info: dict[str, ModelInfo | None] = {}
         self._status = DiscoveryStatus.NOT_STARTED if enabled else DiscoveryStatus.DISABLED
 
     async def setup(self) -> None:
-        """Setup the discovery manager. Start initial discovery and setup interval based rediscovery."""
+        """Setup the discovery manager. Schedule the library update interval and initial discovery.
+
+        The library update is scheduled regardless of the discovery status. Startup deliberately
+        loads the library from local storage, so this interval is what keeps it up to date, and
+        manually configured sensors depend on the library just as much as discovered ones.
+        `start_discovery` is a no-op while discovery is disabled.
+        """
+        self._schedule_library_update()
+
         if self._status == DiscoveryStatus.DISABLED:
-            _LOGGER.debug("Discovery manager is disabled, skipping setup")
+            _LOGGER.debug("Discovery manager is disabled, skipping initial discovery")
             return
 
-        await self.start_discovery()
+        self._schedule_initial_discovery()
+
+    def _schedule_library_update(self) -> None:
+        """Refresh the library from the download API every REDISCOVERY_INTERVAL, then rediscover."""
 
         async def _rediscover(_: datetime) -> None:
-            """Rediscover entities."""
+            """Update the library and rediscover entities."""
             await self.update_library_and_rediscover()
 
-        if self._cancel_rediscover_interval:  # pragma: no cover
-            self._cancel_rediscover_interval()
+        if self._cancel_library_update_interval:
+            self._cancel_library_update_interval()
 
-        self._cancel_rediscover_interval = async_track_time_interval(
+        self._cancel_library_update_interval = async_track_time_interval(
             self.hass,
             _rediscover,
-            timedelta(hours=2),
+            REDISCOVERY_INTERVAL,
             cancel_on_shutdown=True,
+        )
+
+    def _schedule_initial_discovery(self) -> None:
+        """Start the first discovery run after DISCOVERY_DELAY, instead of during setup."""
+        if self._cancel_initial_discovery:  # pragma: no cover
+            self._cancel_initial_discovery()
+
+        async def _start_discovery(_: datetime) -> None:
+            self._cancel_initial_discovery = None
+            # Nothing awaits this task, so handle failures here instead of leaving Home Assistant
+            # to report them as an unretrieved task exception.
+            try:
+                await self.start_discovery()
+            except asyncio.CancelledError:
+                if not self.hass.is_stopping:
+                    raise
+                _LOGGER.debug("Initial discovery cancelled, Home Assistant is stopping")
+            except Exception:
+                if self.hass.is_stopping:
+                    _LOGGER.debug("Initial discovery aborted, Home Assistant is stopping")
+                else:
+                    _LOGGER.exception("Error during initial discovery")
+
+        _LOGGER.debug("Scheduling initial discovery in %s seconds", DISCOVERY_DELAY.total_seconds())
+        self._cancel_initial_discovery = async_call_later(
+            self.hass,
+            DISCOVERY_DELAY,
+            HassJob(_start_discovery, "powercalc initial discovery", cancel_on_shutdown=True),
         )
 
     async def update_library_and_rediscover(self) -> None:
         """Update the library and rediscover entities."""
         library = await self._get_library()
-        await library.initialize()
+        await library.initialize(prefer_cached=False)
         await self.start_discovery()
 
     async def start_discovery(self) -> None:
@@ -160,25 +215,29 @@ class DiscoveryManager:
             _LOGGER.debug("Discovery already in progress, skipping new discovery run")
             return
         self._status = DiscoveryStatus.IN_PROGRESS
-        await self.initialize_existing_entries()
+        try:
+            await self.initialize_existing_entries()
 
-        _LOGGER.debug("Start auto discovery")
+            _LOGGER.debug("Start auto discovery")
 
-        _LOGGER.debug("Start entity discovery")
-        await self.perform_discovery(self.get_entities, self.create_entity_source, DiscoveryBy.ENTITY)
+            _LOGGER.debug("Start entity discovery")
+            await self.perform_discovery(self.get_entities, self.create_entity_source, DiscoveryBy.ENTITY)
 
-        _LOGGER.debug("Start device discovery")
-        await self.perform_discovery(self.get_devices, self.create_device_source, DiscoveryBy.DEVICE)
+            _LOGGER.debug("Start device discovery")
+            await self.perform_discovery(self.get_devices, self.create_device_source, DiscoveryBy.DEVICE)
 
-        _LOGGER.debug("Start config entry discovery")
-        await self.perform_discovery(
-            self.get_config_entries,
-            self.create_config_entry_source,
-            DiscoveryBy.CONFIG_ENTRY,
-        )
+            _LOGGER.debug("Start config entry discovery")
+            await self.perform_discovery(
+                self.get_config_entries,
+                self.create_config_entry_source,
+                DiscoveryBy.CONFIG_ENTRY,
+            )
 
-        _LOGGER.debug("Done auto discovery")
-        self._status = DiscoveryStatus.FINISHED
+            _LOGGER.debug("Done auto discovery")
+        finally:
+            # The registries can change between runs, so never carry the lookups over to the next one.
+            self._device_model_info.clear()
+            self._status = DiscoveryStatus.FINISHED
 
     async def initialize_existing_entries(self) -> None:
         """Build a list of config entries which are already setup, to prevent duplicate discovery flows"""
@@ -241,7 +300,7 @@ class DiscoveryManager:
                     _LOGGER.debug("%s: Integration domain is ignored, skipping discovery", log_identifier)
                     continue
                 source_entity = source_creator(source)
-                model_info = await self.extract_model_info_from_device_info(
+                model_info = self.extract_model_info_from_device_info(
                     source_entity.entity_entry or source_entity.device_entry,
                 )
                 if not model_info:
@@ -348,13 +407,18 @@ class DiscoveryManager:
             return None
 
         power_profiles = []
-        for model_info in models:
+        for found_model in models:
+            metadata = await library.get_model_metadata(found_model)
+            if metadata and not self._matches_metadata(metadata, source_entity, discovery_type):
+                continue
+
             profile = await get_power_profile(
                 self.hass,
                 {},
                 source_entity,
-                model_info=model_info,
+                model_info=found_model,
                 process_variables=False,
+                model_resolved=True,
             )
             if not profile or profile.discovery_by != discovery_type:  # pragma: no cover
                 continue
@@ -377,6 +441,26 @@ class DiscoveryManager:
             power_profiles.append(profile)
 
         return power_profiles
+
+    def _matches_metadata(
+        self,
+        metadata: ModelMetadata,
+        source_entity: SourceEntity,
+        discovery_type: DiscoveryBy,
+    ) -> bool:
+        """Check the library index before building a profile, to skip models which can never match.
+
+        Only rejects on properties the index is authoritative for. Everything it does not carry,
+        such as `only_self_usage` and `compatible_integrations`, is still checked on the profile
+        itself, so this can only save work, never change the outcome.
+        """
+        if metadata.discovery_by != discovery_type:
+            return False
+        if metadata.device_type in self._exclude_device_types:
+            return False
+        if discovery_type == DiscoveryBy.ENTITY and source_entity.entity_entry is not None:
+            return is_device_type_supported_for_entity(metadata.device_type, source_entity.entity_entry)
+        return True
 
     def _is_domain_ignored(self, source: _DiscoverySourceT, ignored_domains: set[str]) -> bool:
         """Return whether a discovery source belongs to a globally ignored integration domain."""
@@ -465,18 +549,13 @@ class DiscoveryManager:
 
     def get_devices(self) -> list[dr.DeviceEntry]:
         """Fetch device entries."""
-        return [
-            device
-            for device in dr.async_get(self.hass).devices.values()
-            if not is_composite_device_id(self.hass, device.id)
-        ]
+        return get_non_composite_devices(self.hass)
 
     def get_config_entries(self) -> list[ConfigEntry]:
         """Fetch config entries which have at least one non-composite device."""
         config_entry_ids = {
             config_entry_id
-            for device in dr.async_get(self.hass).devices.values()
-            if not is_composite_device_id(self.hass, device.id)
+            for device in get_non_composite_devices(self.hass)
             for config_entry_id in get_config_entry_ids(device)
         }
         return [
@@ -490,10 +569,14 @@ class DiscoveryManager:
         self._status = DiscoveryStatus.NOT_STARTED
 
     async def disable(self) -> None:
-        """Disable the discovery."""
-        if self._cancel_rediscover_interval:
-            self._cancel_rediscover_interval()
-            self._cancel_rediscover_interval = None
+        """Disable the discovery.
+
+        The library update interval is deliberately kept running: manually configured sensors
+        still need up to date profiles. `start_discovery` returns early while disabled.
+        """
+        if self._cancel_initial_discovery:
+            self._cancel_initial_discovery()
+            self._cancel_initial_discovery = None
         self._status = DiscoveryStatus.DISABLED
         self.initialized_flows = set()
         flows = self.hass.config_entries.flow.async_progress_by_handler(DOMAIN)
@@ -502,7 +585,7 @@ class DiscoveryManager:
                 continue  # pragma: no cover
             self.hass.config_entries.flow.async_abort(flow["flow_id"])
 
-    async def extract_model_info_from_device_info(
+    def extract_model_info_from_device_info(
         self,
         entry: er.RegistryEntry | dr.DeviceEntry | None,
     ) -> ModelInfo | None:
@@ -513,9 +596,9 @@ class DiscoveryManager:
         log_identifier = entry.entity_id if isinstance(entry, er.RegistryEntry) else entry.id
 
         if isinstance(entry, er.RegistryEntry):
-            model_info = await self.get_model_information_from_entity(entry)
+            model_info = self.get_model_information_from_entity(entry)
         else:
-            model_info = await self.get_model_information_from_device(entry)
+            model_info = self.get_model_information_from_device(entry)
         if not model_info:
             _LOGGER.debug(
                 "%s: Cannot autodiscover model, manufacturer or model unknown from device registry",
@@ -543,7 +626,7 @@ class DiscoveryManager:
         return model_info
 
     @staticmethod
-    async def get_model_information_from_device(device_entry: dr.DeviceEntry) -> ModelInfo | None:
+    def get_model_information_from_device(device_entry: dr.DeviceEntry) -> ModelInfo | None:
         """See if we have enough information in device registry to automatically set up the power sensor."""
         if device_entry.manufacturer is None or device_entry.model is None:
             return None
@@ -561,16 +644,20 @@ class DiscoveryManager:
 
         return ModelInfo(manufacturer, model, model_id)
 
-    async def get_model_information_from_entity(self, entity_entry: er.RegistryEntry) -> ModelInfo | None:
+    def get_model_information_from_entity(self, entity_entry: er.RegistryEntry) -> ModelInfo | None:
         """See if we have enough information in device registry to automatically setup the power sensor."""
-        if entity_entry.device_id is None:
-            return None
-        device_registry = dr.async_get(self.hass)
-        device_entry = device_registry.async_get(entity_entry.device_id)
-        if device_entry is None:
+        device_id = entity_entry.device_id
+        if device_id is None:
             return None
 
-        return await self.get_model_information_from_device(device_entry)
+        # All entities of a device resolve to the same model info, so only look it up once per run.
+        if device_id in self._device_model_info:
+            return self._device_model_info[device_id]
+
+        device_entry = dr.async_get(self.hass).async_get(device_id)
+        model_info = self.get_model_information_from_device(device_entry) if device_entry else None
+        self._device_model_info[device_id] = model_info
+        return model_info
 
     async def _init_entity_discovery(
         self,
@@ -648,12 +735,14 @@ class DiscoveryManager:
         """Check if user have setup powercalc sensors for a given entity_id.
         Either with the YAML or GUI method.
         """
-        if not self.manually_configured_entities:
+        # Explicit None check: when nothing is configured manually the result is an empty set,
+        # which would otherwise be reloaded for every single entity.
+        if self.manually_configured_entities is None:
             self.manually_configured_entities = self._load_manually_configured_entities()
 
         return entity_id in self.manually_configured_entities
 
-    def _load_manually_configured_entities(self) -> list[str]:
+    def _load_manually_configured_entities(self) -> set[str]:
         """Looks at the YAML and GUI config entries for all the configured entity_id's."""
         entities = []
 
@@ -682,7 +771,9 @@ class DiscoveryManager:
             ],
         )
 
-        return entities
+        # A YAML `entity_id` can hold a list of entity ids, for example for the composite strategy.
+        # Those are collected as nested lists, which never matched a single entity id anyway.
+        return {entity_id for entity_id in entities if isinstance(entity_id, str)}
 
     def _find_entity_ids_in_yaml_config(self, search_dict: ConfigType) -> list[str]:
         """Takes a dict with nested lists and dicts,

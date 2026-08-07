@@ -7,7 +7,7 @@ from typing import Any, cast
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.power_profile.error import LibraryLoadingError
-from custom_components.powercalc.power_profile.loader.protocol import Loader
+from custom_components.powercalc.power_profile.loader.protocol import Loader, ModelMetadata
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
@@ -20,8 +20,8 @@ class LocalLoader(Loader):
         self._hass = hass
         self._manufacturer_model_listing: dict[str, dict[str, PowerProfile]] = {}
 
-    async def initialize(self) -> None:
-        """Initialize the loader."""
+    async def initialize(self, prefer_cached: bool = False) -> None:
+        """Initialize the loader. Local profiles are read from disk, so nothing is ever cached remotely."""
         if not self._is_custom_directory:
             await self._hass.async_add_executor_job(self._load_custom_library)
 
@@ -138,6 +138,15 @@ class LocalLoader(Loader):
     async def find_model_migration(self, manufacturer: str, model: str) -> str | None:
         """Local custom libraries do not support metadata-driven legacy profile migrations."""
         return None
+
+    async def get_model_metadata(self, manufacturer: str, model: str) -> ModelMetadata | None:
+        """Return discovery metadata from the already parsed local profile."""
+        models = self._manufacturer_model_listing.get(manufacturer.lower())
+        profile = models.get(model.lower()) if models else None
+        if profile is None or profile.device_type is None:
+            return None
+
+        return ModelMetadata(device_type=profile.device_type, discovery_by=profile.discovery_by)
 
     def _load_custom_library(self) -> None:
         """Loading custom models and aliases from file system.

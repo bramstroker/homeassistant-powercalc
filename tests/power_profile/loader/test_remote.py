@@ -419,6 +419,67 @@ async def test_fallback_to_local_library_fails(
         await loader.initialize()
 
 
+async def test_prefer_cached_skips_download(
+    hass: HomeAssistant,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """With a library.json in local storage, initialize must not touch the download API."""
+    shutil.copy(get_library_json_path(), hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json"))
+
+    # Any request to the library endpoint fails the test, nothing may be downloaded.
+    mock_aioresponse.get(ENDPOINT_LIBRARY, repeat=True, exception=AssertionError("library.json was downloaded"))
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+    await loader.initialize(prefer_cached=True)
+
+    assert "signify" in loader.model_lookup
+
+
+async def test_prefer_cached_downloads_when_no_local_copy(
+    hass: HomeAssistant,
+    mock_library_json_response: None,
+) -> None:
+    """On a fresh install there is nothing cached yet, so it must still download."""
+    with contextlib.suppress(FileNotFoundError):
+        os.remove(hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json"))
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+    await loader.initialize(prefer_cached=True)
+
+    assert "signify" in loader.model_lookup
+
+
+async def test_library_update_refreshes_from_remote(
+    hass: HomeAssistant,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """The periodic update must re-download, even though a local copy exists."""
+    shutil.copy(get_library_json_path(), hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json"))
+
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=200,
+        payload={
+            "manufacturers": [
+                {
+                    "name": "acme",
+                    "dir_name": "acme",
+                    "models": [{"id": "widget", "device_type": "light", "hash": "dummy"}],
+                },
+            ],
+        },
+    )
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+    await loader.initialize()
+
+    assert "acme" in loader.model_lookup
+    assert "signify" not in loader.model_lookup
+
+
 async def test_fallback_to_local_profile(
     mock_aioresponse: aioresponses,
     remote_loader: RemoteLoader,
@@ -577,7 +638,7 @@ async def test_find_model(
         "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.load_library_json",
     ) as mock_load_lib:
 
-        def load_library_json() -> dict:
+        def load_library_json(*_args: object) -> dict:
             library_path = (
                 get_test_config_dir(f"library_mock/{library_dir}/library.json")
                 if library_dir
@@ -712,7 +773,7 @@ async def test_min_version(hass: HomeAssistant, version: str, expect_model: bool
         "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.load_library_json",
     ) as mock_load_lib:
 
-        def load_library_json() -> dict:
+        def load_library_json(*_args: object) -> dict:
             with open(get_test_config_dir("library_mock/min_version/library.json")) as f:
                 return json.load(f)
 

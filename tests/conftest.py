@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Generator
+import contextlib
 from functools import lru_cache
 import inspect
 import json
@@ -15,12 +16,14 @@ import aioresponses.core
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.storage import STORAGE_DIR
 import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
 )
 
 from custom_components.powercalc.const import (
+    BUILT_IN_LIBRARY_DIR,
     CONF_FIXED,
     CONF_POWER,
     CONF_SENSOR_TYPE,
@@ -75,6 +78,12 @@ def configure_hass_config_dir(request: SubRequest) -> None:
         return
     hass = request.getfixturevalue("hass")
     hass.config.config_dir = get_test_config_dir()
+
+    # The test .storage directory is scratch that survives between runs. The loader prefers a
+    # cached library.json when there is one, so drop it to keep every test starting from the
+    # same state a clean checkout has. Downloaded profiles are kept, they are only a cache.
+    with contextlib.suppress(FileNotFoundError):
+        os.remove(hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, "library.json"))
 
 
 @pytest.fixture(autouse=True)
@@ -141,5 +150,6 @@ def mock_remote_loader(request: SubRequest) -> Generator:
     ):
         mock_download.side_effect = side_effect
 
-        mock_load_lib.side_effect = _load_test_library_json
+        # Swallow the prefer_cached argument, the test library is always served from disk.
+        mock_load_lib.side_effect = lambda *_args, **_kwargs: _load_test_library_json()
         yield

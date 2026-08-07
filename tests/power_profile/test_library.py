@@ -82,6 +82,16 @@ async def test_find_models(hass: HomeAssistant, model_info: ModelInfo, expected_
     assert [model.model for model in models] == expected_models
 
 
+async def test_factory_prefers_cached_library(hass: HomeAssistant) -> None:
+    """Startup must load the library from local storage, never blocking on the download API."""
+    with patch(
+        "custom_components.powercalc.power_profile.library.ProfileLibrary.initialize",
+    ) as mock_initialize:
+        await ProfileLibrary.factory(hass)
+
+    mock_initialize.assert_called_once_with(prefer_cached=True)
+
+
 async def test_find_model_migration(hass: HomeAssistant) -> None:
     mock_loader = LocalLoader(hass, "")
     mock_loader.find_manufacturers = AsyncMock(return_value={"eglo"})

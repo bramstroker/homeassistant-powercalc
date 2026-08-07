@@ -25,6 +25,7 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.setup import async_setup_component
 import pytest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -59,7 +60,10 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.discovery import (
+    DISCOVERY_DELAY,
+    REDISCOVERY_INTERVAL,
     DiscoveryStatus,
+    get_discovery_manager,
     get_power_profile_by_source_device,
     get_power_profile_by_source_entity,
 )
@@ -747,7 +751,7 @@ async def test_get_model_information(
         mock_device_registry(hass, {str(device_entry.id): device_entry})
     mock_registry(hass, {str(entity_entry.id): entity_entry})
     discovery_manager = DiscoveryManager(hass, {})
-    assert await discovery_manager.get_model_information_from_entity(entity_entry) == model_info
+    assert discovery_manager.get_model_information_from_entity(entity_entry) == model_info
 
 
 async def test_interval_based_rediscovery(
@@ -852,9 +856,11 @@ async def test_composite_devices_are_ignored_for_device_discovery(
     composite_device = mocked_devices["composite-device"]
     discovery_manager = DiscoveryManager(hass, {})
 
-    with patch(
-        "custom_components.powercalc.discovery.is_composite_device_id",
-        side_effect=lambda _hass, device_id: device_id == composite_device.id,
+    with patch.object(
+        dr.async_get(hass),
+        "async_is_composite_device_id",
+        side_effect=lambda device_id: device_id == composite_device.id,
+        create=True,
     ):
         devices = discovery_manager.get_devices()
 
@@ -1102,6 +1108,9 @@ async def test_discovery_enable_runtime(
     hass.config_entries.async_update_entry(entry, data=new_data)
     await hass.async_block_till_done()
 
+    # Enabling discovery at runtime schedules a delayed initial run, same as during setup.
+    await async_advance_time(hass, DISCOVERY_DELAY)
+
     assert len(mock_flow_init.mock_calls) == 1
 
 
@@ -1134,6 +1143,54 @@ async def test_discovery_disable_runtime(
     await hass.async_block_till_done(True)
 
     assert "Start auto discovery" not in caplog.text
+
+
+async def test_library_keeps_updating_when_discovery_disabled(hass: HomeAssistant) -> None:
+    """Startup loads the library from local storage, so the periodic update must run regardless.
+
+    Manually configured sensors rely on the library just as much as discovered ones.
+    """
+    await run_powercalc_setup(hass, {}, {CONF_DISCOVERY: {CONF_ENABLED: False}})
+
+    with patch(
+        "custom_components.powercalc.power_profile.library.ProfileLibrary.initialize",
+    ) as mock_initialize:
+        await async_advance_time(hass, REDISCOVERY_INTERVAL)
+
+    mock_initialize.assert_any_call(prefer_cached=False)
+
+
+async def test_initial_discovery_is_delayed(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """Initial discovery must only start after DISCOVERY_DELAY, to let HA settle first."""
+    mock_device_with_entities(hass, "light.test", "signify", "LCT010")
+
+    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
+    await hass.async_block_till_done()
+
+    assert not mock_flow_init.mock_calls
+
+    await async_advance_time(hass, DISCOVERY_DELAY)
+
+    assert len(mock_flow_init.mock_calls) == 1
+
+
+async def test_pending_initial_discovery_is_cancelled_when_disabled(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """Disabling discovery before the delay elapsed must not leave a run scheduled."""
+    mock_device_with_entities(hass, "light.test", "signify", "LCT010")
+
+    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
+    await hass.async_block_till_done()
+
+    await get_discovery_manager(hass).disable()
+    await async_advance_time(hass, DISCOVERY_DELAY)
+
+    assert not mock_flow_init.mock_calls
 
 
 @pytest.mark.parametrize(

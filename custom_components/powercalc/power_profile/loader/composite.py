@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from custom_components.powercalc.power_profile.loader.protocol import Loader
+from custom_components.powercalc.power_profile.loader.protocol import Loader, ModelMetadata
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy
 
 _LOGGER = logging.getLogger(__name__)
@@ -11,9 +11,9 @@ class CompositeLoader(Loader):
     def __init__(self, loaders: list[Loader]) -> None:
         self.loaders = loaders
 
-    async def initialize(self) -> None:
+    async def initialize(self, prefer_cached: bool = False) -> None:
         for loader in self.loaders:
-            await loader.initialize()
+            await loader.initialize(prefer_cached)
 
     def get_discovery_ignored_domains(self) -> set[str]:
         """Get all integration domains excluded by the combined libraries."""
@@ -74,6 +74,15 @@ class CompositeLoader(Loader):
             models.extend(await loader.find_model(manufacturer, search))
 
         return models
+
+    async def get_model_metadata(self, manufacturer: str, model: str) -> ModelMetadata | None:
+        """Return the metadata of the first loader knowing the model, matching load_model precedence."""
+        for loader in self.loaders:
+            metadata = await loader.get_model_metadata(manufacturer, model)
+            if metadata:
+                return metadata
+
+        return None
 
     async def find_model_migration(self, manufacturer: str, model: str) -> str | None:
         """Find the canonical model id for a legacy profile id."""
