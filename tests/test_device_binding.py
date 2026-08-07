@@ -24,6 +24,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.device_binding import (
     attach_configured_device_entry,
+    get_config_entry_ids,
     get_first_device_for_config_entry,
     get_non_composite_devices,
     get_related_device_ids,
@@ -77,7 +78,9 @@ def test_get_related_device_ids_for_unknown_device(hass: HomeAssistant) -> None:
 def test_get_first_device_for_config_entry(hass: HomeAssistant) -> None:
     device_entry = mock_device(hass, "regular-device", manufacturer=None, model=None)
 
-    assert get_first_device_for_config_entry(hass, device_entry.config_entry_id) == device_entry
+    config_entry_id = next(iter(get_config_entry_ids(device_entry)))
+
+    assert get_first_device_for_config_entry(hass, config_entry_id) == device_entry
 
 
 def test_attach_configured_device_entry_keeps_source_entity_when_device_is_missing(hass: HomeAssistant) -> None:
