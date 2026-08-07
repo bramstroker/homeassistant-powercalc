@@ -25,10 +25,10 @@ class FakeClient:
     def commit_sha(self, ref: str) -> str:
         return f"sha-of-{ref}"
 
-    def commit_shas_since(self, base_sha: str | None, head_ref: str) -> list[str]:  # noqa: ARG002
+    def commit_shas_since(self, base_sha: str | None, head_ref: str) -> list[str]:
         return ["sha1", "sha2"]
 
-    def merged_pull_requests(self, commit_shas: list[str]) -> list[dict[str, Any]]:  # noqa: ARG002
+    def merged_pull_requests(self, commit_shas: list[str]) -> list[dict[str, Any]]:
         return self._pull_requests
 
     def create_release(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -177,4 +177,5 @@ def test_supporters_failure_does_not_block_drafting(monkeypatch: pytest.MonkeyPa
 def test_no_stable_release_is_a_noop(monkeypatch: pytest.MonkeyPatch) -> None:
     client = FakeClient(releases=[release("v1.0.0-beta.0", prerelease=True)], pull_requests=[pr(10, "fix: x")])
     run(monkeypatch, client, channel="stable", head_ref="master")
-    assert not client.created and not client.updated
+    assert not client.created
+    assert not client.updated

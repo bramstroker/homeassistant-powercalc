@@ -43,13 +43,15 @@ repos:
         language: script
         types: [python]
         require_serial: true
-        files: ^custom_components/powercalc
+        files: ^(custom_components/powercalc|\.github/scripts|utils/library)/
+        exclude: /tests/
       - id: ty
         name: ty
-        entry: uv run ty check custom_components/powercalc
+        entry: uv run ty check custom_components/powercalc .github/scripts utils/library
         language: system
         pass_filenames: false
-        files: ^custom_components/powercalc/.*\.py$
+        files: ^(custom_components/powercalc|\.github/scripts|utils/library)/.*\.py$
+        exclude: /tests/
       - id: uv-lock
         name: uv lock --check
         entry: uv lock --check

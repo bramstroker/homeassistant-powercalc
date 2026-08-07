@@ -1,0 +1,30 @@
+name: OSV scan
+
+# Scans every lockfile in the repository (root uv.lock, the measure and visualize
+# projects, and the npm lockfiles) against the OSV database. Findings land in
+# Security > Code scanning so they can be triaged and dismissed there, rather
+# than turning into a recurring red cross on an unfixable upstream advisory.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+  push:
+    branches:
+      - master
+    paths:
+      - '**/package-lock.json'
+      - '**/uv.lock'
+      - '.github/workflows/osv-scanner.yml'
+
+permissions: {}
+
+jobs:
+  scan:
+    permissions:
+      # Required by the reusable workflow to upload its SARIF report.
+      actions: read
+      contents: read
+      security-events: write
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@8deb546fdb875b9996d27d4950be7312dac076a1 # v2.5.0
+    with:
+      fail-on-vuln: false

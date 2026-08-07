@@ -1,6 +1,7 @@
 from collections.abc import Generator
 import json
 import os
+from typing import Any
 
 PROFILE_DIRECTORY = os.path.join(os.path.dirname(__file__), "../../profile_library")
 
@@ -10,7 +11,7 @@ def _path_part(path_parts: list[str], index: int) -> str | None:
     return path_parts[index] if len(path_parts) > index else None
 
 
-def _read_model_json(directory: str, root: str, file_name: str) -> dict:
+def _read_model_json(directory: str, root: str, file_name: str) -> dict[str, Any]:
     """Read a single model.json file and enrich it with the profile identifiers from its path."""
     full_path = os.path.join(root, file_name)
     path_parts = os.path.relpath(root, directory).split(os.sep)
@@ -27,7 +28,7 @@ def _read_model_json(directory: str, root: str, file_name: str) -> dict:
     }
 
 
-def find_model_json_files(directory: str | None = None) -> Generator:
+def find_model_json_files(directory: str | None = None) -> Generator[dict[str, Any]]:
     """Recursively find all model.json files in a directory."""
     if directory is None:
         directory = PROFILE_DIRECTORY

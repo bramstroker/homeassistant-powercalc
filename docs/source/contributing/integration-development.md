@@ -8,6 +8,24 @@ So it's highly recommended to use the tests to verify your changes. See the [Run
 
 ## Setting up the development environment
 
+### Using the dev container (recommended)
+
+The repository ships a dev container that installs everything and runs Home Assistant with Powercalc already loaded, so you don't have to set up Home Assistant Core yourself.
+
+1. Fork the repository, then open your fork either in VS Code with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension (**Reopen in Container**) or in a [GitHub Codespace](https://github.com/features/codespaces).
+2. Wait for the container to build. It installs [uv](https://docs.astral.sh/uv/), the pinned Python version, all dependencies and the git hooks.
+3. Start Home Assistant:
+
+    ```bash
+    script/develop.sh
+    ```
+
+    Home Assistant becomes available on [http://localhost:8123](http://localhost:8123) with debug logging enabled for Powercalc. The configuration lives in a `config/` directory that is not tracked by git. Restart Home Assistant to pick up code changes.
+
+See [.devcontainer/README.md](https://github.com/bramstroker/homeassistant-powercalc/blob/master/.devcontainer/README.md) for more details.
+
+### Manual setup
+
 1. Setup a development environment for Home Assistant Core. Follow the instructions on the [Home Assistant Developer Documentation](https://developers.home-assistant.io/docs/development_environment).
 2. Fork and clone the Powercalc repository:
 

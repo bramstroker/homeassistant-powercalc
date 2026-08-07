@@ -27,6 +27,7 @@ jobs:
   prepare:
     name: Prepare release pull request
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       actions: write
       contents: write

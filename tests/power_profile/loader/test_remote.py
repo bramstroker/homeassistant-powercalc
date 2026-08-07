@@ -5,6 +5,7 @@ import logging
 import os
 import re
 import shutil
+from typing import cast
 from unittest.mock import AsyncMock, Mock, patch
 
 from aiohttp import ClientError
@@ -18,7 +19,12 @@ from custom_components.powercalc.const import LIBRARY_DISCOVERY_IGNORED_DOMAINS
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
-from custom_components.powercalc.power_profile.loader.remote import ENDPOINT_DOWNLOAD, ENDPOINT_LIBRARY, RemoteLoader
+from custom_components.powercalc.power_profile.loader.remote import (
+    ENDPOINT_DOWNLOAD,
+    ENDPOINT_LIBRARY,
+    LibraryModel,
+    RemoteLoader,
+)
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy
 from tests.common import get_test_config_dir, get_test_profile_dir
 
@@ -159,6 +165,15 @@ async def test_get_model_listing(remote_loader: RemoteLoader) -> None:
     device_models = await remote_loader.get_model_listing("signify", None, DiscoveryBy.DEVICE)
     assert ("BSB002", "Hue Bridge V2") in device_models
     assert ("LCT010", "Hue White and Color Ambiance A19 E26 (Gen 3)") not in device_models
+
+
+async def test_get_model_metadata_rejects_invalid_device_type(remote_loader: RemoteLoader) -> None:
+    remote_loader.model_infos["test/invalid"] = cast(
+        "LibraryModel",
+        {"id": "invalid", "hash": "hash", "device_type": "invalid"},
+    )
+
+    assert await remote_loader.get_model_metadata("test", "invalid") is None
 
 
 async def test_find_model_migration(hass: HomeAssistant, mock_aioresponse: aioresponses) -> None:

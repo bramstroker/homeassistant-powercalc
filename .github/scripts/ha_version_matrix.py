@@ -11,7 +11,6 @@ that did not exist yet when it was published.
 
 import json
 import re
-import sys
 import time
 import urllib.error
 import urllib.request
@@ -95,4 +94,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
