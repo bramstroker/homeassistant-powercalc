@@ -34,7 +34,9 @@ jobs:
           cache-dependency-glob: |
             pyproject.toml
             uv.lock
-      - run: uv sync --locked
+        # The type checkers now cover utils/library and .github/scripts, so the
+        # groups holding their third-party imports have to be installed too.
+      - run: uv sync --locked --group library --group profile-library
       - uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
         with:
           cache: true
