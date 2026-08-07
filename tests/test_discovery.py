@@ -21,7 +21,7 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -75,6 +75,7 @@ from .common import (
     mock_devices,
     mock_entities_in_registry,
     requires_composite_devices,
+    requires_linked_devices,
     run_powercalc_setup,
     set_states,
 )
@@ -910,6 +911,62 @@ async def test_no_discovery_for_devices_split_from_configured_composite_device(
     await run_powercalc_setup(hass)
 
     assert not mock_flow_init.mock_calls
+
+
+def _mock_linked_devices(hass: HomeAssistant) -> None:
+    """Mock two devices registered by different integrations for the same physical device."""
+    mock_devices(
+        hass,
+        {
+            f"linked-device-{index}": {
+                "config_entry_id": f"source-entry-{index}",
+                "manufacturer": "test",
+                "model": "discovery_type_device",
+                "identifiers": {("test", "shared-serial")},
+                "connections": {(dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff")},
+            }
+            for index in range(2)
+        },
+    )
+
+
+@requires_linked_devices
+async def test_no_discovery_for_devices_sharing_identifiers_with_configured_device(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """A device sharing identifiers with an already configured device must not be discovered."""
+    _mock_linked_devices(hass)
+
+    await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Linked device",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "discovery_type_device",
+            CONF_DEVICE: "linked-device-0",
+        },
+    )
+
+    await run_powercalc_setup(hass)
+
+    assert not mock_flow_init.mock_calls
+
+
+@requires_linked_devices
+async def test_discovery_for_devices_sharing_identifiers_without_configured_device(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """Devices sharing identifiers must still be discovered when none of them is setup yet."""
+    _mock_linked_devices(hass)
+
+    await run_powercalc_setup(hass)
+
+    unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
+    assert unique_ids == {"pc_linked-device-0", "pc_linked-device-1"}
 
 
 @requires_composite_devices
