@@ -971,6 +971,7 @@
           "playbook": "Možnosti playbooku",
           "multi_switch": "Možnosti viacerých prepínačov",
           "real_power": "Skutočné možnosti napájania",
+          "select_device": "Zariadenie",
           "utility_meter_options": "Možnosti elektromera",
           "wled": "WLED možnosti",
           "cost_options": "Možnosti nákladov"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Možnosti knižnice",
         "description": "Momentálne je vybratý nasledujúci profil knižnice: \n výrobca: {manufacturer}\n model: {model}\n\nAk chcete profil zmeniť, kliknite na tlačidlo Ďalej."
+      },
+      "select_device": {
+        "data": {
+          "device": "Zariadenie"
+        },
+        "data_description": {
+          "device": "Zariadenie, ku ktorému majú byť priradené entity Powercalc"
+        },
+        "description": "Vyberte zariadenie, ku ktorému má byť priradený senzor Powercalc.",
+        "title": "Vyberte zariadenie"
       },
       "linear": {
         "title": "lineárne možnosti",

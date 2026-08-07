@@ -971,6 +971,7 @@
           "playbook": "Playbookin vaihtoehdot",
           "multi_switch": "Useita kytkinvaihtoehtoja",
           "real_power": "Todelliset tehovaihtoehdot",
+          "select_device": "Laite",
           "utility_meter_options": "Kulutusmittarin asetukset",
           "wled": "WLED vaihtoehdot",
           "cost_options": "Kustannusvaihtoehdot"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Kirjaston vaihtoehdot",
         "description": "Tällä hetkellä on valittuna seuraava kirjastoprofiili: \n valmistaja: {manufacturer}\n malli: {model}\n\nJos haluat vaihtaa profiilia, napsauta Seuraava."
+      },
+      "select_device": {
+        "data": {
+          "device": "Laite"
+        },
+        "data_description": {
+          "device": "Laite, johon Powercalc-entiteetit liitetään"
+        },
+        "description": "Valitse laite, johon Powercalc-anturi liitetään.",
+        "title": "Valitse laite"
       },
       "linear": {
         "title": "Lineaariset vaihtoehdot",

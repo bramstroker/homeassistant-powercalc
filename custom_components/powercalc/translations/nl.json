@@ -971,6 +971,7 @@
           "playbook": "Playbook opties",
           "multi_switch": "Multi switch opties",
           "real_power": "Opties voor werkelijk vermogen",
+          "select_device": "Apparaat",
           "utility_meter_options": "Nutsmeter opties",
           "wled": "WLED opties",
           "cost_options": "Kosten opties"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Bibliotheek opties",
         "description": "Momenteel is het huidige profiel geselecteerd: \nfabrikant: {manufacturer}\nmodel: {model}\n\nAls u het profiel wilt wijzigen, klikt u op volgende."
+      },
+      "select_device": {
+        "data": {
+          "device": "Apparaat"
+        },
+        "data_description": {
+          "device": "Het apparaat waaraan de Powercalc-entiteiten moeten worden gekoppeld"
+        },
+        "description": "Selecteer het apparaat waaraan de Powercalc-sensor moet worden gekoppeld.",
+        "title": "Apparaat selecteren"
       },
       "linear": {
         "title": "Lineaire opties",

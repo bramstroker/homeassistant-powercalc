@@ -971,6 +971,7 @@
           "playbook": "Playbook-alternativer",
           "multi_switch": "Alternativer for flere brytere",
           "real_power": "Innstillinger for målt effekt",
+          "select_device": "Enhet",
           "utility_meter_options": "Innstillinger for forbruksmåler",
           "wled": "WLED-innstillinger",
           "cost_options": "Kostnadsalternativer"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Alternativer for bibliotek",
         "description": "For øyeblikket er følgende bibliotekprofil valgt: \n produsent: {manufacturer}\n modell: {model}\n\nHvis du vil endre profilen, klikker du på neste."
+      },
+      "select_device": {
+        "data": {
+          "device": "Enhet"
+        },
+        "data_description": {
+          "device": "Enheten Powercalc-entitetene skal knyttes til"
+        },
+        "description": "Velg enheten som Powercalc-sensoren skal knyttes til.",
+        "title": "Velg enhet"
       },
       "linear": {
         "title": "Lineære alternativer",

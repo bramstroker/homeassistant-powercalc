@@ -971,6 +971,7 @@
           "playbook": "Opcje playbook",
           "multi_switch": "Opcje wieloprzełącznika",
           "real_power": "Opcje rzeczywistej mocy",
+          "select_device": "Urządzenie",
           "utility_meter_options": "Opcje licznika mediów",
           "wled": "Opcje WLED",
           "cost_options": "Opcje kosztów"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Opcje biblioteki",
         "description": "Obecnie wybrany jest następujący profil biblioteki: \n producent: {manufacturer}\n model: {model}\n\nJeśli chcesz zmienić profil, kliknij dalej."
+      },
+      "select_device": {
+        "data": {
+          "device": "Urządzenie"
+        },
+        "data_description": {
+          "device": "Urządzenie, z którym mają zostać powiązane encje Powercalc"
+        },
+        "description": "Wybierz urządzenie, z którym ma zostać powiązany czujnik Powercalc.",
+        "title": "Wybierz urządzenie"
       },
       "linear": {
         "title": "Opcje liniowe",

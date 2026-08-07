@@ -971,6 +971,7 @@
           "playbook": "Opções de sequência",
           "multi_switch": "Opções de interruptor múltiplo",
           "real_power": "Opções de potência real",
+          "select_device": "Dispositivo",
           "utility_meter_options": "Opções de contador de serviços",
           "wled": "Opções WLED",
           "cost_options": "Opções de custo"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Opções da biblioteca",
         "description": "Atualmente está selecionado o seguinte perfil da biblioteca: \n fabricante: {manufacturer}\n modelo: {model}\n\nSe quiser alterar o perfil, clique em seguinte."
+      },
+      "select_device": {
+        "data": {
+          "device": "Dispositivo"
+        },
+        "data_description": {
+          "device": "O dispositivo ao qual as entidades do Powercalc devem ser associadas"
+        },
+        "description": "Selecione o dispositivo ao qual o sensor do Powercalc deve ser associado.",
+        "title": "Selecionar dispositivo"
       },
       "linear": {
         "title": "Opções lineares",

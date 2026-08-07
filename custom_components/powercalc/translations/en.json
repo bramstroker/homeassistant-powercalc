@@ -971,6 +971,7 @@
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
+          "select_device": "Device",
           "utility_meter_options": "Utility meter options",
           "wled": "WLED options",
           "cost_options": "Cost options"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Library options",
         "description": "Currently the following library profile is selected: \n manufacturer: {manufacturer}\n model: {model}\n\nIf you want to change the profile, click next."
+      },
+      "select_device": {
+        "data": {
+          "device": "Device"
+        },
+        "data_description": {
+          "device": "The device the Powercalc entities should be linked to"
+        },
+        "description": "Select the device to which the Powercalc sensor should be linked.",
+        "title": "Select device"
       },
       "linear": {
         "title": "Linear options",

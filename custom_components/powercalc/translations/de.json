@@ -971,6 +971,7 @@
           "playbook": "Playbook-Optionen",
           "multi_switch": "Mehrfachschalter-Optionen",
           "real_power": "Optionen für reale Leistung",
+          "select_device": "Gerät",
           "utility_meter_options": "Verbrauchszähler-Optionen",
           "wled": "WLED Einstellung",
           "cost_options": "Kostenoptionen"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "Bibliotheksoptionen",
         "description": "Derzeit ist folgendes Bibliotheksprofil ausgewählt: \n Hersteller: {manufacturer}\n Modell: {model}\n\nWenn du das Profil ändern möchtest, klicke auf Weiter."
+      },
+      "select_device": {
+        "data": {
+          "device": "Gerät"
+        },
+        "data_description": {
+          "device": "Das Gerät, mit dem die Powercalc-Entitäten verknüpft werden sollen"
+        },
+        "description": "Wählen Sie das Gerät aus, mit dem der Powercalc-Sensor verknüpft werden soll.",
+        "title": "Gerät auswählen"
       },
       "linear": {
         "title": "Lineare Optionen",

@@ -971,6 +971,7 @@
           "playbook": "运行方案选项",
           "multi_switch": "多路开关选项",
           "real_power": "实际功率选项",
+          "select_device": "设备",
           "utility_meter_options": "公用事业计量表选项",
           "wled": "WLED 选项",
           "cost_options": "费用选项"
@@ -979,6 +980,16 @@
       "library_options": {
         "title": "配置文件库选项",
         "description": "当前选择了以下配置文件库中的配置文件：\n 制造商：{manufacturer}\n 型号：{model}\n\n如需更改配置文件，请点击“下一步”。"
+      },
+      "select_device": {
+        "data": {
+          "device": "设备"
+        },
+        "data_description": {
+          "device": "Powercalc 实体应关联到的设备"
+        },
+        "description": "选择 Powercalc 传感器应关联到的设备。",
+        "title": "选择设备"
       },
       "linear": {
         "title": "线性选项",
