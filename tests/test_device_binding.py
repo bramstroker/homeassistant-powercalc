@@ -22,7 +22,14 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SensorType,
 )
-from custom_components.powercalc.device_binding import attach_configured_device_entry, is_composite_device_id
+from custom_components.powercalc.device_binding import (
+    attach_configured_device_entry,
+    get_config_entry_ids,
+    get_first_device_for_config_entry,
+    get_non_composite_devices,
+    get_related_device_ids,
+    is_composite_device_id,
+)
 from tests.common import (
     create_mock_config_entry,
     mock_device,
@@ -50,6 +57,30 @@ def test_device_is_not_composite_when_detection_is_unavailable(
     monkeypatch.setattr(DeviceRegistry, "async_is_composite_device_id", None, raising=False)
 
     assert not is_composite_device_id(hass, device_entry.id)
+
+
+def test_get_non_composite_devices_when_detection_is_unavailable(
+    hass: HomeAssistant,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    device_entry = mock_device(hass, "regular-device", manufacturer=None, model=None)
+    monkeypatch.setattr(DeviceRegistry, "async_is_composite_device_id", None, raising=False)
+
+    assert get_non_composite_devices(hass) == [device_entry]
+
+
+def test_get_related_device_ids_for_unknown_device(hass: HomeAssistant) -> None:
+    mock_device_registry(hass)
+
+    assert get_related_device_ids(hass, "missing-device") == {"missing-device"}
+
+
+def test_get_first_device_for_config_entry(hass: HomeAssistant) -> None:
+    device_entry = mock_device(hass, "regular-device", manufacturer=None, model=None)
+
+    config_entry_id = next(iter(get_config_entry_ids(device_entry)))
+
+    assert get_first_device_for_config_entry(hass, config_entry_id) == device_entry
 
 
 def test_attach_configured_device_entry_keeps_source_entity_when_device_is_missing(hass: HomeAssistant) -> None:

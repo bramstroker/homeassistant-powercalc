@@ -8,6 +8,12 @@ on:
       - '.github/scripts/profile_library/validate_model_json.py'
       - '.github/workflows/validate-model-json.yml'
 
+concurrency:
+  # Supersede in-flight runs for the same pull request; every other event gets a
+  # unique group so pushes, schedules and dispatches never cancel or queue each other.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -15,6 +21,7 @@ jobs:
   validate_model_json:
     name: Validate model.json
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout trusted validation code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7

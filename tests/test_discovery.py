@@ -1,3 +1,4 @@
+import asyncio
 from datetime import timedelta
 import logging
 from typing import Any
@@ -1258,6 +1259,36 @@ async def test_initial_discovery_is_delayed(
     await async_advance_time(hass, DISCOVERY_DELAY)
 
     assert len(mock_flow_init.mock_calls) == 1
+
+
+async def test_initial_discovery_propagates_cancellation_while_running(hass: HomeAssistant) -> None:
+    discovery_manager = DiscoveryManager(hass, {})
+
+    with (
+        patch.object(discovery_manager, "start_discovery", side_effect=asyncio.CancelledError),
+        patch("custom_components.powercalc.discovery.async_call_later") as mock_call_later,
+    ):
+        discovery_manager._schedule_initial_discovery()  # noqa: SLF001
+        scheduled_job = mock_call_later.call_args.args[2]
+        with pytest.raises(asyncio.CancelledError):
+            await scheduled_job.target(None)
+
+
+async def test_initial_discovery_logs_unexpected_failure(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    discovery_manager = DiscoveryManager(hass, {})
+
+    with (
+        patch.object(discovery_manager, "start_discovery", side_effect=RuntimeError("boom")),
+        patch("custom_components.powercalc.discovery.async_call_later") as mock_call_later,
+    ):
+        discovery_manager._schedule_initial_discovery()  # noqa: SLF001
+        scheduled_job = mock_call_later.call_args.args[2]
+        await scheduled_job.target(None)
+
+    assert "Error during initial discovery" in caplog.text
 
 
 async def test_pending_initial_discovery_is_cancelled_when_disabled(

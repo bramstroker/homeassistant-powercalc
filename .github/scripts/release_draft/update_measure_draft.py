@@ -96,10 +96,7 @@ class ReleaseDraftDriftError(ValueError):
 
 
 def _touches_measure(files: list[str]) -> bool:
-    return any(
-        filename.startswith(MEASURE_DIRECTORIES) or filename in MEASURE_FILES
-        for filename in files
-    )
+    return any(filename.startswith(MEASURE_DIRECTORIES) or filename in MEASURE_FILES for filename in files)
 
 
 def _only_touches_release_infrastructure(files: list[str]) -> bool:
@@ -130,9 +127,7 @@ def _qualified_pull_requests_since(
         raise ReleaseDraftDriftError(f"could not resolve previous tag {previous_tag}: {error}") from error
     commit_shas = client.commit_shas_since(base_sha, head_ref)
     return [
-        pull_request
-        for pull_request in client.merged_pull_requests(commit_shas)
-        if _qualifies(client, pull_request)
+        pull_request for pull_request in client.merged_pull_requests(commit_shas) if _qualifies(client, pull_request)
     ]
 
 
@@ -148,9 +143,7 @@ def _changelog_release(changelog: str, target_version: str) -> tuple[str, str]:
     headings = list(re.finditer(r"^## (?P<title>.+?)[ \t]*$", normalized, re.MULTILINE))
     target_pattern = re.compile(rf"{re.escape(target_version)}(?:\s+-\s+.+)?")
     target_indexes = [
-        index
-        for index, heading in enumerate(headings)
-        if target_pattern.fullmatch(heading.group("title"))
+        index for index, heading in enumerate(headings) if target_pattern.fullmatch(heading.group("title"))
     ]
     if not target_indexes:
         raise ReleaseDraftDriftError(f"Changelog has no section for target version {target_version}")

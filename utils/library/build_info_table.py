@@ -1,13 +1,14 @@
 from collections.abc import Callable, Mapping
+from typing import Any
 
 import pytablewriter
 
 from utils.library.common import find_model_json_files
 
 
-def build_list(filter_callback: Callable | None, fields: list[str]) -> list[Mapping[str, str]]:
+def build_list(filter_callback: Callable[[dict[str, Any]], bool] | None, fields: list[str]) -> list[Mapping[str, str]]:
     """Count occurrences of each measure_device in all model.json files."""
-    listing = []
+    listing: list[Mapping[str, str]] = []
     for model_data in find_model_json_files():
         json_data = model_data["data"]
         if filter_callback and not filter_callback(json_data):
@@ -26,7 +27,7 @@ def write_md_table(data: list[Mapping[str, str]], output_file: str) -> None:
     """Write the listing data to a Markdown table using pytablewriter."""
     writer = pytablewriter.MarkdownTableWriter()
     writer.table_name = "Device Power Data"
-    fields = data[0].keys()
+    fields = list(data[0].keys())
     writer.headers = fields
     writer.value_matrix = [[row.get(field, "") for field in fields] for row in data]
 

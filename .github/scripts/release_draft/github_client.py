@@ -12,6 +12,8 @@ import urllib.request
 
 API_ROOT = "https://api.github.com"
 PAGE_SIZE = 100
+type JsonObject = dict[str, Any]
+type JsonResponse = JsonObject | list[JsonObject] | None
 
 
 class GitHubClient:
@@ -19,7 +21,7 @@ class GitHubClient:
         self._token = token
         self.repository = repository
 
-    def _request(self, method: str, url: str, payload: dict[str, Any] | None = None) -> Any:
+    def _request(self, method: str, url: str, payload: JsonObject | None = None) -> JsonResponse:
         if url.startswith("/"):
             url = f"{API_ROOT}{url}"
         data = json.dumps(payload).encode("utf-8") if payload is not None else None
@@ -37,12 +39,17 @@ class GitHubClient:
             body = response.read()
         return json.loads(body) if body else None
 
+    def _request_list(self, method: str, url: str) -> list[JsonObject]:
+        """Request an endpoint that is documented to return an array."""
+        response = self._request(method, url)
+        return cast(list[JsonObject], response) if response is not None else []
+
     def _paginate(self, path: str) -> list[dict[str, Any]]:
         items: list[dict[str, Any]] = []
         page = 1
         while True:
             separator = "&" if "?" in path else "?"
-            chunk = self._request("GET", f"{path}{separator}per_page={PAGE_SIZE}&page={page}")
+            chunk = self._request_list("GET", f"{path}{separator}per_page={PAGE_SIZE}&page={page}")
             items.extend(chunk)
             if len(chunk) < PAGE_SIZE:
                 return items
@@ -52,9 +59,9 @@ class GitHubClient:
         """Resolve pushed commits to the merged pull requests they belong to."""
         pull_requests: dict[int, dict[str, Any]] = {}
         for sha in commit_shas:
-            for pull_request in self._request("GET", f"/repos/{self.repository}/commits/{sha}/pulls"):
+            for pull_request in self._request_list("GET", f"/repos/{self.repository}/commits/{sha}/pulls"):
                 if pull_request.get("merged_at") is not None:
-                    pull_requests.setdefault(pull_request["number"], pull_request)
+                    pull_requests.setdefault(int(pull_request["number"]), pull_request)
         return [pull_requests[number] for number in sorted(pull_requests)]
 
     def pull_request_files(self, number: int) -> list[str]:
@@ -63,7 +70,7 @@ class GitHubClient:
 
     def commit_sha(self, ref: str) -> str:
         """Resolve a tag, branch or sha to its commit sha."""
-        commit = self._request("GET", f"/repos/{self.repository}/commits/{ref}")
+        commit = cast(JsonObject, self._request("GET", f"/repos/{self.repository}/commits/{ref}"))
         return str(commit["sha"])
 
     def commit_shas_since(self, base_sha: str | None, head_ref: str) -> list[str]:
@@ -76,7 +83,7 @@ class GitHubClient:
         shas: list[str] = []
         page = 1
         while True:
-            chunk = self._request(
+            chunk = self._request_list(
                 "GET",
                 f"/repos/{self.repository}/commits?sha={head_ref}&per_page={PAGE_SIZE}&page={page}",
             )
@@ -85,7 +92,7 @@ class GitHubClient:
             for commit in chunk:
                 if commit["sha"] == base_sha:
                     return shas
-                shas.append(commit["sha"])
+                shas.append(str(commit["sha"]))
             page += 1
 
     def releases(self) -> list[dict[str, Any]]:

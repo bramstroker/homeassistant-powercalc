@@ -35,6 +35,7 @@ MAX_MONTHLY_NAMES = 5
 
 # ---------- HTTP / pagination helpers ----------
 
+
 def _get(url: str) -> list[dict[str, Any]]:
     """
     Simple GET request helper.
@@ -47,10 +48,11 @@ def _get(url: str) -> list[dict[str, Any]]:
 
     return data
 
+
 # ---------- Data fetchers ----------
 
-def fetch_supporters(
-) -> list[dict[str, Any]]:
+
+def fetch_supporters() -> list[dict[str, Any]]:
     """
     Fetch supporters from Buy Me a Coffee across pages.
 
@@ -59,8 +61,7 @@ def fetch_supporters(
     return [s for s in _get(SUPPORTERS_API) if s.get("name") != "Someone"]
 
 
-def fetch_active_subscriptions(
-) -> list[dict[str, Any]]:
+def fetch_active_subscriptions() -> list[dict[str, Any]]:
     """
     Fetch active subscriptions (memberships)
     """
@@ -71,6 +72,7 @@ def fetch_active_subscriptions(
 
 
 # ---------- grouping helpers ----------
+
 
 def group_supporters_by_tier(
     supporters: list[dict[str, Any]],
@@ -92,7 +94,7 @@ def group_supporters_by_tier(
         coffees_raw = s.get("coffees", 0)
         try:
             coffees = int(coffees_raw)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             continue
         if coffees <= 0:
             continue
@@ -110,7 +112,7 @@ def group_supporters_by_tier(
             continue
 
         # BMC returns most recent first, so slicing keeps that order
-        names = [item.get("name") for item in matches[:max_names_per_tier]]
+        names = [str(name) for item in matches[:max_names_per_tier] if (name := item.get("name"))]
         more = len(matches) > max_names_per_tier
 
         tiered[label] = {"names": names, "more": more}
@@ -130,7 +132,10 @@ def build_monthly_supporters_block(
 
     names: list[str] = []
     for item in subs:
-        names.append(item.get("name"))
+        name = item.get("name")
+        if not name:
+            continue
+        names.append(str(name))
         if len(names) >= max_names:
             break
 
@@ -145,6 +150,7 @@ def build_monthly_supporters_block(
 
 
 # ---------- main assembly ----------
+
 
 def build_supporters_section() -> str:
     """
@@ -174,7 +180,7 @@ def build_supporters_section() -> str:
         return (
             "Supporters powering this project ⚡ 👇\n\n"
             "_No public supporters found yet._\n"
-            f"Support the project at https://buymeacoffee.com/bramski"
+            "Support the project at https://buymeacoffee.com/bramski"
         )
 
     tiered = group_supporters_by_tier(supporters)
@@ -206,7 +212,7 @@ def build_supporters_section() -> str:
         lines.append("")
 
     lines.append("")
-    lines.append(f"Support the project at https://buymeacoffee.com/bramski")
+    lines.append("Support the project at https://buymeacoffee.com/bramski")
 
     return "\n".join(lines)
 

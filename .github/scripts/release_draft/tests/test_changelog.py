@@ -44,7 +44,10 @@ def pr(number: int = 1, title: str = "chore: tidy", labels: list[str] | None = N
 
 def test_label_beats_conventional_type_and_respects_order() -> None:
     # powerprofile is declared before Features, so it wins even with a feat title.
-    assert category_title(pr(title="feat: new bulb", labels=["powerprofile", "feature"]), CATEGORIES) == "💡 Power profiles"
+    assert (
+        category_title(pr(title="feat: new bulb", labels=["powerprofile", "feature"]), CATEGORIES)
+        == "💡 Power profiles"
+    )
 
 
 def test_conventional_type_used_when_no_label_matches() -> None:
@@ -59,12 +62,14 @@ def test_unknown_type_is_uncategorised() -> None:
 
 
 def test_breaking_wins_over_everything() -> None:
-    assert resolve_category(pr(title="feat!: drop legacy", labels=["feature"]), CATEGORIES).title == "💥 Breaking Changes"
+    assert (
+        resolve_category(pr(title="feat!: drop legacy", labels=["feature"]), CATEGORIES).title == "💥 Breaking Changes"
+    )
     assert resolve_category(pr(title="fix: x", labels=["breaking"]), CATEGORIES).title == "💥 Breaking Changes"
 
 
 @pytest.mark.parametrize(
-    ("title", "labels", "breaking"),
+    "title,labels,breaking",
     [
         ("feat!: x", [], True),
         ("fix(core)!: x", [], True),
@@ -82,7 +87,7 @@ def test_is_breaking(title: str, labels: list[str], breaking: bool) -> None:
 
 
 @pytest.mark.parametrize(
-    ("title", "labels", "level"),
+    "title,labels,level",
     [
         ("feat!: x", [], MAJOR),
         ("feat: x", ["breaking"], MAJOR),
@@ -103,7 +108,7 @@ def test_powerprofile_does_not_bump_minor_by_itself() -> None:
 
 
 @pytest.mark.parametrize(
-    ("version", "level", "expected"),
+    "version,level,expected",
     [
         ((1, 2, 3), PATCH, (1, 2, 4)),
         ((1, 2, 3), MINOR, (1, 3, 0)),
