@@ -8,7 +8,7 @@
   "device_type": "light",
   "max_voltage": 123.15,
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Test Plug",
+  "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 1,
