@@ -35,6 +35,6 @@ jobs:
       - uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10
         if: github.ref == 'refs/heads/master'
         with:
-          message: 'chore: generate plots'
+          message: 'chore(profile): generate plots'
           pull: '--rebase --autostash'
           push: 'origin HEAD:master --force'

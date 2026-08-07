@@ -124,7 +124,7 @@ If you already use Git, create a branch in your fork, copy the profile, and push
 ```bash
 git switch -c profile/acme-led1837r5
 git add profile_library/acme/LED1837R5
-git commit -m "Add Acme LED1837R5 power profile"
+git commit -m "feat(profile): add Acme LED1837R5"
 git push --set-upstream origin profile/acme-led1837r5
 ```
 

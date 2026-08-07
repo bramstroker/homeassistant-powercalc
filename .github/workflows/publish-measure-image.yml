@@ -229,7 +229,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "App repository is already up to date"
           else
-            git commit -m "Powercalc Measure ${VERSION}"
+            git commit -m "chore(measure): release ${VERSION}"
             # The token is supplied only for this push instead of being
             # persisted in .git/config by actions/checkout.
             git push "https://x-access-token:${APPS_REPO_TOKEN}@github.com/bramstroker/powercalc-measure-app.git" HEAD

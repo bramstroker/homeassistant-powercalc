@@ -1,10 +1,12 @@
 import asyncio
-from collections.abc import Callable
+from collections import defaultdict
+from collections.abc import Iterable, Iterator
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import StrEnum
 import logging
 import re
-from typing import Any, TypeVar
+from typing import Any
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -36,7 +38,6 @@ from .const import (
 )
 from .device_binding import (
     get_config_entry_ids,
-    get_first_device_for_config_entry,
     get_non_composite_devices,
     get_related_device_ids,
 )
@@ -62,7 +63,6 @@ from .power_profile.power_profile import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-_DiscoverySourceT = TypeVar("_DiscoverySourceT", er.RegistryEntry, dr.DeviceEntry, ConfigEntry)
 
 # Give Home Assistant a moment to settle before the first scan. Discovery walks the whole entity
 # and device registry, which other integrations are still filling while they set up. Starting a
@@ -86,7 +86,8 @@ async def _get_power_profile_by_source(
 ) -> PowerProfile | None:
     """Look up a power profile for a source entity, discovered either by entity or by device."""
     discovery_manager = get_discovery_manager(hass)
-    model_info = discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry)
+    registry_entry = source_entity.device_entry if discovery_by == DiscoveryBy.DEVICE else source_entity.entity_entry
+    model_info = discovery_manager.extract_model_info_from_device_info(registry_entry)
     if not model_info:
         return None
     profiles = await discovery_manager.find_power_profiles(model_info, source_entity, discovery_by)
@@ -112,6 +113,25 @@ class DiscoveryStatus(StrEnum):
     FINISHED = "finished"
 
 
+@dataclass(frozen=True, slots=True)
+class DiscoveryCandidate:
+    """Normalized source considered during a discovery run."""
+
+    source_entity: SourceEntity
+    discovery_type: DiscoveryBy
+    log_identifier: str
+    integration_domains: frozenset[str]
+
+
+@dataclass(frozen=True, slots=True)
+class DiscoveryMatch:
+    """Information needed to create a discovery flow for a candidate."""
+
+    power_profiles: list[PowerProfile] | None = None
+    extra_data: dict[str, Any] | None = None
+    unique_id: str | None = None
+
+
 class DiscoveryManager:
     """This class is responsible for scanning the HA instance for entities and their manufacturer / model info
     It checks if any of these devices is supported in the powercalc library
@@ -128,11 +148,12 @@ class DiscoveryManager:
     ) -> None:
         self.hass = hass
         self.ha_config = ha_config
-        self.manually_configured_entities: set[str] | None = None
-        self.initialized_flows: set[str] = set()
-        self.library: ProfileLibrary | None = None
-        self._exclude_device_types = exclude_device_types or []
-        self._exclude_self_usage_profiles = exclude_self_usage_profiles or False
+        self._manually_configured_entities: set[str] | None = None
+        self._configured_discovery_keys: set[str] = set()
+        self._pending_discovery_keys: set[str] = set()
+        self._library: ProfileLibrary | None = None
+        self._exclude_device_types = set(exclude_device_types or [])
+        self._exclude_self_usage_profiles = exclude_self_usage_profiles
         self._cancel_library_update_interval: CALLBACK_TYPE | None = None
         self._cancel_initial_discovery: CALLBACK_TYPE | None = None
         # Model info per device id, only valid for the duration of a single discovery run.
@@ -216,22 +237,21 @@ class DiscoveryManager:
             return
         self._status = DiscoveryStatus.IN_PROGRESS
         try:
-            await self.initialize_existing_entries()
+            self.initialize_existing_entries()
+
+            devices = self.get_devices()
+            devices_by_config_entry = self._index_devices_by_config_entry(devices)
 
             _LOGGER.debug("Start auto discovery")
 
             _LOGGER.debug("Start entity discovery")
-            await self.perform_discovery(self.get_entities, self.create_entity_source, DiscoveryBy.ENTITY)
+            await self.perform_discovery(self._create_entity_candidates())
 
             _LOGGER.debug("Start device discovery")
-            await self.perform_discovery(self.get_devices, self.create_device_source, DiscoveryBy.DEVICE)
+            await self.perform_discovery(self._create_device_candidates(devices))
 
             _LOGGER.debug("Start config entry discovery")
-            await self.perform_discovery(
-                self.get_config_entries,
-                self.create_config_entry_source,
-                DiscoveryBy.CONFIG_ENTRY,
-            )
+            await self.perform_discovery(self._create_config_entry_candidates(devices_by_config_entry))
 
             _LOGGER.debug("Done auto discovery")
         finally:
@@ -239,26 +259,21 @@ class DiscoveryManager:
             self._device_model_info.clear()
             self._status = DiscoveryStatus.FINISHED
 
-    async def initialize_existing_entries(self) -> None:
+    def initialize_existing_entries(self) -> None:
         """Build a list of config entries which are already setup, to prevent duplicate discovery flows"""
+        self._configured_discovery_keys = self._collect_configured_discovery_keys()
+
+    def _collect_configured_discovery_keys(self, excluded_entry_id: str | None = None) -> set[str]:
+        """Collect discovery keys claimed by existing config entries."""
+        keys: set[str] = set()
         for entry in self.hass.config_entries.async_entries(DOMAIN):
-            if not entry.unique_id:
+            if not entry.unique_id or entry.entry_id == excluded_entry_id:
                 continue  # pragma: no cover
+            keys.update(self._discovery_keys_for_entry(entry))
+        return keys
 
-            self.initialized_flows.add(entry.unique_id)
-            self._initialize_configured_device(entry)
-
-            entity_id = entry.data.get(CONF_ENTITY_ID)
-            if not entity_id or entity_id == DUMMY_ENTITY_ID:
-                continue
-
-            entity = create_source_entity(str(entity_id), self.hass)
-            if entity and entity.device_entry:
-                self.initialized_flows.add(f"pc_{entity.device_entry.id}")
-            self.initialized_flows.add(entity_id)
-
-    def _initialize_configured_device(self, entry: ConfigEntry) -> None:
-        """Mark the device a config entry was setup for as already setup.
+    def _discovery_keys_for_entry(self, entry: ConfigEntry) -> set[str]:
+        """Return all discovery keys claimed by a config entry.
 
         A single physical device can be represented by several device registry entries. HA >=2026.8
         splits devices belonging to multiple config entries into one device per entry, so the entry
@@ -267,60 +282,67 @@ class DiscoveryManager:
         registered by several integrations, in which case they share identifiers or connections.
         All of them are the device the user already configured, so none should be discovered again.
         """
+        keys = {entry.unique_id} if entry.unique_id else set()
+
+        entity_id = entry.data.get(CONF_ENTITY_ID)
+        if entity_id and entity_id != DUMMY_ENTITY_ID:
+            entity_id = str(entity_id)
+            keys.add(entity_id)
+            source_entity = create_source_entity(entity_id, self.hass)
+            if source_entity.device_entry:
+                keys.add(f"pc_{source_entity.device_entry.id}")
+
         device_id = entry.data.get(CONF_DEVICE)
         if not device_id:
-            return
+            return keys
 
         for related_device_id in get_related_device_ids(self.hass, str(device_id)):
-            self.initialized_flows.add(f"pc_{related_device_id}")
+            keys.add(f"pc_{related_device_id}")
+        return keys
 
     def remove_initialized_flow(self, entry: ConfigEntry) -> None:
         """Remove a flow from the initialized flows."""
-        if entry.unique_id:
-            self.initialized_flows.discard(entry.unique_id)
-        entity_id = entry.data.get(CONF_ENTITY_ID)
-        if entity_id:
-            self.initialized_flows.discard(entity_id)
+        self._pending_discovery_keys.difference_update(self._discovery_keys_for_entry(entry))
+        self._configured_discovery_keys = self._collect_configured_discovery_keys(entry.entry_id)
 
     async def perform_discovery(
         self,
-        source_provider: Callable[[], list[_DiscoverySourceT]],
-        source_creator: Callable[[_DiscoverySourceT], SourceEntity],
-        discovery_type: DiscoveryBy,
+        candidates: Iterable[DiscoveryCandidate],
     ) -> None:
-        """Generalized discovery procedure for entities and devices."""
+        """Discover profiles and create flows for normalized candidates."""
         library = await self._get_library()
         ignored_domains = library.discovery_ignored_domains
-        for source in source_provider():
-            log_identifier = str(
-                getattr(source, "entity_id", getattr(source, "id", getattr(source, "entry_id", "unknown"))),
-            )
+        for candidate in candidates:
             try:
-                if self._is_domain_ignored(source, ignored_domains):
-                    _LOGGER.debug("%s: Integration domain is ignored, skipping discovery", log_identifier)
+                if candidate.integration_domains & ignored_domains:
+                    _LOGGER.debug(
+                        "%s: Integration domain is ignored, skipping discovery",
+                        candidate.log_identifier,
+                    )
                     continue
-                source_entity = source_creator(source)
+                source_entity = candidate.source_entity
                 model_info = self.extract_model_info_from_device_info(
                     source_entity.entity_entry or source_entity.device_entry,
                 )
                 if not model_info:
                     continue
 
-                power_profiles = await self.discover_entity(source_entity, model_info, discovery_type)
-                if not power_profiles:
-                    _LOGGER.debug("%s: Model not found in library, skipping discovery", log_identifier)
+                match = await self._find_discovery_match(source_entity, model_info, candidate.discovery_type)
+                if not match:
+                    _LOGGER.debug(
+                        "%s: Model not found in library, skipping discovery",
+                        candidate.log_identifier,
+                    )
                     continue
 
-                unique_id = self.create_unique_id(
-                    source_entity,
-                    discovery_type,
-                    power_profiles[0] if power_profiles else None,
+                unique_id = match.unique_id or self.create_unique_id(
+                    candidate, match.power_profiles[0] if match.power_profiles else None
                 )
 
                 if self._is_already_discovered(source_entity, unique_id):
                     _LOGGER.debug(
                         "%s: Already setup with discovery, skipping new discovery (unique_id=%s)",
-                        log_identifier,
+                        candidate.log_identifier,
                         unique_id,
                     )
                     continue
@@ -329,28 +351,80 @@ class DiscoveryManager:
                     model_info,
                     unique_id,
                     source_entity,
-                    log_identifier,
-                    power_profiles,
-                    {},
+                    candidate.log_identifier,
+                    match.power_profiles,
+                    match.extra_data,
                 )
             except Exception:
                 _LOGGER.exception(
                     "%s: Error during %s discovery",
-                    log_identifier,
-                    discovery_type,
+                    candidate.log_identifier,
+                    candidate.discovery_type,
                 )
 
-    async def discover_entity(
+    async def _find_discovery_match(
         self,
         source_entity: SourceEntity,
         model_info: ModelInfo,
-        discovery_type: DiscoveryBy = DiscoveryBy.ENTITY,
-    ) -> list[PowerProfile] | None:
+        discovery_type: DiscoveryBy,
+    ) -> DiscoveryMatch | None:
+        """Resolve a candidate to either a library profile or a special discovery mode."""
         if source_entity.entity_entry and self.is_wled_light(model_info, source_entity.entity_entry):
-            await self.init_wled_flow(model_info, source_entity)
-            return None
+            if DeviceType.LIGHT in self._exclude_device_types:
+                return None
+            unique_id = (
+                f"pc_{source_entity.device_entry.id}"
+                if source_entity.device_entry
+                else get_or_create_unique_id({}, source_entity, None)
+            )
+            return DiscoveryMatch(extra_data={CONF_MODE: CalculationStrategy.WLED}, unique_id=unique_id)
 
-        return await self.find_power_profiles(model_info, source_entity, discovery_type)
+        power_profiles = await self.find_power_profiles(model_info, source_entity, discovery_type)
+        return DiscoveryMatch(power_profiles=power_profiles) if power_profiles else None
+
+    def _create_entity_candidates(self) -> Iterator[DiscoveryCandidate]:
+        """Yield normalized entity discovery candidates."""
+        for entity_entry in self.get_entities():
+            yield DiscoveryCandidate(
+                source_entity=self.create_entity_source(entity_entry),
+                discovery_type=DiscoveryBy.ENTITY,
+                log_identifier=entity_entry.entity_id,
+                integration_domains=frozenset({entity_entry.platform}),
+            )
+
+    def _create_device_candidates(self, devices: Iterable[dr.DeviceEntry]) -> Iterator[DiscoveryCandidate]:
+        """Yield normalized device discovery candidates."""
+        for device_entry in devices:
+            yield DiscoveryCandidate(
+                source_entity=self.create_device_source(device_entry),
+                discovery_type=DiscoveryBy.DEVICE,
+                log_identifier=device_entry.id,
+                integration_domains=self._get_integration_domains(get_config_entry_ids(device_entry)),
+            )
+
+    def _create_config_entry_candidates(
+        self,
+        devices_by_config_entry: dict[str, list[dr.DeviceEntry]],
+    ) -> Iterator[DiscoveryCandidate]:
+        """Yield normalized config-entry discovery candidates."""
+        for config_entry in self.get_config_entries(devices_by_config_entry):
+            yield DiscoveryCandidate(
+                source_entity=self.create_config_entry_source(
+                    config_entry,
+                    devices_by_config_entry[config_entry.entry_id][0],
+                ),
+                discovery_type=DiscoveryBy.CONFIG_ENTRY,
+                log_identifier=config_entry.entry_id,
+                integration_domains=frozenset({config_entry.domain}),
+            )
+
+    def _get_integration_domains(self, config_entry_ids: Iterable[str]) -> frozenset[str]:
+        """Resolve config entry IDs to integration domains."""
+        return frozenset(
+            entry.domain
+            for config_entry_id in config_entry_ids
+            if (entry := self.hass.config_entries.async_get_entry(config_entry_id)) is not None
+        )
 
     def create_entity_source(self, entity_entry: er.RegistryEntry) -> SourceEntity:
         """Create SourceEntity for an entity."""
@@ -363,30 +437,32 @@ class DiscoveryManager:
             object_id=device_entry.name_by_user or device_entry.name or "",
             name=device_entry.name,
             entity_id=DUMMY_ENTITY_ID,
-            domain="sensor",
+            domain=SENSOR_DOMAIN,
             device_entry=device_entry,
         )
 
-    def create_config_entry_source(self, config_entry: ConfigEntry) -> SourceEntity:
+    @staticmethod
+    def create_config_entry_source(config_entry: ConfigEntry, device_entry: dr.DeviceEntry) -> SourceEntity:
         """Create a source representing all devices belonging to a config entry."""
-        device_entry = get_first_device_for_config_entry(self.hass, config_entry.entry_id)
         return SourceEntity(
             object_id=config_entry.entry_id,
             name=config_entry.title,
             entity_id=DUMMY_ENTITY_ID,
-            domain="sensor",
+            domain=SENSOR_DOMAIN,
             device_entry=device_entry,
             config_entry_id=config_entry.entry_id,
         )
 
     @staticmethod
-    def create_unique_id(source: SourceEntity, discovery_type: DiscoveryBy, power_profile: PowerProfile | None) -> str:
-        """Generate a unique ID based on source and type."""
-        if discovery_type == DiscoveryBy.CONFIG_ENTRY:
+    def create_unique_id(candidate: DiscoveryCandidate, power_profile: PowerProfile | None) -> str:
+        """Generate a unique ID for a discovery candidate."""
+        source = candidate.source_entity
+
+        if candidate.discovery_type == DiscoveryBy.CONFIG_ENTRY:
             config_entry_id = source.config_entry_id or source.object_id
             return f"pc_config_entry_{config_entry_id}"
 
-        if discovery_type == DiscoveryBy.DEVICE:
+        if candidate.discovery_type == DiscoveryBy.DEVICE:
             device_id = source.object_id
             if source.device_entry:
                 device_id = source.device_entry.id
@@ -399,12 +475,12 @@ class DiscoveryManager:
         model_info: ModelInfo,
         source_entity: SourceEntity,
         discovery_type: DiscoveryBy,
-    ) -> list[PowerProfile] | None:
+    ) -> list[PowerProfile]:
         """Find power profiles for a given entity."""
         library = await self._get_library()
         models = await library.find_models(model_info)
         if not models:
-            return None
+            return []
 
         power_profiles = []
         for found_model in models:
@@ -420,27 +496,36 @@ class DiscoveryManager:
                 process_variables=False,
                 model_resolved=True,
             )
-            if not profile or profile.discovery_by != discovery_type:  # pragma: no cover
-                continue
-            if discovery_type == DiscoveryBy.ENTITY:
-                entity_entry = source_entity.entity_entry
-                if entity_entry is not None and not profile.is_entity_domain_supported(entity_entry):
-                    continue
-            if profile.device_type in self._exclude_device_types:
-                continue
-            if self._exclude_self_usage_profiles and profile.only_self_usage:
-                continue
-            # Check if the entity's integration is compatible with the profile
-            if (
-                discovery_type == DiscoveryBy.ENTITY
-                and source_entity.entity_entry
-                and profile.compatible_integrations
-                and source_entity.entity_entry.platform not in profile.compatible_integrations
-            ):
+            if not profile or not self._matches_profile(profile, source_entity, discovery_type):
                 continue
             power_profiles.append(profile)
 
         return power_profiles
+
+    def _matches_profile(
+        self,
+        profile: PowerProfile,
+        source_entity: SourceEntity,
+        discovery_type: DiscoveryBy,
+    ) -> bool:
+        """Return whether a loaded profile is eligible for a discovery candidate."""
+        if not self._matches_discovery_constraints(
+            profile.device_type,
+            profile.discovery_by,
+            source_entity,
+            discovery_type,
+        ):
+            return False
+        if self._exclude_self_usage_profiles and profile.only_self_usage:
+            return False
+
+        entity_entry = source_entity.entity_entry
+        return not (
+            discovery_type == DiscoveryBy.ENTITY
+            and entity_entry
+            and profile.compatible_integrations
+            and entity_entry.platform not in profile.compatible_integrations
+        )
 
     def _matches_metadata(
         self,
@@ -454,58 +539,26 @@ class DiscoveryManager:
         such as `only_self_usage` and `compatible_integrations`, is still checked on the profile
         itself, so this can only save work, never change the outcome.
         """
-        if metadata.discovery_by != discovery_type:
-            return False
-        if metadata.device_type in self._exclude_device_types:
-            return False
-        if discovery_type == DiscoveryBy.ENTITY and source_entity.entity_entry is not None:
-            return is_device_type_supported_for_entity(metadata.device_type, source_entity.entity_entry)
-        return True
-
-    def _is_domain_ignored(self, source: _DiscoverySourceT, ignored_domains: set[str]) -> bool:
-        """Return whether a discovery source belongs to a globally ignored integration domain."""
-        if not ignored_domains:
-            return False
-
-        if isinstance(source, er.RegistryEntry):
-            return source.platform in ignored_domains
-        if isinstance(source, ConfigEntry):
-            return source.domain in ignored_domains
-
-        config_entry_id = next(iter(source.config_entries), None)
-        if config_entry_id is None:  # pragma: no cover
-            return False
-
-        config_entry = self.hass.config_entries.async_get_entry(config_entry_id)
-        return config_entry is not None and config_entry.domain in ignored_domains
-
-    async def init_wled_flow(self, model_info: ModelInfo, source_entity: SourceEntity) -> None:
-        """Initialize the discovery flow for a WLED light."""
-        if DeviceType.LIGHT in self._exclude_device_types:
-            return
-        unique_id = (
-            f"pc_{source_entity.device_entry.id}"
-            if source_entity.device_entry
-            else get_or_create_unique_id({}, source_entity, None)
-        )
-        if self._is_already_discovered(source_entity, unique_id):
-            _LOGGER.debug(
-                "%s: Already setup with discovery, skipping new discovery (unique_id=%s)",
-                source_entity.entity_id,
-                unique_id,
-            )
-            return
-
-        await self._init_entity_discovery(
-            model_info,
-            unique_id,
+        return self._matches_discovery_constraints(
+            metadata.device_type,
+            metadata.discovery_by,
             source_entity,
-            source_entity.entity_id,
-            power_profiles=None,
-            extra_discovery_data={
-                CONF_MODE: CalculationStrategy.WLED,
-            },
+            discovery_type,
         )
+
+    def _matches_discovery_constraints(
+        self,
+        device_type: DeviceType | None,
+        profile_discovery_type: DiscoveryBy,
+        source_entity: SourceEntity,
+        requested_discovery_type: DiscoveryBy,
+    ) -> bool:
+        """Check constraints shared by indexed metadata and loaded profiles."""
+        if profile_discovery_type != requested_discovery_type or device_type in self._exclude_device_types:
+            return False
+        if requested_discovery_type == DiscoveryBy.ENTITY and source_entity.entity_entry is not None:
+            return is_device_type_supported_for_entity(device_type, source_entity.entity_entry)
+        return True
 
     @staticmethod
     def is_wled_light(model_info: ModelInfo, entity_entry: er.RegistryEntry) -> bool:
@@ -551,17 +604,28 @@ class DiscoveryManager:
         """Fetch device entries."""
         return get_non_composite_devices(self.hass)
 
-    def get_config_entries(self) -> list[ConfigEntry]:
+    @staticmethod
+    def _index_devices_by_config_entry(
+        devices: Iterable[dr.DeviceEntry],
+    ) -> dict[str, list[dr.DeviceEntry]]:
+        """Group devices by their owning config entry without rescanning the registry."""
+        devices_by_config_entry: defaultdict[str, list[dr.DeviceEntry]] = defaultdict(list)
+        for device in devices:
+            for config_entry_id in get_config_entry_ids(device):
+                devices_by_config_entry[config_entry_id].append(device)
+        return dict(devices_by_config_entry)
+
+    def get_config_entries(
+        self,
+        devices_by_config_entry: dict[str, list[dr.DeviceEntry]] | None = None,
+    ) -> list[ConfigEntry]:
         """Fetch config entries which have at least one non-composite device."""
-        config_entry_ids = {
-            config_entry_id
-            for device in get_non_composite_devices(self.hass)
-            for config_entry_id in get_config_entry_ids(device)
-        }
+        if devices_by_config_entry is None:
+            devices_by_config_entry = self._index_devices_by_config_entry(self.get_devices())
         return [
             entry
             for entry in self.hass.config_entries.async_entries()
-            if entry.domain != DOMAIN and entry.entry_id in config_entry_ids
+            if entry.domain != DOMAIN and entry.entry_id in devices_by_config_entry
         ]
 
     def enable(self) -> None:
@@ -578,7 +642,8 @@ class DiscoveryManager:
             self._cancel_initial_discovery()
             self._cancel_initial_discovery = None
         self._status = DiscoveryStatus.DISABLED
-        self.initialized_flows = set()
+        self._configured_discovery_keys.clear()
+        self._pending_discovery_keys.clear()
         flows = self.hass.config_entries.flow.async_progress_by_handler(DOMAIN)
         for flow in flows:
             if flow["context"]["source"] != SOURCE_INTEGRATION_DISCOVERY:
@@ -692,9 +757,9 @@ class DiscoveryManager:
         if extra_discovery_data:
             discovery_data.update(extra_discovery_data)
 
-        self.initialized_flows.add(unique_id)
+        self._pending_discovery_keys.add(unique_id)
         if source_entity.entity_id != DUMMY_ENTITY_ID:
-            self.initialized_flows.add(source_entity.entity_id)
+            self._pending_discovery_keys.add(source_entity.entity_id)
 
         _LOGGER.debug("%s: Initiating discovery flow, unique_id=%s", log_identifier, unique_id)
 
@@ -737,14 +802,14 @@ class DiscoveryManager:
         """
         # Explicit None check: when nothing is configured manually the result is an empty set,
         # which would otherwise be reloaded for every single entity.
-        if self.manually_configured_entities is None:
-            self.manually_configured_entities = self._load_manually_configured_entities()
+        if self._manually_configured_entities is None:
+            self._manually_configured_entities = self._load_manually_configured_entities()
 
-        return entity_id in self.manually_configured_entities
+        return entity_id in self._manually_configured_entities
 
     def _load_manually_configured_entities(self) -> set[str]:
         """Looks at the YAML and GUI config entries for all the configured entity_id's."""
-        entities = []
+        entities: set[str] = set()
 
         # Find entity ids in yaml config (Legacy)
         if SENSOR_DOMAIN in self.ha_config:  # pragma: no cover
@@ -753,64 +818,56 @@ class DiscoveryManager:
                 item for item in sensor_config or {} if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN
             ]
             for entry in platform_entries:
-                entities.extend(self._find_entity_ids_in_yaml_config(entry))
+                entities.update(self._iter_entity_ids(entry))
 
         # Find entity ids in yaml config (New)
         domain_config: ConfigType = self.ha_config.get(DOMAIN, {})
         if CONF_SENSORS in domain_config:
             sensors = domain_config[CONF_SENSORS]
             for sensor_config in sensors:
-                entities.extend(self._find_entity_ids_in_yaml_config(sensor_config))
+                entities.update(self._iter_entity_ids(sensor_config))
 
         # Add entities from existing config entries
-        entities.extend(
-            [
-                str(entry.data.get(CONF_ENTITY_ID))
-                for entry in self.hass.config_entries.async_entries(DOMAIN)
-                if entry.source == SOURCE_USER
-            ],
+        entities.update(
+            entity_id
+            for entry in self.hass.config_entries.async_entries(DOMAIN)
+            if entry.source == SOURCE_USER
+            if isinstance((entity_id := entry.data.get(CONF_ENTITY_ID)), str)
         )
+        return entities
 
-        # A YAML `entity_id` can hold a list of entity ids, for example for the composite strategy.
-        # Those are collected as nested lists, which never matched a single entity id anyway.
-        return {entity_id for entity_id in entities if isinstance(entity_id, str)}
-
-    def _find_entity_ids_in_yaml_config(self, search_dict: ConfigType) -> list[str]:
-        """Takes a dict with nested lists and dicts,
-        and searches all dicts for a key of the field
-        provided.
-        """
-        found_entity_ids: list[str] = []
-        self._extract_entity_ids(search_dict, found_entity_ids)
-        return found_entity_ids
-
-    def _extract_entity_ids(self, search_dict: ConfigType, found_entity_ids: list[str]) -> None:
-        """Helper function to recursively extract entity IDs."""
-        for key, value in search_dict.items():
-            if key == CONF_ENTITY_ID:
-                found_entity_ids.append(value)
-            elif isinstance(value, dict):
-                self._extract_entity_ids(value, found_entity_ids)
-            elif isinstance(value, list):
-                self._process_list_items(value, found_entity_ids)
-
-    def _process_list_items(self, items: list[Any], found_entity_ids: list[str]) -> None:
-        """Helper function to process list items."""
-        for item in items:
-            if isinstance(item, dict):
-                self._extract_entity_ids(item, found_entity_ids)
+    def _iter_entity_ids(self, value: object) -> Iterator[str]:
+        """Yield entity IDs from nested Powercalc YAML configuration."""
+        if isinstance(value, dict):
+            for key, nested_value in value.items():
+                if key == CONF_ENTITY_ID:
+                    if isinstance(nested_value, str):
+                        yield nested_value
+                    elif isinstance(nested_value, list):
+                        yield from (item for item in nested_value if isinstance(item, str))
+                elif isinstance(nested_value, dict | list):
+                    yield from self._iter_entity_ids(nested_value)
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict | list):
+                    yield from self._iter_entity_ids(item)
 
     def _is_already_discovered(self, source_entity: SourceEntity, unique_id: str) -> bool:
         """Prevent duplicate discovery flows."""
-        unique_ids_to_check = [unique_id, source_entity.entity_id, source_entity.unique_id]
+        unique_ids_to_check = {
+            key for key in (unique_id, source_entity.entity_id, source_entity.unique_id) if key is not None
+        }
         if unique_id.startswith("pc_"):
-            unique_ids_to_check.append(unique_id[3:])
-        unique_ids_to_check.extend([f"pc_{uid}" for uid in unique_ids_to_check])
+            unique_ids_to_check.add(unique_id[3:])
+        unique_ids_to_check.update({f"pc_{uid}" for uid in unique_ids_to_check})
 
-        return any(unique_id in self.initialized_flows for unique_id in unique_ids_to_check)
+        return not (
+            unique_ids_to_check.isdisjoint(self._configured_discovery_keys)
+            and unique_ids_to_check.isdisjoint(self._pending_discovery_keys)
+        )
 
     async def _get_library(self) -> ProfileLibrary:
         """Get the powercalc library instance."""
-        if not self.library:
-            self.library = await ProfileLibrary.factory(self.hass)
-        return self.library
+        if not self._library:
+            self._library = await ProfileLibrary.factory(self.hass)
+        return self._library

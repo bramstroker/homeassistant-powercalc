@@ -52,6 +52,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_FACTOR,
     CONF_SENSOR_TYPE,
+    CONF_SENSORS,
     CONF_VOLTAGE,
     CONF_WLED,
     DISCOVERY_INTEGRATION_NAME,
@@ -443,6 +444,10 @@ async def test_get_power_profile_by_source_device_returns_none_without_required_
 
     source_entity = create_source_entity("sensor.test", hass)
 
+    profile = await get_power_profile_by_source_device(hass, source_entity)
+    assert profile is not None
+    assert profile.model == "discovery_type_device"
+
     assert await get_power_profile_by_source_device(hass, source_entity._replace(device_entry=None)) is None
     assert await get_power_profile_by_source_device(hass, source_entity._replace(entity_entry=None)) is None
 
@@ -586,6 +591,23 @@ async def test_wled_not_discovered_twice(
 
     mock_calls = mock_flow_init.mock_calls
     assert len(mock_calls) == 0
+
+
+async def test_wled_discovery_uses_standard_dispatch_path(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """WLED discovery should dispatch once without being reported as a missing profile."""
+    caplog.set_level(logging.DEBUG)
+    mock_device_with_entities(hass, "light.test", "WLED", "FOSS")
+
+    await run_powercalc_setup(hass)
+
+    assert len(mock_flow_init.mock_calls) == 1
+    discovery_data = mock_flow_init.mock_calls[0][2]["data"]
+    assert discovery_data[CONF_MODE] == "wled"
+    assert not any(record.message.startswith("light.test: Model not found in library") for record in caplog.records)
 
 
 async def test_wled_skipped_when_light_device_type_excluded(
@@ -842,6 +864,17 @@ async def test_discovery_by_config_entry(
     assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == f"pc_config_entry_{source_entry.entry_id}"
 
 
+def test_get_config_entries_builds_device_index_when_not_supplied(hass: HomeAssistant) -> None:
+    """Config-entry collection should support callers which do not already have a device index."""
+    source_entry = MockConfigEntry(domain="test")
+    source_entry.add_to_hass(hass)
+    mock_device(hass, config_entry_id=source_entry.entry_id)
+
+    config_entries = DiscoveryManager(hass, {}).get_config_entries()
+
+    assert source_entry in config_entries
+
+
 async def test_composite_devices_are_ignored_for_device_discovery(
     hass: HomeAssistant,
 ) -> None:
@@ -959,6 +992,33 @@ async def test_no_discovery_for_devices_sharing_identifiers_with_configured_devi
     await run_powercalc_setup(hass)
 
     assert not mock_flow_init.mock_calls
+
+
+@requires_linked_devices
+async def test_removing_entry_releases_all_related_device_discovery_keys(hass: HomeAssistant) -> None:
+    """Removing an entry must release discovery keys for every related device."""
+    _mock_linked_devices(hass)
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_DEVICE: "linked-device-0",
+        },
+        unique_id="pc_linked-device-0",
+        setup=False,
+    )
+    discovery_manager = DiscoveryManager(hass, {})
+    discovery_manager.initialize_existing_entries()
+    linked_device = dr.async_get(hass).async_get("linked-device-1")
+    assert linked_device is not None
+    source_entity = discovery_manager.create_device_source(linked_device)
+
+    assert discovery_manager._is_already_discovered(source_entity, "pc_linked-device-1")  # noqa: SLF001
+
+    discovery_manager.remove_initialized_flow(entry)
+
+    assert not discovery_manager._is_already_discovered(source_entity, "pc_linked-device-1")  # noqa: SLF001
 
 
 @requires_linked_devices
@@ -1082,6 +1142,29 @@ async def test_get_entities(
     discovery_manager = DiscoveryManager(hass, {})
     entity_ids = [entity.entity_id for entity in discovery_manager.get_entities()]
     assert entity_ids == expected_entities
+
+
+def test_load_manually_configured_entities_flattens_nested_entity_id_lists(hass: HomeAssistant) -> None:
+    """Entity IDs in composite YAML lists should all be treated as manually configured."""
+    discovery_manager = DiscoveryManager(
+        hass,
+        {
+            DOMAIN: {
+                CONF_SENSORS: [
+                    {
+                        CONF_ENTITY_ID: ["light.first", "light.second"],
+                        "nested": [{CONF_ENTITY_ID: "switch.third"}],
+                    },
+                ],
+            },
+        },
+    )
+
+    assert discovery_manager._load_manually_configured_entities() == {  # noqa: SLF001
+        "light.first",
+        "light.second",
+        "switch.third",
+    }
 
 
 async def test_discovery_enable_runtime(
