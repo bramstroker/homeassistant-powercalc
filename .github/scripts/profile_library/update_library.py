@@ -13,7 +13,9 @@ import json
 import math
 import os
 from pathlib import Path
+import subprocess
 import sys
+from typing import Any
 
 import aiofiles
 import git
@@ -45,13 +47,13 @@ def create_model_hash(mapping: Mapping[str, object]) -> str:
     return hashlib.md5(json.dumps(mapping, sort_keys=True).encode(), usedforsecurity=False).hexdigest()
 
 
-async def generate_library_json(model_listing: list[dict]) -> None:
-    manufacturers: dict[str, dict] = {}
+async def generate_library_json(model_listing: list[dict[str, Any]]) -> None:
+    manufacturers: dict[str, dict[str, Any]] = {}
 
     # Process manufacturers concurrently
     tasks = []
     for model in model_listing:
-        manufacturer_name = model.get("manufacturer")
+        manufacturer_name = model["manufacturer"]
         if manufacturer_name not in manufacturers:
             task = get_manufacturer_json(manufacturer_name)
             tasks.append((manufacturer_name, task))
@@ -67,8 +69,7 @@ async def generate_library_json(model_listing: list[dict]) -> None:
 
     # Process models
     for model in model_listing:
-        manufacturer_name = model.get("manufacturer")
-        manufacturer = manufacturers.get(manufacturer_name)
+        manufacturer = manufacturers[model["manufacturer"]]
 
         device_type = model.get("device_type")
         if device_type not in manufacturer["device_types"]:
@@ -107,7 +108,7 @@ async def generate_library_json(model_listing: list[dict]) -> None:
     print("Generated library.json")
 
 
-async def update_authors(_model_listing: list[dict]) -> None:
+async def update_authors(_model_listing: list[dict[str, Any]]) -> None:
     model_json_paths = sorted(
         glob.glob(f"{DATA_DIR}/**/model.json", recursive=True),
         key=lambda model_json_path: (len(Path(model_json_path).parts), model_json_path),
@@ -143,7 +144,7 @@ async def process_author_update(model_json_path: str) -> None:
     print(f"Updated author metadata in {model_json_path}")
 
 
-def has_author_info(model_data: dict) -> bool:
+def has_author_info(model_data: dict[str, Any]) -> bool:
     author_info = model_data.get("author_info")
     return isinstance(author_info, dict) and bool(author_info.get("name")) and bool(author_info.get("github"))
 
@@ -153,7 +154,7 @@ def is_main_model_json(model_json_path: str) -> bool:
     return len(relative_path.parts) == 3
 
 
-def author_to_json(author: Author) -> dict:
+def author_to_json(author: Author) -> dict[str, str]:
     author_json = {
         "name": author.name,
         "github": author.github_username,
@@ -163,7 +164,7 @@ def author_to_json(author: Author) -> dict:
     return author_json
 
 
-async def update_translations(model_listing: list[dict]) -> None:
+async def update_translations(model_listing: list[dict[str, Any]]) -> None:
     data_translations: dict[str, str] = {}
     description_translations: dict[str, str] = {}
     for model in model_listing:
@@ -196,7 +197,7 @@ async def update_translations(model_listing: list[dict]) -> None:
         await file.write(json.dumps(json_data, indent=2) + "\n")
 
 
-def deep_update(target: dict, updates: dict) -> None:
+def deep_update(target: dict[str, Any], updates: dict[str, Any]) -> None:
     """
     Recursively updates a dictionary with another dictionary,
     only adding keys that are missing.
@@ -208,7 +209,7 @@ def deep_update(target: dict, updates: dict) -> None:
             target[key] = value
 
 
-async def get_manufacturer_json(manufacturer: str) -> dict:
+async def get_manufacturer_json(manufacturer: str) -> dict[str, Any]:
     json_path = os.path.join(DATA_DIR, manufacturer, "manufacturer.json")
     try:
         async with aiofiles.open(json_path) as json_file:
@@ -231,7 +232,7 @@ async def get_manufacturer_json(manufacturer: str) -> dict:
         return default_json
 
 
-async def get_model_list() -> list[dict]:
+async def get_model_list() -> list[dict[str, Any]]:
     """Get a listing of all available powercalc models"""
     json_paths = glob.glob(
         f"{DATA_DIR}/*/*/model.json",
@@ -240,7 +241,7 @@ async def get_model_list() -> list[dict]:
 
     semaphore = asyncio.Semaphore(MAX_CONCURRENT_FILE_TASKS)
 
-    async def process_with_limit(json_path: str) -> dict:
+    async def process_with_limit(json_path: str) -> dict[str, Any]:
         async with semaphore:
             return await process_model_file(json_path)
 
@@ -250,11 +251,11 @@ async def get_model_list() -> list[dict]:
     return [model for model in models if model]
 
 
-async def process_model_file(json_path: str) -> dict:
+async def process_model_file(json_path: str) -> dict[str, Any]:
     """Process a single model file asynchronously"""
     async with aiofiles.open(json_path) as json_file:
         content = await json_file.read()
-        model_data: dict = json.loads(content)
+        model_data: dict[str, Any] = json.loads(content)
         model_data.pop("author", None)
         model_directory = os.path.dirname(json_path)
         model_data["id"] = os.path.basename(model_directory)
@@ -288,8 +289,8 @@ async def process_model_file(json_path: str) -> dict:
         return model_data
 
 
-async def get_color_modes(model_directory: str) -> set:
-    color_modes = set()
+async def get_color_modes(model_directory: str) -> set[str]:
+    color_modes: set[str] = set()
     paths = glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True)
     for path in paths:
         filename = os.path.basename(path)
@@ -307,7 +308,7 @@ def get_sub_profile_count(model_directory: str) -> int:
     return sum(1 for p in path.iterdir() if p.is_dir())
 
 
-async def get_max_power(model_directory: str, model_data: dict) -> float | None:
+async def get_max_power(model_directory: str, model_data: dict[str, Any]) -> float | None:
     calculation_strategy = model_data.get("calculation_strategy", "lut")
     if calculation_strategy == "lut":
         max_power = 0
@@ -316,9 +317,9 @@ async def get_max_power(model_directory: str, model_data: dict) -> float | None:
         # Process CSV files concurrently
         if paths:
             tasks = [process_csv_file(path) for path in paths]
-            power_values = await asyncio.gather(*tasks)
+            csv_powers = await asyncio.gather(*tasks)
             # Filter out None values and find max
-            valid_powers = [p for p in power_values if p is not None]
+            valid_powers = [p for p in csv_powers if p is not None]
             if valid_powers:
                 return max(valid_powers)
             return max_power
@@ -327,23 +328,22 @@ async def get_max_power(model_directory: str, model_data: dict) -> float | None:
     if calculation_strategy == "linear":
         linear_config = model_data.get("linear_config", {})
         if "calibrate" in linear_config:
-            power_values = [
+            calibrate_powers = [
                 float(line.split("->")[1].strip()) for line in linear_config.get("calibrate", []) if "->" in line
             ]
-            return max(power_values) if power_values else 0
-        return max(linear_config.get("max_power", 0), model_data.get("standby_power_on", 0))
+            return max(calibrate_powers) if calibrate_powers else 0
+        return float(max(linear_config.get("max_power", 0), model_data.get("standby_power_on", 0)))
 
     if calculation_strategy == "fixed":
         fixed_config = model_data.get("fixed_config", {})
-        power_values = [
+        candidates = [
             fixed_config.get("power", 0),
             model_data.get("standby_power_on", 0),
+            *fixed_config.get("states_power", {}).values(),
         ]
-        states_power = fixed_config.get("states_power", {})
-        power_values.extend(states_power.values())
-        power_values = filter(lambda p: is_number(p), power_values)
+        fixed_powers = [float(value) for value in candidates if is_number(value)]
 
-        return max(power_values) if power_values else 0
+        return max(fixed_powers) if fixed_powers else 0
 
     return None
 
@@ -354,7 +354,7 @@ async def process_csv_file(path: str) -> float | None:
         with gzip.open(path, "rt") as f:
             reader = csv.reader(f)
             next(reader, None)  # skip header row
-            max_power = 0
+            max_power = 0.0
             for row in reader:
                 if not row:
                     continue
@@ -394,7 +394,7 @@ async def get_last_commit_time(directory: str) -> datetime:
             return datetime.fromtimestamp(0)
         timestamp = int(out)
         return datetime.fromtimestamp(timestamp)
-    except asyncio.SubprocessError, ValueError:
+    except subprocess.SubprocessError, ValueError:
         # Handle case where there are no commits or Git command fails
         return datetime.fromtimestamp(0)
 
@@ -407,12 +407,12 @@ async def run_git_command(command: str) -> str:
     stdout, stderr = await proc.communicate()
 
     if proc.returncode != 0:
-        raise asyncio.SubprocessError(f"Command failed: {command}, error: {stderr.decode()}")
+        raise subprocess.SubprocessError(f"Command failed: {command}, error: {stderr.decode()}")
 
     return stdout.decode().strip()
 
 
-async def get_commits_affected_directory(directory: str) -> list:
+async def get_commits_affected_directory(directory: str) -> list[str]:
     """Get a list of commits that affected the given directory, including renames."""
     command = f"git log --follow --format='%H' -- '{directory}'"
     commits = await run_git_command(command)
@@ -458,7 +458,7 @@ async def get_commit_author(commit_hash: str) -> Author | None:
     )
 
 
-async def get_pull_request_author(client: httpx.AsyncClient, commit_hash: str, headers: dict) -> str | None:
+async def get_pull_request_author(client: httpx.AsyncClient, commit_hash: str, headers: dict[str, str]) -> str | None:
     """Get the author of the pull request that contains the given commit."""
     r = await client.get(
         f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/commits/{commit_hash}/pulls",
@@ -533,9 +533,11 @@ async def main_async() -> None:
 
 def is_number(value: float | str | None) -> bool:
     """Try to convert value to a float."""
+    if value is None:
+        return False
     try:
         fvalue = float(value)
-    except ValueError, TypeError:
+    except ValueError:
         return False
     return math.isfinite(fvalue)
 

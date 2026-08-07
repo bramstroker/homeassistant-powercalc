@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import re
 import sys
+from typing import Any
 
 
 def extract_placeholders(text: str) -> set[str]:
@@ -16,15 +17,12 @@ def extract_placeholders(text: str) -> set[str]:
     Returns:
         A set of placeholder names without the braces
     """
-    if not isinstance(text, str):
-        return set()
-
     # Find all occurrences of {name}
     placeholders = re.findall(r"\{([^{}]+)\}", text)
     return set(placeholders)
 
 
-def extract_all_placeholders(data: dict, path: str = "") -> dict[str, set[str]]:
+def extract_all_placeholders(data: dict[str, Any], path: str = "") -> dict[str, set[str]]:
     """
     Recursively extract all placeholders from a nested dictionary.
 
@@ -53,7 +51,7 @@ def extract_all_placeholders(data: dict, path: str = "") -> dict[str, set[str]]:
     return result
 
 
-def get_path_value(data: dict, path: str) -> tuple[bool, object]:
+def get_path_value(data: dict[str, Any], path: str) -> tuple[bool, object]:
     """Return whether a dotted path exists and its value when it does."""
     current: object = data
     for part in path.split("."):

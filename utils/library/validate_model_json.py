@@ -1,19 +1,20 @@
 import glob
 import json
 import os
+from typing import Any, cast
 
 from jsonschema import ValidationError, validate
 
 from utils.library.common import PROFILE_DIRECTORY
 
 
-def load_json(file_path: str) -> dict:
+def load_json(file_path: str) -> dict[str, Any]:
     """Load a JSON file from the given file path."""
     with open(file_path) as file:
-        return json.load(file)
+        return cast(dict[str, Any], json.load(file))
 
 
-def validate_model(model_path: str, schema: dict) -> None:
+def validate_model(model_path: str, schema: dict[str, Any]) -> None:
     """Validate a JSON model against the schema."""
     try:
         model = load_json(model_path)

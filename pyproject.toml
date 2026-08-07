@@ -41,6 +41,14 @@ known-third-party = ["homeassistant"]
 force-sort-within-sections = true
 combine-as-imports = true
 
+[tool.ty.environment]
+# The release-draft entry points run as plain scripts and import their siblings flat.
+extra-paths = [".github/scripts/release_draft"]
+
+[tool.ty.src]
+# Test suites are exercised by pytest, not by the type checker.
+exclude = ["**/tests/"]
+
 [tool.ty.analysis]
 allowed-unresolved-imports = [
     "homeassistant.components.**",
@@ -56,6 +64,13 @@ local_partial_types = true
 warn_incomplete_stub = true
 warn_unused_configs = true
 warn_unreachable = true
+# The release-draft entry points are executed as plain scripts, so their sibling
+# modules are imported flat. Put that directory on the search path and make mypy
+# derive module names from an explicit base instead of walking up to __init__.py.
+mypy_path = ".github/scripts/release_draft"
+explicit_package_bases = true
+# Test suites are exercised by pytest, not by the type checker.
+exclude = ["/tests/"]
 
 [[tool.mypy.overrides]]
 module = "homeassistant.components.*"
@@ -126,6 +141,8 @@ dev = [
     "aioresponses>=0.7.6",
     "pyturbojpeg>=1.8.2",
     "ty>=0.0.39",
+    "types-jsonschema>=4.26.0.20260518",
+    "types-aiofiles>=25.1.0.20260518",
 ]
 
 [tool.setuptools]

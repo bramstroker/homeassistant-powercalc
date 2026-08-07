@@ -112,7 +112,7 @@ def group_supporters_by_tier(
             continue
 
         # BMC returns most recent first, so slicing keeps that order
-        names = [item.get("name") for item in matches[:max_names_per_tier]]
+        names = [str(name) for item in matches[:max_names_per_tier] if (name := item.get("name"))]
         more = len(matches) > max_names_per_tier
 
         tiered[label] = {"names": names, "more": more}
@@ -132,7 +132,10 @@ def build_monthly_supporters_block(
 
     names: list[str] = []
     for item in subs:
-        names.append(item.get("name"))
+        name = item.get("name")
+        if not name:
+            continue
+        names.append(str(name))
         if len(names) >= max_names:
             break
 
