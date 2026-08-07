@@ -9,3 +9,4 @@
 - [Why does Powercalc create additional power sensor for my smart plug?](faq/smart-plug-additional-sensors.md)
 - [Why is the power of my group sensor too high or lagging?](faq/group-power-too-high.md)
 - [What to do when power sensor is unavailable?](faq/power-sensor-unavailable.md)
+- [Why does Home Assistant say "Starting Powercalc" during startup?](faq/starting-powercalc-toast.md)
