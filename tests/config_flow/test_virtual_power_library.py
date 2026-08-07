@@ -236,7 +236,6 @@ async def test_composite_library_profile_options_flow_builds_menu(
     assert result["menu_options"] == [
         Step.BASIC_OPTIONS,
         Step.LIBRARY_OPTIONS,
-        Step.SELECT_DEVICE,
         Step.ADVANCED_OPTIONS,
     ]
 
@@ -479,8 +478,8 @@ async def test_change_device_from_options_flow_discovery_by_device(hass: HomeAss
     assert registry_entry.device_id == "device-b"
 
 
-async def test_change_device_from_options_flow_discovery_by_entity(hass: HomeAssistant) -> None:
-    """Entity discovered profiles can be linked to another device, and unlinked again."""
+async def test_select_device_not_available_from_options_flow_discovery_by_entity(hass: HomeAssistant) -> None:
+    """Entity-discovered profiles cannot change their device from the options flow."""
     mock_devices(
         hass,
         {
@@ -500,27 +499,10 @@ async def test_change_device_from_options_flow_discovery_by_entity(hass: HomeAss
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.SELECT_DEVICE)
+    result = await hass.config_entries.options.async_init(entry.entry_id, data=None)
 
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert isinstance(result["data_schema"].schema[vol.Optional(CONF_DEVICE)], DeviceSelector)
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_DEVICE: "other-device"},
-    )
-    await hass.async_block_till_done()
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert entry.data[CONF_DEVICE] == "other-device"
-
-    # Submitting the form without a device unlinks it again, so the source entity device is used.
-    result = await initialize_options_flow(hass, entry, Step.SELECT_DEVICE)
-    result = await hass.config_entries.options.async_configure(result["flow_id"], user_input={})
-    await hass.async_block_till_done()
-
-    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert CONF_DEVICE not in entry.data
+    assert result["type"] == data_entry_flow.FlowResultType.MENU
+    assert Step.SELECT_DEVICE not in result["menu_options"]
 
 
 async def test_change_sub_profile_options_flow(hass: HomeAssistant) -> None:

@@ -258,10 +258,7 @@ class LibraryFlow:
                 },
             )
 
-        # For device discovery the device is also the source of the profile, so it cannot be cleared.
-        # For entity discovery clearing it falls back to the device of the source entity.
-        marker = vol.Required if discovery_by == DiscoveryBy.DEVICE else vol.Optional
-        return vol.Schema({marker(CONF_DEVICE): selector.DeviceSelector()})
+        return vol.Schema({vol.Required(CONF_DEVICE): selector.DeviceSelector()})
 
     def get_selectable_devices(self) -> list[DeviceEntry]:
         """Return the devices belonging to the same config entry as the source of the profile."""

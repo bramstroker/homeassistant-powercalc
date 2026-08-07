@@ -581,7 +581,10 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     def should_add_select_device_to_menu(self) -> bool:
         """Check whether the device selection should be added to the menu."""
-        if not self.selected_profile:
+        if not self.selected_profile or self.selected_profile.discovery_by not in [
+            DiscoveryBy.DEVICE,
+            DiscoveryBy.CONFIG_ENTRY,
+        ]:
             return False
 
         if self.selected_profile.discovery_by == DiscoveryBy.CONFIG_ENTRY:
