@@ -48,8 +48,8 @@ from changelog import (
     parse_core,
     render_sections,
 )
-from supporters import build_supporters_section
 from github_client import GitHubClient
+from supporters import build_supporters_section
 
 NAME_TEMPLATE = "v{version} 🌈"
 EXCLUDE_LABELS = frozenset({"skip-changelog", "dependencies", "measure-tool"})
@@ -100,11 +100,11 @@ def _latest_stable_release(client: GitHubClient) -> dict[str, Any] | None:
 def _next_beta_number(client: GitHubClient, core: tuple[int, int, int]) -> int:
     prefix = f"v{format_version(core)}-beta."
     numbers = [
-        int(release["tag_name"][len(prefix):])
+        int(release["tag_name"][len(prefix) :])
         for release in client.releases()
         if not release["draft"]
         and release["tag_name"].startswith(prefix)
-        and release["tag_name"][len(prefix):].isdigit()
+        and release["tag_name"][len(prefix) :].isdigit()
     ]
     return max(numbers) + 1 if numbers else 0
 
@@ -119,9 +119,7 @@ def _find_draft(client: GitHubClient, *, prerelease: bool) -> dict[str, Any] | N
         (
             release
             for release in client.releases()
-            if release["draft"]
-            and bool(release["prerelease"]) == prerelease
-            and release["tag_name"].startswith("v")
+            if release["draft"] and bool(release["prerelease"]) == prerelease and release["tag_name"].startswith("v")
         ),
         None,
     )

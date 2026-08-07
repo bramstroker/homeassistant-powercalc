@@ -12,6 +12,8 @@ import urllib.request
 
 API_ROOT = "https://api.github.com"
 PAGE_SIZE = 100
+type JsonObject = dict[str, Any]
+type JsonResponse = JsonObject | list[JsonObject] | None
 
 
 class GitHubClient:
@@ -19,7 +21,7 @@ class GitHubClient:
         self._token = token
         self.repository = repository
 
-    def _request(self, method: str, url: str, payload: dict[str, Any] | None = None) -> Any:
+    def _request(self, method: str, url: str, payload: JsonObject | None = None) -> JsonResponse:
         if url.startswith("/"):
             url = f"{API_ROOT}{url}"
         data = json.dumps(payload).encode("utf-8") if payload is not None else None

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 import json
-import os
+from pathlib import Path
 import re
 import sys
-from pathlib import Path
-from typing import Dict, List, Set, Tuple
+
 
 def extract_placeholders(text: str) -> set[str]:
     """
@@ -21,8 +20,9 @@ def extract_placeholders(text: str) -> set[str]:
         return set()
 
     # Find all occurrences of {name}
-    placeholders = re.findall(r'\{([^{}]+)\}', text)
+    placeholders = re.findall(r"\{([^{}]+)\}", text)
     return set(placeholders)
+
 
 def extract_all_placeholders(data: dict, path: str = "") -> dict[str, set[str]]:
     """
@@ -52,6 +52,17 @@ def extract_all_placeholders(data: dict, path: str = "") -> dict[str, set[str]]:
 
     return result
 
+
+def get_path_value(data: dict, path: str) -> tuple[bool, object]:
+    """Return whether a dotted path exists and its value when it does."""
+    current: object = data
+    for part in path.split("."):
+        if not isinstance(current, dict) or part not in current:
+            return False, None
+        current = current[part]
+    return True, current
+
+
 def validate_translations(translations_dir: Path) -> list[str]:
     """
     Validate that all placeholders in en.json exist in all other translation files.
@@ -67,7 +78,7 @@ def validate_translations(translations_dir: Path) -> list[str]:
     if not en_file.exists():
         return ["Error: en.json not found in the translations directory"]
 
-    with open(en_file, 'r', encoding='utf-8') as f:
+    with open(en_file, encoding="utf-8") as f:
         en_data = json.load(f)
 
     en_placeholders = extract_all_placeholders(en_data)
@@ -80,7 +91,7 @@ def validate_translations(translations_dir: Path) -> list[str]:
         lang_code = translation_file.stem
 
         try:
-            with open(translation_file, 'r', encoding='utf-8') as f:
+            with open(translation_file, encoding="utf-8") as f:
                 lang_data = json.load(f)
         except json.JSONDecodeError:
             errors.append(f"Error: {lang_code}.json is not a valid JSON file")
@@ -89,19 +100,9 @@ def validate_translations(translations_dir: Path) -> list[str]:
         lang_placeholders = extract_all_placeholders(lang_data)
 
         for path, en_path_placeholders in en_placeholders.items():
-            path_parts = path.split('.')
-
-            current = lang_data
-            path_exists = True
-
-            for part in path_parts:
-                if part not in current:
-                    path_exists = False
-                    errors.append(f"Missing path in {lang_code}.json: {path}")
-                    break
-                current = current[part]
-
+            path_exists, current = get_path_value(lang_data, path)
             if not path_exists:
+                errors.append(f"Missing path in {lang_code}.json: {path}")
                 continue
 
             if path in lang_placeholders:
@@ -111,14 +112,14 @@ def validate_translations(translations_dir: Path) -> list[str]:
                 if missing_placeholders:
                     placeholders_str = ", ".join([f"{{{p}}}" for p in missing_placeholders])
                     errors.append(f"Missing placeholders in {lang_code}.json at path {path}: {placeholders_str}")
-            else:
-                if isinstance(current, str):
-                    placeholders_str = ", ".join([f"{{{p}}}" for p in en_path_placeholders])
-                    errors.append(f"Missing placeholders in {lang_code}.json at path {path}: {placeholders_str}")
+            elif isinstance(current, str):
+                placeholders_str = ", ".join([f"{{{p}}}" for p in en_path_placeholders])
+                errors.append(f"Missing placeholders in {lang_code}.json at path {path}: {placeholders_str}")
 
     return errors
 
-def main():
+
+def main() -> None:
     repo_root = Path(__file__).parent.parent.parent
 
     translations_dir = repo_root / "custom_components" / "powercalc" / "translations"
@@ -139,6 +140,7 @@ def main():
     else:
         print("\nAll translations are valid! No missing placeholders found.")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

@@ -21,6 +21,7 @@ permissions:
 jobs:
   tests:
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
     name: Run tests
     steps:
       - name: Check out code
@@ -58,6 +59,7 @@ jobs:
 
   docker:
     runs-on: "ubuntu-latest"
+    timeout-minutes: 60
     name: Build Docker image
     steps:
       - name: Check out code
@@ -69,6 +71,7 @@ jobs:
 
   home-assistant-app:
     runs-on: "ubuntu-latest"
+    timeout-minutes: 60
     name: Validate Home Assistant app
     steps:
       - name: Check out code

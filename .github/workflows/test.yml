@@ -4,10 +4,23 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '**.py'
+      - '.github/scripts/ha_version_matrix.py'
+      - '.github/scripts/release_draft/**'
+      - '.github/workflows/test.yml'
+      - 'custom_components/powercalc/**'
+      - 'pyproject.toml'
+      - 'tests/**'
+      - 'utils/library/**'
+      - 'uv.lock'
   pull_request:
     paths:
-      - '**.py'
+      - '.github/scripts/ha_version_matrix.py'
+      - '.github/scripts/release_draft/**'
+      - '.github/workflows/test.yml'
+      - 'custom_components/powercalc/**'
+      - 'pyproject.toml'
+      - 'tests/**'
+      - 'utils/library/**'
       - 'uv.lock'
 
 permissions:
@@ -16,6 +29,7 @@ permissions:
 jobs:
   tests:
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
     name: Run tests
     steps:
       - name: Check out code
@@ -43,8 +57,7 @@ jobs:
             --cov custom_components.powercalc \
             --cov-report xml \
             -o console_output_style=count \
-            -p no:sugar \
-            tests
+            -p no:sugar
           uv run --locked coverage lcov
       - name: Upload Coverage Results
         uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
@@ -54,6 +67,7 @@ jobs:
 
   ha-versions:
     runs-on: "ubuntu-latest"
+    timeout-minutes: 10
     name: Determine supported HA versions
     outputs:
       versions: ${{ steps.matrix.outputs.versions }}
@@ -62,12 +76,17 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.14'
       - name: Build version matrix
         id: matrix
         run: python3 .github/scripts/ha_version_matrix.py >> "$GITHUB_OUTPUT"
 
   tests-ha-compat:
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
     needs: ha-versions
     if: needs.ha-versions.outputs.versions != '[]'
     name: Run tests (HA ${{ matrix.target.ha_version }})

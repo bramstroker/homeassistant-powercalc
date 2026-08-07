@@ -64,10 +64,15 @@ ignore_missing_imports = true
 [tool.coverage.paths]
 source = ["custom_components/powercalc", "utils", "tests"]
 
+[tool.coverage.report]
+fail_under = 100
+precision = 2
+show_missing = true
+
 [tool.ruff]
 line-length = 120
 target-version = "py314"
-exclude = ["utils/measure/playground", ".github", "docs"]
+exclude = ["utils/measure/playground", "docs"]
 
 [tool.ruff.lint]
 select = ["A", "ANN", "ASYNC", "B", "BLE", "C", "C4", "COM", "E", "F", "FAST", "FIX", "FLY", "FURB", "G", "ICN", "I", "INP", "ISC", "LOG", "N", "NPY", "PERF", "PIE", "PLE", "PT", "PYI", "Q", "RET", "RSE", "RUF", "S", "SIM", "SLF", "SLOT", "T10", "T20", "TID", "UP", "W", "YTT"]
@@ -76,6 +81,7 @@ select = ["A", "ANN", "ASYNC", "B", "BLE", "C", "C4", "COM", "E", "F", "FAST", "
 ignore = ["S101", "COM812"]
 
 [tool.ruff.lint.per-file-ignores]
+".github/scripts/**.py" = ["T201"]
 "utils/measure/**.py" = ["T201"]
 "tests/**.py" = ["ASYNC230"]
 

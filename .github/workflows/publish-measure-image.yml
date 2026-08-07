@@ -26,6 +26,7 @@ jobs:
     name: Build and push CLI Docker image
     if: github.event_name == 'push' || inputs.release_tag != ''
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     permissions:
       contents: read
       packages: write
@@ -83,6 +84,7 @@ jobs:
     name: Initialize Home Assistant app build
     if: inputs.release_tag != ''
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     outputs:
@@ -129,6 +131,7 @@ jobs:
     name: Build Home Assistant app (${{ matrix.arch }})
     needs: home-assistant-app-init
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
     permissions:
       contents: read
       id-token: write
@@ -171,6 +174,7 @@ jobs:
       - home-assistant-app-init
       - home-assistant-app-build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       id-token: write
       packages: write
@@ -196,6 +200,7 @@ jobs:
       - home-assistant-app-init
       - home-assistant-app-manifest
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:
@@ -246,6 +251,7 @@ jobs:
       - home-assistant-app-init
       - publish-app-repository
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: write
     steps:

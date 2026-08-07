@@ -2,22 +2,22 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from collections.abc import Mapping
 import csv
+from dataclasses import dataclass
+from datetime import datetime
 import glob
 import gzip
 import hashlib
 import json
+import math
 import os
-import sys
-from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
-from typing import Mapping
+import sys
 
 import aiofiles
 import git
 import httpx
-import math
 
 sys.path.insert(
     1,
@@ -33,14 +33,17 @@ REPO_NAME = "homeassistant-powercalc"
 MAX_CONCURRENT_FILE_TASKS = 50
 DISCOVERY_IGNORED_DOMAINS: list[str] = ["unifi"]
 
+
 @dataclass
 class Author:
     name: str
     email: str | None
     github_username: str
 
-def create_model_hash(mapping: Mapping) -> str:
-    return hashlib.md5(json.dumps(mapping, sort_keys=True).encode()).hexdigest()
+
+def create_model_hash(mapping: Mapping[str, object]) -> str:
+    return hashlib.md5(json.dumps(mapping, sort_keys=True).encode(), usedforsecurity=False).hexdigest()
+
 
 async def generate_library_json(model_listing: list[dict]) -> None:
     manufacturers: dict[str, dict] = {}
@@ -85,9 +88,7 @@ async def generate_library_json(model_listing: list[dict]) -> None:
             "sensor_config",
             "sub_profile_select",
         ]
-        mapped_dict = {
-            key: value for key, value in model.items() if key not in skipped_fields
-        }
+        mapped_dict = {key: value for key, value in model.items() if key not in skipped_fields}
         hash_dict = {key: value for key, value in mapped_dict.items() if key != "sub_profile_count"}
         mapped_dict["hash"] = create_model_hash(hash_dict)
         manufacturer["models"].append(mapped_dict)
@@ -114,9 +115,10 @@ async def update_authors(_model_listing: list[dict]) -> None:
     for model_json_path in model_json_paths:
         await process_author_update(model_json_path)
 
+
 async def process_author_update(model_json_path: str) -> None:
     """Process a single author update asynchronously"""
-    async with aiofiles.open(model_json_path, mode="r") as file:
+    async with aiofiles.open(model_json_path) as file:
         content = await file.read()
         json_data = json.loads(content)
 
@@ -162,7 +164,7 @@ def author_to_json(author: Author) -> dict:
 
 
 async def update_translations(model_listing: list[dict]) -> None:
-    data_translations: dict[str, str] =  {}
+    data_translations: dict[str, str] = {}
     description_translations: dict[str, str] = {}
     for model in model_listing:
         custom_fields = model.get("fields")
@@ -174,15 +176,15 @@ async def update_translations(model_listing: list[dict]) -> None:
             description_translations[key] = field_data.get("description")
 
     if not data_translations:
-        print(f"No translations found")
+        print("No translations found")
         return
 
     translation_file = os.path.join(PROJECT_ROOT, "custom_components/powercalc/translations/en.json")
-    async with aiofiles.open(translation_file, mode='r') as file:
+    async with aiofiles.open(translation_file) as file:
         content = await file.read()
         json_data = json.loads(content)
         step = "library_custom_fields"
-        if not step in json_data["config"]["step"]:
+        if step not in json_data["config"]["step"]:
             json_data["config"]["step"][step] = {
                 "data": {},
                 "data_description": {},
@@ -190,7 +192,7 @@ async def update_translations(model_listing: list[dict]) -> None:
         deep_update(json_data["config"]["step"][step]["data"], data_translations)
         deep_update(json_data["config"]["step"][step]["data_description"], description_translations)
 
-    async with aiofiles.open(translation_file, mode='w') as file:
+    async with aiofiles.open(translation_file, mode="w") as file:
         await file.write(json.dumps(json_data, indent=2) + "\n")
 
 
@@ -209,23 +211,20 @@ def deep_update(target: dict, updates: dict) -> None:
 async def get_manufacturer_json(manufacturer: str) -> dict:
     json_path = os.path.join(DATA_DIR, manufacturer, "manufacturer.json")
     try:
-        async with aiofiles.open(json_path, mode='r') as json_file:
+        async with aiofiles.open(json_path) as json_file:
             content = await json_file.read()
             manufacturer_data = json.loads(content)
             return {
                 "aliases": manufacturer_data.get("aliases", []),
                 "name": manufacturer,
                 "full_name": manufacturer_data.get("name"),
-                "dir_name": manufacturer
+                "dir_name": manufacturer,
             }
     except FileNotFoundError:
-        default_json = {
-            "name": manufacturer.capitalize(),
-            "aliases": []
-        }
+        default_json = {"name": manufacturer.capitalize(), "aliases": []}
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(json_path), exist_ok=True)
-        async with aiofiles.open(json_path, mode='w', encoding="utf-8") as json_file:
+        async with aiofiles.open(json_path, mode="w", encoding="utf-8") as json_file:
             await json_file.write(json.dumps(default_json, ensure_ascii=False, indent=4) + "\n")
         git.Repo(PROJECT_ROOT).git.add(json_path)
         print(f"Added {json_path}")
@@ -250,14 +249,15 @@ async def get_model_list() -> list[dict]:
     # Filter out None values (if any)
     return [model for model in models if model]
 
+
 async def process_model_file(json_path: str) -> dict:
     """Process a single model file asynchronously"""
-    async with aiofiles.open(json_path, mode='r') as json_file:
+    async with aiofiles.open(json_path) as json_file:
         content = await json_file.read()
         model_data: dict = json.loads(content)
         model_data.pop("author", None)
         model_directory = os.path.dirname(json_path)
-        model_data['id'] = os.path.basename(model_directory)
+        model_data["id"] = os.path.basename(model_directory)
         if "linked_profile" in model_data:
             model_directory = os.path.join(DATA_DIR, model_data["linked_profile"])
 
@@ -265,8 +265,8 @@ async def process_model_file(json_path: str) -> dict:
         updated_at, max_power, sub_profile_count, color_modes = await asyncio.gather(
             get_last_commit_time(model_directory),
             get_max_power(model_directory, model_data),
-            get_sub_profile_count(model_directory),
-            get_color_modes(model_directory)
+            asyncio.to_thread(get_sub_profile_count, model_directory),
+            get_color_modes(model_directory),
         )
 
         model_data.update(
@@ -302,9 +302,10 @@ async def get_color_modes(model_directory: str) -> set:
     return color_modes
 
 
-async def get_sub_profile_count(model_directory: str) -> int:
+def get_sub_profile_count(model_directory: str) -> int:
     path = Path(model_directory)
     return sum(1 for p in path.iterdir() if p.is_dir())
+
 
 async def get_max_power(model_directory: str, model_data: dict) -> float | None:
     calculation_strategy = model_data.get("calculation_strategy", "lut")
@@ -326,7 +327,9 @@ async def get_max_power(model_directory: str, model_data: dict) -> float | None:
     if calculation_strategy == "linear":
         linear_config = model_data.get("linear_config", {})
         if "calibrate" in linear_config:
-            power_values = [float(line.split("->")[1].strip()) for line in linear_config.get("calibrate", []) if "->" in line]
+            power_values = [
+                float(line.split("->")[1].strip()) for line in linear_config.get("calibrate", []) if "->" in line
+            ]
             return max(power_values) if power_values else 0
         return max(linear_config.get("max_power", 0), model_data.get("standby_power_on", 0))
 
@@ -344,10 +347,11 @@ async def get_max_power(model_directory: str, model_data: dict) -> float | None:
 
     return None
 
+
 async def process_csv_file(path: str) -> float | None:
     """Process a single CSV file to find the maximum power value"""
     try:
-        with gzip.open(path, 'rt') as f:
+        with gzip.open(path, "rt") as f:
             reader = csv.reader(f)
             next(reader, None)  # skip header row
             max_power = 0
@@ -358,10 +362,10 @@ async def process_csv_file(path: str) -> float | None:
                     watt = float(row[-1])
                     if watt > max_power:
                         max_power = watt
-                except (ValueError, IndexError):
+                except ValueError, IndexError:
                     continue
             return max_power if max_power > 0 else None
-    except Exception as e:
+    except (OSError, EOFError, UnicodeDecodeError, csv.Error) as e:
         print(f"Error processing {path}: {e}")
         return None
 
@@ -370,12 +374,17 @@ async def get_last_commit_time(directory: str) -> datetime:
     try:
         # Use asyncio to run the git command
         proc = await asyncio.create_subprocess_exec(
-            "git", "log", "-1", "--format=%ct", "--", directory,
+            "git",
+            "log",
+            "-1",
+            "--format=%ct",
+            "--",
+            directory,
             cwd=directory,
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            stderr=asyncio.subprocess.PIPE,
         )
-        stdout, stderr = await proc.communicate()
+        stdout, _stderr = await proc.communicate()
 
         if proc.returncode != 0:
             return datetime.fromtimestamp(0)
@@ -385,16 +394,15 @@ async def get_last_commit_time(directory: str) -> datetime:
             return datetime.fromtimestamp(0)
         timestamp = int(out)
         return datetime.fromtimestamp(timestamp)
-    except (asyncio.SubprocessError, ValueError):
+    except asyncio.SubprocessError, ValueError:
         # Handle case where there are no commits or Git command fails
         return datetime.fromtimestamp(0)
 
-async def run_git_command(command):
+
+async def run_git_command(command: str) -> str:
     """Run a git command asynchronously and return the output."""
     proc = await asyncio.create_subprocess_shell(
-        command,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
+        command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await proc.communicate()
 
@@ -426,7 +434,7 @@ async def get_commit_author(commit_hash: str) -> Author | None:
         r.raise_for_status()
         data = r.json()
 
-        if not "commit" in data and not "author" in data:
+        if "commit" not in data and "author" not in data:
             return None
 
         commit = data.get("commit")
@@ -449,6 +457,7 @@ async def get_commit_author(commit_hash: str) -> Author | None:
         github_username=github_username,
     )
 
+
 async def get_pull_request_author(client: httpx.AsyncClient, commit_hash: str, headers: dict) -> str | None:
     """Get the author of the pull request that contains the given commit."""
     r = await client.get(
@@ -462,6 +471,7 @@ async def get_pull_request_author(client: httpx.AsyncClient, commit_hash: str, h
     user = pulls[0].get("user")
     return user.get("login") if user else None
 
+
 async def find_first_commit_author(file: str, check_paths: bool = True) -> Author | None:
     """Find the first commit that affected the directory and return the author's name."""
     commits = await get_commits_affected_directory(file)
@@ -472,13 +482,17 @@ async def find_first_commit_author(file: str, check_paths: bool = True) -> Autho
 
         affected_files = await run_git_command(command)
         file = file.replace(PROJECT_ROOT, "").lstrip("/")
-        paths = [file.replace("profile_library", "custom_components/powercalc/data"), file.replace("profile_library", "data"), file]
+        paths = [
+            file.replace("profile_library", "custom_components/powercalc/data"),
+            file.replace("profile_library", "data"),
+            file,
+        ]
         if any(path in affected_files.splitlines() for path in paths):
-            author = await get_commit_author(commit)
-            return author
+            return await get_commit_author(commit)
     return None
 
-async def main_async():
+
+async def main_async() -> None:
     parser = argparse.ArgumentParser(description="Process profiles JSON files and perform updates.")
     parser.add_argument("--authors", action="store_true", help="Update authors")
     parser.add_argument("--library-json", action="store_true", help="Generate library.json")
@@ -516,19 +530,20 @@ async def main_async():
     total_time = (datetime.now() - start_time).total_seconds()
     print(f"All operations completed in {total_time:.2f} seconds")
 
-def is_number(value):
+
+def is_number(value: float | str | None) -> bool:
     """Try to convert value to a float."""
     try:
         fvalue = float(value)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return False
-    if not math.isfinite(fvalue):
-        return False
-    return True
+    return math.isfinite(fvalue)
 
-def main():
+
+def main() -> None:
     """Entry point that runs the async main function"""
     asyncio.run(main_async())
+
 
 if __name__ == "__main__":
     main()
