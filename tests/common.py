@@ -45,6 +45,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.discovery import DISCOVERY_DELAY
 
 type StateDefinition = (
     tuple[str, StateType] | tuple[str, StateType, Mapping[str, Any]] | tuple[str, StateType, Mapping[str, Any], bool]
@@ -90,6 +91,9 @@ async def run_powercalc_setup(
 
     hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
     await hass.async_block_till_done()
+
+    # Initial discovery is scheduled DISCOVERY_DELAY after setup, so let it fire.
+    await async_advance_time(hass, DISCOVERY_DELAY)
 
 
 def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:

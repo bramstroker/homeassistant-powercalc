@@ -117,6 +117,22 @@ def _build_domain_device_type_mapping() -> Mapping[str, set[DeviceType]]:
 DOMAIN_DEVICE_TYPE_MAPPING: Mapping[str, set[DeviceType]] = _build_domain_device_type_mapping()
 
 
+def is_device_type_supported_for_entity(device_type: DeviceType | None, entity_entry: RegistryEntry) -> bool:
+    """Check whether a device type can be applied to a given entity.
+
+    Kept module level so discovery can apply it to the device type from the library index,
+    without having to build the full power profile first.
+    """
+    if device_type is None:
+        return False
+
+    # see https://github.com/bramstroker/homeassistant-powercalc/issues/2529
+    if device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:
+        return False
+
+    return device_type in DOMAIN_DEVICE_TYPE_MAPPING[entity_entry.domain]
+
+
 class PowerProfile:
     def __init__(
         self,
@@ -433,16 +449,7 @@ class PowerProfile:
 
     def is_entity_domain_supported(self, entity_entry: RegistryEntry) -> bool:
         """Check whether this power profile supports a given entity domain."""
-        if self.device_type is None:
-            return False
-
-        domain = entity_entry.domain
-
-        # see https://github.com/bramstroker/homeassistant-powercalc/issues/2529
-        if self.device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:
-            return False
-
-        return self.device_type in DOMAIN_DEVICE_TYPE_MAPPING[domain]
+        return is_device_type_supported_for_entity(self.device_type, entity_entry)
 
     @property
     def is_custom_profile(self) -> bool:

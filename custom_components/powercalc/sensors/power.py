@@ -242,7 +242,7 @@ async def _get_power_profile(
 
     power_profile = None
     try:
-        model_info = await discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry)
+        model_info = discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry)
         power_profile = await get_power_profile(
             hass,
             sensor_config,

@@ -119,6 +119,7 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     assert result["data"][CONF_LINEAR] == {CONF_MIN_POWER: 2, CONF_MAX_POWER: 50}
 
     await async_setup_entry(hass, result["result"])
+    await hass.async_block_till_done()
 
     config_entry = result["result"]
 

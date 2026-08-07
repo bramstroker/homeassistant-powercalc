@@ -31,6 +31,19 @@ def is_composite_device_id(hass: HomeAssistant, device_id: str) -> bool:
     return bool(is_composite(device_id))
 
 
+def get_non_composite_devices(hass: HomeAssistant) -> list[DeviceEntry]:
+    """Return all registered devices which are not legacy composite devices.
+
+    Resolves the registry and the composite device support once, instead of per device like
+    a per-entry `is_composite_device_id` call would.
+    """
+    device_reg = device_registry.async_get(hass)
+    is_composite = getattr(device_reg, "async_is_composite_device_id", None)
+    if not callable(is_composite):
+        return list(device_reg.devices.values())
+    return [device for device in device_reg.devices.values() if not is_composite(device.id)]
+
+
 def get_related_device_ids(hass: HomeAssistant, device_id: str) -> set[str]:
     """
     Return the IDs of all devices representing the same physical device, including `device_id` itself.
@@ -97,11 +110,7 @@ def get_first_device_for_config_entry(hass: HomeAssistant, config_entry_id: str)
 
 def get_devices_for_config_entry(hass: HomeAssistant, config_entry_id: str) -> list[DeviceEntry]:
     """Return all non-composite devices belonging to a config entry."""
-    return [
-        device
-        for device in device_registry.async_get(hass).devices.values()
-        if config_entry_id in get_config_entry_ids(device) and not is_composite_device_id(hass, device.id)
-    ]
+    return [device for device in get_non_composite_devices(hass) if config_entry_id in get_config_entry_ids(device)]
 
 
 def get_related_devices(hass: HomeAssistant, device_id: str) -> list[DeviceEntry]:

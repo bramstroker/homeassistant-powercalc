@@ -1,3 +1,4 @@
+from copy import deepcopy
 import json
 import os
 import re
@@ -19,7 +20,7 @@ from custom_components.powercalc.helpers import (
 from .error import LibraryError
 from .loader.composite import CompositeLoader
 from .loader.local import LocalLoader
-from .loader.protocol import Loader
+from .loader.protocol import Loader, ModelMetadata
 from .loader.remote import RemoteLoader
 from .power_profile import DeviceType, DiscoveryBy, PowerProfile
 
@@ -48,9 +49,14 @@ class ProfileLibrary:
         self._loader = loader
         self._profiles: dict[str, list[PowerProfile]] = {}
         self._manufacturer_models: dict[str, set[tuple[str, str]]] = {}
+        self._sub_profile_data: dict[str, list[tuple[str, dict[str, Any]]]] = {}
+        self._found_models: dict[ModelInfo, list[ModelInfo]] = {}
 
-    async def initialize(self) -> None:
-        await self._loader.initialize()
+    async def initialize(self, prefer_cached: bool = False) -> None:
+        """Initialize the underlying loaders, see `Loader.initialize` for `prefer_cached`."""
+        self._sub_profile_data.clear()
+        self._found_models.clear()
+        await self._loader.initialize(prefer_cached)
 
     @property
     def discovery_ignored_domains(self) -> set[str]:
@@ -65,7 +71,8 @@ class ProfileLibrary:
         Make sure we have a single instance throughout the application.
         """
         library = ProfileLibrary(hass, ProfileLibrary.create_loader(hass))
-        await library.initialize()
+        # Startup must not block on the download API. The periodic library update refreshes it.
+        await library.initialize(prefer_cached=True)
         return library
 
     @staticmethod
@@ -129,15 +136,20 @@ class ProfileLibrary:
         custom_directory: str | None = None,
         variables: dict[str, str] | None = None,
         process_variables: bool = True,
+        model_resolved: bool = False,
     ) -> PowerProfile:
-        """Get a power profile for a given manufacturer and model."""
+        """Get a power profile for a given manufacturer and model.
+
+        Pass `model_resolved` when `model_info` already comes out of `find_models`, to skip
+        looking the model up in the library a second time.
+        """
         # Support multiple LUT in subdirectories
         sub_profile = None
         if "/" in model_info.model:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
-        if not custom_directory:
+        if not custom_directory and not model_resolved:
             models = await self.find_models(model_info)
             if not models:
                 raise LibraryError(f"Model {model_info.manufacturer} {model_info.model} not found")
@@ -178,7 +190,11 @@ class ProfileLibrary:
             )
             json_data.update(linked_json_data)
 
-        raw_sub_profiles = await self._hass.async_add_executor_job(load_sub_profile_data, directory)
+        raw_sub_profiles = self._sub_profile_data.get(directory)
+        if raw_sub_profiles is None:
+            raw_sub_profiles = await self._hass.async_add_executor_job(load_sub_profile_data, directory)
+            self._sub_profile_data[directory] = raw_sub_profiles
+
         sub_profiles = [
             (
                 sub_dir,
@@ -202,10 +218,14 @@ class ProfileLibrary:
         source_entity: SourceEntity | None,
         process_variables: bool,
     ) -> dict[str, Any]:
-        # json_data is potentially retrieved from cache, so we need to copy it to avoid modifying the cache
-        json_data = json_data.copy()
         if not process_variables:
-            return json_data
+            # json_data is retrieved from cache, so we need to copy it to avoid modifying the cache
+            return json_data.copy()
+
+        # replace_placeholders rewrites nested dicts and lists in place, so a shallow copy is not
+        # enough here. Without a deep copy the substituted values leak into the cached profile data
+        # and the next profile built from the same model would reuse them.
+        json_data = deepcopy(json_data)
 
         if json_data.get("fields"):  # When custom fields in profile are defined, make sure all variables are passed
             self.validate_variables(json_data, variables)
@@ -258,8 +278,25 @@ class ProfileLibrary:
         """Resolve the manufacturer, either from the model info or by loading it."""
         return await self._loader.find_manufacturers(manufacturer)
 
+    async def get_model_metadata(self, model_info: ModelInfo) -> ModelMetadata | None:
+        """Return discovery metadata for an already resolved model, without building the profile."""
+        return await self._loader.get_model_metadata(model_info.manufacturer, model_info.model)
+
     async def find_models(self, model_info: ModelInfo) -> list[ModelInfo]:
-        """Resolve the model identifier, searching for it if no custom directory is provided."""
+        """Resolve the model identifier, searching for it if no custom directory is provided.
+
+        Discovery resolves the same handful of models for every entity of a device, so the
+        result is memoized until the library is reloaded.
+        """
+        if model_info in self._found_models:
+            return self._found_models[model_info]
+
+        found = await self._find_models(model_info)
+        self._found_models[model_info] = found
+        return found
+
+    async def _find_models(self, model_info: ModelInfo) -> list[ModelInfo]:
+        """Search the loaders for all models matching the given model info."""
         search: set[str] = set()
         for model_identifier in (model_info.model_id, model_info.model):
             if model_identifier:
