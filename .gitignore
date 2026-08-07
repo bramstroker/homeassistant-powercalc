@@ -11,6 +11,9 @@ cov.xml
 
 custom_components/test
 
+# Home Assistant config created by script/develop.sh
+/config
+
 *.egg-info/
 
 # PyEnv Version File
