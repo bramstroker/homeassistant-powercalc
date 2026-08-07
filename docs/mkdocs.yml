@@ -161,6 +161,7 @@ nav:
       - 'cookbook/ups.md'
   - 'Contributing':
       - 'contributing/index.md'
+      - 'Commit messages': 'contributing/commits.md'
       - 'Measure':
           - 'contributing/measure/index.md'
           - 'Home Assistant app': 'contributing/measure/home-assistant-app.md'
