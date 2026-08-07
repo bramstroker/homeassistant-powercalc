@@ -13,7 +13,7 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STARTED,
 )
 from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
@@ -55,6 +55,11 @@ _HAS_SINGLE_CONFIG_ENTRY = hasattr(DeviceEntry, "config_entry_id")
 requires_composite_devices = pytest.mark.skipif(
     not hasattr(DeviceEntry, "composite_device_id"),
     reason="Composite devices were only split off in HA >=2026.8",
+)
+
+requires_linked_devices = pytest.mark.skipif(
+    not hasattr(DeviceRegistry, "async_get_devices"),
+    reason="Devices sharing identifiers or connections were only split up in HA >=2026.8",
 )
 
 

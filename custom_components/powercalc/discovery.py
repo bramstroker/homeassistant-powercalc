@@ -34,9 +34,9 @@ from .const import (
     CalculationStrategy,
 )
 from .device_binding import (
-    get_composite_split_devices,
     get_config_entry_ids,
     get_first_device_for_config_entry,
+    get_related_device_ids,
     is_composite_device_id,
 )
 from .group_include.filter import (
@@ -201,19 +201,19 @@ class DiscoveryManager:
     def _initialize_configured_device(self, entry: ConfigEntry) -> None:
         """Mark the device a config entry was setup for as already setup.
 
-        HA >=2026.8 splits devices belonging to multiple config entries into one device per entry.
-        The entry may hold the composite device ID, which no longer resolves to a registered device,
-        or one of the split devices after the user resolved the composite device repair. Either way
-        all devices split off from that composite represent the same physical device the user already
-        configured, so none of them should be discovered again.
+        A single physical device can be represented by several device registry entries. HA >=2026.8
+        splits devices belonging to multiple config entries into one device per entry, so the entry
+        may hold the composite device ID, which no longer resolves to a registered device, or one of
+        the split devices after the user resolved the composite device repair. Devices can also be
+        registered by several integrations, in which case they share identifiers or connections.
+        All of them are the device the user already configured, so none should be discovered again.
         """
         device_id = entry.data.get(CONF_DEVICE)
         if not device_id:
             return
 
-        self.initialized_flows.add(f"pc_{device_id}")
-        for device in get_composite_split_devices(self.hass, str(device_id)):
-            self.initialized_flows.add(f"pc_{device.id}")
+        for related_device_id in get_related_device_ids(self.hass, str(device_id)):
+            self.initialized_flows.add(f"pc_{related_device_id}")
 
     def remove_initialized_flow(self, entry: ConfigEntry) -> None:
         """Remove a flow from the initialized flows."""
