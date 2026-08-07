@@ -49,7 +49,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         with:
           add: 'profile_library'
-          message: 'Update profile library'
+          message: 'chore(profile): update generated library'
           push: 'origin HEAD:master --force'
       - name: Wait 5 seconds
         run: sleep 5

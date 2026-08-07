@@ -25,6 +25,7 @@ jobs:
           upload_sources: false
           upload_translations: false
           download_translations: true
+          commit_message: 'chore(translations): update translations'
           localization_branch_name: crowdin
           create_pull_request: true
           pull_request_title: 'Update translations'

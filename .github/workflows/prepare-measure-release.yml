@@ -127,7 +127,7 @@ jobs:
             utils/measure/frontend/package-lock.json \
             utils/measure/home-assistant-app/powercalc_measure/CHANGELOG.md \
             utils/measure/home-assistant-app/powercalc_measure/config.yaml
-          git commit -m "chore: prepare Powercalc Measure release ${VERSION}"
+          git commit -m "chore(measure): prepare release ${VERSION}"
 
           # The branch is generated from master on every run, so overwriting a
           # previous attempt is always safe. The token is supplied only for
