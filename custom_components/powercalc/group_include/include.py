@@ -62,8 +62,8 @@ async def find_entities(
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug("Source entities: %s", [entity.entity_id for entity in source_entities])
 
-    for source_entity in source_entities:
-        entity_id = source_entity.entity_id
+    for entity_entry in source_entities:
+        entity_id = entity_entry.entity_id
 
         mapped = source_entity_powercalc_entity_map.get(entity_id)
         if mapped:
@@ -75,12 +75,12 @@ async def find_entities(
             resolved_entities.append(existing)
             continue
 
-        real_sensor = _create_real_sensor(source_entity)
+        real_sensor = _create_real_sensor(entity_entry)
         if real_sensor:
             resolved_entities.append(real_sensor)
             continue
 
-        if await _is_discoverable_source_entity(hass, source_entity):
+        if await _is_discoverable_source_entity(hass, entity_entry):
             discoverable_entities.append(entity_id)
 
     if exclude_utility_meters:
@@ -95,18 +95,18 @@ async def find_entities(
 
 def _is_source_entity_eligible(
     hass: HomeAssistant,
-    source_entity: RegistryEntry,
+    entity_entry: RegistryEntry,
     include_non_powercalc: bool,
 ) -> bool:
     """Return whether a registry entity is eligible for Powercalc discovery."""
-    if source_entity.platform != DOMAIN:
-        return include_non_powercalc or source_entity.domain != sensor.DOMAIN
+    if entity_entry.platform != DOMAIN:
+        return include_non_powercalc or entity_entry.domain != sensor.DOMAIN
 
     # YAML-created Powercalc entities have no config entry and are classified by their runtime type later.
-    if source_entity.config_entry_id is None:
+    if entity_entry.config_entry_id is None:
         return True
 
-    config_entry = hass.config_entries.async_get_entry(source_entity.config_entry_id)
+    config_entry = hass.config_entries.async_get_entry(entity_entry.config_entry_id)
     if config_entry is None:
         return False
 
@@ -117,30 +117,30 @@ def _is_source_entity_eligible(
         config_entry.data.get(ENTRY_DATA_POWER_ENTITY),
         config_entry.data.get(ENTRY_DATA_ENERGY_ENTITY),
     }
-    return source_entity.entity_id in main_entity_ids
+    return entity_entry.entity_id in main_entity_ids
 
 
-def _create_real_sensor(source_entity: RegistryEntry) -> Entity | None:
-    if source_entity.domain != sensor.DOMAIN:
+def _create_real_sensor(entity_entry: RegistryEntry) -> Entity | None:
+    if entity_entry.domain != sensor.DOMAIN:
         return None
 
-    device_class = source_entity.device_class or source_entity.original_device_class
+    device_class = entity_entry.device_class or entity_entry.original_device_class
     if device_class == SensorDeviceClass.POWER:
-        return RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement)
+        return RealPowerSensor(entity_entry.entity_id, entity_entry.unit_of_measurement)
     if device_class == SensorDeviceClass.ENERGY:
-        return RealEnergySensor(source_entity.entity_id)
+        return RealEnergySensor(entity_entry.entity_id)
     return None  # pragma: no cover
 
 
-async def _is_discoverable_source_entity(hass: HomeAssistant, source_entity: RegistryEntry) -> bool:
+async def _is_discoverable_source_entity(hass: HomeAssistant, entity_entry: RegistryEntry) -> bool:
     power_profile = await get_power_profile_by_source_entity(
         hass,
-        create_source_entity(source_entity.entity_id, hass),
+        create_source_entity(entity_entry.entity_id, hass),
     )
     return bool(
         power_profile
         and not await power_profile.needs_user_configuration
-        and power_profile.is_entity_domain_supported(source_entity),
+        and power_profile.is_entity_domain_supported(entity_entry),
     )
 
 

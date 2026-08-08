@@ -1,3 +1,4 @@
+from dataclasses import replace
 import logging
 
 from homeassistant.config_entries import ConfigEntry
@@ -12,7 +13,7 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_AREA, DUMMY_ENTITY_ID
+from custom_components.powercalc.const import CONF_AREA
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -131,12 +132,12 @@ def attach_configured_device_entry(
     source_entity: SourceEntity,
 ) -> SourceEntity:
     """Attach the configured device entry to a device-based source entity."""
-    if source_entity.entity_id != DUMMY_ENTITY_ID:
+    if not source_entity.is_dummy:
         return source_entity
 
     device_entry = get_device_entry(hass, sensor_config=sensor_config)
     if device_entry:
-        return source_entity._replace(device_entry=device_entry)
+        return replace(source_entity, device_entry=device_entry)
     return source_entity
 
 

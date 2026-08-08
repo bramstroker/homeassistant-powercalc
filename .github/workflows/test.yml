@@ -124,7 +124,14 @@ jobs:
         # --no-config skips the override-dependencies from pyproject.toml, which are
         # pinned against the locked release and conflict with older ones. --python is
         # required because UV_PYTHON, set by setup-uv, otherwise wins over .venv here.
-        run: uv pip install --no-config --python .venv "homeassistant==${HA_VERSION}" pytest-homeassistant-custom-component
+        # The floors keep a release without a matching plugin an outright resolution
+        # error: without them the resolver walks back to a plugin old enough to pin no
+        # homeassistant at all, and silently swaps in a pytest that predates our Python.
+        run: |
+          uv pip install --no-config --python .venv \
+            "homeassistant==${HA_VERSION}" \
+            "pytest-homeassistant-custom-component>=0.13" \
+            "pytest>=9"
       - name: Prepare test env
         run: bash tests/setup.sh
       - name: Run tests

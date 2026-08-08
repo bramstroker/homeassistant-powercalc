@@ -248,7 +248,7 @@ async def initialize_discovery_flow(
                 hass,
                 {},
                 source_entity,
-                discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry),
+                discovery_manager.extract_model_info(source_entity),
             ),
         ]
 

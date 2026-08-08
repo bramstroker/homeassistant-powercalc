@@ -12,13 +12,16 @@ that did not exist yet when it was published.
 import json
 import re
 import time
+from typing import Any
 import urllib.error
 import urllib.request
 
 PYPI_URL = "https://pypi.org/pypi/homeassistant/json"
+PLUGIN_URL = "https://pypi.org/pypi/pytest-homeassistant-custom-component/json"
 CONST_FILE = "custom_components/powercalc/const.py"
 STABLE_VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 PYTHON_FLOOR = re.compile(r">=\s*(\d+)\.(\d+)")
+PLUGIN_HA_PIN = re.compile(r"^homeassistant\s*==\s*(\d+)\.(\d+)\.(\d+)")
 
 
 def read_min_version() -> tuple[int, int]:
@@ -36,24 +39,45 @@ def read_min_version() -> tuple[int, int]:
     return int(version.group(1)), int(version.group(2))
 
 
-def fetch_releases() -> dict[str, str]:
-    """Fetch all published homeassistant versions from PyPI, mapped to their requires-python."""
+def fetch_pypi_json(url: str) -> dict[str, Any]:
+    """Fetch a PyPI JSON document, retrying a few times on network trouble."""
     last_error: Exception | None = None
     for attempt in range(3):
         try:
-            with urllib.request.urlopen(PYPI_URL, timeout=30) as response:  # noqa: S310
-                releases = json.load(response)["releases"]
+            with urllib.request.urlopen(url, timeout=30) as response:  # noqa: S310
+                return json.load(response)  # type: ignore[no-any-return]
         except (urllib.error.URLError, TimeoutError) as error:
             last_error = error
             time.sleep(2**attempt)
-        else:
-            return {
-                version: next((file["requires_python"] for file in files if file.get("requires_python")), "")
-                for version, files in releases.items()
-                if files
-            }
 
-    raise RuntimeError(f"Could not fetch releases from PyPI: {last_error}")
+    raise RuntimeError(f"Could not fetch {url} from PyPI: {last_error}")
+
+
+def fetch_releases() -> dict[str, str]:
+    """Fetch all published homeassistant versions from PyPI, mapped to their requires-python."""
+    return {
+        version: next((file["requires_python"] for file in files if file.get("requires_python")), "")
+        for version, files in fetch_pypi_json(PYPI_URL)["releases"].items()
+        if files
+    }
+
+
+def fetch_max_supported_version() -> tuple[int, int, int]:
+    """Return the newest Home Assistant release the test plugin can be installed against.
+
+    pytest-homeassistant-custom-component pins one exact Home Assistant release, so its newest
+    release names the newest one that has a matching plugin. A Home Assistant release published
+    before the plugin catches up has none, and asking for both together does not fail: the
+    resolver walks back to a plugin old enough to pin no Home Assistant at all, quietly bringing
+    a pytest that predates the Python we run on. Leave those releases out until the plugin lands.
+    """
+    info = fetch_pypi_json(PLUGIN_URL)["info"]
+    for requirement in info.get("requires_dist") or []:
+        pin = PLUGIN_HA_PIN.match(requirement)
+        if pin:
+            return int(pin.group(1)), int(pin.group(2)), int(pin.group(3))
+
+    raise RuntimeError(f"pytest-homeassistant-custom-component {info['version']} does not pin a Home Assistant release")
 
 
 def python_version_for(release: str, requires_python: str) -> str:
@@ -65,8 +89,12 @@ def python_version_for(release: str, requires_python: str) -> str:
     return f"{floor.group(1)}.{floor.group(2)}"
 
 
-def build_matrix(releases: dict[str, str], min_version: tuple[int, int]) -> list[dict[str, str]]:
-    """Pick the highest patch release of every month at or after the minimum version."""
+def build_matrix(
+    releases: dict[str, str],
+    min_version: tuple[int, int],
+    max_version: tuple[int, int, int],
+) -> list[dict[str, str]]:
+    """Pick the highest supported patch release of every month at or after the minimum version."""
     latest_per_month: dict[tuple[int, int], tuple[int, str]] = {}
     for release in releases:
         version = STABLE_VERSION.match(release)
@@ -78,6 +106,9 @@ def build_matrix(releases: dict[str, str], min_version: tuple[int, int]) -> list
             continue
 
         patch = int(version.group(3))
+        if (*month, patch) > max_version:
+            continue
+
         known = latest_per_month.get(month)
         if known is None or patch > known[0]:
             latest_per_month[month] = (patch, release)
@@ -89,7 +120,7 @@ def build_matrix(releases: dict[str, str], min_version: tuple[int, int]) -> list
 
 
 def main() -> None:
-    versions = build_matrix(fetch_releases(), read_min_version())
+    versions = build_matrix(fetch_releases(), read_min_version(), fetch_max_supported_version())
     print(f"versions={json.dumps(versions)}")
 
 
