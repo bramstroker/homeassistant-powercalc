@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - '.github/scripts/ha_version_matrix.py'
+      - '.github/scripts/profile_library/**'
       - '.github/scripts/release_draft/**'
       - '.github/workflows/test.yml'
       - 'custom_components/powercalc/**'
@@ -15,6 +16,7 @@ on:
   pull_request:
     paths:
       - '.github/scripts/ha_version_matrix.py'
+      - '.github/scripts/profile_library/**'
       - '.github/scripts/release_draft/**'
       - '.github/workflows/test.yml'
       - 'custom_components/powercalc/**'
@@ -49,11 +51,13 @@ jobs:
             pyproject.toml
             uv.lock
       - name: Install dependencies
-        run: uv sync --locked --group dev
+        run: uv sync --locked --group dev --group library
       - name: Prepare test env
         run: bash tests/setup.sh
       - name: Run release draft engine tests
         run: uv run --locked pytest .github/scripts/release_draft/tests -qq
+      - name: Run profile library script tests
+        run: uv run --locked pytest .github/scripts/profile_library/tests -qq
       - name: Run tests
         run: |
           uv run --locked pytest \
