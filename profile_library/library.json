@@ -1,5 +1,5 @@
 {
-  "discovery_ignored_domains": [
+  "discovery_low_priority_domains": [
     "unifi"
   ],
   "manufacturers": [

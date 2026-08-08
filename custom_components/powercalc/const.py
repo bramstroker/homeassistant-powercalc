@@ -242,7 +242,7 @@ DISCOVERY_SOURCE_ENTITY = "source_entity"
 DISCOVERY_POWER_PROFILES = "power_profiles"
 DISCOVERY_INTEGRATION_NAME = "integration_name"
 DISCOVERY_TYPE = "discovery_type"
-LIBRARY_DISCOVERY_IGNORED_DOMAINS = "discovery_ignored_domains"
+LIBRARY_DISCOVERY_LOW_PRIORITY_DOMAINS = "discovery_low_priority_domains"
 
 LIBRARY_URL = "https://library.powercalc.nl"
 API_URL = "https://api.powercalc.nl"

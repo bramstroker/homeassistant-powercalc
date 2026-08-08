@@ -18,8 +18,8 @@ class Loader(Protocol):
         downloads off the caller's critical path.
         """
 
-    def get_discovery_ignored_domains(self) -> set[str]:
-        """Get integration domains excluded from discovery."""
+    def get_discovery_low_priority_domains(self) -> set[str]:
+        """Get integration domains that are the least preferred source for discovery."""
 
     async def get_manufacturer_listing(
         self,

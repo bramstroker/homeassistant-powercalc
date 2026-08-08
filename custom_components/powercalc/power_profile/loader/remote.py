@@ -20,7 +20,7 @@ from custom_components.powercalc.const import (
     API_URL,
     BUILT_IN_LIBRARY_DIR,
     DOMAIN,
-    LIBRARY_DISCOVERY_IGNORED_DOMAINS,
+    LIBRARY_DISCOVERY_LOW_PRIORITY_DOMAINS,
 )
 from custom_components.powercalc.helpers import async_cache, clear_async_cache
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
@@ -89,9 +89,9 @@ class RemoteLoader(Loader):
         for manufacturer in manufacturers:
             self._index_manufacturer(manufacturer, powercalc_version)
 
-    def get_discovery_ignored_domains(self) -> set[str]:
-        """Get integration domains excluded from discovery by library metadata."""
-        return set(self.library_contents.get(LIBRARY_DISCOVERY_IGNORED_DOMAINS, []))
+    def get_discovery_low_priority_domains(self) -> set[str]:
+        """Get the low priority discovery integration domains declared by library metadata."""
+        return set(self.library_contents.get(LIBRARY_DISCOVERY_LOW_PRIORITY_DOMAINS, []))
 
     def _index_manufacturer(self, manufacturer: LibraryManufacturer, powercalc_version: AwesomeVersion) -> None:
         """Register a manufacturer, its aliases and all of its supported models in the lookup tables."""

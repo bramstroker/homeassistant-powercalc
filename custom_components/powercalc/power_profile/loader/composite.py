@@ -15,9 +15,9 @@ class CompositeLoader(Loader):
         for loader in self.loaders:
             await loader.initialize(prefer_cached)
 
-    def get_discovery_ignored_domains(self) -> set[str]:
-        """Get all integration domains excluded by the combined libraries."""
-        return {domain for loader in self.loaders for domain in loader.get_discovery_ignored_domains()}
+    def get_discovery_low_priority_domains(self) -> set[str]:
+        """Get all low priority integration domains of the combined libraries."""
+        return {domain for loader in self.loaders for domain in loader.get_discovery_low_priority_domains()}
 
     async def get_manufacturer_listing(
         self,

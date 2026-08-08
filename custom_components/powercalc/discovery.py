@@ -151,7 +151,7 @@ class DiscoveryStats:
     """
 
     candidates: int = 0
-    ignored_integration: int = 0
+    low_priority_integration: int = 0
     no_model_info: int = 0
     no_profile_match: int = 0
     already_configured: int = 0
@@ -362,17 +362,28 @@ class DiscoveryManager:
     ) -> DiscoveryStats:
         """Discover profiles and create flows for normalized candidates."""
         library = await self._get_library()
-        ignored_domains = library.discovery_ignored_domains
+        low_priority_domains = library.discovery_low_priority_domains
         stats = DiscoveryStats()
-        for candidate in candidates:
+        # Device candidates from low priority integrations go last, so a device represented by
+        # several integrations is discovered through the preferred one, and only falls back to
+        # the low priority representation when nothing better matched a profile.
+        ordered_candidates = sorted(
+            candidates,
+            key=lambda candidate: (
+                candidate.discovery_type == DiscoveryBy.DEVICE
+                and bool(candidate.integration_domains & low_priority_domains)
+            ),
+        )
+        for candidate in ordered_candidates:
             stats.candidates += 1
             try:
-                if matched_ignored_domains := candidate.integration_domains & ignored_domains:
-                    stats.ignored_integration += 1
+                matched_low_priority_domains = candidate.integration_domains & low_priority_domains
+                if candidate.discovery_type != DiscoveryBy.DEVICE and matched_low_priority_domains:
+                    stats.low_priority_integration += 1
                     _LOGGER.debug(
-                        "%s: Integration domain is ignored, skipping discovery (domains=[%s])",
+                        "%s: Integration domain has low discovery priority, skipping discovery (domains=[%s])",
                         candidate.log_identifier,
-                        ",".join(sorted(matched_ignored_domains)),
+                        ",".join(sorted(matched_low_priority_domains)),
                     )
                     continue
                 source_entity = candidate.source_entity
@@ -395,7 +406,7 @@ class DiscoveryManager:
                     candidate, match.power_profiles[0] if match.power_profiles else None
                 )
 
-                if self._is_already_discovered(source_entity, unique_id):
+                if self._is_already_discovered(candidate, unique_id):
                     stats.already_configured += 1
                     _LOGGER.debug(
                         "%s: Already setup with discovery, skipping new discovery (unique_id=%s)",
@@ -928,13 +939,18 @@ class DiscoveryManager:
                 if isinstance(item, dict | list):
                     yield from self._iter_entity_ids(item)
 
-    def _is_already_discovered(self, source_entity: SourceEntity, unique_id: str) -> bool:
+    def _is_already_discovered(self, candidate: DiscoveryCandidate, unique_id: str) -> bool:
         """Prevent duplicate discovery flows."""
+        source_entity = candidate.source_entity
         unique_ids_to_check = {
             key for key in (unique_id, source_entity.entity_id, source_entity.unique_id) if key is not None
         }
         if unique_id.startswith(DISCOVERY_KEY_PREFIX):
             unique_ids_to_check.add(unique_id.removeprefix(DISCOVERY_KEY_PREFIX))
+
+        if candidate.discovery_type == DiscoveryBy.DEVICE and source_entity.device_id:
+            unique_ids_to_check.update(get_related_device_ids(self.hass, source_entity.device_id))
+
         unique_ids_to_check.update({device_discovery_key(uid) for uid in unique_ids_to_check})
 
         return not (
