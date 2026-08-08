@@ -1420,55 +1420,55 @@ async def test_discovery_compatible_integrations(
     assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == "light.hue_light"
 
 
-async def test_discovery_ignored_domain_filters_entities(
+async def test_discovery_low_priority_domain_filters_entities(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    """Entities provided by a globally ignored integration must not be discovered."""
+    """Entities provided by a low priority integration must never be discovered."""
     mock_entities_in_registry(
         hass,
         {
-            "light.ignored": {"platform": "ignored", "device_id": "ignored-device"},
-            "light.allowed": {"platform": "hue", "device_id": "allowed-device"},
+            "light.low_priority": {"platform": "low_priority", "device_id": "low-priority-device"},
+            "light.preferred": {"platform": "hue", "device_id": "preferred-device"},
         },
     )
     mock_devices(
         hass,
         {
-            "ignored-device": {"manufacturer": "test", "model": "compatible_integrations"},
-            "allowed-device": {"manufacturer": "test", "model": "compatible_integrations"},
+            "low-priority-device": {"manufacturer": "test", "model": "compatible_integrations"},
+            "preferred-device": {"manufacturer": "test", "model": "compatible_integrations"},
         },
     )
 
     with patch(
-        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_ignored_domains",
-        return_value={"ignored"},
+        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_low_priority_domains",
+        return_value={"low_priority"},
     ):
         await run_powercalc_setup(hass)
 
     assert len(mock_flow_init.mock_calls) == 1
-    assert mock_flow_init.mock_calls[0][2]["data"][CONF_ENTITY_ID] == "light.allowed"
+    assert mock_flow_init.mock_calls[0][2]["data"][CONF_ENTITY_ID] == "light.preferred"
 
 
-async def test_discovery_ignored_domain_is_fallback_for_unrelated_devices(
+async def test_discovery_low_priority_domain_is_fallback_for_unrelated_devices(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    """An ignored integration remains eligible when it is the only representation of a device."""
-    ignored_entry = MockConfigEntry(domain="ignored")
-    ignored_entry.add_to_hass(hass)
-    allowed_entry = MockConfigEntry(domain="allowed")
-    allowed_entry.add_to_hass(hass)
+    """A low priority integration remains eligible when it is the only representation of a device."""
+    low_priority_entry = MockConfigEntry(domain="low_priority")
+    low_priority_entry.add_to_hass(hass)
+    preferred_entry = MockConfigEntry(domain="preferred")
+    preferred_entry.add_to_hass(hass)
     mock_devices(
         hass,
         {
-            "ignored-device": {
-                "config_entry_id": ignored_entry.entry_id,
+            "low-priority-device": {
+                "config_entry_id": low_priority_entry.entry_id,
                 "manufacturer": "test",
                 "model": "discovery_type_device",
             },
-            "allowed-device": {
-                "config_entry_id": allowed_entry.entry_id,
+            "preferred-device": {
+                "config_entry_id": preferred_entry.entry_id,
                 "manufacturer": "test",
                 "model": "discovery_type_device",
             },
@@ -1476,36 +1476,36 @@ async def test_discovery_ignored_domain_is_fallback_for_unrelated_devices(
     )
 
     with patch(
-        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_ignored_domains",
-        return_value={"ignored"},
+        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_low_priority_domains",
+        return_value={"low_priority"},
     ):
         await run_powercalc_setup(hass)
 
     unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
-    assert unique_ids == {"pc_ignored-device", "pc_allowed-device"}
+    assert unique_ids == {"pc_low-priority-device", "pc_preferred-device"}
 
 
 @requires_linked_devices
-async def test_discovery_prefers_non_ignored_device_representation(
+async def test_discovery_prefers_higher_priority_device_representation(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    """A matching non-ignored integration should win over an ignored representation."""
-    ignored_entry = MockConfigEntry(domain="ignored")
-    ignored_entry.add_to_hass(hass)
-    allowed_entry = MockConfigEntry(domain="allowed")
-    allowed_entry.add_to_hass(hass)
+    """A matching higher priority integration should win over a low priority representation."""
+    low_priority_entry = MockConfigEntry(domain="low_priority")
+    low_priority_entry.add_to_hass(hass)
+    preferred_entry = MockConfigEntry(domain="preferred")
+    preferred_entry.add_to_hass(hass)
     mock_devices(
         hass,
         {
-            "ignored-device": {
-                "config_entry_id": ignored_entry.entry_id,
+            "low-priority-device": {
+                "config_entry_id": low_priority_entry.entry_id,
                 "manufacturer": "test",
                 "model": "discovery_type_device",
                 "connections": {(dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff")},
             },
-            "allowed-device": {
-                "config_entry_id": allowed_entry.entry_id,
+            "preferred-device": {
+                "config_entry_id": preferred_entry.entry_id,
                 "manufacturer": "test",
                 "model": "discovery_type_device",
                 "connections": {(dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff")},
@@ -1514,36 +1514,36 @@ async def test_discovery_prefers_non_ignored_device_representation(
     )
 
     with patch(
-        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_ignored_domains",
-        return_value={"ignored"},
+        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_low_priority_domains",
+        return_value={"low_priority"},
     ):
         await run_powercalc_setup(hass)
 
     unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
-    assert unique_ids == {"pc_allowed-device"}
+    assert unique_ids == {"pc_preferred-device"}
 
 
 @requires_linked_devices
-async def test_discovery_uses_ignored_device_when_preferred_representation_has_no_profile(
+async def test_discovery_uses_low_priority_device_when_preferred_representation_has_no_profile(
     hass: HomeAssistant,
     mock_flow_init: AsyncMock,
 ) -> None:
-    """An ignored representation should be the fallback when preferred devices do not match a profile."""
-    ignored_entry = MockConfigEntry(domain="ignored")
-    ignored_entry.add_to_hass(hass)
-    allowed_entry = MockConfigEntry(domain="allowed")
-    allowed_entry.add_to_hass(hass)
+    """A low priority representation should be the fallback when preferred devices do not match a profile."""
+    low_priority_entry = MockConfigEntry(domain="low_priority")
+    low_priority_entry.add_to_hass(hass)
+    preferred_entry = MockConfigEntry(domain="preferred")
+    preferred_entry.add_to_hass(hass)
     mock_devices(
         hass,
         {
-            "ignored-device": {
-                "config_entry_id": ignored_entry.entry_id,
+            "low-priority-device": {
+                "config_entry_id": low_priority_entry.entry_id,
                 "manufacturer": "test",
                 "model": "discovery_type_device",
                 "connections": {(dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff")},
             },
-            "allowed-device": {
-                "config_entry_id": allowed_entry.entry_id,
+            "preferred-device": {
+                "config_entry_id": preferred_entry.entry_id,
                 "manufacturer": "test",
                 "model": "unsupported",
                 "connections": {(dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff")},
@@ -1552,10 +1552,10 @@ async def test_discovery_uses_ignored_device_when_preferred_representation_has_n
     )
 
     with patch(
-        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_ignored_domains",
-        return_value={"ignored"},
+        "custom_components.powercalc.power_profile.loader.remote.RemoteLoader.get_discovery_low_priority_domains",
+        return_value={"low_priority"},
     ):
         await run_powercalc_setup(hass)
 
     unique_ids = {call[2]["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
-    assert unique_ids == {"pc_ignored-device"}
+    assert unique_ids == {"pc_low-priority-device"}

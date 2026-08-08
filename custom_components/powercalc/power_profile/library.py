@@ -59,9 +59,13 @@ class ProfileLibrary:
         await self._loader.initialize(prefer_cached)
 
     @property
-    def discovery_ignored_domains(self) -> set[str]:
-        """Get integration domains globally excluded from discovery."""
-        return self._loader.get_discovery_ignored_domains()
+    def discovery_low_priority_domains(self) -> set[str]:
+        """Get integration domains that are the least preferred source for discovery.
+
+        Devices behind these integrations are only discovered when no other integration
+        represents them, and their entities are never discovered by entity discovery.
+        """
+        return self._loader.get_discovery_low_priority_domains()
 
     @staticmethod
     @singleton("powercalc_library")

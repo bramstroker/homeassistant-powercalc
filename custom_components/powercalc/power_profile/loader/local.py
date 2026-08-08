@@ -25,7 +25,7 @@ class LocalLoader(Loader):
         if not self._is_custom_directory:
             await self._hass.async_add_executor_job(self._load_custom_library)
 
-    def get_discovery_ignored_domains(self) -> set[str]:
+    def get_discovery_low_priority_domains(self) -> set[str]:
         """Local profile directories do not provide global library metadata."""
         return set()
 

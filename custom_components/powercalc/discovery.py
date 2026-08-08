@@ -151,7 +151,7 @@ class DiscoveryStats:
     """
 
     candidates: int = 0
-    ignored_integration: int = 0
+    low_priority_integration: int = 0
     no_model_info: int = 0
     no_profile_match: int = 0
     already_configured: int = 0
@@ -362,25 +362,29 @@ class DiscoveryManager:
     ) -> DiscoveryStats:
         """Discover profiles and create flows for normalized candidates."""
         library = await self._get_library()
-        ignored_domains = library.discovery_ignored_domains
+        low_priority_domains = library.discovery_low_priority_domains
         stats = DiscoveryStats()
+        # Device candidates from low priority integrations go last, so a device represented by
+        # several integrations is discovered through the preferred one, and only falls back to
+        # the low priority representation when nothing better matched a profile.
         ordered_candidates = sorted(
             candidates,
             key=lambda candidate: (
-                candidate.discovery_type == DiscoveryBy.DEVICE and bool(candidate.integration_domains & ignored_domains)
+                candidate.discovery_type == DiscoveryBy.DEVICE
+                and bool(candidate.integration_domains & low_priority_domains)
             ),
         )
         for candidate in ordered_candidates:
             stats.candidates += 1
             try:
                 if candidate.discovery_type != DiscoveryBy.DEVICE and (
-                    matched_ignored_domains := candidate.integration_domains & ignored_domains
+                    matched_low_priority_domains := candidate.integration_domains & low_priority_domains
                 ):
-                    stats.ignored_integration += 1
+                    stats.low_priority_integration += 1
                     _LOGGER.debug(
-                        "%s: Integration domain is ignored, skipping discovery (domains=[%s])",
+                        "%s: Integration domain has low discovery priority, skipping discovery (domains=[%s])",
                         candidate.log_identifier,
-                        ",".join(sorted(matched_ignored_domains)),
+                        ",".join(sorted(matched_low_priority_domains)),
                     )
                     continue
                 source_entity = candidate.source_entity
