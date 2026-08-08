@@ -101,5 +101,5 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
 
         try:
             self.fan_controller.turn_off()
-        except Exception:  # noqa: BLE001 - cleanup must not mask the measurement outcome
+        except Exception:  # cleanup must not mask the measurement outcome
             _LOGGER.warning("Could not turn off fan during cleanup", exc_info=True)

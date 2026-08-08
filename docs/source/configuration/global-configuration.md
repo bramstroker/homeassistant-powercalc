@@ -20,7 +20,7 @@ When you'd like the change the configuration later, go to the [Powercalc integra
 
 !!! note
 
-    Sensors created with the GUI do have a configuration set for `create_energy_sensors`, `create_cost_sensor`, `create_utility_meters`, `ignore_unavailable_state` and `energy_integration_method`, changing global configuration will not affect the existing GUI configuration entries, to make it easy to change all of them Powercalc provides an action `powercalc.change_gui_config`. Refer to [Change GUI configuration action](#change-gui-configuration-action).
+    Sensors created with the GUI do have a configuration set for `create_energy_sensors`, `create_cost_sensor`, `create_utility_meters`, `ignore_unavailable_state` and `energy_integration_method`, changing global configuration will not affect the existing GUI configuration entries, to make it easy to change all of them Powercalc provides an action `powercalc.change_gui_config`. Refer to [Change GUI configuration action](../actions/change-gui-configuration.md).
 
 ## YAML configuration
 

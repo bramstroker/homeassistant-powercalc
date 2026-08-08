@@ -152,5 +152,5 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
 
         try:
             self.media_controller.turn_off()
-        except Exception:  # noqa: BLE001 - cleanup must not mask the measurement outcome
+        except Exception:  # cleanup must not mask the measurement outcome
             _LOGGER.warning("Could not turn off speaker during cleanup", exc_info=True)

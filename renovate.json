@@ -11,9 +11,22 @@
     "python"
   ],
   "dependencyDashboard": false,
+  "pre-commit": {
+    "description": "Off by default in Renovate. Without it the ruff pin in .pre-commit-config.yaml drifts behind the ruff in uv.lock and the two disagree on lint rules.",
+    "enabled": true
+  },
   "minimumReleaseAge": "3 days",
   "internalChecksFilter": "strict",
   "automergeStrategy": "squash",
+  "lockFileMaintenance": {
+    "description": "Re-resolve every lockfile weekly. Renovate only bumps declared dependencies, so without this transitive pins (urllib3, pip, pygments, ...) never move and pile up as OSV findings.",
+    "enabled": true,
+    "schedule": [
+      "before 6am on monday"
+    ],
+    "commitMessageAction": "refresh",
+    "automerge": true
+  },
   "packageRules": [
     {
       "description": "All non-major updates: one PR, automerged when CI is green",

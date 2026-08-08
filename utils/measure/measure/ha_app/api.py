@@ -340,7 +340,9 @@ def _register_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def internal_error(_: Request, error: Exception) -> JSONResponse:
-        _LOGGER.exception("Unhandled measure app request error", exc_info=error)
+        # Not lexically inside an `except` block, so `.exception()` trips LOG004.
+        # `.error()` with an explicit exc_info logs at the same level with the traceback.
+        _LOGGER.error("Unhandled measure app request error", exc_info=error)
         return JSONResponse(
             status_code=500,
             content=ErrorResponse(code="internal_error", message="Internal server error").model_dump(),
