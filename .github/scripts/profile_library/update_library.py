@@ -215,21 +215,24 @@ async def get_manufacturer_json(manufacturer: str) -> dict[str, Any]:
         async with aiofiles.open(json_path) as json_file:
             content = await json_file.read()
             manufacturer_data = json.loads(content)
-            return {
-                "aliases": manufacturer_data.get("aliases", []),
-                "name": manufacturer,
-                "full_name": manufacturer_data.get("name"),
-                "dir_name": manufacturer,
-            }
     except FileNotFoundError:
-        default_json = {"name": manufacturer.capitalize(), "aliases": []}
+        # A manufacturer added without its own manufacturer.json. Seed one from the directory
+        # name, then describe it exactly as an existing one, so the entry written to the library
+        # this run carries every field consumers rely on instead of only the seeded ones.
+        manufacturer_data = {"name": manufacturer.capitalize(), "aliases": []}
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(json_path), exist_ok=True)
         async with aiofiles.open(json_path, mode="w", encoding="utf-8") as json_file:
-            await json_file.write(json.dumps(default_json, ensure_ascii=False, indent=4) + "\n")
+            await json_file.write(json.dumps(manufacturer_data, ensure_ascii=False, indent=4) + "\n")
         git.Repo(PROJECT_ROOT).git.add(json_path)
         print(f"Added {json_path}")
-        return default_json
+
+    return {
+        "aliases": manufacturer_data.get("aliases", []),
+        "name": manufacturer,
+        "full_name": manufacturer_data.get("name"),
+        "dir_name": manufacturer,
+    }
 
 
 async def get_model_list() -> list[dict[str, Any]]:

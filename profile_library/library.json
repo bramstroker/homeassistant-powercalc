@@ -5693,8 +5693,10 @@
       ]
     },
     {
-      "name": "Netgear",
       "aliases": [],
+      "name": "netgear",
+      "full_name": "Netgear",
+      "dir_name": "netgear",
       "models": [
         {
           "name": "Netgear GS110MX",
