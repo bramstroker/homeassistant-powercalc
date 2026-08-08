@@ -72,12 +72,12 @@ repos:
         files: ^utils/visualize/(pyproject\.toml|uv\.lock)$
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.3
     hooks:
       - id: codespell
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.36.1
+    rev: 0.37.4
     hooks:
       - id: check-github-workflows
         args: [ "--verbose" ]
@@ -91,12 +91,12 @@ repos:
         files: ^profile_library/[^/]+/manufacturer\.json$
 
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.10
+    rev: v1.7.12
     hooks:
       - id: actionlint
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.26.1
+    rev: v1.29.0
     hooks:
       - id: zizmor
         args: [--no-progress, --fix]
