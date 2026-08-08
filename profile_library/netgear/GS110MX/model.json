@@ -10,5 +10,9 @@
   ],
   "fixed_config": {
     "power": 8.0
+  },
+  "author_info": {
+    "name": "theveninjeremy",
+    "github": "theveninjeremy"
   }
 }
