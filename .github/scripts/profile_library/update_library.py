@@ -33,7 +33,15 @@ DATA_DIR = f"{PROJECT_ROOT}/profile_library"
 REPO_OWNER = "bramstroker"
 REPO_NAME = "homeassistant-powercalc"
 MAX_CONCURRENT_FILE_TASKS = 50
-DISCOVERY_LOW_PRIORITY_DOMAINS: list[str] = ["unifi"]
+DISCOVERY_LOW_PRIORITY_DOMAINS: list[str] = [
+    "androidtv",
+    "dlna_dmr",
+    "mikrotik",
+    "netgear",
+    "onvif",
+    "unifi",
+    "wake_on_lan",
+]
 
 
 @dataclass
