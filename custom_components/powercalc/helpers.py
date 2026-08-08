@@ -16,7 +16,6 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
-    DUMMY_ENTITY_ID,
     PLACEHOLDER_ENTITY_BY_DEVICE_CLASS,
     PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
     CalculationStrategy,
@@ -52,13 +51,13 @@ def get_or_create_unique_id(
     # For multi-switch and wled strategy we need to use the device id as unique id
     # As we don't want to start a discovery for each switch entity
     if (
-        source_entity.device_entry
+        source_entity.device_id
         and power_profile
         and power_profile.calculation_strategy in [CalculationStrategy.WLED, CalculationStrategy.MULTI_SWITCH]
     ):
-        return f"pc_{source_entity.device_entry.id}"
+        return f"pc_{source_entity.device_id}"
 
-    if source_entity and source_entity.entity_id != DUMMY_ENTITY_ID:
+    if source_entity and not source_entity.is_dummy:
         source_unique_id = source_entity.unique_id or source_entity.entity_id
         # Prefix with pc_ to avoid conflicts with other integrations
         return f"pc_{source_unique_id}"
@@ -276,19 +275,20 @@ def _get_related_entity_for_device(
 ) -> str | None:
     """Get the first related entity on the same device matching the given predicate."""
     entity_reg = entity_registry.async_get(hass)
-    if not source_entity.device_entry:
+    device_id = source_entity.device_id
+    if not device_id:
         _LOGGER.debug("No device_id available, cannot find related entity")
         return None
 
     related_entities = [
         entity_entry.entity_id
-        for entity_entry in entity_registry.async_entries_for_device(entity_reg, source_entity.device_entry.id)
+        for entity_entry in entity_registry.async_entries_for_device(entity_reg, device_id)
         if matcher(entity_entry)
     ]
     if not related_entities:
         _LOGGER.debug(
             "No related entities found for device %s with %s %s",
-            source_entity.device_entry.id,
+            device_id,
             match_label,
             match_value,
         )

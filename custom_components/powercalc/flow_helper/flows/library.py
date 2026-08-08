@@ -17,7 +17,6 @@ from custom_components.powercalc.const import (
     CONF_SUB_PROFILE,
     CONF_VARIABLES,
     DOMAIN,
-    DUMMY_ENTITY_ID,
     LIBRARY_URL,
     CalculationStrategy,
 )
@@ -466,7 +465,7 @@ class LibraryFlow:
 
         if source_entity.config_entry_id:
             return DiscoveryBy.CONFIG_ENTRY
-        if source_entity.entity_id != DUMMY_ENTITY_ID:
+        if not source_entity.is_dummy:
             return None
 
         profile = self.flow.selected_profile
