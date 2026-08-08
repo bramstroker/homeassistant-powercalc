@@ -158,6 +158,58 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
     )
 
 
+async def test_include_deeply_nested_light_group(hass: HomeAssistant) -> None:
+    """Light groups nested several levels deep should still resolve to the underlying light entities."""
+    await _create_powercalc_config_entry(hass, "light.deep_light")
+
+    mock_entities_in_registry(hass, {"light.deep_light": {}})
+    await set_states(hass, [("light.deep_light", STATE_ON)])
+
+    await async_setup_component(
+        hass,
+        light.DOMAIN,
+        {
+            light.DOMAIN: [
+                {
+                    "platform": "group",
+                    "name": "Level 1",
+                    "unique_id": "level1",
+                    "entities": ["light.deep_light"],
+                },
+                {
+                    "platform": "group",
+                    "name": "Level 2",
+                    "unique_id": "level2",
+                    "entities": ["light.level_1"],
+                },
+                {
+                    "platform": "group",
+                    "name": "Level 3",
+                    "unique_id": "level3",
+                    "entities": ["light.level_2"],
+                },
+            ],
+        },
+    )
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test deeply nested lightgroup",
+            CONF_INCLUDE: {CONF_GROUP: "light.level_3"},
+        },
+    )
+
+    await hass.async_start()
+
+    assert_entity_state(
+        hass,
+        "sensor.test_deeply_nested_lightgroup_power",
+        attributes={ATTR_ENTITIES: {"sensor.deep_light_power"}},
+    )
+
+
 async def test_error_is_logged_when_light_group_not_exists(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
