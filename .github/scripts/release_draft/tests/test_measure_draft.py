@@ -287,7 +287,7 @@ def test_release_verification_accepts_explicit_previous_tag() -> None:
 
 
 @pytest.mark.parametrize(
-    ("changelog", "message"),
+    "changelog,message",
     [
         ("# Changelog\n\n## Unreleased\n", "no section for target version 0.1.0"),
         (

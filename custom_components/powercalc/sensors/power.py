@@ -242,7 +242,7 @@ async def _get_power_profile(
 
     power_profile = None
     try:
-        model_info = discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry)
+        model_info = discovery_manager.extract_model_info(source_entity)
         power_profile = await get_power_profile(
             hass,
             sensor_config,
@@ -482,7 +482,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
                 await self._strategy_instance.on_start(hass)
 
             entities = self._track_entities
-            if (not entities and self._source_entity.entity_id == DUMMY_ENTITY_ID) or not entities:
+            if (not entities and self._source_entity.is_dummy) or not entities:
                 entities.add(DUMMY_ENTITY_ID)
             for entity_id in entities:
                 new_state = (
@@ -558,7 +558,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             )
             entities_to_track.extend(self._sub_profile_selector.get_tracking_entities())
 
-        if self._source_entity.entity_id != DUMMY_ENTITY_ID:
+        if not self._source_entity.is_dummy:
             entities_to_track.append(self._source_entity.entity_id)
 
         if self._availability_entity and self._availability_entity not in entities_to_track:
@@ -681,10 +681,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         return self._apply_power_adjustments(power, standby_power)
 
     def _resolve_calculation_state(self, state: State) -> State | None:
-        if (
-            self._source_entity.entity_id == DUMMY_ENTITY_ID
-            and self._calculation_strategy != CalculationStrategy.MULTI_SWITCH
-        ):
+        if self._source_entity.is_dummy and self._calculation_strategy != CalculationStrategy.MULTI_SWITCH:
             if self._availability_entity and state.entity_id == self._availability_entity:
                 return State(DUMMY_ENTITY_ID, STATE_ON)
             return state

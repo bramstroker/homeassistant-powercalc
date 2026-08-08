@@ -2,11 +2,17 @@ name: "Pull Request Labeler"
 on:
   - pull_request_target
 
+concurrency:
+  # Only the labels from the latest push to a pull request are interesting.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   labeler:
     permissions:
       contents: read
       pull-requests: write
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
     - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7

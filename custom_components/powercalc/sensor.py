@@ -65,7 +65,6 @@ from .const import (
     DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
-    DUMMY_ENTITY_ID,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
@@ -738,7 +737,7 @@ def check_entity_not_already_configured(
     used_unique_ids: list[str],
     context: CreationContext,
 ) -> None:
-    if source_entity.entity_id == DUMMY_ENTITY_ID:
+    if source_entity.is_dummy:
         return
 
     entity_id = source_entity.entity_id

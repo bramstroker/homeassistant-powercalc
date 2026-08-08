@@ -30,7 +30,7 @@ from tests.strategy.common import create_source_entity
 async def test_color_temp_lut(hass: HomeAssistant) -> None:
     """Test LUT lookup in color_temp mode"""
 
-    source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.COLOR_TEMP])
+    source_entity = create_source_entity(LIGHT_DOMAIN)
 
     strategy = await _create_lut_strategy(hass, "signify", "LCT010", source_entity)
     await strategy.validate_config()
@@ -63,7 +63,7 @@ async def test_color_temp_lut(hass: HomeAssistant) -> None:
 async def test_brightness_lut(hass: HomeAssistant) -> None:
     """Test LUT lookup in brightness mode"""
 
-    source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.BRIGHTNESS])
+    source_entity = create_source_entity(LIGHT_DOMAIN)
 
     strategy = await _create_lut_strategy(hass, "signify", "LWB010", source_entity)
     await strategy.validate_config()
@@ -85,7 +85,7 @@ async def test_brightness_lut(hass: HomeAssistant) -> None:
 async def test_hs_lut(hass: HomeAssistant) -> None:
     """Test LUT lookup in HS mode"""
 
-    source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.HS])
+    source_entity = create_source_entity(LIGHT_DOMAIN)
 
     strategy = await _create_lut_strategy(hass, "signify", "LCT010", source_entity)
     await strategy.validate_config()
@@ -240,7 +240,7 @@ async def test_hs_lut_attribute_none(hass: HomeAssistant, caplog: pytest.LogCapt
     """Test error is logged when hs_color attribute is None"""
 
     caplog.set_level(logging.ERROR)
-    source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.HS])
+    source_entity = create_source_entity(LIGHT_DOMAIN)
 
     strategy = await _create_lut_strategy(hass, "signify", "LCT010", source_entity)
     await strategy.validate_config()
@@ -259,10 +259,7 @@ async def test_hs_lut_attribute_none(hass: HomeAssistant, caplog: pytest.LogCapt
 
 
 async def test_sub_lut_loaded(hass: HomeAssistant) -> None:
-    source_entity = create_source_entity(
-        LIGHT_DOMAIN,
-        [ColorMode.COLOR_TEMP, ColorMode.HS],
-    )
+    source_entity = create_source_entity(LIGHT_DOMAIN)
 
     strategy = await _create_lut_strategy(
         hass,
@@ -280,10 +277,7 @@ async def test_sub_lut_loaded(hass: HomeAssistant) -> None:
 
 
 async def test_linked_profile_loaded(hass: HomeAssistant) -> None:
-    source_entity = create_source_entity(
-        LIGHT_DOMAIN,
-        [ColorMode.COLOR_TEMP, ColorMode.HS],
-    )
+    source_entity = create_source_entity(LIGHT_DOMAIN)
     strategy = await _create_lut_strategy(hass, "signify", "LCA007", source_entity)
     await _calculate_and_assert_power(
         strategy,

@@ -12,10 +12,15 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: profile-library-writes
+  cancel-in-progress: false
+
 jobs:
   format:
     name: Generate plots
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -37,4 +42,4 @@ jobs:
         with:
           message: 'chore(profile): generate plots'
           pull: '--rebase --autostash'
-          push: 'origin HEAD:master --force'
+          push: 'origin HEAD:master'

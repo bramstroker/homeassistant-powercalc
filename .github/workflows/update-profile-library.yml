@@ -19,11 +19,16 @@ permissions:
   contents: write
   pull-requests: read
 
+concurrency:
+  group: profile-library-writes
+  cancel-in-progress: false
+
 jobs:
   format:
     name: Update profile library
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -37,8 +42,6 @@ jobs:
           cache-dependency-glob: |
             pyproject.toml
             uv.lock
-      - name: Pull again
-        run: git pull || true
       - name: Update library.json, authors and translations
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,7 +53,8 @@ jobs:
         with:
           add: 'profile_library'
           message: 'chore(profile): update generated library'
-          push: 'origin HEAD:master --force'
+          pull: '--rebase --autostash'
+          push: 'origin HEAD:master'
       - name: Wait 5 seconds
         run: sleep 5
       - name: Purge cloudflare cache

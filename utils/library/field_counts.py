@@ -4,9 +4,9 @@ from collections import Counter
 from utils.library.common import find_model_json_files
 
 
-def count_field(field_name: str) -> Counter:
+def count_field(field_name: str) -> Counter[str]:
     """Count occurrences of each value for the given field in all model.json files."""
-    counter = Counter()
+    counter: Counter[str] = Counter()
 
     for model_data in find_model_json_files():
         value = model_data["data"].get(field_name)

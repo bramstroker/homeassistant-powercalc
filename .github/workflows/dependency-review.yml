@@ -1,0 +1,42 @@
+name: Dependency review
+
+# Renovate automerges every minor and patch update without a human in the loop,
+# so this is the gate that inspects what a pull request actually adds to the
+# dependency graph before it lands.
+on:
+  pull_request:
+    paths:
+      - '**/package-lock.json'
+      - '**/pyproject.toml'
+      - '**/uv.lock'
+      - '.github/workflows/dependency-review.yml'
+
+concurrency:
+  # Supersede in-flight runs for the same pull request; every other event gets a
+  # unique group so pushes, schedules and dispatches never cancel or queue each other.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  dependency-review:
+    name: Review dependency changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      # Leave the findings as a pull request comment instead of only in the log.
+      pull-requests: write
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          # Only newly introduced vulnerabilities fail the run. Pre-existing ones
+          # in the tree are tracked by the OSV scan, not by every unrelated PR.
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure

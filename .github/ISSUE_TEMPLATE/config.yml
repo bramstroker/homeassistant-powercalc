@@ -1,0 +1,15 @@
+---
+blank_issues_enabled: false
+contact_links:
+  - name: Question or help with your setup
+    url: https://github.com/bramstroker/homeassistant-powercalc/discussions/categories/questions
+    about: Ask in Discussions. The issue tracker is for bugs and feature requests.
+  - name: Frequently asked questions
+    url: https://docs.powercalc.nl/troubleshooting/faq/
+    about: Check the FAQ and troubleshooting guides first, your problem may already be solved there.
+  - name: Request support for a device
+    url: https://github.com/bramstroker/homeassistant-powercalc/discussions/categories/request-light-models
+    about: Ask for a device to be added to the profile library, or find out whether someone is already measuring it.
+  - name: Share a measurement
+    url: https://github.com/bramstroker/homeassistant-powercalc/discussions/categories/finished-measurements
+    about: Measured a device yourself? Share the results here or open a pull request with the profile.

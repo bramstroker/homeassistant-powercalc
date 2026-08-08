@@ -1,3 +1,5 @@
+import asyncio
+from dataclasses import replace
 from datetime import timedelta
 import logging
 from typing import Any
@@ -448,8 +450,27 @@ async def test_get_power_profile_by_source_device_returns_none_without_required_
     assert profile is not None
     assert profile.model == "discovery_type_device"
 
-    assert await get_power_profile_by_source_device(hass, source_entity._replace(device_entry=None)) is None
-    assert await get_power_profile_by_source_device(hass, source_entity._replace(entity_entry=None)) is None
+    assert await get_power_profile_by_source_device(hass, replace(source_entity, device_entry=None)) is None
+    assert await get_power_profile_by_source_device(hass, replace(source_entity, entity_entry=None)) is None
+
+
+async def test_get_power_profile_by_source_entity_returns_none_without_entity_entry(hass: HomeAssistant) -> None:
+    """A source with only a device must not resolve a profile through the entity path.
+
+    Otherwise callers lose the ability to fall back to a device lookup after the entity lookup
+    comes up empty, see the library flow.
+    """
+    device_entry = mock_device(hass, model="discovery_type_device")
+    mock_entities_in_registry(
+        hass,
+        {
+            "sensor.test": {"unique_id": "test-entity", "device_id": device_entry.id, "platform": "test"},
+        },
+    )
+
+    source_entity = create_source_entity("sensor.test", hass)
+
+    assert await get_power_profile_by_source_entity(hass, replace(source_entity, entity_entry=None)) is None
 
 
 @pytest.mark.parametrize(
@@ -683,6 +704,27 @@ async def test_get_power_profile_empty_manufacturer(
     assert not caplog.records
 
 
+async def test_model_is_skipped_when_profile_cannot_be_loaded(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A model listed in the library, but for which no profile can be built, is logged and skipped."""
+    caplog.set_level(logging.DEBUG)
+
+    mock_device_with_entities(hass, "light.test", "signify", "LCT010")
+
+    with patch(
+        "custom_components.powercalc.discovery.get_power_profile",
+        new_callable=AsyncMock,
+        return_value=None,
+    ):
+        await run_powercalc_setup(hass)
+
+    assert len(mock_flow_init.mock_calls) == 0
+    assert "light.test: Could not load profile signify/LCT010, skipping model" in caplog.text
+
+
 async def test_no_power_sensors_are_created_for_ignored_config_entries(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
@@ -771,9 +813,10 @@ async def test_get_model_information(
 ) -> None:
     if device_entry:
         mock_device_registry(hass, {str(device_entry.id): device_entry})
-    mock_registry(hass, {str(entity_entry.id): entity_entry})
+    mock_registry(hass, {entity_entry.entity_id: entity_entry})
     discovery_manager = DiscoveryManager(hass, {})
-    assert discovery_manager.get_model_information_from_entity(entity_entry) == model_info
+    source_entity = create_source_entity(entity_entry.entity_id, hass)
+    assert discovery_manager.extract_model_info(source_entity) == model_info
 
 
 async def test_interval_based_rediscovery(
@@ -1258,6 +1301,36 @@ async def test_initial_discovery_is_delayed(
     await async_advance_time(hass, DISCOVERY_DELAY)
 
     assert len(mock_flow_init.mock_calls) == 1
+
+
+async def test_initial_discovery_propagates_cancellation_while_running(hass: HomeAssistant) -> None:
+    discovery_manager = DiscoveryManager(hass, {})
+
+    with (
+        patch.object(discovery_manager, "start_discovery", side_effect=asyncio.CancelledError),
+        patch("custom_components.powercalc.discovery.async_call_later") as mock_call_later,
+    ):
+        discovery_manager._schedule_initial_discovery()  # noqa: SLF001
+        scheduled_job = mock_call_later.call_args.args[2]
+        with pytest.raises(asyncio.CancelledError):
+            await scheduled_job.target(None)
+
+
+async def test_initial_discovery_logs_unexpected_failure(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    discovery_manager = DiscoveryManager(hass, {})
+
+    with (
+        patch.object(discovery_manager, "start_discovery", side_effect=RuntimeError("boom")),
+        patch("custom_components.powercalc.discovery.async_call_later") as mock_call_later,
+    ):
+        discovery_manager._schedule_initial_discovery()  # noqa: SLF001
+        scheduled_job = mock_call_later.call_args.args[2]
+        await scheduled_job.target(None)
+
+    assert "Error during initial discovery" in caplog.text
 
 
 async def test_pending_initial_discovery_is_cancelled_when_disabled(

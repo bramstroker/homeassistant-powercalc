@@ -60,6 +60,8 @@ PowerCalc is powered by a growing community:
 - [Share measurements](https://docs.powercalc.nl/contributing/measure/)
 - Improve accuracy for everyone
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) to get started, and the [Code of Conduct](CODE_OF_CONDUCT.md) for how we work together.
+
 ---
 
 ## ⭐ Support the project

@@ -2,4 +2,4 @@
 
 set -o errexit
 
-uv run mypy custom_components/powercalc
+uv run mypy custom_components/powercalc .github/scripts utils/library
