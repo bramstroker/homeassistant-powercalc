@@ -4,9 +4,10 @@ on:
   pull_request:
     paths:
       - '**/*.csv.gz'
-      - '.github/scripts/lut_validator/**'
       - '.github/workflows/validate-lut-files.yml'
+      - 'utils/library/common.py'
       - 'utils/library/scan_lut_quality.py'
+      - 'utils/library/validate_lut_files.py'
 
 concurrency:
   # Supersede in-flight runs for the same pull request; every other event gets a
@@ -29,11 +30,7 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: '3.14'
-      - name: Install dependencies
-        run: |
-          cd .github/scripts/lut_validator
-          npm ci --ignore-scripts
       - name: Validate LUT CSV files
-        run: node .github/scripts/lut_validator/validate.js
+        run: python -m utils.library.validate_lut_files profile_library
       - name: Validate LUT quality
         run: python -m utils.library.scan_lut_quality profile_library --severity error --fail-on-issues

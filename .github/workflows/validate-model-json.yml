@@ -4,7 +4,9 @@ on:
   pull_request:
     paths:
       - '**/model.json'
+      - '**/manufacturer.json'
       - 'profile_library/model_schema.json'
+      - 'profile_library/manufacturer_schema.json'
       - '.github/scripts/profile_library/validate_model_json.py'
       - '.github/workflows/validate-model-json.yml'
 
@@ -63,12 +65,13 @@ jobs:
             echo
             echo "The model.json validation workflow failed before it could write a detailed report."
           } > validation-result/model_json_validation_report.md
-      - name: Validate model.json against schema
+      - name: Validate model.json and manufacturer.json against their schemas
         working-directory: pr
         run: >-
           uv run --locked --project ../base --only-group library --no-build
           python ../base/.github/scripts/profile_library/validate_model_json.py
-          --schema ../base/profile_library/model_schema.json
+          --model-schema ../base/profile_library/model_schema.json
+          --manufacturer-schema ../base/profile_library/manufacturer_schema.json
           --changed-files changed_files.json
           --report ../validation-result/model_json_validation_report.md
           --status ../validation-result/model_json_validation_status.txt

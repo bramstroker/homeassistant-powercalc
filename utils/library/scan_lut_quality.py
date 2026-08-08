@@ -11,7 +11,7 @@ from pathlib import Path
 import sys
 from typing import TextIO
 
-from utils.library.common import PROFILE_DIRECTORY
+from utils.library.common import PROFILE_DIRECTORY, open_lut_file
 
 DEFAULT_MIN_SCORE = 80.0
 DEFAULT_MAX_ABSOLUTE_DEVIATION = 0.75
@@ -257,13 +257,6 @@ def read_lut(path: Path, mode: str) -> list[LutPoint]:
             )
             for row in reader
         ]
-
-
-def open_lut_file(path: Path) -> TextIO:
-    if path.suffix == ".gz":
-        return gzip.open(path, "rt")
-
-    return path.open()
 
 
 def write_lut(path: Path, fieldnames: Sequence[str], rows: Sequence[dict[str, str]]) -> None:

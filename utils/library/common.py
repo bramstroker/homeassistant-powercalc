@@ -1,9 +1,23 @@
 from collections.abc import Generator
+import gzip
 import json
 import os
-from typing import Any
+from pathlib import Path
+from typing import Any, TextIO
 
 PROFILE_DIRECTORY = os.path.join(os.path.dirname(__file__), "../../profile_library")
+
+
+def open_lut_file(path: Path) -> TextIO:
+    """Open a LUT CSV for reading, transparently decompressing gzipped files.
+
+    Some contributed LUTs carry a UTF-8 BOM, which would otherwise end up in the first
+    column name, so decode them with the BOM aware codec.
+    """
+    if path.suffix == ".gz":
+        return gzip.open(path, "rt", encoding="utf-8-sig")
+
+    return path.open(encoding="utf-8-sig")
 
 
 def _path_part(path_parts: list[str], index: int) -> str | None:

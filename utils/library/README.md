@@ -18,11 +18,28 @@ cd /path/to/powercalc
 
 ### `validate_model_json.py`
 
-Validate every `profile_library/**/model.json` against `profile_library/model_schema.json`.
-Prints `VALID` / `INVALID` / `ERROR` per file.
+Validate every `profile_library/*/manufacturer.json` against
+`profile_library/manufacturer_schema.json` and every `profile_library/*/*/model.json`
+against `profile_library/model_schema.json`. Prints `VALID` / `INVALID` / `ERROR` per
+file.
 
 ```bash
 uv run --group library python -m utils.library.validate_model_json
+```
+
+### `validate_lut_files.py`
+
+Validate the structure of every LUT (`*.csv.gz`) file in the library: the columns and
+value ranges required for its color mode, whether the measurements reach the top of the
+brightness range, and whether each profile exposes a color mode combination Home
+Assistant can report. Accepts an optional directory; defaults to the whole library.
+Exits non-zero when a problem is found, and runs on every pull request touching a LUT.
+
+```bash
+uv run --group library python -m utils.library.validate_lut_files
+
+# validate a single manufacturer
+uv run --group library python -m utils.library.validate_lut_files profile_library/signify
 ```
 
 ### `scan_lut_quality.py`
