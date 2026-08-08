@@ -197,7 +197,7 @@ class DiscoveryManager:
         self._cancel_initial_discovery: CALLBACK_TYPE | None = None
         self._status = DiscoveryStatus.NOT_STARTED if enabled else DiscoveryStatus.DISABLED
 
-    async def setup(self) -> None:
+    def setup(self) -> None:
         """Setup the discovery manager. Schedule the library update interval and initial discovery.
 
         The library update is scheduled regardless of the discovery status. Startup deliberately
@@ -377,52 +377,7 @@ class DiscoveryManager:
         for candidate in ordered_candidates:
             stats.candidates += 1
             try:
-                matched_low_priority_domains = candidate.integration_domains & low_priority_domains
-                if candidate.discovery_type != DiscoveryBy.DEVICE and matched_low_priority_domains:
-                    stats.low_priority_integration += 1
-                    _LOGGER.debug(
-                        "%s: Integration domain has low discovery priority, skipping discovery (domains=[%s])",
-                        candidate.log_identifier,
-                        ",".join(sorted(matched_low_priority_domains)),
-                    )
-                    continue
-                source_entity = candidate.source_entity
-                model_info = self.extract_model_info(source_entity)
-                if not model_info:
-                    stats.no_model_info += 1
-                    continue
-
-                match = await self._find_discovery_match(source_entity, model_info, candidate.discovery_type)
-                if not match:
-                    stats.no_profile_match += 1
-                    _LOGGER.debug(
-                        "%s: Model not found in library, skipping discovery (discovery_by=%s)",
-                        candidate.log_identifier,
-                        candidate.discovery_type,
-                    )
-                    continue
-
-                unique_id = match.unique_id or self.create_unique_id(
-                    candidate, match.power_profiles[0] if match.power_profiles else None
-                )
-
-                if self._is_already_discovered(candidate, unique_id):
-                    stats.already_configured += 1
-                    _LOGGER.debug(
-                        "%s: Already setup with discovery, skipping new discovery (unique_id=%s)",
-                        candidate.log_identifier,
-                        unique_id,
-                    )
-                    continue
-
-                await self._init_entity_discovery(
-                    candidate,
-                    model_info,
-                    unique_id,
-                    match.power_profiles,
-                    match.extra_data,
-                )
-                stats.flows_initiated += 1
+                await self._discover_candidate(candidate, low_priority_domains, stats)
             except Exception:
                 stats.errors += 1
                 _LOGGER.exception(
@@ -431,6 +386,61 @@ class DiscoveryManager:
                     candidate.discovery_type,
                 )
         return stats
+
+    async def _discover_candidate(
+        self,
+        candidate: DiscoveryCandidate,
+        low_priority_domains: set[str],
+        stats: DiscoveryStats,
+    ) -> None:
+        """Discover a single candidate and create a flow for it when it matches a profile."""
+        matched_low_priority_domains = candidate.integration_domains & low_priority_domains
+        if candidate.discovery_type != DiscoveryBy.DEVICE and matched_low_priority_domains:
+            stats.low_priority_integration += 1
+            _LOGGER.debug(
+                "%s: Integration domain has low discovery priority, skipping discovery (domains=[%s])",
+                candidate.log_identifier,
+                ",".join(sorted(matched_low_priority_domains)),
+            )
+            return
+
+        source_entity = candidate.source_entity
+        model_info = self.extract_model_info(source_entity)
+        if not model_info:
+            stats.no_model_info += 1
+            return
+
+        match = await self._find_discovery_match(source_entity, model_info, candidate.discovery_type)
+        if not match:
+            stats.no_profile_match += 1
+            _LOGGER.debug(
+                "%s: Model not found in library, skipping discovery (discovery_by=%s)",
+                candidate.log_identifier,
+                candidate.discovery_type,
+            )
+            return
+
+        unique_id = match.unique_id or self.create_unique_id(
+            candidate, match.power_profiles[0] if match.power_profiles else None
+        )
+
+        if self._is_already_discovered(candidate, unique_id):
+            stats.already_configured += 1
+            _LOGGER.debug(
+                "%s: Already setup with discovery, skipping new discovery (unique_id=%s)",
+                candidate.log_identifier,
+                unique_id,
+            )
+            return
+
+        await self._init_entity_discovery(
+            candidate,
+            model_info,
+            unique_id,
+            match.power_profiles,
+            match.extra_data,
+        )
+        stats.flows_initiated += 1
 
     async def _find_discovery_match(
         self,
@@ -928,16 +938,20 @@ class DiscoveryManager:
         if isinstance(value, dict):
             for key, nested_value in value.items():
                 if key == CONF_ENTITY_ID:
-                    if isinstance(nested_value, str):
-                        yield nested_value
-                    elif isinstance(nested_value, list):
-                        yield from (item for item in nested_value if isinstance(item, str))
-                elif isinstance(nested_value, dict | list):
+                    yield from self._iter_configured_entity_ids(nested_value)
+                else:
                     yield from self._iter_entity_ids(nested_value)
         elif isinstance(value, list):
             for item in value:
-                if isinstance(item, dict | list):
-                    yield from self._iter_entity_ids(item)
+                yield from self._iter_entity_ids(item)
+
+    @staticmethod
+    def _iter_configured_entity_ids(value: object) -> Iterator[str]:
+        """Yield the entity IDs of a single `entity_id` configuration option."""
+        if isinstance(value, str):
+            yield value
+        elif isinstance(value, list):
+            yield from (item for item in value if isinstance(item, str))
 
     def _is_already_discovered(self, candidate: DiscoveryCandidate, unique_id: str) -> bool:
         """Prevent duplicate discovery flows."""

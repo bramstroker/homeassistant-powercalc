@@ -128,10 +128,13 @@ def find_profile_directories(root: Path) -> list[Path]:
 
 def find_lut_files(directory: Path) -> list[tuple[Path, str]]:
     """Return the LUT files directly inside a directory, paired with their color mode."""
-    return sorted(
-        ((path, color_mode) for path in directory.iterdir() if (color_mode := get_color_mode(path))),
-        key=lambda entry: entry[1],
-    )
+    lut_files = []
+    for path in directory.iterdir():
+        color_mode = get_color_mode(path)
+        if color_mode:
+            lut_files.append((path, color_mode))
+
+    return sorted(lut_files, key=lambda entry: entry[1])
 
 
 def validate_library(root: Path) -> ValidationReport:

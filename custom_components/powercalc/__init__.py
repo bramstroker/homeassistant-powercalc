@@ -225,7 +225,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DATA_ANALYTICS: {},
     }
 
-    await discovery_manager.setup()
+    discovery_manager.setup()
 
     register_services(hass)
 
@@ -463,7 +463,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if discovery_enabled and discovery_manager.status == DiscoveryStatus.DISABLED:
             _LOGGER.debug("Enabling discovery manager based on global configuration")
             discovery_manager.enable()
-            await discovery_manager.setup()
+            discovery_manager.setup()
         if not discovery_enabled and discovery_manager.status != DiscoveryStatus.DISABLED:
             _LOGGER.debug("Disabling discovery manager based on global configuration")
             await discovery_manager.disable()
