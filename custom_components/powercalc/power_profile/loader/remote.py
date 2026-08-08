@@ -441,8 +441,8 @@ class RemoteLoader(Loader):
 
     async def download_with_retry(
         self,
-        callback: Callable[[], Coroutine[Any, Any, None | dict[str, Any]]],
-    ) -> None | dict[str, Any]:
+        callback: Callable[[], Coroutine[Any, Any, dict[str, Any] | None]],
+    ) -> dict[str, Any] | None:
         """Download a file from a remote endpoint with retries"""
         max_retries = 3
         retry_count = 0

@@ -190,7 +190,7 @@ def test_validate_user_input(use_schema: bool, user_input: dict, expected: dict)
         ("7.5", "7.5"),
     ],
 )
-def test_format_power(value: None | float | Decimal, expected: str) -> None:
+def test_format_power(value: float | Decimal | None, expected: str) -> None:
     assert profile_preview._format_power(value) == expected
 
 

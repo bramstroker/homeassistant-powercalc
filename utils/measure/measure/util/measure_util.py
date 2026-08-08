@@ -396,7 +396,7 @@ class MeasureUtil:
             return
         try:
             self._on_sample(power)
-        except Exception:  # noqa: BLE001  # live feedback must not break a measurement
+        except Exception:  # live feedback must not break a measurement
             _LOGGER.debug("Failed to emit live power sample", exc_info=True)
 
     @staticmethod
