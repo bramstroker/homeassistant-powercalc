@@ -377,9 +377,8 @@ class DiscoveryManager:
         for candidate in ordered_candidates:
             stats.candidates += 1
             try:
-                if candidate.discovery_type != DiscoveryBy.DEVICE and (
-                    matched_low_priority_domains := candidate.integration_domains & low_priority_domains
-                ):
+                matched_low_priority_domains = candidate.integration_domains & low_priority_domains
+                if candidate.discovery_type != DiscoveryBy.DEVICE and matched_low_priority_domains:
                     stats.low_priority_integration += 1
                     _LOGGER.debug(
                         "%s: Integration domain has low discovery priority, skipping discovery (domains=[%s])",
