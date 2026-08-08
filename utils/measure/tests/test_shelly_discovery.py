@@ -6,6 +6,7 @@ from measure.ha_app.shelly_discovery import ShellyDiscoveryService
 from measure.home_assistant import HomeAssistantDiscoveryClient, HomeAssistantDiscoveryError, HomeAssistantManager
 import pytest
 import requests
+from requests.auth import AuthBase
 
 
 class FakeResponse:
@@ -36,7 +37,7 @@ def service(name: str, service_type: str, addresses: list[str]) -> dict[str, obj
 
 
 def response_map(responses: dict[str, FakeResponse | Exception]) -> MagicMock:
-    def get(url: str, *, timeout: int, allow_redirects: bool) -> FakeResponse:
+    def get(url: str, *, timeout: int, allow_redirects: bool, auth: AuthBase | None = None) -> FakeResponse:
         assert timeout == 2
         assert allow_redirects is False
         response = responses[url]

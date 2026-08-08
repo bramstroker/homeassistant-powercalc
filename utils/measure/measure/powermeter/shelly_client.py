@@ -186,13 +186,12 @@ class ShellyClient:
 
     def _request_json(self, endpoint: str, description: str) -> object:
         try:
-            request_options: dict[str, object] = {
-                "timeout": self._timeout,
-                "allow_redirects": False,
-            }
-            if self._authentication is not None:
-                request_options["auth"] = self._authentication
-            response = self._http_get(f"{self._base_url}{endpoint}", **request_options)
+            response = self._http_get(
+                f"{self._base_url}{endpoint}",
+                timeout=self._timeout,
+                allow_redirects=False,
+                auth=self._authentication,
+            )
         except requests.RequestException as error:
             raise ShellyProbeError(
                 ShellyProbeFailure.UNREACHABLE,
