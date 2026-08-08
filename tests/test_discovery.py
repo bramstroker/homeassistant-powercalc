@@ -454,6 +454,25 @@ async def test_get_power_profile_by_source_device_returns_none_without_required_
     assert await get_power_profile_by_source_device(hass, replace(source_entity, entity_entry=None)) is None
 
 
+async def test_get_power_profile_by_source_entity_returns_none_without_entity_entry(hass: HomeAssistant) -> None:
+    """A source with only a device must not resolve a profile through the entity path.
+
+    Otherwise callers lose the ability to fall back to a device lookup after the entity lookup
+    comes up empty, see the library flow.
+    """
+    device_entry = mock_device(hass, model="discovery_type_device")
+    mock_entities_in_registry(
+        hass,
+        {
+            "sensor.test": {"unique_id": "test-entity", "device_id": device_entry.id, "platform": "test"},
+        },
+    )
+
+    source_entity = create_source_entity("sensor.test", hass)
+
+    assert await get_power_profile_by_source_entity(hass, replace(source_entity, entity_entry=None)) is None
+
+
 @pytest.mark.parametrize(
     "entity_id,model_info,expected_manufacturer,expected_model",
     [
