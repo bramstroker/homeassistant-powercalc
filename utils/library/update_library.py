@@ -7,29 +7,22 @@ import csv
 from dataclasses import dataclass
 from datetime import datetime
 import glob
-import gzip
 import hashlib
 import json
 import math
 import os
 from pathlib import Path
 import subprocess
-import sys
 from typing import Any
 
 import aiofiles
 import git
 import httpx
 
-sys.path.insert(
-    1,
-    os.path.abspath(
-        os.path.join(Path(__file__), "../../../../custom_components/powercalc"),
-    ),
-)
+from utils.library.common import PROFILE_DIRECTORY, open_lut_file
 
-PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
-DATA_DIR = f"{PROJECT_ROOT}/profile_library"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_DIR = PROFILE_DIRECTORY
 REPO_OWNER = "bramstroker"
 REPO_NAME = "homeassistant-powercalc"
 MAX_CONCURRENT_FILE_TASKS = 50
@@ -188,7 +181,7 @@ async def update_translations(model_listing: list[dict[str, Any]]) -> None:
         print("No translations found")
         return
 
-    translation_file = os.path.join(PROJECT_ROOT, "custom_components/powercalc/translations/en.json")
+    translation_file = PROJECT_ROOT / "custom_components/powercalc/translations/en.json"
     async with aiofiles.open(translation_file) as file:
         content = await file.read()
         json_data = json.loads(content)
@@ -301,17 +294,17 @@ async def process_model_file(json_path: str) -> dict[str, Any]:
 
 
 async def get_color_modes(model_directory: str) -> set[str]:
-    color_modes: set[str] = set()
-    paths = glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True)
-    for path in paths:
-        filename = os.path.basename(path)
-        try:
-            index = filename.index(".")
-            color_mode = filename[:index]
-            color_modes.add(color_mode)
-        except ValueError:
-            continue
-    return color_modes
+    """Return the supported light color modes from known LUT file names only."""
+    return await asyncio.to_thread(_get_color_modes, model_directory)
+
+
+def _get_color_modes(model_directory: str) -> set[str]:
+    """Find known light color modes without blocking the event loop."""
+    from utils.library.validate_lut_files import get_color_mode
+
+    return {
+        color_mode for path in Path(model_directory).rglob("*.csv*") if (color_mode := get_color_mode(path)) is not None
+    }
 
 
 def get_sub_profile_count(model_directory: str) -> int:
@@ -362,7 +355,7 @@ async def get_max_power(model_directory: str, model_data: dict[str, Any]) -> flo
 async def process_csv_file(path: str) -> float | None:
     """Process a single CSV file to find the maximum power value"""
     try:
-        with gzip.open(path, "rt") as f:
+        with open_lut_file(Path(path)) as f:
             reader = csv.reader(f)
             next(reader, None)  # skip header row
             max_power = 0.0
@@ -492,7 +485,7 @@ async def find_first_commit_author(file: str, check_paths: bool = True) -> Autho
             return await get_commit_author(commit)
 
         affected_files = await run_git_command(command)
-        file = file.replace(PROJECT_ROOT, "").lstrip("/")
+        file = file.replace(str(PROJECT_ROOT), "").lstrip("/")
         paths = [
             file.replace("profile_library", "custom_components/powercalc/data"),
             file.replace("profile_library", "data"),

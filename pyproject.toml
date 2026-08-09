@@ -97,6 +97,7 @@ ignore = ["S101", "COM812"]
 
 [tool.ruff.lint.per-file-ignores]
 ".github/scripts/**.py" = ["T201"]
+"utils/library/update_library.py" = ["T201"]
 "utils/measure/**.py" = ["T201"]
 "tests/**.py" = ["ASYNC230"]
 
@@ -129,6 +130,9 @@ profile-library = [
     "httpx>=0.28.1",
 ]
 dev = [
+    "aiofiles>=25.1.0",
+    "gitpython>=3.1.57",
+    "httpx>=0.28.1",
     "prek",
     "ruff>=0.15.0",
     "mypy==2.3.0",
