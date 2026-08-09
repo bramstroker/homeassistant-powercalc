@@ -1877,9 +1877,12 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "aiofiles" },
     { name = "aioresponses" },
     { name = "croniter" },
+    { name = "gitpython" },
     { name = "homeassistant-stubs" },
+    { name = "httpx" },
     { name = "mypy" },
     { name = "prek" },
     { name = "pytest-homeassistant-custom-component" },
@@ -1910,9 +1913,12 @@ requires-dist = [{ name = "homeassistant" }]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "aiofiles", specifier = ">=25.1.0" },
     { name = "aioresponses", specifier = ">=0.7.6" },
     { name = "croniter", specifier = ">=6.0.0" },
+    { name = "gitpython", specifier = ">=3.1.57" },
     { name = "homeassistant-stubs" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "mypy", specifier = "==2.3.0" },
     { name = "prek" },
     { name = "pytest-homeassistant-custom-component", specifier = "==0.13.355" },
