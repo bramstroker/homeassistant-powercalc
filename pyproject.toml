@@ -97,6 +97,7 @@ ignore = ["S101", "COM812"]
 
 [tool.ruff.lint.per-file-ignores]
 ".github/scripts/**.py" = ["T201"]
+"utils/library/update_library.py" = ["T201"]
 "utils/measure/**.py" = ["T201"]
 "tests/**.py" = ["ASYNC230"]
 

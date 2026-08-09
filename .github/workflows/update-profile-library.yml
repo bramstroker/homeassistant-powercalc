@@ -7,7 +7,9 @@ on:
     branches:
       - master
     paths:
-      - '.github/scripts/profile_library/**'
+      - 'utils/library/common.py'
+      - 'utils/library/update_library.py'
+      - 'utils/library/validate_lut_files.py'
   push:
     paths:
       - '**/model.json'
@@ -47,7 +49,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >-
           uv run --locked --only-group profile-library --no-build
-          python .github/scripts/profile_library/update_library.py
+          python -m utils.library.update_library
       - uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10
         if: github.ref == 'refs/heads/master'
         with:
