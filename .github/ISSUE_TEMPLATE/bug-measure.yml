@@ -15,7 +15,7 @@ body:
   attributes:
     label: Checklist
     options:
-      - label: I have read the [FAQ](https://docs.powercalc.nl/troubleshooting/faq/) to see if there is a known solution to my problem.
+      - label: I have read the [FAQ](https://docs.powercalc.nl/contributing/measure/troubleshooting/) to see if there is a known solution to my problem.
         required: true
       - label: I have used the latest version. 
         required: true
