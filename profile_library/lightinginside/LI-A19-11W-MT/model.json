@@ -13,5 +13,8 @@
   },
   "min_voltage": 118.95,
   "name": "Matter RGBCW A19 E26 Smart Bulb",
+  "aliases": [
+    "1718"
+  ],
   "standby_power": 0.22
 }
