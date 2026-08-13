@@ -32,7 +32,7 @@
   },
   "max_voltage": 236.7,
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly Plus 1 PM",
+  "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 1,
