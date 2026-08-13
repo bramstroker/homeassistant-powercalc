@@ -50,7 +50,7 @@ jobs:
         run: >-
           uv run --locked --only-group profile-library --no-build
           python -m utils.library.update_library
-      - uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10
+      - uses: EndBug/add-and-commit@645ecc0dd0a57f4d86d26c0aa5fc42c0a856fbca # v11
         if: github.ref == 'refs/heads/master'
         with:
           add: 'profile_library'
