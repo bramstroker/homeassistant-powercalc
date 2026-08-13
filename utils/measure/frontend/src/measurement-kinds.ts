@@ -1,7 +1,6 @@
 import type {
   BaseMeasurementRequest,
   Capabilities,
-  EntityDescriptor,
   FormField,
   FormFieldOption,
   LutMode,
@@ -29,9 +28,10 @@ export function requestFieldValue(request: MeasurementRequest, field: FormField)
   return isFieldValue(value) ? value : undefined;
 }
 
-function controllerEntityId(request: MeasurementRequest): string | undefined {
-  const { controller } = request as { controller?: { type: string; entity_id?: string } };
-  return controller?.type === "hass" ? controller.entity_id : undefined;
+function controllerEntityId(request: MeasurementRequest): string | string[] | undefined {
+  const { controller } = request as { controller?: { type: string; entity_id?: string; entity_ids?: string[] } };
+  if (controller?.type === "hass") return controller.entity_id;
+  return controller?.type === "hass_multi" ? controller.entity_ids : undefined;
 }
 
 function isFieldValue(value: unknown): value is FieldValue {
@@ -43,8 +43,8 @@ function isFieldValue(value: unknown): value is FieldValue {
  * Options a field offers right now. A field can declare that a controller entity narrows
  * it, in which case only the options that entity reports as supported are offered.
  */
-export function fieldOptions(field: FormField, selectedEntity?: EntityDescriptor): FormFieldOption[] {
-  const supported = field.narrowed_by ? selectedEntity?.supported_modes : undefined;
+export function fieldOptions(field: FormField, supportedModes?: LutMode[]): FormFieldOption[] {
+  const supported = field.narrowed_by ? supportedModes : undefined;
   if (!supported?.length) return field.options;
   return field.options.filter((option) => supported.includes(option.value as LutMode));
 }
@@ -123,7 +123,7 @@ export function buildMeasurementRequest(
   for (const field of definition.fields) {
     if (field.role === "power_meter") continue;
     if (field.role === "controller") {
-      declared.controller = dummyController ? { type: "dummy" } : { type: "hass", entity_id: text(form, field.name) };
+      declared.controller = controllerSpec(form, field, dummyController);
       continue;
     }
     declared[field.name] = formValue(form, field);
@@ -131,6 +131,14 @@ export function buildMeasurementRequest(
 
   // The server validates the assembled payload against its own discriminated model.
   return { ...base, ...declared, measure_type: definition.measure_type } as MeasurementRequest;
+}
+
+/** The controller spec a submitted entity field describes: a virtual device, one entity, or several. */
+function controllerSpec(form: FormData, field: FormField, dummyController: boolean): Record<string, unknown> {
+  if (dummyController) return { type: "dummy" };
+  const entityIds = form.getAll(field.name).map((value) => String(value).trim()).filter(Boolean);
+  if (entityIds.length > 1) return { type: "hass_multi", entity_ids: entityIds };
+  return { type: "hass", entity_id: entityIds[0] ?? "" };
 }
 
 /** The tuning parameters this type declares, taken from the form where the user set one. */

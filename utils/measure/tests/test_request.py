@@ -1,6 +1,7 @@
 from measure.cli.request_adapter import request_from_answers
 from measure.const import PARAMETER_LIMITS, QUESTION_ENTITY_ID, QUESTION_MEASURE_DEVICE, MeasureType
 from measure.controller.light.const import LightControllerType, LutMode
+from measure.controller.light.spec import HassMultiLightControllerSpec
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import (
@@ -45,14 +46,35 @@ def test_request_round_trip_preserves_typed_input() -> None:
     assert isinstance(restored.dummy_load, DummyLoadReuseRequest)
 
 
-def test_request_exposes_the_controlled_entity_only_when_the_controller_drives_one() -> None:
+def test_request_exposes_the_controlled_entities_only_when_the_controller_drives_them() -> None:
     controlled = LightMeasurementRequest.model_validate(valid_request())
     uncontrolled = AverageMeasurementRequest.model_validate(
         {"power_meter": {"type": "hass", "entity_id": "sensor.test_power"}},
     )
 
-    assert controlled.controlled_entity_id == "light.test"
-    assert uncontrolled.controlled_entity_id is None
+    assert controlled.controlled_entity_ids == ("light.test",)
+    assert uncontrolled.controlled_entity_ids == ()
+
+
+def test_request_exposes_all_controlled_entities_for_multi_light_controller() -> None:
+    request = LightMeasurementRequest.model_validate(
+        valid_request()
+        | {"controller": {"type": "hass_multi", "entity_ids": ["light.one", "light.two"]}, "multiple_light_count": 2},
+    )
+
+    assert isinstance(request.controller, HassMultiLightControllerSpec)
+    assert request.controlled_entity_ids == ("light.one", "light.two")
+
+
+@pytest.mark.parametrize(
+    "entity_ids",
+    [["light.one"], ["light.one", "light.one"], ["light.one", "switch.two"]],
+)
+def test_multi_light_controller_requires_multiple_unique_light_entities(entity_ids: list[str]) -> None:
+    with pytest.raises(ValidationError):
+        LightMeasurementRequest.model_validate(
+            valid_request() | {"controller": {"type": "hass_multi", "entity_ids": entity_ids}},
+        )
 
 
 def test_request_normalizes_profile_metadata() -> None:

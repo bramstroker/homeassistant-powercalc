@@ -20,6 +20,8 @@ HASS_DEVICE_REGISTRY_MODEL_ID = "model_id"
 HASS_ENTITY_REGISTRY_UNIQUE_ID = "unique_id"
 HASS_ENTITY_DEVICE_CLASS = "device_class"
 HASS_ENTITY_UNIT_OF_MEASUREMENT = "unit_of_measurement"
+#: Light groups list the entities they drive under this state attribute.
+HASS_ENTITY_GROUP_MEMBERS = "entity_id"
 ZEROCONF_HTTP_SERVICE_TYPE = "_http._tcp.local."
 ZEROCONF_SHELLY_SERVICE_TYPE = "_shelly._tcp.local."
 SHELLY_DISCOVERY_COLLECTION_WINDOW_SECONDS = 2.0

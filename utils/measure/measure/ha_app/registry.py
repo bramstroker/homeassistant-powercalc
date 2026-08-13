@@ -55,6 +55,13 @@ class FormFieldDefinition:
     default: str | int | bool | None = None
     minimum: int | float | None = None
     maximum: int | float | None = None
+    #: Whether several entities can be selected for this field at once.
+    multiple: bool = False
+    #: Label to use while several entities are selected.
+    plural_label: str = ""
+    #: Entity field whose number of selected entities this count follows by default.
+    derived_from: str | None = None
+    hint: str = ""
 
 
 @dataclass(frozen=True)
@@ -98,7 +105,14 @@ class MeasurementDefinition:
         return MEASURE_TYPE_LABELS[self.kind]
 
 
-def _controller(name: str, label: str, *domains: str, narrowed_by: str | None = None) -> FormFieldDefinition:
+def _controller(
+    name: str,
+    label: str,
+    *domains: str,
+    narrowed_by: str | None = None,
+    multiple: bool = False,
+    plural_label: str = "",
+) -> FormFieldDefinition:
     """Entity field that selects the device being measured, and becomes the request controller."""
     return FormFieldDefinition(
         name=name,
@@ -107,6 +121,8 @@ def _controller(name: str, label: str, *domains: str, narrowed_by: str | None = 
         role=FieldRole.CONTROLLER,
         narrowed_by=narrowed_by,
         entity_domains=domains,
+        multiple=multiple,
+        plural_label=plural_label,
     )
 
 
@@ -250,7 +266,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         parameters=LIGHT_PARAMETERS,
         fields=(
             POWER_FIELD,
-            _controller("light_entity_id", "Light", "light"),
+            _controller("light_entity_id", "Light", "light", multiple=True, plural_label="Lights"),
             MODES_FIELD,
             FormFieldDefinition(
                 name="multiple_light_count",
@@ -259,6 +275,8 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                 default=1,
                 minimum=1,
                 maximum=100,
+                derived_from="light_entity_id",
+                hint="Total number of identical physical lights; measured power is divided by this value.",
             ),
         ),
         supports_resume=True,

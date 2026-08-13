@@ -34,6 +34,7 @@ export interface EntityDescriptor {
   supported_modes?: LutMode[];
   effect_list?: string[];
   related_voltage_entity_id?: string;
+  member_entity_ids?: string[];
 }
 
 export interface EntityCatalog {
@@ -101,6 +102,13 @@ export interface FormField {
   default?: PrimitiveValue;
   minimum?: number | null;
   maximum?: number | null;
+  /** Whether several entities can be selected for this field at once. */
+  multiple?: boolean;
+  /** Label to use while several entities are selected. */
+  plural_label?: string;
+  /** Entity field whose number of selected entities this count follows by default. */
+  derived_from?: string | null;
+  hint?: string;
 }
 
 /** A tuning parameter as one measure type presents it. Bounds come from `Capabilities.limits`. */
@@ -170,6 +178,7 @@ export type PowerMeterSpec =
 export type LightControllerSpec =
   | { type: "dummy" }
   | { type: "hass"; entity_id: string; transition_time?: number }
+  | { type: "hass_multi"; entity_ids: string[]; transition_time?: number }
   | { type: "hue"; bridge_ip: string; light: string };
 
 export type MediaControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };

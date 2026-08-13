@@ -7,10 +7,16 @@ from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_
 from measure.controller.charging.const import ATTR_BATTERY_LEVEL
 from measure.controller.charging.spec import HassChargingControllerSpec, charging_entity_domain
 from measure.controller.fan.spec import HassFanControllerSpec
+from measure.controller.light.capabilities import common_effects, merge_light_infos
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.controller.light.dummy import DummyLightController
-from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec, HueLightControllerSpec
+from measure.controller.light.spec import (
+    DummyLightControllerSpec,
+    HassLightControllerSpec,
+    HassMultiLightControllerSpec,
+    HueLightControllerSpec,
+)
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.home_assistant_entities import DeviceClass, EntityDomain
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
@@ -49,6 +55,8 @@ class EntityRecord(Protocol):
     effect_list: list[str] | None
     min_mired: int | None
     max_mired: int | None
+    model_id: str | None
+    member_entity_ids: list[str]
 
 
 EntityLoader = Callable[[EntityDomain | None, DeviceClass | None], Sequence[EntityRecord]]
@@ -63,6 +71,82 @@ class PreflightResult:
     power_meter_diagnostic: PowerMeterDiagnostic | None = None
     battery_level_entity_id: str | None = None
     battery_level_attribute: str | None = None
+
+
+MODEL_UNCONFIRMED_WARNING = (
+    "Could not confirm that every selected light has the same model. Verify this before starting."
+)
+
+
+@dataclass(frozen=True)
+class LightSelection:
+    """The lights one request drives, reduced to the capabilities they all share."""
+
+    lights: tuple[EntityRecord, ...]
+    supported_modes: set[LutMode]
+    light_info: LightInfo
+    effects: list[str]
+
+
+def _no_group_member_overlap(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+    """A group already drives its members, so selecting both would measure them twice."""
+
+    members = {member for light in selection.lights for member in light.member_entity_ids}
+    if members & {light.entity_id for light in selection.lights}:
+        raise PreflightError("A light group and one of its members cannot both be selected")
+    return ()
+
+
+def _count_covers_selection(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
+    """Measured power is divided by the count, so it cannot describe fewer lights than are driven."""
+
+    if request.multiple_light_count < len(selection.lights):
+        raise PreflightError("Number of lights cannot be lower than the number of selected lights")
+    return ()
+
+
+def _models_agree(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+    """One profile is produced for all lights, so they must be the same model."""
+
+    models = {light.model_id for light in selection.lights}
+    if len(models - {None}) > 1:
+        raise PreflightError("Selected lights must have the same model ID")
+    if len(selection.lights) > 1 and None in models:
+        return (MODEL_UNCONFIRMED_WARNING,)
+    return ()
+
+
+def _modes_supported(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
+    if not set(request.modes).issubset(selection.supported_modes):
+        raise PreflightError("Selected light does not advertise every requested mode")
+    return ()
+
+
+def _color_temp_range_overlaps(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+    if selection.light_info.min_mired > selection.light_info.max_mired:
+        raise PreflightError("Selected lights do not share a color temperature range")
+    return ()
+
+
+LightRule = Callable[[LightSelection, LightMeasurementRequest], tuple[str, ...]]
+
+#: Checks applied to a light selection, in order. Each returns warnings or raises a PreflightError,
+#: so a new condition is added here rather than by growing the caller.
+LIGHT_RULES: tuple[LightRule, ...] = (
+    _no_group_member_overlap,
+    _count_covers_selection,
+    _models_agree,
+    _modes_supported,
+    _color_temp_range_overlaps,
+)
+
+
+def _light_info(light: EntityRecord) -> LightInfo:
+    return LightInfo(
+        "unknown",
+        min_mired=light.min_mired if light.min_mired is not None else MIN_MIRED,
+        max_mired=light.max_mired if light.max_mired is not None else MAX_MIRED,
+    )
 
 
 class MeasurementPreflight:
@@ -167,7 +251,11 @@ class MeasurementPreflight:
             return
         if isinstance(
             controller,
-            HassLightControllerSpec | HassMediaControllerSpec | HassChargingControllerSpec | HassFanControllerSpec,
+            HassLightControllerSpec
+            | HassMultiLightControllerSpec
+            | HassMediaControllerSpec
+            | HassChargingControllerSpec
+            | HassFanControllerSpec,
         ):
             return
         if isinstance(controller, HueLightControllerSpec):
@@ -175,17 +263,17 @@ class MeasurementPreflight:
         raise PreflightError(f"{type(controller).__name__} is not supported by the Home Assistant app")
 
     def _validate_power_meter(self, request: MeasurementRequest) -> None:
-        if isinstance(request.power_meter, HassPowerMeterSpec):
-            powers = {entity.entity_id for entity in self._load_entities(None, DeviceClass.POWER)}
-            if request.power_meter.entity_id not in powers:
-                raise PreflightError("Selected power entity is unavailable or not measured in W")
-        if request.dummy_load is None:
+        power_meter = request.power_meter
+        if not isinstance(power_meter, HassPowerMeterSpec):
             return
-        if isinstance(request.power_meter, HassPowerMeterSpec):
-            if not request.power_meter.voltage_entity_id:
-                raise PreflightError("A voltage sensor is required when using a resistive dummy load")
+        powers = {entity.entity_id for entity in self._load_entities(None, DeviceClass.POWER)}
+        if power_meter.entity_id not in powers:
+            raise PreflightError("Selected power entity is unavailable or not measured in W")
+        if request.dummy_load is not None and not power_meter.voltage_entity_id:
+            raise PreflightError("A voltage sensor is required when using a resistive dummy load")
+        if power_meter.voltage_entity_id:
             voltages = {entity.entity_id for entity in self._load_entities(None, DeviceClass.VOLTAGE)}
-            if request.power_meter.voltage_entity_id not in voltages:
+            if power_meter.voltage_entity_id not in voltages:
                 raise PreflightError("Selected voltage entity is unavailable or not measured in V")
 
     @staticmethod
@@ -263,29 +351,31 @@ class MeasurementPreflight:
     def _validate_light(self, request: LightMeasurementRequest) -> PreflightResult:
         if isinstance(request.controller, DummyLightControllerSpec):
             return self._estimate_dummy_light(request)
-        if not isinstance(request.controller, HassLightControllerSpec):
+        if not isinstance(request.controller, HassLightControllerSpec | HassMultiLightControllerSpec):
             raise PreflightError("Selected light entity is unavailable")
-        lights = {entity.entity_id: entity for entity in self._load_entities(EntityDomain.LIGHT, None)}
-        light = lights.get(request.controller.entity_id)
-        if light is None:
-            raise PreflightError("Selected light entity is unavailable")
-        if isinstance(request.power_meter, HassPowerMeterSpec) and request.power_meter.voltage_entity_id:
-            voltages = {entity.entity_id for entity in self._load_entities(None, DeviceClass.VOLTAGE)}
-            if request.power_meter.voltage_entity_id not in voltages:
-                raise PreflightError("Selected voltage entity is unavailable or not measured in V")
-        supported = set(light.supported_modes or [])
-        if not set(request.modes).issubset(supported):
-            raise PreflightError("Selected light does not advertise every requested mode")
-        light_info = LightInfo(
-            "unknown",
-            min_mired=light.min_mired if light.min_mired is not None else MIN_MIRED,
-            max_mired=light.max_mired if light.max_mired is not None else MAX_MIRED,
-        )
-        plan = build_light_plan(request.modes, request.parameters, light_info, light.effect_list or ())
+
+        selection = self._resolve_lights(request.controller.entity_ids)
+        warnings = tuple(warning for rule in LIGHT_RULES for warning in rule(selection, request))
+        plan = build_light_plan(request.modes, request.parameters, selection.light_info, selection.effects)
         return PreflightResult(
+            warnings=warnings,
             estimated_variations=plan.variation_count,
             estimated_duration_seconds=round(estimate_light_time_left(plan, request.parameters)),
-            supported_modes=tuple(sorted(supported, key=str)),
+            supported_modes=tuple(sorted(selection.supported_modes, key=str)),
+        )
+
+    def _resolve_lights(self, entity_ids: Sequence[str]) -> LightSelection:
+        """Look the selected lights up in the catalog and reduce them to their shared capabilities."""
+
+        lights = {entity.entity_id: entity for entity in self._load_entities(EntityDomain.LIGHT, None)}
+        selected = [lights[entity_id] for entity_id in entity_ids if entity_id in lights]
+        if len(selected) != len(entity_ids):
+            raise PreflightError("Selected light entity is unavailable")
+        return LightSelection(
+            lights=tuple(selected),
+            supported_modes=set.intersection(*(set(light.supported_modes or []) for light in selected)),
+            light_info=merge_light_infos([_light_info(light) for light in selected]),
+            effects=common_effects([light.effect_list or [] for light in selected]),
         )
 
     @staticmethod

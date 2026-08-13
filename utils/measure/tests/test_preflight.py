@@ -4,7 +4,11 @@ from typing import Any
 from measure.controller.charging.spec import HassChargingControllerSpec
 from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import LutMode
-from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec
+from measure.controller.light.spec import (
+    DummyLightControllerSpec,
+    HassLightControllerSpec,
+    HassMultiLightControllerSpec,
+)
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.ha_app.preflight import ActiveSessionError, EntityRecord, MeasurementPreflight, PreflightError
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
@@ -30,6 +34,8 @@ class Entity(EntityRecord):
     state: str = "available"
     attribute_names: list[str] = field(default_factory=list)
     device_id: str | None = None
+    model_id: str | None = None
+    member_entity_ids: list[str] = field(default_factory=list)
 
 
 def preflight(
@@ -388,6 +394,114 @@ def test_hs_preflight_uses_default_native_resolution() -> None:
     result = preflight(entities).validate(request)
 
     assert result.estimated_variations == 2_025
+
+
+def test_multi_light_preflight_uses_common_capabilities_and_models() -> None:
+    entities = base_entities()
+    entities[("light", None)] = [
+        Entity(
+            "light.one",
+            [LutMode.BRIGHTNESS, LutMode.COLOR_TEMP],
+            min_mired=150,
+            max_mired=400,
+            model_id="LWA017",
+        ),
+        Entity(
+            "light.two",
+            [LutMode.BRIGHTNESS, LutMode.COLOR_TEMP],
+            min_mired=200,
+            max_mired=500,
+            model_id="LWA017",
+        ),
+    ]
+    request = LightMeasurementRequest(
+        model_id="LWA017",
+        product_name="Test lights",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=HassMultiLightControllerSpec(entity_ids=["light.one", "light.two"]),
+        modes={LutMode.COLOR_TEMP},
+        multiple_light_count=2,
+    )
+
+    result = preflight(entities).validate(request)
+
+    assert result.warnings == ()
+    assert result.supported_modes == (LutMode.BRIGHTNESS, LutMode.COLOR_TEMP)
+
+
+def test_multi_light_preflight_rejects_mixed_models_and_group_member_overlap() -> None:
+    entities = base_entities()
+    entities[("light", None)] = [
+        Entity("light.group", [LutMode.BRIGHTNESS], member_entity_ids=["light.one", "light.two"]),
+        Entity("light.one", [LutMode.BRIGHTNESS], model_id="ONE"),
+        Entity("light.two", [LutMode.BRIGHTNESS], model_id="TWO"),
+    ]
+    common = {
+        "model_id": "ONE",
+        "product_name": "Test lights",
+        "measure_device": "Test meter",
+        "power_meter": HassPowerMeterSpec(entity_id="sensor.power"),
+        "multiple_light_count": 3,
+    }
+
+    mixed = LightMeasurementRequest(
+        **common,
+        controller=HassMultiLightControllerSpec(entity_ids=["light.one", "light.two"]),
+    )
+    with pytest.raises(PreflightError, match="same model ID"):
+        preflight(entities).validate(mixed)
+
+    overlap = LightMeasurementRequest(
+        **common,
+        controller=HassMultiLightControllerSpec(entity_ids=["light.group", "light.one"]),
+    )
+    with pytest.raises(PreflightError, match="group and one of its members"):
+        preflight(entities).validate(overlap)
+
+
+def test_multi_light_preflight_warns_for_unknown_models_and_validates_count() -> None:
+    entities = base_entities()
+    entities[("light", None)] = [
+        Entity("light.one", [LutMode.BRIGHTNESS]),
+        Entity("light.two", [LutMode.BRIGHTNESS]),
+    ]
+    request = LightMeasurementRequest(
+        model_id="manual",
+        product_name="Test lights",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=HassMultiLightControllerSpec(entity_ids=["light.one", "light.two"]),
+        multiple_light_count=2,
+    )
+
+    assert "Could not confirm" in preflight(entities).validate(request).warnings[0]
+    with pytest.raises(PreflightError, match="Number of lights"):
+        preflight(entities).validate(request.model_copy(update={"multiple_light_count": 1}))
+
+
+def test_light_group_does_not_force_its_discovered_member_count() -> None:
+    entities = base_entities()
+    entities[("light", None)] = [
+        Entity(
+            "light.group",
+            [LutMode.BRIGHTNESS],
+            model_id="LWA017",
+            member_entity_ids=["light.one", "light.two"],
+        ),
+        Entity("light.one", [LutMode.BRIGHTNESS], model_id="LWA017"),
+        Entity("light.two", [LutMode.BRIGHTNESS], model_id="LWA017"),
+    ]
+    request = LightMeasurementRequest(
+        model_id="LWA017",
+        product_name="Test group",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=HassLightControllerSpec(entity_id="light.group"),
+        multiple_light_count=1,
+    )
+
+    preflight(entities).validate(request)
 
 
 def test_preflight_reports_active_session_before_external_checks() -> None:

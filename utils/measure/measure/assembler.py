@@ -19,6 +19,7 @@ from measure.controller.light.hass import HassLightController
 from measure.controller.light.spec import (
     DummyLightControllerSpec,
     HassLightControllerSpec,
+    HassMultiLightControllerSpec,
     HueLightControllerSpec,
     LightControllerSpec,
 )
@@ -209,12 +210,12 @@ class MeasurementAssembler:
     def _light_controller(self, spec: LightControllerSpec) -> LightController:
         if isinstance(spec, DummyLightControllerSpec):
             return DummyLightController()
-        if isinstance(spec, HassLightControllerSpec):
+        if isinstance(spec, HassLightControllerSpec | HassMultiLightControllerSpec):
             hass = self._home_assistant()
             return HassLightController(
                 hass,
                 spec.transition_time,
-                entity_id=spec.entity_id,
+                entity_ids=spec.entity_ids,
                 wait=self._interaction.wait,
             )
         if isinstance(spec, HueLightControllerSpec):

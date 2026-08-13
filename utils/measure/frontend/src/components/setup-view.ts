@@ -7,6 +7,7 @@ import type {
   EntityDescriptor,
   FormField,
   FormFieldOption,
+  LutMode,
   MeasureDefaults,
   MeasureDefinition,
   MeasureParameter,
@@ -34,6 +35,7 @@ function formText(form: FormData, name: string): string {
 }
 
 const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging.";
+const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
 
 export class SetupView extends LitElement {
   static readonly properties = {
@@ -64,6 +66,7 @@ export class SetupView extends LitElement {
     dummyLoadEnabled: { state: true },
     dummyLoadMode: { state: true },
     dummyController: { state: true },
+    multipleLights: { state: true },
   };
 
   capabilities?: Capabilities;
@@ -86,21 +89,26 @@ export class SetupView extends LitElement {
   busy = false;
   errorMessage = "";
   selectedType?: MeasureType;
-  selectedEntities: Record<string, string> = {};
+  /** Entities picked per field. A single-entity field simply holds a one-entry list. */
+  selectedEntities: Record<string, string[]> = {};
   selectValues: Record<string, string> = {};
   multiSelection: Record<string, string[]> = {};
   parameterValues: Record<string, string> = {};
   dummyLoadEnabled = false;
   dummyLoadMode: DummyLoadSpec["mode"] = "calibrate";
   dummyController = false;
+  multipleLights = false;
+  /** Deliberately not reactive: it exists so a typed count survives re-renders instead of being recomputed. */
+  private derivedCountOverride?: string;
 
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
     form { display: grid; gap: 1rem; }
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     .profile-grid { align-items: start; }
+    .profile-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; }
     label, fieldset { display: grid; gap: 0.4rem; }
-    label > span, legend { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+    label > span, legend, .field-label { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
     .field-hint { color: var(--muted); font-size: 0.74rem; line-height: 1.4; }
     input, select {
       width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 9px;
@@ -110,6 +118,11 @@ export class SetupView extends LitElement {
     fieldset.section { border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem 1.2rem; margin: 0; display: grid; gap: 1rem; }
     fieldset.section > legend { padding: 0 0.4rem; color: var(--signal-strong); font-size: 0.85rem; font-weight: 700; }
     .checks { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .entity-list { display: grid; gap: 0.4rem; }
+    .entity-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; align-items: center; }
+    .entity-row button, .add-entity { min-height: 40px; }
+    .remove-entity { display: grid; place-items: center; width: 44px; padding: 0; }
+    .remove-entity svg { width: 20px; height: 20px; }
     .check { display: flex; grid-template-columns: none; align-items: center; gap: 0.5rem; min-height: 42px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); }
     .check input { min-height: auto; width: auto; accent-color: var(--signal); }
     /* A checkbox pill has no caption above it, so pin it to the input line of its row. */
@@ -143,9 +156,14 @@ export class SetupView extends LitElement {
     .power-meter-summary button { flex: 0 0 auto; min-height: 38px; padding: 0.4rem 0.9rem; }
     .dummy-load { display: grid; gap: 0.9rem; }
     .dummy-load-toggle { width: fit-content; }
+    /* A checkbox that reveals or hides a block of the form, rather than submitting a value. */
+    .toggle-pill { width: fit-content; }
     .dummy-controller { display: grid; gap: 0.4rem; }
-    .dummy-controller-toggle { width: fit-content; }
     .dummy-controller p { margin: 0; }
+    .multiple-lights { display: grid; justify-items: start; gap: 0.4rem; }
+    .multiple-lights p { margin: 0; }
+    .help-link { display: inline-flex; align-items: center; margin-left: 0.25rem; color: var(--signal-strong); vertical-align: 0.15em; }
+    .help-link svg { width: 16px; height: 16px; }
     .dummy-load-options { display: grid; gap: 0.8rem; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
     .dummy-load-options p { margin: 0; }
     .calibration-card { display: grid; gap: 0.2rem; }
@@ -178,6 +196,10 @@ export class SetupView extends LitElement {
       this.dummyLoadMode = this.initialRequest?.dummy_load?.mode ?? (this.dummyLoadCalibration ? "reuse" : "calibrate");
       this.dummyController = Boolean(
         this.initialRequest && "controller" in this.initialRequest && this.initialRequest.controller.type === "dummy",
+      );
+      this.multipleLights = Boolean(
+        this.initialRequest?.measure_type === "light"
+        && (this.initialRequest.controller.type === "hass_multi" || this.initialRequest.multiple_light_count > 1),
       );
     } else if (changed.has("dummyLoadCalibration") && !this.dummyLoadEnabled) {
       this.dummyLoadMode = this.dummyLoadCalibration ? "reuse" : "calibrate";
@@ -255,6 +277,7 @@ export class SetupView extends LitElement {
     if (!definition || !this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
     const run = this.initialRequest?.measure_type === type ? this.initialRequest : undefined;
     const fields = deviceFields(definition);
+    const multipleController = this.multiControllerField();
     // A multi-select needs the room of its own fieldset; the rest are grid cells.
     const blocks = fields.filter((field) => field.control === "multi_select");
     return html`
@@ -268,14 +291,13 @@ export class SetupView extends LitElement {
         <fieldset class="section">
           <legend>${definition.label}</legend>
           ${definition.fields.some((field) => field.role === "controller") ? this.renderDummyControllerToggle() : nothing}
+          ${multipleController && !this.dummyController ? this.renderMultipleLightsToggle(multipleController) : nothing}
           <div class="grid profile-grid">
             ${fields.filter((field) => field.control !== "multi_select").map((field) => this.genericField(field, run))}
-            ${definition.supports_profile
-              ? this.textField("model_id", "Model ID", this.modelId(run), definition.model_id_example && `e.g. ${definition.model_id_example}`, true)
-              : nothing}
-            ${definition.supports_profile
-              ? this.textField("product_name", "Full product name", run?.product_name ?? "", definition.product_name_example || definition.label, true, FULL_PRODUCT_NAME_HINT)
-              : nothing}
+            ${definition.supports_profile ? html`<div class="profile-fields">
+              ${this.textField("model_id", "Model ID", this.modelId(run), definition.model_id_example && `e.g. ${definition.model_id_example}`, true)}
+              ${this.textField("product_name", "Full product name", run?.product_name ?? "", definition.product_name_example || definition.label, true, FULL_PRODUCT_NAME_HINT)}
+            </div>` : nothing}
           </div>
           ${blocks.map((field) => this.multiSelectField(field, run))}
         </fieldset>
@@ -326,7 +348,7 @@ export class SetupView extends LitElement {
     if (!this.capabilities?.developer_mode) return nothing;
     return html`
       <div class="dummy-controller">
-        <label class="check dummy-controller-toggle">
+        <label class="check toggle-pill">
           <input
             type="checkbox"
             name="use_dummy_controller"
@@ -338,6 +360,39 @@ export class SetupView extends LitElement {
         ${this.dummyController
           ? html`<p class="muted">No real device is controlled during this measurement. Use it only to test the app itself.</p>`
           : nothing}
+      </div>
+    `;
+  }
+
+  private renderMultipleLightsToggle(field: FormField) {
+    return html`
+      <div class="multiple-lights">
+        <label class="check toggle-pill">
+          <input
+            type="checkbox"
+            name="measure_multiple_lights"
+            .checked=${this.multipleLights}
+            data-field=${field.name}
+            @change=${this.multipleLightsChanged}
+          />
+          Measure multiple lights
+        </label>
+        <p class="muted">
+          Measuring multiple identical lights together increases the load, making very low power use easier to measure accurately.
+          <a
+            class="help-link"
+            href=${MULTIPLE_LIGHTS_GUIDE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Learn more about measuring multiple identical lights"
+            title="Learn more"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M9.75 9a2.4 2.4 0 0 1 4.57 1c0 1.75-2.32 2.1-2.32 3.5M12 17h.01"></path>
+            </svg>
+          </a>
+        </p>
       </div>
     `;
   }
@@ -497,6 +552,7 @@ export class SetupView extends LitElement {
     if (!definition) return nothing;
     const name = field.name;
     if (this.dummyController && field.role === "controller") return nothing;
+    if (field.derived_from) return this.derivedCountField(field, run);
     const stored = run && requestFieldValue(run, field);
     if (field.control === "boolean") {
       return html`<label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
@@ -512,7 +568,9 @@ export class SetupView extends LitElement {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
       }
       const entities = this.entitiesIn(domains);
-      return this.entitySelect(name, field.label, entities, value, field.required);
+      if (field.multiple && this.multipleLights) return this.multiEntityField(field, entities, run);
+      const selected = field.multiple ? this.selectedEntityId(field, run) || value : value;
+      return this.entitySelect(name, field.label, entities, selected, field.required);
     }
     if (field.control === "select") {
       const value = (stored ?? field.default ?? "").toString();
@@ -522,17 +580,74 @@ export class SetupView extends LitElement {
         ${field.options.map((option) => html`<option value=${option.value} ?selected=${option.value === value}>${option.label}</option>`)}
       </select></label>`;
     }
-    const type = field.control === "number" ? "number" : "text";
-    const value = (stored ?? field.default ?? "").toString();
+    return this.valueField(field, (stored ?? field.default ?? "").toString());
+  }
+
+  /** A plain text or number input, rendered from what the field declares about itself. */
+  private valueField(field: FormField, value: string, onInput: ((event: Event) => void) | null = null) {
     return html`<label><span>${field.label}</span><input
-      type=${type}
-      name=${name}
+      type=${field.control === "number" ? "number" : "text"}
+      name=${field.name}
       .value=${value}
       min=${field.minimum ?? nothing}
       max=${field.maximum ?? nothing}
       ?required=${field.required}
       autocomplete="off"
-    /></label>`;
+      @input=${onInput}
+    />${field.hint ? html`<small class="field-hint">${field.hint}</small>` : nothing}</label>`;
+  }
+
+  /**
+   * A count that follows how many entities its source field selects. It only means anything
+   * while several devices are measured together, so until then it submits a fixed 1 out of sight.
+   */
+  private derivedCountField(field: FormField, run?: MeasurementRequest) {
+    if (!this.multipleLights) return html`<input type="hidden" name=${field.name} value="1" />`;
+    const source = this.selectedType
+      ? this.definition(this.selectedType)?.fields.find((candidate) => candidate.name === field.derived_from)
+      : undefined;
+    const derived = source ? this.selectedEntityIds(source, run).length : 0;
+    const stored = run && requestFieldValue(run, field);
+    const value = this.derivedCountOverride
+      ?? (derived > 1 ? String(derived) : (stored ?? field.default ?? "").toString());
+    return this.valueField(field, value, this.derivedCountChanged);
+  }
+
+  private derivedCountChanged(event: Event): void {
+    this.derivedCountOverride = (event.currentTarget as HTMLInputElement).value;
+  }
+
+  private multiEntityField(field: FormField, entities: EntityDescriptor[], run?: MeasurementRequest) {
+    const rows = this.entityRows(field, run);
+    const values = rows.length ? rows : [""];
+    return html`<div class="entity-list">
+      <span class="field-label">${field.plural_label || field.label}</span>
+      ${values.map((value, index) => html`<div class="entity-row">
+        <select name=${field.name} required data-index=${index} @change=${this.multiEntityChanged}>
+          <option value="">Select an entity</option>
+          ${entities.map((entity) => html`<option
+            value=${entity.entity_id}
+            ?selected=${entity.entity_id === value}
+            ?disabled=${entity.entity_id !== value && values.includes(entity.entity_id)}
+          >${entity.name} · ${entity.entity_id}</option>`)}
+        </select>
+        ${values.length > 1 ? html`<button
+          class="remove-entity danger"
+          type="button"
+          data-field=${field.name}
+          data-index=${index}
+          aria-label="Remove ${field.label}"
+          title="Remove ${field.label}"
+          @click=${this.removeEntity}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6"></path>
+          </svg>
+        </button>` : nothing}
+      </div>`)}
+      <button class="add-entity" type="button" data-field=${field.name} @click=${this.addEntity}>Add another ${field.label.toLowerCase()}</button>
+      ${field.hint ? html`<small class="field-hint">${field.hint}</small>` : nothing}
+    </div>`;
   }
 
   private fieldDomains(field: MeasureDefinition["fields"][number]): string[] {
@@ -582,11 +697,21 @@ export class SetupView extends LitElement {
     this.dummyController = (event.currentTarget as HTMLInputElement).checked;
   }
 
-  /** Options a field offers right now, narrowed by the capabilities of the entity it names. */
+  private multipleLightsChanged(event: Event): void {
+    const input = event.currentTarget as HTMLInputElement;
+    this.multipleLights = input.checked;
+    if (this.multipleLights) return;
+    // Back to one light: keep the first pick so the single selector stays populated, and let the count be derived again.
+    const field = input.dataset.field ?? "";
+    this.selectEntities(field, this.currentRows(field).filter(Boolean).slice(0, 1));
+    this.derivedCountOverride = undefined;
+  }
+
+  /** Options a field offers right now, narrowed by the capabilities of the entities it names. */
   private availableOptions(field: FormField, request?: MeasurementRequest): FormFieldOption[] {
     // A virtual device stands in for any real one, so it supports everything on offer.
     if (this.dummyController) return field.options;
-    return fieldOptions(field, this.narrowingEntity(field, request));
+    return fieldOptions(field, this.narrowedModes(field, request));
   }
 
   /** Currently selected values: what the user picked, else the previous run's, else everything offered. */
@@ -606,12 +731,18 @@ export class SetupView extends LitElement {
     return active;
   }
 
-  private narrowingEntity(field: FormField, request?: MeasurementRequest): EntityDescriptor | undefined {
+  /** Modes every entity named by this field's narrowing source supports; undefined when none is selected. */
+  private narrowedModes(field: FormField, request?: MeasurementRequest): LutMode[] | undefined {
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
     const source = field.narrowed_by ? definition?.fields.find((candidate) => candidate.name === field.narrowed_by) : undefined;
     if (!source) return undefined;
-    const selected = this.selectedEntityId(source, request);
-    return this.entityChoices(source).find((entity) => entity.entity_id === selected);
+    const choices = this.entityChoices(source);
+    const selected = this.selectedEntityIds(source, request)
+      .map((entityId) => choices.find((entity) => entity.entity_id === entityId))
+      .filter((entity): entity is EntityDescriptor => Boolean(entity));
+    const [first, ...rest] = selected;
+    if (!first) return undefined;
+    return (first.supported_modes ?? []).filter((mode) => rest.every((entity) => entity.supported_modes?.includes(mode)));
   }
 
   /** Entities offered for a controller field. Lights arrive with the startup catalog, other domains on demand. */
@@ -623,15 +754,31 @@ export class SetupView extends LitElement {
     return domains.flatMap((domain) => (domain === "light" ? this.lights : this.deviceEntities[domain] ?? []));
   }
 
-  private selectedEntityId(field: FormField, request?: MeasurementRequest): string {
+  /**
+   * Rows a field currently shows: what the user picked, else what a previous run stored.
+   * Empty rows are kept, because an unanswered select is still a row in the form.
+   */
+  private entityRows(field: FormField, request?: MeasurementRequest): string[] {
+    const chosen = this.selectedEntities[field.name];
+    if (chosen) return chosen;
     const stored = request && requestFieldValue(request, field);
-    return this.selectedEntities[field.name] || (typeof stored === "string" ? stored : "");
+    if (Array.isArray(stored)) return stored.map(String);
+    return typeof stored === "string" && stored ? [stored] : [];
+  }
+
+  private selectedEntityId(field: FormField, request?: MeasurementRequest): string {
+    return this.entityRows(field, request)[0] ?? "";
+  }
+
+  private selectedEntityIds(field: FormField, request?: MeasurementRequest): string[] {
+    return this.entityRows(field, request).filter(Boolean);
   }
 
   private selectType(type: MeasureType): void {
     this.errorMessage = "";
     this.selectedType = type;
     this.dummyController = false;
+    this.multipleLights = false;
     this.dispatchEvent(new CustomEvent("measure-type-selected", { detail: type, bubbles: true, composed: true }));
   }
 
@@ -644,10 +791,51 @@ export class SetupView extends LitElement {
 
   private entityChanged(event: Event): void {
     const select = event.currentTarget as HTMLSelectElement;
-    this.selectedEntities = { ...this.selectedEntities, [select.name]: select.value };
+    this.selectEntities(select.name, [select.value]);
   }
 
+  private multiEntityChanged(event: Event): void {
+    const select = event.currentTarget as HTMLSelectElement;
+    const rows = [...this.currentRows(select.name)];
+    rows[Number(select.dataset.index)] = select.value;
+    this.selectEntities(select.name, rows);
+  }
 
+  private addEntity(event: Event): void {
+    const field = (event.currentTarget as HTMLElement).dataset.field ?? "";
+    this.selectEntities(field, [...this.currentRows(field), ""]);
+  }
+
+  private removeEntity(event: Event): void {
+    const button = event.currentTarget as HTMLElement;
+    const field = button.dataset.field ?? "";
+    const rows = [...this.currentRows(field)];
+    rows.splice(Number(button.dataset.index), 1);
+    this.selectEntities(field, rows);
+  }
+
+  /** Rows as the form currently shows them, so an edit starts from what the user can see. */
+  private currentRows(name: string): string[] {
+    const field = this.selectedType
+      ? this.definition(this.selectedType)?.fields.find((candidate) => candidate.name === name)
+      : undefined;
+    return field ? this.entityRows(field, this.currentRun) : [];
+  }
+
+  /** The previous run, when it belongs to the type now being configured. */
+  private get currentRun(): MeasurementRequest | undefined {
+    return this.initialRequest?.measure_type === this.selectedType ? this.initialRequest : undefined;
+  }
+
+  /** The controller field that accepts several entities at once, when this type has one. */
+  private multiControllerField(): FormField | undefined {
+    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
+    return definition?.fields.find((field) => field.role === "controller" && field.multiple);
+  }
+
+  private selectEntities(name: string, rows: string[]): void {
+    this.selectedEntities = { ...this.selectedEntities, [name]: rows };
+  }
 
   private openSettings(): void {
     this.dispatchEvent(new CustomEvent("open-settings", { bubbles: true, composed: true }));
@@ -693,12 +881,20 @@ export class SetupView extends LitElement {
     return this.powers.find((entity) => entity.entity_id === powerEntityId)?.related_voltage_entity_id ?? "";
   }
 
+  /** Model to prefill: the one every selected device reports, or blank when they differ or any is unknown. */
   private modelId(request?: MeasurementRequest): string {
     if (request?.model_id) return request.model_id;
-    const requestEntityId = request && "controller" in request && request.controller.type === "hass" ? request.controller.entity_id : "";
-    const entityId = Object.values(this.selectedEntities).find(Boolean) || requestEntityId;
+    const controller = this.selectedType
+      ? this.definition(this.selectedType)?.fields.find((field) => field.role === "controller")
+      : undefined;
+    if (!controller) return "";
     const entities = [...this.lights, ...Object.values(this.deviceEntities).flat()];
-    return entities.find((entity) => entity.entity_id === entityId)?.model_id ?? "";
+    const models = new Set(
+      this.selectedEntityIds(controller, request)
+        .map((entityId) => entities.find((entity) => entity.entity_id === entityId)?.model_id),
+    );
+    if (models.size !== 1) return "";
+    return [...models][0] ?? "";
   }
 
   private submitMeasurement(event: SubmitEvent): void {

@@ -143,10 +143,10 @@ class BaseMeasurementRequest(BaseModel):
         return self
 
     @property
-    def controlled_entity_id(self) -> str | None:
-        """Home Assistant entity driven during the measurement, when the controller uses one."""
-        entity_id = getattr(self.controller, "entity_id", None)
-        return str(entity_id) if entity_id else None
+    def controlled_entity_ids(self) -> tuple[str, ...]:
+        """Home Assistant entities driven during the measurement, empty when the controller drives none."""
+        entity_ids = getattr(self.controller, "entity_ids", None) or [getattr(self.controller, "entity_id", None)]
+        return tuple(str(entity_id) for entity_id in entity_ids if entity_id)
 
     @property
     def model_name(self) -> str:
