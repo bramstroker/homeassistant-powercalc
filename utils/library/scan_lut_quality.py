@@ -19,6 +19,9 @@ DEFAULT_MAX_RELATIVE_DEVIATION = 0.12
 DEFAULT_Z_SCORE = 6.0
 SMOOTHING_MIN_POINTS = 8
 SMOOTHING_WINDOW_RADIUS = 3
+# Neighbors used to extrapolate an expected value for the first and last point of a curve.
+ENDPOINT_FIT_POINTS = 3
+ENDPOINT_THRESHOLD_FACTOR = 2.0
 SUPPORTED_LUT_FILES = ("brightness.csv", "brightness.csv.gz", "color_temp.csv", "color_temp.csv.gz")
 SUPPORTED_LUT_MODES = ("all", "brightness", "color_temp")
 SCAN_LUT_MODES = ("brightness", "color_temp")
@@ -40,6 +43,7 @@ MANUALLY_VERIFIED_MODELS = (
     "lifx/LIFX Original 1000",
     "lifx/LIFX Downlight Color",
     "lifx/LIFX Candle",
+    "linkind/LS0101911261",
     "osram/Classic A60 RGBW",
     "signify/1742930P7",
     "signify/5060730P7",
@@ -67,6 +71,8 @@ class LutPoint:
     bri: int
     mired: int | None
     watt: float
+    # 1 based line number in the uncompressed CSV, so the header is line 1.
+    line: int = 0
 
 
 @dataclass(frozen=True)
@@ -80,6 +86,7 @@ class LutQualityIssue:
     deviation: float
     threshold: float
     message: str
+    line: int = 0
 
 
 @dataclass(frozen=True)
@@ -109,6 +116,7 @@ class CurveDeviation:
     point: LutPoint
     expected_watt: float
     deviation: float
+    is_endpoint: bool = False
 
 
 def scan_library(
@@ -254,8 +262,9 @@ def read_lut(path: Path, mode: str) -> list[LutPoint]:
                 bri=int(row["bri"]),
                 mired=int(row["mired"]) if mode == "color_temp" else None,
                 watt=float(row["watt"]),
+                line=line_number,
             )
-            for row in reader
+            for line_number, row in enumerate(reader, start=2)
         ]
 
 
@@ -346,8 +355,11 @@ def analyze_brightness_curve(
     candidate_deviations = calculate_detection_curve_deviations(mode, curve)
     deviations = [candidate.deviation for candidate in candidate_deviations]
     curve_range = max(point.watt for point in curve) - min(point.watt for point in curve)
+    # Endpoints are extrapolated instead of interpolated, so their deviations are noisier by
+    # nature. Feeding them into the median/MAD would inflate the threshold and hide real
+    # outliers, so the noise level of a curve is estimated from its interior points only.
     threshold = calculate_curve_threshold(
-        deviations,
+        [candidate.deviation for candidate in candidate_deviations if not candidate.is_endpoint],
         curve_range=curve_range,
         max_absolute_deviation=max_absolute_deviation,
         max_relative_deviation=max_relative_deviation,
@@ -365,7 +377,11 @@ def detect_curve_issues(
     candidate_deviations: Sequence[CurveDeviation],
     threshold: float,
 ) -> list[LutQualityIssue]:
-    candidates = [candidate for candidate in candidate_deviations if candidate.deviation > threshold]
+    candidates = [
+        candidate
+        for candidate in candidate_deviations
+        if candidate.deviation > get_candidate_threshold(candidate, threshold)
+    ]
     clusters = group_adjacent_deviations(candidates)
     selected_candidates = [
         max(
@@ -385,7 +401,7 @@ def detect_curve_issues(
             curve[selected.index],
             selected.expected_watt,
             selected.deviation,
-            threshold,
+            get_candidate_threshold(selected, threshold),
         )
         for selected in selected_candidates
     ]
@@ -403,44 +419,68 @@ def group_adjacent_deviations(candidates: Sequence[CurveDeviation]) -> list[list
     return clusters
 
 
-def calculate_curve_deviations(curve: Sequence[LutPoint]) -> list[CurveDeviation]:
-    return [calculate_curve_deviation(curve, index) for index in range(1, len(curve) - 1)]
-
-
 def calculate_detection_curve_deviations(mode: str, curve: Sequence[LutPoint]) -> list[CurveDeviation]:
-    if mode == "color_temp":
-        return calculate_color_temp_curve_deviations(curve)
-
-    if len(curve) < SMOOTHING_MIN_POINTS:
-        return calculate_curve_deviations(curve)
-
-    return calculate_smoothed_curve_deviations(curve)
+    return [calculate_curve_deviation(mode, curve, index) for index in range(len(curve))]
 
 
-def calculate_color_temp_curve_deviations(curve: Sequence[LutPoint]) -> list[CurveDeviation]:
-    return [calculate_color_temp_curve_deviation(curve, index) for index in range(1, len(curve) - 1)]
-
-
-def calculate_color_temp_curve_deviation(curve: Sequence[LutPoint], index: int) -> CurveDeviation:
+def calculate_curve_deviation(mode: str, curve: Sequence[LutPoint], index: int) -> CurveDeviation:
     point = curve[index]
-    expected_watt = calculate_color_temp_expected_watt(curve, index)
+    endpoint = is_endpoint(curve, index)
+    expected_watt = (
+        calculate_endpoint_expected_watt(curve, index)
+        if endpoint
+        else calculate_interior_expected_watt(mode, curve, index)
+    )
     return CurveDeviation(
         index=index,
         point=point,
         expected_watt=expected_watt,
         deviation=abs(point.watt - expected_watt),
+        is_endpoint=endpoint,
     )
 
 
-def calculate_color_temp_expected_watt(curve: Sequence[LutPoint], index: int) -> float:
-    if index == 1 and len(curve) >= SMOOTHING_MIN_POINTS:
-        return interpolate_watt(curve[2], curve[3], get_axis_value(curve[index]))
-
-    return interpolate_watt(curve[index - 1], curve[index + 1], get_axis_value(curve[index]))
+def is_endpoint(curve: Sequence[LutPoint], index: int) -> bool:
+    return index in (0, len(curve) - 1)
 
 
-def calculate_smoothed_curve_deviations(curve: Sequence[LutPoint]) -> list[CurveDeviation]:
-    return [calculate_smoothed_curve_deviation(curve, index) for index in range(1, len(curve) - 1)]
+def get_candidate_threshold(candidate: CurveDeviation, threshold: float) -> float:
+    """Endpoints are extrapolated, so they get more headroom before counting as an outlier."""
+    return threshold * ENDPOINT_THRESHOLD_FACTOR if candidate.is_endpoint else threshold
+
+
+def calculate_interior_expected_watt(mode: str, curve: Sequence[LutPoint], index: int) -> float:
+    if mode == "color_temp" or len(curve) < SMOOTHING_MIN_POINTS:
+        return calculate_interpolated_expected_watt(curve, index)
+
+    return calculate_smoothed_expected_watt(curve, index)
+
+
+def calculate_endpoint_expected_watt(curve: Sequence[LutPoint], index: int) -> float:
+    """Extrapolate the first or last point of a curve from the neighbors next to it.
+
+    Endpoints have no neighbor on one side, so they cannot be interpolated. Without this a
+    broken first or last measurement stays invisible and its neighbor gets blamed instead.
+    A least squares fit over a few neighbors is used rather than the line through the two
+    nearest ones, so a single bad neighbor cannot drag the prediction along with it.
+    """
+    neighbors = curve[1 : 1 + ENDPOINT_FIT_POINTS] if index == 0 else curve[-1 - ENDPOINT_FIT_POINTS : -1]
+    return extrapolate_watt(neighbors, curve[index].bri)
+
+
+def extrapolate_watt(neighbors: Sequence[LutPoint], bri: int) -> float:
+    """Predict the watt value at a brightness level from a least squares fit of neighbors."""
+    if len(neighbors) < 2:
+        return neighbors[0].watt
+
+    mean_bri = sum(point.bri for point in neighbors) / len(neighbors)
+    mean_watt = sum(point.watt for point in neighbors) / len(neighbors)
+    variance = sum((point.bri - mean_bri) ** 2 for point in neighbors)
+    if not variance:
+        return mean_watt
+
+    covariance = sum((point.bri - mean_bri) * (point.watt - mean_watt) for point in neighbors)
+    return mean_watt + ((covariance / variance) * (bri - mean_bri))
 
 
 def calculate_correction_improvement(
@@ -451,41 +491,23 @@ def calculate_correction_improvement(
 ) -> float:
     before = calculate_total_excess_deviation(mode, curve, threshold)
     corrected_curve = list(curve)
-    corrected_curve[candidate.index] = LutPoint(
-        bri=candidate.point.bri,
-        mired=candidate.point.mired,
-        watt=candidate.expected_watt,
-    )
+    corrected_curve[candidate.index] = replace(candidate.point, watt=candidate.expected_watt)
     after = calculate_total_excess_deviation(mode, corrected_curve, threshold)
     return before - after
 
 
 def calculate_total_excess_deviation(mode: str, curve: Sequence[LutPoint], threshold: float) -> float:
     return sum(
-        max(candidate.deviation - threshold, 0.0) for candidate in calculate_detection_curve_deviations(mode, curve)
+        max(candidate.deviation - get_candidate_threshold(candidate, threshold), 0.0)
+        for candidate in calculate_detection_curve_deviations(mode, curve)
     )
 
 
-def calculate_curve_deviation(curve: Sequence[LutPoint], index: int) -> CurveDeviation:
-    point = curve[index]
-    expected_watt = interpolate_watt(curve[index - 1], curve[index + 1], get_axis_value(point))
-    return CurveDeviation(
-        index=index,
-        point=point,
-        expected_watt=expected_watt,
-        deviation=abs(point.watt - expected_watt),
-    )
+def calculate_interpolated_expected_watt(curve: Sequence[LutPoint], index: int) -> float:
+    if index == 1 and len(curve) >= SMOOTHING_MIN_POINTS:
+        return interpolate_watt(curve[2], curve[3], curve[index].bri)
 
-
-def calculate_smoothed_curve_deviation(curve: Sequence[LutPoint], index: int) -> CurveDeviation:
-    point = curve[index]
-    expected_watt = calculate_smoothed_expected_watt(curve, index)
-    return CurveDeviation(
-        index=index,
-        point=point,
-        expected_watt=expected_watt,
-        deviation=abs(point.watt - expected_watt),
-    )
+    return interpolate_watt(curve[index - 1], curve[index + 1], curve[index].bri)
 
 
 def calculate_smoothed_expected_watt(curve: Sequence[LutPoint], index: int) -> float:
@@ -495,34 +517,21 @@ def calculate_smoothed_expected_watt(curve: Sequence[LutPoint], index: int) -> f
         point.watt for neighbor_index, point in enumerate(curve[start:end], start=start) if neighbor_index != index
     ]
     if len(neighbor_watts) < 2:
-        return interpolate_watt(curve[index - 1], curve[index + 1], get_axis_value(curve[index]))
+        return interpolate_watt(curve[index - 1], curve[index + 1], curve[index].bri)
 
     return median(neighbor_watts)
 
 
-def calculate_point_deviation(curve: Sequence[LutPoint], index: int) -> tuple[LutPoint, float]:
-    deviation = calculate_curve_deviation(curve, index)
-    return deviation.point, deviation.deviation
+def interpolate_watt(left: LutPoint, right: LutPoint, bri: int) -> float:
+    """Estimate the watt value at a brightness level on the line through two points.
 
-
-def expected_values(curve: Sequence[LutPoint]) -> list[float]:
-    return [
-        interpolate_watt(curve[index - 1], curve[index + 1], get_axis_value(curve[index]))
-        for index in range(1, len(curve) - 1)
-    ]
-
-
-def get_axis_value(point: LutPoint) -> int:
-    return point.mired if point.mired is not None else point.bri
-
-
-def interpolate_watt(left: LutPoint, right: LutPoint, axis_value: int) -> float:
-    left_axis = get_axis_value(left)
-    right_axis = get_axis_value(right)
-    if left_axis == right_axis:
+    Curves are always grouped per mired and sorted by brightness, so brightness is the axis
+    for both color modes. Using it keeps uneven brightness steps correctly weighted.
+    """
+    if left.bri == right.bri:
         return (left.watt + right.watt) / 2
 
-    ratio = (axis_value - left_axis) / (right_axis - left_axis)
+    ratio = (bri - left.bri) / (right.bri - left.bri)
     return left.watt + ((right.watt - left.watt) * ratio)
 
 
@@ -553,7 +562,8 @@ def create_issue(
     threshold: float,
 ) -> LutQualityIssue:
     severity = "error" if deviation > threshold * 1.5 else "warning"
-    location = f"brightness {point.bri}, mired {point.mired}" if mode == "color_temp" else f"brightness {point.bri}"
+    coordinates = f"brightness {point.bri}, mired {point.mired}" if mode == "color_temp" else f"brightness {point.bri}"
+    location = f"line {point.line} ({coordinates})" if point.line else coordinates
     return LutQualityIssue(
         severity=severity,
         mode=mode,
@@ -564,6 +574,7 @@ def create_issue(
         deviation=round(deviation, 3),
         threshold=round(threshold, 3),
         message=f"{location}: {point.watt:.3f} W deviates {deviation:.3f} W from smooth curve",
+        line=point.line,
     )
 
 
