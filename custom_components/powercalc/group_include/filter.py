@@ -170,13 +170,7 @@ class LightGroupFilter(EntityFilter):
     @staticmethod
     def _find_light_group(hass: HomeAssistant, group_entity_id: str) -> Entity | None:
         light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
-        return next(
-            filter(
-                lambda entity: entity.entity_id == group_entity_id,
-                light_component.entities,
-            ),
-            None,
-        )
+        return light_component.get_entity(group_entity_id)
 
     def find_all_entity_ids_recursively(
         self,
