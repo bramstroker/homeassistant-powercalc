@@ -1,0 +1,45 @@
+{
+  "author_info": {
+    "github": "wagnerpizza",
+    "name": "wagnerpizza"
+  },
+  "calculation_strategy": "linear",
+  "created_at": "2026-08-13T15:43:19Z",
+  "device_type": "fan",
+  "linear_config": {
+    "calibrate": [
+      "5 -> 16.90",
+      "10 -> 16.86",
+      "15 -> 16.75",
+      "20 -> 16.65",
+      "25 -> 18.84",
+      "30 -> 18.87",
+      "35 -> 18.78",
+      "40 -> 18.82",
+      "45 -> 21.28",
+      "50 -> 21.19",
+      "55 -> 21.10",
+      "60 -> 21.16",
+      "65 -> 25.28",
+      "70 -> 25.28",
+      "75 -> 25.06",
+      "80 -> 25.09",
+      "85 -> 36.02",
+      "90 -> 36.03",
+      "95 -> 35.80",
+      "100 -> 35.90"
+    ]
+  },
+  "max_voltage": 236.7,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus 1 PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.3.0:app"
+  },
+  "min_voltage": 234.4,
+  "name": "Dreo DR-HTF008S",
+  "standby_power": 1.57
+}
