@@ -3,7 +3,7 @@ import { MeasureApiClient, SessionEventStream } from "../api-client";
 import { MeasureAppController } from "../app-controller";
 import type { AppView, MeasureAppApi, MeasureAppState } from "../app-controller";
 import { requestFieldValue } from "../measurement-kinds";
-import type { AppSettings, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DummyLoadCalibration, EntityDescriptor, FormField, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SettingsSection, ShellyDiscoveryDevice } from "../types";
+import type { AppSettings, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DummyLoadCalibration, EntityDescriptor, ErrorHelp, FormField, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SettingsSection, ShellyDiscoveryDevice } from "../types";
 import type { ReviewMetric, ReviewRow } from "./preflight-view";
 import { sharedStyles } from "../styles";
 import "./preflight-view";
@@ -16,7 +16,7 @@ const POWERCALC_LOGO_URL = new URL("../assets/powercalc-logo.svg", import.meta.u
 
 export class AppShell extends LitElement implements MeasureAppState {
   static readonly properties = {
-    view: { state: true }, settingsSection: { state: true }, loadingMessage: { state: true }, errorMessage: { state: true }, busy: { state: true },
+    view: { state: true }, settingsSection: { state: true }, loadingMessage: { state: true }, errorMessage: { state: true }, errorHelp: { state: true }, busy: { state: true },
     connectedToEvents: { state: true }, snapshot: { state: true }, request: { state: true }, preflight: { state: true },
     files: { state: true }, plotCollection: { state: true }, logs: { state: true }, settings: { state: true },
     contributionAuth: { state: true }, contributionDeviceFlow: { state: true }, contributionDeviceStatus: { state: true },
@@ -33,6 +33,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   settingsSection?: SettingsSection;
   loadingMessage = "Connecting to Home Assistant…";
   errorMessage = "";
+  errorHelp?: ErrorHelp;
   busy = false;
   connectedToEvents = false;
   snapshot?: SessionSnapshot;
@@ -180,11 +181,11 @@ export class AppShell extends LitElement implements MeasureAppState {
         @shelly-discover=${this.discoverShellys} @github-device-start=${this.startContributionDeviceAuth}
         @github-token-save=${this.saveContributionToken} @github-disconnect=${this.disconnectContributionAuth}></measure-settings-view>`;
     if (this.view === "review" && this.preflight && this.request) return html`
-      <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .powerMeterDiagnostic=${this.preflight.power_meter_diagnostic} .canOverwrite=${this.reviewCanOverwrite()} .confirmationAction=${this.confirmationAction()} .busy=${this.busy} .errorMessage=${this.errorMessage} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
+      <measure-preflight-view .metrics=${this.reviewMetrics()} .summary=${this.reviewSummary()} .warnings=${this.preflight.warnings} .powerMeterDiagnostic=${this.preflight.power_meter_diagnostic} .lightLoadProbe=${this.preflight.light_load_probe} .canOverwrite=${this.reviewCanOverwrite()} .confirmationAction=${this.confirmationAction()} .busy=${this.busy} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp} @back=${this.backToSetup} @start=${this.start}></measure-preflight-view>`;
     if (this.view === "running" && this.snapshot) return html`
       <measure-running-view .snapshot=${this.snapshot} .confirmationAction=${this.confirmationAction()} .warningConfirmation=${this.confirmationIsWarning()} .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} @cancel=${this.cancel} @confirm=${this.confirm}></measure-running-view>`;
     if (this.view === "result" && this.snapshot) return html`
-      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .plotCollection=${this.plotCollection} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} .contributionAuth=${this.contributionAuth} .contributionDraft=${this.contributionDraft} .contributionPreview=${this.contributionPreview} .contributionResult=${this.contributionResult} .contributionBusy=${this.contributionBusy} .contributionError=${this.contributionError} @new=${this.newMeasurement} @resume=${this.resume} @open-settings=${this.openSettings} @contribution-preview=${this.previewContribution} @contribution-submit=${this.submitContribution}></measure-result-view>`;
+      <measure-result-view .snapshot=${this.snapshot} .files=${this.files} .plotCollection=${this.plotCollection} .fileUrl=${(name: string) => this.api.fileUrl(name)} .downloadAll=${this.downloadAllFiles.bind(this)} .diagnosticsUrl=${this.api.diagnosticsUrl()} .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp} .contributionAuth=${this.contributionAuth} .contributionDraft=${this.contributionDraft} .contributionPreview=${this.contributionPreview} .contributionResult=${this.contributionResult} .contributionBusy=${this.contributionBusy} .contributionError=${this.contributionError} @new=${this.newMeasurement} @resume=${this.resume} @open-settings=${this.openSettings} @contribution-preview=${this.previewContribution} @contribution-submit=${this.submitContribution}></measure-result-view>`;
     return html`
       <measure-setup-view
         .capabilities=${this.capabilities} .definitions=${this.definitions}
@@ -193,7 +194,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         .dummyLoadCalibration=${this.dummyLoadCalibration}
         .defaultPowerEntityId=${this.settings?.default_power_entity_id ?? ""} .defaultMeasureDevice=${this.settings?.default_measure_device ?? ""} .powerMeter=${this.settings?.power_meter ?? "hass"} .shellyIp=${this.settings?.shelly_ip ?? ""} .shellyUsername=${this.settings?.shelly_username ?? "admin"} .kasaIp=${this.settings?.kasa_ip ?? ""}
         .powerMeterConfigured=${this.powerMeterConfigured()}
-        .busy=${this.busy} .errorMessage=${this.errorMessage}
+        .busy=${this.busy} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         @preflight=${this.runPreflight} @measure-type-selected=${this.measureTypeSelected} @entity-domains-requested=${this.entityDomainsRequested} @open-settings=${this.openSettings}></measure-setup-view>`;
   }
 
@@ -228,13 +229,23 @@ export class AppShell extends LitElement implements MeasureAppState {
   private reviewMetrics(): ReviewMetric[] {
     if (!this.request || !this.preflight) return [];
     const { estimated_variations: variations, estimated_duration_seconds: duration } = this.preflight;
-    if (variations === undefined && duration === undefined) return [];
-    const metrics: ReviewMetric[] = [
-      { label: "Variations", value: String(variations ?? "—") },
-      { label: "Estimated time", value: duration === undefined ? "—" : this.duration(duration) },
-    ];
+    const metrics: ReviewMetric[] = variations === undefined && duration === undefined
+      ? []
+      : [
+          { label: "Variations", value: String(variations ?? "—") },
+          { label: "Estimated time", value: duration === undefined ? "—" : this.duration(duration) },
+        ];
     for (const [field, values] of this.multiSelections()) {
       metrics.push({ label: field.label, value: String(values.length) });
+    }
+    if (this.preflight.light_load_probe?.points.length) {
+      metrics.push(
+        { label: "Low-load checks", value: String(this.preflight.light_load_probe.checked_variations) },
+        {
+          label: "Lowest aggregate load",
+          value: `${this.preflight.light_load_probe.minimum_aggregate_power_w.toFixed(3)} W`,
+        },
+      );
     }
     return metrics;
   }

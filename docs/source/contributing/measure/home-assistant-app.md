@@ -92,7 +92,10 @@ During the actual run, live and saved power readings show the target device cons
 1. Configure and test the measurement device in **Settings**.
 2. Select a measurement type and the Home Assistant entity when that measurement controls a device.
 3. Enter the profile details and measurement-specific options. Light measurements also let you choose the modes advertised by the selected entity. Enable a resistive dummy load only when the device load would otherwise be too low for the meter.
-4. Review preflight estimates, warnings, meter diagnostics, and advanced timing settings.
+4. Run the setup check and review its estimates, warnings, meter diagnostics, and advanced timing settings. For a
+   light measurement without a dummy load, this briefly tests representative low-load white and color settings and
+   leaves the selected lights off. A successful result is reused when the unchanged measurement is started shortly
+   afterwards. See [Measuring low-power devices](low-power-measurements.md) when a point repeatedly reads `0` W.
 5. Start the session. Complete the dummy-load calibration or reuse confirmation when enabled. Average, recorder, speaker, and charging measurements also pause for an explicit confirmation when the physical device must be prepared or the actual sampling period is about to begin.
 6. Follow live progress, current operating values, recent power samples, and session logs. You can close or reload the browser; the app owns the job and restores its persisted status when you return.
 7. Review plots and download generated CSV, model, or recording files from the result view. For generated profiles, either prepare a GitHub pull request in the app or use the permanent manual-contribution option.
