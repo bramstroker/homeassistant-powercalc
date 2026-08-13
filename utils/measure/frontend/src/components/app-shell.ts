@@ -250,7 +250,8 @@ export class AppShell extends LitElement implements MeasureAppState {
     const controller = definition?.fields.find((field) => field.role === "controller");
     const entity = controller && requestFieldValue(request, controller);
     if (controller) {
-      rows.push({ label: controller.label, value: typeof entity === "string" && entity ? entity : "Virtual device" });
+      const value = Array.isArray(entity) ? entity.join(", ") : entity;
+      rows.push({ label: controller.label, value: typeof value === "string" && value ? value : "Virtual device" });
     }
     rows.push({
       label: "Power",

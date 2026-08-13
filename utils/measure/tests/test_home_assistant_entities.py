@@ -133,6 +133,31 @@ def test_catalog_loads_entity_data_once_per_instance() -> None:
     assert fresh[0].state == "2.0"
 
 
+def test_catalog_exposes_group_members_and_infers_their_shared_model() -> None:
+    data = _entity_data()
+    data.entities["light"].entities["second"] = _entity(
+        "light.second",
+        "on",
+        supported_color_modes=["brightness"],
+    )
+    group = _entity(
+        "light.group",
+        "on",
+        supported_color_modes=["brightness"],
+    )
+    group.state.attributes["entity_id"] = ["light.desk", "light.second"]
+    data.entities["light"].entities["group"] = group
+    data.entity_registry.append(SimpleNamespace(entity_id="light.second", device_id="light-device", platform="hue"))
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+
+    lights = HomeAssistantEntityCatalog(home_assistant).load_snapshot().select(domain=EntityDomain.LIGHT)
+    group = next(light for light in lights if light.entity_id == "light.group")
+
+    assert group.member_entity_ids == ["light.desk", "light.second"]
+    assert group.model_id == "LWA017"
+
+
 def test_snapshot_requires_exactly_one_entity_filter() -> None:
     home_assistant = MagicMock(spec=HomeAssistantManager)
     home_assistant.get_entity_data.return_value = _entity_data()

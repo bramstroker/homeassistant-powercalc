@@ -152,6 +152,8 @@ class FormField(BaseModel):
     default: str | int | bool | None = None
     minimum: int | float | None = None
     maximum: int | float | None = None
+    multiple: bool = False
+    hint: str = ""
 
 
 class MeasureParameter(BaseModel):
@@ -647,6 +649,8 @@ def _measure_definitions() -> list[MeasureDefinition]:
                     default=field.default,
                     minimum=field.minimum,
                     maximum=field.maximum,
+                    multiple=field.multiple,
+                    hint=field.hint,
                 )
                 for field in definition.fields
             ],

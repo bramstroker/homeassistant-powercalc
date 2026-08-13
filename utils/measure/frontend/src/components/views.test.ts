@@ -64,7 +64,7 @@ const lightDefinition: MeasureDefinition = {
   ],
   fields: [
     { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, entity_domains: ["sensor"], options: [] },
-    { name: "light_entity_id", role: "controller", label: "Light", control: "entity", required: true, entity_domains: ["light"], options: [] },
+    { name: "light_entity_id", role: "controller", label: "Lights", control: "entity", required: true, multiple: true, entity_domains: ["light"], options: [] },
     {
       name: "modes",
       role: "attribute",
@@ -210,6 +210,96 @@ describe("setup view", () => {
       hs_hue_steps: 2731,
       hs_sat_steps: 32,
     });
+  });
+
+  it("submits multiple lights, intersects their modes, and infers model and count", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      definitions: MeasureDefinition[];
+      selectedType: string;
+      selectedEntityLists: Record<string, string[]>;
+      multipleLights: boolean;
+      defaultPowerEntityId: string;
+      defaultMeasureDevice: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = capabilities;
+    element.lights = [
+      {
+        entity_id: "light.one",
+        name: "One group",
+        model_id: "LWA017",
+        supported_modes: ["brightness", "hs"],
+        member_entity_ids: ["light.member_one", "light.member_two"],
+      },
+      { entity_id: "light.two", name: "Two", model_id: "LWA017", supported_modes: ["brightness"] },
+      { entity_id: "light.member_one", name: "Member one", model_id: "LWA017", supported_modes: ["brightness"] },
+      { entity_id: "light.member_two", name: "Member two", model_id: "LWA017", supported_modes: ["brightness"] },
+    ];
+    element.powers = [{ entity_id: "sensor.power", name: "Power", unit: "W" }];
+    element.voltages = [];
+    element.definitions = [lightDefinition];
+    element.selectedType = "light";
+    element.selectedEntityLists = { light_entity_id: ["light.one", "light.two"] };
+    element.multipleLights = true;
+    element.defaultPowerEntityId = "sensor.power";
+    element.defaultMeasureDevice = "Meter";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelectorAll('select[name="light_entity_id"]')).toHaveLength(2);
+    expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
+    expect((element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value).toBe("LWA017");
+    expect((element.shadowRoot.querySelector('input[name="multiple_light_count"]') as HTMLInputElement).value).toBe("2");
+
+    (element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).value = "Two identical lights";
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
+    });
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true }),
+    );
+
+    const request = await submitted;
+    const lightRequest = request as Extract<MeasurementRequest, { measure_type: "light" }>;
+    expect(lightRequest.controller).toEqual({ type: "hass_multi", entity_ids: ["light.one", "light.two"] });
+    expect(lightRequest.multiple_light_count).toBe(2);
+  });
+
+  it("keeps multi-light controls hidden until the user opts in", async () => {
+    const element = document.createElement("measure-setup-view") as HTMLElement & {
+      capabilities: Capabilities;
+      lights: EntityDescriptor[];
+      powers: EntityDescriptor[];
+      voltages: EntityDescriptor[];
+      definitions: MeasureDefinition[];
+      selectedType: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.capabilities = capabilities;
+    element.lights = lights;
+    element.powers = [{ entity_id: "sensor.power", name: "Power", unit: "W" }];
+    element.voltages = [];
+    element.definitions = [lightDefinition];
+    element.selectedType = "light";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".add-entity")).toBeNull();
+    expect(element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('select[name="light_entity_id"]')).toHaveLength(1);
+    expect(element.shadowRoot.querySelector(".multiple-lights")?.textContent).toContain("very low power use");
+
+    element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!.click();
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".add-entity")).not.toBeNull();
+    expect(element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')).not.toBeNull();
   });
 
   it("hides the virtual-device toggle unless developer mode is enabled", async () => {
@@ -1270,7 +1360,9 @@ describe("setup view defaults", () => {
     const labels = profileFields.map(
       (field) => [...field.children].find((child) => child.tagName === "SPAN")?.textContent?.trim(),
     );
-    expect(labels).toEqual(["Light", "Number of lights", "Model ID", "Full product name"]);
+    expect(labels).toEqual(["Light"]);
+    expect([...element.shadowRoot.querySelectorAll(".profile-fields > label > span")].map((label) => label.textContent?.trim()))
+      .toEqual(["Model ID", "Full product name"]);
     expect(element.shadowRoot.querySelector(".field-hint")?.textContent).toContain("complete marketed name");
   });
 });

@@ -2,7 +2,7 @@ from enum import StrEnum
 import math
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from measure.const import (
     HASS_DEVICE_REGISTRY_ID,
@@ -60,6 +60,7 @@ class EntityDescriptor(BaseModel):
     min_mired: int | None = None
     max_mired: int | None = None
     related_voltage_entity_id: str | None = None
+    member_entity_ids: list[str] = Field(default_factory=list)
 
 
 class EntityCatalogSnapshot:
@@ -181,7 +182,30 @@ class HomeAssistantEntityCatalog:
                 _describe_entity(entity, domain, registry.get(entity.entity_id), devices)
                 for entity in group.entities.values()
             )
-        return EntityCatalogSnapshot(descriptors)
+        by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
+
+        def group_model(descriptor: EntityDescriptor, path: frozenset[str]) -> str | None:
+            if descriptor.model_id:
+                return descriptor.model_id
+            if descriptor.entity_id in path or not descriptor.member_entity_ids:
+                return None
+            members = [by_id.get(entity_id) for entity_id in descriptor.member_entity_ids]
+            if not members or any(member is None for member in members):
+                return None
+            resolved = [group_model(member, path | {descriptor.entity_id}) for member in members if member is not None]
+            if any(model is None for model in resolved):
+                return None
+            models = set(resolved)
+            return models.pop() if len(models) == 1 else None
+
+        enriched: list[EntityDescriptor] = []
+        for descriptor in descriptors:
+            if not descriptor.member_entity_ids or descriptor.model_id:
+                enriched.append(descriptor)
+                continue
+            model_id = group_model(descriptor, frozenset())
+            enriched.append(descriptor.model_copy(update={"model_id": model_id}) if model_id else descriptor)
+        return EntityCatalogSnapshot(enriched)
 
 
 def _describe_entity(
@@ -213,6 +237,9 @@ def _describe_entity(
         effect_list=[str(effect) for effect in attributes.get("effect_list", [])] or None,
         min_mired=light_info.get_min_mired() if light_info is not None else None,
         max_mired=light_info.get_max_mired() if light_info is not None else None,
+        member_entity_ids=[str(item) for item in attributes.get("entity_id", [])]
+        if isinstance(attributes.get("entity_id"), list)
+        else [],
     )
 
 

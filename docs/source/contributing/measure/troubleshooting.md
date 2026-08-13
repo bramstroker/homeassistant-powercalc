@@ -35,7 +35,7 @@ Example:
 - Expected standby: ~0.2 W per bulb
 - With 4 bulbs: ~0.8 W total, which is usually measurable
 
-Make sure to have a group in Home Assistant that turns all bulbs on and off simultaneously during measurement. In the measure tool wizard select `yes` when asked `Are you measuring multiple lights?`, then enter the number of bulbs you are measuring.
+In the Home Assistant app, select a few individual light entities with **Add another light**, or select one native Zigbee/Hue group. Native groups are preferred for larger sets because they use one lighting-network command. A Home Assistant light group also works, but may send a separate command to every member. Enter the total number of physical bulbs in **Number of lights**; the app divides every measured value by this number.
 
 ### Add a dummy load
 

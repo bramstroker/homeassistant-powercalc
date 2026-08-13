@@ -37,7 +37,7 @@ from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
 from measure.version import measure_version
-from pydantic import SecretStr
+from pydantic import SecretStr, TypeAdapter
 import pytest
 
 
@@ -900,6 +900,33 @@ def test_contribution_device_flow_reports_configuration_and_uses_injected_servic
     assert unknown.json()["code"] == "flow_not_found"
     completed = test_client.post(f"/api/contribution/auth/device/{flow_id}")
     assert completed.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "integrations, expected",
+    [
+        ({"light.one": "hue", "light.two": "hue"}, "hue"),
+        ({"light.one": "hue", "light.two": "zha"}, None),
+        ({"light.one": "hue", "light.two": None}, None),
+    ],
+)
+def test_contribution_integration_requires_every_light_to_share_the_integration(
+    tmp_path: Path,
+    integrations: dict[str, str | None],
+    expected: str | None,
+) -> None:
+    request_payload = payload()
+    request_payload["controller"] = {
+        "type": "hass_multi",
+        "entity_ids": ["light.one", "light.two"],
+    }
+    request = TypeAdapter(MeasurementRequest).validate_python(request_payload)
+    coordinator = ContributionApiCoordinator(
+        SessionStorage(tmp_path),
+        resolve_integration=integrations.get,
+    )
+
+    assert coordinator._integration(request) == expected  # noqa: SLF001
 
 
 def test_contribution_pat_rejects_reported_insufficient_scope(tmp_path: Path) -> None:

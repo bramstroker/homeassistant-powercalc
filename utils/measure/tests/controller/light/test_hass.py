@@ -4,7 +4,7 @@ from homeassistant_api import State
 from homeassistant_api.errors import HomeassistantAPIError
 from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
-from measure.controller.light.hass import HassLightController
+from measure.controller.light.hass import HassLightController, HassMultiLightController
 from measure.home_assistant import HomeAssistantManager
 import pytest
 
@@ -103,6 +103,37 @@ def test_connection_validation() -> None:
     client.get_config.side_effect = HomeassistantAPIError("Error")
     with pytest.raises(ApiConnectionError):
         HassLightController(client, 0)
+
+
+def test_multi_light_controller_targets_all_entities_and_intersects_capabilities() -> None:
+    client = _mock_client()
+    client.get_state.side_effect = [
+        State(
+            entity_id="light.one",
+            state="on",
+            attributes={"min_color_temp_kelvin": 2000, "max_color_temp_kelvin": 5000},
+        ),
+        State(
+            entity_id="light.two",
+            state="on",
+            attributes={"min_color_temp_kelvin": 2500, "max_color_temp_kelvin": 6500},
+        ),
+        State(entity_id="light.one", state="on", attributes={"effect_list": ["one", "shared"]}),
+        State(entity_id="light.two", state="on", attributes={"effect_list": ["shared", "two"]}),
+    ]
+    controller = HassMultiLightController(client, 0, entity_ids=["light.one", "light.two"])
+
+    controller.change_light_state(LutMode.BRIGHTNESS, bri=100)
+    client.trigger_service.assert_called_once_with(
+        "light",
+        "turn_on",
+        entity_id=["light.one", "light.two"],
+        brightness=100,
+        transition=0,
+    )
+    info = controller.get_light_info()
+    assert (info.min_mired, info.max_mired) == (200, 400)
+    assert controller.get_effect_list() == ["shared"]
 
 
 def _get_instance(client: MagicMock | None = None) -> HassLightController:

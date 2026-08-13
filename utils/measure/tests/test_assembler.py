@@ -2,7 +2,11 @@ from unittest.mock import ANY, MagicMock, patch
 
 from measure.assembler import MeasurementAssembler
 from measure.controller.fan.spec import DummyFanControllerSpec
-from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec
+from measure.controller.light.spec import (
+    DummyLightControllerSpec,
+    HassLightControllerSpec,
+    HassMultiLightControllerSpec,
+)
 from measure.execution import RunInteraction
 from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec, TuyaPowerMeterSpec
@@ -97,6 +101,23 @@ def test_assembler_applies_typed_home_assistant_configuration_at_construction() 
         entity_id="light.test",
         wait=ANY,
     )
+
+
+def test_assembler_builds_multi_light_controller() -> None:
+    request = LightMeasurementRequest(
+        model_id="light",
+        product_name="Light",
+        measure_device="Meter",
+        power_meter=DummyPowerMeterSpec(),
+        controller=HassMultiLightControllerSpec(entity_ids=["light.one", "light.two"], transition_time=2),
+        multiple_light_count=2,
+    )
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+
+    with patch("measure.assembler.HassMultiLightController") as controller:
+        _assembler(home_assistant=home_assistant).assemble(request)
+
+    controller.assert_called_once_with(home_assistant, 2, entity_ids=["light.one", "light.two"], wait=ANY)
 
 
 def test_assembler_reads_tuya_key_from_cli_config_dependency() -> None:

@@ -29,3 +29,10 @@ def test_charging_definition_discovers_both_supported_domains() -> None:
     )
 
     assert entity.entity_domains == ("vacuum", "lawn_mower")
+
+
+def test_light_definition_allows_multiple_entities_and_explains_the_physical_count() -> None:
+    fields = {field.name: field for field in MEASUREMENT_REGISTRY[MeasureType.LIGHT].fields}
+
+    assert fields["light_entity_id"].multiple is True
+    assert "physical lights" in fields["multiple_light_count"].hint

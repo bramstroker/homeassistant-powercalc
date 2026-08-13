@@ -10,7 +10,12 @@ from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.controller.light.dummy import DummyLightController
-from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec, HueLightControllerSpec
+from measure.controller.light.spec import (
+    DummyLightControllerSpec,
+    HassLightControllerSpec,
+    HassMultiLightControllerSpec,
+    HueLightControllerSpec,
+)
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.home_assistant_entities import DeviceClass, EntityDomain
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
@@ -49,6 +54,8 @@ class EntityRecord(Protocol):
     effect_list: list[str] | None
     min_mired: int | None
     max_mired: int | None
+    model_id: str | None
+    member_entity_ids: list[str]
 
 
 EntityLoader = Callable[[EntityDomain | None, DeviceClass | None], Sequence[EntityRecord]]
@@ -167,7 +174,11 @@ class MeasurementPreflight:
             return
         if isinstance(
             controller,
-            HassLightControllerSpec | HassMediaControllerSpec | HassChargingControllerSpec | HassFanControllerSpec,
+            HassLightControllerSpec
+            | HassMultiLightControllerSpec
+            | HassMediaControllerSpec
+            | HassChargingControllerSpec
+            | HassFanControllerSpec,
         ):
             return
         if isinstance(controller, HueLightControllerSpec):
@@ -260,33 +271,86 @@ class MeasurementPreflight:
             None,
         )
 
-    def _validate_light(self, request: LightMeasurementRequest) -> PreflightResult:
+    def _validate_light(self, request: LightMeasurementRequest) -> PreflightResult:  # noqa: C901
         if isinstance(request.controller, DummyLightControllerSpec):
             return self._estimate_dummy_light(request)
-        if not isinstance(request.controller, HassLightControllerSpec):
+        if not isinstance(request.controller, HassLightControllerSpec | HassMultiLightControllerSpec):
             raise PreflightError("Selected light entity is unavailable")
         lights = {entity.entity_id: entity for entity in self._load_entities(EntityDomain.LIGHT, None)}
-        light = lights.get(request.controller.entity_id)
-        if light is None:
+        entity_ids = (
+            request.controller.entity_ids
+            if isinstance(request.controller, HassMultiLightControllerSpec)
+            else [request.controller.entity_id]
+        )
+        selected = [lights[entity_id] for entity_id in entity_ids if entity_id in lights]
+        if len(selected) != len(entity_ids):
             raise PreflightError("Selected light entity is unavailable")
         if isinstance(request.power_meter, HassPowerMeterSpec) and request.power_meter.voltage_entity_id:
             voltages = {entity.entity_id for entity in self._load_entities(None, DeviceClass.VOLTAGE)}
             if request.power_meter.voltage_entity_id not in voltages:
                 raise PreflightError("Selected voltage entity is unavailable or not measured in V")
-        supported = set(light.supported_modes or [])
+        expanded = self._expand_selected_lights(selected, lights)
+        leaves = list({light.entity_id: light for light in expanded}.values())
+        if len(leaves) != len(expanded):
+            raise PreflightError("A light group and one of its members cannot both be selected")
+        if request.multiple_light_count < len(selected):
+            raise PreflightError("Number of lights cannot be lower than the number of selected lights")
+        model_ids = {model_id for light in leaves if (model_id := getattr(light, "model_id", None))}
+        if len(model_ids) > 1:
+            raise PreflightError("Selected lights must have the same model ID")
+        models_confirmed = len(model_ids) == 1 and all(getattr(light, "model_id", None) for light in leaves)
+        warnings = (
+            ("Could not confirm that every selected light has the same model. Verify this before starting.",)
+            if len(leaves) > 1 and not models_confirmed
+            else ()
+        )
+        supported_sets = [set(light.supported_modes or []) for light in selected]
+        supported = set.intersection(*supported_sets)
         if not set(request.modes).issubset(supported):
             raise PreflightError("Selected light does not advertise every requested mode")
+        min_mired = max(light.min_mired if light.min_mired is not None else MIN_MIRED for light in selected)
+        max_mired = min(light.max_mired if light.max_mired is not None else MAX_MIRED for light in selected)
+        if min_mired > max_mired:
+            raise PreflightError("Selected lights do not share a color temperature range")
         light_info = LightInfo(
             "unknown",
-            min_mired=light.min_mired if light.min_mired is not None else MIN_MIRED,
-            max_mired=light.max_mired if light.max_mired is not None else MAX_MIRED,
+            min_mired=min_mired,
+            max_mired=max_mired,
         )
-        plan = build_light_plan(request.modes, request.parameters, light_info, light.effect_list or ())
+        effects = list(selected[0].effect_list or ())
+        for light in selected[1:]:
+            effects = [effect for effect in effects if effect in (light.effect_list or ())]
+        plan = build_light_plan(request.modes, request.parameters, light_info, effects)
         return PreflightResult(
+            warnings=warnings,
             estimated_variations=plan.variation_count,
             estimated_duration_seconds=round(estimate_light_time_left(plan, request.parameters)),
             supported_modes=tuple(sorted(supported, key=str)),
         )
+
+    @staticmethod
+    def _expand_selected_lights(
+        selected: Sequence[EntityRecord],
+        lights: dict[str, EntityRecord],
+    ) -> list[EntityRecord]:
+        leaves: list[EntityRecord] = []
+
+        def visit(light: EntityRecord, path: frozenset[str]) -> None:
+            if light.entity_id in path:
+                raise PreflightError("Selected light groups contain a cycle")
+            member_ids = getattr(light, "member_entity_ids", [])
+            if any(entity_id not in lights for entity_id in member_ids):
+                raise PreflightError("A selected light group contains an unavailable member")
+            members = [lights[entity_id] for entity_id in member_ids if entity_id in lights]
+            if not members:
+                leaves.append(light)
+                return
+            for member in members:
+                visit(member, path | {light.entity_id})
+
+        for light in selected:
+            visit(light, frozenset())
+        return leaves
 
     @staticmethod
     def _estimate_dummy_light(request: LightMeasurementRequest) -> PreflightResult:

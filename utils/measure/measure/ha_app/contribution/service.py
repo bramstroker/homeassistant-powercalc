@@ -480,7 +480,7 @@ def _build_preview_response(
     }
     home_assistant_info: dict[str, str | int | float | bool | None] = {
         "measure_type": request.measure_type.value,
-        "controlled_entity": request.controlled_entity_id,
+        "controlled_entity": ", ".join(request.controlled_entity_ids) or None,
         "integration": content.integration,
     }
     return ContributionPreviewResponse(

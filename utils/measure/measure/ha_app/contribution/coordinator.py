@@ -228,11 +228,13 @@ class ContributionApiCoordinator:
             return result
 
     def _integration(self, request: MeasurementRequest) -> str | None:
-        """Return the Home Assistant integration providing the measured entity, when it can be resolved."""
-        entity_id = request.controlled_entity_id
-        if entity_id is None or self._resolve_integration is None:
+        """Return the shared Home Assistant integration providing every measured entity."""
+        if not request.controlled_entity_ids or self._resolve_integration is None:
             return None
-        return self._resolve_integration(entity_id)
+        integrations = {self._resolve_integration(entity_id) for entity_id in request.controlled_entity_ids}
+        if None in integrations:
+            return None
+        return integrations.pop() if len(integrations) == 1 else None
 
     def _require_oauth_client_id(self) -> str:
         if not self._oauth_client_id:

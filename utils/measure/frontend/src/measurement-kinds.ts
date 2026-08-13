@@ -29,9 +29,10 @@ export function requestFieldValue(request: MeasurementRequest, field: FormField)
   return isFieldValue(value) ? value : undefined;
 }
 
-function controllerEntityId(request: MeasurementRequest): string | undefined {
-  const { controller } = request as { controller?: { type: string; entity_id?: string } };
-  return controller?.type === "hass" ? controller.entity_id : undefined;
+function controllerEntityId(request: MeasurementRequest): string | string[] | undefined {
+  const { controller } = request as { controller?: { type: string; entity_id?: string; entity_ids?: string[] } };
+  if (controller?.type === "hass") return controller.entity_id;
+  return controller?.type === "hass_multi" ? controller.entity_ids : undefined;
 }
 
 function isFieldValue(value: unknown): value is FieldValue {
@@ -123,7 +124,12 @@ export function buildMeasurementRequest(
   for (const field of definition.fields) {
     if (field.role === "power_meter") continue;
     if (field.role === "controller") {
-      declared.controller = dummyController ? { type: "dummy" } : { type: "hass", entity_id: text(form, field.name) };
+      const entityIds = form.getAll(field.name).map(String).map((value) => value.trim()).filter(Boolean);
+      declared.controller = dummyController
+        ? { type: "dummy" }
+        : entityIds.length > 1
+          ? { type: "hass_multi", entity_ids: entityIds }
+          : { type: "hass", entity_id: entityIds[0] ?? "" };
       continue;
     }
     declared[field.name] = formValue(form, field);
