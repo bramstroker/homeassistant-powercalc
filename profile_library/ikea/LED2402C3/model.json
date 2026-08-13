@@ -1,4 +1,8 @@
 {
+  "aliases": [
+    "KAJPLATS E14 WS B38 CL 470lm",
+    "36872"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-06-18T00:07:18Z",
   "device_type": "light",
