@@ -244,7 +244,7 @@ def mock_device_with_entities(
     model: str = "LCT010",
     model_id: str | None = None,
     **entity_kwargs: Any,  # noqa: ANN401
-) -> None:
+) -> EntityRegistry:
     """Register entities on a single device carrying manufacturer/model info, so discovery can match a profile.
 
     Replaces both registries, so call it once per test and use `mock_devices` /
@@ -256,7 +256,7 @@ def mock_device_with_entities(
     if isinstance(entity_ids, str):
         entity_ids = [entity_ids]
     unique_id = entity_kwargs.pop("unique_id", None)
-    mock_entities_in_registry(
+    return mock_entities_in_registry(
         hass,
         {
             entity_id: {

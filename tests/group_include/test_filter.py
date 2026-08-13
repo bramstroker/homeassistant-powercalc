@@ -265,7 +265,7 @@ def test_create_filter(hass: HomeAssistant, filter_type: str, filter_config: dic
     assert isinstance(filter_instance, expected_type)
 
 
-def test_create_composite_filter(hass: HomeAssistant) -> None:
+def test_create_composite_filter_with_nested_and_or_conditions(hass: HomeAssistant) -> None:
     entity_filter = create_composite_filter(
         {
             CONF_DOMAIN: "switch",
@@ -288,7 +288,10 @@ def test_create_composite_filter(hass: HomeAssistant) -> None:
     assert not entity_filter.is_valid(_create_registry_entry("switch.some1"))
 
 
-def test_create_composite_filter2(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+def test_create_composite_filter_combines_area_and_nested_filter(
+    hass: HomeAssistant,
+    area_registry: AreaRegistry,
+) -> None:
     area_registry.async_get_or_create("kitchen")
     entity_filter = create_composite_filter(
         {

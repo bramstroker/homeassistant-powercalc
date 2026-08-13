@@ -267,7 +267,8 @@ async def test_playbook(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "sensor.dishwasher_power", "0.00")
 
 
-async def test_calculate_standby_power(hass: HomeAssistant) -> None:
+async def test_standby_power_is_ignored_when_strategy_handles_off_state(hass: HomeAssistant) -> None:
+    """Multi switch resolves the off state itself, so the configured standby power must not take over."""
     sensor_config = {
         CONF_ENTITY_ID: "switch.test",
         CONF_STANDBY_POWER: 1,
@@ -304,7 +305,8 @@ async def test_calculate_standby_power(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "sensor.test_power", "10.00")
 
 
-async def test_calculate_standby_power2(hass: HomeAssistant) -> None:
+async def test_standby_power_is_used_when_strategy_cannot_handle_off_state(hass: HomeAssistant) -> None:
+    """Fixed cannot resolve the off state, so the configured standby power applies instead."""
     sensor_config = {
         CONF_ENTITY_ID: "switch.test",
         CONF_STANDBY_POWER: 1,

@@ -239,7 +239,7 @@ async def test_create_nested_handles_exception(hass: HomeAssistant, caplog: pyte
     caplog.set_level(logging.ERROR)
 
     with patch(
-        "custom_components.powercalc.sensor.attach_entities_to_resolved_device",
+        "custom_components.powercalc.sensor.assign_device_to_entities",
         new=MagicMock(side_effect=SensorConfigurationError("My custom error message")),
     ):
         await run_powercalc_setup(
