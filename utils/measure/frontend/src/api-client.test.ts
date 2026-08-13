@@ -161,9 +161,23 @@ describe("MeasureApiClient", () => {
   });
 
   it("surfaces stable API errors", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ code: "active_session", message: "Already measuring", field: null }, 409));
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({
+      code: "active_session",
+      message: "Already measuring",
+      field: null,
+      help_url: "https://docs.powercalc.nl/contributing/measure/low-power-measurements/",
+      help_label: "Low-power measurement guide",
+    }, 409));
     await expect(new MeasureApiClient(fetcher, "http://ha.local/prefix/").cancel()).rejects.toEqual(
-      expect.objectContaining({ status: 409, code: "active_session", message: "Already measuring" }),
+      expect.objectContaining({
+        status: 409,
+        code: "active_session",
+        message: "Already measuring",
+        help: {
+          url: "https://docs.powercalc.nl/contributing/measure/low-power-measurements/",
+          label: "Low-power measurement guide",
+        },
+      }),
     );
   });
 });

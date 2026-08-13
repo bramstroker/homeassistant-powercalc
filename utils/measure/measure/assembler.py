@@ -179,7 +179,7 @@ class MeasurementAssembler:
     ) -> MeasurementRunner[Any]:
         interaction = self._interaction
         if isinstance(request, LightMeasurementRequest):
-            light_controller = self._light_controller(request.controller)
+            light_controller = self.build_light_controller(request.controller)
             return LightRunner(
                 measure_util,
                 parameters,
@@ -207,7 +207,9 @@ class MeasurementAssembler:
             return FanRunner(measure_util, parameters, fan_controller, interaction)
         raise ValueError(f"Unsupported measurement request: {type(request).__name__}")
 
-    def _light_controller(self, spec: LightControllerSpec) -> LightController:
+    def build_light_controller(self, spec: LightControllerSpec) -> LightController:
+        """Build a configured light controller for execution or active preflight checks."""
+
         if isinstance(spec, DummyLightControllerSpec):
             return DummyLightController()
         if isinstance(spec, HassLightControllerSpec | HassMultiLightControllerSpec):

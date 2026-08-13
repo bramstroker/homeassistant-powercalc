@@ -1,6 +1,7 @@
 import { LitElement, css, html, nothing } from "lit";
-import type { ContributionAuthState, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, PlotCollection, SessionFile, SessionSnapshot, SettingsSection } from "../types";
+import type { ContributionAuthState, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SettingsSection } from "../types";
 import { sharedStyles } from "../styles";
+import { errorHelpLink } from "./error-help-link";
 import "./result-plot";
 
 const CONTRIBUTION_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/output/";
@@ -30,6 +31,7 @@ export class ResultView extends LitElement {
     busy: { type: Boolean },
     canResume: { type: Boolean },
     errorMessage: { type: String },
+    errorHelp: { attribute: false },
     contributionAuth: { attribute: false },
     contributionDraft: { attribute: false },
     contributionPreview: { attribute: false },
@@ -48,6 +50,7 @@ export class ResultView extends LitElement {
   busy = false;
   canResume = false;
   errorMessage = "";
+  errorHelp?: ErrorHelp;
   contributionAuth?: ContributionAuthState;
   contributionDraft?: ContributionPreview;
   contributionPreview?: ContributionPreview;
@@ -137,7 +140,7 @@ export class ResultView extends LitElement {
         ${showArtifacts ? this.renderPlots() : nothing}
         ${showArtifacts ? this.renderFiles() : nothing}
         ${showArtifacts ? this.renderContributionSection(state) : nothing}
-        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
+        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         <div class="diagnostics-download">
           <span>Session snapshot and logs for issue reporting.</span>
           <a href=${this.diagnosticsUrl} download>Download diagnostics</a>

@@ -93,6 +93,53 @@ class LightMeasurementPlan:
         return next(mode_plan for mode_plan in self.modes if mode_plan.mode == mode)
 
 
+def low_load_probe_variations(plan: LightMeasurementPlan) -> list[Variation]:
+    """Select bounded, deterministic low-load points from a light measurement plan."""
+
+    probes: list[Variation] = []
+    for mode_plan in plan.modes:
+        variations = mode_plan.variations
+        if not variations or mode_plan.mode == LutMode.EFFECT:
+            continue
+        if mode_plan.mode == LutMode.BRIGHTNESS:
+            probes.append(min(variations, key=lambda variation: variation.bri))
+            continue
+        if mode_plan.mode == LutMode.COLOR_TEMP:
+            minimum_brightness = min(variation.bri for variation in variations)
+            ct_candidates = [
+                variation
+                for variation in variations
+                if isinstance(variation, ColorTempVariation) and variation.bri == minimum_brightness
+            ]
+            probes.extend(
+                (
+                    min(ct_candidates, key=lambda variation: variation.ct),
+                    max(ct_candidates, key=lambda variation: variation.ct),
+                ),
+            )
+            continue
+        if mode_plan.mode == LutMode.HS:
+            minimum_brightness = min(variation.bri for variation in variations)
+            maximum_saturation = max(
+                variation.sat
+                for variation in variations
+                if isinstance(variation, HsVariation) and variation.bri == minimum_brightness
+            )
+            hs_candidates = [
+                variation
+                for variation in variations
+                if isinstance(variation, HsVariation)
+                and variation.bri == minimum_brightness
+                and variation.sat == maximum_saturation
+            ]
+            probes.extend(
+                min(hs_candidates, key=lambda variation: abs(variation.hue - primary_hue))
+                for primary_hue in (0, 65535 // 3, 2 * 65535 // 3)
+            )
+
+    return list(dict.fromkeys(probes))
+
+
 def build_light_plan(
     modes: Collection[LutMode],
     parameters: MeasurementParameters,

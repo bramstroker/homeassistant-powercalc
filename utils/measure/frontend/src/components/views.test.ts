@@ -1,4 +1,4 @@
-import type { AppSettings, AppSettingsUpdate, Capabilities, DummyLoadCalibration, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, PowerMeterDiagnostic, SessionSnapshot, SettingsSection } from "../types";
+import type { AppSettings, AppSettingsUpdate, Capabilities, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasurementRequest, OperatingPoint, PowerMeterDiagnostic, PreflightResponse, SessionSnapshot, SettingsSection } from "../types";
 import { sharedStyles } from "../styles";
 import { AppShell } from "./app-shell";
 import "./result-view";
@@ -57,6 +57,8 @@ type SetupViewElement = HTMLElement & {
   defaultPowerEntityId: string;
   defaultMeasureDevice: string;
   errorMessage: string;
+  errorHelp?: ErrorHelp;
+  busy: boolean;
   updateComplete: Promise<boolean>;
   shadowRoot: ShadowRoot;
 };
@@ -160,6 +162,41 @@ describe("setup view", () => {
 
     const checkedModes = [...element.shadowRoot.querySelectorAll<HTMLInputElement>('input[name="modes"]:checked')].map((input) => input.value);
     expect(checkedModes).toEqual(["brightness", "color_temp", "hs", "effect"]);
+  });
+
+  it("warns that an active light setup check controls the light and leaves it off", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.lights = [{ entity_id: "light.rgb", name: "RGB lamp", supported_modes: ["brightness", "hs"] }];
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.voltages = [];
+    element.definitions = [lightDefinition];
+    element.selectedType = "light";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.textContent).toContain("briefly controls the selected light");
+    expect(element.shadowRoot.querySelector<HTMLButtonElement>('button[type="submit"]')?.textContent).toBe("Check light and setup");
+
+    element.busy = true;
+    await element.updateComplete;
+    const progress = element.shadowRoot.querySelector('[role="status"]');
+    expect(progress?.textContent).toContain("Checking low-load light settings");
+    expect(progress?.textContent).toContain("representative low-load points");
+    expect(progress?.querySelector("progress")?.hasAttribute("value")).toBe(false);
+
+    element.busy = false;
+    element.errorMessage = "The meter repeatedly returned 0 W.";
+    element.errorHelp = {
+      url: "https://docs.powercalc.nl/contributing/measure/low-power-measurements/",
+      label: "Low-power measurement guide",
+    };
+    await element.updateComplete;
+    const guide = element.shadowRoot.querySelector<HTMLAnchorElement>('[role="alert"] a');
+    expect(guide?.textContent).toBe("Low-power measurement guide");
+    expect(guide?.href).toBe("https://docs.powercalc.nl/contributing/measure/low-power-measurements/");
+    expect(guide?.target).toBe("_blank");
+    expect(guide?.rel).toBe("noopener noreferrer");
   });
 
   it("submits mode-specific native light-grid steps", async () => {
@@ -1794,9 +1831,71 @@ describe("preflight power meter diagnostics", () => {
     expect(diagnostic.shadowRoot.textContent).toContain("1.8 s");
     expect(diagnostic.shadowRoot.textContent).toContain("Good");
   });
+
+  it("shows every completed low-load probe point and measured power", async () => {
+    const element = document.createElement("measure-preflight-view") as HTMLElement & {
+      lightLoadProbe: NonNullable<PreflightResponse["light_load_probe"]>;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.lightLoadProbe = {
+      checked_variations: 2,
+      minimum_aggregate_power_w: 0.9,
+      points: [
+        { label: "Color 120° / 100% saturation · brightness 1", mode: "hs", power_w: 0.9 },
+        { label: "Color temperature 454 mired · brightness 1", mode: "color_temp", power_w: 1.25 },
+      ],
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const results = element.shadowRoot.querySelector('[aria-label="Low-load light check results"]');
+    expect(results?.textContent).toContain("Low-load light check passed");
+    expect(results?.textContent).toContain("Color 120° / 100% saturation · brightness 1");
+    expect(results?.textContent).toContain("0.900 W aggregate");
+    expect(results?.textContent).toContain("Color temperature 454 mired · brightness 1");
+    expect(results?.textContent).toContain("1.250 W aggregate");
+  });
 });
 
 describe("app shell", () => {
+  it("adds active low-load probe results to the review metrics", () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.request = {
+      measure_type: "light",
+      model_id: "test",
+      product_name: "Test light",
+      measure_device: "Test meter",
+      generate_model: true,
+      parameters: capabilities.defaults,
+      power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+      controller: { type: "hass", entity_id: "light.test" },
+      modes: ["hs"],
+      gzip: true,
+      multiple_light_count: 1,
+      resume_policy: "new",
+    };
+    element.preflight = {
+      valid: true,
+      warnings: [],
+      light_load_probe: {
+        checked_variations: 3,
+        minimum_aggregate_power_w: 0.9,
+        points: [
+          { label: "Color 0° / 100% saturation · brightness 1", mode: "hs", power_w: 1.2 },
+          { label: "Color 120° / 100% saturation · brightness 1", mode: "hs", power_w: 0.9 },
+          { label: "Color 240° / 100% saturation · brightness 1", mode: "hs", power_w: 1.1 },
+        ],
+      },
+    };
+
+    const metrics = (element as unknown as { reviewMetrics: () => { label: string; value: string }[] }).reviewMetrics();
+
+    expect(metrics).toContainEqual({ label: "Low-load checks", value: "3" });
+    expect(metrics).toContainEqual({ label: "Lowest aggregate load", value: "0.900 W" });
+  });
+
   it("shows the auto-discovered battery sensor in the charging preflight review", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;

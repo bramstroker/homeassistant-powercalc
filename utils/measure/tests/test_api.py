@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 from measure.const import MeasureType
 from measure.contribution.github import GitHubUser
+from measure.controller.light.const import LutMode
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import LightOperatingPoint
 from measure.ha_app.api import _power_meter_spec, create_app
@@ -27,6 +28,7 @@ from measure.ha_app.contribution import (
     SharedContributionService,
 )
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
+from measure.ha_app.light_probe import LightLoadProbeError, LightLoadProbePoint, LightLoadProbeResult
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
@@ -339,6 +341,12 @@ def client(tmp_path: Path, *, trusted_ingress_only: bool = False, developer_mode
     app.state.context.power_meter_diagnostics = PowerMeterDiagnostics(
         app.state.context.build_power_meter,
         duration=0,
+    )
+    app.state.context.light_load_probe = MagicMock()
+    app.state.context.light_load_probe.evaluate.return_value = LightLoadProbeResult(
+        checked_variations=1,
+        minimum_aggregate_power_w=1.25,
+        points=(LightLoadProbePoint(label="Brightness 1", mode=LutMode.BRIGHTNESS, power_w=1.25),),
     )
     app.state.context.coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
     return TestClient(app)
@@ -668,10 +676,51 @@ def test_preflight_exposes_quality_warnings_and_start_reuses_diagnostics(tmp_pat
     assert response.status_code == 200
     assert response.json()["power_meter_diagnostic"]["precision_status"] == "good"
     assert response.json()["power_meter_diagnostic"]["update_interval_status"] == "poor"
+    assert response.json()["light_load_probe"] == {
+        "checked_variations": 1,
+        "minimum_aggregate_power_w": 1.25,
+        "points": [{"label": "Brightness 1", "mode": "brightness", "power_w": 1.25}],
+    }
     assert "did not report often enough" in response.json()["warnings"][0]
     assert home_assistant.state_calls == 2
     assert test_client.post("/api/sessions", json=payload()).status_code == 201
     assert home_assistant.state_calls == 2
+
+
+def test_preflight_maps_low_load_probe_failure_to_actionable_error(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    test_client.app.state.context.light_load_probe.evaluate.side_effect = LightLoadProbeError(
+        "The power meter repeatedly returned 0 W while checking the selected light",
+        help_url="https://docs.powercalc.nl/contributing/measure/low-power-measurements/",
+        help_label="Low-power measurement guide",
+    )
+
+    response = test_client.post("/api/preflight", json=payload())
+
+    assert response.status_code == 422
+    assert response.json() == {
+        "code": "preflight_failed",
+        "message": "The power meter repeatedly returned 0 W while checking the selected light",
+        "field": None,
+        "help_url": "https://docs.powercalc.nl/contributing/measure/low-power-measurements/",
+        "help_label": "Low-power measurement guide",
+    }
+
+
+def test_preflight_does_not_attribute_probe_adapter_failures_to_low_power(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    test_client.app.state.context.light_load_probe.evaluate.side_effect = LightLoadProbeError(
+        "Could not complete the active light check: connection refused",
+    )
+
+    response = test_client.post("/api/preflight", json=payload())
+
+    assert response.status_code == 422
+    assert response.json() == {
+        "code": "preflight_failed",
+        "message": "Could not complete the active light check: connection refused",
+        "field": None,
+    }
 
 
 def test_preflight_rejects_unavailable_entity(tmp_path: Path) -> None:

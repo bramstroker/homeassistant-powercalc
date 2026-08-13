@@ -1,3 +1,4 @@
+import { ApiError } from "./api-client";
 import { MeasureAppController } from "./app-controller";
 import type { EventConnection, MeasureAppApi, MeasureAppState } from "./app-controller";
 import type { PowerMeterDiagnostic, SessionEvent } from "./types";
@@ -120,6 +121,35 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
 }
 
 describe("measure app controller", () => {
+  it("preserves structured help from API errors", async () => {
+    const appState = state();
+    const help = {
+      url: "https://docs.powercalc.nl/contributing/measure/low-power-measurements/",
+      label: "Low-power measurement guide",
+    };
+    const controller = new MeasureAppController(appState, () => api({
+      preflight: async () => { throw new ApiError("The meter repeatedly returned 0 W.", 422, "preflight_failed", null, help); },
+    }), () => connection(), () => undefined);
+
+    await controller.preflight({
+      measure_type: "average",
+      duration: 1,
+      model_id: "",
+      product_name: "",
+      measure_device: "",
+      generate_model: false,
+      parameters: capabilities.defaults,
+      resume_policy: "new",
+      power_meter: { type: "dummy" },
+    });
+
+    expect(appState.errorMessage).toBe("The meter repeatedly returned 0 W.");
+    expect(appState.errorHelp).toEqual(help);
+
+    controller.backToSetup();
+    expect(appState.errorHelp).toBeUndefined();
+  });
+
   it("loads the matching dummy-load calibration during boot", async () => {
     const appState = state();
     const calibration = {

@@ -33,7 +33,9 @@ There are two ways to run a measurement. Both share the same measurement core an
 1. [Light profiles](lights.md) - create LUT profiles for lights, the most common contribution path.
 2. [Other measure modes](modes.md) - measure speakers, fans, charging devices, average readings, or recorder sessions.
 3. [Output and pull requests](output.md) - inspect the generated files and submit them to the library.
-4. [Troubleshooting](troubleshooting.md) - fix common measurement problems.
+4. [Measuring low-power devices](low-power-measurements.md) - handle sub-watt loads with multiple devices, a dummy
+   load, or a more precise meter.
+5. [Troubleshooting](troubleshooting.md) - fix common measurement problems.
 
 Developers can read [Architecture](architecture.md) to understand how the CLI and app share the same measurement pipeline.
 
@@ -53,7 +55,8 @@ When the device is not suitable for the public library, you can still use the ge
 
 ## Safety and measurement quality
 
-- Use a power meter that can measure low loads accurately. For small lights, sub-watt accuracy matters.
+- Use a power meter that can measure low loads accurately. For small lights, sub-watt accuracy matters; see
+  [Measuring low-power devices](low-power-measurements.md).
 - Let devices and power meters settle before trusting readings.
 - Pause Home Assistant automations that might change the measured device during a run.
 - Keep the measured device as the only changing load behind the power meter, unless you deliberately use a dummy load.
