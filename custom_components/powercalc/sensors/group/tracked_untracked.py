@@ -43,6 +43,11 @@ class SensorType(StrEnum):
     TRACKED = "tracked"
     UNTRACKED = "untracked"
 
+    @property
+    def label(self) -> str:
+        """Capitalized variant, used in the friendly names of the created sensors."""
+        return self.value.capitalize()
+
 
 async def find_auto_tracked_power_entities(hass: HomeAssistant, exclude_entities: set[str] | None = None) -> set[str]:
     """Find tracked power entities."""
@@ -124,7 +129,7 @@ class TrackedPowerSensorFactory:
                 self.config,
                 energy_sensor,
                 utility_meter_config={CONF_UTILITY_METER_NET_CONSUMPTION: True, **self.config},
-                cost_name=str(sensor_type),
+                cost_name=sensor_type.label,
             ),
         )
 
@@ -186,7 +191,7 @@ class TrackedPowerSensorFactory:
         _LOGGER.debug("Creating tracked grouped power sensor, entities: %s", tracked_entities)
         unique_id = f"{unique_id}_{sensor_type}_power"
         entity_id = generate_power_sensor_entity_id(self.hass, self.config, name=sensor_type, unique_id=unique_id)
-        name = generate_power_sensor_name(self.config, name=sensor_type)
+        name = generate_power_sensor_name(self.config, name=sensor_type.label)
         return GroupedPowerSensor(
             self.hass,
             sensor_config=self.config,
@@ -207,7 +212,7 @@ class TrackedPowerSensorFactory:
         _LOGGER.debug("Creating untracked grouped power sensor")
         unique_id = f"{unique_id}_{sensor_type}_power"
         entity_id = generate_power_sensor_entity_id(self.hass, self.config, name=sensor_type, unique_id=unique_id)
-        name = generate_power_sensor_name(self.config, name=sensor_type)
+        name = generate_power_sensor_name(self.config, name=sensor_type.label)
         return SubtractGroupSensor(
             self.hass,
             entity_id=entity_id,
@@ -226,7 +231,7 @@ class TrackedPowerSensorFactory:
         """Create an energy sensor for a power sensor."""
         _LOGGER.debug("Creating %s grouped energy sensor", sensor_type)
         unique_id = f"{power_sensor.unique_id}_{sensor_type}_energy"
-        name = generate_energy_sensor_name(self.config, sensor_type)
+        name = generate_energy_sensor_name(self.config, sensor_type.label)
         entity_id = generate_energy_sensor_entity_id(self.hass, self.config, name=sensor_type, unique_id=unique_id)
         return VirtualEnergySensor(
             hass=self.hass,
