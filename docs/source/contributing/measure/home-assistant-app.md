@@ -89,29 +89,30 @@ During the actual run, live and saved power readings show the target device cons
 
 ## Running a measurement
 
-1. Configure and test the measurement device in **Settings**.
-2. Select a measurement type and the Home Assistant entity when that measurement controls a device.
-3. Enter the profile details and measurement-specific options. Light measurements also let you choose the modes advertised by the selected entity. Enable a resistive dummy load only when the device load would otherwise be too low for the meter.
-4. Review preflight estimates, warnings, meter diagnostics, and advanced timing settings.
-5. Start the session. Complete the dummy-load calibration or reuse confirmation when enabled. Average, recorder, speaker, and charging measurements also pause for an explicit confirmation when the physical device must be prepared or the actual sampling period is about to begin.
-6. Follow live progress, current operating values, recent power samples, and session logs. You can close or reload the browser; the app owns the job and restores its persisted status when you return.
-7. Review plots and download generated CSV, model, or recording files from the result view. For generated profiles, either prepare a GitHub pull request in the app or use the permanent manual-contribution option.
+1. Open **All sessions** and select **New measurement**.
+2. Configure and test the measurement device in **Settings**.
+3. Select a measurement type and the Home Assistant entity when that measurement controls a device.
+4. Enter the profile details and measurement-specific options. Light measurements also let you choose the modes advertised by the selected entity. Enable a resistive dummy load only when the device load would otherwise be too low for the meter.
+5. Review preflight estimates, warnings, meter diagnostics, and advanced timing settings.
+6. Start the session. Complete the dummy-load calibration or reuse confirmation when enabled. Average, recorder, speaker, and charging measurements also pause for an explicit confirmation when the physical device must be prepared or the actual sampling period is about to begin.
+7. Follow live progress, current operating values, recent power samples, and session logs. You can close or reload the browser; the app owns the job and restores its persisted status when you return.
+8. Review plots and download generated CSV, model, or recording files from the result view. For generated profiles, either prepare a GitHub pull request in the app or use the permanent manual-contribution option.
 
-Only one measurement runs at a time.
+The PowerCalc logo and the **All sessions** action in the top bar return to the session dashboard. Only one measurement runs at a time; while one is active, its dashboard entry provides the monitor action and starting or resuming another session is disabled.
 
 ## Cancellation and resume
 
 Cancellation is cooperative. A device request or configured wait already in progress may finish before the app stops changing the device. The app keeps complete output rows and does not mark partial output as completed.
 
-Light LUT measurements can resume compatible partial output. Resume with the same light, meter, modes, and measurement settings. Other measurement types currently start a new session after interruption. If the UI does not offer resume, start over rather than manually editing session files.
+Light LUT measurements can resume compatible partial output. Select **Resume** on the retained session to continue with the same light, meter, modes, and measurement settings. Other measurement types currently start a new session after interruption. If the dashboard does not offer resume, use **Duplicate config** to create a new draft with the stored measurement configuration. Duplication does not copy output or progress.
 
 ## Storage and backups
 
-Requests, session state, events, and output are stored in the app's private `/data` directory. Home Assistant includes this directory in app backups. The app does not mount or write to the Home Assistant configuration directory.
+Requests, session state, events, and output are stored in the app's private `/data` directory. Completed, failed, and cancelled sessions remain available on the session dashboard until you explicitly confirm deletion. Home Assistant includes this directory in app backups. The app does not mount or write to the Home Assistant configuration directory.
 
 Persisted GitHub credentials are also stored under `/data`, separately from preferences, sessions, and diagnostics. Treat app backups as sensitive while a GitHub account is connected.
 
-The result view provides:
+The session dashboard provides per-session progress, file count, storage use, diagnostics, resume when compatible, configuration duplication, and explicit deletion. Opening a stopped session restores its result view, which provides:
 
 - raw measurement and generated model files;
 - interactive plots for supported output;
@@ -153,7 +154,7 @@ Reload the app. Browser and ingress connections do not control the worker, and t
 
 ### An interrupted run cannot resume
 
-Resume is rejected when output is incomplete or settings that determine the measurement sequence changed. Preserve the existing files for diagnosis, then start a new session with overwrite when appropriate.
+Resume is rejected when output is incomplete or settings that determine the measurement sequence changed. Preserve the existing files for diagnosis, then duplicate the session configuration and start a new measurement when appropriate.
 
 ### Storage errors
 
