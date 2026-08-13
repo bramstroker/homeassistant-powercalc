@@ -35,6 +35,7 @@ function formText(form: FormData, name: string): string {
 }
 
 const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging.";
+const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
 
 export class SetupView extends LitElement {
   static readonly properties = {
@@ -120,6 +121,8 @@ export class SetupView extends LitElement {
     .entity-list { display: grid; gap: 0.4rem; }
     .entity-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; align-items: center; }
     .entity-row button, .add-entity { min-height: 40px; }
+    .remove-entity { display: grid; place-items: center; width: 44px; padding: 0; }
+    .remove-entity svg { width: 20px; height: 20px; }
     .check { display: flex; grid-template-columns: none; align-items: center; gap: 0.5rem; min-height: 42px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); }
     .check input { min-height: auto; width: auto; accent-color: var(--signal); }
     /* A checkbox pill has no caption above it, so pin it to the input line of its row. */
@@ -159,6 +162,8 @@ export class SetupView extends LitElement {
     .dummy-controller p { margin: 0; }
     .multiple-lights { display: grid; justify-items: start; gap: 0.4rem; }
     .multiple-lights p { margin: 0; }
+    .help-link { display: inline-flex; align-items: center; margin-left: 0.25rem; color: var(--signal-strong); vertical-align: 0.15em; }
+    .help-link svg { width: 16px; height: 16px; }
     .dummy-load-options { display: grid; gap: 0.8rem; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
     .dummy-load-options p { margin: 0; }
     .calibration-card { display: grid; gap: 0.2rem; }
@@ -372,7 +377,22 @@ export class SetupView extends LitElement {
           />
           Measure multiple lights
         </label>
-        <p class="muted">Measuring multiple identical lights together increases the load, making very low power use easier to measure accurately.</p>
+        <p class="muted">
+          Measuring multiple identical lights together increases the load, making very low power use easier to measure accurately.
+          <a
+            class="help-link"
+            href=${MULTIPLE_LIGHTS_GUIDE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Learn more about measuring multiple identical lights"
+            title="Learn more"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M9.75 9a2.4 2.4 0 0 1 4.57 1c0 1.75-2.32 2.1-2.32 3.5M12 17h.01"></path>
+            </svg>
+          </a>
+        </p>
       </div>
     `;
   }
@@ -611,7 +631,19 @@ export class SetupView extends LitElement {
             ?disabled=${entity.entity_id !== value && values.includes(entity.entity_id)}
           >${entity.name} · ${entity.entity_id}</option>`)}
         </select>
-        ${values.length > 1 ? html`<button type="button" data-field=${field.name} data-index=${index} @click=${this.removeEntity}>Remove</button>` : nothing}
+        ${values.length > 1 ? html`<button
+          class="remove-entity danger"
+          type="button"
+          data-field=${field.name}
+          data-index=${index}
+          aria-label="Remove ${field.label}"
+          title="Remove ${field.label}"
+          @click=${this.removeEntity}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6"></path>
+          </svg>
+        </button>` : nothing}
       </div>`)}
       <button class="add-entity" type="button" data-field=${field.name} @click=${this.addEntity}>Add another ${field.label.toLowerCase()}</button>
       ${field.hint ? html`<small class="field-hint">${field.hint}</small>` : nothing}

@@ -232,6 +232,10 @@ describe("setup view", () => {
     await element.updateComplete;
 
     expect(element.shadowRoot.querySelectorAll('select[name="light_entity_id"]')).toHaveLength(2);
+    const removeButton = element.shadowRoot.querySelector<HTMLButtonElement>("button.remove-entity");
+    expect(removeButton?.getAttribute("aria-label")).toBe("Remove Light");
+    expect(removeButton?.querySelector("svg")).toBeTruthy();
+    expect(removeButton?.textContent?.trim()).toBe("");
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
     expect((element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value).toBe("LWA017");
     expect((element.shadowRoot.querySelector('input[name="multiple_light_count"]') as HTMLInputElement).value).toBe("2");
@@ -271,6 +275,10 @@ describe("setup view", () => {
 
     expect(element.shadowRoot.querySelector(".add-entity")).not.toBeNull();
     expect(element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')).not.toBeNull();
+    const helpLink = element.shadowRoot.querySelector<HTMLAnchorElement>(".multiple-lights .help-link");
+    expect(helpLink?.href).toBe("https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights");
+    expect(helpLink?.getAttribute("aria-label")).toBe("Learn more about measuring multiple identical lights");
+    expect(helpLink?.querySelector("svg")).toBeTruthy();
   });
 
   it("hides the virtual-device toggle unless developer mode is enabled", async () => {
