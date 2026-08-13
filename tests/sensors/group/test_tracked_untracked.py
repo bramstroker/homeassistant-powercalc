@@ -5,8 +5,10 @@ from homeassistant.helpers import entity_registry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.const import (
+    CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_PRICE,
     CONF_FIXED,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TRACKED_AUTO,
@@ -19,6 +21,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
     DATA_GROUP_ENTITIES,
     DOMAIN,
+    DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
     GroupType,
     SensorType,
@@ -90,6 +93,39 @@ async def test_energy_sensors_and_utility_meters_created(hass: HomeAssistant) ->
     assert sensors[4].entity_id == "sensor.untracked_energy"
     assert isinstance(sensors[5], VirtualUtilityMeter)
     assert sensors[5].entity_id == "sensor.untracked_energy_daily"
+
+
+async def test_sensor_names_are_capitalized(hass: HomeAssistant) -> None:
+    """Friendly names must not be lowercased. See #4500."""
+    hass.data[DOMAIN] = {DOMAIN_CONFIG: {CONF_ENERGY_PRICE: 0.25}}
+    factory = TrackedPowerSensorFactory(
+        hass,
+        MockConfigEntry(),
+        {
+            CONF_UNIQUE_ID: "abc",
+            CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
+            CONF_GROUP_TRACKED_POWER_ENTITIES: ["sensor.1_power", "sensor.2_power"],
+            CONF_MAIN_POWER_SENSOR: "sensor.main_power",
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TYPES: ["daily"],
+            CONF_CREATE_COST_SENSOR: True,
+        },
+    )
+    sensors = await factory.create_tracked_untracked_group_sensors()
+
+    assert [sensor.name for sensor in sensors] == [
+        "Tracked power",
+        "Tracked energy",
+        "Tracked energy daily",
+        "Tracked cost",
+        "Tracked energy daily cost",
+        "Untracked power",
+        "Untracked energy",
+        "Untracked energy daily",
+        "Untracked cost",
+        "Untracked energy daily cost",
+    ]
 
 
 async def test_auto_tracking_entities(hass: HomeAssistant) -> None:
