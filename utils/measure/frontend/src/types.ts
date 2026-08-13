@@ -102,7 +102,12 @@ export interface FormField {
   default?: PrimitiveValue;
   minimum?: number | null;
   maximum?: number | null;
+  /** Whether several entities can be selected for this field at once. */
   multiple?: boolean;
+  /** Label to use while several entities are selected. */
+  plural_label?: string;
+  /** Entity field whose number of selected entities this count follows by default. */
+  derived_from?: string | null;
   hint?: string;
 }
 

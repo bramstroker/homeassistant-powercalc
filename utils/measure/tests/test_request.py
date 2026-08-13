@@ -46,14 +46,14 @@ def test_request_round_trip_preserves_typed_input() -> None:
     assert isinstance(restored.dummy_load, DummyLoadReuseRequest)
 
 
-def test_request_exposes_the_controlled_entity_only_when_the_controller_drives_one() -> None:
+def test_request_exposes_the_controlled_entities_only_when_the_controller_drives_them() -> None:
     controlled = LightMeasurementRequest.model_validate(valid_request())
     uncontrolled = AverageMeasurementRequest.model_validate(
         {"power_meter": {"type": "hass", "entity_id": "sensor.test_power"}},
     )
 
-    assert controlled.controlled_entity_id == "light.test"
-    assert uncontrolled.controlled_entity_id is None
+    assert controlled.controlled_entity_ids == ("light.test",)
+    assert uncontrolled.controlled_entity_ids == ()
 
 
 def test_request_exposes_all_controlled_entities_for_multi_light_controller() -> None:
@@ -63,7 +63,6 @@ def test_request_exposes_all_controlled_entities_for_multi_light_controller() ->
     )
 
     assert isinstance(request.controller, HassMultiLightControllerSpec)
-    assert request.controlled_entity_id is None
     assert request.controlled_entity_ids == ("light.one", "light.two")
 
 

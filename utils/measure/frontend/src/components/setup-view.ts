@@ -7,6 +7,7 @@ import type {
   EntityDescriptor,
   FormField,
   FormFieldOption,
+  LutMode,
   MeasureDefaults,
   MeasureDefinition,
   MeasureParameter,
@@ -58,7 +59,6 @@ export class SetupView extends LitElement {
     errorMessage: { type: String },
     selectedType: { state: true },
     selectedEntities: { state: true },
-    selectedEntityLists: { state: true },
     selectValues: { state: true },
     multiSelection: { state: true },
     parameterValues: { state: true },
@@ -88,8 +88,8 @@ export class SetupView extends LitElement {
   busy = false;
   errorMessage = "";
   selectedType?: MeasureType;
-  selectedEntities: Record<string, string> = {};
-  selectedEntityLists: Record<string, string[]> = {};
+  /** Entities picked per field. A single-entity field simply holds a one-entry list. */
+  selectedEntities: Record<string, string[]> = {};
   selectValues: Record<string, string> = {};
   multiSelection: Record<string, string[]> = {};
   parameterValues: Record<string, string> = {};
@@ -97,7 +97,8 @@ export class SetupView extends LitElement {
   dummyLoadMode: DummyLoadSpec["mode"] = "calibrate";
   dummyController = false;
   multipleLights = false;
-  lightCountOverride?: string;
+  /** Deliberately not reactive: it exists so a typed count survives re-renders instead of being recomputed. */
+  private derivedCountOverride?: string;
 
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
@@ -152,8 +153,9 @@ export class SetupView extends LitElement {
     .power-meter-summary button { flex: 0 0 auto; min-height: 38px; padding: 0.4rem 0.9rem; }
     .dummy-load { display: grid; gap: 0.9rem; }
     .dummy-load-toggle { width: fit-content; }
+    /* A checkbox that reveals or hides a block of the form, rather than submitting a value. */
+    .toggle-pill { width: fit-content; }
     .dummy-controller { display: grid; gap: 0.4rem; }
-    .dummy-controller-toggle { width: fit-content; }
     .dummy-controller p { margin: 0; }
     .multiple-lights { display: grid; justify-items: start; gap: 0.4rem; }
     .multiple-lights p { margin: 0; }
@@ -270,7 +272,7 @@ export class SetupView extends LitElement {
     if (!definition || !this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
     const run = this.initialRequest?.measure_type === type ? this.initialRequest : undefined;
     const fields = deviceFields(definition);
-    const multipleController = fields.find((field) => field.role === "controller" && field.multiple);
+    const multipleController = this.multiControllerField();
     // A multi-select needs the room of its own fieldset; the rest are grid cells.
     const blocks = fields.filter((field) => field.control === "multi_select");
     return html`
@@ -341,7 +343,7 @@ export class SetupView extends LitElement {
     if (!this.capabilities?.developer_mode) return nothing;
     return html`
       <div class="dummy-controller">
-        <label class="check dummy-controller-toggle">
+        <label class="check toggle-pill">
           <input
             type="checkbox"
             name="use_dummy_controller"
@@ -360,7 +362,7 @@ export class SetupView extends LitElement {
   private renderMultipleLightsToggle(field: FormField) {
     return html`
       <div class="multiple-lights">
-        <label class="check dummy-controller-toggle">
+        <label class="check toggle-pill">
           <input
             type="checkbox"
             name="measure_multiple_lights"
@@ -530,9 +532,7 @@ export class SetupView extends LitElement {
     if (!definition) return nothing;
     const name = field.name;
     if (this.dummyController && field.role === "controller") return nothing;
-    if (name === "multiple_light_count" && !this.multipleLights) {
-      return html`<input type="hidden" name=${name} value="1" />`;
-    }
+    if (field.derived_from) return this.derivedCountField(field, run);
     const stored = run && requestFieldValue(run, field);
     if (field.control === "boolean") {
       return html`<label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
@@ -548,12 +548,9 @@ export class SetupView extends LitElement {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
       }
       const entities = this.entitiesIn(domains);
-      if (field.multiple) {
-        if (this.multipleLights) return this.multiEntityField(field, entities, stored);
-        const selected = this.selectedEntityIds(field, run)[0] ?? value;
-        return this.entitySelect(name, field.label.replace(/s$/, ""), entities, selected, field.required);
-      }
-      return this.entitySelect(name, field.label, entities, value, field.required);
+      if (field.multiple && this.multipleLights) return this.multiEntityField(field, entities, run);
+      const selected = field.multiple ? this.selectedEntityId(field, run) || value : value;
+      return this.entitySelect(name, field.label, entities, selected, field.required);
     }
     if (field.control === "select") {
       const value = (stored ?? field.default ?? "").toString();
@@ -563,28 +560,48 @@ export class SetupView extends LitElement {
         ${field.options.map((option) => html`<option value=${option.value} ?selected=${option.value === value}>${option.label}</option>`)}
       </select></label>`;
     }
-    const type = field.control === "number" ? "number" : "text";
-    const inferredCount = name === "multiple_light_count" ? this.selectedLightCount(run) : undefined;
-    const value = name === "multiple_light_count"
-      ? (this.lightCountOverride ?? (inferredCount && inferredCount > 1 ? String(inferredCount) : (stored ?? field.default ?? "").toString()))
-      : (stored ?? field.default ?? "").toString();
+    return this.valueField(field, (stored ?? field.default ?? "").toString());
+  }
+
+  /** A plain text or number input, rendered from what the field declares about itself. */
+  private valueField(field: FormField, value: string, onInput: ((event: Event) => void) | null = null) {
     return html`<label><span>${field.label}</span><input
-      type=${type}
-      name=${name}
+      type=${field.control === "number" ? "number" : "text"}
+      name=${field.name}
       .value=${value}
       min=${field.minimum ?? nothing}
       max=${field.maximum ?? nothing}
       ?required=${field.required}
       autocomplete="off"
-      @input=${name === "multiple_light_count" ? this.lightCountChanged : null}
+      @input=${onInput}
     />${field.hint ? html`<small class="field-hint">${field.hint}</small>` : nothing}</label>`;
   }
 
-  private multiEntityField(field: FormField, entities: EntityDescriptor[], stored: unknown) {
-    const storedValues = Array.isArray(stored) ? stored.map(String) : typeof stored === "string" && stored ? [stored] : [];
-    const values = this.selectedEntityLists[field.name] ?? (storedValues.length ? storedValues : [""]);
+  /**
+   * A count that follows how many entities its source field selects. It only means anything
+   * while several devices are measured together, so until then it submits a fixed 1 out of sight.
+   */
+  private derivedCountField(field: FormField, run?: MeasurementRequest) {
+    if (!this.multipleLights) return html`<input type="hidden" name=${field.name} value="1" />`;
+    const source = this.selectedType
+      ? this.definition(this.selectedType)?.fields.find((candidate) => candidate.name === field.derived_from)
+      : undefined;
+    const derived = source ? this.selectedEntityIds(source, run).length : 0;
+    const stored = run && requestFieldValue(run, field);
+    const value = this.derivedCountOverride
+      ?? (derived > 1 ? String(derived) : (stored ?? field.default ?? "").toString());
+    return this.valueField(field, value, this.derivedCountChanged);
+  }
+
+  private derivedCountChanged(event: Event): void {
+    this.derivedCountOverride = (event.currentTarget as HTMLInputElement).value;
+  }
+
+  private multiEntityField(field: FormField, entities: EntityDescriptor[], run?: MeasurementRequest) {
+    const rows = this.entityRows(field, run);
+    const values = rows.length ? rows : [""];
     return html`<div class="entity-list">
-      <span class="field-label">${field.label}</span>
+      <span class="field-label">${field.plural_label || field.label}</span>
       ${values.map((value, index) => html`<div class="entity-row">
         <select name=${field.name} required data-index=${index} @change=${this.multiEntityChanged}>
           <option value="">Select an entity</option>
@@ -596,7 +613,7 @@ export class SetupView extends LitElement {
         </select>
         ${values.length > 1 ? html`<button type="button" data-field=${field.name} data-index=${index} @click=${this.removeEntity}>Remove</button>` : nothing}
       </div>`)}
-      <button class="add-entity" type="button" data-field=${field.name} @click=${this.addEntity}>Add another light</button>
+      <button class="add-entity" type="button" data-field=${field.name} @click=${this.addEntity}>Add another ${field.label.toLowerCase()}</button>
       ${field.hint ? html`<small class="field-hint">${field.hint}</small>` : nothing}
     </div>`;
   }
@@ -650,29 +667,19 @@ export class SetupView extends LitElement {
 
   private multipleLightsChanged(event: Event): void {
     const input = event.currentTarget as HTMLInputElement;
-    const field = input.dataset.field ?? "";
     this.multipleLights = input.checked;
-    if (this.multipleLights) {
-      const selected = this.selectedEntities[field];
-      if (!this.selectedEntityLists[field] && selected) {
-        this.selectedEntityLists = { ...this.selectedEntityLists, [field]: [selected] };
-      }
-      return;
-    }
-    const first = this.selectedEntityLists[field]?.find(Boolean)
-      ?? this.selectedEntities[field]
-      ?? this.initialControllerEntities(field).find(Boolean)
-      ?? "";
-    this.selectedEntities = { ...this.selectedEntities, [field]: first };
-    this.selectedEntityLists = { ...this.selectedEntityLists, [field]: first ? [first] : [""] };
-    this.lightCountOverride = undefined;
+    if (this.multipleLights) return;
+    // Back to one light: keep the first pick so the single selector stays populated, and let the count be derived again.
+    const field = input.dataset.field ?? "";
+    this.selectEntities(field, this.currentRows(field).filter(Boolean).slice(0, 1));
+    this.derivedCountOverride = undefined;
   }
 
-  /** Options a field offers right now, narrowed by the capabilities of the entity it names. */
+  /** Options a field offers right now, narrowed by the capabilities of the entities it names. */
   private availableOptions(field: FormField, request?: MeasurementRequest): FormFieldOption[] {
     // A virtual device stands in for any real one, so it supports everything on offer.
     if (this.dummyController) return field.options;
-    return fieldOptions(field, this.narrowingEntity(field, request));
+    return fieldOptions(field, this.narrowedModes(field, request));
   }
 
   /** Currently selected values: what the user picked, else the previous run's, else everything offered. */
@@ -692,24 +699,18 @@ export class SetupView extends LitElement {
     return active;
   }
 
-  private narrowingEntity(field: FormField, request?: MeasurementRequest): EntityDescriptor | undefined {
+  /** Modes every entity named by this field's narrowing source supports; undefined when none is selected. */
+  private narrowedModes(field: FormField, request?: MeasurementRequest): LutMode[] | undefined {
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
     const source = field.narrowed_by ? definition?.fields.find((candidate) => candidate.name === field.narrowed_by) : undefined;
     if (!source) return undefined;
-    if (source.multiple) {
-      const selected = this.selectedEntityIds(source, request)
-        .map((entityId) => this.entityChoices(source).find((entity) => entity.entity_id === entityId))
-        .filter((entity): entity is EntityDescriptor => Boolean(entity));
-      if (!selected.length) return undefined;
-      const first = selected[0];
-      if (!first) return undefined;
-      const supported = selected
-        .map((entity) => new Set(entity.supported_modes ?? []))
-        .reduce((common, modes) => new Set([...common].filter((mode) => modes.has(mode))));
-      return { ...first, supported_modes: [...supported] };
-    }
-    const selected = this.selectedEntityId(source, request);
-    return this.entityChoices(source).find((entity) => entity.entity_id === selected);
+    const choices = this.entityChoices(source);
+    const selected = this.selectedEntityIds(source, request)
+      .map((entityId) => choices.find((entity) => entity.entity_id === entityId))
+      .filter((entity): entity is EntityDescriptor => Boolean(entity));
+    const [first, ...rest] = selected;
+    if (!first) return undefined;
+    return (first.supported_modes ?? []).filter((mode) => rest.every((entity) => entity.supported_modes?.includes(mode)));
   }
 
   /** Entities offered for a controller field. Lights arrive with the startup catalog, other domains on demand. */
@@ -721,18 +722,24 @@ export class SetupView extends LitElement {
     return domains.flatMap((domain) => (domain === "light" ? this.lights : this.deviceEntities[domain] ?? []));
   }
 
-  private selectedEntityId(field: FormField, request?: MeasurementRequest): string {
+  /**
+   * Rows a field currently shows: what the user picked, else what a previous run stored.
+   * Empty rows are kept, because an unanswered select is still a row in the form.
+   */
+  private entityRows(field: FormField, request?: MeasurementRequest): string[] {
+    const chosen = this.selectedEntities[field.name];
+    if (chosen) return chosen;
     const stored = request && requestFieldValue(request, field);
-    return this.selectedEntities[field.name] || (typeof stored === "string" ? stored : "");
+    if (Array.isArray(stored)) return stored.map(String);
+    return typeof stored === "string" && stored ? [stored] : [];
+  }
+
+  private selectedEntityId(field: FormField, request?: MeasurementRequest): string {
+    return this.entityRows(field, request)[0] ?? "";
   }
 
   private selectedEntityIds(field: FormField, request?: MeasurementRequest): string[] {
-    const stored = request && requestFieldValue(request, field);
-    const selected = this.selectedEntities[field.name];
-    const values = this.selectedEntityLists[field.name]
-      ?? (selected ? [selected] : undefined)
-      ?? (Array.isArray(stored) ? stored : typeof stored === "string" && stored ? [stored] : []);
-    return values.filter(Boolean);
+    return this.entityRows(field, request).filter(Boolean);
   }
 
   private selectType(type: MeasureType): void {
@@ -752,52 +759,51 @@ export class SetupView extends LitElement {
 
   private entityChanged(event: Event): void {
     const select = event.currentTarget as HTMLSelectElement;
-    this.selectedEntities = { ...this.selectedEntities, [select.name]: select.value };
+    this.selectEntities(select.name, [select.value]);
   }
 
   private multiEntityChanged(event: Event): void {
     const select = event.currentTarget as HTMLSelectElement;
-    const index = Number(select.dataset.index);
-    const values = [...(this.selectedEntityLists[select.name] ?? [""])];
-    values[index] = select.value;
-    this.selectedEntityLists = { ...this.selectedEntityLists, [select.name]: values };
+    const rows = [...this.currentRows(select.name)];
+    rows[Number(select.dataset.index)] = select.value;
+    this.selectEntities(select.name, rows);
   }
 
   private addEntity(event: Event): void {
     const field = (event.currentTarget as HTMLElement).dataset.field ?? "";
-    const values = this.selectedEntityLists[field] ?? this.initialControllerEntities(field);
-    this.selectedEntityLists = { ...this.selectedEntityLists, [field]: [...values, ""] };
+    this.selectEntities(field, [...this.currentRows(field), ""]);
   }
 
   private removeEntity(event: Event): void {
     const button = event.currentTarget as HTMLElement;
     const field = button.dataset.field ?? "";
-    const index = Number(button.dataset.index);
-    const values = [...(this.selectedEntityLists[field] ?? this.initialControllerEntities(field))];
-    values.splice(index, 1);
-    this.selectedEntityLists = { ...this.selectedEntityLists, [field]: values.length ? values : [""] };
+    const rows = [...this.currentRows(field)];
+    rows.splice(Number(button.dataset.index), 1);
+    this.selectEntities(field, rows);
   }
 
-  private initialControllerEntities(field: string): string[] {
+  /** Rows as the form currently shows them, so an edit starts from what the user can see. */
+  private currentRows(name: string): string[] {
+    const field = this.selectedType
+      ? this.definition(this.selectedType)?.fields.find((candidate) => candidate.name === name)
+      : undefined;
+    return field ? this.entityRows(field, this.currentRun) : [];
+  }
+
+  /** The previous run, when it belongs to the type now being configured. */
+  private get currentRun(): MeasurementRequest | undefined {
+    return this.initialRequest?.measure_type === this.selectedType ? this.initialRequest : undefined;
+  }
+
+  /** The controller field that accepts several entities at once, when this type has one. */
+  private multiControllerField(): FormField | undefined {
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    const descriptor = definition?.fields.find((candidate) => candidate.name === field);
-    const stored = descriptor && this.initialRequest ? requestFieldValue(this.initialRequest, descriptor) : undefined;
-    if (Array.isArray(stored)) return stored;
-    return typeof stored === "string" && stored ? [stored] : [""];
+    return definition?.fields.find((field) => field.role === "controller" && field.multiple);
   }
 
-  private lightCountChanged(event: Event): void {
-    this.lightCountOverride = (event.currentTarget as HTMLInputElement).value;
+  private selectEntities(name: string, rows: string[]): void {
+    this.selectedEntities = { ...this.selectedEntities, [name]: rows };
   }
-
-  private selectedLightCount(request?: MeasurementRequest): number {
-    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    const field = definition?.fields.find((candidate) => candidate.role === "controller" && candidate.multiple);
-    if (!field) return 1;
-    return Math.max(1, new Set(this.selectedEntityIds(field, request)).size);
-  }
-
-
 
   private openSettings(): void {
     this.dispatchEvent(new CustomEvent("open-settings", { bubbles: true, composed: true }));
@@ -843,17 +849,20 @@ export class SetupView extends LitElement {
     return this.powers.find((entity) => entity.entity_id === powerEntityId)?.related_voltage_entity_id ?? "";
   }
 
+  /** Model to prefill: the one every selected device reports, or blank when they differ or any is unknown. */
   private modelId(request?: MeasurementRequest): string {
     if (request?.model_id) return request.model_id;
+    const controller = this.selectedType
+      ? this.definition(this.selectedType)?.fields.find((field) => field.role === "controller")
+      : undefined;
+    if (!controller) return "";
     const entities = [...this.lights, ...Object.values(this.deviceEntities).flat()];
-    const multiField = this.selectedType ? this.definition(this.selectedType)?.fields.find((field) => field.multiple) : undefined;
-    const multiIds = multiField ? this.selectedEntityIds(multiField, request) : [];
-    const requestEntityId = request && "controller" in request && request.controller.type === "hass" ? request.controller.entity_id : "";
-    const ids = multiIds.length ? multiIds : [Object.values(this.selectedEntities).find(Boolean) || requestEntityId].filter(Boolean);
-    const modelIds = ids.map((id) => entities.find((entity) => entity.entity_id === id)?.model_id);
-    if (!modelIds.length || modelIds.some((modelId) => !modelId)) return "";
-    const models = new Set(modelIds);
-    return models.size === 1 ? [...models][0] ?? "" : "";
+    const models = new Set(
+      this.selectedEntityIds(controller, request)
+        .map((entityId) => entities.find((entity) => entity.entity_id === entityId)?.model_id),
+    );
+    if (models.size !== 1) return "";
+    return [...models][0] ?? "";
   }
 
   private submitMeasurement(event: SubmitEvent): void {

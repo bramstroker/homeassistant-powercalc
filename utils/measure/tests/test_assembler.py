@@ -98,7 +98,7 @@ def test_assembler_applies_typed_home_assistant_configuration_at_construction() 
     light_controller.assert_called_once_with(
         home_assistant,
         2,
-        entity_id="light.test",
+        entity_ids=["light.test"],
         wait=ANY,
     )
 
@@ -114,7 +114,7 @@ def test_assembler_builds_multi_light_controller() -> None:
     )
     home_assistant = MagicMock(spec=HomeAssistantManager)
 
-    with patch("measure.assembler.HassMultiLightController") as controller:
+    with patch("measure.assembler.HassLightController") as controller:
         _assembler(home_assistant=home_assistant).assemble(request)
 
     controller.assert_called_once_with(home_assistant, 2, entity_ids=["light.one", "light.two"], wait=ANY)

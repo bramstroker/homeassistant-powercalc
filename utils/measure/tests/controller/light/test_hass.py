@@ -4,7 +4,7 @@ from homeassistant_api import State
 from homeassistant_api.errors import HomeassistantAPIError
 from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
-from measure.controller.light.hass import HassLightController, HassMultiLightController
+from measure.controller.light.hass import HassLightController
 from measure.home_assistant import HomeAssistantManager
 import pytest
 
@@ -102,10 +102,15 @@ def test_connection_validation() -> None:
     client = _mock_client()
     client.get_config.side_effect = HomeassistantAPIError("Error")
     with pytest.raises(ApiConnectionError):
-        HassLightController(client, 0)
+        HassLightController(client, 0, entity_ids=["light.test"])
 
 
-def test_multi_light_controller_targets_all_entities_and_intersects_capabilities() -> None:
+def test_controller_requires_an_entity() -> None:
+    with pytest.raises(ValueError, match="at least one entity"):
+        HassLightController(_mock_client(), 0, entity_ids=[])
+
+
+def test_multiple_entities_are_targeted_together_with_their_common_capabilities() -> None:
     client = _mock_client()
     client.get_state.side_effect = [
         State(
@@ -121,7 +126,7 @@ def test_multi_light_controller_targets_all_entities_and_intersects_capabilities
         State(entity_id="light.one", state="on", attributes={"effect_list": ["one", "shared"]}),
         State(entity_id="light.two", state="on", attributes={"effect_list": ["shared", "two"]}),
     ]
-    controller = HassMultiLightController(client, 0, entity_ids=["light.one", "light.two"])
+    controller = HassLightController(client, 0, entity_ids=["light.one", "light.two"])
 
     controller.change_light_state(LutMode.BRIGHTNESS, bri=100)
     client.trigger_service.assert_called_once_with(
@@ -140,7 +145,7 @@ def _get_instance(client: MagicMock | None = None) -> HassLightController:
     return HassLightController(
         client or _mock_client(),
         0,
-        entity_id="light.test",
+        entity_ids=["light.test"],
     )
 
 

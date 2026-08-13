@@ -15,7 +15,7 @@ from measure.controller.fan.hass import HassFanController
 from measure.controller.fan.spec import DummyFanControllerSpec, FanControllerSpec, HassFanControllerSpec
 from measure.controller.light.controller import LightController
 from measure.controller.light.dummy import DummyLightController
-from measure.controller.light.hass import HassLightController, HassMultiLightController
+from measure.controller.light.hass import HassLightController
 from measure.controller.light.spec import (
     DummyLightControllerSpec,
     HassLightControllerSpec,
@@ -210,17 +210,9 @@ class MeasurementAssembler:
     def _light_controller(self, spec: LightControllerSpec) -> LightController:
         if isinstance(spec, DummyLightControllerSpec):
             return DummyLightController()
-        if isinstance(spec, HassLightControllerSpec):
+        if isinstance(spec, HassLightControllerSpec | HassMultiLightControllerSpec):
             hass = self._home_assistant()
             return HassLightController(
-                hass,
-                spec.transition_time,
-                entity_id=spec.entity_id,
-                wait=self._interaction.wait,
-            )
-        if isinstance(spec, HassMultiLightControllerSpec):
-            hass = self._home_assistant()
-            return HassMultiLightController(
                 hass,
                 spec.transition_time,
                 entity_ids=spec.entity_ids,

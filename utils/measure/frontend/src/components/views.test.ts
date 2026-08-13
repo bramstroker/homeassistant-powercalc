@@ -1,4 +1,4 @@
-import type { AppSettings, AppSettingsUpdate, Capabilities, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, PowerMeterDiagnostic, SessionSnapshot, SettingsSection } from "../types";
+import type { AppSettings, AppSettingsUpdate, Capabilities, DummyLoadCalibration, EntityDescriptor, MeasureDefinition, MeasurementRequest, OperatingPoint, PowerMeterDiagnostic, SessionSnapshot, SettingsSection } from "../types";
 import { sharedStyles } from "../styles";
 import { AppShell } from "./app-shell";
 import "./result-view";
@@ -36,6 +36,31 @@ const goodPowerMeterDiagnostic: PowerMeterDiagnostic = {
   messages: ["The sensor meets the recommended update frequency."],
 };
 
+/** The setup view under test, with the reactive properties these tests drive. */
+type SetupViewElement = HTMLElement & {
+  capabilities: Capabilities;
+  definitions: MeasureDefinition[];
+  initialRequest?: MeasurementRequest;
+  lights: EntityDescriptor[];
+  powers: EntityDescriptor[];
+  voltages: EntityDescriptor[];
+  deviceEntities: Record<string, EntityDescriptor[]>;
+  deviceEntityErrors: Record<string, string>;
+  dummyLoadCalibration: DummyLoadCalibration | null;
+  selectedType: string;
+  selectedEntities: Record<string, string[]>;
+  multipleLights: boolean;
+  powerMeter: string;
+  powerMeterConfigured: boolean;
+  shellyIp: string;
+  kasaIp: string;
+  defaultPowerEntityId: string;
+  defaultMeasureDevice: string;
+  errorMessage: string;
+  updateComplete: Promise<boolean>;
+  shadowRoot: ShadowRoot;
+};
+
 const modeParameter = (name: string, label: string) => ({ name, label, group: "Profile resolution" });
 
 const lightDefinition: MeasureDefinition = {
@@ -64,7 +89,7 @@ const lightDefinition: MeasureDefinition = {
   ],
   fields: [
     { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, entity_domains: ["sensor"], options: [] },
-    { name: "light_entity_id", role: "controller", label: "Lights", control: "entity", required: true, multiple: true, entity_domains: ["light"], options: [] },
+    { name: "light_entity_id", role: "controller", label: "Light", plural_label: "Lights", control: "entity", required: true, multiple: true, entity_domains: ["light"], options: [] },
     {
       name: "modes",
       role: "attribute",
@@ -79,7 +104,7 @@ const lightDefinition: MeasureDefinition = {
         { value: "effect", label: "Effect", enables: ["effect_bri_steps", "measure_time_effect_min", "measure_time_effect"] },
       ],
     },
-    { name: "multiple_light_count", role: "attribute", label: "Number of lights", control: "number", required: true, options: [], default: 1, minimum: 1, maximum: 100 },
+    { name: "multiple_light_count", role: "attribute", label: "Number of lights", control: "number", required: true, options: [], default: 1, minimum: 1, maximum: 100, derived_from: "light_entity_id" },
   ],
   supports_profile: true,
   supports_resume: true,
@@ -93,25 +118,14 @@ it("uses dark native form controls so iOS select indicators remain visible", () 
 
 describe("setup view", () => {
   it("renders dynamic entities, mode choices, and collapsed advanced settings", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      selectedEntities: Record<string, string>;
-      defaultMeasureDevice: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
     element.definitions = [lightDefinition];
     element.selectedType = "light";
-    element.selectedEntities = { light_entity_id: "light.desk" };
+    element.selectedEntities = { light_entity_id: ["light.desk"] };
     document.body.append(element);
     await element.updateComplete;
 
@@ -134,16 +148,7 @@ describe("setup view", () => {
   });
 
   it("auto-selects every supported color mode for a capable light", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = [{ entity_id: "light.rgb", name: "RGB lamp", supported_modes: ["brightness", "color_temp", "hs"] }];
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
@@ -158,19 +163,7 @@ describe("setup view", () => {
   });
 
   it("submits mode-specific native light-grid steps", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      selectedEntities: Record<string, string>;
-      defaultPowerEntityId: string;
-      defaultMeasureDevice: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = [{ entity_id: "light.rgb", name: "RGB lamp", supported_modes: ["brightness", "color_temp", "hs"] }];
     element.powers = [{
@@ -182,7 +175,7 @@ describe("setup view", () => {
     element.voltages = [{ entity_id: "sensor.plug_voltage", name: "Plug voltage", unit: "V" }];
     element.definitions = [lightDefinition];
     element.selectedType = "light";
-    element.selectedEntities = { light_entity_id: "light.rgb" };
+    element.selectedEntities = { light_entity_id: ["light.rgb"] };
     element.defaultPowerEntityId = "sensor.plug_power";
     element.defaultMeasureDevice = "Shelly Plug S";
     document.body.append(element);
@@ -213,20 +206,7 @@ describe("setup view", () => {
   });
 
   it("submits multiple lights, intersects their modes, and infers model and count", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      selectedEntityLists: Record<string, string[]>;
-      multipleLights: boolean;
-      defaultPowerEntityId: string;
-      defaultMeasureDevice: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = [
       {
@@ -244,7 +224,7 @@ describe("setup view", () => {
     element.voltages = [];
     element.definitions = [lightDefinition];
     element.selectedType = "light";
-    element.selectedEntityLists = { light_entity_id: ["light.one", "light.two"] };
+    element.selectedEntities = { light_entity_id: ["light.one", "light.two"] };
     element.multipleLights = true;
     element.defaultPowerEntityId = "sensor.power";
     element.defaultMeasureDevice = "Meter";
@@ -271,16 +251,7 @@ describe("setup view", () => {
   });
 
   it("keeps multi-light controls hidden until the user opts in", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.power", name: "Power", unit: "W" }];
@@ -303,16 +274,7 @@ describe("setup view", () => {
   });
 
   it("hides the virtual-device toggle unless developer mode is enabled", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
@@ -326,17 +288,7 @@ describe("setup view", () => {
   });
 
   it("submits a dummy light controller when the developer virtual-device toggle is on", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      defaultMeasureDevice: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = { ...capabilities, developer_mode: true };
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
@@ -376,12 +328,7 @@ describe("setup view", () => {
       fields: [{ name: "fan_entity_id", role: "controller", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
       supports_profile: true, supports_resume: false,
     };
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
-      deviceEntities: Record<string, EntityDescriptor[]>;
-      selectedType: string;
-      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = [fanDefinition];
     element.capabilities = { ...capabilities, developer_mode: true };
     element.powerMeter = "dummy";
@@ -408,16 +355,7 @@ describe("setup view", () => {
   });
 
   it("includes effect mode when the light exposes effects", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = [{ entity_id: "light.effect", name: "Effect lamp", supported_modes: ["brightness", "effect"], effect_list: ["colorloop"] }];
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
@@ -469,12 +407,7 @@ const definitions: MeasureDefinition[] = [
 
 describe("setup type picker", () => {
   it("uses a matching saved dummy-load calibration by default", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powers: EntityDescriptor[]; powerMeter: string;
-      defaultPowerEntityId: string; defaultMeasureDevice: string; selectedType: string;
-      dummyLoadCalibration: { description: string; resistance: number; calibrated_at: string };
-      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     element.capabilities = capabilities;
     element.powers = [{
@@ -517,11 +450,7 @@ describe("setup type picker", () => {
   });
 
   it("collects a load description when inline calibration is required", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
-      selectedType: string; dummyLoadCalibration: null;
-      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     element.capabilities = capabilities;
     element.powerMeter = "shelly";
@@ -546,10 +475,7 @@ describe("setup type picker", () => {
   });
 
   it("does not offer a resistive dummy load for the synthetic test meter", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
-      selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     element.capabilities = capabilities;
     element.powerMeter = "dummy";
@@ -562,16 +488,7 @@ describe("setup type picker", () => {
   });
 
   it("disables a resistive dummy load when the Home Assistant meter has no voltage sensor", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[];
-      capabilities: Capabilities;
-      powers: EntityDescriptor[];
-      powerMeter: string;
-      defaultPowerEntityId: string;
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     element.capabilities = capabilities;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
@@ -586,9 +503,7 @@ describe("setup type picker", () => {
   });
 
   it("requires power meter setup before choosing a measurement type", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; powerMeterConfigured: boolean; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     element.powerMeterConfigured = false;
     document.body.append(element);
@@ -602,9 +517,7 @@ describe("setup type picker", () => {
   });
 
   it("shows a card per measurement type before a type is chosen", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     document.body.append(element);
     await element.updateComplete;
@@ -615,10 +528,7 @@ describe("setup type picker", () => {
   });
 
   it("renders generic fields, dedupes the power sensor, and emits one typed preflight request", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powers: EntityDescriptor[]; powerMeter: string;
-      defaultPowerEntityId: string; defaultMeasureDevice: string; selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.powerMeter = "hass";
@@ -654,10 +564,7 @@ describe("setup type picker", () => {
   });
 
   it("includes the configured Shelly adapter in the submitted request", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string; shellyIp: string;
-      selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     element.capabilities = capabilities;
     element.powerMeter = "shelly";
@@ -675,10 +582,7 @@ describe("setup type picker", () => {
   });
 
   it("includes the configured Kasa adapter in the submitted request", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string; kasaIp: string;
-      selectedType: string; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     element.capabilities = capabilities;
     element.powerMeter = "kasa";
@@ -711,11 +615,7 @@ describe("setup type picker", () => {
       supports_profile: true,
       supports_resume: false,
     };
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powers: EntityDescriptor[]; powerMeter: string;
-      deviceEntities: Record<string, EntityDescriptor[]>; selectedType: string;
-      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = [fanDefinition];
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.powerMeter = "hass";
@@ -821,15 +721,7 @@ describe("setup type picker", () => {
   ])("orders $type fields by dependency and prefills the selected device model ID", async ({
     type, definition, entities, entityField, entityId, expectedFields, modelId,
   }) => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[];
-      capabilities: Capabilities;
-      powerMeter: string;
-      deviceEntities: Record<string, EntityDescriptor[]>;
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = [definition];
     element.capabilities = capabilities;
     element.powerMeter = "dummy";
@@ -865,11 +757,7 @@ describe("setup type picker", () => {
       fields: [{ name: "fan_entity_id", role: "controller", label: "Fan", control: "entity", required: true, entity_domains: ["fan"], options: [] }],
       supports_profile: false, supports_resume: false,
     };
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
-      deviceEntityErrors: Record<string, string>; selectedType: string;
-      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = [fanDefinition];
     element.capabilities = capabilities;
     element.powerMeter = "dummy";
@@ -904,11 +792,7 @@ describe("setup type picker", () => {
       ],
       supports_profile: false, supports_resume: false,
     };
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      definitions: MeasureDefinition[]; capabilities: Capabilities; powerMeter: string;
-      deviceEntities: Record<string, EntityDescriptor[]>; selectedType: string; errorMessage: string;
-      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = [chargingDefinition];
     element.capabilities = capabilities;
     element.powerMeter = "dummy";
@@ -1229,18 +1113,7 @@ describe("running view", () => {
 
 describe("setup view defaults", () => {
   it("shows the configured power sensor as read-only measurement context", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      defaultPowerEntityId: string;
-      defaultMeasureDevice: string;
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
@@ -1262,17 +1135,7 @@ describe("setup view defaults", () => {
   });
 
   it("shows the voltage sensor automatically paired with the configured power sensor", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      defaultPowerEntityId: string;
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = lights;
     element.powers = [
@@ -1296,17 +1159,7 @@ describe("setup view defaults", () => {
   });
 
   it("prefills the model ID from the selected measurement device", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      defaultPowerEntityId: string;
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"], device_id: "light-device", model_id: "LWA017" }];
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", device_id: "plug-device", model_id: "WSP002" }];
@@ -1327,16 +1180,7 @@ describe("setup view defaults", () => {
   });
 
   it("orders the light fields by dependency and explains the full product name", async () => {
-    const element = document.createElement("measure-setup-view") as HTMLElement & {
-      capabilities: Capabilities;
-      lights: EntityDescriptor[];
-      powers: EntityDescriptor[];
-      voltages: EntityDescriptor[];
-      definitions: MeasureDefinition[];
-      selectedType: string;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power" }];

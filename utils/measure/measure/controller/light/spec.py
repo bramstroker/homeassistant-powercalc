@@ -17,6 +17,11 @@ class HassLightControllerSpec(BaseControllerSpec):
     entity_id: str = Field(pattern=LIGHT_ENTITY_PATTERN)
     transition_time: int = DEFAULT_LIGHT_TRANSITION_TIME
 
+    @property
+    def entity_ids(self) -> list[str]:
+        """Lights this spec drives, so callers can treat single and multi specs alike."""
+        return [self.entity_id]
+
 
 class HassMultiLightControllerSpec(BaseControllerSpec):
     type: Literal["hass_multi"] = "hass_multi"

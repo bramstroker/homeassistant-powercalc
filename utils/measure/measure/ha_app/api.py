@@ -153,6 +153,8 @@ class FormField(BaseModel):
     minimum: int | float | None = None
     maximum: int | float | None = None
     multiple: bool = False
+    plural_label: str = ""
+    derived_from: str | None = None
     hint: str = ""
 
 
@@ -650,6 +652,8 @@ def _measure_definitions() -> list[MeasureDefinition]:
                     minimum=field.minimum,
                     maximum=field.maximum,
                     multiple=field.multiple,
+                    plural_label=field.plural_label,
+                    derived_from=field.derived_from,
                     hint=field.hint,
                 )
                 for field in definition.fields

@@ -1,9 +1,30 @@
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 import math
 from typing import Any
 
 from measure.controller.light.const import HASS_HS_COMPATIBLE_COLOR_MODES, MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
+
+
+def merge_light_infos(infos: Sequence[LightInfo]) -> LightInfo:
+    """Reduce several lights to the color temperature range they all support."""
+
+    if not infos:
+        raise ValueError("Cannot merge an empty set of light infos")
+    return LightInfo(
+        "unknown",
+        min_mired=max(info.min_mired for info in infos),
+        max_mired=min(info.max_mired for info in infos),
+    )
+
+
+def common_effects(effect_lists: Sequence[Sequence[str]]) -> list[str]:
+    """Effects every light offers, in the order the first light lists them."""
+
+    if not effect_lists:
+        return []
+    first, *rest = effect_lists
+    return [effect for effect in first if all(effect in other for other in rest)]
 
 
 def light_info_from_attributes(attributes: Mapping[str, Any]) -> LightInfo:

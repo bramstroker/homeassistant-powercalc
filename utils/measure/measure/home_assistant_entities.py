@@ -9,6 +9,7 @@ from measure.const import (
     HASS_DEVICE_REGISTRY_MODEL,
     HASS_DEVICE_REGISTRY_MODEL_ID,
     HASS_ENTITY_DEVICE_CLASS,
+    HASS_ENTITY_GROUP_MEMBERS,
     HASS_ENTITY_UNIT_OF_MEASUREMENT,
 )
 from measure.controller.light.capabilities import light_info_from_attributes, supported_light_modes
@@ -183,29 +184,35 @@ class HomeAssistantEntityCatalog:
                 for entity in group.entities.values()
             )
         by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
+        return EntityCatalogSnapshot([_with_group_model(descriptor, by_id) for descriptor in descriptors])
 
-        def group_model(descriptor: EntityDescriptor, path: frozenset[str]) -> str | None:
-            if descriptor.model_id:
-                return descriptor.model_id
-            if descriptor.entity_id in path or not descriptor.member_entity_ids:
-                return None
-            members = [by_id.get(entity_id) for entity_id in descriptor.member_entity_ids]
-            if not members or any(member is None for member in members):
-                return None
-            resolved = [group_model(member, path | {descriptor.entity_id}) for member in members if member is not None]
-            if any(model is None for model in resolved):
-                return None
-            models = set(resolved)
-            return models.pop() if len(models) == 1 else None
 
-        enriched: list[EntityDescriptor] = []
-        for descriptor in descriptors:
-            if not descriptor.member_entity_ids or descriptor.model_id:
-                enriched.append(descriptor)
-                continue
-            model_id = group_model(descriptor, frozenset())
-            enriched.append(descriptor.model_copy(update={"model_id": model_id}) if model_id else descriptor)
-        return EntityCatalogSnapshot(enriched)
+def _with_group_model(
+    descriptor: EntityDescriptor,
+    by_id: dict[str, EntityDescriptor],
+) -> EntityDescriptor:
+    """Give a light group the model of its members, so a group can be measured as one product."""
+
+    if descriptor.model_id or not descriptor.member_entity_ids:
+        return descriptor
+    model_id = _group_model(descriptor, by_id, frozenset())
+    return descriptor.model_copy(update={"model_id": model_id}) if model_id else descriptor
+
+
+def _group_model(descriptor: EntityDescriptor, by_id: dict[str, EntityDescriptor], seen: frozenset[str]) -> str | None:
+    """Model shared by every member of a group, or None when they differ or any is unknown."""
+
+    if descriptor.model_id:
+        return descriptor.model_id
+    # Groups can nest, and a malformed one can point back at itself.
+    if descriptor.entity_id in seen or not descriptor.member_entity_ids:
+        return None
+    seen = seen | {descriptor.entity_id}
+    models = {
+        _group_model(member, by_id, seen) if (member := by_id.get(entity_id)) is not None else None
+        for entity_id in descriptor.member_entity_ids
+    }
+    return models.pop() if len(models) == 1 and None not in models else None
 
 
 def _describe_entity(
@@ -222,6 +229,7 @@ def _describe_entity(
     supported_modes = supported_light_modes(attributes) if domain == EntityDomain.LIGHT else None
     light_info = light_info_from_attributes(attributes) if domain == EntityDomain.LIGHT else None
     unit = attributes.get(HASS_ENTITY_UNIT_OF_MEASUREMENT)
+    members = attributes.get(HASS_ENTITY_GROUP_MEMBERS)
     return EntityDescriptor(
         entity_id=entity.entity_id,
         name=str(attributes.get("friendly_name", entity.entity_id)),
@@ -237,9 +245,7 @@ def _describe_entity(
         effect_list=[str(effect) for effect in attributes.get("effect_list", [])] or None,
         min_mired=light_info.get_min_mired() if light_info is not None else None,
         max_mired=light_info.get_max_mired() if light_info is not None else None,
-        member_entity_ids=[str(item) for item in attributes.get("entity_id", [])]
-        if isinstance(attributes.get("entity_id"), list)
-        else [],
+        member_entity_ids=[str(member) for member in members] if isinstance(members, list) else [],
     )
 
 
