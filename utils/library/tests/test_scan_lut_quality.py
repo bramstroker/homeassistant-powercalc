@@ -63,12 +63,59 @@ def test_ikea_led2408g10_color_temp_scans_cleanly() -> None:
     assert result.issues == []
 
 
-def test_emos_zqw516r_color_temp_scans_cleanly() -> None:
+def test_emos_zqw516r_color_temp_reports_outlier_on_first_curve_point() -> None:
+    """The first point of the 153 mired curve draws 7.9 W where its neighbors draw around 2 W."""
     lut_path = FIXTURES_DIR / "emos_zqw516r" / "color_temp.csv"
 
     result = analyze_color_temp_lut(lut_path, root=lut_path.parent)
 
     assert result.path == "color_temp.csv"
+    assert len(result.issues) == 1
+    assert result.issues[0].line == 2
+    assert result.issues[0].bri == 1
+    assert result.issues[0].mired == 153
+    assert result.issues[0].severity == "error"
+
+
+def test_last_curve_point_outlier_is_reported_with_line_number(tmp_path: Path) -> None:
+    """A broken final measurement must be blamed on itself, not on the point before it."""
+    lut_path = tmp_path / "color_temp.csv"
+    write_lut(
+        lut_path,
+        [
+            (221, 243, 9.45),
+            (226, 243, 9.66),
+            (231, 243, 9.86),
+            (236, 243, 10.05),
+            (241, 243, 10.33),
+            (255, 243, 4.0),
+        ],
+    )
+
+    result = analyze_color_temp_lut(lut_path, root=tmp_path)
+
+    assert len(result.issues) == 1
+    assert result.issues[0].bri == 255
+    assert result.issues[0].line == 7
+    assert "line 7 (brightness 255, mired 243)" in result.issues[0].message
+
+
+def test_uneven_brightness_steps_are_weighted_by_brightness(tmp_path: Path) -> None:
+    """A straight line stays clean even when the brightness steps are not evenly spaced."""
+    lut_path = tmp_path / "color_temp.csv"
+    write_lut(
+        lut_path,
+        [
+            (1, 200, 1.0),
+            (2, 200, 1.1),
+            (3, 200, 1.2),
+            (100, 200, 10.9),
+            (200, 200, 20.9),
+        ],
+    )
+
+    result = analyze_color_temp_lut(lut_path, root=tmp_path)
+
     assert result.issues == []
 
 
