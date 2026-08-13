@@ -1263,15 +1263,15 @@
           },
           "id": "KL135",
           "manufacturer": "tp-link",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "color_temp",
-            "hs",
-            "brightness"
+            "hs"
           ],
-          "hash": "be6bb75ea78230111ac6d81fb56e8550"
+          "hash": "b72acad90520ad3a01161e7bf4ddf21c"
         },
         {
           "aliases": [
@@ -1371,10 +1371,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
-          "hash": "12913c146371fe0a2b9f386046cd1f0f"
+          "hash": "6135cea77f7d32aec4a5646dd461871b"
         },
         {
           "calculation_strategy": "fixed",
@@ -3273,10 +3273,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "brightness"
+            "brightness",
+            "color_temp"
           ],
-          "hash": "51d6a5a799c60715b1116bb7fde6df41"
+          "hash": "24fd57573ae45a89adc35b6a1a181546"
         },
         {
           "aliases": [
@@ -4161,11 +4161,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "color_temp",
-            "hs",
-            "brightness"
+            "hs"
           ],
-          "hash": "99be3df5354795320ca46777c8b394af"
+          "hash": "0ea41b10b1367b9a55058514e0791d28"
         }
       ],
       "device_types": [
@@ -5529,14 +5529,14 @@
           },
           "id": "sl2",
           "manufacturer": "gosund",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 16.1,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "3c5c00eef772f0f9d24303422f9e6761"
+          "hash": "95ad957232770c6172c60b19f19c03a8"
         }
       ],
       "device_types": [
@@ -9647,7 +9647,7 @@
           },
           "id": "LGT009",
           "manufacturer": "signify",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 11.86,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9655,7 +9655,7 @@
             "hs",
             "effect"
           ],
-          "hash": "7c39f308bfcfa1648f50fbb2d5f290e9"
+          "hash": "f16a100860d18ae56ca7d9d90f4ef161"
         },
         {
           "calculation_strategy": "lut",
@@ -9705,10 +9705,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "brightness"
+            "brightness",
+            "effect"
           ],
-          "hash": "59bfe229e936e3b5c259fab7a0fbb28b"
+          "hash": "728e12409f1fa364a4a7b3abb6498a73"
         },
         {
           "aliases": [
@@ -11805,7 +11805,7 @@
           },
           "id": "LCX027",
           "manufacturer": "signify",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 29.03,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11813,7 +11813,7 @@
             "hs",
             "effect"
           ],
-          "hash": "a78f3b96a1b279284c564c9185b6d08e"
+          "hash": "f4b34c60c0647cfa9eea1cdc4efeddaf"
         },
         {
           "calculation_strategy": "lut",
@@ -11834,14 +11834,14 @@
           },
           "id": "LCX028",
           "manufacturer": "signify",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 19.45,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "2bae514a7a330bb6354f62bc8a28bed8"
+          "hash": "629bdbee9973d9d0435751964720760b"
         },
         {
           "calculation_strategy": "lut",
@@ -12735,7 +12735,7 @@
           },
           "id": "929004608002",
           "manufacturer": "signify",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 41.45,
           "sub_profile_count": 0,
           "color_modes": [
@@ -12743,7 +12743,7 @@
             "hs",
             "effect"
           ],
-          "hash": "38dd05bb1effd191c9400a449c7f1d32"
+          "hash": "a56ce2d46fc0969a3f05ff15ecdd5d40"
         },
         {
           "aliases": [
@@ -13516,13 +13516,13 @@
           },
           "id": "LWB022",
           "manufacturer": "signify",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 8.56,
           "sub_profile_count": 0,
           "color_modes": [
             "brightness"
           ],
-          "hash": "e7c1bc395325fbd2827ba1ab5ef0c29a"
+          "hash": "1ed8aa114a164c279521a4b54938fe3d"
         },
         {
           "aliases": [
@@ -14508,14 +14508,14 @@
           },
           "id": "LCL001",
           "manufacturer": "signify",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 21.14,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "ef593ae20130fb12022ef5a19aff7984"
+          "hash": "731bb0f8bd910a61760f06389ed245e8"
         },
         {
           "aliases": [
@@ -14941,14 +14941,14 @@
           },
           "id": "LCD007",
           "manufacturer": "signify",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 12.59,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "bb861595fec2db84b36e2407f4b29947"
+          "hash": "d0b13a4041ec7cfcfd4685ad3e5fd490"
         },
         {
           "aliases": [
@@ -16182,6 +16182,35 @@
             "hs"
           ],
           "hash": "76a45bc5669b9c7d861d9f2ba533c766"
+        },
+        {
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-10T01:00:53Z",
+          "device_type": "light",
+          "max_voltage": 121.41,
+          "measure_device": "Tapo P110M",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.3.0:app"
+          },
+          "min_voltage": 118.95,
+          "name": "Matter RGBCW A19 E26 Smart Bulb",
+          "aliases": [
+            "1718"
+          ],
+          "standby_power": 0.22,
+          "id": "LI-A19-11W-MT",
+          "manufacturer": "lightinginside",
+          "updated_at": "2026-08-13T14:47:02",
+          "max_power": 10.96,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "hash": "3592b391f0b58ee7ab31a4ffcfeca496"
         }
       ],
       "device_types": [
@@ -20124,14 +20153,14 @@
           },
           "id": "H14C0",
           "manufacturer": "govee",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 5.25,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "7c5a3e0d0a3e0957d72883f33356c4b3"
+          "hash": "473f1bd560915c9e4ff2a5848ef62069"
         },
         {
           "calculation_strategy": "lut",
@@ -20156,11 +20185,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "color_temp",
-            "hs",
-            "brightness"
+            "hs"
           ],
-          "hash": "5eb0d01e1838de755e0370de2f817bc1"
+          "hash": "473c7a0bef33f4a9bcabc37718f641a0"
         },
         {
           "calculation_strategy": "lut",
@@ -21807,14 +21836,14 @@
           },
           "id": "ZQW516R",
           "manufacturer": "emos",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T08:03:22",
           "max_power": 13.85,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
-          "hash": "f4f1cf64bf6cd512ebbbf86d2f847ea7"
+          "hash": "d70aead3e0dc1f1ba55f520c0d0da5a9"
         },
         {
           "calculation_strategy": "lut",
