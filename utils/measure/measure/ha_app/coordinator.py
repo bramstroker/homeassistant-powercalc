@@ -69,6 +69,22 @@ class MeasurementCoordinator:
         with self._lock:
             return self._snapshot
 
+    def get(self, session_id: str) -> SessionSnapshot:
+        """Return the live projection or a stored historical snapshot."""
+        with self._lock:
+            if self._snapshot is not None and self._snapshot.id == session_id:
+                return self._snapshot
+        return self.storage.load_snapshot(session_id)
+
+    def sessions(self) -> tuple[SessionSnapshot, ...]:
+        """Return all retained sessions with the live projection substituted."""
+        stored = self.storage.list_sessions()
+        with self._lock:
+            current = self._snapshot
+            if current is None:
+                return stored
+            return tuple(current if snapshot.id == current.id else snapshot for snapshot in stored)
+
     def start(self, request: MeasurementRequest) -> SessionSnapshot:
         """Persist and launch a new session, rejecting overlapping work."""
 
@@ -85,40 +101,51 @@ class MeasurementCoordinator:
                 updated_at=now,
             )
             self.storage.create(snapshot, request)
-            # Bound add-on storage: keep the new session, plus the replaced one when the
-            # operator chose to preserve its output instead of overwriting it.
-            keep = {snapshot.id}
-            if request.resume_policy != ResumePolicy.OVERWRITE and self._snapshot is not None:
-                keep.add(self._snapshot.id)
-            self.storage.prune_sessions(keep)
             self._snapshot = snapshot
             self._events = []
             self._last_snapshot_write = 0.0
             self._launch_locked(request)
             return self._snapshot
 
-    def resume(self) -> SessionSnapshot:
-        """Relaunch the current session from compatible persisted output."""
+    def resume(self, session_id: str | None = None) -> SessionSnapshot:
+        """Relaunch a retained session from compatible persisted output."""
 
         with self._lock:
-            if self._snapshot is None or self._snapshot.state not in {
+            if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
+                raise SessionConflictError("A measurement session is already active")
+            target_id = session_id or (self._snapshot.id if self._snapshot is not None else None)
+            if target_id is None:
+                raise SessionConflictError("There is no session to resume")
+            try:
+                snapshot = (
+                    self._snapshot
+                    if self._snapshot is not None and self._snapshot.id == target_id
+                    else self.storage.load_snapshot(target_id)
+                )
+            except (FileNotFoundError, KeyError, TypeError, ValueError) as error:
+                raise SessionConflictError("The requested session does not exist") from error
+            if snapshot.state not in {
                 SessionState.RESUMABLE,
                 SessionState.CANCELLED,
                 SessionState.FAILED,
             }:
-                raise SessionConflictError("The current session cannot be resumed")
-            if not self.storage.can_resume(self._snapshot.id):
-                raise SessionConflictError("The current session has no compatible complete row to resume")
-            request = self.storage.load_request(self._snapshot.id).model_copy(
+                raise SessionConflictError("The requested session cannot be resumed")
+            if not self.storage.can_resume(snapshot.id):
+                raise SessionConflictError("The requested session has no compatible complete row to resume")
+            self._snapshot = snapshot
+            self._events = list(self.storage.load_events(snapshot.id))
+            self.storage.set_current(snapshot.id)
+            request = self.storage.load_request(snapshot.id).model_copy(
                 update={"resume_policy": ResumePolicy.RESUME},
             )
             self._launch_locked(request)
             return self._snapshot
 
-    def cancel(self) -> SessionSnapshot:
+    def cancel(self, session_id: str | None = None) -> SessionSnapshot:
         """Persist cancellation intent and signal the worker cooperatively."""
 
         with self._lock:
+            self._require_current_id(session_id)
             if self._snapshot is not None and self._snapshot.state == SessionState.CANCELLED:
                 return self._snapshot
             if self._snapshot is None or self._snapshot.state not in {
@@ -140,10 +167,11 @@ class MeasurementCoordinator:
                 self._control.cancel()
             return self._snapshot
 
-    def confirm(self) -> SessionSnapshot:
+    def confirm(self, session_id: str | None = None) -> SessionSnapshot:
         """Release a worker paused at an operator checkpoint."""
 
         with self._lock:
+            self._require_current_id(session_id)
             if self._snapshot is None or self._snapshot.state != SessionState.AWAITING_CONFIRMATION:
                 raise SessionConflictError("The current session is not waiting for confirmation")
             if self._control is None:
@@ -159,11 +187,37 @@ class MeasurementCoordinator:
             self._control.continue_run()
             return self._snapshot
 
-    def events_since(self, sequence: int) -> tuple[SessionEvent, ...]:
-        """Return buffered events after ``sequence`` for client replay."""
-
+    def delete(self, session_id: str) -> None:
+        """Delete a terminal retained session."""
         with self._lock:
-            return tuple(event for event in self._events if event.sequence > sequence)
+            try:
+                snapshot = (
+                    self._snapshot
+                    if self._snapshot is not None and self._snapshot.id == session_id
+                    else self.storage.load_snapshot(session_id)
+                )
+            except (FileNotFoundError, KeyError, TypeError, ValueError) as error:
+                raise SessionConflictError("The requested session does not exist") from error
+            if snapshot.state in ACTIVE_SESSION_STATES:
+                raise SessionConflictError("An active measurement session cannot be deleted")
+            self.storage.delete_session(session_id)
+            if self._snapshot is not None and self._snapshot.id == session_id:
+                self._snapshot = None
+                self._events = []
+
+    def _require_current_id(self, session_id: str | None) -> None:
+        if session_id is not None and (self._snapshot is None or self._snapshot.id != session_id):
+            raise SessionConflictError("The requested session is not active")
+
+    def events_since(self, sequence: int, session_id: str | None = None) -> tuple[SessionEvent, ...]:
+        """Return events after ``sequence`` for a live or retained session."""
+        with self._lock:
+            target_id = session_id or (self._snapshot.id if self._snapshot is not None else None)
+            if target_id is None:
+                return ()
+            if self._snapshot is not None and self._snapshot.id == target_id:
+                return tuple(event for event in self._events if event.sequence > sequence)
+        return tuple(event for event in self.storage.load_events(target_id) if event.sequence > sequence)
 
     def _launch_locked(self, request: MeasurementRequest) -> None:
         """Create session control and launch the worker while holding the coordinator lock."""

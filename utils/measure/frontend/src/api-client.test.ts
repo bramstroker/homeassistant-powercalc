@@ -27,8 +27,8 @@ describe("MeasureApiClient", () => {
       new URL("http://ha.local/api/hassio_ingress/token/api/capabilities"),
       expect.objectContaining({ headers: expect.any(Headers) }),
     );
-    expect(client.fileUrl("model data.json")).toBe("http://ha.local/api/hassio_ingress/token/api/session/current/files/model%20data.json");
-    expect(client.diagnosticsUrl()).toBe("http://ha.local/api/hassio_ingress/token/api/session/current/diagnostics");
+    expect(client.fileUrl("session 1", "model data.json")).toBe("http://ha.local/api/hassio_ingress/token/api/sessions/session%201/files/model%20data.json");
+    expect(client.diagnosticsUrl("session 1")).toBe("http://ha.local/api/hassio_ingress/token/api/sessions/session%201/diagnostics");
     expect(apiUrl("api/entities", "http://ha.local/prefix/").pathname).toBe("/prefix/api/entities");
   });
 
@@ -37,9 +37,9 @@ describe("MeasureApiClient", () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(plots));
     const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
 
-    await expect(client.getPlots()).resolves.toEqual(plots);
+    await expect(client.getPlots("session-1")).resolves.toEqual(plots);
     expect(fetcher).toHaveBeenCalledWith(
-      new URL("http://ha.local/prefix/api/session/current/plots"),
+      new URL("http://ha.local/prefix/api/sessions/session-1/plots"),
       expect.objectContaining({ headers: expect.any(Headers) }),
     );
   });
@@ -66,7 +66,7 @@ describe("MeasureApiClient", () => {
     expect(fetcher).toHaveBeenNthCalledWith(5, new URL("http://ha.local/prefix/api/contribution/auth"), expect.objectContaining({ method: "DELETE" }));
   });
 
-  it("uses the current-session contribution endpoints below the ingress prefix", async () => {
+  it("uses ID-addressed contribution endpoints below the ingress prefix", async () => {
     const preview = {
       eligible: true,
       repository: "bramstroker/homeassistant-powercalc",
@@ -92,13 +92,13 @@ describe("MeasureApiClient", () => {
       .mockResolvedValueOnce(response({ status: "success", pull_request_url: "https://github.com/pull/1" }));
     const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
 
-    await client.getContributionDraft();
-    await client.previewContribution({ manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "" });
-    await client.submitContribution({ manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "", confirmed: true });
+    await client.getContributionDraft("session-1");
+    await client.previewContribution("session-1", { manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "" });
+    await client.submitContribution("session-1", { manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "", confirmed: true });
 
-    expect(fetcher).toHaveBeenNthCalledWith(1, new URL("http://ha.local/prefix/api/session/current/contribution"), expect.anything());
-    expect(fetcher).toHaveBeenNthCalledWith(2, new URL("http://ha.local/prefix/api/session/current/contribution/preview"), expect.objectContaining({ method: "POST" }));
-    expect(fetcher).toHaveBeenNthCalledWith(3, new URL("http://ha.local/prefix/api/session/current/contribution"), expect.objectContaining({ method: "POST" }));
+    expect(fetcher).toHaveBeenNthCalledWith(1, new URL("http://ha.local/prefix/api/sessions/session-1/contribution"), expect.anything());
+    expect(fetcher).toHaveBeenNthCalledWith(2, new URL("http://ha.local/prefix/api/sessions/session-1/contribution/preview"), expect.objectContaining({ method: "POST" }));
+    expect(fetcher).toHaveBeenNthCalledWith(3, new URL("http://ha.local/prefix/api/sessions/session-1/contribution"), expect.objectContaining({ method: "POST" }));
   });
 
   it("loads the matching dummy-load calibration below the ingress prefix", async () => {
@@ -161,8 +161,12 @@ describe("MeasureApiClient", () => {
   });
 
   it("surfaces stable API errors", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ code: "active_session", message: "Already measuring", field: null }, 409));
-    await expect(new MeasureApiClient(fetcher, "http://ha.local/prefix/").cancel()).rejects.toEqual(
+    const fetcher = vi.fn<typeof fetch>().mockImplementation(async () => response({ code: "active_session", message: "Already measuring", field: null }, 409));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+    await expect(client.cancel("session-1")).rejects.toEqual(
+      expect.objectContaining({ status: 409, code: "active_session", message: "Already measuring" }),
+    );
+    await expect(client.deleteSession("session-1")).rejects.toEqual(
       expect.objectContaining({ status: 409, code: "active_session", message: "Already measuring" }),
     );
   });

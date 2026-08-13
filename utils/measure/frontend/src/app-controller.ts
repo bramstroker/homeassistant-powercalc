@@ -1,5 +1,8 @@
 import { ApiError } from "./api-client";
+import type { MeasureApiClient } from "./api-client";
 import { entityDomains } from "./measurement-kinds";
+import { meterFor } from "./power-meter";
+import { emptyPlots } from "./types";
 import type {
   AppSettings,
   AppSettingsUpdate,
@@ -12,9 +15,7 @@ import type {
   ContributionResult,
   ContributionStatus,
   ContributionSubmitRequest,
-  DeviceClass,
   DummyLoadCalibration,
-  EntityCatalog,
   EntityDescriptor,
   MeasureDefinition,
   MeasureType,
@@ -25,12 +26,13 @@ import type {
   SessionEvent,
   SessionFile,
   SessionSnapshot,
+  SessionState,
+  SessionSummary,
   SettingsSection,
   ShellyDiscoveryDevice,
-  ShellyDiscoveryResponse,
 } from "./types";
 
-export type AppView = "loading" | "setup" | "review" | "running" | "result" | "settings";
+export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | "result" | "settings";
 
 export interface MeasureAppState {
   view: AppView;
@@ -39,6 +41,7 @@ export interface MeasureAppState {
   busy: boolean;
   connectedToEvents: boolean;
   snapshot?: SessionSnapshot;
+  sessions: SessionSummary[];
   request?: MeasurementRequest;
   selectedMeasureType?: MeasureType;
   preflight?: PreflightResponse;
@@ -75,35 +78,11 @@ export interface MeasureAppState {
   shellyDiscoveryMessage?: string | null;
 }
 
-export interface MeasureAppApi {
-  getCapabilities(): Promise<Capabilities>;
-  getMeasureDefinitions(): Promise<MeasureDefinition[]>;
-  getSettings(): Promise<AppSettings>;
-  getContributionAuth(): Promise<ContributionAuthState>;
-  getContributionStatus(): Promise<ContributionStatus>;
-  startContributionDeviceAuth(): Promise<ContributionDeviceFlow>;
-  getContributionDeviceAuth(flowId: string): Promise<ContributionAuthDeviceStatus>;
-  saveContributionToken(token: string): Promise<ContributionAuthState>;
-  disconnectContributionAuth(): Promise<ContributionAuthState>;
-  saveSettings(settings: AppSettingsUpdate): Promise<AppSettings>;
-  testPowerMeter(settings: AppSettingsUpdate): Promise<PowerMeterDiagnostic>;
-  getShellyDevices(): Promise<ShellyDiscoveryResponse>;
-  getEntityCatalog(): Promise<EntityCatalog>;
-  getEntitiesByDomain(domain: string): Promise<EntityDescriptor[]>;
-  getEntitiesByDeviceClass(deviceClass: DeviceClass): Promise<EntityDescriptor[]>;
-  getDummyLoadCalibration(): Promise<DummyLoadCalibration | null>;
-  preflight(request: MeasurementRequest): Promise<PreflightResponse>;
-  start(request: MeasurementRequest): Promise<SessionSnapshot>;
-  getCurrent(): Promise<SessionSnapshot>;
-  cancel(): Promise<SessionSnapshot>;
-  confirm(): Promise<SessionSnapshot>;
-  resume(): Promise<SessionSnapshot>;
-  getFiles(): Promise<SessionFile[]>;
-  getPlots(): Promise<PlotCollection>;
-  getContributionDraft(): Promise<ContributionPreview>;
-  previewContribution(request: ContributionPreviewRequest): Promise<ContributionPreview>;
-  submitContribution(request: ContributionSubmitRequest): Promise<ContributionResult>;
-}
+/**
+ * Everything the controller calls on the API client. Derived from the client itself so the two
+ * cannot drift; the URL builders are excluded because only the shell hands those to its views.
+ */
+export type MeasureAppApi = Omit<MeasureApiClient, "fileUrl" | "diagnosticsUrl" | "eventsUrl">;
 
 export interface EventConnection {
   connect(): void;
@@ -116,7 +95,7 @@ interface EventCallbacks {
   onReconnect: () => void;
 }
 
-type EventConnectionFactory = (callbacks: EventCallbacks) => EventConnection;
+type EventConnectionFactory = (sessionId: string, callbacks: EventCallbacks) => EventConnection;
 
 /** Framework-neutral application controller. Lit only observes the state mutations. */
 export class MeasureAppController {
@@ -149,17 +128,13 @@ export class MeasureAppController {
     this.changed();
     try {
       const api = this.api();
-      const currentPromise = api.getCurrent().catch((error: unknown) => {
-        if (error instanceof ApiError && error.status === 404) return { state: "idle" } satisfies SessionSnapshot;
-        throw error;
-      });
       const calibrationPromise = this.refreshDummyLoadCalibration();
-      const [capabilities, entities, settings, auth, snapshot, definitions] = await Promise.all([
+      const [capabilities, entities, settings, auth, sessions, definitions] = await Promise.all([
         api.getCapabilities(),
         api.getEntityCatalog(),
         api.getSettings(),
         api.getContributionAuth().catch(() => ({ connected: false }) satisfies ContributionAuthState),
-        currentPromise,
+        api.getSessions(),
         api.getMeasureDefinitions(),
       ]);
       this.state.capabilities = capabilities;
@@ -168,10 +143,12 @@ export class MeasureAppController {
       this.state.voltages = entities.voltages;
       this.state.settings = settings;
       this.state.contributionAuth = auth;
-      this.state.snapshot = snapshot;
+      this.state.sessions = sessions;
+      const active = sessions.find((session) => session.active);
+      this.state.snapshot = active ? await api.getSession(active.session_id) : undefined;
       this.state.definitions = definitions;
       await calibrationPromise;
-      this.state.request = this.state.snapshot.request;
+      this.state.request = this.state.snapshot?.request;
       if (this.state.request) await this.loadTypeEntities(this.state.request.measure_type);
       await this.routeSnapshot();
     } catch (error) {
@@ -191,19 +168,11 @@ export class MeasureAppController {
   }
 
   async preflight(request: MeasurementRequest): Promise<void> {
-    this.state.busy = true;
-    this.state.errorMessage = "";
     this.state.request = request;
-    this.changed();
-    try {
+    await this.run(async () => {
       this.state.preflight = await this.api().preflight(request);
       this.state.view = "review";
-    } catch (error) {
-      this.state.errorMessage = message(error);
-    } finally {
-      this.state.busy = false;
-      this.changed();
-    }
+    });
   }
 
   backToSetup(): void {
@@ -213,66 +182,100 @@ export class MeasureAppController {
   }
 
   async start(): Promise<void> {
-    if (!this.state.request) return;
-    this.state.busy = true;
-    this.state.errorMessage = "";
+    const request = this.state.request;
+    if (!request) return;
     this.state.samples = [];
-    this.state.plotCollection = { partial: false, plots: [], warnings: [] };
-    this.changed();
-    try {
-      this.state.snapshot = await this.api().start(this.state.request);
-      this.state.view = "running";
-      this.connectEvents();
-    } catch (error) {
-      this.state.errorMessage = message(error);
-    } finally {
-      this.state.busy = false;
-      this.changed();
-    }
+    this.state.plotCollection = emptyPlots();
+    await this.run(async () => {
+      this.state.snapshot = await this.api().start(request);
+      await this.enterRunning();
+    });
   }
 
   async confirm(): Promise<void> {
-    await this.sessionCommand("Confirmation", () => this.api().confirm());
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
+    await this.sessionCommand("Confirmation", () => this.api().confirm(sessionId));
   }
 
   async cancel(): Promise<void> {
-    await this.sessionCommand("Cancellation", () => this.api().cancel());
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
+    await this.sessionCommand("Cancellation", () => this.api().cancel(sessionId));
   }
 
   async resume(): Promise<void> {
-    this.state.busy = true;
-    this.state.errorMessage = "";
-    this.state.plotCollection = { partial: false, plots: [], warnings: [] };
-    this.changed();
-    try {
-      this.state.snapshot = await this.api().resume();
-      this.state.view = "running";
-      this.connectEvents();
-    } catch (error) {
-      this.state.errorMessage = message(error);
-    } finally {
-      this.state.busy = false;
-      this.changed();
-    }
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
+    this.state.plotCollection = emptyPlots();
+    await this.run(async () => {
+      this.state.snapshot = await this.api().resume(sessionId);
+      await this.enterRunning();
+    });
   }
 
   newMeasurement(): void {
-    this.eventConnection?.close();
-    this.state.snapshot = { state: "idle" };
-    this.state.request = undefined;
-    this.state.selectedMeasureType = undefined;
-    this.state.preflight = undefined;
-    this.state.files = [];
-    this.state.plotCollection = { partial: false, plots: [], warnings: [] };
-    this.state.logs = [];
-    this.state.samples = [];
-    this.state.contributionDraft = undefined;
-    this.state.contributionPreview = undefined;
-    this.state.contributionResult = undefined;
-    this.state.contributionError = "";
-    this.state.errorMessage = "";
+    this.resetDraft();
     this.state.view = "setup";
     this.changed();
+  }
+
+  replaceDraftEnvironment(powerMeter: MeasurementRequest["power_meter"], measureDevice: string): void {
+    if (!this.state.request) return;
+    this.state.request = { ...this.state.request, power_meter: powerMeter, measure_device: measureDevice };
+    this.changed();
+  }
+
+  async showSessions(): Promise<void> {
+    this.eventConnection?.close();
+    this.state.connectedToEvents = false;
+    await this.run(async () => {
+      await this.refreshSessions();
+      this.state.view = "sessions";
+    });
+  }
+
+  async openSession(sessionId: string): Promise<void> {
+    await this.run(async () => {
+      const snapshot = await this.api().getSession(sessionId);
+      this.state.snapshot = snapshot;
+      await this.adoptRequest(snapshot.request);
+      if (isActive(snapshot.state)) {
+        this.state.view = "running";
+        this.connectEvents();
+      } else {
+        await this.enterResult();
+      }
+    });
+  }
+
+  async resumeSession(sessionId: string): Promise<void> {
+    this.state.plotCollection = emptyPlots();
+    await this.run(async () => {
+      const snapshot = await this.api().resume(sessionId);
+      this.state.snapshot = snapshot;
+      await this.adoptRequest(snapshot.request);
+      await this.enterRunning();
+    });
+  }
+
+  async duplicateSession(sessionId: string): Promise<void> {
+    await this.run(async () => {
+      const snapshot = await this.api().getSession(sessionId);
+      if (!snapshot.request) throw new Error("The stored session has no reusable configuration.");
+      const draft = { ...snapshot.request, resume_policy: "new" as const };
+      this.resetDraft(draft);
+      await this.loadTypeEntities(draft.measure_type);
+      this.state.view = "setup";
+    });
+  }
+
+  async deleteSession(sessionId: string): Promise<void> {
+    await this.run(async () => {
+      await this.api().deleteSession(sessionId);
+      if (this.state.snapshot?.session_id === sessionId) this.state.snapshot = undefined;
+      await this.refreshSessions();
+    });
   }
 
   openSettings(section?: SettingsSection): void {
@@ -285,7 +288,8 @@ export class MeasureAppController {
     this.state.testingPowerMeter = false;
     this.state.view = "settings";
     this.changed();
-    if (this.state.settings?.power_meter === "shelly") void this.discoverShellys();
+    const meter = this.state.settings?.power_meter;
+    if (meter && meterFor(meter).discoverable) void this.discoverShellys();
   }
 
   closeSettings(): void {
@@ -353,22 +357,14 @@ export class MeasureAppController {
   }
 
   async saveSettings(settings: AppSettingsUpdate): Promise<void> {
-    this.state.busy = true;
-    this.state.errorMessage = "";
-    this.changed();
-    try {
+    await this.run(async () => {
       this.state.settings = await this.api().saveSettings(settings);
       [this.state.capabilities] = await Promise.all([
         this.api().getCapabilities(),
         this.refreshDummyLoadCalibration(),
       ]);
       this.state.view = this.settingsReturnView;
-    } catch (error) {
-      this.state.errorMessage = message(error);
-    } finally {
-      this.state.busy = false;
-      this.changed();
-    }
+    });
   }
 
   async startContributionDeviceAuth(): Promise<void> {
@@ -526,32 +522,20 @@ export class MeasureAppController {
   }
 
   async previewContribution(request: ContributionPreviewRequest): Promise<void> {
-    this.state.contributionBusy = true;
-    this.state.contributionError = "";
-    this.changed();
-    try {
-      this.state.contributionPreview = await this.api().previewContribution(request);
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
+    await this.runContribution(async () => {
+      this.state.contributionPreview = await this.api().previewContribution(sessionId, request);
       this.state.contributionResult = undefined;
-    } catch (error) {
-      this.state.contributionError = message(error);
-    } finally {
-      this.state.contributionBusy = false;
-      this.changed();
-    }
+    });
   }
 
   async submitContribution(request: ContributionSubmitRequest): Promise<void> {
-    this.state.contributionBusy = true;
-    this.state.contributionError = "";
-    this.changed();
-    try {
-      this.state.contributionResult = await this.api().submitContribution(request);
-    } catch (error) {
-      this.state.contributionError = message(error);
-    } finally {
-      this.state.contributionBusy = false;
-      this.changed();
-    }
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
+    await this.runContribution(async () => {
+      this.state.contributionResult = await this.api().submitContribution(sessionId, request);
+    });
   }
 
   async retryDummyLoadCalibration(): Promise<void> {
@@ -598,17 +582,14 @@ export class MeasureAppController {
       this.connectEvents();
       return;
     }
-    if (isTerminal(state)) {
-      this.state.view = "result";
-      await this.loadResultArtifacts();
-      return;
-    }
-    this.state.view = "setup";
+    this.state.view = "sessions";
   }
 
   private connectEvents(): void {
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
     this.eventConnection?.close();
-    this.eventConnection = this.createEventConnection({
+    this.eventConnection = this.createEventConnection(sessionId, {
       onEvent: (event) => this.consumeEvent(event),
       onConnection: (connected) => {
         this.state.connectedToEvents = connected;
@@ -632,8 +613,10 @@ export class MeasureAppController {
   }
 
   private async refreshSnapshot(): Promise<void> {
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
     try {
-      this.state.snapshot = await this.api().getCurrent();
+      this.state.snapshot = await this.api().getSession(sessionId);
       if (isTerminal(this.state.snapshot.state)) await this.enterResult();
     } catch {
       this.state.connectedToEvents = false;
@@ -647,7 +630,79 @@ export class MeasureAppController {
     if (this.state.view === "settings") this.settingsReturnView = "result";
     else this.state.view = "result";
     await this.loadResultArtifacts();
+    await this.refreshSessions();
     this.changed();
+  }
+
+  private async refreshSessions(): Promise<void> {
+    try {
+      this.state.sessions = await this.api().getSessions();
+    } catch (error) {
+      this.state.errorMessage ||= `Could not refresh measurement sessions: ${message(error)}`;
+    }
+  }
+
+  private resetDraft(request?: MeasurementRequest): void {
+    this.eventConnection?.close();
+    this.state.connectedToEvents = false;
+    this.state.snapshot = { state: "idle" };
+    this.state.request = request;
+    this.state.selectedMeasureType = request?.measure_type;
+    this.state.preflight = undefined;
+    this.state.files = [];
+    this.state.plotCollection = emptyPlots();
+    this.state.logs = [];
+    this.state.samples = [];
+    this.state.contributionDraft = undefined;
+    this.state.contributionPreview = undefined;
+    this.state.contributionResult = undefined;
+    this.state.contributionError = "";
+    this.state.errorMessage = "";
+  }
+
+  /**
+   * Shared shape of every user-triggered command: mark the app busy, report a failure in the
+   * error banner, and notify the view once before and once after the work.
+   */
+  private async run(work: () => Promise<void>): Promise<void> {
+    this.state.busy = true;
+    this.state.errorMessage = "";
+    this.changed();
+    try {
+      await work();
+    } catch (error) {
+      this.state.errorMessage = message(error);
+    } finally {
+      this.state.busy = false;
+      this.changed();
+    }
+  }
+
+  /** The same, for contribution work, which reports into its own busy flag and error banner. */
+  private async runContribution(work: () => Promise<void>): Promise<void> {
+    this.state.contributionBusy = true;
+    this.state.contributionError = "";
+    this.changed();
+    try {
+      await work();
+    } catch (error) {
+      this.state.contributionError = message(error);
+    } finally {
+      this.state.contributionBusy = false;
+      this.changed();
+    }
+  }
+
+  /** Adopt the configuration a stored session was started with, so the draft and forms match it. */
+  private async adoptRequest(request?: MeasurementRequest): Promise<void> {
+    this.state.request = request;
+    if (request) await this.loadTypeEntities(request.measure_type);
+  }
+
+  private async enterRunning(): Promise<void> {
+    await this.refreshSessions();
+    this.state.view = "running";
+    this.connectEvents();
   }
 
   private async sessionCommand(label: string, command: () => Promise<SessionSnapshot>): Promise<void> {
@@ -664,18 +719,18 @@ export class MeasureAppController {
   }
 
   private async loadResultArtifacts(): Promise<void> {
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
     const [files, plots, calibration, auth, contribution, contributionStatus] = await Promise.allSettled([
-      this.api().getFiles(),
-      this.api().getPlots(),
+      this.api().getFiles(sessionId),
+      this.api().getPlots(sessionId),
       this.api().getDummyLoadCalibration(),
       this.api().getContributionAuth(),
-      this.api().getContributionDraft(),
+      this.api().getContributionDraft(sessionId),
       this.api().getContributionStatus(),
     ]);
     this.state.files = files.status === "fulfilled" ? files.value : [];
-    this.state.plotCollection = plots.status === "fulfilled"
-      ? plots.value
-      : { partial: false, plots: [], warnings: ["Plots could not be loaded."] };
+    this.state.plotCollection = plots.status === "fulfilled" ? plots.value : emptyPlots(["Plots could not be loaded."]);
     if (calibration.status === "fulfilled") this.state.dummyLoadCalibration = calibration.value;
     if (auth.status === "fulfilled") this.state.contributionAuth = auth.value;
     if (contribution.status === "fulfilled") {
@@ -712,12 +767,15 @@ export class MeasureAppController {
   }
 }
 
-function isActive(state: SessionSnapshot["state"]): boolean {
-  return ["running", "awaiting_confirmation", "cancelling", "validating", "ready"].includes(state);
+const ACTIVE_STATES: ReadonlySet<SessionState> = new Set(["running", "awaiting_confirmation", "cancelling", "validating", "ready"]);
+const TERMINAL_STATES: ReadonlySet<SessionState> = new Set(["completed", "failed", "cancelled", "resumable"]);
+
+function isActive(state: SessionState): boolean {
+  return ACTIVE_STATES.has(state);
 }
 
-function isTerminal(state: SessionSnapshot["state"]): boolean {
-  return ["completed", "failed", "cancelled", "resumable"].includes(state);
+function isTerminal(state: SessionState): boolean {
+  return TERMINAL_STATES.has(state);
 }
 
 function message(error: unknown): string {

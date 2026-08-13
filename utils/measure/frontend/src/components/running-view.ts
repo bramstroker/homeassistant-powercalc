@@ -1,7 +1,9 @@
 import { LitElement, css, html, nothing, svg, type PropertyValues } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import type { OperatingPoint, SessionProgress, SessionSnapshot } from "../types";
-import { sharedStyles } from "../styles";
+import { emit } from "../events";
+import { remaining } from "../format";
+import { diagnosticsDownload, sharedStyles } from "../styles";
 
 type StateChipIcon =
   | "battery"
@@ -99,7 +101,6 @@ export class RunningView extends LitElement {
     .ready-card.warning .ready-eyebrow { color: var(--warning); }
     .ready-message { max-width: 620px; color: var(--muted); line-height: 1.6; white-space: pre-line; }
     .ready-topline { display: flex; justify-content: flex-end; align-items: center; gap: 0.9rem; width: 100%; }
-    @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes prepare { 0% { transform: translateX(-105%); } 50% { transform: translateX(165%); } 100% { transform: translateX(-105%); } }
     @media (max-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } .topline { align-items: flex-start; flex-direction: column; } }
     @media (prefers-reduced-motion: reduce) {
@@ -127,24 +128,36 @@ export class RunningView extends LitElement {
         <div class="instrument">
           <div class="topline">
             <span class="muted" aria-live="polite">${this.snapshot.phase ?? "Preparing measurement"}</span>
-            <span class="topline-right">
-              ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>View log <span class="log-count">${this.logs.length}</span></button>` : nothing}
-              <span class="connection ${this.connected ? "connected" : ""}" role="status">${this.connected ? "Live" : "Reconnecting"}</span>
-            </span>
+            <span class="topline-right">${this.renderLogToggle()}${this.renderConnection(true)}</span>
           </div>
           ${preparing ? this.renderPreparation() : this.renderMeasurement(openEnded, progress)}
         </div>
-        ${this.renderLatestWarning()}
-        ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
-        <div class="diagnostics-download">
-          <span>Session snapshot and logs for issue reporting.</span>
-          <a href=${this.diagnosticsUrl} download>Download diagnostics</a>
-        </div>
-        <div class="actions">
-          ${this.renderStopButton(openEnded)}
-        </div>
+        ${this.renderFooter(openEnded)}
       </section>
     `;
+  }
+
+  /** Warnings, the log drawer, diagnostics and the stop control — the same on both screens. */
+  private renderFooter(openEnded: boolean) {
+    return html`
+      ${this.renderLatestWarning()}
+      ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
+      ${diagnosticsDownload(this.diagnosticsUrl)}
+      <div class="actions">${this.renderStopButton(openEnded)}</div>
+    `;
+  }
+
+  private renderLogToggle() {
+    if (!this.logs.length) return nothing;
+    return html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>
+      View log <span class="log-count">${this.logs.length}</span>
+    </button>`;
+  }
+
+  private renderConnection(announce: boolean) {
+    return html`<span class="connection ${this.connected ? "connected" : ""}" role=${announce ? "status" : nothing}>
+      ${this.connected ? "Live" : "Reconnecting"}
+    </span>`;
   }
 
   private renderReady() {
@@ -155,10 +168,7 @@ export class RunningView extends LitElement {
         <p class="eyebrow">03 / Measurement</p>
         <h2 id="running-title">Ready when you are</h2>
         <div class="ready-card ${warning ? "warning" : ""}">
-          <span class="ready-topline">
-            ${this.logs.length ? html`<button class="log-toggle" type="button" @click=${this.toggleLog} aria-expanded=${this.logOpen}>View log <span class="log-count">${this.logs.length}</span></button>` : nothing}
-            <span class="connection ${this.connected ? "connected" : ""}">${this.connected ? "Live" : "Reconnecting"}</span>
-          </span>
+          <span class="ready-topline">${this.renderLogToggle()}${this.renderConnection(false)}</span>
           <div class="ready-announcement" role=${warning ? "alert" : "status"} aria-live=${warning ? "assertive" : "polite"}>
             <span class="ready-icon" aria-hidden="true">${warning ? svg`
               <svg viewBox="0 0 24 24">
@@ -172,13 +182,7 @@ export class RunningView extends LitElement {
           </div>
           <button class="primary confirm" type="button" @click=${this.confirm} ?disabled=${this.busy}>${this.busy ? "Starting…" : this.confirmationAction || "Start measurement"}</button>
         </div>
-        ${this.renderLatestWarning()}
-        ${this.logOpen && this.logs.length ? this.renderLog() : nothing}
-        <div class="diagnostics-download">
-          <span>Session snapshot and logs for issue reporting.</span>
-          <a href=${this.diagnosticsUrl} download>Download diagnostics</a>
-        </div>
-        <div class="actions">${this.renderStopButton(false)}</div>
+        ${this.renderFooter(false)}
       </section>
     `;
   }
@@ -234,7 +238,7 @@ export class RunningView extends LitElement {
         <div class="metric"><span>Mode</span><strong>${this.snapshot.mode ?? "—"}</strong></div>
         <div class="metric"><span>${progressLabel}</span><strong>${openEnded ? progress.completed : html`${progress.completed} / ${progress.total}`}</strong></div>
         ${progress.skipped ? html`<div class="metric"><span>Skipped</span><strong>${progress.skipped}</strong></div>` : nothing}
-        <div class="metric"><span>Remaining</span><strong>${openEnded ? "Until stopped" : this.remaining(progress.estimated_remaining_seconds)}</strong></div>
+        <div class="metric"><span>Remaining</span><strong>${openEnded ? "Until stopped" : remaining(progress.estimated_remaining_seconds)}</strong></div>
       </div>
     `;
   }
@@ -361,18 +365,12 @@ export class RunningView extends LitElement {
     this.logOpen = !this.logOpen;
   }
 
-  private remaining(seconds?: number | null): string {
-    if (seconds == null) return "Calculating";
-    const minutes = Math.ceil(seconds / 60);
-    return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} hr ${minutes % 60} min`;
-  }
-
   private cancel(): void {
-    this.dispatchEvent(new CustomEvent("cancel", { bubbles: true, composed: true }));
+    emit(this, "cancel");
   }
 
   private confirm(): void {
-    this.dispatchEvent(new CustomEvent("confirm", { bubbles: true, composed: true }));
+    emit(this, "confirm");
   }
 
   private runningTitle(preparing = false): string {

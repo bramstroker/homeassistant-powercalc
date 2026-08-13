@@ -752,6 +752,7 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     response = test_client.post("/api/sessions", json=payload())
 
     assert response.status_code == 201
+    session_id = response.json()["session_id"]
     current = {}
     for _ in range(50):
         current_response = test_client.get("/api/session/current")
@@ -762,6 +763,12 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
         time.sleep(0.02)
     assert current["progress"]["estimated_remaining_seconds"] == 0
     assert current["operating_point"] == {"type": "light", "on": True, "brightness": 128}
+    retained = test_client.get("/api/sessions")
+    assert retained.status_code == 200
+    assert retained.json()[0]["session_id"] == session_id
+    assert retained.json()[0]["file_count"] == 1
+    assert retained.json()[0]["size"] > 0
+    assert test_client.get(f"/api/sessions/{session_id}").json() == current
     files = test_client.get("/api/session/current/files")
     assert files.json()[0]["name"] == "LCT010/brightness.csv"
     plots = test_client.get("/api/session/current/plots")
@@ -786,6 +793,14 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     assert report["events"][-1]["data"]["state"] == "completed"
     assert report["files"][0]["name"] == "LCT010/brightness.csv"
     assert "test-token" not in diagnostics.text
+    assert test_client.get(f"/api/sessions/{session_id}/files").json() == files.json()
+    assert test_client.get(f"/api/sessions/{session_id}/plots").json() == plots.json()
+    assert test_client.get(f"/api/sessions/{session_id}/files/LCT010/brightness.csv").status_code == 200
+    assert test_client.get(f"/api/sessions/{session_id}/diagnostics").status_code == 200
+
+    assert test_client.delete(f"/api/sessions/{session_id}").status_code == 204
+    assert test_client.get(f"/api/sessions/{session_id}").status_code == 404
+    assert test_client.get("/api/sessions").json() == []
 
 
 def test_diagnostics_retains_only_the_latest_thousand_events(tmp_path: Path) -> None:
@@ -853,7 +868,16 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
 
     paths = app.openapi()["paths"]
 
-    assert set(paths["/api/sessions"]) == {"post"}
+    assert set(paths["/api/sessions"]) == {"get", "post"}
+    assert set(paths["/api/sessions/{session_id}"]) == {"get", "delete"}
+    assert set(paths["/api/sessions/{session_id}/cancel"]) == {"delete"}
+    assert set(paths["/api/sessions/{session_id}/confirm"]) == {"post"}
+    assert set(paths["/api/sessions/{session_id}/resume"]) == {"post"}
+    assert set(paths["/api/sessions/{session_id}/diagnostics"]) == {"get"}
+    assert set(paths["/api/sessions/{session_id}/plots"]) == {"get"}
+    assert set(paths["/api/sessions/{session_id}/files/{name}"]) == {"get"}
+    assert set(paths["/api/sessions/{session_id}/contribution"]) == {"get", "post"}
+    assert set(paths["/api/sessions/{session_id}/contribution/preview"]) == {"post"}
     assert set(paths["/api/session/current"]) == {"get", "delete"}
     assert set(paths["/api/session/current/resume"]) == {"post"}
     assert set(paths["/api/session/current/diagnostics"]) == {"get"}

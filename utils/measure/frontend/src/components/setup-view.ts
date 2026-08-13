@@ -1,6 +1,5 @@
 import { LitElement, css, html, nothing } from "lit";
 import type {
-  AppSettings,
   Capabilities,
   DummyLoadCalibration,
   DummyLoadSpec,
@@ -8,14 +7,15 @@ import type {
   FormField,
   FormFieldOption,
   LutMode,
-  MeasureDefaults,
   MeasureDefinition,
   MeasureParameter,
-  MeasurementParameters,
+  MeasureParameterName,
   MeasureType,
   MeasurementRequest,
   PowerMeterSpec,
 } from "../types";
+import { hasVoltageReading, meterFor } from "../power-meter";
+import type { MeterContext } from "../power-meter";
 import {
   buildMeasurementRequest,
   deviceFields,
@@ -27,12 +27,19 @@ import {
   narrowingField,
   requestFieldValue,
 } from "../measurement-kinds";
+import { emit } from "../events";
+import { formText } from "../form";
 import { sharedStyles } from "../styles";
-
-function formText(form: FormData, name: string): string {
-  const value = form.get(name);
-  return typeof value === "string" ? value.trim() : "";
-}
+import { entitySelect, numberField, textField } from "./fields";
+import { defaultDummyLoadMode, dummyLoadSpec, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
+import { entityListStyles, renderEntityList } from "./entity-list-field";
+import {
+  renderPowerMeterRequired,
+  renderPowerMeterSummary,
+  renderTypeChip,
+  renderTypePicker,
+  setupChromeStyles,
+} from "./setup-chrome";
 
 const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging.";
 const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
@@ -49,12 +56,8 @@ export class SetupView extends LitElement {
     initialRequest: { attribute: false },
     dummyLoadCalibration: { attribute: false },
     initialType: { attribute: false },
-    defaultPowerEntityId: { type: String },
+    meter: { attribute: false },
     defaultMeasureDevice: { type: String },
-    powerMeter: { type: String },
-    shellyIp: { type: String },
-    shellyUsername: { type: String },
-    kasaIp: { type: String },
     powerMeterConfigured: { type: Boolean },
     busy: { type: Boolean },
     errorMessage: { type: String },
@@ -79,12 +82,9 @@ export class SetupView extends LitElement {
   initialRequest?: MeasurementRequest;
   dummyLoadCalibration: DummyLoadCalibration | null = null;
   initialType?: MeasureType;
-  defaultPowerEntityId = "";
+  /** How the power meter this measurement uses is addressed. */
+  meter: PowerMeterSpec = { type: "hass", entity_id: "" };
   defaultMeasureDevice = "";
-  powerMeter: AppSettings["power_meter"] = "hass";
-  shellyIp = "";
-  shellyUsername = "admin";
-  kasaIp = "";
   powerMeterConfigured = true;
   busy = false;
   errorMessage = "";
@@ -93,7 +93,7 @@ export class SetupView extends LitElement {
   selectedEntities: Record<string, string[]> = {};
   selectValues: Record<string, string> = {};
   multiSelection: Record<string, string[]> = {};
-  parameterValues: Record<string, string> = {};
+  parameterValues: Partial<Record<MeasureParameterName, string>> = {};
   dummyLoadEnabled = false;
   dummyLoadMode: DummyLoadSpec["mode"] = "calibrate";
   dummyController = false;
@@ -101,20 +101,12 @@ export class SetupView extends LitElement {
   /** Deliberately not reactive: it exists so a typed count survives re-renders instead of being recomputed. */
   private derivedCountOverride?: string;
 
-  static readonly styles = [sharedStyles, css`
+
+  static readonly styles = [sharedStyles, dummyLoadStyles, entityListStyles, setupChromeStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
     form { display: grid; gap: 1rem; }
-    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     .profile-grid { align-items: start; }
     .profile-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; }
-    label, fieldset { display: grid; gap: 0.4rem; }
-    label > span, legend, .field-label { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
-    .field-hint { color: var(--muted); font-size: 0.74rem; line-height: 1.4; }
-    input, select {
-      width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 9px;
-      padding: 0.65rem 0.75rem; background: var(--field); color: var(--ink);
-    }
-    fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
     fieldset.section { border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem 1.2rem; margin: 0; display: grid; gap: 1rem; }
     fieldset.section > legend { padding: 0 0.4rem; color: var(--signal-strong); font-size: 0.85rem; font-weight: 700; }
     .checks { display: flex; flex-wrap: wrap; gap: 0.6rem; }
@@ -123,37 +115,15 @@ export class SetupView extends LitElement {
     .entity-row button, .add-entity { min-height: 40px; }
     .remove-entity { display: grid; place-items: center; width: 44px; padding: 0; }
     .remove-entity svg { width: 20px; height: 20px; }
-    .check { display: flex; grid-template-columns: none; align-items: center; gap: 0.5rem; min-height: 42px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); }
-    .check input { min-height: auto; width: auto; accent-color: var(--signal); }
+    .check { min-height: 42px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 999px; }
     /* A checkbox pill has no caption above it, so pin it to the input line of its row. */
     .profile-grid > .check { align-self: end; }
     details { border-top: 1px solid var(--line); padding-top: 1rem; }
     summary { width: fit-content; color: var(--signal-strong); cursor: pointer; font-weight: 700; }
     details .grid { margin-top: 1rem; }
     .advanced-heading { grid-column: 1 / -1; margin: 0.25rem 0 -0.25rem; color: var(--signal-strong); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
-    .context { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
     .context p { margin-bottom: 0; }
 
-    .type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 1.25rem 0 0.25rem; }
-    .type-card { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 0.75rem; row-gap: 0.25rem; text-align: left; align-items: start; padding: 1rem; min-height: auto; background: var(--field); }
-    .type-card:hover:not(:disabled) { border-color: var(--signal); }
-    .type-icon { grid-row: 1 / span 2; font-size: 1.6rem; line-height: 1; }
-    .type-label { font-weight: 700; color: var(--ink); }
-    .type-desc { color: var(--muted); font-size: 0.82rem; font-weight: 500; line-height: 1.35; }
-
-    .type-chip { display: flex; align-items: center; gap: 0.75rem; margin: 1.25rem 0 0.5rem; padding: 0.75rem 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--field); }
-    .type-chip .type-icon { grid-row: auto; font-size: 1.4rem; }
-    .type-chip .chip-body { display: grid; gap: 0.1rem; flex: 1; min-width: 0; }
-    .type-chip button { min-height: 38px; padding: 0.4rem 0.9rem; }
-
-    .power-meter-required { display: grid; justify-items: start; gap: 0.65rem; margin-top: 1.25rem; padding: 1.1rem; border: 1px solid var(--signal); border-radius: 12px; background: color-mix(in srgb, var(--signal) 8%, var(--field)); }
-    .power-meter-required h3, .power-meter-required p { margin: 0; }
-    .power-meter-summary { display: flex; align-items: center; gap: 0.8rem; min-width: 0; padding: 0.8rem 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
-    .power-meter-icon { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: color-mix(in srgb, var(--signal) 14%, transparent); color: var(--signal-strong); font-size: 1.05rem; }
-    .power-meter-details { display: grid; gap: 0.12rem; flex: 1; min-width: 0; }
-    .power-meter-details strong { overflow-wrap: anywhere; color: var(--ink); font-size: 0.84rem; }
-    .power-meter-details span { overflow-wrap: anywhere; color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
-    .power-meter-summary button { flex: 0 0 auto; min-height: 38px; padding: 0.4rem 0.9rem; }
     .dummy-load { display: grid; gap: 0.9rem; }
     .dummy-load-toggle { width: fit-content; }
     /* A checkbox that reveals or hides a block of the form, rather than submitting a value. */
@@ -174,15 +144,7 @@ export class SetupView extends LitElement {
     .choice input { width: auto; min-height: auto; margin-top: 0.2rem; accent-color: var(--signal); }
 
     @media (max-width: 640px) {
-      .grid { grid-template-columns: 1fr; }
       .context { display: block; }
-      .type-grid { grid-template-columns: 1fr; }
-      .type-chip { flex-wrap: wrap; }
-      .type-chip .chip-body { min-width: calc(100% - 50px); }
-      .type-chip button { width: 100%; }
-      .power-meter-summary { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; }
-      .power-meter-details { min-width: 0; }
-      .power-meter-summary button { grid-column: 1 / -1; width: 100%; }
     }
   `];
 
@@ -193,7 +155,7 @@ export class SetupView extends LitElement {
     }
     if (changed.has("initialRequest")) {
       this.dummyLoadEnabled = Boolean(this.initialRequest?.dummy_load);
-      this.dummyLoadMode = this.initialRequest?.dummy_load?.mode ?? (this.dummyLoadCalibration ? "reuse" : "calibrate");
+      this.dummyLoadMode = this.initialRequest?.dummy_load?.mode ?? defaultDummyLoadMode(this.dummyLoadCalibration);
       this.dummyController = Boolean(
         this.initialRequest && "controller" in this.initialRequest && this.initialRequest.controller.type === "dummy",
       );
@@ -202,7 +164,7 @@ export class SetupView extends LitElement {
         && (this.initialRequest.controller.type === "hass_multi" || this.initialRequest.multiple_light_count > 1),
       );
     } else if (changed.has("dummyLoadCalibration") && !this.dummyLoadEnabled) {
-      this.dummyLoadMode = this.dummyLoadCalibration ? "reuse" : "calibrate";
+      this.dummyLoadMode = defaultDummyLoadMode(this.dummyLoadCalibration);
     }
   }
 
@@ -218,58 +180,26 @@ export class SetupView extends LitElement {
         ${this.capabilities?.fast_test_mode
           ? html`<p class="notice" role="status"><strong>Fast test mode is enabled.</strong> Dummy light, fan, speaker and charging runs use minimal waits and measurement points. Their output is for app testing only.</p>`
           : nothing}
-        ${this.powerMeterConfigured ? this.renderSetupContent() : this.renderPowerMeterRequired()}
+        ${this.initialRequest ? html`<p class="notice" role="status">
+          This draft uses the selected session's measurement device and power-meter configuration.
+          <button type="button" @click=${this.useCurrentSettings}>Use current app defaults</button>
+        </p>` : nothing}
+        ${this.powerMeterConfigured ? this.renderSetupContent() : renderPowerMeterRequired(this.openSettings)}
       </section>
     `;
   }
 
   private renderSetupContent() {
     return html`
-      ${this.selectedType ? this.renderChip(this.selectedType) : this.renderPicker()}
+      ${this.selectedType
+        ? renderTypeChip(this.selectedType, this.definition(this.selectedType), this.changeType)
+        : renderTypePicker(this.definitions, this.selectType)}
       ${this.selectedType ? this.renderMeasurementForm(this.selectedType) : nothing}
     `;
   }
 
-  private renderPowerMeterRequired() {
-    return html`
-      <div class="power-meter-required">
-        <h3>Set up your power meter</h3>
-        <p class="muted">Choose the power source used for every measurement before creating a profile.</p>
-        <button class="primary" type="button" @click=${this.openSettings}>Set up power meter</button>
-      </div>
-    `;
-  }
-
-  private renderPicker() {
-    if (!this.definitions.length) {
-      return html`<p class="muted">Loading measurement types…</p>`;
-    }
-    return html`
-      <p class="muted">What do you want to measure?</p>
-      <div class="type-grid" role="list">
-        ${this.definitions.map((definition) => html`
-          <button type="button" class="type-card" role="listitem" @click=${() => this.selectType(definition.measure_type)}>
-            <span class="type-icon" aria-hidden="true">${definition.icon}</span>
-            <span class="type-label">${definition.label}</span>
-            <span class="type-desc">${definition.description}</span>
-          </button>
-        `)}
-      </div>
-    `;
-  }
-
-  private renderChip(type: MeasureType) {
-    const definition = this.definition(type);
-    return html`
-      <div class="type-chip">
-        <span class="type-icon" aria-hidden="true">${definition?.icon ?? ""}</span>
-        <span class="chip-body">
-          <strong>${definition?.label ?? type}</strong>
-          ${definition ? html`<span class="type-desc">${definition.description}</span>` : nothing}
-        </span>
-        <button type="button" @click=${this.changeType}>Change</button>
-      </div>
-    `;
+  private useCurrentSettings(): void {
+    emit(this, "use-current-settings");
   }
 
   private renderMeasurementForm(type: MeasureType) {
@@ -284,7 +214,12 @@ export class SetupView extends LitElement {
       <form @submit=${this.submitMeasurement}>
         <fieldset class="section">
           <legend>Measurement device</legend>
-          ${this.renderPowerMeterSummary()}
+          ${renderPowerMeterSummary({
+            meter: this.meter,
+            measureDevice: this.defaultMeasureDevice,
+            context: this.meterContext(),
+            onOpenSettings: this.openSettings,
+          })}
           ${this.renderDummyLoadSection(run?.dummy_load)}
         </fieldset>
 
@@ -295,8 +230,17 @@ export class SetupView extends LitElement {
           <div class="grid profile-grid">
             ${fields.filter((field) => field.control !== "multi_select").map((field) => this.genericField(field, run))}
             ${definition.supports_profile ? html`<div class="profile-fields">
-              ${this.textField("model_id", "Model ID", this.modelId(run), definition.model_id_example && `e.g. ${definition.model_id_example}`, true)}
-              ${this.textField("product_name", "Full product name", run?.product_name ?? "", definition.product_name_example || definition.label, true, FULL_PRODUCT_NAME_HINT)}
+              ${textField("model_id", "Model ID", {
+                value: this.modelId(run),
+                placeholder: definition.model_id_example && `e.g. ${definition.model_id_example}`,
+                required: true,
+              })}
+              ${textField("product_name", "Full product name", {
+                value: run?.product_name ?? "",
+                placeholder: definition.product_name_example || definition.label,
+                required: true,
+                hint: FULL_PRODUCT_NAME_HINT,
+              })}
             </div>` : nothing}
           </div>
           ${blocks.map((field) => this.multiSelectField(field, run))}
@@ -307,40 +251,6 @@ export class SetupView extends LitElement {
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? "Checking setup…" : "Check setup"}</button></div>
       </form>
-    `;
-  }
-
-  private renderPowerMeterSummary() {
-    let source = "Synthetic test meter";
-    let detail = "No external readings are used.";
-    if (this.powerMeter === "shelly") {
-      source = "Shelly power meter";
-      detail = this.shellyIp;
-    } else if (this.powerMeter === "kasa") {
-      source = "Kasa power meter";
-      detail = this.kasaIp;
-    } else if (this.powerMeter === "hass") {
-      const entity = this.powers.find((candidate) => candidate.entity_id === this.defaultPowerEntityId);
-      source = entity ? `${entity.name} · ${entity.entity_id}` : this.defaultPowerEntityId;
-      const voltageEntityId = this.relatedVoltageEntityId(this.defaultPowerEntityId);
-      const voltage = this.voltages.find((candidate) => candidate.entity_id === voltageEntityId);
-      if (voltageEntityId) {
-        const voltageName = voltage ? `${voltage.name} · ` : "";
-        detail = `Voltage: ${voltageName}${voltageEntityId}`;
-      } else {
-        detail = "Home Assistant power sensor";
-      }
-    }
-    return html`
-      <div class="power-meter-summary">
-        <span class="power-meter-icon" aria-hidden="true">⚡</span>
-        <span class="power-meter-details">
-          <strong>${source}</strong>
-          <span>Measurement device: ${this.defaultMeasureDevice}</span>
-          <span>${detail}</span>
-        </span>
-        <button type="button" @click=${this.openSettings}>Change</button>
-      </div>
     `;
   }
 
@@ -397,64 +307,26 @@ export class SetupView extends LitElement {
     `;
   }
 
-  private renderDummyLoadSection(request?: DummyLoadSpec | null) {
-    if (this.powerMeter === "dummy") return nothing;
-    const calibration = this.dummyLoadCalibration;
-    const description = request?.description ?? calibration?.description ?? "";
-    const voltageAvailable = this.powerMeter !== "hass" || Boolean(this.relatedVoltageEntityId(this.defaultPowerEntityId));
-    return html`
-      <div class="dummy-load">
-        <label class="check dummy-load-toggle">
-          <input
-            type="checkbox"
-            name="use_dummy_load"
-            .checked=${this.dummyLoadEnabled}
-            ?disabled=${!voltageAvailable}
-            @change=${this.dummyLoadEnabledChanged}
-          />
-          Use resistive dummy load
-        </label>
-        ${!voltageAvailable
-          ? html`<p class="muted">Dummy-load correction requires a voltage sensor associated with the selected power sensor.</p>`
-          : nothing}
-        ${this.dummyLoadEnabled && voltageAvailable ? this.renderDummyLoadOptions(description) : nothing}
-      </div>
-    `;
+  private renderDummyLoadSection(stored?: DummyLoadSpec | null) {
+    if (!meterFor(this.meter.type).supportsDummyLoad) return nothing;
+    return renderDummyLoad({
+      calibration: this.dummyLoadCalibration,
+      stored,
+      enabled: this.dummyLoadEnabled,
+      mode: this.dummyLoadMode,
+      voltageAvailable: hasVoltageReading(this.meter),
+      onToggle: this.dummyLoadEnabledChanged,
+      onModeChange: this.dummyLoadModeChanged,
+    });
   }
 
-  private renderDummyLoadOptions(description: string) {
-    const calibration = this.dummyLoadCalibration;
-    return html`
-      <div class="dummy-load-options">
-        ${calibration ? html`
-          <div class="calibration-card">
-            <strong>${calibration.description}</strong>
-            <span class="calibration-meta">${this.formatResistance(calibration.resistance)} Ω · calibrated ${this.formatCalibrationDate(calibration.calibrated_at)}</span>
-          </div>
-          <div class="choice-list" role="radiogroup" aria-label="Dummy-load calibration">
-            <label class="choice">
-              <input type="radio" name="dummy_load_mode" value="reuse" .checked=${this.dummyLoadMode === "reuse"} @change=${this.dummyLoadModeChanged} />
-              <span><strong>Use saved calibration</strong><br /><small class="field-hint">Confirm that this exact, preheated load is connected when the measurement starts.</small></span>
-            </label>
-            <label class="choice">
-              <input type="radio" name="dummy_load_mode" value="calibrate" .checked=${this.dummyLoadMode === "calibrate"} @change=${this.dummyLoadModeChanged} />
-              <span><strong>Recalibrate</strong><br /><small class="field-hint">Measure the load again before starting this measurement.</small></span>
-            </label>
-          </div>
-        ` : html`
-          <input type="hidden" name="dummy_load_mode" value="calibrate" />
-          <p class="muted">The dummy load will be calibrated inline before the measurement. Allow at least 10 minutes; an unstable load can take longer.</p>
-        `}
-        ${this.dummyLoadMode === "calibrate" ? this.textField(
-          "dummy_load_description",
-          "Dummy-load description",
-          description,
-          "e.g. 60 W incandescent bulb",
-          true,
-          "Identify the exact resistive load so the calibration can be safely reused later.",
-        ) : nothing}
-      </div>
-    `;
+  private dummyLoadEnabledChanged(event: Event): void {
+    this.dummyLoadEnabled = (event.currentTarget as HTMLInputElement).checked;
+    if (this.dummyLoadEnabled) this.dummyLoadMode = defaultDummyLoadMode(this.dummyLoadCalibration);
+  }
+
+  private dummyLoadModeChanged(event: Event): void {
+    this.dummyLoadMode = (event.currentTarget as HTMLInputElement).value as DummyLoadSpec["mode"];
   }
 
   /**
@@ -469,7 +341,6 @@ export class SetupView extends LitElement {
     return html`<details>
       <summary>Advanced timing & quality</summary>
       <div class="grid">
-        ${definition.supports_resume ? this.resumePolicyField(request) : nothing}
         ${shown.map((parameter, index) => html`
           ${parameter.group && parameter.group !== shown[index - 1]?.group
             ? html`<p class="advanced-heading">${parameter.group}</p>`
@@ -481,70 +352,35 @@ export class SetupView extends LitElement {
   }
 
   private parameterField(parameter: MeasureParameter, request?: MeasurementRequest) {
-    const required = parameter.requires_multiple;
-    return this.numberField(parameter.name, parameter.label, this.parameterValue(parameter.name, request), {
+    const gate = parameter.requires_multiple;
+    // Bounds come from the capabilities endpoint so the form cannot drift from server-side validation.
+    const { min, max } = this.capabilities?.limits?.[parameter.name] ?? {};
+    return numberField(parameter.name, parameter.label, this.parameterValue(parameter.name, request), {
+      min,
+      max,
       step: parameter.step,
       hint: parameter.hint,
-      disabled: required ? Number(this.parameterValue(required, request)) <= 1 : false,
+      disabled: gate ? Number(this.parameterValue(gate, request)) <= 1 : false,
       // Re-render when a parameter that gates another one changes, so the gate keeps up.
       onInput: this.gatesAnother(parameter.name) ? this.parameterChanged : null,
     });
   }
 
-  private resumePolicyField(request?: MeasurementRequest) {
-    return html`<label><span>Previous measurement</span><select name="resume_policy">
-      <option value="new" ?selected=${(request?.resume_policy ?? "new") === "new"}>Keep it and start a new session</option>
-      <option value="overwrite" ?selected=${request?.resume_policy === "overwrite"}>Delete it and start over</option>
-    </select></label>`;
-  }
-
   /** What the field should show: what the user typed, else the previous run's, else the default. */
-  private parameterValue(name: string, request?: MeasurementRequest): string {
-    const stored = request?.parameters[name as keyof MeasurementParameters] ?? this.capabilities?.defaults[name as keyof MeasureDefaults];
+  private parameterValue(name: MeasureParameterName, request?: MeasurementRequest): string {
+    const stored = request?.parameters[name] ?? this.capabilities?.defaults[name];
     return this.parameterValues[name] ?? String(stored ?? "");
   }
 
-  private gatesAnother(name: string): boolean {
+  private gatesAnother(name: MeasureParameterName): boolean {
     return this.definitions.some((definition) => definition.parameters.some((parameter) => parameter.requires_multiple === name));
   }
 
   private parameterChanged(event: Event): void {
     const input = event.currentTarget as HTMLInputElement;
-    this.parameterValues = { ...this.parameterValues, [input.name]: input.value };
+    this.parameterValues = { ...this.parameterValues, [input.name as MeasureParameterName]: input.value };
   }
 
-  private textField(name: string, label: string, value = "", placeholder = "", required = false, hint = "") {
-    return html`<label>
-      <span>${label}</span>
-      <input name=${name} .value=${value} placeholder=${placeholder} ?required=${required} autocomplete="off" />
-      ${hint ? html`<small class="field-hint">${hint}</small>` : nothing}
-    </label>`;
-  }
-
-  private numberField(
-    name: string,
-    label: string,
-    value: string,
-    options: { step?: string; hint?: string; disabled?: boolean; onInput?: ((event: Event) => void) | null } = {},
-  ) {
-    const { step = "1", hint = "", disabled = false, onInput = null } = options;
-    // Bounds come from the capabilities endpoint so the form cannot drift from server-side validation.
-    const { min, max } = this.capabilities?.limits?.[name] ?? {};
-    return html`<label>
-      <span>${label}</span>
-      <input type="number" name=${name} .value=${value} min=${min ?? nothing} max=${max ?? nothing} step=${step} required ?disabled=${disabled} @input=${onInput} />
-      ${hint ? html`<small class="field-hint">${hint}</small>` : nothing}
-    </label>`;
-  }
-
-  private entitySelect(name: string, label: string, entities: EntityDescriptor[], selected = "", required = false) {
-    return html`
-      <label><span>${label}</span><select name=${name} ?required=${required} @change=${this.entityChanged}>
-        <option value="">${required ? "Select an entity" : "None"}</option>
-        ${entities.map((entity) => html`<option value=${entity.entity_id} ?selected=${entity.entity_id === selected}>${entity.name} · ${entity.entity_id}</option>`)}
-      </select></label>
-    `;
-  }
 
   private genericField(field: MeasureDefinition["fields"][number], run?: MeasurementRequest) {
     if (!this.selectedType) return nothing;
@@ -570,7 +406,7 @@ export class SetupView extends LitElement {
       const entities = this.entitiesIn(domains);
       if (field.multiple && this.multipleLights) return this.multiEntityField(field, entities, run);
       const selected = field.multiple ? this.selectedEntityId(field, run) || value : value;
-      return this.entitySelect(name, field.label, entities, selected, field.required);
+      return entitySelect(name, field.label, entities, { selected, required: field.required, onChange: this.entityChanged });
     }
     if (field.control === "select") {
       const value = (stored ?? field.default ?? "").toString();
@@ -618,36 +454,12 @@ export class SetupView extends LitElement {
   }
 
   private multiEntityField(field: FormField, entities: EntityDescriptor[], run?: MeasurementRequest) {
-    const rows = this.entityRows(field, run);
-    const values = rows.length ? rows : [""];
-    return html`<div class="entity-list">
-      <span class="field-label">${field.plural_label || field.label}</span>
-      ${values.map((value, index) => html`<div class="entity-row">
-        <select name=${field.name} required data-index=${index} @change=${this.multiEntityChanged}>
-          <option value="">Select an entity</option>
-          ${entities.map((entity) => html`<option
-            value=${entity.entity_id}
-            ?selected=${entity.entity_id === value}
-            ?disabled=${entity.entity_id !== value && values.includes(entity.entity_id)}
-          >${entity.name} · ${entity.entity_id}</option>`)}
-        </select>
-        ${values.length > 1 ? html`<button
-          class="remove-entity danger"
-          type="button"
-          data-field=${field.name}
-          data-index=${index}
-          aria-label="Remove ${field.label}"
-          title="Remove ${field.label}"
-          @click=${this.removeEntity}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6"></path>
-          </svg>
-        </button>` : nothing}
-      </div>`)}
-      <button class="add-entity" type="button" data-field=${field.name} @click=${this.addEntity}>Add another ${field.label.toLowerCase()}</button>
-      ${field.hint ? html`<small class="field-hint">${field.hint}</small>` : nothing}
-    </div>`;
+    return renderEntityList({
+      field,
+      entities,
+      rows: this.entityRows(field, run),
+      onChange: (rows) => this.selectEntities(field.name, rows),
+    });
   }
 
   private fieldDomains(field: MeasureDefinition["fields"][number]): string[] {
@@ -682,15 +494,6 @@ export class SetupView extends LitElement {
       const boxes = [...(this.shadowRoot?.querySelectorAll<HTMLInputElement>(`input[name="${field.name}"]`) ?? [])];
       this.multiSelection = { ...this.multiSelection, [field.name]: boxes.filter((box) => box.checked).map((box) => box.value) };
     };
-  }
-
-  private dummyLoadEnabledChanged(event: Event): void {
-    this.dummyLoadEnabled = (event.currentTarget as HTMLInputElement).checked;
-    if (this.dummyLoadEnabled) this.dummyLoadMode = this.dummyLoadCalibration ? "reuse" : "calibrate";
-  }
-
-  private dummyLoadModeChanged(event: Event): void {
-    this.dummyLoadMode = (event.currentTarget as HTMLInputElement).value as DummyLoadSpec["mode"];
   }
 
   private dummyControllerChanged(event: Event): void {
@@ -774,44 +577,24 @@ export class SetupView extends LitElement {
     return this.entityRows(field, request).filter(Boolean);
   }
 
-  private selectType(type: MeasureType): void {
+  private readonly selectType = (type: MeasureType): void => {
     this.errorMessage = "";
     this.selectedType = type;
     this.dummyController = false;
     this.multipleLights = false;
-    this.dispatchEvent(new CustomEvent("measure-type-selected", { detail: type, bubbles: true, composed: true }));
-  }
+    emit<MeasureType>(this, "measure-type-selected", type);
+  };
 
-  private changeType(): void {
+  private readonly changeType = (): void => {
     this.errorMessage = "";
     this.selectedType = undefined;
-  }
+  };
 
 
 
   private entityChanged(event: Event): void {
     const select = event.currentTarget as HTMLSelectElement;
     this.selectEntities(select.name, [select.value]);
-  }
-
-  private multiEntityChanged(event: Event): void {
-    const select = event.currentTarget as HTMLSelectElement;
-    const rows = [...this.currentRows(select.name)];
-    rows[Number(select.dataset.index)] = select.value;
-    this.selectEntities(select.name, rows);
-  }
-
-  private addEntity(event: Event): void {
-    const field = (event.currentTarget as HTMLElement).dataset.field ?? "";
-    this.selectEntities(field, [...this.currentRows(field), ""]);
-  }
-
-  private removeEntity(event: Event): void {
-    const button = event.currentTarget as HTMLElement;
-    const field = button.dataset.field ?? "";
-    const rows = [...this.currentRows(field)];
-    rows.splice(Number(button.dataset.index), 1);
-    this.selectEntities(field, rows);
   }
 
   /** Rows as the form currently shows them, so an edit starts from what the user can see. */
@@ -837,9 +620,9 @@ export class SetupView extends LitElement {
     this.selectedEntities = { ...this.selectedEntities, [name]: rows };
   }
 
-  private openSettings(): void {
-    this.dispatchEvent(new CustomEvent("open-settings", { bubbles: true, composed: true }));
-  }
+  private readonly openSettings = (): void => {
+    emit(this, "open-settings");
+  };
 
   /**
    * Catch an entity that does not match the domain its narrowing field currently calls for —
@@ -862,7 +645,7 @@ export class SetupView extends LitElement {
     const select = event.currentTarget as HTMLSelectElement;
     this.selectValues = { ...this.selectValues, [select.name]: select.value };
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    if (definition) this.dispatchEvent(new CustomEvent("entity-domains-requested", { detail: entityDomains(definition), bubbles: true, composed: true }));
+    if (definition) emit<string[]>(this, "entity-domains-requested", entityDomains(definition));
   }
 
   /** Value a narrowing select currently holds: the user's choice, else the previous run's, else its first option. */
@@ -875,10 +658,6 @@ export class SetupView extends LitElement {
 
   private definition(type: MeasureType): MeasureDefinition | undefined {
     return this.definitions.find((item) => item.measure_type === type);
-  }
-
-  private relatedVoltageEntityId(powerEntityId: string): string {
-    return this.powers.find((entity) => entity.entity_id === powerEntityId)?.related_voltage_entity_id ?? "";
   }
 
   /** Model to prefill: the one every selected device reports, or blank when they differ or any is unknown. */
@@ -921,55 +700,26 @@ export class SetupView extends LitElement {
       definition,
       form,
       this.capabilities,
-      this.powerMeterSpec(),
+      this.meter,
       this.defaultMeasureDevice,
       this.dummyController,
     );
-    request.dummy_load = this.dummyLoadSpec(form);
+    request.dummy_load = meterFor(this.meter.type).supportsDummyLoad
+      ? dummyLoadSpec(form, this.dummyLoadCalibration)
+      : undefined;
     const mismatch = this.dummyController ? undefined : this.narrowedEntityMismatch(definition, form);
     if (mismatch) {
       this.errorMessage = mismatch;
       return;
     }
-    this.dispatchEvent(new CustomEvent("preflight", { detail: request, bubbles: true, composed: true }));
+    emit<MeasurementRequest>(this, "preflight", request);
   }
 
-  private powerMeterSpec(): PowerMeterSpec {
-    if (this.powerMeter === "dummy") return { type: "dummy" };
-    if (this.powerMeter === "shelly") return { type: "shelly", device_ip: this.shellyIp, username: this.shellyUsername };
-    if (this.powerMeter === "kasa") return { type: "kasa", device_ip: this.kasaIp };
-    return {
-      type: "hass",
-      entity_id: this.defaultPowerEntityId,
-      voltage_entity_id: this.relatedVoltageEntityId(this.defaultPowerEntityId) || null,
-    };
+  private meterContext(): MeterContext {
+    return { powers: this.powers, voltages: this.voltages };
   }
 
-  private dummyLoadSpec(form: FormData): DummyLoadSpec | undefined {
-    if (this.powerMeter === "dummy" || !form.has("use_dummy_load")) return undefined;
-    const mode = form.get("dummy_load_mode");
-    if (mode === "reuse" && this.dummyLoadCalibration) {
-      return {
-        mode,
-        description: this.dummyLoadCalibration.description,
-        resistance: this.dummyLoadCalibration.resistance,
-      };
-    }
-    const description = form.get("dummy_load_description");
-    return {
-      mode: "calibrate",
-      description: typeof description === "string" ? description.trim() : "",
-    };
-  }
 
-  private formatResistance(resistance: number): string {
-    return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(resistance);
-  }
-
-  private formatCalibrationDate(value: string): string {
-    const date = new Date(value);
-    return Number.isNaN(date.valueOf()) ? value : date.toLocaleDateString();
-  }
 }
 
 customElements.define("measure-setup-view", SetupView);

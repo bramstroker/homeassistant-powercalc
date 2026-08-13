@@ -1,3 +1,4 @@
+import { SESSION_EVENT_TYPES } from "./types";
 import type {
   ApiErrorBody,
   AppSettings,
@@ -24,6 +25,7 @@ import type {
   SessionEvent,
   SessionFile,
   SessionSnapshot,
+  SessionSummary,
   ShellyDiscoveryResponse,
 } from "./types";
 
@@ -126,71 +128,84 @@ export class MeasureApiClient {
     return this.request("api/sessions", { method: "POST", body: JSON.stringify(request) });
   }
 
+  getSessions(): Promise<SessionSummary[]> {
+    return this.request("api/sessions");
+  }
+
+  getSession(sessionId: string): Promise<SessionSnapshot> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}`);
+  }
+
+  deleteSession(sessionId: string): Promise<void> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}`, { method: "DELETE" }, "none");
+  }
 
   getCurrent(): Promise<SessionSnapshot> {
     return this.request("api/session/current");
   }
 
-  cancel(): Promise<SessionSnapshot> {
-    return this.request("api/session/current", { method: "DELETE" });
+  cancel(sessionId: string): Promise<SessionSnapshot> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/cancel`, { method: "DELETE" });
   }
 
-  confirm(): Promise<SessionSnapshot> {
-    return this.request("api/session/current/confirm", { method: "POST" });
+  confirm(sessionId: string): Promise<SessionSnapshot> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/confirm`, { method: "POST" });
   }
 
-  resume(): Promise<SessionSnapshot> {
-    return this.request("api/session/current/resume", { method: "POST" });
+  resume(sessionId: string): Promise<SessionSnapshot> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/resume`, { method: "POST" });
   }
 
-  getFiles(): Promise<SessionFile[]> {
-    return this.request<SessionFile[]>("api/session/current/files");
+  getFiles(sessionId: string): Promise<SessionFile[]> {
+    return this.request<SessionFile[]>(`api/sessions/${encodeURIComponent(sessionId)}/files`);
   }
 
-  getPlots(): Promise<PlotCollection> {
-    return this.request<PlotCollection>("api/session/current/plots");
+  getPlots(sessionId: string): Promise<PlotCollection> {
+    return this.request<PlotCollection>(`api/sessions/${encodeURIComponent(sessionId)}/plots`);
   }
 
-  getContributionDraft(): Promise<ContributionPreview> {
-    return this.request("api/session/current/contribution");
+  getContributionDraft(sessionId: string): Promise<ContributionPreview> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/contribution`);
   }
 
-  previewContribution(request: ContributionPreviewRequest): Promise<ContributionPreview> {
-    return this.request("api/session/current/contribution/preview", { method: "POST", body: JSON.stringify(request) });
+  previewContribution(sessionId: string, request: ContributionPreviewRequest): Promise<ContributionPreview> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/contribution/preview`, { method: "POST", body: JSON.stringify(request) });
   }
 
-  submitContribution(request: ContributionSubmitRequest): Promise<ContributionResult> {
-    return this.request("api/session/current/contribution", { method: "POST", body: JSON.stringify(request) });
+  submitContribution(sessionId: string, request: ContributionSubmitRequest): Promise<ContributionResult> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/contribution`, { method: "POST", body: JSON.stringify(request) });
   }
 
-  fileUrl(name: string): string {
-    return apiUrl(`api/session/current/files/${encodeURIComponent(name)}`, this.base).toString();
+  fileUrl(sessionId: string, name: string): string {
+    return apiUrl(`api/sessions/${encodeURIComponent(sessionId)}/files/${encodeURIComponent(name)}`, this.base).toString();
   }
 
-  diagnosticsUrl(): string {
-    return apiUrl("api/session/current/diagnostics", this.base).toString();
+  diagnosticsUrl(sessionId: string): string {
+    return apiUrl(`api/sessions/${encodeURIComponent(sessionId)}/diagnostics`, this.base).toString();
   }
 
-  eventsUrl(): string {
-    return apiUrl("api/session/current/events", this.base).toString();
+  eventsUrl(sessionId: string): string {
+    return apiUrl(`api/sessions/${encodeURIComponent(sessionId)}/events`, this.base).toString();
   }
 
-  private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  private async request<T>(path: string, init: RequestInit = {}, body: "json" | "none" = "json"): Promise<T> {
     const headers = new Headers(init.headers);
     if (init.body !== undefined) headers.set("Content-Type", "application/json");
     headers.set("Accept", "application/json");
     const response = await this.fetcher(apiUrl(path, this.base), { ...init, headers });
-    if (!response.ok) {
-      let body: Partial<ApiErrorBody> & { detail?: unknown } = {};
-      try {
-        body = (await response.json()) as Partial<ApiErrorBody>;
-      } catch {
-        // Keep the stable fallback for non-JSON proxy and server errors.
-      }
-      const detail = typeof body.detail === "string" ? body.detail : undefined;
-      throw new ApiError(body.message ?? detail ?? `Request failed (${response.status})`, response.status, body.code, body.field);
+    if (!response.ok) throw await this.error(response);
+    return body === "none" ? (undefined as T) : ((await response.json()) as T);
+  }
+
+  private async error(response: Response): Promise<ApiError> {
+    let body: Partial<ApiErrorBody> & { detail?: unknown } = {};
+    try {
+      body = (await response.json()) as Partial<ApiErrorBody>;
+    } catch {
+      // Keep the stable fallback for non-JSON proxy and server errors.
     }
-    return (await response.json()) as T;
+    const detail = typeof body.detail === "string" ? body.detail : undefined;
+    return new ApiError(body.message ?? detail ?? `Request failed (${response.status})`, response.status, body.code, body.field);
   }
 }
 
@@ -217,7 +232,7 @@ export class SessionEventStream {
     };
     source.onerror = () => this.onConnection(false);
     source.onmessage = (event) => this.consume(event.data);
-    for (const type of ["phase", "progress", "state", "warning", "log", "checkpoint", "heartbeat", "sample", "operating_point"] as const) {
+    for (const type of SESSION_EVENT_TYPES) {
       source.addEventListener(type, (event) => this.consume((event as MessageEvent<string>).data));
     }
   }

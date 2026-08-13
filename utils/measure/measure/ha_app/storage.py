@@ -1,5 +1,4 @@
 from collections import deque
-from collections.abc import Collection
 import csv
 from dataclasses import replace
 import json
@@ -7,14 +6,13 @@ import logging
 import os
 from pathlib import Path
 import shutil
-from typing import Any, cast
+from typing import Any
 from uuid import uuid4
 
 from measure.clock import utc_now
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.dummy_load import DummyLoadCalibration
-from measure.execution import OperatingPoint
 from measure.ha_app.contribution.models import ContributionStatus
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.session import (
@@ -73,18 +71,28 @@ class SessionStorage:
         self._write_json(self.data_root / "current.json", {"id": snapshot.id})
         return directory
 
+    def set_current(self, session_id: str) -> None:
+        """Point recovery and compatibility routes at an existing session."""
+        self.load_snapshot(session_id)
+        self._write_json(self.data_root / "current.json", {"id": session_id})
+
+    def clear_current(self, session_id: str | None = None) -> None:
+        """Remove the current pointer, optionally only when it names ``session_id``."""
+        path = self.data_root / "current.json"
+        if session_id is not None and path.exists():
+            try:
+                if str(self._read_json(path)["id"]) != session_id:
+                    return
+            except OSError, KeyError, TypeError, ValueError:
+                pass
+        path.unlink(missing_ok=True)
+
     def delete_session(self, session_id: str) -> None:
         self._request_cache.pop(session_id, None)
         directory = self.session_directory(session_id)
         if directory.exists():
             shutil.rmtree(directory)
-
-    def prune_sessions(self, keep: Collection[str]) -> None:
-        """Delete persisted sessions other than ``keep`` so add-on storage stays bounded."""
-        for path in self.sessions_root.iterdir():
-            if path.is_dir() and path.name not in keep:
-                self._request_cache.pop(path.name, None)
-                shutil.rmtree(path, ignore_errors=True)
+        self.clear_current(session_id)
 
     def write_snapshot(self, snapshot: SessionSnapshot) -> None:
         directory = self.session_directory(snapshot.id)
@@ -136,35 +144,13 @@ class SessionStorage:
         )
 
     def load_current(self) -> SessionSnapshot | None:
-        """Load the current snapshot and recover interrupted active sessions."""
-
+        """Load the current snapshot and recover an interrupted active session."""
         current_path = self.data_root / "current.json"
         if not current_path.exists():
             return None
         try:
             session_id = str(self._read_json(current_path)["id"])
-            self.load_request(session_id)
-            state_path = self.session_directory(session_id) / "state.json"
-            state = self._read_json(state_path)
-            snapshot = SessionSnapshot(
-                id=str(state["id"]),
-                state=SessionState(state["state"]),
-                created_at=str(state["created_at"]),
-                updated_at=str(state["updated_at"]),
-                completed=int(state.get("completed", 0)),
-                total=int(state.get("total", 0)),
-                skipped=int(state.get("skipped", 0)),
-                phase=state.get("phase"),
-                confirmation_message=state.get("confirmation_message"),
-                mode=state.get("mode"),
-                estimated_remaining=state.get("estimated_remaining"),
-                error=state.get("error"),
-                files=tuple(state.get("files", [])),
-                warnings=tuple(state.get("warnings", [])),
-                event_sequence=int(state.get("event_sequence", 0)),
-                summary=state.get("summary"),
-                operating_point=cast(OperatingPoint | None, state.get("operating_point")),
-            )
+            snapshot = self.load_snapshot(session_id)
         except (OSError, KeyError, TypeError, ValueError) as error:
             _LOGGER.warning("Discarding incompatible current session pointer: %s", error)
             current_path.unlink(missing_ok=True)
@@ -183,6 +169,52 @@ class SessionStorage:
             )
             self.write_snapshot(snapshot)
         return snapshot
+
+    def load_snapshot(self, session_id: str) -> SessionSnapshot:
+        """Load one persisted session without changing the current pointer."""
+        self.load_request(session_id)
+        state = self._read_json(self.session_directory(session_id) / "state.json")
+        snapshot = SessionSnapshot(
+            id=str(state["id"]),
+            state=SessionState(state["state"]),
+            created_at=str(state["created_at"]),
+            updated_at=str(state["updated_at"]),
+            completed=int(state.get("completed", 0)),
+            total=int(state.get("total", 0)),
+            skipped=int(state.get("skipped", 0)),
+            phase=state.get("phase"),
+            confirmation_message=state.get("confirmation_message"),
+            mode=state.get("mode"),
+            estimated_remaining=state.get("estimated_remaining"),
+            error=state.get("error"),
+            files=tuple(state.get("files", [])),
+            warnings=tuple(state.get("warnings", [])),
+            event_sequence=int(state.get("event_sequence", 0)),
+            summary=state.get("summary"),
+            operating_point=state.get("operating_point"),
+        )
+        if snapshot.id != session_id:
+            raise ValueError("Session state id does not match its directory")
+        return snapshot
+
+    def list_sessions(self) -> tuple[SessionSnapshot, ...]:
+        """Return valid persisted sessions, newest activity first."""
+        sessions: list[SessionSnapshot] = []
+        for path in self.sessions_root.iterdir():
+            if not path.is_dir() or path.is_symlink():
+                continue
+            try:
+                sessions.append(self.load_snapshot(path.name))
+            except (OSError, KeyError, TypeError, ValueError) as error:
+                _LOGGER.warning("Ignoring incompatible measurement session %s: %s", path.name, error)
+        return tuple(sorted(sessions, key=lambda item: item.updated_at, reverse=True))
+
+    def session_size(self, session_id: str) -> int:
+        """Return the total size of regular files stored for one session."""
+        directory = self.session_directory(session_id)
+        if not directory.exists():
+            raise FileNotFoundError(session_id)
+        return sum(path.stat().st_size for path in directory.rglob("*") if path.is_file() and not path.is_symlink())
 
     def load_request(self, session_id: str) -> MeasurementRequest:
         cached = self._request_cache.get(session_id)

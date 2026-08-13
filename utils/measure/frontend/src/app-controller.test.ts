@@ -1,6 +1,6 @@
 import { MeasureAppController } from "./app-controller";
 import type { EventConnection, MeasureAppApi, MeasureAppState } from "./app-controller";
-import type { PowerMeterDiagnostic, SessionEvent } from "./types";
+import type { PowerMeterDiagnostic, SessionEvent, SessionSummary } from "./types";
 
 const measurementDefaults = { sleep_time: 1, sample_count: 2, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
 const settings = {
@@ -20,9 +20,31 @@ const capabilities = {
   },
 };
 
+function sessionSummary(overrides: Partial<SessionSummary> = {}): SessionSummary {
+  return {
+    session_id: "session-1",
+    state: "completed",
+    created_at: "2026-08-13T10:00:00Z",
+    updated_at: "2026-08-13T10:05:00Z",
+    measure_type: "light",
+    model_id: "LCT010",
+    product_name: "Hue lamp",
+    measure_device: "Desk lamp",
+    completed: 1,
+    total: 1,
+    percent: 100,
+    can_resume: false,
+    file_count: 1,
+    size: 10,
+    active: false,
+    ...overrides,
+  };
+}
+
 function state(): MeasureAppState {
   return {
     view: "loading", errorMessage: "", busy: false, connectedToEvents: false,
+    sessions: [],
     files: [], plotCollection: { partial: false, plots: [], warnings: [] },
     logs: [], samples: [], lights: [], powers: [], voltages: [], definitions: [],
     dummyLoadCalibration: null, dummyLoadCalibrationError: "",
@@ -69,6 +91,9 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     getDummyLoadCalibration: async () => null,
     preflight: async () => ({ valid: true, warnings: [] }),
     start: async () => ({ state: "running" }),
+    getSessions: async () => [],
+    getSession: async () => ({ state: "idle" }),
+    deleteSession: async () => undefined,
     getCurrent: async () => ({ state: "idle" }),
     cancel: async () => ({ state: "cancelled" }),
     confirm: async () => ({ state: "running" }),
@@ -95,7 +120,7 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
       branch_name: "",
       warnings: [],
     }),
-    previewContribution: async (request) => ({
+    previewContribution: async (_sessionId, request) => ({
       eligible: true,
       repository: "bramstroker/homeassistant-powercalc",
       base_branch: "master",
@@ -145,7 +170,7 @@ describe("measure app controller", () => {
 
     await controller.boot();
 
-    expect(appState.view).toBe("setup");
+    expect(appState.view).toBe("sessions");
     expect(appState.dummyLoadCalibration).toBeNull();
     expect(appState.dummyLoadCalibrationError).toContain("Calibration API unavailable");
   });
@@ -167,7 +192,7 @@ describe("measure app controller", () => {
       }],
     };
     const controller = new MeasureAppController(appState, () => api({
-      getCurrent: async () => ({ state: "cancelled" }),
+      getSession: async () => ({ state: "cancelled", session_id: "session-1" }),
       getFiles: async () => [{ name: "brightness.csv", size: 10, media_type: "text/csv" }],
       getPlots: async () => plots,
       getDummyLoadCalibration: async () => {
@@ -179,6 +204,7 @@ describe("measure app controller", () => {
     }), () => connection(), () => undefined);
 
     await controller.boot();
+    await controller.openSession("session-1");
 
     expect(appState.view).toBe("result");
     expect(appState.files).toHaveLength(1);
@@ -189,7 +215,7 @@ describe("measure app controller", () => {
   it("loads contribution auth and draft data for a completed session", async () => {
     const appState = state();
     const controller = new MeasureAppController(appState, () => api({
-      getCurrent: async () => ({ state: "completed" }),
+      getSession: async () => ({ state: "completed", session_id: "session-1" }),
       getContributionAuth: async () => ({ connected: true, identity: { login: "octocat" }, method: "device" }),
       getContributionDraft: async () => ({
         eligible: true,
@@ -214,6 +240,7 @@ describe("measure app controller", () => {
     }), () => connection(), () => undefined);
 
     await controller.boot();
+    await controller.openSession("session-1");
 
     expect(appState.view).toBe("result");
     expect(appState.contributionAuth?.identity?.login).toBe("octocat");
@@ -224,7 +251,7 @@ describe("measure app controller", () => {
   it("restores a persisted submitted contribution for the current session", async () => {
     const appState = state();
     const controller = new MeasureAppController(appState, () => api({
-      getCurrent: async () => ({ state: "completed", session_id: "session-1" }),
+      getSession: async () => ({ state: "completed", session_id: "session-1" }),
       getContributionStatus: async () => ({
         state: "submitted" as const,
         session_id: "session-1",
@@ -234,6 +261,7 @@ describe("measure app controller", () => {
     }), () => connection(), () => undefined);
 
     await controller.boot();
+    await controller.openSession("session-1");
 
     expect(appState.contributionResult?.pull_request_url).toBe("https://github.com/pull/9");
     expect(appState.contributionResult?.status).toBe("success");
@@ -242,7 +270,7 @@ describe("measure app controller", () => {
   it("ignores persisted contribution status from another session", async () => {
     const appState = state();
     const controller = new MeasureAppController(appState, () => api({
-      getCurrent: async () => ({ state: "completed", session_id: "session-2" }),
+      getSession: async () => ({ state: "completed", session_id: "session-2" }),
       getContributionStatus: async () => ({
         state: "failed" as const,
         session_id: "session-1",
@@ -251,6 +279,7 @@ describe("measure app controller", () => {
     }), () => connection(), () => undefined);
 
     await controller.boot();
+    await controller.openSession("session-2");
 
     expect(appState.contributionResult).toBeUndefined();
     expect(appState.contributionError).toBe("");
@@ -265,7 +294,7 @@ describe("measure app controller", () => {
         devicePolls += 1;
         return { status: "authorized", auth: { connected: true, identity: { login: "octocat" }, method: "device" } };
       },
-      previewContribution: async (request) => ({
+      previewContribution: async (_sessionId, request) => ({
         eligible: true,
         repository: "bramstroker/homeassistant-powercalc",
         base_branch: "master",
@@ -286,6 +315,7 @@ describe("measure app controller", () => {
         warnings: [],
       }),
     }), () => connection(), () => undefined);
+    appState.snapshot = { state: "completed", session_id: "session-1" };
 
     await controller.startContributionDeviceAuth();
     expect(appState.contributionDeviceFlow?.flow_id).toBe("flow-1");
@@ -407,7 +437,7 @@ describe("measure app controller", () => {
     const controller = new MeasureAppController(appState, () => appApi, () => connection(), () => undefined);
 
     await controller.boot();
-    expect(appState.view).toBe("setup");
+    expect(appState.view).toBe("sessions");
     expect(catalogCalls).toBe(1);
     expect(appState.lights[0]?.entity_id).toBe("light.desk");
     expect(appState.powers[0]?.entity_id).toBe("sensor.plug_power");
@@ -425,7 +455,8 @@ describe("measure app controller", () => {
     let onEvent: ((event: SessionEvent) => void) | undefined;
     const appState = state();
     const appApi = api({
-      getCurrent: async () => ({ state: "running" }),
+      getSessions: async () => [sessionSummary({ state: "running", active: true, percent: 50 })],
+      getSession: async () => ({ state: "running", session_id: "session-1" }),
       getMeasureDefinitions: async () => [{
         measure_type: "fan",
     icon: "🌀",
@@ -439,7 +470,7 @@ describe("measure app controller", () => {
         return [];
       },
     });
-    const controller = new MeasureAppController(appState, () => appApi, (callbacks) => {
+    const controller = new MeasureAppController(appState, () => appApi, (_sessionId, callbacks) => {
       onEvent = callbacks.onEvent;
       return connection();
     }, () => undefined);
@@ -480,7 +511,7 @@ describe("measure app controller", () => {
 
     expect(appState.capabilities?.defaults.sleep_time).toBe(4);
     expect(appState.capabilities?.defaults.sample_count).toBe(3);
-    expect(appState.view).toBe("setup");
+    expect(appState.view).toBe("sessions");
   });
 
   it("reloads the matching dummy-load calibration after changing the power meter", async () => {

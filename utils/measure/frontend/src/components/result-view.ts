@@ -1,6 +1,9 @@
 import { LitElement, css, html, nothing } from "lit";
-import type { ContributionAuthState, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, PlotCollection, SessionFile, SessionSnapshot, SettingsSection } from "../types";
-import { sharedStyles } from "../styles";
+import type { ContributionAuthState, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, PlotCollection, SessionFile, SessionSnapshot, SessionState, SettingsSection } from "../types";
+import { emit } from "../events";
+import { fileSize, words } from "../format";
+import { formText } from "../form";
+import { diagnosticsDownload, sharedStyles } from "../styles";
 import "./result-plot";
 
 const CONTRIBUTION_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/output/";
@@ -18,6 +21,46 @@ interface ContributionMethod {
   available: boolean;
   unavailableReason?: string;
 }
+
+interface ResultOutcome {
+  mark: string;
+  title: string;
+  description: string;
+}
+
+const COMPLETED: ResultOutcome = {
+  mark: "✓",
+  title: "Profile captured",
+  description: "The complete output is ready to inspect or download.",
+};
+
+const COMPLETED_WITH_READOUT: ResultOutcome = {
+  mark: "✓",
+  title: "Measurement complete",
+  description: "Here is the measured result.",
+};
+
+const CANCELLED: ResultOutcome = {
+  mark: "↻",
+  title: "Measurement cancelled",
+  description: "Any complete output rows have been kept safely.",
+};
+
+/** Every terminal state a session can be shown in. Non-terminal states never reach this view. */
+const OUTCOMES: Partial<Record<SessionState, ResultOutcome>> = {
+  completed: COMPLETED,
+  failed: {
+    mark: "!",
+    title: "Measurement stopped with an error",
+    description: "Review the guidance below, correct the problem, and start a new measurement.",
+  },
+  resumable: {
+    mark: "↻",
+    title: "A measurement can be resumed",
+    description: "Compatible output was found. Continue from the last complete variation.",
+  },
+  cancelled: CANCELLED,
+};
 
 export class ResultView extends LitElement {
   static readonly properties = {
@@ -95,10 +138,7 @@ export class ResultView extends LitElement {
     .contribution-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
     .contribution-grid label, .notes-field { display: grid; gap: 0.35rem; }
     .contribution-grid span, .notes-field span, .preview-block span, .info-list span { color: var(--muted); font-size: 0.76rem; font-weight: 650; }
-    input, textarea {
-      width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 9px;
-      padding: 0.65rem 0.75rem; background: var(--well); color: var(--ink);
-    }
+    input, textarea { background: var(--well); }
     textarea { min-height: 84px; resize: vertical; }
     .info-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.5rem 0.8rem; margin: 0; }
     .info-list div { min-width: 0; }
@@ -123,14 +163,15 @@ export class ResultView extends LitElement {
 
   render() {
     const state = this.snapshot.state;
+    const outcome = this.outcome(state);
     const error = typeof this.snapshot.error === "string" ? this.snapshot.error : this.snapshot.error?.message;
     const showArtifacts = state !== "failed";
     return html`
       <section class="panel" aria-labelledby="result-title">
         <p class="eyebrow">04 / Result</p>
         <div class="result-summary">
-          <div class="status-mark ${state}" aria-hidden="true">${this.statusMark(state)}</div>
-          <div><h2 id="result-title">${this.resultTitle(state)}</h2><p class="muted">${this.description(state)}</p></div>
+          <div class="status-mark ${state}" aria-hidden="true">${outcome.mark}</div>
+          <div><h2 id="result-title">${outcome.title}</h2><p class="muted">${outcome.description}</p></div>
         </div>
         ${error ? html`<p class="notice error" role="alert">${this.renderError(error)}</p>` : nothing}
         ${showArtifacts ? this.renderSummary() : nothing}
@@ -138,11 +179,9 @@ export class ResultView extends LitElement {
         ${showArtifacts ? this.renderFiles() : nothing}
         ${showArtifacts ? this.renderContributionSection(state) : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
-        <div class="diagnostics-download">
-          <span>Session snapshot and logs for issue reporting.</span>
-          <a href=${this.diagnosticsUrl} download>Download diagnostics</a>
-        </div>
+        ${diagnosticsDownload(this.diagnosticsUrl)}
         <div class="actions">
+          <button type="button" @click=${() => this.emit("sessions")}>All sessions</button>
           <button type="button" @click=${() => this.emit("new")}>New measurement</button>
           ${this.renderResume(state)}
         </div>
@@ -164,7 +203,7 @@ export class ResultView extends LitElement {
           <button class="download-all" type="button" @click=${() => this.downloadAll()}>Download all</button>
         </div>
         <ul>${this.files.map((file) => html`
-          <li><span>${file.name}</span><small>${this.size(file.size)}</small><a href=${this.fileUrl(file.name)} download>Download<span class="sr-only"> ${file.name}</span></a></li>
+          <li><span>${file.name}</span><small>${fileSize(file.size)}</small><a href=${this.fileUrl(file.name)} download>Download<span class="sr-only"> ${file.name}</span></a></li>
         `)}</ul>
       `;
     }
@@ -350,7 +389,7 @@ export class ResultView extends LitElement {
 
   private infoEntries(prefix: string, values: Record<string, string | number | boolean | null>) {
     return Object.entries(values).map(([label, value]) => html`
-      <div><dt><span>${prefix} ${this.label(label)}</span></dt><dd>${value ?? "—"}</dd></div>
+      <div><dt><span>${prefix} ${words(label)}</span></dt><dd>${value ?? "—"}</dd></div>
     `);
   }
 
@@ -412,35 +451,15 @@ ${preview.pr_body}</pre>
     </div>`;
   }
 
-  private renderResume(state: SessionSnapshot["state"]) {
+  private renderResume(state: SessionState) {
     if (!this.canResume || (state !== "resumable" && state !== "cancelled")) return nothing;
     return html`<button class="primary" type="button" @click=${() => this.emit("resume")} ?disabled=${this.busy}>${this.busy ? "Resuming…" : "Resume measurement"}</button>`;
   }
 
-  private statusMark(state: SessionSnapshot["state"]): string {
-    if (state === "completed") return "✓";
-    if (state === "failed") return "!";
-    return "↻";
-  }
-
-  private resultTitle(state: SessionSnapshot["state"]): string {
-    if (state === "completed") return this.summaryEntries().length ? "Measurement complete" : "Profile captured";
-    if (state === "failed") return "Measurement stopped with an error";
-    if (state === "resumable") return "A measurement can be resumed";
-    return "Measurement cancelled";
-  }
-
-  private description(state: SessionSnapshot["state"]): string {
-    if (state === "completed") return this.summaryEntries().length ? "Here is the measured result." : "The complete output is ready to inspect or download.";
-    if (state === "resumable") return "Compatible output was found. Continue from the last complete variation.";
-    if (state === "failed") return "Review the guidance below, correct the problem, and start a new measurement.";
-    return "Any complete output rows have been kept safely.";
-  }
-
-  private size(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1_048_576) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / 1_048_576).toFixed(1)} MB`;
+  /** How this outcome is announced. A completed run reads differently with and without a readout. */
+  private outcome(state: SessionState): ResultOutcome {
+    if (state !== "completed") return OUTCOMES[state] ?? CANCELLED;
+    return this.summaryEntries().length ? COMPLETED_WITH_READOUT : COMPLETED;
   }
 
   private input(
@@ -458,35 +477,26 @@ ${preview.pr_body}</pre>
     if (!form) return null;
     const data = new FormData(form);
     return {
-      manufacturer_name: this.formString(data, "manufacturer_name"),
-      manufacturer_directory: this.formString(data, "manufacturer_directory"),
-      model_id: this.formString(data, "model_id"),
-      product_name: this.formString(data, "product_name"),
-      contributor: this.formString(data, "contributor"),
-      notes: this.formString(data, "notes"),
+      manufacturer_name: formText(data, "manufacturer_name"),
+      manufacturer_directory: formText(data, "manufacturer_directory"),
+      model_id: formText(data, "model_id"),
+      product_name: formText(data, "product_name"),
+      contributor: formText(data, "contributor"),
+      notes: formText(data, "notes"),
     };
-  }
-
-  private formString(data: FormData, name: string): string {
-    const value = data.get(name);
-    return typeof value === "string" ? value.trim() : "";
   }
 
   private previewContribution(event: SubmitEvent): void {
     event.preventDefault();
     const detail = this.collectContribution();
     if (!detail) return;
-    this.dispatchEvent(new CustomEvent<ContributionPreviewRequest>("contribution-preview", { detail, bubbles: true, composed: true }));
+    emit<ContributionPreviewRequest>(this, "contribution-preview", detail);
   }
 
   private submitContribution(): void {
     const detail = this.collectContribution();
     if (!detail || !this.canSubmitContribution()) return;
-    this.dispatchEvent(new CustomEvent<ContributionSubmitRequest>("contribution-submit", {
-      detail: { ...detail, confirmed: true },
-      bubbles: true,
-      composed: true,
-    }));
+    emit<ContributionSubmitRequest>(this, "contribution-submit", { ...detail, confirmed: true });
   }
 
   private canSubmitContribution(): boolean {
@@ -494,16 +504,12 @@ ${preview.pr_body}</pre>
     return Boolean(confirmed && this.contributionAuth?.connected && !this.contributionBusy);
   }
 
-  private label(value: string): string {
-    return value.replaceAll("_", " ");
-  }
-
   private openGithubSettings(): void {
-    this.dispatchEvent(new CustomEvent<{ section: SettingsSection }>("open-settings", { detail: { section: "github" }, bubbles: true, composed: true }));
+    emit<{ section: SettingsSection }>(this, "open-settings", { section: "github" });
   }
 
-  private emit(name: "new" | "resume" | "open-settings"): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true }));
+  private emit(name: "sessions" | "new" | "resume"): void {
+    emit(this, name);
   }
 }
 

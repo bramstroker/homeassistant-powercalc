@@ -153,15 +153,59 @@ def test_coordinator_rejects_resume_without_compatible_output(tmp_path: Path) ->
         coordinator.resume()
 
 
-def test_overwrite_removes_previous_session_files(tmp_path: Path) -> None:
+def test_legacy_overwrite_policy_retains_previous_session_files(tmp_path: Path) -> None:
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
     first = coordinator.start(light_request())
     wait_for_state(coordinator, SessionState.COMPLETED)
     old_directory = coordinator.storage.session_directory(first.id)
 
-    coordinator.start(light_request().model_copy(update={"resume_policy": ResumePolicy.OVERWRITE}))
+    second = coordinator.start(light_request().model_copy(update={"resume_policy": ResumePolicy.OVERWRITE}))
 
-    assert not old_directory.exists()
+    assert old_directory.exists()
+    assert {session.id for session in coordinator.sessions()} == {first.id, second.id}
+
+
+def test_coordinator_resumes_a_retained_historical_session(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    old = SessionSnapshot(
+        id="old-session",
+        state=SessionState.CANCELLED,
+        created_at="2026-07-12T12:00:00Z",
+        updated_at="2026-07-12T12:05:00Z",
+    )
+    storage.create(old, light_request())
+    output = storage.artifact_directory(old.id, "LCT010")
+    output.mkdir()
+    (output / "brightness.csv").write_text("bri,watt\n2,1.0\n", encoding="utf-8")
+    current = SessionSnapshot(
+        id="new-session",
+        state=SessionState.COMPLETED,
+        created_at="2026-07-13T12:00:00Z",
+        updated_at="2026-07-13T12:05:00Z",
+    )
+    storage.create(current, light_request())
+    started = Event()
+    coordinator = MeasurementCoordinator(storage, lambda: BlockingService(started))
+
+    resumed = coordinator.resume(old.id)
+
+    assert started.wait(1)
+    assert resumed.id == old.id
+    assert resumed.state == SessionState.RUNNING
+    assert "old-session" in (tmp_path / "current.json").read_text(encoding="utf-8")
+    coordinator.cancel(old.id)
+    wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_coordinator_deletes_only_terminal_sessions(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+    completed = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    coordinator.delete(completed.id)
+
+    assert coordinator.sessions() == ()
+    assert coordinator.current is None
 
 
 def test_transient_sample_does_not_reuse_terminal_event_sequence(tmp_path: Path) -> None:

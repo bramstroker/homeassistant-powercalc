@@ -125,6 +125,24 @@ class SessionPlots(BaseModel):
     warnings: list[str]
 
 
+class SessionSummary(BaseModel):
+    session_id: str
+    state: SessionState
+    created_at: str
+    updated_at: str
+    measure_type: MeasureType
+    model_id: str
+    product_name: str
+    measure_device: str
+    completed: int
+    total: int
+    percent: float
+    can_resume: bool
+    file_count: int
+    size: int
+    active: bool
+
+
 class CapabilitiesResponse(BaseModel):
     runtime_version: str
     defaults: dict[str, int | float]
@@ -446,6 +464,68 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
 
 
 def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
+    @router.get("/sessions")
+    async def sessions(request: Request) -> list[SessionSummary]:
+        context = _context(request)
+        snapshots = await run_in_threadpool(context.coordinator.sessions)
+        summaries = [await run_in_threadpool(_session_summary, context, snapshot) for snapshot in snapshots]
+        return sorted(summaries, key=lambda item: not item.active)
+
+    @router.get("/sessions/{session_id}", responses={404: _ERROR})
+    async def session(session_id: str, request: Request) -> dict[str, object]:
+        context = _context(request)
+        return _snapshot_response(context, _require_session(context, session_id))
+
+    @router.delete("/sessions/{session_id}", status_code=204, responses={404: _ERROR, 409: _ERROR})
+    async def delete_session(session_id: str, request: Request) -> Response:
+        context = _context(request)
+        _require_session(context, session_id)
+        try:
+            await run_in_threadpool(context.coordinator.delete, session_id)
+        except SessionConflictError as error:
+            raise HTTPException(status_code=409, detail=str(error)) from error
+        return Response(status_code=204)
+
+    @router.delete("/sessions/{session_id}/cancel", status_code=202, responses={404: _ERROR, 409: _ERROR})
+    async def cancel_session_by_id(session_id: str, request: Request) -> dict[str, object]:
+        return _cancel_session(_context(request), session_id)
+
+    @router.post("/sessions/{session_id}/confirm", responses={404: _ERROR, 409: _ERROR})
+    async def confirm_session_by_id(session_id: str, request: Request) -> dict[str, object]:
+        return _confirm_session(_context(request), session_id)
+
+    @router.post("/sessions/{session_id}/resume", responses={404: _ERROR, 409: _ERROR, 422: _ERROR})
+    async def resume_session_by_id(session_id: str, request: Request) -> dict[str, object]:
+        return await _resume_session(_context(request), session_id)
+
+    @router.get("/sessions/{session_id}/files", responses={404: _ERROR})
+    async def session_files(session_id: str, request: Request) -> list[SessionFile]:
+        context = _context(request)
+        snapshot = _require_session(context, session_id)
+        return _session_files(context, snapshot)
+
+    @router.get("/sessions/{session_id}/plots", responses={404: _ERROR, 409: _ERROR})
+    async def session_plots(session_id: str, request: Request) -> SessionPlots:
+        context = _context(request)
+        return await _session_plots(context, _require_session(context, session_id))
+
+    @router.get("/sessions/{session_id}/files/{name:path}", responses={404: _ERROR})
+    async def session_download(session_id: str, name: str, request: Request) -> FileResponse:
+        context = _context(request)
+        return _session_download(context, _require_session(context, session_id), name)
+
+    @router.get("/sessions/{session_id}/diagnostics", responses={404: _ERROR})
+    async def session_diagnostics(session_id: str, request: Request) -> Response:
+        context = _context(request)
+        return _session_diagnostics(context, _require_session(context, session_id))
+
+    @router.get("/sessions/{session_id}/events", responses={404: _ERROR})
+    async def session_events(session_id: str, request: Request) -> StreamingResponse:
+        context = _context(request)
+        _require_session(context, session_id)
+        return StreamingResponse(_event_stream(request, context, session_id), media_type="text/event-stream")
+
+    # Compatibility aliases for clients released before session history.
     @router.get("/session/current", responses={404: _ERROR})
     async def current_session(request: Request) -> dict[str, object]:
         context = _context(request)
@@ -453,105 +533,44 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
 
     @router.delete("/session/current", status_code=202, responses={409: _ERROR})
     async def cancel_session(request: Request) -> dict[str, object]:
-        context = _context(request)
-        try:
-            snapshot = context.coordinator.cancel()
-        except SessionConflictError as error:
-            raise HTTPException(status_code=409, detail=str(error)) from error
-        return _snapshot_response(context, snapshot)
+        return _cancel_session(_context(request))
 
     @router.post("/session/current/confirm", responses={404: _ERROR, 409: _ERROR})
     async def confirm_session(request: Request) -> dict[str, object]:
-        context = _context(request)
-        try:
-            snapshot = context.coordinator.confirm()
-        except SessionConflictError as error:
-            raise HTTPException(status_code=409, detail=str(error)) from error
-        return _snapshot_response(context, snapshot)
+        return _confirm_session(_context(request))
 
     @router.post("/session/current/resume", responses={404: _ERROR, 409: _ERROR})
     async def resume_session(request: Request) -> dict[str, object]:
-        context = _context(request)
-        try:
-            snapshot = context.coordinator.current
-            if snapshot is None:
-                raise SessionConflictError("There is no current session to resume")
-            await run_in_threadpool(_preflight, context, context.storage.load_request(snapshot.id))
-            snapshot = context.coordinator.resume()
-        except SessionConflictError as error:
-            raise HTTPException(status_code=409, detail=str(error)) from error
-        return _snapshot_response(context, snapshot)
+        return await _resume_session(_context(request))
 
     @router.get("/session/current/files", responses={404: _ERROR})
     async def files(request: Request) -> list[SessionFile]:
         context = _context(request)
-        snapshot = _require_current_session(context)
-        return [
-            _file_descriptor(context.storage.file_path(snapshot.id, name), name)
-            for name in context.storage.list_files(snapshot.id)
-        ]
+        return _session_files(context, _require_current_session(context))
 
     @router.get("/session/current/plots", responses={404: _ERROR, 409: _ERROR})
     async def plots(request: Request) -> SessionPlots:
         context = _context(request)
-        snapshot = _require_current_session(context)
-        if snapshot.state in ACTIVE_SESSION_STATES:
-            raise HTTPException(status_code=409, detail="Plots are available after the measurement stops")
-        names = context.storage.list_files(snapshot.id)
-        paths = {name: context.storage.file_path(snapshot.id, name) for name in names}
-        result = await run_in_threadpool(
-            build_session_plots,
-            context.storage.load_request(snapshot.id),
-            paths,
-        )
-        return SessionPlots(
-            partial=snapshot.state is not SessionState.COMPLETED,
-            plots=list(result.plots),
-            warnings=list(result.warnings),
-        )
+        return await _session_plots(context, _require_current_session(context))
 
     @router.get("/session/current/files/{name:path}", responses={404: _ERROR})
     async def download(name: str, request: Request) -> FileResponse:
         context = _context(request)
-        snapshot = _require_current_session(context)
-        try:
-            path = context.storage.file_path(snapshot.id, name)
-        except (FileNotFoundError, ValueError) as error:
-            raise HTTPException(status_code=404, detail="File not found") from error
-        return FileResponse(path, filename=path.name)
+        return _session_download(context, _require_current_session(context), name)
 
     @router.get("/session/current/diagnostics", responses={404: _ERROR})
     async def diagnostics(request: Request) -> Response:
         context = _context(request)
-        snapshot = _require_current_session(context)
-        files = [
-            _file_descriptor(context.storage.file_path(snapshot.id, name), name).model_dump()
-            for name in context.storage.list_files(snapshot.id)
-        ]
-        events = context.storage.load_events(snapshot.id, limit=DIAGNOSTIC_EVENT_LIMIT + 1)
-        events_truncated = len(events) > DIAGNOSTIC_EVENT_LIMIT
-        payload = build_session_diagnostics(
-            snapshot,
-            context.storage.load_request(snapshot.id),
-            events[-DIAGNOSTIC_EVENT_LIMIT:],
-            files,
-            events_truncated=events_truncated,
-        )
-        filename = f"powercalc-measure-diagnostics-{snapshot.id[:8]}.json"
-        return Response(
-            content=json.dumps(payload, indent=2, default=str),
-            media_type="application/json",
-            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-        )
+        return _session_diagnostics(context, _require_current_session(context))
 
     @router.get("/session/current/events", responses={404: _ERROR})
     async def events(request: Request) -> StreamingResponse:
         context = _context(request)
-        _require_current_session(context)
-        return StreamingResponse(_event_stream(request, context), media_type="text/event-stream")
+        snapshot = _require_current_session(context)
+        return StreamingResponse(_event_stream(request, context, snapshot.id), media_type="text/event-stream")
 
 
-def _register_contribution_routes(router: APIRouter) -> None:
+def _register_contribution_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/contribution/auth")
     async def contribution_auth_status(request: Request) -> ContributionAuthStatus:
         return await run_in_threadpool(_context(request).contribution.auth_status)
@@ -575,6 +594,43 @@ def _register_contribution_routes(router: APIRouter) -> None:
     @router.get("/contribution/status")
     async def contribution_status(request: Request) -> ContributionStatus:
         return _context(request).contribution.status()
+
+    @router.get("/sessions/{session_id}/contribution", responses={404: _ERROR, 409: _ERROR})
+    async def contribution_draft(session_id: str, request: Request) -> ContributionPreviewResponse:
+        context = _context(request)
+        return await run_in_threadpool(context.contribution.draft, _require_session(context, session_id))
+
+    @router.post(
+        "/sessions/{session_id}/contribution/preview",
+        responses={404: _ERROR, 409: _ERROR, 422: _ERROR, 502: _ERROR},
+    )
+    async def contribution_preview(
+        session_id: str,
+        payload: ContributionPreviewRequest,
+        request: Request,
+    ) -> ContributionPreviewResponse:
+        context = _context(request)
+        return await run_in_threadpool(
+            context.contribution.preview,
+            _require_session(context, session_id),
+            payload,
+        )
+
+    @router.post(
+        "/sessions/{session_id}/contribution",
+        responses={401: _ERROR, 404: _ERROR, 409: _ERROR, 502: _ERROR},
+    )
+    async def contribution_submit(
+        session_id: str,
+        payload: ContributionSubmitRequest,
+        request: Request,
+    ) -> ContributionSubmissionResult:
+        context = _context(request)
+        return await run_in_threadpool(
+            context.contribution.submit,
+            _require_session(context, session_id),
+            payload,
+        )
 
     @router.get("/session/current/contribution", responses={404: _ERROR, 409: _ERROR})
     async def current_contribution_draft(request: Request) -> ContributionPreviewResponse:
@@ -616,6 +672,93 @@ def _require_current_session(context: AppContext) -> SessionSnapshot:
     if snapshot is None:
         raise HTTPException(status_code=404, detail=_NO_SESSION)
     return snapshot
+
+
+def _require_session(context: AppContext, session_id: str) -> SessionSnapshot:
+    try:
+        return context.coordinator.get(session_id)
+    except (FileNotFoundError, KeyError, TypeError, ValueError) as error:
+        raise HTTPException(status_code=404, detail="Measurement session not found") from error
+
+
+def _cancel_session(context: AppContext, session_id: str | None = None) -> dict[str, object]:
+    try:
+        snapshot = context.coordinator.cancel(session_id)
+    except SessionConflictError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    return _snapshot_response(context, snapshot)
+
+
+def _confirm_session(context: AppContext, session_id: str | None = None) -> dict[str, object]:
+    try:
+        snapshot = context.coordinator.confirm(session_id)
+    except SessionConflictError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    return _snapshot_response(context, snapshot)
+
+
+async def _resume_session(context: AppContext, session_id: str | None = None) -> dict[str, object]:
+    snapshot = _require_session(context, session_id) if session_id is not None else _require_current_session(context)
+    await run_in_threadpool(_preflight, context, context.storage.load_request(snapshot.id))
+    try:
+        snapshot = context.coordinator.resume(snapshot.id)
+    except SessionConflictError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    return _snapshot_response(context, snapshot)
+
+
+def _session_files(context: AppContext, snapshot: SessionSnapshot) -> list[SessionFile]:
+    return [
+        _file_descriptor(context.storage.file_path(snapshot.id, name), name)
+        for name in context.storage.list_files(snapshot.id)
+    ]
+
+
+async def _session_plots(context: AppContext, snapshot: SessionSnapshot) -> SessionPlots:
+    if snapshot.state in ACTIVE_SESSION_STATES:
+        raise HTTPException(status_code=409, detail="Plots are available after the measurement stops")
+    names = context.storage.list_files(snapshot.id)
+    paths = {name: context.storage.file_path(snapshot.id, name) for name in names}
+    result = await run_in_threadpool(
+        build_session_plots,
+        context.storage.load_request(snapshot.id),
+        paths,
+    )
+    return SessionPlots(
+        partial=snapshot.state is not SessionState.COMPLETED,
+        plots=list(result.plots),
+        warnings=list(result.warnings),
+    )
+
+
+def _session_download(context: AppContext, snapshot: SessionSnapshot, name: str) -> FileResponse:
+    try:
+        path = context.storage.file_path(snapshot.id, name)
+    except (FileNotFoundError, ValueError) as error:
+        raise HTTPException(status_code=404, detail="File not found") from error
+    return FileResponse(path, filename=path.name)
+
+
+def _session_diagnostics(context: AppContext, snapshot: SessionSnapshot) -> Response:
+    files = [
+        _file_descriptor(context.storage.file_path(snapshot.id, name), name).model_dump()
+        for name in context.storage.list_files(snapshot.id)
+    ]
+    events = context.storage.load_events(snapshot.id, limit=DIAGNOSTIC_EVENT_LIMIT + 1)
+    events_truncated = len(events) > DIAGNOSTIC_EVENT_LIMIT
+    payload = build_session_diagnostics(
+        snapshot,
+        context.storage.load_request(snapshot.id),
+        events[-DIAGNOSTIC_EVENT_LIMIT:],
+        files,
+        events_truncated=events_truncated,
+    )
+    filename = f"powercalc-measure-diagnostics-{snapshot.id[:8]}.json"
+    return Response(
+        content=json.dumps(payload, indent=2, default=str),
+        media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 def _measure_definitions() -> list[MeasureDefinition]:
@@ -817,6 +960,8 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[s
     return {
         "session_id": snapshot.id,
         "state": snapshot.state,
+        "created_at": snapshot.created_at,
+        "updated_at": snapshot.updated_at,
         "phase": snapshot.phase,
         "confirmation_message": snapshot.confirmation_message,
         "mode": snapshot.mode,
@@ -833,6 +978,29 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[s
         "operating_point": snapshot.operating_point,
         "request": request,
     }
+
+
+def _session_summary(context: AppContext, snapshot: SessionSnapshot) -> SessionSummary:
+    request = context.storage.load_request(snapshot.id)
+    current = context.coordinator.current
+    return SessionSummary(
+        session_id=snapshot.id,
+        state=snapshot.state,
+        created_at=snapshot.created_at,
+        updated_at=snapshot.updated_at,
+        measure_type=request.measure_type,
+        model_id=request.model_id,
+        product_name=request.product_name,
+        measure_device=request.measure_device,
+        completed=snapshot.completed,
+        total=snapshot.total,
+        percent=snapshot.progress,
+        can_resume=context.storage.can_resume(snapshot.id)
+        and snapshot.state in {SessionState.RESUMABLE, SessionState.CANCELLED, SessionState.FAILED},
+        file_count=len(context.storage.list_files(snapshot.id)),
+        size=context.storage.session_size(snapshot.id),
+        active=current is not None and current.id == snapshot.id and snapshot.state in ACTIVE_SESSION_STATES,
+    )
 
 
 def _duration_seconds(value: str | None) -> int | None:
@@ -853,20 +1021,23 @@ def _file_descriptor(path: Path, name: str) -> SessionFile:
     )
 
 
-async def _event_stream(request: Request, context: AppContext) -> AsyncIterator[str]:
+async def _event_stream(request: Request, context: AppContext, session_id: str) -> AsyncIterator[str]:
     last_event_id = request.headers.get("last-event-id", "0")
     try:
         sequence = max(0, int(last_event_id))
     except ValueError:
         sequence = 0
     while not await request.is_disconnected():
-        events = context.coordinator.events_since(sequence)
+        events = context.coordinator.events_since(sequence, session_id)
         if events:
             for event in events:
                 sequence = max(sequence, event.sequence)
-                yield _encode_event(context, event)
+                yield _encode_event(context, event, session_id)
         else:
-            snapshot = context.coordinator.current
+            try:
+                snapshot = context.coordinator.get(session_id)
+            except FileNotFoundError, KeyError, TypeError, ValueError:
+                return
             if snapshot is not None:
                 heartbeat = {
                     "sequence": snapshot.event_sequence,
@@ -878,8 +1049,11 @@ async def _event_stream(request: Request, context: AppContext) -> AsyncIterator[
         await asyncio.sleep(1)
 
 
-def _encode_event(context: AppContext, event: SessionEvent) -> str:
-    snapshot = context.coordinator.current
+def _encode_event(context: AppContext, event: SessionEvent, session_id: str) -> str:
+    try:
+        snapshot = context.coordinator.get(session_id)
+    except FileNotFoundError, KeyError, TypeError, ValueError:
+        snapshot = None
     payload: dict[str, object] = {
         "sequence": event.sequence,
         "type": event.type,

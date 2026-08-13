@@ -1,17 +1,9 @@
 import { LitElement, css, html, nothing } from "lit";
+import type { LabelledValue } from "../review-summary";
 import type { PowerMeterDiagnostic } from "../types";
+import { emit } from "../events";
 import { sharedStyles } from "../styles";
 import "./power-meter-diagnostic";
-
-export interface ReviewMetric {
-  label: string;
-  value: string;
-}
-
-export interface ReviewRow {
-  label: string;
-  value: string;
-}
 
 export class PreflightView extends LitElement {
   static readonly properties = {
@@ -28,8 +20,8 @@ export class PreflightView extends LitElement {
   };
 
   title = "Ready for the bench";
-  metrics: ReviewMetric[] = [];
-  summary: ReviewRow[] = [];
+  metrics: LabelledValue[] = [];
+  summary: LabelledValue[] = [];
   warnings: string[] = [];
   powerMeterDiagnostic?: PowerMeterDiagnostic | null;
   canOverwrite = false;
@@ -50,7 +42,6 @@ export class PreflightView extends LitElement {
     .starting-indicator { width: 22px; height: 22px; flex: none; border: 2px solid var(--line); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
     .starting strong, .starting span { display: block; }
     .starting span { margin-top: 0.2rem; color: var(--muted); font-size: 0.86rem; }
-    @keyframes spin { to { transform: rotate(360deg); } }
     @media (max-width: 640px) { dl { grid-template-columns: 1fr; gap: 0.2rem; } dd { margin-bottom: 0.6rem; } }
     @media (prefers-reduced-motion: reduce) { .starting-indicator { animation: none; } }
   `];
@@ -75,7 +66,7 @@ export class PreflightView extends LitElement {
           <div class="notice"><strong>Check before starting</strong><ul class="warning-list">${this.warnings.map((warning) => html`<li>${warning}</li>`)}</ul></div>
         ` : nothing}
         ${this.canOverwrite ? html`
-          <label><input type="checkbox" @change=${this.confirmOverwrite} /> I understand the previous measurement and its files will be deleted.</label>
+          <label class="check"><input type="checkbox" @change=${this.confirmOverwrite} /> I understand the previous measurement and its files will be deleted.</label>
         ` : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         ${this.busy ? html`
@@ -102,7 +93,7 @@ export class PreflightView extends LitElement {
   }
 
   private emit(name: "back" | "start"): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true }));
+    emit(this, name);
   }
 }
 
