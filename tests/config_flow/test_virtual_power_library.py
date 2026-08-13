@@ -110,7 +110,7 @@ async def test_manual_setup_from_library_skips_to_manufacturer_step(
     assert result["step_id"] == Step.MANUFACTURER
 
 
-async def test_manufacturer_listing_is_filtered_by_entity_domain(
+async def test_manufacturer_listing_is_filtered_for_light_entity(
     hass: HomeAssistant,
 ) -> None:
     mock_entities_in_registry(hass, {"light.test": {"unique_id": DEFAULT_UNIQUE_ID}})
@@ -127,7 +127,7 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain(
     assert {"value": "signify", "label": "Signify"} in manufacturer_options
 
 
-async def test_manufacturer_listing_is_filtered_by_entity_domain2(
+async def test_manufacturer_listing_is_filtered_for_switch_entity(
     hass: HomeAssistant,
 ) -> None:
     result = await goto_virtual_power_strategy_step(

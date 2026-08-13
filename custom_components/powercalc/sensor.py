@@ -86,8 +86,8 @@ from .const import (
     SensorType,
 )
 from .device_binding import (
-    attach_configured_device_entry,
-    attach_entities_to_resolved_device,
+    assign_device_to_entities,
+    resolve_source_device,
 )
 from .errors import (
     PowercalcSetupError,
@@ -217,7 +217,7 @@ async def _async_setup_entities(
         _LOGGER.error(err)
         return
 
-    attach_entities_to_resolved_device(config_entry, entities.new, hass, None, config)
+    assign_device_to_entities(hass, config_entry, entities.new, None, config)
 
     entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
     for entity in entities_to_add:
@@ -661,7 +661,7 @@ async def create_individual_sensors(
     source_entity = create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     # For device-based profiles, attach the device entry to the source entity
-    source_entity = attach_configured_device_entry(hass, sensor_config, source_entity)
+    source_entity = resolve_source_device(hass, sensor_config, source_entity)
 
     used_unique_ids = hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS, [])
 
@@ -698,7 +698,7 @@ async def create_individual_sensors(
             create_energy_related_sensors(hass, sensor_config, energy_sensor, source_entity, config_entry),
         )
 
-    attach_entities_to_resolved_device(config_entry, entities_to_add, hass, source_entity, sensor_config)
+    assign_device_to_entities(hass, config_entry, entities_to_add, source_entity, sensor_config)
     hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
         {source_entity.entity_id: [(entity, context.is_yaml) for entity in entities_to_add]},
     )

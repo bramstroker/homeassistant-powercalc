@@ -23,16 +23,17 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.device_binding import (
-    attach_configured_device_entry,
     get_config_entry_ids,
     get_first_device_for_config_entry,
     get_non_composite_devices,
     get_related_device_ids,
     is_composite_device_id,
+    resolve_source_device,
 )
 from tests.common import (
     create_mock_config_entry,
     mock_device,
+    mock_device_with_entities,
     mock_devices,
     mock_entities_in_registry,
     run_powercalc_setup,
@@ -83,11 +84,11 @@ def test_get_first_device_for_config_entry(hass: HomeAssistant) -> None:
     assert get_first_device_for_config_entry(hass, config_entry_id) == device_entry
 
 
-def test_attach_configured_device_entry_keeps_source_entity_when_device_is_missing(hass: HomeAssistant) -> None:
+def test_resolve_source_device_keeps_source_entity_when_device_is_missing(hass: HomeAssistant) -> None:
     mock_device_registry(hass)
     source_entity = SourceEntity(object_id="powercalc_dummy", entity_id=DUMMY_ENTITY_ID, domain="sensor")
 
-    result = attach_configured_device_entry(hass, {CONF_DEVICE: "missing-device-id"}, source_entity)
+    result = resolve_source_device(hass, {CONF_DEVICE: "missing-device-id"}, source_entity)
 
     assert result == source_entity
 
@@ -147,7 +148,7 @@ async def test_entities_are_bound_to_source_device(
     assert utility_entity_entry.device_id == device_entry.id
 
 
-async def test_entities_are_bound_to_source_device2(
+async def test_entities_are_bound_to_source_device_when_using_power_sensor_id(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -184,6 +185,20 @@ async def test_entities_are_bound_to_source_device2(
     assert len(caplog.records) == 0
 
 
+async def test_yaml_sensor_is_bound_to_source_device(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """YAML entities are bound with a registry update, which must not trigger the HA device attach warning."""
+    caplog.set_level(logging.WARNING)
+
+    entity_registry = mock_device_with_entities(hass, "light.test")
+    await run_powercalc_setup(hass, {CONF_ENTITY_ID: "light.test"})
+
+    power_sensor = entity_registry.async_get("sensor.test_power")
+    assert power_sensor
+    assert power_sensor.device_id == "model-device"
+
+    assert "attempts to attach a device to an entity without a config entry" not in caplog.text
+
+
 async def test_entities_are_bound_to_disabled_source_device(
     hass: HomeAssistant,
 ) -> None:
@@ -215,10 +230,11 @@ async def test_entities_are_bound_to_disabled_source_device(
     assert energy_entity_entry.device_id == device_id
 
 
-async def test_entities_are_bound_to_source_device3(
+async def test_entities_are_bound_to_configured_device_without_source_entity(
     hass: HomeAssistant,
     entity_registry: er.EntityRegistry,
 ) -> None:
+    """A device based profile has no source entity, so the sensors bind to the configured device."""
     device_id = "abc"
     mock_device(hass, device_id, "test", "test")
 

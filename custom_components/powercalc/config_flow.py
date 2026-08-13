@@ -47,7 +47,7 @@ from .const import (
     CalculationStrategy,
     SensorType,
 )
-from .device_binding import attach_configured_device_entry
+from .device_binding import resolve_source_device
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults, flatten_sections
 from .flow_helper.flows.cost import CostConfigFlow, CostOptionsFlow
@@ -510,7 +510,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
         self.sensor_config = dict(self.config_entry.data)
         if self.source_entity_id:
-            self.source_entity = attach_configured_device_entry(
+            self.source_entity = resolve_source_device(
                 self.hass,
                 self.sensor_config,
                 create_source_entity(

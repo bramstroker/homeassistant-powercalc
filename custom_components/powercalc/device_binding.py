@@ -126,7 +126,7 @@ def get_related_devices(hass: HomeAssistant, device_id: str) -> list[DeviceEntry
     return list(devices.values())
 
 
-def attach_configured_device_entry(
+def resolve_source_device(
     hass: HomeAssistant,
     sensor_config: ConfigType,
     source_entity: SourceEntity,
@@ -141,10 +141,10 @@ def attach_configured_device_entry(
     return source_entity
 
 
-def attach_entities_to_resolved_device(
+def assign_device_to_entities(
+    hass: HomeAssistant,
     config_entry: ConfigEntry | None,
     entities_to_add: list[Entity],
-    hass: HomeAssistant,
     source_entity: SourceEntity | None,
     sensor_config: ConfigType | None = None,
 ) -> None:
@@ -155,11 +155,12 @@ def attach_entities_to_resolved_device(
         return
 
     for entity in entities_to_add:
-        try:
+        # Home Assistant only accepts `device_entry` on entities belonging to a config entry.
+        # Setting it for YAML entities makes HA report a deprecation warning, so those rely
+        # solely on the registry update `bind_entity_to_device` does after they are added.
+        if config_entry:
             entity.device_entry = device_entry
-            setattr(entity, "_powercalc_device_entry", device_entry)  # noqa: B010
-        except AttributeError:  # pragma: no cover
-            _LOGGER.error("%s: Cannot set device id on entity", entity.entity_id)
+        setattr(entity, "_powercalc_device_entry", device_entry)  # noqa: B010
 
 
 def get_device_entry(
