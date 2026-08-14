@@ -17,6 +17,7 @@ import type {
   ContributionSubmitRequest,
   DummyLoadCalibration,
   EntityDescriptor,
+  ErrorHelp,
   MeasureDefinition,
   MeasureType,
   MeasurementRequest,
@@ -38,6 +39,7 @@ export interface MeasureAppState {
   view: AppView;
   settingsSection?: SettingsSection;
   errorMessage: string;
+  errorHelp?: ErrorHelp;
   busy: boolean;
   connectedToEvents: boolean;
   snapshot?: SessionSnapshot;
@@ -115,6 +117,16 @@ export class MeasureAppController {
     private readonly changed: () => void,
   ) {}
 
+  private clearError(): void {
+    this.state.errorMessage = "";
+    this.state.errorHelp = undefined;
+  }
+
+  private setError(error: unknown): void {
+    this.state.errorMessage = message(error);
+    this.state.errorHelp = error instanceof ApiError ? error.help : undefined;
+  }
+
   dispose(): void {
     this.shellyDiscoveryVersion += 1;
     this.stopContributionDevicePolling();
@@ -124,7 +136,7 @@ export class MeasureAppController {
 
   async boot(): Promise<void> {
     this.state.view = "loading";
-    this.state.errorMessage = "";
+    this.clearError();
     this.changed();
     try {
       const api = this.api();
@@ -152,7 +164,7 @@ export class MeasureAppController {
       if (this.state.request) await this.loadTypeEntities(this.state.request.measure_type);
       await this.routeSnapshot();
     } catch (error) {
-      this.state.errorMessage = message(error);
+      this.setError(error);
     }
     this.changed();
   }
@@ -176,7 +188,7 @@ export class MeasureAppController {
   }
 
   backToSetup(): void {
-    this.state.errorMessage = "";
+    this.clearError();
     this.state.view = "setup";
     this.changed();
   }
@@ -282,7 +294,7 @@ export class MeasureAppController {
     if (this.state.view === "loading" || this.state.view === "settings") return;
     this.settingsReturnView = this.state.view;
     this.state.settingsSection = section;
-    this.state.errorMessage = "";
+    this.clearError();
     this.powerMeterTestVersion += 1;
     this.state.powerMeterTestResult = undefined;
     this.state.testingPowerMeter = false;
@@ -293,7 +305,7 @@ export class MeasureAppController {
   }
 
   closeSettings(): void {
-    this.state.errorMessage = "";
+    this.clearError();
     this.state.view = this.settingsReturnView;
     this.changed();
   }
@@ -657,7 +669,7 @@ export class MeasureAppController {
     this.state.contributionPreview = undefined;
     this.state.contributionResult = undefined;
     this.state.contributionError = "";
-    this.state.errorMessage = "";
+    this.clearError();
   }
 
   /**
@@ -666,12 +678,12 @@ export class MeasureAppController {
    */
   private async run(work: () => Promise<void>): Promise<void> {
     this.state.busy = true;
-    this.state.errorMessage = "";
+    this.clearError();
     this.changed();
     try {
       await work();
     } catch (error) {
-      this.state.errorMessage = message(error);
+      this.setError(error);
     } finally {
       this.state.busy = false;
       this.changed();

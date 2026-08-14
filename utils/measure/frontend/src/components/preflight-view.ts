@@ -1,9 +1,10 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { LabelledValue } from "../review-summary";
-import type { PowerMeterDiagnostic } from "../types";
+import type { ErrorHelp, PowerMeterDiagnostic, PreflightResponse } from "../types";
 import { emit } from "../events";
 import { sharedStyles } from "../styles";
+import { errorHelpLink } from "./error-help-link";
 import "./power-meter-diagnostic";
 
 @customElement("measure-preflight-view")
@@ -23,6 +24,9 @@ export class PreflightView extends LitElement {
   @property({ attribute: false })
   powerMeterDiagnostic?: PowerMeterDiagnostic | null;
 
+  @property({ attribute: false })
+  lightLoadProbe?: PreflightResponse["light_load_probe"];
+
   @property({ type: String })
   confirmationAction = "";
 
@@ -32,6 +36,9 @@ export class PreflightView extends LitElement {
   @property({ type: String })
   errorMessage = "";
 
+  @property({ attribute: false })
+  errorHelp?: ErrorHelp;
+
   static readonly styles = [sharedStyles, css`
     .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); margin-bottom: 1rem; }
     .metric { padding: 1rem; background: var(--field); }
@@ -40,6 +47,9 @@ export class PreflightView extends LitElement {
     dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.6rem 1rem; }
     dt { color: var(--muted); } dd { margin: 0; overflow-wrap: anywhere; }
     .warning-list { padding-left: 1.25rem; }
+    .probe-list { display: grid; gap: 0.45rem; padding: 0; margin: 0.75rem 0 0; list-style: none; }
+    .probe-list li { display: flex; justify-content: space-between; gap: 1rem; padding-top: 0.45rem; border-top: 1px solid var(--line); }
+    .probe-list strong { white-space: nowrap; font-family: ui-monospace, monospace; }
     .starting { display: flex; align-items: center; gap: 0.8rem; margin-top: 1rem; }
     .starting-indicator { width: 22px; height: 22px; flex: none; border: 2px solid var(--line); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
     .starting strong, .starting span { display: block; }
@@ -55,7 +65,7 @@ export class PreflightView extends LitElement {
         <h2 id="review-title">${this.title}</h2>
         <p class="muted">${this.confirmationAction
           ? "Powercalc checked entity availability and storage. Preparing sets up the selected devices; you will explicitly start the measurement on the next screen."
-          : "Powercalc checked entity availability and storage. Starting will begin controlling the selected device."}</p>
+          : "Powercalc checked the configured setup. Starting will begin controlling the selected device."}</p>
         ${this.metrics.length ? html`
           <div class="readout" aria-label="Measurement estimate">
             ${this.metrics.map((metric) => html`<div class="metric"><span>${metric.label}</span><strong>${metric.value}</strong></div>`)}
@@ -64,10 +74,21 @@ export class PreflightView extends LitElement {
           ${this.summary.map((row) => html`<dt>${row.label}</dt><dd>${row.value}</dd>`)}
         </dl>
         ${this.powerMeterDiagnostic ? html`<measure-power-meter-diagnostic heading="Measurement device quality" .diagnostic=${this.powerMeterDiagnostic}></measure-power-meter-diagnostic>` : nothing}
+        ${this.lightLoadProbe?.points.length ? html`
+          <div class="notice" aria-label="Low-load light check results">
+            <strong>Low-load light check passed</strong>
+            <p>The meter returned a usable aggregate value at every representative low-load point.</p>
+            <ul class="probe-list">
+              ${this.lightLoadProbe.points.map((point) => html`
+                <li><span>${point.label}</span><strong>${point.power_w.toFixed(3)} W aggregate</strong></li>
+              `)}
+            </ul>
+          </div>
+        ` : nothing}
         ${this.warnings.length ? html`
           <div class="notice"><strong>Check before starting</strong><ul class="warning-list">${this.warnings.map((warning) => html`<li>${warning}</li>`)}</ul></div>
         ` : nothing}
-        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
+        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${this.busy ? html`
           <div class="notice starting" role="status" aria-live="polite">
             <span class="starting-indicator" aria-hidden="true"></span>

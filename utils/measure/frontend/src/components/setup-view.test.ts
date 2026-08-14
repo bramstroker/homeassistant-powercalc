@@ -48,6 +48,41 @@ describe("setup view", () => {
     expect(checkedModes).toEqual(["brightness", "color_temp", "hs", "effect"]);
   });
 
+  it("warns that an active light setup check controls the light and leaves it off", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.lights = [{ entity_id: "light.rgb", name: "RGB lamp", supported_modes: ["brightness", "hs"] }];
+    element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
+    element.voltages = [];
+    element.definitions = [lightDefinition];
+    element.selectedType = "light";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.textContent).toContain("briefly controls the selected light");
+    expect(element.shadowRoot.querySelector<HTMLButtonElement>('button[type="submit"]')?.textContent).toBe("Check light and setup");
+
+    element.busy = true;
+    await element.updateComplete;
+    const progress = element.shadowRoot.querySelector('[role="status"]');
+    expect(progress?.textContent).toContain("Checking low-load light settings");
+    expect(progress?.textContent).toContain("representative low-load points");
+    expect(progress?.querySelector("progress")?.hasAttribute("value")).toBe(false);
+
+    element.busy = false;
+    element.errorMessage = "The meter repeatedly returned 0 W.";
+    element.errorHelp = {
+      url: "https://docs.powercalc.nl/contributing/measure/low-power-measurements/",
+      label: "Low-power measurement guide",
+    };
+    await element.updateComplete;
+    const guide = element.shadowRoot.querySelector<HTMLAnchorElement>('[role="alert"] a');
+    expect(guide?.textContent).toBe("Low-power measurement guide");
+    expect(guide?.href).toBe("https://docs.powercalc.nl/contributing/measure/low-power-measurements/");
+    expect(guide?.target).toBe("_blank");
+    expect(guide?.rel).toBe("noopener noreferrer");
+  });
+
   it("submits mode-specific native light-grid steps", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;

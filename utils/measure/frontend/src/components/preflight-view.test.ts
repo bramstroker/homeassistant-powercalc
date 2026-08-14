@@ -1,4 +1,4 @@
-import type { PowerMeterDiagnostic } from "../types";
+import type { PowerMeterDiagnostic, PreflightResponse } from "../types";
 import "./preflight-view";
 import { goodPowerMeterDiagnostic } from "./test-fixtures";
 
@@ -51,5 +51,30 @@ describe("preflight power meter diagnostics", () => {
     expect(diagnostic.getAttribute("heading")).toBe("Measurement device quality");
     expect(diagnostic.shadowRoot.textContent).toContain("1.8 s");
     expect(diagnostic.shadowRoot.textContent).toContain("Good");
+  });
+
+  it("shows every completed low-load probe point and measured power", async () => {
+    const element = document.createElement("measure-preflight-view") as HTMLElement & {
+      lightLoadProbe: NonNullable<PreflightResponse["light_load_probe"]>;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.lightLoadProbe = {
+      checked_variations: 2,
+      minimum_aggregate_power_w: 0.9,
+      points: [
+        { label: "Color 120° / 100% saturation · brightness 1", mode: "hs", power_w: 0.9 },
+        { label: "Color temperature 454 mired · brightness 1", mode: "color_temp", power_w: 1.25 },
+      ],
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const results = element.shadowRoot.querySelector('[aria-label="Low-load light check results"]');
+    expect(results?.textContent).toContain("Low-load light check passed");
+    expect(results?.textContent).toContain("Color 120° / 100% saturation · brightness 1");
+    expect(results?.textContent).toContain("0.900 W aggregate");
+    expect(results?.textContent).toContain("Color temperature 454 mired · brightness 1");
+    expect(results?.textContent).toContain("1.250 W aggregate");
   });
 });

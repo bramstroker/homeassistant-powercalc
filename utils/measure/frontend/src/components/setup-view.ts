@@ -5,6 +5,7 @@ import type {
   DummyLoadCalibration,
   DummyLoadSpec,
   EntityDescriptor,
+  ErrorHelp,
   FormField,
   FormFieldOption,
   LutMode,
@@ -41,6 +42,7 @@ import {
   renderTypePicker,
   setupChromeStyles,
 } from "./setup-chrome";
+import { errorHelpLink } from "./error-help-link";
 
 const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging.";
 const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
@@ -93,6 +95,9 @@ export class SetupView extends LitElement {
 
   @property({ type: String })
   errorMessage = "";
+
+  @property({ attribute: false })
+  errorHelp?: ErrorHelp;
 
   @state()
   selectedType?: MeasureType;
@@ -235,6 +240,7 @@ export class SetupView extends LitElement {
     const multipleController = this.multiControllerField();
     // A multi-select needs the room of its own fieldset; the rest are grid cells.
     const blocks = fields.filter((field) => field.control === "multi_select");
+    const activeLightCheck = type === "light" && !this.dummyController && !this.dummyLoadEnabled;
     return html`
       <form @submit=${this.submitMeasurement}>
         <fieldset class="section">
@@ -273,8 +279,20 @@ export class SetupView extends LitElement {
 
         ${this.renderTuning(definition, run)}
 
-        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
-        <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? "Checking setup…" : "Check setup"}</button></div>
+        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
+        ${activeLightCheck ? html`
+          <p class="muted">The setup check briefly controls the selected light at low-load settings and leaves it off.</p>
+        ` : nothing}
+        ${activeLightCheck && this.busy ? html`
+          <div class="notice" role="status" aria-live="polite">
+            <strong>Checking low-load light settings…</strong>
+            <p>Testing representative low-load points for the selected brightness, white-channel, and color modes. Each point uses the configured settle, sample, and retry settings.</p>
+            <progress aria-label="Low-load light check in progress"></progress>
+          </div>
+        ` : nothing}
+        <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy
+          ? activeLightCheck ? "Checking light and setup…" : "Checking setup…"
+          : activeLightCheck ? "Check light and setup" : "Check setup"}</button></div>
       </form>
     `;
   }

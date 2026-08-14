@@ -216,6 +216,15 @@ export interface PreflightResponse {
   power_meter_diagnostic?: PowerMeterDiagnostic | null;
   battery_level_entity_id?: string | null;
   battery_level_attribute?: string | null;
+  light_load_probe?: {
+    checked_variations: number;
+    minimum_aggregate_power_w: number;
+    points: {
+      label: string;
+      mode: LutMode;
+      power_w: number;
+    }[];
+  } | null;
 }
 
 export interface SessionProgress {
@@ -494,4 +503,11 @@ export interface ApiErrorBody {
   code: string;
   message: string;
   field: string | null;
+  help_url?: string | null;
+  help_label?: string | null;
+}
+
+export interface ErrorHelp {
+  url: string;
+  label: string;
 }

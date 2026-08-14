@@ -17,6 +17,7 @@ import type {
   DummyLoadCalibration,
   EntityCatalog,
   EntityDescriptor,
+  ErrorHelp,
   MeasurementRequest,
   MeasureDefinition,
   PlotCollection,
@@ -35,6 +36,7 @@ export class ApiError extends Error {
     readonly status: number,
     readonly code = "request_failed",
     readonly field: string | null = null,
+    readonly help?: ErrorHelp,
   ) {
     super(message);
     this.name = "ApiError";
@@ -201,7 +203,8 @@ export class MeasureApiClient {
       // Keep the stable fallback for non-JSON proxy and server errors.
     }
     const detail = typeof body.detail === "string" ? body.detail : undefined;
-    return new ApiError(body.message ?? detail ?? `Request failed (${response.status})`, response.status, body.code, body.field);
+    const help = body.help_url && body.help_label ? { url: body.help_url, label: body.help_label } : undefined;
+    return new ApiError(body.message ?? detail ?? `Request failed (${response.status})`, response.status, body.code, body.field, help);
   }
 }
 

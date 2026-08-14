@@ -1,10 +1,11 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import type { ContributionAuthState, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, PlotCollection, SessionFile, SessionSnapshot, SessionState, SettingsSection } from "../types";
+import type { ContributionAuthState, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionState, SettingsSection } from "../types";
 import { emit } from "../events";
 import { fileSize, words } from "../format";
 import { formText } from "../form";
 import { diagnosticsDownload, sharedStyles } from "../styles";
+import { errorHelpLink } from "./error-help-link";
 import "./result-plot";
 
 const CONTRIBUTION_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/output/";
@@ -91,6 +92,9 @@ export class ResultView extends LitElement {
 
   @property({ type: String })
   errorMessage = "";
+
+  @property({ attribute: false })
+  errorHelp?: ErrorHelp;
 
   @property({ attribute: false })
   contributionAuth?: ContributionAuthState;
@@ -192,7 +196,7 @@ export class ResultView extends LitElement {
         ${showArtifacts ? this.renderPlots() : nothing}
         ${showArtifacts ? this.renderFiles() : nothing}
         ${showArtifacts ? this.renderContributionSection(state) : nothing}
-        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
+        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${diagnosticsDownload(this.diagnosticsUrl)}
         <div class="actions">
           <button type="button" @click=${() => this.emit("sessions")}>All sessions</button>

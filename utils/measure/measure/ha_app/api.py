@@ -38,6 +38,12 @@ from measure.ha_app.contribution import (
 )
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
+from measure.ha_app.light_probe import (
+    LightLoadProbe,
+    LightLoadProbeError,
+    LightLoadProbeResult,
+    app_measurement_assembler,
+)
 from measure.ha_app.preferences import AppPreferences, AppSettingsResponse, AppSettingsUpdate
 from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
 from measure.ha_app.registry import FieldControl, FieldRole, measurement_definitions
@@ -70,7 +76,7 @@ from measure.powermeter.spec import (
     PowerMeterSpec,
     ShellyPowerMeterSpec,
 )
-from measure.request import MeasurementRequest
+from measure.request import LightMeasurementRequest, MeasurementRequest
 from measure.tuning import MeasurementParameters
 from measure.version import measure_version
 from measure.visualization import PlotSpec, build_session_plots
@@ -82,6 +88,17 @@ class ErrorResponse(BaseModel):
     code: str
     message: str
     field: str | None = None
+    help_url: str | None = None
+    help_label: str | None = None
+
+
+class DocumentedHTTPException(HTTPException):
+    """HTTP failure with a structured documentation action for API clients."""
+
+    def __init__(self, *, status_code: int, detail: str, help_url: str, help_label: str) -> None:
+        super().__init__(status_code=status_code, detail=detail)
+        self.help_url = help_url
+        self.help_label = help_label
 
 
 # Shared OpenAPI documentation for the JSON error body returned by every failed request.
@@ -110,6 +127,7 @@ class PreflightResponse(BaseModel):
     power_meter_diagnostic: PowerMeterDiagnostic | None = None
     battery_level_entity_id: str | None = None
     battery_level_attribute: str | None = None
+    light_load_probe: LightLoadProbeResult | None = None
 
 
 class EntityCatalogResponse(BaseModel):
@@ -220,6 +238,12 @@ class AppContext:
         self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
+        self.light_load_probe = LightLoadProbe(
+            lambda: app_measurement_assembler(
+                home_assistant=self.home_assistant,
+                shelly_password=self.shelly_password(),
+            ),
+        )
         self.contribution = ContributionApiCoordinator(self.storage, resolve_integration=self.entity_integration)
         self.coordinator = MeasurementCoordinator(
             self.storage,
@@ -352,9 +376,18 @@ def _register_error_handlers(app: FastAPI) -> None:
             409: "session_conflict",
             422: "preflight_failed",
         }.get(error.status_code, "request_failed")
+        content = ErrorResponse(
+            code=code,
+            message=detail,
+            help_url=getattr(error, "help_url", None),
+            help_label=getattr(error, "help_label", None),
+        ).model_dump()
+        if content["help_url"] is None or content["help_label"] is None:
+            content.pop("help_url")
+            content.pop("help_label")
         return JSONResponse(
             status_code=error.status_code,
-            content=ErrorResponse(code=code, message=detail).model_dump(),
+            content=content,
         )
 
     @app.exception_handler(ContributionApiError)
@@ -829,8 +862,26 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
             diagnose_power_meter=context.power_meter_diagnostics.evaluate,
             developer_mode=context.developer_mode,
         ).validate(payload)
+        light_load_probe = (
+            context.light_load_probe.evaluate(payload)
+            if isinstance(payload, LightMeasurementRequest)
+            and payload.dummy_load is None
+            and not payload.controller.is_dummy
+            and not isinstance(payload.power_meter, DummyPowerMeterSpec)
+            and bool(payload.modes - {LutMode.EFFECT})
+            else None
+        )
     except ActiveSessionError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
+    except LightLoadProbeError as error:
+        if error.help_url is None or error.help_label is None:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+        raise DocumentedHTTPException(
+            status_code=422,
+            detail=str(error),
+            help_url=error.help_url,
+            help_label=error.help_label,
+        ) from error
     except PreflightError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
     return PreflightResponse(
@@ -842,6 +893,7 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
         power_meter_diagnostic=result.power_meter_diagnostic,
         battery_level_entity_id=result.battery_level_entity_id,
         battery_level_attribute=result.battery_level_attribute,
+        light_load_probe=light_load_probe,
     )
 
 

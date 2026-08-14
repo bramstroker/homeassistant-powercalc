@@ -17,15 +17,24 @@ export function reviewMetrics(
 ): LabelledValue[] {
   if (!request || !preflight) return [];
   const { estimated_variations: variations, estimated_duration_seconds: seconds } = preflight;
-  if (variations === undefined && seconds === undefined) return [];
-  return [
-    { label: "Variations", value: String(variations ?? "—") },
-    { label: "Estimated time", value: seconds === undefined ? "—" : formatDuration(seconds) },
-    ...multiSelections(request, definition).map(([field, values]) => ({
-      label: field.label,
-      value: String(values.length),
-    })),
-  ];
+  const metrics: LabelledValue[] =
+    variations === undefined && seconds === undefined
+      ? []
+      : [
+          { label: "Variations", value: String(variations ?? "—") },
+          { label: "Estimated time", value: seconds === undefined ? "—" : formatDuration(seconds) },
+        ];
+  for (const [field, values] of multiSelections(request, definition)) {
+    metrics.push({ label: field.label, value: String(values.length) });
+  }
+  const probe = preflight.light_load_probe;
+  if (probe?.points.length) {
+    metrics.push(
+      { label: "Low-load checks", value: String(probe.checked_variations) },
+      { label: "Lowest aggregate load", value: `${probe.minimum_aggregate_power_w.toFixed(3)} W` },
+    );
+  }
+  return metrics;
 }
 
 /** Everything the review screen restates about the pending measurement, in the order it reads. */

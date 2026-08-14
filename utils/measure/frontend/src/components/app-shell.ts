@@ -7,7 +7,7 @@ import type { AppView, MeasureAppState } from "../app-controller";
 import { isAddressed, specFromRequest, specFromSettings } from "../power-meter";
 import type { MeterContext } from "../power-meter";
 import { reviewMetrics, reviewSummary } from "../review-summary";
-import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DummyLoadCalibration, EntityDescriptor, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SettingsSection, ShellyDiscoveryDevice } from "../types";
+import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SettingsSection, ShellyDiscoveryDevice } from "../types";
 import { sharedStyles } from "../styles";
 import "./preflight-view";
 import "./result-view";
@@ -19,6 +19,17 @@ import "./sessions-view";
 const POWERCALC_LOGO_URL = new URL("../assets/powercalc-logo.svg", import.meta.url).href;
 
 /**
+ * The measurement flow, in order. The progress bar belongs to a session being configured or run,
+ * so it is shown for these views only — never while loading, in the session overview, or in settings.
+ */
+const MEASUREMENT_STEPS: readonly { view: AppView; label: string }[] = [
+  { view: "setup", label: "Set up" },
+  { view: "review", label: "Review" },
+  { view: "running", label: "Measure" },
+  { view: "result", label: "Result" },
+];
+
+/**
  * Root element. It owns the application state as plain fields — the controller mutates them and
  * asks for a re-render, so none of it needs Lit's reactive property machinery.
  */
@@ -28,6 +39,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   settingsSection?: SettingsSection;
   loadingMessage = "Connecting to Home Assistant…";
   errorMessage = "";
+  errorHelp?: ErrorHelp;
   busy = false;
   connectedToEvents = false;
   snapshot?: SessionSnapshot;
@@ -132,11 +144,7 @@ export class AppShell extends LitElement implements MeasureAppState {
             <div>
             <p class="subtitle">Configure, validate, and monitor a power measurement without leaving Home Assistant.</p>
             </div>
-            ${this.view !== "sessions" && this.view !== "settings" ? html`<nav aria-label="Measurement progress">
-              <ol class="sequence">
-                ${["Set up", "Review", "Measure", "Result"].map((step, index) => html`<li class=${this.stepClass(index)} aria-current=${index === this.currentStep() ? "step" : nothing}><span class="step-number">${index < this.currentStep() ? "✓" : index + 1}</span><span>${step}</span></li>`)}
-              </ol>
-            </nav>` : nothing}
+            ${this.renderProgress()}
           </div>
         </header>
         ${this.dummyLoadCalibrationError ? html`
@@ -214,8 +222,9 @@ export class AppShell extends LitElement implements MeasureAppState {
         .metrics=${reviewMetrics(this.request, this.preflight, definition)}
         .summary=${reviewSummary(this.request, this.preflight, definition)}
         .warnings=${this.preflight?.warnings ?? []} .powerMeterDiagnostic=${this.preflight?.power_meter_diagnostic}
+        .lightLoadProbe=${this.preflight?.light_load_probe}
         .confirmationAction=${this.confirmationAction()}
-        .busy=${this.busy} .errorMessage=${this.errorMessage}
+        .busy=${this.busy} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         @back=${() => this.controller.backToSetup()} @start=${() => void this.controller.start()}
       ></measure-preflight-view>`;
   }
@@ -237,7 +246,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         .snapshot=${snapshot} .files=${this.files} .plotCollection=${this.plotCollection}
         .fileUrl=${(name: string) => this.api.fileUrl(sessionId, name)} .downloadAll=${this.downloadAllFiles.bind(this)}
         .diagnosticsUrl=${this.api.diagnosticsUrl(sessionId)}
-        .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage}
+        .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         .contributionAuth=${this.contributionAuth} .contributionDraft=${this.contributionDraft}
         .contributionPreview=${this.contributionPreview} .contributionResult=${this.contributionResult}
         .contributionBusy=${this.contributionBusy} .contributionError=${this.contributionError}
@@ -259,7 +268,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         .meter=${this.meterSpec()}
         .defaultMeasureDevice=${this.request?.measure_device ?? this.settings?.default_measure_device ?? ""}
         .powerMeterConfigured=${this.powerMeterConfigured()}
-        .busy=${this.busy} .errorMessage=${this.errorMessage}
+        .busy=${this.busy} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         @preflight=${(event: CustomEvent<MeasurementRequest>) => void this.controller.preflight(event.detail)}
         @measure-type-selected=${(event: CustomEvent<MeasureType>) => this.controller.selectMeasureType(event.detail)}
         @entity-domains-requested=${(event: CustomEvent<string[]>) => this.controller.loadEntityDomains(event.detail)}
@@ -350,11 +359,28 @@ export class AppShell extends LitElement implements MeasureAppState {
     this.controller.openSettings(section);
   }
 
-  private stepClass(index: number): string {
+  private renderProgress() {
     const current = this.currentStep();
-    if (index === current) return "active";
-    if (index < current) return "done";
-    return "";
+    if (current < 0) return nothing;
+    return html`
+      <nav aria-label="Measurement progress">
+        <ol class="sequence">
+          ${MEASUREMENT_STEPS.map(({ label }, index) => html`
+            <li class=${stepClass(index, current)} aria-current=${index === current ? "step" : nothing}>
+              <span class="step-number">${index < current ? "✓" : index + 1}</span><span>${label}</span>
+            </li>`)}
+        </ol>
+      </nav>`;
   }
-  private currentStep(): number { return { loading: 0, sessions: 0, setup: 0, review: 1, running: 2, result: 3, settings: 0 }[this.view]; }
+
+  /** Index within the measurement flow, or -1 for a view outside it. */
+  private currentStep(): number {
+    return MEASUREMENT_STEPS.findIndex((step) => step.view === this.view);
+  }
+}
+
+function stepClass(index: number, current: number): string {
+  if (index === current) return "active";
+  if (index < current) return "done";
+  return "";
 }

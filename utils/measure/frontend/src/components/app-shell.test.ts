@@ -267,6 +267,27 @@ describe("app shell", () => {
     expect(settings.shadowRoot.querySelector("measure-power-meter-diagnostic")).toBeNull();
   });
 
+  it("hides the measurement progress bar outside the measurement flow", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    document.body.append(element);
+    await element.updateComplete;
+
+    // The app boots into "loading" and lands on the session overview, so the bar must not flash.
+    expect(element.view).toBe("loading");
+    expect(element.shadowRoot?.querySelector(".sequence")).toBeNull();
+
+    element.view = "sessions";
+    element.requestUpdate();
+    await element.updateComplete;
+    expect(element.shadowRoot?.querySelector(".sequence")).toBeNull();
+
+    element.view = "setup";
+    element.requestUpdate();
+    await element.updateComplete;
+    expect(element.shadowRoot?.querySelector(".sequence")).not.toBeNull();
+  });
+
   it("keeps Settings in the app bar and labels each measurement step", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;

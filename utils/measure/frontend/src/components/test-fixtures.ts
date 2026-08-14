@@ -3,6 +3,7 @@ import type {
   Capabilities,
   DummyLoadCalibration,
   EntityDescriptor,
+  ErrorHelp,
   MeasureDefinition,
   MeasureParameter,
   MeasureParameterName,
@@ -63,6 +64,8 @@ export type SetupViewElement = HTMLElement & {
   powerMeterConfigured: boolean;
   defaultMeasureDevice: string;
   errorMessage: string;
+  errorHelp?: ErrorHelp;
+  busy: boolean;
   updateComplete: Promise<boolean>;
   shadowRoot: ShadowRoot;
 };
