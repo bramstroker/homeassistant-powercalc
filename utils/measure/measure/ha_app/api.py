@@ -940,6 +940,7 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[s
         "updated_at": snapshot.updated_at,
         "phase": snapshot.phase,
         "confirmation_message": snapshot.confirmation_message,
+        "confirmation_action": snapshot.confirmation_action,
         "mode": snapshot.mode,
         "progress": {
             "completed": snapshot.completed,
@@ -952,6 +953,7 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[s
         "error": snapshot.error,
         "summary": snapshot.summary,
         "operating_point": snapshot.operating_point,
+        "calibration_sample": snapshot.calibration_sample,
         "request": request,
     }
 

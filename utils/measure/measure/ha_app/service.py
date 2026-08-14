@@ -131,6 +131,7 @@ class MeasurementService(SessionMeasurementService):
             home_assistant=self.home_assistant,
             shelly_password=self.shelly_password,
             on_sample=control.sample,
+            on_calibration_sample=control.calibration_sample,
             dummy_load_calibration_store=calibration_store,
         ).assemble(request)
         control.phase("Starting measurement")

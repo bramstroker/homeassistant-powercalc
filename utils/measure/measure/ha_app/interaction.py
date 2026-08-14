@@ -8,8 +8,8 @@ class SessionInteraction(RunInteraction):
     def __init__(self, control: SessionControl) -> None:
         self.control = control
 
-    def confirm(self, message: str) -> None:
-        self.control.confirm(message)
+    def confirm(self, message: str, *, action: str | None = None) -> None:
+        self.control.confirm(message, action=action)
 
     def notify(self, message: str) -> None:
         self.control.log(message)

@@ -242,6 +242,7 @@ export interface SessionSnapshot {
   updated_at?: string;
   phase?: string;
   confirmation_message?: string | null;
+  confirmation_action?: string | null;
   mode?: string | null;
   progress?: SessionProgress;
   warnings?: string[];
@@ -249,6 +250,11 @@ export interface SessionSnapshot {
   summary?: Record<string, string> | null;
   request?: MeasurementRequest;
   operating_point?: OperatingPoint | null;
+  calibration_sample?: {
+    power: number;
+    resistance: number;
+    voltage: number;
+  } | null;
 }
 
 export interface SessionSummary {
@@ -310,11 +316,13 @@ export function emptyPlots(warnings: string[] = []): PlotCollection {
 
 /**
  * Payload of a regular session event. Progress, phase and state all reach the app through the
- * snapshot that rides along with the event, so only these two fields are read from the payload.
+ * snapshot that rides along with the event, so only live/log fields are read from the payload.
  */
 export interface SessionEventData {
   message?: string;
   power?: number;
+  resistance?: number;
+  voltage?: number;
 }
 
 /** Event types the stream subscribes to. The server sends each one as its own SSE event name. */
@@ -327,6 +335,7 @@ export const REGULAR_SESSION_EVENT_TYPES = [
   "checkpoint",
   "heartbeat",
   "sample",
+  "calibration_sample",
 ] as const;
 
 export const SESSION_EVENT_TYPES = [...REGULAR_SESSION_EVENT_TYPES, "operating_point"] as const;

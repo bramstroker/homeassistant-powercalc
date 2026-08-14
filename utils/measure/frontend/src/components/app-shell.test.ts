@@ -177,6 +177,43 @@ describe("app shell", () => {
     expect(running.warningConfirmation).toBe(false);
   });
 
+  it("uses checkpoint actions for the two-step dummy-load workflow", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.request = {
+      measure_type: "average",
+      model_id: "measurement",
+      product_name: "Measurement",
+      measure_device: "Shelly Plug S",
+      generate_model: false,
+      duration: 60,
+      parameters: capabilities.defaults,
+      power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+      dummy_load: { mode: "calibrate", description: "60 W lamp" },
+      resume_policy: "new",
+    };
+    element.preflight = { valid: true, warnings: [] };
+    element.view = "review";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const review = element.shadowRoot?.querySelector("measure-preflight-view") as HTMLElement & { confirmationAction: string };
+    expect(review.confirmationAction).toBe("Start measurement");
+
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      request: element.request,
+      confirmation_message: "Disconnect the light and connect only the dummy load.",
+      confirmation_action: "Start dummy-load calibration",
+    };
+    element.view = "running";
+    element.requestUpdate();
+    await element.updateComplete;
+
+    const running = element.shadowRoot?.querySelector("measure-running-view") as HTMLElement & { confirmationAction: string };
+    expect(running.confirmationAction).toBe("Start dummy-load calibration");
+  });
+
   it("marks speaker confirmation as a warning", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;

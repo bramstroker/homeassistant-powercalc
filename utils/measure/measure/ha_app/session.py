@@ -2,10 +2,16 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
 from threading import Event, Lock
-from typing import Any, cast
+from typing import Any, TypedDict, cast
 
 from measure.clock import utc_now
 from measure.execution import MeasurementCancelledError, OperatingPoint
+
+
+class CalibrationSample(TypedDict):
+    power: float
+    resistance: float
+    voltage: float
 
 
 class SessionState(StrEnum):
@@ -51,6 +57,7 @@ class SessionEventType(StrEnum):
     LOG = "log"
     CHECKPOINT = "checkpoint"
     SAMPLE = "sample"
+    CALIBRATION_SAMPLE = "calibration_sample"
     OPERATING_POINT = "operating_point"
 
 
@@ -78,6 +85,7 @@ class SessionSnapshot:
     skipped: int = 0
     phase: str | None = None
     confirmation_message: str | None = None
+    confirmation_action: str | None = None
     mode: str | None = None
     estimated_remaining: str | None = None
     error: str | None = None
@@ -86,6 +94,7 @@ class SessionSnapshot:
     event_sequence: int = 0
     summary: dict[str, str] | None = None
     operating_point: OperatingPoint | None = None
+    calibration_sample: CalibrationSample | None = None
 
     @property
     def progress(self) -> float:
@@ -131,11 +140,11 @@ class SessionControl:
         if self._cancelled.wait(seconds):
             raise MeasurementCancelledError
 
-    def confirm(self, message: str) -> None:
+    def confirm(self, message: str, *, action: str | None = None) -> None:
         """Pause at an operator checkpoint while remaining cancellable."""
 
         self._confirmed.clear()
-        self.emit(SessionEventType.CHECKPOINT, {"message": message})
+        self.emit(SessionEventType.CHECKPOINT, {"message": message, "action": action})
         while not self._confirmed.wait(0.25):
             self.checkpoint()
         self.checkpoint()
@@ -188,6 +197,17 @@ class SessionControl:
     def sample(self, power: float) -> None:
         """Emit a transient live power reading for realtime visualisation."""
         self.emit(SessionEventType.SAMPLE, {"power": round(power, 2)})
+
+    def calibration_sample(self, power: float, resistance: float, voltage: float) -> None:
+        """Emit the latest electrical values observed while calibrating a dummy load."""
+        self.emit(
+            SessionEventType.CALIBRATION_SAMPLE,
+            {
+                "power": round(power, 2),
+                "resistance": round(resistance, 2),
+                "voltage": round(voltage, 2),
+            },
+        )
 
     def operating_point(self, point: OperatingPoint) -> None:
         self.emit(SessionEventType.OPERATING_POINT, cast(dict[str, Any], dict(point)))

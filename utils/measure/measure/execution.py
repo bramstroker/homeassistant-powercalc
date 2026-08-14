@@ -50,7 +50,7 @@ type OperatingPoint = LightOperatingPoint | SpeakerOperatingPoint | FanOperating
 class RunInteraction(Protocol):
     """Full interaction boundary used while a measurement is running."""
 
-    def confirm(self, message: str) -> None:
+    def confirm(self, message: str, *, action: str | None = None) -> None:
         """Wait until the user confirms a physical preparation step."""
 
     def choose(self, message: str, *, default: bool) -> bool:
@@ -90,7 +90,8 @@ class MeasurementCancelledError(Exception):
 class ImmediateInteraction(RunInteraction):
     """Non-interactive execution adapter used by tests and unattended runs."""
 
-    def confirm(self, _: str) -> None:
+    def confirm(self, _: str, *, action: str | None = None) -> None:
+        del action
         return
 
     def notify(self, _: str) -> None:
@@ -152,11 +153,14 @@ class DummyLoadPreparation(MeasurementPreparation):
         self.measure_util.validate_dummy_load_support()
         calibrated = False
         resistance = self._restored_resistance()
+        target = "light" if self.request.measure_type == "light" else "target device"
 
         if resistance is None:
             interaction.phase("Preparing dummy-load calibration")
             interaction.confirm(
-                f"Connect only the preheated resistive dummy load ({self.spec.description}) to the power meter.",
+                f"Disconnect the {target} from the power meter. Connect only the preheated resistive dummy load "
+                f"({self.spec.description}) before starting calibration.",
+                action="Start dummy-load calibration",
             )
             resistance = self._calibrate(interaction)
             calibrated = True
@@ -169,8 +173,11 @@ class DummyLoadPreparation(MeasurementPreparation):
         self.measure_util.set_dummy_load_resistance(resistance)
         if calibrated and self.calibration_store is not None:
             self.calibration_store.save(self.request, resistance)
+        completion = "Dummy-load calibration is complete. " if calibrated else ""
         interaction.confirm(
-            "Connect the target device in parallel with the dummy load and keep the dummy load connected.",
+            f"{completion}Connect the {target} in parallel with the dummy load, and keep the dummy load connected "
+            "during the measurement.",
+            action="Start measurement",
         )
 
     def _restored_resistance(self) -> float | None:

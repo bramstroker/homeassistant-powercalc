@@ -319,7 +319,10 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
 
   private confirmationAction(): string {
-    return this.activeDefinition()?.confirmation_action ?? "";
+    const request = this.snapshot?.request ?? this.request;
+    return this.snapshot?.confirmation_action
+      ?? this.activeDefinition()?.confirmation_action
+      ?? (request?.dummy_load ? "Start measurement" : "");
   }
 
   private confirmationIsWarning(): boolean {

@@ -79,6 +79,22 @@ def test_dummy_load_requires_voltage_support(mock_config_factory: MockConfigFact
         measure_util.set_dummy_load_resistance(42.5)
 
 
+def test_resistance_reading_emits_live_calibration_values(mock_config_factory: MockConfigFactory) -> None:
+    power_meter = MagicMock(PowerMeter)
+    power_meter.get_power.return_value = PowerMeasurementResult(power=60.0, voltage=230.0, updated=time.time())
+    samples: list[tuple[float, float, float]] = []
+    measure_util = MeasureUtil(
+        power_meter,
+        mock_config_factory(),
+        on_calibration_sample=lambda power, resistance, voltage: samples.append((power, resistance, voltage)),
+    )
+
+    result = measure_util._take_resistance_reading()  # noqa: SLF001
+
+    assert result == MeasurementResult(power=pytest.approx(881.6667), voltages=[230.0])
+    assert samples == [(60.0, pytest.approx(881.6667), 230.0)]
+
+
 def test_dummy_load_emits_corrected_sample(mock_config_factory: MockConfigFactory) -> None:
     power_meter = MagicMock(PowerMeter)
     power_meter.has_voltage_support.return_value = True

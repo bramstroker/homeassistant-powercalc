@@ -103,7 +103,10 @@ class CheckpointService(SessionMeasurementService):
         context: SessionExecutionContext,
     ) -> RunnerResult:
         control.phase("Preparing operator checkpoint")
-        control.confirm("Place the device on its charger, then start the measurement.")
+        control.confirm(
+            "Place the device on its charger, then start the measurement.",
+            action="Start charging measurement",
+        )
         self.continued.set()
         return RunnerResult(model_json_data={})
 
@@ -259,13 +262,16 @@ def test_coordinator_projects_phase_and_confirmation_message(tmp_path: Path) -> 
     assert coordinator.current is not None
     assert coordinator.current.phase == "Waiting for confirmation"
     assert coordinator.current.confirmation_message == "Place the device on its charger, then start the measurement."
+    assert coordinator.current.confirmation_action == "Start charging measurement"
     persisted = storage.load_current()
     assert persisted is not None
     assert persisted.confirmation_message == coordinator.current.confirmation_message
+    assert persisted.confirmation_action == coordinator.current.confirmation_action
 
     confirmed = coordinator.confirm(session.id)
     assert confirmed.state == SessionState.RUNNING
     assert confirmed.phase == "Starting measurement"
     assert confirmed.confirmation_message is None
+    assert confirmed.confirmation_action is None
     assert continued.wait(1)
     wait_for_state(coordinator, SessionState.COMPLETED)

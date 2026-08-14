@@ -195,6 +195,7 @@ class SessionStorage:
             skipped=int(state.get("skipped", 0)),
             phase=state.get("phase"),
             confirmation_message=state.get("confirmation_message"),
+            confirmation_action=state.get("confirmation_action"),
             mode=state.get("mode"),
             estimated_remaining=state.get("estimated_remaining"),
             error=state.get("error"),
@@ -203,6 +204,7 @@ class SessionStorage:
             event_sequence=int(state.get("event_sequence", 0)),
             summary=state.get("summary"),
             operating_point=state.get("operating_point"),
+            calibration_sample=state.get("calibration_sample"),
         )
         if snapshot.id != session_id:
             raise ValueError("Session state id does not match its directory")

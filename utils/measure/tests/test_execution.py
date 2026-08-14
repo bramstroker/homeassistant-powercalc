@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
 from measure.execution import (
     DummyLoadPreparation,
@@ -15,6 +16,7 @@ from measure.request import (
     AverageMeasurementRequest,
     DummyLoadCalibrationRequest,
     DummyLoadReuseRequest,
+    LightMeasurementRequest,
 )
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasurementResult, MeasureUtil
@@ -154,11 +156,21 @@ def test_dummy_load_reuse_requires_two_confirmations_and_configures_measure_util
     preparation.run(interaction)
 
     assert interaction.confirm.call_count == 2
+    assert interaction.confirm.call_args_list[0].kwargs == {}
+    assert interaction.confirm.call_args_list[1].kwargs == {"action": "Start measurement"}
+    assert "Connect the target device in parallel" in interaction.confirm.call_args_list[1].args[0]
+    assert "calibration is complete" not in interaction.confirm.call_args_list[1].args[0]
     measure_util.set_dummy_load_resistance.assert_called_once_with(812.4)
 
 
 def test_dummy_load_calibration_repeats_until_steady_and_saves_result(monkeypatch: pytest.MonkeyPatch) -> None:
-    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    request = LightMeasurementRequest(
+        model_id="test-light",
+        product_name="Test light",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyLightControllerSpec(),
+    )
     measure_util = MagicMock(spec=MeasureUtil)
     interaction = MagicMock(spec=RunInteraction)
     calibration_store = MagicMock()
@@ -181,6 +193,13 @@ def test_dummy_load_calibration_repeats_until_steady_and_saves_result(monkeypatc
     measure_util.set_dummy_load_resistance.assert_called_once_with(100.0)
     calibration_store.save.assert_called_once_with(request, 100.0)
     assert interaction.confirm.call_count == 2
+    first_confirmation, second_confirmation = interaction.confirm.call_args_list
+    assert "Disconnect the light" in first_confirmation.args[0]
+    assert "only the preheated resistive dummy load" in first_confirmation.args[0]
+    assert first_confirmation.kwargs == {"action": "Start dummy-load calibration"}
+    assert "Dummy-load calibration is complete" in second_confirmation.args[0]
+    assert "Connect the light in parallel" in second_confirmation.args[0]
+    assert second_confirmation.kwargs == {"action": "Start measurement"}
 
 
 def test_dummy_load_cancelled_during_calibration_is_not_saved() -> None:

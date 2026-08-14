@@ -136,6 +136,26 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector(".value")).toBeNull();
   });
 
+  it("shows wattage, resistance, and voltage while calibrating a dummy load", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "running",
+      phase: "Calibrating resistive dummy load",
+      mode: "Calibrating resistive dummy load",
+      progress: { completed: 3, total: 20 },
+      calibration_sample: { power: 60.125, resistance: 881.234, voltage: 230.25 },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const calibration = element.shadowRoot.querySelector('[aria-label="Live dummy-load calibration reading"]');
+    expect(calibration?.textContent).toContain("Wattage60.13 W");
+    expect(calibration?.textContent).toContain("Resistance881.23 Ω");
+    expect(calibration?.textContent).toContain("Voltage230.25 V");
+  });
+
   it.each([
     [
       { type: "light", on: true, brightness: 128, color_temp_mired: 370, hue: 32_768, saturation: 128 } as OperatingPoint,

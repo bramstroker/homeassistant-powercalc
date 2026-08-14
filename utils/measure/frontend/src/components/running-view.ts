@@ -198,6 +198,7 @@ export class RunningView extends LitElement {
   private renderMeasurement(openEnded: boolean, progress: SessionProgress) {
     return html`
       ${this.renderProgress(openEnded, progress)}
+      ${this.renderCalibrationSample()}
       ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
       ${this.renderMetrics(openEnded, progress)}
       ${this.samples.length ? this.renderChart() : nothing}
@@ -247,6 +248,19 @@ export class RunningView extends LitElement {
         <div class="metric"><span>${progressLabel}</span><strong>${openEnded ? progress.completed : html`${progress.completed} / ${progress.total}`}</strong></div>
         ${progress.skipped ? html`<div class="metric"><span>Skipped</span><strong>${progress.skipped}</strong></div>` : nothing}
         <div class="metric"><span>Remaining</span><strong>${openEnded ? "Until stopped" : remaining(progress.estimated_remaining_seconds)}</strong></div>
+      </div>
+    `;
+  }
+
+  private renderCalibrationSample() {
+    const sample = this.snapshot.calibration_sample;
+    const phase = `${this.snapshot.phase ?? ""} ${this.snapshot.mode ?? ""}`;
+    if (!sample || !/dummy[- ]load/i.test(phase)) return nothing;
+    return html`
+      <div class="metrics calibration-metrics" aria-label="Live dummy-load calibration reading">
+        <div class="metric"><span>Wattage</span><strong>${sample.power.toFixed(2)} W</strong></div>
+        <div class="metric"><span>Resistance</span><strong>${sample.resistance.toFixed(2)} Ω</strong></div>
+        <div class="metric"><span>Voltage</span><strong>${sample.voltage.toFixed(2)} V</strong></div>
       </div>
     `;
   }

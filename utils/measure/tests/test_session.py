@@ -52,6 +52,17 @@ def test_sample_emits_rounded_power_reading() -> None:
     assert events[0].data == {"power": 4.21}
 
 
+def test_calibration_sample_emits_rounded_electrical_readings() -> None:
+    control = SessionControl()
+    events = []
+    control.subscribe(events.append)
+
+    control.calibration_sample(60.126, 881.234, 230.257)
+
+    assert events[0].type == SessionEventType.CALIBRATION_SAMPLE
+    assert events[0].data == {"power": 60.13, "resistance": 881.23, "voltage": 230.26}
+
+
 def test_operating_point_emits_typed_device_state() -> None:
     control = SessionControl()
     events = []

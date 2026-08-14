@@ -88,6 +88,7 @@ class MeasurementAssembler:
         tuya_device_key: str | None = None,
         shelly_password: str | None = None,
         on_sample: Callable[[float], None] | None = None,
+        on_calibration_sample: Callable[[float, float, float], None] | None = None,
         dummy_load_calibration_store: DummyLoadCalibrationStore | None = None,
     ) -> None:
         self._interaction = interaction
@@ -95,6 +96,7 @@ class MeasurementAssembler:
         self._tuya_device_key = tuya_device_key
         self._shelly_password = shelly_password
         self._on_sample = on_sample
+        self._on_calibration_sample = on_calibration_sample
         self._dummy_load_calibration_store = dummy_load_calibration_store
 
     def assemble(self, request: MeasurementRequest) -> PreparedMeasurement:
@@ -109,6 +111,7 @@ class MeasurementAssembler:
             include_voltage=lambda: voltage_enabled,
             wait=self._interaction.wait,
             on_sample=self._on_sample,
+            on_calibration_sample=self._on_calibration_sample,
         )
         runner = self._runner(request, parameters, measure_util)
         preparations: list[MeasurementPreparation] = (

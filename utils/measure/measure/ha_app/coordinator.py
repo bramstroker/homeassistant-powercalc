@@ -12,6 +12,7 @@ from measure.execution import MeasurementCancelledError, OperatingPoint
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
     RESUMABLE_SESSION_STATES,
+    CalibrationSample,
     SessionControl,
     SessionEvent,
     SessionEventType,
@@ -155,6 +156,7 @@ class MeasurementCoordinator:
                     state=SessionState.CANCELLING,
                     phase="Cancelling measurement",
                     confirmation_message=None,
+                    confirmation_action=None,
                     updated_at=utc_now(),
                 )
                 self._snapshot = snapshot
@@ -177,6 +179,7 @@ class MeasurementCoordinator:
                 state=SessionState.RUNNING,
                 phase="Starting measurement",
                 confirmation_message=None,
+                confirmation_action=None,
                 updated_at=utc_now(),
             )
             self._snapshot = snapshot
@@ -223,6 +226,8 @@ class MeasurementCoordinator:
             state=SessionState.RUNNING,
             phase="Initializing measurement",
             confirmation_message=None,
+            confirmation_action=None,
+            calibration_sample=None,
             updated_at=utc_now(),
             error=None,
         )
@@ -269,11 +274,7 @@ class MeasurementCoordinator:
             self._events.append(event)
             if len(self._events) > 1000:
                 self._events = self._events[-1000:]
-            if event.type == SessionEventType.SAMPLE:
-                # High-frequency live readings: stream to clients, but don't persist
-                # the snapshot. Keep the in-memory cursor current so the terminal
-                # state cannot reuse a transient event's sequence number.
-                self._snapshot = replace(self._snapshot, event_sequence=event.sequence, updated_at=event.created_at)
+            if self._project_transient_sample(event):
                 return
             if event.type == SessionEventType.PROGRESS:
                 self._snapshot = replace(
@@ -316,6 +317,7 @@ class MeasurementCoordinator:
                     state=SessionState.AWAITING_CONFIRMATION,
                     phase="Waiting for confirmation",
                     confirmation_message=str(event.data["message"]),
+                    confirmation_action=(str(event.data["action"]) if event.data.get("action") else None),
                 )
             else:
                 self._snapshot = replace(
@@ -333,6 +335,23 @@ class MeasurementCoordinator:
             if self._should_persist_snapshot(event):
                 self.storage.write_snapshot(self._snapshot)
                 self._last_snapshot_write = time.monotonic()
+
+    def _project_transient_sample(self, event: SessionEvent) -> bool:
+        """Project live readings in memory without writing high-frequency snapshots."""
+
+        assert self._snapshot is not None
+        if event.type == SessionEventType.SAMPLE:
+            self._snapshot = replace(self._snapshot, event_sequence=event.sequence, updated_at=event.created_at)
+        elif event.type == SessionEventType.CALIBRATION_SAMPLE:
+            self._snapshot = replace(
+                self._snapshot,
+                event_sequence=event.sequence,
+                updated_at=event.created_at,
+                calibration_sample=cast(CalibrationSample, event.data),
+            )
+        else:
+            return False
+        return True
 
     def _should_persist_snapshot(self, event: SessionEvent) -> bool:
         if event.type == SessionEventType.LOG:
@@ -365,6 +384,7 @@ class MeasurementCoordinator:
                     SessionState.FAILED: "Measurement failed",
                 }.get(state, self._snapshot.phase),
                 confirmation_message=None,
+                confirmation_action=None,
                 updated_at=updated_at,
                 error=error,
                 files=files,
