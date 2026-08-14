@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 import type { ContributionAuthState, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, PlotCollection, SessionFile, SessionSnapshot, SessionState, SettingsSection } from "../types";
 import { emit } from "../events";
 import { fileSize, words } from "../format";
@@ -62,41 +63,54 @@ const OUTCOMES: Partial<Record<SessionState, ResultOutcome>> = {
   cancelled: CANCELLED,
 };
 
+@customElement("measure-result-view")
 export class ResultView extends LitElement {
-  static readonly properties = {
-    snapshot: { attribute: false },
-    files: { attribute: false },
-    plotCollection: { attribute: false },
-    fileUrl: { attribute: false },
-    downloadAll: { attribute: false },
-    diagnosticsUrl: { type: String },
-    busy: { type: Boolean },
-    canResume: { type: Boolean },
-    errorMessage: { type: String },
-    contributionAuth: { attribute: false },
-    contributionDraft: { attribute: false },
-    contributionPreview: { attribute: false },
-    contributionResult: { attribute: false },
-    contributionBusy: { type: Boolean },
-    contributionError: { type: String },
-    contributionMethod: { state: true },
-  };
-
+  @property({ attribute: false })
   snapshot!: SessionSnapshot;
+
+  @property({ attribute: false })
   files: SessionFile[] = [];
+
+  @property({ attribute: false })
   plotCollection: PlotCollection = { partial: false, plots: [], warnings: [] };
+
+  @property({ attribute: false })
   fileUrl: (name: string) => string = () => "";
+
+  @property({ attribute: false })
   downloadAll: () => void = () => {};
+
+  @property({ type: String })
   diagnosticsUrl = "";
+
+  @property({ type: Boolean })
   busy = false;
+
+  @property({ type: Boolean })
   canResume = false;
+
+  @property({ type: String })
   errorMessage = "";
+
+  @property({ attribute: false })
   contributionAuth?: ContributionAuthState;
+
+  @property({ attribute: false })
   contributionDraft?: ContributionPreview;
+
+  @property({ attribute: false })
   contributionPreview?: ContributionPreview;
+
+  @property({ attribute: false })
   contributionResult?: ContributionResult;
+
+  @property({ type: Boolean })
   contributionBusy = false;
+
+  @property({ type: String })
   contributionError = "";
+
+  @state()
   contributionMethod?: ContributionMethodId;
 
   static readonly styles = [sharedStyles, css`
@@ -512,5 +526,3 @@ ${preview.pr_body}</pre>
     emit(this, name);
   }
 }
-
-customElements.define("measure-result-view", ResultView);

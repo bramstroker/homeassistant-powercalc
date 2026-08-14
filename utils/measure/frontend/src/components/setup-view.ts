@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 import type {
   Capabilities,
   DummyLoadCalibration,
@@ -44,60 +45,84 @@ import {
 const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging.";
 const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
 
+@customElement("measure-setup-view")
 export class SetupView extends LitElement {
-  static readonly properties = {
-    capabilities: { attribute: false },
-    definitions: { attribute: false },
-    lights: { attribute: false },
-    powers: { attribute: false },
-    voltages: { attribute: false },
-    deviceEntities: { attribute: false },
-    deviceEntityErrors: { attribute: false },
-    initialRequest: { attribute: false },
-    dummyLoadCalibration: { attribute: false },
-    initialType: { attribute: false },
-    meter: { attribute: false },
-    defaultMeasureDevice: { type: String },
-    powerMeterConfigured: { type: Boolean },
-    busy: { type: Boolean },
-    errorMessage: { type: String },
-    selectedType: { state: true },
-    selectedEntities: { state: true },
-    selectValues: { state: true },
-    multiSelection: { state: true },
-    parameterValues: { state: true },
-    dummyLoadEnabled: { state: true },
-    dummyLoadMode: { state: true },
-    dummyController: { state: true },
-    multipleLights: { state: true },
-  };
-
+  @property({ attribute: false })
   capabilities?: Capabilities;
+
+  @property({ attribute: false })
   definitions: MeasureDefinition[] = [];
+
+  @property({ attribute: false })
   lights: EntityDescriptor[] = [];
+
+  @property({ attribute: false })
   powers: EntityDescriptor[] = [];
+
+  @property({ attribute: false })
   voltages: EntityDescriptor[] = [];
+
+  @property({ attribute: false })
   deviceEntities: Record<string, EntityDescriptor[]> = {};
+
+  @property({ attribute: false })
   deviceEntityErrors: Record<string, string> = {};
+
+  @property({ attribute: false })
   initialRequest?: MeasurementRequest;
+
+  @property({ attribute: false })
   dummyLoadCalibration: DummyLoadCalibration | null = null;
+
+  @property({ attribute: false })
   initialType?: MeasureType;
+
   /** How the power meter this measurement uses is addressed. */
+
+  @property({ attribute: false })
   meter: PowerMeterSpec = { type: "hass", entity_id: "" };
+
+  @property({ type: String })
   defaultMeasureDevice = "";
+
+  @property({ type: Boolean })
   powerMeterConfigured = true;
+
+  @property({ type: Boolean })
   busy = false;
+
+  @property({ type: String })
   errorMessage = "";
+
+  @state()
   selectedType?: MeasureType;
+
   /** Entities picked per field. A single-entity field simply holds a one-entry list. */
+
+  @state()
   selectedEntities: Record<string, string[]> = {};
+
+  @state()
   selectValues: Record<string, string> = {};
+
+  @state()
   multiSelection: Record<string, string[]> = {};
+
+  @state()
   parameterValues: Partial<Record<MeasureParameterName, string>> = {};
+
+  @state()
   dummyLoadEnabled = false;
+
+  @state()
   dummyLoadMode: DummyLoadSpec["mode"] = "calibrate";
+
+  @state()
   dummyController = false;
+
+  @state()
   multipleLights = false;
+
   /** Deliberately not reactive: it exists so a typed count survives re-renders instead of being recomputed. */
   private derivedCountOverride?: string;
 
@@ -721,5 +746,3 @@ export class SetupView extends LitElement {
 
 
 }
-
-customElements.define("measure-setup-view", SetupView);

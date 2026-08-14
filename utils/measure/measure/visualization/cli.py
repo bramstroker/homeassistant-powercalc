@@ -3,9 +3,12 @@ from collections.abc import Sequence
 import json
 from pathlib import Path
 
-from measure.visualization import build_plot_from_file
+from measure.visualization import PlotSpec, build_plot_from_file, limit_plot_points
 from measure.visualization.renderer import render_plot
 
+# Every marker stays a separate element in an SVG, so the largest LUTs (~25k rows) would
+# write multi-megabyte files into the profile library. The PNGs keep the full measurement set.
+_SVG_MAX_POINTS = 4_000
 _LIGHT_PLOT_FILES = {
     "brightness.csv",
     "brightness.csv.gz",
@@ -42,11 +45,13 @@ def plot_output_path(input_path: Path, output: str | None) -> Path | None:
 def generate_directory_plots(directory: Path, *, force: bool = False) -> int:
     generated = 0
     for input_path in _directory_plot_inputs(directory):
-        output_path = _directory_output_path(input_path)
-        if output_path.exists() and not force:
+        outputs = [path for path in _directory_output_paths(input_path) if force or not path.exists()]
+        if not outputs:
             continue
-        render_plot(build_plot_from_file(input_path), output_path)
-        generated += 1
+        plot = build_plot_from_file(input_path)
+        for output_path in outputs:
+            render_plot(_plot_for_output(plot, output_path), output_path)
+            generated += 1
     return generated
 
 
@@ -69,11 +74,18 @@ def _is_linear_model(path: Path) -> bool:
     )
 
 
-def _directory_output_path(input_path: Path) -> Path:
+def _directory_output_paths(input_path: Path) -> tuple[Path, ...]:
     if input_path.name == "model.json":
-        return input_path.with_name("calibration.png")
-    name = input_path.name.removesuffix(".gz").removesuffix(".csv")
-    return input_path.with_name(f"{name}.png")
+        name = "calibration"
+    else:
+        name = input_path.name.removesuffix(".gz").removesuffix(".csv")
+    return tuple(input_path.with_name(f"{name}.{extension}") for extension in ("png", "svg"))
+
+
+def _plot_for_output(plot: PlotSpec, output: Path) -> PlotSpec:
+    if output.suffix == ".svg":
+        return limit_plot_points(plot, _SVG_MAX_POINTS)
+    return plot
 
 
 def main(argv: Sequence[str] | None = None) -> None:

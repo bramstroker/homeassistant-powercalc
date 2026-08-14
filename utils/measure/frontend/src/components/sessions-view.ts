@@ -1,18 +1,12 @@
 import { LitElement, css, html, nothing, svg } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 import type { SessionSummary } from "../types";
 import { emit } from "../events";
 import { fileSize, humanize, timestamp } from "../format";
 import { sharedStyles } from "../styles";
 
+@customElement("measure-sessions-view")
 export class SessionsView extends LitElement {
-  static readonly properties = {
-    sessions: { attribute: false },
-    busy: { type: Boolean },
-    errorMessage: { type: String },
-    diagnosticsUrl: { attribute: false },
-    pendingDelete: { state: true },
-  };
-
   static readonly styles = [sharedStyles, css`
     .heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
     .heading h2 { margin: 0.15rem 0 0.35rem; }
@@ -41,10 +35,19 @@ export class SessionsView extends LitElement {
     @media (max-width: 640px) { .actions .action-button { width: 100%; } }
   `];
 
+  @property({ attribute: false })
   sessions: SessionSummary[] = [];
+
+  @property({ type: Boolean })
   busy = false;
+
+  @property({ type: String })
   errorMessage = "";
+
+  @property({ attribute: false })
   diagnosticsUrl: (sessionId: string) => string = () => "";
+
+  @state()
   private pendingDelete?: string;
 
   render() {
@@ -113,5 +116,3 @@ export class SessionsView extends LitElement {
     emit(this, name, detail);
   }
 }
-
-customElements.define("measure-sessions-view", SessionsView);

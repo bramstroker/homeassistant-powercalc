@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing, svg } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, EntityDescriptor, MeasureParameterName, PowerMeterDiagnostic, PowerMeterType, SettingsSection, ShellyDiscoveryDevice } from "../types";
 import { DEFAULT_SHELLY_USERNAME, POWER_METER_LIST, meterFor, settingsFromForm } from "../power-meter";
@@ -38,63 +39,88 @@ const SETTINGS_SECTIONS: SettingsSectionDescriptor[] = [
   },
 ];
 
+@customElement("measure-settings-view")
 export class SettingsView extends LitElement {
-  static readonly properties = {
-    powers: { attribute: false },
-    settings: { attribute: false },
-    capabilities: { attribute: false },
-    busy: { type: Boolean },
-    testing: { type: Boolean },
-    testResult: { attribute: false },
-    errorMessage: { type: String },
-    meter: { state: true },
-    activeSection: { state: true },
-    initialSection: { attribute: false },
-    contributionAuth: { attribute: false },
-    contributionDeviceFlow: { attribute: false },
-    contributionDeviceStatus: { attribute: false },
-    contributionAuthBusy: { type: Boolean },
-    contributionAuthError: { type: String },
-    githubCopyStatus: { state: true },
-    shellyDiscoveryDevices: { attribute: false },
-    discoveringShellys: { type: Boolean },
-    shellyDiscoveryError: { type: String },
-    shellyDiscoveryAvailable: { attribute: false },
-    shellyDiscoveryMessage: { attribute: false },
-    shellyIp: { state: true },
-    shellyUsername: { state: true },
-    shellyPassword: { state: true },
-    clearShellyPassword: { state: true },
-    kasaIp: { state: true },
-  };
-
+  @property({ attribute: false })
   powers: EntityDescriptor[] = [];
+
+  @property({ attribute: false })
   settings?: AppSettings;
+
+  @property({ attribute: false })
   capabilities?: Capabilities;
+
+  @state()
   meter?: PowerMeterType;
+
+  @property({ type: Boolean })
   busy = false;
+
+  @property({ type: Boolean })
   testing = false;
+
+  @property({ attribute: false })
   testResult?: PowerMeterDiagnostic;
+
+  @property({ type: String })
   errorMessage = "";
+
+  @state()
   activeSection: SettingsSection = "power_meter";
+
+  @property({ attribute: false })
   initialSection?: SettingsSection;
+
   private appliedInitialSection = false;
+
+  @property({ attribute: false })
   contributionAuth?: ContributionAuthState;
+
+  @property({ attribute: false })
   contributionDeviceFlow?: ContributionDeviceFlow;
+
+  @property({ attribute: false })
   contributionDeviceStatus?: ContributionAuthDeviceStatus;
+
+  @property({ type: Boolean })
   contributionAuthBusy = false;
+
+  @property({ type: String })
   contributionAuthError = "";
+
+  @state()
   private githubCopyStatus = "";
+
+  @property({ attribute: false })
   shellyDiscoveryDevices: ShellyDiscoveryDevice[] = [];
+
+  @property({ type: Boolean })
   discoveringShellys = false;
+
+  @property({ type: String })
   shellyDiscoveryError = "";
+
+  @property({ attribute: false })
   shellyDiscoveryAvailable?: boolean;
+
+  @property({ attribute: false })
   shellyDiscoveryMessage?: string | null;
+
+  @state()
   private shellyIp?: string;
+
+  @state()
   private shellyUsername?: string;
+
+  @state()
   private shellyPassword = "";
+
+  @state()
   private clearShellyPassword = false;
+
+  @state()
   private kasaIp?: string;
+
   private readonly form = createRef<HTMLFormElement>();
 
   static readonly styles = [sharedStyles, css`
@@ -668,5 +694,3 @@ export class SettingsView extends LitElement {
     emit(this, name);
   }
 }
-
-customElements.define("measure-settings-view", SettingsView);

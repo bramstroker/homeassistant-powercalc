@@ -1,14 +1,14 @@
 import { LitElement, css, html, nothing } from "lit";
+import { customElement, property } from "lit/decorators.js";
 import type { DiagnosticStatus, PowerMeterDiagnostic } from "../types";
 import { sharedStyles } from "../styles";
 
+@customElement("measure-power-meter-diagnostic")
 export class PowerMeterDiagnosticView extends LitElement {
-  static readonly properties = {
-    diagnostic: { attribute: false },
-    heading: { type: String },
-  };
-
+  @property({ attribute: false })
   diagnostic?: PowerMeterDiagnostic;
+
+  @property({ type: String })
   heading = "Power meter quality";
 
   static readonly styles = [sharedStyles, css`
@@ -109,5 +109,3 @@ export class PowerMeterDiagnosticView extends LitElement {
     return "Not applicable";
   }
 }
-
-customElements.define("measure-power-meter-diagnostic", PowerMeterDiagnosticView);

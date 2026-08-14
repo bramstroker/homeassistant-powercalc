@@ -1,33 +1,41 @@
 import { LitElement, css, html, nothing } from "lit";
+import { customElement, property } from "lit/decorators.js";
 import type { LabelledValue } from "../review-summary";
 import type { PowerMeterDiagnostic } from "../types";
 import { emit } from "../events";
 import { sharedStyles } from "../styles";
 import "./power-meter-diagnostic";
 
+@customElement("measure-preflight-view")
 export class PreflightView extends LitElement {
-  static readonly properties = {
-    title: { type: String },
-    metrics: { attribute: false },
-    summary: { attribute: false },
-    warnings: { attribute: false },
-    powerMeterDiagnostic: { attribute: false },
-    canOverwrite: { type: Boolean },
-    confirmationAction: { type: String },
-    busy: { type: Boolean },
-    errorMessage: { type: String },
-    overwriteConfirmed: { type: Boolean },
-  };
-
+  @property({ type: String })
   title = "Ready for the bench";
+
+  @property({ attribute: false })
   metrics: LabelledValue[] = [];
+
+  @property({ attribute: false })
   summary: LabelledValue[] = [];
+
+  @property({ attribute: false })
   warnings: string[] = [];
+
+  @property({ attribute: false })
   powerMeterDiagnostic?: PowerMeterDiagnostic | null;
+
+  @property({ type: Boolean })
   canOverwrite = false;
+
+  @property({ type: String })
   confirmationAction = "";
+
+  @property({ type: Boolean })
   busy = false;
+
+  @property({ type: String })
   errorMessage = "";
+
+  @property({ type: Boolean })
   overwriteConfirmed = false;
 
   static readonly styles = [sharedStyles, css`
@@ -96,5 +104,3 @@ export class PreflightView extends LitElement {
     emit(this, name);
   }
 }
-
-customElements.define("measure-preflight-view", PreflightView);

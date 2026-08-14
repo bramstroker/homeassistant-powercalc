@@ -13,10 +13,14 @@ def render_plot(plot: PlotSpec, output: Path | None = None) -> None:
 
         if output is not None:
             mpl.use("Agg")
+            if _is_svg(output):
+                # Element ids are salted per process, so an unchanged plot would otherwise
+                # render to different bytes on every run and churn the committed SVGs.
+                mpl.rcParams["svg.hashsalt"] = "powercalc"
         import matplotlib.pyplot as plt
     except ImportError as error:
         raise RuntimeError(
-            "Matplotlib is required for PNG rendering. Run with `uv run --group visualize`.",
+            "Matplotlib is required for image rendering. Run with `uv run --group visualize`.",
         ) from error
 
     figure, axes = plt.subplots(figsize=(10, 6))
@@ -40,6 +44,14 @@ def render_plot(plot: PlotSpec, output: Path | None = None) -> None:
         plt.show()
     else:
         output.parent.mkdir(parents=True, exist_ok=True)
-        figure.savefig(output)
+        if _is_svg(output):
+            # Matplotlib stamps the current date into SVG metadata; drop it for the same reason.
+            figure.savefig(output, metadata={"Date": None})
+        else:
+            figure.savefig(output)
         print(f"Save plot to {output}")
     plt.close(figure)
+
+
+def _is_svg(output: Path) -> bool:
+    return output.suffix.lower() == ".svg"

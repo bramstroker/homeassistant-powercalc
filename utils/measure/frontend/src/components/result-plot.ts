@@ -1,4 +1,5 @@
 import { LitElement, css, html } from "lit";
+import { customElement, property } from "lit/decorators.js";
 import type { PlotSpec } from "../types";
 import { sharedStyles } from "../styles";
 
@@ -10,14 +11,14 @@ interface PlotPalette {
   signal: string;
 }
 
+@customElement("measure-result-plot")
 export class ResultPlot extends LitElement {
-  static readonly properties = {
-    plot: { attribute: false },
-    partial: { type: Boolean },
-  };
-
+  @property({ attribute: false })
   plot!: PlotSpec;
+
+  @property({ type: Boolean })
   partial = false;
+
   private resizeObserver?: ResizeObserver;
 
   static readonly styles = [sharedStyles, css`
@@ -267,5 +268,3 @@ function format(value: number): string {
   if (magnitude >= 10) return value.toFixed(1);
   return value.toFixed(2);
 }
-
-customElements.define("measure-result-plot", ResultPlot);

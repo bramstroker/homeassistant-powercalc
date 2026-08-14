@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from measure.visualization import PlotKind, PlotSpec, cli
+from measure.visualization.cli import _SVG_MAX_POINTS
 import pytest
 
 
@@ -39,10 +40,12 @@ def test_generate_directory_plots_writes_supported_artifacts(
 
     generated = cli.generate_directory_plots(tmp_path)
 
-    assert generated == 2
+    assert generated == 4
     assert rendered == [
         tmp_path / "acme" / "lamp" / "brightness.png",
+        tmp_path / "acme" / "lamp" / "brightness.svg",
         tmp_path / "acme" / "speaker" / "calibration.png",
+        tmp_path / "acme" / "speaker" / "calibration.svg",
     ]
 
 
@@ -51,15 +54,51 @@ def test_generate_directory_plots_skips_existing_output_unless_forced(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     brightness = tmp_path / "brightness.csv"
-    output = tmp_path / "brightness.png"
+    png = tmp_path / "brightness.png"
+    svg = tmp_path / "brightness.svg"
     brightness.write_text("bri,watt\n1,1.0\n", encoding="utf-8")
-    output.write_bytes(b"existing")
+    png.write_bytes(b"existing")
+    svg.write_bytes(b"existing")
     rendered: list[Path] = []
     monkeypatch.setattr(cli, "render_plot", lambda _plot, path: rendered.append(path))
 
     assert cli.generate_directory_plots(tmp_path) == 0
-    assert cli.generate_directory_plots(tmp_path, force=True) == 1
-    assert rendered == [output]
+    assert cli.generate_directory_plots(tmp_path, force=True) == 2
+    assert rendered == [png, svg]
+
+
+def test_generate_directory_plots_adds_missing_format_only(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    brightness = tmp_path / "brightness.csv"
+    brightness.write_text("bri,watt\n1,1.0\n", encoding="utf-8")
+    (tmp_path / "brightness.png").write_bytes(b"existing")
+    rendered: list[Path] = []
+    monkeypatch.setattr(cli, "render_plot", lambda _plot, path: rendered.append(path))
+
+    assert cli.generate_directory_plots(tmp_path) == 1
+    assert rendered == [tmp_path / "brightness.svg"]
+
+
+def test_generate_directory_plots_downsamples_svg_only(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    brightness = tmp_path / "brightness.csv"
+    rows = "".join(f"{index},{index / 10}\n" for index in range(_SVG_MAX_POINTS + 500))
+    brightness.write_text(f"bri,watt\n{rows}", encoding="utf-8")
+    rendered: dict[str, int] = {}
+    monkeypatch.setattr(
+        cli,
+        "render_plot",
+        lambda plot, path: rendered.__setitem__(path.suffix, sum(len(series.points) for series in plot.series)),
+    )
+
+    cli.generate_directory_plots(tmp_path)
+
+    assert rendered[".png"] == _SVG_MAX_POINTS + 500
+    assert rendered[".svg"] == _SVG_MAX_POINTS
 
 
 def _plot(source: Path) -> PlotSpec:

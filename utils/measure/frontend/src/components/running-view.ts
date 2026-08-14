@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing, svg, type PropertyValues } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import type { OperatingPoint, SessionProgress, SessionSnapshot } from "../types";
 import { emit } from "../events";
@@ -24,28 +25,35 @@ interface StateChip {
   icon: StateChipIcon;
 }
 
+@customElement("measure-running-view")
 export class RunningView extends LitElement {
-  static readonly properties = {
-    snapshot: { attribute: false },
-    confirmationAction: { type: String },
-    warningConfirmation: { type: Boolean },
-    connected: { type: Boolean },
-    logs: { attribute: false },
-    samples: { attribute: false },
-    diagnosticsUrl: { type: String },
-    busy: { type: Boolean },
-    logOpen: { state: true },
-  };
-
+  @property({ attribute: false })
   snapshot!: SessionSnapshot;
+
+  @property({ type: String })
   confirmationAction = "";
+
+  @property({ type: Boolean })
   warningConfirmation = false;
+
+  @property({ type: Boolean })
   connected = false;
+
+  @property({ attribute: false })
   logs: string[] = [];
+
+  @property({ attribute: false })
   samples: number[] = [];
+
+  @property({ type: String })
   diagnosticsUrl = "";
+
+  @property({ type: Boolean })
   busy = false;
+
+  @state()
   logOpen = false;
+
   private readonly logContainer = createRef<HTMLDivElement>();
 
   static readonly styles = [sharedStyles, css`
@@ -380,5 +388,3 @@ export class RunningView extends LitElement {
     return "Sampling in progress";
   }
 }
-
-customElements.define("measure-running-view", RunningView);

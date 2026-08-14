@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing } from "lit";
+import { customElement } from "lit/decorators.js";
 import { MeasureApiClient, SessionEventStream } from "../api-client";
 import { MeasureAppController } from "../app-controller";
 import type { AppView, MeasureAppState } from "../app-controller";
@@ -21,6 +22,7 @@ const POWERCALC_LOGO_URL = new URL("../assets/powercalc-logo.svg", import.meta.u
  * Root element. It owns the application state as plain fields — the controller mutates them and
  * asks for a re-render, so none of it needs Lit's reactive property machinery.
  */
+@customElement("powercalc-measure-app")
 export class AppShell extends LitElement implements MeasureAppState {
   view: AppView = "loading";
   settingsSection?: SettingsSection;
@@ -360,5 +362,3 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
   private currentStep(): number { return { loading: 0, sessions: 0, setup: 0, review: 1, running: 2, result: 3, settings: 0 }[this.view]; }
 }
-
-customElements.define("powercalc-measure-app", AppShell);
