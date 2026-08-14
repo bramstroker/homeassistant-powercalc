@@ -27,7 +27,7 @@ import {
   fieldOptions,
   narrowingField,
   requestFieldValue,
-} from "../measurement-kinds";
+} from "../measure-definition";
 import { emit } from "../events";
 import { formText } from "../form";
 import { sharedStyles } from "../styles";

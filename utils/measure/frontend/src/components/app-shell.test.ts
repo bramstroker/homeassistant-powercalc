@@ -26,7 +26,6 @@ describe("app shell device entities", () => {
       getContributionAuth: async () => ({ connected: false }),
       getDummyLoadCalibration: async () => null,
       getSessions: async () => [],
-      getCurrent: async () => ({ state: "idle" }),
       getMeasureDefinitions: async () => [fanDefinition],
       getEntitiesByDomain: async (domain: string) => {
         requestedDomains.push(domain);

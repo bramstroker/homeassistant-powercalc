@@ -1,5 +1,5 @@
 import { duration as formatDuration } from "./format";
-import { requestFieldValue } from "./measurement-kinds";
+import { requestFieldValue } from "./measure-definition";
 import { summarize } from "./power-meter";
 import type { FormField, MeasureDefinition, MeasurementRequest, PreflightResponse } from "./types";
 

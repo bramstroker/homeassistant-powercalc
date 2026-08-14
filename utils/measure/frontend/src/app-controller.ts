@@ -1,6 +1,6 @@
 import { ApiError } from "./api-client";
 import type { MeasureApiClient } from "./api-client";
-import { entityDomains } from "./measurement-kinds";
+import { entityDomains } from "./measure-definition";
 import { meterFor } from "./power-meter";
 import { emptyPlots } from "./types";
 import type {

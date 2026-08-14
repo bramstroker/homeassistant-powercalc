@@ -92,7 +92,6 @@ _CONTRIBUTION_STATUS_CODES = {
     ContributionApiErrorCode.INVALID_METADATA: 422,
     ContributionApiErrorCode.SUBMISSION_FAILED: 502,
 }
-_NO_SESSION = "No measurement session"
 MeasurementRequestPayload = Annotated[MeasurementRequest, Body(discriminator="measure_type")]
 
 
@@ -525,52 +524,8 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         _require_session(context, session_id)
         return StreamingResponse(_event_stream(request, context, session_id), media_type="text/event-stream")
 
-    # Compatibility aliases for clients released before session history.
-    @router.get("/session/current", responses={404: _ERROR})
-    async def current_session(request: Request) -> dict[str, object]:
-        context = _context(request)
-        return _snapshot_response(context, _require_current_session(context))
 
-    @router.delete("/session/current", status_code=202, responses={409: _ERROR})
-    async def cancel_session(request: Request) -> dict[str, object]:
-        return _cancel_session(_context(request))
-
-    @router.post("/session/current/confirm", responses={404: _ERROR, 409: _ERROR})
-    async def confirm_session(request: Request) -> dict[str, object]:
-        return _confirm_session(_context(request))
-
-    @router.post("/session/current/resume", responses={404: _ERROR, 409: _ERROR})
-    async def resume_session(request: Request) -> dict[str, object]:
-        return await _resume_session(_context(request))
-
-    @router.get("/session/current/files", responses={404: _ERROR})
-    async def files(request: Request) -> list[SessionFile]:
-        context = _context(request)
-        return _session_files(context, _require_current_session(context))
-
-    @router.get("/session/current/plots", responses={404: _ERROR, 409: _ERROR})
-    async def plots(request: Request) -> SessionPlots:
-        context = _context(request)
-        return await _session_plots(context, _require_current_session(context))
-
-    @router.get("/session/current/files/{name:path}", responses={404: _ERROR})
-    async def download(name: str, request: Request) -> FileResponse:
-        context = _context(request)
-        return _session_download(context, _require_current_session(context), name)
-
-    @router.get("/session/current/diagnostics", responses={404: _ERROR})
-    async def diagnostics(request: Request) -> Response:
-        context = _context(request)
-        return _session_diagnostics(context, _require_current_session(context))
-
-    @router.get("/session/current/events", responses={404: _ERROR})
-    async def events(request: Request) -> StreamingResponse:
-        context = _context(request)
-        snapshot = _require_current_session(context)
-        return StreamingResponse(_event_stream(request, context, snapshot.id), media_type="text/event-stream")
-
-
-def _register_contribution_routes(router: APIRouter) -> None:  # noqa: C901
+def _register_contribution_routes(router: APIRouter) -> None:
     @router.get("/contribution/auth")
     async def contribution_auth_status(request: Request) -> ContributionAuthStatus:
         return await run_in_threadpool(_context(request).contribution.auth_status)
@@ -632,46 +587,9 @@ def _register_contribution_routes(router: APIRouter) -> None:  # noqa: C901
             payload,
         )
 
-    @router.get("/session/current/contribution", responses={404: _ERROR, 409: _ERROR})
-    async def current_contribution_draft(request: Request) -> ContributionPreviewResponse:
-        context = _context(request)
-        snapshot = _require_current_session(context)
-        return await run_in_threadpool(context.contribution.draft, snapshot)
-
-    @router.post(
-        "/session/current/contribution/preview",
-        responses={404: _ERROR, 409: _ERROR, 422: _ERROR, 502: _ERROR},
-    )
-    async def current_contribution_preview(
-        payload: ContributionPreviewRequest,
-        request: Request,
-    ) -> ContributionPreviewResponse:
-        context = _context(request)
-        snapshot = _require_current_session(context)
-        return await run_in_threadpool(context.contribution.preview, snapshot, payload)
-
-    @router.post(
-        "/session/current/contribution",
-        responses={401: _ERROR, 404: _ERROR, 409: _ERROR, 502: _ERROR},
-    )
-    async def current_contribution_submit(
-        payload: ContributionSubmitRequest,
-        request: Request,
-    ) -> ContributionSubmissionResult:
-        context = _context(request)
-        snapshot = _require_current_session(context)
-        return await run_in_threadpool(context.contribution.submit, snapshot, payload)
-
 
 def _context(request: Request) -> AppContext:
     return cast(AppContext, request.app.state.context)
-
-
-def _require_current_session(context: AppContext) -> SessionSnapshot:
-    snapshot = context.coordinator.current
-    if snapshot is None:
-        raise HTTPException(status_code=404, detail=_NO_SESSION)
-    return snapshot
 
 
 def _require_session(context: AppContext, session_id: str) -> SessionSnapshot:
@@ -681,7 +599,7 @@ def _require_session(context: AppContext, session_id: str) -> SessionSnapshot:
         raise HTTPException(status_code=404, detail="Measurement session not found") from error
 
 
-def _cancel_session(context: AppContext, session_id: str | None = None) -> dict[str, object]:
+def _cancel_session(context: AppContext, session_id: str) -> dict[str, object]:
     try:
         snapshot = context.coordinator.cancel(session_id)
     except SessionConflictError as error:
@@ -689,7 +607,7 @@ def _cancel_session(context: AppContext, session_id: str | None = None) -> dict[
     return _snapshot_response(context, snapshot)
 
 
-def _confirm_session(context: AppContext, session_id: str | None = None) -> dict[str, object]:
+def _confirm_session(context: AppContext, session_id: str) -> dict[str, object]:
     try:
         snapshot = context.coordinator.confirm(session_id)
     except SessionConflictError as error:
@@ -697,8 +615,8 @@ def _confirm_session(context: AppContext, session_id: str | None = None) -> dict
     return _snapshot_response(context, snapshot)
 
 
-async def _resume_session(context: AppContext, session_id: str | None = None) -> dict[str, object]:
-    snapshot = _require_session(context, session_id) if session_id is not None else _require_current_session(context)
+async def _resume_session(context: AppContext, session_id: str) -> dict[str, object]:
+    snapshot = _require_session(context, session_id)
     await run_in_threadpool(_preflight, context, context.storage.load_request(snapshot.id))
     try:
         snapshot = context.coordinator.resume(snapshot.id)

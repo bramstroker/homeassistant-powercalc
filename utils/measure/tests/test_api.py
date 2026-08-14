@@ -755,7 +755,7 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     session_id = response.json()["session_id"]
     current = {}
     for _ in range(50):
-        current_response = test_client.get("/api/session/current")
+        current_response = test_client.get(f"/api/sessions/{session_id}")
         assert current_response.status_code == 200
         current = current_response.json()
         if current["state"] == "completed":
@@ -768,10 +768,9 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     assert retained.json()[0]["session_id"] == session_id
     assert retained.json()[0]["file_count"] == 1
     assert retained.json()[0]["size"] > 0
-    assert test_client.get(f"/api/sessions/{session_id}").json() == current
-    files = test_client.get("/api/session/current/files")
+    files = test_client.get(f"/api/sessions/{session_id}/files")
     assert files.json()[0]["name"] == "LCT010/brightness.csv"
-    plots = test_client.get("/api/session/current/plots")
+    plots = test_client.get(f"/api/sessions/{session_id}/plots")
     assert plots.status_code == 200
     assert plots.json()["partial"] is False
     assert plots.json()["warnings"] == []
@@ -779,9 +778,9 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     assert plots.json()["plots"][0]["series"][0]["points"] == [
         {"x": 1.0, "y": 1.0, "color": None},
     ]
-    download = test_client.get("/api/session/current/files/LCT010/brightness.csv")
+    download = test_client.get(f"/api/sessions/{session_id}/files/LCT010/brightness.csv")
     assert download.status_code == 200
-    diagnostics = test_client.get("/api/session/current/diagnostics")
+    diagnostics = test_client.get(f"/api/sessions/{session_id}/diagnostics")
     assert diagnostics.status_code == 200
     assert diagnostics.headers["content-disposition"].startswith('attachment; filename="powercalc-measure-diagnostics-')
     report = diagnostics.json()
@@ -793,10 +792,6 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     assert report["events"][-1]["data"]["state"] == "completed"
     assert report["files"][0]["name"] == "LCT010/brightness.csv"
     assert "test-token" not in diagnostics.text
-    assert test_client.get(f"/api/sessions/{session_id}/files").json() == files.json()
-    assert test_client.get(f"/api/sessions/{session_id}/plots").json() == plots.json()
-    assert test_client.get(f"/api/sessions/{session_id}/files/LCT010/brightness.csv").status_code == 200
-    assert test_client.get(f"/api/sessions/{session_id}/diagnostics").status_code == 200
 
     assert test_client.delete(f"/api/sessions/{session_id}").status_code == 204
     assert test_client.get(f"/api/sessions/{session_id}").status_code == 404
@@ -822,7 +817,7 @@ def test_diagnostics_retains_only_the_latest_thousand_events(tmp_path: Path) -> 
     storage = test_client.app.state.context.storage
 
     with patch.object(storage, "load_events", return_value=events) as load_events:
-        response = test_client.get("/api/session/current/diagnostics")
+        response = test_client.get(f"/api/sessions/{coordinator.current.id}/diagnostics")
 
     assert response.status_code == 200
     load_events.assert_called_once_with(coordinator.current.id, limit=1001)
@@ -842,11 +837,13 @@ def test_session_summary_is_exposed(tmp_path: Path) -> None:
         "power_meter": {"type": "hass", "entity_id": "sensor.test_power"},
         "duration": 30,
     }
-    assert test_client.post("/api/sessions", json=run_payload).status_code == 201
+    started = test_client.post("/api/sessions", json=run_payload)
+    assert started.status_code == 201
+    session_id = started.json()["session_id"]
 
     current = {}
     for _ in range(50):
-        current = test_client.get("/api/session/current").json()
+        current = test_client.get(f"/api/sessions/{session_id}").json()
         if current["state"] == "completed":
             break
         time.sleep(0.02)
@@ -878,18 +875,11 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
     assert set(paths["/api/sessions/{session_id}/files/{name}"]) == {"get"}
     assert set(paths["/api/sessions/{session_id}/contribution"]) == {"get", "post"}
     assert set(paths["/api/sessions/{session_id}/contribution/preview"]) == {"post"}
-    assert set(paths["/api/session/current"]) == {"get", "delete"}
-    assert set(paths["/api/session/current/resume"]) == {"post"}
-    assert set(paths["/api/session/current/diagnostics"]) == {"get"}
-    assert set(paths["/api/session/current/plots"]) == {"get"}
-    assert set(paths["/api/session/current/files/{name}"]) == {"get"}
     assert set(paths["/api/dummy-load/calibration"]) == {"get"}
     assert set(paths["/api/contribution/auth"]) == {"get", "put", "delete"}
     assert set(paths["/api/contribution/auth/device"]) == {"post"}
     assert set(paths["/api/contribution/auth/device/{flow_id}"]) == {"post"}
     assert set(paths["/api/contribution/status"]) == {"get"}
-    assert set(paths["/api/session/current/contribution"]) == {"get", "post"}
-    assert set(paths["/api/session/current/contribution/preview"]) == {"post"}
 
 
 def test_contribution_device_flow_reports_configuration_and_uses_injected_service(tmp_path: Path) -> None:
@@ -1039,7 +1029,9 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
         resolve_integration=context.entity_integration,
     )
 
-    assert test_client.post("/api/sessions", json=payload()).status_code == 201
+    started = test_client.post("/api/sessions", json=payload())
+    assert started.status_code == 201
+    session_id = started.json()["session_id"]
     assert context.coordinator._worker is not None  # noqa: SLF001
     context.coordinator._worker.join(timeout=5)  # noqa: SLF001
 
@@ -1051,7 +1043,7 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     if settings_path.exists():
         assert "github_pat_test" not in settings_path.read_text(encoding="utf-8")
 
-    draft = test_client.get("/api/session/current/contribution")
+    draft = test_client.get(f"/api/sessions/{session_id}/contribution")
     assert draft.status_code == 200
     assert draft.json()["eligible"] is False
     assert draft.json()["repository"] == "test-owner/powercalc-sandbox"
@@ -1060,7 +1052,7 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     assert "- Integration: hue" in draft.json()["pr_body"]
 
     preview = test_client.post(
-        "/api/session/current/contribution/preview",
+        f"/api/sessions/{session_id}/contribution/preview",
         json={
             "manufacturer_name": "Signify",
             "manufacturer_directory": "signify",
@@ -1079,7 +1071,7 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     assert service.submit_calls == 0
 
     unconfirmed = test_client.post(
-        "/api/session/current/contribution",
+        f"/api/sessions/{session_id}/contribution",
         json={
             "manufacturer_name": "Signify",
             "manufacturer_directory": "signify",
@@ -1094,7 +1086,7 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     assert service.submit_calls == 0
 
     submitted = test_client.post(
-        "/api/session/current/contribution",
+        f"/api/sessions/{session_id}/contribution",
         json={
             "manufacturer_name": "Signify",
             "manufacturer_directory": "signify",
@@ -1114,11 +1106,11 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     assert status.status_code == 200
     assert status.json()["state"] == "submitted"
     assert status.json()["submission_url"] == "https://github.com/example/pull/1"
-    assert status.json()["session_id"] == test_client.get("/api/session/current").json()["session_id"]
+    assert status.json()["session_id"] == session_id
 
-    files = test_client.get("/api/session/current/files").json()
+    files = test_client.get(f"/api/sessions/{session_id}/files").json()
     assert [item["name"] for item in files] == ["LCT010/brightness.csv"]
-    diagnostics = test_client.get("/api/session/current/diagnostics")
+    diagnostics = test_client.get(f"/api/sessions/{session_id}/diagnostics")
     assert "github_pat_test" not in diagnostics.text
 
 
@@ -1143,7 +1135,7 @@ def test_contribution_preview_rejects_unsupported_generated_session(tmp_path: Pa
     (artifact_root / "model.json").write_text("{}", encoding="utf-8")
 
     response = test_client.post(
-        "/api/session/current/contribution/preview",
+        f"/api/sessions/{context.coordinator.current.id}/contribution/preview",
         json={
             "manufacturer_name": "Acme",
             "manufacturer_directory": "acme",
@@ -1165,7 +1157,7 @@ def test_plot_endpoint_rejects_active_session(tmp_path: Path) -> None:
     now = "2026-07-12T12:00:00Z"
     coordinator._snapshot = SessionSnapshot(id="active", state=SessionState.RUNNING, created_at=now, updated_at=now)  # noqa: SLF001
 
-    response = test_client.get("/api/session/current/plots")
+    response = test_client.get("/api/sessions/active/plots")
 
     assert response.status_code == 409
 
@@ -1180,7 +1172,7 @@ def test_plot_endpoint_marks_terminal_incomplete_session_as_partial(tmp_path: Pa
     assert coordinator.current.state is SessionState.COMPLETED
     coordinator._snapshot = replace(coordinator.current, state=SessionState.CANCELLED)  # noqa: SLF001
 
-    response = test_client.get("/api/session/current/plots")
+    response = test_client.get(f"/api/sessions/{coordinator.current.id}/plots")
 
     assert response.status_code == 200
     assert response.json()["partial"] is True

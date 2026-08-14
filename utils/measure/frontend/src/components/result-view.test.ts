@@ -10,7 +10,7 @@ describe("result view", () => {
       shadowRoot: ShadowRoot;
     };
     element.snapshot = { state };
-    element.diagnosticsUrl = "http://ha.local/ingress/api/session/current/diagnostics";
+    element.diagnosticsUrl = "http://ha.local/ingress/api/sessions/session-1/diagnostics";
     document.body.append(element);
     await element.updateComplete;
 
@@ -35,7 +35,7 @@ describe("result view", () => {
     };
     element.files = [{ name: "brightness.csv", size: 10, media_type: "text/csv" }];
     element.plotCollection = { partial: true, plots: [], warnings: ["Could not plot brightness.csv"] };
-    element.diagnosticsUrl = "http://ha.local/ingress/api/session/current/diagnostics";
+    element.diagnosticsUrl = "http://ha.local/ingress/api/sessions/session-1/diagnostics";
     document.body.append(element);
     await element.updateComplete;
 

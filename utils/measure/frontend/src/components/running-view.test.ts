@@ -76,7 +76,7 @@ describe("running view", () => {
     };
     element.snapshot = { state: "running", phase: "Brightness", mode: "brightness", progress: { completed: 25, total: 100, estimated_remaining_seconds: 120 } };
     element.connected = true;
-    element.diagnosticsUrl = "http://ha.local/ingress/api/session/current/diagnostics";
+    element.diagnosticsUrl = "http://ha.local/ingress/api/sessions/session-1/diagnostics";
     document.body.append(element);
     await element.updateComplete;
 

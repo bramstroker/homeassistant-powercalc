@@ -140,10 +140,6 @@ export class MeasureApiClient {
     return this.request(`api/sessions/${encodeURIComponent(sessionId)}`, { method: "DELETE" }, "none");
   }
 
-  getCurrent(): Promise<SessionSnapshot> {
-    return this.request("api/session/current");
-  }
-
   cancel(sessionId: string): Promise<SessionSnapshot> {
     return this.request(`api/sessions/${encodeURIComponent(sessionId)}/cancel`, { method: "DELETE" });
   }

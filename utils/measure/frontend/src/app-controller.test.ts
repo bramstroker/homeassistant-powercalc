@@ -94,7 +94,6 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     getSessions: async () => [],
     getSession: async () => ({ state: "idle" }),
     deleteSession: async () => undefined,
-    getCurrent: async () => ({ state: "idle" }),
     cancel: async () => ({ state: "cancelled" }),
     confirm: async () => ({ state: "running" }),
     resume: async () => ({ state: "running" }),
