@@ -16,7 +16,6 @@ from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import (
     LightMeasurementRequest,
     MeasurementRequest,
-    ResumePolicy,
 )
 from measure.runner.runner import RunnerResult
 import pytest
@@ -112,13 +111,13 @@ class CheckpointService(SessionMeasurementService):
 def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
 
-    coordinator.start(light_request())
+    session = coordinator.start(light_request())
     wait_for_state(coordinator, SessionState.COMPLETED)
 
     assert coordinator.current is not None
     assert coordinator.current.progress == 100
     assert coordinator.current.files == ("LCT010/brightness.csv",)
-    assert [(event.sequence, event.data["state"]) for event in coordinator.events_since(1)] == [
+    assert [(event.sequence, event.data["state"]) for event in coordinator.events_since(1, session.id)] == [
         (2, SessionState.COMPLETED),
     ]
 
@@ -126,16 +125,16 @@ def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
 def test_coordinator_rejects_concurrent_start_and_cancels(tmp_path: Path) -> None:
     started = Event()
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
-    coordinator.start(light_request())
+    session = coordinator.start(light_request())
     assert started.wait(1)
 
     duplicate = light_request()
     with pytest.raises(SessionConflictError):
         coordinator.start(duplicate)
 
-    coordinator.cancel()
+    coordinator.cancel(session.id)
     wait_for_state(coordinator, SessionState.CANCELLED)
-    assert coordinator.cancel().state == SessionState.CANCELLED
+    assert coordinator.cancel(session.id).state == SessionState.CANCELLED
 
 
 def test_coordinator_rejects_resume_without_compatible_output(tmp_path: Path) -> None:
@@ -150,16 +149,16 @@ def test_coordinator_rejects_resume_without_compatible_output(tmp_path: Path) ->
     coordinator = MeasurementCoordinator(storage, CompletingService)
 
     with pytest.raises(SessionConflictError, match="no compatible complete row"):
-        coordinator.resume()
+        coordinator.resume(current.id)
 
 
-def test_legacy_overwrite_policy_retains_previous_session_files(tmp_path: Path) -> None:
+def test_starting_a_session_retains_the_previous_one(tmp_path: Path) -> None:
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
     first = coordinator.start(light_request())
     wait_for_state(coordinator, SessionState.COMPLETED)
     old_directory = coordinator.storage.session_directory(first.id)
 
-    second = coordinator.start(light_request().model_copy(update={"resume_policy": ResumePolicy.OVERWRITE}))
+    second = coordinator.start(light_request())
 
     assert old_directory.exists()
     assert {session.id for session in coordinator.sessions()} == {first.id, second.id}
@@ -211,10 +210,10 @@ def test_coordinator_deletes_only_terminal_sessions(tmp_path: Path) -> None:
 def test_transient_sample_does_not_reuse_terminal_event_sequence(tmp_path: Path) -> None:
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SamplingService)
 
-    coordinator.start(light_request())
+    session = coordinator.start(light_request())
     wait_for_state(coordinator, SessionState.COMPLETED)
 
-    events = coordinator.events_since(0)
+    events = coordinator.events_since(0, session.id)
     assert [event.sequence for event in events] == [1, 2]
     assert len({event.sequence for event in events}) == len(events)
 
@@ -222,18 +221,18 @@ def test_transient_sample_does_not_reuse_terminal_event_sequence(tmp_path: Path)
 def test_coordinator_reloads_persisted_events_for_reconnect(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
     coordinator = MeasurementCoordinator(storage, CompletingService)
-    coordinator.start(light_request())
+    session = coordinator.start(light_request())
     wait_for_state(coordinator, SessionState.COMPLETED)
 
     reloaded = MeasurementCoordinator(storage, CompletingService)
 
-    assert [event.sequence for event in reloaded.events_since(0)] == [1, 2]
+    assert [event.sequence for event in reloaded.events_since(0, session.id)] == [1, 2]
 
 
 def test_coordinator_projects_and_persists_operating_point(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
     coordinator = MeasurementCoordinator(storage, OperatingPointService)
-    coordinator.start(light_request())
+    session = coordinator.start(light_request())
 
     deadline = time.monotonic() + 1
     while coordinator.current and coordinator.current.operating_point is None and time.monotonic() < deadline:
@@ -245,7 +244,7 @@ def test_coordinator_projects_and_persists_operating_point(tmp_path: Path) -> No
     assert persisted is not None
     assert persisted.operating_point == coordinator.current.operating_point
 
-    coordinator.cancel()
+    coordinator.cancel(session.id)
     wait_for_state(coordinator, SessionState.CANCELLED)
 
 
@@ -254,7 +253,7 @@ def test_coordinator_projects_phase_and_confirmation_message(tmp_path: Path) -> 
     continued = Event()
     coordinator = MeasurementCoordinator(storage, lambda: CheckpointService(continued))
 
-    coordinator.start(light_request())
+    session = coordinator.start(light_request())
     wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
 
     assert coordinator.current is not None
@@ -264,7 +263,7 @@ def test_coordinator_projects_phase_and_confirmation_message(tmp_path: Path) -> 
     assert persisted is not None
     assert persisted.confirmation_message == coordinator.current.confirmation_message
 
-    confirmed = coordinator.confirm()
+    confirmed = coordinator.confirm(session.id)
     assert confirmed.state == SessionState.RUNNING
     assert confirmed.phase == "Starting measurement"
     assert confirmed.confirmation_message is None

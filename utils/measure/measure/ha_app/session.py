@@ -32,6 +32,16 @@ ACTIVE_SESSION_STATES = frozenset(
     },
 )
 
+# States a session can be relaunched from. The resume endpoint and the flag the session
+# listing exposes both read this, so a new state cannot make the two disagree.
+RESUMABLE_SESSION_STATES = frozenset(
+    {
+        SessionState.RESUMABLE,
+        SessionState.CANCELLED,
+        SessionState.FAILED,
+    },
+)
+
 
 class SessionEventType(StrEnum):
     STATE = "state"

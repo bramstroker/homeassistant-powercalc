@@ -23,9 +23,6 @@ export class PreflightView extends LitElement {
   @property({ attribute: false })
   powerMeterDiagnostic?: PowerMeterDiagnostic | null;
 
-  @property({ type: Boolean })
-  canOverwrite = false;
-
   @property({ type: String })
   confirmationAction = "";
 
@@ -34,9 +31,6 @@ export class PreflightView extends LitElement {
 
   @property({ type: String })
   errorMessage = "";
-
-  @property({ type: Boolean })
-  overwriteConfirmed = false;
 
   static readonly styles = [sharedStyles, css`
     .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); margin-bottom: 1rem; }
@@ -73,9 +67,6 @@ export class PreflightView extends LitElement {
         ${this.warnings.length ? html`
           <div class="notice"><strong>Check before starting</strong><ul class="warning-list">${this.warnings.map((warning) => html`<li>${warning}</li>`)}</ul></div>
         ` : nothing}
-        ${this.canOverwrite ? html`
-          <label class="check"><input type="checkbox" @change=${this.confirmOverwrite} /> I understand the previous measurement and its files will be deleted.</label>
-        ` : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
         ${this.busy ? html`
           <div class="notice starting" role="status" aria-live="polite">
@@ -85,7 +76,7 @@ export class PreflightView extends LitElement {
         ` : nothing}
         <div class="actions">
           <button type="button" @click=${() => this.emit("back")} ?disabled=${this.busy}>Back</button>
-          <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy || (this.canOverwrite && !this.overwriteConfirmed)}>${this.startButtonLabel()}</button>
+          <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy}>${this.startButtonLabel()}</button>
         </div>
       </section>
     `;
@@ -94,10 +85,6 @@ export class PreflightView extends LitElement {
   private startButtonLabel(): string {
     if (this.busy) return "Preparing…";
     return this.confirmationAction ? "Prepare measurement" : "Start measurement";
-  }
-
-  private confirmOverwrite(event: Event): void {
-    this.overwriteConfirmed = (event.currentTarget as HTMLInputElement).checked;
   }
 
   private emit(name: "back" | "start"): void {

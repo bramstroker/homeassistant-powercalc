@@ -5,7 +5,6 @@ from uuid import uuid4
 
 from measure.clock import utc_now
 from measure.contribution.credentials import CredentialStore
-from measure.contribution.files import write_json_atomic
 from measure.contribution.github import GitHubApiError, GitHubClient, missing_required_scopes
 from measure.contribution.models import (
     ContributionError,
@@ -22,6 +21,7 @@ from measure.contribution.pull_request import (
     pull_request_body,
     pull_request_title,
 )
+from measure.files import write_json_atomic
 
 
 class ContributionJobExpiredError(LookupError):

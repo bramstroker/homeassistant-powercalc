@@ -11,13 +11,14 @@ from measure.clock import utc_now
 from measure.execution import MeasurementCancelledError, OperatingPoint
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
+    RESUMABLE_SESSION_STATES,
     SessionControl,
     SessionEvent,
     SessionEventType,
     SessionSnapshot,
     SessionState,
 )
-from measure.ha_app.storage import SessionStorage
+from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
 from measure.request import MeasurementRequest, ResumePolicy
 from measure.runner.runner import RunnerResult
 
@@ -49,7 +50,7 @@ class SessionMeasurementService(Protocol):
 
 
 class MeasurementCoordinator:
-    """Own the single persisted Home Assistant measurement session.
+    """Own the Home Assistant measurement sessions and the single slot they compete for.
 
     State transitions are serialized under a lock while the measurement runs on a worker thread.
     """
@@ -72,8 +73,13 @@ class MeasurementCoordinator:
     def get(self, session_id: str) -> SessionSnapshot:
         """Return the live projection or a stored historical snapshot."""
         with self._lock:
-            if self._snapshot is not None and self._snapshot.id == session_id:
-                return self._snapshot
+            return self._snapshot_locked(session_id)
+
+    def _snapshot_locked(self, session_id: str) -> SessionSnapshot:
+        """Resolve one session against the live projection first. Call while holding the lock."""
+
+        if self._snapshot is not None and self._snapshot.id == session_id:
+            return self._snapshot
         return self.storage.load_snapshot(session_id)
 
     def sessions(self) -> tuple[SessionSnapshot, ...]:
@@ -92,7 +98,7 @@ class MeasurementCoordinator:
             if self._snapshot and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if request.resume_policy == ResumePolicy.RESUME:
-                raise SessionConflictError("Use the current-session resume action for persisted output")
+                raise SessionConflictError("Use the resume action for persisted output")
             now = utc_now()
             snapshot = SessionSnapshot(
                 id=str(uuid4()),
@@ -107,28 +113,17 @@ class MeasurementCoordinator:
             self._launch_locked(request)
             return self._snapshot
 
-    def resume(self, session_id: str | None = None) -> SessionSnapshot:
+    def resume(self, session_id: str) -> SessionSnapshot:
         """Relaunch a retained session from compatible persisted output."""
 
         with self._lock:
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
-            target_id = session_id or (self._snapshot.id if self._snapshot is not None else None)
-            if target_id is None:
-                raise SessionConflictError("There is no session to resume")
             try:
-                snapshot = (
-                    self._snapshot
-                    if self._snapshot is not None and self._snapshot.id == target_id
-                    else self.storage.load_snapshot(target_id)
-                )
-            except (FileNotFoundError, KeyError, TypeError, ValueError) as error:
+                snapshot = self._snapshot_locked(session_id)
+            except SESSION_LOAD_ERRORS as error:
                 raise SessionConflictError("The requested session does not exist") from error
-            if snapshot.state not in {
-                SessionState.RESUMABLE,
-                SessionState.CANCELLED,
-                SessionState.FAILED,
-            }:
+            if snapshot.state not in RESUMABLE_SESSION_STATES:
                 raise SessionConflictError("The requested session cannot be resumed")
             if not self.storage.can_resume(snapshot.id):
                 raise SessionConflictError("The requested session has no compatible complete row to resume")
@@ -141,62 +136,60 @@ class MeasurementCoordinator:
             self._launch_locked(request)
             return self._snapshot
 
-    def cancel(self, session_id: str | None = None) -> SessionSnapshot:
+    def cancel(self, session_id: str) -> SessionSnapshot:
         """Persist cancellation intent and signal the worker cooperatively."""
 
         with self._lock:
-            self._require_current_id(session_id)
-            if self._snapshot is not None and self._snapshot.state == SessionState.CANCELLED:
-                return self._snapshot
-            if self._snapshot is None or self._snapshot.state not in {
+            snapshot = self._require_active(session_id)
+            if snapshot.state == SessionState.CANCELLED:
+                return snapshot
+            if snapshot.state not in {
                 SessionState.RUNNING,
                 SessionState.AWAITING_CONFIRMATION,
                 SessionState.CANCELLING,
             }:
                 raise SessionConflictError("No running measurement session")
-            if self._snapshot.state != SessionState.CANCELLING:
-                self._snapshot = replace(
-                    self._snapshot,
+            if snapshot.state != SessionState.CANCELLING:
+                snapshot = replace(
+                    snapshot,
                     state=SessionState.CANCELLING,
                     phase="Cancelling measurement",
                     confirmation_message=None,
                     updated_at=utc_now(),
                 )
-                self.storage.write_snapshot(self._snapshot)
+                self._snapshot = snapshot
+                self.storage.write_snapshot(snapshot)
             if self._control is not None:
                 self._control.cancel()
-            return self._snapshot
+            return snapshot
 
-    def confirm(self, session_id: str | None = None) -> SessionSnapshot:
+    def confirm(self, session_id: str) -> SessionSnapshot:
         """Release a worker paused at an operator checkpoint."""
 
         with self._lock:
-            self._require_current_id(session_id)
-            if self._snapshot is None or self._snapshot.state != SessionState.AWAITING_CONFIRMATION:
-                raise SessionConflictError("The current session is not waiting for confirmation")
+            snapshot = self._require_active(session_id)
+            if snapshot.state != SessionState.AWAITING_CONFIRMATION:
+                raise SessionConflictError("The requested session is not waiting for confirmation")
             if self._control is None:
-                raise SessionConflictError("The current session cannot be continued")
-            self._snapshot = replace(
-                self._snapshot,
+                raise SessionConflictError("The requested session cannot be continued")
+            snapshot = replace(
+                snapshot,
                 state=SessionState.RUNNING,
                 phase="Starting measurement",
                 confirmation_message=None,
                 updated_at=utc_now(),
             )
-            self.storage.write_snapshot(self._snapshot)
+            self._snapshot = snapshot
+            self.storage.write_snapshot(snapshot)
             self._control.continue_run()
-            return self._snapshot
+            return snapshot
 
     def delete(self, session_id: str) -> None:
         """Delete a terminal retained session."""
         with self._lock:
             try:
-                snapshot = (
-                    self._snapshot
-                    if self._snapshot is not None and self._snapshot.id == session_id
-                    else self.storage.load_snapshot(session_id)
-                )
-            except (FileNotFoundError, KeyError, TypeError, ValueError) as error:
+                snapshot = self._snapshot_locked(session_id)
+            except SESSION_LOAD_ERRORS as error:
                 raise SessionConflictError("The requested session does not exist") from error
             if snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("An active measurement session cannot be deleted")
@@ -205,19 +198,19 @@ class MeasurementCoordinator:
                 self._snapshot = None
                 self._events = []
 
-    def _require_current_id(self, session_id: str | None) -> None:
-        if session_id is not None and (self._snapshot is None or self._snapshot.id != session_id):
-            raise SessionConflictError("The requested session is not active")
+    def _require_active(self, session_id: str) -> SessionSnapshot:
+        """Return the live projection, refusing any session that does not hold the measurement slot."""
 
-    def events_since(self, sequence: int, session_id: str | None = None) -> tuple[SessionEvent, ...]:
+        if self._snapshot is None or self._snapshot.id != session_id:
+            raise SessionConflictError("The requested session is not active")
+        return self._snapshot
+
+    def events_since(self, sequence: int, session_id: str) -> tuple[SessionEvent, ...]:
         """Return events after ``sequence`` for a live or retained session."""
         with self._lock:
-            target_id = session_id or (self._snapshot.id if self._snapshot is not None else None)
-            if target_id is None:
-                return ()
-            if self._snapshot is not None and self._snapshot.id == target_id:
+            if self._snapshot is not None and self._snapshot.id == session_id:
                 return tuple(event for event in self._events if event.sequence > sequence)
-        return tuple(event for event in self.storage.load_events(target_id) if event.sequence > sequence)
+        return tuple(event for event in self.storage.load_events(session_id) if event.sequence > sequence)
 
     def _launch_locked(self, request: MeasurementRequest) -> None:
         """Create session control and launch the worker while holding the coordinator lock."""

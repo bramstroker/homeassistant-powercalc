@@ -1,7 +1,7 @@
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 import math
-from typing import Protocol
+from typing import Any, Protocol
 
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION
 from measure.controller.charging.const import ATTR_BATTERY_LEVEL
@@ -291,28 +291,42 @@ class MeasurementPreflight:
             )
 
     def _validate_controller(self, request: MeasurementRequest) -> PreflightResult:
-        if isinstance(request, SpeakerMeasurementRequest):
-            if isinstance(request.controller, HassMediaControllerSpec):
-                self._require_entity(
-                    request.controller.entity_id,
-                    EntityDomain.MEDIA_PLAYER,
-                    "Selected media player is unavailable",
-                )
-        elif isinstance(request, FanMeasurementRequest):
-            if isinstance(request.controller, HassFanControllerSpec):
-                self._require_entity(request.controller.entity_id, EntityDomain.FAN, "Selected fan is unavailable")
-        elif isinstance(request, ChargingMeasurementRequest):
-            domain = EntityDomain(charging_entity_domain(request.charging_device_type))
-            if isinstance(request.controller, HassChargingControllerSpec):
-                if not request.controller.entity_id.startswith(f"{domain}."):
-                    raise PreflightError("Charging device type does not match the selected entity")
-                charging_entity = self._require_entity(
-                    request.controller.entity_id,
-                    domain,
-                    "Selected charging device is unavailable",
-                )
-                return self._validate_charging_battery_source(charging_entity)
+        """Apply the check this request type declares; a type absent here drives nothing up front."""
+
+        checks: dict[type[MeasurementRequest], Callable[[Any], PreflightResult]] = {
+            SpeakerMeasurementRequest: self._validate_speaker,
+            FanMeasurementRequest: self._validate_fan,
+            ChargingMeasurementRequest: self._validate_charging,
+        }
+        check = checks.get(type(request))
+        return PreflightResult() if check is None else check(request)
+
+    def _validate_speaker(self, request: SpeakerMeasurementRequest) -> PreflightResult:
+        if isinstance(request.controller, HassMediaControllerSpec):
+            self._require_entity(
+                request.controller.entity_id,
+                EntityDomain.MEDIA_PLAYER,
+                "Selected media player is unavailable",
+            )
         return PreflightResult()
+
+    def _validate_fan(self, request: FanMeasurementRequest) -> PreflightResult:
+        if isinstance(request.controller, HassFanControllerSpec):
+            self._require_entity(request.controller.entity_id, EntityDomain.FAN, "Selected fan is unavailable")
+        return PreflightResult()
+
+    def _validate_charging(self, request: ChargingMeasurementRequest) -> PreflightResult:
+        if not isinstance(request.controller, HassChargingControllerSpec):
+            return PreflightResult()
+        domain = EntityDomain(charging_entity_domain(request.charging_device_type))
+        if not request.controller.entity_id.startswith(f"{domain}."):
+            raise PreflightError("Charging device type does not match the selected entity")
+        charging_entity = self._require_entity(
+            request.controller.entity_id,
+            domain,
+            "Selected charging device is unavailable",
+        )
+        return self._validate_charging_battery_source(charging_entity)
 
     def _validate_charging_battery_source(self, charging_entity: EntityRecord) -> PreflightResult:
         # Prefer a separate battery sensor on the same device (the modern HA default),

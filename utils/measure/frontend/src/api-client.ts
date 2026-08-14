@@ -141,7 +141,7 @@ export class MeasureApiClient {
   }
 
   cancel(sessionId: string): Promise<SessionSnapshot> {
-    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/cancel`, { method: "DELETE" });
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/cancel`, { method: "POST" });
   }
 
   confirm(sessionId: string): Promise<SessionSnapshot> {

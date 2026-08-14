@@ -15,7 +15,7 @@ export type SessionState =
 export type LutMode = "brightness" | "color_temp" | "hs" | "effect";
 export type DeviceClass = "power" | "voltage";
 export type ChargingDeviceType = "vacuum_robot" | "lawn_mower_robot";
-export type ResumePolicy = "new" | "resume" | "overwrite";
+export type ResumePolicy = "new" | "resume";
 /** Derived from the spec union so a new meter variant automatically widens it. */
 export type PowerMeterType = PowerMeterSpec["type"];
 

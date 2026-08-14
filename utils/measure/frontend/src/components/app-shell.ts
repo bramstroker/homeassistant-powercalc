@@ -214,7 +214,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         .metrics=${reviewMetrics(this.request, this.preflight, definition)}
         .summary=${reviewSummary(this.request, this.preflight, definition)}
         .warnings=${this.preflight?.warnings ?? []} .powerMeterDiagnostic=${this.preflight?.power_meter_diagnostic}
-        .canOverwrite=${this.reviewCanOverwrite()} .confirmationAction=${this.confirmationAction()}
+        .confirmationAction=${this.confirmationAction()}
         .busy=${this.busy} .errorMessage=${this.errorMessage}
         @back=${() => this.controller.backToSetup()} @start=${() => void this.controller.start()}
       ></measure-preflight-view>`;
@@ -301,10 +301,6 @@ export class AppShell extends LitElement implements MeasureAppState {
     const retained = this.sessions.find((session) => session.session_id === this.snapshot?.session_id);
     if (retained) return retained.can_resume;
     return this.activeDefinition()?.supports_resume ?? false;
-  }
-
-  private reviewCanOverwrite(): boolean {
-    return this.request?.resume_policy === "overwrite";
   }
 
   /** The definition of the type being measured or configured, whichever the current view is about. */

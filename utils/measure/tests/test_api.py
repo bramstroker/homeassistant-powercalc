@@ -867,7 +867,7 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
 
     assert set(paths["/api/sessions"]) == {"get", "post"}
     assert set(paths["/api/sessions/{session_id}"]) == {"get", "delete"}
-    assert set(paths["/api/sessions/{session_id}/cancel"]) == {"delete"}
+    assert set(paths["/api/sessions/{session_id}/cancel"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/confirm"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/resume"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/diagnostics"]) == {"get"}

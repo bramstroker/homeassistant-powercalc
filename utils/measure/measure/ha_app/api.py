@@ -42,10 +42,16 @@ from measure.ha_app.preferences import AppPreferences, AppSettingsResponse, AppS
 from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
 from measure.ha_app.registry import FieldControl, FieldRole, measurement_definitions
 from measure.ha_app.service import MeasurementService
-from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionEvent, SessionSnapshot, SessionState
+from measure.ha_app.session import (
+    ACTIVE_SESSION_STATES,
+    RESUMABLE_SESSION_STATES,
+    SessionEvent,
+    SessionSnapshot,
+    SessionState,
+)
 from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
-from measure.ha_app.storage import SessionStorage
+from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
 from measure.home_assistant import HomeAssistantManager
 from measure.home_assistant_entities import (
     DeviceClass,
@@ -450,6 +456,8 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
         prepared = await run_in_threadpool(_apply_fast_test_mode, context, payload)
         return await run_in_threadpool(_preflight, context, prepared)
 
+
+def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
     @router.post("/sessions", status_code=201, responses={409: _ERROR, 422: _ERROR})
     async def start_session(payload: MeasurementRequestPayload, request: Request) -> dict[str, object]:
         context = _context(request)
@@ -461,8 +469,6 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
             raise HTTPException(status_code=409, detail=str(error)) from error
         return _snapshot_response(context, snapshot)
 
-
-def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/sessions")
     async def sessions(request: Request) -> list[SessionSummary]:
         context = _context(request)
@@ -485,16 +491,16 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
             raise HTTPException(status_code=409, detail=str(error)) from error
         return Response(status_code=204)
 
-    @router.delete("/sessions/{session_id}/cancel", status_code=202, responses={404: _ERROR, 409: _ERROR})
-    async def cancel_session_by_id(session_id: str, request: Request) -> dict[str, object]:
+    @router.post("/sessions/{session_id}/cancel", status_code=202, responses={404: _ERROR, 409: _ERROR})
+    async def cancel_session(session_id: str, request: Request) -> dict[str, object]:
         return _cancel_session(_context(request), session_id)
 
     @router.post("/sessions/{session_id}/confirm", responses={404: _ERROR, 409: _ERROR})
-    async def confirm_session_by_id(session_id: str, request: Request) -> dict[str, object]:
+    async def confirm_session(session_id: str, request: Request) -> dict[str, object]:
         return _confirm_session(_context(request), session_id)
 
     @router.post("/sessions/{session_id}/resume", responses={404: _ERROR, 409: _ERROR, 422: _ERROR})
-    async def resume_session_by_id(session_id: str, request: Request) -> dict[str, object]:
+    async def resume_session(session_id: str, request: Request) -> dict[str, object]:
         return await _resume_session(_context(request), session_id)
 
     @router.get("/sessions/{session_id}/files", responses={404: _ERROR})
@@ -595,7 +601,7 @@ def _context(request: Request) -> AppContext:
 def _require_session(context: AppContext, session_id: str) -> SessionSnapshot:
     try:
         return context.coordinator.get(session_id)
-    except (FileNotFoundError, KeyError, TypeError, ValueError) as error:
+    except SESSION_LOAD_ERRORS as error:
         raise HTTPException(status_code=404, detail="Measurement session not found") from error
 
 
@@ -682,7 +688,7 @@ def _session_diagnostics(context: AppContext, snapshot: SessionSnapshot) -> Resp
 def _measure_definitions() -> list[MeasureDefinition]:
     return [
         MeasureDefinition(
-            measure_type=definition.kind,
+            measure_type=definition.measure_type,
             label=definition.label,
             description=definition.description,
             icon=definition.icon,
@@ -913,11 +919,10 @@ def _session_summary(context: AppContext, snapshot: SessionSnapshot) -> SessionS
         completed=snapshot.completed,
         total=snapshot.total,
         percent=snapshot.progress,
-        can_resume=context.storage.can_resume(snapshot.id)
-        and snapshot.state in {SessionState.RESUMABLE, SessionState.CANCELLED, SessionState.FAILED},
+        can_resume=context.storage.can_resume(snapshot.id) and snapshot.state in RESUMABLE_SESSION_STATES,
         file_count=len(context.storage.list_files(snapshot.id)),
         size=context.storage.session_size(snapshot.id),
-        active=current is not None and current.id == snapshot.id and snapshot.state in ACTIVE_SESSION_STATES,
+        active=current is not None and current.id == snapshot.id and _is_active(snapshot),
     )
 
 
@@ -954,23 +959,22 @@ async def _event_stream(request: Request, context: AppContext, session_id: str) 
         else:
             try:
                 snapshot = context.coordinator.get(session_id)
-            except FileNotFoundError, KeyError, TypeError, ValueError:
+            except SESSION_LOAD_ERRORS:
                 return
-            if snapshot is not None:
-                heartbeat = {
-                    "sequence": snapshot.event_sequence,
-                    "type": "heartbeat",
-                    "data": {},
-                    "snapshot": _snapshot_response(context, snapshot),
-                }
-                yield f"event: heartbeat\ndata: {json.dumps(heartbeat, default=str)}\n\n"
+            heartbeat = {
+                "sequence": snapshot.event_sequence,
+                "type": "heartbeat",
+                "data": {},
+                "snapshot": _snapshot_response(context, snapshot),
+            }
+            yield f"event: heartbeat\ndata: {json.dumps(heartbeat, default=str)}\n\n"
         await asyncio.sleep(1)
 
 
 def _encode_event(context: AppContext, event: SessionEvent, session_id: str) -> str:
     try:
         snapshot = context.coordinator.get(session_id)
-    except FileNotFoundError, KeyError, TypeError, ValueError:
+    except SESSION_LOAD_ERRORS:
         snapshot = None
     payload: dict[str, object] = {
         "sequence": event.sequence,
