@@ -176,6 +176,88 @@ async def test_get_model_metadata_rejects_invalid_device_type(remote_loader: Rem
     assert await remote_loader.get_model_metadata("test", "invalid") is None
 
 
+async def test_get_model_metadata_rejects_invalid_discovery_by(remote_loader: RemoteLoader) -> None:
+    remote_loader.model_infos["test/invalid"] = cast(
+        "LibraryModel",
+        {"id": "invalid", "hash": "hash", "device_type": "light", "discovery_by": "invalid"},
+    )
+
+    assert await remote_loader.get_model_metadata("test", "invalid") is None
+
+
+async def test_listings_skip_models_with_unknown_values(hass: HomeAssistant, mock_aioresponse: aioresponses) -> None:
+    """Models using a device type or discovery mode introduced in a newer Powercalc version must be ignored.
+
+    They may never break the listings for the installed version.
+    """
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=200,
+        payload={
+            "manufacturers": [
+                {
+                    "name": "future",
+                    "full_name": "Future",
+                    "dir_name": "future",
+                    "models": [
+                        {"id": "unknown_device_type", "device_type": "spaceship", "hash": "dummy"},
+                        {
+                            "id": "unknown_discovery_by",
+                            "device_type": "light",
+                            "discovery_by": "galaxy",
+                            "hash": "dummy",
+                        },
+                    ],
+                },
+                {
+                    "name": "known",
+                    "full_name": "Known",
+                    "dir_name": "known",
+                    "models": [{"id": "some_light", "device_type": "light", "hash": "dummy"}],
+                },
+            ],
+        },
+    )
+
+    loader = RemoteLoader(hass)
+    await loader.initialize()
+
+    for device_types in (None, {DeviceType.LIGHT}):
+        manufacturers = await loader.get_manufacturer_listing(device_types, DiscoveryBy.ENTITY)
+        assert ("known", "Known") in manufacturers
+        assert ("future", "Future") not in manufacturers
+
+    assert await loader.get_model_listing("future", None) == set()
+    assert await loader.get_model_metadata("future", "unknown_discovery_by") is None
+
+
+async def test_manufacturer_listing_skips_models_requiring_newer_version(
+    hass: HomeAssistant,
+    mock_aioresponse: aioresponses,
+) -> None:
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=200,
+        payload={
+            "manufacturers": [
+                {
+                    "name": "test_manu",
+                    "full_name": "Test manufacturer",
+                    "dir_name": "test_manu",
+                    "models": [
+                        {"id": "future_profile", "device_type": "light", "hash": "dummy", "min_version": "v99.0.0"},
+                    ],
+                },
+            ],
+        },
+    )
+
+    loader = RemoteLoader(hass)
+    await loader.initialize()
+
+    assert await loader.get_manufacturer_listing(None) == set()
+
+
 async def test_find_model_migration(hass: HomeAssistant, mock_aioresponse: aioresponses) -> None:
     mock_aioresponse.get(
         ENDPOINT_LIBRARY,
