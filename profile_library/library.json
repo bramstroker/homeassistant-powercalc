@@ -1267,11 +1267,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "hs",
+            "brightness",
             "color_temp"
           ],
-          "hash": "7179005f12a9f1cf1713816e058b172e"
+          "hash": "3e0fb721d00648aaaa4db9d3c94be36a"
         },
         {
           "aliases": [
@@ -1371,10 +1371,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
-          "hash": "6135cea77f7d32aec4a5646dd461871b"
+          "hash": "12913c146371fe0a2b9f386046cd1f0f"
         },
         {
           "calculation_strategy": "fixed",
@@ -4161,11 +4161,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "hs",
+            "brightness",
             "color_temp"
           ],
-          "hash": "7a12ce1ccc7d04822c72c686efa8181f"
+          "hash": "b7378729aac7ace210e2b4bbde61c97b"
         }
       ],
       "device_types": [
@@ -9214,6 +9214,10 @@
           "hash": "12ae88c7ab97889288856539376413ef"
         },
         {
+          "aliases": [
+            "KAJPLATS E14 WS B38 CL 470lm",
+            "36872"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2026-06-18T00:07:18Z",
           "device_type": "light",
@@ -9234,14 +9238,14 @@
           },
           "id": "LED2402C3",
           "manufacturer": "ikea",
-          "updated_at": "2026-07-18T07:09:16",
+          "updated_at": "2026-08-13T19:56:30",
           "max_power": 3.57,
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
             "color_temp"
           ],
-          "hash": "6cf57439a73244dbe1453df711e7c8e9"
+          "hash": "eb31033c96b71deb55c9406263b5e18d"
         },
         {
           "calculation_strategy": "lut",
@@ -9652,10 +9656,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "dba99382a0b631d67a623a113df77f73"
+          "hash": "35376d26a5a8218cb54ea5a09ce0d0be"
         },
         {
           "calculation_strategy": "lut",
@@ -9705,10 +9709,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "effect"
+            "effect",
+            "brightness"
           ],
-          "hash": "728e12409f1fa364a4a7b3abb6498a73"
+          "hash": "59bfe229e936e3b5c259fab7a0fbb28b"
         },
         {
           "aliases": [
@@ -10699,10 +10703,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "3857dba79736baf73915fc4957ea3253"
+          "hash": "91cc8b3b3a9adda4d2970b5159635904"
         },
         {
           "aliases": [
@@ -11810,10 +11814,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "0f28345a7b8cd287401e5928b91db4b6"
+          "hash": "b3c479620dc1d9149da0c4e0e47fd57e"
         },
         {
           "calculation_strategy": "lut",
@@ -11867,10 +11871,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "a6bc34f5bf108a2959f79463bd4e8ffe"
+          "hash": "aaae42fccedc2f90620e829f2355dfb3"
         },
         {
           "aliases": [
@@ -12740,10 +12744,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "cc27a4eb0255d818dcbcb0a4ce36fc2b"
+          "hash": "a602a9bb1e1d783e8655c8797a130c55"
         },
         {
           "aliases": [
@@ -13359,10 +13363,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "38ec6ec8fe56f55e5da478c4fb774bcf"
+          "hash": "a95f6c413177e0059c1b32a22d439c57"
         },
         {
           "aliases": [
@@ -13427,10 +13431,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "1548c246f3d6e79b167c56c1cf4b4294"
+          "hash": "c0c5d612320637ac7930a9bd95ff4b69"
         },
         {
           "aliases": [
@@ -16263,10 +16267,10 @@
           "standby_power": 1.57,
           "id": "DR-HTF008S",
           "manufacturer": "dreo",
-          "updated_at": "2026-08-13T17:16:47",
+          "updated_at": "2026-08-13T17:23:40",
           "max_power": 36.03,
           "sub_profile_count": 0,
-          "hash": "23211993584886cdb9203524fb5a157a"
+          "hash": "bf8f5bb0bed9195502c16c01ba8e42b6"
         },
         {
           "calculation_strategy": "linear",
@@ -18668,10 +18672,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "d3fd4b6463a8f50891539274ba4e8a1e"
+          "hash": "9927d2ba8eccef5f1ece61cea8b61c37"
         }
       ],
       "device_types": [
@@ -19885,10 +19889,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "3f41e34317346db133dd4232cdad79ea"
+          "hash": "f96b3fd0e7606dc83212fb758a4a6811"
         }
       ],
       "device_types": [
@@ -20125,10 +20129,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "71c8875394f747fb35013b1ebab67211"
+          "hash": "9969116fcf0e2c677ed9f462a488d485"
         },
         {
           "calculation_strategy": "lut",
@@ -20211,11 +20215,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "hs",
+            "brightness",
             "color_temp"
           ],
-          "hash": "a23d75edfc1e7ea021bf5b515801268e"
+          "hash": "8b04010a1b630d7730615409aad56421"
         },
         {
           "calculation_strategy": "lut",
@@ -20242,10 +20246,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "be7a890101c27878946fbc1863a38678"
+          "hash": "ed2a322331bde3233565c2b7edba4d92"
         },
         {
           "calculation_strategy": "lut",
@@ -20301,10 +20305,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "e65b6c7abea8589046ff1e7777701aa6"
+          "hash": "566cb0023fb44937a25d1629d1e6df04"
         },
         {
           "calculation_strategy": "lut",
@@ -20475,10 +20479,10 @@
           "sub_profile_count": 0,
           "color_modes": [
             "hs",
-            "color_temp",
-            "effect"
+            "effect",
+            "color_temp"
           ],
-          "hash": "96b36d43556fae919943b19b48ea9854"
+          "hash": "516fe8e31f926892f942111bf547bd58"
         }
       ],
       "device_types": [
