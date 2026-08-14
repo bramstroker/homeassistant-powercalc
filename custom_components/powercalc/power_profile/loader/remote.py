@@ -246,7 +246,8 @@ class RemoteLoader(Loader):
             for manufacturer in self.library_contents.get("manufacturers", [])
             if any(
                 self._model_matches_filters(model, device_types, discovery_by)
-                for model in manufacturer.get("models", [])
+                # Use the indexed models, so models requiring a newer Powercalc version are left out here as well.
+                for model in self.manufacturer_models.get(str(manufacturer.get("dir_name")), [])
             )
         }
 
@@ -279,11 +280,20 @@ class RemoteLoader(Loader):
         device_types: set[DeviceType] | None,
         discovery_by: DiscoveryBy | None,
     ) -> bool:
-        model_device_type = DeviceType(model.get("device_type", DeviceType.LIGHT))
+        """Check whether an indexed model passes the requested filters.
+
+        Device types and discovery modes this Powercalc version does not know about are treated
+        as a non match, so profiles using a newly introduced value never break the listings.
+        """
+        try:
+            model_device_type = DeviceType(model.get("device_type", DeviceType.LIGHT))
+            model_discovery_by = DiscoveryBy(model.get("discovery_by", DiscoveryBy.ENTITY))
+        except ValueError:
+            return False
+
         if device_types and model_device_type not in device_types:
             return False
 
-        model_discovery_by = DiscoveryBy(model.get("discovery_by", DiscoveryBy.ENTITY))
         return not discovery_by or model_discovery_by == discovery_by
 
     @async_cache
@@ -322,13 +332,11 @@ class RemoteLoader(Loader):
 
         try:
             device_type = DeviceType(model_info.get("device_type", DeviceType.LIGHT))
+            discovery_by = DiscoveryBy(model_info.get("discovery_by", DiscoveryBy.ENTITY))
         except ValueError:
             return None
 
-        return ModelMetadata(
-            device_type=device_type,
-            discovery_by=DiscoveryBy(model_info.get("discovery_by", DiscoveryBy.ENTITY)),
-        )
+        return ModelMetadata(device_type=device_type, discovery_by=discovery_by)
 
     @async_cache
     async def load_model(
