@@ -11,6 +11,7 @@
   "measure_description": "Measure average for 10 minutes",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "min_version": "v1.24.0",
   "name": "P1 Energy Monitor",
   "fixed_config": {
     "power": 1.18
