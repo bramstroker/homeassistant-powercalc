@@ -93,7 +93,8 @@ export class AppShell extends LitElement implements MeasureAppState {
     header { margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
     .topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
     .brand { display: flex; align-items: center; gap: 0.7rem; min-height: 36px; padding: 0; border: 0; background: transparent; color: var(--muted); font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.16em; text-transform: uppercase; }
-    .brand:hover:not(:disabled) { border-color: transparent; background: transparent; color: var(--ink); }
+    .brand:hover:not(:disabled) { border-color: transparent; background: transparent; color: var(--ink); transform: none; }
+    .brand:active:not(:disabled) { transform: none; }
     .brand-logo { width: 20px; height: 24px; object-fit: contain; }
     .version { color: var(--muted); font: 500 0.68rem/1 ui-monospace, monospace; letter-spacing: normal; text-transform: none; white-space: nowrap; }
     .intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr); gap: 1.25rem clamp(1.5rem, 5vw, 4rem); align-items: end; padding-top: clamp(1.5rem, 4vw, 2.5rem); }
