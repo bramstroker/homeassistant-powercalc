@@ -41,6 +41,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.3,
+            "brightness": 98.3
+          },
           "hash": "517dfc1a83c16983b64d935ea15594d4"
         },
         {
@@ -67,10 +71,14 @@
           "max_power": 13.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "0d57218c1c272d3b0a294383933853b3"
+          "lut_quality": {
+            "score": 95.6,
+            "color_temp": 95.6
+          },
+          "hash": "48c30999303cdfaa8a8145726b349e1f"
         },
         {
           "calculation_strategy": "lut",
@@ -98,6 +106,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.3,
+            "brightness": 98.3
+          },
           "hash": "3e07c6d103ac8981ba53ad605defdaff"
         },
         {
@@ -125,6 +137,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.2,
+            "color_temp": 96.2
+          },
           "hash": "a0696e5574b7c168473e73886351fa9c"
         },
         {
@@ -209,6 +225,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 89.9,
+            "color_temp": 89.9
+          },
           "hash": "90fcaf4e743b0b28cfa56eb808e0038b"
         },
         {
@@ -264,6 +284,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 92.9,
+            "color_temp": 92.9
+          },
           "hash": "062e714b6225f3c093e78ea2679f92d4"
         }
       ],
@@ -301,10 +325,14 @@
           "max_power": 6.59,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "3251465a8649d3cb4c911441169757e2"
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
+          "hash": "3c09c25d7fb049f6c81272fa83be4509"
         }
       ],
       "device_types": [
@@ -348,10 +376,14 @@
           "max_power": 5.79,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "c9906e2cc142dbc16cd29094b12a250c"
+          "lut_quality": {
+            "score": 45.8,
+            "color_temp": 45.8
+          },
+          "hash": "89f42deab0f66c23034d349304f5c0c6"
         },
         {
           "calculation_strategy": "lut",
@@ -377,10 +409,14 @@
           "max_power": 9.55,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "a609a427ba84a6fcebcd5f4195978e30"
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "5d1e953936cd2117967e7df0c31f8cd6"
         },
         {
           "calculation_strategy": "lut",
@@ -405,10 +441,14 @@
           "max_power": 8.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "93cee6a5727c9baa81b8c3bf06286895"
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "ff5db7f486e3df2bb609ae5d25811cf5"
         },
         {
           "aliases": [
@@ -437,10 +477,14 @@
           "max_power": 7.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f764c62864fded78320248fd6d093e8f"
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "b563e5142d023d0ac6060eebd19534b3"
         },
         {
           "calculation_strategy": "lut",
@@ -466,10 +510,14 @@
           "max_power": 9.41,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "147a5453e6948fd572f4426dde39b9c5"
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "1e3e67ddac5e531c592f7da9b51189a1"
         },
         {
           "calculation_strategy": "lut",
@@ -523,10 +571,14 @@
           "max_power": 6.41,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "fb117f1457cf8018c17cebe93a17c3fb"
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
+          "hash": "4c04513044af5c2f245dc48ca3e160d3"
         },
         {
           "calculation_strategy": "lut",
@@ -552,10 +604,14 @@
           "max_power": 8.24,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "c8ad7f2b0b4f80bc50c635cf4deca437"
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "b62380b12b3f5d5d456b08cb16d8db72"
         },
         {
           "calculation_strategy": "lut",
@@ -581,10 +637,14 @@
           "max_power": 18.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e9f4ef1ed95f31dbd8a590ec07efeff2"
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "50266b34d69e53e308957f1994f79b37"
         },
         {
           "calculation_strategy": "lut",
@@ -611,6 +671,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.1,
+            "brightness": 99.1
+          },
           "hash": "7e13076900b49ca6d4c7b32d39ef86e4"
         },
         {
@@ -637,10 +701,14 @@
           "max_power": 9.17,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "9ca1ebb1ee41d212b8e8ebc8656c4710"
+          "lut_quality": {
+            "score": 98.4,
+            "color_temp": 98.4
+          },
+          "hash": "120ce25043864fce43c1ed3cd434b5cc"
         },
         {
           "calculation_strategy": "lut",
@@ -668,6 +736,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
           "hash": "2c10c296b937bbb1232af85dd35b2e8b"
         },
         {
@@ -696,6 +768,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 94.7,
+            "brightness": 94.7
+          },
           "hash": "2939aaef7203a2d444b312b6cd6c5d75"
         },
         {
@@ -722,10 +798,14 @@
           "max_power": 5.78,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f2304fe0e61d1e5d4625245b8b42d1cd"
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
+          "hash": "8a888c26085c888131105eab51ca65d1"
         },
         {
           "calculation_strategy": "lut",
@@ -777,10 +857,14 @@
           "max_power": 36.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f9c2eab6ff68f28c5cbe74a815c219f2"
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
+          "hash": "ee87db0d2944382f2cdc5183c0b4c342"
         },
         {
           "calculation_strategy": "lut",
@@ -806,10 +890,14 @@
           "max_power": 5.96,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d1eeed08ca7b4434551240f96ef4829f"
+          "lut_quality": {
+            "score": 65.1,
+            "color_temp": 65.1
+          },
+          "hash": "5f849082fcba0ea7033b9a70e9a9b911"
         },
         {
           "calculation_strategy": "lut",
@@ -834,10 +922,14 @@
           "max_power": 5.42,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e2310046545d54cdeb9f44857c505acc"
+          "lut_quality": {
+            "score": 97.0,
+            "color_temp": 97.0
+          },
+          "hash": "d7959bea12953b8316402683d0748c37"
         },
         {
           "aliases": [
@@ -868,6 +960,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.3,
+            "color_temp": 97.3
+          },
           "hash": "e5c0b28bb893a14f28fc7020ada9964b"
         },
         {
@@ -896,6 +992,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
           "hash": "9ba2093ce0f74b155bdd4ea99dff3436"
         },
         {
@@ -922,10 +1022,14 @@
           "max_power": 6.51,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b154b9447da2fa7ec4424ae9bdf41d59"
+          "lut_quality": {
+            "score": 94.8,
+            "color_temp": 94.8
+          },
+          "hash": "21471538a9f571a46969894ca0a90a44"
         },
         {
           "calculation_strategy": "lut",
@@ -953,6 +1057,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.3,
+            "color_temp": 96.3
+          },
           "hash": "75c04557dde2cf54fe2d31e6000fd308"
         },
         {
@@ -978,10 +1086,14 @@
           "max_power": 27.51,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "47795a387f2a0e29a31cbe468bfbe269"
+          "lut_quality": {
+            "score": 97.8,
+            "color_temp": 97.8
+          },
+          "hash": "2f44a32154723475d99e752b8f9b3645"
         },
         {
           "calculation_strategy": "lut",
@@ -1007,10 +1119,14 @@
           "max_power": 26.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "66a9287712cfba522af1c0de4043ba9a"
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
+          "hash": "50fc4110c7fd9094515140fa999f36f1"
         },
         {
           "calculation_strategy": "lut",
@@ -1036,10 +1152,14 @@
           "max_power": 19.08,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "20db3275889b8840437577eb99d0a162"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "3c0107da6f831c20436df14faf5ada2b"
         },
         {
           "calculation_strategy": "fixed",
@@ -1086,10 +1206,14 @@
           "max_power": 10.54,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "13e425bfd3891cf1dc66a68d8dc15c29"
+          "lut_quality": {
+            "score": 98.3,
+            "color_temp": 98.3
+          },
+          "hash": "7193544a7fbcb28207ef579bb5f3f215"
         }
       ],
       "device_types": [
@@ -1127,10 +1251,14 @@
           "max_power": 10.1,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "fbf7e1a71db8374c5a6bc1b346a28ffa"
+          "lut_quality": {
+            "score": 98.3,
+            "color_temp": 98.3
+          },
+          "hash": "bfe14b9995f49eeb0a67e4e95aa88bbd"
         }
       ],
       "device_types": [
@@ -1166,10 +1294,14 @@
           "max_power": 10.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6e058f236346e808cd87f3ea05798620"
+          "lut_quality": {
+            "score": 96.8,
+            "color_temp": 96.8
+          },
+          "hash": "9dc2ee184b2f0707dc40643d26dd5ae9"
         },
         {
           "calculation_strategy": "lut",
@@ -1194,10 +1326,14 @@
           "max_power": 3.38,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8bcb55188ed30c90131a1fc43f475374"
+          "lut_quality": {
+            "score": 92.4,
+            "color_temp": 92.4
+          },
+          "hash": "18c21a9a2bbe16339d8a33541ecdb483"
         }
       ],
       "device_types": [
@@ -1234,10 +1370,14 @@
           "max_power": 5.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b7bb466843216bb3530385c617d65a5e"
+          "lut_quality": {
+            "score": 96.4,
+            "color_temp": 96.4
+          },
+          "hash": "ca14bc6744f6451ffe045e4bb78fe646"
         },
         {
           "calculation_strategy": "lut",
@@ -1265,6 +1405,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
           "hash": "025930a2e583d3c9f585697e60914b12"
         },
         {
@@ -1290,10 +1434,14 @@
           "max_power": 12.78,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f48846842e31e0711eea122e30f023de"
+          "lut_quality": {
+            "score": 80.5,
+            "color_temp": 80.5
+          },
+          "hash": "40dc294a09e6a99581cbb2035d82803b"
         },
         {
           "calculation_strategy": "lut",
@@ -1321,6 +1469,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
           "hash": "a1ee7d8d0f09befae72846ce4161779d"
         },
         {
@@ -1349,6 +1501,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 92.3,
+            "brightness": 92.3
+          },
           "hash": "44e303c1ae6ff2e76dfa099a6062faf4"
         },
         {
@@ -1438,6 +1594,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "brightness": 98.8
+          },
           "hash": "9ac6d47dac7afb0564332abc55b1cc3b"
         },
         {
@@ -1490,6 +1650,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.4,
+            "brightness": 98.4
+          },
           "hash": "698aefe86e66d3d2e1cf37a5547a0054"
         },
         {
@@ -1516,10 +1680,14 @@
           "max_power": 9.72,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e703fc46e4b340cb215d7b2b95eb8ecf"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "65163e897b095764324258845c14a57a"
         },
         {
           "calculation_strategy": "lut",
@@ -1546,6 +1714,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 74.6,
+            "color_temp": 74.6
+          },
           "hash": "069fd3ee76b5cdb919bc6cdffbaa9862"
         },
         {
@@ -1574,6 +1746,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 80.0,
+            "color_temp": 80.0
+          },
           "hash": "74e0f06e4b27433d7491a8accfba95c9"
         },
         {
@@ -1599,10 +1775,14 @@
           "max_power": 9.21,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d6dc9e32635a3237618649dc937e40bd"
+          "lut_quality": {
+            "score": 97.4,
+            "color_temp": 97.4
+          },
+          "hash": "5ee2da7d1b2361ffd33ec2aaf27553b7"
         },
         {
           "calculation_strategy": "lut",
@@ -1628,10 +1808,14 @@
           "max_power": 6.58,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "76064a007429bc11e66b52b2025d4332"
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
+          "hash": "08671f1ec4c825836a72046249249457"
         },
         {
           "calculation_strategy": "lut",
@@ -1659,6 +1843,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
           "hash": "d6307fa95430a2bc5b9b3e6531684119"
         },
         {
@@ -1687,6 +1875,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
           "hash": "f97ef37cbbb269a8411a43fb28297402"
         },
         {
@@ -1714,6 +1906,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 26.6,
+            "color_temp": 26.6
+          },
           "hash": "83424a6851de134ab415fc8310b0f34f"
         },
         {
@@ -1737,6 +1933,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "brightness": 98.8
+          },
           "hash": "5ea78833939850829f1a4ab53e45b0de"
         },
         {
@@ -1765,6 +1965,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.4,
+            "brightness": 98.4
+          },
           "hash": "ff70ef0bc39f09ca7f3e5637acafd992"
         },
         {
@@ -1792,6 +1996,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.1,
+            "brightness": 99.1
+          },
           "hash": "41a0980e89895dfe54f58c14ff33be8d"
         },
         {
@@ -1839,10 +2047,14 @@
           "max_power": 16.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e42f74d6e988be4d9ea762905a8e4e27"
+          "lut_quality": {
+            "score": 86.6,
+            "color_temp": 86.6
+          },
+          "hash": "0bd483cfd82db208c833ff2c528d9e26"
         },
         {
           "calculation_strategy": "lut",
@@ -1868,10 +2080,14 @@
           "max_power": 10.77,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "5ca8213a47d5653feb971484eed1a17b"
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
+          "hash": "0f175bb3c719897c424a51bca0f56ada"
         },
         {
           "calculation_strategy": "lut",
@@ -1898,6 +2114,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 34.1,
+            "color_temp": 34.1
+          },
           "hash": "945b0f8f6f13ffa69f9b60cba39d462f"
         },
         {
@@ -1923,10 +2143,14 @@
           "max_power": 9.37,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "284c5fbe1a409828bd091cce7fcdf034"
+          "lut_quality": {
+            "score": 13.5,
+            "color_temp": 13.5
+          },
+          "hash": "15b435928840824bbb68db8f2a2d840c"
         },
         {
           "calculation_strategy": "lut",
@@ -1954,6 +2178,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.6,
+            "color_temp": 97.6
+          },
           "hash": "29d8f2a5649183a6a006978713fa0e18"
         },
         {
@@ -1982,6 +2210,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.3,
+            "brightness": 98.3
+          },
           "hash": "1cba64348997ad514cf323613e73ea25"
         }
       ],
@@ -2169,10 +2401,14 @@
           "max_power": 4.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "a03724678a5ab4125f07aca83e037f08"
+          "lut_quality": {
+            "score": 74.8,
+            "color_temp": 74.8
+          },
+          "hash": "26785a5e2f9aeaad783439210341f63b"
         },
         {
           "aliases": [
@@ -2749,6 +2985,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
           "hash": "5a611504169bc5457fbeaeca23432555"
         }
       ],
@@ -2785,10 +3025,14 @@
           "max_power": 6.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "567596f4a7853c38aa2679b6b8471567"
+          "lut_quality": {
+            "score": 95.1,
+            "color_temp": 95.1
+          },
+          "hash": "717b4647d14a70380a2917331456d269"
         }
       ],
       "device_types": [
@@ -2880,10 +3124,14 @@
           "max_power": 10.06,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "dca453d894955f276964247664196539"
+          "lut_quality": {
+            "score": 80.6,
+            "color_temp": 80.6
+          },
+          "hash": "125464d183295f61fb7418b59f593e39"
         }
       ],
       "device_types": [
@@ -2922,6 +3170,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 94.6,
+            "brightness": 94.6
+          },
           "hash": "f286f6a31ec23bdf179e82fcd8b9cc69"
         },
         {
@@ -2947,10 +3199,14 @@
           "max_power": 21.23,
           "sub_profile_count": 2,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "3f609540ac13b931df81c3050a966acf"
+          "lut_quality": {
+            "score": 100.0,
+            "color_temp": 100.0
+          },
+          "hash": "235e8d62b969940ed494da2b43dbab51"
         },
         {
           "calculation_strategy": "lut",
@@ -2976,10 +3232,14 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "74827b3bfc072a4fe1a0f02b098019a3"
+          "lut_quality": {
+            "score": 93.4,
+            "color_temp": 93.4
+          },
+          "hash": "33688a241ffb230b3e6c2f0dd02ea8df"
         },
         {
           "aliases": [
@@ -3011,6 +3271,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.7,
+            "color_temp": 96.7
+          },
           "hash": "fa57cb97c0bc3b16440f7e1c707d2126"
         },
         {
@@ -3039,10 +3303,15 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
-          "hash": "75d35feeef06c78d3f6875c59066bb3a"
+          "lut_quality": {
+            "score": 87.0,
+            "brightness": 87.0,
+            "color_temp": 97.8
+          },
+          "hash": "b7962bddf1de25272a0538c4953299d9"
         },
         {
           "aliases": [
@@ -3074,6 +3343,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
           "hash": "5632819401690ef67a0c94027490980e"
         },
         {
@@ -3100,10 +3373,14 @@
           "max_power": 9.13,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6bf80d54d3c23325d118b21db1978438"
+          "lut_quality": {
+            "score": 96.7,
+            "color_temp": 96.7
+          },
+          "hash": "6c4fc7574d3378b0d50907c48138b06a"
         },
         {
           "calculation_strategy": "lut",
@@ -3130,6 +3407,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
           "hash": "8510320058a6d1ea819bf59a2b1b568d"
         },
         {
@@ -3159,10 +3440,14 @@
           "max_power": 9.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8591af7cbc67202af3d2f3337d643b97"
+          "lut_quality": {
+            "score": 96.1,
+            "color_temp": 96.1
+          },
+          "hash": "957ca4c1c8d9289479a023df0aa57d23"
         },
         {
           "author_info": {
@@ -3189,10 +3474,14 @@
           "max_power": 8.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "183791023f88fd9730a4761d85419936"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "6c1076cb7b63b55f0f16f7068d93622e"
         },
         {
           "calculation_strategy": "lut",
@@ -3227,6 +3516,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.6,
+            "color_temp": 99.6
+          },
           "hash": "29e5fb0a01010d4ef8d5a9626b581708"
         },
         {
@@ -3256,10 +3549,14 @@
           "max_power": 29.87,
           "sub_profile_count": 2,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f209b15ccd8d8344a1c00691ac12e433"
+          "lut_quality": {
+            "score": 83.6,
+            "color_temp": 83.6
+          },
+          "hash": "c43eac38e4e024b842ebb248d7819b18"
         },
         {
           "calculation_strategy": "lut",
@@ -3284,10 +3581,14 @@
           "max_power": 9.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "cc6f7eb17b3eb91c31226462c196c96e"
+          "lut_quality": {
+            "score": 75.4,
+            "color_temp": 75.4
+          },
+          "hash": "40c2c05b0956ffa71f1c7df3d9c3e31a"
         },
         {
           "aliases": [
@@ -3316,10 +3617,14 @@
           "max_power": 12.38,
           "sub_profile_count": 2,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e64214cd47d3ac2d29e3d78ac21fdf2e"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "61674d989599bc66f286410bb874b0bb"
         }
       ],
       "device_types": [
@@ -3430,6 +3735,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
           "hash": "f9aa7f1784a1b8808ca2f6f34c68e7b8"
         },
         {
@@ -3460,10 +3769,14 @@
           "max_power": 8.93,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "7f1c494570d45cb30fb455d4078bfcee"
+          "lut_quality": {
+            "score": 85.8,
+            "color_temp": 85.8
+          },
+          "hash": "d64333ca7a13a7f7b4e327cd833bc9c5"
         },
         {
           "calculation_strategy": "lut",
@@ -3491,6 +3804,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.4,
+            "brightness": 97.4
+          },
           "hash": "962cadb11bbcd14c5b223600cca7ca7a"
         }
       ],
@@ -3563,6 +3880,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 95.0,
+            "color_temp": 95.0
+          },
           "hash": "e557df1f7e63b03bd82271f40fdde3a9"
         }
       ],
@@ -3601,6 +3922,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.8,
+            "color_temp": 96.8
+          },
           "hash": "a9205838bf21b252f454bfeeaf35e557"
         },
         {
@@ -3626,10 +3951,14 @@
           "max_power": 8.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "91a6ce4c1e05af45cbad4445a4e42941"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "91c688ac022b97bd2edcebfa4a84ceef"
         },
         {
           "calculation_strategy": "lut",
@@ -3655,10 +3984,14 @@
           "max_power": 4.12,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "36211609c0263a1496c55bcf54a86ff3"
+          "lut_quality": {
+            "score": 94.4,
+            "color_temp": 94.4
+          },
+          "hash": "28ee4021cd803f23e5860ea90873eaa5"
         },
         {
           "calculation_strategy": "lut",
@@ -3684,10 +4017,14 @@
           "max_power": 5.08,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8a98e3fc825ab822911ea92f5a1ced99"
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
+          "hash": "bf2619b71ec98da3a17219c825c956e8"
         },
         {
           "calculation_strategy": "lut",
@@ -3714,6 +4051,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.3,
+            "color_temp": 97.3
+          },
           "hash": "ddcd58051c1811cbde80cadbd98a7073"
         },
         {
@@ -3740,10 +4081,14 @@
           "max_power": 3.54,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "bd2cbb99a5203781d61e47e08ab5a042"
+          "lut_quality": {
+            "score": 97.8,
+            "color_temp": 97.8
+          },
+          "hash": "ccb12f0346321f64c0e99e0e92b6fc7c"
         }
       ],
       "device_types": [
@@ -4318,6 +4663,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
           "hash": "d6ee84db3eea249851bc4db267a5fda7"
         },
         {
@@ -4346,10 +4695,14 @@
           "max_power": 5.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "786b0f10cd2b24a733b91f276a69856b"
+          "lut_quality": {
+            "score": 95.6,
+            "color_temp": 95.6
+          },
+          "hash": "237da5ac2434e818cd8bae061333f6ee"
         }
       ],
       "device_types": [
@@ -4547,10 +4900,14 @@
           "max_power": 3.46,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "135887ae4c0a56bd617e926e1b217a85"
+          "lut_quality": {
+            "score": 95.1,
+            "color_temp": 95.1
+          },
+          "hash": "e52649788cfac081c57a946024dbee6f"
         },
         {
           "calculation_strategy": "lut",
@@ -4577,6 +4934,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
           "hash": "de82bb1adf0b58cb4aca80a15b8123aa"
         },
         {
@@ -4602,10 +4963,14 @@
           "max_power": 8.05,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "655624f86ba44b792775991b40d1b382"
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
+          "hash": "7ce93cb1066c0306a5bdce74e9777dd3"
         },
         {
           "calculation_strategy": "lut",
@@ -4631,10 +4996,14 @@
           "max_power": 5.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "082e2aba3dd6de6c3fdf9acb1e8f158a"
+          "lut_quality": {
+            "score": 97.3,
+            "color_temp": 97.3
+          },
+          "hash": "b4b8737d9532dad364e18dcb6f304343"
         },
         {
           "name": "T17 infrared header",
@@ -4689,10 +5058,14 @@
           "max_power": 4.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "dc1a7c1cf1d00c16a49605785356200c"
+          "lut_quality": {
+            "score": 97.0,
+            "color_temp": 97.0
+          },
+          "hash": "f38a75a175dbf18c626732e4f882f992"
         },
         {
           "calculation_strategy": "fixed",
@@ -4743,6 +5116,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
           "hash": "adbc94d0a105e3b41987c9ad638432e4"
         },
         {
@@ -4769,10 +5146,14 @@
           "max_power": 20.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "956e5f912834e31c2bbd2e1b80b031c7"
+          "lut_quality": {
+            "score": 92.6,
+            "color_temp": 92.6
+          },
+          "hash": "b313bc0795605dad6e2eba911b4eacc0"
         },
         {
           "aliases": [],
@@ -4799,10 +5180,14 @@
           "max_power": 8.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "2f8a91a77c5964908502e3738a9ff43b"
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "d9242af3256aae5386b29f475df319e6"
         },
         {
           "aliases": [
@@ -4854,10 +5239,14 @@
           "max_power": 23.91,
           "sub_profile_count": 3,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "46a69290947f2f4b2013a182f8d7e523"
+          "lut_quality": {
+            "score": 90.0,
+            "color_temp": 90.0
+          },
+          "hash": "055d99579a6f54d8ffdc9b2f2a1b6e5e"
         },
         {
           "aliases": [],
@@ -4884,10 +5273,14 @@
           "max_power": 13.23,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "251d94c28c6244c5155b3232dc484aba"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "74ae84c357d82cc582479fce33537888"
         },
         {
           "calculation_strategy": "lut",
@@ -4913,10 +5306,14 @@
           "max_power": 9.32,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "1b14a54921aaf9222426be90d7374f4d"
+          "lut_quality": {
+            "score": 93.0,
+            "color_temp": 93.0
+          },
+          "hash": "5e823f97de0c705acedaed6e12043668"
         },
         {
           "aliases": [
@@ -4981,10 +5378,14 @@
           "max_power": 4.85,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "09de1eed90396743a3854dc5dd9910f4"
+          "lut_quality": {
+            "score": 92.2,
+            "color_temp": 92.2
+          },
+          "hash": "99da2003aa2fcee300fbb91ff6f371ec"
         }
       ],
       "device_types": [
@@ -5085,10 +5486,14 @@
           "max_power": 8.68,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d0107ca3957e799bd55f4c4d87d8303f"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "fd738b1efe9fd3c11a1990da0cca2f56"
         },
         {
           "calculation_strategy": "lut",
@@ -5113,10 +5518,14 @@
           "max_power": 9.02,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8c31fb39b528f2277e1fb3ddb493f7ba"
+          "lut_quality": {
+            "score": 86.0,
+            "color_temp": 86.0
+          },
+          "hash": "01b2742db2f06c0f257ba8e5710d2534"
         }
       ],
       "device_types": [
@@ -5193,10 +5602,14 @@
           "max_power": 2.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "a06eb83771e0ab9632aa8fc2894f7c9e"
+          "lut_quality": {
+            "score": 92.8,
+            "color_temp": 92.8
+          },
+          "hash": "3ae26baa118c3648970f82cccbee92f4"
         }
       ],
       "device_types": [
@@ -5271,6 +5684,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
           "hash": "6d1e5cb15254718424fd5634a32bbbf5"
         },
         {
@@ -5297,10 +5714,14 @@
           "max_power": 11.97,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "497ce93246fd7a9f80b0e5ee58c92184"
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
+          "hash": "cad65a0e328fef9d5f5bd4a515f37b56"
         },
         {
           "calculation_strategy": "lut",
@@ -5328,6 +5749,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
           "hash": "5e0ba61777df206a9312bd447adc5849"
         },
         {
@@ -5356,6 +5781,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
           "hash": "ce2d1c982c3eb4872533d3b8aaae3290"
         },
         {
@@ -5383,6 +5812,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
           "hash": "1e789f8297dec8111cc1ce927cd2141a"
         },
         {
@@ -5411,6 +5844,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 95.8,
+            "color_temp": 95.8
+          },
           "hash": "223465644eae3cce1a2475d11f3fdc7c"
         },
         {
@@ -5437,10 +5874,14 @@
           "max_power": 10.48,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "df589894f0b5cf75d67dbade6cc8d551"
+          "lut_quality": {
+            "score": 97.7,
+            "color_temp": 97.7
+          },
+          "hash": "e017409c84c39bc6216c845864080bae"
         },
         {
           "calculation_strategy": "lut",
@@ -5465,10 +5906,14 @@
           "max_power": 18.02,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "443de8162fbe417cdb48cabca215e2b0"
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
+          "hash": "98694043b13e2122b659a92db6d0b541"
         },
         {
           "calculation_strategy": "lut",
@@ -5494,10 +5939,14 @@
           "max_power": 12.61,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "c8cbb437e9ef05f069fe68e521b66208"
+          "lut_quality": {
+            "score": 99.6,
+            "color_temp": 99.6
+          },
+          "hash": "5c499e4ac631f970878b967c7e40577b"
         },
         {
           "aliases": [
@@ -5526,10 +5975,14 @@
           "max_power": 7.83,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d516e79aca57d35bb765d11e03a36776"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "aedfbd8ccd1076116181dac9d154ebe3"
         },
         {
           "aliases": [
@@ -5560,6 +6013,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "brightness": 99.2
+          },
           "hash": "50b9809d3e326f0d9bc7274eb4575353"
         },
         {
@@ -5585,11 +6042,15 @@
           "max_power": null,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "5b5bb6bfd6dd2e4f0a558a5b57ae86e5"
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "d75f9f60c1fd6b6da1d593db258dd7b5"
         },
         {
           "calculation_strategy": "lut",
@@ -5642,10 +6103,14 @@
           "max_power": 4.55,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6929a1004d2bce46ba56a9c79a01a93f"
+          "lut_quality": {
+            "score": 93.2,
+            "color_temp": 93.2
+          },
+          "hash": "9c67470d90c0d131eb71c56cc85ba755"
         },
         {
           "calculation_strategy": "lut",
@@ -5673,6 +6138,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.3,
+            "brightness": 99.3
+          },
           "hash": "a105bfe378c0e1b3f529cf7faf8755e5"
         },
         {
@@ -5699,10 +6168,14 @@
           "max_power": 7.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8593ffe7a7a58b2723e15e21f063609a"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "23ce40db638c250629d0cc8781bc3547"
         },
         {
           "calculation_strategy": "lut",
@@ -5727,10 +6200,14 @@
           "max_power": 8.07,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "804c8b64705c2df45e12727a1b297d43"
+          "lut_quality": {
+            "score": 95.9,
+            "color_temp": 95.9
+          },
+          "hash": "c2528939a6a7871630258de21809a833"
         },
         {
           "calculation_strategy": "lut",
@@ -5758,6 +6235,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
           "hash": "bf7dd94426f6e0f3af629c9c76e0e3c4"
         }
       ],
@@ -5863,6 +6344,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
           "hash": "18e225820d5f91115ffe0adba5fe088b"
         }
       ],
@@ -5907,6 +6392,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
           "hash": "0563db294a08187461049ecfd3c2071b"
         },
         {
@@ -5934,6 +6423,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
           "hash": "846074c9dd79d9dd4ddfb6c2bf76f6ff"
         },
         {
@@ -5964,6 +6457,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
           "hash": "726bb81a65ac7daf42e4b45ecdd43b57"
         },
         {
@@ -5994,6 +6491,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "brightness": 99.2
+          },
           "hash": "84d3a9cee7142ba8f415e379b32df208"
         }
       ],
@@ -6423,10 +6924,14 @@
           "max_power": 8.83,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "311015679fa9514a9770a5634de6a19a"
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "f217568495d88f053e471423cdd0f1a5"
         }
       ],
       "device_types": [
@@ -6463,10 +6968,14 @@
           "max_power": 10.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "c63b0910761469bad25006d33256c6eb"
+          "lut_quality": {
+            "score": 98.3,
+            "color_temp": 98.3
+          },
+          "hash": "fc5422bb57d2cb42d081dc56c8be877b"
         },
         {
           "calculation_strategy": "lut",
@@ -6492,10 +7001,14 @@
           "max_power": 11.11,
           "sub_profile_count": 4,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "774c97dd0a103bacf9c3b96faffa7355"
+          "lut_quality": {
+            "score": 25.5,
+            "color_temp": 25.5
+          },
+          "hash": "d35d40add3fc2f3a991971e0b9d1306e"
         },
         {
           "calculation_strategy": "lut",
@@ -6520,10 +7033,14 @@
           "max_power": 11.03,
           "sub_profile_count": 4,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8b23c2bbfc4eaa04027c5399dc240e55"
+          "lut_quality": {
+            "score": 25.3,
+            "color_temp": 25.3
+          },
+          "hash": "e85193da425bcc3da20c29a62918959d"
         },
         {
           "aliases": [
@@ -6552,10 +7069,14 @@
           "max_power": 12.55,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f8f62fcb9da8394a1fccac250550680e"
+          "lut_quality": {
+            "score": 43.7,
+            "color_temp": 43.7
+          },
+          "hash": "20010b4a6246e29ed10669df6ffec568"
         },
         {
           "calculation_strategy": "lut",
@@ -6580,10 +7101,14 @@
           "max_power": 37.48,
           "sub_profile_count": 10,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "68b4d8a705d6ee9ab8714cc6dc24317b"
+          "lut_quality": {
+            "score": 33.2,
+            "color_temp": 33.2
+          },
+          "hash": "0ebc78f35ade69cf40f7de54ff711f8c"
         },
         {
           "calculation_strategy": "lut",
@@ -6609,10 +7134,14 @@
           "max_power": 8.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "65045e5bbde708ccaba89dd29bf0533e"
+          "lut_quality": {
+            "score": 95.4,
+            "color_temp": 95.4
+          },
+          "hash": "7f25e3055612b1ca8ba1ce1ca4a8c3cd"
         },
         {
           "calculation_strategy": "lut",
@@ -6640,6 +7169,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.3,
+            "brightness": 98.3
+          },
           "hash": "c9783ae97e72a9685c5da60ff55e9c64"
         },
         {
@@ -6665,10 +7198,14 @@
           "max_power": 17.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "eb137ceecf533b4be2c51f5cc2515f39"
+          "lut_quality": {
+            "score": 52.5,
+            "color_temp": 52.5
+          },
+          "hash": "6eea4e793ca6a041429daffdf090b42d"
         },
         {
           "calculation_strategy": "lut",
@@ -6693,10 +7230,14 @@
           "max_power": 4.21,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "202ea97619431eca2f41f188d8f4d6ad"
+          "lut_quality": {
+            "score": 21.7,
+            "color_temp": 21.7
+          },
+          "hash": "957855a965b096e0d67de62c773e9983"
         },
         {
           "calculation_strategy": "lut",
@@ -6722,10 +7263,14 @@
           "max_power": 11.41,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "9681f5929d47f3e9930b3eb53e2d6806"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "aeabcdc9a0ed944c112f6aa82f2f13de"
         },
         {
           "calculation_strategy": "lut",
@@ -6753,6 +7298,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 92.0,
+            "color_temp": 92.0
+          },
           "hash": "61d4ea5c732e7d01bb9eeaaa050d5a62"
         },
         {
@@ -6779,10 +7328,14 @@
           "max_power": 11.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "bd32d233a41d04d7bfc0a325447d906b"
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
+          "hash": "df456395ab165b13c02d03130c09f7e3"
         },
         {
           "aliases": [
@@ -6965,6 +7518,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 76.6,
+            "color_temp": 76.6
+          },
           "hash": "2abafe8fb09a4f9b0e4c5a85f5e61de1"
         },
         {
@@ -6990,10 +7547,14 @@
           "max_power": 8.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "bc7c4d6369d367762f7817ff2c006700"
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
+          "hash": "511669b79a93fe52ab43354c77644c05"
         },
         {
           "calculation_strategy": "lut",
@@ -7020,6 +7581,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 66.3,
+            "color_temp": 66.3
+          },
           "hash": "cd3c0ce9d425724397c6cab4fe5ae61d"
         },
         {
@@ -7074,6 +7639,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 95.1,
+            "color_temp": 95.1
+          },
           "hash": "e5fff3445a7df87b89651780e3a26ce8"
         },
         {
@@ -7101,6 +7670,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.9,
+            "color_temp": 96.9
+          },
           "hash": "a4d7eb3e8372afa9829e29934044a608"
         },
         {
@@ -7125,10 +7698,14 @@
           "max_power": 9.37,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "de0c0d1c918553f587bac412d00a995b"
+          "lut_quality": {
+            "score": 95.0,
+            "color_temp": 95.0
+          },
+          "hash": "5a9a333093061a7803954402822c5d46"
         },
         {
           "calculation_strategy": "lut",
@@ -7154,10 +7731,14 @@
           "max_power": 11.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "64aa483e3a1c7f4b25bb8fc2e0504166"
+          "lut_quality": {
+            "score": 60.4,
+            "color_temp": 60.4
+          },
+          "hash": "e0660a9483d335c57696cf48a82cf4de"
         },
         {
           "calculation_strategy": "lut",
@@ -7185,6 +7766,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
           "hash": "27cd8c8b0220834d5d1f455e859cb8a6"
         },
         {
@@ -7212,6 +7797,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "brightness": 99.0
+          },
           "hash": "15f54d0f90d1b2918097c85b5456579a"
         }
       ],
@@ -7253,10 +7842,14 @@
           "max_power": 9.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "119e2e6753e15def71c211c12b0be71e"
+          "lut_quality": {
+            "score": 95.5,
+            "color_temp": 95.5
+          },
+          "hash": "22433b2ac54af7c2eea743e05534c378"
         },
         {
           "calculation_strategy": "lut",
@@ -7282,10 +7875,14 @@
           "max_power": 29.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f0d1b9a52871909885b28cc75ae23376"
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
+          "hash": "9c2102cc4fe7ad347d807f86547469f8"
         },
         {
           "aliases": [
@@ -7314,10 +7911,14 @@
           "max_power": 13.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "5454556f5488a6094e11c566ce5af514"
+          "lut_quality": {
+            "score": 97.0,
+            "color_temp": 97.0
+          },
+          "hash": "2286f6028a032b3cc9dc04c73386c797"
         }
       ],
       "device_types": [
@@ -7394,10 +7995,14 @@
           "max_power": 8.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b8addbc9bd1d60ee6d27d43c0821587a"
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
+          "hash": "d3735314ce96c17f55029f6f6637c861"
         }
       ],
       "device_types": [
@@ -7433,10 +8038,14 @@
           "max_power": 8.18,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "00c5afc8b996a34230279dd3d04d15e5"
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
+          "hash": "d16a22741896d091b4dc2d8b77e97dc9"
         },
         {
           "calculation_strategy": "lut",
@@ -7462,10 +8071,14 @@
           "max_power": 34.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d6038b719f90e3d148e1bf1103b63cf3"
+          "lut_quality": {
+            "score": 99.7,
+            "color_temp": 99.7
+          },
+          "hash": "757d0645812463d2c67d2153257659b7"
         },
         {
           "calculation_strategy": "lut",
@@ -7491,10 +8104,14 @@
           "max_power": 4.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "7f7241b7324f72886479ca0247a437fb"
+          "lut_quality": {
+            "score": 96.1,
+            "color_temp": 96.1
+          },
+          "hash": "cfada4e620a566d586bc8bb126b25f24"
         },
         {
           "calculation_strategy": "lut",
@@ -7520,10 +8137,14 @@
           "max_power": 9.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f6473be1d7066da4721a684b6caf5429"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "1f1e31952b06f17865b1728ff09eb366"
         },
         {
           "calculation_strategy": "lut",
@@ -7550,6 +8171,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "brightness": 99.2
+          },
           "hash": "f1e7a068736b870119fd2fc5e8f30884"
         },
         {
@@ -7608,10 +8233,14 @@
           "max_power": 8.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "0e5c5b382864462959788acaffceaeee"
+          "lut_quality": {
+            "score": 45.0,
+            "color_temp": 45.0
+          },
+          "hash": "7de0a14ec50204249afbc9210edc18f2"
         },
         {
           "aliases": [
@@ -7637,6 +8266,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
           "hash": "91dffdd4547e3abcdbdc0af24366901c"
         },
         {
@@ -7665,6 +8298,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
           "hash": "1b23422d1e5b1b2929433a15d0d437ee"
         },
         {
@@ -7694,6 +8331,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.6,
+            "color_temp": 97.6
+          },
           "hash": "0df196c3783374164c2154666abd168a"
         },
         {
@@ -7722,6 +8363,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
           "hash": "4a2bd3fdc585cddebf35b09c98cb3620"
         }
       ],
@@ -7801,6 +8446,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.8,
+            "color_temp": 96.8
+          },
           "hash": "99ff851587798247245f1fe89057afb1"
         }
       ],
@@ -7837,10 +8486,14 @@
           "max_power": 16.1,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "a79723fc3c7077d379ef61ab48d562ea"
+          "lut_quality": {
+            "score": 98.3,
+            "color_temp": 98.3
+          },
+          "hash": "2c3c5b813afaa7a3b4b1caca3d591073"
         }
       ],
       "device_types": [
@@ -7957,10 +8610,14 @@
           "max_power": 10.54,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f7191e4507e7022059c1e10a8274d3cf"
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "c359a32d0ddf528d77c469ba04848681"
         },
         {
           "aliases": [
@@ -7991,6 +8648,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
           "hash": "cc784d2c655d9e4ec137ff369ec96e1c"
         },
         {
@@ -8019,6 +8680,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
           "hash": "15fbabac84abbfe5bf04050af119eb59"
         },
         {
@@ -8046,6 +8711,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
           "hash": "7c8359425c09c2eede93a44a2b217fbc"
         },
         {
@@ -8095,10 +8764,14 @@
           "max_power": 30.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "a31a6e51bd041f102cb76e3bbf79243b"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "1ecfe12c30eb0397cdd9413bb075ca67"
         }
       ],
       "device_types": [
@@ -8185,10 +8858,14 @@
           "max_power": 9.6,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d97a22f38c7ce3849ca15ac946aa6dd9"
+          "lut_quality": {
+            "score": 85.2,
+            "color_temp": 85.2
+          },
+          "hash": "0cd62c08006da43109af773457f69584"
         },
         {
           "calculation_strategy": "lut",
@@ -8216,6 +8893,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "brightness": 99.0
+          },
           "hash": "c6f287a6d935f18313ac59b561e9fa81"
         }
       ],
@@ -8254,10 +8935,14 @@
           "max_power": 4.07,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "7b29848f8f6faecafbe8b43ed6bc1361"
+          "lut_quality": {
+            "score": 92.5,
+            "color_temp": 92.5
+          },
+          "hash": "52d3d7449347b6a24695f465dbebbc8c"
         }
       ],
       "device_types": [
@@ -8296,6 +8981,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 96.0,
+            "brightness": 96.0
+          },
           "hash": "49818e38372ae730abd753b77422af4d"
         }
       ],
@@ -8421,10 +9110,14 @@
           "max_power": 9.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8fa9531daf8bf7dbd1293bc23e137ef7"
+          "lut_quality": {
+            "score": 97.8,
+            "color_temp": 97.8
+          },
+          "hash": "f155d403705667d0b6e6c54e7b9a8065"
         }
       ],
       "device_types": [
@@ -8601,10 +9294,14 @@
           "max_power": 19.24,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "840a60992a1fd2eb5ab5fd8fd40d7a0d"
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
+          "hash": "73a318dfdd4b53bbb4ed0e60f7992c95"
         }
       ],
       "device_types": [
@@ -8678,10 +9375,14 @@
           "max_power": 10.82,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b119fb192cf6b40463971e126b34e31d"
+          "lut_quality": {
+            "score": 94.3,
+            "color_temp": 94.3
+          },
+          "hash": "b3999ae02e562e4bc758726924f099f6"
         },
         {
           "calculation_strategy": "fixed",
@@ -8990,6 +9691,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.1,
+            "brightness": 98.1
+          },
           "hash": "e8e8d981e5240baac79bd60dcfc13e79"
         },
         {
@@ -9016,10 +9721,14 @@
           "max_power": 5.08,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b4b8ed45b859cf57d2dbd4203bad3228"
+          "lut_quality": {
+            "score": 99.6,
+            "color_temp": 99.6
+          },
+          "hash": "8bb751fbc2f42e59e943aba5334e5681"
         }
       ],
       "device_types": [
@@ -9098,10 +9807,14 @@
           "max_power": 9.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "918bdeade17b4fb0ea09710329e11020"
+          "lut_quality": {
+            "score": 88.6,
+            "color_temp": 88.6
+          },
+          "hash": "36f666040ff0257d5dae9c542ce4e915"
         }
       ],
       "device_types": [
@@ -9178,6 +9891,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
           "hash": "5e0c82fb63a5bebb81d8ed72f99f5f3e"
         },
         {
@@ -9206,6 +9923,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 89.1,
+            "color_temp": 89.1
+          },
           "hash": "20774ebdfb0ebfe488198ba486e1f74a"
         },
         {
@@ -9232,10 +9953,14 @@
           "max_power": 15.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6a06a61767f2cc92fdceb7f0cacf4c67"
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
+          "hash": "2871721f1a57e73f7ef4a5067f8f5c0d"
         },
         {
           "calculation_strategy": "lut",
@@ -9261,10 +9986,14 @@
           "max_power": 19.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "180e751cd2ec9595dc95486093eb4dd6"
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "808c93d5feed01594a5fc7f5a34d1910"
         },
         {
           "calculation_strategy": "lut",
@@ -9291,6 +10020,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
           "hash": "bab9ab3a5511be6bba6f17eaa39484b2"
         }
       ],
@@ -9392,10 +10125,14 @@
           "max_power": 10.96,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "85ec53cb914995c841720d03951cf18e"
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "efcc3d66b2b1cbd61b07f5cba687f67b"
         },
         {
           "author_info": {
@@ -9425,10 +10162,14 @@
           "max_power": 8.58,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6d1eeb5969efb51746b81e8b57d988f8"
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "ae08cec072cea0c774a9eb8944ab5079"
         }
       ],
       "device_types": [
@@ -9506,6 +10247,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "brightness": 98.5
+          },
           "hash": "d6b1e1f8f6db32fb1de0f887db542e50"
         },
         {
@@ -9532,6 +10277,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.3,
+            "color_temp": 96.3
+          },
           "hash": "1b9609d96ce5237b6146a1b46bfdb14e"
         },
         {
@@ -9564,6 +10313,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
           "hash": "f5ca88db9d42250649bf56b1cdc1f6f2"
         },
         {
@@ -9594,6 +10347,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 95.6,
+            "color_temp": 95.6
+          },
           "hash": "76116341dfb8a7927c4a60ac1d118dc0"
         },
         {
@@ -9625,6 +10382,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
           "hash": "fceec63b2bf97e9f1327ea78f479fa12"
         },
         {
@@ -9655,6 +10416,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
           "hash": "b609e2237a8de0b88738cfd935f9cbfd"
         },
         {
@@ -9685,6 +10450,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
           "hash": "a4cfa4635dde5b4370c08e3af0199b18"
         },
         {
@@ -9712,6 +10481,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.6,
+            "brightness": 99.6
+          },
           "hash": "27a81fab094cc3fc60a51e820c93993c"
         },
         {
@@ -9741,6 +10514,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
           "hash": "1652f4fa5b176bf51fbafb733d6cdda4"
         },
         {
@@ -9771,6 +10548,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
           "hash": "ef2d7497f680e2d11eda45688099e225"
         },
         {
@@ -9827,6 +10608,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
           "hash": "502b6a20b22f167fa62e6329356378c5"
         },
         {
@@ -9853,6 +10638,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "brightness": 98.5
+          },
           "hash": "dd7c1afea739e6979a8419c4be95500c"
         },
         {
@@ -9899,6 +10688,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 83.1,
+            "color_temp": 83.1
+          },
           "hash": "571a0dba4a0ded5148fe5bd1c8486e06"
         },
         {
@@ -9928,6 +10721,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
           "hash": "d2cf9dff6f8c9ceb3e3bf1e7d3b9bd07"
         },
         {
@@ -9980,6 +10777,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "brightness": 99.0
+          },
           "hash": "cf1f95bbba7aa821c9cfd8d041d7f9ab"
         },
         {
@@ -10010,10 +10811,14 @@
           "max_power": 5.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d4a9217ffae6e8ea1b96990fccefda02"
+          "lut_quality": {
+            "score": 98.3,
+            "color_temp": 98.3
+          },
+          "hash": "0361bdcf3b02823b6af3c8dae25d244d"
         },
         {
           "aliases": [
@@ -10043,10 +10848,14 @@
           "max_power": 4.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "9a0b882e753f222b85d31394b6fe6703"
+          "lut_quality": {
+            "score": 97.6,
+            "color_temp": 97.6
+          },
+          "hash": "fcd0ff56bd79a608b16b51971d793712"
         },
         {
           "aliases": [
@@ -10097,6 +10906,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.9,
+            "color_temp": 96.9
+          },
           "hash": "b933d0dcf7ce7bdda34762828cd7a220"
         },
         {
@@ -10128,6 +10941,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.6,
+            "color_temp": 99.6
+          },
           "hash": "bc24183f364db5669b251d2f5c7e0ffd"
         },
         {
@@ -10156,10 +10973,14 @@
           "max_power": 5.46,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e7e4c79b55b6e5ae7c44e968c750370e"
+          "lut_quality": {
+            "score": 96.7,
+            "color_temp": 96.7
+          },
+          "hash": "4f595c5a79c8a4eb0fea9ee6411da530"
         },
         {
           "aliases": [
@@ -10189,6 +11010,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
           "hash": "cbef3658d774dd2176261865ca43f693"
         },
         {
@@ -10217,10 +11042,14 @@
           "max_power": 6.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "80000dcba86367539ecd823c24535574"
+          "lut_quality": {
+            "score": 71.8,
+            "color_temp": 71.8
+          },
+          "hash": "383ea025ae85619d76c69d80449f93c6"
         },
         {
           "aliases": [
@@ -10251,6 +11080,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.3,
+            "brightness": 98.3
+          },
           "hash": "a3f1c9b376e9030202d6847970ade75e"
         },
         {
@@ -10278,6 +11111,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.4,
+            "color_temp": 97.4
+          },
           "hash": "4191a81f0b1938dfeb1c9221f2a922a2"
         },
         {
@@ -10304,6 +11141,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.4,
+            "brightness": 98.4
+          },
           "hash": "834a2255f6b054ab27a337084a2e4012"
         },
         {
@@ -10330,10 +11171,14 @@
           "max_power": 9.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "1c524481908d933b0f059676d76ae41b"
+          "lut_quality": {
+            "score": 99.3,
+            "color_temp": 99.3
+          },
+          "hash": "989adb2fae2404b514800b1d2f2e58e0"
         },
         {
           "aliases": [
@@ -10364,6 +11209,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
           "hash": "4804fc171141746decd91b11a18bd517"
         },
         {
@@ -10390,6 +11239,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "brightness": 99.0
+          },
           "hash": "3ad755d78feb6eb2b243f8639c01b71a"
         },
         {
@@ -10444,6 +11297,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
           "hash": "7a2a625c268e649ca8bebe6ff3d3476f"
         },
         {
@@ -10474,6 +11331,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.8,
+            "color_temp": 96.8
+          },
           "hash": "53665f33c1eb240f6537008c28e57d46"
         },
         {
@@ -10504,6 +11365,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
           "hash": "296f65b8efab094f1a25cfff8057abbb"
         },
         {
@@ -10530,6 +11395,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
           "hash": "b76e010dffd055e9d4da5092bfffb4bc"
         },
         {
@@ -10561,6 +11430,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.6,
+            "color_temp": 96.6
+          },
           "hash": "085236896a5a32603da16b330a0a2d7d"
         },
         {
@@ -10591,6 +11464,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
           "hash": "b5d58ec64e08d903cebad6f7d1e2ac2d"
         },
         {
@@ -10621,10 +11498,14 @@
           "max_power": 7.78,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "c8732d5d414985722905a75ee8c660da"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "b89b4fa11873cd6548bc12deb8b220cc"
         },
         {
           "aliases": [
@@ -10654,10 +11535,14 @@
           "max_power": 10.44,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "1cfe0e11f30a8356b802bf7ca7fcb267"
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "2c4f80eb993114aea6240a64d840661f"
         },
         {
           "aliases": [
@@ -10714,6 +11599,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 96.7,
+            "brightness": 96.7
+          },
           "hash": "926dcc397648531fd8b6f0b3b71bc54e"
         },
         {
@@ -10742,10 +11631,14 @@
           "max_power": 7.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "4a2d24ad420be7316a0688105de72f52"
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
+          "hash": "14f015c1a52fbf239eb49b754ec8e776"
         },
         {
           "aliases": [
@@ -10776,10 +11669,14 @@
           "max_power": 3.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "3f030ee952db7f6fd9be440190c1aab7"
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
+          "hash": "b91cf51ed7ac56b58996d02d3b578ae2"
         },
         {
           "aliases": [
@@ -10807,10 +11704,14 @@
           "max_power": 4.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "0395338157deecab3f70fe524c334510"
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
+          "hash": "37f9939fbc87c8c5c2cc86ad0b77d52a"
         },
         {
           "aliases": [
@@ -10841,6 +11742,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.9,
+            "brightness": 99.9
+          },
           "hash": "37e1adc870d0f5e18eca3cdf3fa8f8eb"
         },
         {
@@ -10871,6 +11776,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
           "hash": "c21ff99009a7f674296c017111fedb49"
         },
         {
@@ -10925,10 +11834,14 @@
           "max_power": 8.6,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f90d1c3ca1620364a19fe8dcb3b5ebb2"
+          "lut_quality": {
+            "score": 97.8,
+            "color_temp": 97.8
+          },
+          "hash": "8176eefaa18c59ee47f7df18e8ec0bec"
         },
         {
           "aliases": [
@@ -10954,6 +11867,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.8,
+            "color_temp": 96.8
+          },
           "hash": "1b4c1a273bdc2530e469f0d3274e53c4"
         },
         {
@@ -10982,10 +11899,14 @@
           "max_power": 7.18,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "0cd3448854fdc4fa64790cb4eb7643af"
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
+          "hash": "965d4077c1244fa98a6bf5be95f1183c"
         },
         {
           "aliases": [
@@ -11013,10 +11934,14 @@
           "max_power": 6.92,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "7b0304f4ea100526af0ec15237bfed1e"
+          "lut_quality": {
+            "score": 18.5,
+            "color_temp": 18.5
+          },
+          "hash": "69c05d3add1c8f6a9e4f6a0dc7c23768"
         },
         {
           "aliases": [
@@ -11046,10 +11971,14 @@
           "max_power": 6.29,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8c5c02b4cee51db9877bab8da9a3944f"
+          "lut_quality": {
+            "score": 97.4,
+            "color_temp": 97.4
+          },
+          "hash": "69384bd6dff84446ce696ef1b1513716"
         },
         {
           "aliases": [
@@ -11079,10 +12008,14 @@
           "max_power": 8.47,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "40f2a45f3d5d6c1fefd3f747ae89dcae"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "6003eae7cf3c72768410a785220e4195"
         },
         {
           "aliases": [
@@ -11113,6 +12046,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.4,
+            "color_temp": 97.4
+          },
           "hash": "eac6975fae4c27fb0d6078e608a5900c"
         },
         {
@@ -11139,6 +12076,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 94.6,
+            "color_temp": 94.6
+          },
           "hash": "742d7f8eb6ecb08b6c6b5550bfd8f8ec"
         },
         {
@@ -11217,6 +12158,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.0,
+            "brightness": 97.0
+          },
           "hash": "c50225cac3725aaadeb637565eab73a0"
         },
         {
@@ -11245,6 +12190,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
           "hash": "e82fac2b0c79dc01f4dd3ce22d219fc6"
         },
         {
@@ -11273,10 +12222,14 @@
           "max_power": 9.89,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "18b9cc167d8d6c7f8410eab93a12fb4a"
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "5326d4a4509a3d745deeeff4971f97af"
         },
         {
           "aliases": [
@@ -11307,6 +12260,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "brightness": 98.9
+          },
           "hash": "4b76d3ac111803799074bd1381252775"
         },
         {
@@ -11337,6 +12294,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.7,
+            "color_temp": 96.7
+          },
           "hash": "794ecae64387c6b2eeb4ec50e9e42bbc"
         },
         {
@@ -11367,6 +12328,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
           "hash": "ce4ba949656ea72dd1aa8a73c5e4b0fb"
         },
         {
@@ -11397,10 +12362,14 @@
           "max_power": 10.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b5b2b3773699aa35d5ef1e874ea582c3"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "62bf9ca623304620a543eff5a1a96849"
         },
         {
           "aliases": [
@@ -11431,6 +12400,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
           "hash": "8705b3b1a75c9518b893781643b509e2"
         },
         {
@@ -11458,6 +12431,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
           "hash": "4bb97e37083a245f4dc1e194d8b9c205"
         },
         {
@@ -11488,6 +12465,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "brightness": 98.6
+          },
           "hash": "bc3cbb8e12ba2e443d0c7cfe43a906dc"
         },
         {
@@ -11515,6 +12496,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "brightness": 98.9
+          },
           "hash": "b167d74f9c7d75b944ea2c00323a1c8b"
         },
         {
@@ -11545,10 +12530,14 @@
           "max_power": 4.93,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "83535e7fa2868dcc6c92ab0220b08c12"
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
+          "hash": "d12dd9ccf576b505fe47aef4c6116268"
         },
         {
           "aliases": [
@@ -11580,6 +12569,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
           "hash": "b1a8ffd5f50dca52adc916b2783c2394"
         },
         {
@@ -11612,6 +12605,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 96.4,
+            "brightness": 96.4
+          },
           "hash": "83d812f6203d3d1d3fd08f213b81cc8f"
         }
       ],
@@ -11652,10 +12649,14 @@
           "max_power": 9.06,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "72bb883df9c2e4c6e74ddc113f6a4877"
+          "lut_quality": {
+            "score": 97.4,
+            "color_temp": 97.4
+          },
+          "hash": "6e072dc29eaa2d88da762ada82d6e26b"
         }
       ],
       "device_types": [
@@ -11692,10 +12693,14 @@
           "max_power": 14.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ce0e6b0ca61033bd9fd8ee44139e56a3"
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
+          "hash": "8cf5da3088b8931d0108cd26bdb4bebe"
         }
       ],
       "device_types": [
@@ -11740,6 +12745,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
           "hash": "77dda07b265f5355e98db7864a9e72e8"
         },
         {
@@ -11766,10 +12775,14 @@
           "max_power": 6.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "9c4d4736e24b4e71c9cde2c646e67afe"
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
+          "hash": "bec8ce275391edaf4977852ae51da9a1"
         },
         {
           "calculation_strategy": "lut",
@@ -11795,10 +12808,14 @@
           "max_power": 9.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ed8e9cbc2781081e424dd03ca6e41f74"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "7d6e3003f41860d8e7d2f0ec13fdd5e8"
         },
         {
           "calculation_strategy": "lut",
@@ -11821,6 +12838,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 93.5,
+            "color_temp": 93.5
+          },
           "hash": "e162a79adc85aca157f78b9abb76f566"
         },
         {
@@ -11849,6 +12870,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 94.6,
+            "color_temp": 94.6
+          },
           "hash": "8637bc8de7ef495434576fcecd0d4210"
         },
         {
@@ -11875,10 +12900,14 @@
           "max_power": 4.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "eaa975c58c8544ec365e4fbb513a488c"
+          "lut_quality": {
+            "score": 95.1,
+            "color_temp": 95.1
+          },
+          "hash": "b2555575329684ce6ec805d294609811"
         },
         {
           "calculation_strategy": "lut",
@@ -11903,10 +12932,14 @@
           "max_power": 6.68,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d2c6d3a72fda45d732ff18930ce318f3"
+          "lut_quality": {
+            "score": 95.7,
+            "color_temp": 95.7
+          },
+          "hash": "48cb26a7ae74e867f92207bebcf983ef"
         },
         {
           "aliases": [
@@ -11936,6 +12969,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
           "hash": "0a2f60ccc276526f1e51ea2586a94295"
         },
         {
@@ -11965,10 +13002,14 @@
           "max_power": 4.56,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e938f06311e15585a110f9dab999ab54"
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "ac43f449de04f4601e15130a877d7739"
         },
         {
           "calculation_strategy": "lut",
@@ -11996,6 +13037,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
           "hash": "122a0575c187f3d68dad4d24db8af08a"
         }
       ],
@@ -12122,10 +13167,14 @@
           "max_power": 5.49,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "a77a1284ee8fcd14310ca05ed54abc73"
+          "lut_quality": {
+            "score": 96.2,
+            "color_temp": 96.2
+          },
+          "hash": "0f230b4d6f7c72d75703f75750ad08c6"
         }
       ],
       "device_types": [
@@ -12196,11 +13245,16 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "brightness",
-            "color_temp"
+            "hs"
           ],
-          "hash": "38a02cf21dba787cf2651229d08c5a31"
+          "lut_quality": {
+            "score": 33.4,
+            "brightness": 98.9,
+            "color_temp": 33.4
+          },
+          "hash": "0927c2473ab6294dbbf54667db386887"
         }
       ],
       "device_types": [
@@ -12238,6 +13292,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "brightness": 98.9
+          },
           "hash": "8dd5707fa0601609e525e1a56a0fb8b5"
         },
         {
@@ -12265,6 +13323,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.1,
+            "brightness": 99.1
+          },
           "hash": "15c7b5b90db2901acef4a19ed8b827f1"
         },
         {
@@ -12296,6 +13358,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.5,
+            "brightness": 99.5
+          },
           "hash": "e16edc001b5ac17e45401a0a0d05cf6b"
         }
       ],
@@ -12332,10 +13398,14 @@
           "max_power": 8.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f5d4ff202168b19dc5b1de1b2055e859"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "040df0cb9572388f4435689d266ebac5"
         },
         {
           "calculation_strategy": "fixed",
@@ -12405,10 +13475,14 @@
           "max_power": 12.01,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "23b7f3cc5dd6069abf1e91c10def6942"
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
+          "hash": "13b3476cf50a4bb3a934c43b10a2fb9c"
         },
         {
           "calculation_strategy": "lut",
@@ -12436,6 +13510,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 95.7,
+            "color_temp": 95.7
+          },
           "hash": "914e51b66d0493ca0b7692188c2520fd"
         },
         {
@@ -12463,6 +13541,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
           "hash": "bfac2bda702260f79f4da1e94bddae01"
         },
         {
@@ -12696,6 +13778,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.6,
+            "color_temp": 97.6
+          },
           "hash": "b2f422785b33cc1b9f80b76bfc5b23ab"
         },
         {
@@ -12721,10 +13807,14 @@
           "max_power": 5.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d1f6bd480535a2e558272e387fa06d1b"
+          "lut_quality": {
+            "score": 99.3,
+            "color_temp": 99.3
+          },
+          "hash": "2cc4cf75e245946994cd6830f9171d37"
         },
         {
           "aliases": [
@@ -12754,6 +13844,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "brightness": 99.0
+          },
           "hash": "cd87faef44b45935bb5fe1b9903580af"
         },
         {
@@ -12782,6 +13876,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "brightness": 99.0
+          },
           "hash": "32340ab6d5198840bc0f972df7bb09d3"
         },
         {
@@ -12827,10 +13925,14 @@
           "max_power": 5.53,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "fb2d67c3737af798066ec8856612910f"
+          "lut_quality": {
+            "score": 91.2,
+            "color_temp": 91.2
+          },
+          "hash": "9876dc93284724ae37eae0f5a0b8db32"
         },
         {
           "aliases": [
@@ -12861,6 +13963,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 31.2,
+            "color_temp": 31.2
+          },
           "hash": "521fa0d0d88dfd0018f433a85f6e64a6"
         },
         {
@@ -12888,6 +13994,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
           "hash": "aef3267a92f169ef4bf5ed450e0371fd"
         },
         {
@@ -12918,6 +14028,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 20.7,
+            "color_temp": 20.7
+          },
           "hash": "7b48720f4218b5dfb5bc2df0f1403a4c"
         },
         {
@@ -12949,10 +14063,14 @@
           "max_power": 21.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "235a8ea9fcb0933cc6ae65cf89e46dc6"
+          "lut_quality": {
+            "score": 98.3,
+            "color_temp": 98.3
+          },
+          "hash": "6c5db046e1fcfcb207eb6f0f6f357415"
         },
         {
           "aliases": [
@@ -12977,10 +14095,14 @@
           "max_power": 9.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "aebca86ef8274d00d4f7fab3e926f0af"
+          "lut_quality": {
+            "score": 79.2,
+            "color_temp": 79.2
+          },
+          "hash": "42f96ae7302d707cd4b442f0c866bad6"
         },
         {
           "calculation_strategy": "lut",
@@ -13007,6 +14129,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
           "hash": "f0d70aa979ed967f90bd04ab91b9328b"
         },
         {
@@ -13038,6 +14164,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.3,
+            "brightness": 98.3
+          },
           "hash": "462b64159d9e7cd7b1392019c6d74132"
         },
         {
@@ -13069,6 +14199,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
           "hash": "c1d02e7bac068ec210fe309c70f46972"
         },
         {
@@ -13096,6 +14230,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "brightness": 98.5
+          },
           "hash": "9f383ce7edd98ff34795590a13f4f77b"
         },
         {
@@ -13125,10 +14263,14 @@
           "max_power": 7.81,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "1755c148c913fcd5e0747ea0a88e9a44"
+          "lut_quality": {
+            "score": 69.6,
+            "color_temp": 69.6
+          },
+          "hash": "927ce18956e5d6cf2e5ce41e6c224bf4"
         },
         {
           "aliases": [
@@ -13156,10 +14298,14 @@
           "max_power": 44.08,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "7b9604e675e02f4268826fa2397f3038"
+          "lut_quality": {
+            "score": 98.4,
+            "color_temp": 98.4
+          },
+          "hash": "04bdd97f4f772b83f6ac66615b7fb0b6"
         },
         {
           "aliases": [
@@ -13218,10 +14364,14 @@
           "max_power": 44.38,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "c8bbfa4b5956f7eaa8064c5242522b57"
+          "lut_quality": {
+            "score": 83.8,
+            "color_temp": 83.8
+          },
+          "hash": "9d3a7f7902a584ad6a9d629be107d4ca"
         },
         {
           "aliases": [
@@ -13253,6 +14403,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "brightness": 98.7
+          },
           "hash": "265cf239e9549059059dba5e18e5cf07"
         },
         {
@@ -13286,6 +14440,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.3,
+            "color_temp": 99.3
+          },
           "hash": "7e143aabcafc51f5f75c618b8e2634ea"
         },
         {
@@ -13314,6 +14472,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
           "hash": "a836750343d97f6c20fa0b69750c4781"
         },
         {
@@ -13345,10 +14507,14 @@
           "max_power": 7.07,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "0f18230928515c0af721086bdc5a1c8c"
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "d658385a2724538ca83d657800329e4e"
         },
         {
           "calculation_strategy": "lut",
@@ -13375,6 +14541,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
           "hash": "4fac96b1766920c4303c5a40214305f5"
         },
         {
@@ -13405,10 +14575,14 @@
           "max_power": 33.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d989ffc37956dca81acb7b87a445dad2"
+          "lut_quality": {
+            "score": 33.6,
+            "color_temp": 33.6
+          },
+          "hash": "e802ed45853588022ef93136a3c7002e"
         },
         {
           "aliases": [
@@ -13439,6 +14613,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 92.6,
+            "color_temp": 92.6
+          },
           "hash": "bece80ea2406535e4ec37e71ed457583"
         },
         {
@@ -13472,6 +14650,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.4,
+            "color_temp": 97.4
+          },
           "hash": "a47912d98906e8a98f4f23f1a493bf5e"
         },
         {
@@ -13501,10 +14683,14 @@
           "max_power": 10.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "3bbf0e7cccfed5981683346c16c6097b"
+          "lut_quality": {
+            "score": 96.3,
+            "color_temp": 96.3
+          },
+          "hash": "40eb5abf4bcba13360a9fd61b48938a7"
         },
         {
           "aliases": [
@@ -13533,10 +14719,14 @@
           "max_power": 9.81,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6cccf63c0876a244f14552e247f09dcc"
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "398afe9d3888869b2a7dfa21bece4f1d"
         },
         {
           "aliases": [
@@ -13567,6 +14757,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
           "hash": "0271e7dbb68726db8acb35a33cee9246"
         },
         {
@@ -13593,10 +14787,14 @@
           "max_power": 5.44,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f933e896f2e9299de9053768f2077378"
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "0254d2327dfca2e64ff67fe83908bd2e"
         },
         {
           "calculation_strategy": "lut",
@@ -13622,10 +14820,14 @@
           "max_power": 7.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "9fc4e1d6b16dc4ba6956f6a93c8c92c0"
+          "lut_quality": {
+            "score": 97.6,
+            "color_temp": 97.6
+          },
+          "hash": "8eaf02ba6afed8a40e1fdf1639451173"
         },
         {
           "calculation_strategy": "lut",
@@ -13651,10 +14853,14 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "brightness"
+            "brightness",
+            "effect"
           ],
-          "hash": "6cb22d127602effd9079a6b0476ba40d"
+          "lut_quality": {
+            "score": 98.7,
+            "brightness": 98.7
+          },
+          "hash": "12a02eca03f42a32eb727e6e1c87757c"
         },
         {
           "calculation_strategy": "lut",
@@ -13681,6 +14887,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 66.1,
+            "color_temp": 66.1
+          },
           "hash": "4599e131e838b296b06ab759c66f172a"
         },
         {
@@ -13711,6 +14921,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
           "hash": "ac91ab54c2e68f944493b780a67bd721"
         },
         {
@@ -13741,6 +14955,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 96.0,
+            "brightness": 96.0
+          },
           "hash": "81825b43f8d69f9eff3bef33984da2e2"
         },
         {
@@ -13769,10 +14987,14 @@
           "max_power": 12.1,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6a14be02dd131bd47b530bc369e31196"
+          "lut_quality": {
+            "score": 84.0,
+            "color_temp": 84.0
+          },
+          "hash": "d49464b05fdfc943542d91cbb1c84994"
         },
         {
           "calculation_strategy": "lut",
@@ -13800,10 +15022,14 @@
           "max_power": 4.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "06cb7dea1b5d13a65c834ac4e458b6f8"
+          "lut_quality": {
+            "score": 75.1,
+            "color_temp": 75.1
+          },
+          "hash": "81d26a226548ccdb798358884863d3f5"
         },
         {
           "calculation_strategy": "lut",
@@ -13824,10 +15050,14 @@
           "max_power": 5.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "53ad905f1c45b8c8893aa797cef2f502"
+          "lut_quality": {
+            "score": 54.6,
+            "color_temp": 54.6
+          },
+          "hash": "3c1e4d8635e80b6cd5c353d943e1ad08"
         },
         {
           "calculation_strategy": "lut",
@@ -13854,6 +15084,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 86.6,
+            "color_temp": 86.6
+          },
           "hash": "c4c4a44201473cab34cad5ea1897f6c0"
         },
         {
@@ -13885,6 +15119,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 95.5,
+            "color_temp": 95.5
+          },
           "hash": "ec12d2eb387225e4644be4e30f7ae849"
         },
         {
@@ -13914,6 +15152,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
           "hash": "bcab715753cd8f1ba7da5320ef2213e8"
         },
         {
@@ -13938,10 +15180,14 @@
           "max_power": 21.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b57192e5dcdb6f1cc3776de9731ece2d"
+          "lut_quality": {
+            "score": 32.7,
+            "color_temp": 32.7
+          },
+          "hash": "558cc3bcc6fbcea2b1bcde86dd1ffba2"
         },
         {
           "aliases": [
@@ -13971,6 +15217,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.5,
+            "brightness": 99.5
+          },
           "hash": "a316a76f2d97da0ed47b78fde79b8907"
         },
         {
@@ -14000,10 +15250,14 @@
           "max_power": 4.61,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d225f39325a040d54263415332c98ca9"
+          "lut_quality": {
+            "score": 76.2,
+            "color_temp": 76.2
+          },
+          "hash": "bb149aadaebf3a1b13d7760278bb59bf"
         },
         {
           "aliases": [
@@ -14034,6 +15288,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
           "hash": "aa0acda844b529f708639957d5d5bb47"
         },
         {
@@ -14065,6 +15323,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
           "hash": "7f414a135689e80b3ddb2c6c41d48f16"
         },
         {
@@ -14095,6 +15357,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
           "hash": "e9b4d71e80dd49ea44382e3375d17f5e"
         },
         {
@@ -14122,6 +15388,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "brightness": 98.8
+          },
           "hash": "f9430ca440ecfc2752644d80d5a557c0"
         },
         {
@@ -14149,6 +15419,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "brightness": 98.8
+          },
           "hash": "a6b3f93bd734a2b17411e5422be064f4"
         },
         {
@@ -14179,10 +15453,14 @@
           "max_power": 23.03,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "9e9166707027075dbc7f9ae271587399"
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
+          "hash": "c6437ee2b094c02e16a70cc8aee4d29e"
         },
         {
           "aliases": [
@@ -14209,6 +15487,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 95.2,
+            "brightness": 95.2
+          },
           "hash": "478ad8a98b24199b31dccd23c94c97d4"
         },
         {
@@ -14234,10 +15516,14 @@
           "max_power": 6.93,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "0130a214d90c429083ef7dc217076c5c"
+          "lut_quality": {
+            "score": 75.7,
+            "color_temp": 75.7
+          },
+          "hash": "b6cee5b0041f50416962acd0b71899dc"
         },
         {
           "aliases": [
@@ -14265,10 +15551,14 @@
           "max_power": 24.1,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "1710357fc35919ef6d74c81c8f60fd05"
+          "lut_quality": {
+            "score": 97.8,
+            "color_temp": 97.8
+          },
+          "hash": "66a08d38e729335f6c2e76be66fcc689"
         },
         {
           "aliases": [
@@ -14296,10 +15586,14 @@
           "max_power": 13.76,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "cbee8e8533f1183d0ada60c94e0e624d"
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
+          "hash": "6e103ba71c001f1642d338fb67e9d420"
         },
         {
           "aliases": [
@@ -14329,10 +15623,14 @@
           "max_power": 14.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "130bbe8f34ea0d60370b0862f1fef7dd"
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "3ea782f261d3471361d259c8a4255a34"
         },
         {
           "aliases": [
@@ -14365,6 +15663,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.7,
+            "color_temp": 99.7
+          },
           "hash": "663b3381ee3f5e4370a60b7cfa2a8f9f"
         },
         {
@@ -14393,6 +15695,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.9,
+            "brightness": 97.9
+          },
           "hash": "2ce20e920f9c3cfa83b708b3de4a61a5"
         },
         {
@@ -14432,10 +15738,14 @@
           "max_power": 4.28,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "db1e9db650e5bb74e59de961d03869ff"
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
+          "hash": "2f9716a7484b1c8b942f102d7d06fb99"
         },
         {
           "aliases": [
@@ -14464,10 +15774,14 @@
           "max_power": 49.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "5d790ebe91a7cc48b706143263279399"
+          "lut_quality": {
+            "score": 36.1,
+            "color_temp": 36.1
+          },
+          "hash": "0c0455fca63a1ae964b8317458d8a219"
         },
         {
           "aliases": [
@@ -14497,6 +15811,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.4,
+            "brightness": 99.4
+          },
           "hash": "7a95889daf94c92f06b7d71bcc1c7956"
         },
         {
@@ -14523,10 +15841,14 @@
           "max_power": 28.69,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "94159d55f5d7271904413fbdd677c267"
+          "lut_quality": {
+            "score": 69.8,
+            "color_temp": 69.8
+          },
+          "hash": "6dbae4698f0360d485750c7da5f3e42e"
         },
         {
           "aliases": [
@@ -14555,10 +15877,14 @@
           "max_power": 17.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "c26bbf8ab540d9921ab5b826036d3d98"
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "e1a14589e3748f55e7efa581e81e71f2"
         },
         {
           "aliases": [
@@ -14589,6 +15915,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 95.5,
+            "brightness": 95.5
+          },
           "hash": "51a2ae04fae2b93648b46d103ea3bffc"
         },
         {
@@ -14618,10 +15948,14 @@
           "max_power": 28.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6058152663e406947e79f301cd476e1b"
+          "lut_quality": {
+            "score": 88.1,
+            "color_temp": 88.1
+          },
+          "hash": "5024fc57ca0ed4bd2e4e45e302cfd847"
         },
         {
           "aliases": [
@@ -14650,10 +15984,14 @@
           "max_power": 12.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "fbd60ca3c15d5a84388750de93dabfd7"
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
+          "hash": "fbf7ce390db15029941fc351d6977402"
         },
         {
           "calculation_strategy": "lut",
@@ -14680,6 +16018,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
           "hash": "8d9f3a0517362158a5ab1f1bdeaf2fc5"
         },
         {
@@ -14709,10 +16051,14 @@
           "max_power": 7.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "720a80b07b9ddcd9b9b056b9f28b81e3"
+          "lut_quality": {
+            "score": 70.9,
+            "color_temp": 70.9
+          },
+          "hash": "71405b23260c609b29abc4fe5a8c20e2"
         },
         {
           "aliases": [
@@ -14739,6 +16085,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
           "hash": "3f4e7eceb60fcdf73ea180df86e5c097"
         },
         {
@@ -14764,11 +16114,15 @@
           "max_power": 11.63,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "f5ec2d2e1d64edcdc994cf580ecd1481"
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
+          "hash": "7d6818ae2a109fb2312a145370b250db"
         },
         {
           "calculation_strategy": "lut",
@@ -14796,6 +16150,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.6,
+            "color_temp": 99.6
+          },
           "hash": "a87823d5d857037e5339765eccdaa4c4"
         },
         {
@@ -14824,6 +16182,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
           "hash": "2684a26d552f0b48aff60c37a73c4253"
         },
         {
@@ -14879,10 +16241,14 @@
           "max_power": 12.59,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d78bdcd1a2266d9d200601a170dbef64"
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "85e44a563d0e9de2e2691a584a2650d8"
         },
         {
           "calculation_strategy": "lut",
@@ -14909,6 +16275,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "brightness": 98.9
+          },
           "hash": "333b55d9a4c8a165e9baac4afb2e1ac7"
         },
         {
@@ -14935,6 +16305,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.9,
+            "brightness": 97.9
+          },
           "hash": "121a8863bf4277a7c0e10a9f39d5cf59"
         },
         {
@@ -14989,10 +16363,14 @@
           "max_power": 40.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "52ea315b100831803ab6c7be1bff033d"
+          "lut_quality": {
+            "score": 74.2,
+            "color_temp": 74.2
+          },
+          "hash": "f0c197135e11725842fc3d695eb0e7d5"
         },
         {
           "calculation_strategy": "lut",
@@ -15013,10 +16391,14 @@
           "max_power": 7.6,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "70d924fa7a3495620f09432ee093be2c"
+          "lut_quality": {
+            "score": 94.3,
+            "color_temp": 94.3
+          },
+          "hash": "4a2ddb53006ab815f6e1679f59850d6a"
         },
         {
           "aliases": [
@@ -15054,10 +16436,14 @@
           "max_power": 43.52,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "0f14e70d4edce1a0e1511bfb146a83a0"
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "e7213d224dbfd798dec4afd3d06211e4"
         },
         {
           "aliases": [
@@ -15086,10 +16472,14 @@
           "max_power": 9.82,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "fa54eba29c582fbcbd6feda7aa0c1ee5"
+          "lut_quality": {
+            "score": 24.0,
+            "color_temp": 24.0
+          },
+          "hash": "85a4b0e7de0322a5cbaf951c4e8d448d"
         },
         {
           "aliases": [
@@ -15121,6 +16511,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
           "hash": "85e10476d601c82eb566b5bf90c49fdb"
         },
         {
@@ -15147,10 +16541,14 @@
           "max_power": 10.31,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "af93bff981a6d888d069a7c9e4887e0c"
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
+          "hash": "c69953f07d3ffea84ff5dfb07d7ddc0f"
         },
         {
           "aliases": [
@@ -15176,6 +16574,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "brightness": 98.8
+          },
           "hash": "f3c6a4f9d82fc5daa9ade6132d3d255c"
         },
         {
@@ -15203,6 +16605,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.7,
+            "brightness": 97.7
+          },
           "hash": "87b996cd59171f15046263fb45af0190"
         },
         {
@@ -15232,10 +16638,14 @@
           "max_power": 59.34,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "66614f42054dc3a8a5127eba04ead5f3"
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "6df93dcc86163e568ac04fc895f69e7f"
         },
         {
           "calculation_strategy": "lut",
@@ -15260,10 +16670,14 @@
           "max_power": 9.51,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e80159f53576d5d186cd5d7659846d5f"
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
+          "hash": "bc8ead9ae61319b368015ed7edb27116"
         },
         {
           "aliases": [
@@ -15289,10 +16703,14 @@
           "max_power": 11.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b4d6080b760a0fe54b5589a298dd360f"
+          "lut_quality": {
+            "score": 71.0,
+            "color_temp": 71.0
+          },
+          "hash": "4412b2292fc50235d5df4c57e2076c2a"
         },
         {
           "aliases": [
@@ -15321,6 +16739,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 36.7,
+            "color_temp": 36.7
+          },
           "hash": "1fd2e9b975bca967ab1c1e82318821ac"
         },
         {
@@ -15352,6 +16774,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.3,
+            "brightness": 99.3
+          },
           "hash": "46514e4b9f051559b7090845d8c014a4"
         },
         {
@@ -15382,6 +16808,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "brightness": 98.6
+          },
           "hash": "b2bbc13e633823cd2fe29cc31ff2af18"
         },
         {
@@ -15413,10 +16843,14 @@
           "max_power": 10.61,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "21f275ab3e1c5ec888e786c0b4fd79b3"
+          "lut_quality": {
+            "score": 94.9,
+            "color_temp": 94.9
+          },
+          "hash": "b3c63183795a42250d227cbef3dc53c7"
         },
         {
           "aliases": [
@@ -15448,6 +16882,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
           "hash": "ddcf89921229476b194c7bac790a81db"
         },
         {
@@ -15477,10 +16915,14 @@
           "max_power": 7.68,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "46b595bcaaa0cacdc91fb7d42ab39da2"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "aed7a06f1e9bcc6d24fe721e9aae5e0d"
         },
         {
           "calculation_strategy": "lut",
@@ -15503,6 +16945,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.4,
+            "color_temp": 98.4
+          },
           "hash": "6115cd1626c5ac95717d5f56b68fd46c"
         },
         {
@@ -15535,10 +16981,14 @@
           "max_power": 33.97,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "a4cf5d82f19eb4519cdec5fb0efc8337"
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "c55f70a50e00ea95407c50d8e5690ac5"
         },
         {
           "aliases": [
@@ -15567,6 +17017,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 95.2,
+            "brightness": 95.2
+          },
           "hash": "8c2d7543e4e23cfae99d54d248d62364"
         },
         {
@@ -15593,10 +17047,14 @@
           "max_power": 9.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "813f9361174d27d518068eba191aab82"
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "2454d61d130ad33ae7dc86deb2171515"
         },
         {
           "aliases": [
@@ -15622,10 +17080,14 @@
           "max_power": 49.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ac662ae4e12734841677711a685fefcc"
+          "lut_quality": {
+            "score": 36.1,
+            "color_temp": 36.1
+          },
+          "hash": "791aaadb468a95a33eddebd324d7fc28"
         },
         {
           "aliases": [
@@ -15652,6 +17114,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 31.9,
+            "color_temp": 31.9
+          },
           "hash": "ba953780605cb33e3550481cc66d0d76"
         },
         {
@@ -15677,10 +17143,14 @@
           "max_power": 4.72,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ca386113c5b333f66668ef7b9a4d5a7f"
+          "lut_quality": {
+            "score": 93.6,
+            "color_temp": 93.6
+          },
+          "hash": "147906e7308967a188709e143cdd945d"
         },
         {
           "aliases": [
@@ -15712,11 +17182,15 @@
           "max_power": 5.16,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "c9cfd54365e89379f4b22148d0da0fbc"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "b2d1b7b7866f79a6cefd2dadf13f18bb"
         },
         {
           "aliases": [
@@ -15743,6 +17217,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.2,
+            "color_temp": 96.2
+          },
           "hash": "ca93a685e24cf2188a893accff393130"
         },
         {
@@ -15794,10 +17272,14 @@
           "max_power": 18.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "785b20cc0bb5c9da35c5d797f056991e"
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
+          "hash": "3a6641099558c0c67a4927ef1090f980"
         },
         {
           "calculation_strategy": "lut",
@@ -15823,10 +17305,14 @@
           "max_power": 16.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "45a4899ec3b8b2097bd85093f28dcd49"
+          "lut_quality": {
+            "score": 85.9,
+            "color_temp": 85.9
+          },
+          "hash": "84fae03616da289c450b289cb8892692"
         },
         {
           "aliases": [
@@ -15856,10 +17342,14 @@
           "max_power": 11.36,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "07c8d50e9accc69c0bcbb108bd7c53a4"
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "46070df1b6cdbc38f2afc6ec82ac6deb"
         },
         {
           "aliases": [
@@ -15890,6 +17380,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
           "hash": "9b6f17d4cc2b271f200da9a9e492479e"
         },
         {
@@ -15915,10 +17409,14 @@
           "max_power": 9.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "1b4208e20df73294bdcba2836a391b46"
+          "lut_quality": {
+            "score": 79.2,
+            "color_temp": 79.2
+          },
+          "hash": "63f7e0f573f3218e4d39514cac23eb21"
         },
         {
           "calculation_strategy": "lut",
@@ -15945,6 +17443,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
           "hash": "15d666c6d57db69af9845948684e3217"
         },
         {
@@ -15975,10 +17477,14 @@
           "max_power": 7.13,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "10989ee06387c1c72afc103e3d7b4566"
+          "lut_quality": {
+            "score": 99.6,
+            "color_temp": 99.6
+          },
+          "hash": "9b727aae94282f84a5972e371ddc9bc5"
         },
         {
           "calculation_strategy": "lut",
@@ -16004,10 +17510,14 @@
           "max_power": 9.05,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b7e340a92a82b1be618adb80f6b8e71b"
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
+          "hash": "42506497387de13e417e512e7bb24d8a"
         },
         {
           "aliases": [
@@ -16039,6 +17549,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "brightness": 98.7
+          },
           "hash": "d635977d9396031efbeed557474fd087"
         },
         {
@@ -16071,6 +17585,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
           "hash": "63661d43a4eafbf327ed97cf0b908ca7"
         },
         {
@@ -16100,6 +17618,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "brightness": 98.9
+          },
           "hash": "68efd535fdfc3f83d28995acc0802200"
         },
         {
@@ -16130,6 +17652,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "brightness": 98.7
+          },
           "hash": "6a6a31080a446c572d1430138cb5496f"
         },
         {
@@ -16159,10 +17685,14 @@
           "max_power": 4.71,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "69c1b8346f87754cb3a7ef03b04548cb"
+          "lut_quality": {
+            "score": 90.5,
+            "color_temp": 90.5
+          },
+          "hash": "bfcf7e60d62acc67067e770533d45e13"
         },
         {
           "aliases": [
@@ -16192,6 +17722,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.3,
+            "color_temp": 99.3
+          },
           "hash": "8d78bc9332b56ce774d6b507c03ff457"
         },
         {
@@ -16217,11 +17751,15 @@
           "max_power": 11.86,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "516d5fe6f177deb55690272c9c6a6da8"
+          "lut_quality": {
+            "score": 86.6,
+            "color_temp": 86.6
+          },
+          "hash": "31e6a0a53cf7d1e71fd22610887e4938"
         },
         {
           "aliases": [
@@ -16252,6 +17790,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
           "hash": "909dda94e6cb447fd9602a6603780f47"
         },
         {
@@ -16279,6 +17821,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.4,
+            "brightness": 98.4
+          },
           "hash": "f809480b04542a6e1a0533efdef8dd67"
         },
         {
@@ -16304,10 +17850,14 @@
           "max_power": 9.19,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "9b03d9624b374268a1918d49d89c5e57"
+          "lut_quality": {
+            "score": 67.3,
+            "color_temp": 67.3
+          },
+          "hash": "087970aed7275b4c5121d4d8a3354332"
         },
         {
           "calculation_strategy": "fixed",
@@ -16353,10 +17903,14 @@
           "max_power": 20.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "9cf8c29bac326ee90f2a0e76b7210a22"
+          "lut_quality": {
+            "score": 97.7,
+            "color_temp": 97.7
+          },
+          "hash": "9e8243c2ef1b478e46e75e5cd0434157"
         },
         {
           "aliases": [
@@ -16382,10 +17936,14 @@
           "max_power": 5.53,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ad0017ee1d5e9c33aee147914ebdfc7a"
+          "lut_quality": {
+            "score": 91.2,
+            "color_temp": 91.2
+          },
+          "hash": "11d3b17a66427db71f5ee22ce4c83050"
         },
         {
           "aliases": [
@@ -16409,10 +17967,14 @@
           "max_power": 6.19,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "35e635cd781bee8357695422498db666"
+          "lut_quality": {
+            "score": 67.4,
+            "color_temp": 67.4
+          },
+          "hash": "78bf98fe804e63da60f0a9e42190b6d8"
         },
         {
           "aliases": [
@@ -16445,6 +18007,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "brightness": 98.5
+          },
           "hash": "948e7ba48df79d7259cf28a3e4681feb"
         },
         {
@@ -16476,6 +18042,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
           "hash": "49b41baf5d25f907da8813dc09febc75"
         },
         {
@@ -16532,6 +18102,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.6,
+            "color_temp": 97.6
+          },
           "hash": "42383e25392e266535b40cb9df958be3"
         },
         {
@@ -16561,10 +18135,14 @@
           "max_power": 34.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "166d14e27ebe6f3f8895cfe09207447b"
+          "lut_quality": {
+            "score": 88.7,
+            "color_temp": 88.7
+          },
+          "hash": "2e06d97e176036b79220ec028fb32e27"
         },
         {
           "calculation_strategy": "lut",
@@ -16589,10 +18167,14 @@
           "max_power": 9.73,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ade8962f0f95fc61efde77cd70dc8993"
+          "lut_quality": {
+            "score": 96.6,
+            "color_temp": 96.6
+          },
+          "hash": "4a387da9677cb487047369f2bc4af37f"
         },
         {
           "aliases": [
@@ -16621,10 +18203,14 @@
           "max_power": 9.55,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8b75c719ffb437bcaf3ca2c66096df46"
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
+          "hash": "2d645046ed831e0a89860f6acca278ee"
         },
         {
           "aliases": [
@@ -16654,6 +18240,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.3,
+            "color_temp": 99.3
+          },
           "hash": "d9a600bb08c851e5dca17d05c8f8d342"
         },
         {
@@ -16685,6 +18275,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.7,
+            "color_temp": 97.7
+          },
           "hash": "6159708afd20a0c675c2e43142e81d1e"
         },
         {
@@ -16715,10 +18309,14 @@
           "max_power": 70.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "549189c175fa56c466e4057d87e1c290"
+          "lut_quality": {
+            "score": 98.4,
+            "color_temp": 98.4
+          },
+          "hash": "7ca18ccda81c1e875ed8a6754487c779"
         },
         {
           "aliases": [
@@ -16746,6 +18344,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
           "hash": "77631c5b9cd0de09ef0537730af45885"
         },
         {
@@ -16795,10 +18397,14 @@
           "max_power": 22.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "1b95942d8818f26a21f5a48a590252fe"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "44d1b3add1764a2b5e9a2145375eb5cd"
         },
         {
           "aliases": [
@@ -16829,6 +18435,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 78.2,
+            "color_temp": 78.2
+          },
           "hash": "3a08bb7b97716554dbc301b1cf75fb9d"
         },
         {
@@ -16860,6 +18470,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
           "hash": "132f1904dfc1a42bde4cb8bf80137735"
         },
         {
@@ -16912,6 +18526,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 95.5,
+            "color_temp": 95.5
+          },
           "hash": "81a2e6c59b463076209a0961f59b9fb3"
         },
         {
@@ -16938,10 +18556,14 @@
           "max_power": 4.47,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d8be2cef3b359f271e488ee57b8ec0fe"
+          "lut_quality": {
+            "score": 50.4,
+            "color_temp": 50.4
+          },
+          "hash": "f1f24232f3f34d83f983e6f2b06980ee"
         },
         {
           "calculation_strategy": "lut",
@@ -16966,10 +18588,14 @@
           "max_power": 21.64,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b6b079616de973eadc10226a5c1f7826"
+          "lut_quality": {
+            "score": 92.9,
+            "color_temp": 92.9
+          },
+          "hash": "d34c1a2c31dc930c49abd8ed47a6e4c9"
         },
         {
           "aliases": [
@@ -16998,10 +18624,14 @@
           "max_power": 38.66,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "05c46fae49aeb8dea386d52e520aa6b8"
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
+          "hash": "6725f39defedb56b7952f816cecac023"
         },
         {
           "aliases": [
@@ -17032,6 +18662,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "brightness": 98.9
+          },
           "hash": "46118566d1d512310d868ad38e2be88e"
         },
         {
@@ -17059,6 +18693,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
           "hash": "8c4daa69f76892ee81ea6e642f19753e"
         },
         {
@@ -17084,10 +18722,14 @@
           "max_power": 46.16,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "08c6b37b220f462ae9377ab141381545"
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "9c8cc1901c906695a5c1efc54bb9fccf"
         },
         {
           "calculation_strategy": "lut",
@@ -17112,10 +18754,14 @@
           "max_power": 19.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "fd0537a16ac528665112bf9c74ac2a4a"
+          "lut_quality": {
+            "score": 86.6,
+            "color_temp": 86.6
+          },
+          "hash": "2b693fc58d0571febfd90375592f0aa8"
         },
         {
           "calculation_strategy": "lut",
@@ -17140,11 +18786,15 @@
           "max_power": 7.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "62bce8cc41e3e56e238ba06f0013ca03"
+          "lut_quality": {
+            "score": 96.2,
+            "color_temp": 96.2
+          },
+          "hash": "62127286a5a3a3fe6304a072768e6997"
         },
         {
           "aliases": [
@@ -17169,10 +18819,14 @@
           "max_power": 8.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ab4b1c8802ec933df566a7fbea20aae8"
+          "lut_quality": {
+            "score": 99.6,
+            "color_temp": 99.6
+          },
+          "hash": "d5da6fd1c5d5f2e4a14e4c97d72a6968"
         },
         {
           "calculation_strategy": "lut",
@@ -17198,11 +18852,15 @@
           "max_power": 29.03,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "f46a03c012542b68fe8829978cbf0e1e"
+          "lut_quality": {
+            "score": 79.3,
+            "color_temp": 79.3
+          },
+          "hash": "040db0f2078b4cb8d74bda1d07632263"
         },
         {
           "calculation_strategy": "lut",
@@ -17255,6 +18913,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.2,
+            "brightness": 98.2
+          },
           "hash": "7ebd1afb1e159485cd60a88860fd7a3d"
         },
         {
@@ -17284,10 +18946,14 @@
           "max_power": 8.38,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "130280f4dfaf6c68c6351fce8f49ce8a"
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
+          "hash": "5ae394af991ad541dff066e30ecc7410"
         },
         {
           "aliases": [
@@ -17316,10 +18982,14 @@
           "max_power": 37.67,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "14e4ae64d0e13ab60b1f721575b5cff8"
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
+          "hash": "4d71fe5a6f62bf13b6362d8c95a86010"
         },
         {
           "aliases": [
@@ -17349,6 +19019,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 95.9,
+            "color_temp": 95.9
+          },
           "hash": "5764817528a60442ca37600088294001"
         },
         {
@@ -17378,10 +19052,14 @@
           "max_power": 22.95,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8f17bad5f1f1ef6b693df112d8cf08b8"
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "967d8253cb1c54d2fbcf1bbf61dad3c3"
         },
         {
           "aliases": [
@@ -17407,6 +19085,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 31.2,
+            "color_temp": 31.2
+          },
           "hash": "8122c6aa9f1837a9da1a5d8696d41c11"
         },
         {
@@ -17433,6 +19115,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.4,
+            "color_temp": 98.4
+          },
           "hash": "d4768f50fcc6bbae302a65490a80dc0c"
         },
         {
@@ -17454,11 +19140,15 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "a0309b3171ac351af63c56e884cecf75"
+          "lut_quality": {
+            "score": 96.9,
+            "color_temp": 96.9
+          },
+          "hash": "a8751ac0084fa2356d2e24995553302a"
         },
         {
           "aliases": [
@@ -17484,6 +19174,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "brightness": 98.5
+          },
           "hash": "27864203aad6b89daeb0428a6d1c8c35"
         },
         {
@@ -17515,6 +19209,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.8,
+            "brightness": 97.8
+          },
           "hash": "2a444553eb98628def3173e2e810e4b2"
         },
         {
@@ -17570,10 +19268,14 @@
           "max_power": 12.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d89592aad223665c58b6b0ff20f66ba8"
+          "lut_quality": {
+            "score": 97.3,
+            "color_temp": 97.3
+          },
+          "hash": "31e970e16cc8ea6f3531ff5f1dfa3aec"
         },
         {
           "aliases": [
@@ -17602,10 +19304,14 @@
           "max_power": 36.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ca8e8e877771a7aaee78481bb952ed7c"
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "7210aaeaad7e48e4fba7a99425f9e584"
         },
         {
           "calculation_strategy": "fixed",
@@ -17652,6 +19358,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.7,
+            "brightness": 97.7
+          },
           "hash": "2a129e3ebf573c536c867f00bcf0c67f"
         },
         {
@@ -17682,6 +19392,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "brightness": 98.8
+          },
           "hash": "470768741833d2d0265d9cae996b8646"
         },
         {
@@ -17712,10 +19426,14 @@
           "max_power": 8.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "2b2b339d0fd85722e36c3cd79f2364f0"
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "27b56bff38d67495f92f1a0134b507c3"
         },
         {
           "calculation_strategy": "lut",
@@ -17738,6 +19456,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 93.9,
+            "brightness": 93.9
+          },
           "hash": "f314b6e5b72b082c05a624bb56d4c32f"
         },
         {
@@ -17764,10 +19486,14 @@
           "max_power": 8.03,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6e9b042775dc4de54b0718d41f82b68e"
+          "lut_quality": {
+            "score": 94.5,
+            "color_temp": 94.5
+          },
+          "hash": "1a8c7e72dd40be0369f4ff325f5e04e9"
         },
         {
           "calculation_strategy": "lut",
@@ -17794,6 +19520,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
           "hash": "2f13142d5186443b5a5fb1a6c2ff27b5"
         },
         {
@@ -17825,6 +19555,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
           "hash": "e706948a5a486d718d64e748e1d03399"
         },
         {
@@ -17850,11 +19584,15 @@
           "max_power": 4.81,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "dbbf21f90b04393614365cd7789332fb"
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "aabbdb8adf16d6c8af0826b5807a0dcc"
         },
         {
           "aliases": [],
@@ -17882,6 +19620,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.3,
+            "brightness": 99.3
+          },
           "hash": "50480ce365bbe3a559d51301ca4ae3e6"
         },
         {
@@ -17913,6 +19655,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.5,
+            "brightness": 97.5
+          },
           "hash": "4662a63eb0a49a468537c38e32bcab58"
         },
         {
@@ -17960,11 +19706,15 @@
           "max_power": 41.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "aff052707790b8fe11a05c9cd03b96ec"
+          "lut_quality": {
+            "score": 97.8,
+            "color_temp": 97.8
+          },
+          "hash": "bf2a9d1c545bbf3908eb2cb00db04b0e"
         },
         {
           "aliases": [
@@ -17991,6 +19741,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
           "hash": "5c8845fcd2b7d003fe7df69fcdd6b2d8"
         },
         {
@@ -18017,10 +19771,14 @@
           "max_power": 6.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "9e1a32c2f3927b7366cefe643584149f"
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "a8eee256687c12d784172e545aefe1d6"
         },
         {
           "aliases": [
@@ -18058,10 +19816,14 @@
           "max_power": 5.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e94ed31ef01c48836a24e27c42fc2e1b"
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
+          "hash": "2b60505113fbd99704cac018bf8f62ee"
         },
         {
           "calculation_strategy": "lut",
@@ -18088,6 +19850,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
           "hash": "519a7a99180ff06c37d091e392995a63"
         },
         {
@@ -18118,6 +19884,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.3,
+            "color_temp": 99.3
+          },
           "hash": "97e04ba6f6a6ea7ad0a93b49795d357d"
         },
         {
@@ -18150,6 +19920,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 79.2,
+            "color_temp": 79.2
+          },
           "hash": "ef1b5ab332bf6276ca169653619d91d7"
         },
         {
@@ -18181,6 +19955,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "brightness": 98.7
+          },
           "hash": "37e47bb6f0f97d3a4b7f5fce1c848723"
         },
         {
@@ -18210,10 +19988,14 @@
           "max_power": 23.87,
           "sub_profile_count": 2,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "49df94d69da58ad9a0459e024ef3322c"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "7a62d2fe7486ff3585cf6f2b5c7dabda"
         },
         {
           "aliases": [
@@ -18243,10 +20025,14 @@
           "max_power": 42.49,
           "sub_profile_count": 2,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "84bdb991dd8639c219a3baf47aa7128d"
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
+          "hash": "eb21b80f43f6354a3cf222138fc36eab"
         },
         {
           "calculation_strategy": "lut",
@@ -18269,6 +20055,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
           "hash": "faf733792518752150e44b27bb569b5b"
         },
         {
@@ -18297,10 +20087,14 @@
           "max_power": 67.79,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "cc91cb762f2292013a400d9c64285b8f"
+          "lut_quality": {
+            "score": 98.3,
+            "color_temp": 98.3
+          },
+          "hash": "953631e149e1161df39edf0c8e71f9bb"
         },
         {
           "aliases": [
@@ -18329,10 +20123,14 @@
           "max_power": 23.66,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e359e0b90123fa0e9cb6fe36698d5f10"
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "7d4322a071fcb206151717fcf1993c3b"
         },
         {
           "calculation_strategy": "lut",
@@ -18359,6 +20157,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 85.5,
+            "color_temp": 85.5
+          },
           "hash": "54a69c8bcab30bcf8001c81b4951e49d"
         },
         {
@@ -18390,6 +20192,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.4,
+            "brightness": 97.4
+          },
           "hash": "a86ae8041996c454191bf1c2065ce91d"
         },
         {
@@ -18416,10 +20222,14 @@
           "max_power": 9.61,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "1542ecb5ab28ce18f1a6ba7882e61ccc"
+          "lut_quality": {
+            "score": 97.7,
+            "color_temp": 97.7
+          },
+          "hash": "3462a18c07f43b63648252077007899c"
         },
         {
           "aliases": [
@@ -18448,10 +20258,14 @@
           "max_power": 59.37,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "6a30ba8712438e92b9c0b9599c2522b0"
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "943dae10779cdba624ccd8b6c6cf7516"
         },
         {
           "aliases": [
@@ -18481,10 +20295,14 @@
           "max_power": 17.96,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "5c4d83477b35fa26c90fd6f8f2e06cc7"
+          "lut_quality": {
+            "score": 21.3,
+            "color_temp": 21.3
+          },
+          "hash": "6dd1ec6f3460d8a7bca38266e3cd61d3"
         },
         {
           "aliases": [
@@ -18512,10 +20330,14 @@
           "max_power": 43.37,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ebfbb1087e71e0c7a0d30845c42ffb29"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "6ca21e7f4e17ddbc49d1d5cda745851f"
         },
         {
           "aliases": [
@@ -18546,6 +20368,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
           "hash": "6db40fb70e44acdc401486ac37eee353"
         },
         {
@@ -18573,6 +20399,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.9,
+            "brightness": 97.9
+          },
           "hash": "2051322485c585da0bceaaba22f52ee7"
         },
         {
@@ -18602,10 +20432,14 @@
           "max_power": 9.06,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d456cb96cd12329dda147e9ebc25ea4d"
+          "lut_quality": {
+            "score": 97.6,
+            "color_temp": 97.6
+          },
+          "hash": "e2b08a2ed5e8d26f364de354647f40c3"
         },
         {
           "aliases": [
@@ -18635,6 +20469,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
           "hash": "2db33c73f28cdbf28927f9a0f27942db"
         },
         {
@@ -18660,10 +20498,14 @@
           "max_power": 8.58,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "29c0945cfaf256a074e6e1d52fb75ed0"
+          "lut_quality": {
+            "score": 68.0,
+            "color_temp": 68.0
+          },
+          "hash": "eb7510eafae9ca4ae7087e60a04c033a"
         },
         {
           "aliases": [
@@ -18694,6 +20536,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.3,
+            "color_temp": 98.3
+          },
           "hash": "2e995f6a1988ca9218c015b7033faeb3"
         },
         {
@@ -18719,10 +20565,14 @@
           "max_power": 40.2,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "ab0d0b0028ad6c9d6d78171a79cdf2bb"
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
+          "hash": "e9babc0f4fa03012b1c6d37b94b05237"
         },
         {
           "aliases": [
@@ -18753,6 +20603,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.5,
+            "brightness": 98.5
+          },
           "hash": "287f83c5f01a0526fee74472f4236714"
         }
       ],
@@ -18791,10 +20645,14 @@
           "max_power": 4.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b1b79791111129557bd489afa9f56aad"
+          "lut_quality": {
+            "score": 96.0,
+            "color_temp": 96.0
+          },
+          "hash": "7cff335dc0ec0629bdb33731a4d3de20"
         },
         {
           "calculation_strategy": "lut",
@@ -18822,6 +20680,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.3,
+            "color_temp": 97.3
+          },
           "hash": "20cb57f6459aa1610122e8ec5ed68128"
         },
         {
@@ -18847,10 +20709,14 @@
           "max_power": 4.8,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "d5b5cb063f3931d17e905a2571bb3cdd"
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
+          "hash": "b4b55f2fa11316d34e4a8b2e080f2157"
         },
         {
           "calculation_strategy": "lut",
@@ -18875,10 +20741,14 @@
           "max_power": 10.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "2bf6a55e7377f4ff9dff6e4c74d5249d"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "a829294e6bee4eaf7ba376f876ecc577"
         },
         {
           "calculation_strategy": "lut",
@@ -18905,6 +20775,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
           "hash": "026ef4279718602e6cf5708cfccc8cf8"
         },
         {
@@ -18930,10 +20804,14 @@
           "max_power": 39.18,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "b2605ca98d95480e6bf6260963300513"
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "88508db5bbfaf0c0260d2edf43dc9a17"
         },
         {
           "calculation_strategy": "lut",
@@ -18958,10 +20836,14 @@
           "max_power": 4.5,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "7dd3aec827d1c685563877b41842045f"
+          "lut_quality": {
+            "score": 97.8,
+            "color_temp": 97.8
+          },
+          "hash": "0a83a148db0e56b44dbffa880504e77f"
         }
       ],
       "device_types": [
@@ -19175,10 +21057,14 @@
           "max_power": 11.41,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "cfbac10c321b5a3317a0d68fcec2721c"
+          "lut_quality": {
+            "score": 87.6,
+            "color_temp": 87.6
+          },
+          "hash": "909c885810b4be24010bd8d03b237d9d"
         },
         {
           "calculation_strategy": "linear",
@@ -19224,10 +21110,14 @@
           "max_power": 10.49,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "5065017622abbf9cd050004b47a08c71"
+          "lut_quality": {
+            "score": 86.8,
+            "color_temp": 86.8
+          },
+          "hash": "3bd1981ce83515e73f232ea0a6fd9d55"
         },
         {
           "calculation_strategy": "linear",
@@ -19320,11 +21210,15 @@
           "max_power": 9.9,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "802454f86e7a2d7a026513632c5f181d"
+          "lut_quality": {
+            "score": 95.7,
+            "color_temp": 95.7
+          },
+          "hash": "e5c6d60f7dff137a0b6a4dd78ae0d892"
         },
         {
           "aliases": [
@@ -19352,10 +21246,14 @@
           "max_power": 5.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "25f979fadaca113c3773b387eea3715c"
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
+          "hash": "de4806bcc1e3a9229480a0ef5de8974e"
         },
         {
           "manufacturer": "lsc",
@@ -19383,6 +21281,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
           "hash": "b557836a8d88be0cf3382263ba4a163f"
         }
       ],
@@ -19421,6 +21323,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
           "hash": "608facbef1baf8b5a47cc85408f3d888"
         },
         {
@@ -19447,10 +21353,14 @@
           "max_power": 13.85,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "8db807285318df0f4a3c3f63c8b22aac"
+          "lut_quality": {
+            "score": 98.3,
+            "color_temp": 98.3
+          },
+          "hash": "5f663646f65aa6fdb35eb2c80ae8ac5d"
         }
       ],
       "device_types": [
@@ -19490,6 +21400,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.6,
+            "brightness": 98.6
+          },
           "hash": "293df345d24fc6fc61f58f4ceb08ae5f"
         },
         {
@@ -19517,6 +21431,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 98.7,
+            "brightness": 98.7
+          },
           "hash": "68277b86fd5f1bede02a4a42bd42ca7e"
         }
       ],
@@ -19595,10 +21513,14 @@
           "max_power": 13.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "f521c53168ed0915352a03421ba44dd8"
+          "lut_quality": {
+            "score": 97.8,
+            "color_temp": 97.8
+          },
+          "hash": "bfcd317f1d939db26bb57120d9244786"
         }
       ],
       "device_types": [
@@ -19725,11 +21647,16 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "brightness",
-            "color_temp"
+            "hs"
           ],
-          "hash": "c3441827940212848dcd1f43613fc60c"
+          "lut_quality": {
+            "score": 93.8,
+            "brightness": 98.8,
+            "color_temp": 93.8
+          },
+          "hash": "04c85f9581514ff23e017ca8eb7c465b"
         },
         {
           "aliases": [
@@ -19834,10 +21761,14 @@
           "max_power": 9.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "7821b2640019af053927f9f15521a809"
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
+          "hash": "62d7ebb4b05d6aaa2d36fcfd81ea1080"
         },
         {
           "aliases": [
@@ -19962,10 +21893,14 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
-          "hash": "91907e51cf07c0a4303501bc63f00d76"
+          "lut_quality": {
+            "score": 99.4,
+            "brightness": 99.4
+          },
+          "hash": "a5eb5f6ed2fcd5a30289e68ce713235e"
         },
         {
           "calculation_strategy": "fixed",
@@ -20087,6 +22022,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 99.0,
+            "brightness": 99.0
+          },
           "hash": "5f582eca5ae8234d5d0fedf0cdc0c15c"
         }
       ],
@@ -20208,10 +22147,14 @@
           "max_power": 11.43,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "23740d4ce7ce33a49c8c51bcd694749d"
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "f235015719f0da978ab21ecaec8989b5"
         },
         {
           "aliases": [
@@ -20240,10 +22183,14 @@
           "max_power": 8.05,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e9af46658ce669e61e8e4f9aaed13aad"
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "ad60cd049cde75a0e694970a359aa028"
         }
       ],
       "device_types": [
@@ -20589,6 +22536,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 95.4,
+            "brightness": 95.4
+          },
           "hash": "2b6bff0d6f65b2c4f51cd308ffc13b36"
         }
       ],
@@ -20627,10 +22578,14 @@
           "max_power": 4.53,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "34bf90baf6fbc255a171a94fd0e1ec79"
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
+          "hash": "5e48822f92699ee09a4092da9bc12b2d"
         }
       ],
       "device_types": [
@@ -20669,10 +22624,14 @@
           "max_power": 12.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "a5a165903b4bcdaaf697c0bf6bf4ad2b"
+          "lut_quality": {
+            "score": 74.8,
+            "color_temp": 74.8
+          },
+          "hash": "3aeb414f6103964118ad4240b8c268db"
         },
         {
           "calculation_strategy": "fixed",
@@ -20762,10 +22721,14 @@
           "max_power": 4.88,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "614a57be1e4a6dedd262b53ad2296960"
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
+          "hash": "23b237634719d392c0a334a7037d3574"
         }
       ],
       "device_types": [
@@ -21329,6 +23292,10 @@
           "color_modes": [
             "color_temp"
           ],
+          "lut_quality": {
+            "score": 98.4,
+            "color_temp": 98.4
+          },
           "hash": "61551b5fd8d55611cfe69ba2f1f25e3c"
         },
         {
@@ -21358,6 +23325,10 @@
           "color_modes": [
             "brightness"
           ],
+          "lut_quality": {
+            "score": 97.6,
+            "brightness": 97.6
+          },
           "hash": "e1e8322f826a3631c023d0ad74b518c4"
         }
       ],
@@ -21398,10 +23369,14 @@
           "max_power": 8.09,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "715366c6eb4e47cfd3f1b0ad4087e79a"
+          "lut_quality": {
+            "score": 71.2,
+            "color_temp": 71.2
+          },
+          "hash": "31b16939c8b72a4a5599b3e6da79c835"
         }
       ],
       "device_types": [
@@ -21438,10 +23413,14 @@
           "max_power": 9.3,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "34289c4404c295dbcc655401fc312317"
+          "lut_quality": {
+            "score": 97.8,
+            "color_temp": 97.8
+          },
+          "hash": "ac186c8e93b5d58a1c26f0f705f9925c"
         }
       ],
       "device_types": [
@@ -21478,10 +23457,14 @@
           "max_power": 3.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "43b77f7c48708c9d60031d8f359d0a10"
+          "lut_quality": {
+            "score": 92.0,
+            "color_temp": 92.0
+          },
+          "hash": "332b22a63b87449963eab0ccdb42ef1e"
         }
       ],
       "device_types": [
@@ -21579,10 +23562,14 @@
           "max_power": 6.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "212623e9131535f3b80aa9023a6e182b"
+          "lut_quality": {
+            "score": 24.3,
+            "color_temp": 24.3
+          },
+          "hash": "12026b623a8f535e5d67a2d7c8afe9b9"
         },
         {
           "calculation_strategy": "lut",
@@ -21608,11 +23595,15 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "67fff11bd53e1f81fb6707d353fbc8e5"
+          "lut_quality": {
+            "score": 99.3,
+            "color_temp": 99.3
+          },
+          "hash": "30cde2c540d5cd10b73832a755f51e7f"
         },
         {
           "calculation_strategy": "lut",
@@ -21637,11 +23628,15 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "66f5be0c62afcccd2e020ed94d717b26"
+          "lut_quality": {
+            "score": 98.4,
+            "color_temp": 98.4
+          },
+          "hash": "666b894e907ac6f971546ace1b7a0767"
         },
         {
           "calculation_strategy": "lut",
@@ -21667,10 +23662,14 @@
           "max_power": 5.25,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "986fd60e048b57f1e3c6ee3f87fe0249"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "dba770a7f548289afeb4a80cf4d5f5a2"
         },
         {
           "calculation_strategy": "lut",
@@ -21696,11 +23695,15 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "347dccdc40c55ed91cee4dc184508804"
+          "lut_quality": {
+            "score": 67.4,
+            "color_temp": 67.4
+          },
+          "hash": "9f15b887766b12857c22e6544132b0eb"
         },
         {
           "calculation_strategy": "lut",
@@ -21726,10 +23729,14 @@
           "max_power": 4.47,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "bbba167dfd9be6a7e48f79d47a34f48c"
+          "lut_quality": {
+            "score": 98.4,
+            "color_temp": 98.4
+          },
+          "hash": "56da338f455e0f5536db4ab0a0460256"
         },
         {
           "calculation_strategy": "lut",
@@ -21755,10 +23762,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "525bd620d6961bebe74f82cb3204db96"
+          "hash": "06ae899b8045b93c59c775f3cfcc4fed"
         },
         {
           "calculation_strategy": "lut",
@@ -21784,10 +23791,14 @@
           "max_power": 35.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "75ddacedd584acc0d06d37af7c97ab36"
+          "lut_quality": {
+            "score": 60.7,
+            "color_temp": 60.7
+          },
+          "hash": "1f0145cfe844f1f65c354161d4af4c26"
         },
         {
           "calculation_strategy": "lut",
@@ -21813,11 +23824,15 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "effect",
-            "color_temp"
+            "hs"
           ],
-          "hash": "bee8b8023e3762f8ce2e6d1b75c008af"
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
+          "hash": "780cbdcc1e2aa6f53662740818a1b57b"
         },
         {
           "calculation_strategy": "lut",
@@ -21843,10 +23858,14 @@
           "max_power": 28.07,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "1c2889fb398a5416861aea89e1d74d29"
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
+          "hash": "d13dfac475844ed5b1acb27c3ee2092b"
         },
         {
           "calculation_strategy": "lut",
@@ -21872,10 +23891,14 @@
           "max_power": 13.15,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "e763a1dacb9ff8ec290735818fe15f84"
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "97a8aa1e5d306a3bbf15611a6917ae6c"
         },
         {
           "calculation_strategy": "lut",
@@ -21900,11 +23923,16 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
+            "color_temp",
             "brightness",
-            "color_temp"
+            "hs"
           ],
-          "hash": "3deced5ec803df9d96aae94d303d4e6b"
+          "lut_quality": {
+            "score": 84.6,
+            "brightness": 98.9,
+            "color_temp": 84.6
+          },
+          "hash": "d2fc9d455ad6b16d246bfce3c4adf242"
         },
         {
           "calculation_strategy": "lut",
@@ -21930,10 +23958,14 @@
           "max_power": 23.75,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "color_temp"
+            "color_temp",
+            "hs"
           ],
-          "hash": "83d3954b89dc7e1a66febf0e31b34293"
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "19197de55aebbb6b4a5a028e72dd8c07"
         }
       ],
       "device_types": [
