@@ -32,31 +32,33 @@ async def test_color_temp_lut(hass: HomeAssistant) -> None:
 
     source_entity = create_source_entity(LIGHT_DOMAIN)
 
-    strategy = await _create_lut_strategy(hass, "signify", "LCT010", source_entity)
+    strategy = await _create_lut_strategy(hass, "test", "lut_color", source_entity)
     await strategy.validate_config()
 
+    # Exact match on both brightness and mired
     await _calculate_and_assert_power(
         strategy,
         state=_create_light_color_temp_state(brightness=100, color_temp=300),
-        expected_power=2.5,
+        expected_power=3.2,
     )
 
+    # Brightness interpolated between 100 (3.4) and 200 (5.4)
     await _calculate_and_assert_power(
         strategy,
         state=_create_light_color_temp_state(brightness=144, color_temp=450),
-        expected_power=3.01,
+        expected_power=4.28,
     )
 
-    # Out of bound values
+    # Out of bound values, lowest / highest brightness and nearest mired is used
     await _calculate_and_assert_power(
         strategy,
         state=_create_light_color_temp_state(brightness=-6, color_temp=170),
-        expected_power=2.03,
+        expected_power=1.0,
     )
     await _calculate_and_assert_power(
         strategy,
         state=_create_light_color_temp_state(brightness=300, color_temp=400),
-        expected_power=7.34,
+        expected_power=7.4,
     )
 
 
@@ -87,13 +89,13 @@ async def test_hs_lut(hass: HomeAssistant) -> None:
 
     source_entity = create_source_entity(LIGHT_DOMAIN)
 
-    strategy = await _create_lut_strategy(hass, "signify", "LCT010", source_entity)
+    strategy = await _create_lut_strategy(hass, "test", "lut_color", source_entity)
     await strategy.validate_config()
 
     await _calculate_and_assert_power(
         strategy,
         state=_create_light_hs_state(100, 200, 300),
-        expected_power=1.53,
+        expected_power=2.2,
     )
 
 
@@ -242,7 +244,7 @@ async def test_hs_lut_attribute_none(hass: HomeAssistant, caplog: pytest.LogCapt
     caplog.set_level(logging.ERROR)
     source_entity = create_source_entity(LIGHT_DOMAIN)
 
-    strategy = await _create_lut_strategy(hass, "signify", "LCT010", source_entity)
+    strategy = await _create_lut_strategy(hass, "test", "lut_color", source_entity)
     await strategy.validate_config()
 
     state = State(
@@ -292,7 +294,7 @@ async def test_no_power_when_no_brightness_available(
 ) -> None:
     """When brightness attribute is not available on state return no power, logged at warning"""
     caplog.set_level(logging.WARNING)
-    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
+    strategy = await _create_lut_strategy(hass, "test", "lut_color")
 
     state = State("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.BRIGHTNESS})
     assert not await strategy.calculate(state)
@@ -306,7 +308,7 @@ async def test_color_mode_unknown_is_handled_gracefully(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.at_level(logging.ERROR)
-    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
+    strategy = await _create_lut_strategy(hass, "test", "lut_color")
 
     state = State(
         "light.test",
@@ -323,7 +325,7 @@ async def test_error_is_logged_when_color_temp_unavailable(
 ) -> None:
     """Test error is logged when color_temp attribute is not available"""
 
-    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
+    strategy = await _create_lut_strategy(hass, "test", "lut_color")
 
     state = State(
         "light.test",
@@ -434,7 +436,7 @@ async def test_warning_is_logged_when_color_mode_is_unknown(
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2323
     """
     caplog.set_level(logging.WARNING)
-    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
+    strategy = await _create_lut_strategy(hass, "test", "lut_color")
 
     assert not await strategy.calculate(State("light.test", STATE_ON, attributes))
     assert "color mode unknown" in caplog.text
