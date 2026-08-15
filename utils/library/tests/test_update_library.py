@@ -30,6 +30,15 @@ def test_process_model_file_adds_lut_quality(tmp_path: Path) -> None:
     assert 0 < model["lut_quality"]["score"] < 100
 
 
+def test_process_model_file_survives_an_unreadable_lut(tmp_path: Path) -> None:
+    model_directory = create_model_directory(tmp_path)
+    (model_directory / "brightness.csv.gz").write_bytes(b"not gzip")
+
+    model = asyncio.run(process_model_file(str(model_directory / "model.json")))
+
+    assert "lut_quality" not in model
+
+
 def test_process_model_file_omits_lut_quality_without_lut_files(tmp_path: Path) -> None:
     model_directory = create_model_directory(tmp_path, calculation_strategy="fixed")
 

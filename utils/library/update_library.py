@@ -277,7 +277,7 @@ async def process_model_file(json_path: str) -> dict[str, Any]:
             get_max_power(model_directory, model_data),
             asyncio.to_thread(get_sub_profile_count, model_directory),
             get_color_modes(model_directory),
-            asyncio.to_thread(score_profile_directory, Path(model_directory)),
+            asyncio.to_thread(get_lut_quality, model_directory),
         )
 
         model_data.update(
@@ -300,6 +300,20 @@ async def process_model_file(json_path: str) -> dict[str, Any]:
             model_data["lut_quality"] = lut_quality
 
         return model_data
+
+
+def get_lut_quality(model_directory: str) -> dict[str, float]:
+    """Score the LUT files of a profile, leaving the score off when they cannot be read.
+
+    A malformed CSV is already caught by the validate-lut-files workflow. Should one slip
+    through anyway, only that profile loses its score rather than the whole library index
+    failing to regenerate over a cosmetic field.
+    """
+    try:
+        return score_profile_directory(Path(model_directory))
+    except (ValueError, OSError, EOFError, UnicodeDecodeError, csv.Error) as error:
+        print(f"Error scoring LUT quality for {model_directory}: {error}")
+        return {}
 
 
 async def get_color_modes(model_directory: str) -> set[str]:
