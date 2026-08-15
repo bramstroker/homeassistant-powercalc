@@ -3039,10 +3039,10 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "brightness"
+            "brightness",
+            "color_temp"
           ],
-          "hash": "51d6a5a799c60715b1116bb7fde6df41"
+          "hash": "24fd57573ae45a89adc35b6a1a181546"
         },
         {
           "aliases": [
@@ -5585,11 +5585,11 @@
           "max_power": null,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "d3fd4b6463a8f50891539274ba4e8a1e"
+          "hash": "d632a286106a411b48f52c300a08e854"
         },
         {
           "calculation_strategy": "lut",
@@ -12196,11 +12196,11 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "hs",
-            "color_temp",
-            "brightness"
+            "color_temp"
           ],
-          "hash": "ad2149c3ca2e8960b71cd50283e6ccaa"
+          "hash": "7a12ce1ccc7d04822c72c686efa8181f"
         }
       ],
       "device_types": [
@@ -13651,10 +13651,10 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "brightness"
+            "brightness",
+            "effect"
           ],
-          "hash": "59bfe229e936e3b5c259fab7a0fbb28b"
+          "hash": "728e12409f1fa364a4a7b3abb6498a73"
         },
         {
           "calculation_strategy": "lut",
@@ -14764,11 +14764,11 @@
           "max_power": 11.63,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "38ec6ec8fe56f55e5da478c4fb774bcf"
+          "hash": "f570afaeec4abbaf863579b01dd334a3"
         },
         {
           "calculation_strategy": "lut",
@@ -15712,11 +15712,11 @@
           "max_power": 5.16,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "1548c246f3d6e79b167c56c1cf4b4294"
+          "hash": "4be76f083116ce04fa457dff30423b1a"
         },
         {
           "aliases": [
@@ -16217,11 +16217,11 @@
           "max_power": 11.86,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "dba99382a0b631d67a623a113df77f73"
+          "hash": "abfd7c86c6eee830bd6785085fd67da0"
         },
         {
           "aliases": [
@@ -17140,11 +17140,11 @@
           "max_power": 7.25,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "a6bc34f5bf108a2959f79463bd4e8ffe"
+          "hash": "70e1890f383a0f93fe9805bb5e8521a4"
         },
         {
           "aliases": [
@@ -17198,11 +17198,11 @@
           "max_power": 29.03,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "0f28345a7b8cd287401e5928b91db4b6"
+          "hash": "98845113738f0d89ac742b2a9c0a063c"
         },
         {
           "calculation_strategy": "lut",
@@ -17439,7 +17439,7 @@
           "calculation_strategy": "lut",
           "created_at": "2021-06-11T22:01:53Z",
           "device_type": "light",
-          "measure_device": "Shelly Plug S",
+          "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "name": "Hue White and Color Ambiance A19 E26 (Gen 3)",
           "standby_power": 0.35,
@@ -17450,14 +17450,15 @@
           },
           "id": "LCT010",
           "manufacturer": "signify",
-          "updated_at": "2026-07-18T07:09:16",
-          "max_power": 9.4,
+          "updated_at": "2026-08-15T06:11:24",
+          "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
             "color_temp"
           ],
-          "hash": "e8e76705f87115ed65eeb771652468f5"
+          "hash": "e87bd5852a69ec58d1e7322a984c8440"
         },
         {
           "aliases": [
@@ -17849,11 +17850,11 @@
           "max_power": 4.81,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "3857dba79736baf73915fc4957ea3253"
+          "hash": "69684c306bd60e9b7e0a75fb50efe329"
         },
         {
           "aliases": [],
@@ -17959,11 +17960,11 @@
           "max_power": 41.45,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "cc27a4eb0255d818dcbcb0a4ce36fc2b"
+          "hash": "aad1e512640300883bdb1d989bc93b55"
         },
         {
           "aliases": [
@@ -19319,11 +19320,11 @@
           "max_power": 9.9,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "3f41e34317346db133dd4232cdad79ea"
+          "hash": "8f36a42c3c0a842c6f41a05b0f0afef8"
         },
         {
           "aliases": [
@@ -19724,11 +19725,11 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "hs",
-            "color_temp",
-            "brightness"
+            "color_temp"
           ],
-          "hash": "289d646379cdaa072d4afaf806504ab9"
+          "hash": "7179005f12a9f1cf1713816e058b172e"
         },
         {
           "aliases": [
@@ -19961,10 +19962,10 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
-          "hash": "12913c146371fe0a2b9f386046cd1f0f"
+          "hash": "6135cea77f7d32aec4a5646dd461871b"
         },
         {
           "calculation_strategy": "fixed",
@@ -21607,11 +21608,11 @@
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "71c8875394f747fb35013b1ebab67211"
+          "hash": "10c323024441fe359a6784124386447d"
         },
         {
           "calculation_strategy": "lut",
@@ -21636,11 +21637,11 @@
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "96b36d43556fae919943b19b48ea9854"
+          "hash": "4986196a91a657b6b4b7fb2b1347ab0b"
         },
         {
           "calculation_strategy": "lut",
@@ -21695,11 +21696,11 @@
           "max_power": 36.45,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "e65b6c7abea8589046ff1e7777701aa6"
+          "hash": "b7a7cd64e71820c63902c9f405438a64"
         },
         {
           "calculation_strategy": "lut",
@@ -21754,10 +21755,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "ceb603b38d6ba3905b3d3e1cf6738668"
+          "hash": "f4756a1109913ce568c7f640740be28f"
         },
         {
           "calculation_strategy": "lut",
@@ -21812,11 +21813,11 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "color_modes": [
+            "effect",
             "hs",
-            "color_temp",
-            "effect"
+            "color_temp"
           ],
-          "hash": "be7a890101c27878946fbc1863a38678"
+          "hash": "f74977e382e21aba5fb874c8a56d6db9"
         },
         {
           "calculation_strategy": "lut",
@@ -21899,11 +21900,11 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
+            "brightness",
             "hs",
-            "color_temp",
-            "brightness"
+            "color_temp"
           ],
-          "hash": "e19b3d27b36c570fe2895510672c325e"
+          "hash": "a23d75edfc1e7ea021bf5b515801268e"
         },
         {
           "calculation_strategy": "lut",
