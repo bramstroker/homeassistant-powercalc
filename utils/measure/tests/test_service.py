@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import HassLightControllerSpec
 from measure.ha_app.coordinator import SessionExecutionContext
-from measure.ha_app.service import MeasurementService, SessionDummyLoadCalibrationStore, _redact
+from measure.ha_app.service import MeasurementService, SessionDummyLoadCalibrationStore, _redact_secrets
 from measure.ha_app.session import (
     SessionControl,
     SessionEvent,
@@ -73,7 +73,9 @@ def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None
 
 
 def test_sensitive_values_are_redacted_from_session_messages() -> None:
-    assert _redact("Authorization: Bearer secret-token", ("secret-token",)) == "Authorization: Bearer [REDACTED]"
+    redacted = _redact_secrets("Authorization: Bearer secret-token", ("secret-token",))
+
+    assert redacted == "Authorization: Bearer [REDACTED]"
 
 
 def test_service_uses_explicit_session_id_for_dummy_load_storage(tmp_path: Path) -> None:

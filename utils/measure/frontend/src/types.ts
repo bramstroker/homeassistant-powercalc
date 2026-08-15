@@ -15,8 +15,9 @@ export type SessionState =
 export type LutMode = "brightness" | "color_temp" | "hs" | "effect";
 export type DeviceClass = "power" | "voltage";
 export type ChargingDeviceType = "vacuum_robot" | "lawn_mower_robot";
-export type ResumePolicy = "new" | "resume" | "overwrite";
-export type PowerMeterKind = PowerMeterSpec["type"];
+export type ResumePolicy = "new" | "resume";
+/** Derived from the spec union so a new meter variant automatically widens it. */
+export type PowerMeterType = PowerMeterSpec["type"];
 
 export type OperatingPoint =
   | { type: "light"; on: boolean; brightness?: number; color_temp_mired?: number; hue?: number; saturation?: number; effect?: string }
@@ -63,12 +64,13 @@ export interface MeasurementParameters {
   measure_time_effect_min: number;
 }
 
-export type MeasureDefaults = MeasurementParameters;
+/** Name of a tuning parameter, so a lookup keyed by one cannot name a parameter that does not exist. */
+export type MeasureParameterName = keyof MeasurementParameters;
 
 export interface Capabilities {
   runtime_version: string;
-  defaults: MeasureDefaults;
-  limits?: Record<string, { min: number; max: number }>;
+  defaults: MeasurementParameters;
+  limits?: Partial<Record<MeasureParameterName, { min: number; max: number }>>;
   developer_mode?: boolean;
   fast_test_mode?: boolean;
 }
@@ -113,14 +115,14 @@ export interface FormField {
 
 /** A tuning parameter as one measure type presents it. Bounds come from `Capabilities.limits`. */
 export interface MeasureParameter {
-  name: string;
+  name: MeasureParameterName;
   label: string;
   hint?: string;
   step?: string;
   /** Heading this parameter is grouped under, repeated on each member of the group. */
   group?: string;
   /** Only applies while the named parameter is greater than one. */
-  requires_multiple?: string | null;
+  requires_multiple?: MeasureParameterName | null;
 }
 
 export interface MeasureDefinition {
@@ -161,13 +163,11 @@ export interface DummyLoadCalibration {
   power_meter_fingerprint?: string;
 }
 
-export interface AppMeasurementDefaults {
-  sleep_time: number;
-  sample_count: number;
-  sleep_time_sample: number;
-  max_retries: number;
-  max_nudges: number;
-}
+/** The subset of tuning parameters the app keeps as reusable defaults across sessions. */
+export type AppMeasurementDefaults = Pick<
+  MeasurementParameters,
+  "sleep_time" | "sample_count" | "sleep_time_sample" | "max_retries" | "max_nudges"
+>;
 
 export type PowerMeterSpec =
   | { type: "dummy" }
@@ -189,7 +189,6 @@ export interface LightMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "light";
   controller: LightControllerSpec;
   modes: LutMode[];
-  generate_model: boolean;
   gzip: boolean;
   multiple_light_count: number;
 }
@@ -239,8 +238,11 @@ export interface SessionProgress {
 export interface SessionSnapshot {
   session_id?: string;
   state: SessionState;
+  created_at?: string;
+  updated_at?: string;
   phase?: string;
   confirmation_message?: string | null;
+  confirmation_action?: string | null;
   mode?: string | null;
   progress?: SessionProgress;
   warnings?: string[];
@@ -248,6 +250,29 @@ export interface SessionSnapshot {
   summary?: Record<string, string> | null;
   request?: MeasurementRequest;
   operating_point?: OperatingPoint | null;
+  calibration_sample?: {
+    power: number;
+    resistance: number;
+    voltage: number;
+  } | null;
+}
+
+export interface SessionSummary {
+  session_id: string;
+  state: SessionState;
+  created_at: string;
+  updated_at: string;
+  measure_type: MeasureType;
+  model_id: string;
+  product_name: string;
+  measure_device: string;
+  completed: number;
+  total: number;
+  percent: number;
+  can_resume: boolean;
+  file_count: number;
+  size: number;
+  active: boolean;
 }
 
 export interface SessionFile {
@@ -284,21 +309,40 @@ export interface PlotCollection {
   warnings: string[];
 }
 
+/** A collection with nothing plotted yet, used as the initial and the reset value. */
+export function emptyPlots(warnings: string[] = []): PlotCollection {
+  return { partial: false, plots: [], warnings };
+}
+
+/**
+ * Payload of a regular session event. Progress, phase and state all reach the app through the
+ * snapshot that rides along with the event, so only live/log fields are read from the payload.
+ */
 export interface SessionEventData {
   message?: string;
   power?: number;
-  completed?: number;
-  total?: number;
-  skipped?: number;
-  mode?: string;
-  estimated_remaining?: string;
-  state?: SessionState;
-  error?: string | null;
+  resistance?: number;
+  voltage?: number;
 }
+
+/** Event types the stream subscribes to. The server sends each one as its own SSE event name. */
+export const REGULAR_SESSION_EVENT_TYPES = [
+  "phase",
+  "progress",
+  "state",
+  "warning",
+  "log",
+  "checkpoint",
+  "heartbeat",
+  "sample",
+  "calibration_sample",
+] as const;
+
+export const SESSION_EVENT_TYPES = [...REGULAR_SESSION_EVENT_TYPES, "operating_point"] as const;
 
 interface RegularSessionEvent {
   sequence: number;
-  type: "phase" | "progress" | "state" | "warning" | "log" | "checkpoint" | "heartbeat" | "sample";
+  type: (typeof REGULAR_SESSION_EVENT_TYPES)[number];
   data: SessionEventData;
   snapshot?: SessionSnapshot;
 }
@@ -315,7 +359,7 @@ export type SessionEvent = RegularSessionEvent | OperatingPointSessionEvent;
 export interface AppSettings {
   default_power_entity_id: string | null;
   default_measure_device: string | null;
-  power_meter: PowerMeterKind | null;
+  power_meter: PowerMeterType | null;
   shelly_ip: string | null;
   shelly_username?: string;
   shelly_password_configured?: boolean;

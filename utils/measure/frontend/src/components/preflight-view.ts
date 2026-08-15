@@ -1,47 +1,43 @@
 import { LitElement, css, html, nothing } from "lit";
+import { customElement, property } from "lit/decorators.js";
+import type { LabelledValue } from "../review-summary";
 import type { ErrorHelp, PowerMeterDiagnostic, PreflightResponse } from "../types";
+import { emit } from "../events";
 import { sharedStyles } from "../styles";
 import { errorHelpLink } from "./error-help-link";
 import "./power-meter-diagnostic";
 
-export interface ReviewMetric {
-  label: string;
-  value: string;
-}
-
-export interface ReviewRow {
-  label: string;
-  value: string;
-}
-
+@customElement("measure-preflight-view")
 export class PreflightView extends LitElement {
-  static readonly properties = {
-    title: { type: String },
-    metrics: { attribute: false },
-    summary: { attribute: false },
-    warnings: { attribute: false },
-    powerMeterDiagnostic: { attribute: false },
-    lightLoadProbe: { attribute: false },
-    canOverwrite: { type: Boolean },
-    confirmationAction: { type: String },
-    busy: { type: Boolean },
-    errorMessage: { type: String },
-    errorHelp: { attribute: false },
-    overwriteConfirmed: { type: Boolean },
-  };
-
+  @property({ type: String })
   title = "Ready for the bench";
-  metrics: ReviewMetric[] = [];
-  summary: ReviewRow[] = [];
+
+  @property({ attribute: false })
+  metrics: LabelledValue[] = [];
+
+  @property({ attribute: false })
+  summary: LabelledValue[] = [];
+
+  @property({ attribute: false })
   warnings: string[] = [];
+
+  @property({ attribute: false })
   powerMeterDiagnostic?: PowerMeterDiagnostic | null;
+
+  @property({ attribute: false })
   lightLoadProbe?: PreflightResponse["light_load_probe"];
-  canOverwrite = false;
+
+  @property({ type: String })
   confirmationAction = "";
+
+  @property({ type: Boolean })
   busy = false;
+
+  @property({ type: String })
   errorMessage = "";
+
+  @property({ attribute: false })
   errorHelp?: ErrorHelp;
-  overwriteConfirmed = false;
 
   static readonly styles = [sharedStyles, css`
     .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); margin-bottom: 1rem; }
@@ -58,7 +54,6 @@ export class PreflightView extends LitElement {
     .starting-indicator { width: 22px; height: 22px; flex: none; border: 2px solid var(--line); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
     .starting strong, .starting span { display: block; }
     .starting span { margin-top: 0.2rem; color: var(--muted); font-size: 0.86rem; }
-    @keyframes spin { to { transform: rotate(360deg); } }
     @media (max-width: 640px) { dl { grid-template-columns: 1fr; gap: 0.2rem; } dd { margin-bottom: 0.6rem; } }
     @media (prefers-reduced-motion: reduce) { .starting-indicator { animation: none; } }
   `];
@@ -93,9 +88,6 @@ export class PreflightView extends LitElement {
         ${this.warnings.length ? html`
           <div class="notice"><strong>Check before starting</strong><ul class="warning-list">${this.warnings.map((warning) => html`<li>${warning}</li>`)}</ul></div>
         ` : nothing}
-        ${this.canOverwrite ? html`
-          <label><input type="checkbox" @change=${this.confirmOverwrite} /> I understand the previous measurement and its files will be deleted.</label>
-        ` : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${this.busy ? html`
           <div class="notice starting" role="status" aria-live="polite">
@@ -105,7 +97,7 @@ export class PreflightView extends LitElement {
         ` : nothing}
         <div class="actions">
           <button type="button" @click=${() => this.emit("back")} ?disabled=${this.busy}>Back</button>
-          <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy || (this.canOverwrite && !this.overwriteConfirmed)}>${this.startButtonLabel()}</button>
+          <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy}>${this.startButtonLabel()}</button>
         </div>
       </section>
     `;
@@ -116,13 +108,7 @@ export class PreflightView extends LitElement {
     return this.confirmationAction ? "Prepare measurement" : "Start measurement";
   }
 
-  private confirmOverwrite(event: Event): void {
-    this.overwriteConfirmed = (event.currentTarget as HTMLInputElement).checked;
-  }
-
   private emit(name: "back" | "start"): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true }));
+    emit(this, name);
   }
 }
-
-customElements.define("measure-preflight-view", PreflightView);

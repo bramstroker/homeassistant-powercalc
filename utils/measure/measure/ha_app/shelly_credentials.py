@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import json
 from pathlib import Path
 
-from measure.contribution.files import write_json_atomic
+from measure.files import write_json_atomic
 
 
 @dataclass(frozen=True)

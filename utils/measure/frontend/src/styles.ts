@@ -1,4 +1,4 @@
-import { css } from "lit";
+import { css, html } from "lit";
 
 export const sharedStyles = css`
   :host {
@@ -69,14 +69,39 @@ export const sharedStyles = css`
   .notice.error { border-left-color: var(--danger); background: color-mix(in srgb, var(--danger) 9%, transparent); }
   .diagnostics-download { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 1rem; margin-top: 1.25rem; color: var(--muted); font-size: 0.78rem; }
   .diagnostics-download a { color: var(--signal-strong); font-weight: 700; white-space: nowrap; }
+  /* Form controls. Every view that renders inputs shares this baseline. */
+  label, fieldset { display: grid; gap: 0.4rem; min-width: 0; }
+  label > span, legend, .field-label { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+  fieldset { border: 0; padding: 0; margin: 0; }
+  input, select, textarea {
+    width: 100%; min-width: 0; max-width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 9px;
+    padding: 0.65rem 0.75rem; background: var(--field); color: var(--ink);
+  }
+  .check { display: flex; grid-template-columns: none; align-items: center; gap: 0.5rem; color: var(--ink); }
+  .check input { width: auto; min-height: auto; accent-color: var(--signal); }
+  .field-hint { color: var(--muted); font-size: 0.74rem; line-height: 1.4; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .context { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
   @media (max-width: 640px) {
     .actions { flex-direction: column-reverse; }
     .actions button { width: 100%; }
+    .grid { grid-template-columns: 1fr; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
   }
+`;
+
+/** The diagnostics download offered at the foot of the running and result views. */
+export const diagnosticsDownload = (url: string) => html`
+  <div class="diagnostics-download">
+    <span>Session snapshot and logs for issue reporting.</span>
+    <a href=${url} download>Download diagnostics</a>
+  </div>
 `;

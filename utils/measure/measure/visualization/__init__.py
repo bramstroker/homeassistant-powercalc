@@ -7,6 +7,7 @@ from measure.visualization.core import (
     PlotSpec,
     build_plot_from_file,
     build_session_plots,
+    limit_plot_points,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "PlotSpec",
     "build_plot_from_file",
     "build_session_plots",
+    "limit_plot_points",
 ]

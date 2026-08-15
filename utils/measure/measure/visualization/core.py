@@ -3,7 +3,7 @@
 from collections.abc import Iterable, Mapping, Sequence
 import colorsys
 import csv
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 import gzip
 import json
@@ -151,6 +151,17 @@ def build_plot_from_file(
         color_mode=resolved_mode,
         max_points=max_points,
     )
+
+
+def limit_plot_points(plot: PlotSpec, max_points: int) -> PlotSpec:
+    """Return the plot with every series downsampled to at most max_points."""
+
+    limit = _limit_line if plot.kind is PlotKind.LINE else _limit_scatter
+    limited: PlotSpec = replace(
+        plot,
+        series=tuple(replace(series, points=limit(series.points, max_points)) for series in plot.series),
+    )
+    return limited
 
 
 def _build_plot(

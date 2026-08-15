@@ -1,5 +1,4 @@
 from collections import deque
-from collections.abc import Collection
 import csv
 from dataclasses import replace
 import json
@@ -7,14 +6,16 @@ import logging
 import os
 from pathlib import Path
 import shutil
-from typing import Any, cast
+from typing import Any, TypeVar
 from uuid import uuid4
+
+from pydantic import BaseModel
 
 from measure.clock import utc_now
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.dummy_load import DummyLoadCalibration
-from measure.execution import OperatingPoint
+from measure.files import write_json_atomic
 from measure.ha_app.contribution.models import ContributionStatus
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.session import (
@@ -37,9 +38,17 @@ from measure.runner.light_plan import (
 
 _LOGGER = logging.getLogger("measure")
 
+_CURRENT_SESSION_FILENAME = "current.json"
 _DUMMY_LOAD_CALIBRATION_FILENAME = "dummy_load_calibration.json"
 _CONTRIBUTION_STATUS_FILENAME = "contribution_status.json"
 _SHELLY_CREDENTIALS_FILENAME = "shelly_credentials.json"
+
+#: Everything reading a persisted session document can raise: the directory is gone or
+#: unreadable, or the JSON no longer matches the model that wrote it. Callers treat all of
+#: these the same way — the session cannot be loaded — so they are caught as one set.
+SESSION_LOAD_ERRORS = (OSError, KeyError, TypeError, ValueError)
+
+_ModelT = TypeVar("_ModelT", bound=BaseModel)
 
 
 class SessionStorage:
@@ -52,6 +61,7 @@ class SessionStorage:
         # Requests are immutable per session; cache them so hot paths (SSE encoding)
         # do not re-read and re-validate the JSON document from disk.
         self._request_cache: dict[str, MeasurementRequest] = {}
+        self._shelly_credentials = ShellyCredentialStore(self.data_root / _SHELLY_CREDENTIALS_FILENAME)
 
     def session_directory(self, session_id: str) -> Path:
         if not session_id or not session_id.replace("-", "").isalnum():
@@ -70,21 +80,31 @@ class SessionStorage:
         self._write_json(directory / "request.json", request.model_dump(mode="json"))
         self._request_cache[snapshot.id] = request
         self.write_snapshot(snapshot)
-        self._write_json(self.data_root / "current.json", {"id": snapshot.id})
+        self._write_json(self.data_root / _CURRENT_SESSION_FILENAME, {"id": snapshot.id})
         return directory
+
+    def set_current(self, session_id: str) -> None:
+        """Point startup recovery at an existing session."""
+        self.load_snapshot(session_id)
+        self._write_json(self.data_root / _CURRENT_SESSION_FILENAME, {"id": session_id})
+
+    def clear_current(self, session_id: str | None = None) -> None:
+        """Remove the current pointer, optionally only when it names ``session_id``."""
+        path = self.data_root / _CURRENT_SESSION_FILENAME
+        if session_id is not None and path.exists():
+            try:
+                if str(self._read_json(path)["id"]) != session_id:
+                    return
+            except SESSION_LOAD_ERRORS:
+                pass
+        path.unlink(missing_ok=True)
 
     def delete_session(self, session_id: str) -> None:
         self._request_cache.pop(session_id, None)
         directory = self.session_directory(session_id)
         if directory.exists():
             shutil.rmtree(directory)
-
-    def prune_sessions(self, keep: Collection[str]) -> None:
-        """Delete persisted sessions other than ``keep`` so add-on storage stays bounded."""
-        for path in self.sessions_root.iterdir():
-            if path.is_dir() and path.name not in keep:
-                self._request_cache.pop(path.name, None)
-                shutil.rmtree(path, ignore_errors=True)
+        self.clear_current(session_id)
 
     def write_snapshot(self, snapshot: SessionSnapshot) -> None:
         directory = self.session_directory(snapshot.id)
@@ -119,7 +139,9 @@ class SessionStorage:
             try:
                 events.append(self._decode_event(pending_line))
             except json.JSONDecodeError:
-                _LOGGER.warning("Ignoring a truncated final session event for %s", session_id)
+                # The session id is caller-supplied, so keep it out of the log and report the
+                # recovered count instead — it says as much about where the file was cut off.
+                _LOGGER.warning("Ignoring a truncated final session event after %d recovered events", len(events))
         return tuple(events)
 
     @staticmethod
@@ -136,36 +158,14 @@ class SessionStorage:
         )
 
     def load_current(self) -> SessionSnapshot | None:
-        """Load the current snapshot and recover interrupted active sessions."""
-
-        current_path = self.data_root / "current.json"
+        """Load the current snapshot and recover an interrupted active session."""
+        current_path = self.data_root / _CURRENT_SESSION_FILENAME
         if not current_path.exists():
             return None
         try:
             session_id = str(self._read_json(current_path)["id"])
-            self.load_request(session_id)
-            state_path = self.session_directory(session_id) / "state.json"
-            state = self._read_json(state_path)
-            snapshot = SessionSnapshot(
-                id=str(state["id"]),
-                state=SessionState(state["state"]),
-                created_at=str(state["created_at"]),
-                updated_at=str(state["updated_at"]),
-                completed=int(state.get("completed", 0)),
-                total=int(state.get("total", 0)),
-                skipped=int(state.get("skipped", 0)),
-                phase=state.get("phase"),
-                confirmation_message=state.get("confirmation_message"),
-                mode=state.get("mode"),
-                estimated_remaining=state.get("estimated_remaining"),
-                error=state.get("error"),
-                files=tuple(state.get("files", [])),
-                warnings=tuple(state.get("warnings", [])),
-                event_sequence=int(state.get("event_sequence", 0)),
-                summary=state.get("summary"),
-                operating_point=cast(OperatingPoint | None, state.get("operating_point")),
-            )
-        except (OSError, KeyError, TypeError, ValueError) as error:
+            snapshot = self.load_snapshot(session_id)
+        except SESSION_LOAD_ERRORS as error:
             _LOGGER.warning("Discarding incompatible current session pointer: %s", error)
             current_path.unlink(missing_ok=True)
             return None
@@ -183,6 +183,54 @@ class SessionStorage:
             )
             self.write_snapshot(snapshot)
         return snapshot
+
+    def load_snapshot(self, session_id: str) -> SessionSnapshot:
+        """Load one persisted session without changing the current pointer."""
+        self.load_request(session_id)
+        state = self._read_json(self.session_directory(session_id) / "state.json")
+        snapshot = SessionSnapshot(
+            id=str(state["id"]),
+            state=SessionState(state["state"]),
+            created_at=str(state["created_at"]),
+            updated_at=str(state["updated_at"]),
+            completed=int(state.get("completed", 0)),
+            total=int(state.get("total", 0)),
+            skipped=int(state.get("skipped", 0)),
+            phase=state.get("phase"),
+            confirmation_message=state.get("confirmation_message"),
+            confirmation_action=state.get("confirmation_action"),
+            mode=state.get("mode"),
+            estimated_remaining=state.get("estimated_remaining"),
+            error=state.get("error"),
+            files=tuple(state.get("files", [])),
+            warnings=tuple(state.get("warnings", [])),
+            event_sequence=int(state.get("event_sequence", 0)),
+            summary=state.get("summary"),
+            operating_point=state.get("operating_point"),
+            calibration_sample=state.get("calibration_sample"),
+        )
+        if snapshot.id != session_id:
+            raise ValueError("Session state id does not match its directory")
+        return snapshot
+
+    def list_sessions(self) -> tuple[SessionSnapshot, ...]:
+        """Return valid persisted sessions, newest activity first."""
+        sessions: list[SessionSnapshot] = []
+        for path in self.sessions_root.iterdir():
+            if not path.is_dir() or path.is_symlink():
+                continue
+            try:
+                sessions.append(self.load_snapshot(path.name))
+            except SESSION_LOAD_ERRORS as error:
+                _LOGGER.warning("Ignoring incompatible measurement session %s: %s", path.name, error)
+        return tuple(sorted(sessions, key=lambda item: item.updated_at, reverse=True))
+
+    def session_size(self, session_id: str) -> int:
+        """Return the total size of regular files stored for one session."""
+        directory = self.session_directory(session_id)
+        if not directory.exists():
+            raise FileNotFoundError(session_id)
+        return sum(path.stat().st_size for path in directory.rglob("*") if path.is_file() and not path.is_symlink())
 
     def load_request(self, session_id: str) -> MeasurementRequest:
         cached = self._request_cache.get(session_id)
@@ -203,13 +251,8 @@ class SessionStorage:
 
     def load_settings(self) -> AppPreferences:
         path = self.data_root / "settings.json"
-        if not path.exists():
-            return AppPreferences()
-        try:
-            return AppPreferences.model_validate(self._read_json(path))
-        except (OSError, ValueError) as error:
-            _LOGGER.warning("Could not load persisted app settings; using defaults: %s", error)
-            return AppPreferences()
+        settings = self._load_model(path, AppPreferences, "persisted app settings; using defaults")
+        return settings if settings is not None else AppPreferences()
 
     def save_settings(self, settings: AppPreferences) -> AppPreferences:
         self._write_json(self.data_root / "settings.json", settings.model_dump(mode="json"))
@@ -217,26 +260,23 @@ class SessionStorage:
 
     def load_shelly_credentials(self) -> ShellyCredentials | None:
         try:
-            return ShellyCredentialStore(self.data_root / _SHELLY_CREDENTIALS_FILENAME).load()
+            return self._shelly_credentials.load()
         except (OSError, ValueError) as error:
             _LOGGER.warning("Could not load persisted Shelly credentials: %s", error)
             return None
 
     def save_shelly_credentials(self, credentials: ShellyCredentials) -> None:
-        ShellyCredentialStore(self.data_root / _SHELLY_CREDENTIALS_FILENAME).save(credentials)
+        self._shelly_credentials.save(credentials)
 
     def clear_shelly_credentials(self) -> None:
-        ShellyCredentialStore(self.data_root / _SHELLY_CREDENTIALS_FILENAME).clear()
+        self._shelly_credentials.clear()
 
     def load_dummy_load_calibration(self) -> DummyLoadCalibration | None:
-        path = self.data_root / _DUMMY_LOAD_CALIBRATION_FILENAME
-        if not path.exists():
-            return None
-        try:
-            return DummyLoadCalibration.model_validate(self._read_json(path))
-        except (OSError, ValueError) as error:
-            _LOGGER.warning("Ignoring invalid dummy-load calibration: %s", error)
-            return None
+        return self._load_model(
+            self.data_root / _DUMMY_LOAD_CALIBRATION_FILENAME,
+            DummyLoadCalibration,
+            "dummy-load calibration",
+        )
 
     def save_dummy_load_calibration(self, calibration: DummyLoadCalibration) -> DummyLoadCalibration:
         self._write_json(
@@ -246,14 +286,11 @@ class SessionStorage:
         return calibration
 
     def load_session_dummy_load_calibration(self, session_id: str) -> DummyLoadCalibration | None:
-        path = self.session_directory(session_id) / _DUMMY_LOAD_CALIBRATION_FILENAME
-        if not path.exists():
-            return None
-        try:
-            return DummyLoadCalibration.model_validate(self._read_json(path))
-        except (OSError, ValueError) as error:
-            _LOGGER.warning("Ignoring invalid session dummy-load calibration for %s: %s", session_id, error)
-            return None
+        return self._load_model(
+            self.session_directory(session_id) / _DUMMY_LOAD_CALIBRATION_FILENAME,
+            DummyLoadCalibration,
+            f"session dummy-load calibration for {session_id}",
+        )
 
     def save_session_dummy_load_calibration(
         self,
@@ -268,13 +305,8 @@ class SessionStorage:
 
     def load_contribution_status(self) -> ContributionStatus:
         path = self.data_root / _CONTRIBUTION_STATUS_FILENAME
-        if not path.exists():
-            return ContributionStatus()
-        try:
-            return ContributionStatus.model_validate(self._read_json(path))
-        except (OSError, ValueError) as error:
-            _LOGGER.warning("Ignoring invalid contribution status: %s", error)
-            return ContributionStatus()
+        status = self._load_model(path, ContributionStatus, "contribution status")
+        return status if status is not None else ContributionStatus()
 
     def save_contribution_status(self, status: ContributionStatus) -> None:
         self._write_json(self.data_root / _CONTRIBUTION_STATUS_FILENAME, status.model_dump(mode="json"))
@@ -283,7 +315,7 @@ class SessionStorage:
         """Return whether the session has a complete row matching its persisted request."""
         try:
             request = self.load_request(session_id)
-        except FileNotFoundError, KeyError, ValueError:
+        except SESSION_LOAD_ERRORS:
             return False
         if not isinstance(request, LightMeasurementRequest):
             return False
@@ -372,6 +404,17 @@ class SessionStorage:
             return variation.bri in {row.bri for row in plan_variations} and MIN_MIRED <= variation.ct <= MAX_MIRED
         return variation in plan_variations
 
+    def _load_model(self, path: Path, model: type[_ModelT], description: str) -> _ModelT | None:
+        """Load one optional JSON document, treating an unreadable or outdated file as absent."""
+
+        if not path.exists():
+            return None
+        try:
+            return model.model_validate(self._read_json(path))
+        except (OSError, ValueError) as error:
+            _LOGGER.warning("Ignoring invalid %s: %s", description, error)
+            return None
+
     @staticmethod
     def _read_json(path: Path) -> dict[str, Any]:
         with path.open(encoding="utf-8") as file:
@@ -382,12 +425,4 @@ class SessionStorage:
 
     @staticmethod
     def _write_json(path: Path, value: dict[str, Any]) -> None:
-        """Atomically replace a JSON document after flushing it to disk."""
-
-        path.parent.mkdir(parents=True, exist_ok=True)
-        temporary = path.with_suffix(path.suffix + ".tmp")
-        with temporary.open("w", encoding="utf-8") as file:
-            json.dump(value, file, indent=2, sort_keys=True, default=str)
-            file.flush()
-            os.fsync(file.fileno())
-        temporary.replace(path)
+        write_json_atomic(path, value)

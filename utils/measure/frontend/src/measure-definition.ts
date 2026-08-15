@@ -1,3 +1,4 @@
+import { formChecked, formList, formNumber, formText } from "./form";
 import type {
   BaseMeasurementRequest,
   Capabilities,
@@ -85,7 +86,7 @@ export function entityDomains(definition: MeasureDefinition, values?: FormData):
       const source = narrowingField(definition, field);
       if (!source) return field.entity_domains ?? [];
       // Without a submitted value every option is still reachable, so offer all their domains.
-      if (values) return [entityDomain(definition, field, text(values, source.name))];
+      if (values) return [entityDomain(definition, field, formText(values, source.name))];
       return source.options.map((option) => option.entity_domain);
     })
     // Lights already arrive with the startup catalog, so they are never fetched on demand.
@@ -109,14 +110,14 @@ export function buildMeasurementRequest(
   dummyController = false,
 ): MeasurementRequest {
   const base: BaseMeasurementRequest = {
-    model_id: text(form, "model_id") || "measurement",
-    product_name: text(form, "product_name") || definition.label,
+    model_id: formText(form, "model_id") || "measurement",
+    product_name: formText(form, "product_name") || definition.label,
     measure_device: measureDevice,
     power_meter: powerMeter,
     generate_model: definition.supports_profile,
     parameters: submittedParameters(definition, form, capabilities),
     // Only a resumable type offers the choice; the rest fall through to a fresh session.
-    resume_policy: (text(form, "resume_policy") || "new") as BaseMeasurementRequest["resume_policy"],
+    resume_policy: (formText(form, "resume_policy") || "new") as BaseMeasurementRequest["resume_policy"],
   };
 
   const declared: Record<string, unknown> = {};
@@ -136,7 +137,10 @@ export function buildMeasurementRequest(
 /** The controller spec a submitted entity field describes: a virtual device, one entity, or several. */
 function controllerSpec(form: FormData, field: FormField, dummyController: boolean): Record<string, unknown> {
   if (dummyController) return { type: "dummy" };
-  const entityIds = form.getAll(field.name).map((value) => String(value).trim()).filter(Boolean);
+  const entityIds = form.getAll(field.name)
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim())
+    .filter(Boolean);
   if (entityIds.length > 1) return { type: "hass_multi", entity_ids: entityIds };
   return { type: "hass", entity_id: entityIds[0] ?? "" };
 }
@@ -153,16 +157,7 @@ function submittedParameters(definition: MeasureDefinition, form: FormData, capa
 
 /** Read one submitted field, coerced to the type its declared control produces. */
 function formValue(form: FormData, field: FormField): FieldValue {
-  if (field.control === "boolean") return form.has(field.name);
-  if (field.control === "multi_select") return form.getAll(field.name).map(String);
-  return field.control === "number" ? number(form, field.name) : text(form, field.name);
-}
-
-function text(form: FormData, name: string): string {
-  const value = form.get(name);
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function number(form: FormData, name: string): number {
-  return Number(text(form, name));
+  if (field.control === "boolean") return formChecked(form, field.name);
+  if (field.control === "multi_select") return formList(form, field.name);
+  return field.control === "number" ? formNumber(form, field.name) : formText(form, field.name);
 }

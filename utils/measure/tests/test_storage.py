@@ -50,6 +50,35 @@ def test_storage_round_trips_current_session(tmp_path: Path) -> None:
     assert persisted_state["state"] == loaded.state
 
 
+def test_storage_lists_retained_sessions_and_clears_deleted_current_pointer(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    first = SessionSnapshot(
+        id="first-session",
+        state=SessionState.COMPLETED,
+        created_at="2026-07-12T12:00:00Z",
+        updated_at="2026-07-12T12:05:00Z",
+    )
+    second = SessionSnapshot(
+        id="second-session",
+        state=SessionState.CANCELLED,
+        created_at="2026-07-13T12:00:00Z",
+        updated_at="2026-07-13T12:05:00Z",
+    )
+    storage.create(first, light_request())
+    storage.create(second, light_request())
+    (storage.sessions_root / "incomplete-session").mkdir()
+
+    retained = storage.list_sessions()
+
+    assert [item.id for item in retained] == [second.id, first.id]
+    assert storage.session_size(first.id) > 0
+
+    storage.delete_session(second.id)
+
+    assert storage.load_current() is None
+    assert storage.load_snapshot(first.id) == first
+
+
 def test_storage_round_trips_bounded_event_replay(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
     current = snapshot()

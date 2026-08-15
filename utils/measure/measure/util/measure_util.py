@@ -71,6 +71,7 @@ class MeasureUtil:
         include_voltage: Callable[[], bool] | None = None,
         wait: Callable[[float], None] = time.sleep,
         on_sample: Callable[[float], None] | None = None,
+        on_calibration_sample: Callable[[float, float, float], None] | None = None,
     ) -> None:
         self.power_meter = power_meter
         self.dummy_load_value: float | None = None
@@ -78,6 +79,7 @@ class MeasureUtil:
         self._include_voltage = include_voltage or (lambda: False)
         self._wait = wait
         self._on_sample = on_sample
+        self._on_calibration_sample = on_calibration_sample
 
     def take_average_measurement(
         self,
@@ -243,6 +245,7 @@ class MeasureUtil:
 
         resistance = round((voltage**2) / power, 4)
         _LOGGER.debug("Measured resistance: %.2f Ω; measured power: %.2f W, voltage: %.2f", resistance, power, voltage)
+        self._emit_calibration_sample(power, resistance, voltage)
         return MeasurementResult(power=resistance, voltages=[voltage])
 
     def take_measurement(
@@ -398,6 +401,14 @@ class MeasureUtil:
             self._on_sample(power)
         except Exception:  # live feedback must not break a measurement
             _LOGGER.debug("Failed to emit live power sample", exc_info=True)
+
+    def _emit_calibration_sample(self, power: float, resistance: float, voltage: float) -> None:
+        if self._on_calibration_sample is None:
+            return
+        try:
+            self._on_calibration_sample(power, resistance, voltage)
+        except Exception:  # live feedback must not break a measurement
+            _LOGGER.debug("Failed to emit live dummy-load calibration sample", exc_info=True)
 
     @staticmethod
     def _get_voltages(measurement: PowerMeasurementResult) -> list[float]:

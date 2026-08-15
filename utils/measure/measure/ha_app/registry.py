@@ -85,7 +85,7 @@ class ParameterDefinition:
 
 @dataclass(frozen=True)
 class MeasurementDefinition:
-    kind: MeasureType
+    measure_type: MeasureType
     description: str
     icon: str
     confirmation_action: str | None = None
@@ -102,7 +102,7 @@ class MeasurementDefinition:
 
     @property
     def label(self) -> str:
-        return MEASURE_TYPE_LABELS[self.kind]
+        return MEASURE_TYPE_LABELS[self.measure_type]
 
 
 def _controller(
@@ -258,7 +258,7 @@ POWER_FIELD = FormFieldDefinition(
 
 MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
     MeasureType.LIGHT: MeasurementDefinition(
-        kind=MeasureType.LIGHT,
+        measure_type=MeasureType.LIGHT,
         description="Build a lookup-table power profile for a light.",
         icon="💡",
         model_id_example="LWA017",
@@ -282,7 +282,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         supports_resume=True,
     ),
     MeasureType.SPEAKER: MeasurementDefinition(
-        kind=MeasureType.SPEAKER,
+        measure_type=MeasureType.SPEAKER,
         description="Measure power across media-player volume levels.",
         icon="🔊",
         model_id_example="B7W64E",
@@ -306,7 +306,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         ),
     ),
     MeasureType.RECORDER: MeasurementDefinition(
-        kind=MeasureType.RECORDER,
+        measure_type=MeasureType.RECORDER,
         description="Record live power readings to a CSV file until cancelled.",
         icon="⏺",
         confirmation_action="Start recording",
@@ -323,7 +323,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         supports_profile=False,
     ),
     MeasureType.AVERAGE: MeasurementDefinition(
-        kind=MeasureType.AVERAGE,
+        measure_type=MeasureType.AVERAGE,
         description="Measure average power for a fixed duration.",
         icon="📊",
         confirmation_action="Start averaging",
@@ -342,7 +342,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         supports_profile=False,
     ),
     MeasureType.CHARGING: MeasurementDefinition(
-        kind=MeasureType.CHARGING,
+        measure_type=MeasureType.CHARGING,
         description="Measure charging power against battery level.",
         icon="🔋",
         model_id_example="s6_maxv",
@@ -377,7 +377,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         ),
     ),
     MeasureType.FAN: MeasurementDefinition(
-        kind=MeasureType.FAN,
+        measure_type=MeasureType.FAN,
         description="Measure fan power across percentage levels.",
         icon="🌀",
         model_id_example="TP07",

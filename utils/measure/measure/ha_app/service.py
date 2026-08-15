@@ -29,7 +29,7 @@ class _SessionLogHandler(logging.Handler):
         if _SESSION_LOG_CONTROL.get() is not self.control:
             return
         try:
-            message = _redact(record.getMessage(), self.secrets)
+            message = _redact_secrets(record.getMessage(), self.secrets)
             if record.levelno < logging.WARNING and message.startswith(("Changing light to:", "Measured power:")):
                 return
             self.control.log(message, warning=record.levelno >= logging.WARNING)
@@ -65,7 +65,7 @@ class SessionDummyLoadCalibrationStore(DummyLoadCalibrationStore):
         return calibration
 
 
-def _redact(message: str, secrets: tuple[str, ...]) -> str:
+def _redact_secrets(message: str, secrets: tuple[str, ...]) -> str:
     redacted = re.sub(r"(?i)(authorization\s*[:=]\s*(?:bearer\s+)?)[^\s,;]+", r"\1[REDACTED]", message)
     for secret in secrets:
         if secret:
@@ -102,7 +102,7 @@ class MeasurementService(SessionMeasurementService):
         try:
             return self._run(request, control, context)
         except Exception as error:
-            message = _redact(str(error), secrets)
+            message = _redact_secrets(str(error), secrets)
             if message != str(error):
                 raise RuntimeError(message) from None
             raise
@@ -131,6 +131,7 @@ class MeasurementService(SessionMeasurementService):
             home_assistant=self.home_assistant,
             shelly_password=self.shelly_password,
             on_sample=control.sample,
+            on_calibration_sample=control.calibration_sample,
             dummy_load_calibration_store=calibration_store,
         ).assemble(request)
         control.phase("Starting measurement")

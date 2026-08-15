@@ -21,7 +21,6 @@ from measure.tuning import MeasurementParameters
 class ResumePolicy(StrEnum):
     NEW = "new"
     RESUME = "resume"
-    OVERWRITE = "overwrite"
 
 
 class DummyLoadCalibrationRequest(BaseModel):

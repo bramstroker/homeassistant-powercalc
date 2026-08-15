@@ -1,66 +1,126 @@
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, svg } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 import { createRef, ref } from "lit/directives/ref.js";
-import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, EntityDescriptor, PowerMeterDiagnostic, SettingsSection, ShellyDiscoveryDevice } from "../types";
+import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, EntityDescriptor, MeasureParameterName, PowerMeterDiagnostic, PowerMeterType, SettingsSection, ShellyDiscoveryDevice } from "../types";
+import { DEFAULT_SHELLY_USERNAME, POWER_METER_LIST, meterFor, settingsFromForm } from "../power-meter";
+import { formRaw, formText, formTextOrNull } from "../form";
+import { emit } from "../events";
 import { sharedStyles } from "../styles";
 import "./power-meter-diagnostic";
 
-export class SettingsView extends LitElement {
-  static readonly properties = {
-    powers: { attribute: false },
-    settings: { attribute: false },
-    capabilities: { attribute: false },
-    busy: { type: Boolean },
-    testing: { type: Boolean },
-    testResult: { attribute: false },
-    errorMessage: { type: String },
-    meter: { state: true },
-    activeSection: { state: true },
-    initialSection: { attribute: false },
-    contributionAuth: { attribute: false },
-    contributionDeviceFlow: { attribute: false },
-    contributionDeviceStatus: { attribute: false },
-    contributionAuthBusy: { type: Boolean },
-    contributionAuthError: { type: String },
-    githubCopyStatus: { state: true },
-    shellyDiscoveryDevices: { attribute: false },
-    discoveringShellys: { type: Boolean },
-    shellyDiscoveryError: { type: String },
-    shellyDiscoveryAvailable: { attribute: false },
-    shellyDiscoveryMessage: { attribute: false },
-    shellyIp: { state: true },
-    shellyUsername: { state: true },
-    shellyPassword: { state: true },
-    clearShellyPassword: { state: true },
-    kasaIp: { state: true },
-  };
+interface SettingsSectionDescriptor {
+  id: SettingsSection;
+  label: string;
+  icon: () => unknown;
+}
 
+const icon = (path: unknown) => html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+
+/** The sections of the settings screen, in the order the navigation lists them. */
+const SETTINGS_SECTIONS: SettingsSectionDescriptor[] = [
+  {
+    id: "power_meter",
+    label: "Power meter",
+    icon: () => icon(svg`<path d="M13 2 5.5 13h6L11 22l7.5-11h-6L13 2Z"></path>`),
+  },
+  {
+    id: "measure_tuning",
+    label: "Measure tuning",
+    icon: () => icon(svg`
+      <path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path>
+      <circle cx="16" cy="7" r="2"></circle>
+      <circle cx="8" cy="17" r="2"></circle>
+    `),
+  },
+  {
+    id: "github",
+    label: "GitHub",
+    icon: () => icon(svg`<path d="M9 19c-4.2 1.2-4.2-2-6-2.4M15 22v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.7 4.7 0 0 0-1.3-3.3 4.4 4.4 0 0 0-.1-3.2s-1-.3-3.4 1.3a11.8 11.8 0 0 0-6.2 0C6.6 3.7 5.6 4 5.6 4a4.4 4.4 0 0 0-.1 3.2A4.7 4.7 0 0 0 4.2 10.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V22"></path>`),
+  },
+];
+
+@customElement("measure-settings-view")
+export class SettingsView extends LitElement {
+  @property({ attribute: false })
   powers: EntityDescriptor[] = [];
+
+  @property({ attribute: false })
   settings?: AppSettings;
+
+  @property({ attribute: false })
   capabilities?: Capabilities;
-  meter?: AppSettings["power_meter"];
+
+  @state()
+  meter?: PowerMeterType;
+
+  @property({ type: Boolean })
   busy = false;
+
+  @property({ type: Boolean })
   testing = false;
+
+  @property({ attribute: false })
   testResult?: PowerMeterDiagnostic;
+
+  @property({ type: String })
   errorMessage = "";
+
+  @state()
   activeSection: SettingsSection = "power_meter";
+
+  @property({ attribute: false })
   initialSection?: SettingsSection;
+
   private appliedInitialSection = false;
+
+  @property({ attribute: false })
   contributionAuth?: ContributionAuthState;
+
+  @property({ attribute: false })
   contributionDeviceFlow?: ContributionDeviceFlow;
+
+  @property({ attribute: false })
   contributionDeviceStatus?: ContributionAuthDeviceStatus;
+
+  @property({ type: Boolean })
   contributionAuthBusy = false;
+
+  @property({ type: String })
   contributionAuthError = "";
+
+  @state()
   private githubCopyStatus = "";
+
+  @property({ attribute: false })
   shellyDiscoveryDevices: ShellyDiscoveryDevice[] = [];
+
+  @property({ type: Boolean })
   discoveringShellys = false;
+
+  @property({ type: String })
   shellyDiscoveryError = "";
+
+  @property({ attribute: false })
   shellyDiscoveryAvailable?: boolean;
+
+  @property({ attribute: false })
   shellyDiscoveryMessage?: string | null;
+
+  @state()
   private shellyIp?: string;
+
+  @state()
   private shellyUsername?: string;
+
+  @state()
   private shellyPassword = "";
+
+  @state()
   private clearShellyPassword = false;
+
+  @state()
   private kasaIp?: string;
+
   private readonly form = createRef<HTMLFormElement>();
 
   static readonly styles = [sharedStyles, css`
@@ -77,20 +137,10 @@ export class SettingsView extends LitElement {
     .settings-section h3 { margin: 0 0 0.35rem; color: var(--ink); font-size: 1rem; }
     .settings-section > .muted { margin: 0 0 1rem; }
     .section-fields { display: grid; gap: 1rem; }
-    label, fieldset { display: grid; gap: 0.4rem; min-width: 0; }
-    label > span, legend { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
-    input, select {
-      width: 100%; min-width: 0; max-width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 9px;
-      padding: 0.65rem 0.75rem; background: var(--field); color: var(--ink);
-    }
-    fieldset { border: 0; padding: 0; margin: 0; }
-    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-    .check { display: flex; grid-template-columns: none; align-items: flex-start; gap: 0.6rem; }
-    .check input { width: auto; min-height: auto; margin-top: 0.2rem; accent-color: var(--signal); }
+    .check { align-items: flex-start; gap: 0.6rem; }
+    .check input { margin-top: 0.2rem; }
     .developer-option { margin-bottom: 1rem; padding: 0.85rem; border: 1px solid var(--signal); border-radius: 10px; background: color-mix(in srgb, var(--signal) 8%, transparent); }
     .developer-option strong { color: var(--ink); }
-    .field-hint { color: var(--muted); font-size: 0.74rem; line-height: 1.4; }
-    .context { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
     .quality-requirements { margin: -0.15rem 0 0; padding: 0.7rem 0.8rem; border-left: 3px solid var(--signal); background: color-mix(in srgb, var(--signal) 8%, transparent); color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
     .test-row { display: grid; gap: 0.75rem; }
     .test-row > button { justify-self: start; }
@@ -126,7 +176,7 @@ export class SettingsView extends LitElement {
       .settings-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 520px) {
-      .grid, .token-row, .device-code-row { grid-template-columns: 1fr; }
+      .token-row, .device-code-row { grid-template-columns: 1fr; }
       .settings-nav { grid-template-columns: 1fr; }
     }
   `];
@@ -141,8 +191,8 @@ export class SettingsView extends LitElement {
   }
 
   render() {
-    const selected = this.settings?.default_power_entity_id ?? "";
     const powerMeter = this.meter ?? this.settings?.power_meter ?? "hass";
+    const descriptor = meterFor(powerMeter);
     const defaults = this.settings?.measurement_defaults
       ?? this.capabilities?.defaults
       ?? { sleep_time: 2, sample_count: 1, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
@@ -158,18 +208,7 @@ export class SettingsView extends LitElement {
         <form ${ref(this.form)} @submit=${this.submit}>
           <div class="settings-layout">
             <nav class="settings-nav" aria-label="Settings sections">
-              <button type="button" class=${this.activeSection === "power_meter" ? "active" : ""} aria-current=${this.activeSection === "power_meter" ? "page" : nothing} @click=${() => this.selectSection("power_meter")}>
-                <span class="nav-icon" aria-hidden="true">${this.powerMeterIcon()}</span>
-                <span>Power meter</span>
-              </button>
-              <button type="button" class=${this.activeSection === "measure_tuning" ? "active" : ""} aria-current=${this.activeSection === "measure_tuning" ? "page" : nothing} @click=${() => this.selectSection("measure_tuning")}>
-                <span class="nav-icon" aria-hidden="true">${this.tuningIcon()}</span>
-                <span>Measure tuning</span>
-              </button>
-              <button type="button" class=${this.activeSection === "github" ? "active" : ""} aria-current=${this.activeSection === "github" ? "page" : nothing} @click=${() => this.selectSection("github")}>
-                <span class="nav-icon" aria-hidden="true">${this.githubIcon()}</span>
-                <span>GitHub</span>
-              </button>
+              ${SETTINGS_SECTIONS.map((section) => this.renderNavButton(section))}
             </nav>
 
             <section class="settings-section" ?hidden=${this.activeSection !== "power_meter"} aria-labelledby="power-meter-title">
@@ -183,24 +222,14 @@ export class SettingsView extends LitElement {
                 <label>
                   <span>Type</span>
                   <select name="power_meter" @change=${this.powerMeterChanged}>
-                    <option value="hass" ?selected=${powerMeter === "hass"}>Home Assistant sensor</option>
-                    <option value="shelly" ?selected=${powerMeter === "shelly"}>Shelly plug</option>
-                    <option value="kasa" ?selected=${powerMeter === "kasa"}>Kasa smart plug</option>
-                    <option value="dummy" ?selected=${powerMeter === "dummy"}>Synthetic test meter</option>
+                    ${POWER_METER_LIST.map((meter) => html`
+                      <option value=${meter.type} ?selected=${powerMeter === meter.type}>${meter.label}</option>
+                    `)}
                   </select>
                 </label>
-                ${powerMeter === "shelly" ? this.renderShellyFields() : nothing}
-                ${powerMeter === "kasa" ? this.renderKasaFields() : nothing}
-                ${powerMeter === "hass" ? html`<label>
-                  <span>Power sensor</span>
-                  <select name="default_power_entity_id" required @change=${this.powerMeterSettingsChanged}>
-                    <option value="">Select a power sensor</option>
-                    ${this.powers.map((entity) => html`<option value=${entity.entity_id} ?selected=${entity.entity_id === selected}>${entity.name} · ${entity.entity_id}</option>`)}
-                  </select>
-                </label>` : nothing}
-                ${powerMeter === "hass" ? html`<p class="quality-requirements">For reliable profiles, use a sensor with at least 0.1 W reported resolution and updates every 5 seconds or faster. Updates within 2 seconds are recommended.</p>` : nothing}
-                ${powerMeter === "shelly" || powerMeter === "kasa" ? html`<p class="quality-requirements">Powercalc polls this device directly, so Home Assistant sensor resolution and update-frequency checks do not apply.</p>` : nothing}
-                ${powerMeter === "dummy" ? nothing : this.renderTestRow()}
+                ${this.renderMeterFields(powerMeter)}
+                ${descriptor.qualityNote ? html`<p class="quality-requirements">${descriptor.qualityNote}</p>` : nothing}
+                ${descriptor.validatable ? this.renderTestRow() : nothing}
               </div>
             </section>
 
@@ -241,6 +270,43 @@ export class SettingsView extends LitElement {
         </form>
       </section>
     `;
+  }
+
+  private renderNavButton({ id, label, icon }: SettingsSectionDescriptor) {
+    const active = this.activeSection === id;
+    return html`
+      <button type="button" class=${active ? "active" : ""} aria-current=${active ? "page" : nothing} @click=${() => this.selectSection(id)}>
+        <span class="nav-icon" aria-hidden="true">${icon()}</span>
+        <span>${label}</span>
+      </button>
+    `;
+  }
+
+  /**
+   * The inputs each meter needs. Kept here rather than in the registry because they are bound to
+   * this view's handlers and credential state; the record's type still names any meter left out.
+   */
+  private renderMeterFields(type: PowerMeterType) {
+    const fields: Record<PowerMeterType, () => unknown> = {
+      hass: () => this.renderHassFields(),
+      shelly: () => this.renderShellyFields(),
+      kasa: () => this.renderKasaFields(),
+      dummy: () => nothing,
+    };
+    return fields[type]();
+  }
+
+  private renderHassFields() {
+    const selected = this.settings?.default_power_entity_id ?? "";
+    return html`<label>
+      <span>Power sensor</span>
+      <select name="default_power_entity_id" required @change=${this.powerMeterSettingsChanged}>
+        <option value="">Select a power sensor</option>
+        ${this.powers.map((entity) => html`
+          <option value=${entity.entity_id} ?selected=${entity.entity_id === selected}>${entity.name} · ${entity.entity_id}</option>
+        `)}
+      </select>
+    </label>`;
   }
 
   private renderTestRow() {
@@ -385,7 +451,7 @@ export class SettingsView extends LitElement {
       <div class="grid">
         <label>
           <span>Shelly username</span>
-          <input name="shelly_username" .value=${this.shellyUsername ?? this.settings?.shelly_username ?? "admin"} required autocomplete="username" maxlength="50" @input=${this.shellyUsernameChanged} />
+          <input name="shelly_username" .value=${this.shellyUsername ?? this.settings?.shelly_username ?? DEFAULT_SHELLY_USERNAME} required autocomplete="username" maxlength="50" @input=${this.shellyUsernameChanged} />
           <small class="field-hint">Gen1 devices may use a custom username. Gen2 and newer always use admin.</small>
         </label>
         <label>
@@ -448,24 +514,16 @@ export class SettingsView extends LitElement {
     const element = this.form.value;
     if (!element) return null;
     const data = new FormData(element);
-    const value = data.get("default_power_entity_id");
-    const powerMeterValue = data.get("power_meter");
-    const powerMeter = (typeof powerMeterValue === "string" ? powerMeterValue : "hass") as AppSettings["power_meter"];
-    const shellyIp = data.get("shelly_ip");
-    const shellyUsername = data.get("shelly_username");
-    const shellyPassword = data.get("shelly_password");
-    const kasaIp = data.get("kasa_ip");
-    const measureDevice = data.get("default_measure_device");
+    const meter = settingsFromForm(data);
+    // Credentials stay here rather than in the registry: they are only ever entered, never read back.
+    const shellyPassword = formRaw(data, "shelly_password");
     return {
-      default_power_entity_id: typeof value === "string" && value ? value : null,
-      default_measure_device: typeof measureDevice === "string" && measureDevice.trim() ? measureDevice.trim() : null,
-      power_meter: powerMeter,
-      shelly_ip: powerMeter === "shelly" && typeof shellyIp === "string" ? shellyIp.trim() || null : null,
-      shelly_username: typeof shellyUsername === "string" && shellyUsername.trim() ? shellyUsername.trim() : "admin",
+      ...meter,
+      default_measure_device: formTextOrNull(data, "default_measure_device"),
+      shelly_username: formText(data, "shelly_username") || DEFAULT_SHELLY_USERNAME,
       shelly_password_configured: this.settings?.shelly_password_configured ?? false,
-      shelly_password: powerMeter === "shelly" && typeof shellyPassword === "string" ? shellyPassword || null : null,
+      shelly_password: meter.power_meter === "shelly" ? shellyPassword || null : null,
       clear_shelly_password: data.get("clear_shelly_password") === "on",
-      kasa_ip: powerMeter === "kasa" && typeof kasaIp === "string" ? kasaIp.trim() || null : null,
       fast_test_mode: data.get("fast_test_mode") === "on",
       measurement_defaults: {
         sleep_time: this.number(data, "sleep_time"),
@@ -477,7 +535,7 @@ export class SettingsView extends LitElement {
     };
   }
 
-  private numberField(name: string, label: string, value: number, fallbackMin: number, fallbackMax: number, step: string, hint: string) {
+  private numberField(name: MeasureParameterName, label: string, value: number, fallbackMin: number, fallbackMax: number, step: string, hint: string) {
     const { min, max } = this.capabilities?.limits?.[name] ?? { min: fallbackMin, max: fallbackMax };
     return html`<label>
       <span>${label}</span>
@@ -494,22 +552,22 @@ export class SettingsView extends LitElement {
     event.preventDefault();
     const settings = this.collect();
     if (!settings) return;
-    this.dispatchEvent(new CustomEvent<AppSettingsUpdate>("save", { detail: settings, bubbles: true, composed: true }));
+    emit<AppSettingsUpdate>(this, "save", settings);
   }
 
   private test(): void {
     const settings = this.collect();
     if (!settings) return;
     this.testResult = undefined;
-    this.dispatchEvent(new CustomEvent<AppSettingsUpdate>("test", { detail: settings, bubbles: true, composed: true }));
+    emit<AppSettingsUpdate>(this, "test", settings);
   }
 
   private powerMeterChanged(event: Event): void {
     this.clearTestResult();
     // Keep the choice in local state so an app-shell re-render can't clobber the
     // in-progress form (which would reset the meter type and typed device IP).
-    this.meter = (event.currentTarget as HTMLSelectElement).value as AppSettings["power_meter"];
-    if (this.meter === "shelly") this.discoverShellys();
+    this.meter = (event.currentTarget as HTMLSelectElement).value as PowerMeterType;
+    if (meterFor(this.meter).discoverable) this.discoverShellys();
   }
 
   private powerMeterSettingsChanged(): void {
@@ -551,17 +609,17 @@ export class SettingsView extends LitElement {
   }
 
   private discoverShellys(): void {
-    this.dispatchEvent(new CustomEvent("shelly-discover", { bubbles: true, composed: true }));
+    emit(this, "shelly-discover");
   }
 
   private clearTestResult(): void {
     this.testResult = undefined;
-    this.dispatchEvent(new CustomEvent("test-clear", { bubbles: true, composed: true }));
+    emit(this, "test-clear");
   }
 
   private startGithubDeviceLogin(): void {
     this.githubCopyStatus = "";
-    this.dispatchEvent(new CustomEvent("github-device-start", { bubbles: true, composed: true }));
+    emit(this, "github-device-start");
   }
 
   private selectGithubCode(event: Event): void {
@@ -614,7 +672,7 @@ export class SettingsView extends LitElement {
     const input = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="github_token"]');
     const token = input?.value.trim() ?? "";
     if (!token) return;
-    this.dispatchEvent(new CustomEvent<string>("github-token-save", { detail: token, bubbles: true, composed: true }));
+    emit<string>(this, "github-token-save", token);
     if (input) input.value = "";
   }
 
@@ -625,36 +683,14 @@ export class SettingsView extends LitElement {
   }
 
   private disconnectGithub(): void {
-    this.dispatchEvent(new CustomEvent("github-disconnect", { bubbles: true, composed: true }));
+    emit(this, "github-disconnect");
   }
 
   private selectSection(section: SettingsSection): void {
     this.activeSection = section;
   }
 
-  private powerMeterIcon() {
-    return html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M13 2 5.5 13h6L11 22l7.5-11h-6L13 2Z"></path>
-    </svg>`;
-  }
-
-  private tuningIcon() {
-    return html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-      <path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path>
-      <circle cx="16" cy="7" r="2"></circle>
-      <circle cx="8" cy="17" r="2"></circle>
-    </svg>`;
-  }
-
-  private githubIcon() {
-    return html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M9 19c-4.2 1.2-4.2-2-6-2.4M15 22v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.7 4.7 0 0 0-1.3-3.3 4.4 4.4 0 0 0-.1-3.2s-1-.3-3.4 1.3a11.8 11.8 0 0 0-6.2 0C6.6 3.7 5.6 4 5.6 4a4.4 4.4 0 0 0-.1 3.2A4.7 4.7 0 0 0 4.2 10.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V22"></path>
-    </svg>`;
-  }
-
   private emit(name: "back"): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true }));
+    emit(this, name);
   }
 }
-
-customElements.define("measure-settings-view", SettingsView);

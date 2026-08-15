@@ -108,9 +108,7 @@ def _redact(value: object, sensitive_values: tuple[str, ...]) -> object:
             else:
                 redacted[normalized_key] = _redact(nested, sensitive_values)
         return redacted
-    if isinstance(value, list):
-        return [_redact(item, sensitive_values) for item in value]
-    if isinstance(value, tuple):
+    if isinstance(value, list | tuple):
         return [_redact(item, sensitive_values) for item in value]
     if isinstance(value, str):
         for sensitive in sensitive_values:

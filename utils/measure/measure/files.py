@@ -16,7 +16,9 @@ def write_json_atomic(path: Path, value: dict[str, Any], *, private: bool = Fals
         else:
             handle = temporary.open("w", encoding="utf-8")
         with handle:
-            json.dump(value, handle, indent=2, sort_keys=True)
+            # ``default`` keeps documents holding enums or timestamps writable; payloads that
+            # already went through ``model_dump(mode="json")`` never reach it.
+            json.dump(value, handle, indent=2, sort_keys=True, default=str)
             handle.flush()
             os.fsync(handle.fileno())
         if private:
