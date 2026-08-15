@@ -28,6 +28,7 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_SENSORS,
+    DATA_MEASURE_APP_COORDINATOR,
     DOMAIN,
     DOMAIN_CONFIG,
     SERVICE_RELOAD,
@@ -37,6 +38,7 @@ from custom_components.powercalc.const import (
     PowerProfileSource,
     SensorType,
 )
+from custom_components.powercalc.measure import MeasureAppCoordinator
 from tests.common import async_advance_time, create_mock_config_entry, get_simple_fixed_config, run_powercalc_setup
 
 MOCK_PAYLOAD = {
@@ -102,6 +104,19 @@ async def test_send_analytics_success(
         PowerProfileSource.MANUAL: 1,
         PowerProfileSource.LIBRARY_BUILTIN: 1,
     }
+    assert posted_json["has_measure_app"] is False
+
+
+async def test_has_measure_app(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(hass)
+    coordinator: MeasureAppCoordinator = hass.data[DOMAIN][DATA_MEASURE_APP_COORDINATOR]
+    coordinator.async_process_event({"app_version": "1.2.3", "state": "idle"})
+
+    analytics = Analytics(hass)
+    payload = await analytics._prepare_payload()  # noqa: SLF001
+
+    assert payload["has_measure_app"] is True
+    coordinator.async_shutdown()
 
 
 @pytest.mark.usefixtures("payload_mock")

@@ -35,6 +35,7 @@ The payload only contains **aggregated counts**, for example:
 - counts per entity type (e.g. power_sensor, energy_sensor, utility_meter)
 - group sizes (number of entities in each group)
 - whether group includes are used
+- whether the Powercalc Measure app is used
 - Powercalc version and Home Assistant version
 - installation date
 - your country-code (derived server-side from your IP-address), example: "NL" for Netherlands.
@@ -96,7 +97,8 @@ No per-device identifiers are included.
       "config_entry_count": 8,
       "custom_profile_count": 12,
       "has_global_gui_config": true,
-      "has_group_include": false
+      "has_group_include": false,
+      "has_measure_app": true
     }
     ```
 
