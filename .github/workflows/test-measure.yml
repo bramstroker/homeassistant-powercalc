@@ -93,13 +93,15 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
+        # The locally installed binary is used rather than `npx`, which would fetch and run
+        # whatever version it resolves when the package is missing.
       - name: Install browser
         if: steps.browser-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: ./node_modules/.bin/playwright install --with-deps chromium
         # A cached browser still needs its system libraries on a fresh runner.
       - name: Install browser system dependencies
         if: steps.browser-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: ./node_modules/.bin/playwright install-deps chromium
       - name: Run Playwright tests
         run: npm run test:e2e
       - name: Upload Playwright report

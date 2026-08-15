@@ -203,6 +203,49 @@ export interface MockApiOptions {
   sessions?: SessionSummary[];
 }
 
+/** What a route may vary its response on: the request itself, and the mock's options. */
+interface RequestContext {
+  url: URL;
+  method: string;
+  sessions: SessionSummary[];
+}
+
+const json = (route: Route, body: unknown): Promise<void> =>
+  route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
+
+/** The error envelope the real API returns, which the client parses for `code` and `field`. */
+const problem = (route: Route, status: number, code: string, message: string): Promise<void> =>
+  route.fulfill({ status, contentType: "application/json", body: JSON.stringify({ code, message, field: null }) });
+
+/** Paths answering with the same payload on every request, whatever the method. */
+const fixedRoutes = new Map<string, unknown>([
+  ["capabilities", capabilities],
+  ["entity-catalog", catalog],
+  ["settings", settings],
+  ["contribution/auth", { connected: false }],
+  ["contribution/status", { submitted: false }],
+  ["measure-definitions", [averageDefinition, lightDefinition]],
+  ["dummy-load/calibration", null],
+  ["preflight", preflight],
+  ["sessions/session-running", startedSnapshot],
+  ["sessions/session-completed", completedSnapshot],
+  ["sessions/session-completed/files", files],
+  ["sessions/session-completed/plots", plots],
+]);
+
+/** Paths whose payload depends on the request or on the sessions the test asked for. */
+const dynamicRoutes = new Map<string, (context: RequestContext) => unknown>([
+  ["entities", ({ url }) => (url.searchParams.get("domain") === "light" ? lights : powers)],
+  ["sessions", ({ method, sessions }) => (method === "POST" ? startedSnapshot : sessions)],
+]);
+
+/** Paths that answer with something other than a 200 JSON body. */
+const rawRoutes = new Map<string, (route: Route) => Promise<void>>([
+  ["sessions/session-running/events", (route) =>
+    route.fulfill({ status: 200, contentType: "text/event-stream", body: eventStreamBody(streamEvents) })],
+  ["sessions/session-completed/contribution", (route) => problem(route, 404, "not_found", "No draft")],
+]);
+
 /**
  * Route every API call the app makes to a canned response.
  *
@@ -211,39 +254,22 @@ export interface MockApiOptions {
 export async function mockApi(page: Page, options: MockApiOptions = {}): Promise<void> {
   const sessions = options.sessions ?? [completedSession];
 
-  await page.route("**/api/**", async (route: Route) => {
+  await page.route("**/api/**", (route: Route) => {
     const url = new URL(route.request().url());
     const path = url.pathname.replace(/^.*\/api\//, "");
     const method = route.request().method();
 
-    const json = (body: unknown) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
+    const raw = rawRoutes.get(path);
+    if (raw) return raw(route);
 
-    if (path === "capabilities") return json(capabilities);
-    if (path === "entity-catalog") return json(catalog);
-    if (path === "settings") return json(settings);
-    if (path === "contribution/auth") return json({ connected: false });
-    if (path === "contribution/status") return json({ submitted: false });
-    if (path === "measure-definitions") return json([averageDefinition, lightDefinition]);
-    if (path === "dummy-load/calibration") return json(null);
-    if (path === "entities") {
-      const domain = url.searchParams.get("domain");
-      return json(domain === "light" ? lights : powers);
-    }
-    if (path === "preflight") return json(preflight);
-    if (path === "sessions" && method === "POST") return json(startedSnapshot);
-    if (path === "sessions") return json(sessions);
-    if (path === "sessions/session-running/events") {
-      return route.fulfill({ status: 200, contentType: "text/event-stream", body: eventStreamBody(streamEvents) });
-    }
-    if (path === "sessions/session-running") return json(startedSnapshot);
-    if (path === "sessions/session-completed/files") return json(files);
-    if (path === "sessions/session-completed/plots") return json(plots);
-    if (path === "sessions/session-completed/contribution") return route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ code: "not_found", message: "No draft", field: null }) });
-    if (path === "sessions/session-completed") return json(completedSnapshot);
+    const dynamic = dynamicRoutes.get(path);
+    if (dynamic) return json(route, dynamic({ url, method, sessions }));
+
+    if (fixedRoutes.has(path)) return json(route, fixedRoutes.get(path));
 
     // Fail loudly rather than silently hanging: an unrouted call means the app grew a
     // dependency this mock does not know about.
-    return route.fulfill({ status: 501, contentType: "application/json", body: JSON.stringify({ code: "not_mocked", message: `No mock for ${method} ${path}`, field: null }) });
+    return problem(route, 501, "not_mocked", `No mock for ${method} ${path}`);
   });
 }
 
