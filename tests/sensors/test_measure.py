@@ -3,21 +3,19 @@ from unittest.mock import AsyncMock, Mock, patch
 from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
 
 from custom_components.powercalc.const import DATA_MEASURE_APP_COORDINATOR, DOMAIN
 from custom_components.powercalc.measure import MEASURE_STATUS_EVENT, MEASURE_STATUS_TIMEOUT, MeasureAppCoordinator
 from custom_components.powercalc.sensors.measure import MeasureSessionStatusSensor
-from tests.common import async_advance_time
+from tests.common import async_advance_time, run_powercalc_setup
 
 
 async def test_measure_sensor_is_only_created_after_app_announcement(hass: HomeAssistant) -> None:
-    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
-    await hass.async_block_till_done()
+    await run_powercalc_setup(hass)
     entity_registry = er.async_get(hass)
 
     assert hass.states.get("sensor.measure_session_status") is None
-    assert entity_registry.async_get_entity_id("sensor", DOMAIN, "measure_session_status") is None
+    assert entity_registry.async_get("measure_session_status") is None
 
     hass.bus.async_fire(
         MEASURE_STATUS_EVENT,
@@ -38,7 +36,7 @@ async def test_measure_sensor_is_only_created_after_app_announcement(hass: HomeA
 
 
 async def test_measure_sensor_updates_and_becomes_unavailable_without_heartbeat(hass: HomeAssistant) -> None:
-    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
+    await run_powercalc_setup(hass)
     hass.bus.async_fire(
         MEASURE_STATUS_EVENT,
         {
@@ -74,7 +72,7 @@ async def test_measure_sensor_updates_and_becomes_unavailable_without_heartbeat(
 
 
 async def test_invalid_measure_announcement_does_not_create_sensor(hass: HomeAssistant) -> None:
-    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
+    await run_powercalc_setup(hass)
 
     hass.bus.async_fire(
         MEASURE_STATUS_EVENT,
@@ -86,7 +84,7 @@ async def test_invalid_measure_announcement_does_not_create_sensor(hass: HomeAss
 
 
 async def test_measure_sensor_creation_can_retry_after_platform_load_failure(hass: HomeAssistant) -> None:
-    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
+    await run_powercalc_setup(hass)
     coordinator: MeasureAppCoordinator = hass.data[DOMAIN][DATA_MEASURE_APP_COORDINATOR]
 
     with patch(
