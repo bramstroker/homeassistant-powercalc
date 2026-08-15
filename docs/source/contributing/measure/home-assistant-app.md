@@ -103,6 +103,34 @@ During the actual run, live and saved power readings show the target device cons
 
 The PowerCalc logo and the **All sessions** action in the top bar return to the session dashboard. Only one measurement runs at a time; while one is active, its dashboard entry provides the monitor action and starting or resuming another session is disabled.
 
+## Measure session status sensor
+
+When both the Powercalc integration and the Measure app are running, Powercalc creates
+`sensor.measure_session_status` after it receives the first status update from the app. The sensor is not created for
+installations that do not use the Measure app.
+
+The sensor reports the current session state, such as `idle`, `running`, `completed`, or `failed`. Its attributes
+include the Measure app version and, when available, the session ID and error message. The sensor becomes unavailable
+when the app stops sending status updates, for example when the app is stopped.
+
+You can use the sensor in an automation to be notified when a long-running measurement completes. Replace the notify
+action with the one for your device:
+
+```yaml
+automation:
+  - alias: "Notify when a Powercalc measurement completes"
+    triggers:
+      - trigger: state
+        entity_id: sensor.measure_session_status
+        to: "completed"
+    actions:
+      - action: notify.mobile_app_your_phone
+        data:
+          title: "Powercalc measurement completed"
+          message: >-
+            Session {{ trigger.to_state.attributes.session_id }} has completed.
+```
+
 ## Cancellation and resume
 
 Cancellation is cooperative. A device request or configured wait already in progress may finish before the app stops changing the device. The app keeps complete output rows and does not mark partial output as completed.
