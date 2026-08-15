@@ -539,7 +539,7 @@ export class SettingsView extends LitElement {
     const { min, max } = this.capabilities?.limits?.[name] ?? { min: fallbackMin, max: fallbackMax };
     return html`<label>
       <span>${label}</span>
-      <input type="number" name=${name} .value=${String(value)} min=${min} max=${max} step=${step} required />
+      <input type="number" name=${name} min=${min} max=${max} step=${step} .value=${String(value)} required />
       <small class="field-hint">${hint}</small>
     </label>`;
   }

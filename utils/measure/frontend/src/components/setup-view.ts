@@ -467,9 +467,9 @@ export class SetupView extends LitElement {
     return html`<label><span>${field.label}</span><input
       type=${field.control === "number" ? "number" : "text"}
       name=${field.name}
-      .value=${value}
       min=${field.minimum ?? nothing}
       max=${field.maximum ?? nothing}
+      .value=${value}
       ?required=${field.required}
       autocomplete="off"
       @input=${onInput}
