@@ -140,6 +140,29 @@ def scan_library(
     ]
 
 
+def score_profile_directory(model_directory: Path) -> dict[str, float]:
+    """Score every LUT file of a single profile, for publication in library.json.
+
+    Returns the worst score over all LUT files under `score`, plus the worst score per color
+    mode. Sub profiles live in subdirectories and are scored along with the main profile, so
+    the number reflects the worst curve a user of this profile can end up with.
+
+    Deliberately does not go through `find_lut_files`: its `MANUALLY_VERIFIED_MODELS` skip list
+    exists to keep CI green on LUTs that were reviewed by hand, several of which are annotated
+    as needing a remeasure. Those are exactly the profiles the published score should expose.
+    """
+    scores: dict[str, list[float]] = defaultdict(list)
+    for file_name in SUPPORTED_LUT_FILES:
+        for path in sorted(model_directory.rglob(file_name)):
+            scores[get_lut_mode(path)].append(analyze_lut(path).score)
+
+    if not scores:
+        return {}
+
+    quality = {mode: min(mode_scores) for mode, mode_scores in scores.items()}
+    return {"score": min(quality.values()), **quality}
+
+
 def find_lut_files(root: Path, *, mode: str = "all") -> list[Path]:
     """Return all supported LUT CSV files below root."""
     if mode != "all":

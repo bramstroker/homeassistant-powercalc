@@ -20,6 +20,7 @@ import git
 import httpx
 
 from utils.library.common import PROFILE_DIRECTORY, open_lut_file
+from utils.library.scan_lut_quality import score_profile_directory
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROFILE_DIRECTORY
@@ -91,7 +92,11 @@ async def generate_library_json(model_listing: list[dict[str, Any]]) -> None:
             "sub_profile_select",
         ]
         mapped_dict = {key: value for key, value in model.items() if key not in skipped_fields}
-        hash_dict = {key: value for key, value in mapped_dict.items() if key != "sub_profile_count"}
+        # Derived metadata only, not profile content. The hash decides whether a Home Assistant
+        # install re-downloads a profile, so folding these in would make every install re-fetch
+        # every profile it uses whenever the scoring changes.
+        unhashed_fields = ("sub_profile_count", "lut_quality")
+        hash_dict = {key: value for key, value in mapped_dict.items() if key not in unhashed_fields}
         mapped_dict["hash"] = create_model_hash(hash_dict)
         manufacturer["models"].append(mapped_dict)
 
@@ -267,11 +272,12 @@ async def process_model_file(json_path: str) -> dict[str, Any]:
             model_directory = os.path.join(DATA_DIR, model_data["linked_profile"])
 
         # Get these values concurrently
-        updated_at, max_power, sub_profile_count, color_modes = await asyncio.gather(
+        updated_at, max_power, sub_profile_count, color_modes, lut_quality = await asyncio.gather(
             get_last_commit_time(model_directory),
             get_max_power(model_directory, model_data),
             asyncio.to_thread(get_sub_profile_count, model_directory),
             get_color_modes(model_directory),
+            asyncio.to_thread(score_profile_directory, Path(model_directory)),
         )
 
         model_data.update(
@@ -289,6 +295,9 @@ async def process_model_file(json_path: str) -> dict[str, Any]:
 
         if color_modes:
             model_data["color_modes"] = list(color_modes)
+
+        if lut_quality:
+            model_data["lut_quality"] = lut_quality
 
         return model_data
 

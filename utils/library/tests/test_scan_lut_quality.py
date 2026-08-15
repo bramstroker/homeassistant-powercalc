@@ -17,6 +17,7 @@ from utils.library.scan_lut_quality import (
     format_text_report,
     read_lut,
     scan_library,
+    score_profile_directory,
 )
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -430,6 +431,70 @@ def test_error_severity_filter_hides_warning_only_results() -> None:
     filtered_results = filter_results_by_severity([result], "error")
 
     assert format_text_report(filtered_results, show_ok=False, min_score=0.0) == "No LUT quality issues found."
+
+
+def test_score_profile_directory_reports_brightness_only_profile(tmp_path: Path) -> None:
+    write_lut(tmp_path / "brightness.csv.gz", smooth_brightness_rows(), gzipped=True)
+
+    quality = score_profile_directory(tmp_path)
+
+    assert list(quality) == ["score", "brightness"]
+    assert quality["score"] == quality["brightness"] > 90.0
+
+
+def test_score_profile_directory_takes_worst_score_over_color_modes(tmp_path: Path) -> None:
+    write_lut(tmp_path / "brightness.csv.gz", smooth_brightness_rows(), gzipped=True)
+    write_lut(tmp_path / "color_temp.csv.gz", rough_color_temp_rows(), gzipped=True)
+
+    quality = score_profile_directory(tmp_path)
+
+    assert quality["color_temp"] < quality["brightness"]
+    assert quality["score"] == quality["color_temp"]
+
+
+def test_score_profile_directory_includes_sub_profiles(tmp_path: Path) -> None:
+    write_lut(tmp_path / "brightness.csv.gz", smooth_brightness_rows(), gzipped=True)
+    sub_profile_dir = tmp_path / "downlight"
+    sub_profile_dir.mkdir()
+    write_lut(sub_profile_dir / "brightness.csv.gz", rough_brightness_rows(), gzipped=True)
+
+    sub_profile_quality = score_profile_directory(sub_profile_dir)
+    quality = score_profile_directory(tmp_path)
+
+    # The rough sub profile drags the score of the whole profile down to its own.
+    assert quality["score"] == sub_profile_quality["score"]
+
+
+def test_score_profile_directory_without_lut_files_returns_nothing(tmp_path: Path) -> None:
+    (tmp_path / "model.json").write_text("{}")
+
+    assert score_profile_directory(tmp_path) == {}
+
+
+def test_score_profile_directory_scores_manually_verified_models(tmp_path: Path) -> None:
+    """The skip list only silences CI; the published score must still cover those profiles."""
+    model_directory = tmp_path / "signify" / "LCT012"
+    model_directory.mkdir(parents=True)
+    write_lut(model_directory / "brightness.csv.gz", rough_brightness_rows(), gzipped=True)
+
+    assert find_lut_files(tmp_path) == []
+    assert score_profile_directory(model_directory)["score"] < 100.0
+
+
+def smooth_brightness_rows() -> list[tuple[int, int | None, float]]:
+    return [(bri, None, float(bri)) for bri in range(1, 21)]
+
+
+def rough_brightness_rows() -> list[tuple[int, int | None, float]]:
+    rows = smooth_brightness_rows()
+    rows[10] = (11, None, 25.0)
+    return rows
+
+
+def rough_color_temp_rows() -> list[tuple[int, int | None, float]]:
+    rows = [(bri, mired, float(bri)) for mired in (150, 300) for bri in range(1, 21)]
+    rows[10] = (11, 150, 25.0)
+    return rows
 
 
 def write_lut(path: Path, rows: list[tuple[int, int | None, float]], *, gzipped: bool = False) -> None:

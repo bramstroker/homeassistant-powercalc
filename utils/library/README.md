@@ -20,7 +20,9 @@ cd /path/to/powercalc
 
 Generate the profile-library index, populate missing author metadata, and add custom
 profile fields to the English translation file. This is normally run by the update
-workflow after a profile change.
+workflow after a profile change. The index records the LUT quality scores from
+[`scan_lut_quality.py`](#scan_lut_qualitypy) per profile, which the
+[library website](https://library.powercalc.nl) renders and filters on.
 
 ```bash
 uv run --group profile-library python -m utils.library.update_library --library-json

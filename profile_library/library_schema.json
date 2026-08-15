@@ -97,8 +97,35 @@
         "has_sub_profiles": {
           "type": "boolean",
           "description": "Indicates whether the profile has sub profiles"
+        },
+        "lut_quality": {
+          "type": "object",
+          "description": "Smoothness scores of the LUT files of the model. Absent for models which do not use the LUT calculation strategy",
+          "required": [
+            "score"
+          ],
+          "properties": {
+            "score": {
+              "$ref": "#/$defs/lut_quality_score",
+              "description": "Worst score over all LUT files of the model, including its sub profiles"
+            },
+            "brightness": {
+              "$ref": "#/$defs/lut_quality_score",
+              "description": "Worst score over all brightness LUT files of the model"
+            },
+            "color_temp": {
+              "$ref": "#/$defs/lut_quality_score",
+              "description": "Worst score over all color_temp LUT files of the model"
+            }
+          }
         }
       }
+    },
+    "lut_quality_score": {
+      "type": "number",
+      "description": "LUT smoothness score, where 100 is a perfectly smooth curve",
+      "minimum": 0,
+      "maximum": 100
     },
     "device_type": {
       "type": "string",
