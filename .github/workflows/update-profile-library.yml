@@ -8,11 +8,13 @@ on:
       - master
     paths:
       - 'utils/library/common.py'
+      - 'utils/library/scan_lut_quality.py'
       - 'utils/library/update_library.py'
       - 'utils/library/validate_lut_files.py'
   push:
     paths:
       - '**/model.json'
+      - '**/*.csv.gz'
     branches:
       - master
   workflow_dispatch:
