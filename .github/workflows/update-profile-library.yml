@@ -14,7 +14,6 @@ on:
   push:
     paths:
       - '**/model.json'
-      # LUT changes move the published quality score, even when model.json stays untouched.
       - '**/*.csv.gz'
     branches:
       - master
