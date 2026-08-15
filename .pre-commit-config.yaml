@@ -27,6 +27,7 @@ repos:
         exclude: (tsconfig|library)\.json$
       - id: requirements-txt-fixer
       - id: trailing-whitespace
+        exclude: \.svg$
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.2
