@@ -10,7 +10,7 @@ import "./power-meter-diagnostic";
 @customElement("measure-preflight-view")
 export class PreflightView extends LitElement {
   @property({ type: String })
-  title = "Ready for the bench";
+  heading = "Ready for the bench";
 
   @property({ attribute: false })
   metrics: LabelledValue[] = [];
@@ -62,7 +62,7 @@ export class PreflightView extends LitElement {
     return html`
       <section class="panel" aria-labelledby="review-title">
         <p class="eyebrow">02 / Setup check</p>
-        <h2 id="review-title">${this.title}</h2>
+        <h2 id="review-title">${this.heading}</h2>
         <p class="muted">${this.confirmationAction
           ? "Powercalc checked entity availability and storage. Preparing sets up the selected devices; you will explicitly start the measurement on the next screen."
           : "Powercalc checked the configured setup. Starting will begin controlling the selected device."}</p>
