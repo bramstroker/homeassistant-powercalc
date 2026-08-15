@@ -79,6 +79,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
     DATA_GROUP_ENTITIES,
     DEFAULT_ENERGY_UPDATE_INTERVAL,
+    DEFAULT_UTILITY_METER_TYPES,
     DOMAIN,
     DUMMY_ENTITY_ID,
     ENTRY_DATA_ENERGY_ENTITY,
@@ -171,6 +172,40 @@ async def test_grouped_power_sensor(hass: HomeAssistant, entity_registry: Entity
     await set_states(hass, [("input_boolean.test1", STATE_OFF)], block_count=2)
 
     assert_entity_state(hass, "sensor.testgroup_power", "50.00")
+
+
+async def test_group_without_unique_id_registers_energy_sensors(
+    hass: HomeAssistant,
+    entity_registry: EntityRegistry,
+) -> None:
+    """A YAML group without an explicit unique_id must still register its energy sensors.
+
+    The power sensor falls back to the group name, so it was always registered. The
+    energy sensor had no such fallback, leaving it and every utility meter derived from
+    it without a unique_id, so they never reached the entity registry.
+    """
+    await set_states(hass, [("input_boolean.test1", STATE_ON)])
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_ENTITIES: [get_simple_fixed_config("input_boolean.test1", 50)],
+        },
+    )
+
+    power_entry = entity_registry.async_get("sensor.testgroup_power")
+    assert power_entry
+    assert power_entry.unique_id == "TestGroup"
+
+    energy_entry = entity_registry.async_get("sensor.testgroup_energy")
+    assert energy_entry
+    assert energy_entry.unique_id == "TestGroup_energy"
+
+    for meter_type in DEFAULT_UTILITY_METER_TYPES:
+        meter_entry = entity_registry.async_get(f"sensor.testgroup_energy_{meter_type}")
+        assert meter_entry, f"{meter_type} utility meter was not registered"
+        assert meter_entry.unique_id == f"TestGroup_energy_{meter_type}"
 
 
 async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:

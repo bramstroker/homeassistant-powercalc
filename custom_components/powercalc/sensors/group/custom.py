@@ -389,9 +389,9 @@ def create_grouped_energy_sensor(
 ) -> EnergySensor:
     name = generate_energy_sensor_name(sensor_config, group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
-    energy_unique_id = None
-    if unique_id:
-        energy_unique_id = f"{unique_id}_energy"
+    if not unique_id:
+        unique_id = generate_unique_id(sensor_config)
+    energy_unique_id = f"{unique_id}_energy"
     entity_id = generate_energy_sensor_entity_id(
         hass,
         sensor_config,
