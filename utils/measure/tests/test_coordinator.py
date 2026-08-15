@@ -125,6 +125,49 @@ def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
     ]
 
 
+def test_coordinator_notifies_session_state_listeners(tmp_path: Path) -> None:
+    started = Event()
+    terminal_notification = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
+    notifications: list[SessionState | None] = []
+
+    def record_notification() -> None:
+        state = coordinator.current.state if coordinator.current is not None else None
+        notifications.append(state)
+        if state == SessionState.CANCELLED:
+            terminal_notification.set()
+
+    unsubscribe = coordinator.subscribe(record_notification)
+
+    session = coordinator.start(light_request())
+    assert started.wait(1)
+    coordinator.cancel(session.id)
+    wait_for_state(coordinator, SessionState.CANCELLED)
+    assert terminal_notification.wait(1)
+    unsubscribe()
+    coordinator.delete(session.id)
+
+    assert notifications == [SessionState.RUNNING, SessionState.CANCELLING, SessionState.CANCELLED]
+
+
+def test_coordinator_isolates_session_state_listener_failures(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+
+    def fail_notification() -> None:
+        raise RuntimeError("Observer failed")
+
+    coordinator.subscribe(fail_notification)
+
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    assert session.id
+    assert "Measurement session state listener failed" in caplog.text
+
+
 def test_coordinator_rejects_concurrent_start_and_cancels(tmp_path: Path) -> None:
     started = Event()
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))

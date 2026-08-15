@@ -59,6 +59,7 @@ from .const import (
     DATA_ENTITY_TYPES,
     DATA_GROUP_ENTITIES,
     DATA_HAS_GROUP_INCLUDE,
+    DATA_MEASURE_APP_COORDINATOR,
     DATA_SENSOR_TYPES,
     DATA_SOURCE_DOMAINS,
     DATA_USED_UNIQUE_IDS,
@@ -96,6 +97,7 @@ from .errors import (
 )
 from .group_include.filter import FilterOperator, create_composite_filter
 from .group_include.include import find_entities
+from .measure import MeasureAppCoordinator
 from .sensors.cost import CostSensor, create_cost_sensor_for_energy_entity
 from .sensors.daily_energy import (
     create_daily_fixed_energy_power_sensor,
@@ -107,6 +109,7 @@ from .sensors.group.config_entry_utils import add_to_associated_groups
 from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
 from .sensors.group.standby import StandbyPowerSensor
+from .sensors.measure import MeasureSessionStatusSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
 
 _LOGGER = logging.getLogger(__name__)
@@ -125,6 +128,11 @@ async def async_setup_platform(
     discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Setup sensors from YAML config sensor entries."""
+
+    if discovery_info and discovery_info.get(DISCOVERY_TYPE) == PowercalcDiscoveryType.MEASURE_APP:
+        coordinator: MeasureAppCoordinator = hass.data[DOMAIN][DATA_MEASURE_APP_COORDINATOR]
+        async_add_entities([MeasureSessionStatusSensor(coordinator)])
+        return
 
     # Legacy sensor platform config is used. Raise an issue.
     if not discovery_info and config:

@@ -65,11 +65,33 @@ class MeasurementCoordinator:
         self._last_snapshot_write = 0.0
         self._control: SessionControl | None = None
         self._worker: Thread | None = None
+        self._listeners: list[Callable[[], None]] = []
 
     @property
     def current(self) -> SessionSnapshot | None:
         with self._lock:
             return self._snapshot
+
+    def subscribe(self, listener: Callable[[], None]) -> Callable[[], None]:
+        """Notify a listener whenever the externally visible session state changes."""
+        with self._lock:
+            self._listeners.append(listener)
+
+        def unsubscribe() -> None:
+            with self._lock:
+                if listener in self._listeners:
+                    self._listeners.remove(listener)
+
+        return unsubscribe
+
+    def _notify_listeners(self) -> None:
+        with self._lock:
+            listeners = tuple(self._listeners)
+        for listener in listeners:
+            try:
+                listener()
+            except Exception:  # Observers must not affect measurement execution.
+                _LOGGER.exception("Measurement session state listener failed")
 
     def get(self, session_id: str) -> SessionSnapshot:
         """Return the live projection or a stored historical snapshot."""
@@ -112,7 +134,9 @@ class MeasurementCoordinator:
             self._events = []
             self._last_snapshot_write = 0.0
             self._launch_locked(request)
-            return self._snapshot
+            snapshot = self._snapshot
+        self._notify_listeners()
+        return snapshot
 
     def resume(self, session_id: str) -> SessionSnapshot:
         """Relaunch a retained session from compatible persisted output."""
@@ -135,7 +159,9 @@ class MeasurementCoordinator:
                 update={"resume_policy": ResumePolicy.RESUME},
             )
             self._launch_locked(request)
-            return self._snapshot
+            current = self._snapshot
+        self._notify_listeners()
+        return current
 
     def cancel(self, session_id: str) -> SessionSnapshot:
         """Persist cancellation intent and signal the worker cooperatively."""
@@ -163,7 +189,8 @@ class MeasurementCoordinator:
                 self.storage.write_snapshot(snapshot)
             if self._control is not None:
                 self._control.cancel()
-            return snapshot
+        self._notify_listeners()
+        return snapshot
 
     def confirm(self, session_id: str) -> SessionSnapshot:
         """Release a worker paused at an operator checkpoint."""
@@ -185,7 +212,8 @@ class MeasurementCoordinator:
             self._snapshot = running
             self.storage.write_snapshot(running)
             self._control.continue_run()
-            return running
+        self._notify_listeners()
+        return running
 
     def delete(self, session_id: str) -> None:
         """Delete a terminal retained session."""
@@ -200,6 +228,7 @@ class MeasurementCoordinator:
             if self._snapshot is not None and self._snapshot.id == session_id:
                 self._snapshot = None
                 self._events = []
+        self._notify_listeners()
 
     def _require_active(self, session_id: str) -> SessionSnapshot:
         """Return the live projection, refusing any session that does not hold the measurement slot."""
@@ -335,6 +364,12 @@ class MeasurementCoordinator:
             if self._should_persist_snapshot(event):
                 self.storage.write_snapshot(self._snapshot)
                 self._last_snapshot_write = time.monotonic()
+        self._notify_checkpoint(event)
+
+    def _notify_checkpoint(self, event: SessionEvent) -> None:
+        """Publish the state transition caused by an operator checkpoint."""
+        if event.type == SessionEventType.CHECKPOINT:
+            self._notify_listeners()
 
     def _project_transient_sample(self, event: SessionEvent) -> bool:
         """Project live readings in memory without writing high-frequency snapshots."""
@@ -400,3 +435,4 @@ class MeasurementCoordinator:
             self._events.append(event)
             self.storage.append_event(self._snapshot.id, event)
             self.storage.write_snapshot(self._snapshot)
+        self._notify_listeners()

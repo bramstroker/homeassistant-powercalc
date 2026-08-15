@@ -57,6 +57,7 @@ from measure.ha_app.session import (
 )
 from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
+from measure.ha_app.status import MeasureStatusPublisher
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
 from measure.home_assistant import HomeAssistantManager
 from measure.home_assistant_entities import (
@@ -280,10 +281,14 @@ class AppContext:
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    context = cast(AppContext, app.state.context)
+    status_publisher = MeasureStatusPublisher(context.home_assistant, context.coordinator)
+    await status_publisher.async_start()
     try:
         yield
     finally:
-        cast(AppContext, app.state.context).home_assistant.close()
+        await status_publisher.async_stop()
+        context.home_assistant.close()
 
 
 def create_app(
