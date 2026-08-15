@@ -603,6 +603,25 @@
       "message": "\"{profile}\" nie jest znanym podprofilem. Dostępne podprofile: {known_profiles}."
     }
   },
+  "entity": {
+    "sensor": {
+      "measure_session_status": {
+        "name": "Measure session status",
+        "state": {
+          "idle": "Idle",
+          "validating": "Validating",
+          "ready": "Ready",
+          "awaiting_confirmation": "Awaiting confirmation",
+          "running": "Running",
+          "cancelling": "Cancelling",
+          "cancelled": "Cancelled",
+          "completed": "Completed",
+          "failed": "Failed",
+          "resumable": "Resumable"
+        }
+      }
+    }
+  },
   "issues": {
     "composite_device_id": {
       "fix_flow": {

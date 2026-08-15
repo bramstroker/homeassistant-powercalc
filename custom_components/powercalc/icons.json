@@ -1,4 +1,22 @@
 {
+  "entity": {
+    "sensor": {
+      "measure_session_status": {
+        "default": "mdi:progress-wrench",
+        "state": {
+          "validating": "mdi:progress-question",
+          "ready": "mdi:progress-check",
+          "awaiting_confirmation": "mdi:progress-clock",
+          "running": "mdi:progress-wrench",
+          "cancelling": "mdi:progress-close",
+          "cancelled": "mdi:cancel",
+          "completed": "mdi:check-circle",
+          "failed": "mdi:alert-circle",
+          "resumable": "mdi:restore"
+        }
+      }
+    }
+  },
   "services": {
     "activate_playbook": {
       "service": "mdi:play"

@@ -249,6 +249,10 @@ class HomeAssistantManager:
             retry_on_disconnect=False,
         )
 
+    def fire_event(self, event_type: str, **event_data: Any) -> None:  # noqa: ANN401
+        """Fire an idempotent status event in Home Assistant."""
+        self._execute(lambda client: client.fire_event(event_type, **event_data))
+
     def list_entity_registry(self) -> list[EntityRegistryEntry]:
         return self._execute(lambda client: list(client.list_entity_registry()))
 

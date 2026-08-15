@@ -30,6 +30,7 @@ DATA_DISCOVERY_MANAGER = "discovery_manager"
 DATA_DOMAIN_ENTITIES = "domain_entities"
 DATA_ENTITIES = "entities"
 DATA_GROUP_ENTITIES = "group_entities"
+DATA_MEASURE_APP_COORDINATOR = "measure_app_coordinator"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
 DATA_STANDBY_POWER_SENSORS = "standby_power_sensors"
 DATA_ANALYTICS = "analytics"
@@ -316,6 +317,7 @@ class PowercalcDiscoveryType(StrEnum):
     DOMAIN_GROUP = "domain_group"
     STANDBY_GROUP = "standby_group"
     LIBRARY = "library"
+    MEASURE_APP = "measure_app"
     USER_YAML = "user_yaml"
 
 

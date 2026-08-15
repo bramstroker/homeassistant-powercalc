@@ -87,6 +87,19 @@ def test_manager_reuses_one_client_for_its_lifecycle() -> None:
     client.close.assert_called_once_with()
 
 
+def test_manager_fires_home_assistant_event() -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    manager = HomeAssistantManager(
+        "ws://127.0.0.1:8123/api/websocket",
+        "token",
+        client_factory=MagicMock(return_value=client),
+    )
+
+    manager.fire_event("powercalc_measure_status", state="idle")
+
+    client.fire_event.assert_called_once_with("powercalc_measure_status", state="idle")
+
+
 def test_manager_serializes_access_to_shared_websocket() -> None:
     client = MagicMock(spec=HomeAssistantWebsocketClient)
     active_calls = 0
