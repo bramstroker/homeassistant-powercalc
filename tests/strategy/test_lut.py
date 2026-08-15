@@ -84,6 +84,31 @@ async def test_brightness_lut(hass: HomeAssistant) -> None:
     )
 
 
+async def test_brightness_lut_above_highest_entry(hass: HomeAssistant) -> None:
+    """When the LUT does not contain the highest brightness, the power of the highest available entry is returned"""
+
+    strategy = await _create_lut_strategy(
+        hass,
+        "test",
+        "test",
+        custom_profile_dir=get_test_profile_dir("lut_truncated"),
+    )
+
+    # Interpolated between 100 (5.0) and 200 (9.0)
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_brightness_state(150),
+        expected_power=7.0,
+    )
+
+    # Above the highest brightness in the LUT (200), power for bri 200 should be returned
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_brightness_state(255),
+        expected_power=9.0,
+    )
+
+
 async def test_hs_lut(hass: HomeAssistant) -> None:
     """Test LUT lookup in HS mode"""
 
