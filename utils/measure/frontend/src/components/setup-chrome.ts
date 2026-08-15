@@ -57,9 +57,9 @@ export function renderTypePicker(definitions: MeasureDefinition[], onSelect: (ty
   if (!definitions.length) return html`<p class="muted">Loading measurement types…</p>`;
   return html`
     <p class="muted">What do you want to measure?</p>
-    <div class="type-grid" role="list">
+    <div class="type-grid">
       ${definitions.map((definition) => html`
-        <button type="button" class="type-card" role="listitem" @click=${() => onSelect(definition.measure_type)}>
+        <button type="button" class="type-card" @click=${() => onSelect(definition.measure_type)}>
           <span class="type-icon" aria-hidden="true">${definition.icon}</span>
           <span class="type-label">${definition.label}</span>
           <span class="type-desc">${definition.description}</span>
@@ -78,7 +78,7 @@ export function renderTypeChip(type: MeasureType, definition: MeasureDefinition 
         <strong>${definition?.label ?? type}</strong>
         ${definition ? html`<span class="type-desc">${definition.description}</span>` : nothing}
       </span>
-      <button type="button" @click=${onChange}>Change</button>
+      <button type="button" aria-label="Change measurement type" @click=${onChange}>Change</button>
     </div>
   `;
 }
@@ -100,7 +100,7 @@ export function renderPowerMeterSummary(options: PowerMeterSummaryOptions) {
         <span>Measurement device: ${options.measureDevice}</span>
         <span>${detail}</span>
       </span>
-      <button type="button" @click=${options.onOpenSettings}>Change</button>
+      <button type="button" aria-label="Change power meter" @click=${options.onOpenSettings}>Change</button>
     </div>
   `;
 }
