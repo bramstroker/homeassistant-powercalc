@@ -15,6 +15,9 @@ export default defineConfig({
     sourcemap: true,
   },
   test: {
+    // Unit tests only. The browser tests under e2e/ are Playwright's, and would otherwise be
+    // collected here by vitest's default *.spec.ts pattern.
+    include: ["src/**/*.test.ts"],
     environment: "jsdom",
     globals: true,
     restoreMocks: true,
