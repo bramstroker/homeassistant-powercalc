@@ -40,10 +40,10 @@ export function numberField(name: string, label: string, value: string, options:
     <input
       type="number"
       name=${name}
-      .value=${value}
       min=${min ?? nothing}
       max=${max ?? nothing}
       step=${step}
+      .value=${value}
       ?required=${required}
       ?disabled=${disabled}
       @input=${onInput}
