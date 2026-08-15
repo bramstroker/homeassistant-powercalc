@@ -38,6 +38,7 @@ from measure.runner.light_plan import (
 
 _LOGGER = logging.getLogger("measure")
 
+_CURRENT_SESSION_FILENAME = "current.json"
 _DUMMY_LOAD_CALIBRATION_FILENAME = "dummy_load_calibration.json"
 _CONTRIBUTION_STATUS_FILENAME = "contribution_status.json"
 _SHELLY_CREDENTIALS_FILENAME = "shelly_credentials.json"
@@ -79,17 +80,17 @@ class SessionStorage:
         self._write_json(directory / "request.json", request.model_dump(mode="json"))
         self._request_cache[snapshot.id] = request
         self.write_snapshot(snapshot)
-        self._write_json(self.data_root / "current.json", {"id": snapshot.id})
+        self._write_json(self.data_root / _CURRENT_SESSION_FILENAME, {"id": snapshot.id})
         return directory
 
     def set_current(self, session_id: str) -> None:
         """Point startup recovery at an existing session."""
         self.load_snapshot(session_id)
-        self._write_json(self.data_root / "current.json", {"id": session_id})
+        self._write_json(self.data_root / _CURRENT_SESSION_FILENAME, {"id": session_id})
 
     def clear_current(self, session_id: str | None = None) -> None:
         """Remove the current pointer, optionally only when it names ``session_id``."""
-        path = self.data_root / "current.json"
+        path = self.data_root / _CURRENT_SESSION_FILENAME
         if session_id is not None and path.exists():
             try:
                 if str(self._read_json(path)["id"]) != session_id:
@@ -138,7 +139,9 @@ class SessionStorage:
             try:
                 events.append(self._decode_event(pending_line))
             except json.JSONDecodeError:
-                _LOGGER.warning("Ignoring a truncated final session event for %s", session_id)
+                # The session id is caller-supplied, so keep it out of the log and report the
+                # recovered count instead — it says as much about where the file was cut off.
+                _LOGGER.warning("Ignoring a truncated final session event after %d recovered events", len(events))
         return tuple(events)
 
     @staticmethod
@@ -156,7 +159,7 @@ class SessionStorage:
 
     def load_current(self) -> SessionSnapshot | None:
         """Load the current snapshot and recover an interrupted active session."""
-        current_path = self.data_root / "current.json"
+        current_path = self.data_root / _CURRENT_SESSION_FILENAME
         if not current_path.exists():
             return None
         try:

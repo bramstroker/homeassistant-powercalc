@@ -137,7 +137,10 @@ export function buildMeasurementRequest(
 /** The controller spec a submitted entity field describes: a virtual device, one entity, or several. */
 function controllerSpec(form: FormData, field: FormField, dummyController: boolean): Record<string, unknown> {
   if (dummyController) return { type: "dummy" };
-  const entityIds = form.getAll(field.name).map((value) => String(value).trim()).filter(Boolean);
+  const entityIds = form.getAll(field.name)
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim())
+    .filter(Boolean);
   if (entityIds.length > 1) return { type: "hass_multi", entity_ids: entityIds };
   return { type: "hass", entity_id: entityIds[0] ?? "" };
 }

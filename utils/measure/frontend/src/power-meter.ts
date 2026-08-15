@@ -84,11 +84,11 @@ export const POWER_METERS: { [T in PowerMeterType]: PowerMeterDescriptor<T> } = 
     describe: (spec, context) => {
       const entity = context.powers.find((candidate) => candidate.entity_id === spec.entity_id);
       const voltage = context.voltages.find((candidate) => candidate.entity_id === spec.voltage_entity_id);
+      const voltageName = voltage ? `${voltage.name} · ` : "";
+      const voltageDetail = `Voltage: ${voltageName}${spec.voltage_entity_id}`;
       return {
         source: entity ? `${entity.name} · ${entity.entity_id}` : spec.entity_id,
-        detail: spec.voltage_entity_id
-          ? `Voltage: ${voltage ? `${voltage.name} · ` : ""}${spec.voltage_entity_id}`
-          : "Home Assistant power sensor",
+        detail: spec.voltage_entity_id ? voltageDetail : "Home Assistant power sensor",
       };
     },
   },

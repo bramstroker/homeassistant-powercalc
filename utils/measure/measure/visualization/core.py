@@ -157,10 +157,11 @@ def limit_plot_points(plot: PlotSpec, max_points: int) -> PlotSpec:
     """Return the plot with every series downsampled to at most max_points."""
 
     limit = _limit_line if plot.kind is PlotKind.LINE else _limit_scatter
-    return replace(
+    limited: PlotSpec = replace(
         plot,
         series=tuple(replace(series, points=limit(series.points, max_points)) for series in plot.series),
     )
+    return limited
 
 
 def _build_plot(

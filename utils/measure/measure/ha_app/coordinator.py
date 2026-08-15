@@ -174,7 +174,7 @@ class MeasurementCoordinator:
                 raise SessionConflictError("The requested session is not waiting for confirmation")
             if self._control is None:
                 raise SessionConflictError("The requested session cannot be continued")
-            snapshot = replace(
+            running: SessionSnapshot = replace(
                 snapshot,
                 state=SessionState.RUNNING,
                 phase="Starting measurement",
@@ -182,10 +182,10 @@ class MeasurementCoordinator:
                 confirmation_action=None,
                 updated_at=utc_now(),
             )
-            self._snapshot = snapshot
-            self.storage.write_snapshot(snapshot)
+            self._snapshot = running
+            self.storage.write_snapshot(running)
             self._control.continue_run()
-            return snapshot
+            return running
 
     def delete(self, session_id: str) -> None:
         """Delete a terminal retained session."""

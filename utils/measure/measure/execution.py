@@ -92,7 +92,6 @@ class ImmediateInteraction(RunInteraction):
 
     def confirm(self, _: str, *, action: str | None = None) -> None:
         del action
-        return
 
     def notify(self, _: str) -> None:
         return
