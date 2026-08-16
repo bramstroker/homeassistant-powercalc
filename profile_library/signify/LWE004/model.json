@@ -1,0 +1,24 @@
+{
+  "aliases": [
+    "9290024795"
+  ],
+  "author_info": {
+    "name": "philscottydev",
+    "github": "philscottydev"
+  },
+  "calculation_strategy": "lut",
+  "created_at": "2026-08-16T13:36:13Z",
+  "device_type": "light",
+  "max_voltage": 231.6,
+  "measure_description": "Measured with utils/measure script on a single lamp, using a resistive dummy load (~8.4 W, calibrated warm at 6434.83 ohm) because the power meter drops to 0.0 W below ~0.8 W. Residual scatter around the smoothed curve is sigma 0.042 W. Note that below brightness ~30 the true increment per step (~0.017 W) is smaller than that scatter, so the lowest ~12 % of the table is noise-dominated and not strictly monotonic; the rest resolves cleanly (bri 60-120: +0.32 W = 7.7 sigma, bri 120-255: +1.50 W = 36 sigma).",
+  "measure_device": "Shelly Plus 1PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 5,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.3.0:cli"
+  },
+  "min_voltage": 228.6,
+  "name": "Hue White Filament Candle E14",
+  "standby_power": 0.24
+}
