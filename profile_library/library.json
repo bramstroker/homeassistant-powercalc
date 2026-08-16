@@ -6047,14 +6047,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "ce6dbe7897fa740802e930f694582c6c"
+          "hash": "d75f9f60c1fd6b6da1d593db258dd7b5"
         },
         {
           "calculation_strategy": "lut",
@@ -6312,12 +6312,13 @@
           "hash": "733c0fc91c5df8a3646a12747dfe09f5"
         },
         {
-          "calculation_strategy": "linear",
+          "calculation_strategy": "fixed",
           "created_at": "2026-08-15T20:38:56Z",
           "device_type": "smart_dimmer",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "manual",
           "name": "2-in-1 Dimmer Switch (VZM31-SN)",
+          "only_self_usage": true,
           "standby_power": 0.26,
           "standby_power_on": 0.29,
           "author_info": {
@@ -6327,10 +6328,10 @@
           },
           "id": "VZM31-SN",
           "manufacturer": "inovelli",
-          "updated_at": "2026-08-16T05:13:44",
+          "updated_at": "2026-08-16T17:17:50",
           "max_power": 0.29,
           "sub_profile_count": 0,
-          "hash": "37386d767b118083af73b92ac15992b8"
+          "hash": "972a6519705fb4d9de495b416107f9d4"
         }
       ],
       "device_types": [
@@ -16161,14 +16162,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "21477d763d284898246bb1e99f9077aa"
+          "hash": "7d6818ae2a109fb2312a145370b250db"
         },
         {
           "calculation_strategy": "lut",
@@ -17229,14 +17230,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "cd9cfebe2fbb594811c295e8deafe2a4"
+          "hash": "b2d1b7b7866f79a6cefd2dadf13f18bb"
         },
         {
           "aliases": [
@@ -17762,7 +17763,7 @@
           "standby_power": 0.24,
           "id": "LWE004",
           "manufacturer": "signify",
-          "updated_at": "2026-08-16T13:39:09",
+          "updated_at": "2026-08-16T13:46:33",
           "max_power": 4.33,
           "sub_profile_count": 0,
           "color_modes": [
@@ -17776,7 +17777,7 @@
             "min": 228.6,
             "max": 231.6
           },
-          "hash": "d050aecf7627662b3e6a8dfce5a53b60"
+          "hash": "5c87b04a2c55c8237d105fde2785d0d2"
         },
         {
           "aliases": [
@@ -17836,14 +17837,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 86.6,
             "color_temp": 86.6
           },
-          "hash": "335979d0cc46539999b328300ef3b608"
+          "hash": "31e6a0a53cf7d1e71fd22610887e4938"
         },
         {
           "aliases": [
@@ -18871,14 +18872,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 96.2,
             "color_temp": 96.2
           },
-          "hash": "a256e77ec5805addd2225abb9865ba1e"
+          "hash": "62127286a5a3a3fe6304a072768e6997"
         },
         {
           "aliases": [
@@ -18937,14 +18938,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 79.3,
             "color_temp": 79.3
           },
-          "hash": "ef0f66b1f39fb6857d61e27a3f4a7915"
+          "hash": "040db0f2078b4cb8d74bda1d07632263"
         },
         {
           "calculation_strategy": "lut",
@@ -19225,14 +19226,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 96.9,
             "color_temp": 96.9
           },
-          "hash": "4716e489c677045f9488285f35c1c105"
+          "hash": "a8751ac0084fa2356d2e24995553302a"
         },
         {
           "aliases": [
@@ -19669,14 +19670,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.2,
             "color_temp": 99.2
           },
-          "hash": "2791f4169f1db5d0eb193707d1961fd0"
+          "hash": "aabbdb8adf16d6c8af0826b5807a0dcc"
         },
         {
           "aliases": [],
@@ -19791,14 +19792,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "421889790cf901d69b9b19ef223a7c1e"
+          "hash": "bf2a9d1c545bbf3908eb2cb00db04b0e"
         },
         {
           "aliases": [
@@ -21338,14 +21339,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 95.7,
             "color_temp": 95.7
           },
-          "hash": "063486970970648ed50d79085778c320"
+          "hash": "e5c6d60f7dff137a0b6a4dd78ae0d892"
         },
         {
           "aliases": [
@@ -23723,14 +23724,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "2ed8aa33616aafc0eb7764e4c1bcd107"
+          "hash": "30cde2c540d5cd10b73832a755f51e7f"
         },
         {
           "calculation_strategy": "lut",
@@ -23756,14 +23757,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 98.4,
             "color_temp": 98.4
           },
-          "hash": "8575dffb81b7e28e3957095fafc5eb45"
+          "hash": "666b894e907ac6f971546ace1b7a0767"
         },
         {
           "calculation_strategy": "lut",
@@ -23823,14 +23824,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 67.4,
             "color_temp": 67.4
           },
-          "hash": "2b9d1ab311d6bc3b083d269393a178e1"
+          "hash": "9f15b887766b12857c22e6544132b0eb"
         },
         {
           "calculation_strategy": "lut",
@@ -23889,10 +23890,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "525bd620d6961bebe74f82cb3204db96"
+          "hash": "06ae899b8045b93c59c775f3cfcc4fed"
         },
         {
           "calculation_strategy": "lut",
@@ -23952,14 +23953,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "31919f370b21c722bffc703ed0be1669"
+          "hash": "780cbdcc1e2aa6f53662740818a1b57b"
         },
         {
           "calculation_strategy": "lut",
