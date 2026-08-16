@@ -11,10 +11,6 @@
   "name": "Hardware Bridge",
   "discovery_by": "device",
   "only_self_usage": true,
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "standby_power": 0.51,
   "author_info": {
     "name": "Tim",

@@ -7,10 +7,6 @@
   "measure_method": "manual",
   "name": "Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA",
   "only_self_usage": true,
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "standby_power": 0.29,
   "standby_power_on": 2.565,
   "author_info": {
