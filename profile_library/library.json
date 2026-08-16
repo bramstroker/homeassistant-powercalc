@@ -1177,10 +1177,10 @@
           },
           "id": "HG08673",
           "manufacturer": "lidl",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.071,
           "sub_profile_count": 0,
-          "hash": "e6551940195ea5d0d294002b5ce58663"
+          "hash": "e65cb6e7c472d4896e4641d675159602"
         },
         {
           "calculation_strategy": "lut",
@@ -1524,10 +1524,10 @@
           },
           "id": "SP 240",
           "manufacturer": "innr",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.75,
           "sub_profile_count": 0,
-          "hash": "a4fdf3deb79e3052fa107beb93df2ca3"
+          "hash": "ccb12da7c5996b731d08cfb5d732db66"
         },
         {
           "calculation_strategy": "fixed",
@@ -2018,10 +2018,10 @@
           },
           "id": "SP 120",
           "manufacturer": "innr",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.61,
           "sub_profile_count": 0,
-          "hash": "aa80973ce5bab0263ffb4e5cfc06ea2d"
+          "hash": "e8268d58697c5aae7d3fda68f812a189"
         },
         {
           "calculation_strategy": "lut",
@@ -2254,10 +2254,10 @@
           },
           "id": "Shelly Pro 3EM 3CT63",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 6,
-          "hash": "1bad81a475445950d10448318a9573e8"
+          "hash": "f44dbcbbd7426b93bd13b798576909e7"
         },
         {
           "name": "Plus 2PM",
@@ -2290,10 +2290,10 @@
           },
           "id": "Shelly Plus 2PM",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": null,
           "sub_profile_count": 16,
-          "hash": "4ee5977add7c2d714ddc47766fc51124"
+          "hash": "39f1b6bd03127f6b7dc515826f877e0c"
         },
         {
           "aliases": [
@@ -2320,10 +2320,10 @@
           },
           "id": "Shelly Dimmer",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "f759c311c9b8e7ab7227b5c6a1c72944"
+          "hash": "6ab4f4a713bad7aa3a0704a88192b413"
         },
         {
           "aliases": [
@@ -2346,10 +2346,10 @@
           },
           "id": "Shelly 3EM",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.22,
           "sub_profile_count": 0,
-          "hash": "f27533b6db83c119d9fb9f767273a6ee"
+          "hash": "a8c855a19ad47317cae41de2004d5e59"
         },
         {
           "aliases": [
@@ -2369,10 +2369,10 @@
           },
           "id": "Shelly Plus Plug US",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0,
           "sub_profile_count": 0,
-          "hash": "51d790a5b877ba2aadd4831b150925ce"
+          "hash": "b0b5d0b30c0efd34bb3bef90385880a0"
         },
         {
           "aliases": [
@@ -2433,10 +2433,10 @@
           },
           "id": "Shelly Plus 1PM",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 3,
-          "hash": "e100ae50444d99dd71691103f32f5141"
+          "hash": "00e77ba645cdad0b80a74529745a841d"
         },
         {
           "aliases": [
@@ -2491,10 +2491,10 @@
           },
           "id": "Shelly I4 Gen3",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 3,
-          "hash": "67848610ae0792462a2f7a953083ec14"
+          "hash": "8b9b75ad6f1617bba37968d3863c2bcb"
         },
         {
           "aliases": [
@@ -2516,10 +2516,10 @@
           },
           "id": "Shelly 1PM Mini Gen3",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 3,
-          "hash": "9cc6e88d98cd77d001381a1af7b423df"
+          "hash": "626408c9de49f38bc1212973995fcaed"
         },
         {
           "aliases": [
@@ -2546,10 +2546,10 @@
           },
           "id": "Shelly i3",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "4dbe1be61394593f0889817095018a8a"
+          "hash": "263c773866f13d0c60a1434d48989baf"
         },
         {
           "aliases": [
@@ -2604,10 +2604,10 @@
           },
           "id": "Shelly Plug S MTR Gen3",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 2,
-          "hash": "cf37be048158f96a82b554ac7528f2bc"
+          "hash": "24b54dcc2a66e937e4cea2a16ea7a814"
         },
         {
           "aliases": [
@@ -2629,10 +2629,10 @@
           },
           "id": "shelly pm mini gen3",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "0b38be6355a681b5875e1262e80869b8"
+          "hash": "d3a98b133b7b091cdeca1d948210f9cb"
         },
         {
           "aliases": [
@@ -2657,10 +2657,10 @@
           },
           "id": "shelly plus plug s",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.01,
           "sub_profile_count": 0,
-          "hash": "5e007cc73ff7134e458e1657b1b3d98a"
+          "hash": "5b92c6da2d7d01002d1c08699267a53a"
         },
         {
           "measure_method": "manual",
@@ -2719,10 +2719,10 @@
           },
           "id": "Shelly 2.5",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "4a0f5d2d31d3d34285fc7a0ba65f5976"
+          "hash": "10499f1190f12b540a0e2fe87a1b92e1"
         },
         {
           "aliases": [
@@ -2771,10 +2771,10 @@
           },
           "id": "Shelly 1L Gen3",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 5,
-          "hash": "305000de8836d0490936c5ed9aea5e34"
+          "hash": "94ef4cf375dcfcec5b92428895a79ea8"
         },
         {
           "aliases": [
@@ -2798,10 +2798,10 @@
           },
           "id": "Shelly 1 Mini Gen4",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 4,
-          "hash": "b6ef15f0255f8c3fef7b8d1bb7ea4851"
+          "hash": "a7e5bf567561d58d3115e60b6162d1ff"
         },
         {
           "aliases": [
@@ -2822,10 +2822,10 @@
           },
           "id": "shelly plug s",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 2,
-          "hash": "23b44440696f4651e7423d7300696a52"
+          "hash": "9488e6b9d73dd19d2c91b0f6237b7a12"
         },
         {
           "aliases": [
@@ -2851,10 +2851,10 @@
           },
           "id": "Shelly 1PM Mini Gen4",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 4,
-          "hash": "a1e4eb2883341c243c19b64c43cfb888"
+          "hash": "353dfb646ad358a3f1ba374634480fb1"
         },
         {
           "aliases": [
@@ -2882,10 +2882,10 @@
           },
           "id": "Shelly 1PM",
           "manufacturer": "shelly",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.85,
           "sub_profile_count": 0,
-          "hash": "60d32b82d9a1e43bf88e190dfbe394d3"
+          "hash": "16db672f9e4fde0b459eb6135559a95c"
         }
       ],
       "device_types": [
@@ -3062,10 +3062,10 @@
           },
           "id": "SHP6-15A",
           "manufacturer": "blitzwolf",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.8,
           "sub_profile_count": 0,
-          "hash": "87589cb00903182352ecddf4f146b71d"
+          "hash": "09803b5f675ca09e09bafbff70f7899d"
         },
         {
           "calculation_strategy": "fixed",
@@ -3084,10 +3084,10 @@
           },
           "id": "SHP6",
           "manufacturer": "blitzwolf",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.85,
           "sub_profile_count": 0,
-          "hash": "9c93fbbd50e9d73adfe7c6be286dd022"
+          "hash": "dacb06e62ea0ec3b97bff7436a7832b9"
         }
       ],
       "device_types": [
@@ -4864,10 +4864,10 @@
           },
           "id": "GWPN1",
           "manufacturer": "greenwave",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.1,
           "sub_profile_count": 0,
-          "hash": "8168a609fcaa189baa55c28f78504286"
+          "hash": "fb956203dc9fc413cc7b9dd56b65cadf"
         }
       ],
       "device_types": [
@@ -5088,10 +5088,10 @@
           },
           "id": "TS0121_plug",
           "manufacturer": "tuya",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.866,
           "sub_profile_count": 0,
-          "hash": "c53fe836b29f7ae07c8aa0e0083ae735"
+          "hash": "808925bece600c33ff6ff0ae46a7eba9"
         },
         {
           "aliases": [],
@@ -5214,10 +5214,10 @@
           },
           "id": "TS011F",
           "manufacturer": "tuya",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.39,
           "sub_profile_count": 0,
-          "hash": "5366cc38220e44857027f15ae2aaf0ed"
+          "hash": "efa3356951bf32f04fcf016891edda49"
         },
         {
           "calculation_strategy": "lut",
@@ -5426,10 +5426,10 @@
           },
           "id": "ZWA023",
           "manufacturer": "aeotec",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.8,
           "sub_profile_count": 0,
-          "hash": "ac93df556e3bff940447e973cb5cece5"
+          "hash": "d5bfcbca4ea8fd5b3412d063e67ab2df"
         },
         {
           "calculation_strategy": "fixed",
@@ -5566,10 +5566,10 @@
           },
           "id": "20EBU4101",
           "manufacturer": "eve",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.9,
           "sub_profile_count": 0,
-          "hash": "a6cee3dd90cdc72584b66ee5e90963e1"
+          "hash": "9b8c3795d92ec7f3f626e1c52bcf002f"
         }
       ],
       "device_types": [
@@ -6273,10 +6273,10 @@
           },
           "id": "AN158",
           "manufacturer": "everspring",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.5,
           "sub_profile_count": 0,
-          "hash": "7d3db3edd5e076176952dc6b52e2efa8"
+          "hash": "5601ae2ea00e748767251f1b97ed78f4"
         }
       ],
       "device_types": [
@@ -6306,10 +6306,10 @@
           },
           "id": "VZM32-SN",
           "manufacturer": "inovelli",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:18:16",
           "max_power": 1.59,
           "sub_profile_count": 0,
-          "hash": "733c0fc91c5df8a3646a12747dfe09f5"
+          "hash": "ec6f60f4ee7cf1e54b8ab7b7aa837568"
         },
         {
           "calculation_strategy": "fixed",
@@ -6551,10 +6551,10 @@
           },
           "id": "ROB_200-017-0",
           "manufacturer": "robb",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.65,
           "sub_profile_count": 0,
-          "hash": "befb8d28daf4363545e1dee969f43a64"
+          "hash": "d403d7a9331abbe2c56ec34af62353d4"
         }
       ],
       "device_types": [
@@ -6611,10 +6611,10 @@
           },
           "id": "HmIP-BSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.2,
           "sub_profile_count": 0,
-          "hash": "d11201764cf86fc239e9b3bbdd6b0f6c"
+          "hash": "d0860c5e58d0e71fea48c0f3d3567a11"
         },
         {
           "calculation_strategy": "fixed",
@@ -6708,10 +6708,10 @@
           },
           "id": "HM-ES-PMSw1-DR",
           "manufacturer": "eq-3",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.73,
           "sub_profile_count": 0,
-          "hash": "4b0463aa0d0439264a1335c4ba14acf1"
+          "hash": "8088627ad1d3ff53cc6e93ec537da15f"
         },
         {
           "calculation_strategy": "fixed",
@@ -6733,10 +6733,10 @@
           },
           "id": "HmIP-FSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.74,
           "sub_profile_count": 0,
-          "hash": "888872180528d2ee928738a63dd9448e"
+          "hash": "ac54c9fbda4d4714ab84d7b3d8f5818e"
         },
         {
           "calculation_strategy": "fixed",
@@ -6758,10 +6758,10 @@
           },
           "id": "HmIP-PSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.78,
           "sub_profile_count": 0,
-          "hash": "fedbbcd1b935bbb55dbc71a4bbee7501"
+          "hash": "dc016a41d2975028af7b2cf0f5b75ce8"
         },
         {
           "calculation_strategy": "linear",
@@ -6829,10 +6829,10 @@
           },
           "id": "HmIP-FSM16",
           "manufacturer": "eq-3",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.2,
           "sub_profile_count": 0,
-          "hash": "e753620dc43c128e7a1214d5792922e6"
+          "hash": "994eba15adb3ed30a90fa013defae960"
         }
       ],
       "device_types": [
@@ -6919,10 +6919,10 @@
           },
           "id": "smart-plug-au",
           "manufacturer": "athom",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.03,
           "sub_profile_count": 0,
-          "hash": "ace2a842032ab72f8bade30258152cdb"
+          "hash": "c82e020960512cbbd1615b1e0a2f15ce"
         },
         {
           "aliases": [
@@ -7979,10 +7979,10 @@
           },
           "id": "Micro Smart Plug",
           "manufacturer": "nodon",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.96,
           "sub_profile_count": 0,
-          "hash": "8139528c7ccef57e38f8b7b729e4c972"
+          "hash": "c548a7bb77aca7c90c6387c30281e505"
         }
       ],
       "device_types": [
@@ -8762,10 +8762,10 @@
           },
           "id": "lumi.plug.maeu01",
           "manufacturer": "aqara",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.46,
           "sub_profile_count": 0,
-          "hash": "5d3fabff5f5dca901f86861051ea35f7"
+          "hash": "4f765311969cdb588de0fa56ca455f40"
         },
         {
           "calculation_strategy": "lut",
@@ -8835,10 +8835,10 @@
           },
           "id": "lumi.gateway.mgl03",
           "manufacturer": "xiaomi",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "ccb401d2c5afeb8440046fa2036f56a8"
+          "hash": "1c66f3de33a21b2914a23185afbc010e"
         },
         {
           "calculation_strategy": "linear",
@@ -9280,10 +9280,10 @@
           },
           "id": "FGWP102",
           "manufacturer": "fibaro",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.8,
           "sub_profile_count": 0,
-          "hash": "6942f60b1084479da62f18ebf1a2c3f8"
+          "hash": "6d2d1a46e9b3b8d292dda56b57a7e4ce"
         }
       ],
       "device_types": [
@@ -9362,10 +9362,10 @@
           },
           "id": "NAS-WR01Z",
           "manufacturer": "neo-coolcam",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.58,
           "sub_profile_count": 0,
-          "hash": "6e24339e6f31af59ca61f28483823bc1"
+          "hash": "26e1536ba3324775a57b1c248899a6da"
         }
       ],
       "device_types": [
@@ -9428,10 +9428,10 @@
           },
           "id": "FRITZ!DECT 200",
           "manufacturer": "avm",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.0,
           "sub_profile_count": 0,
-          "hash": "7b81c4ec3b54c0ef0734f6a7afe824cd"
+          "hash": "97bc642bf79a9bd0b0f4da9fc0f7a2b4"
         },
         {
           "calculation_strategy": "fixed",
@@ -9587,10 +9587,10 @@
           },
           "id": "FRITZ!DECT 210",
           "manufacturer": "avm",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.1,
           "sub_profile_count": 0,
-          "hash": "8d424264cbefcd756fc251a4d1577ff1"
+          "hash": "bdc696a528fa374a0c6060d94a9b485a"
         },
         {
           "calculation_strategy": "fixed",
@@ -10088,10 +10088,10 @@
           },
           "id": "A1T",
           "manufacturer": "nous",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.54,
           "sub_profile_count": 0,
-          "hash": "2de25ab7d1bc215c116ad1655fd638fb"
+          "hash": "a0ca7a22eb08b3956bac5dd92b8c7c10"
         },
         {
           "aliases": [
@@ -10113,10 +10113,10 @@
           },
           "id": "A1Z",
           "manufacturer": "nous",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.4,
           "sub_profile_count": 0,
-          "hash": "3c042c2ce698b9c186139bcc3db06600"
+          "hash": "0c635f4aa0b3d739fe1a825ca31c4342"
         }
       ],
       "device_types": [
@@ -10242,10 +10242,10 @@
           },
           "id": "ECO-DIM.07 Zigbee Basic",
           "manufacturer": "ecodim",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.3,
           "sub_profile_count": 0,
-          "hash": "b08862ec890bcc36d7621c43bb03244b"
+          "hash": "265189caff1ecf1bc32d4aae31e32b79"
         }
       ],
       "device_types": [
@@ -10612,10 +10612,10 @@
           },
           "id": "E2206",
           "manufacturer": "ikea",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.8,
           "sub_profile_count": 0,
-          "hash": "b1f544360ff8a926e98efcff9751b02a"
+          "hash": "3e48b7762a71ff5e19f7319d69bf2729"
         },
         {
           "aliases": [
@@ -11842,10 +11842,10 @@
           },
           "id": "E2491",
           "manufacturer": "ikea",
-          "updated_at": "2026-04-19T14:38:22",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.47,
           "sub_profile_count": 0,
-          "hash": "e72214329af5ff3c2d17b792e8d0856d"
+          "hash": "237d9c7b6c24e276b7066d1d5b520f69"
         },
         {
           "aliases": [
@@ -12142,10 +12142,10 @@
           },
           "id": "E2221",
           "manufacturer": "ikea",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.7,
           "sub_profile_count": 0,
-          "hash": "f13b33d4e11db8008b2c19077401082d"
+          "hash": "02dd2f623ae5b9e68a5da55b8e592e7f"
         },
         {
           "aliases": [
@@ -13253,10 +13253,10 @@
           },
           "id": "220694",
           "manufacturer": "nuki",
-          "updated_at": "2026-04-20T19:33:39",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "7f974bd8e540c73c4f434c5a163d8327"
+          "hash": "288ceb45b38a12c9146929e07bc4e487"
         }
       ],
       "device_types": [
@@ -13293,15 +13293,15 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
           "lut_quality": {
             "score": 33.4,
             "brightness": 98.9,
             "color_temp": 33.4
           },
-          "hash": "0305b81807f93ee986df3d67a0138f1e"
+          "hash": "0927c2473ab6294dbbf54667db386887"
         }
       ],
       "device_types": [
@@ -13471,10 +13471,10 @@
           },
           "id": "PC191HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.144,
           "sub_profile_count": 0,
-          "hash": "01099284059c9e95febc7b9d6fd77535"
+          "hash": "88112dde008de1018fe0b6dddebb8186"
         },
         {
           "calculation_strategy": "fixed",
@@ -13493,10 +13493,10 @@
           },
           "id": "PC287HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 2.565,
           "sub_profile_count": 0,
-          "hash": "eda9c8852b064e92f80d6c76b6161978"
+          "hash": "d5c255005c7ffcd8091ca9adc3473d67"
         },
         {
           "calculation_strategy": "lut",
@@ -13611,10 +13611,10 @@
           },
           "id": "PC192HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.596,
           "sub_profile_count": 0,
-          "hash": "dac0ef2ac80a8ed02f5e3f18886da48f"
+          "hash": "d9f20210636688bf0c4cdcb08cdb9efc"
         }
       ],
       "device_types": [
@@ -21776,15 +21776,15 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
           "lut_quality": {
             "score": 93.8,
             "brightness": 98.8,
             "color_temp": 93.8
           },
-          "hash": "dca4ef1261cdc42ae5552f9dabe95bbc"
+          "hash": "04c85f9581514ff23e017ca8eb7c465b"
         },
         {
           "aliases": [
@@ -21807,10 +21807,10 @@
           },
           "id": "KP115",
           "manufacturer": "tp-link",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.9,
           "sub_profile_count": 0,
-          "hash": "e285ce03982923439768d9cad6b944a1"
+          "hash": "d6b5898f8eb4d5ac4eb40162da74d1d3"
         },
         {
           "aliases": [
@@ -21835,10 +21835,10 @@
           },
           "id": "HS300",
           "manufacturer": "tp-link",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "7735fc7e0423ce282acf544173f68618"
+          "hash": "494daa969b688574b6fb3b0288a03b21"
         },
         {
           "aliases": [
@@ -21860,10 +21860,10 @@
           },
           "id": "HS110",
           "manufacturer": "tp-link",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 2.19,
           "sub_profile_count": 0,
-          "hash": "808a55dd28cf099ff466e1feaa665ac5"
+          "hash": "a3734577ba945059dd718d1594a3cf0f"
         },
         {
           "calculation_strategy": "lut",
@@ -21918,10 +21918,10 @@
           },
           "id": "HS100",
           "manufacturer": "tp-link",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.461,
           "sub_profile_count": 0,
-          "hash": "974e8e377ec0d0e2c71f13bf7ea89cba"
+          "hash": "a68c7924de1d064f56eb3d62048df7da"
         },
         {
           "aliases": [
@@ -21942,10 +21942,10 @@
           },
           "id": "KP125M",
           "manufacturer": "tp-link",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.92,
           "sub_profile_count": 0,
-          "hash": "643805f43fd7fdf4a7c696db770b8b71"
+          "hash": "459bc2d32a740296f823508d44aeb7c0"
         },
         {
           "aliases": [
@@ -21968,10 +21968,10 @@
           },
           "id": "P110M",
           "manufacturer": "tp-link",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.2,
           "sub_profile_count": 0,
-          "hash": "4974ebffaa44174f7dce2df1c79c30bf"
+          "hash": "aae3bb53fbbddce3f8580861d13b877e"
         },
         {
           "aliases": [
@@ -21992,10 +21992,10 @@
           },
           "id": "P110",
           "manufacturer": "tp-link",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.0,
           "sub_profile_count": 0,
-          "hash": "9ee129162c04ba76310977ef1b129835"
+          "hash": "4e280a7e10c9a7a271b77ef7fa7fc4cd"
         },
         {
           "calculation_strategy": "lut",
@@ -22021,14 +22021,14 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.4,
             "brightness": 99.4
           },
-          "hash": "91907e51cf07c0a4303501bc63f00d76"
+          "hash": "a5eb5f6ed2fcd5a30289e68ce713235e"
         },
         {
           "calculation_strategy": "fixed",
@@ -22119,10 +22119,10 @@
           },
           "id": "P115",
           "manufacturer": "tp-link",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 1.0,
           "sub_profile_count": 0,
-          "hash": "95d53c349852e4eef67945be66e54fc9"
+          "hash": "68c8be8bdb4b3b1b4640317fb30cf37e"
         },
         {
           "calculation_strategy": "lut",
@@ -22383,10 +22383,10 @@
           },
           "id": "Smart Plug 16A",
           "manufacturer": "qubino",
-          "updated_at": "2026-07-10T07:54:55",
+          "updated_at": "2026-08-16T17:21:20",
           "max_power": 0.5,
           "sub_profile_count": 0,
-          "hash": "bcf007608e07634436ffdeb5050029f4"
+          "hash": "90a1a7e9463322bcb149db505003ca28"
         }
       ],
       "device_types": [
@@ -24052,15 +24052,15 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
           "lut_quality": {
             "score": 84.6,
             "brightness": 98.9,
             "color_temp": 84.6
           },
-          "hash": "e0c0c95fc8d3fbf6a4c3e795f534ef5d"
+          "hash": "d2fc9d455ad6b16d246bfce3c4adf242"
         },
         {
           "calculation_strategy": "lut",
