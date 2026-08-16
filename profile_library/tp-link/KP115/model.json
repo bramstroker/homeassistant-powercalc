@@ -11,10 +11,6 @@
   "measure_method": "manual",
   "name": "Kasa Smart WiFi Plug Slim with Energy Monitoring",
   "only_self_usage": true,
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "standby_power": 0.5,
   "standby_power_on": 0.9,
   "author_info": {

@@ -16,10 +16,6 @@
   "only_self_usage": true,
   "calculation_strategy": "fixed",
   "standby_power": 1.51,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
   "author_info": {
     "name": "Largelos",
     "github": "Largelos"
