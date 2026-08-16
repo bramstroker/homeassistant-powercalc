@@ -23,7 +23,7 @@ from utils.library.common import PROFILE_DIRECTORY, open_lut_file
 from utils.library.scan_lut_quality import score_profile_directory
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = PROFILE_DIRECTORY
+DATA_DIR = str(Path(PROFILE_DIRECTORY).resolve())  # resolve, PROFILE_DIRECTORY contains ../.. segments
 REPO_OWNER = "bramstroker"
 REPO_NAME = "homeassistant-powercalc"
 MAX_CONCURRENT_FILE_TASKS = 50
@@ -502,17 +502,17 @@ async def get_pull_request_author(client: httpx.AsyncClient, commit_hash: str, h
 async def find_first_commit_author(file: str, check_paths: bool = True) -> Author | None:
     """Find the first commit that affected the directory and return the author's name."""
     commits = await get_commits_affected_directory(file)
+    relative_file = str(Path(file).relative_to(PROJECT_ROOT))
     for commit in reversed(commits):  # Process commits from the oldest to newest
         command = f"git diff-tree --no-commit-id --name-only -r {commit}"
         if not check_paths:
             return await get_commit_author(commit)
 
         affected_files = await run_git_command(command)
-        file = file.replace(str(PROJECT_ROOT), "").lstrip("/")
         paths = [
-            file.replace("profile_library", "custom_components/powercalc/data"),
-            file.replace("profile_library", "data"),
-            file,
+            relative_file.replace("profile_library", "custom_components/powercalc/data"),
+            relative_file.replace("profile_library", "data"),
+            relative_file,
         ]
         if any(path in affected_files.splitlines() for path in paths):
             return await get_commit_author(commit)
