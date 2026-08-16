@@ -7,6 +7,9 @@
     "github": "philscottydev"
   },
   "calculation_strategy": "composite",
+  "compatible_integrations": [
+    "philips_airpurifier_coap"
+  ],
   "composite_config": {
     "mode": "stop_at_first",
     "strategies": [
