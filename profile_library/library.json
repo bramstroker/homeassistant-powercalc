@@ -3457,7 +3457,6 @@
           "calculation_strategy": "lut",
           "created_at": "2026-08-02T19:53:34Z",
           "device_type": "light",
-          "max_voltage": 229.3,
           "measure_device": "IKEA INSPELNING",
           "measure_method": "script",
           "measure_settings": {
@@ -3465,9 +3464,12 @@
             "SLEEP_TIME": 7.0,
             "VERSION": "v0.3.0:app"
           },
-          "min_voltage": 224.2,
           "name": "Smart LED Bulb W4 Lite (Color)",
           "standby_power": 0.45,
+          "voltage_range": {
+            "min": 224.2,
+            "max": 229.3
+          },
           "id": "YLQPD-0011",
           "manufacturer": "yeelight",
           "updated_at": "2026-08-15T07:05:52",
@@ -3481,7 +3483,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "183791023f88fd9730a4761d85419936"
+          "hash": "1ab64e899500dbbb5db05e0a0c031ef3"
         },
         {
           "calculation_strategy": "lut",
@@ -3752,7 +3754,6 @@
           "calculation_strategy": "lut",
           "created_at": "2026-07-29T13:40:01Z",
           "device_type": "light",
-          "max_voltage": 234.2,
           "measure_device": "Shelly Plug S Gen3",
           "measure_method": "script",
           "measure_settings": {
@@ -3760,9 +3761,12 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.2.1:app"
           },
-          "min_voltage": 231.7,
           "name": "Matter Smart RGBTW Lampe, Wifi E27 800 Lumen",
           "standby_power": 0.29,
+          "voltage_range": {
+            "min": 231.7,
+            "max": 234.2
+          },
           "id": "LS0101911261",
           "manufacturer": "linkind",
           "updated_at": "2026-08-15T07:05:52",
@@ -3776,7 +3780,7 @@
             "score": 85.8,
             "color_temp": 85.8
           },
-          "hash": "7f1c494570d45cb30fb455d4078bfcee"
+          "hash": "491af0a52d3800cd074535dbb3855b1f"
         },
         {
           "calculation_strategy": "lut",
@@ -9159,7 +9163,6 @@
           "calculation_strategy": "composite",
           "created_at": "2026-07-20T21:56:29Z",
           "device_type": "fan",
-          "max_voltage": 118.6,
           "measure_device": "TP-Link Tapo P316M",
           "measure_method": "script",
           "measure_settings": {
@@ -9167,15 +9170,18 @@
             "SLEEP_TIME": 2,
             "VERSION": "v1.22.0:docker"
           },
-          "min_voltage": 116.6,
           "name": "Purifier Cool TP07",
           "standby_power": 1.13,
+          "voltage_range": {
+            "min": 116.6,
+            "max": 118.6
+          },
           "id": "TP07",
           "manufacturer": "dyson",
           "updated_at": "2026-07-25T15:23:50",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "a68eb65a4cc0404b502c9b66835f820c"
+          "hash": "50469169f3a5fb629118f8f4be7cef24"
         }
       ],
       "device_types": [
@@ -9769,7 +9775,6 @@
           "created_at": "2026-07-27T17:24:26Z",
           "device_type": "vacuum_robot",
           "integration": "dreame_vacuum",
-          "max_voltage": 234.9,
           "measure_device": "Shelly Plug S Gen3",
           "measure_method": "script",
           "measure_settings": {
@@ -9777,9 +9782,12 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.2.1:app"
           },
-          "min_voltage": 227.5,
           "name": "Robot Vacuum Cleaner",
           "standby_power": 2.6,
+          "voltage_range": {
+            "min": 227.5,
+            "max": 234.9
+          },
           "author_info": {
             "name": "Maxik933",
             "github": "Maxik933"
@@ -9792,7 +9800,7 @@
           "updated_at": "2026-08-01T07:54:35",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "a18aac2c7b0a00d7fcbbcb6d5b7a80c6"
+          "hash": "a6b6c2c210d438a4342f06fe668024ef"
         }
       ],
       "device_types": [
@@ -10126,7 +10134,6 @@
           "calculation_strategy": "lut",
           "created_at": "2026-08-10T01:00:53Z",
           "device_type": "light",
-          "max_voltage": 121.41,
           "measure_device": "Tapo P110M",
           "measure_method": "script",
           "measure_settings": {
@@ -10134,8 +10141,11 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.3.0:app"
           },
-          "min_voltage": 118.95,
           "name": "Matter RGBCW A19 E26 Smart Bulb",
+          "voltage_range": {
+            "min": 118.95,
+            "max": 121.41
+          },
           "aliases": [
             "1718"
           ],
@@ -10158,7 +10168,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "bd75437f77f29923dec105fd91d473ed"
+          "hash": "3339c22b9bf2fa991a397a83a5c4c1c1"
         },
         {
           "author_info": {
@@ -10168,7 +10178,6 @@
           "calculation_strategy": "lut",
           "created_at": "2026-08-05T22:43:13Z",
           "device_type": "light",
-          "max_voltage": 123.15,
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "script",
           "measure_settings": {
@@ -10176,8 +10185,11 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.3.0:app"
           },
-          "min_voltage": 119.45,
           "name": "Matter RGBCW A19 E26 Smart Bulb",
+          "voltage_range": {
+            "min": 119.45,
+            "max": 123.15
+          },
           "aliases": [
             "1718"
           ],
@@ -10195,7 +10207,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "6d1eeb5969efb51746b81e8b57d988f8"
+          "hash": "febb7c99bc69648fce4cdeafcce4f658"
         }
       ],
       "device_types": [
@@ -11674,7 +11686,6 @@
           "calculation_strategy": "lut",
           "created_at": "2026-06-18T00:07:18Z",
           "device_type": "light",
-          "max_voltage": 235.6,
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
@@ -11682,9 +11693,12 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.21.0:docker"
           },
-          "min_voltage": 231.3,
           "name": "KAJPLATS E14 WS B38 CL 470lm",
           "standby_power": 0.2,
+          "voltage_range": {
+            "min": 231.3,
+            "max": 235.6
+          },
           "author_info": {
             "name": "Keysie",
             "github": "keysie"
@@ -11702,7 +11716,7 @@
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "3f030ee952db7f6fd9be440190c1aab7"
+          "hash": "883a33be43fd59faa0205488d3286ae1"
         },
         {
           "aliases": [
@@ -13087,7 +13101,6 @@
           "calculation_strategy": "linear",
           "created_at": "2026-08-08T12:29:23Z",
           "device_type": "vacuum_robot",
-          "max_voltage": 244.58,
           "measure_device": "Athom ESPHome Wifi plug",
           "measure_method": "script",
           "measure_settings": {
@@ -13095,8 +13108,11 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.3.0:app"
           },
-          "min_voltage": 240.08,
           "name": "Roborock S5 Max",
+          "voltage_range": {
+            "min": 240.08,
+            "max": 244.58
+          },
           "author_info": {
             "name": "theveninjeremy",
             "github": "theveninjeremy"
@@ -13106,7 +13122,7 @@
           "updated_at": "2026-08-16T05:30:05",
           "max_power": 20.43,
           "sub_profile_count": 0,
-          "hash": "cec3e8bbada78fec036e1b771117955f"
+          "hash": "5f4cd6187bbc02f06083f66f8c7095dc"
         },
         {
           "calculation_strategy": "composite",
@@ -20856,7 +20872,6 @@
           "calculation_strategy": "lut",
           "created_at": "2026-08-15T16:46:46Z",
           "device_type": "light",
-          "max_voltage": 236.8,
           "measure_device": "Shelly 1PM Gen3",
           "measure_method": "script",
           "measure_settings": {
@@ -20864,9 +20879,12 @@
             "SLEEP_TIME": 3.0,
             "VERSION": "v0.3.0:cli"
           },
-          "min_voltage": 233.1,
           "name": "Base Coin Basic Set Swivelling round 90mm RGBW 420lm 4.9W",
           "standby_power": 0.13,
+          "voltage_range": {
+            "min": 233.1,
+            "max": 236.8
+          },
           "id": "92466",
           "manufacturer": "paulmann licht",
           "updated_at": "2026-08-16T05:22:39",
@@ -20880,7 +20898,7 @@
             "score": 99.5,
             "color_temp": 99.5
           },
-          "hash": "7c5029770b0b787707c7aea787f90872"
+          "hash": "b62bf0a41b80118937549ccdb91c78bc"
         },
         {
           "calculation_strategy": "lut",
@@ -21015,7 +21033,6 @@
           "calculation_strategy": "linear",
           "created_at": "2026-08-13T15:43:19Z",
           "device_type": "fan",
-          "max_voltage": 236.7,
           "measure_device": "Shelly Plus 1PM",
           "measure_method": "script",
           "measure_settings": {
@@ -21023,15 +21040,18 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.3.0:app"
           },
-          "min_voltage": 234.4,
           "name": "Cruiser Pro S Smart Tower Fan",
           "standby_power": 1.57,
+          "voltage_range": {
+            "min": 234.4,
+            "max": 236.7
+          },
           "id": "DR-HTF008S",
           "manufacturer": "dreo",
           "updated_at": "2026-08-15T07:05:52",
           "max_power": 36.03,
           "sub_profile_count": 0,
-          "hash": "01c1f323e8fc321acf994a0f33aeee70"
+          "hash": "c5320a881a45ee1df686ec2e0e02c7ae"
         }
       ],
       "device_types": [

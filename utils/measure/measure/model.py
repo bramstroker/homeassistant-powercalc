@@ -3,7 +3,11 @@ import json
 from pathlib import Path
 from typing import Any
 
-from measure.const import MODEL_JSON_MAX_VOLTAGE, MODEL_JSON_MIN_VOLTAGE
+from measure.const import (
+    MODEL_JSON_VOLTAGE_RANGE,
+    MODEL_JSON_VOLTAGE_RANGE_MAX,
+    MODEL_JSON_VOLTAGE_RANGE_MIN,
+)
 from measure.tuning import MeasurementParameters
 from measure.version import measure_version
 
@@ -33,12 +37,10 @@ def write_model_json(
         "standby_power": standby_power,
     }
     if voltages:
-        json_data.update(
-            {
-                MODEL_JSON_MIN_VOLTAGE: round(min(voltages), 2),
-                MODEL_JSON_MAX_VOLTAGE: round(max(voltages), 2),
-            },
-        )
+        json_data[MODEL_JSON_VOLTAGE_RANGE] = {
+            MODEL_JSON_VOLTAGE_RANGE_MIN: round(min(voltages), 2),
+            MODEL_JSON_VOLTAGE_RANGE_MAX: round(max(voltages), 2),
+        }
     if extra_json_data:
         json_data.update(extra_json_data)
 

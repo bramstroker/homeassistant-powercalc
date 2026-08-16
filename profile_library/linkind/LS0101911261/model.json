@@ -9,7 +9,6 @@
   "calculation_strategy": "lut",
   "created_at": "2026-07-29T13:40:01Z",
   "device_type": "light",
-  "max_voltage": 234.2,
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
@@ -18,7 +17,10 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.2.1:app"
   },
-  "min_voltage": 231.7,
   "name": "Matter Smart RGBTW Lampe, Wifi E27 800 Lumen",
-  "standby_power": 0.29
+  "standby_power": 0.29,
+  "voltage_range": {
+    "min": 231.7,
+    "max": 234.2
+  }
 }

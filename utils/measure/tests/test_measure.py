@@ -13,8 +13,9 @@ from inquirer.render import ConsoleRender
 from measure.cli.environment import CliEnvironment
 from measure.cli.main import Measure
 from measure.const import (
-    MODEL_JSON_MAX_VOLTAGE,
-    MODEL_JSON_MIN_VOLTAGE,
+    MODEL_JSON_VOLTAGE_RANGE,
+    MODEL_JSON_VOLTAGE_RANGE_MAX,
+    MODEL_JSON_VOLTAGE_RANGE_MIN,
     PROJECT_DIR,
     QUESTION_MODEL_ID,
     QUESTION_SELECTED_MEASURE_TYPE,
@@ -124,8 +125,10 @@ def test_run_light(mock_config_factory: MockConfigFactory) -> None:
     assert os.path.exists(model_json_path)
     with open(model_json_path) as model_json_file:
         model_json = json.load(model_json_file)
-    assert model_json[MODEL_JSON_MIN_VOLTAGE] == 233.0
-    assert model_json[MODEL_JSON_MAX_VOLTAGE] == 233.0
+    assert model_json[MODEL_JSON_VOLTAGE_RANGE] == {
+        MODEL_JSON_VOLTAGE_RANGE_MIN: 233.0,
+        MODEL_JSON_VOLTAGE_RANGE_MAX: 233.0,
+    }
 
 
 def test_take_measurement_tracks_voltage_range(mock_config_factory: MockConfigFactory) -> None:

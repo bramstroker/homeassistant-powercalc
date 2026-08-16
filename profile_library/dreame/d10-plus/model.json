@@ -127,7 +127,6 @@
   "created_at": "2026-07-27T17:24:26Z",
   "device_type": "vacuum_robot",
   "integration": "dreame_vacuum",
-  "max_voltage": 234.9,
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
@@ -136,9 +135,12 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.2.1:app"
   },
-  "min_voltage": 227.5,
   "name": "Robot Vacuum Cleaner",
   "standby_power": 2.6,
+  "voltage_range": {
+    "min": 227.5,
+    "max": 234.9
+  },
   "author_info": {
     "name": "Maxik933",
     "github": "Maxik933"
