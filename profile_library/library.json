@@ -3303,15 +3303,15 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "brightness",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
           "lut_quality": {
             "score": 87.0,
             "brightness": 87.0,
             "color_temp": 97.8
           },
-          "hash": "75d35feeef06c78d3f6875c59066bb3a"
+          "hash": "b7962bddf1de25272a0538c4953299d9"
         },
         {
           "aliases": [
@@ -3472,7 +3472,7 @@
           },
           "id": "YLQPD-0011",
           "manufacturer": "yeelight",
-          "updated_at": "2026-08-15T07:05:52",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": 8.3,
           "sub_profile_count": 0,
           "color_modes": [
@@ -3483,7 +3483,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "1ab64e899500dbbb5db05e0a0c031ef3"
+          "hash": "1d439cbaa13b8cbcad0b3f29ded856fc"
         },
         {
           "calculation_strategy": "lut",
@@ -3769,7 +3769,7 @@
           },
           "id": "LS0101911261",
           "manufacturer": "linkind",
-          "updated_at": "2026-08-15T07:05:52",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": 8.93,
           "sub_profile_count": 0,
           "color_modes": [
@@ -3780,7 +3780,7 @@
             "score": 85.8,
             "color_temp": 85.8
           },
-          "hash": "491af0a52d3800cd074535dbb3855b1f"
+          "hash": "30f5fa793554c085267a8bba3c276c15"
         },
         {
           "calculation_strategy": "lut",
@@ -9178,10 +9178,10 @@
           },
           "id": "TP07",
           "manufacturer": "dyson",
-          "updated_at": "2026-07-25T15:23:50",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "50469169f3a5fb629118f8f4be7cef24"
+          "hash": "b6135ead93bf4acbccbb2f638ddcd465"
         }
       ],
       "device_types": [
@@ -9797,10 +9797,10 @@
           ],
           "id": "d10-plus",
           "manufacturer": "dreame",
-          "updated_at": "2026-08-01T07:54:35",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "a6b6c2c210d438a4342f06fe668024ef"
+          "hash": "344daa5d91c794eb03cbe4d6db676e38"
         }
       ],
       "device_types": [
@@ -10157,7 +10157,7 @@
           },
           "id": "LI-A19-11W-MT",
           "manufacturer": "lightinginside",
-          "updated_at": "2026-08-16T05:30:05",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": 10.96,
           "sub_profile_count": 0,
           "color_modes": [
@@ -10168,7 +10168,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "3339c22b9bf2fa991a397a83a5c4c1c1"
+          "hash": "1807b0c76dbf1006488e30dd2744173d"
         },
         {
           "author_info": {
@@ -10196,7 +10196,7 @@
           "standby_power": 0.22,
           "id": "LM-MT-C2-A19-9W",
           "manufacturer": "lightinginside",
-          "updated_at": "2026-08-15T07:05:52",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": 8.58,
           "sub_profile_count": 0,
           "color_modes": [
@@ -10207,7 +10207,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "febb7c99bc69648fce4cdeafcce4f658"
+          "hash": "a65d8b98b357807079b7deb3043c2073"
         }
       ],
       "device_types": [
@@ -11705,7 +11705,7 @@
           },
           "id": "LED2402C3",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-15T07:05:52",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": 3.57,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11716,7 +11716,7 @@
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "883a33be43fd59faa0205488d3286ae1"
+          "hash": "cd5ba25e782071f0c6ae7b84a3bbba31"
         },
         {
           "aliases": [
@@ -13119,10 +13119,10 @@
           },
           "id": "S5 Max",
           "manufacturer": "roborock",
-          "updated_at": "2026-08-16T05:30:05",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": 20.43,
           "sub_profile_count": 0,
-          "hash": "5f4cd6187bbc02f06083f66f8c7095dc"
+          "hash": "5ebd643ad58987fb0b28968822cca79c"
         },
         {
           "calculation_strategy": "composite",
@@ -13291,16 +13291,16 @@
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "hs",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
           "lut_quality": {
             "score": 33.4,
             "brightness": 98.9,
             "color_temp": 33.4
           },
-          "hash": "6cb8f57275d9882c528a957c3f5a0557"
+          "hash": "8483bf1a8ccddc7c73747c450e95e3a8"
         }
       ],
       "device_types": [
@@ -14899,14 +14899,14 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "effect"
+            "effect",
+            "brightness"
           ],
           "lut_quality": {
             "score": 98.7,
             "brightness": 98.7
           },
-          "hash": "12a02eca03f42a32eb727e6e1c87757c"
+          "hash": "6cb22d127602effd9079a6b0476ba40d"
         },
         {
           "calculation_strategy": "lut",
@@ -20887,7 +20887,7 @@
           },
           "id": "92466",
           "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-16T05:22:39",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": 4.77,
           "sub_profile_count": 0,
           "color_modes": [
@@ -20898,7 +20898,7 @@
             "score": 99.5,
             "color_temp": 99.5
           },
-          "hash": "b62bf0a41b80118937549ccdb91c78bc"
+          "hash": "e859a652f896590a257e31351b2b071f"
         },
         {
           "calculation_strategy": "lut",
@@ -21048,10 +21048,10 @@
           },
           "id": "DR-HTF008S",
           "manufacturer": "dreo",
-          "updated_at": "2026-08-15T07:05:52",
+          "updated_at": "2026-08-16T05:39:31",
           "max_power": 36.03,
           "sub_profile_count": 0,
-          "hash": "c5320a881a45ee1df686ec2e0e02c7ae"
+          "hash": "13c30dd55327475549125d6dfb166310"
         }
       ],
       "device_types": [
@@ -21736,16 +21736,16 @@
           "max_power": 10.65,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "hs",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
           "lut_quality": {
             "score": 93.8,
             "brightness": 98.8,
             "color_temp": 93.8
           },
-          "hash": "e2908e870569e5fab78a698df8991061"
+          "hash": "b5a139e044be6994169f974ed9c8d4aa"
         },
         {
           "aliases": [
@@ -21982,14 +21982,14 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
           "lut_quality": {
             "score": 99.4,
             "brightness": 99.4
           },
-          "hash": "a5eb5f6ed2fcd5a30289e68ce713235e"
+          "hash": "91907e51cf07c0a4303501bc63f00d76"
         },
         {
           "calculation_strategy": "fixed",
@@ -24012,16 +24012,16 @@
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
-            "brightness",
             "hs",
-            "color_temp"
+            "color_temp",
+            "brightness"
           ],
           "lut_quality": {
             "score": 84.6,
             "brightness": 98.9,
             "color_temp": 84.6
           },
-          "hash": "23e7253c61e865b4d70e5f245e6d89bc"
+          "hash": "068cc9ac9735e8abe49fe9b78049a0bb"
         },
         {
           "calculation_strategy": "lut",
