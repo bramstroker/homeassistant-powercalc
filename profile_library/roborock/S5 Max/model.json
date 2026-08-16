@@ -99,5 +99,9 @@
     "VERSION": "v0.3.0:app"
   },
   "min_voltage": 240.08,
-  "name": "Roborock S5 Max"
+  "name": "Roborock S5 Max",
+  "author_info": {
+    "name": "theveninjeremy",
+    "github": "theveninjeremy"
+  }
 }

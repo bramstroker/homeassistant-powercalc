@@ -16,5 +16,10 @@
   "aliases": [
     "1718"
   ],
-  "standby_power": 0.22
+  "standby_power": 0.22,
+  "author_info": {
+    "name": "N8",
+    "github": "nathanzm",
+    "email": "none_ya@business.com"
+  }
 }
