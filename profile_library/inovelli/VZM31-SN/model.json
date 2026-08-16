@@ -1,5 +1,4 @@
 {
-  "author": "Martin Emde <me@martinemde.com>",
   "calculation_strategy": "linear",
   "created_at": "2026-08-15T20:38:56Z",
   "device_type": "smart_dimmer",
