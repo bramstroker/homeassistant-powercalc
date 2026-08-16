@@ -1,0 +1,148 @@
+{
+  "aliases": [
+    "AC4236/14"
+  ],
+  "author_info": {
+    "name": "philscottydev",
+    "github": "philscottydev"
+  },
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": [
+                "[[entity]]"
+              ],
+              "state": "sleep_allergy",
+              "attribute": "preset_mode"
+            },
+            {
+              "condition": "state",
+              "entity_id": [
+                "[[entity_by_translation_key:display_backlight]]"
+              ],
+              "state": "on"
+            },
+            {
+              "condition": "state",
+              "entity_id": [
+                "[[entity_by_translation_key:light_brightness]]"
+              ],
+              "state": "on"
+            }
+          ]
+        },
+        "fixed": {
+          "power": 5.08
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": [
+                "[[entity]]"
+              ],
+              "state": "sleep_allergy",
+              "attribute": "preset_mode"
+            },
+            {
+              "condition": "state",
+              "entity_id": [
+                "[[entity_by_translation_key:display_backlight]]"
+              ],
+              "state": "on"
+            }
+          ]
+        },
+        "fixed": {
+          "power": 4.05
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": [
+            "[[entity]]"
+          ],
+          "state": "sleep_allergy",
+          "attribute": "preset_mode"
+        },
+        "fixed": {
+          "power": 3.57
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": [
+                "[[entity_by_translation_key:display_backlight]]"
+              ],
+              "state": "on"
+            },
+            {
+              "condition": "state",
+              "entity_id": [
+                "[[entity_by_translation_key:light_brightness]]"
+              ],
+              "state": "on"
+            }
+          ]
+        },
+        "linear": {
+          "calibrate": [
+            "25 -> 5.03",
+            "50 -> 7.44",
+            "75 -> 13.29",
+            "100 -> 50.86"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": [
+            "[[entity_by_translation_key:display_backlight]]"
+          ],
+          "state": "on"
+        },
+        "linear": {
+          "calibrate": [
+            "25 -> 4.00",
+            "50 -> 6.41",
+            "75 -> 12.26",
+            "100 -> 49.83"
+          ]
+        }
+      },
+      {
+        "linear": {
+          "calibrate": [
+            "25 -> 3.52",
+            "50 -> 5.93",
+            "75 -> 11.78",
+            "100 -> 49.35"
+          ]
+        }
+      }
+    ]
+  },
+  "created_at": "2026-08-16T15:46:12Z",
+  "device_type": "fan",
+  "measure_description": "Measured on a Shelly Plus 1PM, one mode at a time, 30 samples per point after 120 s settling. The device has two independently switchable indicators that draw significant power: the display/button backlight (light entity with translation_key display_backlight, +0.48 W) and the air quality ring (translation_key light_brightness, +1.03 W). All base values were measured with both verified off; the surcharges are folded into the conditional branches. Note the device switches its indicators back on by itself on every mode change, so each point was re-measured until the indicator state held for the whole window. LIMITATION: the ring is the air quality indicator and changes colour, so its 1.03 W applies to the colour present during measurement (blue / good air). LIMITATION: the 'auto' preset reports no percentage and varies with air quality (observed 7.3-13.4 W over 3 min); it is deliberately not covered, so powercalc reports no value in that mode rather than a wrong one.",
+  "measure_device": "Shelly Plus 1PM",
+  "measure_method": "script",
+  "name": "AC4236 Air Purifier 4000i",
+  "standby_power": 0.67
+}
