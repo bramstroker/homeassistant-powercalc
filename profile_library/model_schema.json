@@ -312,7 +312,8 @@
     },
     "max_voltage": {
       "type": "number",
-      "description": "Maximum voltage observed during measurement"
+      "deprecated": true,
+      "description": "DEPRECATED: use voltage_range.max instead. Maximum voltage observed during measurement"
     },
     "min_version": {
       "type": "string",
@@ -320,7 +321,27 @@
     },
     "min_voltage": {
       "type": "number",
-      "description": "Minimum voltage observed during measurement"
+      "deprecated": true,
+      "description": "DEPRECATED: use voltage_range.min instead. Minimum voltage observed during measurement"
+    },
+    "voltage_range": {
+      "type": "object",
+      "description": "Range of voltages observed during measurement",
+      "properties": {
+        "min": {
+          "type": "number",
+          "description": "Minimum voltage observed during measurement"
+        },
+        "max": {
+          "type": "number",
+          "description": "Maximum voltage observed during measurement"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "additionalProperties": false
     },
     "linear_config": {
       "type": "object",

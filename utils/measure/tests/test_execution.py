@@ -85,8 +85,8 @@ def test_execution_writes_model_from_prepared_measurement(
     assert model["measure_device"] == "Test meter"
     assert model["standby_power"] == pytest.approx(0.5)
     assert model["device_type"] == "generic"
-    assert model["min_voltage"] == pytest.approx(229.9)
-    assert model["max_voltage"] == pytest.approx(231.2)
+    assert model["voltage_range"]["min"] == pytest.approx(229.9)
+    assert model["voltage_range"]["max"] == pytest.approx(231.2)
     assert model["measure_settings"]["SAMPLE_COUNT"] == 3
     assert model["measure_settings"]["VERSION"] == measure_version
 

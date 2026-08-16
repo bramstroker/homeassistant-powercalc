@@ -2,7 +2,6 @@
   "calculation_strategy": "lut",
   "created_at": "2026-08-10T01:00:53Z",
   "device_type": "light",
-  "max_voltage": 121.41,
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Tapo P110M",
   "measure_method": "script",
@@ -11,8 +10,11 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.3.0:app"
   },
-  "min_voltage": 118.95,
   "name": "Matter RGBCW A19 E26 Smart Bulb",
+  "voltage_range": {
+    "min": 118.95,
+    "max": 121.41
+  },
   "aliases": [
     "1718"
   ],

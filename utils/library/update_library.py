@@ -27,6 +27,9 @@ DATA_DIR = str(Path(PROFILE_DIRECTORY).resolve())  # resolve, PROFILE_DIRECTORY 
 REPO_OWNER = "bramstroker"
 REPO_NAME = "homeassistant-powercalc"
 MAX_CONCURRENT_FILE_TASKS = 50
+VOLTAGE_RANGE = "voltage_range"
+LEGACY_MIN_VOLTAGE = "min_voltage"
+LEGACY_MAX_VOLTAGE = "max_voltage"
 DISCOVERY_LOW_PRIORITY_DOMAINS: list[str] = [
     "androidtv",
     "dlna_dmr",
@@ -43,6 +46,19 @@ class Author:
     name: str
     email: str | None
     github_username: str
+
+
+def migrate_voltage_range(model: dict[str, Any]) -> None:
+    """Fold the deprecated min_voltage/max_voltage fields into voltage_range.
+
+    Profiles contributed before voltage_range existed still carry the old fields, so the
+    library index exposes a single shape to consumers regardless of when a profile was written.
+    """
+    min_voltage = model.pop(LEGACY_MIN_VOLTAGE, None)
+    max_voltage = model.pop(LEGACY_MAX_VOLTAGE, None)
+    if VOLTAGE_RANGE in model or min_voltage is None or max_voltage is None:
+        return
+    model[VOLTAGE_RANGE] = {"min": min_voltage, "max": max_voltage}
 
 
 def create_model_hash(mapping: Mapping[str, object]) -> str:
@@ -92,6 +108,7 @@ async def generate_library_json(model_listing: list[dict[str, Any]]) -> None:
             "sub_profile_select",
         ]
         mapped_dict = {key: value for key, value in model.items() if key not in skipped_fields}
+        migrate_voltage_range(mapped_dict)
         # Derived metadata only, not profile content. The hash decides whether a Home Assistant
         # install re-downloads a profile, so folding these in would make every install re-fetch
         # every profile it uses whenever the scoring changes.

@@ -30,7 +30,6 @@
       "100 -> 35.90"
     ]
   },
-  "max_voltage": 236.7,
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",
@@ -39,7 +38,10 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.3.0:app"
   },
-  "min_voltage": 234.4,
   "name": "Cruiser Pro S Smart Tower Fan",
-  "standby_power": 1.57
+  "standby_power": 1.57,
+  "voltage_range": {
+    "min": 234.4,
+    "max": 236.7
+  }
 }
