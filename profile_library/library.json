@@ -9106,6 +9106,42 @@
       ]
     },
     {
+      "aliases": [],
+      "name": "philips",
+      "full_name": "Philips",
+      "dir_name": "philips",
+      "models": [
+        {
+          "aliases": [
+            "AC4236/14"
+          ],
+          "author_info": {
+            "name": "philscottydev",
+            "github": "philscottydev"
+          },
+          "calculation_strategy": "composite",
+          "compatible_integrations": [
+            "philips_airpurifier_coap"
+          ],
+          "created_at": "2026-08-16T15:46:12Z",
+          "device_type": "fan",
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "name": "Air Purifier 4000i",
+          "standby_power": 0.67,
+          "id": "AC4236_14",
+          "manufacturer": "philips",
+          "updated_at": "2026-08-16T18:58:02",
+          "max_power": null,
+          "sub_profile_count": 0,
+          "hash": "f08f7e1b8604558aecb45bf94e862e88"
+        }
+      ],
+      "device_types": [
+        "fan"
+      ]
+    },
+    {
       "aliases": [
         "tuya"
       ],
