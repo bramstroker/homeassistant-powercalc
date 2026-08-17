@@ -20960,9 +20960,13 @@
             "min": 233.1,
             "max": 236.8
           },
+          "aliases": [
+            "92467",
+            "92468"
+          ],
           "id": "92466",
           "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-16T05:39:31",
+          "updated_at": "2026-08-17T13:17:59",
           "max_power": 4.77,
           "sub_profile_count": 0,
           "color_modes": [
@@ -20973,7 +20977,7 @@
             "score": 99.5,
             "color_temp": 99.5
           },
-          "hash": "6e768b937439ff00c95d44737bc679bb"
+          "hash": "2579d788c0a53ca32cb6220386953e4f"
         },
         {
           "calculation_strategy": "lut",
@@ -20992,9 +20996,12 @@
             "name": "71820SM01",
             "github": "71820SM01"
           },
+          "aliases": [
+            "29154"
+          ],
           "id": "29150",
           "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-15T07:05:52",
+          "updated_at": "2026-08-17T13:17:57",
           "max_power": 4.5,
           "sub_profile_count": 0,
           "color_modes": [
@@ -21005,7 +21012,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "0a83a148db0e56b44dbffa880504e77f"
+          "hash": "52f596edd3631131a7dbc02f0d1bcec8"
         }
       ],
       "device_types": [
