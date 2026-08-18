@@ -1,0 +1,195 @@
+{
+  "aliases": [
+    "dreame.vacuum.r2538z"
+  ],
+  "author_info": {
+    "name": "philscottydev",
+    "github": "philscottydev"
+  },
+  "calculation_strategy": "composite",
+  "compatible_integrations": [
+    "dreame_vacuum"
+  ],
+  "composite_config": [
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity_by_translation_key:task_status]]",
+        "state": "station_cleaning"
+      },
+      "fixed": {
+        "power": 559.1
+      }
+    },
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+        "state": "active"
+      },
+      "fixed": {
+        "power": 225.0
+      }
+    },
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+        "state": "washing"
+      },
+      "fixed": {
+        "power": 107.8
+      }
+    },
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+        "state": "drying"
+      },
+      "fixed": {
+        "power": 54.9
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": "docked"
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:charging_state]]",
+            "state": "on"
+          }
+        ]
+      },
+      "linear": {
+        "calibrate": [
+          "3 -> 33.18",
+          "4 -> 33.2",
+          "5 -> 33.48",
+          "6 -> 33.37",
+          "7 -> 33.64",
+          "8 -> 33.74",
+          "9 -> 33.82",
+          "10 -> 33.82",
+          "11 -> 34.1",
+          "12 -> 34.02",
+          "13 -> 34.29",
+          "14 -> 34.24",
+          "15 -> 34.37",
+          "16 -> 34.34",
+          "17 -> 34.34",
+          "18 -> 34.39",
+          "19 -> 34.34",
+          "20 -> 34.4",
+          "21 -> 34.51",
+          "22 -> 34.56",
+          "23 -> 34.63",
+          "24 -> 34.74",
+          "25 -> 34.84",
+          "26 -> 34.9",
+          "27 -> 35.02",
+          "28 -> 35.04",
+          "29 -> 35.14",
+          "30 -> 35.18",
+          "31 -> 35.28",
+          "32 -> 35.3",
+          "33 -> 35.4",
+          "34 -> 35.45",
+          "35 -> 36.44",
+          "36 -> 36.98",
+          "37 -> 35.64",
+          "38 -> 35.71",
+          "39 -> 35.79",
+          "40 -> 35.86",
+          "41 -> 35.92",
+          "42 -> 35.96",
+          "43 -> 36.07",
+          "44 -> 36.11",
+          "45 -> 36.2",
+          "46 -> 36.23",
+          "47 -> 36.35",
+          "48 -> 36.35",
+          "49 -> 36.41",
+          "50 -> 34.76",
+          "51 -> 36.57",
+          "52 -> 36.58",
+          "53 -> 36.69",
+          "54 -> 36.76",
+          "55 -> 36.81",
+          "56 -> 36.89",
+          "57 -> 36.95",
+          "58 -> 37.01",
+          "59 -> 37.1",
+          "60 -> 37.13",
+          "61 -> 37.16",
+          "62 -> 37.28",
+          "63 -> 37.26",
+          "64 -> 37.38",
+          "65 -> 37.44",
+          "66 -> 37.51",
+          "67 -> 37.53",
+          "68 -> 37.6",
+          "69 -> 37.66",
+          "70 -> 37.75",
+          "71 -> 37.79",
+          "72 -> 37.81",
+          "73 -> 37.92",
+          "74 -> 37.98",
+          "75 -> 38.04",
+          "76 -> 38.09",
+          "77 -> 38.15",
+          "78 -> 38.17",
+          "79 -> 38.27",
+          "80 -> 38.27",
+          "81 -> 38.26",
+          "82 -> 38.23",
+          "83 -> 38.22",
+          "84 -> 38.02",
+          "85 -> 37.68",
+          "86 -> 37.32",
+          "87 -> 36.53",
+          "88 -> 35.61",
+          "89 -> 34.27",
+          "90 -> 32.78",
+          "91 -> 31.38",
+          "92 -> 30.02",
+          "93 -> 28.45",
+          "94 -> 26.87",
+          "95 -> 25.22",
+          "96 -> 23.64",
+          "97 -> 22.08",
+          "98 -> 20.44",
+          "99 -> 18.44",
+          "100 -> 11.32"
+        ]
+      }
+    },
+    {
+      "fixed": {
+        "power": 5.55
+      }
+    }
+  ],
+  "created_at": "2026-08-18T05:24:41Z",
+  "device_type": "vacuum_robot",
+  "measure_description": "Measured with a Shelly Plus 1PM in the socket that feeds the base station, so the numbers cover the whole station rather than battery charging alone. While the robot is away cleaning it runs on its own battery, so vacuum power levels are not visible on this meter at all and the consumption shows up later as charging.\n\nCharging: measured with the utils/measure charging type, discharged to 3 percent first, then one measurement per battery percent up to 100 followed by the 30 minute trickle phase. Auto drying, self clean and smart mop washing were switched off for that run and the pads were dry, so no station activity contaminates the curve.\n\nThe other branches were recorded separately at 5 to 6 samples per second while triggering each process from its button, with the state sensors logged alongside so power and state line up. Each fixed value is the mean over the whole window in which its condition holds, not the peak, so the energy comes out right even though the real traces are spiky. Measured windows and energies:\n  station cleaning  1.0 min at 559 W mean, 1171 W peak, 9.8 Wh\n  auto empty       26.2 s   at 225 W mean, 623 W peak, 1.6 Wh (two bursts of about 5 s)\n  mop washing       2.7 min at 108 W mean, 1152 W peak, 4.9 Wh (hot water heater fires for ~10 s)\n  hot air drying  180.3 min at  55 W mean, 156.5 Wh, no cycling, drifts 81 W down to 51 W\nIdle was measured three times independently and agreed within 0.07 W: 5.55, 5.62 and 5.5 W.\n\nNote on station cleaning: it does NOT set self_wash_base_status, that stays idle. It shows up in task_status instead, which is why it needs its own branch. UV sterilization was enabled during all of these, which is the default.\n\nKnown gaps. Drainage is not covered because my station has no plumbing kit, so station_drainage_status never leaves idle here. And because the branches are evaluated stop at first, charging while the station dries reports the drying value alone rather than the sum, which understates that combination by roughly the charging power.",
+  "measure_device": "Shelly Plus 1PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 3,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.3.0:cli"
+  },
+  "name": "X50 Ultra",
+  "standby_power": 5.55,
+  "voltage_range": {
+    "min": 225.9,
+    "max": 230.9
+  }
+}
