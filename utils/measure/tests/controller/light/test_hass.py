@@ -90,12 +90,15 @@ def test_turn_off() -> None:
     client.trigger_service.assert_called_once_with("light", "turn_off", entity_id="light.test")
 
 
-def test_change_light_state_error() -> None:
+@pytest.mark.parametrize("connection_error", [HomeassistantAPIError("Error"), BrokenPipeError(32, "Broken pipe")])
+def test_change_light_state_error(connection_error: Exception) -> None:
     client = _mock_client()
-    client.trigger_service.side_effect = HomeassistantAPIError("Error")
+    client.trigger_service.side_effect = connection_error
     controller = _get_instance(client)
-    with pytest.raises(ApiConnectionError):
+    with pytest.raises(ApiConnectionError) as error:
         controller.change_light_state(LutMode.BRIGHTNESS, on=True, bri=100)
+
+    assert error.value.__cause__ is connection_error
 
 
 def test_connection_validation() -> None:
