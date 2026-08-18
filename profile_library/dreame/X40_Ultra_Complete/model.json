@@ -1,0 +1,305 @@
+{
+  "name": "Dreame X40 Ultra Complete",
+  "device_type": "vacuum_robot",
+  "author": "theveninjeremy",
+  "measure_method": "manual",
+  "measure_device": "Athom smart plug (ESP)",
+  "measure_description": "Measured dynamically with a calibrated smart plug during multiple full cycles including washing (all water temperatures tested), drying (all durations tested), auto-emptying, charging, and station cleaning.",
+  "standby_power": 8.69,
+  "calculation_strategy": "composite",
+  "composite_config": [
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity]]",
+        "state": "auto_emptying"
+      },
+      "fixed": {
+        "power": 500.0
+      }
+    },
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity]]",
+        "state": "station_cleaning"
+      },
+      "fixed": {
+        "power": 531.12
+      }
+    },
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity]]",
+        "state": [
+          "sweeping",
+          "mopping",
+          "returning",
+          "returning_to_wash",
+          "returning_auto_empty",
+          "paused"
+        ]
+      },
+      "fixed": {
+        "power": 1.8
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": "drying"
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:drying_time]]",
+            "state": "4h"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 72.0
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": "drying"
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:drying_time]]",
+            "state": "3h"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 74.1
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": "drying"
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:drying_time]]",
+            "state": "2h"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 65.6
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": [
+              "washing",
+              "clean_add_water"
+            ]
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:water_temperature]]",
+            "state": "hot"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 115.0
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": [
+              "washing",
+              "clean_add_water"
+            ]
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:water_temperature]]",
+            "state": "warm"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 117.8
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": [
+              "washing",
+              "clean_add_water"
+            ]
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:water_temperature]]",
+            "state": "mild"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 50.6
+      }
+    },
+    {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": [
+              "washing",
+              "clean_add_water"
+            ]
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:water_temperature]]",
+            "state": "normal"
+          }
+        ]
+      },
+      "fixed": {
+        "power": 60.0
+      }
+    },
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity]]",
+        "state": "charging"
+      },
+      "linear": {
+        "calibrate": [
+          "13 -> 34.25",
+          "14 -> 34.31",
+          "15 -> 34.37",
+          "16 -> 34.33",
+          "17 -> 34.39",
+          "18 -> 34.43",
+          "19 -> 34.47",
+          "20 -> 34.40",
+          "21 -> 34.35",
+          "22 -> 34.43",
+          "23 -> 34.36",
+          "24 -> 34.48",
+          "25 -> 34.49",
+          "26 -> 34.48",
+          "27 -> 34.55",
+          "28 -> 34.59",
+          "29 -> 34.62",
+          "30 -> 34.58",
+          "31 -> 34.67",
+          "32 -> 34.71",
+          "33 -> 34.74",
+          "34 -> 34.77",
+          "35 -> 34.77",
+          "36 -> 34.85",
+          "37 -> 34.87",
+          "38 -> 34.89",
+          "39 -> 34.92",
+          "40 -> 34.95",
+          "41 -> 34.99",
+          "42 -> 35.06",
+          "43 -> 35.04",
+          "44 -> 35.06",
+          "45 -> 35.09",
+          "46 -> 35.12",
+          "47 -> 35.17",
+          "48 -> 35.16",
+          "49 -> 35.25",
+          "50 -> 35.23",
+          "51 -> 35.32",
+          "52 -> 35.30",
+          "53 -> 35.36",
+          "54 -> 35.34",
+          "55 -> 35.41",
+          "56 -> 35.53",
+          "57 -> 35.45",
+          "58 -> 35.48",
+          "59 -> 32.28",
+          "60 -> 22.84",
+          "61 -> 22.87",
+          "62 -> 22.92",
+          "63 -> 22.93",
+          "64 -> 22.96",
+          "65 -> 23.01",
+          "66 -> 23.04",
+          "67 -> 23.04",
+          "68 -> 23.11",
+          "69 -> 23.14",
+          "70 -> 23.20",
+          "71 -> 23.23",
+          "72 -> 23.30",
+          "73 -> 23.34",
+          "74 -> 23.39",
+          "75 -> 23.44",
+          "76 -> 23.49",
+          "77 -> 23.55",
+          "78 -> 23.60",
+          "79 -> 23.64",
+          "80 -> 23.70",
+          "81 -> 23.73",
+          "82 -> 23.72",
+          "83 -> 23.56",
+          "84 -> 23.08",
+          "85 -> 21.99",
+          "86 -> 19.31",
+          "87 -> 20.17",
+          "88 -> 19.80",
+          "89 -> 18.63",
+          "90 -> 18.53",
+          "91 -> 19.79",
+          "92 -> 20.94",
+          "93 -> 20.92",
+          "94 -> 22.12",
+          "95 -> 22.09",
+          "96 -> 23.60",
+          "97 -> 24.57",
+          "98 -> 29.22",
+          "99 -> 22.02",
+          "100 -> 8.69"
+        ]
+      }
+    },
+    {
+      "fixed": {
+        "power": 8.69
+      }
+    }
+  ]
+}
