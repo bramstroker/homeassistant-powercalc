@@ -52,24 +52,24 @@ class HassLightController(HassControllerBase, LightController):
         on: bool = True,
         **kwargs: Any,  # noqa: ANN401
     ) -> None:
-        if not on:
-            self.client.trigger_service("light", "turn_off", entity_id=self.service_target)
-            return
-
-        if lut_mode == LutMode.HS:
-            json = self.build_hs_json_body(kwargs["bri"], kwargs["hue"], kwargs["sat"])
-        elif lut_mode == LutMode.COLOR_TEMP:
-            json = self.build_ct_json_body(kwargs["bri"], kwargs["ct"])
-        elif lut_mode == LutMode.EFFECT:
-            json = self.build_effect_json_body(kwargs["bri"], kwargs["effect"])
-        elif lut_mode == LutMode.WHITE:
-            json = self.build_white_json_body(kwargs["bri"])
-        else:
-            json = self.build_bri_json_body(kwargs["bri"])
-
         try:
+            if not on:
+                self.client.trigger_service("light", "turn_off", entity_id=self.service_target)
+                return
+
+            if lut_mode == LutMode.HS:
+                json = self.build_hs_json_body(kwargs["bri"], kwargs["hue"], kwargs["sat"])
+            elif lut_mode == LutMode.COLOR_TEMP:
+                json = self.build_ct_json_body(kwargs["bri"], kwargs["ct"])
+            elif lut_mode == LutMode.EFFECT:
+                json = self.build_effect_json_body(kwargs["bri"], kwargs["effect"])
+            elif lut_mode == LutMode.WHITE:
+                json = self.build_white_json_body(kwargs["bri"])
+            else:
+                json = self.build_bri_json_body(kwargs["bri"])
+
             self.client.trigger_service("light", "turn_on", **json)
-        except HomeassistantAPIError as e:
+        except (HomeassistantAPIError, OSError) as e:
             raise ApiConnectionError(f"Failed to change light state: {e}") from e
         self._wait(self._transition_time)
 
