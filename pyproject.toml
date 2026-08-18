@@ -135,7 +135,7 @@ dev = [
     "httpx>=0.28.1",
     "prek",
     "ruff>=0.15.0",
-    "mypy==2.3.0",
+    "mypy==2.3.1",
     "voluptuous-stubs>=0.1",
     "homeassistant-stubs",
     "pytest-homeassistant-custom-component==0.13.356",
