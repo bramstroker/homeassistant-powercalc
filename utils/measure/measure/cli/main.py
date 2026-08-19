@@ -259,7 +259,7 @@ class Measure:
                 answer_value: Any = conf_value
                 if isinstance(question, inquirer.Confirm):
                     answer_value = str_to_bool(conf_value)
-                elif question_name == QUESTION_MODE:
+                elif question_name == QUESTION_MODE and not isinstance(conf_value, set):
                     # Normalize before prompting: question callbacks may build a request from the
                     # answers collected so far, and set() on a plain string splits it into letters.
                     answer_value = {LutMode(conf_value)}
