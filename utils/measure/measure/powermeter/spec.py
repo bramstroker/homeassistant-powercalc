@@ -2,7 +2,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from measure.powermeter.const import PowerMeterType
+from measure.powermeter.const import OwonOwh98xxChannelType, PowerMeterType
 
 POWER_ENTITY_PATTERN = r"^sensor\.[a-z0-9_]+$"
 VOLTAGE_ENTITY_PATTERN = r"^sensor\.[a-z0-9_]+$"
@@ -64,6 +64,12 @@ class TuyaPowerMeterSpec(_PowerMeterSpec):
     device_ip: str
     version: str = "3.3"
 
+class OwonOwh98xxPowerMeterSpec(_PowerMeterSpec):
+    type: Literal[PowerMeterType.OWON_OWH98XX] = PowerMeterType.OWON_OWH98XX
+    port: str
+    baudrate: int
+    timeout: float = 5.0
+    channel: OwonOwh98xxChannelType
 
 PowerMeterSpec = Annotated[
     DummyPowerMeterSpec
@@ -74,6 +80,7 @@ PowerMeterSpec = Annotated[
     | OcrPowerMeterSpec
     | ShellyPowerMeterSpec
     | TasmotaPowerMeterSpec
-    | TuyaPowerMeterSpec,
+    | TuyaPowerMeterSpec
+    | OwonOwh98xxPowerMeterSpec,
     Field(discriminator="type"),
 ]

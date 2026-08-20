@@ -11,7 +11,11 @@ class PowerMeterType(StrEnum):
     TASMOTA = "tasmota"
     TUYA = "tuya"
     MYSTROM = "mystrom"
+    OWON_OWH98XX = "owh98xx"
 
+class OwonOwh98xxChannelType(StrEnum):
+    CHANNEL1 = "1"
+    CHANNEL2 = "2"
 
 QUESTION_POWERMETER_ENTITY_ID = "powermeter_entity_id"
 QUESTION_VOLTAGEMETER_ENTITY_ID = "voltagemeter_entity_id"
