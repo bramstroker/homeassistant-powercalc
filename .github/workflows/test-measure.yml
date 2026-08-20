@@ -160,7 +160,7 @@ jobs:
       - name: Validate repository and app metadata
         run: ruby utils/measure/home-assistant-app/validate.rb
       - name: Run Home Assistant app linter
-        uses: frenck/action-addon-linter@f995494fd84fae6310d23617e66d0e37de4f14eb # v2.21.0
+        uses: frenck/action-addon-linter@b9cfd1bc62ba60d2c4fc96317b5f7ada5923f4a7 # v2.21.1
         with:
           path: ./utils/measure/home-assistant-app/powercalc_measure
       - name: Build Home Assistant app image
