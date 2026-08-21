@@ -14,8 +14,10 @@
   },
   "name": "Shelly 1PM Mini Gen3",
   "only_self_usage": true,
-  "author_info": {
-    "name": "CV",
-    "github": "dagobert"
-  }
+  "authors": [
+    {
+      "name": "CV",
+      "github": "dagobert"
+    }
+  ]
 }

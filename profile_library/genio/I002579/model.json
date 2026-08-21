@@ -12,9 +12,11 @@
   },
   "name": "Smart Wi-Fi LED Strip Light (3 m)",
   "standby_power": 0.7,
-  "author_info": {
-    "name": "Daniel O'Connor",
-    "email": "daniel.oconnor@gmail.com",
-    "github": "CloCkWeRX"
-  }
+  "authors": [
+    {
+      "name": "Daniel O'Connor",
+      "email": "daniel.oconnor@gmail.com",
+      "github": "CloCkWeRX"
+    }
+  ]
 }

@@ -15,8 +15,10 @@
   },
   "name": "TRADFRI bulb E14 WS opal 600lm",
   "standby_power": 0.17,
-  "author_info": {
-    "name": "Robert",
-    "github": "metbril"
-  }
+  "authors": [
+    {
+      "name": "Robert",
+      "github": "metbril"
+    }
+  ]
 }

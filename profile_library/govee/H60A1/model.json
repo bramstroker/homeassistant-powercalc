@@ -12,8 +12,10 @@
   },
   "name": "Smart Ceiling Light",
   "standby_power": 0.45,
-  "author_info": {
-    "name": "gobbli",
-    "github": "gobbli"
-  }
+  "authors": [
+    {
+      "name": "gobbli",
+      "github": "gobbli"
+    }
+  ]
 }

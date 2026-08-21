@@ -28,8 +28,10 @@
   },
   "name": "Sub 4",
   "standby_power": 1.9,
-  "author_info": {
-    "name": "Josh Barnard",
-    "github": "barndawgie"
-  }
+  "authors": [
+    {
+      "name": "Josh Barnard",
+      "github": "barndawgie"
+    }
+  ]
 }

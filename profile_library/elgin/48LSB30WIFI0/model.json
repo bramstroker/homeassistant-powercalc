@@ -12,9 +12,11 @@
   },
   "name": "Smart Color 20W",
   "standby_power": 0.75,
-  "author_info": {
-    "name": "Felipe Marinho",
-    "email": "felipe.marinho@ifood.com.br",
-    "github": "felipemarinho97"
-  }
+  "authors": [
+    {
+      "name": "Felipe Marinho",
+      "email": "felipe.marinho@ifood.com.br",
+      "github": "felipemarinho97"
+    }
+  ]
 }

@@ -12,9 +12,11 @@
   },
   "name": "Smart White & Color Tones",
   "standby_power": 0.19,
-  "author_info": {
-    "name": "Sander",
-    "email": "sandolution@outlook.com",
-    "github": "Sandolution"
-  }
+  "authors": [
+    {
+      "name": "Sander",
+      "email": "sandolution@outlook.com",
+      "github": "Sandolution"
+    }
+  ]
 }

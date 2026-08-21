@@ -13,8 +13,10 @@
   "measure_method": "script",
   "name": "Hue Calla Outdoor Pedestal",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Stefan Gries",
-    "github": "stefangries"
-  }
+  "authors": [
+    {
+      "name": "Stefan Gries",
+      "github": "stefangries"
+    }
+  ]
 }

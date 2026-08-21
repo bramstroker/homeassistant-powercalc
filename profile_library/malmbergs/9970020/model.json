@@ -12,9 +12,11 @@
   },
   "name": "Sirius III",
   "standby_power": 0.89,
-  "author_info": {
-    "name": "Magnus Larsson",
-    "email": "maglars2@gmail.com",
-    "github": "Miicroo"
-  }
+  "authors": [
+    {
+      "name": "Magnus Larsson",
+      "email": "maglars2@gmail.com",
+      "github": "Miicroo"
+    }
+  ]
 }

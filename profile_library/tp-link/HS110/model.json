@@ -12,9 +12,11 @@
   "only_self_usage": true,
   "standby_power": 1.54,
   "standby_power_on": 2.19,
-  "author_info": {
-    "name": "roschi02",
-    "email": "roschoschi@gmail.com",
-    "github": "roschi02"
-  }
+  "authors": [
+    {
+      "name": "roschi02",
+      "email": "roschoschi@gmail.com",
+      "github": "roschi02"
+    }
+  ]
 }

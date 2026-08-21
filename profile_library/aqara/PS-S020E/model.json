@@ -13,9 +13,11 @@
   "aliases": [
     "PS-S02D"
   ],
-  "author_info": {
-    "name": "Thorsten Niemann",
-    "email": "ThorstenNiemann.TN@gmail.com",
-    "github": "Thorsten1982"
-  }
+  "authors": [
+    {
+      "name": "Thorsten Niemann",
+      "email": "ThorstenNiemann.TN@gmail.com",
+      "github": "Thorsten1982"
+    }
+  ]
 }

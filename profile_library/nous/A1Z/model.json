@@ -13,8 +13,10 @@
   "only_self_usage": true,
   "standby_power": 0.1,
   "standby_power_on": 0.4,
-  "author_info": {
-    "name": "Andreas Brett",
-    "github": "andreasbrett"
-  }
+  "authors": [
+    {
+      "name": "Andreas Brett",
+      "github": "andreasbrett"
+    }
+  ]
 }

@@ -15,8 +15,10 @@
   },
   "name": "Hue Flourish Pendant Light",
   "standby_power": 0.42,
-  "author_info": {
-    "name": "matteobreschig",
-    "github": "matteobreschig"
-  }
+  "authors": [
+    {
+      "name": "matteobreschig",
+      "github": "matteobreschig"
+    }
+  ]
 }

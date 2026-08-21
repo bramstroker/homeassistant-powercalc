@@ -31,9 +31,11 @@
   },
   "name": "Echo Dot (Gen2)",
   "standby_power": 1.8,
-  "author_info": {
-    "name": "zenzmatz",
-    "email": "eric.021292@gmail.com",
-    "github": "zenzmatz"
-  }
+  "authors": [
+    {
+      "name": "zenzmatz",
+      "email": "eric.021292@gmail.com",
+      "github": "zenzmatz"
+    }
+  ]
 }

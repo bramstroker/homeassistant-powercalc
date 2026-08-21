@@ -27,9 +27,11 @@
   "measure_method": "manual",
   "name": "One",
   "standby_power": 2.92,
-  "author_info": {
-    "name": "Thorjan Knudsvik",
-    "email": "t@knudsvik.com",
-    "github": "knudsvik"
-  }
+  "authors": [
+    {
+      "name": "Thorjan Knudsvik",
+      "email": "t@knudsvik.com",
+      "github": "knudsvik"
+    }
+  ]
 }

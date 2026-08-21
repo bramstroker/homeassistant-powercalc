@@ -10,8 +10,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "FRITZ!Repeater 2700",
-  "author_info": {
-    "name": "hpuac",
-    "github": "hpuac"
-  }
+  "authors": [
+    {
+      "name": "hpuac",
+      "github": "hpuac"
+    }
+  ]
 }

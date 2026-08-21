@@ -2,10 +2,6 @@
   "aliases": [
     "29154"
   ],
-  "author_info": {
-    "name": "71820SM01",
-    "github": "71820SM01"
-  },
   "calculation_strategy": "lut",
   "created_at": "2024-09-22T00:00:00Z",
   "device_type": "light",
@@ -22,5 +18,11 @@
   "voltage_range": {
     "min": 227.3,
     "max": 232.4
-  }
+  },
+  "authors": [
+    {
+      "name": "71820SM01",
+      "github": "71820SM01"
+    }
+  ]
 }

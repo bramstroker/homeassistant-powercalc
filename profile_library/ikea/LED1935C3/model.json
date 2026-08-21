@@ -15,9 +15,11 @@
   },
   "name": "TRADFRI bulb E14 WW clear 250lm",
   "standby_power": 0.1,
-  "author_info": {
-    "name": "Linus",
-    "email": "linus.nordin@gmail.com",
-    "github": "gribber"
-  }
+  "authors": [
+    {
+      "name": "Linus",
+      "email": "linus.nordin@gmail.com",
+      "github": "gribber"
+    }
+  ]
 }

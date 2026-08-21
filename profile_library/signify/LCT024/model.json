@@ -12,8 +12,10 @@
   "measure_method": "script",
   "name": "Hue Play",
   "standby_power": 0.1,
-  "author_info": {
-    "name": "smonesi",
-    "github": "smonesi"
-  }
+  "authors": [
+    {
+      "name": "smonesi",
+      "github": "smonesi"
+    }
+  ]
 }

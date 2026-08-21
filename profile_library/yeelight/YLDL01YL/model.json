@@ -15,9 +15,11 @@
   },
   "name": "Smart Crystal Pendant LED Light (33 W, Tunable White + RGB)",
   "standby_power": 0.72,
-  "author_info": {
-    "name": "Morten Trab",
-    "email": "morten@trab.dk",
-    "github": "MTrab"
-  }
+  "authors": [
+    {
+      "name": "Morten Trab",
+      "email": "morten@trab.dk",
+      "github": "MTrab"
+    }
+  ]
 }

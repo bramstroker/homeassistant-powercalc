@@ -15,9 +15,11 @@
   },
   "name": "Hue Devote Slim ceiling light (29cm)",
   "standby_power": 0.18,
-  "author_info": {
-    "name": "Tom Frenzel",
-    "email": "admin@tom-frenzel.de",
-    "github": "tomfrenzel"
-  }
+  "authors": [
+    {
+      "name": "Tom Frenzel",
+      "email": "admin@tom-frenzel.de",
+      "github": "tomfrenzel"
+    }
+  ]
 }

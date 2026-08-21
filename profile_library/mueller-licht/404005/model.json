@@ -12,9 +12,11 @@
   },
   "name": "Tint GU10 spot white+color",
   "standby_power": 1.27,
-  "author_info": {
-    "name": "Amjad Saadeh",
-    "email": "amjad@saadeh.dev",
-    "github": "amjadsaadeh"
-  }
+  "authors": [
+    {
+      "name": "Amjad Saadeh",
+      "email": "amjad@saadeh.dev",
+      "github": "amjadsaadeh"
+    }
+  ]
 }

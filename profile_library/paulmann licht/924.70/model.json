@@ -12,8 +12,10 @@
   },
   "name": "RGBW Base Spot",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "evohell",
-    "github": "evohell"
-  }
+  "authors": [
+    {
+      "name": "evohell",
+      "github": "evohell"
+    }
+  ]
 }

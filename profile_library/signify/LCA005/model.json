@@ -17,8 +17,10 @@
   },
   "name": "Hue White and Color ambiance A19 800lm",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "ltloopy",
-    "github": "ltloopy"
-  }
+  "authors": [
+    {
+      "name": "ltloopy",
+      "github": "ltloopy"
+    }
+  ]
 }

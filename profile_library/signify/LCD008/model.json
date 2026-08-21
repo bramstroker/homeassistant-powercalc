@@ -12,8 +12,10 @@
   },
   "name": "Hue Slim recessed light S",
   "standby_power": 0.42,
-  "author_info": {
-    "name": "buttonger",
-    "github": "buttonger"
-  }
+  "authors": [
+    {
+      "name": "buttonger",
+      "github": "buttonger"
+    }
+  ]
 }

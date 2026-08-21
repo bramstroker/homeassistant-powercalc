@@ -16,8 +16,10 @@
     "Essentials A19"
   ],
   "standby_power": 0.14,
-  "author_info": {
-    "name": "David Iwanowitsch",
-    "github": "daiw"
-  }
+  "authors": [
+    {
+      "name": "David Iwanowitsch",
+      "github": "daiw"
+    }
+  ]
 }

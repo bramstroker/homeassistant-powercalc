@@ -15,8 +15,10 @@
   },
   "name": "TRADFRI bulb E27 WS clear 806lm",
   "standby_power": 0.34,
-  "author_info": {
-    "name": "marthubner",
-    "github": "marthubner"
-  }
+  "authors": [
+    {
+      "name": "marthubner",
+      "github": "marthubner"
+    }
+  ]
 }

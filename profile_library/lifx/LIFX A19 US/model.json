@@ -12,8 +12,10 @@
   },
   "name": "A19 US",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "Chris",
-    "github": "darthsebulba04"
-  }
+  "authors": [
+    {
+      "name": "Chris",
+      "github": "darthsebulba04"
+    }
+  ]
 }

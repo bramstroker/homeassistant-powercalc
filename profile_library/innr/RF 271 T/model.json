@@ -13,8 +13,10 @@
   },
   "name": "Smart Filament Bulb E27 Tunable Globe",
   "standby_power": 0.21,
-  "author_info": {
-    "name": "Manu",
-    "github": "tr4nt0r"
-  }
+  "authors": [
+    {
+      "name": "Manu",
+      "github": "tr4nt0r"
+    }
+  ]
 }

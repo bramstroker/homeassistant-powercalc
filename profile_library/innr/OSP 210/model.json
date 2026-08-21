@@ -9,9 +9,11 @@
   "only_self_usage": false,
   "standby_power": 0.3,
   "standby_power_on": 0.8,
-  "author_info": {
-    "name": "belleDESiRE",
-    "email": "belledesirepc@gmail.com",
-    "github": "belleDESiRE"
-  }
+  "authors": [
+    {
+      "name": "belleDESiRE",
+      "email": "belledesirepc@gmail.com",
+      "github": "belleDESiRE"
+    }
+  ]
 }

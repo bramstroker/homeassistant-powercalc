@@ -12,8 +12,10 @@
   "name": "HM-LC-Sw1-DR",
   "standby_power": 0.32,
   "standby_power_on": 0.52,
-  "author_info": {
-    "name": "CV",
-    "github": "dagobert"
-  }
+  "authors": [
+    {
+      "name": "CV",
+      "github": "dagobert"
+    }
+  ]
 }

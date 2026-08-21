@@ -10,8 +10,10 @@
   "fixed_config": {
     "power": 0.89
   },
-  "author_info": {
-    "name": "Maxik933",
-    "github": "Maxik933"
-  }
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ]
 }

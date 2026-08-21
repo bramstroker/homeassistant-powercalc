@@ -12,9 +12,11 @@
   },
   "name": "LIGHTIFY Classic B 40 TW 6W E14",
   "standby_power": 0.15,
-  "author_info": {
-    "name": "PalminX",
-    "email": "bkuemmer@gmx.net",
-    "github": "PalminX"
-  }
+  "authors": [
+    {
+      "name": "PalminX",
+      "email": "bkuemmer@gmx.net",
+      "github": "PalminX"
+    }
+  ]
 }

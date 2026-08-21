@@ -1,9 +1,4 @@
 {
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  },
   "calculation_strategy": "fixed",
   "created_at": "2026-08-14T15:20:00Z",
   "device_type": "generic_iot",
@@ -15,5 +10,12 @@
   "name": "P1 Energy Monitor",
   "fixed_config": {
     "power": 1.18
-  }
+  },
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

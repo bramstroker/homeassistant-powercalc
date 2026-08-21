@@ -10,9 +10,11 @@
   "fixed_config": {
     "power": 0.64
   },
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  }
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

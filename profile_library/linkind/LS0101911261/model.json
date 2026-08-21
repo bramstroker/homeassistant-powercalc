@@ -2,10 +2,6 @@
   "aliases": [
     "1011"
   ],
-  "author_info": {
-    "github": "Maxik933",
-    "name": "Maxik933"
-  },
   "calculation_strategy": "lut",
   "created_at": "2026-07-29T13:40:01Z",
   "device_type": "light",
@@ -22,5 +18,11 @@
   "voltage_range": {
     "min": 231.7,
     "max": 234.2
-  }
+  },
+  "authors": [
+    {
+      "github": "Maxik933",
+      "name": "Maxik933"
+    }
+  ]
 }

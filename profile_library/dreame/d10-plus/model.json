@@ -141,11 +141,13 @@
     "min": 227.5,
     "max": 234.9
   },
-  "author_info": {
-    "name": "Maxik933",
-    "github": "Maxik933"
-  },
   "aliases": [
     "dreame.vacuum.r2205"
+  ],
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
   ]
 }

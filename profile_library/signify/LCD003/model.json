@@ -16,8 +16,10 @@
   },
   "name": "Hue Akari Downlight",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "niggles1973",
-    "github": "niggles1973"
-  }
+  "authors": [
+    {
+      "name": "niggles1973",
+      "github": "niggles1973"
+    }
+  ]
 }

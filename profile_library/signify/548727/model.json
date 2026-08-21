@@ -12,8 +12,10 @@
   },
   "name": "Hue White and Color Ambiance BR30 with bluetooth",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "David F. Severski",
-    "github": "davidski"
-  }
+  "authors": [
+    {
+      "name": "David F. Severski",
+      "github": "davidski"
+    }
+  ]
 }

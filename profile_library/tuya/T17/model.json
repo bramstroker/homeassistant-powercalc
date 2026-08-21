@@ -24,9 +24,11 @@
   },
   "measure_description": "Measured with homewizard energy socket, measured each preset separately for 10 seconds.",
   "measure_method": "manual",
-  "author_info": {
-    "name": "Rogier Lommers",
-    "github": "rogierlommers",
-    "email": "rogier@lommers.org"
-  }
+  "authors": [
+    {
+      "name": "Rogier Lommers",
+      "github": "rogierlommers",
+      "email": "rogier@lommers.org"
+    }
+  ]
 }

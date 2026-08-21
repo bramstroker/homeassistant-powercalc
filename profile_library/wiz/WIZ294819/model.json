@@ -15,9 +15,11 @@
   },
   "name": "3.5 inch recessed downlight 8W",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "Mike Debney",
-    "email": "mike.debney@outlook.com",
-    "github": "mike-debney"
-  }
+  "authors": [
+    {
+      "name": "Mike Debney",
+      "email": "mike.debney@outlook.com",
+      "github": "mike-debney"
+    }
+  ]
 }

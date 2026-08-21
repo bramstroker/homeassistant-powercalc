@@ -13,8 +13,10 @@
   "fixed_config": {
     "power": 0.51
   },
-  "author_info": {
-    "name": "Tim",
-    "github": "EinRainerZufall"
-  }
+  "authors": [
+    {
+      "name": "Tim",
+      "github": "EinRainerZufall"
+    }
+  ]
 }

@@ -2,10 +2,6 @@
   "aliases": [
     "AC4236/14"
   ],
-  "author_info": {
-    "name": "philscottydev",
-    "github": "philscottydev"
-  },
   "calculation_strategy": "composite",
   "compatible_integrations": [
     "philips_airpurifier_coap"
@@ -147,5 +143,11 @@
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",
   "name": "Air Purifier 4000i",
-  "standby_power": 0.67
+  "standby_power": 0.67,
+  "authors": [
+    {
+      "name": "philscottydev",
+      "github": "philscottydev"
+    }
+  ]
 }

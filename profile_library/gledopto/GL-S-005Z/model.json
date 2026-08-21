@@ -12,9 +12,11 @@
   },
   "name": "RGB+CCT 4 W MR16 Zigbee Spot Light",
   "standby_power": 0.49,
-  "author_info": {
-    "name": "Emory Penney",
-    "email": "emory.j.penney@intel.com",
-    "github": "ejpenney"
-  }
+  "authors": [
+    {
+      "name": "Emory Penney",
+      "email": "emory.j.penney@intel.com",
+      "github": "ejpenney"
+    }
+  ]
 }

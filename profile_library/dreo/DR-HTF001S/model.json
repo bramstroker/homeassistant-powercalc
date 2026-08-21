@@ -18,8 +18,10 @@
   "measure_method": "manual",
   "name": "Cruiser Pro T1S Smart Tower Fan",
   "standby_power": 0.87,
-  "author_info": {
-    "name": "Miguel",
-    "github": "miggi92"
-  }
+  "authors": [
+    {
+      "name": "Miguel",
+      "github": "miggi92"
+    }
+  ]
 }

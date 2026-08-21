@@ -12,9 +12,11 @@
   },
   "name": "LIFX BR30",
   "standby_power": 0.63,
-  "author_info": {
-    "name": "mlebaugh",
-    "email": "mattlebaugh@gmail.com",
-    "github": "mlebaugh"
-  }
+  "authors": [
+    {
+      "name": "mlebaugh",
+      "email": "mattlebaugh@gmail.com",
+      "github": "mlebaugh"
+    }
+  ]
 }

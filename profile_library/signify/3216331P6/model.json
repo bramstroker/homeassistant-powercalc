@@ -16,9 +16,11 @@
   },
   "name": "Hue White Ambiance Aurelle Rectangular",
   "standby_power": 0.35,
-  "author_info": {
-    "name": "Jari Eskelinen",
-    "email": "jari.eskelinen@iki.fi",
-    "github": "jarpatus"
-  }
+  "authors": [
+    {
+      "name": "Jari Eskelinen",
+      "email": "jari.eskelinen@iki.fi",
+      "github": "jarpatus"
+    }
+  ]
 }

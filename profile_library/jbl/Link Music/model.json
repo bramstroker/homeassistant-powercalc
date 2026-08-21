@@ -32,8 +32,10 @@
   },
   "name": "Link Music",
   "standby_power": 1.7,
-  "author_info": {
-    "name": "Marcus Voß",
-    "github": "mvoss96"
-  }
+  "authors": [
+    {
+      "name": "Marcus Voß",
+      "github": "mvoss96"
+    }
+  ]
 }

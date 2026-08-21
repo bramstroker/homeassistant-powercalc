@@ -13,8 +13,10 @@
   },
   "name": "Ceiling light T1M",
   "standby_power": 0.18,
-  "author_info": {
-    "name": "CV",
-    "github": "dagobert"
-  }
+  "authors": [
+    {
+      "name": "CV",
+      "github": "dagobert"
+    }
+  ]
 }

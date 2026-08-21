@@ -28,8 +28,10 @@
   },
   "name": "Ray",
   "standby_power": 2.92,
-  "author_info": {
-    "name": "Tim",
-    "github": "EinRainerZufall"
-  }
+  "authors": [
+    {
+      "name": "Tim",
+      "github": "EinRainerZufall"
+    }
+  ]
 }

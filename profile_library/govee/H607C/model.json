@@ -12,9 +12,11 @@
   },
   "name": "Floor Lamp 2",
   "standby_power": 0.7,
-  "author_info": {
-    "name": "Udo Haß",
-    "email": "udo.hass@proton.me",
-    "github": "gobbli"
-  }
+  "authors": [
+    {
+      "name": "Udo Haß",
+      "email": "udo.hass@proton.me",
+      "github": "gobbli"
+    }
+  ]
 }

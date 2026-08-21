@@ -12,8 +12,10 @@
   },
   "name": "Livarno Lux LED-Außenstrahler (3000 lm) RGBCT",
   "standby_power": 0.58,
-  "author_info": {
-    "name": "Stefan Gries",
-    "github": "stefangries"
-  }
+  "authors": [
+    {
+      "name": "Stefan Gries",
+      "github": "stefangries"
+    }
+  ]
 }

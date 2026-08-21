@@ -12,9 +12,11 @@
   },
   "name": "GOSMART A65 14W",
   "standby_power": 0.5,
-  "author_info": {
-    "name": "SamK",
-    "email": "samotion2@gmail.com",
-    "github": "samotion2"
-  }
+  "authors": [
+    {
+      "name": "SamK",
+      "email": "samotion2@gmail.com",
+      "github": "samotion2"
+    }
+  ]
 }

@@ -12,9 +12,11 @@
   },
   "name": "Glide Hexa Light Panels (10 panels)",
   "standby_power": 0.85,
-  "author_info": {
-    "name": "Kenneth Fribert",
-    "email": "fribse@gmail.com",
-    "github": "fribse"
-  }
+  "authors": [
+    {
+      "name": "Kenneth Fribert",
+      "email": "fribse@gmail.com",
+      "github": "fribse"
+    }
+  ]
 }

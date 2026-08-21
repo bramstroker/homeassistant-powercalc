@@ -15,8 +15,10 @@
   },
   "name": "Kasa Smart Wi-Fi Light Bulb, Multicolour",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "xags",
-    "github": "xags"
-  }
+  "authors": [
+    {
+      "name": "xags",
+      "github": "xags"
+    }
+  ]
 }

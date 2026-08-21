@@ -10,9 +10,11 @@
   "measure_device_firmware": "ESPHome 2023.12.5",
   "measure_method": "script",
   "name": "TRADFRI signal repeater",
-  "author_info": {
-    "name": "confucius78",
-    "email": "dekker.wj@gmail.com",
-    "github": "confucius78"
-  }
+  "authors": [
+    {
+      "name": "confucius78",
+      "email": "dekker.wj@gmail.com",
+      "github": "confucius78"
+    }
+  ]
 }

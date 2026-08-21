@@ -16,9 +16,11 @@
   },
   "name": "Hue White and Color Ambiance Surimu",
   "standby_power": 0.39,
-  "author_info": {
-    "name": "vandalon",
-    "email": "joris@vandalon.nl",
-    "github": "vandalon"
-  }
+  "authors": [
+    {
+      "name": "vandalon",
+      "email": "joris@vandalon.nl",
+      "github": "vandalon"
+    }
+  ]
 }

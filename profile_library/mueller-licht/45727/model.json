@@ -15,9 +15,11 @@
   },
   "name": "Tint Amela 30cm, white+ambiance (1800-6500K)",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "Dr-Seltsam",
-    "email": "sebastian.jaekel@web.de",
-    "github": "Dr-Seltsam"
-  }
+  "authors": [
+    {
+      "name": "Dr-Seltsam",
+      "email": "sebastian.jaekel@web.de",
+      "github": "Dr-Seltsam"
+    }
+  ]
 }

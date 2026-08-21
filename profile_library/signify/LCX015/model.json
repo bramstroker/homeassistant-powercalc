@@ -12,9 +12,11 @@
   },
   "name": "Hue Festavia gradient light string 250",
   "standby_power": 0.35,
-  "author_info": {
-    "name": "dewbot6",
-    "email": "drewsnodgrass@comcast.net",
-    "github": "dewbot6"
-  }
+  "authors": [
+    {
+      "name": "dewbot6",
+      "email": "drewsnodgrass@comcast.net",
+      "github": "dewbot6"
+    }
+  ]
 }

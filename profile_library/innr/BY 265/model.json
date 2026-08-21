@@ -12,8 +12,10 @@
   },
   "name": "Smart Bulb B22 White 806lm",
   "standby_power": 0.44,
-  "author_info": {
-    "name": "Jamie De Vivo",
-    "github": "jamiedevivoo"
-  }
+  "authors": [
+    {
+      "name": "Jamie De Vivo",
+      "github": "jamiedevivoo"
+    }
+  ]
 }

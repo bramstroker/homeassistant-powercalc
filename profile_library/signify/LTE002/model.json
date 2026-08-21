@@ -16,8 +16,10 @@
   },
   "name": "Hue White Ambiance E14 w/ BT",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "xpenno255",
-    "github": "xpenno255"
-  }
+  "authors": [
+    {
+      "name": "xpenno255",
+      "github": "xpenno255"
+    }
+  ]
 }

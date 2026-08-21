@@ -119,7 +119,7 @@ def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_u
         "profile_library/signify/LCT999/model.json",
         "profile_library/signify/LCT999/brightness.csv.gz",
     ]
-    assert seen_model["author_info"] == {"name": "Test User", "github": "test-user", "email": "test@example.com"}
+    assert seen_model["authors"] == [{"name": "Test User", "github": "test-user", "email": "test@example.com"}]
     assert seen_model["name"] == "Hue test lamp"
     assert "aliases" not in seen_model
     prepared_contents = dict(preparer.render_contents(artifacts, contribution_metadata, preview))

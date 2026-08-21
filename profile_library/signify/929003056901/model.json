@@ -15,8 +15,10 @@
   },
   "name": "Hue Struana Bathroom Ceiling Light 36cm",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "matteobreschig",
-    "github": "matteobreschig"
-  }
+  "authors": [
+    {
+      "name": "matteobreschig",
+      "github": "matteobreschig"
+    }
+  ]
 }

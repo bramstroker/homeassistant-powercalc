@@ -12,9 +12,11 @@
   },
   "name": "Hue White and Color Ambiance A19 E26",
   "standby_power": 0.17,
-  "author_info": {
-    "name": "Emory Penney",
-    "email": "emory.j.penney@intel.com",
-    "github": "ejpenney"
-  }
+  "authors": [
+    {
+      "name": "Emory Penney",
+      "email": "emory.j.penney@intel.com",
+      "github": "ejpenney"
+    }
+  ]
 }

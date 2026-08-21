@@ -29,8 +29,10 @@
   },
   "name": "Beosound Balance",
   "standby_power": 3.8,
-  "author_info": {
-    "name": "Steffen Brandsborg",
-    "github": "sbrandsborg"
-  }
+  "authors": [
+    {
+      "name": "Steffen Brandsborg",
+      "github": "sbrandsborg"
+    }
+  ]
 }

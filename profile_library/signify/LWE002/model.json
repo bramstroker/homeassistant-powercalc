@@ -16,9 +16,11 @@
   },
   "name": "Hue White E14 SES Candle 470lm w/ BT",
   "standby_power": 0.25,
-  "author_info": {
-    "name": "Dan Thompson",
-    "email": "dba@techtree.co.uk",
-    "github": "leedsdata"
-  }
+  "authors": [
+    {
+      "name": "Dan Thompson",
+      "email": "dba@techtree.co.uk",
+      "github": "leedsdata"
+    }
+  ]
 }

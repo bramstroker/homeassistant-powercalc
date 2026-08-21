@@ -12,9 +12,11 @@
   "only_self_usage": true,
   "standby_power": 0.66,
   "standby_power_on": 1.03,
-  "author_info": {
-    "name": "Hadley Rich",
-    "email": "hads@nice.net.nz",
-    "github": "hadleyrich"
-  }
+  "authors": [
+    {
+      "name": "Hadley Rich",
+      "email": "hads@nice.net.nz",
+      "github": "hadleyrich"
+    }
+  ]
 }

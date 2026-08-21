@@ -9,8 +9,10 @@
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",
   "name": "Indoor Cam C120",
-  "author_info": {
-    "name": "dxmnkd316",
-    "github": "dxmnkd316"
-  }
+  "authors": [
+    {
+      "name": "dxmnkd316",
+      "github": "dxmnkd316"
+    }
+  ]
 }

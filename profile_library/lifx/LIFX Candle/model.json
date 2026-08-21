@@ -12,8 +12,10 @@
   },
   "name": "Candle",
   "standby_power": 0.56,
-  "author_info": {
-    "name": "Jamie De Vivo",
-    "github": "jamiedevivoo"
-  }
+  "authors": [
+    {
+      "name": "Jamie De Vivo",
+      "github": "jamiedevivoo"
+    }
+  ]
 }

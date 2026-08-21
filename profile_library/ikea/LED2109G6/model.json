@@ -15,8 +15,10 @@
   },
   "name": "TRADFRI bulb E27 CWS globe 806lm",
   "standby_power": 0.17,
-  "author_info": {
-    "name": "marthubner",
-    "github": "marthubner"
-  }
+  "authors": [
+    {
+      "name": "marthubner",
+      "github": "marthubner"
+    }
+  ]
 }

@@ -16,9 +16,11 @@
   "measure_method": "script",
   "name": "Player POP",
   "standby_power": 1.63,
-  "author_info": {
-    "name": "Alexandre Bertrand",
-    "email": "alexandre.bertrand@invirtus.io",
-    "github": "trandbert37"
-  }
+  "authors": [
+    {
+      "name": "Alexandre Bertrand",
+      "email": "alexandre.bertrand@invirtus.io",
+      "github": "trandbert37"
+    }
+  ]
 }

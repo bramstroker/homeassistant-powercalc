@@ -12,9 +12,11 @@
   },
   "name": "Zigbee LED Smart Strip DC12V RGBCCT 60led/m",
   "standby_power": 1.05,
-  "author_info": {
-    "name": "RubenKelevra",
-    "email": "cyrond@gmail.com",
-    "github": "RubenKelevra"
-  }
+  "authors": [
+    {
+      "name": "RubenKelevra",
+      "email": "cyrond@gmail.com",
+      "github": "RubenKelevra"
+    }
+  ]
 }

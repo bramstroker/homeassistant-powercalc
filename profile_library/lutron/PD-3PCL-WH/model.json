@@ -13,8 +13,10 @@
   "name": "Plug-In Lamp Dimmer (Wireless Smart Dimmer)",
   "standby_power": 0.1,
   "standby_power_on": 0.56,
-  "author_info": {
-    "name": "Josh Barnard",
-    "github": "barndawgie"
-  }
+  "authors": [
+    {
+      "name": "Josh Barnard",
+      "github": "barndawgie"
+    }
+  ]
 }

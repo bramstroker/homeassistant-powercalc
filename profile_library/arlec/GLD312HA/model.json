@@ -12,8 +12,10 @@
   },
   "name": "12W 1050Lm CCT Colour Mode LED E27 Globe",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "Mallett",
-    "github": "Ma11ett"
-  }
+  "authors": [
+    {
+      "name": "Mallett",
+      "github": "Ma11ett"
+    }
+  ]
 }

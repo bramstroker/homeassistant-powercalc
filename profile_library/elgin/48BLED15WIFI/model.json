@@ -15,9 +15,11 @@
   },
   "name": "Smart Color 15W",
   "standby_power": 0.7,
-  "author_info": {
-    "name": "Diefferson Koderer Môro",
-    "email": "diefferson.moro@gmail.com",
-    "github": "djpremier"
-  }
+  "authors": [
+    {
+      "name": "Diefferson Koderer Môro",
+      "email": "diefferson.moro@gmail.com",
+      "github": "djpremier"
+    }
+  ]
 }

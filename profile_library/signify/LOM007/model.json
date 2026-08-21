@@ -9,8 +9,10 @@
   "only_self_usage": false,
   "standby_power": 0.15,
   "standby_power_on": 0.85,
-  "author_info": {
-    "name": "msteenhuiz",
-    "github": "msteenhuiz"
-  }
+  "authors": [
+    {
+      "name": "msteenhuiz",
+      "github": "msteenhuiz"
+    }
+  ]
 }

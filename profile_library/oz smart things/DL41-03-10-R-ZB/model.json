@@ -15,8 +15,10 @@
   },
   "name": "Zigbee Downlight",
   "standby_power": 0.72,
-  "author_info": {
-    "name": "Scales82",
-    "github": "Scales82"
-  }
+  "authors": [
+    {
+      "name": "Scales82",
+      "github": "Scales82"
+    }
+  ]
 }

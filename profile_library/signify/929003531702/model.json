@@ -15,9 +15,11 @@
   },
   "name": "Hue White and Color Ambiance Infuse medium ceiling lamp",
   "standby_power": 0.34,
-  "author_info": {
-    "name": "dewbot6",
-    "email": "drewsnodgrass@comcast.net",
-    "github": "dewbot6"
-  }
+  "authors": [
+    {
+      "name": "dewbot6",
+      "email": "drewsnodgrass@comcast.net",
+      "github": "dewbot6"
+    }
+  ]
 }

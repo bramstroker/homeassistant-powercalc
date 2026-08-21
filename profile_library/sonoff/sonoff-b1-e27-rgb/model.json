@@ -15,8 +15,10 @@
   },
   "name": "B1 Smart WiFi Light LED Bulb",
   "standby_power": 0.8,
-  "author_info": {
-    "name": "TyzzyT",
-    "github": "TyzzyT"
-  }
+  "authors": [
+    {
+      "name": "TyzzyT",
+      "github": "TyzzyT"
+    }
+  ]
 }

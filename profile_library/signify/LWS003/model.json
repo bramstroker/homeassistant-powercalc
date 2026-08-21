@@ -12,8 +12,10 @@
   },
   "name": "Hue White Bulb A60 E27 w/ Bluetooth",
   "standby_power": 0.25,
-  "author_info": {
-    "name": "dxmnkd316",
-    "github": "dxmnkd316"
-  }
+  "authors": [
+    {
+      "name": "dxmnkd316",
+      "github": "dxmnkd316"
+    }
+  ]
 }

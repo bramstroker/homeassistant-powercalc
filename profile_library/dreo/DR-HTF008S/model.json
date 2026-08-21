@@ -1,8 +1,4 @@
 {
-  "author_info": {
-    "github": "wagnerpizza",
-    "name": "wagnerpizza"
-  },
   "calculation_strategy": "linear",
   "created_at": "2026-08-13T15:43:19Z",
   "device_type": "fan",
@@ -43,5 +39,11 @@
   "voltage_range": {
     "min": 234.4,
     "max": 236.7
-  }
+  },
+  "authors": [
+    {
+      "github": "wagnerpizza",
+      "name": "wagnerpizza"
+    }
+  ]
 }

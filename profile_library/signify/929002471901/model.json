@@ -12,8 +12,10 @@
   },
   "name": "Hue White Ambiance Bulb A67 1600lm with Bluetooth",
   "standby_power": 0.41,
-  "author_info": {
-    "name": "Macstar1601",
-    "github": "Macstar1601"
-  }
+  "authors": [
+    {
+      "name": "Macstar1601",
+      "github": "Macstar1601"
+    }
+  ]
 }

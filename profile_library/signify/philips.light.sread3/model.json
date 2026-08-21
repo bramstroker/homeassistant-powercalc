@@ -12,9 +12,11 @@
   },
   "name": "Mijia Philips Desk Lamp 3",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "xxddff",
-    "github": "xxddff",
-    "email": "772327379@qq.com"
-  }
+  "authors": [
+    {
+      "name": "xxddff",
+      "github": "xxddff",
+      "email": "772327379@qq.com"
+    }
+  ]
 }

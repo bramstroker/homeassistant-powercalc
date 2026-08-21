@@ -13,9 +13,11 @@
   "measure_method": "script",
   "name": "Hue Being Ceiling Light",
   "standby_power": 0.35,
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  }
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

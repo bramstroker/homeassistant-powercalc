@@ -12,8 +12,10 @@
   },
   "name": "TRADFRI bulb B22, white spectrum, globe, opal, 1055 lm",
   "standby_power": 0.06,
-  "author_info": {
-    "name": "ngengerous",
-    "github": "ngengerous"
-  }
+  "authors": [
+    {
+      "name": "ngengerous",
+      "github": "ngengerous"
+    }
+  ]
 }

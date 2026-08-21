@@ -15,9 +15,11 @@
   },
   "name": "Hue White and Color Ambiance GU10 w/BT",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Emory Penney",
-    "email": "emory.j.penney@intel.com",
-    "github": "ejpenney"
-  }
+  "authors": [
+    {
+      "name": "Emory Penney",
+      "email": "emory.j.penney@intel.com",
+      "github": "ejpenney"
+    }
+  ]
 }

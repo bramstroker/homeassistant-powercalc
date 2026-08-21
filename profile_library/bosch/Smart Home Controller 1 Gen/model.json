@@ -15,9 +15,11 @@
   "measure_device_firmware": "1.3.4 Build 250403 Rel.150504",
   "measure_method": "script",
   "name": "Smart Home Controller 1 Gen.",
-  "author_info": {
-    "name": "Justin Hahn",
-    "email": "hahnjustin27@gmail.com",
-    "github": "justinh998"
-  }
+  "authors": [
+    {
+      "name": "Justin Hahn",
+      "email": "hahnjustin27@gmail.com",
+      "github": "justinh998"
+    }
+  ]
 }

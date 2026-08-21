@@ -15,9 +15,11 @@
   },
   "name": "TRADFRI bulb E27 1055 lumen, smart wireless dimmable/white spectrum globe",
   "standby_power": 0.19,
-  "author_info": {
-    "name": "Jari Eskelinen",
-    "email": "jari.eskelinen@iki.fi",
-    "github": "jarpatus"
-  }
+  "authors": [
+    {
+      "name": "Jari Eskelinen",
+      "email": "jari.eskelinen@iki.fi",
+      "github": "jarpatus"
+    }
+  ]
 }

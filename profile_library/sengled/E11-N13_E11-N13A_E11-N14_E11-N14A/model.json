@@ -15,9 +15,11 @@
   },
   "name": "Smart LED Extra Bright Soft White A19 Bulb",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "dhedges01",
-    "email": "dhedges01@gmail.com",
-    "github": "dhedges01"
-  }
+  "authors": [
+    {
+      "name": "dhedges01",
+      "email": "dhedges01@gmail.com",
+      "github": "dhedges01"
+    }
+  ]
 }

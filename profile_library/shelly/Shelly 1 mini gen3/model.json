@@ -13,8 +13,10 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "1 Mini Gen3",
-  "author_info": {
-    "name": "CV",
-    "github": "dagobert"
-  }
+  "authors": [
+    {
+      "name": "CV",
+      "github": "dagobert"
+    }
+  ]
 }

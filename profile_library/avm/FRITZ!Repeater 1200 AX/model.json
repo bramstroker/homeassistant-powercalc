@@ -10,9 +10,11 @@
   "measure_device": "Nous A1Z",
   "measure_method": "manual",
   "name": "FRITZ!Repeater 1200 AX",
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  }
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

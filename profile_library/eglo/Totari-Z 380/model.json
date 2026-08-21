@@ -15,8 +15,10 @@
   },
   "name": "Totari-Z 380 ceiling light",
   "standby_power": 0.22,
-  "author_info": {
-    "name": "tommials",
-    "github": "tommials"
-  }
+  "authors": [
+    {
+      "name": "tommials",
+      "github": "tommials"
+    }
+  ]
 }

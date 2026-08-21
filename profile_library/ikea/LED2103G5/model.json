@@ -15,8 +15,10 @@
   },
   "name": "TRADFRI bulb E27 WW globe 806lm",
   "standby_power": 0.11,
-  "author_info": {
-    "name": "dansie",
-    "github": "dansie"
-  }
+  "authors": [
+    {
+      "name": "dansie",
+      "github": "dansie"
+    }
+  ]
 }

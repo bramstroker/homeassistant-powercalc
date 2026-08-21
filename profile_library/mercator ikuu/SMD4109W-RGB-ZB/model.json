@@ -12,9 +12,11 @@
   },
   "name": "RGB + CCT Zigbee 9 W LED Downlight (92 mm)",
   "standby_power": 0.43,
-  "author_info": {
-    "name": "hemiceni",
-    "email": "ivansiegmann@live.com",
-    "github": "hemiceni"
-  }
+  "authors": [
+    {
+      "name": "hemiceni",
+      "email": "ivansiegmann@live.com",
+      "github": "hemiceni"
+    }
+  ]
 }

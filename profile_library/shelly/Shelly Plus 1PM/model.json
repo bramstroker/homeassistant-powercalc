@@ -20,8 +20,10 @@
   "sub_profile_select": {
     "default": "default"
   },
-  "author_info": {
-    "name": "CV",
-    "github": "dagobert"
-  }
+  "authors": [
+    {
+      "name": "CV",
+      "github": "dagobert"
+    }
+  ]
 }

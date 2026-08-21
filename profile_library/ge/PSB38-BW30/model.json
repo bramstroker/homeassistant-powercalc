@@ -12,8 +12,10 @@
   },
   "name": "Link PAR38 Bright White Bulb",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Ross Troha",
-    "github": "rosstroha"
-  }
+  "authors": [
+    {
+      "name": "Ross Troha",
+      "github": "rosstroha"
+    }
+  ]
 }

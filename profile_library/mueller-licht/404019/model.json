@@ -12,8 +12,10 @@
   },
   "name": "Tint LED-Kerzenform white+color",
   "standby_power": 0.38,
-  "author_info": {
-    "name": "ffm777",
-    "github": "ffm777"
-  }
+  "authors": [
+    {
+      "name": "ffm777",
+      "github": "ffm777"
+    }
+  ]
 }

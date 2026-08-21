@@ -15,8 +15,10 @@
   },
   "name": "SMART+ Classic E27 tunable white",
   "standby_power": 0.5,
-  "author_info": {
-    "name": "Jan Hoff",
-    "github": "mehgrmlhmpf"
-  }
+  "authors": [
+    {
+      "name": "Jan Hoff",
+      "github": "mehgrmlhmpf"
+    }
+  ]
 }

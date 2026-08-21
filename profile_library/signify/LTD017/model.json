@@ -15,8 +15,10 @@
   },
   "name": "Hue 5/6″ Retrofit Downlight White",
   "standby_power": 0.22,
-  "author_info": {
-    "name": "ltloopy",
-    "github": "ltloopy"
-  }
+  "authors": [
+    {
+      "name": "ltloopy",
+      "github": "ltloopy"
+    }
+  ]
 }

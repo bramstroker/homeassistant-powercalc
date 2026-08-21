@@ -12,8 +12,10 @@
   },
   "name": "Candle Tunable White E14 Bulb",
   "standby_power": 0.48,
-  "author_info": {
-    "name": "Florian Mulatz",
-    "github": "florianmulatz"
-  }
+  "authors": [
+    {
+      "name": "Florian Mulatz",
+      "github": "florianmulatz"
+    }
+  ]
 }

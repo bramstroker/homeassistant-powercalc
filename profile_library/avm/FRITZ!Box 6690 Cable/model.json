@@ -13,8 +13,10 @@
     "VERSION": "v1.20.12:docker"
   },
   "name": "FRITZ!Box 6690 Cable",
-  "author_info": {
-    "name": "Tim",
-    "github": "EinRainerZufall"
-  }
+  "authors": [
+    {
+      "name": "Tim",
+      "github": "EinRainerZufall"
+    }
+  ]
 }

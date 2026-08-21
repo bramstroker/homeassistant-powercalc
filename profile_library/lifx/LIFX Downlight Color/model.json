@@ -15,9 +15,11 @@
   },
   "name": "Downlight Color",
   "standby_power": 0.68,
-  "author_info": {
-    "name": "Joshua Rich",
-    "email": "joshua.rich@gmail.com",
-    "github": "joshuar"
-  }
+  "authors": [
+    {
+      "name": "Joshua Rich",
+      "email": "joshua.rich@gmail.com",
+      "github": "joshuar"
+    }
+  ]
 }

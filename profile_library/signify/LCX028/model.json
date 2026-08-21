@@ -12,8 +12,10 @@
   },
   "name": "Hue Festavia Outdoor White & Colour Gradient Globe String Lights, 14m",
   "standby_power": 0.38,
-  "author_info": {
-    "name": "phoenixxx-1",
-    "github": "phoenixxx-1"
-  }
+  "authors": [
+    {
+      "name": "phoenixxx-1",
+      "github": "phoenixxx-1"
+    }
+  ]
 }

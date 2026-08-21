@@ -12,9 +12,11 @@
   },
   "name": "12W 1050lm RGB Colour Mode Grid Connect Smart LED B22 Globe",
   "standby_power": 0.7,
-  "author_info": {
-    "name": "Daniel O'Connor",
-    "email": "daniel.oconnor@gmail.com",
-    "github": "CloCkWeRX"
-  }
+  "authors": [
+    {
+      "name": "Daniel O'Connor",
+      "email": "daniel.oconnor@gmail.com",
+      "github": "CloCkWeRX"
+    }
+  ]
 }

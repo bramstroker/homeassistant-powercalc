@@ -6,9 +6,11 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Indoor Cam Pan&Tilt",
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  }
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

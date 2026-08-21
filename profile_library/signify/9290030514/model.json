@@ -15,9 +15,11 @@
   },
   "name": "Hue Filament Standard A60/E27 bluetooth",
   "standby_power": 0.14,
-  "author_info": {
-    "name": "Dr-Seltsam",
-    "email": "sebastian.jaekel@web.de",
-    "github": "Dr-Seltsam"
-  }
+  "authors": [
+    {
+      "name": "Dr-Seltsam",
+      "email": "sebastian.jaekel@web.de",
+      "github": "Dr-Seltsam"
+    }
+  ]
 }

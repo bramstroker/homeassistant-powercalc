@@ -31,8 +31,10 @@
   },
   "name": "Echo Dot (Gen4) with clock",
   "standby_power": 1.05,
-  "author_info": {
-    "name": "Jarod2801",
-    "github": "Jarod2801"
-  }
+  "authors": [
+    {
+      "name": "Jarod2801",
+      "github": "Jarod2801"
+    }
+  ]
 }

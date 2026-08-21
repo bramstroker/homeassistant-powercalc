@@ -11,9 +11,11 @@
   "measure_method": "script",
   "name": "Hue White Ambiance A60 E27 806lm",
   "standby_power": 0.39,
-  "author_info": {
-    "name": "nepozs",
-    "email": "szopen@os.pl",
-    "github": "nepozs"
-  }
+  "authors": [
+    {
+      "name": "nepozs",
+      "email": "szopen@os.pl",
+      "github": "nepozs"
+    }
+  ]
 }

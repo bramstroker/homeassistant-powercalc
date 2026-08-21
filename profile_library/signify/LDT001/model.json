@@ -12,8 +12,10 @@
   },
   "name": "Hue Aphelion Recessed Downlight White Ambiance",
   "standby_power": 0.45,
-  "author_info": {
-    "name": "NotSoBrightReally",
-    "github": "NotSoBrightReally"
-  }
+  "authors": [
+    {
+      "name": "NotSoBrightReally",
+      "github": "NotSoBrightReally"
+    }
+  ]
 }

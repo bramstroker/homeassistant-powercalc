@@ -15,8 +15,10 @@
   },
   "name": "Hue Lily Outdoor Lightstrip",
   "standby_power": 0.25,
-  "author_info": {
-    "name": "x5serv",
-    "github": "x5serv"
-  }
+  "authors": [
+    {
+      "name": "x5serv",
+      "github": "x5serv"
+    }
+  ]
 }

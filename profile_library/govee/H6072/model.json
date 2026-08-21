@@ -12,9 +12,11 @@
   },
   "name": "Lyra RGBICWW Corner Floor Lamp",
   "standby_power": 1.78,
-  "author_info": {
-    "name": "sockmonkey0223",
-    "email": "joshua.oswald@gmail.com",
-    "github": "sockmonkey0223"
-  }
+  "authors": [
+    {
+      "name": "sockmonkey0223",
+      "email": "joshua.oswald@gmail.com",
+      "github": "sockmonkey0223"
+    }
+  ]
 }

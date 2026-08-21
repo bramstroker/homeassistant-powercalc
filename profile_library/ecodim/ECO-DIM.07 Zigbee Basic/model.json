@@ -13,9 +13,11 @@
   "only_self_usage": false,
   "standby_power": 0.3,
   "standby_power_on": 0.3,
-  "author_info": {
-    "name": "Jasper",
-    "email": "jaspervanvliet1996@gmail.com",
-    "github": "SustainableBlueDuck"
-  }
+  "authors": [
+    {
+      "name": "Jasper",
+      "email": "jaspervanvliet1996@gmail.com",
+      "github": "SustainableBlueDuck"
+    }
+  ]
 }

@@ -33,8 +33,10 @@
   },
   "name": "Echo (Gen1)",
   "standby_power": 3.06,
-  "author_info": {
-    "name": "Stuart Pearson",
-    "github": "stuartp44"
-  }
+  "authors": [
+    {
+      "name": "Stuart Pearson",
+      "github": "stuartp44"
+    }
+  ]
 }

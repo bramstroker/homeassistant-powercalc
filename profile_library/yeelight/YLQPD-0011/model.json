@@ -1,8 +1,4 @@
 {
-  "author_info": {
-    "github": "AlexMihai1804",
-    "name": "AlexMihai1804"
-  },
   "calculation_strategy": "lut",
   "created_at": "2026-08-02T19:53:34Z",
   "device_type": "light",
@@ -19,5 +15,11 @@
   "voltage_range": {
     "min": 224.2,
     "max": 229.3
-  }
+  },
+  "authors": [
+    {
+      "github": "AlexMihai1804",
+      "name": "AlexMihai1804"
+    }
+  ]
 }

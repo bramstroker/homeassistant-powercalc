@@ -15,8 +15,10 @@
   },
   "name": "Tint Amela 50 cm",
   "standby_power": 0.19,
-  "author_info": {
-    "name": "LtKowalski",
-    "github": "LtKowalski"
-  }
+  "authors": [
+    {
+      "name": "LtKowalski",
+      "github": "LtKowalski"
+    }
+  ]
 }

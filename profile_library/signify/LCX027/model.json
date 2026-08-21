@@ -13,8 +13,10 @@
   },
   "name": "Festavia bulb string light 21m",
   "standby_power": 0.52,
-  "author_info": {
-    "name": "phoenixxx-1",
-    "github": "phoenixxx-1"
-  }
+  "authors": [
+    {
+      "name": "phoenixxx-1",
+      "github": "phoenixxx-1"
+    }
+  ]
 }

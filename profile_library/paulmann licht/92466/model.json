@@ -1,8 +1,4 @@
 {
-  "author_info": {
-    "name": "philscottydev",
-    "github": "philscottydev"
-  },
   "calculation_strategy": "lut",
   "created_at": "2026-08-15T16:46:46Z",
   "device_type": "light",
@@ -23,5 +19,11 @@
   "aliases": [
     "92467",
     "92468"
+  ],
+  "authors": [
+    {
+      "name": "philscottydev",
+      "github": "philscottydev"
+    }
   ]
 }

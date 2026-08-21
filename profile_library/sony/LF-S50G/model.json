@@ -23,8 +23,10 @@
   "measure_method": "manual",
   "name": "Smart Wireless Speaker with Google Assistant",
   "standby_power": 3.28,
-  "author_info": {
-    "name": "jonathanlflatt",
-    "github": "jonathanlflatt"
-  }
+  "authors": [
+    {
+      "name": "jonathanlflatt",
+      "github": "jonathanlflatt"
+    }
+  ]
 }

@@ -17,8 +17,10 @@
   "fixed_config": {
     "power": 1.51
   },
-  "author_info": {
-    "name": "Largelos",
-    "github": "Largelos"
-  }
+  "authors": [
+    {
+      "name": "Largelos",
+      "github": "Largelos"
+    }
+  ]
 }

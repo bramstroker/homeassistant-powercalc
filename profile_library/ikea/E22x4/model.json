@@ -12,8 +12,10 @@
   "only_self_usage": false,
   "standby_power": 0.13,
   "standby_power_on": 0.73,
-  "author_info": {
-    "name": "ZleekWolf",
-    "github": "folfy"
-  }
+  "authors": [
+    {
+      "name": "ZleekWolf",
+      "github": "folfy"
+    }
+  ]
 }
