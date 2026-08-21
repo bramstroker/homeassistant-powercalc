@@ -2185,6 +2185,45 @@
           "hash": "77ed0764e4bdc8fa50f77f8216e1d218"
         },
         {
+          "authors": [
+            {
+              "github": "LewisSpring",
+              "name": "LewisSpring"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-21T13:17:00Z",
+          "device_type": "light",
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.4.1:app"
+          },
+          "name": "RGBW Bulb Colour E27 880lm",
+          "standby_power": 0.34,
+          "voltage_range": {
+            "max": 245.17,
+            "min": 238.75
+          },
+          "id": "RB 282 C",
+          "manufacturer": "innr",
+          "updated_at": "2026-08-21T14:22:51",
+          "max_power": 9.11,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "effect",
+            "hs",
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
+          "hash": "861709fea96af3c72f07704d83e73726"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2025-12-03T15:24:51Z",
           "device_type": "light",
@@ -15835,14 +15874,14 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "brightness"
+            "brightness",
+            "effect"
           ],
           "lut_quality": {
             "score": 98.7,
             "brightness": 98.7
           },
-          "hash": "f18eac5d2a6fb907afbaa5ebf2cae363"
+          "hash": "c13689fd0bd878e990adc75a1475facb"
         },
         {
           "calculation_strategy": "lut",
