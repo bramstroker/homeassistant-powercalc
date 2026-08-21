@@ -8,6 +8,7 @@ from measure.visualization.core import (
     build_plot_from_file,
     build_session_plots,
     limit_plot_points,
+    model_has_linear_calibration,
 )
 
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     "build_plot_from_file",
     "build_session_plots",
     "limit_plot_points",
+    "model_has_linear_calibration",
 ]

@@ -3,7 +3,7 @@ from collections.abc import Sequence
 import json
 from pathlib import Path
 
-from measure.visualization import PlotSpec, build_plot_from_file, limit_plot_points
+from measure.visualization import PlotSpec, build_plot_from_file, limit_plot_points, model_has_linear_calibration
 from measure.visualization.renderer import render_plot
 
 # Every marker stays a separate element in an SVG, so the largest LUTs (~25k rows) would
@@ -57,21 +57,16 @@ def generate_directory_plots(directory: Path, *, force: bool = False) -> int:
 
 def _directory_plot_inputs(directory: Path) -> list[Path]:
     light_files = (path for path in directory.rglob("*.csv*") if path.name in _LIGHT_PLOT_FILES)
-    linear_models = (path for path in directory.rglob("model.json") if _is_linear_model(path))
+    linear_models = (path for path in directory.rglob("model.json") if _has_linear_calibration(path))
     return sorted((*light_files, *linear_models))
 
 
-def _is_linear_model(path: Path) -> bool:
+def _has_linear_calibration(path: Path) -> bool:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except OSError, json.JSONDecodeError:
         return False
-    linear_config = data.get("linear_config")
-    return (
-        data.get("calculation_strategy") == "linear"
-        and isinstance(linear_config, dict)
-        and isinstance(linear_config.get("calibrate"), list)
-    )
+    return model_has_linear_calibration(data)
 
 
 def _directory_output_paths(input_path: Path) -> tuple[Path, ...]:
