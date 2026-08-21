@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## 0.4.0 - 2026-08-21
+
+- #4441 Reduce test suite duplication with shared helpers @bramstroker
+- #4473 Document coventional commits @bramstroker
+- #4528 Change min_voltage and max_voltage to voltage_range in library @bramstroker
+
+### 🚀 Features
+
+- #4435 Improve UI of view log button @bramstroker
+- #4507 Measure multiple lights directly in measure app @bramstroker
+- #4508 Add probe for lower power measurements @bramstroker
+- #4513 Add session overview to measure app @bramstroker
+- #4518 Add playwright tests @bramstroker
+- #4519 Add eslint @bramstroker
+- #4521 Add measure status sensor to HA @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4449 Fix sonarcloud issues @bramstroker
+- #4451 Anable more ruff rules @bramstroker
+- #4549 Potential fix for broken connection after 10000 seconds @bramstroker
+- #4552 Fix MODE from .env being split into characters when a dummy load is configured @philscottydev
+
+### 🧰 Maintenance
+
+- #4474 ci: harden repository quality gates @bramstroker
+- #4479 chore: refresh lockfiles and enable Renovate lock maintenance @bramstroker
+
 ## 0.3.0 - 2026-07-31
 
 - #4428 Cleanup typing @bramstroker
