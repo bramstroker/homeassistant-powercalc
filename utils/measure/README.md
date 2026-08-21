@@ -39,7 +39,13 @@ Visualization is part of the measure package, while its scientific dependencies 
 uv run --group visualize powercalc-visualize export/LCT010/brightness.csv.gz --output=brightness.png
 ```
 
-To generate or refresh every supported plot in the profile library:
+For a composite `model.json`, render its branch evaluation flow with:
+
+```bash
+uv run --group visualize powercalc-visualize path/to/model.json --kind=composite --output=composite.png
+```
+
+To generate or refresh every supported plot in the profile library, including composite branch diagrams:
 
 ```bash
 uv run --group visualize powercalc-visualize ../../profile_library --force
