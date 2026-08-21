@@ -2,6 +2,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_ID, CONF_NAME, CONF_PATH, Platform
 from homeassistant.helpers import selector
@@ -16,6 +17,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_STANDBY_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_CURRENT_ENTITY,
     CONF_FIXED,
     CONF_FIXED_VALUE,
     CONF_GAMMA_CURVE,
@@ -253,6 +255,19 @@ class VirtualPowerFlow:
             schema = schema.extend(SCHEMA_POWER_MULTI_SWITCH_MANUAL.schema)
 
         return schema
+
+    async def create_schema_wled(self) -> vol.Schema:
+        """Create the config schema for WLED strategy."""
+        return SCHEMA_POWER_WLED.extend(  # type: ignore[no-any-return]
+            {
+                vol.Optional(CONF_CURRENT_ENTITY): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        domain="sensor",
+                        device_class=SensorDeviceClass.CURRENT,
+                    ),
+                ),
+            },
+        )
 
     async def create_schema_playbook(self) -> vol.Schema:
         """Create the config schema for playbook strategy."""

@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Current entity",
           "power_factor": "Power factor",
           "voltage": "Voltage"
         },
         "description": "Make sure to enable brightness limiter in WLED software. Also see {docs_uri}",
-        "title": "WLED config"
+        "title": "WLED config",
+        "data_description": {
+          "current_entity": "Optionally select a sensor providing the estimated current in mA. Only needed when Powercalc cannot find the WLED estimated current sensor automatically, for example when the brightness limiter is configured per output."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "WLED options",
         "data": {
+          "current_entity": "Current entity",
           "power_factor": "Power factor",
           "voltage": "Voltage"
+        },
+        "data_description": {
+          "current_entity": "Optionally select a sensor providing the estimated current in mA. Only needed when Powercalc cannot find the WLED estimated current sensor automatically, for example when the brightness limiter is configured per output."
         }
       },
       "cost_options": {
