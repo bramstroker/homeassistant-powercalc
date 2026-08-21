@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Virtayksikkö",
           "power_factor": "Tehokerroin",
           "voltage": "Jännite"
         },
         "description": "Varmista, että kirkkauden rajoitin on käytössä WLED-ohjelmistossa. Katso myös {docs_uri}",
-        "title": "WLED määritys"
+        "title": "WLED määritys",
+        "data_description": {
+          "current_entity": "Valitse halutessasi anturi, joka ilmoittaa arvioidun virran mA:ina. Tarvitaan vain, jos Powercalc ei löydä WLED:n arvioidun virran anturia automaattisesti, esimerkiksi kun kirkkauden rajoitin on määritetty lähdöittäin."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "WLED vaihtoehdot",
         "data": {
+          "current_entity": "Virtayksikkö",
           "power_factor": "Tehokerroin",
           "voltage": "Jännite"
+        },
+        "data_description": {
+          "current_entity": "Valitse halutessasi anturi, joka ilmoittaa arvioidun virran mA:ina. Tarvitaan vain, jos Powercalc ei löydä WLED:n arvioidun virran anturia automaattisesti, esimerkiksi kun kirkkauden rajoitin on määritetty lähdöittäin."
         }
       },
       "cost_options": {

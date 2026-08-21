@@ -2,8 +2,18 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_ID, CONF_NAME, CONF_PATH, Platform
+from homeassistant.const import (
+    CONF_ATTRIBUTE,
+    CONF_ENTITIES,
+    CONF_ENTITY_ID,
+    CONF_ID,
+    CONF_NAME,
+    CONF_PATH,
+    Platform,
+    UnitOfElectricCurrent,
+)
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 import voluptuous as vol
@@ -16,6 +26,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_STANDBY_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_CURRENT_ENTITY,
     CONF_FIXED,
     CONF_FIXED_VALUE,
     CONF_GAMMA_CURVE,
@@ -67,7 +78,7 @@ from custom_components.powercalc.flow_helper.strategy_form import (
     wrap_strategy_form_data,
 )
 from custom_components.powercalc.power_profile.power_profile import DeviceType
-from custom_components.powercalc.strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
+from custom_components.powercalc.strategy.wled import CONFIG_SCHEMA as CONFIG_SCHEMA_WLED
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
@@ -147,6 +158,21 @@ SCHEMA_POWER_LINEAR = vol.Schema(
                 multiple=True,
                 label_field=CONF_VALUE,
                 description_field=CONF_POWER,
+            ),
+        ),
+    },
+)
+
+# The WLED strategy config schema, with the current entity rendered as an entity picker in the GUI.
+SCHEMA_POWER_WLED = CONFIG_SCHEMA_WLED.extend(
+    {
+        vol.Optional(CONF_CURRENT_ENTITY): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                filter={
+                    "domain": "sensor",
+                    "device_class": SensorDeviceClass.CURRENT,
+                    "unit_of_measurement": UnitOfElectricCurrent.MILLIAMPERE,
+                },
             ),
         ),
     },

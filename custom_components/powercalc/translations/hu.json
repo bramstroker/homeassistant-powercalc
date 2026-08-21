@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Áram-entitás",
           "power_factor": "Teljesítménytényező",
           "voltage": "Feszültség"
         },
         "description": "Győződjön meg arról, hogy engedélyezte a fényerő-korlátozót a WLED szoftverben. Lásd még: {docs_uri}",
-        "title": "WLED beállításai"
+        "title": "WLED beállításai",
+        "data_description": {
+          "current_entity": "Opcionálisan válasszon egy, az áram becsült értékét mA-ben biztosító érzékelőt. Csak akkor szükséges, ha a Powercalc nem találja meg automatikusan a WLED becsültáram-érzékelőjét, például ha a fényerőkorlátozó kimenetenként van beállítva."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "WLED beállításai",
         "data": {
+          "current_entity": "Áram-entitás",
           "power_factor": "Teljesítménytényező",
           "voltage": "Feszültség"
+        },
+        "data_description": {
+          "current_entity": "Opcionálisan válasszon egy, az áram becsült értékét mA-ben biztosító érzékelőt. Csak akkor szükséges, ha a Powercalc nem találja meg automatikusan a WLED becsültáram-érzékelőjét, például ha a fényerőkorlátozó kimenetenként van beállítva."
         }
       },
       "cost_options": {

@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Encja prądu",
           "power_factor": "Współczynnik mocy (cos φ)",
           "voltage": "Napięcie"
         },
         "description": "Upewnij się, że włączono ogranicznik jasności w oprogramowaniu WLED. Zobacz również {docs_uri}",
-        "title": "Konfiguracja WLED"
+        "title": "Konfiguracja WLED",
+        "data_description": {
+          "current_entity": "Opcjonalnie wybierz sensor udostępniający szacowany prąd w mA. Jest to potrzebne tylko wtedy, gdy Powercalc nie może automatycznie znaleźć sensora szacowanego prądu WLED, na przykład gdy ogranicznik jasności jest skonfigurowany dla każdego wyjścia."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "Opcje WLED",
         "data": {
+          "current_entity": "Encja prądu",
           "power_factor": "Współczynnik mocy (cos φ)",
           "voltage": "Napięcie"
+        },
+        "data_description": {
+          "current_entity": "Opcjonalnie wybierz sensor udostępniający szacowany prąd w mA. Jest to potrzebne tylko wtedy, gdy Powercalc nie może automatycznie znaleźć sensora szacowanego prądu WLED, na przykład gdy ogranicznik jasności jest skonfigurowany dla każdego wyjścia."
         }
       },
       "cost_options": {

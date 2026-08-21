@@ -3,13 +3,14 @@ import logging
 
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry
+from homeassistant.helpers import config_validation as cv, entity_registry
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_CURRENT_ENTITY,
     CONF_POWER_FACTOR,
     CONF_VOLTAGE,
     OFF_STATES,
@@ -25,6 +26,7 @@ CONFIG_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VOLTAGE): vol.Coerce(float),
         vol.Optional(CONF_POWER_FACTOR, default=0.9): vol.Coerce(float),
+        vol.Optional(CONF_CURRENT_ENTITY): cv.entity_id,
     },
 )
 
@@ -44,6 +46,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
         self._power_factor = config.get(CONF_POWER_FACTOR) or 0.9
         self._light_entity = light_entity
         self._standby_power: Decimal = Decimal(standby_power or 0)
+        self._configured_current_entity: str | None = config.get(CONF_CURRENT_ENTITY)
         self._estimated_current_entity: str | None = None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
@@ -85,6 +88,9 @@ class WledStrategy(PowerCalculationStrategyInterface):
         return evaluate_to_decimal(power)
 
     async def find_estimated_current_entity(self) -> str:
+        if self._configured_current_entity:
+            return self._configured_current_entity
+
         entity_reg = entity_registry.async_get(self._hass)
         entity_id = f"sensor.{self._light_entity.object_id}_estimated_current"
         entry = entity_reg.async_get(entity_id)
@@ -97,7 +103,10 @@ class WledStrategy(PowerCalculationStrategyInterface):
                 return entity
 
         raise StrategyConfigurationError(
-            "No estimated current entity found. Probably brightness limiter not enabled. See documentation",
+            "No estimated current entity found. Probably brightness limiter not enabled, "
+            "or configured per output rather than globally. "
+            "You can also point Powercalc to a current entity yourself using the current_entity option. "
+            "See documentation",
         )
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:

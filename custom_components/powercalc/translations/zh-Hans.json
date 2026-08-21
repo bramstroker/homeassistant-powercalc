@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "电流实体",
           "power_factor": "功率因数",
           "voltage": "电压"
         },
         "description": "请确保在 WLED 软件中启用亮度限制器。另请参阅 {docs_uri}",
-        "title": "WLED 配置"
+        "title": "WLED 配置",
+        "data_description": {
+          "current_entity": "可选取一个提供估算电流（mA）的传感器。仅当 Powercalc 无法自动找到 WLED 估算电流传感器时才需要，例如亮度限制器按输出进行配置时。"
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "WLED 选项",
         "data": {
+          "current_entity": "电流实体",
           "power_factor": "功率因数",
           "voltage": "电压"
+        },
+        "data_description": {
+          "current_entity": "可选取一个提供估算电流（mA）的传感器。仅当 Powercalc 无法自动找到 WLED 估算电流传感器时才需要，例如亮度限制器按输出进行配置时。"
         }
       },
       "cost_options": {

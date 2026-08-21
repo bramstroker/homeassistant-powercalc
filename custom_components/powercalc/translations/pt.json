@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Entidade de corrente",
           "power_factor": "Factor de potência",
           "voltage": "Voltagem"
         },
         "description": "Certifique-se de que ativa o limitador de brilho no software WLED. Consulte também {docs_uri}",
-        "title": "Configuração WLED"
+        "title": "Configuração WLED",
+        "data_description": {
+          "current_entity": "Opcionalmente, selecione um sensor que forneça a corrente estimada em mA. Necessário apenas quando o Powercalc não consegue encontrar automaticamente o sensor de corrente estimada do WLED, por exemplo, quando o limitador de brilho está configurado por saída."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "Opções WLED",
         "data": {
+          "current_entity": "Entidade de corrente",
           "power_factor": "Fator de potência",
           "voltage": "Tensão"
+        },
+        "data_description": {
+          "current_entity": "Opcionalmente, selecione um sensor que forneça a corrente estimada em mA. Necessário apenas quando o Powercalc não consegue encontrar automaticamente o sensor de corrente estimada do WLED, por exemplo, quando o limitador de brilho está configurado por saída."
         }
       },
       "cost_options": {

@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Strømenhed",
           "power_factor": "Effektfaktor",
           "voltage": "Spænding"
         },
         "description": "Sørg for at aktivere lysstyrkebegrænser i WLED-software. Se også {docs_uri}",
-        "title": "WLED-konfiguration"
+        "title": "WLED-konfiguration",
+        "data_description": {
+          "current_entity": "Vælg eventuelt en sensor, der leverer den estimerede strøm i mA. Kun nødvendigt når Powercalc ikke automatisk kan finde WLED-sensoren for estimeret strøm, f.eks. når lysstyrkebegrænseren er konfigureret pr. output."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "WLED-indstillinger",
         "data": {
+          "current_entity": "Strømenhed",
           "power_factor": "Effektfaktor",
           "voltage": "Spænding"
+        },
+        "data_description": {
+          "current_entity": "Vælg eventuelt en sensor, der leverer den estimerede strøm i mA. Kun nødvendigt når Powercalc ikke automatisk kan finde WLED-sensoren for estimeret strøm, f.eks. når lysstyrkebegrænseren er konfigureret pr. output."
         }
       },
       "cost_options": {

@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Strom-Entität",
           "power_factor": "Leistungs-Faktor",
           "voltage": "Volt"
         },
         "description": "Stelle sicher, dass der Helligkeitsbegrenzer in der WLED-Software aktiviert ist. Siehe auch {docs_uri}",
-        "title": "WLED Konfiguration"
+        "title": "WLED Konfiguration",
+        "data_description": {
+          "current_entity": "Optional einen Sensor auswählen, der den geschätzten Strom in mA bereitstellt. Nur erforderlich, wenn Powercalc den WLED-Sensor für den geschätzten Strom nicht automatisch finden kann, z. B. wenn der Helligkeitsbegrenzer pro Ausgang konfiguriert ist."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "WLED-Einstellungen",
         "data": {
+          "current_entity": "Strom-Entität",
           "power_factor": "Leistungsfaktor",
           "voltage": "Spannung"
+        },
+        "data_description": {
+          "current_entity": "Optional einen Sensor auswählen, der den geschätzten Strom in mA bereitstellt. Nur erforderlich, wenn Powercalc den WLED-Sensor für den geschätzten Strom nicht automatisch finden kann, z. B. wenn der Helligkeitsbegrenzer pro Ausgang konfiguriert ist."
         }
       },
       "cost_options": {

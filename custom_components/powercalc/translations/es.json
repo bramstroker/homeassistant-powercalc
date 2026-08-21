@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Entidad de corriente",
           "power_factor": "Factor de potencia",
           "voltage": "Voltaje"
         },
         "description": "Asegúrate de habilitar el limitador de brillo en el software WLED. También consulta {docs_uri}",
-        "title": "Configuración WLED"
+        "title": "Configuración WLED",
+        "data_description": {
+          "current_entity": "Selecciona opcionalmente un sensor que proporcione la corriente estimada en mA. Solo es necesario cuando Powercalc no puede encontrar automáticamente el sensor de corriente estimada de WLED, por ejemplo, cuando el limitador de brillo está configurado por salida."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "Opciones de WLED",
         "data": {
+          "current_entity": "Entidad de corriente",
           "power_factor": "Factor de potencia",
           "voltage": "Voltaje"
+        },
+        "data_description": {
+          "current_entity": "Selecciona opcionalmente un sensor que proporcione la corriente estimada en mA. Solo es necesario cuando Powercalc no puede encontrar automáticamente el sensor de corriente estimada de WLED, por ejemplo, cuando el limitador de brillo está configurado por salida."
         }
       },
       "cost_options": {

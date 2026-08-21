@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Entita proudu",
           "power_factor": "Účiník",
           "voltage": "Napětí"
         },
         "description": "Ujistěte se, že je v softwaru WLED povolen omezovač jasu. Viz také {docs_uri}",
-        "title": "Konfigurace WLED"
+        "title": "Konfigurace WLED",
+        "data_description": {
+          "current_entity": "Volitelně vyberte senzor poskytující odhadovaný proud v mA. Je potřeba pouze tehdy, když Powercalc nemůže automaticky najít senzor odhadovaného proudu WLED, například když je omezovač jasu nastaven pro jednotlivé výstupy."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "Možnosti WLED",
         "data": {
+          "current_entity": "Entita proudu",
           "power_factor": "Účiník",
           "voltage": "Napětí"
+        },
+        "data_description": {
+          "current_entity": "Volitelně vyberte senzor poskytující odhadovaný proud v mA. Je potřeba pouze tehdy, když Powercalc nemůže automaticky najít senzor odhadovaného proudu WLED, například když je omezovač jasu nastaven pro jednotlivé výstupy."
         }
       },
       "cost_options": {

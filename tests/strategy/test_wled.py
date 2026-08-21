@@ -15,6 +15,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
+    CONF_CURRENT_ENTITY,
     CONF_POWER_FACTOR,
     CONF_VOLTAGE,
     CONF_WLED,
@@ -148,6 +149,64 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
     )
     with pytest.raises(StrategyConfigurationError):
         await strategy.find_estimated_current_entity()
+
+
+async def test_configured_current_entity_takes_precedence(
+    hass: HomeAssistant,
+) -> None:
+    """
+    When the user provides a current entity themselves, that one must be used.
+    This is needed when the WLED integration does not create an estimated current sensor,
+    for example when the brightness limiter is configured per output. See #4545
+    """
+    mock_device(hass, "wled-device-id", "WLED", "WLED")
+
+    mock_entities_in_registry(
+        hass,
+        {
+            "light.test": {"device_id": "wled-device-id"},
+            "sensor.test_current": {
+                "device_id": "wled-device-id",
+                "unit_of_measurement": "mA",
+                "original_device_class": SensorDeviceClass.CURRENT,
+            },
+        },
+    )
+
+    strategy = WledStrategy(
+        config={CONF_VOLTAGE: 5, CONF_POWER_FACTOR: 0.9, CONF_CURRENT_ENTITY: "sensor.wled_rest_current"},
+        light_entity=create_source_entity("light.test", hass),
+        hass=hass,
+    )
+    await strategy.validate_config()
+
+    assert strategy.get_entities_to_track() == ["sensor.wled_rest_current"]
+
+    await set_states(hass, [("light.test", STATE_ON), ("sensor.wled_rest_current", "500")])
+    assert float(await strategy.calculate(State("light.test", STATE_ON))) == pytest.approx(2.25, 0.01)
+
+
+async def test_configured_current_entity_not_in_registry(hass: HomeAssistant) -> None:
+    """
+    A current entity provided by the user does not need to be in the entity registry.
+    YAML defined sensors, for example a REST sensor, have no unique id and are not registered.
+    """
+    mock_entities_in_registry(hass, {"light.test": {}})
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_WLED: {
+                CONF_VOLTAGE: 5,
+                CONF_POWER_FACTOR: 1,
+                CONF_CURRENT_ENTITY: "sensor.wled_rest_current",
+            },
+        },
+    )
+
+    await set_states(hass, [("light.test", STATE_ON), ("sensor.wled_rest_current", "500")])
+    assert_entity_state(hass, "sensor.test_power", "2.50")
 
 
 async def test_wled_autodiscovery_flow(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
