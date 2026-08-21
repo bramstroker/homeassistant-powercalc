@@ -12,9 +12,11 @@
   },
   "name": "Dimmable Warm White Filament E27 6.2W 806lm Bulb",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "PalminX",
-    "email": "bkuemmer@gmx.net",
-    "github": "PalminX"
-  }
+  "authors": [
+    {
+      "name": "PalminX",
+      "email": "bkuemmer@gmx.net",
+      "github": "PalminX"
+    }
+  ]
 }

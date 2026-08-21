@@ -15,8 +15,10 @@
   },
   "name": "Smart Wi-Fi RGBW LED Bulb (A21, 1600 lm)",
   "standby_power": 0.31,
-  "author_info": {
-    "name": "TheRealBernie",
-    "github": "TheRealBernie"
-  }
+  "authors": [
+    {
+      "name": "TheRealBernie",
+      "github": "TheRealBernie"
+    }
+  ]
 }

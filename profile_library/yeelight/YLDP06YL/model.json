@@ -15,9 +15,11 @@
   },
   "name": "Smart LED Bulb II Color",
   "standby_power": 1.07,
-  "author_info": {
-    "name": "Aetha",
-    "email": "aetha@snuzzle.me",
-    "github": "aetha"
-  }
+  "authors": [
+    {
+      "name": "Aetha",
+      "email": "aetha@snuzzle.me",
+      "github": "aetha"
+    }
+  ]
 }

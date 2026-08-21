@@ -12,8 +12,10 @@
   },
   "name": "Dimmable CCT LED Light Bulb, E27 (10 W)",
   "standby_power": 0.38,
-  "author_info": {
-    "name": "Jort",
-    "github": "JortvanSchijndel"
-  }
+  "authors": [
+    {
+      "name": "Jort",
+      "github": "JortvanSchijndel"
+    }
+  ]
 }

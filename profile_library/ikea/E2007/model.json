@@ -26,8 +26,10 @@
   "measure_method": "manual",
   "name": "STARKVIND air purifier table",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "Marius",
-    "github": "Mariusthvdb"
-  }
+  "authors": [
+    {
+      "name": "Marius",
+      "github": "Mariusthvdb"
+    }
+  ]
 }

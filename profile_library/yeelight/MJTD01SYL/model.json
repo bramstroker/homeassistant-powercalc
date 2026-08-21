@@ -12,8 +12,10 @@
   },
   "name": "Mi LED Desk Lamp 1S",
   "standby_power": 0.64,
-  "author_info": {
-    "name": "Pasquale Cuorpo",
-    "github": "maverick1982"
-  }
+  "authors": [
+    {
+      "name": "Pasquale Cuorpo",
+      "github": "maverick1982"
+    }
+  ]
 }

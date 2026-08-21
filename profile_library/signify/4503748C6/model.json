@@ -15,9 +15,11 @@
   },
   "name": "Hue White Ambiance Muscari Ceiling Light",
   "standby_power": 0.46,
-  "author_info": {
-    "name": "Blake Garner",
-    "email": "blake.garner@gmail.com",
-    "github": "BlakeGarner"
-  }
+  "authors": [
+    {
+      "name": "Blake Garner",
+      "email": "blake.garner@gmail.com",
+      "github": "BlakeGarner"
+    }
+  ]
 }

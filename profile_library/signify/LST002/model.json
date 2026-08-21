@@ -10,9 +10,11 @@
   "measure_method": "script",
   "name": "Hue LightStrip Plus (2m)",
   "standby_power": 0.18,
-  "author_info": {
-    "name": "Simon Hörrle",
-    "email": "simon.hoerrle@gmail.com",
-    "github": "CM000n"
-  }
+  "authors": [
+    {
+      "name": "Simon Hörrle",
+      "email": "simon.hoerrle@gmail.com",
+      "github": "CM000n"
+    }
+  ]
 }

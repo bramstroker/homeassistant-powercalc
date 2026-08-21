@@ -15,9 +15,11 @@
   },
   "name": "LED Light Bulb T1",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Eduard Kutuev",
-    "email": "ed@napych.com",
-    "github": "napych"
-  }
+  "authors": [
+    {
+      "name": "Eduard Kutuev",
+      "email": "ed@napych.com",
+      "github": "napych"
+    }
+  ]
 }

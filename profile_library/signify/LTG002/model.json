@@ -15,9 +15,11 @@
   },
   "name": "Hue White Ambiance GU10 w/ BT",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "mariwing",
-    "email": "mariwing@gmail.com",
-    "github": "mariwing"
-  }
+  "authors": [
+    {
+      "name": "mariwing",
+      "email": "mariwing@gmail.com",
+      "github": "mariwing"
+    }
+  ]
 }

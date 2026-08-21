@@ -16,8 +16,10 @@
   },
   "name": "Hue White Ambiance E26 1600lm with Bluetooth",
   "standby_power": 0.22,
-  "author_info": {
-    "name": "ltloopy",
-    "github": "ltloopy"
-  }
+  "authors": [
+    {
+      "name": "ltloopy",
+      "github": "ltloopy"
+    }
+  ]
 }

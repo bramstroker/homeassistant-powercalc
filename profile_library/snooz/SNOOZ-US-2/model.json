@@ -36,9 +36,11 @@
   },
   "name": "Smart White Noise Machine",
   "standby_power": 0.31,
-  "author_info": {
-    "name": "Thomas R. Novak",
-    "email": "trnovak@illinoisalumni.org",
-    "github": "trnovak"
-  }
+  "authors": [
+    {
+      "name": "Thomas R. Novak",
+      "email": "trnovak@illinoisalumni.org",
+      "github": "trnovak"
+    }
+  ]
 }

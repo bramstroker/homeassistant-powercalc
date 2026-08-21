@@ -12,9 +12,11 @@
   },
   "name": "Wi-Fi Dimmable Warm White BC 9W LED GLS Bulb",
   "standby_power": 0.87,
-  "author_info": {
-    "name": "Daniel O'Connor",
-    "email": "daniel.oconnor@gmail.com",
-    "github": "CloCkWeRX"
-  }
+  "authors": [
+    {
+      "name": "Daniel O'Connor",
+      "email": "daniel.oconnor@gmail.com",
+      "github": "CloCkWeRX"
+    }
+  ]
 }

@@ -10,9 +10,11 @@
   "measure_method": "script",
   "name": "Hue Wellness White Ambiance Table lamp",
   "standby_power": 0.29,
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  }
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

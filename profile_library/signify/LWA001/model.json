@@ -12,9 +12,11 @@
   "measure_method": "script",
   "name": "Hue White Ambiance Bulb A60 E27",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "wormiedk",
-    "email": "wormie@alberg.dk",
-    "github": "wormiedk"
-  }
+  "authors": [
+    {
+      "name": "wormiedk",
+      "email": "wormie@alberg.dk",
+      "github": "wormiedk"
+    }
+  ]
 }

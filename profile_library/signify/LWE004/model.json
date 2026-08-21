@@ -2,10 +2,6 @@
   "aliases": [
     "9290024795"
   ],
-  "author_info": {
-    "name": "philscottydev",
-    "github": "philscottydev"
-  },
   "calculation_strategy": "lut",
   "created_at": "2026-08-16T13:36:13Z",
   "device_type": "light",
@@ -20,5 +16,11 @@
   },
   "min_voltage": 228.6,
   "name": "Hue White Filament Candle E14",
-  "standby_power": 0.24
+  "standby_power": 0.24,
+  "authors": [
+    {
+      "name": "philscottydev",
+      "github": "philscottydev"
+    }
+  ]
 }

@@ -24,9 +24,11 @@
   },
   "name": "Hue Centura",
   "standby_power": 0.25,
-  "author_info": {
-    "name": "Marc Geurts",
-    "email": "geurtsmarc@hotmail.com",
-    "github": "marcgeurts"
-  }
+  "authors": [
+    {
+      "name": "Marc Geurts",
+      "email": "geurtsmarc@hotmail.com",
+      "github": "marcgeurts"
+    }
+  ]
 }

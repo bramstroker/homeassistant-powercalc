@@ -15,9 +15,11 @@
   },
   "name": "1 Mini Gen4",
   "only_self_usage": true,
-  "author_info": {
-    "name": "Jasper",
-    "email": "jaspervanvliet1996@gmail.com",
-    "github": "SustainableBlueDuck"
-  }
+  "authors": [
+    {
+      "name": "Jasper",
+      "email": "jaspervanvliet1996@gmail.com",
+      "github": "SustainableBlueDuck"
+    }
+  ]
 }

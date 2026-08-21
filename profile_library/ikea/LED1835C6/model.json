@@ -16,8 +16,10 @@
   },
   "name": "TRADFRI bulb E14 WS 470lm",
   "standby_power": 0.25,
-  "author_info": {
-    "name": "marthubner",
-    "github": "marthubner"
-  }
+  "authors": [
+    {
+      "name": "marthubner",
+      "github": "marthubner"
+    }
+  ]
 }

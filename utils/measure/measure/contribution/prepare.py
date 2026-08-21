@@ -96,11 +96,13 @@ class ProfilePreparer:
     def _apply_metadata(model: dict[str, Any], metadata: ContributionMetadata) -> dict[str, Any]:
         if metadata.product_name is not None:
             model["name"] = metadata.product_name
-        model["author_info"] = {
-            "name": metadata.author.name,
-            "github": metadata.author.github,
-            **({"email": metadata.author.email} if metadata.author.email else {}),
-        }
+        model["authors"] = [
+            {
+                "name": metadata.author.name,
+                "github": metadata.author.github,
+                **({"email": metadata.author.email} if metadata.author.email else {}),
+            },
+        ]
         return model
 
     def _resolve_manufacturer_directory(self, manufacturer: str, requested_directory: str | None) -> str:

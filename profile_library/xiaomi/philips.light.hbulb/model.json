@@ -12,9 +12,11 @@
   },
   "name": "Philips Smart LED Bulb",
   "standby_power": 0.9,
-  "author_info": {
-    "name": "Andrzej Dopierała",
-    "email": "andrzej.dopierala@currency-one.com",
-    "github": "theundefined"
-  }
+  "authors": [
+    {
+      "name": "Andrzej Dopierała",
+      "email": "andrzej.dopierala@currency-one.com",
+      "github": "theundefined"
+    }
+  ]
 }

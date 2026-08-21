@@ -9,8 +9,10 @@
   "only_self_usage": false,
   "standby_power": 0.8,
   "standby_power_on": 1.56,
-  "author_info": {
-    "name": "LtKowalski",
-    "github": "LtKowalski"
-  }
+  "authors": [
+    {
+      "name": "LtKowalski",
+      "github": "LtKowalski"
+    }
+  ]
 }

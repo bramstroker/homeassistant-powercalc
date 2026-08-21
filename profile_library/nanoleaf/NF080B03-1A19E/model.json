@@ -12,8 +12,10 @@
   },
   "name": "Essentials Matter A19 Smart LED Light Bulb",
   "standby_power": 0.13,
-  "author_info": {
-    "name": "DawidPietrykowski",
-    "github": "DawidPietrykowski"
-  }
+  "authors": [
+    {
+      "name": "DawidPietrykowski",
+      "github": "DawidPietrykowski"
+    }
+  ]
 }

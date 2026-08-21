@@ -18,8 +18,10 @@
   },
   "name": "Hue White Ambiance E27 with Bluetooth",
   "standby_power": 0.18,
-  "author_info": {
-    "name": "ltloopy",
-    "github": "ltloopy"
-  }
+  "authors": [
+    {
+      "name": "ltloopy",
+      "github": "ltloopy"
+    }
+  ]
 }

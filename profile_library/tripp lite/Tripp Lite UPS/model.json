@@ -34,9 +34,11 @@
   "fixed_config": {
     "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_power_nominal]]') | float(0) * [[power_factor]] | float(0.7) }}"
   },
-  "author_info": {
-    "name": "Brian Egge",
-    "github": "brianegge",
-    "email": "brianegge@gmail.com"
-  }
+  "authors": [
+    {
+      "name": "Brian Egge",
+      "github": "brianegge",
+      "email": "brianegge@gmail.com"
+    }
+  ]
 }

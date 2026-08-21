@@ -16,8 +16,10 @@
   },
   "name": "Hue lightstrip outdoor",
   "standby_power": 0.25,
-  "author_info": {
-    "name": "Stuart Pearson",
-    "github": "stuartp44"
-  }
+  "authors": [
+    {
+      "name": "Stuart Pearson",
+      "github": "stuartp44"
+    }
+  ]
 }

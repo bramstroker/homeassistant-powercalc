@@ -16,8 +16,10 @@
       "percentage|100": 37.0
     }
   },
-  "author_info": {
-    "name": "nathanzm",
-    "github": "nathanzm"
-  }
+  "authors": [
+    {
+      "name": "nathanzm",
+      "github": "nathanzm"
+    }
+  ]
 }

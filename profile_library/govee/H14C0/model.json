@@ -12,9 +12,11 @@
   },
   "name": "Govee ST19 Smart Edison Light Bulb E26",
   "standby_power": 0.5,
-  "author_info": {
-    "name": "Benjamin Pearce",
-    "github": "bcpearce",
-    "email": "admin@bcpearce.com"
-  }
+  "authors": [
+    {
+      "name": "Benjamin Pearce",
+      "github": "bcpearce",
+      "email": "admin@bcpearce.com"
+    }
+  ]
 }

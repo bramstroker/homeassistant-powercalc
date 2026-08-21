@@ -102,8 +102,10 @@
     "min": 240.08,
     "max": 244.58
   },
-  "author_info": {
-    "name": "theveninjeremy",
-    "github": "theveninjeremy"
-  }
+  "authors": [
+    {
+      "name": "theveninjeremy",
+      "github": "theveninjeremy"
+    }
+  ]
 }

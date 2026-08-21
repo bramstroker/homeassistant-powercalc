@@ -24,9 +24,11 @@
   "measure_method": "manual",
   "name": "HomePod Mini",
   "standby_power": 0.65,
-  "author_info": {
-    "name": "vandalon",
-    "email": "joris@vandalon.nl",
-    "github": "vandalon"
-  }
+  "authors": [
+    {
+      "name": "vandalon",
+      "email": "joris@vandalon.nl",
+      "github": "vandalon"
+    }
+  ]
 }

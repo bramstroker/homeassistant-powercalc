@@ -12,8 +12,10 @@
   },
   "name": "Smart Wi-Fi RGB LED Light Strip (5 m)",
   "standby_power": 0.1,
-  "author_info": {
-    "name": "Jarod2801",
-    "github": "Jarod2801"
-  }
+  "authors": [
+    {
+      "name": "Jarod2801",
+      "github": "Jarod2801"
+    }
+  ]
 }

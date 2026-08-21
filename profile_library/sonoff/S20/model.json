@@ -13,8 +13,10 @@
   "only_self_usage": false,
   "standby_power": 0.29,
   "standby_power_on": 1.14,
-  "author_info": {
-    "name": "TyzzyT",
-    "github": "TyzzyT"
-  }
+  "authors": [
+    {
+      "name": "TyzzyT",
+      "github": "TyzzyT"
+    }
+  ]
 }

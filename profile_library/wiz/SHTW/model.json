@@ -12,9 +12,11 @@
   },
   "name": "SHTW",
   "standby_power": 0.21,
-  "author_info": {
-    "name": "Joseph Livecchi",
-    "email": "joewashear007@gmail.com",
-    "github": "joewashear007"
-  }
+  "authors": [
+    {
+      "name": "Joseph Livecchi",
+      "email": "joewashear007@gmail.com",
+      "github": "joewashear007"
+    }
+  ]
 }

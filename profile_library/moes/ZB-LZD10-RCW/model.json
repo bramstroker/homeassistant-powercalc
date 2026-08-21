@@ -12,8 +12,10 @@
   },
   "name": "Zigbee Smart Downlight",
   "standby_power": 0.7,
-  "author_info": {
-    "name": "Pranjal Joshi",
-    "github": "pranjal-joshi"
-  }
+  "authors": [
+    {
+      "name": "Pranjal Joshi",
+      "github": "pranjal-joshi"
+    }
+  ]
 }

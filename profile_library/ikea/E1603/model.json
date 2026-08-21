@@ -12,8 +12,10 @@
   "only_self_usage": false,
   "standby_power": 0.23,
   "standby_power_on": 0.98,
-  "author_info": {
-    "name": "Marius",
-    "github": "Mariusthvdb"
-  }
+  "authors": [
+    {
+      "name": "Marius",
+      "github": "Mariusthvdb"
+    }
+  ]
 }

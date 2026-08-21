@@ -15,9 +15,11 @@
   },
   "name": "Hue White Ambiance Aurelle square panel",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "vandalon",
-    "email": "joris@vandalon.nl",
-    "github": "vandalon"
-  }
+  "authors": [
+    {
+      "name": "vandalon",
+      "email": "joris@vandalon.nl",
+      "github": "vandalon"
+    }
+  ]
 }

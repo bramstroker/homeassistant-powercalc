@@ -11,9 +11,11 @@
   "measure_method": "script",
   "name": "Hue White G25 E26 Edison Filament Globe Bluetooth",
   "standby_power": 0.35,
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  }
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

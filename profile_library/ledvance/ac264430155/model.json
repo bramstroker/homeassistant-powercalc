@@ -12,9 +12,11 @@
   },
   "name": "SMART+ Wifi Planon 30x30 TW",
   "standby_power": 0.9,
-  "author_info": {
-    "name": "Kenneth Fribert",
-    "email": "fribse@gmail.com",
-    "github": "fribse"
-  }
+  "authors": [
+    {
+      "name": "Kenneth Fribert",
+      "email": "fribse@gmail.com",
+      "github": "fribse"
+    }
+  ]
 }

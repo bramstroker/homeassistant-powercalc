@@ -12,8 +12,10 @@
   "name": "TRADFRI LED driver, 30 w",
   "standby_power": 0.31,
   "standby_power_on": 0.35,
-  "author_info": {
-    "name": "Marcus Voß",
-    "github": "mvoss96"
-  }
+  "authors": [
+    {
+      "name": "Marcus Voß",
+      "github": "mvoss96"
+    }
+  ]
 }

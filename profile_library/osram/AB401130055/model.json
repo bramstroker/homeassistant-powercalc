@@ -12,8 +12,10 @@
   },
   "name": "LIGHTIFY Surface Light LED Tunable White",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "101081kai",
-    "github": "101081kai"
-  }
+  "authors": [
+    {
+      "name": "101081kai",
+      "github": "101081kai"
+    }
+  ]
 }

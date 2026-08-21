@@ -12,8 +12,10 @@
   "only_self_usage": true,
   "standby_power": 0.17,
   "standby_power_on": 0.46,
-  "author_info": {
-    "name": "BenRoe",
-    "github": "BenRoe"
-  }
+  "authors": [
+    {
+      "name": "BenRoe",
+      "github": "BenRoe"
+    }
+  ]
 }

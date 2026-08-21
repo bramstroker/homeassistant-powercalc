@@ -15,8 +15,10 @@
   },
   "name": "Hue White Smart Bulb Candle E14 5.5W ",
   "standby_power": 0.22,
-  "author_info": {
-    "name": "sve",
-    "github": "sve007"
-  }
+  "authors": [
+    {
+      "name": "sve",
+      "github": "sve007"
+    }
+  ]
 }

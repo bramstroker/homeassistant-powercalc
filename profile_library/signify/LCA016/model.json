@@ -12,9 +12,11 @@
   },
   "name": "Hue Essentials E27 8W",
   "standby_power": 0.157,
-  "author_info": {
-    "name": "Ikkei Odaira",
-    "github": "Triserden",
-    "email": "git@triserden.dev"
-  }
+  "authors": [
+    {
+      "name": "Ikkei Odaira",
+      "github": "Triserden",
+      "email": "git@triserden.dev"
+    }
+  ]
 }

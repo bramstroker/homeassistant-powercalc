@@ -12,8 +12,10 @@
   },
   "name": "STOFTMOLN ceiling/wall lamp WW37",
   "standby_power": 0.11,
-  "author_info": {
-    "name": "WarLL3",
-    "github": "WarLL3"
-  }
+  "authors": [
+    {
+      "name": "WarLL3",
+      "github": "WarLL3"
+    }
+  ]
 }

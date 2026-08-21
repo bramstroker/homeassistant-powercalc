@@ -12,8 +12,10 @@
   "only_self_usage": true,
   "standby_power": 0.2,
   "standby_power_on": 0.7,
-  "author_info": {
-    "name": "Patrick Lehner",
-    "github": "lehnerpat"
-  }
+  "authors": [
+    {
+      "name": "Patrick Lehner",
+      "github": "lehnerpat"
+    }
+  ]
 }

@@ -12,8 +12,10 @@
   },
   "name": "Hue Cher Ceiling Light",
   "standby_power": 0.53,
-  "author_info": {
-    "name": "Nicolas L",
-    "github": "Loustik"
-  }
+  "authors": [
+    {
+      "name": "Nicolas L",
+      "github": "Loustik"
+    }
+  ]
 }

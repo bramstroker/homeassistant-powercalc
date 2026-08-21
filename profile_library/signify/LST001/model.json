@@ -14,9 +14,11 @@
   },
   "name": "Hue LightStrip",
   "standby_power": 0.41,
-  "author_info": {
-    "name": "mariwing",
-    "email": "mariwing@gmail.com",
-    "github": "mariwing"
-  }
+  "authors": [
+    {
+      "name": "mariwing",
+      "email": "mariwing@gmail.com",
+      "github": "mariwing"
+    }
+  ]
 }

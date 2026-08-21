@@ -24,9 +24,11 @@
   "measure_method": "manual",
   "name": "Sub (Gen1)",
   "standby_power": 5.23,
-  "author_info": {
-    "name": "vandalon",
-    "email": "joris@vandalon.nl",
-    "github": "vandalon"
-  }
+  "authors": [
+    {
+      "name": "vandalon",
+      "email": "joris@vandalon.nl",
+      "github": "vandalon"
+    }
+  ]
 }

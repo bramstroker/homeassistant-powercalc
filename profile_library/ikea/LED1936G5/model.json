@@ -13,9 +13,11 @@
   },
   "name": "TRADFRI bulb E27 470 lumen, dimmable, opal white",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  }
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

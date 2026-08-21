@@ -12,9 +12,11 @@
   },
   "name": "STOFTMOLN ceiling/wall lamp 24 warm light dimmable",
   "standby_power": 0.25,
-  "author_info": {
-    "name": "vyruz1986",
-    "email": "alex.goris@fastlikehell.com",
-    "github": "vyruz1986"
-  }
+  "authors": [
+    {
+      "name": "vyruz1986",
+      "email": "alex.goris@fastlikehell.com",
+      "github": "vyruz1986"
+    }
+  ]
 }

@@ -1,8 +1,4 @@
 {
-  "author_info": {
-    "name": "philscottydev",
-    "github": "philscottydev"
-  },
   "calculation_strategy": "lut",
   "created_at": "2026-08-17T11:48:24Z",
   "device_type": "light",
@@ -19,5 +15,11 @@
   "voltage_range": {
     "min": 228.3,
     "max": 235.5
-  }
+  },
+  "authors": [
+    {
+      "name": "philscottydev",
+      "github": "philscottydev"
+    }
+  ]
 }

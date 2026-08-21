@@ -12,9 +12,11 @@
   },
   "name": "Hue white ambiance Aurelle square panel light 120x30",
   "standby_power": 0.43,
-  "author_info": {
-    "name": "EpicFazer",
-    "github": "EpicFazer",
-    "email": "jan.h@ikmail.com"
-  }
+  "authors": [
+    {
+      "name": "EpicFazer",
+      "github": "EpicFazer",
+      "email": "jan.h@ikmail.com"
+    }
+  ]
 }

@@ -15,9 +15,11 @@
   },
   "name": "Hue Calla outdoor bollard",
   "standby_power": 0.25,
-  "author_info": {
-    "name": "dewbot6",
-    "email": "drewsnodgrass@comcast.net",
-    "github": "dewbot6"
-  }
+  "authors": [
+    {
+      "name": "dewbot6",
+      "email": "drewsnodgrass@comcast.net",
+      "github": "dewbot6"
+    }
+  ]
 }

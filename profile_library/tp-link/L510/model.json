@@ -12,9 +12,11 @@
   },
   "name": "Tapo Smart Wi-Fi Light Bulb, Dimmable 806lm (2700K)",
   "standby_power": 0.45,
-  "author_info": {
-    "name": "Paul Smith",
-    "github": "smithps",
-    "email": "p.smith@malms.aero"
-  }
+  "authors": [
+    {
+      "name": "Paul Smith",
+      "github": "smithps",
+      "email": "p.smith@malms.aero"
+    }
+  ]
 }

@@ -26,8 +26,10 @@
   "measure_method": "script",
   "name": "Playbase",
   "standby_power": 2.9,
-  "author_info": {
-    "name": "alvinchen1",
-    "github": "alvinchen1"
-  }
+  "authors": [
+    {
+      "name": "alvinchen1",
+      "github": "alvinchen1"
+    }
+  ]
 }

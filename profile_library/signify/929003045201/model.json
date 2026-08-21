@@ -18,9 +18,11 @@
   },
   "name": "Hue Centura Spot",
   "standby_power": 0.26,
-  "author_info": {
-    "name": "Morpheus361",
-    "email": "marco.morpheus@kabelmail.de",
-    "github": "Morpheus361"
-  }
+  "authors": [
+    {
+      "name": "Morpheus361",
+      "email": "marco.morpheus@kabelmail.de",
+      "github": "Morpheus361"
+    }
+  ]
 }

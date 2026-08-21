@@ -12,8 +12,10 @@
   },
   "name": "Smart light JL01",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Nicolas Liaudat",
-    "github": "nliaudat"
-  }
+  "authors": [
+    {
+      "name": "Nicolas Liaudat",
+      "github": "nliaudat"
+    }
+  ]
 }

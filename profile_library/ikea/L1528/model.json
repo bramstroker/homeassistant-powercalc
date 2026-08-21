@@ -15,8 +15,10 @@
   },
   "name": "FLOALT panel WS 30x90",
   "standby_power": 0.45,
-  "author_info": {
-    "name": "Florian B",
-    "github": "DerFlob"
-  }
+  "authors": [
+    {
+      "name": "Florian B",
+      "github": "DerFlob"
+    }
+  ]
 }

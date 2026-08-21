@@ -28,8 +28,10 @@
   },
   "name": "Era 300",
   "standby_power": 1.8,
-  "author_info": {
-    "name": "Josh Barnard",
-    "github": "barndawgie"
-  }
+  "authors": [
+    {
+      "name": "Josh Barnard",
+      "github": "barndawgie"
+    }
+  ]
 }

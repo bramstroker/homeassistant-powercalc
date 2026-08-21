@@ -12,9 +12,11 @@
   },
   "name": "Smart Filament Bulb E27 Tunable Edison",
   "standby_power": 0.21,
-  "author_info": {
-    "name": "Felix",
-    "email": "felixsp@posteo.de",
-    "github": "felixsp"
-  }
+  "authors": [
+    {
+      "name": "Felix",
+      "email": "felixsp@posteo.de",
+      "github": "felixsp"
+    }
+  ]
 }

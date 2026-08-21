@@ -12,9 +12,11 @@
   },
   "name": "Wi-Fi Dimmable 9 W LED CCT Downlight",
   "standby_power": 1.2,
-  "author_info": {
-    "name": "noob4722019",
-    "email": "s.milisavic@gmail.com",
-    "github": "smilisav"
-  }
+  "authors": [
+    {
+      "name": "noob4722019",
+      "email": "s.milisavic@gmail.com",
+      "github": "smilisav"
+    }
+  ]
 }

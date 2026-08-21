@@ -16,8 +16,10 @@
   },
   "name": "Hue White A60 E27 800lm with Bluetooth",
   "standby_power": 0.41,
-  "author_info": {
-    "name": "Benedikt Vollmerhaus",
-    "github": "BVollmerhaus"
-  }
+  "authors": [
+    {
+      "name": "Benedikt Vollmerhaus",
+      "github": "BVollmerhaus"
+    }
+  ]
 }

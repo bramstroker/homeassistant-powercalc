@@ -9,9 +9,11 @@
   "only_self_usage": false,
   "standby_power": 0.23,
   "standby_power_on": 0.72,
-  "author_info": {
-    "name": "Thiago Oliveira",
-    "email": "infratl@gmail.com",
-    "github": "chilicheech"
-  }
+  "authors": [
+    {
+      "name": "Thiago Oliveira",
+      "email": "infratl@gmail.com",
+      "github": "chilicheech"
+    }
+  ]
 }

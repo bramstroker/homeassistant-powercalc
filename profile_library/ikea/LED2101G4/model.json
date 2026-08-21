@@ -15,8 +15,10 @@
   },
   "name": "TRADFRI bulb E12/E14 WS globe 450/470 lumen, dimmable, white spectrum, opal white (LED2101G4)",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "Michal",
-    "github": "michalpulda"
-  }
+  "authors": [
+    {
+      "name": "Michal",
+      "github": "michalpulda"
+    }
+  ]
 }

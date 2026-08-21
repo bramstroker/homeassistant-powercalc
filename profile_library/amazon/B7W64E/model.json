@@ -33,8 +33,10 @@
   },
   "name": "Echo Dot (Gen4)",
   "standby_power": 0.9,
-  "author_info": {
-    "name": "wranglatang",
-    "github": "wranglatang"
-  }
+  "authors": [
+    {
+      "name": "wranglatang",
+      "github": "wranglatang"
+    }
+  ]
 }

@@ -11,9 +11,11 @@
   "measure_method": "manual",
   "name": "TRADFRI bulb E27 opal 1000lm",
   "standby_power": 0.36,
-  "author_info": {
-    "name": "nepozs",
-    "email": "szopen@os.pl",
-    "github": "nepozs"
-  }
+  "authors": [
+    {
+      "name": "nepozs",
+      "email": "szopen@os.pl",
+      "github": "nepozs"
+    }
+  ]
 }

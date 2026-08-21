@@ -15,9 +15,11 @@
   },
   "name": "Hue White and Color ambiance E27 800lm",
   "standby_power": 0.33,
-  "author_info": {
-    "name": "Mikael Ganehag Brorsson",
-    "email": "mikael.brorsson@gmail.com",
-    "github": "ganehag"
-  }
+  "authors": [
+    {
+      "name": "Mikael Ganehag Brorsson",
+      "email": "mikael.brorsson@gmail.com",
+      "github": "ganehag"
+    }
+  ]
 }

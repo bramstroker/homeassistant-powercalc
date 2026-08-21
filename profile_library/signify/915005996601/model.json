@@ -16,9 +16,11 @@
   },
   "name": "Hue Enrave Medium",
   "standby_power": 0.1,
-  "author_info": {
-    "name": "Niklas Ausborn",
-    "email": "niklas@ausborn.de",
-    "github": "Midbin"
-  }
+  "authors": [
+    {
+      "name": "Niklas Ausborn",
+      "email": "niklas@ausborn.de",
+      "github": "Midbin"
+    }
+  ]
 }

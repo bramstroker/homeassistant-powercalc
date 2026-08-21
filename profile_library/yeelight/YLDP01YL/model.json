@@ -10,9 +10,11 @@
   "measure_method": "manual",
   "name": "LED 600lm 4000K 8W WiFi",
   "standby_power": 1.1,
-  "author_info": {
-    "name": "OzGav",
-    "email": "gavnosp@hotmail.com",
-    "github": "OzGav"
-  }
+  "authors": [
+    {
+      "name": "OzGav",
+      "email": "gavnosp@hotmail.com",
+      "github": "OzGav"
+    }
+  ]
 }

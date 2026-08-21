@@ -11,8 +11,10 @@
   "measure_method": "script",
   "name": "Hue Fair Ceiling Lamp",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Stefan Gries",
-    "github": "stefangries"
-  }
+  "authors": [
+    {
+      "name": "Stefan Gries",
+      "github": "stefangries"
+    }
+  ]
 }

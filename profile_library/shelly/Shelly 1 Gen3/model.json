@@ -17,9 +17,11 @@
   "only_self_usage": false,
   "config_flow_sub_profile_remarks": "Select a profile depending on your Shelly device configuration.",
   "created_at": "2026-01-15T10:15:00Z",
-  "author_info": {
-    "name": "Michal Bartak",
-    "email": "michal.bartak@betsys.com",
-    "github": "michalk-k"
-  }
+  "authors": [
+    {
+      "name": "Michal Bartak",
+      "email": "michal.bartak@betsys.com",
+      "github": "michalk-k"
+    }
+  ]
 }

@@ -10,8 +10,10 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "FRITZ!Box 6670 Cable",
-  "author_info": {
-    "name": "hpuac",
-    "github": "hpuac"
-  }
+  "authors": [
+    {
+      "name": "hpuac",
+      "github": "hpuac"
+    }
+  ]
 }

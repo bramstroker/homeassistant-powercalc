@@ -11,9 +11,11 @@
   "measure_method": "script",
   "name": "Hue White Filament Bulb G93 E27 w/ BT",
   "standby_power": 0.35,
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  }
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

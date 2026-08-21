@@ -11,9 +11,11 @@
   "measure_method": "script",
   "name": " Hue White Ambiance Candle E14",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "wormiedk",
-    "email": "wormie@alberg.dk",
-    "github": "wormiedk"
-  }
+  "authors": [
+    {
+      "name": "wormiedk",
+      "email": "wormie@alberg.dk",
+      "github": "wormiedk"
+    }
+  ]
 }

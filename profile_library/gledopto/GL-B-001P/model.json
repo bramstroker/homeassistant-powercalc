@@ -12,9 +12,11 @@
   },
   "name": "RGB+CCT Zigbee E14 LED Candle Bulb (4 W)",
   "standby_power": 0.31,
-  "author_info": {
-    "name": "el97",
-    "email": "erik1337.el@gmail.com",
-    "github": "el97"
-  }
+  "authors": [
+    {
+      "name": "el97",
+      "email": "erik1337.el@gmail.com",
+      "github": "el97"
+    }
+  ]
 }

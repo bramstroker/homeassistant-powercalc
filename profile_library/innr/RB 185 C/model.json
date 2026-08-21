@@ -12,8 +12,10 @@
   },
   "name": "RGBW Bulb Colour E27",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Florian Mulatz",
-    "github": "florianmulatz"
-  }
+  "authors": [
+    {
+      "name": "Florian Mulatz",
+      "github": "florianmulatz"
+    }
+  ]
 }

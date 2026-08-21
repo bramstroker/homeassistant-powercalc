@@ -18,8 +18,10 @@
   "measure_method": "manual",
   "name": "Cruiser Pro T2S Smart Tower Fan",
   "standby_power": 1.04,
-  "author_info": {
-    "name": "Miguel",
-    "github": "miggi92"
-  }
+  "authors": [
+    {
+      "name": "Miguel",
+      "github": "miggi92"
+    }
+  ]
 }

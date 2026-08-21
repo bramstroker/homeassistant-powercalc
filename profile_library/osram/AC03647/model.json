@@ -12,8 +12,10 @@
   },
   "name": "SMART+ LED Classic E27 RGBW",
   "standby_power": 0.35,
-  "author_info": {
-    "name": "Jarod2801",
-    "github": "Jarod2801"
-  }
+  "authors": [
+    {
+      "name": "Jarod2801",
+      "github": "Jarod2801"
+    }
+  ]
 }

@@ -13,9 +13,11 @@
   },
   "name": "Hue Being Pendant Light",
   "standby_power": 0.38,
-  "author_info": {
-    "name": "Stijn Bernards",
-    "email": "stijn@bernards.nl",
-    "github": "stijnbernards"
-  }
+  "authors": [
+    {
+      "name": "Stijn Bernards",
+      "email": "stijn@bernards.nl",
+      "github": "stijnbernards"
+    }
+  ]
 }

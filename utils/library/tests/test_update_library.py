@@ -10,7 +10,12 @@ from typing import Any
 import pytest
 
 from utils.library import update_library
-from utils.library.update_library import generate_library_json, get_color_modes, process_model_file
+from utils.library.update_library import (
+    generate_library_json,
+    get_color_modes,
+    process_author_update,
+    process_model_file,
+)
 
 
 def test_get_color_modes_only_includes_known_lut_color_modes(tmp_path: Path) -> None:
@@ -59,6 +64,17 @@ def test_library_json_hash_ignores_lut_quality(tmp_path: Path, monkeypatch: pyte
     assert first["lut_quality"] == {"score": 96.4, "brightness": 96.4}
     assert second["lut_quality"] == {"score": 42.0, "brightness": 42.0}
     assert first["hash"] == second["hash"]
+
+
+def test_process_author_update_migrates_legacy_author_info(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(update_library, "DATA_DIR", str(tmp_path))
+    model_path = tmp_path / "signify" / "LCT012" / "model.json"
+    model_path.parent.mkdir(parents=True)
+    model_path.write_text(json.dumps({"author_info": {"name": "Test User", "github": "test-user"}}))
+
+    asyncio.run(process_author_update(str(model_path)))
+
+    assert json.loads(model_path.read_text()) == {"authors": [{"name": "Test User", "github": "test-user"}]}
 
 
 def generate_library(data_dir: Path, lut_quality: dict[str, float]) -> dict[str, Any]:

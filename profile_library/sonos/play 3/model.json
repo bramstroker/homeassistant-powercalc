@@ -27,9 +27,11 @@
   "measure_method": "script",
   "name": "Play:3",
   "standby_power": 4.17,
-  "author_info": {
-    "name": "krazos",
-    "email": "krazos@gmail.com",
-    "github": "krazos"
-  }
+  "authors": [
+    {
+      "name": "krazos",
+      "email": "krazos@gmail.com",
+      "github": "krazos"
+    }
+  ]
 }

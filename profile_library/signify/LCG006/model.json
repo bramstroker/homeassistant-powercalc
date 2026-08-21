@@ -15,8 +15,10 @@
     "929003666501"
   ],
   "standby_power": 0.2,
-  "author_info": {
-    "name": "matteobreschig",
-    "github": "matteobreschig"
-  }
+  "authors": [
+    {
+      "name": "matteobreschig",
+      "github": "matteobreschig"
+    }
+  ]
 }

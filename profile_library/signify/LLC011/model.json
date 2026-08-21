@@ -10,9 +10,11 @@
   "measure_method": "script",
   "name": "Living Colours Bloom",
   "standby_power": 0.29,
-  "author_info": {
-    "name": "nepozs",
-    "email": "szopen@os.pl",
-    "github": "nepozs"
-  }
+  "authors": [
+    {
+      "name": "nepozs",
+      "email": "szopen@os.pl",
+      "github": "nepozs"
+    }
+  ]
 }

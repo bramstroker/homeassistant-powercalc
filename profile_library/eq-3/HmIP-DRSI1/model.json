@@ -16,8 +16,10 @@
   },
   "standby_power": 0.25,
   "standby_power_on": 0.3,
-  "author_info": {
-    "name": "CV",
-    "github": "dagobert"
-  }
+  "authors": [
+    {
+      "name": "CV",
+      "github": "dagobert"
+    }
+  ]
 }

@@ -14,9 +14,11 @@
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",
   "name": "V8 (r1)",
-  "author_info": {
-    "name": "Alexandre Bertrand",
-    "email": "alexandre.bertrand@invirtus.io",
-    "github": "trandbert37"
-  }
+  "authors": [
+    {
+      "name": "Alexandre Bertrand",
+      "email": "alexandre.bertrand@invirtus.io",
+      "github": "trandbert37"
+    }
+  ]
 }

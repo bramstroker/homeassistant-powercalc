@@ -12,9 +12,11 @@
   },
   "name": "Smart GU10 Tunable-White CCT LED Spotlight (7 W)",
   "standby_power": 0.63,
-  "author_info": {
-    "name": "dsolva",
-    "email": "diego_10sv@hotmail.com",
-    "github": "dsolva"
-  }
+  "authors": [
+    {
+      "name": "dsolva",
+      "email": "diego_10sv@hotmail.com",
+      "github": "dsolva"
+    }
+  ]
 }

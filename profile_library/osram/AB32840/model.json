@@ -12,8 +12,10 @@
   },
   "name": "LIGHTIFY LED Classic B40 tunable white",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "ffm777",
-    "github": "ffm777"
-  }
+  "authors": [
+    {
+      "name": "ffm777",
+      "github": "ffm777"
+    }
+  ]
 }

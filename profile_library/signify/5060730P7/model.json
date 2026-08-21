@@ -16,8 +16,10 @@
   },
   "name": "Hue Centris 4-Spot Ceiling Light",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "matteobreschig",
-    "github": "matteobreschig"
-  }
+  "authors": [
+    {
+      "name": "matteobreschig",
+      "github": "matteobreschig"
+    }
+  ]
 }

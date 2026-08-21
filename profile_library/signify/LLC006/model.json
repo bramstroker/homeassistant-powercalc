@@ -13,9 +13,11 @@
   },
   "name": "LivingColors Iris Table Lamp Gen3",
   "standby_power": 0.37,
-  "author_info": {
-    "name": "wormiedk",
-    "email": "wormie@alberg.dk",
-    "github": "wormiedk"
-  }
+  "authors": [
+    {
+      "name": "wormiedk",
+      "email": "wormie@alberg.dk",
+      "github": "wormiedk"
+    }
+  ]
 }

@@ -12,9 +12,11 @@
   },
   "name": "Tapo Smart Wi-Fi Light Strip, Multicolor",
   "standby_power": 0.53,
-  "author_info": {
-    "name": "Ed Kutuev",
-    "email": "ed@napych.com",
-    "github": "napych"
-  }
+  "authors": [
+    {
+      "name": "Ed Kutuev",
+      "email": "ed@napych.com",
+      "github": "napych"
+    }
+  ]
 }

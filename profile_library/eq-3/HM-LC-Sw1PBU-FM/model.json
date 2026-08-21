@@ -16,9 +16,11 @@
   },
   "standby_power": 0.83,
   "standby_power_on": 1.42,
-  "author_info": {
-    "name": "zenzmatz",
-    "email": "eric.021292@gmail.com",
-    "github": "zenzmatz"
-  }
+  "authors": [
+    {
+      "name": "zenzmatz",
+      "email": "eric.021292@gmail.com",
+      "github": "zenzmatz"
+    }
+  ]
 }

@@ -15,9 +15,11 @@
   },
   "name": "A19 Matter Smart CCT Light Bulb - 800lm",
   "standby_power": 0.91,
-  "author_info": {
-    "name": "Phil DeMonaco",
-    "github": "pdemonaco",
-    "email": "phil@demona.co"
-  }
+  "authors": [
+    {
+      "name": "Phil DeMonaco",
+      "github": "pdemonaco",
+      "email": "phil@demona.co"
+    }
+  ]
 }

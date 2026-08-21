@@ -16,9 +16,11 @@
   },
   "name": "KAJPLATS E27 CWS globe 1055lm",
   "standby_power": 0.17,
-  "author_info": {
-    "name": "Linus Nordin",
-    "github": "gribber",
-    "email": "linus.nordin@gmail.com"
-  }
+  "authors": [
+    {
+      "name": "Linus Nordin",
+      "github": "gribber",
+      "email": "linus.nordin@gmail.com"
+    }
+  ]
 }

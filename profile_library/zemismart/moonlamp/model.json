@@ -12,9 +12,11 @@
   },
   "name": "Moonlamp (esphome)",
   "standby_power": 0.5,
-  "author_info": {
-    "name": "Kenneth Fribert",
-    "email": "fribse@gmail.com",
-    "github": "fribse"
-  }
+  "authors": [
+    {
+      "name": "Kenneth Fribert",
+      "email": "fribse@gmail.com",
+      "github": "fribse"
+    }
+  ]
 }

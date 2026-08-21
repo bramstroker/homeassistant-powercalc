@@ -36,9 +36,11 @@
   },
   "name": "TurboPoly Fan 715S",
   "standby_power": 0.98,
-  "author_info": {
-    "name": "pinkfin",
-    "github": "pinkfin",
-    "email": "hot.wire1618@fastmail.com"
-  }
+  "authors": [
+    {
+      "name": "pinkfin",
+      "github": "pinkfin",
+      "email": "hot.wire1618@fastmail.com"
+    }
+  ]
 }

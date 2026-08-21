@@ -12,8 +12,10 @@
   },
   "name": "RGBICW Smart Corner Floor Lamp",
   "standby_power": 2.14,
-  "author_info": {
-    "name": "Sku1ly",
-    "github": "Sku1ly"
-  }
+  "authors": [
+    {
+      "name": "Sku1ly",
+      "github": "Sku1ly"
+    }
+  ]
 }

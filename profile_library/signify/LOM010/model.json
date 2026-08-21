@@ -9,8 +9,10 @@
   "only_self_usage": false,
   "standby_power": 0.2,
   "standby_power_on": 0.5,
-  "author_info": {
-    "name": "keatre",
-    "github": "keatre"
-  }
+  "authors": [
+    {
+      "name": "keatre",
+      "github": "keatre"
+    }
+  ]
 }

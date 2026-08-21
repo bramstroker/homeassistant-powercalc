@@ -18,8 +18,10 @@
   },
   "name": "Hue Being Ceiling Light",
   "standby_power": 0.47,
-  "author_info": {
-    "name": "dansie",
-    "github": "dansie"
-  }
+  "authors": [
+    {
+      "name": "dansie",
+      "github": "dansie"
+    }
+  ]
 }

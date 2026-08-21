@@ -15,8 +15,10 @@
   },
   "name": "LEPTITER recessed spot light",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "marthubner",
-    "github": "marthubner"
-  }
+  "authors": [
+    {
+      "name": "marthubner",
+      "github": "marthubner"
+    }
+  ]
 }

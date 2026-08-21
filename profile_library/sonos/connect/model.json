@@ -11,9 +11,11 @@
   "measure_method": "script",
   "name": "Connect",
   "standby_power": 5.0,
-  "author_info": {
-    "name": "krazos",
-    "email": "krazos@gmail.com",
-    "github": "krazos"
-  }
+  "authors": [
+    {
+      "name": "krazos",
+      "email": "krazos@gmail.com",
+      "github": "krazos"
+    }
+  ]
 }

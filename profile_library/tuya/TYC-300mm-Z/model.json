@@ -12,9 +12,11 @@
   },
   "name": "Tuya Zigbee 3.0 Ceiling Lamp RGB+CW+WW 24W",
   "standby_power": 0.36,
-  "author_info": {
-    "name": "Dr-Seltsam",
-    "email": "sebastian.jaekel@web.de",
-    "github": "Dr-Seltsam"
-  }
+  "authors": [
+    {
+      "name": "Dr-Seltsam",
+      "email": "sebastian.jaekel@web.de",
+      "github": "Dr-Seltsam"
+    }
+  ]
 }
