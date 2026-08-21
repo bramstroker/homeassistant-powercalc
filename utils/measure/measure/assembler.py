@@ -175,6 +175,7 @@ class MeasurementAssembler:
             return TuyaPowerMeter(spec.device_id, spec.device_ip, self._tuya_device_key, spec.version)
         if isinstance(spec, OwonOwh98xxPowerMeterSpec):
             from measure.powermeter.serial_scpi import OwonOwh98xxPowerMeter
+
             return OwonOwh98xxPowerMeter(spec.port, spec.baudrate, spec.timeout, spec.channel)
         raise PowerMeterError(f"Unsupported power meter specification: {type(spec).__name__}")
 

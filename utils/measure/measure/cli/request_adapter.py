@@ -112,6 +112,7 @@ def _parameters_from_environment(environment: CliEnvironment) -> MeasurementPara
         **{field.name: getattr(environment, field.name) for field in dataclasses.fields(MeasurementParameters)},
     )
 
+
 # Disable function too complex for this, as it is a simple function to read
 # ruff: disable[C901]
 def _power_meter_spec(environment: CliEnvironment, answers: dict[str, Any]) -> PowerMeterSpec:
@@ -148,12 +149,13 @@ def _power_meter_spec(environment: CliEnvironment, answers: dict[str, Any]) -> P
         )
     if selected == PowerMeterType.OWON_OWH98XX:
         return OwonOwh98xxPowerMeterSpec(
-            port=environment.serial_port,
-            baudrate=environment.serial_baudrate,
-            channel=environment.owon_owh98xx_channel
+            port=environment.serial_port, baudrate=environment.serial_baudrate, channel=environment.owon_owh98xx_channel
         )
     raise ValueError(f"Unsupported CLI power meter: {selected}")
+
+
 # ruff: enable[C901]
+
 
 def _light_controller_spec(
     environment: CliEnvironment,

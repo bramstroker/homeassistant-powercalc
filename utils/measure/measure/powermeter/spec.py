@@ -64,12 +64,14 @@ class TuyaPowerMeterSpec(_PowerMeterSpec):
     device_ip: str
     version: str = "3.3"
 
+
 class OwonOwh98xxPowerMeterSpec(_PowerMeterSpec):
     type: Literal[PowerMeterType.OWON_OWH98XX] = PowerMeterType.OWON_OWH98XX
     port: str
     baudrate: int
     timeout: float = 5.0
     channel: OwonOwh98xxChannelType
+
 
 PowerMeterSpec = Annotated[
     DummyPowerMeterSpec

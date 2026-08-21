@@ -13,8 +13,7 @@ class SerialScpiPowerMeter(PowerMeter):
     def __init__(self, port: str, baudrate: int, timeout: float = 5.0) -> None:
         # Timeout so the readline cannot hang indefinitely
         self._serial = serial.Serial(port, baudrate, timeout=timeout)
-        self.manufacturer, self.model, self.serial, self.software_version = \
-            self._identify()
+        self.manufacturer, self.model, self.serial, self.software_version = self._identify()
 
     def identify_request(self) -> bytes:
         """
@@ -41,8 +40,7 @@ class SerialScpiPowerMeter(PowerMeter):
 
     def _identify(self) -> (bytes, bytes, bytes, bytes):
         response = self._retrieve_data(self.identify_request())
-        manufacturer, model, serial, software_version = \
-            response.strip().split(b",")
+        manufacturer, model, serial, software_version = response.strip().split(b",")
         return manufacturer, model, serial, software_version
 
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
@@ -50,10 +48,9 @@ class SerialScpiPowerMeter(PowerMeter):
         if include_voltage and self.has_voltage_support:
             voltage = self._retrieve_float(self.voltage_request())
         return PowerMeasurementResult(
-            power=power,
-            updated=time.time(),
-            voltage=voltage if include_voltage and self.has_voltage_support else None
+            power=power, updated=time.time(), voltage=voltage if include_voltage and self.has_voltage_support else None
         )
+
 
 class OwonOwh98xxPowerMeter(SerialScpiPowerMeter):
     # Based on https://storage.eleshop.eu/files/OWH9811_Power_Meter_Programming_Manual.pdf
@@ -88,4 +85,3 @@ class OwonOwh98xxPowerMeter(SerialScpiPowerMeter):
 
     def has_voltage_support(self) -> bool:
         return True
-
