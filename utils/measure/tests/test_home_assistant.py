@@ -196,11 +196,10 @@ def test_manager_does_not_retry_non_connection_errors() -> None:
     client.close.assert_not_called()
 
 
-def test_manager_does_not_retry_service_call_after_disconnect() -> None:
+def test_manager_replays_service_call_on_a_fresh_client_after_disconnect() -> None:
     disconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
     disconnected_client.trigger_service.side_effect = OSError("stream closed error")
     reconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
-    reconnected_client.get_config.return_value = {"location_name": "Home"}
     client_factory = MagicMock(side_effect=(disconnected_client, reconnected_client))
     manager = HomeAssistantManager(
         "ws://127.0.0.1:8123/api/websocket",
@@ -208,9 +207,110 @@ def test_manager_does_not_retry_service_call_after_disconnect() -> None:
         client_factory=client_factory,
     )
 
-    with pytest.raises(OSError, match="stream closed error"):
+    manager.trigger_service("media_player", "turn_off", entity_id="media_player.test")
+
+    disconnected_client.close.assert_called_once_with()
+    reconnected_client.trigger_service.assert_called_once_with(
+        "media_player",
+        "turn_off",
+        entity_id="media_player.test",
+    )
+
+
+def test_manager_reraises_service_call_failure_when_reconnect_also_fails() -> None:
+    disconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    disconnected_client.trigger_service.side_effect = OSError("stream closed error")
+    reconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    reconnected_client.trigger_service.side_effect = OSError("stream closed again")
+    client_factory = MagicMock(side_effect=(disconnected_client, reconnected_client))
+    manager = HomeAssistantManager(
+        "ws://127.0.0.1:8123/api/websocket",
+        "token",
+        client_factory=client_factory,
+    )
+
+    with pytest.raises(OSError, match="stream closed again"):
         manager.trigger_service("media_player", "turn_off", entity_id="media_player.test")
 
-    assert manager.get_config() == {"location_name": "Home"}
-    disconnected_client.close.assert_called_once_with()
-    reconnected_client.trigger_service.assert_not_called()
+    reconnected_client.close.assert_called_once_with()
+
+
+def _keepalive_manager(client: MagicMock, *, keepalive_interval: float = 20.0) -> HomeAssistantManager:
+    return HomeAssistantManager(
+        "ws://supervisor/core/websocket",
+        "token",
+        client_factory=MagicMock(return_value=client),
+        keepalive_interval=keepalive_interval,
+    )
+
+
+def test_keepalive_pings_a_connection_that_went_quiet() -> None:
+    """Long effect measurements leave the socket unread, so the proxy drops it. See #4543."""
+
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    manager = _keepalive_manager(client)
+    manager.get_config()
+    manager._last_activity -= 60  # noqa: SLF001 - simulate a measurement that took a minute
+
+    manager.send_keepalive()
+
+    client.ping_latency.assert_called_once_with()
+
+
+def test_keepalive_stays_quiet_while_measurements_keep_the_socket_busy() -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    manager = _keepalive_manager(client)
+    manager.get_config()
+
+    manager.send_keepalive()
+
+    client.ping_latency.assert_not_called()
+
+
+def test_keepalive_does_not_open_a_connection_of_its_own() -> None:
+    client_factory = MagicMock()
+    manager = HomeAssistantManager("ws://supervisor/core/websocket", "token", client_factory=client_factory)
+
+    manager.send_keepalive()
+
+    client_factory.assert_not_called()
+
+
+def test_keepalive_discards_the_client_when_the_ping_fails() -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    client.ping_latency.side_effect = OSError("stream closed error")
+    manager = _keepalive_manager(client)
+    manager.get_config()
+    manager._last_activity -= 60  # noqa: SLF001
+
+    manager.send_keepalive()
+
+    client.close.assert_called_once_with()
+
+
+def test_keepalive_thread_pings_until_the_manager_is_closed() -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    manager = _keepalive_manager(client, keepalive_interval=0.02)
+    manager.get_config()
+
+    for _ in range(100):
+        if client.ping_latency.call_count:
+            break
+        sleep(0.01)
+    manager.close()
+    pings_at_close = client.ping_latency.call_count
+
+    assert pings_at_close > 0
+    sleep(0.1)
+    assert client.ping_latency.call_count == pings_at_close
+
+
+def test_keepalive_interval_of_zero_starts_no_background_thread() -> None:
+    """Lets the CLI and tests opt out of a pinger they have no use for."""
+
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    manager = _keepalive_manager(client, keepalive_interval=0)
+    manager.get_config()
+
+    assert manager._keepalive_thread is None  # noqa: SLF001
+    client.ping_latency.assert_not_called()

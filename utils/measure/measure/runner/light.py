@@ -8,9 +8,9 @@ import shutil
 import time
 from typing import Literal, TextIO
 
+from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
-from measure.controller.light.errors import ApiConnectionError
 from measure.execution import ImmediateInteraction, LightOperatingPoint, RunInteraction
 from measure.powermeter.errors import (
     OutdatedMeasurementError,

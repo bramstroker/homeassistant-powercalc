@@ -127,3 +127,23 @@ def _top_level_imports(path: Path) -> set[str]:
         elif isinstance(node, ast.ImportFrom) and node.module:
             imports.add(node.module)
     return imports
+
+
+def test_controller_exception_names_are_defined_once() -> None:
+    """Two sibling classes sharing a name make `except` clauses silently miss.
+
+    measure.controller.errors and measure.controller.light.errors both defined an
+    unrelated ApiConnectionError, so the light runner never retried a dropped
+    Home Assistant connection. See issue #4543.
+    """
+
+    definitions: dict[str, list[str]] = {}
+    for path in (MEASURE_ROOT / "controller").rglob("errors.py"):
+        module = path.relative_to(MEASURE_ROOT).with_suffix("").as_posix().replace("/", ".")
+        tree = ast.parse(path.read_text())
+        for node in tree.body:
+            if isinstance(node, ast.ClassDef):
+                definitions.setdefault(node.name, []).append(module)
+
+    duplicates = {name: modules for name, modules in definitions.items() if len(modules) > 1}
+    assert duplicates == {}

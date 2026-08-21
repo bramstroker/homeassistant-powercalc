@@ -2,7 +2,9 @@ import asyncio
 from collections.abc import Callable
 import contextlib
 from dataclasses import dataclass
-from threading import RLock
+import logging
+from threading import Event, RLock, Thread
+import time
 from types import TracebackType
 from typing import Any, Self
 import urllib.parse
@@ -16,6 +18,16 @@ from measure.const import (
     HASS_ENTITY_REGISTRY_UNIQUE_ID,
     HASS_ZEROCONF_SUBSCRIBE_DISCOVERY,
 )
+
+_LOGGER = logging.getLogger("measure")
+
+# The Supervisor proxy serves add-ons a ``web.WebSocketResponse(heartbeat=30)``: aiohttp
+# sends a WebSocket PING every 30 seconds and closes the socket when nothing comes back
+# within half that. urllib3-future only answers those PINGs while the client sits inside
+# ``next_payload()``, so a measurement that talks to the power meter for a minute or more
+# without touching Home Assistant leaves the connection unanswered and gets dropped.
+# Pinging well inside that window keeps the socket alive across long measurements.
+KEEPALIVE_INTERVAL = 20.0
 
 
 class HomeAssistantDiscoveryError(RuntimeError):
@@ -152,6 +164,7 @@ class HomeAssistantManager:
         *,
         client_factory: Callable[[str, str], HomeAssistantWebsocketClient] | None = None,
         discovery_client_factory: Callable[[str, str], HomeAssistantDiscoveryClient] | None = None,
+        keepalive_interval: float = KEEPALIVE_INTERVAL,
     ) -> None:
         self.api_url = normalize_hass_url(api_url)
         self.token = token
@@ -159,6 +172,10 @@ class HomeAssistantManager:
         self._discovery_client_factory = discovery_client_factory or HomeAssistantDiscoveryClient
         self._client: HomeAssistantWebsocketClient | None = None
         self._lock = RLock()
+        self._keepalive_interval = keepalive_interval
+        self._keepalive_stop = Event()
+        self._keepalive_thread: Thread | None = None
+        self._last_activity = time.monotonic()
 
     def _connected_client(self) -> HomeAssistantWebsocketClient:
         if self._client is None:
@@ -170,7 +187,54 @@ class HomeAssistantManager:
                     client.close()
                 raise
             self._client = client
+            self._start_keepalive()
         return self._client
+
+    def _start_keepalive(self) -> None:
+        """Run one background pinger for as long as this manager holds a connection."""
+
+        if self._keepalive_interval <= 0 or self._keepalive_thread is not None:
+            return
+        self._keepalive_stop.clear()
+        self._keepalive_thread = Thread(
+            target=self._keepalive_loop,
+            name="measure-hass-keepalive",
+            daemon=True,
+        )
+        self._keepalive_thread.start()
+
+    def _stop_keepalive(self) -> None:
+        thread = self._keepalive_thread
+        self._keepalive_thread = None
+        if thread is None:
+            return
+        self._keepalive_stop.set()
+        thread.join(timeout=self._keepalive_interval)
+
+    def _keepalive_loop(self) -> None:
+        # Wake up more often than the interval so an idle window is never missed by a
+        # measurement that finished just after the previous tick.
+        while not self._keepalive_stop.wait(self._keepalive_interval / 2):
+            self.send_keepalive()
+
+    def send_keepalive(self) -> None:
+        """Ping Home Assistant when the connection has gone quiet, never raising.
+
+        A failed ping discards the client so the next real call reconnects, which is
+        what the callers already expect from a dropped connection.
+        """
+
+        with self._lock:
+            if self._client is None or time.monotonic() - self._last_activity < self._keepalive_interval:
+                return
+            try:
+                self._client.ping_latency()
+            except Exception as error:  # noqa: BLE001 - a keepalive must never break the app
+                _LOGGER.debug("Home Assistant keepalive ping failed: %s", error)
+                if self._is_connection_error(error):
+                    self._discard_client()
+            else:
+                self._last_activity = time.monotonic()
 
     @staticmethod
     def _is_connection_error(error: BaseException) -> bool:
@@ -205,7 +269,7 @@ class HomeAssistantManager:
         with self._lock:
             client = self._connected_client()
             try:
-                return operation(client)
+                return self._record_activity(operation(client))
             except Exception as error:
                 if not self._is_connection_error(error):
                     raise
@@ -214,11 +278,17 @@ class HomeAssistantManager:
                     raise
 
             try:
-                return operation(self._connected_client())
+                return self._record_activity(operation(self._connected_client()))
             except Exception as error:
                 if self._is_connection_error(error):
                     self._discard_client()
                 raise
+
+    def _record_activity[T](self, result: T) -> T:
+        """Mark the connection as recently used so the keepalive stays quiet."""
+
+        self._last_activity = time.monotonic()
+        return result
 
     def get_config(self) -> dict[str, Any]:
         return self._execute(lambda client: client.get_config())
@@ -244,10 +314,15 @@ class HomeAssistantManager:
         return self._execute(lambda client: client.get_entity(group_id=group_id, slug=slug, entity_id=entity_id))
 
     def trigger_service(self, domain: str, service: str, **service_data: Any) -> None:  # noqa: ANN401
-        self._execute(
-            lambda client: client.trigger_service(domain, service, **service_data),
-            retry_on_disconnect=False,
-        )
+        """Call a Home Assistant service, reconnecting once when the socket died while idle.
+
+        Measure only issues idempotent service calls (turning a light on at a fixed
+        operating point, turning it off, setting a fan percentage), so replaying one
+        on a fresh connection is safe and keeps hours-long sessions alive when a
+        proxy drops the WebSocket between two measurements.
+        """
+
+        self._execute(lambda client: client.trigger_service(domain, service, **service_data))
 
     def fire_event(self, event_type: str, **event_data: Any) -> None:  # noqa: ANN401
         """Fire an idempotent status event in Home Assistant."""
@@ -277,5 +352,6 @@ class HomeAssistantManager:
             return await client.discover_zeroconf(collection_window)
 
     def close(self) -> None:
+        self._stop_keepalive()
         with self._lock:
             self._discard_client()
