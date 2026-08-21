@@ -3303,15 +3303,15 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "brightness"
+            "brightness",
+            "color_temp"
           ],
           "lut_quality": {
             "score": 87.0,
             "brightness": 87.0,
             "color_temp": 97.8
           },
-          "hash": "b7962bddf1de25272a0538c4953299d9"
+          "hash": "75d35feeef06c78d3f6875c59066bb3a"
         },
         {
           "aliases": [
@@ -6047,14 +6047,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "d75f9f60c1fd6b6da1d593db258dd7b5"
+          "hash": "ce6dbe7897fa740802e930f694582c6c"
         },
         {
           "calculation_strategy": "lut",
@@ -13329,15 +13329,15 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
           "lut_quality": {
             "score": 33.4,
             "brightness": 98.9,
             "color_temp": 33.4
           },
-          "hash": "0927c2473ab6294dbbf54667db386887"
+          "hash": "0305b81807f93ee986df3d67a0138f1e"
         }
       ],
       "device_types": [
@@ -14936,14 +14936,14 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "brightness"
+            "brightness",
+            "effect"
           ],
           "lut_quality": {
             "score": 98.7,
             "brightness": 98.7
           },
-          "hash": "6cb22d127602effd9079a6b0476ba40d"
+          "hash": "12a02eca03f42a32eb727e6e1c87757c"
         },
         {
           "calculation_strategy": "lut",
@@ -16198,14 +16198,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "7d6818ae2a109fb2312a145370b250db"
+          "hash": "21477d763d284898246bb1e99f9077aa"
         },
         {
           "calculation_strategy": "lut",
@@ -17266,14 +17266,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "b2d1b7b7866f79a6cefd2dadf13f18bb"
+          "hash": "cd9cfebe2fbb594811c295e8deafe2a4"
         },
         {
           "aliases": [
@@ -17904,14 +17904,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 86.6,
             "color_temp": 86.6
           },
-          "hash": "31e6a0a53cf7d1e71fd22610887e4938"
+          "hash": "335979d0cc46539999b328300ef3b608"
         },
         {
           "aliases": [
@@ -18939,14 +18939,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 96.2,
             "color_temp": 96.2
           },
-          "hash": "62127286a5a3a3fe6304a072768e6997"
+          "hash": "a256e77ec5805addd2225abb9865ba1e"
         },
         {
           "aliases": [
@@ -19005,14 +19005,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 79.3,
             "color_temp": 79.3
           },
-          "hash": "040db0f2078b4cb8d74bda1d07632263"
+          "hash": "ef0f66b1f39fb6857d61e27a3f4a7915"
         },
         {
           "calculation_strategy": "lut",
@@ -19293,14 +19293,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 96.9,
             "color_temp": 96.9
           },
-          "hash": "a8751ac0084fa2356d2e24995553302a"
+          "hash": "4716e489c677045f9488285f35c1c105"
         },
         {
           "aliases": [
@@ -19737,14 +19737,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 99.2,
             "color_temp": 99.2
           },
-          "hash": "aabbdb8adf16d6c8af0826b5807a0dcc"
+          "hash": "2791f4169f1db5d0eb193707d1961fd0"
         },
         {
           "aliases": [],
@@ -19859,14 +19859,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "bf2a9d1c545bbf3908eb2cb00db04b0e"
+          "hash": "421889790cf901d69b9b19ef223a7c1e"
         },
         {
           "aliases": [
@@ -21011,39 +21011,43 @@
           "hash": "2579d788c0a53ca32cb6220386953e4f"
         },
         {
-          "calculation_strategy": "lut",
-          "created_at": "2024-09-22T00:00:00Z",
-          "device_type": "light",
-          "measure_device": "Shelly Plus Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.14.8:docker"
-          },
-          "name": "RGBW Bulb E14 470lm 5W",
-          "standby_power": 0.25,
+          "aliases": [
+            "29154"
+          ],
           "author_info": {
             "name": "71820SM01",
             "github": "71820SM01"
           },
-          "aliases": [
-            "29154"
-          ],
+          "calculation_strategy": "lut",
+          "created_at": "2024-09-22T00:00:00Z",
+          "device_type": "light",
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 6.0,
+            "VERSION": "v0.3.0:cli"
+          },
+          "name": "RGBW Bulb E14 470lm 5W",
+          "standby_power": 0.28,
+          "voltage_range": {
+            "min": 227.3,
+            "max": 232.4
+          },
           "id": "29150",
           "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-17T13:17:57",
-          "max_power": 4.5,
+          "updated_at": "2026-08-19T05:03:07",
+          "max_power": 4.3,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
             "hs"
           ],
           "lut_quality": {
-            "score": 97.8,
-            "color_temp": 97.8
+            "score": 98.8,
+            "color_temp": 98.8
           },
-          "hash": "52f596edd3631131a7dbc02f0d1bcec8"
+          "hash": "a50dde5ed26a8fe0e257072ef51ff9e4"
         }
       ],
       "device_types": [
@@ -21413,14 +21417,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 95.7,
             "color_temp": 95.7
           },
-          "hash": "e5c6d60f7dff137a0b6a4dd78ae0d892"
+          "hash": "063486970970648ed50d79085778c320"
         },
         {
           "aliases": [
@@ -21898,15 +21902,15 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
           "lut_quality": {
             "score": 93.8,
             "brightness": 98.8,
             "color_temp": 93.8
           },
-          "hash": "04c85f9581514ff23e017ca8eb7c465b"
+          "hash": "dca4ef1261cdc42ae5552f9dabe95bbc"
         },
         {
           "aliases": [
@@ -23846,14 +23850,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "30cde2c540d5cd10b73832a755f51e7f"
+          "hash": "2ed8aa33616aafc0eb7764e4c1bcd107"
         },
         {
           "calculation_strategy": "lut",
@@ -23879,14 +23883,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 98.4,
             "color_temp": 98.4
           },
-          "hash": "666b894e907ac6f971546ace1b7a0767"
+          "hash": "8575dffb81b7e28e3957095fafc5eb45"
         },
         {
           "calculation_strategy": "lut",
@@ -23946,14 +23950,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 67.4,
             "color_temp": 67.4
           },
-          "hash": "9f15b887766b12857c22e6544132b0eb"
+          "hash": "2b9d1ab311d6bc3b083d269393a178e1"
         },
         {
           "calculation_strategy": "lut",
@@ -24012,10 +24016,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
-          "hash": "06ae899b8045b93c59c775f3cfcc4fed"
+          "hash": "525bd620d6961bebe74f82cb3204db96"
         },
         {
           "calculation_strategy": "lut",
@@ -24075,14 +24079,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "effect",
-            "hs"
+            "hs",
+            "effect"
           ],
           "lut_quality": {
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "780cbdcc1e2aa6f53662740818a1b57b"
+          "hash": "31919f370b21c722bffc703ed0be1669"
         },
         {
           "calculation_strategy": "lut",
@@ -24174,15 +24178,15 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "brightness",
-            "hs"
+            "hs",
+            "brightness"
           ],
           "lut_quality": {
             "score": 84.6,
             "brightness": 98.9,
             "color_temp": 84.6
           },
-          "hash": "d2fc9d455ad6b16d246bfce3c4adf242"
+          "hash": "e0c0c95fc8d3fbf6a4c3e795f534ef5d"
         },
         {
           "calculation_strategy": "lut",
