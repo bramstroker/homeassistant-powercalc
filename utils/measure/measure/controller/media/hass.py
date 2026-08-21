@@ -30,6 +30,7 @@ class HassMediaController(HassControllerBase, MediaController):
         self.client.trigger_service(
             "media_player",
             "mute_volume",
+            retry_on_disconnect=False,
             entity_id=self.entity_id,
         )
 
@@ -37,6 +38,7 @@ class HassMediaController(HassControllerBase, MediaController):
         self.client.trigger_service(
             "media_player",
             "play_media",
+            retry_on_disconnect=False,
             entity_id=self.entity_id,
             media_content_type="music",
             media_content_id=stream_url,

@@ -6,7 +6,7 @@ import logging
 from threading import Event, RLock, Thread
 import time
 from types import TracebackType
-from typing import Any, Protocol, Self, cast
+from typing import Any, Protocol, Self, runtime_checkable
 import urllib.parse
 
 from homeassistant_api import AsyncWebsocketClient, Entity, EntityRegistryEntry, Group, State, WebsocketClient
@@ -28,8 +28,10 @@ _LOGGER = logging.getLogger("measure")
 # without touching Home Assistant leaves the connection unanswered and gets dropped.
 # Pinging well inside that window keeps the socket alive across long measurements.
 KEEPALIVE_INTERVAL = 20.0
+KEEPALIVE_JOIN_TIMEOUT = 1.0
 
 
+@runtime_checkable
 class _WebSocketPingSender(Protocol):
     def ping(self) -> None: ...
 
@@ -140,7 +142,9 @@ class HomeAssistantWebsocketClient(WebsocketClient):
     def send_ping(self) -> None:
         """Send a WebSocket keepalive without waiting for the peer's PONG."""
 
-        cast(_WebSocketPingSender, self._ws).ping()
+        if not isinstance(self._ws, _WebSocketPingSender):
+            raise WebsocketError("WebSocket implementation does not support protocol pings")
+        self._ws.ping()
 
     def get_device_registry(self) -> list[dict[str, object]]:
         """Return Home Assistant device registry entries."""
@@ -212,13 +216,13 @@ class HomeAssistantManager:
         )
         self._keepalive_thread.start()
 
-    def _stop_keepalive(self) -> None:
+    def _stop_keepalive(self) -> Thread | None:
+        """Detach and stop the keepalive thread while holding the client lock."""
+
         thread = self._keepalive_thread
         self._keepalive_thread = None
-        if thread is None:
-            return
         self._keepalive_stop.set()
-        thread.join(timeout=self._keepalive_interval)
+        return thread
 
     def _keepalive_loop(self) -> None:
         # Wake up more often than the interval so an idle window is never missed by a
@@ -235,6 +239,10 @@ class HomeAssistantManager:
         reconnects, which is what callers already expect from a dropped connection.
         """
 
+        # Avoid waiting for an active measurement after shutdown has already begun.
+        if self._keepalive_stop.is_set():
+            return
+
         with self._lock:
             if (
                 self._keepalive_stop.is_set()
@@ -246,8 +254,7 @@ class HomeAssistantManager:
                 self._client.send_ping()
             except Exception as error:  # noqa: BLE001 - a keepalive must never break the app
                 _LOGGER.debug("Home Assistant keepalive ping failed: %s", error)
-                if self._is_connection_error(error):
-                    self._discard_client()
+                self._discard_client()
             else:
                 self._last_activity = time.monotonic()
 
@@ -290,13 +297,14 @@ class HomeAssistantManager:
                     raise
                 self._discard_client()
                 if not retry_on_disconnect:
-                    raise
+                    raise WebsocketError(f"Home Assistant WebSocket connection failed: {error}") from error
 
             try:
                 return self._record_activity(operation(self._connected_client()))
             except Exception as error:
                 if self._is_connection_error(error):
                     self._discard_client()
+                    raise WebsocketError(f"Home Assistant WebSocket connection failed: {error}") from error
                 raise
 
     def _record_activity[T](self, result: T) -> T:
@@ -328,16 +336,23 @@ class HomeAssistantManager:
     ) -> Entity | None:
         return self._execute(lambda client: client.get_entity(group_id=group_id, slug=slug, entity_id=entity_id))
 
-    def trigger_service(self, domain: str, service: str, **service_data: Any) -> None:  # noqa: ANN401
+    def trigger_service(
+        self,
+        domain: str,
+        service: str,
+        *,
+        retry_on_disconnect: bool = True,
+        **service_data: Any,  # noqa: ANN401
+    ) -> None:
         """Call a Home Assistant service, reconnecting once when the socket died while idle.
 
-        Measure only issues idempotent service calls (turning a light on at a fixed
-        operating point, turning it off, setting a fan percentage), so replaying one
-        on a fresh connection is safe and keeps hours-long sessions alive when a
-        proxy drops the WebSocket between two measurements.
+        Callers must disable retries for actions whose effect cannot safely be replayed.
         """
 
-        self._execute(lambda client: client.trigger_service(domain, service, **service_data))
+        self._execute(
+            lambda client: client.trigger_service(domain, service, **service_data),
+            retry_on_disconnect=retry_on_disconnect,
+        )
 
     def fire_event(self, event_type: str, **event_data: Any) -> None:  # noqa: ANN401
         """Fire an idempotent status event in Home Assistant."""
@@ -367,6 +382,10 @@ class HomeAssistantManager:
             return await client.discover_zeroconf(collection_window)
 
     def close(self) -> None:
-        self._stop_keepalive()
+        # Wake a sleeping pinger before waiting for an in-flight client operation.
+        self._keepalive_stop.set()
         with self._lock:
+            keepalive_thread = self._stop_keepalive()
             self._discard_client()
+        if keepalive_thread is not None:
+            keepalive_thread.join(timeout=KEEPALIVE_JOIN_TIMEOUT)
