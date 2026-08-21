@@ -5,8 +5,9 @@ from typing import Any
 
 import aiohttp
 from aiohue.errors import Unauthorized
+from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import LutMode
-from measure.controller.light.errors import ApiConnectionError, LightControllerError
+from measure.controller.light.errors import LightControllerError
 import measure.controller.light.hue as hue_module
 from measure.controller.light.hue import HueLightController
 import pytest

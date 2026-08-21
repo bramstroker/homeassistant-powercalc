@@ -1,10 +1,12 @@
 import csv
 from dataclasses import dataclass, replace
+import itertools
 import os.path
 from pathlib import Path
 from unittest.mock import MagicMock
 
 from measure.cli.questions import light_questions
+from measure.controller.errors import ApiConnectionError as HassApiConnectionError
 from measure.controller.light.const import LutMode
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import DummyLightControllerSpec
@@ -249,6 +251,58 @@ def test_controller_close_failure_does_not_mask_measurement_result(caplog: pytes
     runner.cleanup()
 
     assert "Could not close the light controller during measurement cleanup: close unavailable" in caplog.text
+
+
+def _flaky_light_controller(failures_after_startup: int) -> MagicMock:
+    """A light controller that drops its connection once the measurement loop starts.
+
+    The first two calls belong to set_light_to_maximum_brightness, which runs before
+    any variation is measured.
+    """
+
+    light_controller = MagicMock(spec=DummyLightController)
+    calls = itertools.count()
+
+    def change_light_state(*_: object, **__: object) -> None:
+        index = next(calls)
+        if index >= 2 and index - 2 < failures_after_startup:
+            raise HassApiConnectionError("Failed to change light state: Connection broken")
+
+    light_controller.change_light_state.side_effect = change_light_state
+    return light_controller
+
+
+def test_change_light_state_is_retried_after_a_dropped_connection(tmp_path: Path) -> None:
+    """A Home Assistant light must survive a dropped WebSocket mid-session.
+
+    HassLightController raises measure.controller.errors.ApiConnectionError, while the
+    runner used to catch a same-named class from measure.controller.light.errors. The
+    two were unrelated, so the retry never fired and hours-long sessions died on a
+    single broken pipe. See issue #4543.
+    """
+
+    variations = [Variation(1), Variation(2)]
+    run = _brightness_run(tmp_path, variations)
+    run.runner.light_controller = _flaky_light_controller(failures_after_startup=1)
+    run.measure_util.take_measurement.side_effect = [
+        MeasurementResult(power=1, voltages=[]),
+        MeasurementResult(power=2, voltages=[]),
+    ]
+
+    run.execute()
+
+    with open(run.measurement_info.csv_file, newline="") as csv_file:
+        rows = list(csv.reader(csv_file))
+    assert rows == [["bri", "watt"], ["1", "1.0"], ["2", "2.0"]]
+
+
+def test_change_light_state_gives_up_after_five_failed_retries(tmp_path: Path) -> None:
+    variations = [Variation(1)]
+    run = _brightness_run(tmp_path, variations)
+    run.runner.light_controller = _flaky_light_controller(failures_after_startup=5)
+
+    with pytest.raises(RunnerError, match="Failed to change light state after 5 retries"):
+        run.execute()
 
 
 def test_resume_effect(tmp_path: Path) -> None:

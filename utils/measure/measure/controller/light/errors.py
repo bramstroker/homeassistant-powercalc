@@ -5,9 +5,5 @@ class LightControllerError(ControllerError):
     pass
 
 
-class ApiConnectionError(LightControllerError):
-    pass
-
-
 class ModelNotDiscoveredError(LightControllerError):
     pass
