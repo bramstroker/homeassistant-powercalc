@@ -9,7 +9,7 @@ import gzip
 import json
 import math
 from pathlib import Path
-from typing import TextIO
+from typing import TextIO, TypeGuard
 
 from measure.controller.light.const import LutMode
 from measure.request import (
@@ -32,6 +32,8 @@ _EFFECT_COLORS = (
     "#b8d45f",
     "#f28bb7",
 )
+_COMPOSITE_STRATEGY = "composite"
+_LINEAR_STRATEGY = "linear"
 _LIGHT_MODE_ORDER = (LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS, LutMode.EFFECT)
 _POWER_AXIS_LABEL = "Power (W)"
 
@@ -151,6 +153,12 @@ def build_plot_from_file(
         color_mode=resolved_mode,
         max_points=max_points,
     )
+
+
+def model_has_linear_calibration(data: object) -> bool:
+    """Return whether model data declares a linear calibration."""
+
+    return bool(_linear_calibration_configs(data))
 
 
 def limit_plot_points(plot: PlotSpec, max_points: int) -> PlotSpec:
@@ -273,11 +281,79 @@ def _light_point(row: Mapping[str, str | None], mode: LutMode) -> PlotPoint | No
 
 def _linear_plot(path: Path, *, source: str, max_points: int | None) -> PlotSpec:
     data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict) or data.get("calculation_strategy") != "linear":
-        raise PlotDataError("model does not contain a linear calculation strategy")
-    linear_config = data.get("linear_config")
-    calibrate = linear_config.get("calibrate") if isinstance(linear_config, dict) else None
-    if not isinstance(calibrate, list):
+    linear_configs = _linear_calibration_configs(data)
+    if not linear_configs:
+        raise PlotDataError("model does not contain linear calibration data")
+
+    series_count = len(linear_configs)
+    series = tuple(
+        _linear_series(
+            linear_config,
+            label=_condition_label(condition, index) if series_count > 1 else None,
+            color=_EFFECT_COLORS[(index - 1) % len(_EFFECT_COLORS)],
+            max_points=max_points,
+        )
+        for index, (condition, linear_config) in enumerate(linear_configs, start=1)
+    )
+
+    device_type = data.get("device_type") if isinstance(data, dict) else None
+    title, x_label = _linear_labels(device_type if isinstance(device_type, str) else None)
+    return PlotSpec(
+        id="calibration",
+        title=title,
+        kind=PlotKind.LINE,
+        x_label=x_label,
+        y_label=_POWER_AXIS_LABEL,
+        source=source,
+        series=series,
+    )
+
+
+def _linear_calibration_configs(data: object) -> tuple[tuple[object, Mapping[str, object]], ...]:
+    if not isinstance(data, dict):
+        return ()
+
+    strategy = data.get("calculation_strategy")
+    if strategy == _LINEAR_STRATEGY:
+        linear_config = data.get("linear_config")
+        return ((None, linear_config),) if _has_calibration(linear_config) else ()
+    if strategy != _COMPOSITE_STRATEGY:
+        return ()
+
+    composite_config = data.get("composite_config")
+    strategies: object
+    if isinstance(composite_config, list):
+        strategies = composite_config
+    elif isinstance(composite_config, dict):
+        strategies = composite_config.get("strategies")
+    else:
+        return ()
+    if not isinstance(strategies, list):
+        return ()
+
+    configs: list[tuple[object, Mapping[str, object]]] = []
+    for strategy_config in strategies:
+        if not isinstance(strategy_config, dict):
+            continue
+        linear_config = strategy_config.get(_LINEAR_STRATEGY)
+        if _has_calibration(linear_config):
+            configs.append((strategy_config.get("condition"), linear_config))
+    return tuple(configs)
+
+
+def _has_calibration(config: object) -> TypeGuard[Mapping[str, object]]:
+    return isinstance(config, dict) and isinstance(config.get("calibrate"), list)
+
+
+def _linear_series(
+    linear_config: Mapping[str, object],
+    *,
+    label: str | None,
+    color: str,
+    max_points: int | None,
+) -> PlotSeries:
+    calibrate = linear_config.get("calibrate")
+    if not isinstance(calibrate, list):  # pragma: no cover - guarded by _linear_calibration_configs
         raise PlotDataError("model does not contain linear calibration data")
 
     points: list[PlotPoint] = []
@@ -294,24 +370,53 @@ def _linear_plot(path: Path, *, source: str, max_points: int | None) -> PlotSpec
     if not points:
         raise PlotDataError("no valid linear calibration entries found")
     points.sort(key=lambda point: point.x)
-
-    device_type = data.get("device_type")
-    title, x_label = _linear_labels(device_type if isinstance(device_type, str) else None)
-    return PlotSpec(
-        id="calibration",
-        title=title,
-        kind=PlotKind.LINE,
-        x_label=x_label,
-        y_label=_POWER_AXIS_LABEL,
-        source=source,
-        series=(
-            PlotSeries(
-                label=None,
-                color=_DEFAULT_COLOR,
-                points=_limit_line(points, max_points),
-            ),
-        ),
+    return PlotSeries(
+        label=label,
+        color=color,
+        points=_limit_line(points, max_points),
     )
+
+
+def _condition_label(condition: object, strategy_index: int) -> str:
+    if not isinstance(condition, dict):
+        return "Unconditional"
+
+    condition_type = condition.get("condition")
+    if condition_type in {"and", "or", "not"}:
+        conditions = condition.get("conditions")
+        if isinstance(conditions, list):
+            labels = [_condition_label(item, strategy_index) for item in conditions]
+            if labels:
+                if condition_type == "not":
+                    return f"NOT ({' AND '.join(labels)})"
+                return f" {str(condition_type).upper()} ".join(labels)
+    if condition_type == "state":
+        subject = condition.get("attribute") or _condition_entity_label(condition.get("entity_id"))
+        state = condition.get("state")
+        if subject and state is not None:
+            return f"{str(subject).replace('_', ' ')} = {_condition_value_label(state)}"
+    return f"Strategy {strategy_index}"
+
+
+def _condition_entity_label(entity_id: object) -> str | None:
+    if isinstance(entity_id, list):
+        entity_id = entity_id[0] if entity_id else None
+    if not isinstance(entity_id, str):
+        return None
+    if entity_id == "[[entity]]":
+        return "state"
+    if entity_id.startswith("[[") and entity_id.endswith("]]"):
+        entity_id = entity_id[2:-2]
+    _, separator, value = entity_id.partition(":")
+    return (value if separator else entity_id).replace("_", " ")
+
+
+def _condition_value_label(value: object) -> str:
+    if isinstance(value, list):
+        return ", ".join(str(item) for item in value)
+    if isinstance(value, bool):
+        return str(value).lower()
+    return str(value)
 
 
 def _recorder_plot(path: Path, *, source: str, max_points: int | None) -> PlotSpec:

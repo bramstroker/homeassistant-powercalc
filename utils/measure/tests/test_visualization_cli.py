@@ -49,6 +49,44 @@ def test_generate_directory_plots_writes_supported_artifacts(
     ]
 
 
+@pytest.mark.parametrize(
+    "composite_config",
+    [
+        [{"linear": {"calibrate": ["0 -> 1.0", "100 -> 5.0"]}}],
+        {
+            "mode": "sum_all",
+            "strategies": [{"linear": {"calibrate": ["0 -> 1.0", "100 -> 5.0"]}}],
+        },
+    ],
+)
+def test_generate_directory_plots_includes_composite_calibration(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    composite_config: object,
+) -> None:
+    model = tmp_path / "model.json"
+    model.write_text(
+        json.dumps(
+            {
+                "calculation_strategy": "composite",
+                "composite_config": composite_config,
+            },
+        ),
+        encoding="utf-8",
+    )
+    rendered: list[Path] = []
+    monkeypatch.setattr(cli, "render_plot", lambda _plot, output: rendered.append(output))
+
+    assert cli.generate_directory_plots(tmp_path) == 2
+    assert rendered == [tmp_path / "calibration.png", tmp_path / "calibration.svg"]
+
+
+def test_generate_directory_plots_ignores_invalid_model_json(tmp_path: Path) -> None:
+    (tmp_path / "model.json").write_text("invalid", encoding="utf-8")
+
+    assert cli.generate_directory_plots(tmp_path) == 0
+
+
 def test_generate_directory_plots_skips_existing_output_unless_forced(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
