@@ -76,9 +76,77 @@ def test_generate_directory_plots_includes_composite_calibration(
     )
     rendered: list[Path] = []
     monkeypatch.setattr(cli, "render_plot", lambda _plot, output: rendered.append(output))
+    monkeypatch.setattr(cli, "render_composite_diagram", lambda _diagram, output: rendered.append(output))
+
+    assert cli.generate_directory_plots(tmp_path) == 4
+    assert rendered == [
+        tmp_path / "calibration.png",
+        tmp_path / "calibration.svg",
+        tmp_path / "composite.png",
+        tmp_path / "composite.svg",
+    ]
+
+
+def test_generate_directory_plots_includes_composite_without_linear_calibration(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    model = tmp_path / "model.json"
+    model.write_text(
+        json.dumps(
+            {
+                "calculation_strategy": "composite",
+                "composite_config": [{"fixed": {"power": 2.5}}],
+            },
+        ),
+        encoding="utf-8",
+    )
+    rendered: list[Path] = []
+    monkeypatch.setattr(cli, "render_composite_diagram", lambda _diagram, output: rendered.append(output))
 
     assert cli.generate_directory_plots(tmp_path) == 2
-    assert rendered == [tmp_path / "calibration.png", tmp_path / "calibration.svg"]
+    assert rendered == [tmp_path / "composite.png", tmp_path / "composite.svg"]
+
+
+def test_generate_directory_plots_skips_existing_composite_outputs(tmp_path: Path) -> None:
+    (tmp_path / "model.json").write_text(
+        '{"calculation_strategy":"composite","composite_config":[{"fixed":{"power":2}}]}',
+        encoding="utf-8",
+    )
+    (tmp_path / "composite.png").write_bytes(b"existing")
+    (tmp_path / "composite.svg").write_bytes(b"existing")
+
+    assert cli.generate_directory_plots(tmp_path) == 0
+
+
+@pytest.mark.parametrize(
+    "output, expected",
+    [(None, None), ("auto", Path("composite.png")), ("flow.svg", Path("flow.svg"))],
+)
+def test_composite_output_path(output: str | None, expected: Path | None) -> None:
+    assert cli.composite_output_path(output) == expected
+
+
+def test_main_renders_composite_diagram(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    model = tmp_path / "model.json"
+    model.write_text(
+        '{"calculation_strategy":"composite","composite_config":[{"fixed":{"power":2}}]}',
+        encoding="utf-8",
+    )
+    rendered: list[Path | None] = []
+    monkeypatch.setattr(cli, "render_composite_diagram", lambda _diagram, output: rendered.append(output))
+
+    cli.main([str(model), "--kind=composite", "--output=auto"])
+
+    assert rendered == [Path("composite.png")]
+
+
+def test_main_rejects_colormode_for_composite_diagram(tmp_path: Path) -> None:
+    model = tmp_path / "model.json"
+    model.write_text("{}", encoding="utf-8")
+
+    with pytest.raises(SystemExit):
+        cli.main([str(model), "--kind=composite", "--colormode=brightness"])
 
 
 def test_generate_directory_plots_ignores_invalid_model_json(tmp_path: Path) -> None:

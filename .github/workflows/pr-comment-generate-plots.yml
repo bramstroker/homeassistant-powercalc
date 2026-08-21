@@ -48,7 +48,8 @@ jobs:
               if (!/^profile_library\/.+\/model\.json$/.test(file) || !fs.existsSync(file)) return false
               try {
                 const model = JSON.parse(fs.readFileSync(file, 'utf8'))
-                return model.calculation_strategy === 'linear' && Array.isArray(model.linear_config?.calibrate)
+                if (model.calculation_strategy === 'linear') return Array.isArray(model.linear_config?.calibrate)
+                return model.calculation_strategy === 'composite'
               } catch {
                 return false
               }
@@ -67,6 +68,22 @@ jobs:
             if [ -f "${{ github.workspace }}/${file}" ]; then
               relative="${file#profile_library/}"
               if [[ "${relative}" == */model.json ]]; then
+                strategy="$(jq -r '.calculation_strategy // empty' "${file}")"
+                if [[ "${strategy}" == "composite" ]]; then
+                  uv --project utils/measure run --group visualize powercalc-visualize \
+                    "${{ github.workspace }}/${file}" --kind=composite \
+                    --output="plot-artifacts/${relative%model.json}composite.png"
+                  if jq -e '
+                    .composite_config
+                    | if type == "array" then . else .strategies end
+                    | any(.linear.calibrate? | type == "array")
+                  ' "${file}" > /dev/null; then
+                    uv --project utils/measure run --group visualize powercalc-visualize \
+                      "${{ github.workspace }}/${file}" \
+                      --output="plot-artifacts/${relative%model.json}calibration.png"
+                  fi
+                  continue
+                fi
                 output="plot-artifacts/${relative%model.json}calibration.png"
               else
                 output="plot-artifacts/${relative%.csv.gz}.png"
