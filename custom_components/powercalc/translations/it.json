@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Entità della corrente",
           "power_factor": "Fattore di potenza",
           "voltage": "Tensione"
         },
         "description": "Assicurati di abilitare il limitatore di luminosità nel software WLED. Vedi anche {docs_uri}",
-        "title": "Configurazione WLED"
+        "title": "Configurazione WLED",
+        "data_description": {
+          "current_entity": "Seleziona facoltativamente un sensore che fornisca la corrente stimata in mA. Necessario solo quando Powercalc non riesce a trovare automaticamente il sensore della corrente stimata WLED, ad esempio quando il limitatore di luminosità è configurato per uscita."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "Opzioni WLED",
         "data": {
+          "current_entity": "Entità della corrente",
           "power_factor": "Fattore di potenza",
           "voltage": "Tensione"
+        },
+        "data_description": {
+          "current_entity": "Seleziona facoltativamente un sensore che fornisca la corrente stimata in mA. Necessario solo quando Powercalc non riesce a trovare automaticamente il sensore della corrente stimata WLED, ad esempio quando il limitatore di luminosità è configurato per uscita."
         }
       },
       "cost_options": {

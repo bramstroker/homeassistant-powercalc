@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Stroomentiteit",
           "power_factor": "Vermogensfactor",
           "voltage": "Spanning"
         },
         "description": "Zorg ervoor dat u helderheidsbegrenzer inschakelt in WLED-software. Zie ook {docs_uri}",
-        "title": "WLED configuratie"
+        "title": "WLED configuratie",
+        "data_description": {
+          "current_entity": "Selecteer optioneel een sensor die de geschatte stroom in mA levert. Alleen nodig wanneer Powercalc de WLED-sensor voor geschatte stroom niet automatisch kan vinden, bijvoorbeeld wanneer de helderheidsbegrenzer per uitgang is geconfigureerd."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "WLED opties",
         "data": {
+          "current_entity": "Stroomentiteit",
           "power_factor": "Vermogensfactor",
           "voltage": "Spanning"
+        },
+        "data_description": {
+          "current_entity": "Selecteer optioneel een sensor die de geschatte stroom in mA levert. Alleen nodig wanneer Powercalc de WLED-sensor voor geschatte stroom niet automatisch kan vinden, bijvoorbeeld wanneer de helderheidsbegrenzer per uitgang is geconfigureerd."
         }
       },
       "cost_options": {

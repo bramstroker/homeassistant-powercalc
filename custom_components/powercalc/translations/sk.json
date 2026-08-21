@@ -581,11 +581,15 @@
       },
       "wled": {
         "data": {
+          "current_entity": "Entita prúdu",
           "power_factor": "Účinník",
           "voltage": "Napätie"
         },
         "description": "Uistite sa, že ste povolili obmedzovač jasu v softvéri WLED. Pozri tiež {docs_uri}",
-        "title": "WLED konfigurácia"
+        "title": "WLED konfigurácia",
+        "data_description": {
+          "current_entity": "Voliteľne vyberte snímač poskytujúci odhadovaný prúd v mA. Potrebné len vtedy, keď Powercalc nedokáže automaticky nájsť snímač odhadovaného prúdu WLED, napríklad keď je obmedzovač jasu nastavený pre jednotlivé výstupy."
+        }
       }
     }
   },
@@ -1102,8 +1106,12 @@
       "wled": {
         "title": "WLED možnosti",
         "data": {
+          "current_entity": "Entita prúdu",
           "power_factor": "Účiník",
           "voltage": "Napätie"
+        },
+        "data_description": {
+          "current_entity": "Voliteľne vyberte snímač poskytujúci odhadovaný prúd v mA. Potrebné len vtedy, keď Powercalc nedokáže automaticky nájsť snímač odhadovaného prúdu WLED, napríklad keď je obmedzovač jasu nastavený pre jednotlivé výstupy."
         }
       },
       "cost_options": {
