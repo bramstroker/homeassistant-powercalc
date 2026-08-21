@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Du skal angive mindst én af Værdi eller Værdiskabelon",
       "entity_mandatory": "Der skal vælges en entitet for alle andre strategier end playbook",
       "fixed_mandatory": "Du skal angive mindst én af Effekt, Effektskabelon eller Effekt efter tilstand",
-      "fixed_states_power_only": "Denne entitet kan kun bruges med 'states_power', ikke 'power'",
       "group_mandatory": "Du skal som minimum definere undergrupper eller effekt- og energientiteter",
       "linear_mandatory": "Du skal angive mindst én af max_power eller calibrate",
       "linear_min_higher_as_max": "Maksimal effekt kan ikke være lavere end minimal effekt",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Du skal angive enten en energipris eller en energiprissensor",
       "fixed_mandatory": "Du skal angive mindst én af Effekt, Effektskabelon eller Effekt efter tilstand",
-      "fixed_states_power_only": "Denne entitet kan kun bruges med 'states_power', ikke 'power'",
       "group_mandatory": "Du skal som minimum definere undergrupper eller effekt- og energientiteter",
       "linear_mandatory": "Du skal angive mindst én af max_power eller calibrate",
       "linear_min_higher_as_max": "Maksimal effekt kan ikke være lavere end minimal effekt",

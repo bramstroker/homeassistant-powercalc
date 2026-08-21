@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Musisz podać co najmniej jedną Wartość lub Szablon wartości",
       "entity_mandatory": "Wybranie encji jest wymagane w przypadku każdej strategii innej niż playbook",
       "fixed_mandatory": "Musisz podać co najmniej jedno z: Moc, Szablon mocy lub Moce stanów",
-      "fixed_states_power_only": "Ta encja może działać tylko ze 'states_power', a nie z 'power'",
       "group_mandatory": "Musisz zdefiniować przynajmniej podgrupy lub encje mocy i energii",
       "linear_mandatory": "Musisz dostarczyć co najmniej jedno z: Maksymalna moc lub Kalibracja",
       "linear_min_higher_as_max": "Maksymalna moc nie może być mniejsza niż Minimalna moc",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Należy podać cenę energii lub czujnik ceny energii",
       "fixed_mandatory": "Musisz podać co najmniej jedno z: Moc, Szablon mocy lub Moce stanów",
-      "fixed_states_power_only": "Ta encja może działać tylko ze 'states_power', a nie z 'power'",
       "group_mandatory": "Musisz zdefiniować przynajmniej podgrupy lub encje mocy i energii",
       "linear_mandatory": "Musisz dostarczyć co najmniej jedno z: Maksymalna moc lub Kalibracja",
       "linear_min_higher_as_max": "Maksymalna moc nie może być mniejsza niż Minimalna moc",

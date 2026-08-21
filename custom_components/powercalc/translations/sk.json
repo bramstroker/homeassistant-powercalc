@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Musíte dodať aspoň jednu šablónu hodnoty alebo hodnoty",
       "entity_mandatory": "Výber subjektu je potrebný pre akúkoľvek inú stratégiu, než je stratégia playbook",
       "fixed_mandatory": "Musíte zadať aspoň jednu z možností: fixnú hodnotu, šablónu alebo mapovanie stavov",
-      "fixed_states_power_only": "Táto entita môže pracovať iba s 'states_power', nie 'power'",
       "group_mandatory": "Musíte definovať aspoň podskupiny alebo silové a energetické entity",
       "linear_mandatory": "Musíte dodať aspoň jeden z max_power alebo calibrate",
       "linear_min_higher_as_max": "Maximálny výkon nemôže byť nižší ako minimálny výkon",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Musíte dodať buď cenu energie, alebo snímač ceny energie",
       "fixed_mandatory": "Musíte zadať aspoň jednu z možností: fixnú hodnotu, šablónu alebo mapovanie stavov",
-      "fixed_states_power_only": "Táto entita môže pracovať iba s 'states_power', nie 'power'",
       "group_mandatory": "Musíte definovať aspoň podskupiny alebo výkonové a energetické entity",
       "linear_mandatory": "Musíte dodať aspoň jeden z max_power alebo calibrate",
       "linear_min_higher_as_max": "Maximálny výkon nemôže byť nižší ako minimálny výkon",

@@ -150,14 +150,15 @@ async def test_validation_error_when_no_power_supplied(hass: HomeAssistant) -> N
         await strategy.validate_config()
 
 
-async def test_validation_error_state_power_only_entity_domain(hass: HomeAssistant) -> None:
+@pytest.mark.parametrize("entity_id", ["vacuum.test", "lawn_mower.test"])
+async def test_power_supported_for_state_based_entity_domain(hass: HomeAssistant, entity_id: str) -> None:
     strategy = FixedStrategy(
         power=20,
         per_state_power=None,
-        source_entity=create_source_entity("vacuum.test", hass),
+        source_entity=create_source_entity(entity_id, hass),
     )
-    with pytest.raises(StrategyConfigurationError):
-        await strategy.validate_config()
+    await strategy.validate_config()
+    assert await strategy.calculate(State(entity_id, STATE_ON)) == 20
 
 
 async def test_config_entry_with_template_rendered_correctly(

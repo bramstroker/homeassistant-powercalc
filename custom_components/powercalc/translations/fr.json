@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Vous devez fournir au moins une valeur ou un modèle de valeur",
       "entity_mandatory": "La sélection d'une entité est requise pour toute stratégie autre que le playbook",
       "fixed_mandatory": "Vous devez fournir au moins une alimentation, un modèle d'alimentation ou un état d'alimentation",
-      "fixed_states_power_only": "Cette entité ne peut fonctionner qu'avec 'states_power' et non 'power'",
       "group_mandatory": "Vous devez définir au moins des sous-groupes ou des entités de puissance et d'énergie",
       "linear_mandatory": "Vous devez spécifier au moins la puissance minimale ou la valeur d'étalonnage",
       "linear_min_higher_as_max": "La puissance maximale ne peut pas être inférieure à la puissance minimale",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Vous devez fournir soit un prix de l'énergie, soit un capteur de prix de l'énergie",
       "fixed_mandatory": "Vous devez fournir au moins une alimentation, un modèle d'alimentation ou une alimentation des états",
-      "fixed_states_power_only": "Cette entité ne peut fonctionner qu'avec des 'Etat de puissance' et non 'Puissance'",
       "group_mandatory": "Vous devez définir au moins des sous-groupes ou des entités de puissance et d'énergie",
       "linear_mandatory": "Vous devez spécifier au moins la puissance minimale ou la valeur d'étalonnage",
       "linear_min_higher_as_max": "La puissance maximale ne peut pas être inférieure à la puissance minimale",

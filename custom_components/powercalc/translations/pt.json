@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Deve fornecer pelo menos um modelo de Valor ou Valor",
       "entity_mandatory": "A selecção de entidade é obrigatória para qualquer estratégia diferente de 'Sequência'",
       "fixed_mandatory": "Deve fornecer pelo menos uma potência, um modelo de potência ou potências por estado",
-      "fixed_states_power_only": "Esta entidade só pode trabalhar com 'states_power' e não 'power'",
       "group_mandatory": "Deve definir pelo menos subgrupos ou entidades de poder e energia",
       "linear_mandatory": "Deve fornecer pelo menos um de max_power ou calibrar",
       "linear_min_higher_as_max": "A potência máxima não pode ser inferior à potência mínima",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Deve fornecer um preço de energia ou um sensor de preço da energia",
       "fixed_mandatory": "Deve fornecer pelo menos uma potência, um modelo de potência ou potências por estado",
-      "fixed_states_power_only": "Esta entidade só pode trabalhar com 'states_power' e não 'power'",
       "group_mandatory": "Deve definir pelo menos subgrupos ou entidades de poder e energia",
       "linear_mandatory": "Deve fornecer pelo menos um de max_power ou calibrar",
       "linear_min_higher_as_max": "A potência máxima não pode ser inferior à potência mínima",

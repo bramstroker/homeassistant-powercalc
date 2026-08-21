@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Debes proveer al menos un valor o valor en plantilla",
       "entity_mandatory": "El sensor ya está configurado, especifique un identificador único",
       "fixed_mandatory": "Debes proveer al menos uno de los siguientes: potencia, potencia en plantilla, o potencia en un estado",
-      "fixed_states_power_only": "Esta entidad solamente funciona con \"states_power\" y no con \"power\"",
       "group_mandatory": "Debes definir como mínimo subgrupos o potencia y entidades de energía",
       "linear_mandatory": "Debes proveer al menos potencia máxima (max_power) o calibrar",
       "linear_min_higher_as_max": "La potencia máxima no puede ser menos que la potencia mínima",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Debe proporcionar un precio de energía o un sensor de precio de energía.",
       "fixed_mandatory": "Debe suministrar al menos uno de: potencia, plantilla de potencia o estados de potencia",
-      "fixed_states_power_only": "Esta entidad sólo puede funcionar con 'states_power' no 'power'",
       "group_mandatory": "Debes definir como mínimo subgrupos o potencia y entidades de energía",
       "linear_mandatory": "Debes proveer al menos potencia máxima (max_power) o calibrar",
       "linear_min_higher_as_max": "La potencia máxima no puede ser menos que la potencia mínima",

@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-from homeassistant.components import lawn_mower, vacuum
 from homeassistant.core import State
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
@@ -22,11 +21,6 @@ CONFIG_SCHEMA = vol.Schema(
         ),
     },
 )
-
-STATE_BASED_ENTITY_DOMAINS = [
-    vacuum.DOMAIN,
-    lawn_mower.DOMAIN,
-]
 
 
 class FixedStrategy(PowerCalculationStrategyInterface):
@@ -66,12 +60,6 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             raise StrategyConfigurationError(
                 "You must supply one of 'states_power' or 'power'",
                 "fixed_mandatory",
-            )
-
-        if self._source_entity.domain in STATE_BASED_ENTITY_DOMAINS and self._per_state_power is None:
-            raise StrategyConfigurationError(
-                "This entity can only work with 'states_power' not 'power'",
-                "fixed_states_power_only",
             )
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:

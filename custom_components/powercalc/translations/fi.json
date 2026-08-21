@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Anna vähintään value tai value_template",
       "entity_mandatory": "Entiteetti on valittava kaikille muille strategioille paitsi playbook-strategialle",
       "fixed_mandatory": "Anna vähintään power, power_template tai states_power",
-      "fixed_states_power_only": "Tämä entiteetti toimii vain states_power-asetuksella, ei power-asetuksella",
       "group_mandatory": "Määritä vähintään aliryhmät tai teho- ja energiaentiteetit",
       "linear_mandatory": "Anna vähintään max_power tai calibrate",
       "linear_min_higher_as_max": "Enimmäisteho ei voi olla pienempi kuin vähimmäisteho",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Anna joko energian hinta tai energian hinta-anturi",
       "fixed_mandatory": "Anna vähintään power-, power_template- tai states_power-arvo",
-      "fixed_states_power_only": "Tämä entiteetti voi toimia vain 'states_power', ei 'power':n kanssa",
       "group_mandatory": "Sinun on määritettävä vähintään alaryhmät tai teho- ja energiaentiteetit",
       "linear_mandatory": "Anna vähintään max_power tai calibrate",
       "linear_min_higher_as_max": "Enimmäisteho ei voi olla pienempi kuin vähimmäisteho",
