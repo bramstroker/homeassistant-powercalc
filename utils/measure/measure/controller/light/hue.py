@@ -11,9 +11,10 @@ from aiohue.v1.groups import Groups
 from aiohue.v1.lights import Lights
 
 from measure.const import PROJECT_DIR
+from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
-from measure.controller.light.errors import ApiConnectionError, LightControllerError, ModelNotDiscoveredError
+from measure.controller.light.errors import LightControllerError, ModelNotDiscoveredError
 
 TYPE_LIGHT = "light"
 TYPE_GROUP = "group"
