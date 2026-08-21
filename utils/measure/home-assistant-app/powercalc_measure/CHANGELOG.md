@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.4.1 - 2026-08-21
+
+### 🐛 Bug Fixes
+
+- #4563 Fix connectivity issues broken pipe in measure app @bramstroker
+
 ## 0.4.0 - 2026-08-21
 
 - #4441 Reduce test suite duplication with shared helpers @bramstroker
