@@ -16,7 +16,7 @@ async def test_network_device(hass: HomeAssistant) -> None:
     manufacturer = "AVM"
     model = "FRITZ!Repeater 1200 AX"
 
-    power_sensor_id = "sensor.wifi_repeater_device_power"
+    power_sensor_id = "sensor.wifi_repeater_power"
 
     await run_powercalc_setup(
         hass,

@@ -10,10 +10,6 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "FRITZ!Repeater 6000",
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "authors": [
     {
       "name": "hpuac",

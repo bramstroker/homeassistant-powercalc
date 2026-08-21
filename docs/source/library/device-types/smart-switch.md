@@ -40,21 +40,19 @@ Assuming the user provides a value of 50W the following power values will be cal
     In this scenario Powercalc will only provide the self-usage measurements for the smart switch itself.
     As the smart switch itself already measures the connected appliance.
 
-Note the sensor_naming configuration which will make sure the entities are named different than the power entities already provided, so they don't conflict.
-
 ```json
 {
   "standby_power": 0.3,
   "standby_power_on": 0.7,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
   "only_self_usage": true
 }
 ```
+
+Because of `only_self_usage` the sensors are named `{} Device Power` and `{} Device Energy` instead of `{} power` and `{} energy`,
+so they don't conflict with the power entities the switch already provides. This naming is applied by Powercalc itself,
+a profile must never set `power_sensor_naming` or `energy_sensor_naming`.
 
 Following the example above, the following power values will be calculated:
 - ON: 0.7W
@@ -77,10 +75,6 @@ Examples of this type of smart switch are:
   "standby_power": 0.25,
   "multi_switch_config": {
     "power": 0.8
-  },
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
   },
   "only_self_usage": true
 }

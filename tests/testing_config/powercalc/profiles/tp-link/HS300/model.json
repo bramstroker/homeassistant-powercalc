@@ -11,8 +11,5 @@
     "power_off": 0.52
   },
   "name": "IKEA Control outlet",
-  "only_self_usage": true,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power"
-  }
+  "only_self_usage": true
 }

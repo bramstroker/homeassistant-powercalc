@@ -5,8 +5,5 @@
     "power": 0.82,
     "power_off": 0.52
   },
-  "name": "IKEA Control outlet",
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power"
-  }
+  "name": "IKEA Control outlet"
 }

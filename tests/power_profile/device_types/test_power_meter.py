@@ -19,11 +19,17 @@ from tests.common import (
 )
 
 
-@pytest.mark.parametrize("profile_dir", ["power_meter", "power_meter_legacy"])
-async def test_power_meter(hass: HomeAssistant, profile_dir: str) -> None:
+@pytest.mark.parametrize(
+    "profile_dir,power_sensor_id",
+    [
+        ("power_meter", "sensor.pm_mini_device_power"),
+        # The legacy profile has no `only_self_usage`, so the sensors use the regular naming.
+        ("power_meter_legacy", "sensor.pm_mini_power"),
+    ],
+)
+async def test_power_meter(hass: HomeAssistant, profile_dir: str, power_sensor_id: str) -> None:
     """Test that a power meter can be setup from the profile library, in both profile formats"""
     sensor_id = "sensor.pm_mini"
-    power_sensor_id = "sensor.pm_mini_device_power"
 
     await run_powercalc_setup(
         hass,

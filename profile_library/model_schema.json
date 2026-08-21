@@ -2,6 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "model.json describes a number of devices, typically lights, for use within the HomeAssistant Powercalc extension.",
   "type": "object",
+  "propertyNames": {
+    "not": {
+      "$ref": "#/definitions/sensor_naming_option"
+    }
+  },
   "required": [
     "name",
     "device_type",
@@ -410,7 +415,12 @@
     },
     "sensor_config": {
       "type": "object",
-      "description": "Sensor configuration options. See the README"
+      "description": "Sensor configuration options. See the README",
+      "propertyNames": {
+        "not": {
+          "$ref": "#/definitions/sensor_naming_option"
+        }
+      }
     },
     "standby_power": {
       "type": "number",
@@ -481,6 +491,15 @@
     }
   },
   "definitions": {
+    "sensor_naming_option": {
+      "description": "Naming options a profile must not set. Sensor naming is a user preference, configured globally or per sensor.",
+      "enum": [
+        "power_sensor_naming",
+        "power_sensor_friendly_naming",
+        "energy_sensor_naming",
+        "energy_sensor_friendly_naming"
+      ]
+    },
     "condition": {
       "type": "object",
       "properties": {

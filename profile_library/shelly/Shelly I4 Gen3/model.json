@@ -16,7 +16,6 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "i4 Gen3",
-  "only_self_usage": true,
   "authors": [
     {
       "name": "CV",

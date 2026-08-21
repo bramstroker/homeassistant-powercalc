@@ -10,10 +10,6 @@
   "measure_device_firmware": "ESPHome 2023.12.5",
   "measure_method": "script",
   "name": "TRADFRI signal repeater",
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "authors": [
     {
       "name": "confucius78",

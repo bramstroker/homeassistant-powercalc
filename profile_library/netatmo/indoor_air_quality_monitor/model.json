@@ -12,9 +12,10 @@
     "Smart Indoor Air Quality Monitor"
   ],
   "device_type": "generic_iot",
-  "only_self_usage": true,
   "calculation_strategy": "fixed",
-  "standby_power": 0.43,
+  "fixed_config": {
+    "power": 0.43
+  },
   "authors": [
     {
       "name": "Largelos",

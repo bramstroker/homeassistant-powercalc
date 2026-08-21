@@ -14,7 +14,7 @@
     "VERSION": "v1.17.12:docker"
   },
   "name": "1 Mini Gen4",
-  "only_self_usage": true,
+  "only_self_usage": false,
   "authors": [
     {
       "name": "Jasper",

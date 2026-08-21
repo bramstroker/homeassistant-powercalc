@@ -10,10 +10,6 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "HM-LC-Sw1-DR",
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "standby_power": 0.32,
   "standby_power_on": 0.52,
   "authors": [

@@ -13,9 +13,10 @@
   ],
   "discovery_by": "device",
   "device_type": "network",
-  "only_self_usage": true,
   "calculation_strategy": "fixed",
-  "standby_power": 1.51,
+  "fixed_config": {
+    "power": 1.51
+  },
   "authors": [
     {
       "name": "Largelos",

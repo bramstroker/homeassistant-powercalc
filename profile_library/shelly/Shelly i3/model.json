@@ -15,8 +15,9 @@
     "SLEEP_TIME": 0.5
   },
   "name": "i3",
-  "only_self_usage": true,
-  "standby_power": 0.587,
+  "fixed_config": {
+    "power": 0.587
+  },
   "authors": [
     {
       "name": "Michal Bartak",

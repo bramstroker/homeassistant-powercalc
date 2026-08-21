@@ -10,10 +10,6 @@
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
   "name": "Gas sensor",
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "authors": [
     {
       "name": "Andrzej Dopierała",

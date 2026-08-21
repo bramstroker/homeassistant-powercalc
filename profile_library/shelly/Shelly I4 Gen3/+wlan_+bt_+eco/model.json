@@ -1,5 +1,6 @@
 {
   "name": "WLAN + Bluetooth + ECO",
-  "standby_power": 0.3,
-  "standby_power_on": 0.3
+  "fixed_config": {
+    "power": 0.3
+  }
 }

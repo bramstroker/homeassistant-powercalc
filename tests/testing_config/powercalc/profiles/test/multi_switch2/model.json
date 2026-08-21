@@ -7,8 +7,5 @@
   },
   "name": "Kasa Smart Wi-Fi Power Strip",
   "only_self_usage": true,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power"
-  },
   "standby_power": 0.25
 }
