@@ -12,9 +12,11 @@
   },
   "name": "SMART+ WIFI PLANON FRAMELESS TW RGB 600x600",
   "standby_power": 1.0,
-  "author_info": {
-    "name": "Kenneth Fribert",
-    "email": "fribse@gmail.com",
-    "github": "fribse"
-  }
+  "authors": [
+    {
+      "name": "Kenneth Fribert",
+      "email": "fribse@gmail.com",
+      "github": "fribse"
+    }
+  ]
 }

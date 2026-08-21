@@ -28,8 +28,10 @@
   },
   "name": "SoundTouch 300",
   "standby_power": 1.5,
-  "author_info": {
-    "name": "wranglatang",
-    "github": "wranglatang"
-  }
+  "authors": [
+    {
+      "name": "wranglatang",
+      "github": "wranglatang"
+    }
+  ]
 }

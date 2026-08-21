@@ -17,9 +17,11 @@
   },
   "name": "Hue White Ambiance Milliskin",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "mariwing",
-    "email": "mariwing@gmail.com",
-    "github": "mariwing"
-  }
+  "authors": [
+    {
+      "name": "mariwing",
+      "email": "mariwing@gmail.com",
+      "github": "mariwing"
+    }
+  ]
 }

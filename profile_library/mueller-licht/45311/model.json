@@ -12,9 +12,11 @@
   },
   "name": "E27 Globe Gold",
   "standby_power": 0.26,
-  "author_info": {
-    "name": "RubenKelevra",
-    "email": "cyrond@gmail.com",
-    "github": "RubenKelevra"
-  }
+  "authors": [
+    {
+      "name": "RubenKelevra",
+      "email": "cyrond@gmail.com",
+      "github": "RubenKelevra"
+    }
+  ]
 }

@@ -12,9 +12,11 @@
   },
   "name": "Bulb Color",
   "standby_power": 0.92,
-  "author_info": {
-    "name": "Bob Shaker",
-    "email": "bobshaker1@gmail.com",
-    "github": "EpicBurrito"
-  }
+  "authors": [
+    {
+      "name": "Bob Shaker",
+      "email": "bobshaker1@gmail.com",
+      "github": "EpicBurrito"
+    }
+  ]
 }

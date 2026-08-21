@@ -12,9 +12,11 @@
   },
   "name": "Livarno Lux GU10 5W RGBCT Bulb",
   "standby_power": 0.39,
-  "author_info": {
-    "name": "RubenKelevra",
-    "email": "cyrond@gmail.com",
-    "github": "RubenKelevra"
-  }
+  "authors": [
+    {
+      "name": "RubenKelevra",
+      "email": "cyrond@gmail.com",
+      "github": "RubenKelevra"
+    }
+  ]
 }

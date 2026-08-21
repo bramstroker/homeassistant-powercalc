@@ -15,8 +15,10 @@
   },
   "name": "TRADFRI bulb E27 WW G95 CL 470lm",
   "standby_power": 0.09,
-  "author_info": {
-    "name": "dansie",
-    "github": "dansie"
-  }
+  "authors": [
+    {
+      "name": "dansie",
+      "github": "dansie"
+    }
+  ]
 }

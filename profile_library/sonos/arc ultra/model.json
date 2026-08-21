@@ -28,8 +28,10 @@
   },
   "name": "Arc Ultra",
   "standby_power": 4.45,
-  "author_info": {
-    "name": "Josh Barnard",
-    "github": "barndawgie"
-  }
+  "authors": [
+    {
+      "name": "Josh Barnard",
+      "github": "barndawgie"
+    }
+  ]
 }

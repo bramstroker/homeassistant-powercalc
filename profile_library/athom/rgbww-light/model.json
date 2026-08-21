@@ -15,8 +15,10 @@
   },
   "name": "7W Color Bulb for ESPHome",
   "standby_power": 0.47,
-  "author_info": {
-    "name": "DellanX",
-    "github": "DellanX"
-  }
+  "authors": [
+    {
+      "name": "DellanX",
+      "github": "DellanX"
+    }
+  ]
 }

@@ -31,9 +31,11 @@
   },
   "name": "Nest Wifi Point",
   "standby_power": 3.71,
-  "author_info": {
-    "name": "Bob Shaker",
-    "email": "bobshaker1@gmail.com",
-    "github": "EpicBurrito"
-  }
+  "authors": [
+    {
+      "name": "Bob Shaker",
+      "email": "bobshaker1@gmail.com",
+      "github": "EpicBurrito"
+    }
+  ]
 }

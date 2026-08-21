@@ -15,8 +15,10 @@
   },
   "name": "Hue Infuse Large Ceiling Lamp",
   "standby_power": 0.34,
-  "author_info": {
-    "name": "matteobreschig",
-    "github": "matteobreschig"
-  }
+  "authors": [
+    {
+      "name": "matteobreschig",
+      "github": "matteobreschig"
+    }
+  ]
 }

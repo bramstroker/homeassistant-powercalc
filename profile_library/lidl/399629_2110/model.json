@@ -12,8 +12,10 @@
   },
   "name": "Livarno Lux Ceiling Panel RGB+CCT",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "rammstone83",
-    "github": "rammstone83"
-  }
+  "authors": [
+    {
+      "name": "rammstone83",
+      "github": "rammstone83"
+    }
+  ]
 }

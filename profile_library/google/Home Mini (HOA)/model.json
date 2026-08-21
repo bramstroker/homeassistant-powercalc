@@ -26,9 +26,11 @@
   "measure_method": "manual",
   "name": "Home Mini",
   "standby_power": 1.65,
-  "author_info": {
-    "name": "Daniel O'Connor",
-    "email": "daniel.oconnor@gmail.com",
-    "github": "CloCkWeRX"
-  }
+  "authors": [
+    {
+      "name": "Daniel O'Connor",
+      "email": "daniel.oconnor@gmail.com",
+      "github": "CloCkWeRX"
+    }
+  ]
 }

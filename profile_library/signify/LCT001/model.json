@@ -7,9 +7,11 @@
   "measure_method": "script",
   "name": "Hue White and Color Ambiance (1 gen)",
   "standby_power": 0.22,
-  "author_info": {
-    "name": "wormiedk",
-    "email": "wormie@alberg.dk",
-    "github": "wormiedk"
-  }
+  "authors": [
+    {
+      "name": "wormiedk",
+      "email": "wormie@alberg.dk",
+      "github": "wormiedk"
+    }
+  ]
 }

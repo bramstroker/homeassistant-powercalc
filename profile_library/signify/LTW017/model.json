@@ -15,9 +15,11 @@
   },
   "name": "Hue Adore Bathroom Mirror Light",
   "standby_power": 0.42,
-  "author_info": {
-    "name": "mariwing",
-    "email": "mariwing@gmail.com",
-    "github": "mariwing"
-  }
+  "authors": [
+    {
+      "name": "mariwing",
+      "email": "mariwing@gmail.com",
+      "github": "mariwing"
+    }
+  ]
 }

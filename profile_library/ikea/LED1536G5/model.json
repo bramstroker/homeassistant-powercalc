@@ -10,9 +10,11 @@
   "measure_method": "script",
   "name": "TRADFRI bulb E14 WS opal 400lm",
   "standby_power": 0.44,
-  "author_info": {
-    "name": "nepozs",
-    "email": "szopen@os.pl",
-    "github": "nepozs"
-  }
+  "authors": [
+    {
+      "name": "nepozs",
+      "email": "szopen@os.pl",
+      "github": "nepozs"
+    }
+  ]
 }

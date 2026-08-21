@@ -9,9 +9,11 @@
   "only_self_usage": false,
   "standby_power": 0.18,
   "standby_power_on": 0.83,
-  "author_info": {
-    "name": "Daniel O'Connor",
-    "email": "daniel.oconnor@gmail.com",
-    "github": "CloCkWeRX"
-  }
+  "authors": [
+    {
+      "name": "Daniel O'Connor",
+      "email": "daniel.oconnor@gmail.com",
+      "github": "CloCkWeRX"
+    }
+  ]
 }

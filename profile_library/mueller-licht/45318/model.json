@@ -15,9 +15,11 @@
   },
   "name": "GU10 Spot white+color",
   "standby_power": 0.15,
-  "author_info": {
-    "name": "RubenKelevra",
-    "email": "cyrond@gmail.com",
-    "github": "RubenKelevra"
-  }
+  "authors": [
+    {
+      "name": "RubenKelevra",
+      "email": "cyrond@gmail.com",
+      "github": "RubenKelevra"
+    }
+  ]
 }

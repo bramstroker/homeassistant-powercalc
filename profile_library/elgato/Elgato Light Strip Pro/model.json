@@ -12,9 +12,11 @@
   },
   "name": "Light Strip Pro",
   "standby_power": 1.2,
-  "author_info": {
-    "name": "Franck Nijhof",
-    "email": "git@frenck.dev",
-    "github": "frenck"
-  }
+  "authors": [
+    {
+      "name": "Franck Nijhof",
+      "email": "git@frenck.dev",
+      "github": "frenck"
+    }
+  ]
 }

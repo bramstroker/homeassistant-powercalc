@@ -15,8 +15,10 @@
   },
   "name": "TRADFRI bulb E14 WS candle 470lm",
   "standby_power": 0.15,
-  "author_info": {
-    "name": "dansie",
-    "github": "dansie"
-  }
+  "authors": [
+    {
+      "name": "dansie",
+      "github": "dansie"
+    }
+  ]
 }

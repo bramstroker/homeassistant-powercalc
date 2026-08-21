@@ -12,8 +12,10 @@
   },
   "name": "SmarterHome 10W White Smart Bulb",
   "standby_power": 1.0,
-  "author_info": {
-    "name": "Stuart Mackintosh",
-    "github": "stuartmackintosh"
-  }
+  "authors": [
+    {
+      "name": "Stuart Mackintosh",
+      "github": "stuartmackintosh"
+    }
+  ]
 }

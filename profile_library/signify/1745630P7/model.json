@@ -15,8 +15,10 @@
   },
   "name": "Hue Nyro Outdoor Wall",
   "standby_power": 0.27,
-  "author_info": {
-    "name": "Imperial-Guard",
-    "github": "Imperial-Guard"
-  }
+  "authors": [
+    {
+      "name": "Imperial-Guard",
+      "github": "Imperial-Guard"
+    }
+  ]
 }

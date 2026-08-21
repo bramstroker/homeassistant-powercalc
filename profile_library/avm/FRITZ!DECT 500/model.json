@@ -12,8 +12,10 @@
   },
   "name": "FRITZ!DECT 500",
   "standby_power": 0.39,
-  "author_info": {
-    "name": "NickBaer",
-    "github": "NickBaer"
-  }
+  "authors": [
+    {
+      "name": "NickBaer",
+      "github": "NickBaer"
+    }
+  ]
 }

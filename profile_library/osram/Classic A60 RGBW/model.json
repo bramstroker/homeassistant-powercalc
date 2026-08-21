@@ -12,9 +12,11 @@
   },
   "name": "LIGHTIFY Classic A60 RGBW",
   "standby_power": 0.6,
-  "author_info": {
-    "name": "PalminX",
-    "email": "bkuemmer@gmx.net",
-    "github": "PalminX"
-  }
+  "authors": [
+    {
+      "name": "PalminX",
+      "email": "bkuemmer@gmx.net",
+      "github": "PalminX"
+    }
+  ]
 }

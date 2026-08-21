@@ -13,8 +13,10 @@
   },
   "name": "A19",
   "standby_power": 0.5,
-  "author_info": {
-    "name": "xpenno255",
-    "github": "xpenno255"
-  }
+  "authors": [
+    {
+      "name": "xpenno255",
+      "github": "xpenno255"
+    }
+  ]
 }

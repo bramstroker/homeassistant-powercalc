@@ -15,9 +15,11 @@
   },
   "name": "Smart Wi-Fi LED Light Bulb (dimmable, soft white)",
   "standby_power": 0.42,
-  "author_info": {
-    "name": "Emory Penney",
-    "email": "emory.j.penney@intel.com",
-    "github": "ejpenney"
-  }
+  "authors": [
+    {
+      "name": "Emory Penney",
+      "email": "emory.j.penney@intel.com",
+      "github": "ejpenney"
+    }
+  ]
 }

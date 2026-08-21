@@ -26,8 +26,10 @@
   "measure_method": "script",
   "name": "Play:1",
   "standby_power": 3.31,
-  "author_info": {
-    "name": "alvinchen1",
-    "github": "alvinchen1"
-  }
+  "authors": [
+    {
+      "name": "alvinchen1",
+      "github": "alvinchen1"
+    }
+  ]
 }

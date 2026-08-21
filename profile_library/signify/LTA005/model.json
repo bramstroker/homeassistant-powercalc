@@ -16,9 +16,11 @@
   },
   "name": "Hue White Ambiance Filament Standard",
   "standby_power": 0.13,
-  "author_info": {
-    "name": "Niklas Ausborn",
-    "email": "niklas@ausborn.de",
-    "github": "Midbin"
-  }
+  "authors": [
+    {
+      "name": "Niklas Ausborn",
+      "email": "niklas@ausborn.de",
+      "github": "Midbin"
+    }
+  ]
 }

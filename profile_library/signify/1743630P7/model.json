@@ -15,9 +15,11 @@
   },
   "name": "Hue Welcome outdoor wall",
   "standby_power": 0.5,
-  "author_info": {
-    "name": "Paul Bottein",
-    "email": "paul.bottein@gmail.com",
-    "github": "piitaya"
-  }
+  "authors": [
+    {
+      "name": "Paul Bottein",
+      "email": "paul.bottein@gmail.com",
+      "github": "piitaya"
+    }
+  ]
 }

@@ -32,8 +32,10 @@
   },
   "name": "Beoplay M5",
   "standby_power": 3.2,
-  "author_info": {
-    "name": "Steffen Brandsborg",
-    "github": "sbrandsborg"
-  }
+  "authors": [
+    {
+      "name": "Steffen Brandsborg",
+      "github": "sbrandsborg"
+    }
+  ]
 }

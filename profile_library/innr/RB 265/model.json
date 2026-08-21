@@ -12,9 +12,11 @@
   },
   "name": "Smart Bulb White E27 (2700K)",
   "standby_power": 0.5,
-  "author_info": {
-    "name": "flipsa",
-    "email": "n00dl3s@gmx.net",
-    "github": "flipsa"
-  }
+  "authors": [
+    {
+      "name": "flipsa",
+      "email": "n00dl3s@gmx.net",
+      "github": "flipsa"
+    }
+  ]
 }

@@ -15,8 +15,10 @@
   },
   "name": "GUNNARP LED Ceiling / Wall Lamp 40cm",
   "standby_power": 0.05,
-  "author_info": {
-    "name": "Servox3",
-    "github": "Servox3"
-  }
+  "authors": [
+    {
+      "name": "Servox3",
+      "github": "Servox3"
+    }
+  ]
 }

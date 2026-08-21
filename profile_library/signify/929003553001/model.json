@@ -12,8 +12,10 @@
   },
   "name": "Hue outdoor Resonate downward wall lamp",
   "standby_power": 0.66,
-  "author_info": {
-    "name": "posixx",
-    "github": "posixx"
-  }
+  "authors": [
+    {
+      "name": "posixx",
+      "github": "posixx"
+    }
+  ]
 }

@@ -12,9 +12,11 @@
   },
   "name": "Hue White Bulb A19 840lm",
   "standby_power": 0.34,
-  "author_info": {
-    "name": "mariwing",
-    "email": "mariwing@gmail.com",
-    "github": "mariwing"
-  }
+  "authors": [
+    {
+      "name": "mariwing",
+      "email": "mariwing@gmail.com",
+      "github": "mariwing"
+    }
+  ]
 }

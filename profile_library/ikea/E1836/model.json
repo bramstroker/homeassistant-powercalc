@@ -13,9 +13,11 @@
   "only_self_usage": false,
   "standby_power": 0.21,
   "standby_power_on": 0.78,
-  "author_info": {
-    "name": "confucius78",
-    "email": "dekker.wj@gmail.com",
-    "github": "confucius78"
-  }
+  "authors": [
+    {
+      "name": "confucius78",
+      "email": "dekker.wj@gmail.com",
+      "github": "confucius78"
+    }
+  ]
 }

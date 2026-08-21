@@ -16,9 +16,11 @@
   },
   "name": "KAJPLATS E27 WS G60 clear 470lm",
   "standby_power": 0.07,
-  "author_info": {
-    "name": "Linus Nordin",
-    "email": "linus.nordin@gmail.com",
-    "github": "gribber"
-  }
+  "authors": [
+    {
+      "name": "Linus Nordin",
+      "email": "linus.nordin@gmail.com",
+      "github": "gribber"
+    }
+  ]
 }

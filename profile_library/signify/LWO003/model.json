@@ -12,9 +12,11 @@
   },
   "name": "Hue White Filament Bulb G125 E27 w/ BT",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "geelenbert",
-    "email": "mail2bert@gmail.com",
-    "github": "geelenbert"
-  }
+  "authors": [
+    {
+      "name": "geelenbert",
+      "email": "mail2bert@gmail.com",
+      "github": "geelenbert"
+    }
+  ]
 }

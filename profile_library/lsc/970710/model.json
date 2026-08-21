@@ -15,8 +15,10 @@
   },
   "name": "Smart RGB-CCT GU10 LED Reflector Lamp",
   "standby_power": 1.13,
-  "author_info": {
-    "name": "Jort",
-    "github": "JortvanSchijndel"
-  }
+  "authors": [
+    {
+      "name": "Jort",
+      "github": "JortvanSchijndel"
+    }
+  ]
 }

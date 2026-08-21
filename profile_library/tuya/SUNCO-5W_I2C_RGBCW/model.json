@@ -12,9 +12,11 @@
   },
   "name": "Sunco G25 LED Smart Bulb, WiFi",
   "standby_power": 0.7,
-  "author_info": {
-    "name": "Emory Penney",
-    "email": "emory.j.penney@intel.com",
-    "github": "ejpenney"
-  }
+  "authors": [
+    {
+      "name": "Emory Penney",
+      "email": "emory.j.penney@intel.com",
+      "github": "ejpenney"
+    }
+  ]
 }

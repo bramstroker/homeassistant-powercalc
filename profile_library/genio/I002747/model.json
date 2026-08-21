@@ -12,9 +12,11 @@
   },
   "name": "Wi-Fi Dimmable 5 W G95 CCT Filament LED Bulb",
   "standby_power": 0.7,
-  "author_info": {
-    "name": "Daniel O'Connor",
-    "email": "daniel.oconnor@gmail.com",
-    "github": "CloCkWeRX"
-  }
+  "authors": [
+    {
+      "name": "Daniel O'Connor",
+      "email": "daniel.oconnor@gmail.com",
+      "github": "CloCkWeRX"
+    }
+  ]
 }

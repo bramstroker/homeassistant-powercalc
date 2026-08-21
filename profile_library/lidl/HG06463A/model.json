@@ -12,8 +12,10 @@
   },
   "name": "Livarno Lux E27 ST64 Filament Bulb",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "bobsbrain",
-    "github": "bobsbrain"
-  }
+  "authors": [
+    {
+      "name": "bobsbrain",
+      "github": "bobsbrain"
+    }
+  ]
 }

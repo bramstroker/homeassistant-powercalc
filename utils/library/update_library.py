@@ -147,12 +147,18 @@ async def process_author_update(model_json_path: str) -> None:
         json_data = json.loads(content)
 
     changed = False
-    if is_main_model_json(model_json_path) and not has_author_info(json_data):
+    if "author_info" in json_data:
+        legacy_author = json_data.pop("author_info")
+        if "authors" not in json_data and isinstance(legacy_author, dict):
+            json_data["authors"] = [legacy_author]
+        changed = True
+
+    if is_main_model_json(model_json_path) and not has_authors(json_data):
         author = await find_first_commit_author(model_json_path)
         if author is None:
             print(f"Skipping {model_json_path}, author not found")
         else:
-            json_data["author_info"] = author_to_json(author)
+            json_data["authors"] = [author_to_json(author)]
             changed = True
 
     if "author" in json_data:
@@ -167,9 +173,15 @@ async def process_author_update(model_json_path: str) -> None:
     print(f"Updated author metadata in {model_json_path}")
 
 
-def has_author_info(model_data: dict[str, Any]) -> bool:
-    author_info = model_data.get("author_info")
-    return isinstance(author_info, dict) and bool(author_info.get("name")) and bool(author_info.get("github"))
+def has_authors(model_data: dict[str, Any]) -> bool:
+    authors = model_data.get("authors")
+    return (
+        isinstance(authors, list)
+        and bool(authors)
+        and all(
+            isinstance(author, dict) and bool(author.get("name")) and bool(author.get("github")) for author in authors
+        )
+    )
 
 
 def is_main_model_json(model_json_path: str) -> bool:

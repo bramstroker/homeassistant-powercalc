@@ -15,8 +15,10 @@
   },
   "name": "TRADFRI bulb GU10 CWS 345lm",
   "standby_power": 0.18,
-  "author_info": {
-    "name": "marthubner",
-    "github": "marthubner"
-  }
+  "authors": [
+    {
+      "name": "marthubner",
+      "github": "marthubner"
+    }
+  ]
 }

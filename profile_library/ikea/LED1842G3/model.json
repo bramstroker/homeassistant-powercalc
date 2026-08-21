@@ -15,9 +15,11 @@
   },
   "name": "TRADFRI bulb E27 WW clear 250lm",
   "standby_power": 0.551,
-  "author_info": {
-    "name": "alanpaone",
-    "email": "alanpaone@gmail.com",
-    "github": "alanpaone"
-  }
+  "authors": [
+    {
+      "name": "alanpaone",
+      "email": "alanpaone@gmail.com",
+      "github": "alanpaone"
+    }
+  ]
 }

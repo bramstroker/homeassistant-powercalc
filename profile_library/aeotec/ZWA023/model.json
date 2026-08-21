@@ -14,8 +14,10 @@
   "only_self_usage": true,
   "standby_power": 0.7,
   "standby_power_on": 0.8,
-  "author_info": {
-    "name": "Josh Barnard",
-    "github": "barndawgie"
-  }
+  "authors": [
+    {
+      "name": "Josh Barnard",
+      "github": "barndawgie"
+    }
+  ]
 }

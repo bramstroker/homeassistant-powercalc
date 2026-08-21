@@ -12,9 +12,11 @@
   "name": "Neon Rope Light",
   "standby_power": 2.67,
   "device_type": "light",
-  "author_info": {
-    "name": "Minne",
-    "email": "fendersfolly@icloud.com",
-    "github": "miniminne"
-  }
+  "authors": [
+    {
+      "name": "Minne",
+      "email": "fendersfolly@icloud.com",
+      "github": "miniminne"
+    }
+  ]
 }

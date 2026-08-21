@@ -15,9 +15,11 @@
   },
   "name": "FLOALT panel WS 60x60",
   "standby_power": 0.12,
-  "author_info": {
-    "name": "confucius78",
-    "email": "dekker.wj@gmail.com",
-    "github": "confucius78"
-  }
+  "authors": [
+    {
+      "name": "confucius78",
+      "email": "dekker.wj@gmail.com",
+      "github": "confucius78"
+    }
+  ]
 }

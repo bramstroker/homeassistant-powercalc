@@ -12,8 +12,10 @@
   },
   "name": "Hue White Ambiance A19 E26 (75W)",
   "standby_power": 0.35,
-  "author_info": {
-    "name": "dxmnkd316",
-    "github": "dxmnkd316"
-  }
+  "authors": [
+    {
+      "name": "dxmnkd316",
+      "github": "dxmnkd316"
+    }
+  ]
 }

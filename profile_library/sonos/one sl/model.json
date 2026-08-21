@@ -24,8 +24,10 @@
   "measure_method": "script",
   "name": "One SL",
   "standby_power": 2.83,
-  "author_info": {
-    "name": "Chris",
-    "github": "darthsebulba04"
-  }
+  "authors": [
+    {
+      "name": "Chris",
+      "github": "darthsebulba04"
+    }
+  ]
 }

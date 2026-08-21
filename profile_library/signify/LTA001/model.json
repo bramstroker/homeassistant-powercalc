@@ -13,8 +13,10 @@
   "measure_method": "script",
   "name": "Hue White Ambiance E27",
   "standby_power": 0.29,
-  "author_info": {
-    "name": "smonesi",
-    "github": "smonesi"
-  }
+  "authors": [
+    {
+      "name": "smonesi",
+      "github": "smonesi"
+    }
+  ]
 }

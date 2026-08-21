@@ -12,9 +12,11 @@
   },
   "name": "Smart Bulb Colour E27 1200lm",
   "standby_power": 0.31,
-  "author_info": {
-    "name": "Felix",
-    "email": "felixsp@posteo.de",
-    "github": "felixsp"
-  }
+  "authors": [
+    {
+      "name": "Felix",
+      "email": "felixsp@posteo.de",
+      "github": "felixsp"
+    }
+  ]
 }

@@ -12,9 +12,11 @@
   },
   "name": "Livarno Lux E14 candle CCT",
   "standby_power": 0.31,
-  "author_info": {
-    "name": "Paul Mc Auley",
-    "email": "dev@roscarraig.com",
-    "github": "roscarraig"
-  }
+  "authors": [
+    {
+      "name": "Paul Mc Auley",
+      "email": "dev@roscarraig.com",
+      "github": "roscarraig"
+    }
+  ]
 }

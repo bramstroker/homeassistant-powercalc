@@ -12,9 +12,11 @@
   },
   "name": "Smart Spot Comfort",
   "standby_power": 0.33,
-  "author_info": {
-    "name": "Desaydrone",
-    "email": "tarlak.Desaydrone@gmail.com",
-    "github": "Desaydrone"
-  }
+  "authors": [
+    {
+      "name": "Desaydrone",
+      "email": "tarlak.Desaydrone@gmail.com",
+      "github": "Desaydrone"
+    }
+  ]
 }

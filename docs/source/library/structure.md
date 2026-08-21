@@ -30,7 +30,7 @@ Below is a comprehensive table of all fields that can be used in a `model.json` 
 | `measure_method`                  | string           | Yes | How the device was measured (manual, script)                                                                                            |
 | `measure_device`                  | string           | Yes | Device which was used to measure (e.g., `Shelly PM Gen 3`)                                                                              |
 | `created_at`                      | string           | Yes | Creation date of the profile (ISO 8601 format, e.g., `2023-06-19T08:02:31`)                                                             |
-| `author`                          | string           | Yes | Author of the profile                                                                                                                   |
+| `authors`                         | array of objects | No | Contributors to the profile; each object has required `name` and `github`, plus optional `email`                                      |
 | `aliases`                         | array of strings | No | Alternative model id's for this model, used for discovery purposes                                                                      |
 | `compatible_integrations`         | array of strings | No | List of compatible integration platforms (e.g., "hue", "lifx"). Only entities from these integrations will be discovered                     |
 | `calculation_enabled_condition`   | string           | No | Template which can be evaluated to determine if calculation is enabled                                                                  |

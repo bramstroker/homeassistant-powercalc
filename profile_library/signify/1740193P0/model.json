@@ -16,8 +16,10 @@
   },
   "name": "Hue Lucca Outdoor Wall Light",
   "standby_power": 0.35,
-  "author_info": {
-    "name": "TyzzyT",
-    "github": "TyzzyT"
-  }
+  "authors": [
+    {
+      "name": "TyzzyT",
+      "github": "TyzzyT"
+    }
+  ]
 }

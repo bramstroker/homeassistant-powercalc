@@ -17,9 +17,11 @@
   "name": "Dimmer",
   "only_self_usage": true,
   "standby_power": 0.596,
-  "author_info": {
-    "name": "Michal Bartak",
-    "email": "michal.bartak@betsys.com",
-    "github": "michalk-k"
-  }
+  "authors": [
+    {
+      "name": "Michal Bartak",
+      "email": "michal.bartak@betsys.com",
+      "github": "michalk-k"
+    }
+  ]
 }

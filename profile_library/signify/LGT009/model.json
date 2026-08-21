@@ -12,8 +12,10 @@
   },
   "name": "Hue Play wall washer",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "phoenixxx-1",
-    "github": "phoenixxx-1"
-  }
+  "authors": [
+    {
+      "name": "phoenixxx-1",
+      "github": "phoenixxx-1"
+    }
+  ]
 }

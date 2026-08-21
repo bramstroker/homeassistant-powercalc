@@ -16,9 +16,11 @@
   },
   "name": "1L Gen3",
   "only_self_usage": true,
-  "author_info": {
-    "name": "Victor Burlacu-Zane",
-    "email": "vvbbzz@yahoo.com",
-    "github": "besteru"
-  }
+  "authors": [
+    {
+      "name": "Victor Burlacu-Zane",
+      "email": "vvbbzz@yahoo.com",
+      "github": "besteru"
+    }
+  ]
 }

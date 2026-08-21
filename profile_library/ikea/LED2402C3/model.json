@@ -20,8 +20,10 @@
     "min": 231.3,
     "max": 235.6
   },
-  "author_info": {
-    "name": "Keysie",
-    "github": "keysie"
-  }
+  "authors": [
+    {
+      "name": "Keysie",
+      "github": "keysie"
+    }
+  ]
 }

@@ -12,8 +12,10 @@
   },
   "name": "RGB+CCT 9 W Zigbee Downlight",
   "standby_power": 0.22,
-  "author_info": {
-    "name": "Peklaa",
-    "github": "Peklaa"
-  }
+  "authors": [
+    {
+      "name": "Peklaa",
+      "github": "Peklaa"
+    }
+  ]
 }

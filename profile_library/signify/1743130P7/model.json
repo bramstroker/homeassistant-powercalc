@@ -13,8 +13,10 @@
   "measure_method": "script",
   "name": "Hue Impress Pedestal Low",
   "standby_power": 0.17,
-  "author_info": {
-    "name": "Cafun",
-    "github": "Cafun"
-  }
+  "authors": [
+    {
+      "name": "Cafun",
+      "github": "Cafun"
+    }
+  ]
 }

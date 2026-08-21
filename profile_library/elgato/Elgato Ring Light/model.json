@@ -12,9 +12,11 @@
   },
   "name": "Ring Light",
   "standby_power": 0.45,
-  "author_info": {
-    "name": "Marc Geurts",
-    "email": "geurtsmarc@hotmail.com",
-    "github": "marcgeurts"
-  }
+  "authors": [
+    {
+      "name": "Marc Geurts",
+      "email": "geurtsmarc@hotmail.com",
+      "github": "marcgeurts"
+    }
+  ]
 }

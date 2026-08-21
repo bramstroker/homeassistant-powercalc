@@ -12,9 +12,11 @@
   },
   "name": "LED light bulb (tunable white)",
   "standby_power": 0.41,
-  "author_info": {
-    "name": "RubenKelevra",
-    "email": "cyrond@gmail.com",
-    "github": "RubenKelevra"
-  }
+  "authors": [
+    {
+      "name": "RubenKelevra",
+      "email": "cyrond@gmail.com",
+      "github": "RubenKelevra"
+    }
+  ]
 }

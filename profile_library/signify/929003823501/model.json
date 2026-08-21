@@ -12,8 +12,10 @@
   },
   "name": "Hue Tento round panel (White Ambiance)",
   "standby_power": 0.05,
-  "author_info": {
-    "name": "Lukas Köhl",
-    "github": "lkoehl"
-  }
+  "authors": [
+    {
+      "name": "Lukas Köhl",
+      "github": "lkoehl"
+    }
+  ]
 }

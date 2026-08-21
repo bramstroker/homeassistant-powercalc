@@ -25,9 +25,11 @@
   },
   "name": "Hue white and color GU10 4.2W 400lm",
   "standby_power": 0.14,
-  "author_info": {
-    "name": "Wouter Rutgers",
-    "email": "git@wouterrutgers.nl",
-    "github": "wouterrutgers"
-  }
+  "authors": [
+    {
+      "name": "Wouter Rutgers",
+      "email": "git@wouterrutgers.nl",
+      "github": "wouterrutgers"
+    }
+  ]
 }

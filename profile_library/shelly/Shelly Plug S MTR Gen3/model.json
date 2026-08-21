@@ -15,9 +15,11 @@
   },
   "name": "Plug S Gen3",
   "only_self_usage": true,
-  "author_info": {
-    "name": "Largelos",
-    "email": "vasilenkoeyu@gmail.com",
-    "github": "Largelos"
-  }
+  "authors": [
+    {
+      "name": "Largelos",
+      "email": "vasilenkoeyu@gmail.com",
+      "github": "Largelos"
+    }
+  ]
 }

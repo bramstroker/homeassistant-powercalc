@@ -12,8 +12,10 @@
   },
   "name": "Livarno Lux GU10 spot RGB",
   "standby_power": 0.28,
-  "author_info": {
-    "name": "aqwserf",
-    "github": "aqwserf"
-  }
+  "authors": [
+    {
+      "name": "aqwserf",
+      "github": "aqwserf"
+    }
+  ]
 }

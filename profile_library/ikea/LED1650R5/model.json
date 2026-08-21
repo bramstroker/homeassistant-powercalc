@@ -10,9 +10,11 @@
   "measure_method": "manual",
   "name": "TRADFRI bulb GU10 W 400lm",
   "standby_power": 0.38,
-  "author_info": {
-    "name": "nepozs",
-    "email": "szopen@os.pl",
-    "github": "nepozs"
-  }
+  "authors": [
+    {
+      "name": "nepozs",
+      "email": "szopen@os.pl",
+      "github": "nepozs"
+    }
+  ]
 }

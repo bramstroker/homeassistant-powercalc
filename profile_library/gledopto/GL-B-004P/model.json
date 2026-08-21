@@ -12,8 +12,10 @@
   },
   "name": "Filament LED light bulb E27 G95 7W",
   "standby_power": 0.36,
-  "author_info": {
-    "name": "Jurjen",
-    "github": "Coornh"
-  }
+  "authors": [
+    {
+      "name": "Jurjen",
+      "github": "Coornh"
+    }
+  ]
 }

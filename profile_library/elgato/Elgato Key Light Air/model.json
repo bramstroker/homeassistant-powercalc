@@ -12,8 +12,10 @@
   },
   "name": "Key Light Air",
   "standby_power": 0.41,
-  "author_info": {
-    "name": "BeardedTinker",
-    "github": "BeardedTinker"
-  }
+  "authors": [
+    {
+      "name": "BeardedTinker",
+      "github": "BeardedTinker"
+    }
+  ]
 }

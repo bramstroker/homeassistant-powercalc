@@ -15,9 +15,11 @@
   },
   "name": "Hue White Ambiance E26",
   "standby_power": 0.29,
-  "author_info": {
-    "name": "Scott Hoyt",
-    "email": "scottrhoyt@gmail.com",
-    "github": "scottrhoyt"
-  }
+  "authors": [
+    {
+      "name": "Scott Hoyt",
+      "email": "scottrhoyt@gmail.com",
+      "github": "scottrhoyt"
+    }
+  ]
 }

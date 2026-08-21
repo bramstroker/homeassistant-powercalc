@@ -10,9 +10,11 @@
   "measure_device": "Nous A1Z",
   "measure_method": "manual",
   "name": "FRITZ!Box 5690 Pro",
-  "author_info": {
-    "name": "Robert M. Albrecht",
-    "email": "powercalc@romal.org",
-    "github": "rmalbrecht"
-  }
+  "authors": [
+    {
+      "name": "Robert M. Albrecht",
+      "email": "powercalc@romal.org",
+      "github": "rmalbrecht"
+    }
+  ]
 }

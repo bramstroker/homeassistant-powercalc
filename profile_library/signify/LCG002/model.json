@@ -32,8 +32,10 @@
   "measure_method": "script",
   "name": "Hue White and Color Ambiance GU10 BT",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Stefan Gries",
-    "github": "stefangries"
-  }
+  "authors": [
+    {
+      "name": "Stefan Gries",
+      "github": "stefangries"
+    }
+  ]
 }

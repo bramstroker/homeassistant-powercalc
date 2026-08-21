@@ -13,8 +13,10 @@
   },
   "name": "Livarno Lux E27 filament bulb",
   "standby_power": 0.2,
-  "author_info": {
-    "name": "Stefan Gries",
-    "github": "stefangries"
-  }
+  "authors": [
+    {
+      "name": "Stefan Gries",
+      "github": "stefangries"
+    }
+  ]
 }

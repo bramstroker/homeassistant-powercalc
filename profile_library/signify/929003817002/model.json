@@ -12,8 +12,10 @@
   },
   "name": "Hue Solo Lightstrip (5m)",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "Gerd Rütten",
-    "github": "GerdRuetten"
-  }
+  "authors": [
+    {
+      "name": "Gerd Rütten",
+      "github": "GerdRuetten"
+    }
+  ]
 }

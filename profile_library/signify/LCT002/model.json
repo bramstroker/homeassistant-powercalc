@@ -12,8 +12,10 @@
   },
   "name": "Hue White and Color Ambiance BR30 (1st Gen)",
   "standby_power": 0.12,
-  "author_info": {
-    "name": "Ben Brooks",
-    "github": "brooksben11"
-  }
+  "authors": [
+    {
+      "name": "Ben Brooks",
+      "github": "brooksben11"
+    }
+  ]
 }

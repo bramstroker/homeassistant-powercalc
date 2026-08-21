@@ -11,8 +11,10 @@
   "measure_method": "script",
   "name": "LIGHTIFY Indoor Flex RGBW 3P (1.8m)",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "Stefan Gries",
-    "github": "stefangries"
-  }
+  "authors": [
+    {
+      "name": "Stefan Gries",
+      "github": "stefangries"
+    }
+  ]
 }

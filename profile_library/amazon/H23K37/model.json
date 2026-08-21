@@ -31,8 +31,10 @@
   },
   "name": "Echo Show 5 (Gen1)",
   "standby_power": 2.7,
-  "author_info": {
-    "name": "Jarod2801",
-    "github": "Jarod2801"
-  }
+  "authors": [
+    {
+      "name": "Jarod2801",
+      "github": "Jarod2801"
+    }
+  ]
 }

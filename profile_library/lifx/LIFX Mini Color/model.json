@@ -12,9 +12,11 @@
   },
   "name": "Mini Color",
   "standby_power": 0.5,
-  "author_info": {
-    "name": "Jacob Donenfeld",
-    "email": "jacobdonenfeld@gmail.com",
-    "github": "jacobdonenfeld"
-  }
+  "authors": [
+    {
+      "name": "Jacob Donenfeld",
+      "email": "jacobdonenfeld@gmail.com",
+      "github": "jacobdonenfeld"
+    }
+  ]
 }

@@ -13,9 +13,11 @@
   },
   "name": "Smart 24ft LED Color Changing Plug-In String Lights",
   "standby_power": 1.45,
-  "author_info": {
-    "name": "Chris Hallgren",
-    "email": "challgren@gmail.com",
-    "github": "challgren"
-  }
+  "authors": [
+    {
+      "name": "Chris Hallgren",
+      "email": "challgren@gmail.com",
+      "github": "challgren"
+    }
+  ]
 }

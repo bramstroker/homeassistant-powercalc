@@ -28,8 +28,10 @@
   },
   "name": "Nest Audio",
   "standby_power": 1.8,
-  "author_info": {
-    "name": "sunjaxx",
-    "github": "sunjaxx"
-  }
+  "authors": [
+    {
+      "name": "sunjaxx",
+      "github": "sunjaxx"
+    }
+  ]
 }

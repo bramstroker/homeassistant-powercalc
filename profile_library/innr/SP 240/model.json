@@ -9,9 +9,11 @@
   "only_self_usage": true,
   "standby_power": 0.2,
   "standby_power_on": 0.75,
-  "author_info": {
-    "name": "Tim van Werkhoven",
-    "email": "tim+github.com@vanwerkhoven.org",
-    "github": "tvwerkhoven"
-  }
+  "authors": [
+    {
+      "name": "Tim van Werkhoven",
+      "email": "tim+github.com@vanwerkhoven.org",
+      "github": "tvwerkhoven"
+    }
+  ]
 }

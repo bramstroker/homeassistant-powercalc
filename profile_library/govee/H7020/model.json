@@ -12,9 +12,11 @@
   },
   "name": "String lights",
   "standby_power": 1.8,
-  "author_info": {
-    "name": "Chris Hallgren",
-    "email": "challgren@gmail.com",
-    "github": "challgren"
-  }
+  "authors": [
+    {
+      "name": "Chris Hallgren",
+      "email": "challgren@gmail.com",
+      "github": "challgren"
+    }
+  ]
 }

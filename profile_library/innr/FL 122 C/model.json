@@ -12,9 +12,11 @@
   },
   "name": "Light Strip Colour",
   "standby_power": 0.3,
-  "author_info": {
-    "name": "Amjad Saadeh",
-    "email": "amjad@saadeh.dev",
-    "github": "amjadsaadeh"
-  }
+  "authors": [
+    {
+      "name": "Amjad Saadeh",
+      "email": "amjad@saadeh.dev",
+      "github": "amjadsaadeh"
+    }
+  ]
 }

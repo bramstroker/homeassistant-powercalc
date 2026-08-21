@@ -19,9 +19,11 @@
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
-  "author_info": {
-    "name": "Justin Hahn",
-    "email": "hahnjustin27@gmail.com",
-    "github": "justinh998"
-  }
+  "authors": [
+    {
+      "name": "Justin Hahn",
+      "email": "hahnjustin27@gmail.com",
+      "github": "justinh998"
+    }
+  ]
 }

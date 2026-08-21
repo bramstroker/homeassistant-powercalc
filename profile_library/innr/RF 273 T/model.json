@@ -12,9 +12,11 @@
   },
   "name": "Smart Filament Bulb E27 Tunable ",
   "standby_power": 0.18,
-  "author_info": {
-    "name": "Felix",
-    "email": "felixsp@posteo.de",
-    "github": "felixsp"
-  }
+  "authors": [
+    {
+      "name": "Felix",
+      "email": "felixsp@posteo.de",
+      "github": "felixsp"
+    }
+  ]
 }

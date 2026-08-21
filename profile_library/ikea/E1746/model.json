@@ -14,9 +14,11 @@
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
-  "author_info": {
-    "name": "confucius78",
-    "email": "dekker.wj@gmail.com",
-    "github": "confucius78"
-  }
+  "authors": [
+    {
+      "name": "confucius78",
+      "email": "dekker.wj@gmail.com",
+      "github": "confucius78"
+    }
+  ]
 }

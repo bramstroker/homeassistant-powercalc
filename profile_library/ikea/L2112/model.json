@@ -15,8 +15,10 @@
   },
   "name": "ORMANAS LED Strip",
   "standby_power": 0.1,
-  "author_info": {
-    "name": "Marius",
-    "github": "Mariusthvdb"
-  }
+  "authors": [
+    {
+      "name": "Marius",
+      "github": "Mariusthvdb"
+    }
+  ]
 }

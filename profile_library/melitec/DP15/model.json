@@ -12,9 +12,11 @@
   },
   "name": "LightZone DP15 LED-Pendelleuchte",
   "standby_power": 0.83,
-  "author_info": {
-    "name": "RubenKelevra",
-    "email": "cyrond@gmail.com",
-    "github": "RubenKelevra"
-  }
+  "authors": [
+    {
+      "name": "RubenKelevra",
+      "email": "cyrond@gmail.com",
+      "github": "RubenKelevra"
+    }
+  ]
 }

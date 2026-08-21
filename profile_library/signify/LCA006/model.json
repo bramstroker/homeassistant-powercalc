@@ -12,8 +12,10 @@
   "measure_method": "script",
   "name": "Hue White and Color Ambiance E27 1100lm with BT",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Thomas-Henning von Kamptz",
-    "github": "tomsoftcom"
-  }
+  "authors": [
+    {
+      "name": "Thomas-Henning von Kamptz",
+      "github": "tomsoftcom"
+    }
+  ]
 }

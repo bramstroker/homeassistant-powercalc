@@ -7,8 +7,10 @@
   "measure_method": "script",
   "name": "B02 Light with dimmer and temperature",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "Francisco Bischoff",
-    "github": "franzbischoff"
-  }
+  "authors": [
+    {
+      "name": "Francisco Bischoff",
+      "github": "franzbischoff"
+    }
+  ]
 }

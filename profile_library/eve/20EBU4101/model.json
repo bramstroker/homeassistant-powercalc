@@ -17,8 +17,10 @@
   "only_self_usage": true,
   "standby_power": 0.4,
   "standby_power_on": 0.9,
-  "author_info": {
-    "name": "dxmnkd316",
-    "github": "dxmnkd316"
-  }
+  "authors": [
+    {
+      "name": "dxmnkd316",
+      "github": "dxmnkd316"
+    }
+  ]
 }

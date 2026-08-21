@@ -13,9 +13,11 @@
   },
   "name": "Connected A-19 60W Equivalent",
   "standby_power": 0.25,
-  "author_info": {
-    "name": "Mark Atwood",
-    "email": "me@mark.atwood.name",
-    "github": "fallenpegasus"
-  }
+  "authors": [
+    {
+      "name": "Mark Atwood",
+      "email": "me@mark.atwood.name",
+      "github": "fallenpegasus"
+    }
+  ]
 }

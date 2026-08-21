@@ -31,8 +31,10 @@
   },
   "name": "HomePod Gen 2",
   "standby_power": 1.01,
-  "author_info": {
-    "name": "laplacacm",
-    "github": "laplacacm"
-  }
+  "authors": [
+    {
+      "name": "laplacacm",
+      "github": "laplacacm"
+    }
+  ]
 }

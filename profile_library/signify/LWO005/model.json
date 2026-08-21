@@ -15,8 +15,10 @@
   },
   "name": "Hue smart bulb G93 warm white E27 7,2W ",
   "standby_power": 0.18,
-  "author_info": {
-    "name": "sve",
-    "github": "sve007"
-  }
+  "authors": [
+    {
+      "name": "sve",
+      "github": "sve007"
+    }
+  ]
 }

@@ -16,9 +16,11 @@
   },
   "name": "Bluetooth Mesh Smart LED Bulb (Dimmable CCT, 4 W)",
   "standby_power": 0.27,
-  "author_info": {
-    "name": "Ed Kutuev",
-    "email": "ed@napych.com",
-    "github": "napych"
-  }
+  "authors": [
+    {
+      "name": "Ed Kutuev",
+      "email": "ed@napych.com",
+      "github": "napych"
+    }
+  ]
 }

@@ -27,8 +27,10 @@
       }
     ]
   },
-  "author_info": {
-    "name": "Jamie De Vivo",
-    "github": "jamiedevivoo"
-  }
+  "authors": [
+    {
+      "name": "Jamie De Vivo",
+      "github": "jamiedevivoo"
+    }
+  ]
 }

@@ -16,8 +16,10 @@
   },
   "name": "LSC Smart Connect moodlight",
   "standby_power": 0.5,
-  "author_info": {
-    "name": "TyzzyT",
-    "github": "TyzzyT"
-  }
+  "authors": [
+    {
+      "name": "TyzzyT",
+      "github": "TyzzyT"
+    }
+  ]
 }

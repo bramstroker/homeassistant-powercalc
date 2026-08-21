@@ -32,8 +32,10 @@
     ]
   },
   "standby_power": 0.36,
-  "author_info": {
-    "name": "Lukas Köhl",
-    "github": "lkoehl"
-  }
+  "authors": [
+    {
+      "name": "Lukas Köhl",
+      "github": "lkoehl"
+    }
+  ]
 }

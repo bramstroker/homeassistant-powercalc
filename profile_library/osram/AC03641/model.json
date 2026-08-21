@@ -12,8 +12,10 @@
   },
   "name": "LIGHTIFY LED Classic A60 clear",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "ffm777",
-    "github": "ffm777"
-  }
+  "authors": [
+    {
+      "name": "ffm777",
+      "github": "ffm777"
+    }
+  ]
 }

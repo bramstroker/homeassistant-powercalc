@@ -1,8 +1,4 @@
 {
-  "author_info": {
-    "github": "buntwo",
-    "name": "buntwo"
-  },
   "calculation_strategy": "composite",
   "composite_config": [
     {
@@ -209,5 +205,11 @@
   "voltage_range": {
     "min": 116.6,
     "max": 118.6
-  }
+  },
+  "authors": [
+    {
+      "github": "buntwo",
+      "name": "buntwo"
+    }
+  ]
 }

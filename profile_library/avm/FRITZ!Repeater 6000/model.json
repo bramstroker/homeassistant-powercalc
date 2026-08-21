@@ -14,8 +14,10 @@
     "energy_sensor_naming": "{} Device Energy",
     "power_sensor_naming": "{} Device Power"
   },
-  "author_info": {
-    "name": "hpuac",
-    "github": "hpuac"
-  }
+  "authors": [
+    {
+      "name": "hpuac",
+      "github": "hpuac"
+    }
+  ]
 }

@@ -15,8 +15,10 @@
   },
   "name": "Hue white bulb E27 800lm 2700K with Bluetooth",
   "standby_power": 0.26,
-  "author_info": {
-    "name": "Peter",
-    "github": "PtPazuzu"
-  }
+  "authors": [
+    {
+      "name": "Peter",
+      "github": "PtPazuzu"
+    }
+  ]
 }

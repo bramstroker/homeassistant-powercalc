@@ -12,9 +12,11 @@
   },
   "name": "Hue white ambiance Still",
   "standby_power": 0.48,
-  "author_info": {
-    "name": "Kenneth Lerche Madsen",
-    "github": "dells2k",
-    "email": "kenneth.lm@gmail.com"
-  }
+  "authors": [
+    {
+      "name": "Kenneth Lerche Madsen",
+      "github": "dells2k",
+      "email": "kenneth.lm@gmail.com"
+    }
+  ]
 }

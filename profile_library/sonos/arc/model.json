@@ -28,9 +28,11 @@
   },
   "name": "Arc",
   "standby_power": 4.4,
-  "author_info": {
-    "name": "vandalon",
-    "email": "joris@vandalon.nl",
-    "github": "vandalon"
-  }
+  "authors": [
+    {
+      "name": "vandalon",
+      "email": "joris@vandalon.nl",
+      "github": "vandalon"
+    }
+  ]
 }

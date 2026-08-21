@@ -15,9 +15,11 @@
   },
   "name": "LED Bulb T2 (E26, RGB, CCT)",
   "standby_power": 0.14,
-  "author_info": {
-    "name": "pinkfin",
-    "github": "pinkfin",
-    "email": "hot.wire1618@fastmail.com"
-  }
+  "authors": [
+    {
+      "name": "pinkfin",
+      "github": "pinkfin",
+      "email": "hot.wire1618@fastmail.com"
+    }
+  ]
 }

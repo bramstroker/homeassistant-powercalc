@@ -13,9 +13,11 @@
   },
   "name": "NYMANE pendant lamp",
   "standby_power": 0.29,
-  "author_info": {
-    "name": "Mr. Bubbles",
-    "email": "manni@zapto.de",
-    "github": "tr4nt0r"
-  }
+  "authors": [
+    {
+      "name": "Mr. Bubbles",
+      "email": "manni@zapto.de",
+      "github": "tr4nt0r"
+    }
+  ]
 }

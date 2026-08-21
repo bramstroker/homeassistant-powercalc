@@ -15,8 +15,10 @@
   },
   "name": "Hue White Bulb A19 E26 with Bluetooth",
   "standby_power": 0.35,
-  "author_info": {
-    "name": "Zachery Notz",
-    "github": "TheZackCodec"
-  }
+  "authors": [
+    {
+      "name": "Zachery Notz",
+      "github": "TheZackCodec"
+    }
+  ]
 }

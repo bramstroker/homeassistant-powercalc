@@ -9,9 +9,11 @@
   "measure_device": "Nous A1T",
   "measure_method": "manual",
   "name": "4K Wi-Fi 6 Surveillance Camera",
-  "author_info": {
-    "name": "Robert M. Albrecht",
-    "email": "powercalc@romal.org",
-    "github": "rmalbrecht"
-  }
+  "authors": [
+    {
+      "name": "Robert M. Albrecht",
+      "email": "powercalc@romal.org",
+      "github": "rmalbrecht"
+    }
+  ]
 }

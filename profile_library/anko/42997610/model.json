@@ -12,9 +12,11 @@
   },
   "name": "Smart String Lights",
   "standby_power": 1.09,
-  "author_info": {
-    "name": "Daniel O'Connor",
-    "email": "daniel.oconnor@gmail.com",
-    "github": "CloCkWeRX"
-  }
+  "authors": [
+    {
+      "name": "Daniel O'Connor",
+      "email": "daniel.oconnor@gmail.com",
+      "github": "CloCkWeRX"
+    }
+  ]
 }

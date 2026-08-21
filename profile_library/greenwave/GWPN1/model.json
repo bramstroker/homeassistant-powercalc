@@ -9,9 +9,11 @@
   "only_self_usage": true,
   "standby_power": 0.3,
   "standby_power_on": 1.1,
-  "author_info": {
-    "name": "Bram Gerritsen",
-    "email": "bgerritsen@gmail.com",
-    "github": "bramstroker"
-  }
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
 }

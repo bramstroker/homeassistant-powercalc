@@ -9,8 +9,10 @@
   "only_self_usage": false,
   "standby_power": 0.24,
   "standby_power_on": 0.6,
-  "author_info": {
-    "name": "daloki83",
-    "github": "daloki83"
-  }
+  "authors": [
+    {
+      "name": "daloki83",
+      "github": "daloki83"
+    }
+  ]
 }

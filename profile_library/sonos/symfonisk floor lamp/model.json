@@ -28,8 +28,10 @@
   },
   "name": "SYMFONISK Floor lamp",
   "standby_power": 2.75,
-  "author_info": {
-    "name": "martinkura-svk",
-    "github": "martinkura-svk"
-  }
+  "authors": [
+    {
+      "name": "martinkura-svk",
+      "github": "martinkura-svk"
+    }
+  ]
 }

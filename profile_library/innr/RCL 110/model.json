@@ -12,9 +12,11 @@
   },
   "name": "Round Ceiling Light (Tunable White)",
   "standby_power": 0.4,
-  "author_info": {
-    "name": "vandalon",
-    "email": "joris@vandalon.nl",
-    "github": "vandalon"
-  }
+  "authors": [
+    {
+      "name": "vandalon",
+      "email": "joris@vandalon.nl",
+      "github": "vandalon"
+    }
+  ]
 }
