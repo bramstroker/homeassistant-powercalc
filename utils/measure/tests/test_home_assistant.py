@@ -14,6 +14,16 @@ def test_client_uses_canonical_websocket_url() -> None:
     assert client.api_url == "ws://127.0.0.1:8123/api/websocket"
 
 
+def test_client_sends_non_blocking_websocket_ping() -> None:
+    client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
+    websocket = MagicMock()
+    client._ws = websocket  # noqa: SLF001 - exercise the connected client's protocol adapter
+
+    client.send_ping()
+
+    websocket.ping.assert_called_once_with()
+
+
 def _entity_registry_entry(*, entity_id: str, unique_id: object) -> dict[str, object]:
     return {
         "created_at": "2026-07-18T12:00:00+00:00",
@@ -254,7 +264,8 @@ def test_keepalive_pings_a_connection_that_went_quiet() -> None:
 
     manager.send_keepalive()
 
-    client.ping_latency.assert_called_once_with()
+    client.send_ping.assert_called_once_with()
+    client.ping_latency.assert_not_called()
 
 
 def test_keepalive_stays_quiet_while_measurements_keep_the_socket_busy() -> None:
@@ -264,7 +275,19 @@ def test_keepalive_stays_quiet_while_measurements_keep_the_socket_busy() -> None
 
     manager.send_keepalive()
 
-    client.ping_latency.assert_not_called()
+    client.send_ping.assert_not_called()
+
+
+def test_keepalive_stays_quiet_after_shutdown_starts() -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    manager = _keepalive_manager(client)
+    manager.get_config()
+    manager._last_activity -= 60  # noqa: SLF001
+    manager._keepalive_stop.set()  # noqa: SLF001 - simulate close while the pinger waits for the client lock
+
+    manager.send_keepalive()
+
+    client.send_ping.assert_not_called()
 
 
 def test_keepalive_does_not_open_a_connection_of_its_own() -> None:
@@ -278,7 +301,7 @@ def test_keepalive_does_not_open_a_connection_of_its_own() -> None:
 
 def test_keepalive_discards_the_client_when_the_ping_fails() -> None:
     client = MagicMock(spec=HomeAssistantWebsocketClient)
-    client.ping_latency.side_effect = OSError("stream closed error")
+    client.send_ping.side_effect = OSError("stream closed error")
     manager = _keepalive_manager(client)
     manager.get_config()
     manager._last_activity -= 60  # noqa: SLF001
@@ -294,15 +317,15 @@ def test_keepalive_thread_pings_until_the_manager_is_closed() -> None:
     manager.get_config()
 
     for _ in range(100):
-        if client.ping_latency.call_count:
+        if client.send_ping.call_count:
             break
         sleep(0.01)
     manager.close()
-    pings_at_close = client.ping_latency.call_count
+    pings_at_close = client.send_ping.call_count
 
     assert pings_at_close > 0
     sleep(0.1)
-    assert client.ping_latency.call_count == pings_at_close
+    assert client.send_ping.call_count == pings_at_close
 
 
 def test_keepalive_interval_of_zero_starts_no_background_thread() -> None:
@@ -313,4 +336,4 @@ def test_keepalive_interval_of_zero_starts_no_background_thread() -> None:
     manager.get_config()
 
     assert manager._keepalive_thread is None  # noqa: SLF001
-    client.ping_latency.assert_not_called()
+    client.send_ping.assert_not_called()

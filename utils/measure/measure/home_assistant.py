@@ -6,7 +6,7 @@ import logging
 from threading import Event, RLock, Thread
 import time
 from types import TracebackType
-from typing import Any, Self
+from typing import Any, Protocol, Self, cast
 import urllib.parse
 
 from homeassistant_api import AsyncWebsocketClient, Entity, EntityRegistryEntry, Group, State, WebsocketClient
@@ -28,6 +28,10 @@ _LOGGER = logging.getLogger("measure")
 # without touching Home Assistant leaves the connection unanswered and gets dropped.
 # Pinging well inside that window keeps the socket alive across long measurements.
 KEEPALIVE_INTERVAL = 20.0
+
+
+class _WebSocketPingSender(Protocol):
+    def ping(self) -> None: ...
 
 
 class HomeAssistantDiscoveryError(RuntimeError):
@@ -133,6 +137,11 @@ class HomeAssistantWebsocketClient(WebsocketClient):
     def close(self) -> None:
         self.__exit__(None, None, None)
 
+    def send_ping(self) -> None:
+        """Send a WebSocket keepalive without waiting for the peer's PONG."""
+
+        cast(_WebSocketPingSender, self._ws).ping()
+
     def get_device_registry(self) -> list[dict[str, object]]:
         """Return Home Assistant device registry entries."""
 
@@ -220,15 +229,21 @@ class HomeAssistantManager:
     def send_keepalive(self) -> None:
         """Ping Home Assistant when the connection has gone quiet, never raising.
 
-        A failed ping discards the client so the next real call reconnects, which is
-        what the callers already expect from a dropped connection.
+        The protocol-level PING is intentionally send-only: waiting for an
+        application-level PONG could block this thread and every real call behind the
+        shared client lock. A failed send discards the client so the next real call
+        reconnects, which is what callers already expect from a dropped connection.
         """
 
         with self._lock:
-            if self._client is None or time.monotonic() - self._last_activity < self._keepalive_interval:
+            if (
+                self._keepalive_stop.is_set()
+                or self._client is None
+                or time.monotonic() - self._last_activity < self._keepalive_interval
+            ):
                 return
             try:
-                self._client.ping_latency()
+                self._client.send_ping()
             except Exception as error:  # noqa: BLE001 - a keepalive must never break the app
                 _LOGGER.debug("Home Assistant keepalive ping failed: %s", error)
                 if self._is_connection_error(error):
