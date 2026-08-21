@@ -7,10 +7,6 @@ Smart power meter. Powercalc profiles can be used to define the self usage of th
 ```json
 {
   "standby_power": 0.3,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
   "device_type": "power_meter",
   "calculation_strategy": "fixed",
   "discovery_by": "device",

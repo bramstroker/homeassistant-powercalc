@@ -42,6 +42,8 @@ async def test_multi_switch_legacy(hass: HomeAssistant) -> None:
     """
     Test that multi switch can be setup from profile library
     """
+    # This profile has no `only_self_usage`, so the sensors use the regular naming.
+    power_sensor_id = "sensor.outlet_power"
     switch1_id = "switch.outlet1"
     switch2_id = "switch.outlet2"
 
@@ -58,12 +60,18 @@ async def test_multi_switch_legacy(hass: HomeAssistant) -> None:
     )
 
     await set_states(hass, [(switch1_id, STATE_OFF), (switch2_id, STATE_OFF)])
-    await set_state_and_assert_power(hass, switch1_id, STATE_ON, "0.95")
-    await set_state_and_assert_power(hass, switch2_id, STATE_ON, "1.40")
-    await set_state_and_assert_power(hass, switch1_id, STATE_OFF, "0.95")
-    await set_state_and_assert_power(hass, switch2_id, STATE_OFF, "0.50")
+    await set_state_and_assert_power(hass, switch1_id, STATE_ON, "0.95", power_sensor_id)
+    await set_state_and_assert_power(hass, switch2_id, STATE_ON, "1.40", power_sensor_id)
+    await set_state_and_assert_power(hass, switch1_id, STATE_OFF, "0.95", power_sensor_id)
+    await set_state_and_assert_power(hass, switch2_id, STATE_OFF, "0.50", power_sensor_id)
 
 
-async def set_state_and_assert_power(hass: HomeAssistant, entity_id: str, state: str, expected_power: str) -> None:
+async def set_state_and_assert_power(
+    hass: HomeAssistant,
+    entity_id: str,
+    state: str,
+    expected_power: str,
+    power_sensor_id: str = "sensor.outlet_device_power",
+) -> None:
     await set_states(hass, [(entity_id, state)])
-    assert_entity_state(hass, "sensor.outlet_device_power", expected_power)
+    assert_entity_state(hass, power_sensor_id, expected_power)

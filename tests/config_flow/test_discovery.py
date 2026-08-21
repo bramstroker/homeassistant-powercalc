@@ -305,7 +305,7 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
         CONF_DEVICE: "youless-device",
     }
 
-    assert hass.states.get("sensor.foobar_device_power")
+    assert hass.states.get("sensor.foobar_power")
 
 
 async def test_discovery_by_config_entry(hass: HomeAssistant) -> None:

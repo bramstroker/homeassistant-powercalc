@@ -11,10 +11,6 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "HmIP-BDT",
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "standby_power": 0.36,
   "standby_power_on": 0.41,
   "author_info": {

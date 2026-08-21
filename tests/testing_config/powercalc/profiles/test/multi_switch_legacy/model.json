@@ -6,8 +6,5 @@
     "power": 0.7,
     "power_off": 0.25
   },
-  "name": "Kasa Smart Wi-Fi Power Strip",
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power"
-  }
+  "name": "Kasa Smart Wi-Fi Power Strip"
 }

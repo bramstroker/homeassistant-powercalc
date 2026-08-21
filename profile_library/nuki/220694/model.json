@@ -10,8 +10,9 @@
   "measure_method": "manual",
   "name": "Hardware Bridge",
   "discovery_by": "device",
-  "only_self_usage": true,
-  "standby_power": 0.51,
+  "fixed_config": {
+    "power": 0.51
+  },
   "author_info": {
     "name": "Tim",
     "github": "EinRainerZufall"

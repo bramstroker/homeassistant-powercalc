@@ -15,7 +15,7 @@
     "VERSION": "Home Assistant Core 2025.12.5"
   },
   "name": "1L Gen3",
-  "only_self_usage": true,
+  "only_self_usage": false,
   "author_info": {
     "name": "Victor Burlacu-Zane",
     "email": "vvbbzz@yahoo.com",

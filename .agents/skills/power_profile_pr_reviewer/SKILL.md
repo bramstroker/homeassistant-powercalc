@@ -141,7 +141,19 @@ Expect:
 - defined states
 - internally consistent power values
 
-### 5. Validate Measurement Credibility
+### 5. Validate `only_self_usage`
+
+`only_self_usage: true` means the device has a **built-in power meter**, so Powercalc only adds its self usage and names
+the sensors `{} Device Power` / `{} Device Energy`.
+
+- Allowed only on `smart_switch`, `smart_dimmer` and `power_meter`, and only for metering models (`HmIP-PSM` vs
+  `HmIP-DRSI1`, Shelly `1PM` vs `1`, TP-Link `P110` vs `P100`). Hubs, bridges, repeaters and sensors never qualify;
+  those describe their full draw with `fixed_config`.
+- A metering plug or dimmer with only `standby_power`/`standby_power_on` and no flag most likely forgot it.
+- Naming options (`power_sensor_naming`, `energy_sensor_naming`, `_friendly_` variants) are never allowed, in
+  `sensor_config` or at the root. Contributors copy them instead of setting the flag; the flag produces that naming.
+
+### 6. Validate Measurement Credibility
 
 Look for signs the measurement may be unreliable:
 
@@ -153,7 +165,7 @@ Look for signs the measurement may be unreliable:
 
 Flag suspicious cases but avoid assuming bad intent.
 
-### 6. Compare With Similar Profiles
+### 7. Compare With Similar Profiles
 
 Review neighbouring profiles in the library for consistency:
 
@@ -176,6 +188,7 @@ Large deviations should be questioned.
 - [ ] Strategy matches provided data
 - [ ] Measurement metadata present
 - [ ] Standby behaviour sensible
+- [ ] `only_self_usage` matches a real built-in power meter, no sensor naming overrides
 - [ ] Naming consistent with existing profiles
 
 ## Output Format

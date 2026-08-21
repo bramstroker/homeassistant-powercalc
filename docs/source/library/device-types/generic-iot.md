@@ -7,15 +7,12 @@ Powercalc profiles can be used to define the self usage of the IoT device itself
 
 ```json
 {
-  "standby_power": 0.3,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
   "device_type": "generic_iot",
   "calculation_strategy": "fixed",
   "discovery_by": "device",
-  "only_self_usage": true
+  "fixed_config": {
+    "power": 0.3
+  }
 }
 ```
 

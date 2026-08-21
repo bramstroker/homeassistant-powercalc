@@ -153,7 +153,7 @@ async def test_gui_smart_switch_with_builtin_powermeter(
     Test setting up smart switch with relay, but with a built-in powermeter
     """
     switch_id = "switch.heater"
-    power_sensor_id = "sensor.heater_device_power"
+    power_sensor_id = "sensor.heater_power"
 
     result = await start_discovery_flow(
         hass,

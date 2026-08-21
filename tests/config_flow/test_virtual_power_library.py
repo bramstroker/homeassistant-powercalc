@@ -473,7 +473,7 @@ async def test_change_device_from_options_flow_discovery_by_device(hass: HomeAss
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_DEVICE] == "device-b"
 
-    registry_entry = er.async_get(hass).async_get("sensor.some_switch_device_power")
+    registry_entry = er.async_get(hass).async_get("sensor.some_switch_power")
     assert registry_entry
     assert registry_entry.device_id == "device-b"
 

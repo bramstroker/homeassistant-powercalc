@@ -10,7 +10,7 @@
   "measure_device": "Brennenstuhl EM 231-A",
   "measure_method": "manual",
   "name": "ZigBee LED Dimmer",
-  "only_self_usage": true,
+  "only_self_usage": false,
   "standby_power": 0.3,
   "standby_power_on": 0.3,
   "author_info": {

@@ -47,10 +47,6 @@ When the dimmer already has a built-in powermeter, the following configuration c
 ```json
 {
   "standby_power": 0.3,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
   "device_type": "smart_dimmer",
   "calculation_strategy": "linear",
   "only_self_usage": true

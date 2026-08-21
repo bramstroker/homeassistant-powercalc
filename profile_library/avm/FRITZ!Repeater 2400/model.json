@@ -10,10 +10,6 @@
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "manual",
   "name": "FRITZ!Repeater 2400",
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "author_info": {
     "name": "ca-dmin",
     "github": "ca-dmin"

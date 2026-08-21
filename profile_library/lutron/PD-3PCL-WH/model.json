@@ -11,10 +11,6 @@
   "measure_device": "Shelly Plus Plug",
   "measure_method": "script",
   "name": "Plug-In Lamp Dimmer (Wireless Smart Dimmer)",
-  "sensor_config": {
-    "energy_sensor_naming": "{} Device Energy",
-    "power_sensor_naming": "{} Device Power"
-  },
   "standby_power": 0.1,
   "standby_power_on": 0.56,
   "author_info": {
