@@ -1,6 +1,7 @@
 from homeassistant import data_entry_flow
 from homeassistant.components import sensor
-from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_ON
+from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_ON, UnitOfElectricCurrent
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import setup_test_component_platform
@@ -18,6 +19,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.flow_helper.flows.virtual_power import SCHEMA_POWER_WLED
 import custom_components.test.sensor as test_sensor_platform
 from tests.common import create_mock_config_entry, mock_entities_in_registry, set_states
 from tests.config_flow.common import (
@@ -27,6 +29,20 @@ from tests.config_flow.common import (
     handle_options_flow_update,
     set_virtual_power_configuration,
 )
+
+
+def test_wled_current_entity_selector_is_limited_to_milliamperes() -> None:
+    current_entity_selector = next(
+        value for key, value in SCHEMA_POWER_WLED.schema.items() if key.schema == CONF_CURRENT_ENTITY
+    )
+
+    assert current_entity_selector.serialize()["selector"]["entity"]["filter"] == [
+        {
+            "domain": ["sensor"],
+            "device_class": [SensorDeviceClass.CURRENT],
+            "unit_of_measurement": [UnitOfElectricCurrent.MILLIAMPERE],
+        },
+    ]
 
 
 async def test_create_wled_sensor_entry(hass: HomeAssistant) -> None:

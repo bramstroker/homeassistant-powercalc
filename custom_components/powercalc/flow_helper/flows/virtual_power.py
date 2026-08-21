@@ -4,7 +4,16 @@ from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_ID, CONF_NAME, CONF_PATH, Platform
+from homeassistant.const import (
+    CONF_ATTRIBUTE,
+    CONF_ENTITIES,
+    CONF_ENTITY_ID,
+    CONF_ID,
+    CONF_NAME,
+    CONF_PATH,
+    Platform,
+    UnitOfElectricCurrent,
+)
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 import voluptuous as vol
@@ -159,8 +168,11 @@ SCHEMA_POWER_WLED = CONFIG_SCHEMA_WLED.extend(
     {
         vol.Optional(CONF_CURRENT_ENTITY): selector.EntitySelector(
             selector.EntitySelectorConfig(
-                domain="sensor",
-                device_class=SensorDeviceClass.CURRENT,
+                filter={
+                    "domain": "sensor",
+                    "device_class": SensorDeviceClass.CURRENT,
+                    "unit_of_measurement": UnitOfElectricCurrent.MILLIAMPERE,
+                },
             ),
         ),
     },
