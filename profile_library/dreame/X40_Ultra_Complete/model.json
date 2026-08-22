@@ -5,10 +5,12 @@
     "dreame.vacuum.r2449a",
     "X40 Ultra Complete"
   ],
-  "authors": [{
-    "name": "theveninjeremy",
-    "github": "theveninjeremy"
-  }],
+  "authors": [
+    {
+      "name": "theveninjeremy",
+      "github": "theveninjeremy"
+    }
+  ],
   "compatible_integrations": [
     "dreame_vacuum"
   ],
