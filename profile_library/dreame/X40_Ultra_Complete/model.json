@@ -22,7 +22,7 @@
     {
       "condition": {
         "condition": "state",
-        "entity_id": "[[entity_by_translation_key:status]]",
+        "entity_id": "[[entity_by_translation_key:state]]",
         "state": "auto_emptying"
       },
       "fixed": {
@@ -32,7 +32,7 @@
     {
       "condition": {
         "condition": "state",
-        "entity_id": "[[entity_by_translation_key:status]]",
+        "entity_id": "[[entity_by_translation_key:state]]",
         "state": "station_cleaning"
       },
       "fixed": {
@@ -42,7 +42,7 @@
     {
       "condition": {
         "condition": "state",
-        "entity_id": "[[entity_by_translation_key:status]]",
+        "entity_id": "[[entity_by_translation_key:state]]",
         "state": [
           "sweeping",
           "mopping",
@@ -64,7 +64,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity_by_translation_key:status]]",
+            "entity_id": "[[entity_by_translation_key:state]]",
             "state": "drying"
           },
           {
@@ -84,7 +84,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity_by_translation_key:status]]",
+            "entity_id": "[[entity_by_translation_key:state]]",
             "state": "drying"
           },
           {
@@ -104,7 +104,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity_by_translation_key:status]]",
+            "entity_id": "[[entity_by_translation_key:state]]",
             "state": "drying"
           },
           {
@@ -124,7 +124,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity_by_translation_key:status]]",
+            "entity_id": "[[entity_by_translation_key:state]]",
             "state": [
               "washing",
               "clean_add_water"
@@ -147,7 +147,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity_by_translation_key:status]]",
+            "entity_id": "[[entity_by_translation_key:state]]",
             "state": [
               "washing",
               "clean_add_water"
@@ -170,7 +170,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity_by_translation_key:status]]",
+            "entity_id": "[[entity_by_translation_key:state]]",
             "state": [
               "washing",
               "clean_add_water"
@@ -193,7 +193,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity_by_translation_key:status]]",
+            "entity_id": "[[entity_by_translation_key:state]]",
             "state": [
               "washing",
               "clean_add_water"
@@ -213,7 +213,7 @@
     {
       "condition": {
         "condition": "state",
-        "entity_id": "[[entity_by_translation_key:status]]",
+        "entity_id": "[[entity_by_translation_key:state]]",
         "state": "charging"
       },
       "linear": {
