@@ -1,4 +1,5 @@
 site_name: Powercalc documentation
+site_url: https://docs.powercalc.nl/
 docs_dir: source
 theme:
   name: material
