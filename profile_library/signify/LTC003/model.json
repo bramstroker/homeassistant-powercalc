@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "3261331P7"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-05-03T20:17:15Z",
   "device_type": "light",
