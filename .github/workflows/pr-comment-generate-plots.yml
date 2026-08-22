@@ -21,33 +21,42 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Checkout trusted visualization code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - name: Checkout PR files
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
+          path: pr
           persist-credentials: false
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: '0.12.5'
-          working-directory: './utils/measure'
+          working-directory: './base/utils/measure'
           enable-cache: true
           cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
+            base/utils/measure/pyproject.toml
+            base/utils/measure/uv.lock
       - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         name: List changed files from the PR
         id: list-files
         with:
           script: |
-            const { execSync } = require('child_process')
             const fs = require('fs')
-            const { base, head } = context.payload.pull_request
-            const rawFiles = execSync(`git diff --name-only ${base.sha} ${head.sha}`).toString()
-            const files = rawFiles.split('\n').filter((file) => {
+            const changed = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            })
+            const files = changed.map((entry) => entry.filename).filter((file) => {
               if (/^profile_library\/.+\/(brightness|color_temp|hs|effect)\.csv\.gz$/.test(file)) return true
-              if (!/^profile_library\/.+\/model\.json$/.test(file) || !fs.existsSync(file)) return false
+              if (!/^profile_library\/.+\/model\.json$/.test(file) || !fs.existsSync(`pr/${file}`)) return false
               try {
-                const model = JSON.parse(fs.readFileSync(file, 'utf8'))
+                const model = JSON.parse(fs.readFileSync(`pr/${file}`, 'utf8'))
                 if (model.calculation_strategy === 'linear') return Array.isArray(model.linear_config?.calibrate)
                 return model.calculation_strategy === 'composite'
               } catch {
@@ -65,21 +74,22 @@ jobs:
               continue
             fi
             echo "Generating plot for - ${file}."
-            if [ -f "${{ github.workspace }}/${file}" ]; then
+            source="${{ github.workspace }}/pr/${file}"
+            if [ -f "${source}" ]; then
               relative="${file#profile_library/}"
               if [[ "${relative}" == */model.json ]]; then
-                strategy="$(jq -r '.calculation_strategy // empty' "${file}")"
+                strategy="$(jq -r '.calculation_strategy // empty' "${source}")"
                 if [[ "${strategy}" == "composite" ]]; then
-                  uv --project utils/measure run --group visualize powercalc-visualize \
-                    "${{ github.workspace }}/${file}" --kind=composite \
+                  uv --project base/utils/measure run --group visualize powercalc-visualize \
+                    "${source}" --kind=composite \
                     --output="plot-artifacts/${relative%model.json}composite.png"
                   if jq -e '
                     .composite_config
                     | if type == "array" then . else .strategies end
                     | any(.linear.calibrate? | type == "array")
-                  ' "${file}" > /dev/null; then
-                    uv --project utils/measure run --group visualize powercalc-visualize \
-                      "${{ github.workspace }}/${file}" \
+                  ' "${source}" > /dev/null; then
+                    uv --project base/utils/measure run --group visualize powercalc-visualize \
+                      "${source}" \
                       --output="plot-artifacts/${relative%model.json}calibration.png"
                   fi
                   continue
@@ -88,8 +98,8 @@ jobs:
               else
                 output="plot-artifacts/${relative%.csv.gz}.png"
               fi
-              uv --project utils/measure run --group visualize powercalc-visualize \
-                "${{ github.workspace }}/${file}" --output="${output}"
+              uv --project base/utils/measure run --group visualize powercalc-visualize \
+                "${source}" --output="${output}"
             else
               echo "::error::Changed file is missing from checkout: ${file}"
               exit 1
