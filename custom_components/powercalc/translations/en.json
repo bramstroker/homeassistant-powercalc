@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "You must supply at least one of Value or Value template",
       "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
       "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
       "group_mandatory": "You must define at least subgroups or power and energy-entities",
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
       "linear_min_higher_as_max": "Max power cannot be lower than min power",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "You must supply either an energy price or an energy price sensor",
       "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
       "group_mandatory": "You must define at least subgroups or power and energy-entities",
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
       "linear_min_higher_as_max": "Max power cannot be lower than min power",

@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Du måste ange minst ett värde eller en värdemall",
       "entity_mandatory": "Att välja en entitet krävs för alla strategier utom playbook",
       "fixed_mandatory": "Du måste ange minst en av Effekt, Effektmall eller effekttillstånd",
-      "fixed_states_power_only": "Den här entiteten kan bara jobba med 'state effekt' inte 'effekt'",
       "group_mandatory": "Du måste ange minst en subgrupp eller effekt och energi entititeter",
       "linear_mandatory": "Du måste ange minst en av max_effekt eller kalibrera",
       "linear_min_higher_as_max": "Max effekt kan inte vara lägre än min effekt",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Du måste ange antingen ett energipris eller en energiprissensor",
       "fixed_mandatory": "Du måste ange minst en av Effekt, Effektmall eller effekttillstånd",
-      "fixed_states_power_only": "Den här entiteten kan bara jobba med 'state effekt' inte 'effekt'",
       "group_mandatory": "Du måste ange minst en subgrupp eller effekt och energi entititeter",
       "linear_mandatory": "Du måste ange minst en av max_effekt eller kalibrera",
       "linear_min_higher_as_max": "Max effekt kan inte vara lägre än min effekt",

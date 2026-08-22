@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Musíte zadat alespoň jednu z možností „Hodnota“ nebo „Šablona hodnoty“",
       "entity_mandatory": "Pro všechny strategie kromě playbook je nutné vybrat entitu",
       "fixed_mandatory": "Musíte zadat alespoň jednu z následujících možností: pevnou hodnotu, šablonu nebo mapování stavů",
-      "fixed_states_power_only": "Tato entita může pracovat pouze s 'states_power', ne s 'power'",
       "group_mandatory": "Musíte definovat alespoň podskupiny nebo entity výkonu a energie",
       "linear_mandatory": "Musíte zadat alespoň jednu z možností max_power nebo calibrate",
       "linear_min_higher_as_max": "Maximální spotřeba nebůže být nižší, nežli minimální spotřeba",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Musíte zadat buď cenu energie, nebo senzor ceny energie",
       "fixed_mandatory": "Musíte zadat alespoň jednu z možností Výkon, šablona výkonu nebo výkon podle stavů",
-      "fixed_states_power_only": "Tato entita může pracovat pouze s 'states_power', ne s 'power'",
       "group_mandatory": "Musíte definovat alespoň podskupiny nebo entity výkonu a energie",
       "linear_mandatory": "Musíte zadat alespoň jednu z možností max_power nebo calibrate",
       "linear_min_higher_as_max": "Maximální spotřeba nebůže být nižší, nežli minimální spotřeba",

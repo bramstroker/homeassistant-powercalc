@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Du musst mindestens einen Wert oder ein Werte-Template angeben",
       "entity_mandatory": "Die Auswahl einer Entität ist für jede Strategie mit Ausnahme des Playbooks erforderlich",
       "fixed_mandatory": "Du musst mindestens Leistung, Leistungs-Template oder Leistung je Zustand angeben",
-      "fixed_states_power_only": "Diese Entität kann nur mit Leistung je Zustand und nicht mit Leistung arbeiten",
       "group_mandatory": "Du musst mindestens Untergruppen oder Leistungs- und Energie-Entitäten definieren",
       "linear_mandatory": "Du musst mindestens die minimale Leistung oder den Kalibrierungswert angeben",
       "linear_min_higher_as_max": "Die maximale Leistung kann nicht niedriger als die minimale Leistung sein",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Du musst entweder einen Energiepreis oder einen Energiepreissensor angeben",
       "fixed_mandatory": "Sie müssen mindestens eines von Leistung, Leistung-Template oder Leistung je Zustand angeben",
-      "fixed_states_power_only": "Diese Entität kann nur mit Leistung je Zustand und nicht mit Leistung arbeiten",
       "group_mandatory": "Sie müssen mindestens Untergruppen oder Leistung- und Energie-Entitäten definieren",
       "linear_mandatory": "Sie müssen mindestens Maximale Leistung oder Kalibrierung angeben",
       "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung",

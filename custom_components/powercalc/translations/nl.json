@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Je moet minimaal waarde of waarde template opgeven",
       "entity_mandatory": "Je moet verplicht een entiteit opgeven voor iedere andere strategie dan playbook",
       "fixed_mandatory": "Je dient minimaal een van de volgende velden te definiëren: Vermogen, Vermogen template of Vermogen per status",
-      "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
       "group_mandatory": "Je dient minimaal een van de volgende velden te definiëren: sub groepen, vermogen entiteiten of energie entiteiten",
       "linear_mandatory": "Je moet tenminste één van Max vermogen of Kalibratie waardes opgeven",
       "linear_min_higher_as_max": "Maximale vermogen kan niet lager zijn dan minimale vermogen",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "U moet een energieprijs of een energieprijssensor aanleveren",
       "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren: vermogen, vermogen template of vermogen per status",
-      "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
       "group_mandatory": "Je dient minimaal een van de volgende velden te definieren: sub groepen, vermogen entiteiten of energie entiteiten",
       "linear_mandatory": "Je moet mimimaal max vermogen of kalibratie waardes instellen",
       "linear_min_higher_as_max": "Maximale vermogen kan niet lager zijn dan mimimale vermogen",

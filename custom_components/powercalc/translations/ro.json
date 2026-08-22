@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Trebuie să furnizați cel puțin o Valoare sau șablonul Valoare",
       "entity_mandatory": "Selectarea unei entități este necesară pentru orice altă strategie decât playbook",
       "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
-      "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
       "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
       "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
       "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Trebuie să furnizați fie un preț al energiei, fie un senzor al prețului energiei",
       "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
-      "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
       "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
       "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
       "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă",

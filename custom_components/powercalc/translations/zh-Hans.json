@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "必须至少提供“值”或“值模板”中的一项",
       "entity_mandatory": "除运行方案 (playbook) 外，所有策略都必须选择实体",
       "fixed_mandatory": "必须至少提供“功率”“功率模板”或“状态功率”中的一项",
-      "fixed_states_power_only": "此实体只能使用 'states_power'，不能使用 'power'",
       "group_mandatory": "必须定义至少一个子组，或功率和能源实体",
       "linear_mandatory": "必须至少提供 max_power 或 calibrate 其中一项",
       "linear_min_higher_as_max": "最大功率不能低于最小功率",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "必须提供能源价格或能源价格传感器",
       "fixed_mandatory": "必须至少提供功率、功率模板或状态功率中的一项",
-      "fixed_states_power_only": "此实体只能使用 'states_power'，不能使用 'power'",
       "group_mandatory": "必须至少定义一个子组，或定义功率和能源实体",
       "linear_mandatory": "必须至少提供 max_power 或 calibrate 中的一项",
       "linear_min_higher_as_max": "最大功率不能低于最小功率",

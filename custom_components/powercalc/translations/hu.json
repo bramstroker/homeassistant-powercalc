@@ -14,7 +14,6 @@
       "daily_energy_mandatory": "Adja meg legalább a value vagy value_template egyikét",
       "entity_mandatory": "A playbook stratégián kívül minden stratégiához entitást kell választani",
       "fixed_mandatory": "Adja meg legalább a power, power_template vagy states_power egyikét",
-      "fixed_states_power_only": "Ez az entitás csak a „states_power” beállítással működik, a „power” beállítással nem",
       "group_mandatory": "Adjon meg legalább alcsoportokat, illetve energia- vagy teljesítményentitásokat",
       "linear_mandatory": "Adja meg legalább a max_power vagy a calibrate értéket",
       "linear_min_higher_as_max": "A maximális teljesítmény nem lehet kisebb a minimális teljesítménynél",
@@ -680,7 +679,6 @@
     "error": {
       "cost_price_mandatory": "Adja meg az energiaárat vagy az energiaár-érzékelőt",
       "fixed_mandatory": "Adja meg legalább a power, power_template vagy states_power egyikét",
-      "fixed_states_power_only": "Ez az entitás csak a 'states_power'-vel működik, nem a 'power'-val",
       "group_mandatory": "Meg kell határoznia legalább alcsoportokat vagy teljesítmény- és energia-entitásokat",
       "linear_mandatory": "A max_power vagy a calibrate közül legalább egyet meg kell adnia",
       "linear_min_higher_as_max": "A maximális teljesítmény nem lehet kisebb a minimális teljesítménynél",
