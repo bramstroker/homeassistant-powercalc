@@ -1,0 +1,114 @@
+name: Comment on merged power profile
+
+on:
+  workflow_run:
+    workflows: [Prepare merged power profile comment]
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  comment:
+    name: Thank profile contributor
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Find comment metadata
+        id: artifact
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+            })
+            const exists = data.artifacts.some((artifact) => artifact.name === 'merged-power-profile-comment')
+            core.setOutput('exists', exists ? 'true' : 'false')
+      - name: Download comment metadata
+        if: steps.artifact.outputs.exists == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: merged-power-profile-comment
+          path: artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+      - name: Post merge comment
+        if: steps.artifact.outputs.exists == 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            const fs = require('fs')
+            const prNumberText = fs.readFileSync('artifacts/pr_number.txt', 'utf8').trim()
+            if (!/^\d+$/.test(prNumberText)) {
+              throw new Error(`Invalid pull request number: ${prNumberText}`)
+            }
+
+            const prNumber = Number(prNumberText)
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            })
+            if (!pullRequest.merged_at || pullRequest.base.ref !== 'master') {
+              throw new Error(`Pull request #${prNumber} is not merged into master`)
+            }
+
+            const changedFiles = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            })
+
+            const profiles = new Map()
+            for (const file of changedFiles) {
+              if (file.status === 'removed') continue
+
+              const match = file.filename.match(/^profile_library\/([^/]+)\/([^/]+)\//)
+              if (!match) continue
+
+              const [, manufacturer, model] = match
+              profiles.set(`${manufacturer}/${model}`, { manufacturer, model })
+            }
+
+            if (profiles.size === 0) {
+              core.info('No merged profile directory found; skipping comment.')
+              return
+            }
+
+            const slug = (value) => String(value)
+              .normalize('NFKD')
+              .replace(/\p{Mark}+/gu, '')
+              .toLocaleLowerCase('en-US')
+              .trim()
+              .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
+              .replace(/^-+|-+$/g, '')
+
+            const libraryUrl = 'https://library.powercalc.nl'
+            const profileLinks = [...profiles.values()].map(({ manufacturer, model }) => {
+              const url = `${libraryUrl}/profiles/${encodeURIComponent(slug(manufacturer))}/${encodeURIComponent(slug(model))}`
+              return `[View ${manufacturer} ${model} in the profile library](${url})`
+            })
+            const contributorUrl = `${libraryUrl}/author/${encodeURIComponent(slug(pullRequest.user.login))}`
+
+            const body = [
+              `Congratulations on getting your power profile merged, @${pullRequest.user.login}! 🎉`,
+              '',
+              'Thank you again for submitting your measurements and helping grow the Powercalc library.',
+              '',
+              ...profileLinks.map((link) => `- ${link}`),
+              `- [View your contributor page](${contributorUrl})`,
+            ].join('\n')
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body,
+            })

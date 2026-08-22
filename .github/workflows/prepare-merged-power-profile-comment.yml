@@ -1,0 +1,49 @@
+name: Prepare merged power profile comment
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
+    paths:
+      - 'profile_library/**'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  prepare:
+    name: Prepare comment metadata
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Find merged profiles
+        id: profiles
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            const fs = require('fs')
+            const changedFiles = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            })
+            const hasProfiles = changedFiles.some((file) => {
+              return file.status !== 'removed' && /^profile_library\/[^/]+\/[^/]+\//.test(file.filename)
+            })
+
+            core.setOutput('found', hasProfiles ? 'true' : 'false')
+            if (hasProfiles) {
+              fs.mkdirSync('comment-metadata', { recursive: true })
+              fs.writeFileSync('comment-metadata/pr_number.txt', String(context.payload.pull_request.number))
+            }
+      - name: Upload comment metadata
+        if: steps.profiles.outputs.found == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: merged-power-profile-comment
+          path: comment-metadata/pr_number.txt
+          if-no-files-found: error
