@@ -10829,7 +10829,7 @@
           "calculation_strategy": "lut",
           "created_at": "2026-08-10T01:00:53Z",
           "device_type": "light",
-          "measure_device": "Tapo P110M",
+          "measure_device": "TP-Link Tapo P110M",
           "measure_method": "script",
           "measure_settings": {
             "SAMPLE_COUNT": 1,
@@ -10854,7 +10854,7 @@
           ],
           "id": "LI-A19-11W-MT",
           "manufacturer": "lightinginside",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-22T17:01:01",
           "max_power": 10.96,
           "sub_profile_count": 0,
           "color_modes": [
@@ -10865,7 +10865,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "be6ed3300eb1c13fa77b820615ce0ff9"
+          "hash": "7ce1bf9b09ea3b804c2d70d843155b3c"
         },
         {
           "calculation_strategy": "lut",
@@ -23526,14 +23526,14 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.4,
             "brightness": 99.4
           },
-          "hash": "a2365a9e96c2f6538bdd7d0c7f05c724"
+          "hash": "1b168835fcc128ed63fb6d62a5ef7825"
         },
         {
           "calculation_strategy": "fixed",
@@ -25521,10 +25521,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "95dd403b44781fe6cad4639beb9fb1e4"
+          "hash": "540a3b84e9066196b34d53e08edace59"
         },
         {
           "calculation_strategy": "lut",
