@@ -25393,7 +25393,7 @@
           "calculation_strategy": "lut",
           "created_at": "2026-06-30T04:03:04Z",
           "device_type": "light",
-          "measure_device": "shelly",
+          "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "SAMPLE_COUNT": 2,
@@ -25411,7 +25411,7 @@
           ],
           "id": "H14C0",
           "manufacturer": "govee",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-22T17:31:23",
           "max_power": 5.25,
           "sub_profile_count": 0,
           "color_modes": [
@@ -25422,7 +25422,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "439ab366a77c95d5129a29b650d3e880"
+          "hash": "f900869deef4ece108321ac5f3938553"
         },
         {
           "calculation_strategy": "lut",
