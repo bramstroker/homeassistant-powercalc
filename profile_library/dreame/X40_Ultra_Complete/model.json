@@ -1,7 +1,7 @@
 {
   "name": "Dreame X40 Ultra Complete",
   "device_type": "vacuum_robot",
-  "author": "theveninjeremy",
+  "author": "jeremythevenin",
   "compatible_integrations": [
     "dreame_vacuum"
   ],
@@ -15,7 +15,7 @@
     {
       "condition": {
         "condition": "state",
-        "entity_id": "[[entity]]",
+        "entity_id": "[[entity_by_translation_key:status]]",
         "state": "auto_emptying"
       },
       "fixed": {
@@ -25,7 +25,7 @@
     {
       "condition": {
         "condition": "state",
-        "entity_id": "[[entity]]",
+        "entity_id": "[[entity_by_translation_key:status]]",
         "state": "station_cleaning"
       },
       "fixed": {
@@ -35,7 +35,7 @@
     {
       "condition": {
         "condition": "state",
-        "entity_id": "[[entity]]",
+        "entity_id": "[[entity_by_translation_key:status]]",
         "state": [
           "sweeping",
           "mopping",
@@ -55,7 +55,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": "[[entity_by_translation_key:status]]",
             "state": "drying"
           },
           {
@@ -75,7 +75,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": "[[entity_by_translation_key:status]]",
             "state": "drying"
           },
           {
@@ -95,7 +95,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": "[[entity_by_translation_key:status]]",
             "state": "drying"
           },
           {
@@ -115,7 +115,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": "[[entity_by_translation_key:status]]",
             "state": [
               "washing",
               "clean_add_water"
@@ -138,7 +138,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": "[[entity_by_translation_key:status]]",
             "state": [
               "washing",
               "clean_add_water"
@@ -161,7 +161,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": "[[entity_by_translation_key:status]]",
             "state": [
               "washing",
               "clean_add_water"
@@ -184,7 +184,7 @@
         "conditions": [
           {
             "condition": "state",
-            "entity_id": "[[entity]]",
+            "entity_id": "[[entity_by_translation_key:status]]",
             "state": [
               "washing",
               "clean_add_water"
@@ -204,7 +204,7 @@
     {
       "condition": {
         "condition": "state",
-        "entity_id": "[[entity]]",
+        "entity_id": "[[entity_by_translation_key:status]]",
         "state": "charging"
       },
       "linear": {
