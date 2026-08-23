@@ -325,6 +325,16 @@ async def test_get_model_listing(remote_loader: RemoteLoader) -> None:
     assert ("LCT010", "Hue White and Color Ambiance A19 E26 (Gen 3)") not in device_models
 
 
+async def test_get_model_listing_manual_profile(remote_loader: RemoteLoader) -> None:
+    """Manual profiles are listed only when explicitly requested."""
+    manual_models = await remote_loader.get_model_listing("netgear", None, DiscoveryBy.MANUAL)
+
+    assert ("GS110MX", "Netgear GS110MX") in manual_models
+    assert ("GS110MX", "Netgear GS110MX") not in await remote_loader.get_model_listing(
+        "netgear", None, DiscoveryBy.ENTITY
+    )
+
+
 async def test_get_model_metadata_rejects_invalid_device_type(remote_loader: RemoteLoader) -> None:
     remote_loader.model_infos["test/invalid"] = cast(
         "LibraryModel",
