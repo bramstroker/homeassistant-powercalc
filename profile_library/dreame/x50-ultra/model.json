@@ -1,0 +1,261 @@
+{
+  "aliases": [
+    "dreame.vacuum.r2538z"
+  ],
+  "authors": [{
+    "name": "philscottydev",
+    "github": "philscottydev"
+  }],
+  "calculation_strategy": "composite",
+  "compatible_integrations": [
+    "dreame_vacuum"
+  ],
+  "composite_config": {
+    "mode": "sum_all",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:charging_state]]",
+              "state": "off"
+            },
+            {
+              "condition": "or",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:status]]",
+                  "state": "sleeping"
+                },
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:status]]",
+                  "state": "idle"
+                }
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 5.55
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:charging_state]]",
+              "state": "on"
+            },
+            {
+              "condition": "template",
+              "value_template": "{{ states('[[entity_by_translation_key:self_wash_base_status]]') not in ['washing', 'clean_add_water'] and states('[[entity_by_translation_key:auto_empty_status]]') != 'active' and states('[[entity_by_translation_key:task_status]]') != 'station_cleaning' }}"
+            }
+          ]
+        },
+        "linear": {
+          "calibrate": [
+            "3 -> 27.63",
+            "4 -> 27.65",
+            "5 -> 27.93",
+            "6 -> 27.82",
+            "7 -> 28.09",
+            "8 -> 28.19",
+            "9 -> 28.27",
+            "10 -> 28.27",
+            "11 -> 28.55",
+            "12 -> 28.47",
+            "13 -> 28.74",
+            "14 -> 28.69",
+            "15 -> 28.82",
+            "16 -> 28.79",
+            "17 -> 28.79",
+            "18 -> 28.84",
+            "19 -> 28.79",
+            "20 -> 28.85",
+            "21 -> 28.96",
+            "22 -> 29.01",
+            "23 -> 29.08",
+            "24 -> 29.19",
+            "25 -> 29.29",
+            "26 -> 29.35",
+            "27 -> 29.47",
+            "28 -> 29.49",
+            "29 -> 29.59",
+            "30 -> 29.63",
+            "31 -> 29.73",
+            "32 -> 29.75",
+            "33 -> 29.85",
+            "34 -> 29.9",
+            "35 -> 30.89",
+            "36 -> 31.43",
+            "37 -> 30.09",
+            "38 -> 30.16",
+            "39 -> 30.24",
+            "40 -> 30.31",
+            "41 -> 30.37",
+            "42 -> 30.41",
+            "43 -> 30.52",
+            "44 -> 30.56",
+            "45 -> 30.65",
+            "46 -> 30.68",
+            "47 -> 30.8",
+            "48 -> 30.8",
+            "49 -> 30.86",
+            "50 -> 29.21",
+            "51 -> 31.02",
+            "52 -> 31.03",
+            "53 -> 31.14",
+            "54 -> 31.21",
+            "55 -> 31.26",
+            "56 -> 31.34",
+            "57 -> 31.4",
+            "58 -> 31.46",
+            "59 -> 31.55",
+            "60 -> 31.58",
+            "61 -> 31.61",
+            "62 -> 31.73",
+            "63 -> 31.71",
+            "64 -> 31.83",
+            "65 -> 31.89",
+            "66 -> 31.96",
+            "67 -> 31.98",
+            "68 -> 32.05",
+            "69 -> 32.11",
+            "70 -> 32.2",
+            "71 -> 32.24",
+            "72 -> 32.26",
+            "73 -> 32.37",
+            "74 -> 32.43",
+            "75 -> 32.49",
+            "76 -> 32.54",
+            "77 -> 32.6",
+            "78 -> 32.62",
+            "79 -> 32.72",
+            "80 -> 32.72",
+            "81 -> 32.71",
+            "82 -> 32.68",
+            "83 -> 32.67",
+            "84 -> 32.47",
+            "85 -> 32.13",
+            "86 -> 31.77",
+            "87 -> 30.98",
+            "88 -> 30.06",
+            "89 -> 28.72",
+            "90 -> 27.23",
+            "91 -> 25.83",
+            "92 -> 24.47",
+            "93 -> 22.9",
+            "94 -> 21.32",
+            "95 -> 19.67",
+            "96 -> 18.09",
+            "97 -> 16.53",
+            "98 -> 14.89",
+            "99 -> 12.89",
+            "100 -> 5.77"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+              "state": "washing"
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": "cleaning"
+            }
+          ]
+        },
+        "fixed": {
+          "power": 29.5
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+              "state": "washing"
+            },
+            {
+              "condition": "template",
+              "value_template": "{{ states('[[entity_by_translation_key:status]]') != 'cleaning' }}"
+            }
+          ]
+        },
+        "fixed": {
+          "power": 107.1
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+          "state": "clean_add_water"
+        },
+        "fixed": {
+          "power": 18.5
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+          "state": "active"
+        },
+        "fixed": {
+          "power": 214.3
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:task_status]]",
+          "state": "station_cleaning"
+        },
+        "fixed": {
+          "power": 540.0
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+          "state": "drying"
+        },
+        "fixed": {
+          "power": 47.5
+        }
+      }
+    ]
+  },
+  "created_at": "2026-08-21T13:51:11Z",
+  "device_type": "vacuum_robot",
+  "measure_device": "Shelly Plus 1PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 3,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.3.0:cli"
+  },
+  "name": "X50 Ultra",
+  "standby_power": 5.55,
+  "voltage_range": {
+    "min": 225.9,
+    "max": 230.9
+  },
+  "measure_description": "Measured with a Shelly Plus 1PM in the socket feeding the base station, so every number covers the whole station rather than battery charging alone. Station settings during the runs: smart mop washing on, self clean on, mop washing with detergent on, UV sterilization on, auto drying on, silent drying off, drying time 3h. With smart mop washing on the machine selects water temperature and washing program itself and both selects read unavailable; the stored manual values are hot and standard. The heater does run under this configuration, 937 W for about 14 s during the end of job wash. Measuring the four manual settings separately gives 27.7 W on normal, where the heater never fires, 92.9 W on mild, 106.6 W on warm and 110.3 W on hot; smart washing sits between warm and hot. The washing branch carries the smart washing figure since that is the default. Fixed values are time averages over the window in which each condition holds, not peaks."
+}
