@@ -11,7 +11,6 @@ dependencies = [
     "homeassistant-api~=6.0",
     "jsonschema>=4.0",
     "pydantic>=2.13",
-    "pyserial>=3.5",
     "requests>=2.28",
 ]
 
@@ -25,6 +24,7 @@ cli = [
     "aiohue>=4.8.1,<5",
     "inquirer>=3.1",
     "pycryptodome>=3.20",
+    "pyserial>=3.5",
     "python-decouple>=3.4",
     "python-kasa>=0.7",
     "tuyapower>=0.2",

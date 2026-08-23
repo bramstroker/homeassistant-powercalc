@@ -1028,7 +1028,6 @@ dependencies = [
     { name = "homeassistant-api" },
     { name = "jsonschema" },
     { name = "pydantic" },
-    { name = "pyserial" },
     { name = "requests" },
 ]
 
@@ -1042,6 +1041,7 @@ cli = [
     { name = "aiohue" },
     { name = "inquirer" },
     { name = "pycryptodome" },
+    { name = "pyserial" },
     { name = "python-decouple" },
     { name = "python-kasa" },
     { name = "tuyapower" },
@@ -1079,7 +1079,7 @@ requires-dist = [
     { name = "pillow", marker = "extra == 'ocr'", specifier = ">=12.0" },
     { name = "pycryptodome", marker = "extra == 'cli'", specifier = ">=3.20" },
     { name = "pydantic", specifier = ">=2.13" },
-    { name = "pyserial", specifier = ">=3.5" },
+    { name = "pyserial", marker = "extra == 'cli'", specifier = ">=3.5" },
     { name = "pytesseract", marker = "extra == 'ocr'", specifier = ">=0.3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.3" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.0" },
