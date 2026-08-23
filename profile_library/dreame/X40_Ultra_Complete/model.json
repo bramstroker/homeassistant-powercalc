@@ -60,9 +60,9 @@
             ]
           },
           {
-  "condition": "template",
-  "value_template": "{{ states('[[entity_by_translation_key:charging_status]]') != 'charging' }}"
-}
+            "condition": "template",
+            "value_template": "{{ states('[[entity_by_translation_key:charging_status]]') != 'charging' }}"
+          }
         ]
       },
       "fixed": {
