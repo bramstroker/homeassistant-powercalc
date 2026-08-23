@@ -720,7 +720,7 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
         ("signify", {"lca001"}, ["LCA001"], None),
         ("test_manu", {"CCT Light"}, ["model1", "model2"], "multi_profile"),
         ("eq-3", {"HMIP-PSM"}, ["HmIP-PSM"], None),
-        ("shelly", {"Shelly 1PM mini gen3"}, ["Shelly 1PM Mini Gen3"], None),
+        ("shelly", {"Shelly 1PM mini gen3"}, ["S3SW-001P8EU"], None),
     ],
 )
 @pytest.mark.skip_remote_loader_mocking

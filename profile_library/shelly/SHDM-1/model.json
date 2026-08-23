@@ -1,0 +1,31 @@
+{
+  "aliases": [
+    "Shelly Dimmer"
+  ],
+  "legacy_ids": [
+    "Shelly Dimmer"
+  ],
+  "calculation_strategy": "fixed",
+  "description": "Smart Wi-Fi Light Dimmer",
+  "created_at": "2024-01-09T21:22:00Z",
+  "device_type": "smart_dimmer",
+  "discovery_by": "entity",
+  "measure_description": "The measured device fw: 1.14.1-rc1, Eco Mode enabled, Wifi Client enabled, LED disabled. The result represents the average value of measurements collected from the measurement device API for the following scenarios: dumb device/baseline consumption (~4.9W), the device consumption (same regardless dimming level)",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_device_firmware": "20241011-114503/1.4.4-g6d2a586",
+  "measure_method": "manual",
+  "measure_settings": {
+    "SAMPLE_COUNT": 200,
+    "SLEEP_TIME": 0.5
+  },
+  "name": "Dimmer",
+  "only_self_usage": true,
+  "standby_power": 0.596,
+  "authors": [
+    {
+      "name": "Michal Bartak",
+      "email": "michal.bartak@betsys.com",
+      "github": "michalk-k"
+    }
+  ]
+}

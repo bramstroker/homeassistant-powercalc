@@ -52,7 +52,7 @@
       "required": [
         "id",
         "device_type",
-        "update_timestamp"
+        "updated_at"
       ],
       "properties": {
         "id": {
@@ -70,7 +70,10 @@
           }
         },
         "max_power": {
-          "type": "number",
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "Maximum power consumption of the model in Watts",
           "minimum": 0
         },
@@ -88,10 +91,13 @@
             "type": "string"
           }
         },
+        "description": {
+          "type": "string",
+          "description": "A short description of the device"
+        },
         "updated_at": {
           "type": "string",
-          "format": "date-time",
-          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
           "description": "Last update of the model"
         },
         "has_sub_profiles": {
@@ -131,10 +137,21 @@
       "type": "string",
       "enum": [
         "camera",
+        "cover",
+        "fan",
+        "generic_iot",
+        "heating",
+        "lawn_mower_robot",
         "light",
+        "power_meter",
+        "printer",
+        "smart_dimmer",
         "smart_switch",
         "smart_speaker",
-        "network"
+        "television",
+        "network",
+        "ups",
+        "vacuum_robot"
       ],
       "description": "Type of device"
     }

@@ -1,0 +1,29 @@
+{
+  "aliases": [
+    "Shelly Plug S"
+  ],
+  "legacy_ids": [
+    "shelly plug s"
+  ],
+  "calculation_strategy": "fixed",
+  "description": "Smart Wi-Fi Plug with Power Monitoring",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN\": No Access Point (AP), no ECO mode, only connected to network.\n\"WLAN + ECO\": ECO setting turned on, repeater (AP) turned off.",
+  "created_at": "2025-06-07T00:00:00Z",
+  "device_type": "smart_switch",
+  "discovery_by": "entity",
+  "measure_description": "Manual measurement of single smart plug. Measured values ",
+  "measure_device": "Brennenstuhl EM 231-A",
+  "measure_method": "manual",
+  "name": "Plug S",
+  "only_self_usage": true,
+  "sub_profile_select": {
+    "default": "+wlan"
+  },
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
+}

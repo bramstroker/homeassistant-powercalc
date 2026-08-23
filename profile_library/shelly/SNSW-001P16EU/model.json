@@ -1,0 +1,33 @@
+{
+  "aliases": [
+    "Shelly Plus 1PM"
+  ],
+  "legacy_ids": [
+    "Shelly Plus 1PM"
+  ],
+  "calculation_strategy": "fixed",
+  "description": "Smart Wi-Fi Relay with Power Monitoring",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN + BT + ECO\": All three turned on, repeater turned off.\n\"WLAN + ECO\": Both turned on, repeater turned off.\n\"Other combinations\": For all other combinations. Maximum device power draw.",
+  "created_at": "2024-01-09T19:21:00Z",
+  "device_type": "smart_switch",
+  "discovery_by": "entity",
+  "measure_description": "Measured with 7.5W (average over 300s) dummy load over 300s and calculated average. Multiple combinations of settings were tested. Firmware version 1.44",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_device_firmware": "20241011-114503/1.4.4-g6d2a586",
+  "measure_method": "manual",
+  "measure_settings": {
+    "SAMPLE_COUNT": 200,
+    "SLEEP_TIME": 0.5
+  },
+  "name": "Plus 1PM",
+  "only_self_usage": true,
+  "sub_profile_select": {
+    "default": "default"
+  },
+  "authors": [
+    {
+      "name": "CV",
+      "github": "dagobert"
+    }
+  ]
+}
