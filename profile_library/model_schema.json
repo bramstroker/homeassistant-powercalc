@@ -185,9 +185,10 @@
       "enum": [
         "config_entry",
         "device",
-        "entity"
+        "entity",
+        "manual"
       ],
-      "description": "Whether to discover the profile by config entry, device, or entity"
+      "description": "Whether to discover the profile by config entry, device, or entity; manual profiles cannot be discovered"
     },
     "fields": {
       "type": "object",

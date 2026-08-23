@@ -69,6 +69,7 @@ class DiscoveryBy(StrEnum):
     CONFIG_ENTRY = "config_entry"
     DEVICE = "device"
     ENTITY = "entity"
+    MANUAL = "manual"
 
 
 @dataclass(frozen=True)
