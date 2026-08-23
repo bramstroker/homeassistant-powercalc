@@ -43,37 +43,37 @@
     },
     {
       "condition": {
-  "condition": "and",
-  "conditions": [
-    {
-      "condition": "state",
-      "entity_id": "[[entity_by_translation_key:state]]",
-      "state": [
-        "sweeping",
-        "mopping",
-        "sweeping_and_mopping",
-        "second_cleaning",
-        "returning",
-        "returning_to_wash",
-        "returning_auto_empty",
-        "paused"
-      ]
-    },
-    {
-      "condition": "not",
-      "conditions": [
-        {
-          "condition": "state",
-          "entity_id": "[[entity_by_translation_key:charging_status]]",
-          "state": "charging"
-        }
-      ]
-    }
-  ]
-},
-"fixed": {
-  "power": 1.8
-}
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:state]]",
+            "state": [
+              "sweeping",
+              "mopping",
+              "sweeping_and_mopping",
+              "second_cleaning",
+              "returning",
+              "returning_to_wash",
+              "returning_auto_empty",
+              "paused"
+            ]
+          },
+          {
+            "condition": "not",
+            "conditions": [
+              {
+                "condition": "state",
+                "entity_id": "[[entity_by_translation_key:charging_status]]",
+                "state": "charging"
+              }
+            ]
+          }
+        ]
+      },
+      "fixed": {
+        "power": 1.8
+      }
     },
     {
       "condition": {
@@ -229,20 +229,20 @@
     },
     {
       "condition": {
-  "condition": "or",
-  "conditions": [
-    {
-      "condition": "state",
-      "entity_id": "[[entity_by_translation_key:state]]",
-      "state": "charging"
-    },
-    {
-      "condition": "state",
-      "entity_id": "[[entity_by_translation_key:charging_status]]",
-      "state": "charging"
-    }
-  ]
-},
+        "condition": "or",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:state]]",
+            "state": "charging"
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:charging_status]]",
+            "state": "charging"
+          }
+        ]
+      },
       "linear": {
         "calibrate": [
           "13 -> 34.25",
