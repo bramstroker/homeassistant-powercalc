@@ -2214,14 +2214,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "42ad3e027c61cd4336b9dfca83445956"
+          "hash": "e6333037bf198e8a87d0068673358797"
         },
         {
           "calculation_strategy": "lut",
@@ -3638,15 +3638,15 @@
           "max_power": 26.1,
           "sub_profile_count": 2,
           "color_modes": [
-            "color_temp",
-            "brightness"
+            "brightness",
+            "color_temp"
           ],
           "lut_quality": {
             "score": 87.0,
             "brightness": 87.0,
             "color_temp": 97.8
           },
-          "hash": "a89b044a22aecff1a1bfe36a79c869fb"
+          "hash": "2eb099c5f36417cf81b2e8b3d41a3003"
         },
         {
           "aliases": [
@@ -6535,14 +6535,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "9ad8366817713c9a3fde43dce0df6046"
+          "hash": "9ce2a8ea311cdc3d726fb5329fbc1952"
         },
         {
           "calculation_strategy": "lut",
@@ -10559,10 +10559,10 @@
           },
           "id": "x50-ultra",
           "manufacturer": "dreame",
-          "updated_at": "2026-08-23T09:40:12",
+          "updated_at": "2026-08-23T10:21:59",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "c6142d95cc037f8453d0c42622253949"
+          "hash": "f145b3a3fb4f044c48d1c5e71c87710d"
         },
         {
           "calculation_strategy": "composite",
@@ -14288,15 +14288,15 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
           "lut_quality": {
             "score": 33.4,
             "brightness": 98.9,
             "color_temp": 33.4
           },
-          "hash": "bd80c1236b30c644bbcb856aaf80fa95"
+          "hash": "ac5fdec4dc81a7d824d174e29c0ee286"
         }
       ],
       "device_types": [
@@ -16017,14 +16017,14 @@
           "max_power": 9.7,
           "sub_profile_count": 0,
           "color_modes": [
-            "effect",
-            "brightness"
+            "brightness",
+            "effect"
           ],
           "lut_quality": {
             "score": 98.7,
             "brightness": 98.7
           },
-          "hash": "f18eac5d2a6fb907afbaa5ebf2cae363"
+          "hash": "c13689fd0bd878e990adc75a1475facb"
         },
         {
           "calculation_strategy": "lut",
@@ -17353,14 +17353,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "3f1e87e61e0141392e7d04b242581864"
+          "hash": "f12d5075a3d53738da4d61897c0d8d1f"
         },
         {
           "calculation_strategy": "lut",
@@ -18521,14 +18521,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "120c9b2c233104808d27d7363c2d2eb3"
+          "hash": "03968f61726e1479b9333cd0bc072516"
         },
         {
           "aliases": [
@@ -19194,14 +19194,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 86.6,
             "color_temp": 86.6
           },
-          "hash": "b4fe05536c9f3158b610334ad63e7a2c"
+          "hash": "491990efa584553a4d1b442cdcb38b92"
         },
         {
           "aliases": [
@@ -20293,14 +20293,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 96.2,
             "color_temp": 96.2
           },
-          "hash": "72cbd22eeeee22001a124b9594a7ff79"
+          "hash": "5a5d0cd84ef9da39c53d4ed4a31c96a5"
         },
         {
           "aliases": [
@@ -20363,14 +20363,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 79.3,
             "color_temp": 79.3
           },
-          "hash": "3b80a0a1709a5b74142a9a3414da7fab"
+          "hash": "92edd0cce2fd5f1158e95508702c8ad7"
         },
         {
           "calculation_strategy": "lut",
@@ -20669,14 +20669,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 96.9,
             "color_temp": 96.9
           },
-          "hash": "8c7c135a161a7b821ea2fcdacfe5c851"
+          "hash": "4d7b904515e6b04f9282e963c952664d"
         },
         {
           "aliases": [
@@ -21140,14 +21140,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.2,
             "color_temp": 99.2
           },
-          "hash": "8740e4c3143f5a2ed0464770f10af092"
+          "hash": "cdadacbed2b1f566e90a73dd65364046"
         },
         {
           "aliases": [],
@@ -21270,14 +21270,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "1ed1f2cca1adb2a92fc14a7f83306adc"
+          "hash": "5928d636d24829536790dcc2bede3cea"
         },
         {
           "aliases": [
@@ -22890,14 +22890,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 95.7,
             "color_temp": 95.7
           },
-          "hash": "1dd7dcaeab3db9c6ff8990b129132c5f"
+          "hash": "e4e0e5b071c5db19c90457a7bfa254da"
         },
         {
           "aliases": [
@@ -23398,15 +23398,15 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
           "lut_quality": {
             "score": 93.8,
             "brightness": 98.8,
             "color_temp": 93.8
           },
-          "hash": "b82104da1fef60e204615fa481d8dd50"
+          "hash": "4a675f7b4c051789798bae1cbae2918d"
         },
         {
           "aliases": [
@@ -23658,14 +23658,14 @@
           "max_power": 12.91,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.4,
             "brightness": 99.4
           },
-          "hash": "a2365a9e96c2f6538bdd7d0c7f05c724"
+          "hash": "1b168835fcc128ed63fb6d62a5ef7825"
         },
         {
           "calculation_strategy": "fixed",
@@ -25465,14 +25465,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "eab4cb7cadfaf9ebf5c38f42a605f909"
+          "hash": "eb04914a2a011bc4323d32c0f046b73a"
         },
         {
           "calculation_strategy": "lut",
@@ -25500,14 +25500,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 98.4,
             "color_temp": 98.4
           },
-          "hash": "15a833480fcfefdb3cc60eec5483f4e8"
+          "hash": "5544593953d682f73d5a742f53f9fc20"
         },
         {
           "calculation_strategy": "lut",
@@ -25571,14 +25571,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 67.4,
             "color_temp": 67.4
           },
-          "hash": "860e2812544dc0ace25f10f4b4e5c025"
+          "hash": "f94fe36d8de284af5b02c72ac029bac3"
         },
         {
           "calculation_strategy": "lut",
@@ -25641,10 +25641,10 @@
           "max_power": 24.11,
           "sub_profile_count": 0,
           "color_modes": [
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
-          "hash": "95dd403b44781fe6cad4639beb9fb1e4"
+          "hash": "540a3b84e9066196b34d53e08edace59"
         },
         {
           "calculation_strategy": "lut",
@@ -25708,14 +25708,14 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "effect"
+            "effect",
+            "hs"
           ],
           "lut_quality": {
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "ae56c192cc2729d0642598a160b9f933"
+          "hash": "00031306faa65740075d5d33aaa3964e"
         },
         {
           "calculation_strategy": "lut",
@@ -25813,15 +25813,15 @@
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp",
-            "hs",
-            "brightness"
+            "brightness",
+            "hs"
           ],
           "lut_quality": {
             "score": 84.6,
             "brightness": 98.9,
             "color_temp": 84.6
           },
-          "hash": "63795d12072ff22cbf1e87006eb690b3"
+          "hash": "64a4b53d0345d983d486ee36c0055f0d"
         },
         {
           "calculation_strategy": "lut",
