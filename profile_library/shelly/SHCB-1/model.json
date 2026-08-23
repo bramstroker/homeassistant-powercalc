@@ -6,6 +6,7 @@
     "Shelly Bulb RGBW"
   ],
   "calculation_strategy": "lut",
+  "description": "Smart Wi-Fi RGBW LED Bulb",
   "created_at": "2025-01-20T22:38:52Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",

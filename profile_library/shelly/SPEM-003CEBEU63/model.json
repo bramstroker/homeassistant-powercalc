@@ -6,6 +6,7 @@
     "Shelly Pro 3EM 3CT63"
   ],
   "calculation_strategy": "fixed",
+  "description": "DIN-Rail Smart Three-Phase Energy Meter with 63 A Current Transformers",
   "created_at": "2024-01-03T19:07:00Z",
   "device_type": "power_meter",
   "discovery_by": "device",

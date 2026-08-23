@@ -6,6 +6,7 @@
     "shelly pm mini gen3"
   ],
   "calculation_strategy": "fixed",
+  "description": "Smart Wi-Fi Power Meter for Energy Monitoring",
   "created_at": "2024-12-01T16:51:00Z",
   "device_type": "power_meter",
   "discovery_by": "device",

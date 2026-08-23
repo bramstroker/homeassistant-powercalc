@@ -6,6 +6,7 @@
     "Shelly 1"
   ],
   "calculation_strategy": "fixed",
+  "description": "Smart Wi-Fi Relay Switch with Dry Contacts",
   "created_at": "2024-01-05T12:55:00Z",
   "device_type": "smart_switch",
   "discovery_by": "entity",

@@ -88,6 +88,10 @@
             "type": "string"
           }
         },
+        "description": {
+          "type": "string",
+          "description": "A short description of the device"
+        },
         "updated_at": {
           "type": "string",
           "format": "date-time",

@@ -8,6 +8,7 @@
     "shelly plus plug s"
   ],
   "calculation_strategy": "fixed",
+  "description": "Smart Wi-Fi Plug with Power Monitoring",
   "created_at": "2024-12-01T18:36:00Z",
   "device_type": "smart_switch",
   "discovery_by": "entity",

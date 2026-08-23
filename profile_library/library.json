@@ -2415,6 +2415,7 @@
             "Shelly Pro 3EM 3CT63"
           ],
           "calculation_strategy": "fixed",
+          "description": "DIN-Rail Smart Three-Phase Energy Meter with 63 A Current Transformers",
           "created_at": "2024-01-03T19:07:00Z",
           "device_type": "power_meter",
           "discovery_by": "device",
@@ -2439,7 +2440,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.0,
           "sub_profile_count": 6,
-          "hash": "46904dcaa1997b87f4558f9769cbf13c"
+          "hash": "c9667d3dd308a3b1e538411ec8571aad"
         },
         {
           "name": "Plus 2PM",
@@ -2453,6 +2454,7 @@
             "Shelly Plus 2PM"
           ],
           "calculation_strategy": "multi_switch",
+          "description": "Dual-Channel Smart Wi-Fi Relay with Power Monitoring",
           "created_at": "2025-01-12T21:46:00Z",
           "device_type": "smart_switch",
           "discovery_by": "device",
@@ -2480,7 +2482,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": null,
           "sub_profile_count": 16,
-          "hash": "cbe03a3bd96e6b6df63e268aead23592"
+          "hash": "084c543bc04268562ac95f27bde26871"
         },
         {
           "aliases": [
@@ -2490,6 +2492,7 @@
             "Shelly Dimmer"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Light Dimmer",
           "created_at": "2024-01-09T21:22:00Z",
           "device_type": "smart_dimmer",
           "discovery_by": "entity",
@@ -2515,7 +2518,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "ee71d7aa024224dd50735b6ef1ff3e5b"
+          "hash": "2fba4543caf327130ddb9835e67d9deb"
         },
         {
           "aliases": [
@@ -2525,6 +2528,7 @@
             "Shelly 3EM"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Three-Phase Energy Meter",
           "created_at": "2024-12-01T18:27:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -2546,7 +2550,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 1.22,
           "sub_profile_count": 0,
-          "hash": "1ffefbcbe609736819a564dfc7a5ba5b"
+          "hash": "fd9293b2eee68a015f82bd820fbae35b"
         },
         {
           "aliases": [
@@ -2556,6 +2560,7 @@
             "Shelly Plus Plug US"
           ],
           "calculation_strategy": "lut",
+          "description": "Smart Wi-Fi Plug with Power Monitoring",
           "created_at": "2025-07-15T04:34:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -2574,7 +2579,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0,
           "sub_profile_count": 0,
-          "hash": "a5392d861612880d2fb13f9a0b2f0d2b"
+          "hash": "e41777d323363b3131eced2a7b522298"
         },
         {
           "aliases": [
@@ -2584,6 +2589,7 @@
             "Shelly Bulb RGBW"
           ],
           "calculation_strategy": "lut",
+          "description": "Smart Wi-Fi RGBW LED Bulb",
           "created_at": "2025-01-20T22:38:52Z",
           "device_type": "light",
           "measure_device": "Shelly PM Mini Gen3",
@@ -2615,7 +2621,7 @@
             "score": 74.8,
             "color_temp": 74.8
           },
-          "hash": "36bbac13490d3f1c9fd066c1e6834e01"
+          "hash": "bc0563cdf91c9fb066ec1a9bf65612f5"
         },
         {
           "aliases": [
@@ -2625,6 +2631,7 @@
             "Shelly Plus 1PM"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Relay with Power Monitoring",
           "created_at": "2024-01-09T19:21:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -2648,7 +2655,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.0,
           "sub_profile_count": 3,
-          "hash": "bd9178089b3195c9aa0685ff60bbbec6"
+          "hash": "6e0b28c775a5fa122bc945268c3a240f"
         },
         {
           "aliases": [
@@ -2658,6 +2665,7 @@
             "Shelly EM"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Energy Meter with Contactor Control",
           "created_at": "2024-01-06T21:34:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -2684,7 +2692,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.923,
           "sub_profile_count": 0,
-          "hash": "479765da3fb05f43e4d41b3b366a3d4b"
+          "hash": "93d6f2ebf390d8c8384f2f8bb4287321"
         },
         {
           "aliases": [
@@ -2695,7 +2703,7 @@
           ],
           "calculation_strategy": "fixed",
           "created_at": "2025-01-27T11:56:26Z",
-          "description": "Shelly i4 device to connect simple switches or buttons to for input. This device does not itself contain a rely.",
+          "description": "Smart 4-Channel Wi-Fi Input Controller",
           "device_type": "generic_iot",
           "discovery_by": "device",
           "measure_device": "Shelly PM Mini Gen3",
@@ -2715,7 +2723,7 @@
           "updated_at": "2026-08-21T12:12:06",
           "max_power": 0.0,
           "sub_profile_count": 3,
-          "hash": "b73efc643b412a64998a1c7ddf479dcd"
+          "hash": "aaa703a815082f2ba43c9d4f71313f4c"
         },
         {
           "aliases": [
@@ -2725,6 +2733,7 @@
             "Shelly 1PM Mini Gen3"
           ],
           "calculation_strategy": "fixed",
+          "description": "Compact Smart Wi-Fi Relay with Power Monitoring",
           "created_at": "2025-02-23T11:56:26Z",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
@@ -2745,7 +2754,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.0,
           "sub_profile_count": 3,
-          "hash": "54bf09920ece0da7f0b4a731b10f2078"
+          "hash": "68db62c2a117c39cf6d4b02724719050"
         },
         {
           "aliases": [
@@ -2755,6 +2764,7 @@
             "Shelly i3"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart 3-Channel Wi-Fi Input Controller",
           "created_at": "2026-01-09T22:55:00Z",
           "device_type": "generic_iot",
           "discovery_by": "device",
@@ -2778,7 +2788,7 @@
           "updated_at": "2026-08-21T12:12:06",
           "max_power": 0.587,
           "sub_profile_count": 0,
-          "hash": "f039a59406956dfb55c4086232570638"
+          "hash": "a8b18ebefab2edd3fa6232b24e8e5328"
         },
         {
           "aliases": [
@@ -2788,6 +2798,7 @@
             "Shelly 1"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Relay Switch with Dry Contacts",
           "created_at": "2024-01-05T12:55:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -2814,7 +2825,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.618,
           "sub_profile_count": 0,
-          "hash": "b7a1a26dcdf42fd1143a4f7bcabc2f4a"
+          "hash": "d25fa19daea279a69245a2f4e1ac6139"
         },
         {
           "aliases": [
@@ -2824,6 +2835,7 @@
             "Shelly Plug S MTR Gen3"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Plug with Power Monitoring & Matter",
           "created_at": "2025-05-01T21:56:26Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -2846,7 +2858,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.0,
           "sub_profile_count": 2,
-          "hash": "62a04211e5469f2cdb0a4e5a0d8b1b7b"
+          "hash": "2477bb274793dd5569fea56d3edc1d8c"
         },
         {
           "aliases": [
@@ -2856,6 +2868,7 @@
             "shelly pm mini gen3"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Power Meter for Energy Monitoring",
           "created_at": "2024-12-01T16:51:00Z",
           "device_type": "power_meter",
           "discovery_by": "device",
@@ -2876,7 +2889,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "727534dc6217fb5a7d1a1214f0823d2c"
+          "hash": "1a94a5f3c88b7030454ec5b43f41d443"
         },
         {
           "aliases": [
@@ -2888,6 +2901,7 @@
             "shelly plus plug s"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Plug with Power Monitoring",
           "created_at": "2024-12-01T18:36:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -2909,7 +2923,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 1.01,
           "sub_profile_count": 0,
-          "hash": "4f0d7519ec02c274448514601773c4ca"
+          "hash": "a10af70800772146d2476de119789ea4"
         },
         {
           "measure_method": "manual",
@@ -2929,6 +2943,7 @@
           ],
           "device_type": "smart_switch",
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Relay Switch with Dry Contacts",
           "only_self_usage": false,
           "created_at": "2026-01-15T10:15:00Z",
           "authors": [
@@ -2943,7 +2958,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.0,
           "sub_profile_count": 16,
-          "hash": "f238b46922ef26456a625b2cd5c62b78"
+          "hash": "898bc14e25a31e4926b3ce88f168f9b2"
         },
         {
           "aliases": [
@@ -2953,6 +2968,7 @@
             "Shelly 2.5"
           ],
           "calculation_strategy": "multi_switch",
+          "description": "Dual-Channel Smart Wi-Fi Relay with Power Monitoring",
           "created_at": "2024-01-02T22:39:00Z",
           "device_type": "smart_switch",
           "discovery_by": "device",
@@ -2981,7 +2997,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "d90f935f3456da1d900a35a8e8395ea0"
+          "hash": "ff41432f6e1d687a5ef511c5f4c43277"
         },
         {
           "aliases": [
@@ -2991,6 +3007,7 @@
             "Shelly 1 mini gen3"
           ],
           "calculation_strategy": "fixed",
+          "description": "Compact Smart Wi-Fi Relay Switch",
           "created_at": "2025-02-23T11:56:26Z",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
@@ -3010,7 +3027,7 @@
           "updated_at": "2026-08-21T12:12:06",
           "max_power": 0.0,
           "sub_profile_count": 3,
-          "hash": "04fb4967ff50896a53e72074f2542c39"
+          "hash": "44c723b7ee2a4cee2fe6dfdc95576002"
         },
         {
           "aliases": [
@@ -3020,6 +3037,7 @@
             "Shelly 1L Gen3"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Relay for No-Neutral-Wire Switches",
           "created_at": "2026-01-05T19:06:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -3043,7 +3061,7 @@
           "updated_at": "2026-08-21T12:12:06",
           "max_power": 0.0,
           "sub_profile_count": 5,
-          "hash": "fae64f4757e0a97b1df2d5887b7374d5"
+          "hash": "e935fbe108a31c5059c7988c968a6d6b"
         },
         {
           "aliases": [
@@ -3053,6 +3071,7 @@
             "Shelly 1 Mini Gen4"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi, Zigbee & Matter Relay",
           "created_at": "2025-05-10T00:00:00Z",
           "device_type": "smart_switch",
           "discovery_by": "device",
@@ -3075,7 +3094,7 @@
           "updated_at": "2026-08-21T12:12:06",
           "max_power": 0.0,
           "sub_profile_count": 4,
-          "hash": "a8a221e2a5af26e1d2c054285aa396f2"
+          "hash": "8562164278159f43eeac3917bc3ddd77"
         },
         {
           "aliases": [
@@ -3085,6 +3104,7 @@
             "shelly plug s"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Plug with Power Monitoring",
           "created_at": "2025-06-07T00:00:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -3104,7 +3124,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.0,
           "sub_profile_count": 2,
-          "hash": "791556310b49323f3a4ce68800347fb5"
+          "hash": "d9b4d99c2bfd9de07cd9e98e4d16d77c"
         },
         {
           "aliases": [
@@ -3115,6 +3135,7 @@
             "Shelly 1PM Mini Gen4"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi, Zigbee & Matter Relay with Power Monitoring",
           "created_at": "2025-11-29T09:48:00Z",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
@@ -3138,7 +3159,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.0,
           "sub_profile_count": 4,
-          "hash": "76b3b4f39164026863fe08efef92cea8"
+          "hash": "3fc9588d4d763d22eee7325ede255b94"
         },
         {
           "aliases": [
@@ -3148,6 +3169,7 @@
             "Shelly 1PM"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Relay with Power Monitoring",
           "created_at": "2024-01-09T19:21:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -3174,7 +3196,7 @@
           "updated_at": "2026-08-21T10:30:36",
           "max_power": 0.85,
           "sub_profile_count": 0,
-          "hash": "f910d9c57fe6d7fb38cb9a74f9ed7075"
+          "hash": "5c269862d2d0c636136554d314f04c2b"
         }
       ],
       "device_types": [
@@ -8001,6 +8023,7 @@
             "shelly plus plug s"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Plug with Power Monitoring",
           "created_at": "2024-12-01T18:36:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -8022,7 +8045,7 @@
           "updated_at": "2024-05-03T07:11:32",
           "max_power": 1.01,
           "sub_profile_count": 0,
-          "hash": "3b737cb95e23e005a9a317902e1bd5a4"
+          "hash": "9cdcd1f17d1dc9a66e28450df1a8fc77"
         },
         {
           "aliases": [
@@ -8059,6 +8082,7 @@
             "shelly plug s"
           ],
           "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Plug with Power Monitoring",
           "created_at": "2025-06-07T00:00:00Z",
           "device_type": "smart_switch",
           "discovery_by": "entity",
@@ -8078,7 +8102,7 @@
           "updated_at": "2024-05-03T07:11:32",
           "max_power": 0.0,
           "sub_profile_count": 2,
-          "hash": "2c8ee82ad01a903ff7d35ce6d020ddce"
+          "hash": "c86648c0c25b378fd6b9927bcc78a917"
         }
       ],
       "device_types": [
