@@ -1,7 +1,4 @@
 {
-  "aliases": [
-    "Beosound Emerge"
-  ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2026-01-29T11:53:36Z",

@@ -1,7 +1,4 @@
 {
-  "aliases": [
-    "Playbar"
-  ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2023-04-14T16:03:13Z",

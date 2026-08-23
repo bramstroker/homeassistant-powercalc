@@ -1,7 +1,4 @@
 {
-  "aliases": [
-    "ECO-DIM.07 Zigbee Basic"
-  ],
   "calculation_strategy": "fixed",
   "created_at": "2025-06-09T00:00:00Z",
   "device_type": "smart_dimmer",

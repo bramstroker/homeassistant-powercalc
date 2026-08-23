@@ -1,7 +1,6 @@
 {
   "aliases": [
     "A15996VY63BQ2D",
-    "A8H3N2",
     "KNIGHT A15996VY63BQ2D"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
