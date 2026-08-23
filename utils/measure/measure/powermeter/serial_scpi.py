@@ -43,7 +43,7 @@ class SerialScpiPowerMeter(PowerMeter):
     def _bytes_to_float(self, data: bytes) -> float:
         try:
             return float(data.strip().decode())
-        except (UnicodeError, ValueError, OverflowError) as error:
+        except (ValueError, OverflowError) as error:
             raise PowerMeterError(error) from error
 
     def _retrieve_float(self, request: bytes) -> float:
