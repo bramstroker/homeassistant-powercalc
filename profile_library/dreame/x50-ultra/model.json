@@ -2,10 +2,12 @@
   "aliases": [
     "dreame.vacuum.r2538z"
   ],
-  "authors": [{
-    "name": "philscottydev",
-    "github": "philscottydev"
-  }],
+  "authors": [
+    {
+      "name": "philscottydev",
+      "github": "philscottydev"
+    }
+  ],
   "calculation_strategy": "composite",
   "compatible_integrations": [
     "dreame_vacuum"
