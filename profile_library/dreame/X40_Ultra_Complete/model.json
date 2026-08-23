@@ -1,5 +1,5 @@
 {
-  "name": "Dreame X40 Ultra Complete",
+  "name": "X40 Ultra Complete",
   "device_type": "vacuum_robot",
   "aliases": [
     "dreame.vacuum.r2449a",
@@ -28,7 +28,7 @@
         "state": "auto_emptying"
       },
       "fixed": {
-        "power": 500.0
+        "power": 454.5
       }
     },
     {
@@ -38,7 +38,7 @@
         "state": "station_cleaning"
       },
       "fixed": {
-        "power": 531.12
+        "power": 268.6
       }
     },
     {
@@ -60,15 +60,9 @@
             ]
           },
           {
-            "condition": "not",
-            "conditions": [
-              {
-                "condition": "state",
-                "entity_id": "[[entity_by_translation_key:charging_status]]",
-                "state": "charging"
-              }
-            ]
-          }
+  "condition": "template",
+  "value_template": "{{ states('[[entity_by_translation_key:charging_status]]') != 'charging' }}"
+}
         ]
       },
       "fixed": {
