@@ -11,5 +11,12 @@
     "VERSION": "v1.20.4:docker"
   },
   "name": "Hue Surimu panel",
-  "standby_power": 0.15
+  "standby_power": 0.15,
+  "authors": [
+    {
+      "name": "Bram",
+      "github": "bramstroker",
+      "email": "bgerritsen@emico.nl"
+    }
+  ]
 }
