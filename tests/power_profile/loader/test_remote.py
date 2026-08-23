@@ -3,6 +3,7 @@ from functools import partial
 import json
 import logging
 import os
+from pathlib import Path
 import re
 import shutil
 from typing import cast
@@ -143,6 +144,163 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
             os.path.exists,
             os.path.join(storage_dir, remote_file["path"]),
         )
+
+
+@pytest.mark.parametrize(
+    "resource_url",
+    [
+        "http://raw.githubusercontent.com/example/profile/model.json",
+        "https://example.com/profile/model.json",
+        "https://raw.githubusercontent.com.example.com/profile/model.json",
+        "https://github.com@127.0.0.1/profile/model.json",
+        "https://github.com:444/profile/model.json",
+        "https://github.com:invalid/profile/model.json",
+        None,
+    ],
+)
+async def test_download_rejects_untrusted_resource_url(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+    resource_url: str | None,
+) -> None:
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=[{"path": "model.json", "url": resource_url}],
+    )
+
+    with pytest.raises(ProfileDownloadError, match="URL"):
+        await remote_loader.download_profile("test", "model", str(tmp_path / "profiles"), "test_download")
+
+
+@pytest.mark.parametrize("resource_path", ["../outside.json", "nested/../../outside.json", "", None])
+async def test_download_rejects_invalid_resource_path(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+    resource_path: str | None,
+) -> None:
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=[
+            {
+                "path": resource_path,
+                "url": "https://raw.githubusercontent.com/example/profile/model.json",
+            },
+        ],
+    )
+
+    with pytest.raises(ProfileDownloadError, match="path"):
+        await remote_loader.download_profile("test", "model", str(tmp_path / "profiles"), "test_download")
+
+
+async def test_download_rejects_invalid_storage_path(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+) -> None:
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=[
+            {
+                "path": "model.json",
+                "url": "https://raw.githubusercontent.com/example/profile/model.json",
+            },
+        ],
+    )
+
+    with pytest.raises(ProfileDownloadError, match="invalid path"):
+        await remote_loader.download_profile("test", "model", "invalid\0path", "test_download")
+
+
+@pytest.mark.parametrize("resources", [{}, ["invalid"]])
+async def test_download_rejects_invalid_resource_manifest(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+    resources: object,
+) -> None:
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=resources,
+    )
+
+    with pytest.raises(ProfileDownloadError, match="invalid resources"):
+        await remote_loader.download_profile("test", "model", str(tmp_path / "profiles"), "test_download")
+
+
+async def test_download_rejects_absolute_resource_path(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=[
+            {
+                "path": str(tmp_path / "outside.json"),
+                "url": "https://raw.githubusercontent.com/example/profile/model.json",
+            },
+        ],
+    )
+
+    with pytest.raises(ProfileDownloadError, match="path"):
+        await remote_loader.download_profile("test", "model", str(tmp_path / "profiles"), "test_download")
+
+    assert not (tmp_path / "outside.json").exists()
+
+
+async def test_download_rejects_resource_path_through_symlink(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    storage_path = tmp_path / "profiles"
+    outside_path = tmp_path / "outside"
+    storage_path.mkdir()
+    outside_path.mkdir()
+    (storage_path / "linked").symlink_to(outside_path, target_is_directory=True)
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=[
+            {
+                "path": "linked/model.json",
+                "url": "https://raw.githubusercontent.com/example/profile/model.json",
+            },
+        ],
+    )
+
+    with pytest.raises(ProfileDownloadError, match="path"):
+        await remote_loader.download_profile("test", "model", str(storage_path), "test_download")
+
+    assert not (outside_path / "model.json").exists()
+
+
+async def test_download_does_not_follow_resource_redirects(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    resource_url = "https://raw.githubusercontent.com/example/profile/model.json"
+    redirected_url = "http://192.168.1.1/model.json"
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=[{"path": "model.json", "url": resource_url}],
+    )
+    mock_aioresponse.get(resource_url, status=302, headers={"Location": redirected_url})
+    mock_aioresponse.get(redirected_url, status=200, body=b"untrusted")
+    storage_path = tmp_path / "profiles"
+
+    with pytest.raises(ProfileDownloadError, match="Failed to download github URL"):
+        await remote_loader.download_profile("test", "model", str(storage_path), "test_download")
+
+    assert not (storage_path / "model.json").exists()
 
 
 async def test_get_manufacturer_listing(remote_loader: RemoteLoader) -> None:

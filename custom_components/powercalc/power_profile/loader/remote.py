@@ -5,8 +5,10 @@ import json
 from json import JSONDecodeError
 import logging
 import os
+from pathlib import Path
 import shutil
 from typing import Any, NotRequired, TypedDict, cast
+from urllib.parse import urlsplit
 
 import aiohttp
 from aiohttp import ClientError
@@ -33,6 +35,67 @@ ENDPOINT_LIBRARY = f"{API_URL}/library"
 ENDPOINT_DOWNLOAD = f"{API_URL}/download"
 
 TIMEOUT_SECONDS = 30
+
+ALLOWED_RESOURCE_HOSTS = frozenset({"github.com", "raw.githubusercontent.com"})
+
+
+def _validate_resource_url(url: object) -> str:
+    """Validate that a resource URL points to an allowed HTTPS host."""
+    if not isinstance(url, str):
+        raise ProfileDownloadError("Remote profile resource has an invalid URL")
+
+    try:
+        parsed_url = urlsplit(url)
+        is_allowed = (
+            parsed_url.scheme == "https"
+            and parsed_url.hostname in ALLOWED_RESOURCE_HOSTS
+            and parsed_url.username is None
+            and parsed_url.password is None
+            and parsed_url.port in (None, 443)
+        )
+    except ValueError as err:
+        raise ProfileDownloadError(f"Remote profile resource has an invalid URL: {url}") from err
+
+    if not is_allowed:
+        raise ProfileDownloadError(f"Remote profile resource URL is not allowed: {url}")
+    return url
+
+
+def _resolve_resource_path(storage_path: str, resource_path: object) -> Path:
+    """Resolve and validate a resource path within the profile storage directory."""
+    if not isinstance(resource_path, str) or not resource_path or "\0" in resource_path:
+        raise ProfileDownloadError("Remote profile resource has an invalid path")
+
+    relative_path = Path(resource_path)
+    if relative_path.is_absolute():
+        raise ProfileDownloadError(f"Remote profile resource path is not allowed: {resource_path}")
+
+    try:
+        storage_directory = Path(storage_path).resolve()
+        destination = (storage_directory / relative_path).resolve()
+    except (OSError, ValueError) as err:
+        raise ProfileDownloadError(f"Remote profile resource has an invalid path: {resource_path}") from err
+    if destination == storage_directory or not destination.is_relative_to(storage_directory):
+        raise ProfileDownloadError(f"Remote profile resource path is not allowed: {resource_path}")
+    return destination
+
+
+def _validate_resources(resources: object, storage_path: str) -> list[tuple[str, Path]]:
+    """Validate all resources in a remote profile response."""
+    if not isinstance(resources, list) or not all(isinstance(resource, dict) for resource in resources):
+        raise ProfileDownloadError("Remote profile response contains invalid resources")
+
+    return [
+        (_validate_resource_url(resource.get("url")), _resolve_resource_path(storage_path, resource.get("path")))
+        for resource in resources
+    ]
+
+
+def _save_resource(data: bytes, path: Path) -> None:
+    """Save a downloaded resource to the local profile storage directory."""
+    os.makedirs(path.parent, exist_ok=True)
+    with open(path, "wb") as file_handle:
+        file_handle.write(data)
 
 
 class LibraryModel(TypedDict):
@@ -480,13 +543,6 @@ class RemoteLoader(Loader):
 
         endpoint = f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}"
 
-        def _save_file(data: bytes, directory: str) -> None:
-            """Save file from Github to local storage directory"""
-            path = os.path.join(storage_path, directory)
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, "wb") as f:
-                f.write(data)
-
         session = async_get_clientsession(self.hass)
 
         try:
@@ -496,17 +552,22 @@ class RemoteLoader(Loader):
                         raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
                     resources = await resp.json()
 
+                validated_resources = await self.hass.async_add_executor_job(
+                    _validate_resources,
+                    resources,
+                    storage_path,
+                )
+
                 await self.hass.async_add_executor_job(lambda: os.makedirs(storage_path, exist_ok=True))
 
                 # Download the files
-                for resource in resources:
-                    url = resource.get("url")
-                    async with session.get(url) as resp:
+                for url, destination in validated_resources:
+                    async with session.get(url, allow_redirects=False) as resp:
                         if resp.status != 200:
                             raise ProfileDownloadError(f"Failed to download github URL: {url}")
 
                         contents = await resp.read()
-                        await self.hass.async_add_executor_job(_save_file, contents, resource.get("path"))
+                        await self.hass.async_add_executor_job(_save_resource, contents, destination)
         except (TimeoutError, aiohttp.ClientError) as e:
             raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
 
