@@ -67,6 +67,10 @@ def create_model_hash(mapping: Mapping[str, object]) -> str:
 
 async def generate_library_json(model_listing: list[dict[str, Any]]) -> None:
     manufacturers: dict[str, dict[str, Any]] = {}
+    model_listing = sorted(
+        model_listing,
+        key=lambda model: (model["manufacturer"].casefold(), model["id"].casefold()),
+    )
 
     # Process manufacturers concurrently
     tasks = []
@@ -301,13 +305,14 @@ async def process_model_file(json_path: str) -> dict[str, Any]:
             model_directory = os.path.join(DATA_DIR, model_data["linked_profile"])
 
         # Get these values concurrently
-        updated_at, max_power, sub_profile_count, color_modes, lut_quality = await asyncio.gather(
+        updated_at, power_values, sub_profile_count, color_modes, lut_quality = await asyncio.gather(
             get_last_commit_time(model_directory),
-            get_max_power(model_directory, model_data),
+            get_power_values(model_directory, model_data),
             asyncio.to_thread(get_sub_profile_count, model_directory),
             get_color_modes(model_directory),
             asyncio.to_thread(get_lut_quality, model_directory),
         )
+        max_power, standby_power = power_values
 
         model_data.update(
             {
@@ -319,11 +324,13 @@ async def process_model_file(json_path: str) -> dict[str, Any]:
                 "sub_profile_count": sub_profile_count,
             },
         )
+        if standby_power is not None:
+            model_data["standby_power"] = standby_power
         if "device_type" not in model_data:
             model_data["device_type"] = "light"
 
         if color_modes:
-            model_data["color_modes"] = list(color_modes)
+            model_data["color_modes"] = sorted(color_modes)
 
         if lut_quality:
             model_data["lut_quality"] = lut_quality
@@ -362,6 +369,43 @@ def _get_color_modes(model_directory: str) -> set[str]:
 def get_sub_profile_count(model_directory: str) -> int:
     path = Path(model_directory)
     return sum(1 for p in path.iterdir() if p.is_dir())
+
+
+async def get_power_values(model_directory: str, model_data: dict[str, Any]) -> tuple[float | None, float | None]:
+    """Return the highest maximum and standby power across all effective profiles."""
+    profiles = await asyncio.to_thread(get_effective_profiles, model_directory, model_data)
+
+    max_powers = await asyncio.gather(
+        *(get_max_power(profile_directory, profile_data) for profile_directory, profile_data in profiles),
+    )
+    valid_max_powers = [power for power in max_powers if power is not None]
+    standby_powers = [
+        float(profile_data["standby_power"])
+        for _profile_directory, profile_data in profiles
+        if is_number(profile_data.get("standby_power"))
+    ]
+
+    return (
+        max(valid_max_powers) if valid_max_powers else None,
+        max(standby_powers) if standby_powers else None,
+    )
+
+
+def get_effective_profiles(
+    model_directory: str,
+    model_data: dict[str, Any],
+) -> list[tuple[str, dict[str, Any]]]:
+    """Load the effective configuration of the base profile and its sub-profiles."""
+    profiles = [(model_directory, model_data)]
+    for sub_profile_directory in (path for path in Path(model_directory).iterdir() if path.is_dir()):
+        sub_profile_data: dict[str, Any] = {}
+        sub_profile_json = sub_profile_directory / "model.json"
+        if sub_profile_json.is_file():
+            sub_profile_data = json.loads(sub_profile_json.read_text())
+
+        profiles.append((str(sub_profile_directory), {**model_data, **sub_profile_data}))
+
+    return profiles
 
 
 async def get_max_power(model_directory: str, model_data: dict[str, Any]) -> float | None:

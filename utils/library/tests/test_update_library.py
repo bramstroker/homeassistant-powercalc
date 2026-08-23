@@ -52,6 +52,58 @@ def test_process_model_file_omits_lut_quality_without_lut_files(tmp_path: Path) 
     assert "lut_quality" not in model
 
 
+def test_process_model_file_calculates_power_values_from_sub_profiles(tmp_path: Path) -> None:
+    model_directory = create_model_directory(tmp_path, calculation_strategy="fixed")
+    (model_directory / "model.json").write_text(
+        json.dumps(
+            {
+                "name": "Hue White and Color Ambiance",
+                "calculation_strategy": "fixed",
+                "fixed_config": {"power": 1},
+                "standby_power": 0.2,
+            },
+        ),
+    )
+    low_profile = model_directory / "low"
+    low_profile.mkdir()
+    (low_profile / "model.json").write_text(
+        json.dumps({"fixed_config": {"power": 4}, "standby_power": 0.3}),
+    )
+    high_profile = model_directory / "high"
+    high_profile.mkdir()
+    (high_profile / "model.json").write_text(
+        json.dumps({"fixed_config": {"power": 8}, "standby_power": 0.5}),
+    )
+
+    model = asyncio.run(process_model_file(str(model_directory / "model.json")))
+
+    assert model["max_power"] == 8
+    assert model["standby_power"] == 0.5
+    assert model["sub_profile_count"] == 2
+
+
+def test_process_model_file_uses_inherited_sub_profile_power_values(tmp_path: Path) -> None:
+    model_directory = create_model_directory(tmp_path, calculation_strategy="fixed")
+    (model_directory / "model.json").write_text(
+        json.dumps(
+            {
+                "name": "Hue White and Color Ambiance",
+                "calculation_strategy": "fixed",
+                "fixed_config": {"power": 6},
+                "standby_power": 0.4,
+            },
+        ),
+    )
+    sub_profile = model_directory / "inherited"
+    sub_profile.mkdir()
+    (sub_profile / "model.json").write_text(json.dumps({"name": "Inherited"}))
+
+    model = asyncio.run(process_model_file(str(model_directory / "model.json")))
+
+    assert model["max_power"] == 6
+    assert model["standby_power"] == 0.4
+
+
 def test_library_json_hash_ignores_lut_quality(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """The hash drives profile re-downloads, so a score change must not invalidate every install."""
     monkeypatch.setattr(update_library, "DATA_DIR", str(tmp_path))
@@ -64,6 +116,26 @@ def test_library_json_hash_ignores_lut_quality(tmp_path: Path, monkeypatch: pyte
     assert first["lut_quality"] == {"score": 96.4, "brightness": 96.4}
     assert second["lut_quality"] == {"score": 42.0, "brightness": 42.0}
     assert first["hash"] == second["hash"]
+
+
+def test_generate_library_json_sorts_manufacturers_and_models(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(update_library, "DATA_DIR", str(tmp_path))
+    for manufacturer in ("zeta", "alpha"):
+        manufacturer_directory = tmp_path / manufacturer
+        manufacturer_directory.mkdir()
+        (manufacturer_directory / "manufacturer.json").write_text(json.dumps({"name": manufacturer.title()}))
+
+    models = [
+        {"id": "Z Model", "manufacturer": "alpha", "device_type": "light"},
+        {"id": "A Model", "manufacturer": "zeta", "device_type": "light"},
+        {"id": "A Model", "manufacturer": "alpha", "device_type": "light"},
+    ]
+
+    asyncio.run(generate_library_json(models))
+
+    library = json.loads((tmp_path / "library.json").read_text())
+    assert [manufacturer["name"] for manufacturer in library["manufacturers"]] == ["alpha", "zeta"]
+    assert [model["id"] for model in library["manufacturers"][0]["models"]] == ["A Model", "Z Model"]
 
 
 def test_process_author_update_migrates_legacy_author_info(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
