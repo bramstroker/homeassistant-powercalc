@@ -1,7 +1,6 @@
 {
   "aliases": [
     "AB72C64C86AW2",
-    "SK705DI",
     "ECHO AB72C64C86AW2"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",

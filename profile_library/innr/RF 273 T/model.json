@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.2:docker"
   },
-  "name": "Smart Filament Bulb E27 Tunable ",
+  "name": "Smart Filament Bulb E27 Tunable",
   "standby_power": 0.18,
   "authors": [
     {

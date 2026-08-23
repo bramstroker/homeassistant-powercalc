@@ -1,7 +1,4 @@
 {
-  "aliases": [
-    "T8400"
-  ],
   "calculation_strategy": "fixed",
   "created_at": "2024-12-14T09:59:57Z",
   "device_type": "camera",
