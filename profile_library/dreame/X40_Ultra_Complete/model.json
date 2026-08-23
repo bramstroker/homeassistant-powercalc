@@ -18,7 +18,7 @@
   "measure_method": "manual",
   "measure_device": "Athom ESPHome Wifi plug",
   "measure_description": "Measured dynamically with a calibrated smart plug during multiple full cycles including washing (all water temperatures tested), drying (all durations tested), auto-emptying, charging, and station cleaning.",
-  "standby_power": 8.69,
+  "standby_power": 5.47,
   "calculation_strategy": "composite",
   "composite_config": [
     {
@@ -43,22 +43,37 @@
     },
     {
       "condition": {
-        "condition": "state",
-        "entity_id": "[[entity_by_translation_key:state]]",
-        "state": [
-          "sweeping",
-          "mopping",
-          "sweeping_and_mopping",
-          "second_cleaning",
-          "returning",
-          "returning_to_wash",
-          "returning_auto_empty",
-          "paused"
-        ]
-      },
-      "fixed": {
-        "power": 1.8
-      }
+  "condition": "and",
+  "conditions": [
+    {
+      "condition": "state",
+      "entity_id": "[[entity_by_translation_key:state]]",
+      "state": [
+        "sweeping",
+        "mopping",
+        "sweeping_and_mopping",
+        "second_cleaning",
+        "returning",
+        "returning_to_wash",
+        "returning_auto_empty",
+        "paused"
+      ]
+    },
+    {
+      "condition": "not",
+      "conditions": [
+        {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:charging_status]]",
+          "state": "charging"
+        }
+      ]
+    }
+  ]
+},
+"fixed": {
+  "power": 1.8
+}
     },
     {
       "condition": {
@@ -140,7 +155,7 @@
         ]
       },
       "fixed": {
-        "power": 115.0
+        "power": 110.3
       }
     },
     {
@@ -163,7 +178,7 @@
         ]
       },
       "fixed": {
-        "power": 117.8
+        "power": 109.2
       }
     },
     {
@@ -186,7 +201,7 @@
         ]
       },
       "fixed": {
-        "power": 50.6
+        "power": 104.2
       }
     },
     {
@@ -209,15 +224,25 @@
         ]
       },
       "fixed": {
-        "power": 60.0
+        "power": 26.9
       }
     },
     {
       "condition": {
-        "condition": "state",
-        "entity_id": "[[entity_by_translation_key:state]]",
-        "state": "charging"
-      },
+  "condition": "or",
+  "conditions": [
+    {
+      "condition": "state",
+      "entity_id": "[[entity_by_translation_key:state]]",
+      "state": "charging"
+    },
+    {
+      "condition": "state",
+      "entity_id": "[[entity_by_translation_key:charging_status]]",
+      "state": "charging"
+    }
+  ]
+},
       "linear": {
         "calibrate": [
           "13 -> 34.25",
@@ -313,7 +338,7 @@
     },
     {
       "fixed": {
-        "power": 8.69
+        "power": 5.47
       }
     }
   ]
