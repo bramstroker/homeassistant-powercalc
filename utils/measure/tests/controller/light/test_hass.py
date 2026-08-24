@@ -48,6 +48,18 @@ def test_effect_list() -> None:
     assert _get_instance(client).get_effect_list() == ["A", "B", "C"]
 
 
+def test_effect_list_handles_null_value() -> None:
+    mocked_state = State(
+        entity_id="light.test",
+        state="on",
+        attributes={"effect_list": None},
+    )
+    client = _mock_client()
+    client.get_state.return_value = mocked_state
+
+    assert _get_instance(client).get_effect_list() == []
+
+
 def test_has_effect_support() -> None:
     hass_controller = _get_instance()
     assert hass_controller.has_effect_support()

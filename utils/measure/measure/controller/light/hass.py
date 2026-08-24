@@ -81,7 +81,7 @@ class HassLightController(HassControllerBase, LightController):
 
     def get_effect_list(self) -> list[str]:
         return common_effects(
-            [[str(effect) for effect in state.attributes.get("effect_list", [])] for state in self._states()],
+            [[str(effect) for effect in (state.attributes.get("effect_list") or [])] for state in self._states()],
         )
 
     def close(self) -> None:

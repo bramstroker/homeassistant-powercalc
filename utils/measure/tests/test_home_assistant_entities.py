@@ -133,6 +133,17 @@ def test_catalog_loads_entity_data_once_per_instance() -> None:
     assert fresh[0].state == "2.0"
 
 
+def test_catalog_handles_light_with_null_effect_list() -> None:
+    data = _entity_data()
+    data.entities["light"].entities["desk"].state.attributes["effect_list"] = None
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+
+    lights = HomeAssistantEntityCatalog(home_assistant).load_snapshot().select(domain=EntityDomain.LIGHT)
+
+    assert lights[0].effect_list is None
+
+
 def test_catalog_exposes_group_members_and_infers_their_shared_model() -> None:
     data = _entity_data()
     data.entities["light"].entities["second"] = _entity(
