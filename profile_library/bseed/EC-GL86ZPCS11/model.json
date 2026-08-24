@@ -1,15 +1,13 @@
 {
-  "name": "Zigbee Switch 1 Gang",
+  "name": "1 Gang Switch with Scene and Backlight",
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
-  "measure_description": "Measured via Powercalc Measure Tool",
+  "measure_description": "Switch self-consumption measured via Powercalc Measure Tool. Total load depends on connected lamp.",
   "created_at": "2026-07-27T15:17:25Z",
   "standby_power": 0.59,
-  "fixed_config": {
-    "power": 0.89
-  },
+  "standby_power_on": 0.89,
   "authors": [
     {
       "name": "Maxik933",
