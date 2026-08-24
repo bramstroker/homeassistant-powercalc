@@ -69,6 +69,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._attribute: str | None = None
         self._standby_power = standby_power
         self._initialized: bool = False
+        self._missing_attribute_warned: bool = False
         self._calibration: list[tuple[int, float]] | None = None
 
     async def initialize(self) -> None:
@@ -199,12 +200,15 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         value = entity_state.attributes.get(self._attribute)
         if value is None:
-            _LOGGER.warning(
-                "No %s attribute for entity: %s",
-                self._attribute,
-                entity_state.entity_id,
-            )
+            if not self._missing_attribute_warned:
+                _LOGGER.warning(
+                    "No %s attribute for entity: %s",
+                    self._attribute,
+                    entity_state.entity_id,
+                )
+                self._missing_attribute_warned = True
             return None
+        self._missing_attribute_warned = False
         # Convert volume level to 0-100 range
         if self._attribute == ATTR_MEDIA_VOLUME_LEVEL:
             if entity_state.attributes.get(ATTR_MEDIA_VOLUME_MUTED) is True:

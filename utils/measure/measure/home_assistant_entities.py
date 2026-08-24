@@ -242,7 +242,7 @@ def _describe_entity(
         unit=str(unit) if unit else None,
         attribute_names=sorted(attributes),
         supported_modes=supported_modes,
-        effect_list=[str(effect) for effect in attributes.get("effect_list", [])] or None,
+        effect_list=[str(effect) for effect in (attributes.get("effect_list") or [])] or None,
         min_mired=light_info.get_min_mired() if light_info is not None else None,
         max_mired=light_info.get_max_mired() if light_info is not None else None,
         member_entity_ids=[str(member) for member in members] if isinstance(members, list) else [],
