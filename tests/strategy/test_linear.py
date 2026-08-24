@@ -192,6 +192,43 @@ async def test_error_on_non_number_state(
     assert "Expecting state to be a number for entity" in caplog.text
 
 
+async def test_missing_attribute_warning_is_logged_once(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """The 'no attribute' warning fires once per occurrence, not every calculation.
+
+    A fan in a preset mode without a percentage attribute is a normal runtime
+    state, so the warning must not spam the log. It should warn when entering the
+    state, stay quiet while it persists, and warn again only after a successful
+    reading in between.
+
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/4585
+    """
+    caplog.set_level(logging.WARNING)
+    strategy = await _create_strategy_instance(
+        hass,
+        create_source_entity("fan.test", hass),
+        {CONF_MIN_POWER: 10, CONF_MAX_POWER: 100},
+    )
+
+    missing = State("fan.test", STATE_ON, {ATTR_PERCENTAGE: None})
+
+    assert await strategy.calculate(missing) is None
+    assert caplog.text.count("No percentage attribute for entity") == 1
+
+    # Same state again must not raise another warning.
+    assert await strategy.calculate(missing) is None
+    assert caplog.text.count("No percentage attribute for entity") == 1
+
+    # A successful reading resets the flag.
+    assert await strategy.calculate(State("fan.test", STATE_ON, {ATTR_PERCENTAGE: 50})) == 55
+
+    # Entering the missing state again warns once more.
+    assert await strategy.calculate(missing) is None
+    assert caplog.text.count("No percentage attribute for entity") == 2
+
+
 async def test_validate_raises_exception_not_allowed_domain(
     hass: HomeAssistant,
 ) -> None:
