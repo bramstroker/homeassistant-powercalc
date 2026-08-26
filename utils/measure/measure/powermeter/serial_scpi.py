@@ -36,9 +36,9 @@ class SerialScpiPowerMeter(PowerMeter):
     def _retrieve_data(self, request: bytes) -> bytes:
         try:
             self._serial.write(request)
-        except serial.SerialTimeoutException as error:
+            return self._serial.readline()
+        except serial.SerialException as error:
             raise PowerMeterError(error) from error
-        return self._serial.readline()
 
     def _bytes_to_float(self, data: bytes) -> float:
         try:
