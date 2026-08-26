@@ -63,9 +63,7 @@ class SerialScpiPowerMeter(PowerMeter):
         measure_voltage = include_voltage and self.has_voltage_support
         if measure_voltage:
             voltage = self._retrieve_float(self.voltage_request())
-        return PowerMeasurementResult(
-            power=power, updated=time.time(), voltage=voltage if measure_voltage else None
-        )
+        return PowerMeasurementResult(power=power, updated=time.time(), voltage=voltage if measure_voltage else None)
 
 
 class OwonOwh98xxPowerMeter(SerialScpiPowerMeter):
