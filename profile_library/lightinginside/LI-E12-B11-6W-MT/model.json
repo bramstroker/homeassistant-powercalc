@@ -16,7 +16,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.4.1:app"
   },
-  "name": "Lightinginside Matter Candelabra Smart Light 5W 550LM E12 RGBCW",
+  "name": "Matter Candelabra Smart Light 5W 550LM E12 RGBCW",
   "standby_power": 0.27,
   "voltage_range": {
     "max": 122.09,
