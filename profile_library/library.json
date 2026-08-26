@@ -19968,6 +19968,43 @@
           "hash": "440068bae6c9e4edc761dab967ed6334"
         },
         {
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-26T19:58:06Z",
+          "device_type": "light",
+          "measure_device": "Riden RD6012P",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.4.1:cli"
+          },
+          "name": "Philips Hue White Ambiance GU5.3/MR16 5.1W",
+          "standby_power": 0.27,
+          "voltage_range": {
+            "max": 12.0,
+            "min": 12.0
+          },
+          "authors": [
+            {
+              "name": "ZleekWolf",
+              "github": "folfy"
+            }
+          ],
+          "id": "LTG003",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-26T21:44:42",
+          "max_power": 4.55,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "3a9f4ae89e288fe2f7b17a942f62b165"
+        },
+        {
           "aliases": [
             "929003666701"
           ],
