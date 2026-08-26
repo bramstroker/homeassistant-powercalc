@@ -28,7 +28,7 @@ def test_owh98xx_retrieve_float() -> None:
 
     serial.readline = MagicMock(return_value=b"1.0\n")
 
-    assert meter._retrieve_float(b"") == 1.0 #noqa: SLF001
+    assert meter._retrieve_float(b"") == 1.0  # noqa: SLF001
     serial.readline.assert_called_once()
 
 
@@ -42,7 +42,7 @@ def test_owh98xx_retrieve_float_zero() -> None:
 
     serial.readline = MagicMock(return_value=b"----\n")
 
-    assert meter._retrieve_float(b"") == 0.0 #noqa: SLF001
+    assert meter._retrieve_float(b"") == 0.0  # noqa: SLF001
     serial.readline.assert_called_once()
 
 
@@ -56,7 +56,7 @@ def test_owh98xx_retrieve_float_failure() -> None:
     serial.readline = MagicMock(return_value=b"\n")
 
     with pytest.raises(PowerMeterError):
-        meter._retrieve_float(b"") #noqa: SLF001
+        meter._retrieve_float(b"")  # noqa: SLF001
 
     serial.readline.assert_called_once()
 
@@ -87,12 +87,14 @@ def test_owh98xx_get_power_with_voltage() -> None:
     # Ugly way of giving back different values based on if it's the first call
     global firstCall
     firstCall = True
+
     def readline_side_effect() -> bytes:
         global firstCall
         if firstCall:
             firstCall = False
             return b"1.0\n"
         return b"2.0\n"
+
     serial.readline = MagicMock(side_effect=readline_side_effect)
 
     measurement = meter.get_power(True)
@@ -100,4 +102,3 @@ def test_owh98xx_get_power_with_voltage() -> None:
     assert measurement.power == 1.0
     assert measurement.voltage == 2.0
     assert serial.readline.call_count == 2
-
