@@ -36,7 +36,7 @@ class SerialScpiPowerMeter(PowerMeter):
     def _retrieve_data(self, request: bytes) -> bytes:
         try:
             self._serial.write(request)
-            return self._serial.readline()
+            return bytes(self._serial.readline())
         except serial.SerialException as error:
             raise PowerMeterError(error) from error
 
@@ -60,10 +60,11 @@ class SerialScpiPowerMeter(PowerMeter):
 
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
         power = self._retrieve_float(self.power_request())
-        if include_voltage and self.has_voltage_support:
+        measure_voltage = include_voltage and self.has_voltage_support
+        if measure_voltage:
             voltage = self._retrieve_float(self.voltage_request())
         return PowerMeasurementResult(
-            power=power, updated=time.time(), voltage=voltage if include_voltage and self.has_voltage_support else None
+            power=power, updated=time.time(), voltage=voltage if measure_voltage else None
         )
 
 
