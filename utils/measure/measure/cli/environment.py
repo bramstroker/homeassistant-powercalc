@@ -10,7 +10,7 @@ from measure.controller.charging.const import ChargingControllerType
 from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import DEFAULT_LIGHT_TRANSITION_TIME, LightControllerType
 from measure.controller.media.const import MediaControllerType
-from measure.powermeter.const import PowerMeterType
+from measure.powermeter.const import OwonOwh98xxChannelType, PowerMeterType
 from measure.tuning import MeasurementParameters
 
 _LOGGER = logging.getLogger("measure")
@@ -382,6 +382,18 @@ class CliEnvironment:
             default=_DEFAULTS.csv_add_datetime_column,
             converter=bool,
         )
+
+    @property
+    def serial_port(self) -> str:
+        return _config_value("SERIAL_PORT", converter=str)
+
+    @property
+    def serial_baudrate(self) -> int:
+        return _config_value("SERIAL_BAUDRATE", converter=int)
+
+    @property
+    def owon_owh98xx_channel(self) -> OwonOwh98xxChannelType:
+        return _enum_value("OWON_OWH98XX_CHANNEL", OwonOwh98xxChannelType, OwonOwh98xxChannelType.CHANNEL1)
 
     @staticmethod
     def get_conf_value(key: str) -> str | None:

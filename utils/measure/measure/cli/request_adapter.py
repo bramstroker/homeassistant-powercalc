@@ -26,6 +26,7 @@ from measure.powermeter.spec import (
     ManualPowerMeterSpec,
     MyStromPowerMeterSpec,
     OcrPowerMeterSpec,
+    OwonOwh98xxPowerMeterSpec,
     PowerMeterSpec,
     ShellyPowerMeterSpec,
     TasmotaPowerMeterSpec,
@@ -112,7 +113,8 @@ def _parameters_from_environment(environment: CliEnvironment) -> MeasurementPara
     )
 
 
-def _power_meter_spec(environment: CliEnvironment, answers: dict[str, Any]) -> PowerMeterSpec:
+# Disable function too complex for this, as it is a simple function to read
+def _power_meter_spec(environment: CliEnvironment, answers: dict[str, Any]) -> PowerMeterSpec:  # noqa: C901
     selected = environment.selected_power_meter
     if selected == PowerMeterType.DUMMY:
         return DummyPowerMeterSpec()
@@ -143,6 +145,10 @@ def _power_meter_spec(environment: CliEnvironment, answers: dict[str, Any]) -> P
             device_id=environment.tuya_device_id,
             device_ip=environment.tuya_device_ip,
             version=environment.tuya_device_version,
+        )
+    if selected == PowerMeterType.OWON_OWH98XX:
+        return OwonOwh98xxPowerMeterSpec(
+            port=environment.serial_port, baudrate=environment.serial_baudrate, channel=environment.owon_owh98xx_channel
         )
     raise ValueError(f"Unsupported CLI power meter: {selected}")
 
