@@ -1,5 +1,6 @@
 {
-  "name": "Zigbee Switch 1 Gang No Neutral",
+  "name": "Switch 1 Gang No Neutral",
+  "model_id": "SL-GL86ZTS11B",
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
   "measure_device": "Shelly Plug S Gen3",
