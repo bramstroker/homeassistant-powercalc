@@ -1,5 +1,6 @@
 from dataclasses import replace
 import logging
+from typing import cast
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE
@@ -12,37 +13,45 @@ import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.common import AnyDeviceEntry, SourceEntity
 from custom_components.powercalc.const import CONF_AREA
 
 _LOGGER = logging.getLogger(__name__)
 
 _HAS_SINGLE_CONFIG_ENTRY = hasattr(DeviceEntry, "config_entry_id")
+_HAS_CHILD_DEVICES = hasattr(device_registry, "ChildDeviceEntry")
 
 
 def is_composite_device_id(hass: HomeAssistant, device_id: str) -> bool:
-    """
-    Return whether a device ID identifies a legacy composite device.
-    Check for availability of async_is_composite_device_id, because this function is only available in HA >=2026.8
-    """
+    """Return whether a device ID identifies a legacy composite device."""
     device_reg = device_registry.async_get(hass)
+    if _HAS_CHILD_DEVICES:
+        return (
+            device_reg.async_get(device_id) is not None
+            and device_reg.async_get(
+                device_id,
+                include_composite_devices=False,
+            )
+            is None
+        )
+
     is_composite = getattr(device_reg, "async_is_composite_device_id", None)
     if not callable(is_composite):
-        return False
-    return bool(is_composite(device_id))
+        return False  # pragma: no cover
+    return bool(is_composite(device_id))  # pragma: no cover
 
 
 def get_non_composite_devices(hass: HomeAssistant) -> list[DeviceEntry]:
     """Return all registered devices which are not legacy composite devices.
 
-    Resolves the registry and the composite device support once, instead of per device like
-    a per-entry `is_composite_device_id` call would.
+    Composite devices are synthesized on lookup and are not included in registry enumeration.
     """
     device_reg = device_registry.async_get(hass)
-    is_composite = getattr(device_reg, "async_is_composite_device_id", None)
-    if not callable(is_composite):
-        return list(device_reg.devices.values())
-    return [device for device in device_reg.devices.values() if not is_composite(device.id)]
+    return (
+        list(device_reg.devices)
+        if _HAS_CHILD_DEVICES
+        else list(cast(dict[str, DeviceEntry], device_reg.devices).values())  # pragma: no cover
+    )
 
 
 def get_related_device_ids(hass: HomeAssistant, device_id: str) -> set[str]:
@@ -58,7 +67,7 @@ def get_related_device_ids(hass: HomeAssistant, device_id: str) -> set[str]:
     related.update(device.id for device in _get_composite_split_devices(device_reg, device_id))
 
     device = device_reg.async_get(device_id)
-    if device is None:
+    if not isinstance(device, DeviceEntry):
         return related
 
     sibling_devices = _get_composite_split_devices(device_reg, getattr(device, "composite_device_id", None))
@@ -93,7 +102,7 @@ def _get_composite_split_devices(
     return list(get_split_devices(composite_device_id))
 
 
-def get_config_entry_ids(device: DeviceEntry) -> set[str]:
+def get_config_entry_ids(device: AnyDeviceEntry) -> set[str]:
     """
     Return the config entry IDs a device belongs to.
     HA >=2026.8 splits composite devices, so a device belongs to exactly one config entry and
@@ -111,7 +120,8 @@ def get_first_device_for_config_entry(hass: HomeAssistant, config_entry_id: str)
 
 def get_devices_for_config_entry(hass: HomeAssistant, config_entry_id: str) -> list[DeviceEntry]:
     """Return all non-composite devices belonging to a config entry."""
-    return [device for device in get_non_composite_devices(hass) if config_entry_id in get_config_entry_ids(device)]
+    device_reg = device_registry.async_get(hass)
+    return list(device_registry.async_entries_for_config_entry(device_reg, config_entry_id))
 
 
 def get_related_devices(hass: HomeAssistant, device_id: str) -> list[DeviceEntry]:
@@ -168,7 +178,7 @@ def get_device_entry(
     sensor_config: ConfigType | None = None,
     source_entity: SourceEntity | None = None,
     config_entry: ConfigEntry | None = None,
-) -> DeviceEntry | None:
+) -> AnyDeviceEntry | None:
     """
     Get device entry for a given powercalc entity configuration.
     Prefer user configured device, when it is not set fallback to the same device as the source entity
@@ -193,7 +203,7 @@ def get_device_entry(
 def bind_entity_to_registry_metadata(
     hass: HomeAssistant,
     entity_id: str | None,
-    device_entry: DeviceEntry | None,
+    device_entry: AnyDeviceEntry | None,
     sensor_config: ConfigType | None,
 ) -> None:
     """Bind a Powercalc entity to configured registry metadata."""
@@ -213,7 +223,7 @@ def bind_entity_to_registry_metadata(
 def bind_entity_to_device(
     entity_reg: er.EntityRegistry,
     entity_entry: RegistryEntry,
-    device_entry: DeviceEntry | None,
+    device_entry: AnyDeviceEntry | None,
 ) -> None:
     """Bind a Powercalc entity to the resolved device."""
     # Home Assistant only consumes entity.device_entry while creating registry

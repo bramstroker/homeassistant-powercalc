@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import math
 import re
+from typing import TYPE_CHECKING, cast
 
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, split_entity_id
@@ -27,6 +28,15 @@ from .const import (
 )
 from .errors import SensorConfigurationError
 
+_HAS_CHILD_DEVICES = hasattr(dr, "ChildDeviceEntry")
+
+if TYPE_CHECKING:
+    from homeassistant.helpers.device_registry import AnyDeviceEntry as AnyDeviceEntry
+else:
+    # AnyDeviceEntry was introduced together with child devices in HA 2026.9.
+    # Keep imports working on older supported versions, where every entry is a DeviceEntry.
+    AnyDeviceEntry = dr.DeviceEntry
+
 
 @dataclass(frozen=True)
 class SourceEntity:
@@ -38,7 +48,7 @@ class SourceEntity:
     unique_id: str | None = None
     name: str | None = None
     entity_entry: er.RegistryEntry | None = None
-    device_entry: dr.DeviceEntry | None = None
+    device_entry: AnyDeviceEntry | None = None
     config_entry_id: str | None = None
 
     @property
@@ -92,6 +102,13 @@ def is_number(value: str) -> bool:
     return math.isfinite(fvalue)
 
 
+def get_main_device_entry(device_registry: dr.DeviceRegistry, device_id: str) -> dr.DeviceEntry | None:
+    """Return a main device entry, excluding child devices on versions which support them."""
+    if _HAS_CHILD_DEVICES:
+        return device_registry.async_get(device_id, include_child_devices=False)
+    return cast(dr.DeviceEntry | None, device_registry.async_get(device_id))  # pragma: no cover
+
+
 def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
     """Create object containing all information about the source entity."""
 
@@ -138,7 +155,7 @@ def get_wrapped_entity_name(
     entity_id: str,
     object_id: str,
     entity_entry: er.RegistryEntry | None,
-    device_entry: dr.DeviceEntry | None,
+    device_entry: AnyDeviceEntry | None,
 ) -> str:
     """Construct entity name based on the wrapped entity"""
     if entity_entry is None:
@@ -156,7 +173,7 @@ def get_wrapped_entity_name(
 
 def _get_device_entity_name(
     entity_entry: er.RegistryEntry,
-    device_entry: dr.DeviceEntry | None,
+    device_entry: AnyDeviceEntry | None,
 ) -> str | None:
     if not entity_entry.has_entity_name or device_entry is None:
         return None

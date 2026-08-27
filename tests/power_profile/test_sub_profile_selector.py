@@ -1,8 +1,9 @@
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import RegistryEntry
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults
+from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.errors import PowercalcSetupError
@@ -13,7 +14,7 @@ from custom_components.powercalc.power_profile.sub_profile_selector import (
     ModelIdMatcher,
     SubProfileSelector,
 )
-from tests.common import build_device_entry, get_test_profile_dir
+from tests.common import build_device_entry, get_test_profile_dir, requires_child_devices
 
 
 async def test_matcher_attribute(hass: HomeAssistant) -> None:
@@ -245,6 +246,35 @@ def test_matcher_model_id_no_device_entry() -> None:
         matcher.match(
             State("light.test", STATE_ON),
             SourceEntity(entity_id="light.test", domain="light", object_id="test"),
+        )
+        is None
+    )
+
+
+@requires_child_devices
+def test_matcher_model_id_ignores_child_device(
+    hass: HomeAssistant,
+    device_registry: DeviceRegistry,
+) -> None:
+    config_entry = MockConfigEntry(domain="test")
+    config_entry.add_to_hass(hass)
+    parent = device_registry.async_get_or_create(
+        config_entry_id=config_entry.entry_id,
+        identifiers={("test", "parent")},
+        name="Parent",
+    )
+    child = device_registry.async_get_or_create_child(
+        config_entry_id=config_entry.entry_id,
+        identifiers={("test", "child")},
+        name="Child",
+        parent_device_id=parent.id,
+    )
+
+    matcher = ModelIdMatcher("foo", "bar")
+    assert (
+        matcher.match(
+            State("light.test", STATE_ON),
+            SourceEntity(entity_id="light.test", domain="light", object_id="test", device_entry=child),
         )
         is None
     )

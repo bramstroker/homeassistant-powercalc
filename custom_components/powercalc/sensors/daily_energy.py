@@ -239,7 +239,10 @@ class DailyEnergySensor(EnergySensor, RestoreEntity, SensorEntity):
                     self._state,
                 )
                 self.async_schedule_update_ha_state()
-                self._last_updated = dt_util.now().timestamp()
+                # Reuse the timestamp captured by calculate_delta. Reading the clock again here can
+                # cross a whole-second boundary and make the next interval one second too short.
+                assert self._last_delta_calculate is not None
+                self._last_updated = self._last_delta_calculate
 
         self._update_timer_removal = async_track_time_interval(
             self.hass,

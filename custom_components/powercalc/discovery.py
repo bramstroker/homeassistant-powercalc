@@ -753,7 +753,7 @@ class DiscoveryManager:
     def extract_model_info(self, source_entity: SourceEntity) -> ModelInfo | None:
         """Try to fetch manufacturer and model from the known device information."""
         device_entry = source_entity.device_entry
-        if not device_entry:
+        if not isinstance(device_entry, dr.DeviceEntry):
             return None
 
         log_identifier = source_entity.log_identifier
