@@ -37,6 +37,7 @@ The skill expects:
 - Modified files under `profile_library/`
 - Relevant `model.json` and `manufacturer.json`
 - Associated LUT or auxiliary files
+- PR device information, including the integration through which Home Assistant reported the manufacturer and model
 
 ## Repository Assumptions
 
@@ -76,7 +77,21 @@ Check that the layout follows repository conventions:
 - Additional files are inside the model directory
 - `library.json` was **not manually modified**
 
-### 3. Validate Metadata
+### 3. Establish the Canonical Model Identifier
+
+Treat the generated or PR-reported model value as evidence, not automatically as the canonical identifier. Integrations can expose a marketing description, friendly name, bridge resource name, or protocol product ID instead of the manufacturer's stable model code.
+
+For every new or renamed model directory:
+
+1. Read [references/model_identifiers.md](references/model_identifiers.md), including the manufacturer-specific entry when one exists.
+2. Cross-check the proposed directory against the manufacturer's technical product data, device label/manual, official device API, and Home Assistant device information or integration diagnostics as available.
+3. Use the stable, specific manufacturer model code for the directory. Put other stable model values reported by integrations in `aliases` when they uniquely identify the same hardware.
+4. Keep the full product or marketing name in `name`; add it to `aliases` only when it is actually reported as a model identifier and is needed for discovery.
+5. Reject unstable identifiers such as entity/friendly names, room names, serial numbers, MAC addresses, bridge resource names such as `Light0x...`, and generic protocol identifiers shared by different products.
+
+Do not infer a canonical ID from its shape alone. When authoritative sources conflict or uniqueness cannot be established, request contributor confirmation and state what evidence is missing.
+
+### 4. Validate Metadata
 
 Inspect `model.json` for required metadata.
 
@@ -93,7 +108,7 @@ Ensure:
 
 - `created_at` is ISO formatted
 
-### 4. Validate Strategy-Specific Data
+### 5. Validate Strategy-Specific Data
 
 Ensure the data matches the declared strategy.
 
@@ -141,7 +156,7 @@ Expect:
 - defined states
 - internally consistent power values
 
-### 5. Validate `only_self_usage`
+### 6. Validate `only_self_usage`
 
 `only_self_usage: true` means the device has a **built-in power meter**, so Powercalc only adds its self usage and names
 the sensors `{} Device Power` / `{} Device Energy`.
@@ -153,7 +168,7 @@ the sensors `{} Device Power` / `{} Device Energy`.
 - Naming options (`power_sensor_naming`, `energy_sensor_naming`, `_friendly_` variants) are never allowed, in
   `sensor_config` or at the root. Contributors copy them instead of setting the flag; the flag produces that naming.
 
-### 6. Validate Measurement Credibility
+### 7. Validate Measurement Credibility
 
 Look for signs the measurement may be unreliable:
 
@@ -165,7 +180,7 @@ Look for signs the measurement may be unreliable:
 
 Flag suspicious cases but avoid assuming bad intent.
 
-### 7. Compare With Similar Profiles
+### 8. Compare With Similar Profiles
 
 Review neighbouring profiles in the library for consistency:
 
@@ -181,6 +196,8 @@ Large deviations should be questioned.
 ## Review Checklist
 
 - [ ] Directory structure correct
+- [ ] Directory uses the canonical, stable manufacturer model identifier
+- [ ] Integration-specific stable identifiers are aliases; friendly, resource, serial, and generic identifiers are excluded
 - [ ] Generated files not manually edited
 - [ ] `manufacturer.json` present
 - [ ] `model.json` schema appears valid`
