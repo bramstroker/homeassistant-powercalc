@@ -58,6 +58,11 @@ requires_composite_devices = pytest.mark.skipif(
     reason="Composite devices were only split off in HA >=2026.8",
 )
 
+requires_child_devices = pytest.mark.skipif(
+    not hasattr(DeviceRegistry, "async_get_or_create_child"),
+    reason="Child devices are only available in HA >=2026.9",
+)
+
 requires_linked_devices = pytest.mark.skipif(
     not hasattr(DeviceRegistry, "async_get_devices"),
     reason="Devices sharing identifiers or connections were only split up in HA >=2026.8",
