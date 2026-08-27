@@ -1,3 +1,4 @@
+import asyncio
 import contextlib
 from functools import partial
 import json
@@ -110,6 +111,40 @@ async def test_download(
             os.path.exists,
             os.path.join(storage_dir, remote_file["path"]),
         )
+
+
+async def test_download_keeps_existing_resources_when_a_later_download_fails(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    """Do not partially update a cached profile when one of its resources cannot be downloaded."""
+    storage_path = tmp_path / "profiles"
+    storage_path.mkdir()
+    existing_resource = storage_path / "model.json"
+    existing_resource.write_bytes(b'{"existing": true}')
+    resources = [
+        {
+            "path": "model.json",
+            "url": "https://raw.githubusercontent.com/example/profile/model.json",
+        },
+        {
+            "path": "data.csv.gz",
+            "url": "https://raw.githubusercontent.com/example/profile/data.csv.gz",
+        },
+    ]
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=resources,
+    )
+    mock_aioresponse.get(resources[0]["url"], status=200, body=b'{"new": true}')
+    mock_aioresponse.get(resources[1]["url"], status=500)
+
+    with pytest.raises(ProfileDownloadError, match="Failed to download github URL"):
+        await remote_loader.download_profile("test", "model", str(storage_path), "test_download")
+
+    assert existing_resource.read_bytes() == b'{"existing": true}'
 
 
 async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aioresponse: aioresponses) -> None:
@@ -799,6 +834,45 @@ async def test_profile_redownloaded_when_model_json_missing(
     assert storage_path == local_storage_path
 
 
+async def test_concurrent_model_loads_only_download_profile_once(remote_loader: RemoteLoader) -> None:
+    """Concurrent entities using the same profile must not write the cached files concurrently."""
+    manufacturer = "signify"
+    model = "LCA001"
+    local_storage_path = remote_loader.get_storage_path(manufacturer, model)
+    clear_storage_dir(local_storage_path)
+    remote_loader.profile_hashes.pop(f"{manufacturer}/{model}", None)
+    download_started = asyncio.Event()
+    release_download = asyncio.Event()
+
+    async def _download_profile(
+        requested_manufacturer: str,
+        requested_model: str,
+        storage_path: str,
+        model_hash: str,
+    ) -> None:
+        download_started.set()
+        assert (requested_manufacturer, requested_model, model_hash) == (
+            manufacturer,
+            model,
+            remote_loader.model_infos[f"{manufacturer}/{model}"]["hash"],
+        )
+        await release_download.wait()
+        shutil.copytree(get_test_profile_dir("signify_LCA001"), storage_path, dirs_exist_ok=True)
+
+    with patch.object(remote_loader, "download_profile", side_effect=_download_profile) as mock_download:
+        first_load = asyncio.create_task(remote_loader.load_model(manufacturer, model))
+        await download_started.wait()
+        second_load = asyncio.create_task(remote_loader.load_model(manufacturer, model))
+        await asyncio.sleep(0)
+
+        assert mock_download.await_count == 1
+        release_download.set()
+        first_result, second_result = await asyncio.gather(first_load, second_load)
+
+    assert mock_download.await_count == 1
+    assert first_result == second_result
+
+
 async def test_profile_redownloaded_when_model_json_corrupt(
     remote_loader: RemoteLoader,
     mock_aioresponse: aioresponses,
@@ -837,14 +911,16 @@ async def test_profile_redownloaded_when_model_json_corrupt(
 
     await remote_loader.load_model("apple", "HomePod Mini")
 
-    assert "model.json file is not valid JSON" in caplog.text
-    assert "Retrying to load model.json file" in caplog.text
+    recovery_records = [record for record in caplog.records if "model.json is not valid JSON" in record.message]
+    assert len(recovery_records) == 1
+    assert recovery_records[0].levelno == logging.WARNING
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
 
 
 async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
-    hass: HomeAssistant,
     remote_loader: RemoteLoader,
     mock_aioresponse: aioresponses,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """
     When model.json is corrupt, retry 3 times before giving up.
@@ -877,6 +953,13 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
 
     with pytest.raises(LibraryLoadingError):
         await remote_loader.load_model("apple", "HomePod Mini")
+
+    recovery_records = [record for record in caplog.records if "model.json is not valid JSON" in record.message]
+    assert len(recovery_records) == 2
+    assert all(record.levelno == logging.WARNING for record in recovery_records)
+    failure_records = [record for record in caplog.records if "model.json remains invalid" in record.message]
+    assert len(failure_records) == 1
+    assert failure_records[0].levelno == logging.ERROR
 
 
 @pytest.mark.parametrize(

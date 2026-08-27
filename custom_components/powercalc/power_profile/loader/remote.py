@@ -7,6 +7,7 @@ import logging
 import os
 from pathlib import Path
 import shutil
+import tempfile
 from typing import Any, NotRequired, TypedDict, cast
 from urllib.parse import urlsplit
 
@@ -35,6 +36,7 @@ ENDPOINT_LIBRARY = f"{API_URL}/library"
 ENDPOINT_DOWNLOAD = f"{API_URL}/download"
 
 TIMEOUT_SECONDS = 30
+MODEL_JSON_RETRY_LIMIT = 2
 
 ALLOWED_RESOURCE_HOSTS = frozenset({"github.com", "raw.githubusercontent.com"})
 
@@ -92,10 +94,26 @@ def _validate_resources(resources: object, storage_path: str) -> list[tuple[str,
 
 
 def _save_resource(data: bytes, path: Path) -> None:
-    """Save a downloaded resource to the local profile storage directory."""
+    """Atomically save a downloaded resource to the local profile storage directory."""
     os.makedirs(path.parent, exist_ok=True)
-    with open(path, "wb") as file_handle:
-        file_handle.write(data)
+    file_descriptor, temporary_name = tempfile.mkstemp(
+        dir=path.parent,
+        prefix=f".{path.name}.",
+        suffix=".tmp",
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with os.fdopen(file_descriptor, "wb") as file_handle:
+            file_handle.write(data)
+        os.replace(temporary_path, path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
+
+
+def _save_resources(resources: list[tuple[bytes, Path]]) -> None:
+    """Save all downloaded resources after every response has completed successfully."""
+    for data, path in resources:
+        _save_resource(data, path)
 
 
 class LibraryModel(TypedDict):
@@ -127,6 +145,7 @@ class RemoteLoader(Loader):
         self.model_lookup: dict[str, dict[str, list[LibraryModel]]] = {}
         self.manufacturer_lookup: dict[str, set[str]] = {}
         self.profile_hashes: dict[str, str] = {}
+        self._model_load_locks: dict[tuple[str, str], asyncio.Lock] = {}
 
     async def initialize(self, prefer_cached: bool = False) -> None:
         """Initialize the loader.
@@ -410,19 +429,51 @@ class RemoteLoader(Loader):
         retry_count: int = 0,
     ) -> tuple[dict[str, Any], str] | None:
         """Load a model, downloading it if necessary, with retry logic."""
+        lock = self._model_load_locks.setdefault((manufacturer, model), asyncio.Lock())
+        async with lock:
+            return await self._load_model_locked(manufacturer, model, force_update, retry_count)
+
+    async def _load_model_locked(
+        self,
+        manufacturer: str,
+        model: str,
+        force_update: bool,
+        retry_count: int,
+    ) -> tuple[dict[str, Any], str] | None:
+        """Load a model while holding its per-profile lock."""
         model_info = self._get_library_model(manufacturer, model)
         storage_path = self.get_storage_path(manufacturer, model)
         model_path = os.path.join(storage_path, "model.json")
 
-        if await self._needs_update(model_info, manufacturer, model, model_path, force_update):
-            await self._download_profile_with_retry(manufacturer, model, storage_path, model_path)
+        while True:
+            if await self._needs_update(model_info, manufacturer, model, model_path, force_update):
+                await self._download_profile_with_retry(manufacturer, model, storage_path, model_path)
 
-        try:
-            json_data = await self._load_model_json(model_path)
-        except JSONDecodeError as e:
-            return await self._handle_json_decode_error(e, manufacturer, model, retry_count)
+            try:
+                json_data = await self._load_model_json(model_path)
+            except JSONDecodeError as error:
+                if retry_count >= MODEL_JSON_RETRY_LIMIT:
+                    _LOGGER.error(
+                        "model.json remains invalid after %d redownload attempts for manufacturer: %s, model: %s",
+                        MODEL_JSON_RETRY_LIMIT,
+                        manufacturer,
+                        model,
+                    )
+                    raise LibraryLoadingError("Failed to load model.json file") from error
 
-        return json_data, storage_path
+                retry_count += 1
+                force_update = True
+                _LOGGER.warning(
+                    "model.json is not valid JSON for manufacturer: %s, model: %s; redownloading profile "
+                    "(attempt %d of %d)",
+                    manufacturer,
+                    model,
+                    retry_count,
+                    MODEL_JSON_RETRY_LIMIT,
+                )
+                continue
+
+            return json_data, storage_path
 
     def _get_library_model(self, manufacturer: str, model: str) -> LibraryModel:
         """Retrieve model info, or raise an error if not found."""
@@ -492,20 +543,6 @@ class RemoteLoader(Loader):
 
         return await self.hass.async_add_executor_job(_load_json)
 
-    async def _handle_json_decode_error(
-        self,
-        error: JSONDecodeError,
-        manufacturer: str,
-        model: str,
-        retry_count: int,
-    ) -> tuple[dict[str, Any], str] | None:
-        """Handle JSON decode errors with retry logic."""
-        _LOGGER.error("model.json file is not valid JSON for manufacturer: %s, model: %s", manufacturer, model)
-        if retry_count < 2:
-            _LOGGER.debug("Retrying to load model.json file")
-            return await self.load_model(manufacturer, model, True, retry_count + 1)
-        raise LibraryLoadingError("Failed to load model.json file") from error
-
     def get_storage_path(self, manufacturer: str, model: str) -> str:
         """Retrieve the storage path for a given manufacturer and model."""
         return str(self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, manufacturer, model))
@@ -561,13 +598,16 @@ class RemoteLoader(Loader):
                 await self.hass.async_add_executor_job(lambda: os.makedirs(storage_path, exist_ok=True))
 
                 # Download the files
+                downloaded_resources: list[tuple[bytes, Path]] = []
                 for url, destination in validated_resources:
                     async with session.get(url, allow_redirects=False) as resp:
                         if resp.status != 200:
                             raise ProfileDownloadError(f"Failed to download github URL: {url}")
 
                         contents = await resp.read()
-                        await self.hass.async_add_executor_job(_save_resource, contents, destination)
+                        downloaded_resources.append((contents, destination))
+
+                await self.hass.async_add_executor_job(_save_resources, downloaded_resources)
         except (TimeoutError, aiohttp.ClientError) as e:
             raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
 
