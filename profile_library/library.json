@@ -19995,7 +19995,7 @@
           ],
           "id": "LTG003",
           "manufacturer": "signify",
-          "updated_at": "2026-08-26T21:44:42",
+          "updated_at": "2026-08-26T21:45:20",
           "max_power": 4.55,
           "sub_profile_count": 0,
           "color_modes": [
@@ -20005,7 +20005,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "3a9f4ae89e288fe2f7b17a942f62b165"
+          "hash": "7e33955175f3ac64154525b02b7ee146"
         },
         {
           "aliases": [
