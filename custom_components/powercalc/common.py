@@ -109,11 +109,6 @@ def get_main_device_entry(device_registry: dr.DeviceRegistry, device_id: str) ->
     return cast(dr.DeviceEntry | None, device_registry.async_get(device_id))  # pragma: no cover
 
 
-def get_any_device_entry(device_registry: dr.DeviceRegistry, device_id: str) -> AnyDeviceEntry | None:
-    """Return either a main or child device entry when supported by Home Assistant."""
-    return device_registry.async_get(device_id)
-
-
 def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
     """Create object containing all information about the source entity."""
 
@@ -130,9 +125,7 @@ def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
 
     device_registry = dr.async_get(hass)
     device_entry = (
-        get_any_device_entry(device_registry, entity_entry.device_id)
-        if entity_entry and entity_entry.device_id
-        else None
+        device_registry.async_get(entity_entry.device_id) if entity_entry and entity_entry.device_id else None
     )
 
     unique_id = None
