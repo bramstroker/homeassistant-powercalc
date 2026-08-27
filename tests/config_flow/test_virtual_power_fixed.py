@@ -5,8 +5,12 @@ from homeassistant import data_entry_flow
 from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_ICON, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-from probatio import UNSUPPORTED, to_field_list
 import voluptuous as vol
+
+try:
+    from voluptuous_serialize import convert as schema_to_field_list
+except ImportError:
+    from probatio import to_field_list as schema_to_field_list
 
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
@@ -49,12 +53,7 @@ from tests.config_flow.common import (
 
 def serialize_schema(schema: vol.Schema) -> list[dict[str, Any]]:
     """Serialize a form schema with the serializer used by the installed Home Assistant version."""
-
-    def custom_serializer(value: Any) -> Any:  # noqa: ANN401
-        result = cv.custom_serializer(value)
-        return UNSUPPORTED if result is None else result
-
-    serialized = to_field_list(schema, custom_serializer=custom_serializer)
+    serialized = schema_to_field_list(schema, custom_serializer=cv.custom_serializer)
     assert isinstance(serialized, list)
     return serialized
 

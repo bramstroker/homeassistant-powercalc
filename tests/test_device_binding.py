@@ -84,6 +84,10 @@ def test_get_first_device_for_config_entry(hass: HomeAssistant) -> None:
     assert get_first_device_for_config_entry(hass, config_entry_id) == device_entry
 
 
+@pytest.mark.skipif(
+    not hasattr(DeviceRegistry, "async_get_or_create_child"),
+    reason="Child devices are only available in Home Assistant 2026.9+",
+)
 def test_get_main_device_entry_excludes_child_devices(
     hass: HomeAssistant,
     device_registry: DeviceRegistry,
