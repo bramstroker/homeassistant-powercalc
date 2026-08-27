@@ -93,8 +93,27 @@ def _validate_resources(resources: object, storage_path: str) -> list[tuple[str,
     ]
 
 
+def _sync_directory(directory: Path) -> None:
+    """Persist a directory entry, so a completed rename survives an unclean shutdown."""
+    try:
+        directory_descriptor = os.open(directory, os.O_RDONLY)
+    except OSError:  # pragma: no cover - directories cannot be opened on all platforms
+        return
+    try:
+        os.fsync(directory_descriptor)
+    except OSError:  # pragma: no cover - directory fsync is not supported on all platforms
+        pass
+    finally:
+        os.close(directory_descriptor)
+
+
 def _save_resource(data: bytes, path: Path) -> None:
-    """Atomically save a downloaded resource to the local profile storage directory."""
+    """Atomically save a downloaded resource to the local profile storage directory.
+
+    The contents are flushed to disk before the rename, and the directory entry is flushed
+    after it. Without both, a power loss shortly after an update can leave the new file name
+    pointing at unwritten data, which is how a cached profile ends up as invalid JSON.
+    """
     os.makedirs(path.parent, exist_ok=True)
     file_descriptor, temporary_name = tempfile.mkstemp(
         dir=path.parent,
@@ -105,7 +124,10 @@ def _save_resource(data: bytes, path: Path) -> None:
     try:
         with os.fdopen(file_descriptor, "wb") as file_handle:
             file_handle.write(data)
+            file_handle.flush()
+            os.fsync(file_handle.fileno())
         os.replace(temporary_path, path)
+        _sync_directory(path.parent)
     finally:
         temporary_path.unlink(missing_ok=True)
 
@@ -270,18 +292,26 @@ class RemoteLoader(Loader):
         return str(self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, "library.json"))
 
     def _read_local_library_json(self) -> dict[str, Any] | None:
-        """Read library.json from local storage, None when it has not been downloaded yet."""
+        """Read library.json from local storage, None when it is missing or unusable.
+
+        A truncated or unreadable copy is reported as absent rather than raised, so the caller
+        falls through to a fresh download instead of failing setup on every restart.
+        """
         local_path = self._get_library_json_path()
         if not os.path.exists(local_path):
             return None
-        with open(local_path) as f:
-            return cast(dict[str, Any], json.load(f))
+        try:
+            with open(local_path) as f:
+                return cast(dict[str, Any], json.load(f))
+        except (JSONDecodeError, OSError) as err:
+            _LOGGER.warning("Local library.json is unusable (%s), discarding it and downloading a fresh copy", err)
+            return None
 
     def _load_local_library_json(self) -> dict[str, Any]:
-        """Load library.json from local storage, raising when it is not there."""
+        """Load library.json from local storage, raising when it is not usable."""
         library_json = self._read_local_library_json()
         if library_json is None:
-            raise ProfileDownloadError("Local library.json file not found")
+            raise ProfileDownloadError("Local library.json file not found or unusable")
         return library_json
 
     async def _download_remote_library_json(self) -> dict[str, Any] | None:
@@ -306,12 +336,7 @@ class RemoteLoader(Loader):
         except (TimeoutError, ClientError) as err:
             raise ProfileDownloadError(f"Failed to download library.json: {err}") from err
 
-        def _save_to_local_storage(data: bytes) -> None:
-            os.makedirs(os.path.dirname(local_path), exist_ok=True)
-            with open(local_path, "wb") as f:
-                f.write(data)
-
-        await self.hass.async_add_executor_job(_save_to_local_storage, data)
+        await self.hass.async_add_executor_job(_save_resource, data, Path(local_path))
 
         return cast(dict[str, Any], json.loads(data))
 
@@ -516,7 +541,7 @@ class RemoteLoader(Loader):
             callback = partial(self.download_profile, manufacturer, model, storage_path, model_hash)
             await self.download_with_retry(callback)
             self.profile_hashes[f"{manufacturer}/{model}"] = model_hash
-            await self.hass.async_add_executor_job(self._write_profile_hashes, self.profile_hashes)
+            await self.hass.async_add_executor_job(self._write_profile_hashes, dict(self.profile_hashes))
         except ProfileDownloadError as e:
             path_exists, storage_path_exists = await self.hass.async_add_executor_job(
                 self._profile_paths_exist,
@@ -616,18 +641,25 @@ class RemoteLoader(Loader):
         return str(self.hass.config.path(STORAGE_DIR, BUILT_IN_LIBRARY_DIR, ".profile_hashes"))
 
     def _load_profile_hashes(self) -> dict[str, str]:
-        """Load profile hashes from local storage"""
+        """Load profile hashes from local storage.
+
+        An unusable file is treated as empty rather than raised: the hashes are only a cache
+        validity marker, so the worst case is that every profile is downloaded once more.
+        """
 
         path = self._get_profile_hashes_path()
         if not os.path.exists(path):
             return {}
 
-        with open(path) as f:
-            return json.load(f)  # type: ignore[no-any-return]
+        try:
+            with open(path) as f:
+                return cast(dict[str, str], json.load(f))
+        except (JSONDecodeError, OSError) as err:
+            _LOGGER.warning("Profile hashes file is unusable (%s), profiles will be downloaded again", err)
+            return {}
 
     def _write_profile_hashes(self, hashes: dict[str, str]) -> None:
-        """Write profile hashes to local storage"""
+        """Write profile hashes to local storage, atomically."""
 
         path = self._get_profile_hashes_path()
-        with open(path, "w") as json_file:
-            json.dump(hashes, json_file, indent=4)
+        _save_resource(json.dumps(hashes, indent=4).encode(), Path(path))
