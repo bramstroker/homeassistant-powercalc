@@ -81,6 +81,7 @@ from .common import (
     mock_device_with_entities,
     mock_devices,
     mock_entities_in_registry,
+    requires_child_devices,
     requires_composite_devices,
     requires_linked_devices,
     run_powercalc_setup,
@@ -918,29 +919,48 @@ def test_get_config_entries_builds_device_index_when_not_supplied(hass: HomeAssi
     assert source_entry in config_entries
 
 
+@requires_composite_devices
 async def test_composite_devices_are_ignored_for_device_discovery(
     hass: HomeAssistant,
 ) -> None:
-    mocked_devices = mock_devices(
-        hass,
-        {
-            "regular-device": {"manufacturer": "test", "model": "regular"},
-            "composite-device": {"manufacturer": "test", "model": "composite"},
-        },
-    )
-    regular_device = mocked_devices["regular-device"]
-    composite_device = mocked_devices["composite-device"]
+    _mock_split_devices(hass)
     discovery_manager = DiscoveryManager(hass, {})
 
-    with patch.object(
-        dr.async_get(hass),
-        "async_is_composite_device_id",
-        side_effect=lambda device_id: device_id == composite_device.id,
-        create=True,
-    ):
-        devices = discovery_manager.get_devices()
+    devices = discovery_manager.get_devices()
 
-    assert devices == [regular_device]
+    assert {device.id for device in devices} == {"split-device-0", "split-device-1"}
+
+
+@requires_child_devices
+def test_child_device_is_excluded_from_model_discovery(
+    hass: HomeAssistant,
+    device_registry: dr.DeviceRegistry,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Child devices have no manufacturer/model fields and must not use their compatibility shim."""
+    config_entry = MockConfigEntry(domain="test")
+    config_entry.add_to_hass(hass)
+    parent = device_registry.async_get_or_create(
+        config_entry_id=config_entry.entry_id,
+        identifiers={("test", "parent")},
+        name="Parent",
+    )
+    child = device_registry.async_get_or_create_child(
+        config_entry_id=config_entry.entry_id,
+        identifiers={("test", "child")},
+        name="Child",
+        parent_device_id=parent.id,
+    )
+
+    source_entity = SourceEntity(
+        object_id="child",
+        entity_id="switch.child",
+        domain="switch",
+        device_entry=child,
+    )
+
+    assert DiscoveryManager(hass, {}).extract_model_info(source_entity) is None
+    assert "accesses ChildDeviceEntry" not in caplog.text
 
 
 def _mock_split_devices(hass: HomeAssistant) -> None:

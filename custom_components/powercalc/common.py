@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import math
 import re
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, split_entity_id
@@ -30,6 +30,13 @@ from .errors import SensorConfigurationError
 
 _HAS_CHILD_DEVICES = hasattr(dr, "ChildDeviceEntry")
 
+if TYPE_CHECKING:
+    from homeassistant.helpers.device_registry import AnyDeviceEntry as AnyDeviceEntry
+else:
+    # AnyDeviceEntry was introduced together with child devices in HA 2026.9.
+    # Keep imports working on older supported versions, where every entry is a DeviceEntry.
+    AnyDeviceEntry = dr.DeviceEntry
+
 
 @dataclass(frozen=True)
 class SourceEntity:
@@ -41,7 +48,7 @@ class SourceEntity:
     unique_id: str | None = None
     name: str | None = None
     entity_entry: er.RegistryEntry | None = None
-    device_entry: dr.DeviceEntry | None = None
+    device_entry: AnyDeviceEntry | None = None
     config_entry_id: str | None = None
 
     @property
@@ -102,6 +109,11 @@ def get_main_device_entry(device_registry: dr.DeviceRegistry, device_id: str) ->
     return cast(dr.DeviceEntry | None, device_registry.async_get(device_id))  # pragma: no cover
 
 
+def get_any_device_entry(device_registry: dr.DeviceRegistry, device_id: str) -> AnyDeviceEntry | None:
+    """Return either a main or child device entry when supported by Home Assistant."""
+    return device_registry.async_get(device_id)
+
+
 def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
     """Create object containing all information about the source entity."""
 
@@ -118,7 +130,7 @@ def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
 
     device_registry = dr.async_get(hass)
     device_entry = (
-        get_main_device_entry(device_registry, entity_entry.device_id)
+        get_any_device_entry(device_registry, entity_entry.device_id)
         if entity_entry and entity_entry.device_id
         else None
     )
@@ -150,7 +162,7 @@ def get_wrapped_entity_name(
     entity_id: str,
     object_id: str,
     entity_entry: er.RegistryEntry | None,
-    device_entry: dr.DeviceEntry | None,
+    device_entry: AnyDeviceEntry | None,
 ) -> str:
     """Construct entity name based on the wrapped entity"""
     if entity_entry is None:
@@ -168,7 +180,7 @@ def get_wrapped_entity_name(
 
 def _get_device_entity_name(
     entity_entry: er.RegistryEntry,
-    device_entry: dr.DeviceEntry | None,
+    device_entry: AnyDeviceEntry | None,
 ) -> str | None:
     if not entity_entry.has_entity_name or device_entry is None:
         return None
