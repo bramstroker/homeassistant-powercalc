@@ -10,11 +10,9 @@ from homeassistant.components.light import (
     ColorMode,
 )
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
-from homeassistant.components.vacuum import (
-    ATTR_BATTERY_LEVEL,
-    VacuumActivity,
-)
+from homeassistant.components.vacuum import VacuumActivity
 from homeassistant.const import (
+    ATTR_BATTERY_LEVEL,
     ATTR_ENTITY_ID,
     CONF_ATTRIBUTE,
     CONF_ENTITIES,

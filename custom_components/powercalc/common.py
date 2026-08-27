@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import math
 import re
+from typing import cast
 
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, split_entity_id
@@ -26,6 +27,8 @@ from .const import (
     SensorType,
 )
 from .errors import SensorConfigurationError
+
+_HAS_CHILD_DEVICES = hasattr(dr, "ChildDeviceEntry")
 
 
 @dataclass(frozen=True)
@@ -92,6 +95,13 @@ def is_number(value: str) -> bool:
     return math.isfinite(fvalue)
 
 
+def get_main_device_entry(device_registry: dr.DeviceRegistry, device_id: str) -> dr.DeviceEntry | None:
+    """Return a main device entry, excluding child devices on versions which support them."""
+    if _HAS_CHILD_DEVICES:
+        return device_registry.async_get(device_id, include_child_devices=False)
+    return cast(dr.DeviceEntry | None, device_registry.async_get(device_id))  # pragma: no cover
+
+
 def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
     """Create object containing all information about the source entity."""
 
@@ -108,7 +118,9 @@ def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
 
     device_registry = dr.async_get(hass)
     device_entry = (
-        device_registry.async_get(entity_entry.device_id) if entity_entry and entity_entry.device_id else None
+        get_main_device_entry(device_registry, entity_entry.device_id)
+        if entity_entry and entity_entry.device_id
+        else None
     )
 
     unique_id = None

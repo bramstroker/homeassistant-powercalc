@@ -1,11 +1,12 @@
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 from homeassistant import data_entry_flow
 from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_ICON, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
+from probatio import UNSUPPORTED, to_field_list
 import voluptuous as vol
-from voluptuous_serialize import convert
 
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
@@ -44,6 +45,18 @@ from tests.config_flow.common import (
     select_menu_item,
     set_virtual_power_configuration,
 )
+
+
+def serialize_schema(schema: vol.Schema) -> list[dict[str, Any]]:
+    """Serialize a form schema with the serializer used by the installed Home Assistant version."""
+
+    def custom_serializer(value: Any) -> Any:  # noqa: ANN401
+        result = cv.custom_serializer(value)
+        return UNSUPPORTED if result is None else result
+
+    serialized = to_field_list(schema, custom_serializer=custom_serializer)
+    assert isinstance(serialized, list)
+    return serialized
 
 
 async def test_create_fixed_sensor_entry(hass: HomeAssistant) -> None:
@@ -195,7 +208,7 @@ async def test_fixed_options_flow_ignores_empty_states_power_when_power_is_set(h
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
     assert schema_keys[schema_keys.index(CONF_FIXED_VALUE)].default() == 47.0
     assert schema_keys[schema_keys.index(CONF_FIXED_VALUE)].description == {"suggested_value": 47.0}
-    fixed_schema = convert(result["data_schema"], custom_serializer=cv.custom_serializer)[0]
+    fixed_schema = serialize_schema(result["data_schema"])[0]
     assert next(iter(fixed_schema["selector"]["choose"]["choices"])) == CONF_POWER
     assert fixed_schema["default"] == 47.0
 
@@ -232,7 +245,7 @@ async def test_fixed_states_power_options_flow(hass: HomeAssistant) -> None:
         {"state": "2", "power": 50},
         {"state": "4", "power": 20},
     ]
-    fixed_schema = convert(result["data_schema"], custom_serializer=cv.custom_serializer)[0]
+    fixed_schema = serialize_schema(result["data_schema"])[0]
     assert next(iter(fixed_schema["selector"]["choose"]["choices"])) == CONF_STATES_POWER
     states_power_selector = fixed_schema["selector"]["choose"]["choices"][CONF_STATES_POWER]["selector"]["object"]
     assert states_power_selector["label_field"] == CONF_STATE
@@ -279,7 +292,7 @@ async def test_fixed_states_power_options_flow_reconstructs_existing_config(hass
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
     assert schema_keys[schema_keys.index(CONF_FIXED_VALUE)].default() == states_power
     assert schema_keys[schema_keys.index(CONF_FIXED_VALUE)].description == {"suggested_value": states_power}
-    fixed_schema = convert(result["data_schema"], custom_serializer=cv.custom_serializer)[0]
+    fixed_schema = serialize_schema(result["data_schema"])[0]
     assert next(iter(fixed_schema["selector"]["choose"]["choices"])) == CONF_STATES_POWER
     assert fixed_schema["default"] == states_power
     assert fixed_schema["description"] == {"suggested_value": states_power}

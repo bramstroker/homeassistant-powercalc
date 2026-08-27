@@ -1,5 +1,6 @@
 from dataclasses import replace
 import logging
+from typing import cast
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE
@@ -12,12 +13,13 @@ import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.common import SourceEntity, get_main_device_entry
 from custom_components.powercalc.const import CONF_AREA
 
 _LOGGER = logging.getLogger(__name__)
 
 _HAS_SINGLE_CONFIG_ENTRY = hasattr(DeviceEntry, "config_entry_id")
+_HAS_CHILD_DEVICES = hasattr(device_registry, "ChildDeviceEntry")
 
 
 def is_composite_device_id(hass: HomeAssistant, device_id: str) -> bool:
@@ -40,9 +42,14 @@ def get_non_composite_devices(hass: HomeAssistant) -> list[DeviceEntry]:
     """
     device_reg = device_registry.async_get(hass)
     is_composite = getattr(device_reg, "async_is_composite_device_id", None)
+    devices = (
+        list(device_reg.devices)
+        if _HAS_CHILD_DEVICES
+        else list(cast(dict[str, DeviceEntry], device_reg.devices).values())  # pragma: no cover
+    )
     if not callable(is_composite):
-        return list(device_reg.devices.values())
-    return [device for device in device_reg.devices.values() if not is_composite(device.id)]
+        return devices
+    return [device for device in devices if not is_composite(device.id)]
 
 
 def get_related_device_ids(hass: HomeAssistant, device_id: str) -> set[str]:
@@ -57,7 +64,7 @@ def get_related_device_ids(hass: HomeAssistant, device_id: str) -> set[str]:
     related = {device_id}
     related.update(device.id for device in _get_composite_split_devices(device_reg, device_id))
 
-    device = device_reg.async_get(device_id)
+    device = get_main_device_entry(device_reg, device_id)
     if device is None:
         return related
 
@@ -111,12 +118,17 @@ def get_first_device_for_config_entry(hass: HomeAssistant, config_entry_id: str)
 
 def get_devices_for_config_entry(hass: HomeAssistant, config_entry_id: str) -> list[DeviceEntry]:
     """Return all non-composite devices belonging to a config entry."""
-    return [device for device in get_non_composite_devices(hass) if config_entry_id in get_config_entry_ids(device)]
+    device_reg = device_registry.async_get(hass)
+    return [
+        device
+        for device in device_registry.async_entries_for_config_entry(device_reg, config_entry_id)
+        if not is_composite_device_id(hass, device.id)
+    ]
 
 
 def get_related_devices(hass: HomeAssistant, device_id: str) -> list[DeviceEntry]:
     """Return all non-composite devices belonging to the same config entry as the given device."""
-    device = device_registry.async_get(hass).async_get(device_id)
+    device = get_main_device_entry(device_registry.async_get(hass), device_id)
     if device is None:
         return []
 
@@ -181,10 +193,11 @@ def get_device_entry(
     if device_id is not None:
         if is_composite_device_id(hass, device_id):
             return None
-        return device_registry.async_get(hass).async_get(device_id)
+        return get_main_device_entry(device_registry.async_get(hass), device_id)
 
     if source_entity and not source_entity.config_entry_id:
-        return source_entity.device_entry or async_entity_id_to_device(hass, source_entity.entity_id)
+        device_entry = source_entity.device_entry or async_entity_id_to_device(hass, source_entity.entity_id)
+        return device_entry if isinstance(device_entry, DeviceEntry) else None
 
     return None
 

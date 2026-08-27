@@ -10,7 +10,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_device_registry,
 )
 
-from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.common import SourceEntity, get_main_device_entry
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -82,6 +82,29 @@ def test_get_first_device_for_config_entry(hass: HomeAssistant) -> None:
     config_entry_id = next(iter(get_config_entry_ids(device_entry)))
 
     assert get_first_device_for_config_entry(hass, config_entry_id) == device_entry
+
+
+def test_get_main_device_entry_excludes_child_devices(
+    hass: HomeAssistant,
+    device_registry: DeviceRegistry,
+) -> None:
+    """Child devices are not returned to code which requires a full device entry."""
+    config_entry = MockConfigEntry(domain="test")
+    config_entry.add_to_hass(hass)
+    parent = device_registry.async_get_or_create(
+        config_entry_id=config_entry.entry_id,
+        identifiers={("test", "parent")},
+        name="Parent",
+    )
+    child = device_registry.async_get_or_create_child(
+        config_entry_id=config_entry.entry_id,
+        identifiers={("test", "child")},
+        name="Child",
+        parent_device_id=parent.id,
+    )
+
+    assert get_main_device_entry(device_registry, parent.id) == parent
+    assert get_main_device_entry(device_registry, child.id) is None
 
 
 def test_resolve_source_device_keeps_source_entity_when_device_is_missing(hass: HomeAssistant) -> None:
