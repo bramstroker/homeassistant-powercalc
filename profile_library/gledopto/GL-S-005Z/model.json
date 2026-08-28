@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.24.8:docker"
   },
-  "name": "RGB+CCT 4 W MR16 Zigbee Spot Light",
+  "name": "RGB+CCT 4W MR16 Zigbee Spotlight",
   "standby_power": 0.49,
   "authors": [
     {

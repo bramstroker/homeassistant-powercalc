@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.25.4:docker"
   },
-  "name": "RGB+CCT Zigbee E14 LED Candle Bulb (4 W)",
+  "name": "RGB+CCT 4W E14 Zigbee Candle Bulb",
   "standby_power": 0.31,
   "authors": [
     {
