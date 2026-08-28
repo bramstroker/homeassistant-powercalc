@@ -8,7 +8,7 @@
   "measure_description": "Manually measured",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",
-  "name": "Wemo Mini v2",
+  "name": "Wemo Mini Smart Plug",
   "only_self_usage": false,
   "standby_power": 0.75,
   "standby_power_on": 1.3,
