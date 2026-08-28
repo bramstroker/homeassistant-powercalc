@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "SoundTouch 300"
+  ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2023-03-10T17:14:51Z",
@@ -26,7 +29,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "SoundTouch 300",
+  "legacy_ids": [
+    "767520-2100"
+  ],
+  "name": "SoundTouch 300 Soundbar",
   "standby_power": 1.5,
   "authors": [
     {
