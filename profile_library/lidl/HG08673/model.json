@@ -5,7 +5,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Voltcraft VC270 with Voltcraft VC-510 and 20 windings",
   "measure_method": "manual",
-  "name": "Silvercrest Smart Plug",
+  "name": "Silvercrest smart plug with power monitoring (EU, FR)",
   "only_self_usage": true,
   "standby_power": 0.595,
   "standby_power_on": 1.071,
