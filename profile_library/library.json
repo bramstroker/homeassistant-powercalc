@@ -9287,6 +9287,48 @@
         },
         {
           "aliases": [
+            "AC26828",
+            "4058075486560",
+            "4058075486584"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-11-30T17:57:54Z",
+          "device_type": "light",
+          "measure_device": "Shelly 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.1.2:docker"
+          },
+          "legacy_ids": [
+            "orbis_cylinder"
+          ],
+          "name": "SMART+ WiFi Orbis Cylinder 450 TW",
+          "standby_power": 0.75,
+          "authors": [
+            {
+              "name": "Kenneth Fribert",
+              "email": "fribse@gmail.com",
+              "github": "fribse"
+            }
+          ],
+          "id": "AC26827",
+          "manufacturer": "ledvance",
+          "updated_at": "2026-08-21T10:30:36",
+          "max_power": 24.0,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
+          "hash": "3839c8809c75d65f44cdc8857fd017dc"
+        },
+        {
+          "aliases": [
             "LDVWF30FILE27RGBW"
           ],
           "legacy_ids": [
@@ -9399,40 +9441,6 @@
             "color_temp": 98.7
           },
           "hash": "5ceb7936b4cc370dd17fd97b1695a5cd"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-11-30T17:57:54Z",
-          "device_type": "light",
-          "measure_device": "Shelly 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.1.2:docker"
-          },
-          "name": "SMART+ WiFi Orbis Cylinder 450 TW",
-          "standby_power": 0.75,
-          "authors": [
-            {
-              "name": "Kenneth Fribert",
-              "email": "fribse@gmail.com",
-              "github": "fribse"
-            }
-          ],
-          "id": "orbis_cylinder",
-          "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 24.0,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 98.6,
-            "color_temp": 98.6
-          },
-          "hash": "37243c06d29f46da79bde18f2dee975e"
         },
         {
           "aliases": [

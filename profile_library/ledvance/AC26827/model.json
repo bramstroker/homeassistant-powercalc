@@ -1,4 +1,9 @@
 {
+  "aliases": [
+    "AC26828",
+    "4058075486560",
+    "4058075486584"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-11-30T17:57:54Z",
   "device_type": "light",
@@ -10,6 +15,9 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.1.2:docker"
   },
+  "legacy_ids": [
+    "orbis_cylinder"
+  ],
   "name": "SMART+ WiFi Orbis Cylinder 450 TW",
   "standby_power": 0.75,
   "authors": [
