@@ -10,7 +10,7 @@
     "SLEEP_TIME": 30,
     "VERSION": "v1.9.8:docker"
   },
-  "name": "RGBICW Smart Corner Floor Lamp",
+  "name": "RGBICW Smart Floor Lamp Basic",
   "standby_power": 2.14,
   "authors": [
     {

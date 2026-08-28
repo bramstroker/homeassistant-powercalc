@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.0:docker"
   },
-  "name": "Smart Ceiling Light",
+  "name": "12-Inch RGBWW + RGBIC Smart Ceiling Light",
   "standby_power": 0.45,
   "authors": [
     {
