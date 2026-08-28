@@ -89,6 +89,7 @@ For every new or renamed model directory:
 4. Keep the full product or marketing name in `name`; add it to `aliases` only when it is actually reported as a model identifier and is needed for discovery.
 5. Reject unstable identifiers such as entity/friendly names, room names, serial numbers, MAC addresses, bridge resource names such as `Light0x...`, and generic protocol identifiers shared by different products.
 6. When renaming an existing profile directory, add the former canonical directory ID to `legacy_ids` so existing profile selections can migrate. Add that value to `aliases` as well only when it is also a real discovery identifier for the device.
+7. Treat `manufacturer.json` aliases as discovery values too: remove exact duplicates, and require evidence that a proposed alias is exposed as the Home Assistant device manufacturer. A raw protocol signature or Zigbee manufacturer string is not sufficient unless the integration maps it to that Device Info field. For an existing uncertain alias, request exact Device Info evidence before removing it when removal could break discovery.
 
 Do not infer a canonical ID from its shape alone. When authoritative sources conflict or uniqueness cannot be established, request contributor confirmation and state what evidence is missing.
 
@@ -149,6 +150,7 @@ Check for:
 - duplicate entries
 - malformed rows
 - large spikes or outliers
+- redundant raw and compressed copies of the same LUT; compare decompressed content and retain one canonical copy, normally the repository's compressed form
 
 #### Multi-switch / state-based
 
@@ -205,6 +207,7 @@ Large deviations should be questioned.
 - [ ] `model.json` schema appears valid`
 - [ ] `created_at` valid ISO date
 - [ ] Strategy matches provided data
+- [ ] LUT data has no redundant raw/compressed duplicate
 - [ ] Measurement metadata present
 - [ ] Standby behaviour sensible
 - [ ] `only_self_usage` matches a real built-in power meter, no sensor naming overrides

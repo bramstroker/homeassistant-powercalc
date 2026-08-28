@@ -13,7 +13,7 @@
     "SLEEP_TIME": 6.0,
     "VERSION": "v0.3.0:cli"
   },
-  "name": "RGBW Bulb E14 470lm 5W",
+  "name": "Standard LED Drop E14 470lm 5W RGBW+",
   "standby_power": 0.28,
   "voltage_range": {
     "min": 227.3,

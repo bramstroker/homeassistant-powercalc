@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.0:docker"
   },
-  "name": "Livarno Lux E27 ST64 Filament Bulb",
+  "name": "Livarno Lux E27 ST64 filament bulb",
   "standby_power": 0.3,
   "authors": [
     {

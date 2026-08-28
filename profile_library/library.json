@@ -7865,7 +7865,7 @@
             "SLEEP_TIME": 15,
             "VERSION": "v0.19.16:docker"
           },
-          "name": "Smart Bulb Color E27",
+          "name": "Smart Bulb Color E26",
           "standby_power": 0.11,
           "authors": [
             {
@@ -7876,7 +7876,7 @@
           ],
           "id": "AE 280 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 9.72,
           "sub_profile_count": 0,
           "color_modes": [
@@ -7887,7 +7887,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "3827e97a08e6d4dd0ac31bf5f9923633"
+          "hash": "a28cec28ad33be850660a874b8281a73"
         },
         {
           "calculation_strategy": "lut",
@@ -7967,7 +7967,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.14.10:docker"
           },
-          "name": "Light Strip Colour",
+          "name": "Strip Light Colour",
           "standby_power": 0.3,
           "authors": [
             {
@@ -7978,7 +7978,7 @@
           ],
           "id": "FL 122 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 16.3,
           "sub_profile_count": 0,
           "color_modes": [
@@ -7989,7 +7989,7 @@
             "score": 86.6,
             "color_temp": 86.6
           },
-          "hash": "640d7c7936bed463364ad9be107ab4c3"
+          "hash": "bb595289ea75bb17ecab4c8d5881aa65"
         },
         {
           "calculation_strategy": "fixed",
@@ -7997,7 +7997,7 @@
           "device_type": "smart_switch",
           "measure_device": "TP-Link Tapo P115 / TP-Link Tapo P110",
           "measure_method": "manual",
-          "name": "Zigbee Outdoor Smart Plug",
+          "name": "Outdoor Smart Plug",
           "only_self_usage": false,
           "standby_power": 0.3,
           "standby_power_on": 0.8,
@@ -8010,10 +8010,10 @@
           ],
           "id": "OSP 210",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 0.8,
           "sub_profile_count": 0,
-          "hash": "58f6c269d8be9af4baff4a7105100366"
+          "hash": "c8a3db2f4f660c965603046f97f87ab1"
         },
         {
           "calculation_strategy": "lut",
@@ -8088,7 +8088,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.3.1:docker"
           },
-          "name": "RGBW Bulb Colour E27",
+          "name": "Smart Bulb Colour E27",
           "standby_power": 0.4,
           "authors": [
             {
@@ -8098,7 +8098,7 @@
           ],
           "id": "RB 185 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 12.78,
           "sub_profile_count": 0,
           "color_modes": [
@@ -8109,7 +8109,7 @@
             "score": 80.5,
             "color_temp": 80.5
           },
-          "hash": "27eae9550478915bab8d8b36ede8b427"
+          "hash": "c3ef0c9348ed54be4ceb91d0fb9f89d4"
         },
         {
           "calculation_strategy": "lut",
@@ -8332,7 +8332,7 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.4.1:app"
           },
-          "name": "RGBW Bulb Colour E27 880lm",
+          "name": "Smart Bulb Colour E27 800lm",
           "standby_power": 0.34,
           "voltage_range": {
             "max": 245.17,
@@ -8340,7 +8340,7 @@
           },
           "id": "RB 282 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T14:26:21",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 9.11,
           "sub_profile_count": 0,
           "color_modes": [
@@ -8352,7 +8352,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "e6333037bf198e8a87d0068673358797"
+          "hash": "f4b751825180ba74e24db5b517ad4bef"
         },
         {
           "calculation_strategy": "lut",
@@ -8434,7 +8434,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.3.13:docker"
           },
-          "name": "Round Ceiling Light (Tunable White)",
+          "name": "Round Ceiling Light",
           "standby_power": 0.4,
           "authors": [
             {
@@ -8445,7 +8445,7 @@
           ],
           "id": "RCL 110",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 20.61,
           "sub_profile_count": 0,
           "color_modes": [
@@ -8455,7 +8455,7 @@
             "score": 98.3,
             "brightness": 98.3
           },
-          "hash": "0ce1b4b4619682f7e7fbce46d463eed5"
+          "hash": "1822aafa97b81a7f6bc6887671c4a719"
         },
         {
           "calculation_strategy": "lut",
@@ -8730,7 +8730,7 @@
           "device_type": "smart_switch",
           "measure_device": "Shelly Plug S",
           "measure_method": "manual",
-          "name": "Zigbee Smart Plug",
+          "name": "Smart Plug",
           "only_self_usage": true,
           "standby_power": 0.41,
           "standby_power_on": 0.61,
@@ -8742,10 +8742,10 @@
           ],
           "id": "SP 120",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 0.61,
           "sub_profile_count": 0,
-          "hash": "f529b78ed34003cdd961808960baf553"
+          "hash": "e64a352aca61450d7b5ca5182808f513"
         },
         {
           "aliases": [
@@ -8756,7 +8756,7 @@
           "device_type": "smart_switch",
           "measure_device": "Shelly Plus Plug S / AVM FRITZ!DECT 200",
           "measure_method": "manual",
-          "name": "Zigbee Smart Plug",
+          "name": "Smart Plug",
           "only_self_usage": false,
           "standby_power": 0.5,
           "standby_power_on": 1.25,
@@ -8768,10 +8768,10 @@
           ],
           "id": "SP 220",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 1.25,
           "sub_profile_count": 0,
-          "hash": "9b364f484b508161c7ad18eb62e4a38a"
+          "hash": "f91a9fed8bf21261a969dd036e25a536"
         },
         {
           "calculation_strategy": "fixed",
@@ -8779,7 +8779,7 @@
           "device_type": "smart_switch",
           "measure_device": "TP-Link Kasa KP115",
           "measure_method": "manual",
-          "name": "Zigbee Smart Plug",
+          "name": "Smart Plug",
           "only_self_usage": false,
           "standby_power": 0.18,
           "standby_power_on": 0.83,
@@ -8792,10 +8792,10 @@
           ],
           "id": "SP 224",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 0.83,
           "sub_profile_count": 0,
-          "hash": "fe9454f7a79df0cc20473a0bb3c51757"
+          "hash": "01b9462f3d028925267e7c5664f5bf7d"
         },
         {
           "calculation_strategy": "fixed",
@@ -8803,7 +8803,7 @@
           "device_type": "smart_switch",
           "measure_device": "Brennenstuhl PM 231 E",
           "measure_method": "manual",
-          "name": "Zigbee Smart Plug",
+          "name": "Smart Plug",
           "only_self_usage": true,
           "standby_power": 0.2,
           "standby_power_on": 0.75,
@@ -8816,10 +8816,10 @@
           ],
           "id": "SP 240",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 0.75,
           "sub_profile_count": 0,
-          "hash": "437ee4e886f5b74ce5af016f381d2604"
+          "hash": "8085f367de83198120dcf59964216f98"
         }
       ],
       "device_types": [
@@ -9608,7 +9608,6 @@
         "_TZ3000_quqaeew6",
         "_TZ3000_th6zqqy6",
         "_TZ3000_qd7hej8u",
-        "_TZ3000_riwp3k79",
         "_TZ3000_oborybow"
       ],
       "name": "lidl",
@@ -9660,7 +9659,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.11.3:docker"
           },
-          "name": "Livarno Home LED floor lamp",
+          "name": "Livarno Home LED floor lamp, RGBW",
           "standby_power": 0.6,
           "authors": [
             {
@@ -9671,7 +9670,7 @@
           ],
           "id": "14158704L",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:24:55",
           "max_power": 26.5,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9682,7 +9681,7 @@
             "score": 97.1,
             "color_temp": 97.1
           },
-          "hash": "24791e22bb82dffb8e58c8a20c385b00"
+          "hash": "2ae63d5250014929322142210395d9b4"
         },
         {
           "calculation_strategy": "lut",
@@ -9695,7 +9694,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "Livarno home Tischleuchte",
+          "name": "Livarno Home LED desk lamp RGBW",
           "standby_power": 0.7,
           "authors": [
             {
@@ -9706,7 +9705,7 @@
           ],
           "id": "14158804L",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:24:55",
           "max_power": 10.54,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9717,7 +9716,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "8a755edf8faf42f6e82f0bd5f1062c4f"
+          "hash": "4246b9611f7680529459cfa235ff1a41"
         },
         {
           "calculation_strategy": "lut",
@@ -9904,7 +9903,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.22.0:docker"
           },
-          "name": "Livarno Lux E27 filament bulb",
+          "name": "Livarno Lux E27 A60 filament bulb",
           "standby_power": 0.2,
           "authors": [
             {
@@ -9914,7 +9913,7 @@
           ],
           "id": "HG06462A",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:24:55",
           "max_power": 7.35,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9924,7 +9923,7 @@
             "score": 94.7,
             "brightness": 94.7
           },
-          "hash": "53ae4d7f83ba5aa9e5b7799d64c66f98"
+          "hash": "a66adffdc9fc142be3ddae1c328120db"
         },
         {
           "calculation_strategy": "lut",
@@ -9937,7 +9936,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.10.0:docker"
           },
-          "name": "Livarno Lux E27 ST64 Filament Bulb",
+          "name": "Livarno Lux E27 ST64 filament bulb",
           "standby_power": 0.3,
           "authors": [
             {
@@ -9947,7 +9946,7 @@
           ],
           "id": "HG06463A",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:24:55",
           "max_power": 6.36,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9957,7 +9956,7 @@
             "score": 99.1,
             "brightness": 99.1
           },
-          "hash": "312cc128e3d693d2ce2832c7442fb7b8"
+          "hash": "e73902a033429c6c957ccfe8114197ae"
         },
         {
           "calculation_strategy": "lut",
@@ -9989,9 +9988,6 @@
           "hash": "aa035801137fd080be644e2940f180c0"
         },
         {
-          "aliases": [
-            "TS0502A"
-          ],
           "calculation_strategy": "lut",
           "created_at": "2023-03-03T10:22:44Z",
           "device_type": "light",
@@ -10013,7 +10009,7 @@
           ],
           "id": "HG06492A",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:24:55",
           "max_power": 5.02,
           "sub_profile_count": 0,
           "color_modes": [
@@ -10023,7 +10019,7 @@
             "score": 97.3,
             "color_temp": 97.3
           },
-          "hash": "68246246caf10151b83682a35e4ae246"
+          "hash": "cf32cede6bd0dc9da3b71178df216f7f"
         },
         {
           "calculation_strategy": "lut",
@@ -10219,13 +10215,13 @@
           ],
           "id": "HG08007",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:24:55",
           "max_power": 26.65,
           "sub_profile_count": 0,
           "color_modes": [
             "hs"
           ],
-          "hash": "fe7f132a45686877d8cb409f4c1591b5"
+          "hash": "8e4da21a79f717d75a98cf1b67098943"
         },
         {
           "calculation_strategy": "lut",
@@ -10238,7 +10234,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.3.5:docker"
           },
-          "name": "Livarno Lux LED Deckenleuchte (1400 lm) RGBCT",
+          "name": "Livarno Home LED ceiling light",
           "standby_power": 0.2,
           "authors": [
             {
@@ -10249,7 +10245,7 @@
           ],
           "id": "HG08008",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:24:55",
           "max_power": 19.08,
           "sub_profile_count": 0,
           "color_modes": [
@@ -10260,7 +10256,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "d5012e39f15a05657d918cf450187b2a"
+          "hash": "d5ff93ea4574a2adc783bf4fefecfff3"
         },
         {
           "calculation_strategy": "lut",
@@ -10436,9 +10432,6 @@
           "hash": "a97b5c4da104f680d45dfbbb8a5787a2"
         },
         {
-          "aliases": [
-            "TS0505B"
-          ],
           "calculation_strategy": "lut",
           "created_at": "2023-03-01T21:41:09Z",
           "device_type": "light",
@@ -10460,7 +10453,7 @@
           ],
           "id": "HG08383A",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:24:55",
           "max_power": 7.11,
           "sub_profile_count": 0,
           "color_modes": [
@@ -10471,7 +10464,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "0a60c7627e370bb3cc9896bd16ec8fd9"
+          "hash": "65be9f4a22b410ca148b78edcea94481"
         },
         {
           "calculation_strategy": "fixed",
@@ -10479,7 +10472,7 @@
           "device_type": "smart_switch",
           "measure_device": "Voltcraft VC270 with Voltcraft VC-510 and 20 windings",
           "measure_method": "manual",
-          "name": "Silvercrest Smart Plug",
+          "name": "Silvercrest smart plug with power monitoring (EU, FR)",
           "only_self_usage": true,
           "standby_power": 0.595,
           "standby_power_on": 1.071,
@@ -10491,10 +10484,10 @@
           ],
           "id": "HG08673",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:24:55",
           "max_power": 1.071,
           "sub_profile_count": 0,
-          "hash": "122eb0c1a406cb0168f08119d07ea227"
+          "hash": "aa549d7cde07abb10adc07a1ff91bd23"
         },
         {
           "calculation_strategy": "lut",
@@ -12927,7 +12920,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.14.8:docker"
           },
-          "name": "RGBW Bulb E27 1055lm 11W",
+          "name": "Standard LED Pear E27 1055lm 11W RGBW+",
           "standby_power": 0.35,
           "authors": [
             {
@@ -12937,7 +12930,7 @@
           ],
           "id": "29145",
           "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T04:59:16",
           "max_power": 10.5,
           "sub_profile_count": 0,
           "color_modes": [
@@ -12948,7 +12941,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "0d4af185a7110d4400c5f181d174e991"
+          "hash": "a11ab1564a7163dd75cee01a1952c6dc"
         },
         {
           "calculation_strategy": "lut",
@@ -12961,7 +12954,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.14.8:docker"
           },
-          "name": "RGBW Reflector GU10 350lm 4.8W",
+          "name": "Standard LED Reflector GU10 350lm 4.8W RGBW+",
           "standby_power": 0.25,
           "authors": [
             {
@@ -12971,7 +12964,7 @@
           ],
           "id": "29147",
           "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T04:59:16",
           "max_power": 4.8,
           "sub_profile_count": 0,
           "color_modes": [
@@ -12982,7 +12975,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "1d00c072a251e38d9d1e8b21aa2e3880"
+          "hash": "777ba04526d444668d215ec9144f53d5"
         },
         {
           "aliases": [
@@ -12998,7 +12991,7 @@
             "SLEEP_TIME": 6.0,
             "VERSION": "v0.3.0:cli"
           },
-          "name": "RGBW Bulb E14 470lm 5W",
+          "name": "Standard LED Drop E14 470lm 5W RGBW+",
           "standby_power": 0.28,
           "voltage_range": {
             "min": 227.3,
@@ -13016,7 +13009,7 @@
           ],
           "id": "29150",
           "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-22T06:19:14",
+          "updated_at": "2026-08-28T04:59:16",
           "max_power": 4.3,
           "sub_profile_count": 0,
           "color_modes": [
@@ -13027,7 +13020,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "b35ba9375cac760e049f679af76bc06e"
+          "hash": "e9a1ff37511d0dd3e173c566edebe533"
         },
         {
           "calculation_strategy": "lut",
@@ -13107,7 +13100,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.15.4:docker"
           },
-          "name": "LED Pear Smart Home Zigbee 3.0 LED Globe E27 806lm 7W Tunable White dimmable Opal",
+          "name": "Filament LED Globe E27 806lm 7W Tunable White",
           "standby_power": 0.25,
           "authors": [
             {
@@ -13118,7 +13111,7 @@
           ],
           "id": "50396",
           "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T04:59:16",
           "max_power": 7.0,
           "sub_profile_count": 0,
           "color_modes": [
@@ -13128,45 +13121,21 @@
             "score": 97.3,
             "color_temp": 97.3
           },
-          "hash": "0aab93266d34c49d1c60b4f926f4c4b8"
+          "hash": "a1c9b716943bafdeffb5480e0c041c54"
         },
         {
+          "aliases": [
+            "924.70",
+            "92466",
+            "92467",
+            "92468"
+          ],
+          "legacy_ids": [
+            "924.70",
+            "92466"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2024-12-14T09:59:57Z",
-          "device_type": "light",
-          "measure_device": "Shelly Plus Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.10.6:docker"
-          },
-          "name": "RGBW Base Spot",
-          "standby_power": 0.2,
-          "authors": [
-            {
-              "name": "evohell",
-              "github": "evohell"
-            }
-          ],
-          "id": "924.70",
-          "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 4.57,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 96.0,
-            "color_temp": 96.0
-          },
-          "hash": "a7b1e88bea4af19d09af1fc5f8eaa034"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2026-08-15T16:46:46Z",
           "device_type": "light",
           "measure_device": "Shelly 1PM Gen3",
           "measure_method": "script",
@@ -13175,25 +13144,25 @@
             "SLEEP_TIME": 3.0,
             "VERSION": "v0.3.0:cli"
           },
-          "name": "Base Coin Basic Set Swivelling round 90mm RGBW 420lm 4.9W",
+          "name": "Base Coin 50mm 420lm 4.9W RGBW+",
           "standby_power": 0.13,
           "voltage_range": {
             "min": 233.1,
             "max": 236.8
           },
-          "aliases": [
-            "92467",
-            "92468"
-          ],
           "authors": [
+            {
+              "name": "evohell",
+              "github": "evohell"
+            },
             {
               "name": "philscottydev",
               "github": "philscottydev"
             }
           ],
-          "id": "92466",
+          "id": "92470",
           "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:14:47",
           "max_power": 4.77,
           "sub_profile_count": 0,
           "color_modes": [
@@ -13204,7 +13173,7 @@
             "score": 99.5,
             "color_temp": 99.5
           },
-          "hash": "e7c30c83b3779c9ede0b9d9e14f53146"
+          "hash": "9f85cac6165c63c100b86c014e4f9c65"
         }
       ],
       "device_types": [
