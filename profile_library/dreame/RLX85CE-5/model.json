@@ -246,6 +246,9 @@
   },
   "created_at": "2026-08-21T13:51:11Z",
   "device_type": "vacuum_robot",
+  "legacy_ids": [
+    "x50-ultra"
+  ],
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",
   "measure_settings": {
@@ -253,11 +256,11 @@
     "SLEEP_TIME": 3.0,
     "VERSION": "v0.3.0:cli"
   },
-  "name": "X50 Ultra",
+  "name": "X50 Ultra Complete",
   "standby_power": 5.55,
   "voltage_range": {
     "min": 225.9,
     "max": 230.9
   },
-  "measure_description": "Measured with a Shelly Plus 1PM in the socket feeding the base station, so every number covers the whole station rather than battery charging alone. Station settings during the runs: smart mop washing on, self clean on, mop washing with detergent on, UV sterilization on, auto drying on, silent drying off, drying time 3h. With smart mop washing on the machine selects water temperature and washing program itself and both selects read unavailable; the stored manual values are hot and standard. The heater does run under this configuration, 937 W for about 14 s during the end of job wash. Measuring the four manual settings separately gives 27.7 W on normal, where the heater never fires, 92.9 W on mild, 106.6 W on warm and 110.3 W on hot; smart washing sits between warm and hot. The washing branch carries the smart washing figure since that is the default. Fixed values are time averages over the window in which each condition holds, not peaks."
+  "measure_description": "Measured on an X50 Ultra Complete robot (RLX85CE-5) with base station RCXE0109, using a Shelly Plus 1PM in the socket feeding the base station, so every number covers the whole station rather than battery charging alone. Station settings during the runs: smart mop washing on, self clean on, mop washing with detergent on, UV sterilization on, auto drying on, silent drying off, drying time 3h. With smart mop washing on the machine selects water temperature and washing program itself and both selects read unavailable; the stored manual values are hot and standard. The heater does run under this configuration, 937 W for about 14 s during the end of job wash. Measuring the four manual settings separately gives 27.7 W on normal, where the heater never fires, 92.9 W on mild, 106.6 W on warm and 110.3 W on hot; smart washing sits between warm and hot. The washing branch carries the smart washing figure since that is the default. Fixed values are time averages over the window in which each condition holds, not peaks."
 }
