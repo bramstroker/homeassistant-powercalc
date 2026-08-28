@@ -1,5 +1,6 @@
 {
   "aliases": [
+    "A18O6U1UQFJ0XK",
     "G2A0V704840708AP"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",

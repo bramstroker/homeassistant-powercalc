@@ -1,7 +1,6 @@
 {
   "aliases": [
     "A2U21SRK4QGSE1",
-    "B7W644",
     "ECHO A2U21SRK4QGSE1"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",

@@ -1,0 +1,28 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2022-08-15T22:44:20Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script. Adjusted 2x readings in H/S. Standby power guesstimated.",
+  "measure_device": "TP-Link Tapo P110",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v0.23.2:docker"
+  },
+  "name": "Grid Connect Smart RGB+CCT B22 Globe (12 W, 1050 lm)",
+  "aliases": [
+    "GLD130P3HA"
+  ],
+  "legacy_ids": [
+    "GLD130P3HA"
+  ],
+  "standby_power": 0.7,
+  "authors": [
+    {
+      "name": "Daniel O'Connor",
+      "email": "daniel.oconnor@gmail.com",
+      "github": "CloCkWeRX"
+    }
+  ]
+}

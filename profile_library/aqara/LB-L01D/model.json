@@ -1,0 +1,30 @@
+{
+  "aliases": [
+    "6145",
+    "LB01D",
+    "lumi.light.agl001"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-02-16T06:45:36Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug US Gen4",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.5:docker"
+  },
+  "legacy_ids": [
+    "LB01D"
+  ],
+  "name": "LED Bulb T2 (E26, RGB CCT)",
+  "standby_power": 0.14,
+  "authors": [
+    {
+      "name": "pinkfin",
+      "github": "pinkfin",
+      "email": "hot.wire1618@fastmail.com"
+    }
+  ]
+}

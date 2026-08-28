@@ -1,5 +1,5 @@
 {
-  "name": "APC Back-UPS ES 650G1",
+  "name": "Back-UPS ES 650G1",
   "aliases": [
     "Back-UPS ES 650G1"
   ],
@@ -13,7 +13,7 @@
   "created_at": "2026-04-28T00:00:00Z",
   "measure_method": "manual",
   "measure_device": "N/A",
-  "config_flow_discovery_remarks": "The Back-UPS ES 650G1 reports load in 10% increments and does not provide ups.realpower. The 650 VA and 0.7 power factor defaults approximate watts for typical mixed loads.",
+  "config_flow_discovery_remarks": "The Back-UPS ES 650G1 reports load in 10% increments and does not provide ups.realpower. The 650 VA and 0.6 power factor defaults match the UPS's 390 W maximum output rating.",
   "fields": {
     "nominal_va": {
       "label": "Nominal Power (VA)",
@@ -28,8 +28,8 @@
     },
     "power_factor": {
       "label": "Power Factor",
-      "description": "Ratio of real power to apparent power. Default: 0.7 for typical mixed loads.",
-      "default": 0.7,
+      "description": "Ratio of real power to apparent power. Default: 0.6, matching this UPS's 390 W / 650 VA rating.",
+      "default": 0.6,
       "selector": {
         "number": {
           "min": 0.1,
@@ -40,7 +40,7 @@
     }
   },
   "fixed_config": {
-    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * [[nominal_va]] | float(650) * [[power_factor]] | float(0.7) }}"
+    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * [[nominal_va]] | float(650) * [[power_factor]] | float(0.6) }}"
   },
   "authors": [
     {

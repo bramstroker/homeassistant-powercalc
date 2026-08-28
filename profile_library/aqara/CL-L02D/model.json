@@ -11,7 +11,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.1:docker"
   },
-  "name": "Ceiling light T1M",
+  "name": "Ceiling Light T1M",
   "standby_power": 0.18,
   "authors": [
     {

@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "2714 CA16"
+  ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "created_at": "2026-01-29T12:42:28Z",
@@ -27,7 +30,7 @@
     "SLEEP_TIME": 5,
     "VERSION": "master"
   },
-  "name": "Beoplay M5",
+  "name": "Wireless Speaker",
   "standby_power": 3.2,
   "authors": [
     {

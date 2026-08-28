@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.8:docker"
   },
-  "name": "Smart Nue ZigBee 9W RGBW downlight",
+  "name": "Nue RGBW Downlight (9 W)",
   "standby_power": 0.64,
   "authors": [
     {

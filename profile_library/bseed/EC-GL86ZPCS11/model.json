@@ -1,6 +1,12 @@
 {
-  "name": "Switch 1 Gang",
-  "model_id": "EC-GL86ZPCS11",
+  "aliases": [
+    "1 gang switch with scene and backlight",
+    "Smart Zigbee Switch 1-Gang"
+  ],
+  "name": "1-Gang Light Switch",
+  "legacy_ids": [
+    "zigbee_switch_1_gang"
+  ],
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
   "measure_device": "Shelly Plug S Gen3",

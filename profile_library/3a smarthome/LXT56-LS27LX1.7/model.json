@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.25.5:docker"
   },
-  "name": "Smart Nue ZigBee 12W RGBW downlight",
+  "name": "Nue RGBW Downlight (12 W)",
   "standby_power": 0.72,
   "authors": [
     {

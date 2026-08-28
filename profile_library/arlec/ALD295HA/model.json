@@ -1,0 +1,27 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2025-05-13T15:07:15Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly 1PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.17.12:docker"
+  },
+  "name": "Grid Connect Smart RGB+CCT LED Downlight (9 W, 740 lm, 92 mm)",
+  "aliases": [
+    "ALD295P5HA"
+  ],
+  "legacy_ids": [
+    "ALD295P5HA"
+  ],
+  "standby_power": 0.5,
+  "authors": [
+    {
+      "name": "Stuart Mackintosh",
+      "github": "stuartmackintosh"
+    }
+  ]
+}
