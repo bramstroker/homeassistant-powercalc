@@ -16,7 +16,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.4.1:app"
   },
-  "name": "RGBW Bulb Colour E27 880lm",
+  "name": "Smart Bulb Colour E27 800lm",
   "standby_power": 0.34,
   "voltage_range": {
     "max": 245.17,

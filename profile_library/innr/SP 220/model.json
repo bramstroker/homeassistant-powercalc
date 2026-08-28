@@ -8,7 +8,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Shelly Plus Plug S / AVM FRITZ!DECT 200",
   "measure_method": "manual",
-  "name": "Zigbee Smart Plug",
+  "name": "Smart Plug",
   "only_self_usage": false,
   "standby_power": 0.5,
   "standby_power_on": 1.25,
