@@ -86,7 +86,7 @@ For every new or renamed model directory:
 1. Read [references/model_identifiers.md](references/model_identifiers.md), including the manufacturer-specific entry when one exists.
 2. Cross-check the proposed directory against the manufacturer's technical product data, device label/manual, official device API, and Home Assistant device information or integration diagnostics as available.
 3. Use the stable, specific manufacturer model code for the directory. Put other stable model values reported by integrations in `aliases` when they uniquely identify the same hardware, or when the manufacturer-specific guidance documents an intentional shared discovery alias that PowerCalc disambiguates by offering multiple profiles.
-4. Keep the full product or marketing name in `name`; add it to `aliases` only when it is actually reported as a model identifier and is needed for discovery.
+4. Use `name` for a concise, recognizable product name or device description; do not merely repeat the canonical model ID or model directory. When the official product name is identical to the model ID, use an official or clearly supported product category such as `Wireless Speaker` or `Smart Plug`. Add a product or marketing name to `aliases` only when it is actually reported as a model identifier and is needed for discovery.
 5. Reject unstable identifiers such as entity/friendly names, room names, serial numbers, MAC addresses, bridge resource names such as `Light0x...`, and generic protocol identifiers shared by different products unless the manufacturer-specific guidance explicitly allows a shared integration-reported alias for discovery.
 6. For every manufacturer, when renaming or consolidating an existing profile directory, always add each former directory ID to `legacy_ids` so existing profile selections can migrate. Only values that were actually directory IDs belong there. Evaluate `aliases` independently: retain a former ID there only when it is also a real discovery identifier, because `legacy_ids` supports migration while `aliases` supports discovery.
 7. Treat `manufacturer.json` aliases as discovery values too: remove exact duplicates, and require evidence that a proposed alias is exposed as the Home Assistant device manufacturer. A raw protocol signature or Zigbee manufacturer string is not sufficient unless the integration maps it to that Device Info field. For an existing uncertain alias, request exact Device Info evidence before removing it when removal could break discovery.
@@ -109,6 +109,7 @@ Required checks:
 Ensure:
 
 - `created_at` is ISO formatted
+- integration restrictions use `compatible_integrations`; do not use the obsolete root-level `integration` key, which discovery ignores
 
 ### 5. Validate Strategy-Specific Data
 
@@ -204,11 +205,13 @@ Large deviations should be questioned.
 
 - [ ] Directory structure correct
 - [ ] Directory uses the canonical, stable manufacturer model identifier
+- [ ] `name` is meaningful and does not merely repeat the canonical model ID or directory
 - [ ] Integration-specific discovery identifiers are aliases; friendly, resource, serial, and undocumented generic identifiers are excluded
 - [ ] Generated files not manually edited
 - [ ] `manufacturer.json` present
 - [ ] `model.json` schema appears valid`
 - [ ] `created_at` valid ISO date
+- [ ] Integration restrictions use `compatible_integrations`
 - [ ] Strategy matches provided data
 - [ ] LUT data has no redundant raw/compressed duplicate
 - [ ] Measurement metadata present
