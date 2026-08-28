@@ -26,7 +26,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.11.3:docker"
   },
-  "name": "SYMFONISK Table lamp",
+  "name": "SYMFONISK Table Lamp",
   "standby_power": 2.6,
   "authors": [
     {
