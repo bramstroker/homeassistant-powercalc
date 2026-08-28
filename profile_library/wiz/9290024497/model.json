@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "SHRGB1W"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-12-20T18:57:50Z",
   "device_type": "light",
@@ -10,8 +13,11 @@
     "SLEEP_TIME": 5,
     "VERSION": "master"
   },
-  "name": "WiZ Bulb A67 E27 RGBWW (type SHRGBW, model 9290024497A, 13 W 220-240 V, 1521 lm)",
-  "standby_power": 0.33,
+  "legacy_ids": [
+    "SHRGB1W"
+  ],
+  "name": "Bulb A67 E27 RGB + Tunable White (13 W, 1521 lm)",
+  "standby_power": 0.26,
   "authors": [
     {
       "name": "Jari Eskelinen",

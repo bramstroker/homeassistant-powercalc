@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "SHRGB1C"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-07-22T08:24:09Z",
   "device_type": "light",
