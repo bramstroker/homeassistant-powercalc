@@ -201,6 +201,10 @@ Review neighbouring profiles in the library for consistency:
 
 Large deviations should be questioned.
 
+### 9. Preserve Manufacturer Learnings
+
+During an ongoing manufacturer-by-manufacturer consistency audit, automatically record new, reusable, evidence-backed identifier, discovery, naming, or measurement rules in `references/model_identifiers.md` after completing each manufacturer. Keep additions concise and manufacturer-specific; do not add a section when the review produced no non-obvious reusable guidance.
+
 ## Review Checklist
 
 - [ ] Directory structure correct
