@@ -22148,6 +22148,9 @@
       "dir_name": "sonos",
       "models": [
         {
+          "aliases": [
+            "S16"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2023-04-03T20:55:15Z",
           "device_type": "smart_speaker",
@@ -22169,12 +22172,15 @@
           ],
           "id": "amp",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 77.12,
           "sub_profile_count": 0,
-          "hash": "82b1d41fff8e711a45496878822c3763"
+          "hash": "5a24943f50131105cae3c304ac6ad197"
         },
         {
+          "aliases": [
+            "S19"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2023-04-03T20:55:15Z",
           "device_type": "smart_speaker",
@@ -22196,12 +22202,15 @@
           ],
           "id": "arc",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 45.34,
           "sub_profile_count": 0,
-          "hash": "989f512b48c457d75a7b9871e363969f"
+          "hash": "23f5acb592db24d11413df9b1488f928"
         },
         {
+          "aliases": [
+            "S45"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2025-08-30T16:58:16Z",
           "device_type": "smart_speaker",
@@ -22222,10 +22231,10 @@
           ],
           "id": "arc ultra",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 28.14,
           "sub_profile_count": 0,
-          "hash": "c6b0b319467d30daf0dc34f9278682c8"
+          "hash": "5471b1587bdd82f4efb4b0c11448a42a"
         },
         {
           "calculation_strategy": "linear",
@@ -22271,6 +22280,9 @@
           "hash": "0ca144c3f91a8e9b2f1d60c17c60f65a"
         },
         {
+          "aliases": [
+            "S39"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2024-06-07T12:44:29Z",
           "device_type": "smart_speaker",
@@ -22292,12 +22304,15 @@
           ],
           "id": "era 100",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 22.71,
           "sub_profile_count": 0,
-          "hash": "ba149c3d0cdc4d47d3ddd14e4cb66852"
+          "hash": "84c804a38952d33017659d01b592bd6b"
         },
         {
+          "aliases": [
+            "S41"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2025-08-30T17:48:07Z",
           "device_type": "smart_speaker",
@@ -22318,12 +22333,15 @@
           ],
           "id": "Era 300",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 49.17,
           "sub_profile_count": 0,
-          "hash": "105c343636b40d6d7f3b2a5651663469"
+          "hash": "4703af3c16719cd20169a809e2f50990"
         },
         {
+          "aliases": [
+            "S24"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2025-08-30T16:35:25Z",
           "device_type": "smart_speaker",
@@ -22344,10 +22362,10 @@
           ],
           "id": "five",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 76.31,
           "sub_profile_count": 0,
-          "hash": "fbe4ede2823d27fa70d40dd18e5fce84"
+          "hash": "005b2bf9e36e062ac861aadddc15eceb"
         },
         {
           "aliases": [
@@ -22397,7 +22415,8 @@
         },
         {
           "aliases": [
-            "Play:1"
+            "Play:1",
+            "S1"
           ],
           "calculation_strategy": "linear",
           "created_at": "2023-04-14T16:03:04Z",
@@ -22414,14 +22433,15 @@
           ],
           "id": "play 1",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 11.4,
           "sub_profile_count": 0,
-          "hash": "6d8fb45f9ce8d9c4f9617389559ab67a"
+          "hash": "4af714530fd37b785b3fa702bd34df15"
         },
         {
           "aliases": [
-            "Play:3"
+            "Play:3",
+            "S3"
           ],
           "calculation_strategy": "linear",
           "created_at": "2022-11-20T21:17:05Z",
@@ -22439,15 +22459,14 @@
           ],
           "id": "play 3",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 13.27,
           "sub_profile_count": 0,
-          "hash": "7803bf2e6fd7aef2dde50c15f5d369d2"
+          "hash": "b7ee59c06b6e87f36d4593acdb85a5c6"
         },
         {
           "aliases": [
-            "Play:5",
-            "Five"
+            "Play:5"
           ],
           "calculation_strategy": "linear",
           "created_at": "2024-03-30T13:51:13Z",
@@ -22470,12 +22489,15 @@
           ],
           "id": "play 5",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 51.73,
           "sub_profile_count": 0,
-          "hash": "2f4f8c2699df7f66bfb48702d6de8a84"
+          "hash": "f32737b7c750743ee77ff20a32dc2b78"
         },
         {
+          "aliases": [
+            "S9"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2023-04-14T16:03:13Z",
           "device_type": "smart_speaker",
@@ -22491,12 +22513,15 @@
           ],
           "id": "playbar",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 26.9,
           "sub_profile_count": 0,
-          "hash": "d12d897a7f4140f8212e3c2d293a4795"
+          "hash": "2a51c7848344fd3100614f01d56ac0e2"
         },
         {
+          "aliases": [
+            "S11"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2023-04-07T17:05:01Z",
           "device_type": "smart_speaker",
@@ -22512,12 +22537,15 @@
           ],
           "id": "playbase",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 34.5,
           "sub_profile_count": 0,
-          "hash": "b88a8ccbfed123d571b8db6d9a6a1319"
+          "hash": "e7c35f24791de5e15e77d5dca51bfba2"
         },
         {
+          "aliases": [
+            "S36"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2026-04-17T09:30:48Z",
           "device_type": "smart_speaker",
@@ -22538,10 +22566,10 @@
           ],
           "id": "ray",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 8.74,
           "sub_profile_count": 0,
-          "hash": "0804d63db7cd272c1ec2bfe530b2fa16"
+          "hash": "303de8250ce77d09f9edaaef241fdb2a"
         },
         {
           "calculation_strategy": "linear",
@@ -22549,7 +22577,7 @@
           "device_type": "smart_speaker",
           "measure_device": "Shelly Plug S",
           "measure_method": "manual",
-          "name": "Sub (Gen1)",
+          "name": "Sub (Gen 1)",
           "standby_power": 5.23,
           "authors": [
             {
@@ -22560,10 +22588,10 @@
           ],
           "id": "sub",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 30.0,
           "sub_profile_count": 0,
-          "hash": "e53e88f01c7aed978cc4b5d12d8a9e8d"
+          "hash": "2f8a793d1657c93ecdb4a068d5005546"
         },
         {
           "calculation_strategy": "linear",
@@ -22627,7 +22655,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.10.0:docker"
           },
-          "name": "SYMFONISK Floor lamp",
+          "name": "SYMFONISK Floor Lamp",
           "standby_power": 2.75,
           "authors": [
             {
@@ -22637,10 +22665,10 @@
           ],
           "id": "symfonisk floor lamp",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 9.5,
           "sub_profile_count": 0,
-          "hash": "aed5d8d4cdf2bb213b286dcd86a269c7"
+          "hash": "25d1a526e8509d831ab5b15826c93f8a"
         },
         {
           "calculation_strategy": "linear",
@@ -22675,7 +22703,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.11.3:docker"
           },
-          "name": "SYMFONISK Table lamp",
+          "name": "SYMFONISK Table Lamp",
           "standby_power": 2.6,
           "authors": [
             {
@@ -22686,10 +22714,10 @@
           ],
           "id": "symfonisk table lamp",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T06:53:55",
           "max_power": 10.49,
           "sub_profile_count": 0,
-          "hash": "850912eed19ea75491f397f6029635d7"
+          "hash": "3c2aff72da276e88b5d08e9b09c35d40"
         }
       ],
       "device_types": [
