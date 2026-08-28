@@ -1,12 +1,12 @@
 {
   "calculation_strategy": "linear",
   "created_at": "2024-09-06T18:37:40Z",
-  "description": "HomematicIP flush mounted smart trailing edge dimmer. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage must be configured by the user since it is possible to connect anything to it.",
+  "description": "Homematic IP flush-mounted trailing-edge dimming actuator. This profile only models the dimmer's self-consumption; configure the connected load separately.",
   "device_type": "smart_dimmer",
   "measure_description": "From manufacturer specifications",
   "measure_device": "From manufacturer specifications",
   "measure_method": "manual",
-  "name": "HmIP-FDT",
+  "name": "Dimming Actuator, Flush-Mount",
   "standby_power": 0.4,
   "standby_power_on": 0.4,
   "authors": [
