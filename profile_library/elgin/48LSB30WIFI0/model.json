@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.19:docker"
   },
-  "name": "Smart Color 20W",
+  "name": "Smart Color 30W",
   "standby_power": 0.75,
   "authors": [
     {
