@@ -1,5 +1,7 @@
 {
-  "aliases": [],
+  "aliases": [
+    "G95 Gold"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-04-28T23:34:57Z",
   "device_type": "light",
@@ -11,7 +13,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.11:docker"
   },
-  "name": "Smart LED Filament Gold Globe-lamp G95 7W",
+  "legacy_ids": [
+    "G95 Gold"
+  ],
+  "name": "Smart LED Filament Lamp E27 G95 CCT Gold (7W)",
   "standby_power": 0.61,
   "authors": [
     {
