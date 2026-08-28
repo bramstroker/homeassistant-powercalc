@@ -1,4 +1,10 @@
 {
+  "aliases": [
+    "LDVWF30FILE27RGBW"
+  ],
+  "legacy_ids": [
+    "LDVWF30FILE27RGBW"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-04-03T10:46:35Z",
   "device_type": "light",
@@ -10,7 +16,7 @@
     "SLEEP_TIME": 1,
     "VERSION": "master"
   },
-  "name": "SMART+ Wi-Fi RGBW Filament Globe LED Bulb (E27, 4.5 W)",
+  "name": "SMART+ WiFi Filament Globe RGBW 30 4.5 W E27",
   "standby_power": 1.04,
   "authors": [
     {

@@ -9086,7 +9086,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "SMART+ ZB FLEX 3P RGB + TW",
+          "name": "SMART+ ZB Flex 3P RGB + TW",
           "standby_power": 0.26,
           "authors": [
             {
@@ -9108,75 +9108,7 @@
             "score": 45.0,
             "color_temp": 45.0
           },
-          "hash": "41843751ddf64e9b36867827f429b2fd"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-11-16T20:39:28Z",
-          "device_type": "light",
-          "measure_device": "Shelly 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.1.1:docker"
-          },
-          "name": "SMART+ WIFI PLANON FRAMELESS TW RGB 600x600",
-          "standby_power": 1.0,
-          "authors": [
-            {
-              "name": "Kenneth Fribert",
-              "email": "fribse@gmail.com",
-              "github": "fribse"
-            }
-          ],
-          "id": "40580754884474",
-          "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 34.65,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 99.7,
-            "color_temp": 99.7
-          },
-          "hash": "ba4b0e743def7bc971df152e84615401"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2025-04-26T20:39:35Z",
-          "device_type": "light",
-          "measure_device": "Sonoff POWR2",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 10,
-            "VERSION": "v1.17.11:docker"
-          },
-          "name": "SMART+ Filament Edison 52 E27 Amber dimmable",
-          "standby_power": 0.24,
-          "authors": [
-            {
-              "name": "dells2k",
-              "github": "dells2k"
-            }
-          ],
-          "id": "4058075729223",
-          "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 5.57,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "brightness"
-          ],
-          "lut_quality": {
-            "score": 99.2,
-            "brightness": 99.2
-          },
-          "hash": "4bb7a033023d943b471885667d9e3312"
+          "hash": "ccca01e171e4caabda6e07633d5e1460"
         },
         {
           "calculation_strategy": "lut",
@@ -9190,7 +9122,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.3.3:docker"
           },
-          "name": "LIGHTIFY LED adjustable color RT 5/6",
+          "name": "LIGHTIFY LED Adjustable Color RT5/6",
           "standby_power": 0.62,
           "authors": [
             {
@@ -9207,7 +9139,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "b4b6eb8bc37212e17ce36df39e4af6ed"
+          "hash": "f4603e0551207addcb092e2373daf9d9"
         },
         {
           "calculation_strategy": "lut",
@@ -9221,7 +9153,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.3.3:docker"
           },
-          "name": "LIGHTIFY LED adjustable white RT 5/6",
+          "name": "LIGHTIFY LED Adjustable White RT5/6",
           "standby_power": 1.0,
           "authors": [
             {
@@ -9242,7 +9174,7 @@
             "score": 97.6,
             "color_temp": 97.6
           },
-          "hash": "6a60a2c8541c785490504bce05738374"
+          "hash": "e241624d7107eaa6dab6eb559e3dcefe"
         },
         {
           "calculation_strategy": "lut",
@@ -9255,7 +9187,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.0.3:docker"
           },
-          "name": "SMART+ Classic Multicolour 60 10W E27",
+          "name": "SMART+ ZB CLA60 60 9 W E27",
           "standby_power": 0.31,
           "authors": [
             {
@@ -9276,7 +9208,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "9ea946ca54513c1788e8d005303f71ab"
+          "hash": "d5b0050fe00ad9e800af74f9c13b6ae8"
         },
         {
           "calculation_strategy": "lut",
@@ -9289,7 +9221,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.1.1:docker"
           },
-          "name": "SMART+ Wifi Planon 30x30 TW",
+          "name": "SMART+ WiFi Planon Frameless 300x300 mm TW",
           "standby_power": 0.9,
           "authors": [
             {
@@ -9310,7 +9242,128 @@
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "9ecffb2b89be99ce843826241bbbb31a"
+          "hash": "6a7900dac3c47a34b900825c4f7eeb7e"
+        },
+        {
+          "aliases": [
+            "4058075484474"
+          ],
+          "legacy_ids": [
+            "40580754884474"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-11-16T20:39:28Z",
+          "device_type": "light",
+          "measure_device": "Shelly 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.1.1:docker"
+          },
+          "name": "SMART+ WiFi Planon Frameless 600x600 mm RGB + TW",
+          "standby_power": 1.0,
+          "authors": [
+            {
+              "name": "Kenneth Fribert",
+              "email": "fribse@gmail.com",
+              "github": "fribse"
+            }
+          ],
+          "id": "AC26447",
+          "manufacturer": "ledvance",
+          "updated_at": "2026-08-21T10:30:36",
+          "max_power": 34.65,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 99.7,
+            "color_temp": 99.7
+          },
+          "hash": "7caa4abfad7899674bd2938a54d62302"
+        },
+        {
+          "aliases": [
+            "LDVWF30FILE27RGBW"
+          ],
+          "legacy_ids": [
+            "LDVWF30FILE27RGBW"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-04-03T10:46:35Z",
+          "device_type": "light",
+          "measure_device": "Shelly Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 1,
+            "VERSION": "master"
+          },
+          "name": "SMART+ WiFi Filament Globe RGBW 30 4.5 W E27",
+          "standby_power": 1.04,
+          "authors": [
+            {
+              "name": "Morten Trab",
+              "email": "morten@trab.dk",
+              "github": "MTrab"
+            }
+          ],
+          "id": "AC32960",
+          "manufacturer": "ledvance",
+          "updated_at": "2026-08-21T10:30:36",
+          "max_power": 4.65,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 96.1,
+            "color_temp": 96.1
+          },
+          "hash": "37ec453e2658a667d88eca087b092e2c"
+        },
+        {
+          "aliases": [
+            "4058075729223"
+          ],
+          "legacy_ids": [
+            "4058075729223"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-04-26T20:39:35Z",
+          "device_type": "light",
+          "measure_device": "Sonoff POWR2",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 10,
+            "VERSION": "v1.17.11:docker"
+          },
+          "name": "SMART+ ZB Filament Edison 52 DIM 6 W 824 Gold E27",
+          "standby_power": 0.24,
+          "authors": [
+            {
+              "name": "dells2k",
+              "github": "dells2k"
+            }
+          ],
+          "id": "AC41293",
+          "manufacturer": "ledvance",
+          "updated_at": "2026-08-21T10:30:36",
+          "max_power": 5.57,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 99.2,
+            "brightness": 99.2
+          },
+          "hash": "1a2ff49798b0f24778dcb07a835dba77"
         },
         {
           "calculation_strategy": "lut",
@@ -9323,7 +9376,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.9.2:docker"
           },
-          "name": "Extended color light RGBW",
+          "name": "SMART+ ZB CLA60 RGBW",
           "standby_power": 0.5,
           "authors": [
             {
@@ -9345,42 +9398,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "8334312532ac4bae55e6249ff85f7ca8"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-04-03T10:46:35Z",
-          "device_type": "light",
-          "measure_device": "Shelly Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 1,
-            "SLEEP_TIME": 1,
-            "VERSION": "master"
-          },
-          "name": "SMART+ Wi-Fi RGBW Filament Globe LED Bulb (E27, 4.5 W)",
-          "standby_power": 1.04,
-          "authors": [
-            {
-              "name": "Morten Trab",
-              "email": "morten@trab.dk",
-              "github": "MTrab"
-            }
-          ],
-          "id": "LDVWF30FILE27RGBW",
-          "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 4.65,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 96.1,
-            "color_temp": 96.1
-          },
-          "hash": "89769d3cdae707bc32f6d3b309678a12"
+          "hash": "5ceb7936b4cc370dd17fd97b1695a5cd"
         },
         {
           "calculation_strategy": "lut",
@@ -9393,7 +9411,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.1.2:docker"
           },
-          "name": "SMART+ WIFI Orbis Cylinder 450 TW",
+          "name": "SMART+ WiFi Orbis Cylinder 450 TW",
           "standby_power": 0.75,
           "authors": [
             {
@@ -9414,7 +9432,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "4a489b98c1bbbd6b62ae4e370e7cfba3"
+          "hash": "37243c06d29f46da79bde18f2dee975e"
         },
         {
           "aliases": [
@@ -9425,7 +9443,7 @@
           "device_type": "light",
           "measure_device": "Shelly Plug S",
           "measure_method": "script",
-          "name": "Tibea Lamp E27 Tuneable White 2000lm",
+          "name": "SMART+ ZB Tibea TW 22 W Gold E27",
           "standby_power": 0.51,
           "authors": [
             {
@@ -9446,7 +9464,7 @@
             "score": 97.5,
             "color_temp": 97.5
           },
-          "hash": "2d23326517ee622bc271edfaf9c527bc"
+          "hash": "bfd8cfc4585baafe5241df85debfed26"
         }
       ],
       "device_types": [
