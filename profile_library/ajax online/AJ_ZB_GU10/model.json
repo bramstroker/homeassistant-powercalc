@@ -10,7 +10,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v1.0.3:docker"
   },
-  "name": "Smart Zigbee pro GU10 spotlight bulb",
+  "name": "Smart Zigbee Pro GU10 Spotlight Bulb (4 W)",
   "standby_power": 0.35,
   "authors": [
     {

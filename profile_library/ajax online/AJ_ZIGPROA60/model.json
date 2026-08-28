@@ -10,7 +10,7 @@
     "SLEEP_TIME": 5,
     "VERSION": "v1.0.3:docker"
   },
-  "name": "Smart Zigbee pro 12W A60 bulb",
+  "name": "Smart Zigbee Pro A60 Bulb (12 W)",
   "standby_power": 0.5,
   "authors": [
     {

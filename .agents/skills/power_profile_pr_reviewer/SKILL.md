@@ -128,10 +128,14 @@ Potential issues:
 
 #### Linear
 
-Expect:
+Normally expect:
 
 - minimum and maximum calibration values
 - plausible brightness mapping
+
+A non-metering `smart_dimmer` may intentionally omit `linear_config`: its profile supplies only
+`standby_power` and `standby_power_on`, while the user provides the connected load's minimum and maximum power during
+setup. Do not flag that pattern as incomplete when the self-usage measurements are credible.
 
 Check for:
 
