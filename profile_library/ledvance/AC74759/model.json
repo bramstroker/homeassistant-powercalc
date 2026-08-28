@@ -1,0 +1,29 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2026-08-26T10:26:57Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script using 2 identical lamps in parallel (MULTIPLE_LIGHTS=true, NUM_LIGHTS=2), reported values are per lamp, because a single E14 lamp draws below the Shelly Plug S Gen3's 0.1 W resolution. A preheated resistive dummy load (~8.5 W, thermally settled) was connected in parallel and its calibrated baseline subtracted: without it the hs sweep aborted on repeated 0 W readings at low brightness with saturated colors, where both lamps combined draw under 0.1 W. The lamp is multicolor (supported_color_modes: color_temp, hs), both modes were measured. Brightness starts at 2. At the darkest, most saturated hs points the per-lamp figure is coarse, limited by the meter resolution, but the absolute error there is well under 0.1 W. Matter device via the Matter integration.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 3,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.4.1:cli"
+  },
+  "name": "SMART+ Classic B40 E14 RGBW",
+  "standby_power": 0.14,
+  "voltage_range": {
+    "max": 237.1,
+    "min": 231.6
+  },
+  "authors": [
+    {
+      "name": "philscottydev",
+      "github": "philscottydev"
+    }
+  ],
+  "aliases": [
+    "SMART MAT B40 RGBW 827 FR E14",
+    "2766"
+  ]
+}
