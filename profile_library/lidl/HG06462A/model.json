@@ -11,7 +11,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.22.0:docker"
   },
-  "name": "Livarno Lux E27 filament bulb",
+  "name": "Livarno Lux E27 A60 filament bulb",
   "standby_power": 0.2,
   "authors": [
     {

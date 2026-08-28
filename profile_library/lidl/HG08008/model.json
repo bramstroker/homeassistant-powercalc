@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.5:docker"
   },
-  "name": "Livarno Lux LED Deckenleuchte (1400 lm) RGBCT",
+  "name": "Livarno Home LED ceiling light",
   "standby_power": 0.2,
   "authors": [
     {

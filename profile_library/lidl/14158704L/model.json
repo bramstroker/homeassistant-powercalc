@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.11.3:docker"
   },
-  "name": "Livarno Home LED floor lamp",
+  "name": "Livarno Home LED floor lamp, RGBW",
   "standby_power": 0.6,
   "authors": [
     {
