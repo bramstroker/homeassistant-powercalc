@@ -13,7 +13,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.9:docker"
   },
-  "name": "Totari-Z 380 ceiling light",
+  "legacy_ids": [
+    "Totari-Z 380"
+  ],
+  "name": "TOTARI-Z Ceiling Light (380mm)",
   "standby_power": 0.22,
   "authors": [
     {
