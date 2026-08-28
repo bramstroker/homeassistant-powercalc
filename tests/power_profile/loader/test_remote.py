@@ -1,3 +1,4 @@
+import asyncio
 import contextlib
 from functools import partial
 import json
@@ -25,6 +26,7 @@ from custom_components.powercalc.power_profile.loader.remote import (
     ENDPOINT_LIBRARY,
     LibraryModel,
     RemoteLoader,
+    _save_resource,
 )
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy
 from tests.common import get_test_config_dir, get_test_profile_dir
@@ -110,6 +112,70 @@ async def test_download(
             os.path.exists,
             os.path.join(storage_dir, remote_file["path"]),
         )
+
+
+async def test_download_keeps_existing_resources_when_a_later_download_fails(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    """Do not partially update a cached profile when one of its resources cannot be downloaded."""
+    storage_path = tmp_path / "profiles"
+    storage_path.mkdir()
+    existing_resource = storage_path / "model.json"
+    existing_resource.write_bytes(b'{"existing": true}')
+    resources = [
+        {
+            "path": "model.json",
+            "url": "https://raw.githubusercontent.com/example/profile/model.json",
+        },
+        {
+            "path": "data.csv.gz",
+            "url": "https://raw.githubusercontent.com/example/profile/data.csv.gz",
+        },
+    ]
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=resources,
+    )
+    mock_aioresponse.get(resources[0]["url"], status=200, body=b'{"new": true}')
+    mock_aioresponse.get(resources[1]["url"], status=500)
+
+    with pytest.raises(ProfileDownloadError, match="Failed to download github URL"):
+        await remote_loader.download_profile("test", "model", str(storage_path), "test_download")
+
+    assert existing_resource.read_bytes() == b'{"existing": true}'
+
+
+def test_save_resource_flushes_to_disk_before_renaming(tmp_path: Path) -> None:
+    """The contents must reach the disk before the rename, so a power loss cannot expose an empty file."""
+    destination = tmp_path / "model.json"
+    destination.write_bytes(b'{"existing": true}')
+    call_order: list[str] = []
+    real_fsync = os.fsync
+    real_replace = os.replace
+
+    def _record_fsync(fd: int) -> None:
+        call_order.append("fsync")
+        real_fsync(fd)
+
+    def _record_replace(source: object, target: object) -> None:
+        call_order.append("replace")
+        real_replace(cast(str, source), cast(str, target))
+
+    with (
+        patch("custom_components.powercalc.power_profile.loader.remote.os.fsync", side_effect=_record_fsync),
+        patch(
+            "custom_components.powercalc.power_profile.loader.remote.os.replace",
+            side_effect=_record_replace,
+        ),
+    ):
+        _save_resource(b'{"new": true}', destination)
+
+    assert destination.read_bytes() == b'{"new": true}'
+    assert call_order[: call_order.index("replace")] == ["fsync"]
+    assert not list(tmp_path.glob(".model.json.*"))
 
 
 async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aioresponse: aioresponses) -> None:
@@ -716,6 +782,120 @@ async def test_prefer_cached_downloads_when_no_local_copy(
     assert "signify" in loader.model_lookup
 
 
+async def test_prefer_cached_redownloads_when_local_copy_is_corrupt(
+    hass: HomeAssistant,
+    mock_library_json_response: None,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A truncated library.json must not brick setup, it has to be discarded and downloaded again."""
+    local_path = hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json")
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    with open(local_path, "w") as f:
+        f.write('{"manufacturers": [')
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+    await loader.initialize(prefer_cached=True)
+
+    assert "signify" in loader.model_lookup
+    assert "Local library.json is unusable" in caplog.text
+    with open(local_path) as f:
+        assert json.load(f)
+
+
+async def test_library_json_falls_back_when_download_fails_and_local_copy_is_corrupt(
+    hass: HomeAssistant,
+    mock_aioresponse: aioresponses,
+) -> None:
+    """With no usable local copy and no connection there is nothing to load, so setup must fail loudly."""
+    local_path = hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json")
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    with open(local_path, "w") as f:
+        f.write("not json at all")
+
+    mock_aioresponse.get(ENDPOINT_LIBRARY, repeat=True, exception=ClientError("no connection"))
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+    with pytest.raises(ProfileDownloadError):
+        await loader.initialize()
+
+
+async def test_library_json_is_written_atomically(
+    hass: HomeAssistant,
+    mock_library_json_response: None,
+) -> None:
+    """The downloaded library.json must land via a rename, never by truncating the existing copy."""
+    local_path = hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json")
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    with open(local_path, "w") as f:
+        f.write('{"manufacturers": []}')
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+
+    real_replace = os.replace
+    renamed: list[str] = []
+
+    def _record_replace(source: object, target: object) -> None:
+        renamed.append(str(target))
+        real_replace(cast(str, source), cast(str, target))
+
+    with patch(
+        "custom_components.powercalc.power_profile.loader.remote.os.replace",
+        side_effect=_record_replace,
+    ):
+        await loader.initialize()
+
+    assert local_path in renamed
+    assert "signify" in loader.model_lookup
+
+
+async def test_corrupt_profile_hashes_are_discarded(
+    hass: HomeAssistant,
+    mock_library_json_response: None,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A truncated .profile_hashes must not fail setup, it only costs one extra download round."""
+    hash_file = hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
+    os.makedirs(os.path.dirname(hash_file), exist_ok=True)
+    with open(hash_file, "w") as f:
+        f.write('{"signify/LCA001": ')
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+    await loader.initialize()
+
+    assert loader.profile_hashes == {}
+    assert "Profile hashes file is unusable" in caplog.text
+
+
+async def test_profile_hashes_are_written_atomically(hass: HomeAssistant) -> None:
+    """The hashes file must land via a rename, so a crash cannot leave it half written."""
+    hash_file = hass.config.path(STORAGE_DIR, "powercalc_profiles", ".profile_hashes")
+    os.makedirs(os.path.dirname(hash_file), exist_ok=True)
+    with open(hash_file, "w") as f:
+        f.write('{"signify/LCA001": "old"}')
+
+    loader = RemoteLoader(hass)
+    real_replace = os.replace
+    renamed: list[str] = []
+
+    def _record_replace(source: object, target: object) -> None:
+        renamed.append(str(target))
+        real_replace(cast(str, source), cast(str, target))
+
+    with patch(
+        "custom_components.powercalc.power_profile.loader.remote.os.replace",
+        side_effect=_record_replace,
+    ):
+        await hass.async_add_executor_job(loader._write_profile_hashes, {"signify/LCA001": "new"})  # noqa: SLF001
+
+    assert renamed == [hash_file]
+    with open(hash_file) as f:
+        assert json.load(f) == {"signify/LCA001": "new"}
+
+
 async def test_library_update_refreshes_from_remote(
     hass: HomeAssistant,
     mock_aioresponse: aioresponses,
@@ -799,6 +979,45 @@ async def test_profile_redownloaded_when_model_json_missing(
     assert storage_path == local_storage_path
 
 
+async def test_concurrent_model_loads_only_download_profile_once(remote_loader: RemoteLoader) -> None:
+    """Concurrent entities using the same profile must not write the cached files concurrently."""
+    manufacturer = "signify"
+    model = "LCA001"
+    local_storage_path = remote_loader.get_storage_path(manufacturer, model)
+    clear_storage_dir(local_storage_path)
+    remote_loader.profile_hashes.pop(f"{manufacturer}/{model}", None)
+    download_started = asyncio.Event()
+    release_download = asyncio.Event()
+
+    async def _download_profile(
+        requested_manufacturer: str,
+        requested_model: str,
+        storage_path: str,
+        model_hash: str,
+    ) -> None:
+        download_started.set()
+        assert (requested_manufacturer, requested_model, model_hash) == (
+            manufacturer,
+            model,
+            remote_loader.model_infos[f"{manufacturer}/{model}"]["hash"],
+        )
+        await release_download.wait()
+        shutil.copytree(get_test_profile_dir("signify_LCA001"), storage_path, dirs_exist_ok=True)
+
+    with patch.object(remote_loader, "download_profile", side_effect=_download_profile) as mock_download:
+        first_load = asyncio.create_task(remote_loader.load_model(manufacturer, model))
+        await download_started.wait()
+        second_load = asyncio.create_task(remote_loader.load_model(manufacturer, model))
+        await asyncio.sleep(0)
+
+        assert mock_download.await_count == 1
+        release_download.set()
+        first_result, second_result = await asyncio.gather(first_load, second_load)
+
+    assert mock_download.await_count == 1
+    assert first_result == second_result
+
+
 async def test_profile_redownloaded_when_model_json_corrupt(
     remote_loader: RemoteLoader,
     mock_aioresponse: aioresponses,
@@ -837,14 +1056,16 @@ async def test_profile_redownloaded_when_model_json_corrupt(
 
     await remote_loader.load_model("apple", "HomePod Mini")
 
-    assert "model.json file is not valid JSON" in caplog.text
-    assert "Retrying to load model.json file" in caplog.text
+    recovery_records = [record for record in caplog.records if "model.json is not valid JSON" in record.message]
+    assert len(recovery_records) == 1
+    assert recovery_records[0].levelno == logging.WARNING
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
 
 
 async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
-    hass: HomeAssistant,
     remote_loader: RemoteLoader,
     mock_aioresponse: aioresponses,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """
     When model.json is corrupt, retry 3 times before giving up.
@@ -877,6 +1098,13 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
 
     with pytest.raises(LibraryLoadingError):
         await remote_loader.load_model("apple", "HomePod Mini")
+
+    recovery_records = [record for record in caplog.records if "model.json is not valid JSON" in record.message]
+    assert len(recovery_records) == 2
+    assert all(record.levelno == logging.WARNING for record in recovery_records)
+    failure_records = [record for record in caplog.records if "model.json remains invalid" in record.message]
+    assert len(failure_records) == 1
+    assert failure_records[0].levelno == logging.ERROR
 
 
 @pytest.mark.parametrize(
