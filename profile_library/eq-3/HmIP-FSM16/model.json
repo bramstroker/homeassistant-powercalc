@@ -1,15 +1,15 @@
 {
   "calculation_strategy": "fixed",
   "created_at": "2025-02-04T18:37:40Z",
-  "description": "HomematicIP flush mounted smart switch with power measurement integrated. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device.",
+  "description": "Homematic IP flush-mounted 16A smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
   "device_type": "smart_switch",
-  "measure_description": "Manually measured with dummy load attached at 7.7W (average over 300s) multiple times, than calculated average of that. There is no difference in standby power on/off.",
+  "measure_description": "Measured repeatedly using Powercalc average mode for 300 seconds with a 7.7W dummy load, then averaged. No difference was measured between the on and off standby power.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
   "measure_settings": {
     "VERSION": "v1.17.1:docker"
   },
-  "name": "HmIP-FSM16",
+  "name": "Switching Actuator and Meter (16A), Flush-Mount",
   "only_self_usage": true,
   "standby_power": 0.2,
   "standby_power_on": 0.2,

@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "ET-3760 Series"
+  ],
   "calculation_strategy": "fixed",
   "created_at": "2024-09-23T13:40:20Z",
   "device_type": "printer",
@@ -11,12 +14,15 @@
   "measure_description": "Printer was measured while idle and while printing",
   "measure_device": "Shelly Plus Plug",
   "measure_method": "manual",
-  "name": "ET-3760 Series",
+  "name": "EcoTank All-in-One Cartridge-Free Supertank Printer",
   "authors": [
     {
       "name": "Brian Egge",
       "email": "brianegge@gmail.com",
       "github": "brianegge"
     }
+  ],
+  "legacy_ids": [
+    "ET-3760 Series"
   ]
 }

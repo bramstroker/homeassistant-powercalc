@@ -1,5 +1,7 @@
 {
   "aliases": [
+    "1",
+    "1 HS2",
     "HEOS 1"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
@@ -24,7 +26,7 @@
   "measure_description": "Streamed 'Armin van Buuren - Coming Around Again' using spotify, and took average measurements using the measure.py tool on different volume levels",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
-  "name": "HEOS 1 HS2",
+  "name": "Wireless Speaker",
   "standby_power": 3.99,
   "authors": [
     {

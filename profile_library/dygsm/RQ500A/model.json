@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "DY-RQ500A"
+  ],
   "calculation_strategy": "fixed",
   "created_at": "2024-12-27T12:00:00Z",
   "device_type": "network",
@@ -6,10 +9,13 @@
   "fixed_config": {
     "power": 0.88
   },
+  "legacy_ids": [
+    "DY-RQ500A"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
-  "name": "Gas sensor",
+  "name": "Gas Leak Detector",
   "authors": [
     {
       "name": "Andrzej Dopierała",

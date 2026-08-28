@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "c0mb70xdt4fqomid"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-12-22T15:07:26Z",
   "device_type": "light",
@@ -10,7 +13,7 @@
     "SLEEP_TIME": 1,
     "VERSION": "v1.16.6:docker"
   },
-  "name": "GOSMART A65 14W",
+  "name": "GoSmart A65 E27 RGB+CCT Bulb (14W, 1400 lm)",
   "standby_power": 0.5,
   "authors": [
     {

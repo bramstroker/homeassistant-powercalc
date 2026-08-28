@@ -1,7 +1,13 @@
 {
+  "aliases": [
+    "Elgato Key Light"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-08-08T08:27:59Z",
   "device_type": "light",
+  "legacy_ids": [
+    "Elgato Key Light"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Zooz Z-Wave Plus Power Switch ZEN15",
   "measure_method": "script",

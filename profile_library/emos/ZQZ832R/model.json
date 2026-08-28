@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.6:docker"
   },
-  "name": "GOSMART LED MR16 4,8W GU10",
+  "name": "GoSmart MR16 GU10 RGB+CCT Bulb (4.8W, 400 lm)",
   "standby_power": 0.24,
   "authors": [
     {

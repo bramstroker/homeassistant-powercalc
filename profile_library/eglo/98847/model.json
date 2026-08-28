@@ -13,7 +13,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.24:docker"
   },
-  "name": "FUEVA-Z recessed light",
+  "legacy_ids": [
+    "FUEVA-Z"
+  ],
+  "name": "FUEVA-Z Surface-Mounted Light (285mm)",
   "standby_power": 0.13,
   "authors": [
     {

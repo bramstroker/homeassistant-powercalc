@@ -2,10 +2,10 @@
   "calculation_strategy": "fixed",
   "created_at": "2023-08-12T11:19:44Z",
   "device_type": "camera",
-  "measure_description": "Used measure tool and took average during 5 minutes",
+  "measure_description": "Measured each state for five minutes using Powercalc average mode",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
-  "name": "Indoor Cam Pan&Tilt",
+  "name": "Indoor Cam E220",
   "authors": [
     {
       "name": "Bram Gerritsen",
