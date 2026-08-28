@@ -307,6 +307,16 @@ Prefer the exact product model printed on the device when it is known. Otherwise
 
 HP's `3301` family includes more specific suffix variants such as `3301fdn`, `3301sdw`, `3301fdw` and `3301cdw`. Do not guess one from a generic IPP value or add every family member as an alias. HP regulatory model numbers such as `SHNGC-2201-01` are explicitly separate from product model numbers and are not preferable discovery identifiers. Use a descriptive product category such as `Color LaserJet Pro Multifunction Printer` for `name` instead of repeating `MFP 3301`. For IPP fixed profiles, document that the `idle` state may cover several physical power phases and that polling can miss short warm-up, fusing and cool-down peaks; preserve measured idle power without pretending that it models per-page energy.
 
+## IKEA
+
+Prefer the exact IKEA **Model identifier** or printed type designation for the measured regional product. Do not replace a confirmed code with a wildcard assembled from regional siblings: for example, the Schuko TRETAKT measured in the original contribution is type `E2204`, while `E2214` is a separate 10 A regional variant. A family-like value such as `E22x4` is suitable only as a historical `legacy_ids` entry after migration, not as a canonical model or discovery alias.
+
+Keep the exact integration-reported description and model ID as separate discovery values. Home Assistant can render these together as `<model> (<model_id>)`, but the parentheses are presentation and PowerCalc matches the fields separately. For example, use aliases `TRADFRI LED driver, 30 w` and `ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2`, not one concatenated or malformed UI string. Preserve an exact descriptive alias on every confirmed profile when integrations reuse it across regional variants, such as the INSPELNING plug models; PowerCalc can offer the matching candidates, but do not infer that the variants share measurements.
+
+Use a concise official product description for `name`, without repeating the canonical code or adding the transport protocol. Retain meaningful distinctions such as fitting, colour capability, dimensions and regional lumen output. Use compact wattage notation such as `30W`, but preserve exact integration spelling such as `30 w` in an alias when needed for discovery. When old product-name directories were migrated to official codes, add those released directory values to `legacy_ids` even if the same string already remains in `aliases` for discovery.
+
+IKEA's numeric Matter product IDs may be retained as exact discovery aliases when Home Assistant reports them and the CSA certification maps them to the product. Verify each ID independently rather than assuming global uniqueness. For LUT profiles, scan the complete manufacturer for quality outliers: low-brightness colour-temperature transitions can capture unsettled readings across an entire curve, so correct only scanner-confirmed isolated points and regenerate the affected plots. Respect profiles in the validator's manually verified skip list; a profile documented there as messy or needing remeasurement must not be auto-smoothed into apparent validity.
+
 ## LEDVANCE / OSRAM
 
 Apply these rules when reviewing or normalizing LEDVANCE and OSRAM profiles:
@@ -382,6 +392,9 @@ When the printed article number, S-code, product name, or generation cannot be r
 - [Powercalc measurement output guidance](../../../../docs/source/contributing/measure/output.md) requires the exact model identifier rather than the marketing name.
 - [Powercalc Matter limitations](../../../../docs/source/library/matter-limitations.md) explains why Matter product IDs can be unsafe for automatic discovery.
 - [IKEA's E2499 product page](https://www.ikea.com/de/en/p/varmblixt-led-table-wall-lamp-dimmable-smart-white-glass-colour-and-white-spectrum-70612940/) is an example of the **Model identifier** field in IKEA technical product information.
+- [IKEA's TRETAKT manual](https://www.ikea.com/nl/nl/manuals/tretakt-stekker-smart__AA-2396101-2-2.pdf) identifies the 16 A European plug as type `E2204`; a separate [regional manual](https://www.ikea.com/ch/en/manuals/tretakt-plug-smart__AA-2437430-1-100.pdf) identifies the 10 A variant as `E2214`.
+- [IKEA's LED2101G4 declaration](https://www.ikea.com/no/en/dec_of_conformity/tradfri-led-bulb-e14-470-lumen-smart-wireless-dimmable-white-spectrum-globe__AA-2378889-1-1.pdf) confirms the official type designation independently of the product description.
+- [Zigbee2MQTT's IKEA device definition](https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/src/devices/ikea.ts) records exact Zigbee descriptions separately from its normalized model values, including the combined TRADFRI driver identifier.
 - [Shelly device information API](https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Shelly/) documents `Shelly.GetDeviceInfo.model`.
 - [TP-Link model-number guidance](https://www.tp-link.com/ae/support/faq/2053/) shows where the product model is printed and exposed in its apps.
 - [Aqara's security and compliance tables](https://www.aqara.com/en/security-certifications/) map official product names to exact model codes and regional variants.
