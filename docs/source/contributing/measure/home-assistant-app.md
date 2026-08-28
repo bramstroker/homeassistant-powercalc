@@ -37,7 +37,7 @@ Direct Hue, Tuya, Tasmota and myStrom controllers or meters, OCR, and manual pow
 
 ## Measurement device setup
 
-Configure the measurement device once from the app settings before creating a session. Select the power-meter type, choose or discover the sensor or plug, and enter a recognizable measurement-device name for generated profile metadata.
+Configure the measurement device once from the app settings before creating a session. Select the power-meter type, choose or discover the sensor or plug, and choose the meter name used by existing Powercalc profiles. The app loads these canonical names from the published library. You can still type a name when your meter is not listed or the library is temporarily unavailable.
 
 Use **Test connection** to sample the configured meter before starting a long run. For Home Assistant sensors, the app checks:
 
@@ -54,7 +54,7 @@ GitHub authentication can be configured in **Settings** before starting a measur
 
 The credential is stored separately in the app's private `/data` directory and is never included in session diagnostics. Home Assistant may include it in app backups. Disconnect locally and revoke the OAuth authorization or token in GitHub when it is no longer needed.
 
-After a completed light, speaker, fan, or charging measurement, the result page can prepare a profile contribution. Review the manufacturer, model, exact file list, JSON, commit message, and pull-request text before explicitly creating the pull request. The app creates or reuses your fork and submits one device to the Powercalc `master` branch.
+After a completed light, speaker, fan, or charging measurement, the result page can prepare a profile contribution. Enter the marketed product name without repeating the manufacturer. When the manufacturer already exists, use the link to its library page to compare names and metadata with existing profiles. Review the manufacturer, model, exact file list, JSON, commit message, and pull-request text before explicitly creating the pull request. The app creates or reuses your fork and submits one device to the Powercalc `master` branch.
 
 Manual contribution remains available at all times. You can still download every generated file and follow the contribution guide when GitHub is not configured, automatic contribution is unavailable, or an existing profile needs to be updated.
 

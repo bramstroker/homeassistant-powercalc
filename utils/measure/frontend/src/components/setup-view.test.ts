@@ -2,6 +2,23 @@ import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "..
 import "./setup-view";
 import { SetupViewElement, capabilities, definitions, lightDefinition, lights } from "./test-fixtures";
 
+interface TestCombobox extends HTMLElement {
+  label: string;
+  options: Array<{ value: string; label: string }>;
+  updateComplete: Promise<boolean>;
+  shadowRoot: ShadowRoot;
+}
+
+function entityCombobox(element: SetupViewElement, name: string): TestCombobox {
+  return element.shadowRoot.querySelector(`measure-combobox[name="${name}"]`) as TestCombobox;
+}
+
+function selectEntity(picker: TestCombobox, value: string): void {
+  const input = picker.querySelector('input[slot="value"]') as HTMLInputElement;
+  input.value = value;
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
 describe("setup view", () => {
   it("renders dynamic entities, mode choices, and collapsed advanced settings", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
@@ -15,7 +32,9 @@ describe("setup view", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.textContent).toContain("Desk lamp · light.desk");
+    const light = entityCombobox(element, "light_entity_id");
+    await light.updateComplete;
+    expect((light.shadowRoot.querySelector("input") as HTMLInputElement).value).toBe("Desk lamp · light.desk");
     expect(element.shadowRoot.textContent).toContain("Brightness");
     expect(element.shadowRoot.querySelector("details")?.open).toBe(false);
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
@@ -26,9 +45,7 @@ describe("setup view", () => {
     const unsupported = ["ct_bri_steps", "ct_mired_steps", "hs_bri_steps", "hs_hue_steps", "hs_sat_steps", "effect_bri_steps", "measure_time_effect"];
     expect(unsupported.filter((name) => element.shadowRoot.querySelector(`input[name="${name}"]`))).toEqual([]);
 
-    const light = element.shadowRoot.querySelector('select[name="light_entity_id"]') as HTMLSelectElement;
-    light.value = "light.desk";
-    light.dispatchEvent(new Event("change"));
+    selectEntity(light, "light.desk");
     await element.updateComplete;
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
   });
@@ -188,7 +205,7 @@ describe("setup view", () => {
 
     expect(element.shadowRoot.querySelector(".add-entity")).toBeNull();
     expect(element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')).toBeNull();
-    expect(element.shadowRoot.querySelectorAll('select[name="light_entity_id"]')).toHaveLength(1);
+    expect(element.shadowRoot.querySelectorAll('measure-combobox[name="light_entity_id"]')).toHaveLength(1);
     expect(element.shadowRoot.querySelector(".multiple-lights")?.textContent).toContain("very low power use");
 
     element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!.click();
@@ -530,9 +547,9 @@ describe("setup type picker", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const fanSelect = element.shadowRoot.querySelector('select[name="fan_entity_id"]') as HTMLSelectElement;
+    const fanSelect = entityCombobox(element, "fan_entity_id");
     expect(fanSelect).toBeTruthy();
-    expect(fanSelect.textContent).toContain("Bedroom fan · fan.bedroom");
+    expect(fanSelect.options.map((option) => option.label)).toContain("Bedroom fan · fan.bedroom");
   });
 
   it.each([
@@ -641,12 +658,11 @@ describe("setup type picker", () => {
     // lives inside a shadow root, so those selectors match nothing under the app's
     // shadow DOM even though browsers resolve them fine.
     const profileGrid = profileSection?.querySelector(".profile-grid");
-    const fields = [...(profileGrid?.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[name]") ?? [])];
+    const fields = [...(profileGrid?.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[name]") ?? [])]
+      .filter((field) => field.getAttribute("slot") !== "value");
     expect(fields.map((field) => field.name)).toEqual(expectedFields);
 
-    const entity = element.shadowRoot.querySelector(`select[name="${entityField}"]`) as HTMLSelectElement;
-    entity.value = entityId;
-    entity.dispatchEvent(new Event("change"));
+    selectEntity(entityCombobox(element, entityField), entityId);
     await element.updateComplete;
 
     expect((element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value).toBe(modelId);
@@ -709,18 +725,18 @@ describe("setup type picker", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const entity = element.shadowRoot.querySelector('[name="charging_entity_id"]') as HTMLSelectElement;
-    expect(entity.textContent).toContain("Downstairs vacuum");
-    expect(entity.textContent).not.toContain("Garden mower");
+    const entity = entityCombobox(element, "charging_entity_id");
+    expect(entity.options.map((option) => option.label)).toContain("Downstairs vacuum · vacuum.downstairs");
+    expect(entity.options.map((option) => option.label)).not.toContain("Garden mower · lawn_mower.garden");
 
     const type = element.shadowRoot.querySelector('[name="charging_device_type"]') as HTMLSelectElement;
     type.value = "lawn_mower_robot";
     type.dispatchEvent(new Event("change"));
     await element.updateComplete;
 
-    const updated = element.shadowRoot.querySelector('[name="charging_entity_id"]') as HTMLSelectElement;
-    expect(updated.textContent).toContain("Garden mower");
-    expect(updated.textContent).not.toContain("Downstairs vacuum");
+    const updated = entityCombobox(element, "charging_entity_id");
+    expect(updated.options.map((option) => option.label)).toContain("Garden mower · lawn_mower.garden");
+    expect(updated.options.map((option) => option.label)).not.toContain("Downstairs vacuum · vacuum.downstairs");
   });
 });
 
@@ -783,9 +799,7 @@ describe("setup view defaults", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const light = element.shadowRoot.querySelector('select[name="light_entity_id"]') as HTMLSelectElement;
-    light.value = "light.desk";
-    light.dispatchEvent(new Event("change"));
+    selectEntity(entityCombobox(element, "light_entity_id"), "light.desk");
     await element.updateComplete;
 
     const modelId = element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement;
@@ -812,14 +826,14 @@ describe("setup view defaults", () => {
     // the assertion scoped to the profile fields and excludes the nested advanced
     // timing grid, exactly as the `:scope > .grid > label` selector intended.
     const profileFields = [...(profileGrid?.children ?? [])].filter(
-      (child): child is HTMLLabelElement => child.tagName === "LABEL",
+      (child): child is TestCombobox => child.tagName === "MEASURE-COMBOBOX",
     );
-    const labels = profileFields.map(
-      (field) => [...field.children].find((child) => child.tagName === "SPAN")?.textContent?.trim(),
-    );
+    const labels = profileFields.map((field) => field.label);
     expect(labels).toEqual(["Light"]);
     expect([...element.shadowRoot.querySelectorAll(".profile-fields > label > span")].map((label) => label.textContent?.trim()))
       .toEqual(["Model ID", "Full product name"]);
+    expect((element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).placeholder)
+      .toBe("Hue White Ambiance A60 E27");
     expect(element.shadowRoot.querySelector(".field-hint")?.textContent).toContain("complete marketed name");
   });
 });

@@ -20,6 +20,7 @@ import type {
   ErrorHelp,
   MeasurementRequest,
   MeasureDefinition,
+  MeasureDeviceCatalog,
   PlotCollection,
   PowerMeterDiagnostic,
   PreflightResponse,
@@ -63,6 +64,10 @@ export class MeasureApiClient {
 
   getMeasureDefinitions(): Promise<MeasureDefinition[]> {
     return this.request("api/measure-definitions");
+  }
+
+  getMeasureDevices(): Promise<MeasureDeviceCatalog> {
+    return this.request("api/library/measure-devices");
   }
 
   getSettings(): Promise<AppSettings> {

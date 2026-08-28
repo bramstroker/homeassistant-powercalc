@@ -1,4 +1,5 @@
 from collections.abc import Callable, Iterator, Sequence
+from dataclasses import dataclass
 import gzip
 import hashlib
 import json
@@ -12,10 +13,30 @@ JsonValidator = Callable[[dict[str, Any], dict[str, Any]], None]
 
 MODEL_JSON = "model.json"
 MANUFACTURER_JSON = "manufacturer.json"
+LIBRARY_URL = "https://library.powercalc.nl"
 
 
 class ProfilePreparationError(ValueError):
-    pass
+    def __init__(self, message: str, *, field: str | None = None) -> None:
+        super().__init__(message)
+        self.field = field
+
+
+@dataclass(frozen=True)
+class ManufacturerResolution:
+    directory: str
+    #: Only the manufacturer's own name(s), never its aliases: aliases are commonly
+    #: sub-brands or product lines ("FRITZ!", "Tapo", "Kasa") that legitimately start
+    #: a product name, so they must not be rejected as a repeated manufacturer.
+    primary_names: frozenset[str]
+    exists: bool
+
+    @property
+    def library_url(self) -> str | None:
+        if not self.exists:
+            return None
+        slug = re.sub(r"[^a-z0-9]+", "-", self.directory.casefold()).strip("-")
+        return f"{LIBRARY_URL}/manufacturers/{slug}" if slug else None
 
 
 class ProfilePreparer:
@@ -42,22 +63,22 @@ class ProfilePreparer:
         artifact_directory = artifact_directory.resolve()
         csv_names = self._artifact_csv_names(artifact_directory)
         model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
+        manufacturer = self._resolve_manufacturer(metadata.manufacturer, metadata.manufacturer_directory)
+        self._validate_product_name(str(model.get("name", "")), metadata.manufacturer, manufacturer.primary_names)
         if model.get("calculation_strategy") == "lut" and not csv_names:
             raise ProfilePreparationError("At least one .csv.gz artifact is required for LUT profiles")
         self.validator(model, self._read_object(self.model_schema_path))
 
-        manufacturer_directory = self._resolve_manufacturer_directory(
-            metadata.manufacturer,
-            metadata.manufacturer_directory,
-        )
+        manufacturer_directory = manufacturer.directory
         profile_directory = Path("profile_library") / manufacturer_directory / metadata.model_id
         relative_files = [profile_directory / name for name in (MODEL_JSON, *csv_names)]
-        if not self._manufacturer_exists(manufacturer_directory):
+        if not manufacturer.exists:
             relative_files.append(profile_directory.parent / MANUFACTURER_JSON)
         self._block_collisions(relative_files)
 
         return ContributionPreview(
             manufacturer_directory=manufacturer_directory,
+            manufacturer_library_url=manufacturer.library_url,
             model_directory=metadata.model_id,
             files=tuple(
                 self._build_prepared_file(relative_path, artifact_directory, model, metadata)
@@ -105,21 +126,56 @@ class ProfilePreparer:
         ]
         return model
 
-    def _resolve_manufacturer_directory(self, manufacturer: str, requested_directory: str | None) -> str:
+    def _resolve_manufacturer(self, manufacturer: str, requested_directory: str | None) -> ManufacturerResolution:
         requested = self._normalize(manufacturer)
         for directory, manifest in self._manufacturer_manifests():
             if requested in self._known_names(manifest, "name"):
-                return directory
+                return ManufacturerResolution(
+                    directory=directory,
+                    primary_names=frozenset(self._name_values(manifest, "name")),
+                    exists=True,
+                )
         for entry in self._manufacturers_in_index():
             dir_name = entry.get("dir_name")
             if isinstance(dir_name, str) and dir_name and requested in self._known_names(entry, "name", "full_name"):
-                return dir_name
-        return requested_directory or self._slugify(manufacturer)
+                return ManufacturerResolution(
+                    directory=dir_name,
+                    primary_names=frozenset(self._name_values(entry, "name", "full_name")),
+                    exists=True,
+                )
+        directory = requested_directory or self._slugify(manufacturer)
+        return ManufacturerResolution(
+            directory=directory,
+            primary_names=frozenset({manufacturer}),
+            # The entered name matched nothing, but the directory it resolves to may
+            # still be an existing manufacturer (the directory is user-editable), and
+            # overwriting its manifest would drop the upstream name and aliases.
+            exists=self._manufacturer_directory_exists(directory),
+        )
 
-    def _manufacturer_exists(self, directory: str) -> bool:
+    def _manufacturer_directory_exists(self, directory: str) -> bool:
+        """Whether ``directory`` is already a manufacturer in the checkout or the index."""
         return (self.library_root / directory).is_dir() or any(
             entry.get("dir_name") == directory for entry in self._manufacturers_in_index()
         )
+
+    @classmethod
+    def _validate_product_name(cls, product_name: str, entered_manufacturer: str, known_names: frozenset[str]) -> None:
+        normalized_product = cls._normalize_words(product_name)
+        manufacturer_names = {cls._normalize_words(name) for name in (*known_names, entered_manufacturer)}
+        repeated = next(
+            (
+                name
+                for name in sorted(manufacturer_names, key=len, reverse=True)
+                if name and (normalized_product == name or normalized_product.startswith(f"{name} "))
+            ),
+            None,
+        )
+        if repeated is not None:
+            raise ProfilePreparationError(
+                "Product name must not start with the manufacturer; enter only the marketed model name",
+                field="product_name",
+            )
 
     def _block_collisions(self, relative_files: Sequence[Path]) -> None:
         # Casefolded: GitHub hosting is case-sensitive, but "LCT001" and "lct001"
@@ -194,11 +250,21 @@ class ProfilePreparer:
     @classmethod
     def _known_names(cls, entry: dict[str, Any], *keys: str) -> set[str]:
         """All normalized names an entry answers to: the values of ``keys`` plus its aliases."""
-        names = [entry.get(key) for key in keys]
+        return {cls._normalize(name) for name in cls._known_name_values(entry, *keys)}
+
+    @classmethod
+    def _known_name_values(cls, entry: dict[str, Any], *keys: str) -> set[str]:
         aliases = entry.get("aliases")
-        if isinstance(aliases, list):
-            names.extend(aliases)
-        return {cls._normalize(str(name)) for name in names if name}
+        return cls._name_values(entry, *keys) | (
+            {str(alias).strip() for alias in aliases if alias and str(alias).strip()}
+            if isinstance(aliases, list)
+            else set()
+        )
+
+    @staticmethod
+    def _name_values(entry: dict[str, Any], *keys: str) -> set[str]:
+        """The entry's own name(s) under ``keys``, without its aliases."""
+        return {str(entry[key]).strip() for key in keys if entry.get(key) and str(entry[key]).strip()}
 
     def _build_prepared_file(
         self,
@@ -251,6 +317,10 @@ class ProfilePreparer:
     @staticmethod
     def _normalize(value: str) -> str:
         return re.sub(r"\s+", " ", value.strip()).casefold()
+
+    @staticmethod
+    def _normalize_words(value: str) -> str:
+        return re.sub(r"[\W_]+", " ", value.casefold()).strip()
 
     @staticmethod
     def _slugify(value: str) -> str:

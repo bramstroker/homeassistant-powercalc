@@ -294,9 +294,10 @@ describe("app shell", () => {
     expect(element.shadowRoot?.querySelector(".sequence")).toBeNull();
     const settings = element.shadowRoot?.querySelector("measure-settings-view") as HTMLElement & { updateComplete: Promise<boolean>; shadowRoot: ShadowRoot };
     await settings.updateComplete;
-    const powerSensor = settings.shadowRoot.querySelector('select[name="default_power_entity_id"]') as HTMLSelectElement;
-    powerSensor.value = "sensor.other_power";
-    powerSensor.dispatchEvent(new Event("change"));
+    const powerSensor = settings.shadowRoot.querySelector('measure-combobox[name="default_power_entity_id"]') as HTMLElement;
+    powerSensor.dispatchEvent(new CustomEvent("combobox-change", {
+      detail: { value: "sensor.other_power" }, bubbles: true, composed: true,
+    }));
     await settings.updateComplete;
     await element.updateComplete;
 

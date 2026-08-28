@@ -44,6 +44,10 @@ export interface EntityCatalog {
   voltages: EntityDescriptor[];
 }
 
+export interface MeasureDeviceCatalog {
+  devices: string[];
+}
+
 export interface MeasurementParameters {
   sleep_time: number;
   sample_count: number;
@@ -421,6 +425,7 @@ export interface ContributionDraft {
   base_sha?: string | null;
   manufacturer_name: string;
   manufacturer_directory: string;
+  manufacturer_library_url?: string | null;
   model_id: string;
   product_name: string;
   contributor: string;

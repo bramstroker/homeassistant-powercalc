@@ -176,7 +176,12 @@ class SharedContributionService:
         try:
             job = self._build_coordinator(preparer, client).create_job(artifact_root, metadata, base_sha=base_sha)
         except ProfilePreparationError as error:
-            raise ContributionApiError(ContributionApiErrorCode.ARTIFACTS_REQUIRED, str(error)) from error
+            code = (
+                ContributionApiErrorCode.INVALID_METADATA
+                if error.field
+                else ContributionApiErrorCode.ARTIFACTS_REQUIRED
+            )
+            raise ContributionApiError(code, str(error), field=error.field) from error
         contents = preparer.render_contents(artifact_root, metadata, job.preview)
         return _preview_from_job(
             session_id=session_id,
@@ -212,7 +217,12 @@ class SharedContributionService:
         try:
             latest_preview = preparer.prepare(artifact_root, job_before_submit.metadata)
         except ProfilePreparationError as error:
-            raise ContributionApiError(ContributionApiErrorCode.ARTIFACTS_REQUIRED, str(error)) from error
+            code = (
+                ContributionApiErrorCode.INVALID_METADATA
+                if error.field
+                else ContributionApiErrorCode.ARTIFACTS_REQUIRED
+            )
+            raise ContributionApiError(code, str(error), field=error.field) from error
         _validate_latest_preview(job_before_submit, latest_preview, base_sha)
         try:
             job = self._build_coordinator(preparer, client).submit(job_id, artifact_root)
@@ -353,6 +363,7 @@ class _PreviewContent:
 
     manufacturer_name: str
     manufacturer_directory: str
+    manufacturer_library_url: str | None
     model_id: str
     product_name: str
     contributor: str
@@ -386,6 +397,7 @@ def draft_from_request(
     content = _PreviewContent(
         manufacturer_name="",
         manufacturer_directory="",
+        manufacturer_library_url=None,
         model_id=request.model_id,
         product_name=request.product_name,
         contributor=auth.username or "",
@@ -433,6 +445,7 @@ def _preview_from_job(
     content = _PreviewContent(
         manufacturer_name=job.metadata.manufacturer,
         manufacturer_directory=job.preview.manufacturer_directory,
+        manufacturer_library_url=job.preview.manufacturer_library_url,
         model_id=job.metadata.model_id,
         product_name=job.metadata.product_name or request.product_name,
         contributor=job.metadata.author.name,
@@ -493,6 +506,7 @@ def _build_preview_response(
         base_sha=base_sha,
         manufacturer_name=content.manufacturer_name,
         manufacturer_directory=content.manufacturer_directory,
+        manufacturer_library_url=content.manufacturer_library_url,
         model_id=content.model_id,
         product_name=content.product_name,
         contributor=content.contributor,

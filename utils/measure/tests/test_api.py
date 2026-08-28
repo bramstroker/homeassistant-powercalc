@@ -28,6 +28,7 @@ from measure.ha_app.contribution import (
     SharedContributionService,
 )
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
+from measure.ha_app.library_catalog import MeasureDeviceCatalog
 from measure.ha_app.light_probe import LightLoadProbeError, LightLoadProbePoint, LightLoadProbeResult
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
@@ -358,6 +359,35 @@ def test_app_metadata_uses_the_runtime_measure_version(tmp_path: Path) -> None:
     assert test_client.app.version == measure_version()
     assert test_client.get("/openapi.json").json()["info"]["version"] == measure_version()
     assert test_client.get("/api/capabilities").json()["runtime_version"] == measure_version()
+
+
+def test_measure_device_catalog_uses_published_values_and_http_caching(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    test_client.app.state.context.measure_device_catalog = MeasureDeviceCatalog(
+        loader=lambda: {
+            "manufacturers": [
+                {"models": [{"measure_device": "Shelly Plug S"}, {"measure_device": "N/A"}]},
+            ],
+        },
+    )
+
+    response = test_client.get("/api/library/measure-devices")
+
+    assert response.status_code == 200
+    assert response.json() == {"devices": ["Shelly Plug S"]}
+    assert response.headers["cache-control"] == "public, max-age=600"
+
+
+def test_measure_device_catalog_failure_returns_service_unavailable(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    test_client.app.state.context.measure_device_catalog = MeasureDeviceCatalog(
+        loader=lambda: (_ for _ in ()).throw(OSError("offline")),
+    )
+
+    response = test_client.get("/api/library/measure-devices")
+
+    assert response.status_code == 503
+    assert response.json()["message"] == "Could not load measurement devices from the Powercalc library"
 
 
 def test_index_is_not_cached(tmp_path: Path) -> None:
@@ -915,6 +945,7 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
     paths = app.openapi()["paths"]
 
     assert set(paths["/api/sessions"]) == {"get", "post"}
+    assert set(paths["/api/library/measure-devices"]) == {"get"}
     assert set(paths["/api/sessions/{session_id}"]) == {"get", "delete"}
     assert set(paths["/api/sessions/{session_id}/cancel"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/confirm"]) == {"post"}

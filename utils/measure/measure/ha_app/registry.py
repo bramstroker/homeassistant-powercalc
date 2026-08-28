@@ -262,7 +262,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         description="Build a lookup-table power profile for a light.",
         icon="💡",
         model_id_example="LWA017",
-        product_name_example="Philips Hue White Ambiance A60 E27",
+        product_name_example="Hue White Ambiance A60 E27",
         parameters=LIGHT_PARAMETERS,
         fields=(
             POWER_FIELD,

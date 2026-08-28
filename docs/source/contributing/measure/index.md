@@ -49,7 +49,9 @@ Before spending time on a long measurement session, check that the device can be
 
 - Use the real manufacturer and exact model where possible.
 - Avoid profiles for generic white-label devices when the same identifier may refer to different hardware.
-- Add the full product name as an alias when the model directory uses only the model ID.
+- Use the marketed product name for `name`, without repeating the manufacturer. For example, use
+  `Hue White Ambiance GU10` for Signify rather than `Signify Hue White Ambiance GU10`.
+- Use `aliases` only for additional model identifiers used to discover the same hardware.
 
 When the device is not suitable for the public library, you can still use the generated files as a custom profile in your own Home Assistant installation.
 

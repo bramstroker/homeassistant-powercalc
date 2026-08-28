@@ -7,11 +7,13 @@ describe("settings view", () => {
     const element = document.createElement("measure-settings-view") as HTMLElement & {
       powers: EntityDescriptor[];
       settings: AppSettings;
+      measureDevices: string[];
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.settings = defaultSettings;
+    element.measureDevices = ["Shelly Plug S", "TP-Link Kasa KP115"];
     document.body.append(element);
     await element.updateComplete;
 
@@ -25,22 +27,63 @@ describe("settings view", () => {
     expect(sectionButtons[1]?.classList.contains("active")).toBe(true);
     expect(element.shadowRoot.querySelector<HTMLElement>('[aria-labelledby="power-meter-title"]')?.hidden).toBe(true);
     expect(element.shadowRoot.querySelector<HTMLElement>('[aria-labelledby="measure-tuning-title"]')?.hidden).toBe(false);
+    sectionButtons[0]?.click();
+    await element.updateComplete;
 
     const saved = new Promise<AppSettings>((resolve) => {
       element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettings>).detail));
     });
-    const select = element.shadowRoot.querySelector('select[name="default_power_entity_id"]') as HTMLSelectElement;
-    const measureDevice = element.shadowRoot.querySelector('input[name="default_measure_device"]') as HTMLInputElement;
+    const powerSensor = element.shadowRoot.querySelector('measure-combobox[name="default_power_entity_id"]') as HTMLElement;
+    const measureDevicePicker = element.shadowRoot.querySelector('measure-combobox[name="default_measure_device"]') as HTMLElement & { updateComplete: Promise<boolean>; shadowRoot: ShadowRoot };
+    const measureDevice = measureDevicePicker.shadowRoot.querySelector("input") as HTMLInputElement;
     expect(measureDevice.required).toBe(true);
-    measureDevice.value = "Shelly Plug S";
-    expect(select.required).toBe(true);
-    expect(select.options[0]?.textContent).toBe("Select a power sensor");
-    select.value = "sensor.plug_power";
+    measureDevice.focus();
+    await measureDevicePicker.updateComplete;
+    expect([...measureDevicePicker.shadowRoot.querySelectorAll(".option")].map((option) => option.textContent?.trim())).toEqual([
+      "Shelly Plug S",
+      "TP-Link Kasa KP115",
+    ]);
+    measureDevice.value = "shelly";
+    measureDevice.dispatchEvent(new InputEvent("input", { bubbles: true }));
+    await measureDevicePicker.updateComplete;
+    expect(measureDevicePicker.shadowRoot.querySelectorAll(".option")).toHaveLength(1);
+    measureDevice.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    await measureDevicePicker.updateComplete;
+    measureDevice.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await measureDevicePicker.updateComplete;
+    expect(measureDevice.value).toBe("Shelly Plug S");
+    expect(measureDevicePicker.shadowRoot.querySelector(".menu")).toBeNull();
+    expect((powerSensor.shadowRoot?.querySelector("input") as HTMLInputElement).required).toBe(true);
+    powerSensor.dispatchEvent(new CustomEvent("combobox-change", {
+      detail: { value: "sensor.plug_power" }, bubbles: true, composed: true,
+    }));
+    await element.updateComplete;
     (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
 
     const settings = await saved;
     expect(settings.default_power_entity_id).toBe("sensor.plug_power");
+    expect(settings.default_measure_device).toBe("Shelly Plug S");
     expect(settings.measurement_defaults).toEqual(measurementDefaults);
+  });
+
+  it("keeps manual measurement-device entry available when library suggestions fail", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      settings: AppSettings;
+      measureDevicesError: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.settings = defaultSettings;
+    element.measureDevicesError = "Library unavailable";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const picker = element.shadowRoot.querySelector('measure-combobox[name="default_measure_device"]') as HTMLElement & { shadowRoot: ShadowRoot };
+    const input = picker.shadowRoot.querySelector("input") as HTMLInputElement;
+    input.value = "My calibrated meter";
+
+    expect(input.disabled).toBe(false);
+    expect(element.shadowRoot.textContent).toContain("manual entry still works");
   });
 
   it("shows fast test mode only in developer mode and saves the toggle", async () => {
@@ -424,9 +467,10 @@ describe("settings power meter test", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const powerSensor = element.shadowRoot.querySelector('select[name="default_power_entity_id"]') as HTMLSelectElement;
-    powerSensor.value = "sensor.other_power";
-    powerSensor.dispatchEvent(new Event("change"));
+    const powerSensor = element.shadowRoot.querySelector('measure-combobox[name="default_power_entity_id"]') as HTMLElement;
+    powerSensor.dispatchEvent(new CustomEvent("combobox-change", {
+      detail: { value: "sensor.other_power" }, bubbles: true, composed: true,
+    }));
     await element.updateComplete;
     expect(element.shadowRoot.querySelector("measure-power-meter-diagnostic")).toBeNull();
 

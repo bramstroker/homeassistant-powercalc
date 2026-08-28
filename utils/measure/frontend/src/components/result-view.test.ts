@@ -1,4 +1,4 @@
-import type { SessionSnapshot } from "../types";
+import type { ContributionPreview, SessionSnapshot } from "../types";
 import "./result-view";
 
 describe("result view", () => {
@@ -100,6 +100,7 @@ describe("result view", () => {
         base_branch: string;
         manufacturer_name: string;
         manufacturer_directory: string;
+        manufacturer_library_url?: string;
         model_id: string;
         product_name: string;
         contributor: string;
@@ -129,6 +130,7 @@ describe("result view", () => {
       base_branch: "master",
       manufacturer_name: "Signify",
       manufacturer_directory: "signify",
+      manufacturer_library_url: "https://library.powercalc.nl/manufacturers/signify",
       model_id: "LCT010",
       product_name: "Hue lamp",
       contributor: "octocat",
@@ -164,6 +166,9 @@ describe("result view", () => {
     expect(automatic?.textContent).toContain("profile_library/signify/LCT010/model.json");
     expect(automatic?.textContent).toContain("Add Signify LCT010");
     expect(automatic?.textContent).not.toContain("aliases");
+    const manufacturerLink = element.shadowRoot.querySelector(".manufacturer-library-link") as HTMLAnchorElement;
+    expect(manufacturerLink.href).toBe("https://library.powercalc.nl/manufacturers/signify");
+    expect(element.shadowRoot.textContent).toContain("without repeating the manufacturer");
 
     const previewed = new Promise<unknown>((resolve) => element.addEventListener("contribution-preview", (event) => resolve((event as CustomEvent).detail)));
     (element.shadowRoot.querySelector('input[name="manufacturer_directory"]') as HTMLInputElement).value = "philips";
@@ -185,6 +190,48 @@ describe("result view", () => {
     await element.updateComplete;
     expect(element.shadowRoot.querySelector(".contribution-auto")).toBeNull();
     expect(element.shadowRoot.querySelector(".contribution-next")?.textContent).toContain("Read the contribution guide");
+  });
+
+  it("shows product-name contribution errors beside the naming guidance", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      contributionAuth: { connected: boolean; identity: { login: string } };
+      contributionDraft: ContributionPreview;
+      contributionError: string;
+      contributionErrorField: string;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "completed" };
+    element.contributionAuth = { connected: true, identity: { login: "octocat" } };
+    element.contributionDraft = {
+      eligible: true,
+      repository: "bramstroker/homeassistant-powercalc",
+      base_branch: "master",
+      manufacturer_name: "Signify",
+      manufacturer_directory: "",
+      model_id: "LCT010",
+      product_name: "Signify Hue lamp",
+      contributor: "octocat",
+      device_info: {},
+      home_assistant: {},
+      notes: "",
+      files: [],
+      commit_message: "",
+      pr_title: "",
+      pr_body: "",
+      branch_name: "",
+      warnings: [],
+    };
+    element.contributionError = "Product name must not start with the manufacturer";
+    element.contributionErrorField = "product_name";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const productName = element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement;
+    expect(productName.getAttribute("aria-invalid")).toBe("true");
+    expect(productName.parentElement?.textContent).toContain(element.contributionError);
+    expect(element.shadowRoot.querySelector(".manufacturer-library-link")).toBeNull();
   });
 
   it("asks to open settings on the GitHub section when GitHub is not connected", async () => {

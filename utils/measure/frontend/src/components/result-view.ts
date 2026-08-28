@@ -114,6 +114,9 @@ export class ResultView extends LitElement {
   @property({ type: String })
   contributionError = "";
 
+  @property({ type: String })
+  contributionErrorField?: string;
+
   @state()
   contributionMethod?: ContributionMethodId;
 
@@ -166,6 +169,7 @@ export class ResultView extends LitElement {
     .confirm-row { display: flex; align-items: flex-start; gap: 0.55rem; color: var(--muted); font-size: 0.82rem; }
     .confirm-row input { width: auto; margin-top: 0.2rem; }
     .success-link { display: inline-flex; margin-top: 0.75rem; color: var(--good); font-weight: 700; }
+    .manufacturer-library-link { justify-self: start; font-size: 0.8rem; }
     .auth-shortcut { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); }
     ul { list-style: none; margin: 0.65rem 0 0; padding: 0; border-top: 1px solid var(--line); }
     li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--line); }
@@ -362,9 +366,15 @@ export class ResultView extends LitElement {
               placeholder: "Derived from the manufacturer when left empty",
             })}
             ${this.input("model_id", "Model ID", draft.model_id)}
-            ${this.input("product_name", "Product name", draft.product_name)}
+            ${this.input("product_name", "Product name", draft.product_name, {
+              hint: "Enter the marketed model name without repeating the manufacturer, for example “Hue White Ambiance GU10” rather than “Signify Hue White Ambiance GU10”.",
+              error: this.contributionErrorField === "product_name" ? this.contributionError : "",
+            })}
             ${this.input("contributor", "Contributor display", draft.contributor)}
           </div>
+          ${draft.manufacturer_library_url
+            ? html`<a class="manufacturer-library-link" href=${draft.manufacturer_library_url} target="_blank" rel="noopener noreferrer">View existing manufacturer profiles <span aria-hidden="true">↗</span></a>`
+            : nothing}
           <label class="notes-field">
             <span>Notes</span>
             <textarea name="notes" .value=${draft.notes}></textarea>
@@ -379,7 +389,9 @@ export class ResultView extends LitElement {
         ${this.contributionPreview
           ? this.renderPreview(this.contributionPreview)
           : html`<p class="muted">Refresh the preview to validate the profile against the latest Powercalc library before confirming.</p>`}
-        ${this.contributionError ? html`<p class="notice error" role="alert">${this.contributionError}</p>` : nothing}
+        ${this.contributionError && this.contributionErrorField !== "product_name"
+          ? html`<p class="notice error" role="alert">${this.contributionError}</p>`
+          : nothing}
         ${this.renderContributionResult()}
       </div>
     `;
@@ -484,10 +496,17 @@ ${preview.pr_body}</pre>
     name: keyof ContributionPreviewRequest,
     label: string,
     value: string,
-    options: { required?: boolean; placeholder?: string } = {},
+    options: { required?: boolean; placeholder?: string; hint?: string; error?: string } = {},
   ) {
-    const { required = true, placeholder = "" } = options;
-    return html`<label><span>${label}</span><input name=${name} .value=${value} ?required=${required} placeholder=${placeholder} autocomplete="off" /></label>`;
+    const { required = true, placeholder = "", hint = "", error = "" } = options;
+    return html`
+      <label>
+        <span>${label}</span>
+        <input name=${name} .value=${value} ?required=${required} placeholder=${placeholder} autocomplete="off" aria-invalid=${error ? "true" : "false"} />
+        ${hint ? html`<small class="field-hint">${hint}</small>` : nothing}
+        ${error ? html`<small class="field-hint error" role="alert">${error}</small>` : nothing}
+      </label>
+    `;
   }
 
   private collectContribution(): ContributionPreviewRequest | null {
