@@ -1,6 +1,6 @@
 {
   "aliases": [
-    "Google Home Mini"
+    "Home Mini"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
@@ -21,6 +21,9 @@
       "100 -> 2.49"
     ]
   },
+  "legacy_ids": [
+    "Home Mini (HOA)"
+  ],
   "measure_description": "Streamed 'Armin van Buuren - Come Around Again' using spotify, and took average measurements using the measure.py tool on different volume levels",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
