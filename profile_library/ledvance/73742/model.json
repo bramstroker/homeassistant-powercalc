@@ -11,7 +11,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.3:docker"
   },
-  "name": "LIGHTIFY LED adjustable white RT 5/6",
+  "name": "LIGHTIFY LED Adjustable White RT5/6",
   "standby_power": 1.0,
   "authors": [
     {

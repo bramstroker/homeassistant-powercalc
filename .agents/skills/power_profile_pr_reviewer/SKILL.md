@@ -88,6 +88,7 @@ For every new or renamed model directory:
 3. Use the stable, specific manufacturer model code for the directory. Put other stable model values reported by integrations in `aliases` when they uniquely identify the same hardware.
 4. Keep the full product or marketing name in `name`; add it to `aliases` only when it is actually reported as a model identifier and is needed for discovery.
 5. Reject unstable identifiers such as entity/friendly names, room names, serial numbers, MAC addresses, bridge resource names such as `Light0x...`, and generic protocol identifiers shared by different products.
+6. When renaming an existing profile directory, add the former canonical directory ID to `legacy_ids` so existing profile selections can migrate. Add that value to `aliases` as well only when it is also a real discovery identifier for the device.
 
 Do not infer a canonical ID from its shape alone. When authoritative sources conflict or uniqueness cannot be established, request contributor confirmation and state what evidence is missing.
 
@@ -198,6 +199,7 @@ Large deviations should be questioned.
 - [ ] Directory structure correct
 - [ ] Directory uses the canonical, stable manufacturer model identifier
 - [ ] Integration-specific stable identifiers are aliases; friendly, resource, serial, and generic identifiers are excluded
+- [ ] Renamed profiles preserve former canonical directory IDs in `legacy_ids`
 - [ ] Generated files not manually edited
 - [ ] `manufacturer.json` present
 - [ ] `model.json` schema appears valid`
