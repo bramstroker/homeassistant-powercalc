@@ -26,7 +26,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.0:docker"
   },
-  "name": "SYMFONISK Floor lamp",
+  "name": "SYMFONISK Floor Lamp",
   "standby_power": 2.75,
   "authors": [
     {

@@ -39,6 +39,7 @@ If no unique identifier can be established, request manual verification. If the 
 | LEDVANCE / OSRAM | Prefer the exact official manufacturer article/model code, such as an `AC...` code or an older OSRAM article number. Retain a device-reported Zigbee model such as `CLA60 RGBW Z3` as canonical only when no more specific official article code can be established for the measured hardware. | Official LEDVANCE product datasheet, declaration or catalog; product label; then HA/integration diagnostics and Zigbee signature | Exact protocol model strings, integration-specific IDs, and officially mapped GTINs can be aliases. Follow the detailed LEDVANCE guidance below. |
 | Innr | Printed and device-reported codes such as `RB 285 C`, `RS 230 C`, `SP 240` | Official Innr product page or declaration, product label/manual, then HA ZHA/Zigbee device signature | Keep spaces and suffix letters when they are part of the model code. Bundle SKUs and regional sibling models are not aliases by default. Follow the detailed Innr guidance below. |
 | Lidl | Printed product/type codes such as `HG06462A`, `HG08131B`, a specific article code, or an IAN-based identifier when that is the only stable label code | Product or packaging label/manual, official Lidl documentation, then current HA Device Info and the integration's raw Zigbee signature | Reject generic Zigbee models such as `TS0502A` and `TS0505B`. Do not assume a raw `_TZ...` string is a manufacturer alias. Follow the detailed Lidl guidance below. |
+| Sonos | Prefer the exact manufacturer article/model number printed on the product or packaging when it uniquely identifies the measured hardware. Preserve established product-name directories unless a verified canonical migration is intentionally requested. | Product label/packaging and official Sonos documentation; then HA Sonos Device information, where `model_id` comes from the speaker's `modelNumber` | `S...` values are useful discovery aliases when one-to-one with the measured generation, but are not automatically retail article numbers. Product names and S-codes can both be generation-ambiguous. Follow the detailed Sonos guidance below. |
 | Sonoff | Printed product codes such as `ZBMINI`, `ZBMINIR2`, and `B02BA60` | Product label/manual, eWeLink or HA Device information, Zigbee device signature | Do not substitute an underlying generic Tuya/Zigbee identifier for a branded Sonoff code. |
 | Tuya and white-label devices | No safe universal pattern | Require a branded model from the product label/manufacturer and compare its full Zigbee signature with known devices | Identifiers such as `TS0601`, `TS0505B`, and `_TZE...` values can cover different hardware. Do not add them as a directory or alias unless uniqueness for the measured device is demonstrated. |
 
@@ -84,6 +85,20 @@ Apply these rules when reviewing or normalizing Lidl profiles, including Livarno
 
 When a Lidl label code and integration-reported value cannot be reconciled, ask for a product or packaging label photo and the current Home Assistant Device Info fields. Keep the profile discoverable only through identifiers proven specific to the measured variant.
 
+## Sonos
+
+Apply these rules when reviewing or normalizing Sonos profiles:
+
+1. Distinguish three identifiers: the existing Powercalc directory ID, the manufacturer article/model number printed on the device or packaging, and the Sonos `modelNumber` commonly formatted as `S...`. Home Assistant's Sonos integration exposes the speaker `modelNumber` as `model_id` and the product name, with the `Sonos ` prefix removed, as `model`. Do not treat the S-code as the printed article number without separate manufacturer evidence.
+2. For an existing profile, preserve its directory ID unless the review explicitly establishes and requests a canonical migration. Adding a newly verified S-code to `aliases` does not require `legacy_ids`; use `legacy_ids` only when the directory itself is renamed, and include the former directory ID there so existing selections can migrate.
+3. Add an exact S-code to `aliases` only when device information, diagnostics, the original profile PR, or equivalent device evidence maps it one-to-one to the measured hardware generation. Do not infer the code from the marketing name or reuse a code across generations merely because Sonos presents them as one product family.
+4. Treat generation-sensitive products as ambiguous until confirmed. This commonly affects One, One SL, Beam, Play:5, Sub, and IKEA SYMFONISK products. Ask for the exact Home Assistant `model` and `model_id`, the originating integration, the printed article/model number, and the hardware generation before adding an alias or sharing calibration data.
+5. Keep distinct Sonos generations or product lines separate even when their names are similar. In particular, `Play:5` and `Five` are different products: never use `Five` as an alias for a Play:5 profile when a separate Five profile exists. Check every proposed name alias case-insensitively against both directory IDs and aliases to avoid discovery collisions.
+6. A generic value such as `Sub` is insufficient evidence for a generation-specific profile. A bonded Sub may not expose standalone Home Assistant Device information, so request the physical label or packaging code and the generation rather than guessing from the household or parent speaker.
+7. Use official product capitalization in `name`, omit the manufacturer, and format generation labels consistently, for example `Sub (Gen 1)`, `SYMFONISK Floor Lamp`, and `SYMFONISK Table Lamp`. Add a product name to `aliases` only when an integration actually reports it as a discovery identifier and it cannot collide with another profile.
+
+When the printed article number, S-code, product name, or generation cannot be reconciled, keep the established profile unchanged and request contributor evidence. Do not add every historically associated S-code to a generic profile as a fallback.
+
 ## Useful primary references
 
 - [Powercalc library structure](../../../../docs/source/library/structure.md) explains that the directory is the model ID and aliases are alternate discovery identifiers.
@@ -94,6 +109,7 @@ When a Lidl label code and integration-reported value cannot be reconciled, ask 
 - [TP-Link model-number guidance](https://www.tp-link.com/ae/support/faq/2053/) shows where the product model is printed and exposed in its apps.
 - [Innr product pages](https://innr.com/collections/frontpage) list official product names and type numbers.
 - [Innr declarations of conformity](https://innr.com/pages/declarations-of-conformity) corroborate exact type codes and regional variants.
+- [Home Assistant's Sonos entity implementation](https://github.com/home-assistant/core/blob/dev/homeassistant/components/sonos/entity.py) maps the speaker product name to `model` and `modelNumber` to `model_id`.
 
 ## Review evidence
 

@@ -1,6 +1,7 @@
 {
   "aliases": [
-    "Play:1"
+    "Play:1",
+    "S1"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
