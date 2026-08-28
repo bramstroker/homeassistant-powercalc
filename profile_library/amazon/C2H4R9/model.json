@@ -22,6 +22,9 @@
       "0 -> 1.3"
     ]
   },
+  "legacy_ids": [
+    "B09ZX7MS5B"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",
