@@ -6,6 +6,9 @@
   "fixed_config": {
     "power": 1.7
   },
+  "legacy_ids": [
+    "PS-S020E"
+  ],
   "measure_device": "Shelly Plus 1PM Gen4",
   "measure_description": "Manually measured, took average values from 24 hours",
   "measure_method": "manual",

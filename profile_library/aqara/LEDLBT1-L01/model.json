@@ -1,5 +1,6 @@
 {
   "aliases": [
+    "AL039",
     "Aqara LED Light Bulb T1"
   ],
   "calculation_strategy": "lut",
@@ -13,7 +14,10 @@
     "SLEEP_TIME": 10,
     "VERSION": "v1.19.1:docker"
   },
-  "name": "LED Light Bulb T1",
+  "legacy_ids": [
+    "AL039"
+  ],
+  "name": "LED Bulb T1",
   "standby_power": 0.4,
   "authors": [
     {
