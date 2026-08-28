@@ -34,7 +34,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.3.0:app"
   },
-  "name": "Cruiser Pro S Smart Tower Fan",
+  "name": "Cruiser Pro T3S Smart Tower Fan",
   "standby_power": 1.57,
   "voltage_range": {
     "min": 234.4,
