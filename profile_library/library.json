@@ -76,7 +76,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.9.8:docker"
           },
-          "name": "Smart Nue ZigBee 9W RGBW downlight",
+          "name": "Nue RGBW Downlight (9 W)",
           "standby_power": 0.64,
           "authors": [
             {
@@ -86,7 +86,7 @@
           ],
           "id": "LXN60-LS27-Z30",
           "manufacturer": "3a smarthome",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T08:13:11",
           "max_power": 10.49,
           "sub_profile_count": 0,
           "color_modes": [
@@ -97,7 +97,7 @@
             "score": 86.8,
             "color_temp": 86.8
           },
-          "hash": "cb414aef42114de361d0d4a0e5a8d886"
+          "hash": "866f516bb7279faeac87d13eb5cd3c8d"
         },
         {
           "calculation_strategy": "lut",
@@ -110,7 +110,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.25.5:docker"
           },
-          "name": "Smart Nue ZigBee 12W RGBW downlight",
+          "name": "Nue RGBW Downlight (12 W)",
           "standby_power": 0.72,
           "authors": [
             {
@@ -121,7 +121,7 @@
           ],
           "id": "LXT56-LS27LX1.7",
           "manufacturer": "3a smarthome",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T08:13:11",
           "max_power": 11.41,
           "sub_profile_count": 0,
           "color_modes": [
@@ -132,7 +132,7 @@
             "score": 87.6,
             "color_temp": 87.6
           },
-          "hash": "3e51a9a914e01ff89d0be137646f9dd3"
+          "hash": "ece91718ab25b3402356b440c31f8085"
         }
       ],
       "device_types": [
@@ -222,7 +222,7 @@
             "SLEEP_TIME": 2,
             "VERSION": "v1.0.3:docker"
           },
-          "name": "Smart Zigbee pro GU10 spotlight bulb",
+          "name": "Smart Zigbee Pro GU10 Spotlight Bulb (4 W)",
           "standby_power": 0.35,
           "authors": [
             {
@@ -232,7 +232,7 @@
           ],
           "id": "AJ_ZB_GU10",
           "manufacturer": "ajax online",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T08:13:11",
           "max_power": 3.38,
           "sub_profile_count": 0,
           "color_modes": [
@@ -243,7 +243,7 @@
             "score": 92.4,
             "color_temp": 92.4
           },
-          "hash": "6a0026be1e7e25c626ab87a319b0ec5b"
+          "hash": "79af918d830a7093158983141f4fb4ea"
         },
         {
           "calculation_strategy": "lut",
@@ -256,7 +256,7 @@
             "SLEEP_TIME": 5,
             "VERSION": "v1.0.3:docker"
           },
-          "name": "Smart Zigbee pro 12W A60 bulb",
+          "name": "Smart Zigbee Pro A60 Bulb (12 W)",
           "standby_power": 0.5,
           "authors": [
             {
@@ -266,7 +266,7 @@
           ],
           "id": "AJ_ZIGPROA60",
           "manufacturer": "ajax online",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T08:13:11",
           "max_power": 10.14,
           "sub_profile_count": 0,
           "color_modes": [
@@ -277,7 +277,7 @@
             "score": 96.8,
             "color_temp": 96.8
           },
-          "hash": "6695f550a55934829f902975c294f203"
+          "hash": "087e7547dbb7f0b00f026951f49c90fe"
         }
       ],
       "device_types": [
@@ -317,37 +317,6 @@
         },
         {
           "aliases": [
-            "ASQZWP4GPYUT7",
-            "ECHO ASQZWP4GPYUT7"
-          ],
-          "calculation_strategy": "linear",
-          "created_at": "2024-09-13T10:01:18Z",
-          "device_type": "smart_speaker",
-          "measure_device": "TP-Link Tapo P110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.14.4:docker"
-          },
-          "name": "Echo Pop (Gen1)",
-          "standby_power": 1.3,
-          "authors": [
-            {
-              "name": "Edouard Kleinhans",
-              "email": "edouard@kleinhans.info",
-              "github": "edouardkleinhans"
-            }
-          ],
-          "id": "B09ZX7MS5B",
-          "manufacturer": "amazon",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 1.87,
-          "sub_profile_count": 0,
-          "hash": "eaabbed0314767fe09676e9674d19c38"
-        },
-        {
-          "aliases": [
             "A2H4LV5GIZ1JFT"
           ],
           "calculation_strategy": "linear",
@@ -378,7 +347,6 @@
         {
           "aliases": [
             "A2U21SRK4QGSE1",
-            "B7W644",
             "ECHO A2U21SRK4QGSE1"
           ],
           "calculation_strategy": "linear",
@@ -401,10 +369,44 @@
           ],
           "id": "B7W64E",
           "manufacturer": "amazon",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T08:46:01",
           "max_power": 2.51,
           "sub_profile_count": 0,
-          "hash": "a7b8c021a95201542339397709c7b799"
+          "hash": "c314847c99b352c5eb9147f98f1b1043"
+        },
+        {
+          "aliases": [
+            "ASQZWP4GPYUT7",
+            "ECHO ASQZWP4GPYUT7"
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2024-09-13T10:01:18Z",
+          "device_type": "smart_speaker",
+          "legacy_ids": [
+            "B09ZX7MS5B"
+          ],
+          "measure_device": "TP-Link Tapo P110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.14.4:docker"
+          },
+          "name": "Echo Pop (Gen1)",
+          "standby_power": 1.3,
+          "authors": [
+            {
+              "name": "Edouard Kleinhans",
+              "email": "edouard@kleinhans.info",
+              "github": "edouardkleinhans"
+            }
+          ],
+          "id": "C2H4R9",
+          "manufacturer": "amazon",
+          "updated_at": "2026-08-28T08:46:01",
+          "max_power": 1.87,
+          "sub_profile_count": 0,
+          "hash": "afbd55a12c2f52258d8ff0b7120338df"
         },
         {
           "aliases": [
@@ -499,6 +501,7 @@
         },
         {
           "aliases": [
+            "A18O6U1UQFJ0XK",
             "G2A0V704840708AP"
           ],
           "calculation_strategy": "linear",
@@ -521,10 +524,10 @@
           ],
           "id": "L9D29R",
           "manufacturer": "amazon",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T08:46:01",
           "max_power": 6.24,
           "sub_profile_count": 0,
-          "hash": "9c6e9d32ff817f193a8eb27687a4038b"
+          "hash": "d05ca6c560985fe592796dad194be2f0"
         },
         {
           "aliases": [
@@ -647,7 +650,7 @@
       "dir_name": "apc",
       "models": [
         {
-          "name": "APC Back-UPS ES 650G1",
+          "name": "Back-UPS ES 650G1",
           "aliases": [
             "Back-UPS ES 650G1"
           ],
@@ -675,8 +678,8 @@
             },
             "power_factor": {
               "label": "Power Factor",
-              "description": "Ratio of real power to apparent power. Default: 0.7 for typical mixed loads.",
-              "default": 0.7,
+              "description": "Ratio of real power to apparent power. Default: 0.6, matching this UPS's 390 W / 650 VA rating.",
+              "default": 0.6,
               "selector": {
                 "number": {
                   "min": 0.1,
@@ -695,10 +698,10 @@
           ],
           "id": "BE650G1",
           "manufacturer": "apc",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T08:53:49",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "15fc1ab48a70d98f018e6ba7f7624b3f"
+          "hash": "aef1fada49b992bd733cd54b6a658b9b"
         }
       ],
       "device_types": [
@@ -712,12 +715,18 @@
       "dir_name": "apple",
       "models": [
         {
+          "aliases": [
+            "HomePod Mini"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2023-04-03T20:55:15Z",
           "device_type": "smart_speaker",
+          "legacy_ids": [
+            "HomePod Mini"
+          ],
           "measure_device": "Shelly Plug S",
           "measure_method": "manual",
-          "name": "HomePod Mini",
+          "name": "HomePod mini",
           "standby_power": 0.65,
           "authors": [
             {
@@ -726,12 +735,12 @@
               "github": "vandalon"
             }
           ],
-          "id": "HomePod Mini",
+          "id": "A2374",
           "manufacturer": "apple",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T09:22:52",
           "max_power": 4.22,
           "sub_profile_count": 0,
-          "hash": "6ea495c4a168f213aa794fafa67f163a"
+          "hash": "56154ecc9c29eef82e7f5e9504681c8e"
         },
         {
           "aliases": [
@@ -740,14 +749,12 @@
           "calculation_strategy": "linear",
           "created_at": "2024-03-17T20:29:31Z",
           "device_type": "smart_speaker",
+          "legacy_ids": [
+            "MQJ83"
+          ],
           "measure_device": "Shelly Plus Plug",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.9.14:docker"
-          },
-          "name": "HomePod Gen 2",
+          "measure_method": "manual",
+          "name": "HomePod (Gen 2)",
           "standby_power": 1.01,
           "authors": [
             {
@@ -755,12 +762,12 @@
               "github": "laplacacm"
             }
           ],
-          "id": "MQJ83",
+          "id": "A2825",
           "manufacturer": "apple",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T09:22:52",
           "max_power": 27.08,
           "sub_profile_count": 0,
-          "hash": "da39ff947f4f74b79d7d5b7528136ae8"
+          "hash": "6f609f72d2bdca95444bdb3d6277c0bd"
         }
       ],
       "device_types": [
@@ -777,7 +784,125 @@
       "dir_name": "aqara",
       "models": [
         {
+          "calculation_strategy": "lut",
+          "created_at": "2025-01-18T11:56:26Z",
+          "device_type": "light",
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.1:docker"
+          },
+          "name": "Ceiling Light T1M",
+          "standby_power": 0.18,
+          "authors": [
+            {
+              "name": "CV",
+              "github": "dagobert"
+            }
+          ],
+          "id": "CL-L02D",
+          "manufacturer": "aqara",
+          "updated_at": "2026-08-28T09:48:25",
+          "max_power": 30.1,
+          "sub_profile_count": 2,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "bfd75f25a81e2435a993de710248751d"
+        },
+        {
           "aliases": [
+            "6145",
+            "LB01D",
+            "lumi.light.agl001"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-02-16T06:45:36Z",
+          "device_type": "light",
+          "measure_device": "Shelly Plug US Gen4",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.20.5:docker"
+          },
+          "legacy_ids": [
+            "LB01D"
+          ],
+          "name": "LED Bulb T2 (E26, RGB CCT)",
+          "standby_power": 0.14,
+          "authors": [
+            {
+              "name": "pinkfin",
+              "github": "pinkfin",
+              "email": "hot.wire1618@fastmail.com"
+            }
+          ],
+          "id": "LB-L01D",
+          "manufacturer": "aqara",
+          "updated_at": "2026-08-28T09:48:25",
+          "max_power": 10.54,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "bbd3e73f05c82bae5f31b9029fe68f0c"
+        },
+        {
+          "aliases": [
+            "6150",
+            "lumi.light.agl006"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-10-18T22:51:14Z",
+          "device_type": "light",
+          "measure_device": "Shelly Plus Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 4,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.24:docker"
+          },
+          "legacy_ids": [
+            "lumi.light.agl006"
+          ],
+          "name": "LED Bulb T2 (GU10, CCT)",
+          "standby_power": 0.39,
+          "authors": [
+            {
+              "name": "schuppan",
+              "github": "schuppan"
+            }
+          ],
+          "id": "LB-L03E",
+          "manufacturer": "aqara",
+          "updated_at": "2026-08-28T09:48:25",
+          "max_power": 5.14,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "5d0a09511393bba3e718a6a9ea484453"
+        },
+        {
+          "aliases": [
+            "AL039",
             "Aqara LED Light Bulb T1"
           ],
           "calculation_strategy": "lut",
@@ -790,7 +915,10 @@
             "SLEEP_TIME": 10,
             "VERSION": "v1.19.1:docker"
           },
-          "name": "LED Light Bulb T1",
+          "legacy_ids": [
+            "AL039"
+          ],
+          "name": "LED Bulb T1",
           "standby_power": 0.4,
           "authors": [
             {
@@ -799,9 +927,9 @@
               "github": "napych"
             }
           ],
-          "id": "AL039",
+          "id": "LEDLBT1-L01",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T09:48:25",
           "max_power": 8.5,
           "sub_profile_count": 0,
           "color_modes": [
@@ -811,144 +939,16 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "c4bafd443f53d550e42dffa370b10c4a"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2025-01-18T11:56:26Z",
-          "device_type": "light",
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.1:docker"
-          },
-          "name": "Ceiling light T1M",
-          "standby_power": 0.18,
-          "authors": [
-            {
-              "name": "CV",
-              "github": "dagobert"
-            }
-          ],
-          "id": "CL-L02D",
-          "manufacturer": "aqara",
-          "updated_at": "2026-08-21T12:12:06",
-          "max_power": 30.1,
-          "sub_profile_count": 2,
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.7,
-            "color_temp": 98.7
-          },
-          "hash": "17f53ebc3aa70f9dda84869df2b9e5ec"
-        },
-        {
-          "aliases": [
-            "6145"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2026-02-16T06:45:36Z",
-          "device_type": "light",
-          "measure_device": "Shelly Plug US Gen4",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.20.5:docker"
-          },
-          "name": "LED Bulb T2 (E26, RGB, CCT)",
-          "standby_power": 0.14,
-          "authors": [
-            {
-              "name": "pinkfin",
-              "github": "pinkfin",
-              "email": "hot.wire1618@fastmail.com"
-            }
-          ],
-          "id": "LB01D",
-          "manufacturer": "aqara",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 10.54,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.5,
-            "color_temp": 98.5
-          },
-          "hash": "4e3923d8e05a4e5de61e489a5eb46190"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2025-10-18T22:51:14Z",
-          "device_type": "light",
-          "measure_device": "Shelly Plus Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 4,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.24:docker"
-          },
-          "name": "LED Light Bulb T2 (GU10, CCT) (Color: White, SKU: AL230GLW02, model: LB-L03E, 4.9 W, 100-240 V, 50/60 Hz, 450 lm @ 2700K, CRI: 90, beam angle: 50\u00b0)",
-          "standby_power": 0.39,
-          "authors": [
-            {
-              "name": "schuppan",
-              "github": "schuppan"
-            }
-          ],
-          "id": "lumi.light.agl006",
-          "manufacturer": "aqara",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 5.14,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 98.7,
-            "color_temp": 98.7
-          },
-          "hash": "89dc6e4df5fed13dc11907d72cde5bc1"
-        },
-        {
-          "aliases": [
-            "Aqara Smart Plug EU"
-          ],
-          "calculation_strategy": "fixed",
-          "created_at": "2023-12-17T16:08:15Z",
-          "device_type": "smart_switch",
-          "measure_device": "Zhurui PR10",
-          "measure_method": "manual",
-          "name": "Smart Plug EU",
-          "only_self_usage": true,
-          "standby_power": 0.17,
-          "standby_power_on": 0.46,
-          "authors": [
-            {
-              "name": "BenRoe",
-              "github": "BenRoe"
-            }
-          ],
-          "id": "lumi.plug.maeu01",
-          "manufacturer": "aqara",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 0.46,
-          "sub_profile_count": 0,
-          "hash": "f57e0e62786987ad3d07c9807c0a97d8"
+          "hash": "441bd63944df3d1b2045f44040504f96"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2026-02-12T15:06:00Z",
           "device_type": "generic_iot",
           "discovery_by": "device",
+          "legacy_ids": [
+            "PS-S020E"
+          ],
           "measure_device": "Shelly Plus 1PM Gen4",
           "measure_method": "manual",
           "name": "Presence Sensor FP2",
@@ -962,12 +962,42 @@
               "github": "Thorsten1982"
             }
           ],
-          "id": "PS-S020E",
+          "id": "PS-S02E",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T09:48:25",
           "max_power": 1.7,
           "sub_profile_count": 0,
-          "hash": "1ace8420a058b8475430d88c3b38769d"
+          "hash": "ad28951ab5db49736fc8f3866d720e3c"
+        },
+        {
+          "aliases": [
+            "Aqara Smart Plug EU",
+            "lumi.plug.maeu01"
+          ],
+          "calculation_strategy": "fixed",
+          "created_at": "2023-12-17T16:08:15Z",
+          "device_type": "smart_switch",
+          "measure_device": "Zhurui PR10",
+          "measure_method": "manual",
+          "legacy_ids": [
+            "lumi.plug.maeu01"
+          ],
+          "name": "Smart Plug EU",
+          "only_self_usage": true,
+          "standby_power": 0.17,
+          "standby_power_on": 0.46,
+          "authors": [
+            {
+              "name": "BenRoe",
+              "github": "BenRoe"
+            }
+          ],
+          "id": "SP-EUC01",
+          "manufacturer": "aqara",
+          "updated_at": "2026-08-28T09:48:25",
+          "max_power": 0.46,
+          "sub_profile_count": 0,
+          "hash": "602d6d194cdf09054b0de297e3eaa3a3"
         },
         {
           "calculation_strategy": "lut",
@@ -980,7 +1010,7 @@
             "SLEEP_TIME": 12,
             "VERSION": "v0.10.4"
           },
-          "name": "LED light bulb (tunable white)",
+          "name": "LED Light Bulb (Tunable White)",
           "standby_power": 0.41,
           "authors": [
             {
@@ -991,23 +1021,23 @@
           ],
           "id": "ZNLDP12LM",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T09:48:25",
           "max_power": 8.9,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp"
           ],
           "lut_quality": {
-            "score": 96.5,
-            "color_temp": 96.5
+            "score": 98.5,
+            "color_temp": 98.5
           },
-          "hash": "5111590d1a34f4695654b9e4c7ed881d"
+          "hash": "dac262b1c686ad3c6c13535bac4685aa"
         }
       ],
       "device_types": [
         "light",
-        "smart_switch",
-        "generic_iot"
+        "generic_iot",
+        "smart_switch"
       ]
     },
     {
@@ -1027,7 +1057,13 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.12:docker"
           },
-          "name": "9W 92mm Grid Connect Smart RGB+CCT LED Downlight",
+          "name": "Grid Connect Smart RGB+CCT LED Downlight (9 W, 740 lm, 92 mm)",
+          "aliases": [
+            "ALD295P5HA"
+          ],
+          "legacy_ids": [
+            "ALD295P5HA"
+          ],
           "standby_power": 0.5,
           "authors": [
             {
@@ -1035,9 +1071,9 @@
               "github": "stuartmackintosh"
             }
           ],
-          "id": "ALD295P5HA",
+          "id": "ALD295HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:03:02",
           "max_power": 8.3,
           "sub_profile_count": 0,
           "color_modes": [
@@ -1048,7 +1084,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "b879bd3c5ae2e89bb07c4ddac29e207d"
+          "hash": "312e80dd5e5e00f177d81605e8dc3625"
         },
         {
           "calculation_strategy": "lut",
@@ -1061,7 +1097,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.23.2:docker"
           },
-          "name": "Smart R80 9.5W 806lm CCT Bulb",
+          "name": "Grid Connect Smart R80 CCT E27 Globe (9.5 W, 806 lm)",
           "standby_power": 0.58,
           "authors": [
             {
@@ -1072,7 +1108,7 @@
           ],
           "id": "GLD115HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:03:02",
           "max_power": 9.34,
           "sub_profile_count": 0,
           "color_modes": [
@@ -1082,7 +1118,7 @@
             "score": 95.7,
             "color_temp": 95.7
           },
-          "hash": "56fa3708461f12cf5b6a14f63f32a380"
+          "hash": "2b0f948ce308eb4485f4e30d7c0def96"
         },
         {
           "calculation_strategy": "lut",
@@ -1095,7 +1131,13 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.23.2:docker"
           },
-          "name": "12W 1050lm RGB Colour Mode Grid Connect Smart LED B22 Globe",
+          "name": "Grid Connect Smart RGB+CCT B22 Globe (12 W, 1050 lm)",
+          "aliases": [
+            "GLD130P3HA"
+          ],
+          "legacy_ids": [
+            "GLD130P3HA"
+          ],
           "standby_power": 0.7,
           "authors": [
             {
@@ -1104,9 +1146,9 @@
               "github": "CloCkWeRX"
             }
           ],
-          "id": "GLD130P3HA",
+          "id": "GLD130HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:03:02",
           "max_power": 12.01,
           "sub_profile_count": 0,
           "color_modes": [
@@ -1117,7 +1159,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "a65d2290770cabb979207047d0c5e375"
+          "hash": "eb844c4a47c179546d60f215b2536a9d"
         },
         {
           "calculation_strategy": "lut",
@@ -1130,7 +1172,7 @@
             "SLEEP_TIME": 5,
             "VERSION": "v1.20.9:docker"
           },
-          "name": "12W 1050Lm CCT Colour Mode LED E27 Globe",
+          "name": "Grid Connect Smart CCT E27 Globe (12 W, 1050 lm)",
           "standby_power": 0.3,
           "authors": [
             {
@@ -1140,7 +1182,7 @@
           ],
           "id": "GLD312HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:03:02",
           "max_power": 11.0,
           "sub_profile_count": 0,
           "color_modes": [
@@ -1150,7 +1192,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "92ecd5f8fe6c9bd3cd1e68c15d5ee0bb"
+          "hash": "c12874283d56f403d1159ba1ab6fb374"
         },
         {
           "calculation_strategy": "fixed",
@@ -1158,7 +1200,7 @@
           "device_type": "smart_switch",
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "manual",
-          "name": "White Grid Connect Smart Plug In Socket With Energy Meter",
+          "name": "Grid Connect Smart Power Adaptor with Energy Meter",
           "only_self_usage": true,
           "standby_power": 0.267,
           "standby_power_on": 1.144,
@@ -1171,10 +1213,10 @@
           ],
           "id": "PC191HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:03:02",
           "max_power": 1.144,
           "sub_profile_count": 0,
-          "hash": "447a9e9bc6d8c816053c4dcad0c028d8"
+          "hash": "9003357715d43b2f901333cd8ecbe3e8"
         },
         {
           "calculation_strategy": "fixed",
@@ -1182,7 +1224,7 @@
           "device_type": "smart_switch",
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "manual",
-          "name": "Grid Connect Smart Plug In Multi-Function Socket With USB",
+          "name": "Grid Connect Smart 2.1 A USB Charger with Power Socket",
           "only_self_usage": false,
           "standby_power": 0.66,
           "standby_power_on": 1.596,
@@ -1195,10 +1237,10 @@
           ],
           "id": "PC192HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-21T12:12:06",
+          "updated_at": "2026-08-28T10:03:02",
           "max_power": 1.596,
           "sub_profile_count": 0,
-          "hash": "895026341ebf205ad5e366a2fadde8b9"
+          "hash": "63433ccc5e16ac602fe407a1fedeed86"
         },
         {
           "calculation_strategy": "fixed",
@@ -1206,7 +1248,7 @@
           "device_type": "smart_switch",
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "manual",
-          "name": "Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA",
+          "name": "Twin Grid Connect Smart Power Adaptor with Energy Meter and Surge Protection",
           "only_self_usage": true,
           "standby_power": 0.29,
           "standby_power_on": 2.565,
@@ -1219,10 +1261,10 @@
           ],
           "id": "PC287HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:03:02",
           "max_power": 2.565,
           "sub_profile_count": 0,
-          "hash": "6468a1891dbdb1ccfda297085bcb0328"
+          "hash": "c575be69a5ae2ff77e421cf5f7af0b4f"
         }
       ],
       "device_types": [
@@ -1232,7 +1274,8 @@
     },
     {
       "aliases": [
-        "Athom_Technology"
+        "Athom_Technology",
+        "China Athom Technology"
       ],
       "name": "athom",
       "full_name": "Athom",
@@ -1240,7 +1283,8 @@
       "models": [
         {
           "aliases": [
-            "athom.rgbww-light"
+            "rgbww-light",
+            "Athom RGBCW Bulb"
           ],
           "calculation_strategy": "lut",
           "created_at": "2022-09-15T20:58:17Z",
@@ -1252,7 +1296,10 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "7W Color Bulb for ESPHome",
+          "name": "7W E27 RGBCCT Bulb for ESPHome (600 lm)",
+          "legacy_ids": [
+            "rgbww-light"
+          ],
           "standby_power": 0.47,
           "authors": [
             {
@@ -1260,9 +1307,9 @@
               "github": "DellanX"
             }
           ],
-          "id": "rgbww-light",
+          "id": "LB01-7W-E27",
           "manufacturer": "athom",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:17:10",
           "max_power": 8.83,
           "sub_profile_count": 0,
           "color_modes": [
@@ -1273,18 +1320,23 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "a9e472094ffa8adbe0b8e185d7babd76"
+          "hash": "bff8045e4c5e6b50c4e8a6c9793b3688"
         },
         {
           "aliases": [
-            "Smart_Plug_V2"
+            "Smart_Plug_V2",
+            "smart-plug-v2",
+            "Athom Plug V2"
           ],
           "calculation_strategy": "fixed",
           "created_at": "2024-01-09T21:37:04Z",
           "device_type": "smart_switch",
           "measure_device": "Hypertec Power-Mate Lite 10A",
           "measure_method": "manual",
-          "name": "Smart Plug AU",
+          "name": "Smart Plug AU V2 (10 A)",
+          "legacy_ids": [
+            "smart-plug-au"
+          ],
           "only_self_usage": true,
           "standby_power": 0.66,
           "standby_power_on": 1.03,
@@ -1295,12 +1347,12 @@
               "github": "hadleyrich"
             }
           ],
-          "id": "smart-plug-au",
+          "id": "PG05V2-AU10A",
           "manufacturer": "athom",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:17:10",
           "max_power": 1.03,
           "sub_profile_count": 0,
-          "hash": "8b577be8194e2e3a63b4cc5eb94af994"
+          "hash": "d9d519f5ef525f0002211dedae4a9b6a"
         }
       ],
       "device_types": [
@@ -1586,6 +1638,9 @@
       "dir_name": "bang olufsen",
       "models": [
         {
+          "aliases": [
+            "2714 CA16"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2026-01-29T12:42:28Z",
           "device_type": "smart_speaker",
@@ -1597,7 +1652,7 @@
             "SLEEP_TIME": 5,
             "VERSION": "master"
           },
-          "name": "Beoplay M5",
+          "name": "Wireless Speaker",
           "standby_power": 3.2,
           "authors": [
             {
@@ -1607,10 +1662,10 @@
           ],
           "id": "Beoplay M5",
           "manufacturer": "bang olufsen",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T10:32:35",
           "max_power": 20.3,
           "sub_profile_count": 0,
-          "hash": "3b465a31522d3ec31d49f0616db1b40f"
+          "hash": "543bcfd9872d6f046a7bb722b66e4d62"
         },
         {
           "calculation_strategy": "linear",
@@ -1624,7 +1679,7 @@
             "SLEEP_TIME": 5,
             "VERSION": "master"
           },
-          "name": "Beosound Balance",
+          "name": "360\u00b0 Speaker",
           "standby_power": 3.8,
           "authors": [
             {
@@ -1634,10 +1689,10 @@
           ],
           "id": "Beosound Balance",
           "manufacturer": "bang olufsen",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:32:35",
           "max_power": 97.95,
           "sub_profile_count": 0,
-          "hash": "6e1e4047fc0791140c0019ed808d4ed2"
+          "hash": "5d3ce242cbf30005c68d42a314e0c898"
         },
         {
           "aliases": [
@@ -1654,7 +1709,7 @@
             "SLEEP_TIME": 5,
             "VERSION": "master"
           },
-          "name": "Beosound Edge",
+          "name": "Multiroom Speaker",
           "standby_power": 2.4,
           "authors": [
             {
@@ -1664,10 +1719,10 @@
           ],
           "id": "Beosound Edge",
           "manufacturer": "bang olufsen",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:32:35",
           "max_power": 36.6,
           "sub_profile_count": 0,
-          "hash": "3e1c75d843c2dd4bf99c05a431a4e5a7"
+          "hash": "bf2fcf4453dad0c4e441b814964b1ef1"
         },
         {
           "calculation_strategy": "linear",
@@ -1681,7 +1736,7 @@
             "SLEEP_TIME": 5,
             "VERSION": "master"
           },
-          "name": "Beosound Emerge",
+          "name": "Bookshelf Speaker",
           "standby_power": 5.0,
           "authors": [
             {
@@ -1691,10 +1746,10 @@
           ],
           "id": "Beosound Emerge",
           "manufacturer": "bang olufsen",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T10:32:35",
           "max_power": 24.55,
           "sub_profile_count": 0,
-          "hash": "7bad120a6fca9199ed2d135c2de17425"
+          "hash": "7943fbae27d329f48e4e08f177446335"
         }
       ],
       "device_types": [
@@ -1713,7 +1768,7 @@
           "device_type": "light",
           "measure_device": "RRPM02 (Model); 4897037690801 (Barcode); Reduction Revolution Plug-in Power Meter",
           "measure_method": "manual",
-          "name": "WeMo smart LED bulb",
+          "name": "Wemo Smart LED Bulb",
           "standby_power": 0.4,
           "authors": [
             {
@@ -1724,7 +1779,7 @@
           ],
           "id": "F7C033",
           "manufacturer": "belkin",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:40:31",
           "max_power": 9.4,
           "sub_profile_count": 0,
           "color_modes": [
@@ -1734,7 +1789,7 @@
             "score": 95.4,
             "brightness": 95.4
           },
-          "hash": "e51b282d65b6a7f182882e51609cdc7f"
+          "hash": "d5dc57daa99a2a9be4a899b5593f914c"
         },
         {
           "aliases": [
@@ -1745,7 +1800,7 @@
           "device_type": "smart_switch",
           "measure_device": "TP-Link Kasa KP125M",
           "measure_method": "manual",
-          "name": "Wemo Mini v2",
+          "name": "Wemo Mini Smart Plug",
           "only_self_usage": false,
           "standby_power": 0.75,
           "standby_power_on": 1.3,
@@ -1757,10 +1812,10 @@
           ],
           "id": "F7C063",
           "manufacturer": "belkin",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T10:40:31",
           "max_power": 1.3,
           "sub_profile_count": 0,
-          "hash": "d5f8563da2e5aeffb6c8b6db83894db8"
+          "hash": "6e7a19dfeadd82f994a77cddce520c89"
         }
       ],
       "device_types": [
@@ -1780,7 +1835,7 @@
           "device_type": "smart_switch",
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
-          "name": "BW-SHP6 version 10A",
+          "name": "10A Power Monitoring Plug",
           "only_self_usage": true,
           "standby_power": 0.5,
           "standby_power_on": 0.85,
@@ -1793,10 +1848,10 @@
           ],
           "id": "SHP6",
           "manufacturer": "blitzwolf",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:47:08",
           "max_power": 0.85,
           "sub_profile_count": 0,
-          "hash": "d2712b747da1deb256fd7b93f5ce3b7f"
+          "hash": "dc4e05ecbf28c22c4e2ec6aa272e5a75"
         },
         {
           "calculation_strategy": "fixed",
@@ -1804,7 +1859,7 @@
           "device_type": "smart_switch",
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
-          "name": "BW-SHP6 version 15A",
+          "name": "15A Power Monitoring Plug",
           "only_self_usage": true,
           "standby_power": 0.4,
           "standby_power_on": 0.8,
@@ -1817,10 +1872,10 @@
           ],
           "id": "SHP6-15A",
           "manufacturer": "blitzwolf",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:47:08",
           "max_power": 0.8,
           "sub_profile_count": 0,
-          "hash": "770c3af1162429c28aca9945f0004504"
+          "hash": "b2d299df8b162d8da533bc3f5eb6ebc2"
         }
       ],
       "device_types": [
@@ -1834,12 +1889,50 @@
       "dir_name": "bosch",
       "models": [
         {
+          "aliases": [
+            "SHC1",
+            "SmartHomeController"
+          ],
+          "calculation_strategy": "fixed",
+          "created_at": "2025-04-09T23:41:25Z",
+          "description": "The measured Bosch Smart Home Controller had the following devices connected: four Bosch Smart Home Radiator Thermostat II (TRV_GEN2), two Bosch Smart Home Radiator Thermostat I (TRV), and two Bosch Smart Home Door/Window Contact II (SWD2). During the 120-second measurement period, the temperature was adjusted both directly on the device itself and via the Smart Home Controller on one TRV thermostat and on one TRV_GEN2 thermostat. In addition, both window sensors were triggered twice each by opening and closing the windows.",
+          "device_type": "generic_iot",
+          "discovery_by": "device",
+          "legacy_ids": [
+            "Smart Home Controller 1 Gen"
+          ],
+          "measure_device": "TP-Link Tapo P115",
+          "measure_device_firmware": "1.3.4 Build 250403 Rel.150504",
+          "measure_method": "script",
+          "name": "Smart Home Controller I",
+          "authors": [
+            {
+              "name": "Justin Hahn",
+              "email": "hahnjustin27@gmail.com",
+              "github": "justinh998"
+            }
+          ],
+          "id": "BSHC-1",
+          "manufacturer": "bosch",
+          "updated_at": "2026-08-28T10:56:26",
+          "max_power": 1.78,
+          "sub_profile_count": 0,
+          "hash": "bc5597b82bc953752f4672f11799523d"
+        },
+        {
+          "aliases": [
+            "BSP-FZ",
+            "PLUG_COMPACT"
+          ],
           "calculation_strategy": "fixed",
           "created_at": "2023-06-19T08:02:31Z",
           "device_type": "smart_switch",
+          "legacy_ids": [
+            "PLUG_COMPACT"
+          ],
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
-          "name": "Smart Home Plug Compact",
+          "name": "Smart Plug Compact",
           "only_self_usage": false,
           "standby_power": 0.24,
           "standby_power_on": 0.6,
@@ -1849,54 +1942,31 @@
               "github": "daloki83"
             }
           ],
-          "id": "PLUG_COMPACT",
+          "id": "BSP-EZ",
           "manufacturer": "bosch",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T10:56:26",
           "max_power": 0.6,
           "sub_profile_count": 0,
-          "hash": "9b90af9a084cd66575539e0f6d824ab1"
-        },
-        {
-          "aliases": [
-            "SHC1",
-            "SmartHomeController"
-          ],
-          "calculation_strategy": "fixed",
-          "created_at": "2025-04-09T23:41:25Z",
-          "description": "The measured Bosch Smart Home Controller had the following devices connected: four Bosch Smart Home Radiator Thermostat II (TRV_GEN2), two Bosch Smart Home Radiator Thermostat I (TRV), and two Bosch Smart Home Door/Window Contact II (SWD2).During the 120-second measurement period, the temperature was adjusted both directly on the device itself and via the Smart Home Controller on one TRV thermostat and on one TRV_GEN2 thermostat. In addition, both window sensors were triggered twice each by opening and closing the windows.",
-          "device_type": "generic_iot",
-          "discovery_by": "device",
-          "measure_device": "TP-Link Tapo P115",
-          "measure_device_firmware": "1.3.4 Build 250403 Rel.150504",
-          "measure_method": "script",
-          "name": "Smart Home Controller 1 Gen.",
-          "authors": [
-            {
-              "name": "Justin Hahn",
-              "email": "hahnjustin27@gmail.com",
-              "github": "justinh998"
-            }
-          ],
-          "id": "Smart Home Controller 1 Gen",
-          "manufacturer": "bosch",
-          "updated_at": "2026-08-21T12:12:06",
-          "max_power": 1.78,
-          "sub_profile_count": 0,
-          "hash": "44b77682060608cac363dc48ca8a9510"
+          "hash": "75ffb15da6add044bdb654cc6d2181a3"
         }
       ],
       "device_types": [
-        "smart_switch",
-        "generic_iot"
+        "generic_iot",
+        "smart_switch"
       ]
     },
     {
-      "aliases": [],
+      "aliases": [
+        "Bose Corporation"
+      ],
       "name": "bose",
       "full_name": "Bose",
       "dir_name": "bose",
       "models": [
         {
+          "aliases": [
+            "SoundTouch 10"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2023-03-10T17:14:51Z",
           "device_type": "smart_speaker",
@@ -1907,7 +1977,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "SoundTouch 10",
+          "name": "SoundTouch 10 Wireless Speaker",
           "standby_power": 1.5,
           "authors": [
             {
@@ -1917,12 +1987,15 @@
           ],
           "id": "416776",
           "manufacturer": "bose",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T11:04:00",
           "max_power": 8.54,
           "sub_profile_count": 0,
-          "hash": "aec1a91c04202c4adccfef966c5c3f37"
+          "hash": "30e2f1ef21cb1c23ee5222c6af9264dc"
         },
         {
+          "aliases": [
+            "SoundTouch 300"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2023-03-10T17:14:51Z",
           "device_type": "smart_speaker",
@@ -1933,7 +2006,10 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "SoundTouch 300",
+          "legacy_ids": [
+            "767520-2100"
+          ],
+          "name": "SoundTouch 300 Soundbar",
           "standby_power": 1.5,
           "authors": [
             {
@@ -1941,12 +2017,12 @@
               "github": "wranglatang"
             }
           ],
-          "id": "767520-2100",
+          "id": "421650",
           "manufacturer": "bose",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T11:04:00",
           "max_power": 37.56,
           "sub_profile_count": 0,
-          "hash": "8f069a1afcc5ca2d7575089078f62800"
+          "hash": "ff05022bac5211e89dfd75fa83b86db5"
         }
       ],
       "device_types": [
@@ -1956,12 +2032,18 @@
     {
       "aliases": [],
       "name": "bseed",
-      "full_name": "Bseed",
+      "full_name": "BSEED",
       "dir_name": "bseed",
       "models": [
         {
-          "name": "Switch 1 Gang",
-          "model_id": "EC-GL86ZPCS11",
+          "aliases": [
+            "1 gang switch with scene and backlight",
+            "Smart Zigbee Switch 1-Gang"
+          ],
+          "name": "1-Gang Light Switch",
+          "legacy_ids": [
+            "zigbee_switch_1_gang"
+          ],
           "device_type": "smart_switch",
           "calculation_strategy": "fixed",
           "measure_device": "Shelly Plug S Gen3",
@@ -1977,14 +2059,16 @@
           ],
           "id": "EC-GL86ZPCS11",
           "manufacturer": "bseed",
-          "updated_at": "2026-08-26T20:52:32",
+          "updated_at": "2026-08-28T11:08:29",
           "max_power": 0.89,
           "sub_profile_count": 0,
-          "hash": "aa07b3af38e57b083b07db902bfcdf05"
+          "hash": "7f4f4abd2abc5c7124e4933892b6f771"
         },
         {
-          "name": "Switch 1 Gang No Neutral",
-          "model_id": "SL-GL86ZTS11B",
+          "name": "1-Gang Light Switch Without Neutral",
+          "legacy_ids": [
+            "zigbee_switch_1_gang_no_neutral"
+          ],
           "device_type": "smart_switch",
           "calculation_strategy": "fixed",
           "measure_device": "Shelly Plug S Gen3",
@@ -2000,10 +2084,10 @@
           ],
           "id": "SL-GL86ZTS11B",
           "manufacturer": "bseed",
-          "updated_at": "2026-08-26T20:52:32",
+          "updated_at": "2026-08-28T11:08:29",
           "max_power": 0.3,
           "sub_profile_count": 0,
-          "hash": "6f2bb0dbf5ff79c4225b3bed95256e96"
+          "hash": "9b3ccdb3d2c5862caef0d7fa0e5c18f1"
         }
       ],
       "device_types": [
@@ -2012,14 +2096,16 @@
     },
     {
       "aliases": [
-        "tuya"
+        "Tuya"
       ],
       "name": "calex",
       "full_name": "Calex",
       "dir_name": "calex",
       "models": [
         {
-          "aliases": [],
+          "aliases": [
+            "G95 Gold"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2025-04-28T23:34:57Z",
           "device_type": "light",
@@ -2030,7 +2116,10 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.11:docker"
           },
-          "name": "Smart LED Filament Gold Globe-lamp G95 7W",
+          "legacy_ids": [
+            "G95 Gold"
+          ],
+          "name": "Smart LED Filament Lamp E27 G95 CCT Gold (7W)",
           "standby_power": 0.61,
           "authors": [
             {
@@ -2038,9 +2127,9 @@
               "github": "JortvanSchijndel"
             }
           ],
-          "id": "G95 Gold",
+          "id": "5101002000",
           "manufacturer": "calex",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T11:11:31",
           "max_power": 6.48,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2050,7 +2139,7 @@
             "score": 96.8,
             "color_temp": 96.8
           },
-          "hash": "89edaa0fa2af887a11a53ab5674acea7"
+          "hash": "e4bc52c07d3974a07fedba205a750a0b"
         }
       ],
       "device_types": [
@@ -2074,7 +2163,10 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "LED Lichts\u00e4ule (103 cm, 600 lm, RGBCT) - ESP8266/ESPHome conversion",
+          "legacy_ids": [
+            "led_column_rgbct_103cm_600lm"
+          ],
+          "name": "LED Light Column Smooth (12W, 600 lm, RGBCT) - ESPHome Conversion",
           "standby_power": 1.15,
           "authors": [
             {
@@ -2083,9 +2175,9 @@
               "github": "RubenKelevra"
             }
           ],
-          "id": "led_column_rgbct_103cm_600lm",
+          "id": "NP-DLS-Smooth",
           "manufacturer": "casalux",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T11:20:15",
           "max_power": 14.35,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2096,7 +2188,7 @@
             "score": 97.9,
             "color_temp": 97.9
           },
-          "hash": "f7dd665cfd260284ee3c83485282c375"
+          "hash": "436025f4deb4f071aaa0f5de0f14fbda"
         }
       ],
       "device_types": [
@@ -2104,13 +2196,19 @@
       ]
     },
     {
-      "aliases": [],
+      "aliases": [
+        "Tuya"
+      ],
       "name": "cree",
       "full_name": "Cree",
       "dir_name": "cree",
       "models": [
         {
           "calculation_strategy": "lut",
+          "aliases": [
+            "B00TN589ZG",
+            "Connected A-19 60W Equivalent"
+          ],
           "created_at": "2023-02-11T15:00:36Z",
           "device_type": "light",
           "measure_device": "Sonoff S31",
@@ -2121,7 +2219,10 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.3.3:docker"
           },
-          "name": "Connected A-19 60W Equivalent",
+          "legacy_ids": [
+            "B00TN589ZG"
+          ],
+          "name": "Connected 60W Equivalent Soft White A19 Dimmable LED Bulb (11.5W, 815 lm)",
           "standby_power": 0.25,
           "authors": [
             {
@@ -2130,9 +2231,9 @@
               "github": "fallenpegasus"
             }
           ],
-          "id": "B00TN589ZG",
+          "id": "BA19-08027OMF-12CE26-1C100",
           "manufacturer": "cree",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T11:27:24",
           "max_power": 10.67,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2142,10 +2243,13 @@
             "score": 97.6,
             "brightness": 97.6
           },
-          "hash": "9046be2b4aea0a6d9a74aa96593ea24c"
+          "hash": "7112b57a7f7f8b830afae8f21ee920a5"
         },
         {
           "calculation_strategy": "lut",
+          "aliases": [
+            "c0raacap0zsw7gq8"
+          ],
           "created_at": "2024-12-08T14:20:08Z",
           "device_type": "light",
           "measure_device": "Shelly PM Mini Gen3",
@@ -2155,7 +2259,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "Connected Max 60-Watt EQ A19 Tunable White E26 Dimmable Smart Light Bulb",
+          "name": "Connected Max A19 Tunable White Smart Bulb (7.5W, 800 lm)",
           "standby_power": 0.55,
           "authors": [
             {
@@ -2166,7 +2270,7 @@
           ],
           "id": "CMA19-60W-AL-9TW-GL",
           "manufacturer": "cree",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T11:27:24",
           "max_power": 6.95,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2176,7 +2280,7 @@
             "score": 98.4,
             "color_temp": 98.4
           },
-          "hash": "0de243e3905c2e8604c0c6564895fd6f"
+          "hash": "6fc1ca7d71d668bca0d98d1a88a57a96"
         }
       ],
       "device_types": [
@@ -9436,7 +9540,7 @@
           ],
           "id": "AC74759",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-28T08:14:25",
+          "updated_at": "2026-08-28T08:23:20",
           "max_power": 4.68,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9447,7 +9551,7 @@
             "score": 98.2,
             "color_temp": 98.2
           },
-          "hash": "e792480c88782a82e53c5e1a1a71caee"
+          "hash": "a455807bc58907f69caf3c02863f99e6"
         },
         {
           "calculation_strategy": "lut",
@@ -10379,7 +10483,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "Livarno Lux GU10 5W RGBCT Bulb",
+          "name": "Livarno Home GU10 5W RGB+CCT Bulb",
           "standby_power": 0.39,
           "authors": [
             {
@@ -10390,7 +10494,7 @@
           ],
           "id": "HG08131A",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T11:44:33",
           "max_power": 5.78,
           "sub_profile_count": 0,
           "color_modes": [
@@ -10401,7 +10505,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "66bec4686c405801932f0014dd33a842"
+          "hash": "4d205e42e19e842d55a775c63cf2025b"
         },
         {
           "calculation_strategy": "lut",
@@ -10414,7 +10518,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "Livarno Lux E14 6.5W RGBCT Candle Bulb",
+          "name": "Livarno Home E14 6.5W RGB+CCT Candle Bulb",
           "standby_power": 0.4,
           "authors": [
             {
@@ -10425,7 +10529,7 @@
           ],
           "id": "HG08131B",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T11:44:33",
           "max_power": 5.96,
           "sub_profile_count": 0,
           "color_modes": [
@@ -10436,7 +10540,7 @@
             "score": 65.1,
             "color_temp": 65.1
           },
-          "hash": "085badb4fe21e3d15e0d866a79e56257"
+          "hash": "7169371eced5f419e6873a3a81273951"
         },
         {
           "calculation_strategy": "lut",
