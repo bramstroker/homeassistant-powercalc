@@ -1,0 +1,39 @@
+{
+  "aliases": [
+    "924.70",
+    "92466",
+    "92467",
+    "92468"
+  ],
+  "legacy_ids": [
+    "924.70",
+    "92466"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2024-12-14T09:59:57Z",
+  "device_type": "light",
+  "measure_description": "Re-measured 2026-08-15 with utils/measure using 10 identical Base Coin modules from Paulmann article 92466 connected in parallel (MULTIPLE_LIGHTS=true, NUM_LIGHTS=10) on a Shelly 1PM Gen3, because a single module draws below the meter's resolution floor of ~0.8 W. Reported values are per module. color_temp was measured with SAMPLE_COUNT=3 and hs with SAMPLE_COUNT=2; measure_settings below reflects the hs run.",
+  "measure_device": "Shelly 1PM Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.3.0:cli"
+  },
+  "name": "Base Coin 50mm 420lm 4.9W RGBW+",
+  "standby_power": 0.13,
+  "voltage_range": {
+    "min": 233.1,
+    "max": 236.8
+  },
+  "authors": [
+    {
+      "name": "evohell",
+      "github": "evohell"
+    },
+    {
+      "name": "philscottydev",
+      "github": "philscottydev"
+    }
+  ]
+}
