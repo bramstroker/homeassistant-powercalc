@@ -22,7 +22,7 @@ Do not use these as a directory name or alias:
 - Home Assistant entity names, user-assigned device names, or room names;
 - serial numbers, MAC addresses, network addresses, and bridge resource names such as `Light0x...`;
 - a marketing family name that covers multiple hardware variants;
-- a generic white-label or protocol identifier shared by materially different products;
+- a generic white-label or protocol identifier shared by materially different products, unless the manufacturer-specific guidance explicitly documents it as an integration-reported discovery alias that PowerCalc safely presents as multiple candidates;
 - a numeric Matter product ID unless there is evidence that it uniquely identifies the physical model.
 
 If no unique identifier can be established, request manual verification. If the device exposes only a generic identifier, it may be suitable only as a custom profile.
@@ -39,6 +39,7 @@ If no unique identifier can be established, request manual verification. If the 
 | LEDVANCE / OSRAM | Prefer the exact official manufacturer article/model code, such as an `AC...` code or an older OSRAM article number. Retain a device-reported Zigbee model such as `CLA60 RGBW Z3` as canonical only when no more specific official article code can be established for the measured hardware. | Official LEDVANCE product datasheet, declaration or catalog; product label; then HA/integration diagnostics and Zigbee signature | Exact protocol model strings, integration-specific IDs, and officially mapped GTINs can be aliases. Follow the detailed LEDVANCE guidance below. |
 | Innr | Printed and device-reported codes such as `RB 285 C`, `RS 230 C`, `SP 240` | Official Innr product page or declaration, product label/manual, then HA ZHA/Zigbee device signature | Keep spaces and suffix letters when they are part of the model code. Bundle SKUs and regional sibling models are not aliases by default. Follow the detailed Innr guidance below. |
 | Lidl | Printed product/type codes such as `HG06462A`, `HG08131B`, a specific article code, or an IAN-based identifier when that is the only stable label code | Product or packaging label/manual, official Lidl documentation, then current HA Device Info and the integration's raw Zigbee signature | Reject generic Zigbee models such as `TS0502A` and `TS0505B`. Do not assume a raw `_TZ...` string is a manufacturer alias. Follow the detailed Lidl guidance below. |
+| WiZ | Prefer the exact WiZ/Signify material or article number (12NC), commonly beginning with `929...`; retain another verified printed manufacturer model when no 12NC can be established | Official WiZ product specifications, product or packaging label, then HA WiZ Device information and the raw `moduleName` | `SHRGB`, `SHRGBC`, `SHTW`, and related `SH...` values are module/configuration codes rather than unique article numbers. Keep confirmed values as intentionally shared discovery aliases. Follow the detailed WiZ guidance below. |
 | Sonos | Prefer the exact manufacturer article/model number printed on the product or packaging when it uniquely identifies the measured hardware. Preserve established product-name directories unless a verified canonical migration is intentionally requested. | Product label/packaging and official Sonos documentation; then HA Sonos Device information, where `model_id` comes from the speaker's `modelNumber` | `S...` values are useful discovery aliases when one-to-one with the measured generation, but are not automatically retail article numbers. Product names and S-codes can both be generation-ambiguous. Follow the detailed Sonos guidance below. |
 | Sonoff | Printed product codes such as `ZBMINI`, `ZBMINIR2`, and `B02BA60` | Product label/manual, eWeLink or HA Device information, Zigbee device signature | Do not substitute an underlying generic Tuya/Zigbee identifier for a branded Sonoff code. |
 | Tuya and white-label devices | No safe universal pattern | Require a branded model from the product label/manufacturer and compare its full Zigbee signature with known devices | Identifiers such as `TS0601`, `TS0505B`, and `_TZE...` values can cover different hardware. Do not add them as a directory or alias unless uniqueness for the measured device is demonstrated. |
@@ -85,6 +86,19 @@ Apply these rules when reviewing or normalizing Lidl profiles, including Livarno
 
 When a Lidl label code and integration-reported value cannot be reconciled, ask for a product or packaging label photo and the current Home Assistant Device Info fields. Keep the profile discoverable only through identifiers proven specific to the measured variant.
 
+## WiZ
+
+Apply these rules when reviewing or normalizing WiZ and WiZ-powered Philips Smart LED profiles:
+
+1. Prefer the exact WiZ/Signify material or article number (12NC) as the canonical directory ID, commonly a `929...` value. Confirm it on an official WiZ product page, product or packaging label, or equivalent manufacturer documentation. Do not substitute the retail EAN/GTIN for the 12NC or describe an EAN as the model number. Retain another concrete printed manufacturer model, such as a regional alphanumeric code, when no more authoritative 12NC can be established.
+2. Home Assistant's WiZ integration derives its displayed `model` from the device `moduleName`. Values such as `SHRGB`, `SHRGBC`, `SHRGB1C`, `SHTW`, and `SHDW1` describe a controller/module configuration and can be shared by products with different fittings, wattages, shapes, or electronics. Do not use such a value as the canonical directory ID when a specific article number is known.
+3. Add the exact `SH...` value reported for each measured device to `aliases`, even when another WiZ profile uses the same alias. This is an intentional WiZ exception: without that alias the article-number profile cannot be discovered, and PowerCalc can present all matching profiles for the user to choose from. Require evidence from Home Assistant Device information, diagnostics, the original profile PR, or the raw `moduleName`; do not infer an alias merely from advertised color capabilities.
+4. When replacing an existing `SH...` directory with its verified article number, put the former directory ID in both `legacy_ids` and `aliases`: `legacy_ids` preserves existing selections, while `aliases` preserves discovery. A former non-reported internal slug belongs only in `legacy_ids`.
+5. Never merge profiles merely because they share an `SH...` alias. Establish that they are the same physical product using the exact 12NC, label, official specifications, and where useful an exact EAN mapping. Shared module codes alone are evidence of discovery ambiguity, not hardware equivalence.
+6. For confirmed duplicate physical products, consolidate under the verified article number and retain the most credible calibration data. Compare supported modes, LUT completeness, measurement setup, standby power, and peak draw against the rated power. A complete color-temperature and HS measurement reaching a plausible rated draw is normally preferable to an incomplete LUT with an implausibly low maximum; preserve relevant authorship and measurement provenance when consolidating.
+7. If the exact article number or duplicate relationship remains uncertain, ask for the product or packaging label, exact Home Assistant Device information, originating integration, and full `moduleName`. Keep the established profile available until the evidence supports a migration; do not invent a regional 12NC suffix from a similar product page.
+8. Spell the manufacturer `WiZ`. Use the official product description in `name`, distinguish WiZ-branded and Philips Smart LED products where that branding identifies the product line, and keep EANs and module codes out of the display name unless they materially clarify unresolved source evidence.
+
 ## Sonos
 
 Apply these rules when reviewing or normalizing Sonos profiles:
@@ -110,6 +124,9 @@ When the printed article number, S-code, product name, or generation cannot be r
 - [Innr product pages](https://innr.com/collections/frontpage) list official product names and type numbers.
 - [Innr declarations of conformity](https://innr.com/pages/declarations-of-conformity) corroborate exact type codes and regional variants.
 - [Home Assistant's Sonos entity implementation](https://github.com/home-assistant/core/blob/dev/homeassistant/components/sonos/entity.py) maps the speaker product name to `model` and `modelNumber` to `model_id`.
+- [Home Assistant's WiZ entity implementation](https://github.com/home-assistant/core/blob/dev/homeassistant/components/wiz/entity.py) derives the displayed model from the WiZ `moduleName`.
+- [pywizlight's bulb library](https://github.com/sbidy/pywizlight/blob/master/pywizlight/bulblibrary.py) documents the structure and capability meaning of WiZ module names.
+- [WiZ product specifications](https://www.wizconnected.com/en-nz/p/downlight-35-inch-recessed-downlight-8w/8720169072251) show the material number (12NC) separately from the EAN.
 
 ## Review evidence
 

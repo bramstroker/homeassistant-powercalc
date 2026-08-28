@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "SHRGBC"
+  ],
   "calculation_strategy": "composite",
   "composite_config": [
     {
@@ -26,7 +29,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.22:docker"
   },
-  "name": "Philips Smart LED A60 E27 RGB 2200K-6500K (type SHRGBC, model 9290023836AA, 8.5 W, 220-240 V, 50/60 Hz, 806 lm, beam angle: 360°)",
+  "legacy_ids": [
+    "SHRGBC"
+  ],
+  "name": "Philips Smart LED A60 E27 RGB + Tunable White (8.5 W, 806 lm)",
   "standby_power": 0.25,
   "authors": [
     {

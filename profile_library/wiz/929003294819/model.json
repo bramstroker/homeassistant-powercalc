@@ -13,7 +13,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.24:docker"
   },
-  "name": "3.5 inch recessed downlight 8W",
+  "legacy_ids": [
+    "WIZ294819"
+  ],
+  "name": "3.5-inch Recessed Downlight (8 W, 800 lm)",
   "standby_power": 0.2,
   "authors": [
     {
