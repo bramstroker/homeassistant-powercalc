@@ -7865,7 +7865,7 @@
             "SLEEP_TIME": 15,
             "VERSION": "v0.19.16:docker"
           },
-          "name": "Smart Bulb Color E27",
+          "name": "Smart Bulb Color E26",
           "standby_power": 0.11,
           "authors": [
             {
@@ -7876,7 +7876,7 @@
           ],
           "id": "AE 280 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 9.72,
           "sub_profile_count": 0,
           "color_modes": [
@@ -7887,7 +7887,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "3827e97a08e6d4dd0ac31bf5f9923633"
+          "hash": "a28cec28ad33be850660a874b8281a73"
         },
         {
           "calculation_strategy": "lut",
@@ -7967,7 +7967,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.14.10:docker"
           },
-          "name": "Light Strip Colour",
+          "name": "Strip Light Colour",
           "standby_power": 0.3,
           "authors": [
             {
@@ -7978,7 +7978,7 @@
           ],
           "id": "FL 122 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 16.3,
           "sub_profile_count": 0,
           "color_modes": [
@@ -7989,7 +7989,7 @@
             "score": 86.6,
             "color_temp": 86.6
           },
-          "hash": "640d7c7936bed463364ad9be107ab4c3"
+          "hash": "bb595289ea75bb17ecab4c8d5881aa65"
         },
         {
           "calculation_strategy": "fixed",
@@ -7997,7 +7997,7 @@
           "device_type": "smart_switch",
           "measure_device": "TP-Link Tapo P115 / TP-Link Tapo P110",
           "measure_method": "manual",
-          "name": "Zigbee Outdoor Smart Plug",
+          "name": "Outdoor Smart Plug",
           "only_self_usage": false,
           "standby_power": 0.3,
           "standby_power_on": 0.8,
@@ -8010,10 +8010,10 @@
           ],
           "id": "OSP 210",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 0.8,
           "sub_profile_count": 0,
-          "hash": "58f6c269d8be9af4baff4a7105100366"
+          "hash": "c8a3db2f4f660c965603046f97f87ab1"
         },
         {
           "calculation_strategy": "lut",
@@ -8088,7 +8088,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.3.1:docker"
           },
-          "name": "RGBW Bulb Colour E27",
+          "name": "Smart Bulb Colour E27",
           "standby_power": 0.4,
           "authors": [
             {
@@ -8098,7 +8098,7 @@
           ],
           "id": "RB 185 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 12.78,
           "sub_profile_count": 0,
           "color_modes": [
@@ -8109,7 +8109,7 @@
             "score": 80.5,
             "color_temp": 80.5
           },
-          "hash": "27eae9550478915bab8d8b36ede8b427"
+          "hash": "c3ef0c9348ed54be4ceb91d0fb9f89d4"
         },
         {
           "calculation_strategy": "lut",
@@ -8332,7 +8332,7 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.4.1:app"
           },
-          "name": "RGBW Bulb Colour E27 880lm",
+          "name": "Smart Bulb Colour E27 800lm",
           "standby_power": 0.34,
           "voltage_range": {
             "max": 245.17,
@@ -8340,7 +8340,7 @@
           },
           "id": "RB 282 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T14:26:21",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 9.11,
           "sub_profile_count": 0,
           "color_modes": [
@@ -8352,7 +8352,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "e6333037bf198e8a87d0068673358797"
+          "hash": "f4b751825180ba74e24db5b517ad4bef"
         },
         {
           "calculation_strategy": "lut",
@@ -8434,7 +8434,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.3.13:docker"
           },
-          "name": "Round Ceiling Light (Tunable White)",
+          "name": "Round Ceiling Light",
           "standby_power": 0.4,
           "authors": [
             {
@@ -8445,7 +8445,7 @@
           ],
           "id": "RCL 110",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 20.61,
           "sub_profile_count": 0,
           "color_modes": [
@@ -8455,7 +8455,7 @@
             "score": 98.3,
             "brightness": 98.3
           },
-          "hash": "0ce1b4b4619682f7e7fbce46d463eed5"
+          "hash": "1822aafa97b81a7f6bc6887671c4a719"
         },
         {
           "calculation_strategy": "lut",
@@ -8730,7 +8730,7 @@
           "device_type": "smart_switch",
           "measure_device": "Shelly Plug S",
           "measure_method": "manual",
-          "name": "Zigbee Smart Plug",
+          "name": "Smart Plug",
           "only_self_usage": true,
           "standby_power": 0.41,
           "standby_power_on": 0.61,
@@ -8742,10 +8742,10 @@
           ],
           "id": "SP 120",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 0.61,
           "sub_profile_count": 0,
-          "hash": "f529b78ed34003cdd961808960baf553"
+          "hash": "e64a352aca61450d7b5ca5182808f513"
         },
         {
           "aliases": [
@@ -8756,7 +8756,7 @@
           "device_type": "smart_switch",
           "measure_device": "Shelly Plus Plug S / AVM FRITZ!DECT 200",
           "measure_method": "manual",
-          "name": "Zigbee Smart Plug",
+          "name": "Smart Plug",
           "only_self_usage": false,
           "standby_power": 0.5,
           "standby_power_on": 1.25,
@@ -8768,10 +8768,10 @@
           ],
           "id": "SP 220",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 1.25,
           "sub_profile_count": 0,
-          "hash": "9b364f484b508161c7ad18eb62e4a38a"
+          "hash": "f91a9fed8bf21261a969dd036e25a536"
         },
         {
           "calculation_strategy": "fixed",
@@ -8779,7 +8779,7 @@
           "device_type": "smart_switch",
           "measure_device": "TP-Link Kasa KP115",
           "measure_method": "manual",
-          "name": "Zigbee Smart Plug",
+          "name": "Smart Plug",
           "only_self_usage": false,
           "standby_power": 0.18,
           "standby_power_on": 0.83,
@@ -8792,10 +8792,10 @@
           ],
           "id": "SP 224",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 0.83,
           "sub_profile_count": 0,
-          "hash": "fe9454f7a79df0cc20473a0bb3c51757"
+          "hash": "01b9462f3d028925267e7c5664f5bf7d"
         },
         {
           "calculation_strategy": "fixed",
@@ -8803,7 +8803,7 @@
           "device_type": "smart_switch",
           "measure_device": "Brennenstuhl PM 231 E",
           "measure_method": "manual",
-          "name": "Zigbee Smart Plug",
+          "name": "Smart Plug",
           "only_self_usage": true,
           "standby_power": 0.2,
           "standby_power_on": 0.75,
@@ -8816,10 +8816,10 @@
           ],
           "id": "SP 240",
           "manufacturer": "innr",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:54:58",
           "max_power": 0.75,
           "sub_profile_count": 0,
-          "hash": "437ee4e886f5b74ce5af016f381d2604"
+          "hash": "8085f367de83198120dcf59964216f98"
         }
       ],
       "device_types": [
